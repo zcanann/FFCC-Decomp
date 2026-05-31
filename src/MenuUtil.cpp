@@ -874,10 +874,11 @@ void CMenuPcs::CalcOptionMenu()
 		}
 	}
 
-	if (m_optionAnimPhase == 0) {
-		return;
-	}
-	if (m_optionAnimPhase == 1) {
+	if (m_optionAnimPhase != 0) {
+		if (m_optionAnimPhase == 1) {
+			return;
+		}
+	} else {
 		return;
 	}
 

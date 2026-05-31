@@ -410,10 +410,6 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 	CFont* font = GetBonusMenuMembers(menu).m_font;
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (font == 0 || activePartyCount <= 0) {
-		return;
-	}
-
 	menu->DrawInit();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);

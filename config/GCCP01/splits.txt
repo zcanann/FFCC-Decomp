@@ -1450,6 +1450,7 @@ charaobj.cpp:
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
 	.data       start:0x802112E8 end:0x80211498
+	.sdata      start:0x8032E948 end:0x8032E970
 	.sbss       start:0x8032EE68 end:0x8032EE70
 	.sdata2     start:0x80331968 end:0x803319C8
 
@@ -1459,6 +1460,7 @@ monobj.cpp:
 	.text       start:0x80112D54 end:0x8011A574
 	.data       start:0x80211498 end:0x802116A4
 	.bss        start:0x80300140 end:0x803001D8
+	.sdata      start:0x8032E970 end:0x8032E9A0
 	.sdata2     start:0x803319C8 end:0x80331A58
 
 partyobj.cpp:
@@ -1467,6 +1469,7 @@ partyobj.cpp:
 	.text       start:0x8011A574 end:0x80124998
 	.data       start:0x802116A4 end:0x80211848
 	.bss        start:0x803001D8 end:0x80300268
+	.sdata      start:0x8032E9A0 end:0x8032E9D0
 	.sdata2     start:0x80331A58 end:0x80331B18
 
 p_mc.cpp:
@@ -1475,6 +1478,7 @@ p_mc.cpp:
 	.text       start:0x80124998 end:0x80124B78
 	.ctors      start:0x801D5438 end:0x801D543C
 	.data       start:0x80211D88 end:0x80211F4C
+	.sdata      start:0x8032E9D0 end:0x8032E9E8
 	.sbss       start:0x8032EE88 end:0x8032EE8D
 	.sdata2     start:0x80331B18 end:0x80331B20
 
@@ -1483,6 +1487,7 @@ itemobj.cpp:
 	extabindex  start:0x800105DC end:0x8001069C
 	.text       start:0x80124B78 end:0x80127008
 	.data       start:0x80211F50 end:0x8021202C
+	.sdata      start:0x8032E9E8 end:0x8032EA10
 	.sbss       start:0x8032EE90 end:0x8032EE94
 	.sdata2     start:0x80331B20 end:0x80331BD0
 

@@ -3215,36 +3215,34 @@ void CMenuPcs::createBonus()
 			short itemId = rewardItems[artifactIndex];
 			if (itemId <= 0) {
 				displaySlots[handleIndex] = 0;
-				handleIndex++;
-				continue;
-			}
+			} else {
+				CCharaPcs::CHandle* itemHandle =
+				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
+				displaySlots[handleIndex] = itemHandle;
+				itemHandle->Add();
+				unsigned short itemModelCode =
+				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
+				unsigned short modelNo = itemModelCode & 0x0FFF;
+				itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
+				itemHandle->m_flags = 0x300543;
 
-			CCharaPcs::CHandle* itemHandle =
-			    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
-			displaySlots[handleIndex] = itemHandle;
-			itemHandle->Add();
-			unsigned short itemModelCode =
-			    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
-			unsigned short modelNo = itemModelCode & 0x0FFF;
-			itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
-			itemHandle->m_flags = 0x300543;
-
-			if (modelNo == 0x79) {
-				itemId = rewardItems[artifactIndex];
-				int effectNo = -1;
-				if (itemId == 0xDF) {
-					effectNo = 0x75;
-				} else if (itemId == 0xE0) {
-					effectNo = 0x76;
-				} else if (itemId == 0xE1) {
-					effectNo = 0x77;
-				} else if (itemId == 0xE2) {
-					effectNo = 0x78;
-				} else if (itemId == 0xE3) {
-					effectNo = 0x79;
-				}
-				if (effectNo >= 0) {
-					BindEffect(handleIndex, effectNo, -1);
+				if (modelNo == 0x79) {
+					itemId = rewardItems[artifactIndex];
+					int effectNo = -1;
+					if (itemId == 0xDF) {
+						effectNo = 0x75;
+					} else if (itemId == 0xE0) {
+						effectNo = 0x76;
+					} else if (itemId == 0xE1) {
+						effectNo = 0x77;
+					} else if (itemId == 0xE2) {
+						effectNo = 0x78;
+					} else if (itemId == 0xE3) {
+						effectNo = 0x79;
+					}
+					if (effectNo >= 0) {
+						BindEffect(handleIndex, effectNo, -1);
+					}
 				}
 			}
 

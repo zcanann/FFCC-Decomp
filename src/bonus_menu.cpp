@@ -2637,11 +2637,18 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int idx = modelBase + i;
-			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, 0x28 + i * 4, 0x18);
-			sprites[idx].depth = 0.0f;
-			sprites[idx].alpha = 0.0f;
-			sprites[idx].scale = 1.0f;
+			BonusAnimSprite* sprite = &sprites[modelBase + i];
+			BonusAnimSprite* icon = &sprites[iconBase + i];
+			sprite->kind = -2;
+			sprite->x = 0;
+			sprite->y = 0;
+			sprite->w = 0;
+			sprite->h = 0;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->startFrame = icon->startFrame + icon->duration;
+			sprite->duration = 8;
+			sprite->depth = 1.0f;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {

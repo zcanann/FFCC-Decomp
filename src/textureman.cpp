@@ -31,17 +31,6 @@ extern const char s_CRef_8032FAE8[];
 extern const float FLOAT_8032faf0;
 extern const float FLOAT_8032faf4;
 
-namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
-static inline unsigned short& U16At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8003B988
@@ -61,6 +50,17 @@ CTexture::CTexture()
     m_name[0] = 0;
     m_cacheId = -1;
     m_usesExternalAddress = 0;
+}
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+static inline unsigned short& U16At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
 }
 
 static inline CTexture* AllocTexture()

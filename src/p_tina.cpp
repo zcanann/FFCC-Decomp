@@ -513,16 +513,6 @@ unsigned char pppAmemRefCntError(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::create0()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005357c
  * PAL Size: 328b
  * EN Address: TODO
@@ -683,26 +673,6 @@ void CPartPcs::destroy()
     if (usb->m_stageExtra != 0) {
         Memory.DestroyStage(usb->m_stageExtra);
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::ChangeDataStage(CMemory::CStage*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::ResetDataStage()
-{
-	// TODO
 }
 
 /*
@@ -1220,32 +1190,6 @@ unsigned int CPartPcs::IsLoadPartCompleted()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::CalcTick()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::DrawInit()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800524d0
  * PAL Size: 400b
  * EN Address: TODO
@@ -1330,16 +1274,6 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
     }
 
     LoadFieldPdt0(mapId, floorId);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void loadPdtPtx(char*, void*, int, void*, int, int)
-{
-	// TODO
 }
 
 /*
@@ -1530,26 +1464,4 @@ void CPartPcs::EndMiruraEvent()
 {
     PartMng.pppReleasePdt(7);
     m_usbStreamData.m_miruraEventActive = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::SetUSBData()
-{
-    int packetCode;
-
-    if (m_usbStreamData.IsUSBStreamDataDone()) {
-        packetCode = m_usbStreamData.m_packetCode;
-        if (packetCode != 0) {
-            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
-        }
-        m_usbStreamData.SetUSBStreamDataDone();
-    }
 }

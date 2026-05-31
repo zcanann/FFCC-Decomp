@@ -312,11 +312,13 @@ void CMaterialEditorPcs::SetUSBData()
         RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
-        u8* dst = static_cast<u8*>(rsdItem->ptr18) + 0x1A;
+        u32 dstOffset = 0;
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            *dst = *dstBuffer;
-            dst += 0x70;
+            u8 value = *dstBuffer;
+            u32 writeOffset = dstOffset + 0x1A;
+            dstOffset += 0x70;
             dstBuffer++;
+            static_cast<u8*>(rsdItem->ptr18)[writeOffset] = value;
         }
 
         if (src != 0) {

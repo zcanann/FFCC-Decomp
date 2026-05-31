@@ -9,7 +9,6 @@ struct Vec;
 struct pppIVECTOR3;
 struct pppFVECTOR4;
 
-void loadPdtPtx(char*, void*, int, void*, int, int);
 void LoadFieldPdt0(int, int);
 unsigned char pppNotAllocAmemCacheRmem(unsigned long);
 unsigned int pppFreeMngStPrioForData();
@@ -51,23 +50,17 @@ public:
     void onScriptChanging(char*);
     int GetTable(unsigned long);
 
-    void create0();
     void create();
     void createLoad();
     void createViewer();
     void destroy();
 
-    void ChangeDataStage(CMemory::CStage*);
-    void ResetDataStage();
-
     void calcInit();
     void calc();
     void calcViewer();
     void calcDead();
-    void CalcTick();
 
     void ClearOt();
-    void DrawInit();
 
     void drawShadow();
     void drawCharaBefore();
@@ -101,7 +94,6 @@ public:
     void EndMiruraEvent();
 
     void pppSetDebugHide(unsigned char);
-    void SetUSBData();
 };
 
 extern CPartPcs PartPcs;

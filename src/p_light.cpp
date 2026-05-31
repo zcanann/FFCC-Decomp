@@ -31,18 +31,18 @@ extern float FLOAT_8032fc3c;
 extern float FLOAT_8032fc40;
 extern float FLOAT_8032fc44;
 extern float FLOAT_8032fc60;
-extern float FLOAT_8032fc70;
-extern float FLOAT_8032fc74;
-extern float FLOAT_8032fc78;
-extern const float FLOAT_8032fc7c;
-extern float FLOAT_8032fc80;
-extern float FLOAT_8032fc84;
+extern const float FLOAT_8032fc70 = 100000.0f;
+extern const float FLOAT_8032fc74 = 360.0f;
+extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
+extern const float FLOAT_8032fc7c = 255.0f;
+extern const float FLOAT_8032fc80 = 999999986991104.0f;
+extern const float FLOAT_8032fc84 = 0.125f;
 extern const float FLOAT_8032fc90;
 extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 float FLOAT_8032ed10;
-extern double DOUBLE_8032fc68;
+extern const double DOUBLE_8032fc68 = 4503599627370496.0;
 extern _GXColor s_mapLightAlphaColor;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }

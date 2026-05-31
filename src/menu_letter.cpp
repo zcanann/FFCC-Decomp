@@ -95,6 +95,9 @@ struct FlatDataView {
 	unsigned char _pad[0x68 - 4];
 	int m_tableCount;
 	FlatDataTableView m_tabl[8];
+	int m_mesCount;
+	char* m_mesBuffer;
+	char* m_mesPtr[1122];
 };
 
 struct LetterAnimStorage {
@@ -372,8 +375,8 @@ void CMenuPcs::LetterInit3()
 	memset(workText, 0, kLetterTextScratchSize);
 
 	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
-	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
+	strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
 	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 	s_ReplyMax = 0;
@@ -1402,8 +1405,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
 			caravanWork + s_SelLetter * 0xC + 0x3EC);
-		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
-		strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
+		strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
 		CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 		s_ReplyMax = 0;
@@ -1907,8 +1910,8 @@ void CMenuPcs::LetterMessDraw()
 	memset(workText, 0, kLetterTextScratchSize);
 
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
-	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
+	strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
 	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 	char* curLine = workText;
@@ -2188,8 +2191,8 @@ int CMenuPcs::LetterCtrlCur()
 				memset(workText, 0, kLetterTextScratchSize);
 
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
-				strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+				FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
+				strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x11]);
 				CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 				char* line = workText;

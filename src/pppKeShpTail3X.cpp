@@ -180,8 +180,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float nextBaseX;
     float nextBaseY;
     float nextBaseZ;
-    u32 currentIndex;
-    u32 nextIndex;
+    s32 currentIndex;
+    s32 nextIndex;
     u8 zEnable;
     const float zero = kPppKeShpTail3XZero;
     s32 dataValIndex;

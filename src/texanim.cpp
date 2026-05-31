@@ -584,24 +584,28 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             chunkFile.PushChunk();
             char* seqName = seq->m_name;
             while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {
-                if (innerChunk.m_id == 'KEY ') {
+                if (innerChunk.m_id != 'KEY ') {
+                    if (innerChunk.m_id != 'INFO') {
+                        if (innerChunk.m_id == 'NAME') {
+                            strcpy(seqName, chunkFile.GetString());
+                            continue;
+                        }
+                    } else {
+                        seq->m_totalFrames = chunkFile.Get4();
+                        chunkFile.Get4();
+                        char b7 = (char)chunkFile.Get4();
+                        seq->m_flags = (unsigned char)(((int)b7 << 7) | (seq->m_flags & 0x7F));
+                        char b6 = (char)chunkFile.Get4();
+                        seq->m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->m_flags & 0xBF));
+                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
+                        seq->m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->m_flags & 0xDF));
+                        continue;
+                    }
+                } else {
                     seq->m_keyCount = innerChunk.m_size / 0x30;
                     seq->m_keys = reinterpret_cast<unsigned int*>(
                         Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
                     memcpy(seq->m_keys, chunkFile.GetAddress(), innerChunk.m_size);
-                    continue;
-                } else if (innerChunk.m_id == 'INFO') {
-                    seq->m_totalFrames = chunkFile.Get4();
-                    chunkFile.Get4();
-                    char b7 = (char)chunkFile.Get4();
-                    seq->m_flags = (unsigned char)(((int)b7 << 7) | (seq->m_flags & 0x7F));
-                    char b6 = (char)chunkFile.Get4();
-                    seq->m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->m_flags & 0xBF));
-                    unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
-                    seq->m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->m_flags & 0xDF));
-                    continue;
-                } else if (innerChunk.m_id == 'NAME') {
-                    strcpy(seqName, chunkFile.GetString());
                     continue;
                 }
             }

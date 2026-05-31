@@ -601,9 +601,9 @@ void CGame::clearWork()
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 8; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i + 4][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i][j + 8][1] = 0;
+            m_scriptWork[i + 4][j][1] = 0;
         }
     }
 
@@ -697,9 +697,9 @@ inline void CGame::clearWorkScript()
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 8; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i + 4][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i][j + 8][1] = 0;
+            m_scriptWork[i + 4][j][1] = 0;
         }
     }
 
@@ -860,9 +860,9 @@ void CGame::ScriptChanged(char*, int)
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 8; j++) {
             m_scriptWork[i][j][0] = 0;
-            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i + 4][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
-            m_scriptWork[i][j + 8][1] = 0;
+            m_scriptWork[i + 4][j][1] = 0;
         }
     }
 

@@ -495,7 +495,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				font->SetPosX(static_cast<float>(valueX));
 				font->SetTlut(9);
 
-				if (8 < attr) {
+				if ((attr >= 1) && (attr <= 8)) {
+					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
+				} else {
 					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
 					} else {
@@ -505,8 +507,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
 						font->SetTlut(3);
 					}
-				} else {
-					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
 				}
 
 				font->Draw(scratch);

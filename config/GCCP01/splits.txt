@@ -200,6 +200,7 @@ p_camera.cpp:
 	.rodata     start:0x801D7860 end:0x801D78F4
 	.data       start:0x801E9030 end:0x801E9B24
 	.bss        start:0x80268790 end:0x80268C6C
+	.sdata      start:0x8032E520 end:0x8032E538
 
 textureman.cpp:
 	extab       start:0x80006414 end:0x80006534
@@ -264,6 +265,7 @@ p_system.cpp:
 	.ctors      start:0x801D53F4 end:0x801D53F8
 	.rodata     start:0x801D7C48 end:0x801D7C69
 	.data       start:0x801EA0D0 end:0x801EA294
+	.sdata      start:0x8032E608 end:0x8032E620
 	.sbss       start:0x8032ED08 end:0x8032ED0C
 
 p_light.cpp:
@@ -298,6 +300,7 @@ p_MaterialEditor.cpp:
 	.rodata     start:0x801D7D18 end:0x801D7D78
 	.data       start:0x801EA498 end:0x801EA668
 	.bss        start:0x8026D338 end:0x8026D724
+	.sdata      start:0x8032E648 end:0x8032E660
 	.sbss       start:0x8032ED18 end:0x8032ED28
 	.sdata2     start:0x8032FCA8 end:0x8032FCD0
 
@@ -1497,6 +1500,7 @@ p_minigame.cpp:
 	.rodata     start:0x801DD0D4 end:0x801DD418
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x80300268 end:0x80306708
+	.sdata      start:0x8032EA30 end:0x8032EA48
 	.sbss       start:0x8032EEA0 end:0x8032EEA8
 	.sdata2     start:0x80331BF0 end:0x80331BF8
 
@@ -1521,7 +1525,7 @@ p_dbgmenu.cpp:
 	.rodata     start:0x801DD428 end:0x801DD498
 	.data       start:0x80212398 end:0x802127A0
 	.bss        start:0x80306708 end:0x80309174
-	.sdata      start:0x8032EA48 end:0x8032EA50
+	.sdata      start:0x8032EA48 end:0x8032EA68
 	.sdata2     start:0x80331C18 end:0x80331CC0
 
 pppChangeBGColor.cpp:

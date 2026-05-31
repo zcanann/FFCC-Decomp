@@ -495,7 +495,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "bonus_menu.cpp"),
+            Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "cflat_data.cpp"),
             Object(NonMatching, "cflat_r2class.cpp"),
             Object(

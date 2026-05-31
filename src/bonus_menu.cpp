@@ -25,6 +25,25 @@ extern const double kPppCrystal2RefractionScale;
 extern const float s_BonusModelYPos[];
 extern const float s_BonusModelScale[];
 
+float s_BallTrnsXspl[] = {
+    0.03333299979567528f, 27.700000762939453f, 0.0f, 0.0f,
+    0.23524600267410278f, 12.29898452758789f, -55.570411682128906f, -55.570411682128906f,
+    0.3703629970550537f, 6.334517955780029f, -25.889270782470703f, -25.889270782470703f,
+    1.0f, -14.300000190734863f, 0.0f, 0.0f,
+};
+
+float s_BallTrnsYspl[] = {
+    0.03333299979567528f, 8.5f, 0.0f, 0.0f,
+    0.241907000541687f, -1.2000000476837158f, 0.0f, 0.0f,
+    0.3153750002384186f, 1.6390860080718994f, 0.0f, 0.0f,
+    0.3817799985408783f, -1.2000000476837158f, 0.0f, 0.0f,
+    1.0f, -1.2000000476837158f, 0.0f, 0.0f,
+    1.3333330154418945f, 0.30000001192092896f, 0.0f, 0.0f,
+};
+
+CMenuPcs::FCV s_BallTrnsX = {4, s_BallTrnsXspl};
+CMenuPcs::FCV s_BallTrnsY = {6, s_BallTrnsYspl};
+
 struct BonusPartySummary {
 	int m_partySlot;
 	CCharaPcs::CHandle* m_partyHandle;

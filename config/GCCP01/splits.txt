@@ -1579,6 +1579,8 @@ bonus_menu.cpp:
 	extabindex  start:0x80010C18 end:0x80010CF0
 	.text       start:0x80133108 end:0x8013E294
 	.rodata     start:0x801DD5C0 end:0x801DD5D0
+	.data       start:0x80212820 end:0x802128C0
+	.sdata      start:0x8032EA68 end:0x8032EA78
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
 	.sdata2     start:0x80331D10 end:0x80331D98
 

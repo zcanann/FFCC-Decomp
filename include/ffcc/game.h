@@ -147,7 +147,7 @@ public:
     unsigned int unkCFlatData0[4];          // 0xC5A0
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     unsigned int m_scriptFoodBase[4];       // 0xC5C0
-    unsigned int m_scriptWork[4][16][2];    // 0xC5D0
+    unsigned int m_scriptWork[8][8][2];     // 0xC5D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0
     unsigned int unk_flat3_count_0xc7d4;    // 0xC7D4
     unsigned int unk_flat3_field_1C_0xc7d8; // 0xC7D8

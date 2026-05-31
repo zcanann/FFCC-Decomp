@@ -376,7 +376,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	font->SetMargin(FLOAT_803335a0);
 	font->SetShadow(1);
-	font->SetScale(margin);
+	font->SetScale(scale);
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);

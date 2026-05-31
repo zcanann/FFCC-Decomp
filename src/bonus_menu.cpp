@@ -1169,10 +1169,8 @@ void CMenuPcs::CalcSelectWait()
 				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection & 7];
 				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
 				*(unsigned char*)(statePtr + 8) = 0;
-				if (currentParty != 0) {
-					currentParty->m_selectedItemId = itemId;
-					currentParty->m_selectedSlot = selection & 7;
-				}
+				currentParty->m_selectedItemId = itemId;
+				currentParty->m_selectedSlot = selection & 7;
 				currentPartyIndex = (short)(currentPartyIndex + 1);
 			}
 		} else {

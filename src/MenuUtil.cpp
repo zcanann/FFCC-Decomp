@@ -431,7 +431,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	} else {
 		drawPrefix = 0;
 	}
-	if (drawPrefix != 0) {
+	if (drawPrefix == 1) {
 		lineStep = FLOAT_80333620;
 	}
 

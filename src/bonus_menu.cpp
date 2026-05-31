@@ -367,7 +367,7 @@ static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 
 static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 {
-	if (alpha <= 0.0f) {
+	if (alpha <= 0.0) {
 		return;
 	}
 

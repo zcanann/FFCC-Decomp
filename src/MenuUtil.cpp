@@ -404,7 +404,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	char* temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x8C) char[0x200];
-	if ((temp == nullptr) && (System.m_execParam != 0)) {
+	if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 		System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x8E);
 	}
 	for (int line = firstLine; line < firstLine + 3; line++) {
@@ -613,7 +613,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 
 		temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x23D) char[0x200];
-		if ((temp == nullptr) && (System.m_execParam != 0)) {
+		if ((temp == nullptr) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
 			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
 		}
 		for (int i = 0; i < 3; i++) {

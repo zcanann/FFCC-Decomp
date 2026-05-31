@@ -20,7 +20,11 @@ extern "C" const float kMapHitEdgeMinT;
 extern "C" const float kMapHitVertexOffsetScale;
 extern "C" const float kMapHitRadiusScale;
 extern "C" const double kMapHitRadiusBase;
-extern "C" const char sOldMidFormat[];
+extern "C" const char sOldMidFormat[] = {
+    (char)0x8C, (char)0xC3, (char)0x82, (char)0xA2, (char)0x20, (char)0x4D, (char)0x49, (char)0x44,
+    (char)0x20, (char)0x82, (char)0xCC, (char)0x8C, (char)0x60, (char)0x8E, (char)0xAE, (char)0x82,
+    (char)0xC5, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
+};
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;

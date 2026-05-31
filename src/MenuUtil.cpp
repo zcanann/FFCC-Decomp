@@ -546,7 +546,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		font->SetPosX(static_cast<float>(attrX));
 
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
-		if (((flags & 0x1000) == 0) && (attr != 0) && (attr < 0x14)) {
+		if ((attr != 0) && (attr < 0x14)) {
 			font->SetTlut(4);
 			strcpy(scratch, GetAttrStr(attr));
 			font->Draw(scratch);

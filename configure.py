@@ -507,7 +507,7 @@ config.libs = [
             Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "chara_anim.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on"]),
             Object(NonMatching, "chara_fur.cpp"),
-            Object(NonMatching, "chara.cpp"),
+            Object(NonMatching, "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "chunkfile.cpp"),
             Object(NonMatching, "cmake.cpp"),

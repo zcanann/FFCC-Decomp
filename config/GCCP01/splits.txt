@@ -816,6 +816,7 @@ chara.cpp:
 	.text       start:0x8006EB04 end:0x80073AF4
 	.ctors      start:0x801D5410 end:0x801D5414
 	.data       start:0x801FCCD0 end:0x801FCD38
+	.sdata      start:0x8032E6D8 end:0x8032E708
 	.sbss       start:0x8032EDA0 end:0x8032EDA8
 
 p_chara.cpp:

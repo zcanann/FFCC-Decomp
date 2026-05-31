@@ -74,7 +74,8 @@ static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnk
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	VYmDeformationShp* work = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
+	_pppPObject* object = (_pppPObject*)pppYmDeformationShp_;
+	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	Vec2d uvs[4];
 	float indMtx[2][3];
@@ -84,7 +85,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
-			PppWorkArea<YmDeformationShpColorInfo>(pppYmDeformationShp_, param_3, 1);
+			(YmDeformationShpColorInfo*)(object->m_workArea + param_3->m_serializedDataOffsets[1]);
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
 		int textureBase =
 			reinterpret_cast<int>(env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex));

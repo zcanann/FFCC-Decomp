@@ -514,7 +514,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
 					} else {
-						if (((attr - 9) > 1) && (attr != 0xC)) {
+						if ((static_cast<unsigned short>(attr - 9) > 1) && (attr != 0xC)) {
 							return;
 						}
 						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));

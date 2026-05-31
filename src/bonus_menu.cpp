@@ -2842,8 +2842,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			scaleMtx[2][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 		} else {
-			scaleMtx[0][3] = 0.0f;
-			scaleMtx[1][3] = 0.0f;
+			BonusAnimSprite* sprite = &sprites[modelBase + i];
+			int itemIndex = i - activePartyCount;
+			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+			scaleMtx[1][3] = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
+			if (itemIndex >= 1 && itemIndex <= 2) {
+				scaleMtx[1][3] -= 0.5f;
+			}
 			scaleMtx[2][3] = 0.0f;
 		}
 

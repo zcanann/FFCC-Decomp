@@ -3131,7 +3131,7 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		for (int i = 0; i < activeCount; i++) {
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			CCaravanWork* caravanWork =
 			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot]);
 
@@ -3158,9 +3158,9 @@ void CMenuPcs::createBonus()
 		order[1] = 1;
 		order[2] = 2;
 		order[3] = 3;
-		for (int i = 0; i < activeCount; i++) {
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
-			for (int j = i + 1; j < activeCount; j++) {
+			for (int j = i + 1; j < s_Rinfo->m_partyCount; j++) {
 				BonusPartySummary& a = s_Rinfo->m_party[leftIndex];
 				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
 				int aTotal = a.m_totalValue;
@@ -3183,7 +3183,7 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		for (int i = 0; i < activeCount; i++) {
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			BonusPartySummary& ranked = s_Rinfo->m_party[order[i]];
 			ranked.m_rank = i;
 			if (i == 0) {
@@ -3196,10 +3196,10 @@ void CMenuPcs::createBonus()
 			displaySlots[i] = 0;
 		}
 
-		for (int i = 0; i < activeCount * 2; i++) {
-			BonusPartySummary& entry = s_Rinfo->m_party[i % activeCount];
+		for (int i = 0; i < s_Rinfo->m_partyCount * 2; i++) {
+			BonusPartySummary& entry = s_Rinfo->m_party[i % s_Rinfo->m_partyCount];
 			unsigned long modelCode = entry.m_partySlot + 0x83;
-			if (i < activeCount) {
+			if (i < s_Rinfo->m_partyCount) {
 				modelCode = entry.m_partySlot + 0x87;
 			}
 			CCharaPcs::CHandle* handle =
@@ -3210,7 +3210,7 @@ void CMenuPcs::createBonus()
 			handle->m_flags = 0x300543;
 		}
 
-		int handleIndex = activeCount * 2;
+		int handleIndex = s_Rinfo->m_partyCount * 2;
 		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
 			short itemId = rewardItems[artifactIndex];

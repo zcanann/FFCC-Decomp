@@ -31,6 +31,9 @@ extern const float FLOAT_80332064;
 extern const double DOUBLE_80332068;
 extern const double DOUBLE_80332070;
 extern const float FLOAT_80332078;
+extern const int kCharaBreakInitialVertexFlag0;
+extern const int kCharaBreakInitialVertexFlag1;
+extern const int kCharaBreakInitialVertexFlag2;
 
 static inline Mtx& CameraMatrix()
 {
@@ -534,7 +537,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                 S16Vec transformed[3];
 
                 if (polygon->m_enabled == 0) {
-                    int flags[3] = { 0, 0, 0 };
+                    int flags[3];
+                    flags[0] = kCharaBreakInitialVertexFlag0;
+                    flags[1] = kCharaBreakInitialVertexFlag1;
+                    flags[2] = kCharaBreakInitialVertexFlag2;
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];

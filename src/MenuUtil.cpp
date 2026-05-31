@@ -447,7 +447,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	if (rangeKind != 0) {
-		int baseY = lineBaseY[drawPrefix + 2];
+		int baseIndex = drawPrefix + 2;
+		int baseY = lineBaseY[baseIndex];
 		int y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(FLOAT_8033357c);

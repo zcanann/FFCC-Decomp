@@ -5,10 +5,10 @@
 #include "dolphin/axfx/__axfx.h"
 
 extern f32 powf(f32 x, f32 y);
+extern const f32 FLOAT_803337C0;
 extern const f32 axfx_reverb_std_handle_f32_0p3;
 extern const f32 axfx_reverb_std_handle_f32_0p6;
 extern const double axfx_reverb_std_handle_i2f_magic;
-extern const f32 FLOAT_803337C0;
 
 s32 sReverbStdDelayLengths[4] = {1789, 1999, 433, 149};
 
@@ -493,3 +493,8 @@ void AXFXReverbStdCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBSTD* reve
         ReverbSTDCallback(bufferUpdate->left, bufferUpdate->right, bufferUpdate->surround, &reverb->rv);
     }
 }
+
+const f32 FLOAT_803337C0 = 100.0f;
+const f32 axfx_reverb_std_handle_f32_0p3 = 0.3f;
+const f32 axfx_reverb_std_handle_f32_0p6 = 0.6f;
+const double axfx_reverb_std_handle_i2f_magic = 4503601774854144.0;

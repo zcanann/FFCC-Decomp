@@ -1132,8 +1132,8 @@ void CMenuPcs::DrawOptionMenu()
 		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
 		uv1.y = kOptionAnimMax;
 		gUtil.RenderTextureQuad(FLOAT_8033357c, static_cast<float>(rowY),
-		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, row, &uv0, &uv1, &color,
-		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, GetMenuTexture(this, 0xC0), &uv0,
+		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (i == m_optionIndex) {
 			DrawFont(0x5E, static_cast<int>(FLOAT_80333580 + static_cast<float>(selectedY)), color, 0x16,

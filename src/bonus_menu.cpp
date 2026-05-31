@@ -3093,6 +3093,8 @@ void CMenuPcs::createBonus()
 				}
 			}
 			entry.m_totalValue = totalValueClamped;
+			totalValue += entry.m_totalValue;
+			activeCount++;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 
 			if (caravanWork->m_treasures[0] > 0) {
@@ -3107,9 +3109,6 @@ void CMenuPcs::createBonus()
 			if (caravanWork->m_treasures[3] > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[3];
 			}
-
-			totalValue += entry.m_totalValue;
-			activeCount++;
 		}
 
 		s_Rinfo->m_partyCount = activeCount;

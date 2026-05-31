@@ -427,9 +427,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
 			}
 		}
-		lineStep = FLOAT_80333620;
 	} else {
 		drawPrefix = 0;
+	}
+	if (drawPrefix != 0) {
+		lineStep = FLOAT_80333620;
 	}
 
 	int rangeKind = 0;

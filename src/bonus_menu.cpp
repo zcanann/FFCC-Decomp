@@ -2153,7 +2153,6 @@ void CMenuPcs::DrawResultCountAnim()
 				} else if (modelIndex < activePartyCount * 2) {
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				} else {
-					lastKind = kind;
 					continue;
 				}
 

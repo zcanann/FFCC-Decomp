@@ -31,6 +31,27 @@ extern const char s_CRef_8032FAE8[];
 extern const float FLOAT_8032faf0;
 extern const float FLOAT_8032faf4;
 
+/*
+ * --INFO--
+ * PAL Address: 0x8003B988
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexture::CTexture()
+{
+    m_maxLod = 0;
+    m_imageData = 0;
+    m_tlutData = 0;
+    m_isIntensityAlpha = 0;
+    m_isAlphaLut = 0;
+    m_name[0] = 0;
+    m_cacheId = -1;
+    m_usesExternalAddress = 0;
+}
+
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {

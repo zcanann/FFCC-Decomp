@@ -244,6 +244,7 @@ p_graphic.cpp:
 	.ctors      start:0x801D53EC end:0x801D53F0
 	.data       start:0x801E9C90 end:0x801E9EC0
 	.bss        start:0x80268E90 end:0x80268F84
+	.sdata      start:0x8032E5D8 end:0x8032E5F0
 	.sdata2     start:0x8032FBFC end:0x8032FC64
 
 p_game.cpp:

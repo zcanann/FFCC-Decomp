@@ -3153,7 +3153,11 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		int order[4] = {0, 1, 2, 3};
+		int order[4];
+		order[0] = 0;
+		order[1] = 1;
+		order[2] = 2;
+		order[3] = 3;
 		for (int i = 0; i < activeCount; i++) {
 			for (int j = i + 1; j < activeCount; j++) {
 				BonusPartySummary& a = s_Rinfo->m_party[order[i]];

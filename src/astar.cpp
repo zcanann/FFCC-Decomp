@@ -1117,6 +1117,67 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CAStar::addAstar(Vec& pos, int groupA, int groupB)
+{
+	int groupLow = groupA;
+	int groupHigh = groupB;
+
+	if (groupB < groupA)
+	{
+		groupLow = groupB;
+		groupHigh = groupA;
+	}
+
+	int index = 0;
+
+	for (; index < 64; ++index)
+	{
+		CAPos& p = m_portals[index];
+
+		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
+		{
+			break;
+		}
+	}
+
+	if (index == 64)
+	{
+		index = 0;
+
+		for (; index < 64; ++index)
+		{
+			bool used = false;
+
+			if (m_portals[index].m_groupA != 0 && m_portals[index].m_groupB != 0)
+			{
+				used = true;
+			}
+
+			if (!used)
+			{
+				m_portalCount++;
+				break;
+			}
+		}
+	}
+
+	CAPos& portal = m_portals[index];
+
+	portal.m_position.x = pos.x;
+	portal.m_position.y = pos.y;
+	portal.m_position.z = pos.z;
+	m_portals[index].m_groupA = static_cast<unsigned char>(groupLow);
+	m_portals[index].m_groupB = static_cast<unsigned char>(groupHigh);
+}
+/*
+ * --INFO--
  * PAL Address: 0x80142ce8
  * PAL Size: 668b
  * EN Address: TODO

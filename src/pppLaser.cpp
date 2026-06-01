@@ -373,7 +373,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     int colorOffset = serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
     s32 dataValIndex = step->m_dataValIndex;
-    u32 count;
+    s32 count;
     s32 i;
     s32 alphaStep;
     char alphaMax;

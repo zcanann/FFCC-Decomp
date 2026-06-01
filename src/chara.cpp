@@ -57,6 +57,15 @@ STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workNormals) == 0x10);
 typedef CCharaModelData CCharaModelRefRaw;
 
 STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x0C);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x10);
+STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
+STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
+STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
+STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x44);
+STATIC_ASSERT(offsetof(CChara::CNode, m_previousQuat) == 0x74);
+STATIC_ASSERT(offsetof(CChara::CNode, m_dynPosition) == 0xA4);
+STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 
 typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
 typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
@@ -318,47 +327,47 @@ static inline u32 CharaFourCC(char a, char b, char c, char d)
 
 static inline char* NodeRefName(CChara::CNode* node)
 {
-	return reinterpret_cast<char*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x74);
+	return reinterpret_cast<char*>(reinterpret_cast<u8*>(node->m_refData) + 0x74);
 }
 
 static inline char* NodeRefAltName(CChara::CNode* node)
 {
-	return reinterpret_cast<char*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x84);
+	return reinterpret_cast<char*>(reinterpret_cast<u8*>(node->m_refData) + 0x84);
 }
 
 static inline u8& NodeDynParamIndex(CChara::CNode* node)
 {
-	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x64);
+	return *(reinterpret_cast<u8*>(node->m_refData) + 0x64);
 }
 
 static inline u16 NodeRefIndex(CChara::CNode* node)
 {
-	return *reinterpret_cast<u16*>(*reinterpret_cast<void**>(node));
+	return *reinterpret_cast<u16*>(node->m_refData);
 }
 
 static inline s16 NodeParentIndex(CChara::CNode* node)
 {
-	return *reinterpret_cast<s16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x68);
+	return *reinterpret_cast<s16*>(reinterpret_cast<u8*>(node->m_refData) + 0x68);
 }
 
 static inline u8 NodeChildCount(CChara::CNode* node)
 {
-	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6A);
+	return *(reinterpret_cast<u8*>(node->m_refData) + 0x6A);
 }
 
 static inline u16 NodeChildBankOffset(CChara::CNode* node)
 {
-	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6C);
+	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(node->m_refData) + 0x6C);
 }
 
 static inline u8 NodeUsesParentLenX(CChara::CNode* node)
 {
-	return *(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x6E);
+	return *(reinterpret_cast<u8*>(node->m_refData) + 0x6E);
 }
 
 static inline float NodeBoneLen(CChara::CNode* node)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x70);
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(node->m_refData) + 0x70);
 }
 
 static inline MtxPtr NodeWorldMtx(CChara::CNode* node)
@@ -383,7 +392,7 @@ static inline Vec& NodeDynVelocity(CChara::CNode* node)
 
 static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)
 {
-	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(node)) + 0x0C);
+	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(node->m_refData) + 0x0C);
 }
 
 static inline float ModelBaseScale(CChara::CModel* model)
@@ -418,32 +427,32 @@ static inline float TexAnimSetChin(CTexAnimSet* texAnimSet)
 
 static inline Quaternion& NodePreviousQuat(CChara::CNode* node)
 {
-	return *reinterpret_cast<Quaternion*>(reinterpret_cast<u8*>(node) + 0x74);
+	return node->m_previousQuat;
 }
 
 static inline Vec& NodePreviousPosition(CChara::CNode* node)
 {
-	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0x84);
+	return node->m_previousPosition;
 }
 
 static inline Vec& NodePreviousScale(CChara::CNode* node)
 {
-	return *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(node) + 0x90);
+	return node->m_previousScale;
 }
 
 static inline CChara::CAnimNode*& NodeAnimNode0(CChara::CNode* node)
 {
-	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(node) + 0x9C);
+	return node->m_animNode0;
 }
 
 static inline CChara::CAnimNode*& NodeAnimNode1(CChara::CNode* node)
 {
-	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(node) + 0xA0);
+	return node->m_animNode1;
 }
 
 static inline u8& NodeRuntimeFlags(CChara::CNode* node)
 {
-	return *(reinterpret_cast<u8*>(node) + 0xBC);
+	return node->m_flags;
 }
 
 static inline u8 AnimFlags(CChara::CAnim* anim)
@@ -517,7 +526,7 @@ static inline void RetainRefCounted(void* refObject)
 
 static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 {
-	*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
+	dst->m_refData = src->m_refData;
 	PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
 	          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
 	PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
@@ -531,14 +540,14 @@ static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 
 static void CalcOneBindNode(CChara::CNode* node, CChara::CModel* model)
 {
-	void* ref = *reinterpret_cast<void**>(node);
+	void* ref = node->m_refData;
 	s16 parent = NodeParentIndex(node);
 	if (parent < 0) {
 		PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0xC),
 		          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0x3C));
 	} else {
 		CChara::CNode* parentNode = ModelNodes(model) + parent;
-		PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(parentNode)) + 0x3C),
+		PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(parentNode->m_refData) + 0x3C),
 		            reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0xC),
 		            reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(ref) + 0x3C));
 	}
@@ -955,7 +964,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				if (nodeCapacity != 0) {
 					CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
 					CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
-					*(void**)((u8*)ref + 0x0C) = nodeRefs;
+					ref->m_nodeRefData = nodeRefs;
 					m_nodes = nodes;
 				}
 
@@ -978,7 +987,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				if (meshCapacity != 0) {
 					CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
 					CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
-					*(void**)((u8*)ref + 0x10) = meshRefs;
+					ref->m_meshRefData = meshRefs;
 					m_meshes = meshes;
 				}
 
@@ -1136,9 +1145,9 @@ void CChara::CModel::setup()
 	u32 meshCount = ModelMeshCount(this);
 	for (u32 i = 0; i < nodeCount; i++) {
 		PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
-		s8 disp = *(s8*)((u8*)*(void**)node + 4);
+		s8 disp = *(s8*)((u8*)node->m_refData + 4);
 		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
-			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * sizeof(CMesh));
+			node->m_displayMesh = mesh + disp;
 		}
 		node = (CNode*)((u8*)node + 0xC0);
 	}
@@ -1152,10 +1161,10 @@ void CChara::CModel::setup()
 		for (u32 j = 0; j < meshData->m_skinCount; j++) {
 			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
 			MtxPtr skinInvBind = reinterpret_cast<MtxPtr>(skin + 0x30);
-			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[skinNodeIndex])) + 0x3C),
+			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(ModelNodes(this)[skinNodeIndex].m_refData) + 0x3C),
 			             skinInvBind);
 			PSMTXConcat(skinInvBind,
-			            reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(*reinterpret_cast<void**>(&ModelNodes(this)[meshData->m_nodeIndex])) + 0x3C),
+			            reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(ModelNodes(this)[meshData->m_nodeIndex].m_refData) + 0x3C),
 			            skinInvBind);
 			skin += 0x64;
 		}
@@ -1192,7 +1201,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	for (u32 i = 0; i < nodeCount; i++) {
 		CChara::CNode* dst = &cloneNodes[i];
 		CChara::CNode* src = &ModelNodes(this)[i];
-		*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
+		dst->m_refData = src->m_refData;
 		PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
 		          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
 		PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
@@ -1274,7 +1283,7 @@ void CChara::CModel::calcBindMatrix()
 	u32 i = 0;
 
 	while (i < ModelNodeCount(this)) {
-		if (*(s16*)((u8*)*(void**)node + 0x68) < 0) {
+		if (NodeParentIndex(node) < 0) {
 			node->CalcBind(this);
 		}
 		i++;
@@ -1927,7 +1936,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(nodes + mesh->m_data->m_nodeIndex) + 0x44), meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
@@ -2056,7 +2065,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(nodes + mesh->m_data->m_nodeIndex) + 0x44), meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
@@ -2120,7 +2129,7 @@ void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode*
 	u8 flags = *(u8*)((u8*)this + 0xA0);
 	s8 safeNodeFlag = static_cast<s32>((static_cast<u32>(flags) << 26) & 0xC0000000) >> 31;
 	if (safeNodeFlag != 0) {
-		PSMTXCopy((float(*)[4])((u8*)node + 0x6C), outMtx);
+		PSMTXCopy(node->m_mtx, outMtx);
 		outMtx[0][3] += *(float*)((u8*)this + 0x74);
 		outMtx[1][3] += *(float*)((u8*)this + 0x84);
 		outMtx[2][3] += *(float*)((u8*)this + 0x94);
@@ -2370,10 +2379,10 @@ CChara::CNode::CNode()
 	};
 	int active = 1;
 
-	*(u32*)((u8*)this + 0x0) = 0;
-	*(u32*)((u8*)this + 0x4) = 0;
-	*(u32*)((u8*)this + 0x9C) = 0;
-	*(u32*)((u8*)this + 0xA0) = 0;
+	m_refData = 0;
+	m_displayMesh = 0;
+	m_animNode0 = 0;
+	m_animNode1 = 0;
 	reinterpret_cast<Flags*>(&m_flags)->active = active;
 }
 
@@ -2402,11 +2411,11 @@ CChara::CNode::~CNode()
 void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNode::TYPE type, CMemory::CStage* stage)
 {
 	(void)stage;
-	void* modelRef = *(void**)((u8*)model + 0xA4);
-	u16 idx = *(u16*)((u8*)modelRef + 8);
-	void* nodeRefBase = *(void**)((u8*)modelRef + 0xC);
+	CCharaModelRefRaw* modelRef = model->m_data;
+	u16 idx = modelRef->m_nodeCount;
+	void* nodeRefBase = modelRef->m_nodeRefData;
 	u8* nodeRef = reinterpret_cast<u8*>((u8*)nodeRefBase + (idx * 0x94));
-	*(void**)this = nodeRef;
+	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(nodeRef);
 	*reinterpret_cast<u16*>(nodeRef + 0x0) = idx;
 	*(nodeRef + 0x2) = static_cast<u8>(type);
 	*(nodeRef + 0x4) = 0xFF;
@@ -2435,7 +2444,7 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 		case 0x5446524D:
 			chunk.Get(nodeRef + 0xC, 0x30);
 			if (*reinterpret_cast<u16*>(nodeRef + 0x68) == 0xFFFF) {
-				float baseScale = *reinterpret_cast<float*>(reinterpret_cast<u8*>(modelRef) + 0x28);
+				float baseScale = modelRef->m_baseScale;
 				PSMTXScaleApply(reinterpret_cast<float(*)[4]>(nodeRef + 0xC), reinterpret_cast<float(*)[4]>(nodeRef + 0xC),
 				               baseScale, baseScale, baseScale);
 			}
@@ -2576,13 +2585,13 @@ CChara::CMesh::~CMesh()
  */
 void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
-	void* modelRef = *(void**)((u8*)model + 0xA4);
-	u16 idx = *(u16*)((u8*)modelRef + 0xA);
-	void* meshRefBase = *(void**)((u8*)modelRef + 0x10);
+	CCharaModelRefRaw* modelRef = model->m_data;
+	u16 idx = modelRef->m_meshCount;
+	void* meshRefBase = modelRef->m_meshRefData;
 	CCharaMeshRefRaw* meshRef = reinterpret_cast<CCharaMeshRefRaw*>((u8*)meshRefBase + (idx * 0x64));
-	*(void**)this = meshRef;
-	*(void**)((u8*)this + 4) = 0;
-	*(void**)((u8*)this + 8) = 0;
+	m_data = meshRef;
+	m_workPositions = 0;
+	m_workNormals = 0;
 
 	CChunkFile::CChunk chunkInfo;
 	chunk.PushChunk();
@@ -2934,7 +2943,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	for (u32 i = 0; i < meshRef->m_skinCount; i++) {
 		int nodeIndex = static_cast<int>(reinterpret_cast<float(*)[4]>(skinData + 0x18)[0][0]);
 		PSMTXConcat(
-		    reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(&ModelNodes(model)[nodeIndex]) + 0x44),
+		    ModelNodes(model)[nodeIndex].m_mtx,
 		    reinterpret_cast<float(*)[4]>(skinData + 0x0C),
 		    reinterpret_cast<float(*)[4]>(skinData));
 		skinData += 0x19;
@@ -3154,7 +3163,7 @@ void CChara::CAnimNode::IsScale()
 void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node)
 {
 	if (node != 0) {
-		PSMTXCopy((float(*)[4])((u8*)node + 0x44), outMtx);
+		PSMTXCopy(node->m_mtx, outMtx);
 	} else {
 		PSMTXIdentity(outMtx);
 	}

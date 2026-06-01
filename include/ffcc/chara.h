@@ -22,7 +22,9 @@ struct CCharaModelData
     u8 _pad0[0x8];
     u16 m_nodeCount;
     u16 m_meshCount;
-    u8 _pad0C[0xA];
+    void* m_nodeRefData;
+    void* m_meshRefData;
+    u8 _pad14[0x2];
     u16 m_headNodeIndex;
     u16 m_chest3NodeIndex;
     u16 m_chest2NodeIndex;
@@ -124,11 +126,16 @@ public:
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
 
-		u8 _pad0[0x14];
+		CRefData* m_refData;
+		CMesh* m_displayMesh;
+		u8 _pad08[0x0C];
 		Mtx m_localRuntimeMtx;
-		u8 _pad44[0x28];
 		Mtx m_mtx;
-		u8 _pad9C[0x8];
+		Quaternion m_previousQuat;
+		Vec m_previousPosition;
+		Vec m_previousScale;
+		CAnimNode* m_animNode0;
+		CAnimNode* m_animNode1;
 		CVector m_dynPosition;
 		CVector m_dynVel;
 		u8 m_flags;

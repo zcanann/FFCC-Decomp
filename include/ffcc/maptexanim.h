@@ -10,8 +10,8 @@ class CTextureSet;
 class CTexture;
 class CMapTexAnim;
 
-extern "C" float FLOAT_8032fd48;
-extern "C" float FLOAT_8032fd4c;
+extern "C" const float FLOAT_8032fd48;
+extern "C" const float FLOAT_8032fd4c;
 
 class CMapTexAnimSet : public CRef
 {

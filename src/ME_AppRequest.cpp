@@ -44,12 +44,10 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
     return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStream.m_stageLoad)))->rsdItem;
 }
-#endif
 
 /*
  * --INFO--
@@ -139,7 +137,6 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
 {
     ZCANMGRP* entry = *colAnmData;
@@ -158,7 +155,6 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
         *colAnmData = (ZCANMGRP*)0;
     }
 }
-#endif
 
 /*
  * --INFO--
@@ -169,7 +165,6 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
 {
     RSDITEM* rsdItem = listItem->rsdItem;
@@ -198,7 +193,6 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
     DeleteColAnmData(&listItem->colAnmData, listItem->colAnmCount);
     delete listItem;
 }
-#endif
 
 /*
  * --INFO--
@@ -209,12 +203,10 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
 {
     return reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 }
-#endif
 
 /*
  * --INFO--

@@ -29,12 +29,9 @@ extern const char s_CardMakerCode_80330CC0[];
 extern const char s_CardMachineCode_80330CC4[];
 extern const char s_CardVersion_80330CC8[];
 
-static const char s_memoryCardAssetNameBlock_801DA9C0[] = {
-    0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
-    0x66, 0x66, 0x63, 0x63, 0x5F, 0x63, 0x6C, 0x69, 0x2E, 0x62, 0x69, 0x6E,
-    0x00, 0x00, 0x00, 0x00, 0x6F, 0x62, 0x6A, 0x64, 0x61, 0x74, 0x2E, 0x73,
-    0x70, 0x74, 0x00, 0x00,
-};
+static const char s_dvd_gba_801DA9C0[] = "dvd/gba/";
+static const char s_ffcc_cli_bin_801DA9CC[] = "ffcc_cli.bin";
+static const char s_objdat_spt_801DA9DC[] = "objdat.spt";
 static const char s_icon_dat_801DA9E8[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
 
@@ -50,7 +47,7 @@ CMemoryCardMan MemoryCardMan;
 
 extern const char sMcOdekakeReturn[8] = "\202\250\213A\202\350";
 // CRC32 lookup table
-static const unsigned int crcTable[256] = {
+static const unsigned int s_CrcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
     0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
     0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
@@ -223,7 +220,7 @@ static inline u32 CalcSaveCrc(u8* data)
     {
         u8 byte = *ptr;
         ptr++;
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ byte];
     }
 
     ptr = data + 0x20;
@@ -232,7 +229,7 @@ static inline u32 CalcSaveCrc(u8* data)
     {
         u8 byte = *ptr;
         ptr++;
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ byte];
     }
 
     return ~crc;
@@ -364,7 +361,7 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     ptr = data;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr += 1;
     }
 
@@ -372,7 +369,7 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     count = 0x8BB0;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr += 1;
     }
 
@@ -416,7 +413,7 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
     count = 0x1C;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr++;
     }
 
@@ -424,7 +421,7 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
     count = 0x8BB0;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr2];
+        crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr2];
         ptr2++;
     }
 

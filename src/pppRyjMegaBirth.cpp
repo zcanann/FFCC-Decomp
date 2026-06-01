@@ -76,28 +76,6 @@ static inline unsigned char clamp_u8(float value)
 	return (unsigned char)ivalue;
 }
 
-static inline unsigned char clamp_u8_int(int value)
-{
-	if (value < 0) {
-		return 0;
-	}
-	if (value > 0xFF) {
-		return 0xFF;
-	}
-	return (unsigned char)value;
-}
-
-static inline unsigned char clamp_alpha_7f(int value)
-{
-	if (value < 0) {
-		return 0;
-	}
-	if (value > 0x7F) {
-		return 0x7F;
-	}
-	return (unsigned char)value;
-}
-
 static inline float calc_mesh_sample_t(u8 mode)
 {
 	switch (mode) {
@@ -480,14 +458,13 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 
 			GXLoadPosMtxImm(drawMatrix, 0);
 
-			short frame = *s16_at(particle, 0x20);
+			u16 frame = *u16_at(particle, 0x20);
 			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + *(s16*)((u8*)animData + frame * 8 + 0x10));
 
 			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
 			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
 			blue = baseBlue + (int)*(s8*)((u8*)particle + 0x26);
-			alpha = (int)(
-				(float)(baseAlpha + (int)*(s8*)((u8*)particle + 0x27)) - *f32_at(particle, 0x54));
+			alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x27) - *f32_at(particle, 0x54));
 
 			if (colorData != NULL) {
 				red += (int)colorData->m_color[0];
@@ -496,14 +473,30 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 				alpha += (int)colorData->m_color[3];
 			}
 
-			unsigned char clampedRed = clamp_u8_int(red);
-			unsigned char clampedGreen = clamp_u8_int(green);
-			unsigned char clampedBlue = clamp_u8_int(blue);
-			unsigned char clampedAlpha = clamp_alpha_7f(alpha);
-			drawColor.rgba[0] = clampedRed;
-			drawColor.rgba[1] = clampedGreen;
-			drawColor.rgba[2] = clampedBlue;
-			drawColor.rgba[3] = clampedAlpha;
+			if (red < 0) {
+				red = 0;
+			} else if (red > 0xFF) {
+				red = 0xFF;
+			}
+			if (green < 0) {
+				green = 0;
+			} else if (green > 0xFF) {
+				green = 0xFF;
+			}
+			if (blue < 0) {
+				blue = 0;
+			} else if (blue > 0xFF) {
+				blue = 0xFF;
+			}
+			if (alpha < 0) {
+				alpha = 0;
+			} else if (alpha > 0x7F) {
+				alpha = 0x7F;
+			}
+			drawColor.rgba[0] = red;
+			drawColor.rgba[1] = green;
+			drawColor.rgba[2] = blue;
+			drawColor.rgba[3] = alpha;
 
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 			pppSetBlendMode(params->m_blendMode);

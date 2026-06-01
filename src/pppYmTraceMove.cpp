@@ -50,7 +50,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	}
 
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
+	pppYmTraceMoveWork* work =
+	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_3->m_serializedDataOffsets);
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;

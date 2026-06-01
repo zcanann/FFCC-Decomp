@@ -1045,7 +1045,6 @@ int CCaravanWork::GetFoodRank(int playerIdx)
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
 	int foundCount = 0;
-	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[3]);
 
 	if (maxResults > 0) {
 		for (int i = 0; i < maxResults; i++) {
@@ -1053,6 +1052,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	}
 
+	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[3]);
 	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter += 0x3E) {
 		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
 
@@ -1391,7 +1391,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 			if (sourceType != 3) {
 				if (sourceType == 1) {
-					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx + 4]);
+					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx]);
 				} else if (sourceType == 0) {
 					if (sourceIdx == 0) {
 						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptSysVal0);
@@ -1457,11 +1457,11 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
 					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
 				} else if ((sourceType < 2) && (sourceType != 0)) {
-					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx >> 3) + 8]) &
+					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[sourceIdx >> 3]) &
 							 (1 << (sourceIdx & 7))) != 0);
-					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[((sourceIdx + 1) >> 3) + 8]) &
+					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 1) >> 3]) &
 							 (1 << ((sourceIdx + 1) & 7))) != 0);
-					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[((sourceIdx + 2) >> 3) + 8]) &
+					bit2 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx + 2) >> 3]) &
 							 (1 << ((sourceIdx + 2) & 7))) != 0);
 				}
 

@@ -29,6 +29,15 @@ public:
         
     };
 
+    struct ViewerState
+    {
+        Vec m_position;
+        float m_rotX;
+        float m_rotY;
+        float m_distance;
+        Vec m_scale;
+    };
+
     CCameraPcs()
     {
         m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
@@ -172,7 +181,12 @@ public:
     float m_distance; // 0x43C
     float m_pitch; // 0x440
     int m_isAbsolute; // 0x444
-    u8 _pad448[0x4C4 - 0x448];
+    ViewerState m_viewer; // 0x448
+    int m_viewerOverride; // 0x46C
+    float m_mapRotX; // 0x470
+    float m_mapRotY; // 0x474
+    float m_mapRotZ; // 0x478
+    u8 _pad47C[0x4C4 - 0x47C];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

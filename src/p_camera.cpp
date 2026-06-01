@@ -255,6 +255,10 @@ STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowPosition) == 0x408);
 STATIC_ASSERT(offsetof(CCameraPcs, m_shadowRectBound) == 0x414);
 STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowDepth) == 0x42C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_isAbsolute) == 0x444);
+STATIC_ASSERT(offsetof(CCameraPcs, m_viewer) == 0x448);
+STATIC_ASSERT(sizeof(CCameraPcs::ViewerState) == 0x24);
+STATIC_ASSERT(offsetof(CCameraPcs, m_viewerOverride) == 0x46C);
+STATIC_ASSERT(offsetof(CCameraPcs, m_mapRotX) == 0x470);
 STATIC_ASSERT(sizeof(CCameraPcs) == 0x4C4);
 
 static inline void CopyCameraState(u8* dst, u8* src)
@@ -887,7 +891,7 @@ void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT*)
  */
 void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
-    u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
+    u32* dst = reinterpret_cast<u32*>(&m_viewer);
     const u32* src = reinterpret_cast<const u32*>(srt);
     u32 value1;
     u32 value0 = *src++;
@@ -908,7 +912,7 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
     value1 = src[7];
     dst[7] = value2;
     dst[8] = value1;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x46C) = 1;
+    m_viewerOverride = 1;
 }
 
 /*
@@ -929,24 +933,24 @@ void CCameraPcs::createChara()
 
     self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<s32*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar6 = FLOAT_8032fac0;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    m_viewer.m_position.y = fVar2;
     fVar7 = FLOAT_8032fac4;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
+    m_viewer.m_position.x = fVar2;
     fVar4 = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
+    m_viewer.m_distance = fVar2;
     fVar3 = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
+    m_viewer.m_rotY = fVar2;
     fVar5 = FLOAT_8032fab8;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar6;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar7;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar6;
+    m_viewer.m_distance = fVar7;
     m_fov = fVar4;
     m_nearZ = fVar3;
     m_farZ = fVar5;
@@ -986,7 +990,7 @@ void CCameraPcs::calcChara()
     C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (*reinterpret_cast<int*>(self + 0x46C) == 0) {
+    if (m_viewerOverride == 0) {
         if (Pad._452_4_ == 0) {
             padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
                                                             ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
@@ -995,10 +999,10 @@ void CCameraPcs::calcChara()
         }
 
         if ((padButtons & 4) != 0) {
-            *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+            m_viewer.m_position.y += FLOAT_8032fa20;
         }
         if ((padButtons & 8) != 0) {
-            *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+            m_viewer.m_position.y -= FLOAT_8032fa20;
         }
 
         stick = FLOAT_8032fa34;
@@ -1006,43 +1010,38 @@ void CCameraPcs::calcChara()
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x458) =
-            FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+        m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x454) =
-            -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+        m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x45C) =
-            -((FLOAT_8032fabc * stick) - *reinterpret_cast<float*>(self + 0x45C));
+        m_viewer.m_distance = -((FLOAT_8032fabc * stick) - m_viewer.m_distance);
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x45C) =
-            FLOAT_8032fabc * stick + *reinterpret_cast<float*>(self + 0x45C);
+        m_viewer.m_distance = FLOAT_8032fabc * stick + m_viewer.m_distance;
     } else {
-        *reinterpret_cast<int*>(self + 0x46C) = 0;
+        m_viewerOverride = 0;
     }
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
@@ -1051,9 +1050,9 @@ void CCameraPcs::calcChara()
     *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
     PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
 
-    m_targetX = *reinterpret_cast<float*>(self + 0x448);
-    m_targetY = *reinterpret_cast<float*>(self + 0x44C);
-    m_targetZ = *reinterpret_cast<float*>(self + 0x450);
+    m_targetX = m_viewer.m_position.x;
+    m_targetY = m_viewer.m_position.y;
+    m_targetZ = m_viewer.m_position.z;
 
     eyeDir = *reinterpret_cast<Vec*>(self + 0xEC);
     PSVECScale(&eyeDir, &scaledDir, FLOAT_8032fa88);
@@ -1085,11 +1084,11 @@ void CCameraPcs::createMap()
 
     fVar1 = FLOAT_8032fa34;
     fVar2 = FLOAT_8032fa5c;
-    *reinterpret_cast<float*>(self + 0x478) = fVar1;
+    m_mapRotZ = fVar1;
     fVar4 = FLOAT_8032fab0;
-    *reinterpret_cast<float*>(self + 0x474) = fVar1;
+    m_mapRotY = fVar1;
     fVar5 = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x470) = fVar1;
+    m_mapRotX = fVar1;
     fVar3 = FLOAT_8032fa8c;
     m_positionZ = fVar1;
     fVar6 = FLOAT_8032fab8;
@@ -1181,12 +1180,12 @@ void CCameraPcs::calcMap()
         triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
     }
 
-    *reinterpret_cast<float*>(self + 0xFC) += triggerL;
-    *reinterpret_cast<float*>(self + 0x470) -= stickV;
-    *reinterpret_cast<float*>(self + 0x474) -= stickH;
+    m_fov += triggerL;
+    m_mapRotX -= stickV;
+    m_mapRotY -= stickH;
 
-    PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(self + 0x470));
-    PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(self + 0x474));
+    PSMTXRotRad(rotXMtx, 'x', m_mapRotX);
+    PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
@@ -1249,10 +1248,8 @@ void CCameraPcs::calcMap()
         }
     }
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), *reinterpret_cast<float*>(self + 0xFC), FLOAT_8032fa3c,
-                     *reinterpret_cast<float*>(self + 0x100),
-                     *reinterpret_cast<float*>(self + 0x104));
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC));
 
@@ -1872,22 +1869,21 @@ void CCameraPcs::createMaterialEditor()
     float fVar3;
     float fVar1;
     float fVar2;
-    u8* self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar3 = FLOAT_8032fa50;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x450) = fVar3;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.x = fVar2;
+    m_viewer.m_distance = fVar2;
+    m_viewer.m_rotY = fVar2;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.z = fVar3;
 }
 
 /*
@@ -1934,10 +1930,10 @@ void CCameraPcs::calcMaterialEditor()
     }
 
     if ((padButtons & 8) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+        m_viewer.m_position.y += FLOAT_8032fa20;
     }
     if ((padButtons & 4) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+        m_viewer.m_position.y -= FLOAT_8032fa20;
     }
 
     stick = FLOAT_8032fa34;
@@ -1945,40 +1941,35 @@ void CCameraPcs::calcMaterialEditor()
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x458) =
-        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x454) =
-        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
@@ -2002,22 +1993,21 @@ void CCameraPcs::createFunnyShape()
     float fVar3;
     float fVar1;
     float fVar2;
-    u8* self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar3 = FLOAT_8032fa50;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x450) = fVar3;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.x = fVar2;
+    m_viewer.m_distance = fVar2;
+    m_viewer.m_rotY = fVar2;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.z = fVar3;
 }
 
 /*
@@ -2064,10 +2054,10 @@ void CCameraPcs::calcFunnyShape()
     }
 
     if ((padButtons & 8) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+        m_viewer.m_position.y += FLOAT_8032fa20;
     }
     if ((padButtons & 4) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+        m_viewer.m_position.y -= FLOAT_8032fa20;
     }
 
     stick = FLOAT_8032fa34;
@@ -2075,40 +2065,35 @@ void CCameraPcs::calcFunnyShape()
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x458) =
-        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x454) =
-        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 

@@ -377,45 +377,10 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
-    int checksumBlockCount = 2;
-    if (offset < 0xBD) {
-        while (checksumBlockCount-- != 0)
-        {
-            signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
-
-            checksum -= bytes[0];
-            checksum -= bytes[1];
-            checksum -= bytes[2];
-            checksum -= bytes[3];
-            checksum -= bytes[4];
-            checksum -= bytes[5];
-            checksum -= bytes[6];
-            offset += 7;
-
-            bytes = reinterpret_cast<signed char*>(managerBase + offset);
-            checksum -= bytes[0];
-            checksum -= bytes[1];
-            checksum -= bytes[2];
-            checksum -= bytes[3];
-            checksum -= bytes[4];
-            checksum -= bytes[5];
-            checksum -= bytes[6];
-            offset += 7;
-        }
-    }
-
-    int remaining = 0xBD - offset;
-    signed char* checksumBytes = reinterpret_cast<signed char*>(managerBase + offset);
-    if (offset < 0xBD)
+    while (offset < 0xBD)
     {
-        do
-        {
-            signed char value = *checksumBytes;
-            offset++;
-            checksumBytes++;
-            checksum -= value;
-            remaining--;
-        } while (remaining != 0);
+        checksum -= *reinterpret_cast<signed char*>(managerBase + offset);
+        offset++;
     }
     *reinterpret_cast<char*>(managerBase + offset) = checksum;
 
@@ -440,45 +405,10 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAE) = self[0x1346];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
-    checksumBlockCount = 2;
-    if (offset < 0xBD) {
-        while (checksumBlockCount-- != 0)
-        {
-            signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
-
-            checksum -= bytes[0];
-            checksum -= bytes[1];
-            checksum -= bytes[2];
-            checksum -= bytes[3];
-            checksum -= bytes[4];
-            checksum -= bytes[5];
-            checksum -= bytes[6];
-            offset += 7;
-
-            bytes = reinterpret_cast<signed char*>(managerBase + offset);
-            checksum -= bytes[0];
-            checksum -= bytes[1];
-            checksum -= bytes[2];
-            checksum -= bytes[3];
-            checksum -= bytes[4];
-            checksum -= bytes[5];
-            checksum -= bytes[6];
-            offset += 7;
-        }
-    }
-
-    remaining = 0xBD - offset;
-    checksumBytes = reinterpret_cast<signed char*>(managerBase + offset);
-    if (offset < 0xBD)
+    while (offset < 0xBD)
     {
-        do
-        {
-            signed char value = *checksumBytes;
-            offset++;
-            checksumBytes++;
-            checksum -= value;
-            remaining--;
-        } while (remaining != 0);
+        checksum -= *reinterpret_cast<signed char*>(managerBase + offset);
+        offset++;
     }
     *reinterpret_cast<char*>(managerBase + offset) = checksum;
 

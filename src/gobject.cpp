@@ -2620,7 +2620,8 @@ void CGObject::Turn(float targetRot, int turnFrames)
     *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 1, 30, 30));
     *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 0, 7, 24, 24));
     *shieldFlags = static_cast<u8>(__rlwimi(*shieldFlags, 1, 3, 28, 28));
-    m_turnSpeed = sZeroFloat;
+    const float& zero = sZeroFloat;
+    m_turnSpeed = zero;
 }
 
 /*
@@ -3011,7 +3012,8 @@ void CGObject::CancelAnim(int keepFacing)
 	*((u8*)&m_shieldNodeFlags) =
 	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
 
-	m_turnSpeed = sZeroFloat;
+	const float& zero = sZeroFloat;
+	m_turnSpeed = zero;
 
 	if (keepFacing != 0)
 	{
@@ -3068,7 +3070,8 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
     flags = static_cast<u8>(__rlwimi(flags, 1, 3, 28, 28));
     *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
-    m_turnSpeed = sZeroFloat;
+    const float& zero = sZeroFloat;
+    m_turnSpeed = zero;
 }
 
 /*

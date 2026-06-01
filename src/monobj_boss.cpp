@@ -54,6 +54,7 @@ extern double DOUBLE_80331d08 = 3.0;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331d38;
 extern double DOUBLE_80331dc0;
+extern "C" char s_c_item_80331D50[7];
 extern "C" char s_meteo_3_80331D64[8];
 extern char SoundBuffer[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
@@ -2402,10 +2403,11 @@ void CGMonObj::initFinishedFuncLastBoss()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	initFinishedFuncDefault();
-	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1260) = this;
-	if (object->m_charaModelHandle != 0) {
-		*reinterpret_cast<void**>(SoundBuffer + 1264) = object->m_charaModelHandle->m_model;
-	}
+	*reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj) = this;
+
+	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(s_c_item_80331D50);
+	CChara::CModel* model = object->m_charaModelHandle->m_model;
+	*reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj + 4) = model->m_nodes + nodeIndex;
 }
 
 /*

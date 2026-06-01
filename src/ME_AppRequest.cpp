@@ -44,7 +44,7 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-RSDITEM* CMaterialEditorPcs::GetReadRsd()
+inline RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
     return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStream.m_stageLoad)))->rsdItem;
 }
@@ -137,7 +137,7 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
+inline void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
 {
     ZCANMGRP* entry = *colAnmData;
 
@@ -165,7 +165,7 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
+inline void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
 {
     RSDITEM* rsdItem = listItem->rsdItem;
 
@@ -203,7 +203,7 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
  * JP Address: TODO
  * JP Size: TODO
  */
-RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
+inline RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
 {
     return reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 }

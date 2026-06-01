@@ -62,12 +62,10 @@ extern "C" float FLOAT_8032fe74;
 extern "C" float FLOAT_8032fe78;
 extern "C" float FLOAT_8032fe7c;
 extern "C" double DOUBLE_8032fe80;
-extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
 extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
-PPPCREATEPARAM g_dcp;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
@@ -80,6 +78,7 @@ unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
+PPPCREATEPARAM g_dcp;
 extern "C" const char s_partMng_cpp[] = "partMng.cpp";
 static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
@@ -4755,49 +4754,6 @@ void CPartMng::pppDestroyAll()
 
 /*
  * --INFO--
- * PAL Address: 0x8005f624
- * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_partMng_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated from global variable initialization.
-    // To match, replace with proper constructors or initializer expressions, then
-    // delete this function so the compiler auto-generates it.
-
-    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18,
-                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, sizeof(_pppMngSt), 0x180);
-
-    g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
-    g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
-    g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectKind = 1;
-    g_dcp.m_soundEffectParams.m_soundEffectStartFrame = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    g_dcp.m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    g_dcp.m_hitParamA = 0;
-    g_dcp.m_hitParamB = 0;
-    g_dcp.m_hitObjectCount = 0;
-    g_dcp.m_hitFlags = 0;
-    g_dcp.m_positionOffsetPtr = 0;
-    g_dcp.m_rotationPtr = 0;
-    g_dcp.m_scalePtr = 0;
-    g_dcp.m_extraPositionPtr = 0;
-    g_dcp.m_paramA = 0;
-    g_dcp.m_paramB = 0;
-    g_dcp.m_lookTargetPtr = 0;
-    g_dcp.m_objectHitMask = 0;
-    g_dcp.m_cylinderAttribute = 0;
-    g_dcp.m_paramC = FLOAT_8032fe18;
-    g_dcp.m_paramD = FLOAT_8032fe18;
-    *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005f6dc
  * PAL Size: 64b
  * EN Address: TODO
@@ -4805,9 +4761,9 @@ extern "C" void __sinit_partMng_cpp(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt)
+_pppMngSt::_pppMngSt()
 {
-    char* base = reinterpret_cast<char*>(pppMngSt);
+    char* base = reinterpret_cast<char*>(this);
     PPPSEST* soundEffectData = reinterpret_cast<PPPSEST*>(base + 0x11c);
     PPPIFPARAM* hitParams = reinterpret_cast<PPPIFPARAM*>(base + 0x130);
 

@@ -300,7 +300,11 @@ static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, flo
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(menu, 0x86C) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(

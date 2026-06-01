@@ -407,4 +407,3 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2
 
 extern const float FLOAT_80331864 = 0.0f;
 extern const char sTHPMagic[4] = "THP";
-extern const float kTHPSimpleDefaultVolume = 127.0f;

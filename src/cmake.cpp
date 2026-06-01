@@ -1020,7 +1020,11 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     const bool widePage = (page == 0);

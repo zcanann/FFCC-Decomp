@@ -1191,7 +1191,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 		sourceObj = 0;
 	}
 
-	unsigned int sourceCid = sourceObj->GetCID();
+	int sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}

@@ -1349,7 +1349,7 @@ void CFlatRuntime2::Calc()
 		if (File.IsCompleted(fileHandle)) {
 			CTextureSet* textureSet = layer->m_textureSet;
 			if (textureSet != 0) {
-				(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+				delete textureSet;
 				layer->m_textureSet = 0;
 			}
 
@@ -1757,7 +1757,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 
 	CTextureSet* textureSet = layer->m_textureSet;
 	if (textureSet != 0) {
-		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+		delete textureSet;
 		layer->m_textureSet = 0;
 	}
 
@@ -1808,9 +1808,9 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 		layer->m_fileHandle = 0;
 	}
 
-	void* textureSet = layer->m_textureSet;
+	CTextureSet* textureSet = layer->m_textureSet;
 	if (textureSet != 0) {
-		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+		delete textureSet;
 		layer->m_textureSet = 0;
 	}
 

@@ -1867,24 +1867,6 @@ CMapObjAtr::~CMapObjAtr()
 {
 }
 
-static inline void FreeByteArrayAndClear(void* base, unsigned int offset)
-{
-    void*& ptr = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(base) + offset);
-    if (ptr != 0) {
-        delete[] static_cast<unsigned char*>(ptr);
-        ptr = 0;
-    }
-}
-
-static inline void FreeFloatArrayAndClear(void* base, unsigned int offset)
-{
-    void*& ptr = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(base) + offset);
-    if (ptr != 0) {
-        delete[] static_cast<float*>(ptr);
-        ptr = 0;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8002BFF0
@@ -1910,29 +1892,27 @@ CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
 CMapObjAtrMime::~CMapObjAtrMime()
 {
     int* self = reinterpret_cast<int*>(this);
-    int i = 0;
     int offset = 0;
+    int i = 0;
 
     while (i < static_cast<int>(*reinterpret_cast<unsigned char*>(self + 2))) {
-        void** entry = reinterpret_cast<void**>(self[3] + offset);
-        if (*entry != 0) {
-            delete[] static_cast<float*>(*entry);
-            *entry = 0;
+        void* entry = *reinterpret_cast<void**>(self[3] + offset);
+        if (entry != 0) {
+            delete static_cast<float*>(entry);
+            *reinterpret_cast<void**>(self[3] + offset) = 0;
         }
 
         offset += 4;
         i++;
     }
 
-    if (self[3] != 0) {
-        delete[] reinterpret_cast<void**>(self[3]);
-        self[3] = 0;
+    MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(this);
+    if (mime->vertexLists != 0) {
+        delete mime->vertexLists;
+        mime->vertexLists = 0;
     }
 
-    FreeByteArrayAndClear(this, 0x2C);
-    FreeFloatArrayAndClear(this, 0x30);
-    FreeFloatArrayAndClear(this, 0x34);
-    FreeFloatArrayAndClear(this, 0x38);
+    mime->keyFrame.~CMapKeyFrame();
 }
 
 /*
@@ -1946,14 +1926,10 @@ CMapObjAtrMime::~CMapObjAtrMime()
  */
 CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
-    FreeByteArrayAndClear(this, 0x100);
-    FreeFloatArrayAndClear(this, 0x104);
-    FreeFloatArrayAndClear(this, 0x108);
-    FreeFloatArrayAndClear(this, 0x10C);
-    FreeByteArrayAndClear(this, 0xD8);
-    FreeFloatArrayAndClear(this, 0xDC);
-    FreeFloatArrayAndClear(this, 0xE0);
-    FreeFloatArrayAndClear(this, 0xE4);
+    MapObjAttrSpotLightLayout* self = reinterpret_cast<MapObjAttrSpotLightLayout*>(this);
+
+    self->altColorKeyFrame.~CMapKeyFrame();
+    self->colorKeyFrame.~CMapKeyFrame();
 }
 
 /*
@@ -1967,14 +1943,10 @@ CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
  */
 CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
-    FreeByteArrayAndClear(this, 0xE4);
-    FreeFloatArrayAndClear(this, 0xE8);
-    FreeFloatArrayAndClear(this, 0xEC);
-    FreeFloatArrayAndClear(this, 0xF0);
-    FreeByteArrayAndClear(this, 0xBC);
-    FreeFloatArrayAndClear(this, 0xC0);
-    FreeFloatArrayAndClear(this, 0xC4);
-    FreeFloatArrayAndClear(this, 0xC8);
+    MapObjAttrPointLightLayout* self = reinterpret_cast<MapObjAttrPointLightLayout*>(this);
+
+    self->altColorKeyFrame.~CMapKeyFrame();
+    self->colorKeyFrame.~CMapKeyFrame();
 }
 
 /*

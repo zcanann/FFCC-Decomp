@@ -1,8 +1,7 @@
 #ifndef _FFCC_PPPCOLUM_H_
 #define _FFCC_PPPCOLUM_H_
 
-#include <dolphin/types.h>
-#include <dolphin/mtx.h>
+#include "ffcc/partMng.h"
 
 // pppCVector structure
 typedef struct pppCVector {
@@ -10,19 +9,7 @@ typedef struct pppCVector {
 } pppCVector;
 
 struct pppColum {
-    u32 m_graphId;
-
-    // Add padding/fields up to the offsets we need
-    char pad[0x82];
-    u16 field_0x82;
-    char pad2[0x88 - 0x82 - 2];
-    void* field_0x88;
-    char pad3[0x90 - 0x88 - 4];
-    float field_0x90;
-    float field_0x94;
-    float field_0x98;
-    char pad4[0xb2 - 0x98 - 4];
-    u8 field_0xb2;
+    _pppPObject m_object;
 };
 
 struct pppColumUnkB {

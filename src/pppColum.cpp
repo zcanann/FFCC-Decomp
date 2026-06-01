@@ -115,11 +115,11 @@ static inline float ColumSqrtPositive(float value)
 void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* objBytes = (u8*)column;
+    u8* workArea = column->m_object.m_workArea;
     pppColumValue* values;
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(objBytes + serializedDataOffsets[3] + 0x80);
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(workArea + serializedDataOffsets[3]);
     pppColumPositionWork* positionWork =
-        (pppColumPositionWork*)(objBytes + serializedDataOffsets[2] + 0x80);
+        (pppColumPositionWork*)(workArea + serializedDataOffsets[2]);
     int textureIndex = 0;
     pppCVECTOR color;
 
@@ -265,7 +265,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
     if (gPppCalcDisabled == 0) {
         serializedDataOffsets = param_3->m_serializedDataOffsets;
-        work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+        work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc(
                 (unsigned long)param_2->m_count * 0xc, ppvEnv->m_stagePtr,
@@ -306,7 +306,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 {
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
 
     if (work->m_values != 0) {
         pppHeapUseRate((CMemory::CStage*)work->m_values);
@@ -326,7 +326,7 @@ void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
 {
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    pppColumFrameWork* work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
+    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
     work->m_shapeC = 0;
     work->m_shapeB = 0;
     work->m_shapeA = 0;

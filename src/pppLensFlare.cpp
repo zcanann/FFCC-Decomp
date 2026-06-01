@@ -46,9 +46,8 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 {
 	int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 	int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-	u8* objBytes = (u8*)obj;
-	u8* shapeBase = objBytes + shapeOffset + 0x80;
-	u8* colorBase = objBytes + colorOffset + 0x80;
+	u8* shapeBase = obj->m_object.m_workArea + shapeOffset;
+	u8* colorBase = obj->m_object.m_workArea + colorOffset;
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
@@ -61,9 +60,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 
 			PSMTXIdentity(local_54);
 			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = (ppvMng->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
-			local_54[1][1] = (ppvMng->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
-			local_54[2][2] = (ppvMng->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
+			local_54[0][0] = (ppvMng->m_scale.x * obj->m_object.m_drawMatrix.value[0][0]) * scale;
+			local_54[1][1] = (ppvMng->m_scale.y * obj->m_object.m_drawMatrix.value[1][1]) * scale;
+			local_54[2][2] = (ppvMng->m_scale.z * obj->m_object.m_drawMatrix.value[2][2]) * scale;
 
 			local_60.x = ppvMng->m_matrix.value[0][3];
 			local_60.y = ppvMng->m_matrix.value[1][3];
@@ -108,10 +107,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 	if (gPppCalcDisabled == 0) {
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-		u8* objBytes = (u8*)obj;
-		u8* colorBase = objBytes + colorOffset;
-		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
-		u8 sourceAlpha = colorBase[0x8B];
+		u8* colorBase = obj->m_object.m_workArea + colorOffset;
+		LensFlareWork* work = (LensFlareWork*)(obj->m_object.m_workArea + shapeOffset);
+		u8 sourceAlpha = colorBase[0xB];
 		float projX = ppvMng->m_matrix.value[0][3];
 		float projY = ppvMng->m_matrix.value[1][3];
 		float projZ = ppvMng->m_matrix.value[2][3];
@@ -227,7 +225,7 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  */
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	LensFlareWork* work = (LensFlareWork*)((char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80);
+	LensFlareWork* work = (LensFlareWork*)(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 
 	float initValue = kPppLensFlareZero;
 

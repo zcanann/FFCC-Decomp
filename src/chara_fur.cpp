@@ -1137,27 +1137,30 @@ void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
 	MogFurState& charaFur = Chara.MogFur();
-	int i = 0;
+	unsigned char* texels = reinterpret_cast<unsigned char*>(charaFur.m_texels);
+	int rowCount = 0;
 	int row = 0;
 	do {
 		int inner = 0;
-		int texelOffset = row;
-		for (int count = 8; count != 0; count--) {
+		int byteOffset = row << 1;
+		int count = 8;
+		do {
 			int idxBase = inner + row;
-			charaFur.m_texels[texelOffset] = 0x7FFF;
-			texelOffset += 8;
-			charaFur.m_texels[idxBase + 1] = 0x7FFF;
-			charaFur.m_texels[idxBase + 2] = 0x7FFF;
-			charaFur.m_texels[idxBase + 3] = 0x7FFF;
-			charaFur.m_texels[idxBase + 4] = 0x7FFF;
-			charaFur.m_texels[idxBase + 5] = 0x7FFF;
-			charaFur.m_texels[idxBase + 6] = 0x7FFF;
-			charaFur.m_texels[idxBase + 7] = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + byteOffset) = 0x7FFF;
+			byteOffset += 0x10;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 2) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 6) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 8) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 10) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 12) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 14) = 0x7FFF;
 			inner += 8;
-		}
-		i++;
+			count--;
+		} while (count != 0);
+		rowCount++;
 		row += 0x40;
-	} while (i < 0x40);
+	} while (rowCount < 0x40);
 
 	fur.m_dirty = 0;
 	charaFur.m_timestamp = System.m_frameCounter;

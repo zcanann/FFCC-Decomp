@@ -1481,7 +1481,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
             static_cast<float>(cursorX),
             static_cast<float>(baseY - 0x10),
             FLOAT_803332dc, FLOAT_803332b0,
-            static_cast<float>((System.m_frameCounter & 7) << 5), FLOAT_80333254,
+            static_cast<float>((static_cast<int>(System.m_frameCounter) % 8) << 5), FLOAT_80333254,
             FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
     }
 }

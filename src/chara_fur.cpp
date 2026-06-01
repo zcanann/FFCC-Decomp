@@ -1401,13 +1401,6 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				work.m_offColorTicks = 0;
 				if ((centerBefore.a != 0) && (centerAfter.a < centerBefore.a)) {
 					work.m_eraseTicks++;
-					if (work.m_eraseTicks == 10 && messageId < 0) {
-						messageId = 5;
-						work.m_eraseTicks = 0x0B;
-					} else if (work.m_eraseTicks == 0x32 && messageId < 0) {
-						messageId = 6;
-						work.m_eraseTicks = 0x33;
-					}
 				}
 				if ((System.m_frameCounter & 7) == 0) {
 					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
@@ -1416,10 +1409,6 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				work.m_eraseTicks = 0;
 				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
 					work.m_offColorTicks++;
-					if (work.m_offColorTicks == 10 && messageId < 0) {
-						messageId = 2;
-						work.m_offColorTicks = 0x0B;
-					}
 				}
 				if ((System.m_frameCounter & 0xF) == 0) {
 					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
@@ -1453,6 +1442,25 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				color.z = static_cast<float>(particleColor.b) / FLOAT_8033111C;
 				color.w = static_cast<float>(particleColor.a) / FLOAT_80331120;
 				PartPcs.SetParColIdx(particleIndex, color);
+			}
+
+			if (work.m_offColorTicks == 10) {
+				if (messageId < 0) {
+					messageId = 2;
+				}
+				work.m_offColorTicks = 0x0B;
+			}
+			if (work.m_eraseTicks == 10) {
+				if (messageId < 0) {
+					messageId = 5;
+				}
+				work.m_eraseTicks = 0x0B;
+			}
+			if (work.m_eraseTicks == 0x32) {
+				if (messageId < 0) {
+					messageId = 6;
+				}
+				work.m_eraseTicks = 0x33;
 			}
 		}
 

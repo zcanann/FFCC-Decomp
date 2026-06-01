@@ -294,7 +294,6 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 			xCoord = FLOAT_80330FD4;
 
 			for (x = 0; x < (u32)textureInfo->m_width; x++) {
-				u32 xFine = x & 3;
 				magnitude = xCoord * xCoord + ySq;
 				if (magnitude > FLOAT_80330FD8) {
 					magnitude = CrystalSqrtPositive(magnitude);
@@ -304,6 +303,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					magnitude = NAN;
 				}
 
+				u32 xFine = x & 3;
 				if (magnitude > maxMagnitude) {
 					magnitude = maxMagnitude;
 				}

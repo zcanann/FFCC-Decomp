@@ -1538,13 +1538,13 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
-    CFont*& font = m_fonts[fontNo + 2];
+    CFont* font = m_fonts[fontNo + 2];
 
     if (font != 0) {
         if (font->DecRef() == 0) {
             delete font;
         }
-        font = 0;
+        m_fonts[fontNo + 2] = 0;
     }
 
     sprintf(path, const_cast<char*>(s_dvd__smenu__s_fnt_801d9da0), Game.GetLangString(), fileName);

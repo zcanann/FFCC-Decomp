@@ -216,7 +216,6 @@ STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x48);
 
 inline CFlatRuntime::CObject::CObject()
 {
-	m_flagBits.m_constructFlag = 0;
 }
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

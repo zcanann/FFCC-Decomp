@@ -30,19 +30,7 @@ public:
     static unsigned int m_table_desc2[3];
     static CProcessTable m_table;
 
-    CMiniGamePcs()
-    {
-        unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
-        table[1] = m_table_desc0[0];
-        table[2] = m_table_desc0[1];
-        table[3] = m_table_desc0[2];
-        table[4] = m_table_desc1[0];
-        table[5] = m_table_desc1[1];
-        table[6] = m_table_desc1[2];
-        table[7] = m_table_desc2[0];
-        table[8] = m_table_desc2[1];
-        table[9] = m_table_desc2[2];
-    }
+    CMiniGamePcs() {}
 
     int GetTable(unsigned long);
 

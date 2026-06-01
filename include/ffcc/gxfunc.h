@@ -12,6 +12,7 @@ void _GXSetTevColorOp(_GXTevStageID, _GXTevOp, _GXTevBias, _GXTevScale, unsigned
 void _GXSetTevAlphaOp(_GXTevStageID, _GXTevOp, _GXTevBias, _GXTevScale, unsigned char, _GXTevRegID);
 void _GXSetAlphaCompare(_GXCompare, unsigned char, _GXAlphaOp, _GXCompare, unsigned char);
 void _GXSetTevOrder(_GXTevStageID, _GXTexCoordID, _GXTexMapID, _GXChannelID);
+void _GXSetNumTevStages(unsigned char);
 void _GXSetTevSwapMode(_GXTevStageID, _GXTevSwapSel, _GXTevSwapSel);
 void _GXSetTevSwapModeTable(_GXTevSwapSel, _GXTevColorChan, _GXTevColorChan, _GXTevColorChan, _GXTevColorChan);
 void _GXSetPixel_Init();

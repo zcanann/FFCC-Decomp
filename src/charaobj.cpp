@@ -2694,7 +2694,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
 	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
-	float castScale = 1.0f;
+	float castScale = kOneF32;
 
 	if (*reinterpret_cast<unsigned short*>(script + 0x4E) != 0) {
 		castScale = CharaObjGetStatusMultiplier(0x0);

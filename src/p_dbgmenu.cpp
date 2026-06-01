@@ -68,20 +68,20 @@ u32 CDbgMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__
 CProcessTable CDbgMenuPcs::m_table = {
     const_cast<char*>(sCDbgMenuPcs),
     {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        m_table_desc0[0],
+        m_table_desc0[1],
+        m_table_desc0[2],
+        m_table_desc1[0],
+        m_table_desc1[1],
+        m_table_desc1[2],
+        m_table_desc2[0],
+        m_table_desc2[1],
+        m_table_desc2[2],
         0x11,
         0,
-        0,
-        0,
-        0,
+        m_table_desc3[0],
+        m_table_desc3[1],
+        m_table_desc3[2],
         0x4A,
         1,
     },
@@ -181,20 +181,6 @@ void CDbgMenuPcs::destroy()
 
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
-    u32* table = reinterpret_cast<u32*>(&m_table);
-
-    table[1] = m_table_desc0[0];
-    table[2] = m_table_desc0[1];
-    table[3] = m_table_desc0[2];
-    table[4] = m_table_desc1[0];
-    table[5] = m_table_desc1[1];
-    table[6] = m_table_desc1[2];
-    table[7] = m_table_desc2[0];
-    table[8] = m_table_desc2[1];
-    table[9] = m_table_desc2[2];
-    table[12] = m_table_desc3[0];
-    table[13] = m_table_desc3[1];
-    table[14] = m_table_desc3[2];
 }
 
 /*

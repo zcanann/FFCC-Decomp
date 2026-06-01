@@ -760,10 +760,10 @@ void CGCharaObj::onFramePreCalc()
 		m_pushParamB = 100;
 	}
 
-	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) == 0) {
-		m_aStarGroupId = static_cast<unsigned short>(static_cast<unsigned char>(m_lastBgGroup));
-	} else {
+	if ((DbgMenuPcs.GetDbgFlagsRaw() & 1) != 0) {
 		m_aStarGroupId = static_cast<unsigned short>(AStar.calcSpecialPolygonGroup(&m_worldPosition));
+	} else {
+		m_aStarGroupId = static_cast<unsigned short>(static_cast<unsigned char>(m_lastBgGroup));
 	}
 }
 

@@ -882,7 +882,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
  * JP Address: TODO
  * JP Size: TODO
  */
-CDbgMenuPcs::CDM::CDM()
+inline CDbgMenuPcs::CDM::CDM()
 {
 	memset(this, 0, sizeof(CDMParam));
 	memset(&m_status, 0, sizeof(*this) - sizeof(CDMParam));

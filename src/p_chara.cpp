@@ -34,7 +34,6 @@ extern const float FLOAT_80330320;
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
@@ -249,19 +248,15 @@ int CPtrArray<T>::GetSize()
 template <class T>
 void CPtrArray<T>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
-
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        T item = m_items[i];
         if (item != 0) {
-            int nextRefCount = item[1] - 1;
-            item[1] = nextRefCount;
-            if (nextRefCount == 0 && item != 0) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            CRef* ref = reinterpret_cast<CRef*>(item);
+            if (ref->DecRef() == 0) {
+                delete ref;
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
 
     RemoveAll();
@@ -361,6 +356,11 @@ template class CPtrArray<CCharaPcs::CLoadPdt*>;
 template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;
 template class CPtrArray<CCharaPcs::CLoadModel*>;
+
+STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
+STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x30);
+STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
+STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
 
 #pragma dont_inline reset
 
@@ -465,7 +465,7 @@ static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
         CRef* ref = reinterpret_cast<CRef*>(ptr);
-        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+        if (ref->DecRef() == 0) {
             delete ref;
         }
         ptr = 0;
@@ -476,7 +476,7 @@ template <typename T>
 static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
-        reinterpret_cast<int*>(ptr)[1]++;
+        reinterpret_cast<CRef*>(ptr)->AddRef();
     }
 }
 
@@ -548,7 +548,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
 {
     for (int i = LoadAnimArray(self)->GetSize() - 1; i >= 0; i--) {
         CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0 || loadAnim->m_mergeFileId >= 0 || reinterpret_cast<int*>(loadAnim)[1] != 1) {
+        if (loadAnim == 0 || loadAnim->m_mergeFileId >= 0 || loadAnim->GetRef() != 1) {
             continue;
         }
         if (target != 0 && loadAnim != target) {
@@ -929,14 +929,14 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             releaseUnuseLoadModel(static_cast<int>(releaseMask));
 
             for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-                int* loadAnim = reinterpret_cast<int*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-                if (!(((loadAnim[4] < 0) && (loadAnim[1] == 1)) ||
-                      ((loadAnim[4] >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0)))) {
+                CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+                if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
+                      ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
                     continue;
                 }
 
-                CRef* loadAnimRef = reinterpret_cast<CRef*>(loadAnim);
-                if (--reinterpret_cast<int*>(loadAnimRef)[1] == 0) {
+                CRef* loadAnimRef = loadAnim;
+                if (loadAnimRef->DecRef() == 0) {
                     delete loadAnimRef;
                 }
                 LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
@@ -1123,8 +1123,8 @@ void CCharaPcs::calcAfter()
             continue;
         }
 
-        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
-        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        void*& bankPtr = loadAnim->m_anim->m_bank;
+        const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1 && bankPtr != 0) {
             operator delete(bankPtr);
             bankPtr = 0;
@@ -1137,9 +1137,9 @@ void CCharaPcs::calcAfter()
             continue;
         }
 
-        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1) {
-            (*reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x24)))++;
+            loadAnim->m_anim->m_lastFrame++;
         }
     }
 }
@@ -1157,7 +1157,7 @@ void CCharaPcs::ReleaseAllAnimBank()
             continue;
         }
 
-        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
+        void*& bankPtr = loadAnim->m_anim->m_bank;
         if (bankPtr != 0) {
             operator delete(bankPtr);
             bankPtr = 0;
@@ -1178,8 +1178,8 @@ void CCharaPcs::ReleaseUnusedAnimBank()
             continue;
         }
 
-        void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
-        const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
+        void*& bankPtr = loadAnim->m_anim->m_bank;
+        const int bankRefCount = loadAnim->m_anim->GetRef();
         if (bankRefCount == 1 && bankPtr != 0) {
             operator delete(bankPtr);
             bankPtr = 0;
@@ -1206,11 +1206,11 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
 
-        const unsigned int bankPtr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x20));
-        const int bankSize = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x24));
-        if (bankPtr != 0 && releaseSize < bankSize) {
+        void* bankPtr = loadAnim->m_anim->m_bank;
+        const int bankHistory = loadAnim->m_anim->m_lastFrame;
+        if (bankPtr != 0 && releaseSize < bankHistory) {
             releaseAnim = loadAnim;
-            releaseSize = bankSize;
+            releaseSize = bankHistory;
         }
     }
 
@@ -1218,10 +1218,10 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
         return 0;
     }
 
-    void* bankPtr = *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20));
+    void* bankPtr = releaseAnim->m_anim->m_bank;
     if (bankPtr != 0) {
         operator delete(bankPtr);
-        *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20)) = 0;
+        releaseAnim->m_anim->m_bank = 0;
     }
 
     if (System.m_execParam > 2) {
@@ -1495,7 +1495,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
     for (int i = LoadModelArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
         const bool shouldRelease =
-            (((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && reinterpret_cast<int*>(loadModel)[1] == 1) ||
+            (((loadModel->m_mergeFileId < 0) || (loadModel->m_streamMode != 0)) && loadModel->GetRef() == 1) ||
             (loadModel->m_mergeFileId >= 0 && (releaseMask & loadModel->m_mergeFlags) != 0);
 
         if (!shouldRelease) {
@@ -1503,7 +1503,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
             continue;
         }
 
-        if (loadModel->m_streamMode != 0 && reinterpret_cast<int*>(loadModel)[1] == 1) {
+        if (loadModel->m_streamMode != 0 && loadModel->GetRef() == 1) {
             ReleaseShared(loadModel->m_model);
             continue;
         }
@@ -1516,7 +1516,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
     for (int i = LoadTextureArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
         const bool shouldRelease =
-            (((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && reinterpret_cast<int*>(loadTexture)[1] == 1) ||
+            (((loadTexture->m_mergeFileId < 0) || (loadTexture->m_streamMode != 0)) && loadTexture->GetRef() == 1) ||
             (loadTexture->m_mergeFileId >= 0 && (releaseMask & loadTexture->m_mergeFlags) != 0);
 
         if (!shouldRelease) {
@@ -1524,7 +1524,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
             continue;
         }
 
-        if (loadTexture->m_streamMode != 0 && reinterpret_cast<int*>(loadTexture)[1] == 1) {
+        if (loadTexture->m_streamMode != 0 && loadTexture->GetRef() == 1) {
             ReleaseShared(loadTexture->m_textureSet);
             continue;
         }
@@ -1537,7 +1537,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
     for (int i = LoadPdtArray(this)->GetSize() - 1; i >= 0; i--) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
         const bool shouldRelease =
-            (loadPdt->m_mergeFileId < 0 && reinterpret_cast<int*>(loadPdt)[1] == 1) ||
+            (loadPdt->m_mergeFileId < 0 && loadPdt->GetRef() == 1) ||
             (loadPdt->m_mergeFileId >= 0 && (releaseMask & loadPdt->m_mergeFlags) != 0);
 
         if (!shouldRelease) {
@@ -1632,8 +1632,8 @@ void CCharaPcs::DumpLoad()
         unsigned int bankAddr = 0;
         if (loadAnim->m_anim != 0) {
             animAddr = reinterpret_cast<unsigned int>(loadAnim->m_anim);
-            bankSize = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 0x1C));
-            bankAddr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x24));
+            bankSize = loadAnim->m_anim->m_bankSize;
+            bankAddr = loadAnim->m_anim->m_bankAddress;
         }
 
         System.Printf(
@@ -2386,7 +2386,7 @@ void CCharaPcs::CHandle::ChangeTexture(
             LoadTextureArray(&CharaPcs)->Add(loadTexture);
         }
         File.Close(fileHandle);
-    } else if (loadTexture->m_streamOffset != 0 && reinterpret_cast<int*>(loadTexture)[1] == 1) {
+    } else if (loadTexture->m_streamOffset != 0 && loadTexture->GetRef() == 1) {
         File.LockBuffer();
         Memory.CopyFromAMemorySync(
             File.m_readBuffer,
@@ -2498,7 +2498,7 @@ void CCharaPcs::CHandle::LoadModel(
     } else {
         m_modelLoadRef = loadModel;
 
-        if (reinterpret_cast<int*>(loadModel)[1] == 1) {
+        if (loadModel->GetRef() == 1) {
             if (loadModel->m_streamOffset != 0) {
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
@@ -2598,7 +2598,7 @@ int CCharaPcs::CHandle::LoadAnim(
 
     *reinterpret_cast<unsigned int*>(Ptr(loadAnim, 0x70)) = static_cast<unsigned int>(animFlags);
     if (loadAnim->m_anim != 0) {
-        unsigned char& flags = *reinterpret_cast<unsigned char*>(Ptr(loadAnim->m_anim, 8));
+        unsigned char& flags = loadAnim->m_anim->m_flags;
         flags = static_cast<unsigned char>((flags & 0x7F) | ((animFlags << 7) & 0x80));
         flags = static_cast<unsigned char>((flags & 0xBF) | ((animFlags << 5) & 0x40));
     }
@@ -3122,7 +3122,7 @@ CCharaPcs::CLoadModel::~CLoadModel()
 CCharaPcs::CLoadAnim::CLoadAnim()
 {
     m_anim = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x2C)) = 0;
+    m_unk2C = 0;
 }
 
 /*
@@ -3185,10 +3185,9 @@ CCharaPcs::CLoadPdt::CLoadPdt()
  */
 CCharaPcs::CLoadPdt::~CLoadPdt()
 {
-    int& pdtSlot = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14);
-    if (pdtSlot >= 0) {
-        PartPcs.ReleasePdt(pdtSlot);
-        pdtSlot = -1;
+    if (m_pdtSlot >= 0) {
+        PartPcs.ReleasePdt(m_pdtSlot);
+        m_pdtSlot = -1;
     }
 }
 

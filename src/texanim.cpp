@@ -25,12 +25,6 @@ extern const char s_collection_ptrarray_h_801D7B30[];
 extern const char s_ptrarray_grow_error_801D7B14[];
 
 namespace {
-struct RefObject
-{
-    void* vtable;
-    int refCount;
-};
-
 struct CMaterialSetStorage
 {
     void* vtable;
@@ -79,19 +73,6 @@ static inline char IsTexAnimInterpFlag(unsigned char flags)
 {
     unsigned int bits = (static_cast<unsigned int>(flags) << 24) & 0xC0000000;
     return static_cast<char>(static_cast<int>(bits) >> 31);
-}
-
-static inline void ReleaseRef(void** slot)
-{
-    int* ref = reinterpret_cast<int*>(*slot);
-    if (ref != 0) {
-        const int nextRefCount = ref[1] - 1;
-        ref[1] = nextRefCount;
-        if (nextRefCount == 0) {
-            reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
-        }
-        *slot = 0;
-    }
 }
 
 }
@@ -190,12 +171,7 @@ CTexAnim::CRefData::~CRefData()
 {
     CRef* material = reinterpret_cast<CRef*>(m_material);
     if (material != 0) {
-        int* materialWords = reinterpret_cast<int*>(material);
-        int refCount = materialWords[1];
-        int nextRefCount = refCount - 1;
-
-        materialWords[1] = nextRefCount;
-        if (nextRefCount == 0) {
+        if (material->DecRef() == 0) {
             delete material;
         }
         m_material = 0;
@@ -217,12 +193,7 @@ CTexAnim::~CTexAnim()
 {
     CRef* refData = reinterpret_cast<CRef*>(m_refData);
     if (refData != 0) {
-        int* refDataWords = reinterpret_cast<int*>(refData);
-        int refCount = refDataWords[1];
-        int nextRefCount = refCount - 1;
-
-        refDataWords[1] = nextRefCount;
-        if (nextRefCount == 0) {
+        if (refData->DecRef() == 0) {
             delete refData;
         }
         m_refData = 0;
@@ -424,13 +395,11 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
          ((texAnimCount = static_cast<unsigned int>(m_texAnims.GetSize())), texAnimIndex < texAnimCount);
          texAnimIndex = texAnimIndex + 1) {
         CTexAnim* texAnim = m_texAnims[texAnimIndex];
-        int* material = reinterpret_cast<int*>(texAnim->m_refData->m_material);
+        CMaterial* material = texAnim->m_refData->m_material;
 
         if (material != 0) {
-            int refCount = material[1] - 1;
-            material[1] = refCount;
-            if (refCount == 0) {
-                delete reinterpret_cast<CMaterial*>(material);
+            if (material->DecRef() == 0) {
+                delete material;
             }
             texAnim->m_refData->m_material = 0;
         }
@@ -439,8 +408,8 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
             ((materialIndex = materialSet->Find(texAnim->m_refData->m_name)), materialIndex >= 0)) {
             CMaterial* foundMaterial = materialSetStorage->materials[materialIndex];
             texAnim->m_refData->m_material = foundMaterial;
-            material = reinterpret_cast<int*>(texAnim->m_refData->m_material);
-            material[1] = material[1] + 1;
+            material = texAnim->m_refData->m_material;
+            material->AddRef();
         }
     }
 }
@@ -464,8 +433,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
         CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
 
         copy->m_refData = src->m_refData;
-        reinterpret_cast<RefObject*>(copy->m_refData)->refCount =
-            reinterpret_cast<RefObject*>(copy->m_refData)->refCount + 1;
+        copy->m_refData->AddRef();
         copy->m_seqIndex = src->m_seqIndex;
         copy->m_frame = src->m_frame;
         copy->m_mode = src->m_mode;
@@ -504,12 +472,10 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         }
 
         CTexAnim* texAnim = new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim;
-        int* ref = reinterpret_cast<int*>(texAnim->m_refData);
+        CRef* ref = texAnim->m_refData;
         if (ref != 0) {
-            int nextRefCount = ref[1] - 1;
-            ref[1] = nextRefCount;
-            if ((nextRefCount == 0) && (ref != 0)) {
-                reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
+            if (ref->DecRef() == 0) {
+                delete ref;
             }
             texAnim->m_refData = 0;
         }
@@ -690,12 +656,7 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
-            int* itemWords = reinterpret_cast<int*>(item);
-            int refCount = itemWords[1];
-            int nextRefCount = refCount - 1;
-
-            itemWords[1] = nextRefCount;
-            if (nextRefCount == 0) {
+            if (item->DecRef() == 0) {
                 delete item;
             }
             m_items[i] = 0;
@@ -905,12 +866,7 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
-            int* itemWords = reinterpret_cast<int*>(item);
-            int refCount = itemWords[1];
-            int nextRefCount = refCount - 1;
-
-            itemWords[1] = nextRefCount;
-            if (nextRefCount == 0) {
+            if (item->DecRef() == 0) {
                 delete item;
             }
             m_items[i] = 0;

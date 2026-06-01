@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
+#include "ffcc/gobject.h"
 #include "ffcc/p_sample.h"
 #include "ffcc/system.h"
 
@@ -69,7 +70,9 @@ public:
     };
     struct EffectInfo
     {
-        unsigned char bytes[0x524];
+        unsigned char m_pad[0xC];
+        CGObject m_object;
+
         EffectInfo();
     };
     enum MENUMODE
@@ -405,5 +408,7 @@ extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
+
+STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 
 #endif // _FFCC_P_MENU_H_

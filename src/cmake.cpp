@@ -154,11 +154,9 @@ static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
 
 static inline void ReleaseRefObject(void* object)
 {
-    int* raw = reinterpret_cast<int*>(object);
-    int refCount = raw[1] - 1;
-    raw[1] = refCount;
-    if (refCount == 0) {
-        delete reinterpret_cast<CRef*>(object);
+    CRef* ref = reinterpret_cast<CRef*>(object);
+    if (ref->DecRef() == 0) {
+        delete ref;
     }
 }
 

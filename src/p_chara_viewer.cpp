@@ -119,7 +119,7 @@ static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
         CRef* ref = reinterpret_cast<CRef*>(ptr);
-        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+        if (ref->DecRef() == 0) {
             delete ref;
         }
         ptr = 0;
@@ -130,8 +130,7 @@ template <class T>
 static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
-        int* ref = reinterpret_cast<int*>(ptr);
-        ref[1] = ref[1] + 1;
+        reinterpret_cast<CRef*>(ptr)->AddRef();
     }
 }
 

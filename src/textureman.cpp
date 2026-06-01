@@ -82,19 +82,17 @@ static inline CTexture* AllocTexture()
  */
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-    if (m_textureArray[idx] != 0) {
-        if (m_textureArray[idx]->m_cacheId != -1) {
-            if (*reinterpret_cast<int*>(Ptr(m_textureArray[idx], 4)) <= 1) {
-                amemCacheSet->DestroyCache(m_textureArray[idx]->m_cacheId);
-                m_textureArray[idx]->m_imageData = 0;
+    CTexture* texture = m_textureArray[idx];
+    if (texture != 0) {
+        if (texture->m_cacheId != -1) {
+            if (texture->GetRef() <= 1) {
+                amemCacheSet->DestroyCache(texture->m_cacheId);
+                texture->m_imageData = 0;
             }
         }
 
-        int* refObj = reinterpret_cast<int*>(m_textureArray[idx]);
-        int refCount = refObj[1] - 1;
-        refObj[1] = refCount;
-        if (refCount == 0) {
-            delete reinterpret_cast<CTexture*>(refObj);
+        if (texture->DecRef() == 0) {
+            delete texture;
         }
 
         m_textureArray.SetAt(idx, 0);
@@ -163,15 +161,12 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                         amemCacheSet->AmemPrev();
                     }
 
-                    int* refObj = reinterpret_cast<int*>(texture);
-                    int refCount = refObj[1] - 1;
-                    refObj[1] = refCount;
-                    if (refCount == 0) {
-                        delete reinterpret_cast<CTexture*>(refObj);
+                    if (texture->DecRef() == 0) {
+                        delete texture;
                     }
 
                     texture = m_textureArray[duplicateIdx];
-                    *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
+                    texture->AddRef();
                 }
             }
 
@@ -248,15 +243,12 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                             amemCacheSet->AmemPrev();
                                         }
 
-                                        int* refObj = reinterpret_cast<int*>(texture);
-                                        int refCount = refObj[1] - 1;
-                                        refObj[1] = refCount;
-                                        if (refCount == 0) {
-                                            delete reinterpret_cast<CTexture*>(refObj);
+                                        if (texture->DecRef() == 0) {
+                                            delete texture;
                                         }
 
                                         texture = m_textureArray[duplicateIdx];
-                                        *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
+                                        texture->AddRef();
                                     }
                                 }
 
@@ -1122,12 +1114,10 @@ template <>
 void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
 {
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = reinterpret_cast<int*>(m_items[i]);
+        CTexture* item = m_items[i];
         if (item != 0) {
-            int refCount = item[1] - 1;
-            item[1] = refCount;
-            if (refCount == 0) {
-                delete reinterpret_cast<CTexture*>(item);
+            if (item->DecRef() == 0) {
+                delete item;
             }
             m_items[i] = 0;
         }

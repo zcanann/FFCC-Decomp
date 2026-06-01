@@ -911,11 +911,9 @@ void CMenuPcs::createSingleMenu()
 
             void* font = *reinterpret_cast<void**>(self + 0x108);
             if (font != 0) {
-                int* raw = reinterpret_cast<int*>(font);
-                int refCount = raw[1] - 1;
-                raw[1] = refCount;
-                if (refCount == 0) {
-                    delete reinterpret_cast<CRef*>(font);
+                CRef* ref = reinterpret_cast<CRef*>(font);
+                if (ref->DecRef() == 0) {
+                    delete ref;
                 }
                 *reinterpret_cast<void**>(self + 0x108) = 0;
             }
@@ -968,11 +966,9 @@ void CMenuPcs::destroySingleMenu()
 
     void* font = *reinterpret_cast<void**>(self + 0x108);
     if (font != 0) {
-        int* raw = reinterpret_cast<int*>(font);
-        int refCount = raw[1] - 1;
-        raw[1] = refCount;
-        if (refCount == 0) {
-            delete reinterpret_cast<CRef*>(font);
+        CRef* ref = reinterpret_cast<CRef*>(font);
+        if (ref->DecRef() == 0) {
+            delete ref;
         }
         *reinterpret_cast<void**>(self + 0x108) = 0;
     }

@@ -138,6 +138,7 @@ public:
         int m_mergeFlags;               // 0x14
         char m_name[16];                // 0x18
         CChara::CAnim* m_anim;          // 0x28
+        unsigned short m_unk2C;         // 0x2C
     };
 
     class CLoadTexture

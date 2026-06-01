@@ -8,6 +8,8 @@ struct Vec;
 class CGQuadObj : public CGBaseObj
 {
 public:
+    CGQuadObj();
+
     virtual void onCreate();
     virtual void onDestroy();
     virtual void onDraw();

@@ -2,6 +2,7 @@
 #define _FFCC_CFLAT_RUNTIME_H_
 
 #include "global.h"
+#include "ffcc/memory.h"
 
 class CChunkFile;
 
@@ -34,9 +35,8 @@ public:
 	class CObject
 	{
 	public:
-		CObject() {}
-		~CObject() {}
-		void onNewFinished();
+		CObject();
+		virtual void onNewFinished();
 
 		unsigned int m_id;         // 0x0
 		void** m_freeListNode;     // 0x4
@@ -58,7 +58,14 @@ public:
 		short m_0x32;              // 0x32
 		short m_0x34;              // 0x34-0x36
 		short m_argCount;          // 0x36-0x38
-		unsigned char m_flags;     // 0x38-0x3B
+		union {
+			unsigned char m_flags;     // 0x38-0x3B
+			struct {
+				unsigned char m_flagBits0 : 3;
+				unsigned char m_constructFlag : 1;
+				unsigned char m_flagBits1 : 4;
+			} m_flagBits;
+		};
 		int m_0x3C;                // 0x3C
 		int m_0x40;                // 0x40
 		int m_0x44;                // 0x44
@@ -96,15 +103,29 @@ public:
 	CFlatRuntime();
 	~CFlatRuntime();
 
-	void Init();
-	void Quit();
-	void Destroy();
+	virtual void Init();
+	virtual void Quit();
+	virtual void Destroy();
+	virtual int Frame(int, int);
+	virtual void onNewObject(CFlatRuntime::CObject*);
+	virtual void onDeleteObject(CFlatRuntime::CObject*);
+	virtual void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
+	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
+	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
+	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
+	virtual CFlatRuntime::CObject* getFreeObject(int);
+	virtual void* intToClass(int);
+	virtual void reqFinished(int, CFlatRuntime::CObject*);
+	virtual CMemory::CStage* getStage() = 0;
+	virtual CMemory::CStage* getDebugStage() = 0;
+
 	void clear();
 
 	void Create(void*);
 	int CreateDebug(void*, int);
 	void createVal(CChunkFile&, int, CFlatRuntime::CVal*);
-	int Frame(int, int);
 	void AfterFrame(int);
 
 	void deleteObject(CFlatRuntime::CObject*);
@@ -142,21 +163,7 @@ public:
 	void ResetPerformance();
 	void PrintPerformance();
 
-	void reqFinished(int, CFlatRuntime::CObject*);
-	void onDeleteObject(CFlatRuntime::CObject*);
-	void onNewObject(CFlatRuntime::CObject*);
-	CFlatRuntime::CObject* getFreeObject(int);
-	void* intToClass(int);
-
-	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
-	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
-	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
-	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
-	int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-
 private:
-    void** m_vtable;                // 0x0000
     int m_permanentVarCount;        // 0x0004
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
@@ -177,7 +184,10 @@ private:
     u8 m_performanceBlock[0x804];   // 0x0048
     u8 m_pad_084C[0x80];            // 0x084C
     CObject m_objectSentinel;       // 0x08CC
-    u8 m_pad_0914[0x64];            // 0x0914
+    CObject m_freeObjectSentinel;   // 0x0918
+    u8 m_pad_0964[0xC];             // 0x0964
+    int m_0x970;                    // 0x0970
+    u8 m_pad_0974[4];               // 0x0974
     void** m_freeListPrev;          // 0x0978
     void** m_freeListNext;          // 0x097C
     int m_freeListCount;            // 0x0980
@@ -202,5 +212,11 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_code) == 0x34);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_systemKind) == 0x40);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
+STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x4C);
+
+inline CFlatRuntime::CObject::CObject()
+{
+	m_flagBits.m_constructFlag = 0;
+}
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

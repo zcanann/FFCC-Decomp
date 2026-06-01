@@ -35,9 +35,7 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
-extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, short);
 extern "C" void __ct__8CGMonObjFv(CGMonObj*);
 extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
 extern "C" void __ct__9CGItemObjFv(CGItemObj*);
@@ -76,10 +74,8 @@ STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
-extern "C" void* __vt__9CGQuadObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" void* __vt__8CGPrgObj[];
-extern "C" void* __vt__9CGItemObj[];
 extern "C" void* __vt__10CGCharaObj[];
 extern "C" void* __vt__8CGMonObj[];
 extern "C" void* __vt__10CGPartyObj[];
@@ -96,13 +92,6 @@ static const char sCFlatRuntime2DebugFileNameFmt[] = "dvd/cft/%s.cft.dbg";
 static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
-
-struct CFlatObjectFlagBits {
-	u8 m_pad[0x38];
-	u8 m_unk0 : 3;
-	u8 m_constructFlag : 1;
-	u8 m_unk1 : 4;
-};
 
 struct CFlatDebugDrawCC {
 	u8 m_flags;
@@ -458,9 +447,6 @@ CFlatRuntime2::CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	new (reinterpret_cast<CFlatRuntime*>(this)) CFlatRuntime;
-	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
-
 	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
 	*reinterpret_cast<int*>(runtime + 0x16FC) = -1;
 	runtime[0x1700] = 0;
@@ -548,10 +534,8 @@ CFlatRuntime2::CFlatRuntime2()
 CFlatRuntime2::~CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
 	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
 	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
-	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 
 /*
@@ -593,7 +577,7 @@ extern "C" void __ct__8CGMonObjFv(CGMonObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
+	static_cast<CFlatRuntime::CObject*>(obj)->m_flagBits.m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
@@ -614,7 +598,7 @@ extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
 {
 	u8* self = reinterpret_cast<u8*>(obj);
 	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
+	static_cast<CFlatRuntime::CObject*>(obj)->m_flagBits.m_constructFlag = 0;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
@@ -631,15 +615,8 @@ extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__9CGItemObjFv(CGItemObj* obj)
+CGItemObj::CGItemObj()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGItemObj;
 }
 
 /*
@@ -651,13 +628,8 @@ extern "C" void __ct__9CGItemObjFv(CGItemObj* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__8CGObjectFv(CGObject* obj)
+CGPrgObj::CGPrgObj()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 }
 
 /*
@@ -669,13 +641,8 @@ extern "C" void __ct__8CGObjectFv(CGObject* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
+CGObject::CGObject()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGQuadObj;
 }
 
 /*
@@ -687,12 +654,12 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
+CGQuadObj::CGQuadObj()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<CFlatObjectFlagBits*>(obj)->m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+}
+
+CGBaseObj::CGBaseObj()
+{
 }
 
 /*
@@ -944,7 +911,7 @@ void* CFlatRuntime2::intToClass(int classId)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::Frame(int arg0, int mode)
+int CFlatRuntime2::Frame(int arg0, int mode)
 {
 	CStopWatch watch((char*)-1);
 
@@ -959,7 +926,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
 		}
-		return;
+		return 1;
 	}
 
 	if (mode == 1) {
@@ -1006,7 +973,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
 			object->copy();
 		}
-		return;
+		return 1;
 	}
 
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
@@ -1032,6 +999,8 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		obj->Draw();
 	}
+
+	return 1;
 }
 
 /*
@@ -1058,10 +1027,7 @@ int CFlatRuntime2::Load(char* fileName)
 	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
 	File.Close(fileHandle);
 
-	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
-	NeedDebugDataFn needDebugData = reinterpret_cast<NeedDebugDataFn>((*reinterpret_cast<void***>(this))[0x12]);
-
-	if (needDebugData(this) != 0) {
+	if (getDebugStage() != 0) {
 		int debugChunk = 0;
 		for (int debugIndex = 0;; debugIndex++) {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);

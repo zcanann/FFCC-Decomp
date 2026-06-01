@@ -431,8 +431,8 @@ void CFont::DrawInit()
 
     TextureMan.SetTexture(GX_TEXMAP0, texturePtr);
 
-    float texWidth = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x64));
-    float texHeight = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x68));
+    float texWidth = static_cast<float>(texturePtr->m_width);
+    float texHeight = static_cast<float>(texturePtr->m_height);
     PSMTXScale(texMtx, LoadFloat(kFontOne) / texWidth, LoadFloat(kFontOne) / texHeight, LoadFloat(kFontOne));
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
@@ -476,7 +476,7 @@ void CFont::FlushTlutColor()
  */
 void CFont::SetTlutColor(int tlutIndex, int colorIndex, _GXColor color)
 {
-	unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x60);
+	unsigned int format = texturePtr->m_format;
 	int colorCount;
 
 	if (format == 9) {
@@ -767,10 +767,7 @@ CFont::~CFont()
 {
 	if (texturePtr != 0) {
 		CTexture* texture = texturePtr;
-		int* textureRef = reinterpret_cast<int*>(texture);
-		int nextRefCount = textureRef[1] - 1;
-		textureRef[1] = nextRefCount;
-		if (nextRefCount == 0) {
+		if (texture->DecRef() == 0) {
 			delete texture;
 		}
 		texturePtr = 0;
@@ -840,10 +837,7 @@ void CFontMan::Quit()
 {
 	CFont* font = m_font;
 	if (font != 0) {
-		int* ref = reinterpret_cast<int*>(font);
-		int nextRefCount = ref[1] - 1;
-		ref[1] = nextRefCount;
-		if (nextRefCount == 0) {
+		if (font->DecRef() == 0) {
 			delete font;
 		}
 		m_font = 0;

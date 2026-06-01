@@ -16,7 +16,6 @@
 #include <dolphin/mtx.h>
 
 #include <string.h>
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 CMaterialMan MaterialMan;
@@ -27,7 +26,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
@@ -2340,27 +2338,6 @@ void CMaterialMan::ErrorTexMtxCur()
 void CMaterialMan::ErrorTexMapIdCur()
 {
 	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003c49c
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial* material, short shouldDelete)
-{
-    if (material != 0) {
-        __destroy_arr(Ptr(material, 0x10), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
-        if (shouldDelete > 0) {
-            operator delete(material);
-        }
-    }
-
-    return material;
 }
 
 /*

@@ -16,6 +16,8 @@ class PPPIFPARAM;
 class CGItemObj : public CGPrgObj
 {
 public:
+	CGItemObj();
+
 	struct CCFS
 	{
 		int m_memoryCapsuleNameIndex;

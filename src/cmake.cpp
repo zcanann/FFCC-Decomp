@@ -3646,7 +3646,8 @@ void CMenuPcs::CmakeVillageDraw()
     if (*reinterpret_cast<short*>(villageWork + 0x28) > 4) {
         showNameCursor = 0;
     }
-    if (strlen(s_CmakeInfo.m_name) > 6) {
+    unsigned int nameLen = strlen(s_CmakeInfo.m_name);
+    if (6 < static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);

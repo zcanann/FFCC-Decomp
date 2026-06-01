@@ -2223,10 +2223,13 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 				result = 1;
 			} else {
 				int frame = static_cast<int>(m_turnSpeed);
+				int frameMod = frame % period;
 				if (m_lastBgAttr < FLOAT_80331988) {
-					result = ((frame % period) == 0) ? 1 : 0;
+					bool isFrame = (frameMod == 0);
+					result = isFrame;
 				} else {
-					result = (period <= frame) ? 1 : 0;
+					bool isPeriod = (period <= frame);
+					result = isPeriod;
 				}
 			}
 		} else {

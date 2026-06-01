@@ -37,7 +37,6 @@ extern const float kMapViewScaleY = 0.88677877f;
 extern const float kMapViewScaleZ = 1.0f;
 extern const float kMapViewScaleXSecondary = 0.84455127f;
 CMapHitDrawMode g_MapHitDrawMode;
-unsigned char g_MapHitFaceFlag;
 extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
 extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
 extern const float kMapZero = 0.0f;

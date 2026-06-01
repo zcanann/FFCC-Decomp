@@ -45,6 +45,11 @@ inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 {
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
 }
+
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
 }
 
 /*
@@ -392,11 +397,13 @@ void CFont::DrawInit()
 
     CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
-        C_MTXOrtho(projMtx, kFontZero, kFontOrthoHeight, kFontZero, kFontOrthoWidth, kFontZero, kFontOne);
-        projMtx[2][2] = kFontOne;
-        projMtx[2][3] = kFontZero;
+        C_MTXOrtho(projMtx, LoadFloat(kFontZero), LoadFloat(kFontOrthoHeight), LoadFloat(kFontZero),
+            LoadFloat(kFontOrthoWidth), LoadFloat(kFontZero), LoadFloat(kFontOne));
+        projMtx[2][2] = LoadFloat(kFontOne);
+        projMtx[2][3] = LoadFloat(kFontZero);
     } else {
-        C_MTXOrtho(projMtx, kFontZero, kFontOrthoHeight, kFontZero, kFontOrthoWidth, kFontZero, kFontOne);
+        C_MTXOrtho(projMtx, LoadFloat(kFontZero), LoadFloat(kFontOrthoHeight), LoadFloat(kFontZero),
+            LoadFloat(kFontOrthoWidth), LoadFloat(kFontZero), LoadFloat(kFontOne));
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 
@@ -426,7 +433,7 @@ void CFont::DrawInit()
 
     float texWidth = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x64));
     float texHeight = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x68));
-    PSMTXScale(texMtx, kFontOne / texWidth, kFontOne / texHeight, kFontOne);
+    PSMTXScale(texMtx, LoadFloat(kFontOne) / texWidth, LoadFloat(kFontOne) / texHeight, LoadFloat(kFontOne));
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
     GXSetNumTexGens(1);

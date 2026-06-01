@@ -205,12 +205,12 @@ static int getPadConnectedForSlot(int slot)
 
 static bool isMenuPcsCommandBusy()
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x740) != 0;
+	return MenuPcs.m_mode != 0;
 }
 
 static CRingMenu* getBattleRingMenuForPort(int port)
 {
-	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x13C + port * 4);
+	return MenuPcs.m_battleRingMenus[port];
 }
 
 static int getPartyJoybusPort(CGPartyObj* self)

@@ -93,7 +93,7 @@ static inline int ScriptPlayerIndex(CGObject* engineObject)
 
 static inline CRingMenu* BattleRingMenu(int playerIndex)
 {
-	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<u8*>(&MenuPcs) + 0x13C + playerIndex * 4);
+	return MenuPcs.m_battleRingMenus[playerIndex];
 }
 
 #define PushValue(runtime, object, value) reinterpret_cast<CFlatRuntime*>(runtime)->push((object), (value))

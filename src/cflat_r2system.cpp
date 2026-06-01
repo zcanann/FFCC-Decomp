@@ -3823,25 +3823,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0xC6:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 72) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 88) = 0x40;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 96) = object->m_localBase[1];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100) = object->m_localBase[2];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 108) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        MenuPcs.m_battleHud.m_visible = *object->m_localBase;
+        MenuPcs.m_battleHud.m_fadeCounter = 0x40;
+        MenuPcs.m_battleHud.m_width = object->m_localBase[1];
+        MenuPcs.m_battleHud.m_gaugeMax = object->m_localBase[2];
+        MenuPcs.m_battleHud.m_gaugeTarget = MenuPcs.m_battleHud.m_gaugeMax;
+        MenuPcs.m_battleHud.m_gaugeValue = MenuPcs.m_battleHud.m_gaugeMax;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0xC7:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 76) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 80) = object->m_localBase[1];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 84) = object->m_localBase[2];
-        if (object->m_localBase[3] < *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104)) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 92) = 0x10;
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
+        MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
+        MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
+        if (object->m_localBase[3] < MenuPcs.m_battleHud.m_gaugeTarget) {
+            MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) = object->m_localBase[3];
+        MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
         runtime->push(object, 0);
         outResult = 0;
         return 1;

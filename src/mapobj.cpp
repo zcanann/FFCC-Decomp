@@ -1335,8 +1335,8 @@ void CMapObj::Calc()
             if (reinterpret_cast<MapObjAttrMimeLayout*>(attr)->keyFrame.IsRun() != 0) {
                 MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(attr);
                 float blend;
-                int key1;
                 int key0;
+                int key1;
                 Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
 
                 if (mime->keyFrame.Get(key0, key1, blend) != 0) {

@@ -413,7 +413,6 @@ static inline char* GetCmakeNameBuffer()
 
 static void LoadCmakeVillageName()
 {
-    memset(s_CmakeInfo.m_name, 0, sizeof(s_CmakeInfo.m_name));
     strcpy(s_CmakeInfo.m_name, s_CmakeVillageName);
 }
 

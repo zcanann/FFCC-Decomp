@@ -40,7 +40,7 @@ public:
     static unsigned int m_table_desc23[3];
     static CProcessTable m_table[3];
 
-    CMapPcs();
+    CMapPcs() {}
 
     void Init();
     void Quit();

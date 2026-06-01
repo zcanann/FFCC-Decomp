@@ -1735,7 +1735,7 @@ void CMapMng::InitMapShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::ReadMtx(char* mapName)
+int CMapMng::ReadMtx(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
@@ -1765,6 +1765,10 @@ void CMapMng::ReadMtx(char* mapName)
         }
         if (!exists) {
             break;
+        }
+
+        if (static_cast<unsigned int>(System.m_execParam) > 2) {
+            System.Printf(const_cast<char*>(s_mapReadMtxFmt), g_StrTmp);
         }
 
         void* filePtr = File.m_readBuffer;
@@ -1808,7 +1812,10 @@ void CMapMng::ReadMtx(char* mapName)
         }
 
         if (filePtr == 0) {
-            return;
+            if (System.m_execParam != 0) {
+                System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+            }
+            return 0;
         }
 
         if (asyncLoadState.m_mapReadMode != 3) {
@@ -1819,7 +1826,7 @@ void CMapMng::ReadMtx(char* mapName)
             if (asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
-                        return;
+                        return 1;
                     }
                 }
             } else {
@@ -1828,7 +1835,7 @@ void CMapMng::ReadMtx(char* mapName)
                         m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
-                            return;
+                            return 1;
                         }
                     }
                 }
@@ -1837,6 +1844,19 @@ void CMapMng::ReadMtx(char* mapName)
 
         loadIndex += 1;
     }
+
+    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+        return 1;
+    }
+
+    if (loadIndex == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+        }
+        return 0;
+    }
+
+    return 1;
 }
 
 /*
@@ -1848,7 +1868,7 @@ void CMapMng::ReadMtx(char* mapName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::ReadMpl(char* mapName)
+int CMapMng::ReadMpl(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
@@ -1873,15 +1893,15 @@ void CMapMng::ReadMpl(char* mapName)
 
         if (!canRead) {
             if (readMode == 3) {
-                return;
+                return 1;
             }
             if (loadIndex == 0) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
                 }
-                return;
+                return 0;
             }
-            return;
+            return 1;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) > 2) {
@@ -1933,7 +1953,7 @@ void CMapMng::ReadMpl(char* mapName)
             if (System.m_execParam != 0) {
                 System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
             }
-            return;
+            return 0;
         }
 
         if (readMode != 3) {
@@ -1944,7 +1964,7 @@ void CMapMng::ReadMpl(char* mapName)
             if (readMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
-                        return;
+                        return 1;
                     }
                 }
             } else {
@@ -1959,13 +1979,13 @@ void CMapMng::ReadMpl(char* mapName)
                         if (meshChunk.m_id == 0x56534554) {
                             short& meshCount = m_mapMeshCount;
                             if (meshCount > 0x9F) {
-                                return;
+                                return 0;
                             }
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
+                            CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                         } else if (meshChunk.m_id == 0x44534554) {
                             short& meshCount = m_mapMeshCount;
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
+                            CMapMesh* mesh = GetMapMeshArray() + meshCount;
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
                         }
@@ -1973,7 +1993,7 @@ void CMapMng::ReadMpl(char* mapName)
                     chunkFile.PopChunk();
 
                     if (chunk.m_arg0 == 1) {
-                        return;
+                        return 1;
                     }
                 }
             }
@@ -2103,7 +2123,7 @@ void CMapMng::ReadOtm(char* mapName)
                     if (meshCount > 0x9F) {
                         return;
                     }
-                    CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
+                    CMapMesh* mesh = GetMapMeshArray() + meshCount;
                     mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
                     meshCount += 1;
                     continue;
@@ -2186,7 +2206,7 @@ void CMapMng::ReadOtm(char* mapName)
     CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
     CMapObj* root = 0;
     while (mapObj < mapObjEnd) {
-        if (mapObj->m_parent != 0) {
+        if (mapObj->m_parent == 0) {
             root = mapObj;
             break;
         }

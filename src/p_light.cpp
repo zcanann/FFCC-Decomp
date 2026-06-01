@@ -63,9 +63,12 @@ unsigned int CLightPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int CLightPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
 unsigned int CLightPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
 unsigned int CLightPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
-unsigned int CLightPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(sLightPcsClassName)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
-    0, 0x2D, 1
+CProcessTable CLightPcs::m_table = {
+    const_cast<char*>(sLightPcsClassName),
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
+        0, 0x2D, 1,
+    },
 };
 
 CLightPcs LightPcs;
@@ -135,7 +138,7 @@ void CLightPcs::Quit()
  */
 int CLightPcs::GetTable(unsigned long index)
 {
-    return (int)m_table + (index * 0x15c);
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

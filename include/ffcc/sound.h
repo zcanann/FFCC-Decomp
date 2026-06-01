@@ -36,7 +36,27 @@ struct CLine {
 class CSound : public CManager
 {
 public:
-    class CSe3D;
+    class CSe3D {
+    public:
+        union {
+            struct {
+                unsigned char m_active : 1;
+                unsigned char m_paused : 1;
+                unsigned char m_flagsRest : 6;
+            } m_bits;
+            signed char m_flags;
+        };
+        unsigned char m_volume;
+        unsigned char m_pan;
+        signed char m_lineIndex;
+        int m_handle;
+        int m_playId;
+        int m_soundId;
+        float m_nearDistance;
+        float m_farDistance;
+        Vec m_position;
+        int m_group;
+    };
 
     CSound();
     ~CSound();
@@ -115,7 +135,7 @@ private:
     int m_waveState;
     int m_waveSyncMode;
     int m_seCount;
-    unsigned char m_seWork[0x1400];
+    CSe3D m_seWork[128];
     CLine<10> m_lines[8];
     unsigned char* m_streamBuffer;
     CFile::CHandle* m_streamFile;
@@ -135,6 +155,8 @@ private:
     int m_pauseAllSe;
     int m_debugPrint;
 };
+
+typedef int CSound_CSe3D_size_mismatch[(sizeof(CSound::CSe3D) == 0x28) ? 1 : -1];
 
 extern CSound Sound;
 

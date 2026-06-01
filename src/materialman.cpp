@@ -177,7 +177,7 @@ static void ReleaseRef(void* object)
     int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
     int nextRefCount = refCount - 1;
     refCount = nextRefCount;
-    if (nextRefCount == 0) {
+    if (nextRefCount == 0 && object != 0) {
         void** vtable = *reinterpret_cast<void***>(object);
         reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
     }
@@ -277,26 +277,6 @@ template <>
 CPtrArray<CMaterial*>::~CPtrArray()
 {
     RemoveAll();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80043aac
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
-{
-    if (ptrArray != 0) {
-        ptrArray->RemoveAll();
-        if (shouldDelete > 0) {
-            operator delete(ptrArray);
-        }
-    }
-    return ptrArray;
 }
 
 template <>
@@ -2430,8 +2410,7 @@ CTexScroll::CTexScroll()
  */
 CMaterial::~CMaterial()
 {
-    int numTexture = static_cast<int>(m_textureCount);
-    for (int i = 0; i < numTexture; i++) {
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         ReleaseRef(m_textures[i]);
         m_textures[i] = 0;
     }

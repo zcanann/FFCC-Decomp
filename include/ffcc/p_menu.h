@@ -31,7 +31,7 @@ public:
     static unsigned int m_table_desc3[3];
     static unsigned int m_table_desc4[3];
     static unsigned int m_table_desc5[3];
-    static unsigned int m_table[0x57];
+    static CProcessTable m_table;
 
     struct BattleHudState
     {

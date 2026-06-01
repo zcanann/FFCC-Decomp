@@ -36,7 +36,7 @@ public:
     static unsigned int m_table_desc1[3];
     static unsigned int m_table_desc2[3];
     static unsigned int m_table_desc3[3];
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     CMaterialEditorPcs() {}
     ~CMaterialEditorPcs();
@@ -129,10 +129,6 @@ public:
     unsigned char _pad3BD[0x3E0 - 0x3BD];
 };
 
-#ifdef FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
-extern u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
-#else
 extern CMaterialEditorPcs MaterialEditorPcs;
-#endif
 
 #endif // _FFCC_P_MATERIALEDITOR_H_

@@ -15,48 +15,6 @@ static const char s_ptrarray_grow_error[] =
     "\x83\x6F\x83\x62\x83\x74\x83\x40\x90\xAC\x92\xB7\x82\xAA\x95\x73\x8B\x96\x89\xC2\x82\xC5\x82\xB7\x81\x42\x0A";
 static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 
-struct CMapAnimNodeTrackKey
-{
-    unsigned int frame;
-    Vec value;
-};
-
-struct CMapAnimNodeTrack
-{
-    unsigned int count;
-    CMapAnimNodeTrackKey* keys;
-};
-class CMapAnimKey
-{
-public:
-    unsigned int count;
-    CMapAnimNodeTrackKey* keys;
-};
-
-struct CMapAnimNodeTracks
-{
-    CMapAnimNodeTrack position;
-    CMapAnimNodeTrack rotation;
-    CMapAnimNodeTrack scale;
-};
-
-struct CMapAnimData
-{
-    unsigned char _00[0x1C];
-    int startFrame;
-    int endFrame;
-};
-
-struct CMapAnimTargetNode
-{
-    unsigned char _00[0x1B];
-    unsigned char dirty;
-    unsigned char _1C[0x48];
-    Vec position;
-    Vec rotation;
-    Vec scale;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8004a4a0
@@ -255,6 +213,66 @@ CMapAnim::CMapAnim()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, int loopFrameCount)
+{
+    CMapAnimNodeTrackKey* keys = track->keys;
+    int trackCount = track->count;
+
+    if (trackCount == 1) {
+        out->x = keys[0].value.x;
+        out->y = keys[0].value.y;
+        out->z = keys[0].value.z;
+    } else {
+        CMapAnimNodeTrackKey* current = keys;
+        unsigned int i = 0;
+        unsigned int keyCount = static_cast<unsigned int>(trackCount);
+
+        for (; i < keyCount; i++) {
+            unsigned int nextIndex = (keyCount <= (i + 1)) ? 0 : (i + 1);
+            CMapAnimNodeTrackKey* next = keys + nextIndex;
+            unsigned int endFrame;
+
+            if (nextIndex != 0) {
+                endFrame = next->frame;
+            } else {
+                endFrame = next->frame + loopFrameCount;
+            }
+
+            unsigned int currentFrame = current->frame;
+            if ((currentFrame <= static_cast<unsigned int>(frameInLoop)) &&
+                (frameInLoop < static_cast<int>(endFrame))) {
+                unsigned int frameRange = endFrame - currentFrame;
+                float t;
+                Vec nextScaled;
+                Vec currentScaled;
+
+                if (frameRange == 0) {
+                    t = 0.0f;
+                } else {
+                    t = static_cast<float>(static_cast<unsigned int>(frameInLoop) - currentFrame) /
+                        static_cast<float>(frameRange);
+                }
+
+                PSVECScale(&current->value, &currentScaled, t);
+                PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                PSVECAdd(&currentScaled, &nextScaled, out);
+                break;
+            }
+
+            current++;
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004a9b4
  * PAL Size: 996b
  * EN Address: TODO
@@ -427,6 +445,84 @@ void CMapAnimNode::Interp(int frame)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 564b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
+{
+    unsigned int chunkData[4];
+    unsigned int& chunkId = chunkData[0];
+    unsigned int& chunkSize = chunkData[3];
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
+    int hasChunk;
+
+    m_mapAnim = reinterpret_cast<CMapAnimData*>(mapAnim);
+    chunkFile.PushChunk();
+    while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData)))) != 0) {
+        if (chunkId == 0x4E494458) {
+            int nodeIdx = static_cast<int>(chunkFile.Get4());
+            m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
+        } else if (chunkId == 0x5452414E) {
+            CMapAnimKeyDt* keyData =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
+            m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(keyData);
+            mapAnimKeyDtArray->Add(keyData);
+            m_tracks->position.count = chunkSize >> 4;
+            m_tracks->position.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
+                    CMapAnimNodeTrackKey[m_tracks->position.count];
+            memcpy(m_tracks->position.keys, chunkFile.GetAddress(), chunkSize);
+        } else if (chunkId == 0x524F5420) {
+            m_tracks->rotation.count = chunkSize >> 4;
+            m_tracks->rotation.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
+                    CMapAnimNodeTrackKey[m_tracks->rotation.count];
+            memcpy(m_tracks->rotation.keys, chunkFile.GetAddress(), chunkSize);
+        } else if (chunkId == 0x5343414C) {
+            m_tracks->scale.count = chunkSize >> 4;
+            m_tracks->scale.keys =
+                new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
+                    CMapAnimNodeTrackKey[m_tracks->scale.count];
+            memcpy(m_tracks->scale.keys, chunkFile.GetAddress(), chunkSize);
+        }
+    }
+    chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapAnimNode::~CMapAnimNode()
+{
+    m_mapAnim = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapAnimNode::CMapAnimNode()
+{
+    m_tracks = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004ad98
  * PAL Size: 148b
  * EN Address: TODO
@@ -448,6 +544,22 @@ CMapAnimKeyDt::~CMapAnimKeyDt()
         delete[] m_scaleKeys;
         m_scaleKeys = 0;
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapAnimKeyDt::CMapAnimKeyDt()
+{
+    m_positionKeys = 0;
+    m_rotationKeys = 0;
+    m_scaleKeys = 0;
 }
 
 /*

@@ -32,9 +32,12 @@ u32 CGraphicPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCo
 u32 CGraphicPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
 u32 CGraphicPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
 u32 CGraphicPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table[0x15C / sizeof(u32)] = {
-    reinterpret_cast<u32>(const_cast<char*>(s_CGraphicPcs)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
-    0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
+CProcessTable CGraphicPcs::m_table = {
+    const_cast<char*>(s_CGraphicPcs),
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
+        0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9,
+    },
 };
 
 extern "C" float FLOAT_8032fb78;
@@ -982,7 +985,7 @@ void CGraphicPcs::create()
  */
 int CGraphicPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * sizeof(m_table));
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

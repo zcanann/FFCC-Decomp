@@ -36,11 +36,6 @@ extern const float kMapViewScaleXPrimary = 0.73898232f;
 extern const float kMapViewScaleY = 0.88677877f;
 extern const float kMapViewScaleZ = 1.0f;
 extern const float kMapViewScaleXSecondary = 0.84455127f;
-extern "C" void* __vt__8CPtrArrayIP14CMapLightHolder[];
-extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
-extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
-extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
-extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
 CMapHitDrawMode g_MapHitDrawMode;
 unsigned char g_MapHitFaceFlag;
 extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
@@ -312,37 +307,6 @@ CPtrArray<CMapLightHolder*>::~CPtrArray()
 
     m_size = 0;
     m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034414
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP14CMapLightHolder;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
 }
 
 template <>
@@ -742,37 +706,6 @@ CPtrArray<CMapAnimRun*>::~CPtrArray()
 
 /*
  * --INFO--
- * PAL Address: 0x800344c4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP11CMapAnimRun;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80034540
  * PAL Size: 52b
  * EN Address: TODO
@@ -810,37 +743,6 @@ CPtrArray<CMapAnim*>::~CPtrArray()
 
     m_size = 0;
     m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034574
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP7CMapAnim;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
 }
 
 /*
@@ -886,37 +788,6 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 
 /*
  * --INFO--
- * PAL Address: 0x80034624
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800346a0
  * PAL Size: 52b
  * EN Address: TODO
@@ -954,37 +825,6 @@ CPtrArray<CMapShadow*>::~CPtrArray()
 
     m_size = 0;
     m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800346d4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP10CMapShadow;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
 }
 
 /*
@@ -3341,7 +3181,7 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
 
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
-            if (reinterpret_cast<CMapObj*>(*reinterpret_cast<int*>(mapAnimNode)) == mapObj) {
+            if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
                 foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
             }

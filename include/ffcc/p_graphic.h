@@ -34,7 +34,7 @@ public:
     static u32 m_table_desc7[3];
     static u32 m_table_desc8[3];
     static u32 m_table_desc9[3];
-    static u32 m_table[0x15C / sizeof(u32)];
+    static CProcessTable m_table;
 
     void Init();
     void Quit();
@@ -67,7 +67,7 @@ public:
 
     CGraphicPcs()
     {
-        u32* table = &m_table[1];
+        u32* table = reinterpret_cast<u32*>(&m_table) + 1;
         table[31] = m_table_desc7[0];
         table[32] = m_table_desc7[1];
         table[36] = m_table_desc8[0];

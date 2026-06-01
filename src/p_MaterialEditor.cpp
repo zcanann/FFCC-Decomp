@@ -37,24 +37,26 @@ unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_
 CMaterialEditorPcs MaterialEditorPcs;
 char* q;
 
-unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)),
-    m_table_desc0[0],
-    m_table_desc0[1],
-    m_table_desc0[2],
-    m_table_desc1[0],
-    m_table_desc1[1],
-    m_table_desc1[2],
-    m_table_desc2[0],
-    m_table_desc2[1],
-    m_table_desc2[2],
-    0x20,
-    0,
-    m_table_desc3[0],
-    m_table_desc3[1],
-    m_table_desc3[2],
-    0x41,
-    1
+CProcessTable CMaterialEditorPcs::m_table = {
+    const_cast<char*>(s_CMaterialEditorPcsViewer),
+    {
+        m_table_desc0[0],
+        m_table_desc0[1],
+        m_table_desc0[2],
+        m_table_desc1[0],
+        m_table_desc1[1],
+        m_table_desc1[2],
+        m_table_desc2[0],
+        m_table_desc2[1],
+        m_table_desc2[2],
+        0x20,
+        0,
+        m_table_desc3[0],
+        m_table_desc3[1],
+        m_table_desc3[2],
+        0x41,
+        1,
+    },
 };
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const double DOUBLE_8032FCD0;
@@ -622,7 +624,7 @@ void CMaterialEditorPcs::createViewer()
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * sizeof(m_table));
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&CMaterialEditorPcs::m_table) + index * sizeof(m_table));
 }
 /*
  * --INFO--

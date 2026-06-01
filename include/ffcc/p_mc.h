@@ -12,14 +12,14 @@ extern "C" void calc__6CMcPcsFv(CMcPcs*);
 class CMcPcs : public CProcess
 {
 public:
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     CMcPcs()
     {
         static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__6CMcPcsFv)};
         static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__6CMcPcsFv)};
         static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__6CMcPcsFv)};
-        unsigned int* table = &m_table[1];
+        unsigned int* table = reinterpret_cast<unsigned int*>(&m_table) + 1;
 
         table[0] = desc0[0];
         table[1] = desc0[1];

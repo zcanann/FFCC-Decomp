@@ -19,11 +19,11 @@ extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 class CGamePcs : public CProcess
 {
 public:
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     CGamePcs()
     {
-        unsigned int* table = reinterpret_cast<unsigned int*>(m_table);
+        unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
         static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
         static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
         static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};

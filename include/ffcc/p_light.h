@@ -76,7 +76,7 @@ public:
     static unsigned int m_table_desc2[3];
     static unsigned int m_table_desc3[3];
     static unsigned int m_table_desc4[3];
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     void Init();
     void Quit();
@@ -130,7 +130,7 @@ extern CLightPcs LightPcs;
 
 inline CLightPcs::CLightPcs()
 {
-    unsigned int* table = m_table;
+    unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
 
     table[0x004 / 4] = m_table_desc0[0];
     table[0x008 / 4] = m_table_desc0[1];

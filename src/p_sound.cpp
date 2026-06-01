@@ -2,24 +2,26 @@
 #include "ffcc/linkage.h"
 #include "ffcc/sound.h"
 
-unsigned int CSoundPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>("CSoundPcs"),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x25,
-    0,
-    0,
-    0,
-    0,
-    0x44,
-    1
+CProcessTable CSoundPcs::m_table = {
+    "CSoundPcs",
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x25,
+        0,
+        0,
+        0,
+        0,
+        0x44,
+        1,
+    },
 };
 
 CSoundPcs SoundPcs;
@@ -109,7 +111,7 @@ void CSoundPcs::create()
  */
 int CSoundPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + (index * 0x15C));
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

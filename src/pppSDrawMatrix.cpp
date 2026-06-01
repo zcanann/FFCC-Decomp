@@ -18,8 +18,8 @@ extern "C" {
 void pppSDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
 {
 	PSMTXConcat(ppvCameraMatrix,
-	           *(Mtx*)((u8*)object + 0x10),
-	           *(Mtx*)((u8*)object + 0x40));
+	           object->m_localMatrix.value,
+	           object->m_drawMatrix.value);
 }
 
 #ifdef __cplusplus

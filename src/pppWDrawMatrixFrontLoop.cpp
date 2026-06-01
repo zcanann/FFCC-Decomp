@@ -16,21 +16,20 @@ void pppWDrawMatrixFrontLoop(struct _pppPObject* object, void*, struct _pppCtrlT
     Vec localPos;
 
     PSMTXScaleApply(
-        *(Mtx*)((char*)object + 0x10),
-        *(Mtx*)((char*)object + 0x40),
+        object->m_localMatrix.value,
+        object->m_drawMatrix.value,
         ppvMng->m_scale.x,
         ppvMng->m_scale.y,
         ppvMng->m_scale.z
     );
 
-    localPos.x = *(float*)((char*)object + 0x1C);
-    localPos.y = *(float*)((char*)object + 0x2C);
-    localPos.z = *(float*)((char*)object + 0x3C);
+    localPos.x = object->m_localMatrix.value[0][3];
+    localPos.y = object->m_localMatrix.value[1][3];
+    localPos.z = object->m_localMatrix.value[2][3];
 
     PSMTXMultVec(ppvCameraMatrix, &localPos, &localPos);
 
-    *(float*)((char*)object + 0x4C) = localPos.x;
-    *(float*)((char*)object + 0x5C) = localPos.y;
-    *(float*)((char*)object + 0x6C) = localPos.z;
+    object->m_drawMatrix.value[0][3] = localPos.x;
+    object->m_drawMatrix.value[1][3] = localPos.y;
+    object->m_drawMatrix.value[2][3] = localPos.z;
 }
-

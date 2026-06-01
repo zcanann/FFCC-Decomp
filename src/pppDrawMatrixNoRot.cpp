@@ -15,17 +15,17 @@
 void pppDrawMatrixNoRot(struct _pppPObject* object, void*, struct _pppCtrlTable*)
 {
     PSMTXScaleApply(
-        *(Mtx*)((char*)object + 0x10),
-        *(Mtx*)((char*)object + 0x40),
+        object->m_localMatrix.value,
+        object->m_drawMatrix.value,
         (((_pppMngSt*)ppvMng)->m_scale).x,
         (((_pppMngSt*)ppvMng)->m_scale).y,
         (((_pppMngSt*)ppvMng)->m_scale).z
     );
-    *(float*)((char*)object + 0x4c) =
-        (*(float*)((char*)object + 0x1c)) * (((_pppMngSt*)ppvMng)->m_scale).x +
+    object->m_drawMatrix.value[0][3] =
+        object->m_localMatrix.value[0][3] * (((_pppMngSt*)ppvMng)->m_scale).x +
         ppvWorldMatrix[0][3];
-    *(float*)((char*)object + 0x5c) =
-        (*(float*)((char*)object + 0x2c)) * (((_pppMngSt*)ppvMng)->m_scale).y + ppvWorldMatrix[1][3];
-    *(float*)((char*)object + 0x6c) =
-        (*(float*)((char*)object + 0x3c)) * (((_pppMngSt*)ppvMng)->m_scale).z + ppvWorldMatrix[2][3];
+    object->m_drawMatrix.value[1][3] =
+        object->m_localMatrix.value[1][3] * (((_pppMngSt*)ppvMng)->m_scale).y + ppvWorldMatrix[1][3];
+    object->m_drawMatrix.value[2][3] =
+        object->m_localMatrix.value[2][3] * (((_pppMngSt*)ppvMng)->m_scale).z + ppvWorldMatrix[2][3];
 }

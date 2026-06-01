@@ -18,21 +18,17 @@ void pppDrawMatrixLoc(_pppPObject* object, void*, _pppCtrlTable*)
     Vec local_2c;
     Vec local_38;
     Vec local_20[2];
-    Mtx* srcMtx;
-    Mtx* dstMtx;
 
-    srcMtx = (Mtx*)((char*)object + 0x10);
     local_2c.z = FLOAT_803331d8;
-    dstMtx = (Mtx*)((char*)object + 0x40);
     local_2c.y = FLOAT_803331d8;
     local_2c.x = FLOAT_803331d8;
-    PSMTXCopy(*srcMtx, *dstMtx);
+    PSMTXCopy(object->m_localMatrix.value, object->m_drawMatrix.value);
     PSMTXMultVec(ppvWorldMatrix, &local_2c, &local_2c);
-    local_38.x = *(float*)((char*)object + 0x4c);
-    local_38.y = *(float*)((char*)object + 0x5c);
-    local_38.z = *(float*)((char*)object + 0x6c);
+    local_38.x = object->m_drawMatrix.value[0][3];
+    local_38.y = object->m_drawMatrix.value[1][3];
+    local_38.z = object->m_drawMatrix.value[2][3];
     PSVECAdd(&local_38, &local_2c, local_20);
-    *(float*)((char*)object + 0x4c) = local_20[0].x;
-    *(float*)((char*)object + 0x5c) = local_20[0].y;
-    *(float*)((char*)object + 0x6c) = local_20[0].z;
+    object->m_drawMatrix.value[0][3] = local_20[0].x;
+    object->m_drawMatrix.value[1][3] = local_20[0].y;
+    object->m_drawMatrix.value[2][3] = local_20[0].z;
 }

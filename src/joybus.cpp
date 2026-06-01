@@ -9,6 +9,7 @@
 #include <dolphin/si.h>
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
 
 #include "string.h"
@@ -165,7 +166,7 @@ unsigned int CSystem::GetCounter()
  * Address:	TODO
  * Size:	TODO
  */
-JoyBus::JoyBus()
+inline JoyBus::JoyBus()
 {
     m_threadRunningMask = 0;
     m_binLoaded = false;
@@ -182,7 +183,7 @@ JoyBus::JoyBus()
     }
 
     strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
-    strcat(m_pathBuf, JoyBusConst::CLIENT_FILE, 128UL);
+    strcat(m_pathBuf, JoyBusConst::CLIENT_FILE);
 
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
     memset(m_stageFlags, 0, sizeof(m_stageFlags));

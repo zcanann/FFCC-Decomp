@@ -2,13 +2,14 @@
 #define _FFCC_PPPCOLACCELE_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppColAccele(_pppPObject* obj1, void* data1, _pppPObject* obj2);
-void pppColAcceleCon(_pppPObject* obj, void* data);
+void pppColAccele(_pppPObject* object, void* data, _pppCtrlTable* ctrlTable);
+void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

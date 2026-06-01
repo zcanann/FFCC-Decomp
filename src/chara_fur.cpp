@@ -864,7 +864,7 @@ static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b
 	*texel = PackFurTexel(r, g, b, a);
 }
 
-static void FurInitTextureDefaults()
+static inline void FurInitTextureDefaults()
 {
 	if (!s_mogFurBaseColorsInit) {
 		s_mogFurBaseColor = CColor(0x80, 0x80, 0x80, 0xFF).color;

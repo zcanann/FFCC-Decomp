@@ -82,15 +82,15 @@ static inline CTexture* AllocTexture()
  */
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-    CTexture* texture = m_textureArray[idx];
-    if (texture != 0) {
-        if (texture->m_cacheId != -1) {
-            if (texture->GetRef() <= 1) {
-                amemCacheSet->DestroyCache(texture->m_cacheId);
-                texture->m_imageData = 0;
+    if (m_textureArray[idx] != 0) {
+        if (m_textureArray[idx]->m_cacheId != -1) {
+            if (m_textureArray[idx]->GetRef() <= 1) {
+                amemCacheSet->DestroyCache(m_textureArray[idx]->m_cacheId);
+                m_textureArray[idx]->m_imageData = 0;
             }
         }
 
+        CTexture* texture = m_textureArray[idx];
         if (texture->DecRef() == 0) {
             delete texture;
         }
@@ -1116,7 +1116,9 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         CTexture* item = m_items[i];
         if (item != 0) {
-            if (item->DecRef() == 0) {
+            int nextRefCount = item->refCount - 1;
+            item->refCount = nextRefCount;
+            if (nextRefCount == 0) {
                 delete item;
             }
             m_items[i] = 0;

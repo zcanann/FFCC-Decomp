@@ -3394,7 +3394,11 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
-        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
+        if (row < maxRow) {
+            row = static_cast<short>(row + 1);
+        } else {
+            row = 0;
+        }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     }
 

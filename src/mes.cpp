@@ -1432,7 +1432,7 @@ void CMes::Next()
 	float* curr;
 	char tempFlags[0x50];
 
-	if (*(char**)((char*)this + 4) != 0)
+	if (mText != 0)
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
@@ -1458,7 +1458,7 @@ void CMes::Next()
 			flagEntry += 6;
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 		}
-		*(int*)((char*)this + 8) = 0;
+		mCounter = 0;
 		*(int*)((char*)this + 0x3c10) = 0;
 		*(int*)((char*)this + 0x3c0c) = 0;
 		*(float*)((char*)this + 0x3c88) = halfVal;
@@ -1469,12 +1469,12 @@ void CMes::Next()
 		*(int*)((char*)this + 0x3c7c) = 0;
 		*(int*)((char*)this + 0x3cac) = 0;
 		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
-		addString((char**)((char*)this + 4), 0);
+		addString(&mText, 0);
 		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
 		halfVal = FLOAT_803308b0;
 		i = 0;
 		curr = (float*)((char*)this + 0xc);
-		while ((start = curr, remaining = *(int*)((char*)this + 8), i < remaining))
+		while ((start = curr, remaining = mCounter, i < remaining))
 		{
 			i = i + 1;
 			curr = start + 5;

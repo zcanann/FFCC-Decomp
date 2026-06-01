@@ -1422,7 +1422,7 @@ void CMapObj::SetDrawEnv()
 
     _GXColor lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), (S16At(this, 0x28) >> 7) & 0xFF);
+                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
 }
 
 /*

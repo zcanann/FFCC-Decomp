@@ -547,12 +547,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
 
                         if (needsMtxUpdate) {
-                            S16Vec worldPos;
                             Vec transformedPos;
-                            worldPos.x = srcPos->x;
-                            worldPos.y = srcPos->y;
-                            worldPos.z = srcPos->z;
-                            gUtil.ConvI2FVector(transformedPos, worldPos, ModelData(model)->m_posQuant);
+                            gUtil.ConvI2FVector(transformedPos, *srcPos, ModelData(model)->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
@@ -679,12 +675,11 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         }
 
                         for (int i = 0; i < 3; i++) {
-                            Vec translated;
                             float wobbleScale;
 
-                            PSVECSubtract(&verts[i], &center, &translated);
-                            PSMTXMultVec(rotMtx, &translated, &translated);
-                            PSVECAdd(&translated, &center, &verts[i]);
+                            PSVECSubtract(&verts[i], &center, &verts[i]);
+                            PSMTXMultVec(rotMtx, &verts[i], &verts[i]);
+                            PSVECAdd(&verts[i], &center, &verts[i]);
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;

@@ -1,6 +1,11 @@
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 
-const __ptmf __ptmf_null = {0, 0, {0}};
+typedef struct __ptmf_null_data {
+    __ptmf ptmf;
+    long pad;
+} __ptmf_null_data;
+
+const __ptmf_null_data __ptmf_null = {{0, 0, {0}}, 0};
 
 asm long __ptmf_test(register __ptmf* ptmf) {
     // clang-format off

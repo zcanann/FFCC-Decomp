@@ -670,8 +670,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 		return;
 	}
 
-	int idx0 = 0;
 	CAPos* pos0 = m_portals;
+	int idx0 = 0;
 	do
 	{
 		int other0 = pos0->m_groupA;
@@ -735,8 +735,10 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 				level1.m_pathLength = temp.m_pathLength;
 				level1.m_cost = temp.m_cost;
-				int pathSlot1 = level1.m_pathLength++;
-				level1.m_cost += PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				float distance1 = PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				int pathSlot1 = level1.m_pathLength;
+				level1.m_pathLength = pathSlot1 + 1;
+				level1.m_cost += distance1;
 				level1.m_path[pathSlot1] = static_cast<unsigned char>(idx0);
 				level1.m_visited[other0] = 1;
 
@@ -786,8 +788,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				}
 				else
 				{
-					int idx1 = 0;
 					CAPos* pos1 = m_portals;
+					int idx1 = 0;
 
 					do
 					{
@@ -851,8 +853,11 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								level2Path[15] = path1[15];
 								level2.m_pathLength = level1.m_pathLength;
 								level2.m_cost = level1.m_cost;
-								level2.m_cost += PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
-								level2.m_path[level2.m_pathLength++] = static_cast<unsigned char>(idx1);
+								float distance2 = PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
+								int pathSlot2 = level2.m_pathLength;
+								level2.m_pathLength = pathSlot2 + 1;
+								level2.m_cost += distance2;
+								level2.m_path[pathSlot2] = static_cast<unsigned char>(idx1);
 								level2.m_visited[other1] = 1;
 
 								if (other1 == goalGroup)
@@ -864,10 +869,11 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								}
 								else
 								{
-									for (int idx2 = 0; idx2 < 64; ++idx2)
-									{
-										CAPos* edge = &m_portals[idx2];
+									CAPos* edge = m_portals;
+									int idx2 = 0;
 
+									do
+									{
 										if (edge->IsExist(other1) != 0)
 										{
 											int nextGroup = edge->GetOthers(other1);
@@ -880,7 +886,10 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 												check(nextGroup, goalGroup, deeper);
 											}
 										}
-									}
+
+										++idx2;
+										++edge;
+									} while (idx2 < 64);
 								}
 							}
 						}

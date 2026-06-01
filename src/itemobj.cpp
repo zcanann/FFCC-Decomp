@@ -233,8 +233,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 		    0.0f != *(float*)(self + 0x4B0)) {
 			font->SetTlut(7);
 
-			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
-			font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaInt).color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, 255.0f * *(float*)(self + 0x4B0)).color);
 
 			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)(self + 0x570)];
 			float width = font->GetWidth(name);

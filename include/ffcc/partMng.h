@@ -265,6 +265,8 @@ struct _pppEnvSt
 
 struct _pppMngSt
 {
+    _pppMngSt();
+
     void* m_pppResSet;                 // 0x00
     int m_partIndex;                   // 0x04
     Vec m_position;                    // 0x08

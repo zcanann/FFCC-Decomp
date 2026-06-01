@@ -32,17 +32,6 @@ inline void* operator new(unsigned long, void* ptr)
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-extern "C" void __dt__8COctTreeFv(void*, int);
-extern "C" void __dt__7CMapHitFv(void*, int);
-extern "C" void __dt__7CMapObjFv(void*, int);
-extern "C" void __dt__8CMapMeshFv(void*, int);
-extern "C" void __dt__7CMapMngFv(void*, int);
-extern "C" void __ct__8COctTreeFv(void*);
-extern "C" void __ct__7CMapHitFv(void*);
-extern "C" void __ct__7CMapObjFv(void*);
-extern "C" void __ct__8CMapMeshFv(void*);
-extern "C" void __ct__9CMapIdGrpFv(void*);
-extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
 extern const float kMapViewScaleXPrimary = 0.73898232f;
 extern const float kMapViewScaleY = 0.88677877f;
 extern const float kMapViewScaleZ = 1.0f;
@@ -52,7 +41,8 @@ extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
 extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
 extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
 extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
-unsigned char gMapHitFaceFlag;
+CMapHitDrawMode g_MapHitDrawMode;
+unsigned char g_MapHitFaceFlag;
 extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
 extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
 extern const float kMapZero = 0.0f;
@@ -72,7 +62,6 @@ extern char g_MsgFlashy[];
 extern const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
-extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static const char s_mapMidPathFmt[] = "%s.mid";
 static const char s_mapOtmPathFmt[] = "%s.otm";
@@ -114,20 +103,6 @@ namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
-static inline void DestroyMapPtrArray(void* ptrArray, void** vtable)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(ptrArray) = vtable;
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-    }
 }
 
 struct MapObjAttachAttr
@@ -3289,7 +3264,7 @@ CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
  */
 int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
 {
-    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    int objCount = m_mapObjCount;
     int objIndex = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
@@ -3352,10 +3327,8 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
-        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
-    CPtrArray<CMapAnim*>* mapAnimArray =
-        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
+    CPtrArray<CMapAnim*>* mapAnimArray = &m_mapAnimArray;
     CMapAnimRun* foundMapAnimRun = 0;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
@@ -3392,8 +3365,7 @@ startMapObjAnim:
 #pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
-        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
     CMapAnimRun* mapAnimRun = 0;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
@@ -3667,13 +3639,4 @@ void CMapMng::GetFogEnable()
  */
 CMapMng::~CMapMng()
 {
-    __destroy_arr(GetMapLightHolderArrays(), reinterpret_cast<ConstructorDestructor>(dtor_80034414), sizeof(CPtrArray<CMapLightHolder*>), 2);
-    DestroyMapPtrArray(&GetMapShadowArray(), __vt__8CPtrArrayIP10CMapShadow);
-    DestroyMapPtrArray(&GetMapAnimKeyDtArray(), __vt__8CPtrArrayIP13CMapAnimKeyDt);
-    DestroyMapPtrArray(&GetMapAnimArray(), __vt__8CPtrArrayIP7CMapAnim);
-    DestroyMapPtrArray(&GetMapAnimRunArray(), __vt__8CPtrArrayIP11CMapAnimRun);
-    __destroy_arr(GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), sizeof(CMapMesh), 0xA0);
-    __destroy_arr(GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), sizeof(CMapObj), 0x200);
-    __destroy_arr(GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), sizeof(CMapHit), 0x20);
-    __destroy_arr(GetOctTreeArray(), reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), sizeof(COctTree), 0x10);
 }

@@ -49,8 +49,8 @@ extern const float FLOAT_8033013C;
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
-unsigned char CFlat_guard[0x20];
-unsigned char CFlat[0x10440];
+unsigned char CFlat_guard[0xC];
+unsigned char CFlat[0x10440] ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = *reinterpret_cast<CFlatRuntime2*>(CFlat);
 unsigned char m_objBase[0xC80];
 unsigned char m_objQuad[0x1020];
@@ -59,7 +59,6 @@ unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
 u32 CFlatFlags;
-Mtx gFlatPosMtx;
 
 enum {
 	kFlatBaseObjCount = sizeof(m_objBase) / sizeof(CGBaseObj),

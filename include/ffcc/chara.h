@@ -295,6 +295,7 @@ public:
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
+    Mtx& FlatPosMtx() { return m_flatPosMtx; }
 
 private:
     struct CDrawBuffer
@@ -303,7 +304,9 @@ private:
         u8* m_base;
     };
 
-    u8 _pad004[0x2054];                       // 0x004
+    u8 _pad004[0x8C];                         // 0x004
+    Mtx m_flatPosMtx;                         // 0x090
+    u8 _pad0C0[0x1F98];                       // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x2058
     u32 m_amemSize;                           // 0x205C
     int m_drawBufferIndex;                    // 0x2060

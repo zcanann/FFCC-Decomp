@@ -1,3 +1,4 @@
+#define FFCC_P_CHARA_DEFINE_LAYOUT
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
@@ -118,32 +119,6 @@ static const char* s_charaKindPathParts[][3] = {
     {s_charaKindPath3, s_charaKindFile, s_charaKindSuffix},
     {s_charaKindPath4, s_charaKindFile, s_charaKindSuffix},
     {s_charaKindPath5, s_charaKindFile, s_charaKindSuffix},
-};
-
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-    bool Add(T item);
-    int GetSize();
-    void ReleaseAndRemoveAll();
-    void RemoveAt(unsigned long index);
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    void SetGrow(int growCapacity);
-    int setSize(unsigned long newSize);
-    T GetAt(unsigned long index);
-    void RemoveAll();
 };
 
 #pragma dont_inline on
@@ -314,22 +289,22 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 
 static inline CPtrArray<CCharaPcs::CLoadModel*>* LoadModelArray(CCharaPcs* self)
 {
-    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadModel*>*>(Ptr(self, 0x50));
+    return &self->m_loadModels;
 }
 
 static inline CPtrArray<CCharaPcs::CLoadAnim*>* LoadAnimArray(CCharaPcs* self)
 {
-    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadAnim*>*>(Ptr(self, 0x6C));
+    return &self->m_loadAnims;
 }
 
 static inline CPtrArray<CCharaPcs::CLoadTexture*>* LoadTextureArray(CCharaPcs* self)
 {
-    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadTexture*>*>(Ptr(self, 0x88));
+    return &self->m_loadTextures;
 }
 
 static inline CPtrArray<CCharaPcs::CLoadPdt*>* LoadPdtArray(CCharaPcs* self)
 {
-    return reinterpret_cast<CPtrArray<CCharaPcs::CLoadPdt*>*>(Ptr(self, 0xA4));
+    return &self->m_loadPdts;
 }
 
 static inline CMemory::CStage*& StageAt(CCharaPcs* self, unsigned int offset)
@@ -660,13 +635,6 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
  */
 CCharaPcs::CCharaPcs()
 {
-    new (LoadModelArray(this)) CPtrArray<CLoadModel*>();
-    new (LoadAnimArray(this)) CPtrArray<CLoadAnim*>();
-    new (LoadTextureArray(this)) CPtrArray<CLoadTexture*>();
-    new (LoadPdtArray(this)) CPtrArray<CLoadPdt*>();
-    for (int i = 0; i < 5; i++) {
-        new (&m_viewerChoiceColor[i]) CColor;
-    }
 }
 
 /*
@@ -676,10 +644,6 @@ CCharaPcs::CCharaPcs()
  */
 CCharaPcs::~CCharaPcs()
 {
-    LoadPdtArray(this)->CPtrArray<CLoadPdt*>::~CPtrArray();
-    LoadTextureArray(this)->CPtrArray<CLoadTexture*>::~CPtrArray();
-    LoadAnimArray(this)->CPtrArray<CLoadAnim*>::~CPtrArray();
-    LoadModelArray(this)->CPtrArray<CLoadModel*>::~CPtrArray();
 }
 
 /*

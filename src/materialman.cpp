@@ -1,3 +1,4 @@
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"
 #include "ffcc/map.h"
@@ -26,7 +27,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern float FLOAT_8032faf0;
@@ -107,30 +107,6 @@ static inline void _GXSetAlphaCompare(int comp0, int ref0, int op, int comp1, in
 {
     _GXSetAlphaCompare((_GXCompare)comp0, (unsigned char)ref0, (_GXAlphaOp)op, (_GXCompare)comp1, (unsigned char)ref1);
 }
-
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-    int GetSize();
-    int Add(T item);
-    void RemoveAll();
-    void SetStage(CMemory::CStage* stage);
-    int setSize(unsigned long size);
-    void SetAt(unsigned long index, T item);
-    T operator[](unsigned long index);
-    T GetAt(unsigned long index);
-
-private:
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
 
 #pragma dont_inline on
 template <>
@@ -2454,14 +2430,11 @@ CTexScroll::CTexScroll()
  */
 CMaterial::~CMaterial()
 {
-    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    int numTexture = static_cast<int>(m_textureCount);
     for (int i = 0; i < numTexture; i++) {
-        unsigned char* textureRef = Ptr(this, 0x3C + (i << 2));
-        ReleaseRef(*reinterpret_cast<void**>(textureRef));
-        *reinterpret_cast<void**>(textureRef) = 0;
+        ReleaseRef(m_textures[i]);
+        m_textures[i] = 0;
     }
-
-    __destroy_arr(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
 }
 
 /*
@@ -2475,8 +2448,6 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    __construct_array(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
     *Ptr(this, 0xA0) = 4;
@@ -2534,7 +2505,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
     CMaterial* material = 0;
     CChunkFile::CChunk chunk;
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    CPtrArray<CMaterial*>* materials = &m_materials;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
@@ -2832,7 +2803,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
  */
 void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 {
-    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    CPtrArray<CMaterial*>* materialArray = &m_materials;
     unsigned long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materialArray))) {
@@ -2920,7 +2891,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
     CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
-    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    CPtrArray<CMaterial*>* materialArray = &m_materials;
     u32 textureIndex = 0;
 
     while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
@@ -3000,8 +2971,8 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 {
     unsigned int index = 0;
 
-    while (index < static_cast<unsigned int>(UnkMaterialSetGetter(Ptr(this, 8)))) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[index];
+    while (index < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
+        CMaterial* material = m_materials[index];
         if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
             unsigned char* textureIndex = reinterpret_cast<unsigned char*>(material);
             unsigned char* textureRef = reinterpret_cast<unsigned char*>(material);
@@ -3034,7 +3005,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
                     reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
                 }
             }
-            reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8))->SetAt(index, 0);
+            m_materials.SetAt(index, 0);
         }
 
         index++;
@@ -3090,16 +3061,12 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
  */
 CMaterialSet::~CMaterialSet()
 {
-    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-
-    for (unsigned long i = 0; i < static_cast<unsigned long>(UnkMaterialSetGetter(materials)); i++) {
-        CMaterial* const material = (*materials)[i];
+    for (unsigned long i = 0; i < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials)); i++) {
+        CMaterial* const material = m_materials[i];
         if (material != 0) {
             delete material;
         }
     }
-
-    materials->~CPtrArray<CMaterial*>();
 }
 
 /*
@@ -3113,8 +3080,7 @@ CMaterialSet::~CMaterialSet()
  */
 CMaterialSet::CMaterialSet()
 {
-    CPtrArray<CMaterial*>* const materials = new (Ptr(this, 8)) CPtrArray<CMaterial*>;
-    materials->SetStage(MaterialMan.GetMemoryStage());
+    m_materials.SetStage(MaterialMan.GetMemoryStage());
 }
 
 /*
@@ -3130,7 +3096,7 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
 {
     int i;
     CMaterial* material =
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
+        m_materials[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
@@ -3158,7 +3124,7 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
 {
     int i;
     CMaterial* material =
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
+        m_materials[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
@@ -3186,8 +3152,8 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
 {
     unsigned int materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned int>(UnkMaterialSetGetter(Ptr(this, 8)))) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[materialIndex];
+    while (materialIndex < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             CMaterial* textureSlot = material;
 
@@ -3220,8 +3186,8 @@ void CMaterialSet::Calc()
 {
     unsigned long materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(Ptr(this, 8)))) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[materialIndex];
+    while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             CTexScroll* texScroll = material->GetTexScroll(0);
             for (int i = 0; i < 4; i++) {
@@ -3274,8 +3240,8 @@ unsigned long CMaterialSet::Find(char* name)
 {
     unsigned long index = 0;
 
-    while (index < static_cast<unsigned long>(UnkMaterialSetGetter(Ptr(this, 8)))) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[index];
+    while (index < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
+        CMaterial* material = m_materials[index];
         if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
             return index;
         }

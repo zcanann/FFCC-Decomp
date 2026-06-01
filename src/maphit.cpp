@@ -46,7 +46,6 @@ int g_hit_edge_idx_min;
 float g_hit_edge_t;
 float g_hit_t_min;
 float g_hit_t;
-unsigned char gMapHitFaceFlag;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_f;
 float g_hit_t_slide_min;

@@ -1398,9 +1398,10 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
     char** itemTable = m_cFlatDataArr[1].TableStrings(0);
+    char** itemEntry = &itemTable[itemIndex * 5];
     unsigned char hasSeparator = 0;
-    char* prefix = itemTable[itemIndex * 5 + 2];
-    char* itemName = itemTable[itemIndex * 5 + 3];
+    char* prefix = itemEntry[2];
+    char* itemName = itemEntry[3];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
@@ -1497,9 +1498,10 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
     char** monTable = m_cFlatDataArr[1].TableStrings(1);
+    char** monEntry = &monTable[monIndex * 5];
     unsigned char hasSeparator = 0;
-    char* prefix = monTable[monIndex * 5 + 2];
-    char* monName = monTable[monIndex * 5 + 3];
+    char* prefix = monEntry[2];
+    char* monName = monEntry[3];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;

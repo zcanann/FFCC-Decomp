@@ -461,13 +461,19 @@ static inline CMemory::CStage* SelectLoadStage(CCharaPcs* self, CMemory::CStage*
 }
 
 template <typename T>
+static inline void ReleaseSharedNonNull(T* ptr)
+{
+    CRef* ref = reinterpret_cast<CRef*>(ptr);
+    if (ref->DecRef() == 0) {
+        delete ref;
+    }
+}
+
+template <typename T>
 static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
-        CRef* ref = reinterpret_cast<CRef*>(ptr);
-        if (ref->DecRef() == 0) {
-            delete ref;
-        }
+        ReleaseSharedNonNull(ptr);
         ptr = 0;
     }
 }
@@ -539,7 +545,7 @@ static inline void ReleaseHandleAnimSlot(CCharaPcs::CHandle* handle, int slot)
 {
     CRef* animRef = handle->m_animSlot[slot];
     if (animRef != 0) {
-        ReleaseShared(animRef);
+        ReleaseSharedNonNull(animRef);
         handle->m_animSlot[slot] = 0;
     }
 }
@@ -556,7 +562,7 @@ static inline void PruneUnsharedAnimRefs(CCharaPcs* self, CCharaPcs::CLoadAnim* 
         }
 
         CCharaPcs::CLoadAnim* releasedAnim = loadAnim;
-        ReleaseShared(releasedAnim);
+        ReleaseSharedNonNull(releasedAnim);
         LoadAnimArray(self)->RemoveAt(static_cast<unsigned long>(i));
     }
 }
@@ -2260,7 +2266,7 @@ CCharaPcs::CHandle::CHandle()
 CCharaPcs::CHandle::~CHandle()
 {
     if (m_asyncFileHandle != 0) {
-        if (System.m_execParam > 1) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
             System.Printf(const_cast<char*>(s_charaAsyncCancelFmt));
         }
         File.Close(m_asyncFileHandle);

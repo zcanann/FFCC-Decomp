@@ -17,8 +17,6 @@ unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
     0x16,
     0x8
 };
-const char sSystemPcsManagerClassName[] = "CManager";
-const char sSystemPcsProcessClassName[] = "CProcess";
 /*
  * --INFO--
  * PAL Address: 0x80047c9c

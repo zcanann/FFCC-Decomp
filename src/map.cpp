@@ -173,7 +173,7 @@ static inline float MapObjWorldZ(unsigned char* mapObj)
  */
 CMapTexAnimSet::CMapTexAnimSet()
 {
-	// TODO
+    m_count = 0;
 }
 
 /*

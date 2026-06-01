@@ -21,6 +21,32 @@ class CAmemCacheSet;
 struct Vec;
 struct CBound;
 
+#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
+template <class T>
+class CPtrArray
+{
+public:
+    CPtrArray();
+    virtual ~CPtrArray();
+    int GetSize();
+    int Add(T item);
+    void RemoveAll();
+    void SetStage(CMemory::CStage* stage);
+    int setSize(unsigned long size);
+    void SetAt(unsigned long index, T item);
+    T operator[](unsigned long index);
+    T GetAt(unsigned long index);
+
+private:
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+};
+#endif
+
 class CTexScroll
 {
 public:
@@ -198,6 +224,10 @@ public:
     void SetPartFromTextureSet(CTextureSet*, int);
     void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
     void AddMaterial(CMaterial*, int);
+
+#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
+    CPtrArray<CMaterial*> m_materials;        // 0x008
+#endif
 };
 
 extern CMaterialMan MaterialMan;

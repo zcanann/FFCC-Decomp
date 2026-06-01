@@ -22,6 +22,34 @@ class CTextureSet;
 
 CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 
+#ifdef FFCC_P_CHARA_DEFINE_LAYOUT
+template <class T>
+class CPtrArray
+{
+public:
+    CPtrArray();
+    virtual ~CPtrArray();
+
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+    bool Add(T item);
+    int GetSize();
+    void ReleaseAndRemoveAll();
+    void RemoveAt(unsigned long index);
+    T operator[](unsigned long index);
+    void SetStage(CMemory::CStage* stage);
+    void SetDefaultSize(unsigned long defaultSize);
+    void SetGrow(int growCapacity);
+    int setSize(unsigned long newSize);
+    T GetAt(unsigned long index);
+    void RemoveAll();
+};
+#endif
+
 class CCharaPcs : public CProcess
 {
 public:
@@ -212,7 +240,14 @@ public:
     int m_texShadowSize;                      // 0x044
     int m_texShadowDistance;                  // 0x048
     CHandle* m_handleList;                    // 0x04C
+#ifdef FFCC_P_CHARA_DEFINE_LAYOUT
+    CPtrArray<CLoadModel*> m_loadModels;      // 0x050
+    CPtrArray<CLoadAnim*> m_loadAnims;        // 0x06C
+    CPtrArray<CLoadTexture*> m_loadTextures;  // 0x088
+    CPtrArray<CLoadPdt*> m_loadPdts;          // 0x0A4
+#else
     u8 _pad050[0x70];                         // 0x050
+#endif
     CMemory::CStage* m_stage;                 // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x0C4
     CMemory::CStage* m_amemWorkStage;         // 0x0C8

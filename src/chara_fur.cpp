@@ -573,7 +573,8 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	return (dr < 6 && dg < 6 && db < 6) ? 1 : 0;
+	int hits = (dr < 6) + (dg < 6) + (db < 6);
+	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 
 /*

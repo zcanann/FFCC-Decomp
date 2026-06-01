@@ -110,7 +110,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     int serializedOffset;
     int graphFrame;
     int graphId;
-    long** shapeTable;
+    pppShapeSt* shape;
     LocationTitle2Particle* particle;
     LocationTitle2Work* work;
 
@@ -123,7 +123,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
     particle = (LocationTitle2Particle*)work->m_particles;
     graphId = locationTitle->m_graphId;
-    shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
     graphFrame = GetGraphFrameFromId(graphId);
 
     pppSetBlendMode(unkB->m_blendMode);
@@ -206,7 +206,8 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             }
 
             GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
-            pppDrawShp(*shapeTable, particle->m_shape, ppvEnv->m_materialSetPtr, unkB->m_blendMode);
+            pppDrawShp(static_cast<long*>(shape->m_animData), particle->m_shape, ppvEnv->m_materialSetPtr,
+                       unkB->m_blendMode);
         }
 
         particle++;

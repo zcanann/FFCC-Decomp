@@ -14,22 +14,17 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const float FLOAT_80330640 = 0.01745329238474369f;
-extern const float FLOAT_80330644 = 0.0f;
-extern const double DOUBLE_80330648 = 4503601774854144.0;
-extern const float FLOAT_80330650 = 32768.0f;
-extern const float FLOAT_80330654 = 3.1415927410125732f;
-extern const float FLOAT_80330658 = 1.0f;
-extern const float FLOAT_8033065c = 0.00003051850947599719f;
-extern const float FLOAT_80330660 = 2.0f;
-extern const float FLOAT_80330664 = 16384.0f;
-extern const float FLOAT_80330668 = -1.0f;
+static const float FLOAT_80330640 = 0.01745329238474369f;
+static const float FLOAT_80330644 = 0.0f;
+static const double DOUBLE_80330648 = 4503601774854144.0;
+static const float FLOAT_80330650 = 32768.0f;
+static const float FLOAT_80330654 = 3.1415927410125732f;
+static const float FLOAT_80330658 = 1.0f;
+static const float FLOAT_8033065c = 0.00003051850947599719f;
+static const float FLOAT_80330660 = 2.0f;
+static const float FLOAT_80330664 = 16384.0f;
+static const float FLOAT_80330668 = -1.0f;
 extern "C" const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
-
-static inline float YmMiasmaConst(const float& value)
-{
-    return *reinterpret_cast<const float*>(&value);
-}
 
 struct PARTICLE_DATA {
     Mtx m_matrix;
@@ -267,9 +262,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
 
     zero = FLOAT_80330644;
     work->m_emitTimer = work->m_emitTimer + 1;
-    speedDecay = work->m_speedDecay;
-    speedDecay = speedDecay - step->m_speedDecayStep;
-    work->m_speedDecay = speedDecay;
+    work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
     if (work->m_speedDecay < zero) {
         work->m_speedDecay = zero;
     }
@@ -359,9 +352,9 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
-    float fVar1 = YmMiasmaConst(FLOAT_80330644);
+    float fVar1 = FLOAT_80330644;
 
-    work->m_radius = YmMiasmaConst(FLOAT_80330644);
+    work->m_radius = FLOAT_80330644;
     work->m_radiusVelocity = fVar1;
     work->m_radiusAcceleration = fVar1;
 }

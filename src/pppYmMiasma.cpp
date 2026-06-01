@@ -176,7 +176,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long** shape = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + step->m_dataValIndex * 4);
+            pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex];
             pppFMATRIX model;
             pppFMATRIX rotMatrix;
             Vec worldPos;
@@ -214,7 +214,8 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
-            pppDrawShp(*shape, state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr, step->m_blendMode);
+            pppDrawShp(static_cast<long*>(shape->m_animData), state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr,
+                       step->m_blendMode);
         }
 
         particleData++;
@@ -410,7 +411,7 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
 {
     YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
-    long** shape;
+    pppShapeSt* shape;
     pppFMATRIX model;
     pppFMATRIX rotMatrix;
     Vec worldPos;
@@ -424,7 +425,7 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
         return;
     }
 
-    shape = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
 
     pppUnitMatrix(model);
     scale = state->m_speed;
@@ -456,7 +457,8 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
     amb.a = state->m_color.m_a;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(*shape, state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(static_cast<long*>(shape->m_animData), state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr,
+               step->m_blendMode);
 }
 
 /*
@@ -573,10 +575,10 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     if (pYmMiasma->m_dataValIndex != 0xffff) {
-        long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+        pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
 
-        pppCalcFrameShape(*shapeTable, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
-            (short)pYmMiasma->m_shapeFrameStep);
+        pppCalcFrameShape(static_cast<long*>(shape->m_animData), state->m_shapeCurrentFrame, state->m_shapeDrawFrame,
+                          state->m_shapeFrameTime, (short)pYmMiasma->m_shapeFrameStep);
     }
 }
 
@@ -598,7 +600,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     s32 randomValue;
     int shapeRandom;
     short shapeCount;
-    long* shape;
+    pppShapeAnimData* shape;
     float randomHeight;
     float radiusJitter;
     float randomScale;
@@ -614,9 +616,10 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
 
     randomValue = rand();
     randomScale = YmMiasmaConst(FLOAT_8033065c) * (float)randomValue;
-    shape = **(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+    shape = static_cast<pppShapeAnimData*>(
+        ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();
-    shapeCount = *(short*)((u8*)shape + 6);
+    shapeCount = shape->m_frameCount;
     angle = (s32)(YmMiasmaConst(FLOAT_80330650) *
                   (YmMiasmaConst(FLOAT_80330654) * (YmMiasmaConst(FLOAT_80330660) * randomScale)) -
                   YmMiasmaConst(FLOAT_80330664));

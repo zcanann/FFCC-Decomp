@@ -310,15 +310,6 @@ static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned s
 	return particleClass;
 }
 
-static void CharaObjCallStateCallback(CGCharaObj* charaObj, int vtableOffset)
-{
-	typedef void (*VCall)(void*);
-
-	unsigned char* self = reinterpret_cast<unsigned char*>(charaObj);
-	VCall fn = *reinterpret_cast<VCall*>(*reinterpret_cast<int*>(self + 0x48) + vtableOffset);
-	fn(charaObj);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8010b67c

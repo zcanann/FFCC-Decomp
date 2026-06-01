@@ -1531,14 +1531,10 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	void** prgScript = *reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58);
-	typedef unsigned int (*GetFlagsFn)(CGPrgObj*);
-	GetFlagsFn getFlags = *reinterpret_cast<GetFlagsFn*>(
-		reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(prgObj) + 0x48)) + 0xC
-	);
 
 	mon[0x6BF] = 1;
 
-	unsigned int prgFlags = getFlags(prgObj);
+	unsigned int prgFlags = prgObj->GetCID();
 	if ((prgFlags & 0x6D) == 0x6D) {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		if (*reinterpret_cast<short*>(mon + 0x6E4) != 0) {
@@ -1550,7 +1546,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
 		if ((*reinterpret_cast<short*>(aiData + 0x106) == 1) || (*reinterpret_cast<int*>(mon + 0x6C4) < 0)) {
 			if ((Game.m_gameWork.m_menuStageMode != '\0') && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-				prgFlags = getFlags(prgObj);
+				prgFlags = prgObj->GetCID();
 				if ((prgFlags & 0x6D) == 0x6D) {
 					if (prgScript[0xED] != nullptr) {
 						goto skip_target_update;

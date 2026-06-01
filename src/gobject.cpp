@@ -2629,8 +2629,6 @@ void CGObject::Turn(float targetRot, int turnFrames)
  */
 void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int colliderIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-    typedef void (*OnHitParticleFn)(CGObject*, int, int, int, int, Vec*, PPPIFPARAM*);
-
     CFlatRuntime::CStack stack[9];
     stack[0].m_word = effectIndex;
     stack[1].m_word = kind;
@@ -2644,9 +2642,7 @@ void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int collide
 
     gCFlatRuntime().SystemCall(this, 2, 0xB, 9, stack, 0);
 
-    OnHitParticleFn onHitParticle = *reinterpret_cast<OnHitParticleFn*>(
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x3C);
-    onHitParticle(this, effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
+    onHitParticle(effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
 }
 
 /*

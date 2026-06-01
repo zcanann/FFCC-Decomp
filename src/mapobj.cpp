@@ -1278,6 +1278,11 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
  */
 void CMapObj::Calc()
 {
+    Vec delta;
+    Vec posCam;
+    Vec pos;
+    Mtx cameraMtx;
+
     if (m_cameraSemiTransStep != 0) {
         m_cameraSemiTransAlpha = static_cast<short>(m_cameraSemiTransAlpha + m_cameraSemiTransStep);
         if (m_cameraSemiTransStep > 0) {
@@ -1305,9 +1310,6 @@ void CMapObj::Calc()
             U8At(this, 0x25) = 1;
             U8At(this, 0x26) = 0;
         } else {
-            Vec pos;
-            Vec posCam;
-            Mtx cameraMtx;
             pos.x = F32At(this, 0xC4);
             pos.y = F32At(this, 0xD4);
             pos.z = F32At(this, 0xE4);
@@ -1342,7 +1344,6 @@ void CMapObj::Calc()
                     Vec* src0 = reinterpret_cast<Vec*>(mime->vertexLists[key0]);
                     Vec* src1 = reinterpret_cast<Vec*>(mime->vertexLists[key1]);
                     for (int i = 0; i < mime->vertexCount; i++) {
-                        Vec delta;
                         PSVECSubtract(src1, src0, &delta);
                         PSVECScale(&delta, &delta, blend);
                         PSVECAdd(src0, &delta, &outVerts[i]);

@@ -17,6 +17,11 @@ struct pppPointRApStep {
     u8 m_cooldown;
 };
 
+struct pppPointRApOffsets {
+    u32 m_srcOffset;
+    u32 m_stateOffset;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80060d20
@@ -29,8 +34,8 @@ struct pppPointRApStep {
 void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
     pppPointRApStep* payload = (pppPointRApStep*)step;
-    u32* ctrlData = (u32*)ctrlTable->m_serializedDataOffsets;
-    u8* state = (u8*)pObject + ctrlData[1] + 0x80;
+    pppPointRApOffsets* ctrlData = (pppPointRApOffsets*)ctrlTable->m_serializedDataOffsets;
+    u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -38,7 +43,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 
     if (state[1] == 0) {
         u32 createId = payload->m_createProgramIndex;
-        Vec* srcPos = (Vec*)((u8*)pObject + ctrlData[0] + 0x80);
+        Vec* srcPos = (Vec*)(pObject->m_workArea + ctrlData->m_srcOffset);
 
         if ((createId + 0x10000) == 0xFFFF) {
             return;
@@ -67,8 +72,8 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         u32 childVelocityOffset = payload->m_childVelocityOffset;
         float xOff = planarOff * *(float*)((u8*)gPppTrigTable + (angleB & 0xFFFC));
         planarOff *= *(float*)((u8*)gPppTrigTable + ((angleB + 0x4000) & 0xFFFC));
-        Vec* dstPos = (Vec*)((u8*)obj + childPosOffset + 0x80);
-        Vec* dstVel = (Vec*)((u8*)obj + childVelocityOffset + 0x80);
+        Vec* dstPos = (Vec*)(obj->m_workArea + childPosOffset);
+        Vec* dstVel = (Vec*)(obj->m_workArea + childVelocityOffset);
 
         dstPos->x = srcPos->x + xOff;
         dstPos->y = srcPos->y + yOff;
@@ -95,8 +100,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
  */
 void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    u32* ctrlData = (u32*)ctrlTable->m_serializedDataOffsets;
-    u32 offset = ctrlData[1];
-    u8* state = (u8*)pObject + offset;
-    state[0x81] = 0;
+    pppPointRApOffsets* ctrlData = (pppPointRApOffsets*)ctrlTable->m_serializedDataOffsets;
+    u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
+    state[1] = 0;
 }

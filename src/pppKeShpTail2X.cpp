@@ -13,7 +13,7 @@ extern const float FLOAT_80330508;
 #include <dolphin/types.h>
 #include <string.h>
 
-STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_workArea) == 0x80);
+STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail2XStep {
     u8 _pad0[4];
@@ -74,10 +74,10 @@ STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XDes(void* obj, _pppCtrlTable* param_2)
+void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* param_2)
 {
     KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
-        reinterpret_cast<_pppPObject*>(obj)->m_workArea + param_2->m_serializedDataOffsets[0]);
+        obj->m_workArea + param_2->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -96,10 +96,10 @@ void pppKeShpTail2XDes(void* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XCon(void* obj, _pppCtrlTable* param_2)
+void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* param_2)
 {
     KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
-        reinterpret_cast<_pppPObject*>(obj)->m_workArea + param_2->m_serializedDataOffsets[0]);
+        obj->m_workArea + param_2->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -175,7 +175,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)reinterpret_cast<KeShpTail2XAlphaWork*>(
-                   obj->m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
+                   obj->m_object.m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
                kPppKeShpTail2XAlphaScale;
     colorStart.w = step->m_colorStartA;
     colorEnd.w = step->m_colorEndA;
@@ -207,11 +207,11 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
     shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
 
-    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
+    pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     drawScale = step->m_scaleStart;
@@ -253,12 +253,12 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
+        PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
                         localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
                         localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
                         localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-        PSMTXCopy(obj->field_0x40.value, drawMtx.value);
+        PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
@@ -369,15 +369,15 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     }
 
     step = (KeShpTail2XStep*)param_2;
-    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
 
-    if (obj->pppPObject.m_graphId == 0) {
+    if (obj->m_object.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {
-            initPos.x = obj->pppPObject.m_localMatrix.value[0][3];
-            initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
-            initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
+            initPos.x = obj->m_object.m_localMatrix.value[0][3];
+            initPos.y = obj->m_object.m_localMatrix.value[1][3];
+            initPos.z = obj->m_object.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
+            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->m_object.m_localMatrix);
             initPos.x = outMatrix.value[0][3];
             initPos.y = outMatrix.value[1][3];
             initPos.z = outMatrix.value[2][3];
@@ -399,11 +399,11 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     work->m_head--;
 
     if (step->m_worldSpaceMode == 0) {
-        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+        pos.x = obj->m_object.m_localMatrix.value[0][3];
+        pos.y = obj->m_object.m_localMatrix.value[1][3];
+        pos.z = obj->m_object.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
+        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->m_object.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];

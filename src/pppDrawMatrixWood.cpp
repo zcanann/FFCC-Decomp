@@ -13,21 +13,18 @@
  * JP Size: TODO
  */
 void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
-    char* p = (char*)object;
-
     PSMTXScaleApply(
-        *(Mtx*)(p + 0x10),
-        *(Mtx*)(p + 0x40),
+        object->m_localMatrix.value,
+        object->m_drawMatrix.value,
         ppvMng->m_scale.x,
         ppvMng->m_scale.y,
         ppvMng->m_scale.z
     );
 
-    *(float*)(p + 0x4C) = *(float*)(p + 0x1C);
-    *(float*)(p + 0x5C) = *(float*)(p + 0x2C);
-    *(float*)(p + 0x6C) = *(float*)(p + 0x3C);
+    object->m_drawMatrix.value[0][3] = object->m_localMatrix.value[0][3];
+    object->m_drawMatrix.value[1][3] = object->m_localMatrix.value[1][3];
+    object->m_drawMatrix.value[2][3] = object->m_localMatrix.value[2][3];
 
-    PSMTXConcat(reinterpret_cast<Mtx&>(ppvWorldMatrixWood), *(Mtx*)(p + 0x40), *(Mtx*)(p + 0x40));
+    PSMTXConcat(ppvWorldMatrixWood, object->m_drawMatrix.value, object->m_drawMatrix.value);
 }
-
 

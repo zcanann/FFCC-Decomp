@@ -4,10 +4,6 @@
 #include "ffcc/partMng.h"
 
 typedef struct {
-    u8 data[0x80];
-} pppScreenBlur;
-
-typedef struct {
     u32 m_dataValIndex;
     u8 m_blurR;
     u8 m_blurG;
@@ -20,11 +16,11 @@ typedef struct {
 extern "C" {
 #endif
 
-void pppConScreenBlur(pppScreenBlur* blur, _pppCtrlTable* ctrlTable);
-void pppCon2ScreenBlur(pppScreenBlur* blur);
+void pppConScreenBlur(_pppPObject* blur, _pppCtrlTable* ctrlTable);
+void pppCon2ScreenBlur(_pppPObject* blur);
 void pppDesScreenBlur(_pppPObjLink* object, _pppCtrlTable* ctrlTable);
 void pppFrameScreenBlur(_pppPObject* object, void* step, _pppCtrlTable* ctrlTable);
-void pppRenderScreenBlur(pppScreenBlur* blur, pppScreenBlurUnkB* step, _pppCtrlTable* ctrlTable);
+void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

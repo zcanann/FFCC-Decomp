@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 struct pppConformBGNormal {
-    u8 field0_0x0[8]; // Placeholder structure
+    _pppPObject m_object;
 };
 
 struct pppConformBGNormalUnkB {

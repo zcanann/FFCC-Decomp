@@ -38,7 +38,7 @@ void pppColor(_pppPObject* param1, void* param2, _pppCtrlTable* param3){
     }
 
     s32 id1 = *(s32*)param2;
-    s32 id2 = *(s32*)((u8*)param1 + 0xC);
+    s32 id2 = param1->m_graphId;
 
     if (id1 == id2) {
         s16* src_colors = (s16*)((u8*)param2 + 8);

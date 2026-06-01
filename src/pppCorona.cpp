@@ -2,6 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/linkage.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -41,6 +42,22 @@ struct CoronaVecWork {
     u8 m_alpha;
 };
 
+STATIC_ASSERT(offsetof(CoronaWork, m_shapeX) == 0x0);
+STATIC_ASSERT(offsetof(CoronaWork, m_scaleX) == 0x8);
+STATIC_ASSERT(offsetof(CoronaVecWork, m_cameraOffset) == 0x10);
+STATIC_ASSERT(offsetof(CoronaVecWork, m_translate) == 0x20);
+STATIC_ASSERT(offsetof(CoronaVecWork, m_alpha) == 0x32);
+
+static inline CoronaWork* GetCoronaWork(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<CoronaWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[3]);
+}
+
+static inline CoronaVecWork* GetCoronaVecWork(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<CoronaVecWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800df320
@@ -50,7 +67,7 @@ struct CoronaVecWork {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
+void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
 {
     CoronaWork* work;
     CoronaVecWork* vecWork;
@@ -64,10 +81,10 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     float scale;
     float distScale;
 
-    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
-    vecWork = (CoronaVecWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
+    work = GetCoronaWork(object, ctrl);
+    vecWork = GetCoronaVecWork(object, ctrl);
 
-    shapeId = param2->m_dataValIndex;
+    shapeId = data->m_dataValIndex;
     if (shapeId == 0xFFFF) {
         return;
     }
@@ -82,16 +99,16 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
-    scale = param2->m_distMin;
-    if (mag < param2->m_distRange) {
-        distScale = param2->m_distMax - param2->m_distMin;
-        distScale *= kYmEnvOne - (mag / param2->m_distRange);
-        scale = param2->m_distMin + distScale;
+    scale = data->m_distMin;
+    if (mag < data->m_distRange) {
+        distScale = data->m_distMax - data->m_distMin;
+        distScale *= kYmEnvOne - (mag / data->m_distRange);
+        scale = data->m_distMin + distScale;
     }
 
-    mtx.value[0][0] = ppvMng->m_scale.x * *(float*)((u8*)param1 + 0x40) * scale;
-    mtx.value[1][1] = ppvMng->m_scale.y * *(float*)((u8*)param1 + 0x54) * scale;
-    mtx.value[2][2] = ppvMng->m_scale.z * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][0] = ppvMng->m_scale.x * object->m_drawMatrix.value[0][0] * scale;
+    mtx.value[1][1] = ppvMng->m_scale.y * object->m_drawMatrix.value[1][1] * scale;
+    mtx.value[2][2] = ppvMng->m_scale.z * object->m_drawMatrix.value[2][2] * scale;
     mtx.value[0][3] = vecWork->m_translate.x;
     mtx.value[1][3] = vecWork->m_translate.y;
     mtx.value[2][3] = vecWork->m_translate.z;
@@ -100,15 +117,15 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 
     scale = work->m_scaleX * (f32)vecWork->m_alpha;
     u8 alpha = (u8)(s32)scale;
-    color.rgba[0] = param2->m_colorR;
-    color.rgba[1] = param2->m_colorG;
-    color.rgba[2] = param2->m_colorB;
+    color.rgba[0] = data->m_colorR;
+    color.rgba[1] = data->m_colorG;
+    color.rgba[2] = data->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmEnvZero, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmEnvZero, data->m_drawA, data->m_drawB, data->m_blendMode, 0, 1,
                   1, 0);
-    pppSetBlendMode(param2->m_blendMode);
-    pppDrawShp(*shape, work->m_shapeY, ppvEnv->m_materialSetPtr, param2->m_blendMode);
+    pppSetBlendMode(data->m_blendMode);
+    pppDrawShp(*shape, work->m_shapeY, ppvEnv->m_materialSetPtr, data->m_blendMode);
 }
 
 /*
@@ -120,7 +137,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
+void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
 {
     CoronaWork* work;
     long** shape;
@@ -130,22 +147,22 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
         return;
     }
 
-    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
+    work = GetCoronaWork(object, ctrl);
     work->m_scaleY = work->m_scaleY + work->m_scaleZ;
     work->m_scaleX = work->m_scaleX + work->m_scaleY;
 
-    shapeId = param2->m_dataValIndex;
+    shapeId = data->m_dataValIndex;
     if (shapeId == 0xFFFF) {
         return;
     }
 
     shape = *(long***)(*(u32*)((u8*)ppvEnv + 0xC) + shapeId * 4);
-    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
+    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, data->m_shapeStep);
 
-    if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
-        work->m_scaleX += param2->m_addX;
-        work->m_scaleY += param2->m_addY;
-        work->m_scaleZ += param2->m_addZ;
+    if (data->m_graphId == object->m_graphId) {
+        work->m_scaleX += data->m_addX;
+        work->m_scaleY += data->m_addY;
+        work->m_scaleZ += data->m_addZ;
     }
 }
 
@@ -158,7 +175,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
+void pppDestructCorona(_pppPObject*, _pppCtrlTable*)
 {
 }
 
@@ -171,14 +188,14 @@ void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
+void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl)
 {
     float fVar1 = kYmEnvZero;
-    u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
-    puVar2[2] = 0;
-    puVar2[1] = 0;
-    puVar2[0] = 0;
-    *(float*)(puVar2 + 8) = fVar1;
-    *(float*)(puVar2 + 6) = fVar1;
-    *(float*)(puVar2 + 4) = fVar1;
+    CoronaWork* work = GetCoronaWork(object, ctrl);
+    work->m_shapeZ = 0;
+    work->m_shapeY = 0;
+    work->m_shapeX = 0;
+    work->m_scaleZ = fVar1;
+    work->m_scaleY = fVar1;
+    work->m_scaleX = fVar1;
 }

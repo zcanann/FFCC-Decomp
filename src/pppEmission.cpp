@@ -143,8 +143,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
-    u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
+    EmissionState* state = (EmissionState*)(pppEmission_->m_object.m_workArea + serializedDataOffsets[2]);
+    u8* dataSet = pppEmission_->m_object.m_workArea + serializedDataOffsets[1];
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
@@ -157,7 +157,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     state->m_colorA = dataSet[0xB];
 
     CalcGraphValue(
-        reinterpret_cast<_pppPObject*>(pppEmission_), param_2->m_graphId,
+        &pppEmission_->m_object, param_2->m_graphId,
         state->m_scale0, state->m_scale1, state->m_scale2,
         param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
@@ -256,7 +256,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
  */
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
-    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    int* state = (int*)(pppEmission_->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
@@ -287,7 +287,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
 void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
-    float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
+    float* state = (float*)(pppEmission_->m_object.m_workArea + offset);
     state[5] = baseScale;
     state[4] = baseScale;
     state[3] = baseScale;
@@ -320,7 +320,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     int offset = serializedDataOffsets[2];
-    EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + offset);
+    EmissionState* state = (EmissionState*)(pppEmission_->m_object.m_workArea + offset);
 
     state->field4 = 0;
     state->field8 = 0x80;

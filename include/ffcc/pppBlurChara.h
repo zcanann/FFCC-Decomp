@@ -2,10 +2,11 @@
 #define _FFCC_PPPBLURCHARA_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
 struct pppBlurChara {
-    u32 m_graphId;
+    _pppPObject m_object;
 };
 
 struct pppBlurCharaUnkB {

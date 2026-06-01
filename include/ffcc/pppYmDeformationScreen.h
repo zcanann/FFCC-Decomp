@@ -1,10 +1,15 @@
 #ifndef _PPP_YMDEFORMATIONSCREEN_H_
 #define _PPP_YMDEFORMATIONSCREEN_H_
 
+#include "ffcc/partMng.h"
+
 class CCameraPcs;
 struct VYmDeformationScreen;
-struct pppYmDeformationScreen;
 struct Vec;
+
+struct pppYmDeformationScreen {
+	_pppPObject m_object;
+};
 
 void SetUpIndWarp(VYmDeformationScreen*);
 void CCameraPcs_GetRefPosition(Vec*);

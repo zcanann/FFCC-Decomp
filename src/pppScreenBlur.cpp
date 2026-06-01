@@ -4,6 +4,7 @@
 #include "global.h"
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
+#include <stddef.h>
 
 /*
  * --INFO--
@@ -14,19 +15,20 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBlur(pppScreenBlur* blur, pppScreenBlurUnkB* blurParam, _pppCtrlTable* ctrlTable)
+void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* blurParam, _pppCtrlTable* ctrlTable)
 {
-    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1] + 0x80;
-    u8* blurValuePtr = blur->data + ctrlTable->m_serializedDataOffsets[0] + 0x80;
+    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1] + offsetof(_pppPObject, m_workArea);
+    u8* blurObjectBytes = (u8*)blur;
+    u8* blurValuePtr = blur->m_workArea + ctrlTable->m_serializedDataOffsets[0];
     u32 blurMask;
 
     blurParam->m_blurB = 0;
-    blurMask = __cntlzw((u32)blur->data[blurActiveOffset]);
+    blurMask = __cntlzw((u32)blurObjectBytes[blurActiveOffset]);
     Graphic.RenderBlur(blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG, blurParam->m_blurB,
                        blurValuePtr[0x0B], blurParam->m_initWOrk);
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
-    blur->data[blurActiveOffset] = 1;
+    blurObjectBytes[blurActiveOffset] = 1;
 }
 
 /*
@@ -69,7 +71,7 @@ void pppDesScreenBlur(_pppPObjLink*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBlur(pppScreenBlur*)
+void pppCon2ScreenBlur(_pppPObject*)
 {
     return;
 }
@@ -83,10 +85,11 @@ void pppCon2ScreenBlur(pppScreenBlur*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenBlur(pppScreenBlur* blur, _pppCtrlTable* ctrlTable)
+void pppConScreenBlur(_pppPObject* blur, _pppCtrlTable* ctrlTable)
 {
-    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1] + 0x80;
+    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1] + offsetof(_pppPObject, m_workArea);
+    u8* blurObjectBytes = (u8*)blur;
 
     Graphic.InitBlurParameter();
-    blur->data[blurOffset] = 0;
+    blurObjectBytes[blurOffset] = 0;
 }

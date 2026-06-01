@@ -24,7 +24,7 @@ struct _pppFilterSerializedData {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTable* param_3)
 {
     struct FilterStep {
         unsigned int unk0;
@@ -34,7 +34,8 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
     FilterStep* step = (FilterStep*)param_2;
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     int serializedOffset = *serializedDataOffsets;
-    _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)((unsigned char*)pppFilterObj + serializedOffset + 0x80);
+    _pppFilterSerializedData* serializedData =
+        (_pppFilterSerializedData*)(pppFilterObj->m_workArea + serializedOffset);
 
     if (step->dataValIndex == 0xFFFF) {
         gUtil.RenderColorQuad(

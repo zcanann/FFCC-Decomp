@@ -17,21 +17,20 @@ void pppDrawMatrixFront(_pppPObject* object, void*, _pppCtrlTable*)
     Vec localPos;
 
     PSMTXScaleApply(
-        *(Mtx*)((char*)object + 0x10),
-        *(Mtx*)((char*)object + 0x40),
+        object->m_localMatrix.value,
+        object->m_drawMatrix.value,
         ppvMng->m_scale.x,
         ppvMng->m_scale.y,
         ppvMng->m_scale.z
     );
 
-    localPos.x = *(float*)((char*)object + 0x1c);
-    localPos.y = *(float*)((char*)object + 0x2c);
-    localPos.z = *(float*)((char*)object + 0x3c);
+    localPos.x = object->m_localMatrix.value[0][3];
+    localPos.y = object->m_localMatrix.value[1][3];
+    localPos.z = object->m_localMatrix.value[2][3];
 
     PSMTXMultVec(ppvWorldMatrix, &localPos, &localPos);
 
-    *(float*)((char*)object + 0x4c) = localPos.x;
-    *(float*)((char*)object + 0x5c) = localPos.y;
-    *(float*)((char*)object + 0x6c) = localPos.z;
+    object->m_drawMatrix.value[0][3] = localPos.x;
+    object->m_drawMatrix.value[1][3] = localPos.y;
+    object->m_drawMatrix.value[2][3] = localPos.z;
 }
-

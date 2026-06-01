@@ -4,10 +4,12 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/linkage.h"
 extern "C" {
 extern u8 gPppDefaultValueBuffer[];
 }
 #include "dolphin/mtx.h"
+#include <stddef.h>
 
 struct pppLightTarget {
 	int unk0;
@@ -59,6 +61,16 @@ struct PppLightMngProgramInfo {
 	pppLightTarget* programInfoTable;
 };
 
+STATIC_ASSERT(offsetof(PppLightWork, attenFalloffAccel) == 0x20);
+STATIC_ASSERT(offsetof(PppLightWork, attenRadiusAccel) == 0x2C);
+STATIC_ASSERT(offsetof(PppLightWork, spotScaleAccel) == 0x38);
+STATIC_ASSERT(offsetof(PppLightWork, specularScaleAccel) == 0x44);
+
+static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<PppLightWork*>(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800dab00
@@ -68,25 +80,18 @@ struct PppLightMngProgramInfo {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppLightCon3(void* param1, void* param2)
+void pppLightCon3(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	// Based on assembly: accesses param2+0xc, then deref twice, then +0x80
-	// Stores zeros and a float constant to various offsets
-	void** ptr1 = (void**)((char*)param2 + 0xc);
-	void** ptr2 = (void**)*ptr1;
-	void* ptr3 = *ptr2;
-	char* base = (char*)param1 + (int)ptr3 + 0x80;
+	PppLightWork* work = GetPppLightWork(object, ctrlTable);
 	float zero = 0.0f;
 	
-	// Clear some integer values
-	*(int*)((char*)base + 0x10) = 0;
-	*(int*)((char*)base + 0x14) = 0;
+	*(int*)&work->color2R = 0;
+	*(int*)&work->color2B = 0;
 	
-	// Set float values to 0.0f
-	*(float*)((char*)base + 0x20) = zero;
-	*(float*)((char*)base + 0x2c) = zero;
-	*(float*)((char*)base + 0x38) = zero;
-	*(float*)((char*)base + 0x44) = zero;
+	work->attenFalloffAccel = zero;
+	work->attenRadiusAccel = zero;
+	work->spotScaleAccel = zero;
+	work->specularScaleAccel = zero;
 }
 
 /*
@@ -98,36 +103,30 @@ void pppLightCon3(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppLightCon(void* param1, void* param2)
+void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	// Similar pattern to pppLightCon3 but clears more values
-	void** ptr1 = (void**)((char*)param2 + 0xc);
-	void** ptr2 = (void**)*ptr1;
-	void* ptr3 = *ptr2;
-	char* base = (char*)param1 + (int)ptr3 + 0x80;
+	PppLightWork* work = GetPppLightWork(object, ctrlTable);
 	float zero = 0.0f;
 	
-	// Clear integer values
-	*(int*)((char*)base + 0x0) = 0;
-	*(int*)((char*)base + 0x4) = 0;
-	*(int*)((char*)base + 0x8) = 0;
-	*(int*)((char*)base + 0xc) = 0;
-	*(int*)((char*)base + 0x10) = 0;
-	*(int*)((char*)base + 0x14) = 0;
+	*(int*)&work->color0R = 0;
+	*(int*)&work->color0B = 0;
+	*(int*)&work->color1R = 0;
+	*(int*)&work->color1B = 0;
+	*(int*)&work->color2R = 0;
+	*(int*)&work->color2B = 0;
 	
-	// Clear float values
-	*(float*)((char*)base + 0x20) = zero;
-	*(float*)((char*)base + 0x1c) = zero;
-	*(float*)((char*)base + 0x18) = zero;
-	*(float*)((char*)base + 0x2c) = zero;
-	*(float*)((char*)base + 0x28) = zero;
-	*(float*)((char*)base + 0x24) = zero;
-	*(float*)((char*)base + 0x38) = zero;
-	*(float*)((char*)base + 0x34) = zero;
-	*(float*)((char*)base + 0x30) = zero;
-	*(float*)((char*)base + 0x44) = zero;
-	*(float*)((char*)base + 0x40) = zero;
-	*(float*)((char*)base + 0x3c) = zero;
+	work->attenFalloffAccel = zero;
+	work->attenFalloffVelocity = zero;
+	work->attenFalloff = zero;
+	work->attenRadiusAccel = zero;
+	work->attenRadiusVelocity = zero;
+	work->attenRadius = zero;
+	work->spotScaleAccel = zero;
+	work->spotScaleVelocity = zero;
+	work->spotScale = zero;
+	work->specularScaleAccel = zero;
+	work->specularScaleVelocity = zero;
+	work->specularScale = zero;
 }
 
 /*

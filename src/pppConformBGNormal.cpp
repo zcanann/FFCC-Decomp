@@ -102,7 +102,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
     dataOffset = *param3->m_serializedDataOffsets;
-    state = (ConformBgNormalState*)((u8*)pppConformBGNormal + 0x80 + dataOffset);
+    state = (ConformBgNormalState*)(pppConformBGNormal->m_object.m_workArea + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
@@ -300,8 +300,8 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _p
     ConformBgNormalState* state;
     f32 scale;
 
-    serializedDataOffsets = *(int**)((u8*)param2 + 0xc);
-    state = (ConformBgNormalState*)((u8*)conformBG + 0x80 + *serializedDataOffsets);
+    serializedDataOffsets = param2->m_serializedDataOffsets;
+    state = (ConformBgNormalState*)(conformBG->m_object.m_workArea + *serializedDataOffsets);
     scale = kPppConformBgNormalZero;
     state->m_normal.z = scale;
     state->m_normal.y = scale;

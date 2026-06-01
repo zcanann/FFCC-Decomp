@@ -14,5 +14,5 @@
  */
 void pppDrawMatrix(struct _pppPObject* object, void*, struct _pppCtrlTable*)
 {
-	PSMTXConcat(ppvWorldMatrix, *(Mtx*)((char*)object + 0x10), *(Mtx*)((char*)object + 0x40));
+	PSMTXConcat(ppvWorldMatrix, object->m_localMatrix.value, object->m_drawMatrix.value);
 }

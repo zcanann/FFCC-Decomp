@@ -47,8 +47,8 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 		model->SetCallbackContext(value, params);
 		model->m_beforeCalcMatrixCallback = CC_BeforeCalcMatrixCallback;
 
-		CalcGraphValue(reinterpret_cast<_pppPObject*>(constrainCameraForLoc), params->m_graphId, value[0],
-		               value[1], value[2], params->m_dataValIndex, params->m_initWork, params->m_stepValue);
+		CalcGraphValue(&constrainCameraForLoc->m_object, params->m_graphId, value[0], value[1], value[2],
+		               params->m_dataValIndex, params->m_initWork, params->m_stepValue);
 	}
 }
 

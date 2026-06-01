@@ -247,23 +247,23 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     model = GetCharaModelPtr(charaHandle);
     work->m_model = model;
 
-    CalcGraphValue(reinterpret_cast<_pppPObject*>(charaBreak),
-                                                 stepData->m_graphId,
-                                                 work->m_value0,
-                                                 work->m_value1,
-                                                 work->m_value2,
-                                                 stepData->m_dataValIndex,
-                                                 stepData->m_graphInit,
-                                                 stepData->m_graphStep);
+    CalcGraphValue(charaBreak,
+                   stepData->m_graphId,
+                   work->m_value0,
+                   work->m_value1,
+                   work->m_value2,
+                   stepData->m_dataValIndex,
+                   stepData->m_graphInit,
+                   stepData->m_graphStep);
 
-    CalcGraphValue(reinterpret_cast<_pppPObject*>(charaBreak),
-                                                 stepData->m_graphId,
-                                                 work->m_value3,
-                                                 work->m_value4,
-                                                 work->m_value5,
-                                                 stepData->m_payloadGraphInit,
-                                                 stepData->m_payloadGraphStep,
-                                                 stepData->m_payloadGraphStepStep);
+    CalcGraphValue(charaBreak,
+                   stepData->m_graphId,
+                   work->m_value3,
+                   work->m_value4,
+                   work->m_value5,
+                   stepData->m_payloadGraphInit,
+                   stepData->m_payloadGraphStep,
+                   stepData->m_payloadGraphStepStep);
 
     model->SetCallbackContext(work, stepData);
     model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);

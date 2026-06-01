@@ -1,22 +1,20 @@
 #ifndef _PPP_LERPPOS_H_
 #define _PPP_LERPPOS_H_
 
-// Forward declarations for structures
-struct pppLerpPos;
-struct pppLerpPosUnkB;
-struct pppLerpPosUnkC;
+struct _pppPObject;
+struct _pppCtrlTable;
+struct pppLerpPosStep;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2);
-void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2);
-void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param_2, struct pppLerpPosUnkC* param_3);
+void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl);
+void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl);
+void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_LERPPOS_H_
-

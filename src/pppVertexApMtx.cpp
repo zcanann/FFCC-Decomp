@@ -52,12 +52,6 @@ struct VertexApMtxSource
 	Vec* points;
 };
 
-struct VertexApMtxObject
-{
-	u8 unk0[0x10];
-	Mtx localMatrix;
-};
-
 extern const double kPppYmSharedDoubleBias;
 extern "C" const f64 kPppVertexApMtxDoubleBias = 4503599627370496.0;
 
@@ -74,9 +68,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 {
 	VertexApMtxData* data = (VertexApMtxData*)dataRaw;
 	VertexApMtxCtrl* ctrl = (VertexApMtxCtrl*)ctrlRaw;
-	VertexApMtxObject* parentObj = (VertexApMtxObject*)parent;
 	s32 stateOffset = *ctrl->stateOffset;
-	VertexApMtxState* state = (VertexApMtxState*)((u8*)parent + stateOffset + 0x80);
+	VertexApMtxState* state = (VertexApMtxState*)(parent->m_workArea + stateOffset);
 
 	if (gPppCalcDisabled != 0) {
 		goto exitStub;
@@ -90,7 +83,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		int count;
 		VertexApMtxEnv* env = (VertexApMtxEnv*)ppvEnv;
 		VertexApMtxEntry* entry;
-		Vec* points = *(Vec**)((u8*)parent + 0x70);
+		Vec* points = parent->m_drawMatrixPtr;
 		entry = &env->entries[data->entryIndex];
 
 		if (points == 0) {
@@ -139,8 +132,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.x = x;
 					pos.y = y;
 					pos.z = z;
-					PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-					outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
+					PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+					outMtx = (Mtx*)(child->m_workArea + data->childMtxOffset);
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(*outMtx);
 						(*outMtx)[0][3] = pos.x;
@@ -192,8 +185,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					pos.x = x;
 					pos.y = y;
 					pos.z = z;
-					PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-					outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
+					PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+					outMtx = (Mtx*)(child->m_workArea + data->childMtxOffset);
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(*outMtx);
 						(*outMtx)[0][3] = pos.x;
@@ -243,7 +236,7 @@ functionEnd:
 void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
 {
 	s32 offset = **(s32**)((u8*)vtx + 0xC);
-	u16* state = (u16*)((u8*)obj + offset + 0x80);
+	u16* state = (u16*)(obj->m_workArea + offset);
 
 	state[0] = 0;
 	state[1] = 0;

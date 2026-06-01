@@ -514,31 +514,45 @@ void CGCharaObj::onCancelStat(int)
 {
 	int state = m_lastStateId;
 
-	if (state != 6) {
-		if (state < 6) {
-			if (state == 2) {
-				for (int i = 0; i < 0x16; i++) {
-					if (((1U << i) & 0x18U) != 0) {
-						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-					}
-				}
-			}
-		} else if (state == 0x12) {
-			for (int i = 0; i < 0x16; i++) {
-				if (((1U << i) & 1U) != 0) {
-					CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-				}
-			}
-		}
-	} else {
-		for (int i = 0; i < 0x16; i++) {
-			if (((1U << i) & 0x138U) != 0) {
-				CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
-			}
-		}
-		m_damageParticle = -1;
+	if (state == 6) {
+		goto cancel_damage;
 	}
+	if (state < 6) {
+		if (state == 2) {
+			goto cancel_state2;
+		}
+		goto cancel_done;
+	}
+	if (state == 0x12) {
+		goto cancel_state18;
+	}
+	goto cancel_done;
 
+cancel_state18:
+	for (int i = 0; i < 0x16; i++) {
+		if (((1U << i) & 1U) != 0) {
+			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+		}
+	}
+	goto cancel_done;
+
+cancel_state2:
+	for (int i = 0; i < 0x16; i++) {
+		if (((1U << i) & 0x18U) != 0) {
+			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+		}
+	}
+	goto cancel_done;
+
+cancel_damage:
+	for (int i = 0; i < 0x16; i++) {
+		if (((1U << i) & 0x138U) != 0) {
+			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+		}
+	}
+	m_damageParticle = -1;
+
+cancel_done:
 	m_comboFrame = 0;
 	m_comboState = 0;
 

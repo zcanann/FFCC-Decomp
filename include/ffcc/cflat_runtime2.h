@@ -2,6 +2,7 @@
 #define _FFCC_CFLAT_RUNTIME2_H_
 
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/gobject.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 
@@ -22,7 +23,7 @@ extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
 extern unsigned char CFlat[0x10440];
 extern u32 CFlatFlags;
 
-class CFlatRuntime2
+class CFlatRuntime2 : public CFlatRuntime
 {
 public:
 	class CParticleWork
@@ -83,17 +84,17 @@ public:
 	CFlatRuntime2();
 	~CFlatRuntime2();
 
-	CMemory::CStage* getStage();
-	CMemory::CStage* getDebugStage();
+	virtual CMemory::CStage* getStage();
+	virtual CMemory::CStage* getDebugStage();
 
-	void onNewObject(CFlatRuntime::CObject*);
-	void onDeleteObject(CFlatRuntime::CObject*);
+	virtual void onNewObject(CFlatRuntime::CObject*);
+	virtual void onDeleteObject(CFlatRuntime::CObject*);
 
 	unsigned int getNumFreeObject(int);
-	CGObject* getFreeObject(int);
-	void* intToClass(int);
+	virtual CGObject* getFreeObject(int);
+	virtual void* intToClass(int);
 
-	void Frame(int, int);
+	virtual int Frame(int, int);
 	int Load(char*);
 
 	CGObject* FindGObjFirst();
@@ -111,7 +112,7 @@ public:
 	CGItemObj* FindGItemObjFirst();
 	CGItemObj* FindGItemObjNext(CGItemObj*);
 
-	void Destroy();
+	virtual void Destroy();
 	void Calc();
 	void Draw();
 
@@ -146,7 +147,7 @@ public:
 	void IgnoreParticle(int, CFlatRuntime::CObject*);
 
 	void initAllFinished();
-	void reqFinished(int, CFlatRuntime::CObject*);
+	virtual void reqFinished(int, CFlatRuntime::CObject*);
 
 	void SysControl(int, int);
 	int GetSysControl(int);
@@ -156,13 +157,13 @@ public:
 	void ResetNewGame();
 
 private:
-	int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
-	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
+	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
+	virtual void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 
-	void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
-	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
+	virtual void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
+	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 };
 
 extern CFlatRuntime2& gCFlatRuntime2;

@@ -9,39 +9,11 @@
 
 extern "C" {
 char s_cflat_runtime_newline[];
-void* __vt__12CFlatRuntime[];
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
 extern "C" const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
-
-struct CFlatRuntimeLifecycleProxy
-{
-    virtual void Init();
-    virtual void Destroy();
-    virtual void Quit();
-};
-
-struct CFlatRuntimeStageProxy
-{
-    virtual void _00();
-    virtual void _01();
-    virtual void _02();
-    virtual void _03();
-    virtual void _04();
-    virtual void _05();
-    virtual void _06();
-    virtual void _07();
-    virtual void _08();
-    virtual void _09();
-    virtual void _10();
-    virtual void _11();
-    virtual void _12();
-    virtual void _13();
-    virtual void _14();
-    virtual void* GetStage();
-};
 
 
 /*
@@ -51,10 +23,8 @@ struct CFlatRuntimeStageProxy
  */
 CFlatRuntime::CFlatRuntime()
 {
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	const u32 clearBit = 0;
 
-	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
 	m_0x970 = clearBit;
 	m_0x1298 = 1;
 
@@ -72,8 +42,7 @@ CFlatRuntime::CFlatRuntime()
  */
 CFlatRuntime::~CFlatRuntime()
 {
-	*reinterpret_cast<void***>(this) = __vt__12CFlatRuntime;
-	reinterpret_cast<CFlatRuntimeLifecycleProxy*>(this)->Quit();
+	Destroy();
 }
 
 /*
@@ -83,12 +52,10 @@ CFlatRuntime::~CFlatRuntime()
  */
 void CFlatRuntime::Init()
 {
-	CFlatRuntimeStageProxy* proxy = reinterpret_cast<CFlatRuntimeStageProxy*>(this);
-
 	m_permanentVarValues =
-	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
+	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
 	m_initScratchA =
-	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u8[0x14880];
+	    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u8[0x14880];
 }
 
 /*
@@ -117,8 +84,6 @@ void CFlatRuntime::Quit()
  */
 void CFlatRuntime::Destroy()
 {
-	typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
-
 	u8* const self = reinterpret_cast<u8*>(this);
 	const u32 clearBit = 0;
 	CObject* const root = &m_objectSentinel;
@@ -138,8 +103,7 @@ void CFlatRuntime::Destroy()
 
 		object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
-		OnDeleteFn onDelete = reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7]);
-		onDelete(this, object);
+		onDeleteObject(object);
 
 		object = next;
 	}
@@ -283,15 +247,11 @@ void CFlatRuntime::clear()
  */
 void CFlatRuntime::Create(void* filePtr)
 {
-	typedef void (*ResetFn)(CFlatRuntime*);
-	typedef void* (*GetStageFn)(CFlatRuntime*);
-
 	CChunkFile::CChunk chunk;
 	CChunkFile chunkFile(filePtr);
 	u8* const self = reinterpret_cast<u8*>(this);
-	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
 
-	reinterpret_cast<ResetFn>((*reinterpret_cast<void***>(this))[0x10])(this);
+	Destroy();
 
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != 'CFLT') {
@@ -310,7 +270,7 @@ void CFlatRuntime::Create(void* filePtr)
 				*reinterpret_cast<int*>(self + 0x14) = classCount;
 
 				*reinterpret_cast<CClass**>(self + 0x18) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
 				        CClass[classCount];
 
 				int classIndex = 0;
@@ -357,7 +317,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int funcCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x1C) = funcCount;
 				*reinterpret_cast<u8**>(self + 0x20) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
 				        u8[funcCount * 0x50];
 
 				int funcIndex = 0;
@@ -391,7 +351,7 @@ void CFlatRuntime::Create(void* filePtr)
 								funcBase->m_code = 0;
 							} else {
 								funcBase->m_code = reinterpret_cast<u8*>(
-								    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
+								    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
 								        u8[chunk.m_size]);
 								memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
 							}
@@ -421,7 +381,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int variableCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x24) = variableCount;
 				*reinterpret_cast<u8**>(self + 0x28) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
 				        u8[variableCount << 2];
 
 				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
@@ -438,10 +398,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int strCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x30) = strCount;
 				*reinterpret_cast<u16**>(self + 0x34) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x121)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x121)
 				        u16[strCount];
 				*reinterpret_cast<char**>(self + 0x38) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x122)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x122)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
@@ -460,10 +420,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int fstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x3C) = fstrCount;
 				*reinterpret_cast<u16**>(self + 0x40) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x12F)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x12F)
 				        u16[fstrCount];
 				*reinterpret_cast<char**>(self + 0x44) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x130)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x130)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x44), chunkFile.GetAddress(), chunk.m_size);
@@ -482,10 +442,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int vstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x48) = vstrCount;
 				*reinterpret_cast<u16**>(self + 0x4C) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x13D)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x13D)
 				        u16[vstrCount];
 				*reinterpret_cast<char**>(self + 0x50) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x13E)
+				    new (getStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x13E)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x50), chunkFile.GetAddress(), chunk.m_size);
@@ -556,14 +516,10 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
 										    = 0;
 									} else {
-										typedef void* (*GetStageFn)(CFlatRuntime*);
-										GetStageFn getStage =
-											reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x12]);
 										*reinterpret_cast<unsigned int*>(
 											reinterpret_cast<u8*>(funcs) + blockOffset + 0x38) = chunk.m_size >> 3;
 										*reinterpret_cast<u8**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
-										    = new (reinterpret_cast<CMemory::CStage*>(getStage(this)),
-										           const_cast<char*>(s_cflat_runtime_cpp), 0x181)
+										    = new (getDebugStage(), const_cast<char*>(s_cflat_runtime_cpp), 0x181)
 										        u8[*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
 										           << 3];
 										memcpy(
@@ -662,8 +618,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 					}
 
 					do {
-						typedef void (*ReqFinishedFn)(CFlatRuntime*, int, CObject*);
-						reinterpret_cast<ReqFinishedFn>((*reinterpret_cast<void***>(this))[0x10])(this, scriptIndex, object);
+						reqFinished(scriptIndex, object);
 
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
@@ -714,8 +669,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 
 			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, 0, 4, 27, 27));
 
-			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
-			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
+			onDeleteObject(object);
 		}
 
 		object = next;
@@ -753,8 +707,7 @@ void CFlatRuntime::AfterFrame(int mode)
 
 			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
-			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
-			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
+			onDeleteObject(object);
 		}
 
 		object = next;
@@ -785,8 +738,7 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 
 	object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
-	typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
-	reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
+	onDeleteObject(object);
 }
 
 /*
@@ -811,8 +763,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		varCount = classBase->m_variableCount;
 	}
 
-	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
-	CObject* object = reinterpret_cast<GetFreeObjectFn>((*reinterpret_cast<void***>(this))[0xE])(this, varCount);
+	CObject* object = getFreeObject(varCount);
 
 	object->m_previous = reinterpret_cast<CObject*>(self + 0x8CC)->m_previous;
 	object->m_next = reinterpret_cast<CObject*>(self + 0x8CC);
@@ -915,8 +866,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		request(object, 1, 0, 0, 0);
 	}
 
-	typedef void (*OnNewFn)(CFlatRuntime*, CObject*);
-	reinterpret_cast<OnNewFn>((*reinterpret_cast<void***>(this))[6])(this, object);
+	onNewObject(object);
 
 	return object;
 }
@@ -973,10 +923,8 @@ void CFlatRuntime::searchFunc(int, int, int)
 void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind, int systemIndex, int argCount,
                               CFlatRuntime::CStack* args, CFlatRuntime::CStack* outArg)
 {
-	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
-
 	if (objectParam == 0) {
-		objectParam = reinterpret_cast<GetFreeObjectFn>((*reinterpret_cast<void***>(this))[0xF])(this, 1);
+		objectParam = getFreeObject(1);
 	}
 
 	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);
@@ -2276,9 +2224,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					*reinterpret_cast<u8*>(engineObject + 0x38) =
 					    static_cast<u8>(__rlwimi(*reinterpret_cast<u8*>(engineObject + 0x38), 0, 4, 27, 27));
 
-					typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
-					reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(
-					    this, reinterpret_cast<CFlatRuntime::CObject*>(engineObject));
+					onDeleteObject(reinterpret_cast<CFlatRuntime::CObject*>(engineObject));
 				} else {
 					object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
 				}
@@ -2486,7 +2432,7 @@ int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
  * Address:	TODO
  * Size:	TODO
  */
-int CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+void CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-    return 0;
+    return;
 }

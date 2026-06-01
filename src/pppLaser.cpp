@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppLaser.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
@@ -75,6 +76,8 @@ struct LaserColorData {
     pppCVECTOR m_color;
 };
 
+STATIC_ASSERT(offsetof(struct pppLaser, m_workArea) == 0x80);
+
 /*
  * --INFO--
  * PAL Address: 801766ec
@@ -87,7 +90,7 @@ struct LaserColorData {
 void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = LaserConst(kPppLaserZero);
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
     int iVar2;
@@ -116,7 +119,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
     work->m_spawnEnabled = 1;
 
-    iVar2 = Game.GetParticleSpecialInfo(*(PPPIFPARAM*)((u8*)ppvMng + 0x130), local_24, local_28);
+    iVar2 = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, local_24, local_28);
     if (iVar2 != 0) {
         Game.GetTargetCursor(local_28, work->m_targetPosition, local_20);
 
@@ -131,8 +134,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
         }
     } else {
         work->m_maxLength = LaserConst(kPppLaserNegativeOne);
-        *(u8*)((u8*)ppvMng + 0xe8) = 1;
-        pppStopSe(ppvMng, (PPPSEST*)((u8*)ppvMng + 0x11c));
+        ppvMng->m_hitBgFlag = 1;
+        pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
     }
 }
 
@@ -148,7 +151,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = LaserConst(kPppLaserZero);
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
 
     work->m_graphValue3 = LaserConst(kPppLaserZero);
     work->m_graphValue2 = fVar1;
@@ -173,7 +176,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
  */
 void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
     void* alloc = work->m_points;
     if (alloc != 0) {
         pppHeapUseRate(static_cast<CMemory::CStage*>(alloc));
@@ -210,7 +213,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         return;
     }
 
-    work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work = (LaserWork*)(pppLaser->m_workArea + param_3->m_serializedDataOffsets[2]);
     emptyHistory = 0;
     f32 maxLengthDisabled = LaserConst(kPppLaserNegativeOne);
     if (maxLengthDisabled == work->m_maxLength) {
@@ -342,7 +345,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)pppLaser;
                 }
 
-                Vec* createdPos = (Vec*)((u8*)created + step->m_laser.m_spawnPositionOffset + 0x80);
+                Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
                 createdPos->x = work->m_points[i].x;
                 createdPos->y = work->m_points[i].y + step->m_laser.m_spawnYOffset;
                 createdPos->z = work->m_points[i].z;
@@ -370,9 +373,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 {
     pppLaserUnkB* step = param_2;
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + serializedDataOffsets[2]);
+    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + serializedDataOffsets[2]);
     int colorOffset = serializedDataOffsets[1];
-    LaserColorData* colorData = (LaserColorData*)((u8*)pppLaser + 0x80 + colorOffset);
+    LaserColorData* colorData = (LaserColorData*)(pppLaser->m_workArea + colorOffset);
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;

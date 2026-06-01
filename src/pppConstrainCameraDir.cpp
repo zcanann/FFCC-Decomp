@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
@@ -7,6 +8,8 @@
 #include <dolphin/mtx.h>
 
 extern const float kConstrainCameraDirFrameOne = 1.0f;
+
+STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
 /*
  * --INFO--
@@ -22,7 +25,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 {
     if (gPppCalcDisabled == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
+        float* value = (float*)(pppConstrainCameraDir->m_workArea + *param_3->m_serializedDataOffsets);
 
         CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
                        param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
@@ -95,7 +98,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = kConstrainCameraDirZero;
-    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
+    float* puVar2 = (float*)(pppConstrainCameraDir->m_workArea + *param_2->m_serializedDataOffsets);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
@@ -113,7 +116,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = kConstrainCameraDirZero;
-    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
+    float* puVar2 = (float*)(pppConstrainCameraDir->m_workArea + *param_2->m_serializedDataOffsets);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;

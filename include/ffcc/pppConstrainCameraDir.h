@@ -4,11 +4,16 @@
 #include "ffcc/partMng.h"
 
 typedef struct pppConstrainCameraDir {
-    s32 m_graphId;            // 0x00
-    s32 m_unknown04;          // 0x04
-    s32 m_unknown08;          // 0x08
-    s32 m_unknown0C;          // 0x0C
-    pppFMATRIX m_localMatrix; // 0x10
+    _pppPObjLink m_link;        // 0x00
+    s32 m_graphId;              // 0x0C
+    pppFMATRIX m_localMatrix;   // 0x10
+    pppFMATRIX m_drawMatrix;    // 0x40
+    Vec* m_drawMatrixPtr;       // 0x70
+    void* m_field74;            // 0x74
+    u8 m_pad78[0x7C - 0x78];    // 0x78
+    u8 m_field7C;               // 0x7C
+    u8 m_pad7D[0x80 - 0x7D];    // 0x7D
+    u8 m_workArea[1];           // 0x80
 } pppConstrainCameraDir;
 
 typedef struct pppConstrainCameraDirUnkB {

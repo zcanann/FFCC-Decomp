@@ -21,7 +21,6 @@ extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
 extern unsigned char CFlat[0x10440];
 extern u32 CFlatFlags;
-extern Mtx gFlatPosMtx;
 
 class CFlatRuntime2
 {

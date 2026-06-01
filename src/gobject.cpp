@@ -69,6 +69,11 @@ static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
     return *reinterpret_cast<CModelAnimState*>(model);
 }
 
+static inline Mtx& FlatPosMtx()
+{
+    return Chara.FlatPosMtx();
+}
+
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
     typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
@@ -1990,7 +1995,7 @@ void CGObject::onDraw()
         pos.x = m_worldPosition.x;
         pos.y = m_worldPosition.y + m_capsuleHalfHeight;
         pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(gFlatPosMtx, &pos, m_capsuleHalfHeight, &color.color);
+        Graphic.DrawSphere(FlatPosMtx(), &pos, m_capsuleHalfHeight, &color.color);
     }
 
     if (((CFlatFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
@@ -2021,7 +2026,7 @@ void CGObject::onDraw()
         scaleMtx[0][3] = spherePos.x;
         scaleMtx[1][3] = spherePos.y;
         scaleMtx[2][3] = spherePos.z;
-        PSMTXConcat(gFlatPosMtx, scaleMtx, scaleMtx);
+        PSMTXConcat(FlatPosMtx(), scaleMtx, scaleMtx);
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
 
         CColor color(0x00, 0xFF, 0x00, 0xFF);
@@ -2035,7 +2040,7 @@ void CGObject::onDraw()
         pos.x = m_worldPosition.x;
         pos.y = m_worldPosition.y + m_bodyColRadius;
         pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(gFlatPosMtx, &pos, m_bodyColRadius, &color.color);
+        Graphic.DrawSphere(FlatPosMtx(), &pos, m_bodyColRadius, &color.color);
     }
 
     if (((CFlatFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
@@ -2044,12 +2049,12 @@ void CGObject::onDraw()
         pos.x = m_worldPosition.x;
         pos.y = m_worldPosition.y + m_attackColRadius;
         pos.z = m_worldPosition.z;
-        Graphic.DrawSphere(gFlatPosMtx, &pos, m_attackColRadius, &color.color);
+        Graphic.DrawSphere(FlatPosMtx(), &pos, m_attackColRadius, &color.color);
     }
 
     if (((CFlatFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
         CColor color(0x40, 0xFF, 0x40, 0xFF);
-        Graphic.DrawSphere(gFlatPosMtx, &m_worldPosition, m_nearColRadius, &color.color);
+        Graphic.DrawSphere(FlatPosMtx(), &m_worldPosition, m_nearColRadius, &color.color);
     }
 
     if (((CFlatFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
@@ -2060,9 +2065,9 @@ void CGObject::onDraw()
             }
 
             CColor color(0xFF, 0x80, 0x80, 0xFF);
-            Graphic.DrawSphere(gFlatPosMtx, &collider->m_worldPosition, collider->m_radius, &color.color);
+            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, collider->m_radius, &color.color);
 
-            GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+            GXLoadPosMtxImm(FlatPosMtx(), GX_PNMTX0);
             GXBegin(GX_LINES, GX_VTXFMT0, 2);
             GXPosition3f32(collider->m_localEnd.y, collider->m_localEnd.z, collider->m_worldPosition.x);
             GXPosition3f32(collider->m_worldPosition.y, collider->m_worldPosition.z, collider->m_radius);
@@ -2081,7 +2086,7 @@ void CGObject::onDraw()
             scale.x = collider->m_innerRadius;
             scale.y = collider->m_outerRadius;
             scale.z = collider->m_innerRadius;
-            Graphic.DrawSphere(gFlatPosMtx, &collider->m_worldPosition, &scale, &color.color);
+            Graphic.DrawSphere(FlatPosMtx(), &collider->m_worldPosition, &scale, &color.color);
         }
     }
 }

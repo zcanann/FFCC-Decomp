@@ -83,7 +83,7 @@ static inline float calc_mesh_sample_t(u8 mode)
 		(void)Math.RandF();
 		return Math.RandF();
 	case 2:
-		return Math.RandF() * Math.RandF();
+		return Math.RandF() * Math.RandF() * Math.RandF();
 	case 3:
 		return (float)(DOUBLE_80330480 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
 	case 4:
@@ -901,6 +901,7 @@ void birth(
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;
 			angle[1] = 0;
+			angle[2] = 0;
 		}
 
 		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
@@ -913,7 +914,7 @@ void birth(
 	}
 
 	speed = *f32_at(payload, 0xD4);
-	if ((*(s8*)(payload + 0x2A) < 4) || (*(s8*)(payload + 0x2A) >= 10)) {
+	if (*(s8*)(payload + 0x2A) >= 10) {
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
@@ -1023,12 +1024,21 @@ void birth(
 		if ((payload[0xEA] & 0x20) == 0) {
 			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
 			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
+			apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
 		} else {
 			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
 			*f32_at(particlePayload, 0x44) = randomRotation;
 			*f32_at(particlePayload, 0x48) = randomRotation;
+			if (((payload[0xEA] & 1) != 0) && ((payload[0xEA] & 2) != 0)) {
+				if (DOUBLE_80330488 < (double)Math.RandF()) {
+					*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * FLOAT_80330490[0];
+					*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * FLOAT_80330490[0];
+				}
+			} else if ((payload[0xEA] & 2) != 0) {
+				*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * FLOAT_80330490[0];
+				*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * FLOAT_80330490[0];
+			}
 		}
-		apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
 	}
 	if ((payload[0xEA] & 4) != 0) {
 		*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x44);
@@ -1041,31 +1051,31 @@ void birth(
 
 	*f32_at(particlePayload, 0x4C) = *f32_at(payload, 0xC0);
 	*f32_at(particlePayload, 0x50) = *f32_at(payload, 0xCC);
-	if (*f32_at(payload, 0xC8) != kPppRyjMegaBirthZero) {
-		*f32_at(particlePayload, 0x4C) =
-			*f32_at(particlePayload, 0x4C) + FLOAT_80330470 * *f32_at(payload, 0xC8) * Math.RandF() -
-			*f32_at(payload, 0xC8);
+	{
+		float velocityRandom = *f32_at(payload, 0xC8);
+		if (velocityRandom != kPppRyjMegaBirthZero) {
+			*f32_at(particlePayload, 0x4C) =
+				*f32_at(particlePayload, 0x4C) + FLOAT_80330470 * velocityRandom * Math.RandF() - velocityRandom;
+		}
 	}
 
 	life = *(s16*)(payload + 0x26);
 	if (life == 0) {
-		*(s16*)(particlePayload + 0x22) = -1;
+		*(u16*)(particlePayload + 0x22) = 0xFFFF;
 	} else {
 		*(s16*)(particlePayload + 0x22) = life;
 	}
 	*(u8*)(particlePayload + 0x58) = 0;
 
-	if (worldMat != NULL) {
-		switch (payload[0xEC]) {
-		case 1:
-			PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
-			break;
-		case 2:
-			PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
-			break;
-		default:
-			break;
-		}
+	switch (payload[0xEC]) {
+	case 1:
+		PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
+		break;
+	case 2:
+		PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
+		break;
+	default:
+		break;
 	}
 
 	if (colorData != NULL) {

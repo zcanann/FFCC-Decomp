@@ -5,11 +5,7 @@
 
 struct pppKeShpTail2X
 {
-    u8 _pad0[0xc];
-    _pppPObjectHead pppPObject;
-    pppFMATRIX field_0x40;
-    u8 field_0x70[0x10];
-    u8 m_workArea[1];
+    _pppPObject m_object;
 };
 
 struct pppKeShpTail2XUnkB;
@@ -20,8 +16,8 @@ extern "C" {
 
 void pppKeShpTail2X(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, _pppCtrlTable*);
 void pppKeShpTail2XDraw(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, _pppCtrlTable*);
-void pppKeShpTail2XCon(void*, _pppCtrlTable*);
-void pppKeShpTail2XDes(void*, _pppCtrlTable*);
+void pppKeShpTail2XCon(_pppPObject*, _pppCtrlTable*);
+void pppKeShpTail2XDes(_pppPObject*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -227,8 +227,8 @@ void CMenuPcs::Init()
     self[0x859] = 0;
     *reinterpret_cast<u16*>(self + 0x86C) = 0;
     *reinterpret_cast<u32*>(self + 0x830) = 0;
-    *reinterpret_cast<u32*>(self + 0x850) = 0;
-    *reinterpret_cast<u16*>(self + 0x864) = 0;
+    m_artiList = 0;
+    m_battleStateFlag = 0;
 
     WmInit();
     BonusInit();
@@ -355,7 +355,7 @@ void CMenuPcs::create()
     }
 
     m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(s_CMenuPcs_801d9d3c), 0);
-    *reinterpret_cast<int*>(self + 0x740) = -1;
+    m_mode = -1;
 
     memset(m_textureSets, 0, sizeof(m_textureSets));
     memset(m_textures, 0, sizeof(m_textures));
@@ -363,7 +363,6 @@ void CMenuPcs::create()
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc22_fnt_801d9db4), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 
-    CMenuPcs* textureSetSlot = this;
     for (int i = 0; i < 2; i++) {
         sprintf(texPath, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), Game.GetLangString(), sMenuTextureRegionNameTable[i]);
 
@@ -372,31 +371,25 @@ void CMenuPcs::create()
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
 
-            void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? MapMng.m_stage
-                                                                     : m_menuStage;
+            void* stage = m_mode == 1 ? MapMng.m_stage : m_menuStage;
 
             CTextureSet* textureSet = new (m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
-            *reinterpret_cast<CTextureSet**>(reinterpret_cast<u8*>(textureSetSlot) + 0x14C) = textureSet;
-            (*reinterpret_cast<CTextureSet**>(reinterpret_cast<u8*>(textureSetSlot) + 0x14C))
-                ->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            m_textureSets[i] = textureSet;
+            m_textureSets[i]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
-
-        textureSetSlot = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureSetSlot) + 4);
     }
 
     int* textureInfo = tTmp;
-    CMenuPcs* textureSlot = this;
     for (int i = 0; i < 0x16; i++) {
-        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + textureInfo[0] * 4);
+        CTextureSet* textureSet = m_textureSets[textureInfo[0]];
         const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
         CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
-        *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(textureSlot) + 0x18C) = texture;
+        m_textures[i] = texture;
         textureInfo += 2;
-        textureSlot = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureSlot) + 4);
     }
 
     changeMode(static_cast<CMenuPcs::MENUMODE>(0));
@@ -646,25 +639,24 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             File.SyncCompleted(fileHandle);
 
             CMemory::CStage* stage;
-            if (*reinterpret_cast<int*>(self + 0x740) == 1) {
+            if (m_mode == 1) {
                 stage = MapMng.m_stage;
             } else if (stageSelect == 3) {
                 stage = MapMng.m_stage;
             } else {
                 if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
-                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                    stage = m_menuStage;
                 } else if (stageSelect == 1) {
-                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
+                    stage = m_stageF0;
                 } else {
-                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                    stage = m_stageF4;
                 }
             }
 
-            *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) =
+            m_textureSets[textureSetStart + i] =
                 new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
 
-            (*reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4))
-                ->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            m_textureSets[textureSetStart + i]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
@@ -674,14 +666,12 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
     for (int i = 0; i < textureCount; i++) {
         const unsigned long textureIndex =
-            static_cast<unsigned long>((*reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4))
-                                           ->Find(tmp->m_textureName));
+            static_cast<unsigned long>(m_textureSets[tmp->m_textureSetIndex]->Find(tmp->m_textureName));
         CTexture* texture =
-            (*reinterpret_cast<CPtrArray<CTexture*>*>(
-                reinterpret_cast<u8*>(*reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4)) + 8))[textureIndex];
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(m_textureSets[tmp->m_textureSetIndex]) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
-        *reinterpret_cast<CTexture**>(self + 0x18C + (textureStart + i) * 4) = texture;
+        m_textures[textureStart + i] = texture;
         tmp++;
     }
 }
@@ -700,24 +690,22 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureCount; i++) {
-        int offset = (i + textureStart) * 4;
-        CRef* refObject = *reinterpret_cast<CRef**>(self + 0x18C + offset);
+        CRef* refObject = reinterpret_cast<CRef*>(m_textures[i + textureStart]);
         if (refObject != nullptr) {
             if (refObject->DecRef() == 0) {
                 delete refObject;
             }
-            *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
+            m_textures[i + textureStart] = 0;
         }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        int offset = (i + textureSetStart) * 4;
-        CRef* refObject = *reinterpret_cast<CRef**>(self + 0x14C + offset);
+        CRef* refObject = reinterpret_cast<CRef*>(m_textureSets[i + textureSetStart]);
         if (refObject != nullptr) {
             if (refObject->DecRef() == 0) {
                 delete refObject;
             }
-            *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
+            m_textureSets[i + textureSetStart] = 0;
         }
     }
 }
@@ -816,7 +804,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 void CMenuPcs::calc()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int mode = *reinterpret_cast<int*>(self + 0x740);
+    int mode = m_mode;
 
     if (mode != 1) {
         if (mode >= 1) {
@@ -830,7 +818,7 @@ void CMenuPcs::calc()
             int i = 0;
             CMenuPcs* menu = this;
             do {
-                (*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x13c))->Calc();
+                menu->m_battleRingMenus[0]->Calc();
                 i++;
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 4);
@@ -838,13 +826,13 @@ void CMenuPcs::calc()
             i = 0;
             menu = this;
             do {
-                (*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x10c))->Calc();
+                menu->m_battleMesMenus[0]->Calc();
                 i++;
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 0xc);
 
-            int limit = *reinterpret_cast<int*>(self + 0x68);
-            int current = *reinterpret_cast<int*>(self + 0x6c);
+            int limit = m_battleHud.m_gaugeTarget;
+            int current = m_battleHud.m_gaugeValue;
             int value = current - 1;
             if (value <= limit) {
                 int alt = current + 1;
@@ -853,12 +841,12 @@ void CMenuPcs::calc()
                     value = alt;
                 }
             }
-            *reinterpret_cast<int*>(self + 0x6c) = value;
+            m_battleHud.m_gaugeValue = value;
 
-            u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
-            *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
-            counter = *reinterpret_cast<u32*>(self + 0x5c) - 1;
-            *reinterpret_cast<u32*>(self + 0x5c) = counter & ~((int)counter >> 31);
+            u32 counter = m_battleHud.m_fadeCounter - 1;
+            m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
+            counter = m_battleHud.m_gaugeCounter - 1;
+            m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
 
             calcVillageMenu();
         }
@@ -1133,21 +1121,21 @@ void CMenuPcs::onScriptChanging(char* script)
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    if (*reinterpret_cast<int*>(self + 0x740) == 0) {
+    if (m_mode == 0) {
         for (int i = 0; i < 4; i++) {
-            CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x13C + i * 4);
+            CMenu* menu = m_battleRingMenus[i];
             menu->ScriptChanging(script);
         }
 
         for (int i = 0; i < 12; i++) {
-            CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x10C + i * 4);
+            CMenu* menu = m_battleMesMenus[i];
             menu->ScriptChanging(script);
         }
     }
 
     memset(self + 0x48, 0, 0x28);
-    ReleaseRefSlot(reinterpret_cast<void**>(self + 0x100));
-    ReleaseRefSlot(reinterpret_cast<void**>(self + 0x104));
+    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[2]));
+    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[3]));
 }
 
 /*
@@ -1566,14 +1554,13 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
-    u8* fontSlot = reinterpret_cast<u8*>(this) + fontNo * 4;
-    CFont* font = *reinterpret_cast<CFont**>(fontSlot + 0x100);
+    CFont*& font = m_fonts[fontNo + 2];
 
     if (font != 0) {
         if (font->DecRef() == 0) {
             delete font;
         }
-        *reinterpret_cast<u32*>(fontSlot + 0x100) = 0;
+        font = 0;
     }
 
     sprintf(path, const_cast<char*>(s_dvd__smenu__s_fnt_801d9da0), Game.GetLangString(), fileName);
@@ -1745,17 +1732,17 @@ void CMenuPcs::destroyBattle()
         ReleaseRefSlot(slot);
     }
 
-    slot = reinterpret_cast<void**>(self + 0x154);
+    slot = reinterpret_cast<void**>(&m_textureSets[2]);
     for (int i = 0; i < 2; i++, slot++) {
         ReleaseRefSlot(slot);
     }
 
-    slot = reinterpret_cast<void**>(self + 0x13C);
+    slot = reinterpret_cast<void**>(m_battleRingMenus);
     for (int i = 0; i < 4; i++, slot++) {
         ReleaseRefSlot(slot);
     }
 
-    slot = reinterpret_cast<void**>(self + 0x10C);
+    slot = reinterpret_cast<void**>(m_battleMesMenus);
     for (int i = 0; i < 12; i++, slot++) {
         ReleaseRefSlot(slot);
     }
@@ -1938,7 +1925,7 @@ void CMenuPcs::drawBattle()
 void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    const int mode = *reinterpret_cast<int*>(self + 0x740);
+    const int mode = m_mode;
 
     if ((mode != 2) && (mode != 1)) {
         destroySingleMenu();

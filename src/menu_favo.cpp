@@ -10,7 +10,7 @@
 
 typedef signed short s16;
 
-unsigned char s_rank[0x20];
+FoodRank s_rank[8];
 
 extern "C" const float FLOAT_80333040;
 extern "C" const float FLOAT_80333044;
@@ -37,6 +37,7 @@ extern "C" const char s_Apagado_80333528[8] = "Apagado";
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 STATIC_ASSERT(sizeof(FoodRank) == 4);
+STATIC_ASSERT(sizeof(s_rank) == 0x20);
 
 /*
  * --INFO--
@@ -166,7 +167,7 @@ void CMenuPcs::FavoDraw()
 		remaining--;
 	}
 
-	FoodRank* rank = reinterpret_cast<FoodRank*>(s_rank);
+	FoodRank* rank = s_rank;
 	FavoEntry* drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
@@ -177,7 +178,7 @@ void CMenuPcs::FavoDraw()
 		drawEntry++;
 	}
 
-	rank = reinterpret_cast<FoodRank*>(s_rank);
+	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int iconX = drawEntry->x + drawEntry->w - 0x10;
@@ -195,7 +196,7 @@ void CMenuPcs::FavoDraw()
 
 	char textBuf[0x10];
 	memset(textBuf, 0, sizeof(textBuf));
-	rank = reinterpret_cast<FoodRank*>(s_rank);
+	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
@@ -219,7 +220,7 @@ void CMenuPcs::FavoDraw()
 	nameFont->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
-	rank = reinterpret_cast<FoodRank*>(s_rank);
+	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
@@ -688,7 +689,7 @@ void CMenuPcs::FavoInit()
 	favoList->count = sVar11;
 
 	memset(s_rank, 0, sizeof(s_rank));
-	FoodRank* ranks = reinterpret_cast<FoodRank*>(s_rank);
+	FoodRank* ranks = s_rank;
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	for (int foodId = 0; foodId < 8; foodId++) {
 		ranks[foodId].foodId = foodId;

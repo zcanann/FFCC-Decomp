@@ -2082,7 +2082,8 @@ void CMenuPcs::CmakeNameDraw()
     if (4 < *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) {
         nameCursor = 0;
     }
-    if (6 < static_cast<int>(strlen(name))) {
+    unsigned int nameLen = strlen(name);
+    if (6 < static_cast<int>(nameLen & (static_cast<int>(-nameLen | nameLen) >> 31))) {
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);

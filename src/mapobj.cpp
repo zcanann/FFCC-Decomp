@@ -36,8 +36,7 @@ extern const float kMapObjColorBlendScale;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
-extern _GXColor s_mapObjLightColor;
-unsigned int gWmModelRotationSplineCount = 5;
+_GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
 inline void* operator new(unsigned long, void* ptr)
 {

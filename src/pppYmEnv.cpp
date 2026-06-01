@@ -11,6 +11,7 @@
 #include "ffcc/pppGetRotMatrixYZX.h"
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 
 #include <math.h>
@@ -41,13 +42,6 @@ struct _pppEnvStYmEnv {
     CMapMesh** m_mapMeshPtr;
 };
 
-struct CTextureLite {
-    char pad_0x0[0x28];
-    GXTexObj m_texObj;
-    GXTlutObj m_tlutObj0;
-    GXTlutObj m_tlutObj1;
-};
-
 struct GraphValueState {
     float value;
     float velocity;
@@ -73,20 +67,6 @@ struct YmEnvPackedYAxisAngles {
 struct PartMngEditRaw {
     u8 m_pad00[0x1C8];
     void* m_recvBuff;
-};
-
-struct CAnimRaw {
-    u8 m_pad00[0x10];
-    u16 m_frameCount;
-};
-
-struct CModelRaw {
-    u8 m_pad00[0xA8];
-    u8* m_nodes;
-    u8 m_padAC[0x8];
-    float m_time;
-    u8 m_padB8[0x18];
-    CAnimRaw* m_anim;
 };
 
 extern const float kYmEnvViewportWidth = 320.0f;
@@ -155,7 +135,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
-    gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, color);
+    gUtil.RenderColorQuad(FLOAT_80331180, FLOAT_80331180, texWidth, texHeight, color);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
@@ -170,7 +150,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXLoadPosMtxImm(cameraMtx, 0);
 
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(0.0f, 0.0f, rtWidth, rtHeight, 0.0f, 1.0f);
+    GXSetViewport(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, FLOAT_80331180, FLOAT_80331184);
     GXSetScissor(0, 0, rtWidth, rtHeight);
     GXSetTexCopySrc(0, 0, rtWidth, rtHeight);
     GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
@@ -279,13 +259,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         Vec2d uvMin;
         Vec2d uvMax;
 
-        uvMin.x = 1.0f;
-        uvMin.y = 0.0f;
-        uvMax.x = 0.0f;
-        uvMax.y = 1.0f;
+        uvMin.x = FLOAT_80331184;
+        uvMin.y = FLOAT_80331180;
+        uvMax.x = FLOAT_80331180;
+        uvMax.y = FLOAT_80331184;
 
-        gUtil.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0, (GXBlendFactor)4,
-                                (GXBlendFactor)5);
+        gUtil.RenderTextureQuad(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0,
+                                (GXBlendFactor)4, (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
     }
 }
@@ -396,7 +376,6 @@ void SetUpPaletteEnv(CTexture* texture)
 {
     GXColor tevColor3;
     GXColor tevColor2;
-    CTextureLite* textureLite;
 
     GXSetNumTevStages(3);
     GXSetNumTexGens(1);
@@ -441,13 +420,12 @@ void SetUpPaletteEnv(CTexture* texture)
     _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 
-    textureLite = (CTextureLite*)texture;
-    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT0);
-    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP0);
-    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT1);
-    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP1);
-    GXLoadTlut(&textureLite->m_tlutObj0, GX_TLUT0);
-    GXLoadTlut(&textureLite->m_tlutObj1, GX_TLUT1);
+    GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
+    GXInitTexObjTlut(&texture->m_texObj, GX_TLUT1);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
+    GXLoadTlut(&texture->m_tlutObj0, GX_TLUT0);
+    GXLoadTlut(&texture->m_tlutObj1, GX_TLUT1);
 }
 
 /*
@@ -593,7 +571,6 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 {
     void* nodeNameBase;
     CGObject* owner;
-    CModelRaw* modelRaw;
     CChara::CModel* model;
     CChara::CNode* node;
     int skNodeIndex;
@@ -643,11 +620,10 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         return 0;
     }
 
-    modelRaw = (CModelRaw*)model;
-    node = (CChara::CNode*)(modelRaw->m_nodes + skNodeIndex * 0xC0);
-    modelTime = modelRaw->m_time;
-    if (modelRaw->m_anim != 0) {
-        animFrameCount = modelRaw->m_anim->m_frameCount;
+    node = &model->m_nodes[skNodeIndex];
+    modelTime = model->m_curFrame;
+    if (model->m_anim != 0) {
+        animFrameCount = model->m_anim->m_frameCount;
     } else {
         animFrameCount = 0;
     }

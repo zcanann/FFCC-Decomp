@@ -10,7 +10,7 @@ struct _pppMngSt;
 struct _pppPObject;
 struct _pppEnvSt;
 struct CGObject;
-struct CTexture;
+class CTexture;
 struct Vec;
 
 CChara::CModel* GetModelPtr(CGObject*);

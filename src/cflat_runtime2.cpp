@@ -679,10 +679,6 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGQuadObj;
 }
 
-CGQuadObj::~CGQuadObj()
-{
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8006EAD8

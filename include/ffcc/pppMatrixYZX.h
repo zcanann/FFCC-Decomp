@@ -3,11 +3,15 @@
 
 
 #include "dolphin/types.h"
+
+struct _pppCtrlTable;
+struct _pppPObject;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixYZX(f32* target, void* unused, void* param);
+void pppMatrixYZX(_pppPObject* target, void* unused, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }

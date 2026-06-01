@@ -2844,7 +2844,7 @@ void CMenuPcs::CmakeJobDraw()
         int sel = *reinterpret_cast<short*>(state + 0x26);
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
-        int cursorFrame = System.m_frameCounter & 7;
+        int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>((static_cast<float>(cursorX) - FLOAT_80333308) + static_cast<float>(cursorFrame)),
             cursorY, alpha);
     }

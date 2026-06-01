@@ -113,7 +113,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         return;
     }
 
-    shape = *(pppShapeSt**)(*(u32*)&ppvEnv->m_particleColors[0] + ctrl->m_dataValIndex * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex];
 
     pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
                   ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
@@ -336,7 +336,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
-        long* animData = **(long***)(*(u32*)&ppvEnv->m_particleColors[0] + ctrl->m_dataValIndex * 4);
+        long* animData = static_cast<long*>(ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex]->m_animData);
         pppCalcFrameShape(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
                                       work->m_shapeFrameTime, ctrl->m_shapeFrameStep);
     }

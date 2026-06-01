@@ -122,7 +122,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
 {
     KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XWork* work;
-    long** shapeTable;
+    pppShapeSt* shape;
     long* shapeEntry;
     s32 count;
     float alphaMul;
@@ -208,8 +208,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     colorStepA = colorStep.w;
 
     work = reinterpret_cast<KeShpTail2XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
-    shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
-    shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
+    shapeEntry = (long*)((u8*)shape->m_animData +
+                         *(s16*)((u8*)shape->m_animData + (work->m_shapePrevFrame << 3) + 0x10));
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -412,8 +413,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     pppCopyVector(work->m_posHistory[work->m_head], pos);
 
     {
-        long** shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + step->m_dataValIndex * 4);
-        u8* shape = (u8*)*shapeTable;
+        u8* shape = static_cast<u8*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex]->m_animData);
         u16 shapeFrame;
         KeShpTail2XShapeFrame* frameEntry;
 

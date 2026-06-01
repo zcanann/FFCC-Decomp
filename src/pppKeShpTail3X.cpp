@@ -142,7 +142,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XWork* work;
-    long** shapeTable;
     long* shapeEntry;
     u8* shapeData;
     int count;
@@ -229,8 +228,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
-    shapeData = (u8*)*shapeTable;
+    shapeData = static_cast<u8*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);

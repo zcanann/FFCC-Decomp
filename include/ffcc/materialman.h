@@ -181,6 +181,8 @@ public:
     }
 
 private:
+    friend class CTexAnimSet;
+
     char m_name[0x10];                    // 0x008
     unsigned short m_textureCount;        // 0x018
     unsigned short m_textureIndices[5];   // 0x01A

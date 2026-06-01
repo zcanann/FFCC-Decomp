@@ -247,9 +247,9 @@ void CTexAnimSet::SetTexGen()
         CTexAnim::CRefData* refData = texAnim->m_refData;
         CMaterial* material = refData->m_material;
         if (material != 0) {
-            int texSrtIndex = refData->m_texSrtIndex;
             const float texGenS = texAnim->m_texGenS;
             const float texGenT = texAnim->m_texGenT;
+            int texSrtIndex = refData->m_texSrtIndex;
             material->m_texScroll[texSrtIndex].m_u0 = texGenS;
             material->m_texScroll[texSrtIndex].m_v0 = texGenT;
             material->m_texScroll[texSrtIndex].m_u1 = zero;

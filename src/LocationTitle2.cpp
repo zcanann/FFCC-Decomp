@@ -39,6 +39,18 @@ struct LocationTitle2Particle {
     s16 m_shape;
 };
 
+struct LOCATION_POLYGON {
+    Vec m_pos;
+    GXColor m_color;
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
+    u16 m_frame;
+    s16 m_pad0;
+    s16 m_pad1;
+    s16 m_shape;
+};
+
 struct LocationTitle2ColorBlock {
     u8 m_pad[8];
     GXColor m_color;
@@ -61,6 +73,28 @@ struct pppMngStLocationTitle2Raw {
 
 extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: UNUSED
+ * EN Size: 260b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
+{
+    pppCopyVector(dst->m_pos, src->m_pos);
+    memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));
+    dst->m_scaleX = src->m_scaleX;
+    dst->m_scaleY = src->m_scaleY;
+    dst->m_scaleZ = src->m_scaleZ;
+    dst->m_frame = src->m_frame;
+    dst->m_pad0 = src->m_pad0;
+    dst->m_pad1 = src->m_pad1;
+    dst->m_shape = src->m_shape;
+}
 
 /*
  * --INFO--

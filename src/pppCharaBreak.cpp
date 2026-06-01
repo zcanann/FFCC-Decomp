@@ -1045,7 +1045,7 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
     CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
     CharaBreakStep* stepData = reinterpret_cast<CharaBreakStep*>(meshData);
 
-    if (work->m_model == 0) {
+    if (work->m_enabled == 0) {
         return reinterpret_cast<int>(model);
     }
 

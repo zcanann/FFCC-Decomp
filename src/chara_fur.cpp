@@ -15,6 +15,8 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
+#include "ffcc/p_tina.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pad.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
@@ -85,6 +87,7 @@ void* gMogFurTexBuffer;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
+extern float FLOAT_8033111C;
 extern float FLOAT_80331120;
 extern float FLOAT_80331130;
 extern float FLOAT_80331134;
@@ -500,10 +503,10 @@ static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayList
  */
 void CChara::TimeMogFur()
 {
-	MogFurState& fur = MogFur();
+	const int frameCounter = static_cast<int>(System.m_frameCounter);
 
-	if (fur.m_timestamp + 0x1A5E0 < static_cast<int>(System.m_frameCounter)) {
-		fur.m_timestamp = static_cast<int>(System.m_frameCounter);
+	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
+		MogFur().m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
@@ -515,6 +518,7 @@ void CChara::TimeMogFur()
 		}
 	}
 
+	MogFurState& fur = MogFur();
 	unsigned short* const texels = fur.m_texels;
 	memset(fur.m_score, 0, 0x40);
 
@@ -586,7 +590,7 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	int hits = (dr < 6) + (dg < 6) + (db < 6);
+	int hits = (dr < 5) + (dg < 5) + (db < 5);
 	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 
@@ -1340,9 +1344,15 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 	if ((heldButtons & 0x100) != 0) {
 		const unsigned char radarType = MogRadarType();
+		if (Chara.MogFur().m_prevRadarType != radarType) {
+			Chara.MogFur().m_prevRadarType = radarType;
+			work.m_pickTicks = 0;
+			Sound.StopSe(work.m_loopSeHandle);
+			work.m_loopSeHandle = 0;
+		}
 		const _GXColor brushColor = MogBrushColor(radarType);
 		const int eraseMode = (radarType == 4) ? 1 : 0;
-		const int doPaint = (radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 0 : 1) : 1;
+		const int doPaint = (radarType == 3 || radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 1 : 0) : 1;
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;
@@ -1392,38 +1402,78 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				work.m_offColorTicks = 0;
 				if ((centerBefore.a != 0) && (centerAfter.a < centerBefore.a)) {
 					work.m_eraseTicks++;
-					if (work.m_eraseTicks == 10 && messageId < 0) {
-						messageId = 5;
-						work.m_eraseTicks = 0x0B;
-					} else if (work.m_eraseTicks == 0x32 && messageId < 0) {
-						messageId = 6;
-						work.m_eraseTicks = 0x33;
-					}
+				}
+				if ((System.m_frameCounter & 7) == 0) {
+					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
 				}
 			} else if (radarType == 3) {
 				work.m_eraseTicks = 0;
 				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
 					work.m_offColorTicks++;
-					if (work.m_offColorTicks == 10 && messageId < 0) {
-						messageId = 2;
-						work.m_offColorTicks = 0x0B;
-					}
+				}
+				if ((System.m_frameCounter & 0xF) == 0) {
+					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
 				}
 			} else {
 				work.m_offColorTicks = 0;
 				work.m_eraseTicks = 0;
 			}
-		}
 
-		if ((radarType < 4) && (pickResult > 0)) {
-			if (work.m_loopSeHandle == 0) {
-				work.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+			int particleNo = 0;
+			int emitParticle = 0;
+			_GXColor particleColor = centerBefore;
+			if (radarType < 3) {
+				particleNo = 0x73;
+				particleColor = brushColor;
+				emitParticle = ((System.m_frameCounter & 1) == 0);
+			} else if (eraseMode != 0) {
+				particleNo = 0x72;
+				emitParticle = 1;
+			} else if (radarType == 3) {
+				particleNo = 0x74;
+				emitParticle = ((System.m_frameCounter & 7) == 0);
 			}
-		} else {
-			StopMogLoopSe(work);
+			if (emitParticle != 0) {
+				CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
+				CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
+				const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+				pppFVECTOR4 color;
+				color.x = static_cast<float>(particleColor.r) / FLOAT_8033111C;
+				color.y = static_cast<float>(particleColor.g) / FLOAT_8033111C;
+				color.z = static_cast<float>(particleColor.b) / FLOAT_8033111C;
+				color.w = static_cast<float>(particleColor.a) / FLOAT_80331120;
+				PartPcs.SetParColIdx(particleIndex, color);
+			}
+
+			if (work.m_offColorTicks == 10) {
+				if (messageId < 0) {
+					messageId = 2;
+				}
+				work.m_offColorTicks = 0x0B;
+			}
+			if (work.m_eraseTicks == 10) {
+				if (messageId < 0) {
+					messageId = 5;
+				}
+				work.m_eraseTicks = 0x0B;
+			}
+			if (work.m_eraseTicks == 0x32) {
+				if (messageId < 0) {
+					messageId = 6;
+				}
+				work.m_eraseTicks = 0x33;
+			}
+
+			if (radarType < 3) {
+				if (work.m_loopSeHandle == 0) {
+					work.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				}
+			}
 		}
 	} else {
-		StopMogLoopSe(work);
+		if (MogRadarType() < 3) {
+			StopMogLoopSe(work);
+		}
 	}
 
 	if ((triggerButtons & 0x200) != 0) {
@@ -1684,7 +1734,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetZCompLoc((u8)0);
 	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
-	GXSetCullMode(GX_CULL_BACK);
+	GXSetCullMode(GX_CULL_FRONT);
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
@@ -1707,8 +1757,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 	GXSetTevDirect(GX_TEVSTAGE1);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
-	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
 	_GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
@@ -1805,8 +1855,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
-					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_RASC, GX_CC_C1, GX_CC_ZERO);
-					_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_CPREV, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+					_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
 					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
 					                 GX_TEVPREV);
 					_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
@@ -1817,8 +1867,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 				GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
 				_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
-				_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
-				_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+				_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
 				_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE,
 				                 GX_TEVPREV);
 				_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
@@ -1834,14 +1884,14 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 					GXSetTevDirect(static_cast<GXTevStageID>(tevStageCount));
 					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStageCount), GX_TEV_SWAP0, GX_TEV_SWAP0);
 					if (extraTextureFormat == 5) {
-						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC,
 						                 GX_CC_ZERO);
-						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA,
 						                 GX_CA_ZERO);
 					} else {
 						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
-						                 GX_CC_TEXC);
-						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						                 GX_CC_CPREV);
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA,
 						                 GX_CA_ZERO);
 					}
 					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStageCount), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,

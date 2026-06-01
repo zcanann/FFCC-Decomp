@@ -501,7 +501,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if ((mode < 6) && (param->m_speedRandRange != 0.0f)) {
+    if ((mode >= 4) && (mode < 6) && (param->m_speedRandRange != 0.0f)) {
         float speedRandRange = param->m_speedRandRange;
         float speedRandHalf = FLOAT_80330568 * speedRandRange;
         u8 randType = param->m_randType;

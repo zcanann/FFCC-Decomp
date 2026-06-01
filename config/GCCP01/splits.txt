@@ -1501,6 +1501,7 @@ partyobj.cpp:
 	.data       start:0x802116A4 end:0x80211D88
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
+	.sbss       start:0x8032EE7C end:0x8032EE80
 	.sdata2     start:0x80331A58 end:0x80331B18
 
 p_mc.cpp:

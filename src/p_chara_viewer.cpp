@@ -302,7 +302,7 @@ void CCharaPcs::drawViewer()
             color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
-            float x = (float)i * gridSpacing;
+            float x = gridSpacing * (float)i;
             GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMin);
             GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMax);
             GXPosition3f32(gridMax, LoadFloat(kCharaViewerZero), x);

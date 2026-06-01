@@ -776,28 +776,34 @@ void CGCharaObj::onFramePreCalc()
  */
 float CGCharaObj::onAlphaUpdate()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	float alpha = m_alpha;
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 
-	if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 		if (((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
-		     *reinterpret_cast<unsigned short*>(script + 0x1C) == 0) ||
+		     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		     (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
-		     self[0x6BA] == 0)) {
-			int createSerial = *reinterpret_cast<int*>(self + 0x54C);
-			alpha += static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(createSerial)))) * 0.05f;
+		     reinterpret_cast<unsigned char*>(this)[0x6BA] == 0)) {
+			int createSerial = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C);
+			float alphaWave = static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(createSerial))));
+			float alphaDelta = 0.05f * alphaWave;
+			alpha = alpha + alphaDelta;
 		}
 	}
 
+	float clamped = 0.0f;
+	float slope = m_stepSlopeLimit;
 	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
+		goto alpha_clamped;
 	}
+	clamped = 1.0f;
+	if (1.0f < alpha) {
+		goto alpha_clamped;
+	}
+	clamped = alpha;
 
-	return m_stepSlopeLimit * alpha;
+alpha_clamped:
+	return slope * clamped;
 }
 
 /*

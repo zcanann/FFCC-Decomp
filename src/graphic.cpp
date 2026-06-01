@@ -98,6 +98,10 @@ STATIC_ASSERT(offsetof(CGraphic, m_fogColor) == 0x7200);
 STATIC_ASSERT(offsetof(CGraphic, m_fogStart) == 0x7204);
 STATIC_ASSERT(offsetof(CGraphic, m_fogEnd) == 0x7208);
 STATIC_ASSERT(offsetof(CGraphic, m_defaultCopyClearColor) == 0x735F);
+STATIC_ASSERT(offsetof(CGraphic, m_drawDoneWaiting) == 0x7364);
+STATIC_ASSERT(offsetof(CGraphic, m_drawDoneFile) == 0x7368);
+STATIC_ASSERT(offsetof(CGraphic, m_drawDoneLine) == 0x736C);
+STATIC_ASSERT(offsetof(CGraphic, m_drawDoneCounter) == 0x7370);
 
 extern "C" {
 }
@@ -146,7 +150,7 @@ void CGraphic::Init()
     m_defaultCopyClearColor.g = m_fogColor.g;
     m_defaultCopyClearColor.b = m_fogColor.b;
     m_defaultCopyClearColor.a = m_fogColor.a;
-    memset(reinterpret_cast<u8*>(this) + 0x7364, 0, 0x10);
+    memset(&m_drawDoneWaiting, 0, 0x10);
 
     OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack + 0x4000, 0x4000, 1, 1);
     OSResumeThread(&m_thread);
@@ -217,13 +221,13 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
-    PtrAt(this, 0x7368) = graphicFileName;
-    S32At(this, 0x736C) = 0xBE;
-    S32At(this, 0x7364) = 1;
+    m_drawDoneFile = graphicFileName;
+    m_drawDoneLine = 0xBE;
+    m_drawDoneWaiting = 1;
     GXSetDrawDone();
     GXWaitDrawDone();
-    S32At(this, 0x7364) = 0;
-    S32At(this, 0x7370) += 1;
+    m_drawDoneWaiting = 0;
+    m_drawDoneCounter += 1;
     VIFlush();
 }
 
@@ -485,13 +489,13 @@ void sleep()
  */
 void CGraphic::_WaitDrawDone(char* file, int line)
 {
-    PtrAt(this, 0x7368) = file;
-    S32At(this, 0x736C) = line;
-    S32At(this, 0x7364) = 1;
+    m_drawDoneFile = file;
+    m_drawDoneLine = line;
+    m_drawDoneWaiting = 1;
     GXSetDrawDone();
     GXWaitDrawDone();
-    S32At(this, 0x7364) = 0;
-    S32At(this, 0x7370) += 1;
+    m_drawDoneWaiting = 0;
+    m_drawDoneCounter += 1;
 }
 
 /*
@@ -515,10 +519,10 @@ void CGraphic::Thread()
     int debugCountdown = 5;
 
     while (true) {
-        if (S32At(this, 0x7364) != 0) {
-            if (lastCounter != S32At(this, 0x7370)) {
+        if (m_drawDoneWaiting != 0) {
+            if (lastCounter != m_drawDoneCounter) {
                 debugCountdown = 100;
-                lastCounter = S32At(this, 0x7370);
+                lastCounter = m_drawDoneCounter;
             }
             debugCountdown--;
 
@@ -529,11 +533,11 @@ void CGraphic::Thread()
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
-                        System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, m_drawDoneFile, m_drawDoneLine);
                     } else if (drawSyncPart == 0x7FFE) {
-                        System.Printf(debugFmtBase + kGraphicCppPartCharaDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicCppPartCharaDoneFmt, m_drawDoneFile, m_drawDoneLine);
                     } else {
-                        System.Printf(debugFmtBase + kGraphicCppPartDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C),
+                        System.Printf(debugFmtBase + kGraphicCppPartDoneFmt, m_drawDoneFile, m_drawDoneLine,
                                       s_pppSysProgTable[drawSyncPart].m_pppName);
                     }
                 }
@@ -551,7 +555,7 @@ void CGraphic::Thread()
                 } else {
                     orderName = sGraphicUnknownOrderName;
                 }
-                System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
+                System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               static_cast<int>(static_cast<char>(drawSyncPart)));
             }
         } else {
@@ -654,13 +658,13 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(m_frameBuffer, GX_TRUE);
-        PtrAt(this, 0x7368) = const_cast<char*>(sGraphicSourceStrings);
-        S32At(this, 0x736C) = 0x26D;
-        S32At(this, 0x7364) = 1;
+        m_drawDoneFile = const_cast<char*>(sGraphicSourceStrings);
+        m_drawDoneLine = 0x26D;
+        m_drawDoneWaiting = 1;
         GXSetDrawDone();
         GXWaitDrawDone();
-        S32At(this, 0x7364) = 0;
-        S32At(this, 0x7370) += 1;
+        m_drawDoneWaiting = 0;
+        m_drawDoneCounter += 1;
         VIFlush();
 
         m_fifoIndex = 1 - m_fifoIndex;

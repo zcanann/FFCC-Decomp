@@ -111,7 +111,11 @@ public:
     u8 m_blurBufferIndex;
     u8 m_blurTextureCount;
     _GXColor m_defaultCopyClearColor;
-    u8 _pad_0x7363_to_0x7373[0x11];
+    u8 _pad_0x7363[0x1];
+    s32 m_drawDoneWaiting;
+    char* m_drawDoneFile;
+    s32 m_drawDoneLine;
+    s32 m_drawDoneCounter;
 };
 
 extern CGraphic Graphic;

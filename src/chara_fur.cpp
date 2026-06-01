@@ -1462,11 +1462,11 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 				}
 				work.m_eraseTicks = 0x33;
 			}
-		}
 
-		if ((radarType < 3) && (pickResult >= 0)) {
-			if (work.m_loopSeHandle == 0) {
-				work.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+			if (radarType < 3) {
+				if (work.m_loopSeHandle == 0) {
+					work.m_loopSeHandle = Sound.PlaySe(0x249f2, 0x40, 0x7F, 0);
+				}
 			}
 		}
 	} else {

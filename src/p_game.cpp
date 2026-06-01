@@ -1,7 +1,7 @@
 #include "ffcc/p_game.h"
 
 CProcessTable CGamePcs::m_table = {
-    const_cast<char*>("CGamePcs"),
+    "CGamePcs",
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
         0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C,

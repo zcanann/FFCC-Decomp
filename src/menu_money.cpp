@@ -29,6 +29,9 @@ extern const float FLOAT_80332f84;
 extern const double DOUBLE_80332F90;
 extern const double DOUBLE_80332F98;
 extern const double DOUBLE_80332FA0;
+extern const float kPppLaserZero = 0.0f;
+extern const float FLOAT_8033342c = 1.0f;
+extern const float FLOAT_80333430 = 2.0f;
 
 unsigned int s_Money = 0;
 signed char s_place[16];

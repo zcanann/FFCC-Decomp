@@ -20,21 +20,6 @@
 
 GbaQueue GbaQue;
 
-struct GbaFlatDataTableEntryView
-{
-	int m_numEntries;
-	char** m_strings;
-	char* m_stringBuf;
-};
-
-struct GbaFlatDataView
-{
-	int m_dataCount;
-	unsigned char _pad[0x68 - 4];
-	int m_tableCount;
-	GbaFlatDataTableEntryView m_tabl[8];
-};
-
 struct GbaQueueFlagView
 {
 	unsigned char _pad0[0x2AFC];
@@ -2310,7 +2295,8 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	char* subjectWrite = subjectNameBuf;
 	unsigned int* entryWrite = letterEntryBuf;
 
-	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+	char** npcTable = Game.m_cFlatDataArr[1].TableStrings(2);
+	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
 	for (int i = 0; i < static_cast<int>(letterCount); i++) {
@@ -2340,7 +2326,7 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, flatData->m_tabl[2].m_strings[(curWord >> 9) & 0x1FF]);
+			strcpy(tempName, npcTable[(curWord >> 9) & 0x1FF]);
 			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
 			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
@@ -2356,7 +2342,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, flatData->m_tabl[5].m_strings[(curHalf >> 2) & 0x1FF]);
+			strcpy(tempName, subjectTable[(curHalf >> 2) & 0x1FF]);
 			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
 			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
@@ -2465,7 +2451,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
     unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
     int mesIndex = (msgIndex & 0x7FC) >> 1;
-    char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
+    char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 
     strcpy(srcText, mesPtr[mesIndex]);
     CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
@@ -3124,9 +3110,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			OSSignalSemaphore(accessSemaphores + i);
 		}
 
-		GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+		char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 		for (int i = 0; i < 0x100; i++) {
-			if (strcmp(flatData->m_tabl[2].m_strings[i], localInfo.m_name) == 0) {
+			if (strcmp(nameTable[i], localInfo.m_name) == 0) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -3425,7 +3411,7 @@ void GbaQueue::ClrCompatibilityFlg(int channel)
 int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 {
 	unsigned char compatibilityData[0x10];
-	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+	char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
 	unsigned char count = 2;
 	unsigned char* writePtr;
 	int outSize = 2;
@@ -3473,7 +3459,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	for (int slot = 1; (selectedCount < count) && (slot < 8); slot++) {
 		unsigned char slotValue = compatibilityData[slot];
 		if ((selectedCount < 2) || (slotValue != 0)) {
-			char* src = flatData->m_tabl[2].m_strings[slotValue];
+			char* src = nameTable[slotValue];
 			int len = strlen(src);
 			memcpy(writePtr, src, len + 1);
 			writePtr += len + 1;
@@ -3833,13 +3819,13 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		totalSize += 4;
 	}
 
-	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+	char** itemNameTable = Game.m_cFlatDataArr[1].TableStrings(6);
 	for (unsigned int i = 0; i < itemCount; i++) {
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
-		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
+		strcpy(itemNameScratch, itemNameTable[itemId]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
@@ -3933,7 +3919,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		totalSize += 4;
 	}
 
-	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
+	char** itemNameTable = Game.m_cFlatDataArr[1].TableStrings(6);
 	for (int i = 0; i < 0x40; i++) {
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
@@ -3946,7 +3932,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 			continue;
 		}
 
-		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
+		strcpy(itemNameScratch, itemNameTable[itemId]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(outData, agbStringScratch, strSize);

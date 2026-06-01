@@ -235,7 +235,7 @@ void CFunnyShapePcs::createViewer()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * sizeof(m_table));
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*
@@ -387,23 +387,26 @@ unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
-unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)),
-    m_table_desc0[0],
-    m_table_desc0[1],
-    m_table_desc0[2],
-    m_table_desc1[0],
-    m_table_desc1[1],
-    m_table_desc1[2],
-    m_table_desc2[0],
-    m_table_desc2[1],
-    m_table_desc2[2],
-    0x21,
-    0,
-    m_table_desc3[0],
-    m_table_desc3[1],
-    m_table_desc3[2],
-    0x42, 1
+CProcessTable CFunnyShapePcs::m_table = {
+    const_cast<char*>(s_CFunnyShapePcsViewer),
+    {
+        m_table_desc0[0],
+        m_table_desc0[1],
+        m_table_desc0[2],
+        m_table_desc1[0],
+        m_table_desc1[1],
+        m_table_desc1[2],
+        m_table_desc2[0],
+        m_table_desc2[1],
+        m_table_desc2[2],
+        0x21,
+        0,
+        m_table_desc3[0],
+        m_table_desc3[1],
+        m_table_desc3[2],
+        0x42,
+        1,
+    },
 };
 template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()

@@ -124,9 +124,9 @@ unsigned int CPartPcs::m_table_desc15[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int CPartPcs::m_table_desc16[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
-unsigned int CPartPcs::m_table[2][0x15C / sizeof(unsigned int)] = {
+CProcessTable CPartPcs::m_table[2] = {
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_GAME_801D7F2C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        const_cast<char*>(s_CPartPcs_GAME_801D7F2C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
         0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
@@ -137,7 +137,7 @@ unsigned int CPartPcs::m_table[2][0x15C / sizeof(unsigned int)] = {
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
         0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
@@ -177,7 +177,7 @@ inline CPartPcs::CPartPcs()
 
 static inline char* InitCPartPcsTable(char* profileName)
 {
-	unsigned int* table = &CPartPcs::m_table[0][0];
+	unsigned int* table = reinterpret_cast<unsigned int*>(&CPartPcs::m_table[0]);
 
 	table[33] = CPartPcs::m_table_desc7[1];
 	table[37] = CPartPcs::m_table_desc8[0];
@@ -384,7 +384,7 @@ void CPartPcs::onScriptChanging(char*)
  */
 int CPartPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(CPartPcs::m_table[index]);
+	return reinterpret_cast<int>(&CPartPcs::m_table[index]);
 }
 
 /*

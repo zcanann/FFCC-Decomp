@@ -56,9 +56,9 @@ extern const char s_CMapPcs_GAME_801D76E0[];
 extern const char s_CMapPcs_VIEWER_801D76F0[];
 extern const char s_CMapPcs_PART_801D7700[];
 
-unsigned int CMapPcs::m_table[3][0x414 / 3 / sizeof(unsigned int)] = {
+CProcessTable CMapPcs::m_table[3] = {
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_GAME_801D76E0)),
+        const_cast<char*>(s_CMapPcs_GAME_801D76E0),
         CMapPcs::m_table_desc0[0],  CMapPcs::m_table_desc0[1],  CMapPcs::m_table_desc0[2],
         CMapPcs::m_table_desc1[0],  CMapPcs::m_table_desc1[1],  CMapPcs::m_table_desc1[2],
         CMapPcs::m_table_desc2[0],  CMapPcs::m_table_desc2[1],  CMapPcs::m_table_desc2[2],
@@ -73,7 +73,7 @@ unsigned int CMapPcs::m_table[3][0x414 / 3 / sizeof(unsigned int)] = {
         CMapPcs::m_table_desc7[2],  0x3F,                        1,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_VIEWER_801D76F0)),
+        const_cast<char*>(s_CMapPcs_VIEWER_801D76F0),
         CMapPcs::m_table_desc8[0],  CMapPcs::m_table_desc8[1],  CMapPcs::m_table_desc8[2],
         CMapPcs::m_table_desc9[0],  CMapPcs::m_table_desc9[1],  CMapPcs::m_table_desc9[2],
         CMapPcs::m_table_desc10[0], CMapPcs::m_table_desc10[1], CMapPcs::m_table_desc10[2],
@@ -88,7 +88,7 @@ unsigned int CMapPcs::m_table[3][0x414 / 3 / sizeof(unsigned int)] = {
         CMapPcs::m_table_desc15[2], 0x3F,                        1,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_PART_801D7700)),
+        const_cast<char*>(s_CMapPcs_PART_801D7700),
         CMapPcs::m_table_desc16[0], CMapPcs::m_table_desc16[1], CMapPcs::m_table_desc16[2],
         CMapPcs::m_table_desc17[0], CMapPcs::m_table_desc17[1], CMapPcs::m_table_desc17[2],
         CMapPcs::m_table_desc18[0], CMapPcs::m_table_desc18[1], CMapPcs::m_table_desc18[2],
@@ -145,7 +145,7 @@ struct CBoundHack {
  */
 CMapPcs::CMapPcs()
 {
-    unsigned int* table = &CMapPcs::m_table[0][0];
+    unsigned int* table = reinterpret_cast<unsigned int*>(&CMapPcs::m_table[0]);
 
     table[0x004 / 4] = CMapPcs::m_table_desc0[0];
     table[0x008 / 4] = CMapPcs::m_table_desc0[1];
@@ -263,7 +263,7 @@ void CMapPcs::Quit()
  */
 int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return reinterpret_cast<int>(CMapPcs::m_table[tableIndex]);
+	return reinterpret_cast<int>(&CMapPcs::m_table[tableIndex]);
 }
 
 /*

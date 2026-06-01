@@ -38,7 +38,7 @@ public:
     static unsigned int m_table_desc21[3];
     static unsigned int m_table_desc22[3];
     static unsigned int m_table_desc23[3];
-    static unsigned int m_table[3][0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table[3];
 
     CMapPcs();
 

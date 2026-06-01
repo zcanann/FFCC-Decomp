@@ -64,7 +64,7 @@ public:
     static unsigned int m_table_desc22[3];
     static unsigned int m_table_desc23[3];
     static unsigned int m_table_desc24[3];
-    static unsigned int m_table[7][0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table[7];
 
     void Init();
     void Quit();

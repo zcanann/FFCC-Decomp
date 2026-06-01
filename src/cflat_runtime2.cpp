@@ -2269,7 +2269,7 @@ void CFlatRuntime2::SetParticleWorkSe(int seNo, int seKind, int seParam)
  */
 int CFlatRuntime2::GetFreeParticleSlot()
 {
-	PartMng.pppGetFreeSlot();
+	return PartMng.pppGetFreeSlot();
 }
 
 /*

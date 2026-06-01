@@ -177,7 +177,7 @@ static void ReleaseRef(void* object)
     int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
     int nextRefCount = refCount - 1;
     refCount = nextRefCount;
-    if (nextRefCount == 0) {
+    if (nextRefCount == 0 && object != 0) {
         void** vtable = *reinterpret_cast<void***>(object);
         reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
     }
@@ -2410,8 +2410,7 @@ CTexScroll::CTexScroll()
  */
 CMaterial::~CMaterial()
 {
-    int numTexture = static_cast<int>(m_textureCount);
-    for (int i = 0; i < numTexture; i++) {
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         ReleaseRef(m_textures[i]);
         m_textures[i] = 0;
     }

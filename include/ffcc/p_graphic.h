@@ -65,40 +65,7 @@ public:
     unsigned int GetScreenFadeExecutingBit();
     void drawScreenFade();
 
-    CGraphicPcs()
-    {
-        u32* table = reinterpret_cast<u32*>(&m_table) + 1;
-        table[31] = m_table_desc7[0];
-        table[32] = m_table_desc7[1];
-        table[36] = m_table_desc8[0];
-        table[37] = m_table_desc8[1];
-        table[0] = m_table_desc0[0];
-        table[1] = m_table_desc0[1];
-        table[2] = m_table_desc0[2];
-        table[3] = m_table_desc1[0];
-        table[4] = m_table_desc1[1];
-        table[5] = m_table_desc1[2];
-        table[6] = m_table_desc2[0];
-        table[7] = m_table_desc2[1];
-        table[8] = m_table_desc2[2];
-        table[11] = m_table_desc3[0];
-        table[12] = m_table_desc3[1];
-        table[13] = m_table_desc3[2];
-        table[16] = m_table_desc4[0];
-        table[17] = m_table_desc4[1];
-        table[18] = m_table_desc4[2];
-        table[21] = m_table_desc5[0];
-        table[22] = m_table_desc5[1];
-        table[23] = m_table_desc5[2];
-        table[26] = m_table_desc6[0];
-        table[27] = m_table_desc6[1];
-        table[28] = m_table_desc6[2];
-        table[33] = m_table_desc7[2];
-        table[38] = m_table_desc8[2];
-        table[41] = m_table_desc9[0];
-        table[42] = m_table_desc9[1];
-        table[43] = m_table_desc9[2];
-    }
+    CGraphicPcs() {}
 
     ScreenFadeSlot m_screenFade[4]; // 0x004
     int m_unkB4;                    // 0x0B4

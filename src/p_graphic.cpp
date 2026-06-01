@@ -35,8 +35,24 @@ u32 CGraphicPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDra
 CProcessTable CGraphicPcs::m_table = {
     const_cast<char*>(s_CGraphicPcs),
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
-        0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9,
+        m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
+        m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
+        m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
+        0x22, 0x8,
+        m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
+        0x26, 0x9,
+        m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
+        0x27, 0xC,
+        m_table_desc5[0], m_table_desc5[1], m_table_desc5[2],
+        0x29, 0x9,
+        m_table_desc6[0], m_table_desc6[1], m_table_desc6[2],
+        0x48, 1,
+        m_table_desc7[0], m_table_desc7[1], m_table_desc7[2],
+        0x4B, 0x9,
+        m_table_desc8[0], m_table_desc8[1], m_table_desc8[2],
+        0x2B, 0x9,
+        m_table_desc9[0], m_table_desc9[1], m_table_desc9[2],
+        0x34, 0x9,
     },
 };
 

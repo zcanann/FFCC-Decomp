@@ -35,7 +35,6 @@ public:
 	class CObject
 	{
 	public:
-		CObject();
 		void onNewFinished();
 
 		unsigned int m_id;         // 0x0
@@ -164,6 +163,14 @@ public:
 	void PrintPerformance();
 
 private:
+	struct CObjectSentinel : public CObject
+	{
+		CObjectSentinel()
+		{
+			m_flagBits.m_constructFlag = 0;
+		}
+	};
+
     int m_permanentVarCount;        // 0x0004
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
@@ -183,8 +190,8 @@ private:
     u16* m_vstrOffsets;             // 0x0044
     u8 m_performanceBlock[0x804];   // 0x0048
     u8 m_pad_084C[0x80];            // 0x084C
-    CObject m_objectSentinel;       // 0x08CC
-    CObject m_freeObjectSentinel;   // 0x0918
+    CObjectSentinel m_objectSentinel;       // 0x08CC
+    CObjectSentinel m_freeObjectSentinel;   // 0x0918
     u8 m_pad_0964[0xC];             // 0x0964
     int m_0x970;                    // 0x0970
     u8 m_pad_0974[4];               // 0x0974
@@ -213,9 +220,5 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_systemKind) == 0x40);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
 STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x48);
-
-inline CFlatRuntime::CObject::CObject()
-{
-}
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

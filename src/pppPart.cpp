@@ -1134,40 +1134,6 @@ ScaleOnly:
 	ppvMng->m_matrix.value[2][2] = scaleAxis2.z;
 	return;
 
-ScaleOnly:
-	if (FLOAT_8032fdfc != pppMngSt->m_scale.x) {
-		scaleAxis0.x = ppvMng->m_matrix.value[0][0];
-		scaleAxis0.y = ppvMng->m_matrix.value[1][0];
-		scaleAxis0.z = ppvMng->m_matrix.value[2][0];
-		PSVECScale(&scaleAxis0, &scaleAxis0, pppMngSt->m_scale.x);
-		ppvMng->m_matrix.value[0][0] = scaleAxis0.x;
-		ppvMng->m_matrix.value[1][0] = scaleAxis0.y;
-		ppvMng->m_matrix.value[2][0] = scaleAxis0.z;
-	}
-
-	if (FLOAT_8032fdfc != pppMngSt->m_scale.y) {
-		scaleAxis1.x = ppvMng->m_matrix.value[0][1];
-		scaleAxis1.y = ppvMng->m_matrix.value[1][1];
-		scaleAxis1.z = ppvMng->m_matrix.value[2][1];
-		PSVECScale(&scaleAxis1, &scaleAxis1, pppMngSt->m_scale.y);
-		ppvMng->m_matrix.value[0][1] = scaleAxis1.x;
-		ppvMng->m_matrix.value[1][1] = scaleAxis1.y;
-		ppvMng->m_matrix.value[2][1] = scaleAxis1.z;
-	}
-
-	if (FLOAT_8032fdfc == pppMngSt->m_scale.z) {
-		return;
-	}
-
-	scaleAxis2.x = ppvMng->m_matrix.value[0][2];
-	scaleAxis2.y = ppvMng->m_matrix.value[1][2];
-	scaleAxis2.z = ppvMng->m_matrix.value[2][2];
-	PSVECScale(&scaleAxis2, &scaleAxis2, pppMngSt->m_scale.z);
-	ppvMng->m_matrix.value[0][2] = scaleAxis2.x;
-	ppvMng->m_matrix.value[1][2] = scaleAxis2.y;
-	ppvMng->m_matrix.value[2][2] = scaleAxis2.z;
-	return;
-
 MatrixMode3:
 	if (pppMngSt->m_bindNode == 0) {
 		goto LocalOnly;

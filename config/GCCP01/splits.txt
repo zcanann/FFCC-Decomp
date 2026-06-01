@@ -353,6 +353,7 @@ p_FunnyShape.cpp:
 	.bss        start:0x8026D728 end:0x80273928
 	.sdata      start:0x8032E660 end:0x8032E688
 	.sbss       start:0x8032ED28 end:0x8032ED35
+	.sdata2     start:0x8032FD10 end:0x8032FD30
 
 FS_USB_Process.cpp:
 	extab       start:0x80006BB0 end:0x80006BB8

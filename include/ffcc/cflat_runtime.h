@@ -36,7 +36,7 @@ public:
 	{
 	public:
 		CObject();
-		virtual void onNewFinished();
+		void onNewFinished();
 
 		unsigned int m_id;         // 0x0
 		void** m_freeListNode;     // 0x4
@@ -109,7 +109,7 @@ public:
 	virtual int Frame(int, int);
 	virtual void onNewObject(CFlatRuntime::CObject*);
 	virtual void onDeleteObject(CFlatRuntime::CObject*);
-	virtual void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
@@ -212,7 +212,7 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_code) == 0x34);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_systemKind) == 0x40);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
-STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x4C);
+STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x48);
 
 inline CFlatRuntime::CObject::CObject()
 {

@@ -2271,9 +2271,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		CStopWatch watch(reinterpret_cast<char*>(-1));
 		watch.Reset();
 		watch.Start();
-		typedef int (*OnSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);
-		ret = reinterpret_cast<OnSystemFuncFn>((*reinterpret_cast<void***>(this))[9])(
-		    this, object, systemKind, systemIndex, &result);
+		ret = onSystemFunc(object, systemKind, systemIndex, result);
 		watch.Stop();
 		*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x24C) += watch.Get();
 		*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x64C) += 1;
@@ -2425,7 +2423,7 @@ int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+int CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-    return;
+    return 0;
 }

@@ -60,7 +60,6 @@ void CMenuPcs::MLstDraw()
 			float w = (float)item->width;
 			float h = (float)item->height;
 			float alpha = item->alpha;
-			float z = item->z;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 			GXColor color;
@@ -76,7 +75,7 @@ void CMenuPcs::MLstDraw()
 				v += (float)((double)item->height);
 			}
 
-			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, v, z, z, 0.0f);
+			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, v, item->z, item->z, 0.0f);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
 			float iconX = (float)item->x;
@@ -93,8 +92,8 @@ void CMenuPcs::MLstDraw()
 				40.0f,
 				0.0f,
 				v,
-				z,
-				z,
+				item->z,
+				item->z,
 				0.0f);
 		}
 		item++;

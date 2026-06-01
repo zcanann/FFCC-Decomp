@@ -32,7 +32,7 @@ public:
 		CGObject* m_source;
 	};
 
-	CGCharaObj();
+	CGCharaObj() {}
 	~CGCharaObj();
 	
 	void onCreate();

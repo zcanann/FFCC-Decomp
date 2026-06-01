@@ -7,7 +7,6 @@
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "dolphin/os/OSMemory.h"
@@ -746,11 +745,9 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     }
 
                     if (mode == 2) {
-                        void* block = reinterpret_cast<CStage*>(
-                                          *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x778C))
-                                          ->alloc(0x810, const_cast<char*>(s_memory_cpp), 0x228, 0);
-                        *reinterpret_cast<int*>(stageBytes + 0x110) =
-                            reinterpret_cast<int>(__construct_new_array(block, 0, 0, 0x40, 0x20));
+                        CStage* backingStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C);
+                        *reinterpret_cast<CStage::CBlock**>(stageBytes + 0x110) =
+                            new (backingStage, const_cast<char*>(s_memory_cpp), 0x228) CStage::CBlock[0x20];
                         *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
                     }
 

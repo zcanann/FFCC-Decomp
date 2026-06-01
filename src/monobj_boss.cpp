@@ -76,8 +76,6 @@ static const char s_to_a_obj_801dd4e8[] = "to_a_obj";
 static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
 static const char s_to_02d_obj_801dd500[] = "to_%02d_obj";
 
-typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
-
 struct MeteoParasiteCBossWork {
     int m_lichTeleportIndex;
     Vec m_lichTeleportVec;
@@ -875,7 +873,7 @@ void CGMonObj::frameStatFuncSaw()
 
 			if (prgObj->m_subFrame == 0x19) {
 				reinterpret_cast<CGCharaObj*>(this)->resetIgnoreHit();
-				(*reinterpret_cast<MonObjSawCallback*>(*reinterpret_cast<int*>(this) + 0x90))(this, 1, 0, 0);
+				enableAttackCol(1, 0, 0);
 				mon[0x6C0] = 0;
 			}
 
@@ -884,7 +882,7 @@ void CGMonObj::frameStatFuncSaw()
 			}
 		} else if (prgObj->m_subState == 2) {
 			if (prgObj->m_subFrame == 0) {
-				(*reinterpret_cast<MonObjSawCallback*>(*reinterpret_cast<int*>(this) + 0x90))(this, 0, 0, 0);
+				enableAttackCol(0, 0, 0);
 				mon[0x6C0] = 0;
 				prgObj->reqAnim(0xB, 0, 0);
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);

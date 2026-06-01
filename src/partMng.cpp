@@ -4258,15 +4258,17 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppGetFreeSlot()
+int CPartMng::pppGetFreeSlot()
 {
-    int slot = m_pppEnvSt.m_mngStCount + 1;
-    m_pppEnvSt.m_mngStCount = slot;
+    int slot = m_pppEnvSt.m_mngStCount;
+    int nextSlot = slot + 1;
+    m_pppEnvSt.m_mngStCount = nextSlot;
 
-    if (slot < 0x7fffffff) {
-        return;
+    if (nextSlot >= 0x7fffffff) {
+        m_pppEnvSt.m_mngStCount = 0x10;
     }
-    m_pppEnvSt.m_mngStCount = 0x10;
+
+    return slot;
 }
 
 /*

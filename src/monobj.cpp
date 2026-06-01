@@ -1510,8 +1510,8 @@ void CGMonObj::onAttacked(CGPrgObj*)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	mon[0x6C0] = 1;
 
-	if (__ptmf_test(reinterpret_cast<__ptmf*>(mon + 0x780)) != 0) {
-		__ptmf_scall(this, mon + 0x708);
+	if (m_funcs->attacked != 0) {
+		(this->*m_funcs->attacked)();
 	}
 }
 
@@ -1622,8 +1622,8 @@ skip_target_update:
 	*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 	mon[0x6BB] = 1;
 
-	if (__ptmf_test(reinterpret_cast<__ptmf*>(mon + 0x774)) != 0) {
-		__ptmf_scall(this, mon + 0x708);
+	if (m_funcs->damaged != 0) {
+		(this->*m_funcs->damaged)();
 	}
 }
 
@@ -2897,10 +2897,8 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-	__ptmf* checkFn = reinterpret_cast<__ptmf*>(mon + 0x78C);
-	if (__ptmf_test(checkFn + 7) != 0) {
-		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
-		int result = reinterpret_cast<PtmfScallRet>(__ptmf_scall)(monObj, partyIndex, mon + 0x708);
+	if (monObj->m_funcs->attackCheck != 0) {
+		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
 		if (result == -2) {
 			return -1;
 		}

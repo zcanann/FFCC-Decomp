@@ -1468,7 +1468,11 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        GXColor drawColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+        GXColor drawColor;
+        drawColor.r = 0xFF;
+        drawColor.g = 0xFF;
+        drawColor.b = 0xFF;
+        drawColor.a = static_cast<unsigned char>(a);
         GXSetChanMatColor(GX_COLOR0A0, drawColor);
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x60 : 0x39));

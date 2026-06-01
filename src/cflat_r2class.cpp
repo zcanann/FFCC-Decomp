@@ -58,10 +58,7 @@ static inline void CallEngineFunc44Arg2(void* engineObject, unsigned int arg0, u
 
 static inline CGObject* FindRuntimeObject(CFlatRuntime2* runtime, unsigned int objectId)
 {
-	typedef CGObject* (*RuntimeFn)(CFlatRuntime2*, unsigned int);
-	void** vtable = *reinterpret_cast<void***>(runtime);
-	RuntimeFn fn = reinterpret_cast<RuntimeFn>(vtable[15]);
-	return fn(runtime, objectId);
+	return static_cast<CGObject*>(runtime->intToClass(static_cast<int>(objectId)));
 }
 
 static inline char* RuntimeString(CFlatRuntime2* runtime, unsigned int index)

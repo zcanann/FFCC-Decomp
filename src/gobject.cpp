@@ -76,18 +76,12 @@ static inline Mtx& FlatPosMtx()
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
-    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
-    void** vtable = *reinterpret_cast<void***>(self);
-    Fn fn = reinterpret_cast<Fn>(vtable[5]);
-    fn(self, other, arg);
+    self->onPush(other, arg);
 }
 
 static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 {
-    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
-    void** vtable = *reinterpret_cast<void***>(self);
-    Fn fn = reinterpret_cast<Fn>(vtable[6]);
-    fn(self, other, arg);
+    self->onTalk(other, arg);
 }
 
 static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
@@ -3115,14 +3109,10 @@ void CGObject::DrawDebug(CFont* font)
         float screenX[2];
         screenX[0] = -(sDebugScreenX * m_projection.z * invDepth - sDebugScreenX);
 
-        typedef void (*OnDrawDebugFn)(CGObject*, CFont*, float, float&, float);
-        void** vtable = *reinterpret_cast<void***>(this);
-        OnDrawDebugFn fn = reinterpret_cast<OnDrawDebugFn>(vtable[16]);
-        fn(this,
-           font,
-           sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
-           screenX[0],
-           m_projection.w * invDepth);
+        onDrawDebug(font,
+                    sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
+                    screenX[0],
+                    m_projection.w * invDepth);
     }
 }
 

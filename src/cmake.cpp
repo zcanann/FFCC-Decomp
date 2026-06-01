@@ -2361,65 +2361,63 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
-        if ((repeat & 0xC) != 0) {
-            return 0;
-        }
+        if ((repeat & 0xC) == 0) {
+            if ((down & 0x200) != 0) {
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                if (selectField == 0) {
+                    resultDir = -1;
+                    return 1;
+                }
 
-        if ((down & 0x200) != 0) {
-            Sound.PlaySe(3, 0x40, 0x7F, 0);
-            if (selectField == 0) {
-                resultDir = -1;
-                return 1;
-            }
-
-            *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField - 1);
-            return 0;
-        }
-
-        if ((down & 0x100) != 0) {
-            Sound.PlaySe(2, 0x40, 0x7F, 0);
-            if (selectField == 0) {
-                *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField + 1);
+                *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField - 1);
                 return 0;
             }
 
-            int duplicateSlot = 8;
-            unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
-            for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
-                if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
-                     (*(entry + 0x1F96) != 1) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == tribe) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == crest) &&
-                     (duplicateSlot = slot,
-                      *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) ||
-                    ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
-                     (*(entry + 0x2BC6) != 1) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x2400) == tribe) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x2404) == crest) &&
-                     (duplicateSlot = slot + 1,
-                      *reinterpret_cast<unsigned short*>(entry + 0x2402) == s_CmakeInfo.m_gender))) {
-                    break;
+            if ((down & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
+                if (selectField == 0) {
+                    *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField + 1);
+                    return 0;
                 }
-                duplicateSlot = slot + 2;
-            }
 
-            if (duplicateSlot > 7) {
-                s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
-                s_CmakeInfo.m_hair = static_cast<signed char>(crest);
-                ChgModel(static_cast<int>(MenuS16(this, 0x86A)),
-                         static_cast<int>(s_CmakeInfo.m_tribe),
-                         static_cast<int>(s_CmakeInfo.m_hair),
-                         static_cast<int>(s_CmakeInfo.m_gender));
-                resultDir = 1;
-                return 1;
-            }
+                int duplicateSlot = 8;
+                unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+                for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
+                    if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                         (*(entry + 0x1F96) != 1) &&
+                         (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == tribe) &&
+                         (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == crest) &&
+                         (duplicateSlot = slot,
+                          *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) ||
+                        ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
+                         (*(entry + 0x2BC6) != 1) &&
+                         (*reinterpret_cast<unsigned short*>(entry + 0x2400) == tribe) &&
+                         (*reinterpret_cast<unsigned short*>(entry + 0x2404) == crest) &&
+                         (duplicateSlot = slot + 1,
+                          *reinterpret_cast<unsigned short*>(entry + 0x2402) == s_CmakeInfo.m_gender))) {
+                        break;
+                    }
+                    duplicateSlot = slot + 2;
+                }
 
-            Sound.PlaySe(4, 0x40, 0x7F, 0);
-            short winX = 0;
-            short winY = 0;
-            GetWinSize(0x15, &winX, &winY, 0);
-            SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
-            mcState = 0;
+                if (duplicateSlot > 7) {
+                    s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
+                    s_CmakeInfo.m_hair = static_cast<signed char>(crest);
+                    ChgModel(static_cast<int>(MenuS16(this, 0x86A)),
+                             static_cast<int>(s_CmakeInfo.m_tribe),
+                             static_cast<int>(s_CmakeInfo.m_hair),
+                             static_cast<int>(s_CmakeInfo.m_gender));
+                    resultDir = 1;
+                    return 1;
+                }
+
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+                short winX = 0;
+                short winY = 0;
+                GetWinSize(0x15, &winX, &winY, 0);
+                SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
+                mcState = 0;
+            }
         }
 
         return 0;

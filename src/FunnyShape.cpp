@@ -51,6 +51,11 @@ static inline s32 Div16Floor(s16 x)
     return x / 16;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 static inline float RotateShapeX(const u8* entry, u32 xOffset, u32 yOffset, float angle)
 {
     float sinA = static_cast<float>(sin(angle));
@@ -432,12 +437,12 @@ void CFunnyShape::RenderShape()
 
     Vec2d offsetCopy;
     Vec2d offset;
-    offsetCopy.x = kFunnyShapeDefaultOffsetX;
-    offsetCopy.y = kFunnyShapeDefaultOffsetY;
+    offsetCopy.x = LoadFloat(kFunnyShapeDefaultOffsetX);
+    offsetCopy.y = LoadFloat(kFunnyShapeDefaultOffsetY);
     offset.x = offsetCopy.x;
     offset.y = offsetCopy.y;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offsetCopy, kFunnyShapeZero);
+    RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeBoundsMaxInitial));
 }
 
 /*
@@ -478,8 +483,8 @@ void CFunnyShape::RenderTexture()
 
     const s16 width = m_textureHeaders[0]->width;
     const s16 height = m_textureHeaders[0]->height;
-    GXSetViewport(kFunnyShapeTextureViewportOrigin, kFunnyShapeTextureViewportOrigin, static_cast<float>(width),
-                  static_cast<float>(height), kFunnyShapeZero, kFunnyShapeOne);
+    GXSetViewport(LoadFloat(kFunnyShapeTextureViewportOrigin), LoadFloat(kFunnyShapeTextureViewportOrigin),
+                  static_cast<float>(width), static_cast<float>(height), kFunnyShapeZero, kFunnyShapeOne);
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);

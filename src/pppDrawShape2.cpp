@@ -1,4 +1,5 @@
 #include "ffcc/pppDrawShape2.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
@@ -44,9 +45,11 @@ typedef struct ShapeControlData {
  * JP Size: TODO
  */
 void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
-    ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
+    _pppPObject* object = (_pppPObject*)param1;
+    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
+    ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
+    void* posData = object->m_workArea + runtimeData->posDataOffset;
     s32 type = param2->type;
 
     if (type == 0xFFFF) {
@@ -60,7 +63,7 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
 
     pppSetDrawEnv(
         (pppCVECTOR*)((u8*)posData + 8),
-        (pppFMATRIX*)((u8*)param1 + 0x40),
+        &object->m_drawMatrix,
         param2->scale,
         param2->param15,
         param2->paramE,
@@ -90,8 +93,10 @@ void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
         return;
     }
 
-    ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
+    _pppPObject* object = (_pppPObject*)param1;
+    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
+    ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
     s32 type = param2->type;
 
     if (type == 0xFFFF) {
@@ -138,8 +143,10 @@ void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
  */
 void pppDrawShape2Construct(void* param1, void* param2)
 {
-    ShapeRuntimeData* data = *(ShapeRuntimeData**)((u8*)param2 + 0xC);
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + data->shapeDataOffset + 0x80);
+    _pppPObject* object = (_pppPObject*)param1;
+    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param2;
+    ShapeRuntimeData* data = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+    ShapeState* shapeData = (ShapeState*)(object->m_workArea + data->shapeDataOffset);
 
     shapeData->currentId = 0;
     shapeData->counter = 0;

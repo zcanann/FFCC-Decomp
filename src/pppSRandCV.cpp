@@ -43,7 +43,6 @@ static inline char randchar(char value, float scale)
  */
 void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     if (gPppCalcDisabled != 0) {
         return;
     }
@@ -64,7 +63,7 @@ void pppSRandCV(_pppPObject* basePtr, SRandCVParam* in, _pppCtrlTable* ctrl)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (basePtr->m_workArea + color_offset);
 
     target_colors[0] += randchar(in->delta[0], target[0]);
     target_colors[1] += randchar(in->delta[1], target[1]);

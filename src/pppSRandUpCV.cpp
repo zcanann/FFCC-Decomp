@@ -46,7 +46,6 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    u8* base = (u8*)basePtr;
     f32* target;
 
     if (in->targetId == basePtr->m_graphId) {
@@ -63,7 +62,7 @@ void pppSRandUpCV(_pppPObject* basePtr, SRandUpCVParam* in, _pppCtrlTable* ctrl)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (basePtr->m_workArea + color_offset);
 
     target_colors[0] += randchar(in->delta[0], target[0]);
     target_colors[1] += randchar(in->delta[1], target[1]);

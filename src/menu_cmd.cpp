@@ -154,8 +154,7 @@ static const char* GetUniteListName(int itemId)
 		return localized;
 	}
 
-	const char** flatText = *reinterpret_cast<const char***>(
-		reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
+	char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 	return flatText[itemId * 5 + 4];
 }
 
@@ -1138,8 +1137,7 @@ void CMenuPcs::CmdDraw()
 					continue;
 				}
 				const s16 skillId = *reinterpret_cast<s16*>(caravanWork + cmdId * 2 + 0xB6);
-				const char** flatText = *reinterpret_cast<const char***>(
-				    reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
+				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 				text = flatText[skillId * 5 + 4];
 				if ((cmdMode == 0) && (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
 					hasItemHelp = true;
@@ -2223,8 +2221,7 @@ void CMenuPcs::DrawUniteList()
 				continue;
 			}
 			const s16 skillId = *reinterpret_cast<const s16*>(caravanWork + itemIdx * 2 + 0xB6);
-			const char** flatText = *reinterpret_cast<const char***>(
-				reinterpret_cast<u8*>(&Game.m_cFlatDataArr[1]) + 0x70);
+			char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 			text = flatText[skillId * 5 + 4];
 		}
 

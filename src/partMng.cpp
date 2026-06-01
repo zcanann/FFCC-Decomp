@@ -31,7 +31,6 @@ extern int gPppHeapUseRateWords[3];
 #include <string.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
@@ -62,10 +61,6 @@ extern "C" float FLOAT_8032fe74;
 extern "C" float FLOAT_8032fe78;
 extern "C" float FLOAT_8032fe7c;
 extern "C" double DOUBLE_8032fe80;
-extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
-extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
-extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
-extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
@@ -359,8 +354,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
-        operator delete(res->m_pppModelStArr);
+        delete[] res->m_pppModelStArr;
         res->m_pppModelStArr = 0;
     }
 
@@ -383,8 +377,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
-        operator delete(res->m_pppShapeStArr);
+        delete[] res->m_pppShapeStArr;
         res->m_pppShapeStArr = 0;
     }
 
@@ -3545,12 +3538,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
     if (m_pppModelStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
-        pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
-            operator new(
-                sizeof(pppModelSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
+        pppModelSt* modelArray = new(stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9) pppModelSt[0x100];
         if (modelArray != 0) {
-            __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
             }
@@ -3663,12 +3652,8 @@ void CPartMng::pppLoadPan(const char* baseName)
 
     if (m_pppShapeStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
-        pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
-            operator new(
-                sizeof(pppShapeSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
+        pppShapeSt* shapeArray = new(stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b) pppShapeSt[0x100];
         if (shapeArray != 0) {
-            __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;
             }

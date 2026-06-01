@@ -59,17 +59,6 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 }
 } // namespace
 
-struct TmpArtiTableEntry {
-    int count;
-    char** strings;
-    char* stringBuf;
-};
-
-struct TmpArtiFlatData {
-    char pad0[0x6C];
-    TmpArtiTableEntry table[8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8015d798
@@ -139,7 +128,6 @@ void CMenuPcs::TmpArtiDraw()
 	font->SetScale(FLOAT_80332F34);
 	font->DrawInit();
 
-	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
 	entry = GetTmpArtiEntries(this);
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
@@ -148,7 +136,7 @@ void CMenuPcs::TmpArtiDraw()
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
 			font->SetColor(textColor.color);
 
-			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
+			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = font->GetWidth(text);
 			float posX = (float)((((float)entry->width - width) * DOUBLE_80332f20) + (float)entry->x);
 			float posY = (float)(entry->y + 11);

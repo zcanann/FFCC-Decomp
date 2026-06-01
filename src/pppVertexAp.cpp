@@ -52,12 +52,6 @@ struct VertexApSource
     Vec* points;
 };
 
-struct VertexApObject
-{
-    u8 unk0[0x10];
-    Mtx localMatrix;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800647e0
@@ -71,9 +65,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 {
     VertexApData* data = (VertexApData*)dataRaw;
     VertexApCtrl* ctrl = (VertexApCtrl*)ctrlRaw;
-    VertexApObject* parentObj = (VertexApObject*)parent;
     s32 stateOffset = *ctrl->stateOffset;
-    VertexApState* state = (VertexApState*)((u8*)parent + stateOffset + 0x80);
+    VertexApState* state = (VertexApState*)(parent->m_workArea + stateOffset);
 
     if (gPppCalcDisabled != 0) {
         goto exitStub;
@@ -87,7 +80,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         int count;
         VertexApEnv* env = (VertexApEnv*)ppvEnv;
         VertexApEntry* entry;
-        Vec* points = *(Vec**)((u8*)parent + 0x70);
+        Vec* points = parent->m_drawMatrixPtr;
         entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
@@ -134,8 +127,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    outPos = (Vec*)(child->m_workArea + data->childPosOffset);
 
                     if (data->useWorldMtx == 0) {
                         outPos->x = pos.x;
@@ -183,8 +176,8 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     pos.x = x;
                     pos.y = y;
                     pos.z = z;
-                    PSMTXMultVec(parentObj->localMatrix, &pos, &pos);
-                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    PSMTXMultVec(parent->m_localMatrix.value, &pos, &pos);
+                    outPos = (Vec*)(child->m_workArea + data->childPosOffset);
 
                     if (data->useWorldMtx == 0) {
                         outPos->x = pos.x;
@@ -230,7 +223,7 @@ functionEnd:
 void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 {
     s32 offset = **(s32**)((u8*)vtxAp + 0xC);
-    u16* state = (u16*)((u8*)pobj + offset + 0x80);
+    u16* state = (u16*)(pobj->m_workArea + offset);
     state[0] = 0;
     state[1] = 0;
 }

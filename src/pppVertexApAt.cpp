@@ -1,5 +1,6 @@
 #include "ffcc/pppVertexApAt.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
 #include <dolphin/types.h>
@@ -57,7 +58,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     VertexApAtData* vtxData = (VertexApAtData*)data;
     VertexApAtCtrl* vtxCtrl = (VertexApAtCtrl*)ctrl;
     s32 stateOffset = *vtxCtrl->stateOffset;
-    VertexApAtState* state = (VertexApAtState*)((u8*)parent + stateOffset + 0x80);
+    VertexApAtState* state = (VertexApAtState*)(parent->m_workArea + stateOffset);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -94,7 +95,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
+                    *(u16*)(child->m_workArea + vtxData->childValueOffset) = outValue;
                 }
             }
             break;
@@ -117,7 +118,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue16;
+                    *(u16*)(child->m_workArea + vtxData->childValueOffset) = outValue16;
                 }
             }
             break;
@@ -141,7 +142,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 void pppVertexApAtCon(_pppPObject* obj, PVertexApAt* data)
 {
     s32 offset = **(s32**)((u8*)data + 0xC);
-    u16* state = (u16*)((u8*)obj + offset + 0x80);
+    u16* state = (u16*)(obj->m_workArea + offset);
     state[0] = 0;
     state[1] = 0;
 }

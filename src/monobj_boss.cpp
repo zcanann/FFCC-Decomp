@@ -56,7 +56,6 @@ extern double DOUBLE_80331d38;
 extern double DOUBLE_80331dc0;
 extern "C" char s_meteo_3_80331D64[8];
 extern char SoundBuffer[];
-extern char SoundBuffer_1260_[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
 extern "C" char g_errCt;
 extern "C" Vec gGoblinKingTeleportPoints[] = {
@@ -115,6 +114,22 @@ struct MeteoParasiteCBossWork {
 struct DuctBossWork {
     u8 m_pad00[0x38];
     CGMonObj* m_objs[3];
+};
+
+struct LKShooterBossWork {
+    u8 m_pad00[0x08];
+    int m_stunTimer;
+    int m_leftCooldown;
+    int m_rightCooldown;
+    union {
+        u8 m_flags;
+        struct {
+            u8 m_bit80 : 1;
+            u8 m_bit40 : 1;
+            u8 m_bit20 : 1;
+            u8 m_rest : 5;
+        } bits;
+    };
 };
 
 /*
@@ -949,8 +964,9 @@ void CGMonObj::attackedFuncSaw()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	if (prgObj->m_lastStateId == 100) {
 		prgObj->addSubStat();
-		*reinterpret_cast<unsigned char*>(SoundBuffer_1260_ + 0x14) |= 0x80;
-		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x8) = 0xFA;
+		LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(m_boss__8CGMonObj);
+		work->bits.m_bit80 = 1;
+		work->m_stunTimer = 0xFA;
 	}
 }
 
@@ -967,10 +983,10 @@ void CGMonObj::frameStatFuncLKShooter()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 
-	int cooldown0 = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) - 1;
-	int cooldown1 = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) - 1;
-	*reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) = cooldown0 & ~(cooldown0 >> 31);
-	*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) = cooldown1 & ~(cooldown1 >> 31);
+	int cooldown0 = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0xC) - 1;
+	int cooldown1 = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x10) - 1;
+	*reinterpret_cast<int*>(m_boss__8CGMonObj + 0xC) = cooldown0 & ~(cooldown0 >> 31);
+	*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x10) = cooldown1 & ~(cooldown1 >> 31);
 
 	const int state = *reinterpret_cast<int*>(self + 0x520);
 	if (state == 0x65) {
@@ -1008,7 +1024,7 @@ state100:
 	moveFrame();
 	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
 	const int flatFlags = CFlatBossState();
-	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
+	if ((*reinterpret_cast<volatile signed char*>(m_boss__8CGMonObj + 0x14) < 0) ||
 	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
@@ -1019,7 +1035,7 @@ state101:
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
 		rotTarget(*reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
 	}
-	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
+	if ((*reinterpret_cast<volatile signed char*>(m_boss__8CGMonObj + 0x14) < 0) ||
 	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < FLOAT_80331da8)) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
@@ -1028,13 +1044,13 @@ state101:
 resetBranch:
 	if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
 		*reinterpret_cast<int*>(self + 0x6D0) = 0;
-		*reinterpret_cast<volatile unsigned char*>(SoundBuffer_1260_ + 0x14) &= 0xDF;
-		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x10) = 0xFA;
+		*reinterpret_cast<volatile unsigned char*>(m_boss__8CGMonObj + 0x14) &= 0xDF;
+		*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x10) = 0xFA;
 	}
 	if (*reinterpret_cast<int*>(self + 0x6D0) == 2) {
 		*reinterpret_cast<int*>(self + 0x6D0) = 0;
-		*reinterpret_cast<volatile unsigned char*>(SoundBuffer_1260_ + 0x14) &= 0xBF;
-		*reinterpret_cast<int*>(SoundBuffer_1260_ + 0xC) = 0xFA;
+		*reinterpret_cast<volatile unsigned char*>(m_boss__8CGMonObj + 0x14) &= 0xBF;
+		*reinterpret_cast<int*>(m_boss__8CGMonObj + 0xC) = 0xFA;
 	}
 }
 
@@ -1051,24 +1067,24 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* work = reinterpret_cast<unsigned char*>(SoundBuffer_1260_);
+	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(m_boss__8CGMonObj);
 
-	if (*reinterpret_cast<int*>(work + 8) == 0) {
-		if ((work[0x14] & 0x40) == 0 && (CFlatBossState() & 2) == 0) {
+	if (work->m_stunTimer == 0) {
+		if (work->bits.m_bit40 == 0 && (CFlatBossState() & 2) == 0) {
 			CVector left(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < FLOAT_80331d98 &&
-			    *reinterpret_cast<int*>(work + 0xC) == 0) {
-				work[0x14] |= 0x40;
-				*reinterpret_cast<int*>(work + 0xC) = 300;
+			    work->m_leftCooldown == 0) {
+				work->bits.m_bit40 = 1;
+				work->m_leftCooldown = 300;
 				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
 				return 100;
 			}
 		}
-		if ((work[0x14] & 0x20) == 0 && (CFlatBossState() & 1) == 0) {
+		if (work->bits.m_bit20 == 0 && (CFlatBossState() & 1) == 0) {
 			CVector right(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
-			    *reinterpret_cast<int*>(work + 0x10) == 0) {
-				work[0x14] |= 0x20;
+			    work->m_rightCooldown == 0) {
+				work->bits.m_bit20 = 1;
 				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 				return 100;
 			}

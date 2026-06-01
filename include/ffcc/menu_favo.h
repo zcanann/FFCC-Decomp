@@ -8,6 +8,9 @@ class CFont;
 class FoodRank
 {
 public:
+    char rank;
+    char food;
+    short value;
 };
 
 struct FavoEntry

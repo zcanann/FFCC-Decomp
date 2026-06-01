@@ -52,6 +52,12 @@ CTexture::CTexture()
     m_usesExternalAddress = 0;
 }
 
+static inline CTexture* NewTexture(CMemory::CStage* textureStage, char* file, int line)
+{
+    void* memory = Memory._Alloc(sizeof(CTexture), textureStage, file, line, 0);
+    return ::new (memory) CTexture;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8003A5FC
@@ -122,7 +128,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x54585452:
-            texture = new (TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED) CTexture;
+            texture = NewTexture(TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED);
             texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
             if (texture->m_name[0] != 0) {
@@ -202,7 +208,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                         while (chunkFile.GetNextChunk(textureChunk)) {
                             switch (textureChunk.m_id) {
                             case 0x54585452:
-                                CTexture* texture = new (TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED) CTexture;
+                                CTexture* texture = NewTexture(TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED);
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (texture->m_name[0] != 0) {

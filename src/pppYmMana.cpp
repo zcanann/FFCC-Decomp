@@ -1458,8 +1458,12 @@ static int RenderWaterMesh(VYmMana* mana)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d5398
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void CalculateNormal(VYmMana* mana)
 {
@@ -1482,10 +1486,10 @@ static void CalculateNormal(VYmMana* mana)
     }
 
     s32 indicesOffset = 0;
-    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
-        u16 i0 = indices[indicesOffset];
-        u16 i1 = indices[indicesOffset + 1];
-        u16 i2 = indices[indicesOffset + 2];
+    for (s32 i = 0; i < 0x200; i++) {
+        u16 i0 = indices[indicesOffset++];
+        u16 i1 = indices[indicesOffset++];
+        u16 i2 = indices[indicesOffset++];
 
         edgeA.x = positions[i1].x - positions[i0].x;
         edgeA.y = positions[i1].y - positions[i0].y;

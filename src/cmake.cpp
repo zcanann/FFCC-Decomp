@@ -3068,13 +3068,15 @@ void CMenuPcs::CmakeResultDraw()
     labelFont->SetColor(color);
 
     float labelWidths[4];
+    int labelY = 0x70;
     for (int i = 0; i < 4; i++) {
         const char* label = GetMenuStr(i + 0x2A);
 
         labelWidths[i] = FLOAT_803332f0 + labelFont->GetWidth(label);
         labelFont->SetPosX(FLOAT_803332f0);
-        labelFont->SetPosY(static_cast<float>(0x70 + i * 0x28) - FLOAT_803332f4);
+        labelFont->SetPosY(static_cast<float>(labelY) - FLOAT_803332f4);
         labelFont->Draw(label);
+        labelY += 0x28;
     }
 
     CFont* valueFont = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];

@@ -808,8 +808,8 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
  */
 void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColor color)
 {
-    Mtx cameraMtx;
     Mtx44 screenMtx;
+    Mtx cameraMtx;
     Mtx44 orthoMtx;
     float indMtx[2][3];
     GXColor white;

@@ -1717,7 +1717,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 		return;
 	}
 
-	CGObject* source = sourceObj != 0 ? reinterpret_cast<CGObject*>(sourceObj) : reinterpret_cast<CGObject*>(this);
+	CGObject* source = reinterpret_cast<CGObject*>(sourceObj);
 	int next = 0;
 
 	switch (staIndex) {

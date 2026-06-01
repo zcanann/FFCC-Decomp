@@ -155,7 +155,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
-    gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, color);
+    gUtil.RenderColorQuad(FLOAT_80331180, FLOAT_80331180, texWidth, texHeight, color);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
@@ -170,7 +170,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXLoadPosMtxImm(cameraMtx, 0);
 
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(0.0f, 0.0f, rtWidth, rtHeight, 0.0f, 1.0f);
+    GXSetViewport(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, FLOAT_80331180, FLOAT_80331184);
     GXSetScissor(0, 0, rtWidth, rtHeight);
     GXSetTexCopySrc(0, 0, rtWidth, rtHeight);
     GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
@@ -279,13 +279,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         Vec2d uvMin;
         Vec2d uvMax;
 
-        uvMin.x = 1.0f;
-        uvMin.y = 0.0f;
-        uvMax.x = 0.0f;
-        uvMax.y = 1.0f;
+        uvMin.x = FLOAT_80331184;
+        uvMin.y = FLOAT_80331180;
+        uvMax.x = FLOAT_80331180;
+        uvMax.y = FLOAT_80331184;
 
-        gUtil.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0, (GXBlendFactor)4,
-                                (GXBlendFactor)5);
+        gUtil.RenderTextureQuad(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0,
+                                (GXBlendFactor)4, (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
     }
 }

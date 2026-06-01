@@ -23,8 +23,12 @@ public:
 };
 
 extern "C" {
+extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
+    0x6D, 0x61, 0x70, 0x83, 0x65, 0x83, 0x4E, 0x83, 0x58, 0x83, 0x60, 0x83, 0x83, 0x83, 0x41, 0x83,
+    0x6A, 0x83, 0x81, 0x20, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x82, 0xAA, 0x82, 0xA0, 0x82, 0xE8,
+    0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00, 0x00, 0x00
+};
 extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
-char s_SetMapTexAnim_MaterialIdNotFound[];
 }
 extern "C" float FLOAT_8032fd38;
 extern "C" float FLOAT_8032fd48;
@@ -122,7 +126,7 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
     }
 
     if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
-        System.Printf(s_SetMapTexAnim_MaterialIdNotFound, materialId);
+        System.Printf(const_cast<char*>(s_SetMapTexAnim_MaterialIdNotFound), materialId);
     }
 }
 

@@ -13,12 +13,12 @@ extern const GXColor kFunnyShapeTextureChanColor;
 extern const GXColor kFunnyShapeTextureColor;
 extern GXColor kFunnyShapeRenderColor;
 extern const float kFunnyShapeBoundsMinInitial;
-extern const float kFunnyShapeBoundsMaxInitial;
+extern const float kFunnyShapeBoundsMaxInitial = -1000.0f;
 extern const float kFunnyShapeZero;
-extern const float kFunnyShapeViewportScale;
+extern const float kFunnyShapeViewportScale = 2.0f;
 extern const float kFunnyShapeOne;
-extern const float kFunnyShapeTexCoordDivisor;
-extern const float kFunnyShapePaddingScale;
+extern const float kFunnyShapeTexCoordDivisor = 4096.0f;
+extern const float kFunnyShapePaddingScale = 0.5f;
 extern const float kFunnyShapeNegativeOne;
 extern const float kFunnyShapeDefaultOffsetX;
 extern const float kFunnyShapeDefaultOffsetY;
@@ -320,6 +320,19 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
         packedStride += 0x24;
         rotatedStride += 0x2C;
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::ClearShapeData()
+{
 }
 
 /*

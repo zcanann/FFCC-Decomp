@@ -31,49 +31,6 @@ struct RefObject
     int refCount;
 };
 
-struct CTexAnimStorage
-{
-    void* vtable;
-    int refCount;
-    void* refData;
-    int unk0C;
-    float unk10;
-    int unk14;
-    float unk18;
-    float unk1C;
-    float unk20;
-};
-
-struct CTexAnimSetStorage
-{
-    void* vtable;
-    int refCount;
-    CPtrArray<CTexAnim*> texAnims;
-    float unk24;
-};
-
-struct CTexAnimRefDataStorage
-{
-    void* vtable;
-    int refCount;
-    char name[0x100];
-    void* material;
-    int texSrtIndex;
-    CPtrArray<CTexAnimSeq*> texAnimSeqs;
-};
-
-struct CTexAnimSeqStorage
-{
-    void* vtable;
-    int refCount;
-    char name[0x100];
-    unsigned int totalFrames;
-    int keyCount;
-    unsigned char flags;
-    unsigned char pad111[3];
-    unsigned int* keys;
-};
-
 struct CMaterialSetStorage
 {
     void* vtable;
@@ -213,11 +170,9 @@ CTexAnimSet::CTexAnimSet()
  */
 CTexAnimSeq::~CTexAnimSeq()
 {
-    CTexAnimSeqStorage* self = reinterpret_cast<CTexAnimSeqStorage*>(this);
-
-    if (self->keys != 0) {
-        delete[] self->keys;
-        self->keys = 0;
+    if (m_keys != 0) {
+        delete[] m_keys;
+        m_keys = 0;
     }
 }
 
@@ -233,9 +188,7 @@ CTexAnimSeq::~CTexAnimSeq()
 #pragma dont_inline on
 CTexAnim::CRefData::~CRefData()
 {
-    CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(this);
-
-    CRef* material = reinterpret_cast<CRef*>(refData->material);
+    CRef* material = reinterpret_cast<CRef*>(m_material);
     if (material != 0) {
         int* materialWords = reinterpret_cast<int*>(material);
         int refCount = materialWords[1];
@@ -245,9 +198,9 @@ CTexAnim::CRefData::~CRefData()
         if (nextRefCount == 0) {
             delete material;
         }
-        refData->material = 0;
+        m_material = 0;
     }
-    refData->texAnimSeqs.ReleaseAndRemoveAll();
+    m_texAnimSeqs.ReleaseAndRemoveAll();
 }
 #pragma dont_inline reset
 
@@ -262,7 +215,7 @@ CTexAnim::CRefData::~CRefData()
  */
 CTexAnim::~CTexAnim()
 {
-    CRef* refData = reinterpret_cast<CRef*>(*reinterpret_cast<void**>(Ptr(this, 8)));
+    CRef* refData = reinterpret_cast<CRef*>(m_refData);
     if (refData != 0) {
         int* refDataWords = reinterpret_cast<int*>(refData);
         int refCount = refDataWords[1];
@@ -272,7 +225,7 @@ CTexAnim::~CTexAnim()
         if (nextRefCount == 0) {
             delete refData;
         }
-        *reinterpret_cast<void**>(Ptr(this, 8)) = 0;
+        m_refData = 0;
     }
 }
 
@@ -287,17 +240,16 @@ CTexAnim::~CTexAnim()
  */
 void CTexAnimSet::SetTexGen()
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     const float zero = FLOAT_8032fb38;
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        CMaterial* material = reinterpret_cast<CMaterial*>(refData->material);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
+        CTexAnim* texAnim = m_texAnims[i];
+        CTexAnim::CRefData* refData = texAnim->m_refData;
+        CMaterial* material = refData->m_material;
         if (material != 0) {
-            CTexScroll* texScroll = material->GetTexScroll(refData->texSrtIndex);
-            const float texGenS = F32At(texAnim, 0x18);
-            const float texGenT = F32At(texAnim, 0x1C);
+            CTexScroll* texScroll = material->GetTexScroll(refData->m_texSrtIndex);
+            const float texGenS = texAnim->m_texGenS;
+            const float texGenT = texAnim->m_texGenT;
             texScroll->m_u0 = texGenS;
             texScroll->m_v0 = texGenT;
             texScroll->m_u1 = zero;
@@ -363,36 +315,35 @@ found:
  */
 void CTexAnimSet::AddFrame()
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     unsigned int i = 0;
 
-    while (i < static_cast<unsigned int>(self->texAnims.GetSize())) {
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
+    while (i < static_cast<unsigned int>(m_texAnims.GetSize())) {
+        CTexAnim* texAnim = m_texAnims[i];
+        CTexAnim::CRefData* refData = texAnim->m_refData;
+        CTexAnimSeq* seq = refData->m_texAnimSeqs[texAnim->m_seqIndex];
         float frameStep;
 
-        if (IsTexAnimChinFlag(seq->flags)) {
+        if (IsTexAnimChinFlag(seq->m_flags)) {
             frameStep = FLOAT_8032fb4c;
         } else {
             frameStep = FLOAT_8032fb3c;
         }
 
-        texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
+        texAnim = m_texAnims[i];
+        refData = texAnim->m_refData;
+        seq = refData->m_texAnimSeqs[texAnim->m_seqIndex];
 
-        if (!IsTexAnimE1Flag(seq->flags) || !IsTexAnimE1Flag(seq->flags) ||
-            (FLOAT_8032fb3c != texAnim->unk10) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
-            float currentFrame = (float)fmod((double)texAnim->unk10, (double)(float)seq->totalFrames);
-            unsigned int keyCount = seq->keyCount;
-            unsigned int* keys = seq->keys;
+        if (!IsTexAnimE1Flag(seq->m_flags) || !IsTexAnimE1Flag(seq->m_flags) ||
+            (FLOAT_8032fb3c != texAnim->m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
+            float currentFrame = (float)fmod((double)texAnim->m_frame, (double)(float)seq->m_totalFrames);
+            unsigned int keyCount = seq->m_keyCount;
+            unsigned int* keys = seq->m_keys;
             unsigned int keyIndex = 0;
             unsigned int lastKeyIndex = keyCount - 1;
 
             while (keyIndex < keyCount) {
                 unsigned int* keyData = keys + keyIndex * 0xC;
-                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[0xC] : seq->totalFrames);
+                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[0xC] : seq->m_totalFrames);
                 unsigned int* nextKeyData;
 
                 if (keyIndex < lastKeyIndex) {
@@ -412,11 +363,11 @@ void CTexAnimSet::AddFrame()
                     Vec v0;
                     PSVECScale(reinterpret_cast<Vec*>(keyData + 9), &v0, FLOAT_8032fb3c - t);
                     PSVECScale(reinterpret_cast<Vec*>(nextKeyData + 9), &v1, t);
-                    PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(&texAnim->unk18));
+                    PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(&texAnim->m_texGenS));
 
-                    if (!IsTexAnimInterpFlag(seq->flags)) {
-                        texAnim->unk18 = reinterpret_cast<float*>(keyData)[9];
-                        texAnim->unk1C = reinterpret_cast<float*>(keyData)[10];
+                    if (!IsTexAnimInterpFlag(seq->m_flags)) {
+                        texAnim->m_texGenS = reinterpret_cast<float*>(keyData)[9];
+                        texAnim->m_texGenT = reinterpret_cast<float*>(keyData)[10];
                     }
                     break;
                 }
@@ -424,29 +375,29 @@ void CTexAnimSet::AddFrame()
                 keyIndex = keyIndex + 1;
             }
 
-            if (texAnim->unk14 != -3) {
-                texAnim->unk10 = texAnim->unk10 + frameStep;
-                if ((float)seq->totalFrames <= texAnim->unk10) {
-                    int mode = texAnim->unk14;
+            if (texAnim->m_mode != -3) {
+                texAnim->m_frame = texAnim->m_frame + frameStep;
+                if ((float)seq->m_totalFrames <= texAnim->m_frame) {
+                    int mode = texAnim->m_mode;
                     if (mode == -1) {
-                        texAnim->unk10 = (float)seq->totalFrames;
+                        texAnim->m_frame = (float)seq->m_totalFrames;
                     } else if (mode >= 0) {
-                        texAnim->unk0C = mode;
-                        texAnim->unk14 = -2;
+                        texAnim->m_seqIndex = mode;
+                        texAnim->m_mode = -2;
                     }
-                    texAnim->unk10 = texAnim->unk10 - (float)seq->totalFrames;
+                    texAnim->m_frame = texAnim->m_frame - (float)seq->m_totalFrames;
                 }
             }
         }
 
-        texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
-        if (IsTexAnimChinFlag(seq->flags)) {
-            texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-            self->unk24 = texAnim->unk20;
+        texAnim = m_texAnims[i];
+        refData = texAnim->m_refData;
+        seq = refData->m_texAnimSeqs[texAnim->m_seqIndex];
+        if (IsTexAnimChinFlag(seq->m_flags)) {
+            texAnim = m_texAnims[i];
+            m_chin = texAnim->m_chin;
         } else {
-            self->unk24 = FLOAT_8032fb38;
+            m_chin = FLOAT_8032fb38;
         }
 
         i = i + 1;
@@ -505,27 +456,26 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  */
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     CTexAnimSet* dup = new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet;
 
     dup->m_texAnims.SetStage(stage);
-    for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
-        CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
-        CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
+        CTexAnim* src = m_texAnims[i];
+        CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
 
-        copy->refData = src->refData;
-        reinterpret_cast<RefObject*>(copy->refData)->refCount = reinterpret_cast<RefObject*>(copy->refData)->refCount + 1;
-        copy->unk0C = src->unk0C;
-        copy->unk10 = src->unk10;
-        copy->unk14 = src->unk14;
-        copy->unk18 = src->unk18;
-        copy->unk1C = src->unk1C;
-        copy->unk20 = src->unk20;
-        dup->m_texAnims.Add(reinterpret_cast<CTexAnim*>(copy));
+        copy->m_refData = src->m_refData;
+        reinterpret_cast<RefObject*>(copy->m_refData)->refCount =
+            reinterpret_cast<RefObject*>(copy->m_refData)->refCount + 1;
+        copy->m_seqIndex = src->m_seqIndex;
+        copy->m_frame = src->m_frame;
+        copy->m_mode = src->m_mode;
+        copy->m_texGenS = src->m_texGenS;
+        copy->m_texGenT = src->m_texGenT;
+        copy->m_chin = src->m_chin;
+        dup->m_texAnims.Add(copy);
     }
 
-    dup->m_chin = self->unk24;
+    dup->m_chin = m_chin;
     return dup;
 }
 
@@ -630,7 +580,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 #pragma dont_inline on
 CTexAnimSet::~CTexAnimSet()
 {
-    reinterpret_cast<CTexAnimSetStorage*>(this)->texAnims.ReleaseAndRemoveAll();
+    m_texAnims.ReleaseAndRemoveAll();
 }
 #pragma dont_inline reset
 

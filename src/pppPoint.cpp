@@ -15,7 +15,7 @@ extern const float kPppPointZero;
 void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
 	int dataOffset = ctrlTable->m_serializedDataOffsets[0];
-	float* dst = (float*)((char*)pObject + dataOffset + 0x80);
+	float* dst = (float*)(pObject->m_workArea + dataOffset);
 	float value = kPppPointZero;
 
 	dst[2] = value;
@@ -38,12 +38,12 @@ void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable
 		return;
 	}
 
-	if (step->m_graphId != *(int*)((char*)pObject + 0xC)) {
+	if (step->m_graphId != pObject->m_graphId) {
 		return;
 	}
 
 	int dataOffset = ctrlTable->m_serializedDataOffsets[0];
-	float* dst = (float*)((char*)pObject + dataOffset + 0x80);
+	float* dst = (float*)(pObject->m_workArea + dataOffset);
 
 	dst[0] += step->m_x;
 	dst[1] += step->m_y;

@@ -2755,19 +2755,19 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if ((((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 0x18) < 0) && (CFlatCenterState() == 0)) &&
-	    ((MiniGamePcs.m_flags & 0x80) != 0)) {
-		char text[0x110];
+	if ((((int)(static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 0x18) < 0) && (CFlatCenterState() == 0)) &&
+	    ((DbgMenuPcs.GetDbgFlagsRaw() & 0x80) != 0)) {
+		char text[0x100];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		double posYDouble;
 		double widthDouble;
 
 		sprintf(text, sCharaObjDebugStatFormat,
-		        *reinterpret_cast<short*>(script + 0x1C),
-		        *reinterpret_cast<short*>(script + 0x1A),
-		        *reinterpret_cast<short*>(script + 0x1E),
-		        *reinterpret_cast<short*>(script + 0x20),
-		        *reinterpret_cast<short*>(script + 0x22));
+		        *reinterpret_cast<unsigned short*>(script + 0x1C),
+		        *reinterpret_cast<unsigned short*>(script + 0x1A),
+		        *reinterpret_cast<unsigned short*>(script + 0x1E),
+		        *reinterpret_cast<unsigned short*>(script + 0x20),
+		        *reinterpret_cast<unsigned short*>(script + 0x22));
 
 		posYDouble = (double)posY;
 		widthDouble = (double)font->GetWidth(text);
@@ -2775,7 +2775,7 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		font->SetPosY((float)posYDouble);
 		font->SetPosZ((float)posZ);
 		font->Draw(text);
-		posY -= (float)((double)(unsigned short)font->m_glyphWidth * (double)font->scaleY);
+		posY -= (float)((double)(unsigned short)font->m_glyphHeight * (double)font->scaleY);
 	}
 }
 

@@ -2,22 +2,22 @@
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/linkage.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
+#include <stddef.h>
 
-struct pppLerpPos {
-    u8 m_pad[0x80];
-};
-
-struct pppLerpPosUnkB {
+struct pppLerpPosStep {
     u8 m_pad[4];
     u8 m_dataValIndex;
 };
 
-struct pppLerpPosUnkC {
-    u8 m_pad[0x0C];
-    s32* m_serializedDataOffsets;
-};
+STATIC_ASSERT(offsetof(pppLerpPosStep, m_dataValIndex) == 0x4);
+
+static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<Vec**>(object->m_workArea + *ctrl->m_serializedDataOffsets);
+}
 
 extern "C" const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
@@ -30,11 +30,10 @@ extern "C" const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param_2, struct pppLerpPosUnkC* param_3)
+void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* ctrl)
 {
     Vec** historyPtr;
     _pppMngSt* pppMngSt;
-    s32 iVar2;
     s32 iVar5;
     s32 iVar7;
     Vec local_2c;
@@ -42,15 +41,14 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = ppvMng;
-        iVar2 = *param_3->m_serializedDataOffsets;
-        historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
+        historyPtr = GetLerpPosHistory(object, ctrl);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
-                (u32)(u8)param_2->m_dataValIndex * 0xc, ppvEnv->m_stagePtr,
+                (u32)(u8)step->m_dataValIndex * 0xc, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppLerpPos_cpp),
                 0x37);
 
-            for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {
+            for (iVar7 = 0; iVar7 < (s32)(u8)step->m_dataValIndex; iVar7 = iVar7 + 1) {
                 (*historyPtr)[iVar7].x = ppvMng->m_matrix.value[0][3];
                 (*historyPtr)[iVar7].y = ppvMng->m_matrix.value[1][3];
                 (*historyPtr)[iVar7].z = ppvMng->m_matrix.value[2][3];
@@ -60,7 +58,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             local_2c.y = 0.0f;
             local_2c.x = 0.0f;
 
-            iVar5 = (u8)param_2->m_dataValIndex - 1;
+            iVar5 = (u8)step->m_dataValIndex - 1;
             iVar7 = iVar5 * 0xc;
             while (0 < iVar5) {
                 pppCopyVector(*(Vec*)((u8*)*historyPtr + iVar7), *(Vec*)((u8*)*historyPtr + iVar7 - 0xc));
@@ -74,7 +72,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             *(f32*)((u8*)*historyPtr + 4) = ppvMng->m_matrix.value[1][3];
             *(f32*)((u8*)*historyPtr + 8) = ppvMng->m_matrix.value[2][3];
 
-            for (; count = (u32)(u8)param_2->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
+            for (; count = (u32)(u8)step->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
                 PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
                 iVar7 = iVar7 + 0xc;
             }
@@ -97,10 +95,9 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
+void pppDestructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    s32 dataOffset = *param_2->m_serializedDataOffsets;
-    void** work = (void**)((u8*)pppLerpPos + 0x80 + dataOffset);
+    void** work = (void**)GetLerpPosHistory(object, ctrl);
 
     if (*work != 0) {
         pppHeapUseRate((CMemory::CStage*)*work);
@@ -117,10 +114,9 @@ void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
+void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    s32 dataOffset = *param_2->m_serializedDataOffsets;
-    Vec** work = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
+    Vec** work = GetLerpPosHistory(object, ctrl);
     *work = 0;
 }
 

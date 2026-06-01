@@ -30,7 +30,6 @@ u8 m_aiWork__8CGMonObj[0xC];
 u8 m_boss__8CGMonObj[0x8C];
 }
 
-extern "C" char SoundBuffer_1248_[];
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
 extern float FLOAT_803319D8;
@@ -684,7 +683,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x21:
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 		memset(mon + 0x70C, 0, 0x34);
 		if ((*reinterpret_cast<unsigned int*>(mon + 0x710) & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
@@ -721,7 +720,7 @@ void CGMonObj::isValidTarget()
 
 	if ((*reinterpret_cast<int*>(mon + 0x6C4) >= 0) &&
 	    ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0)) {
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 		memset(mon + 0x70C, 0, 0x34);
 		*reinterpret_cast<int*>(mon + 0x6D8) = 2;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
@@ -731,7 +730,7 @@ void CGMonObj::isValidTarget()
 
 	if (((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 		memset(mon + 0x70C, 0, 0x34);
 		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
@@ -740,7 +739,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x21;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
 		if (*reinterpret_cast<int*>(mon + 0x734) != 3) {
 			memset(mon + 0x70C, 0, 0x34);
 			*reinterpret_cast<int*>(mon + 0x70C) = 0x806;
@@ -793,13 +792,13 @@ check_home:
 		*reinterpret_cast<int*>(mon + 0x6F8) = *reinterpret_cast<int*>(mon + 0x15C);
 		*reinterpret_cast<int*>(mon + 0x6FC) = *reinterpret_cast<int*>(mon + 0x160);
 		*reinterpret_cast<int*>(mon + 0x700) = *reinterpret_cast<int*>(mon + 0x164);
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 		memset(mon + 0x70C, 0, 0x34);
 		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 1;
 	} else if (*reinterpret_cast<short*>(script9 + 0x10C) != 1) {
-		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x1C;
+		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x1C;
 	}
 }
 
@@ -851,13 +850,13 @@ void CGMonObj::seKiduki()
 
 		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x32;
+			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x32;
 		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x33;
+			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x33;
 		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
 			notice = true;
-			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x34;
+			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x34;
 		}
 	}
 
@@ -866,7 +865,7 @@ void CGMonObj::seKiduki()
 		if (classId < 0x70) {
 			if (classId == 0x6A) {
 				notice = true;
-				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x35;
+				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x35;
 			}
 		} else if (classId == 0x7B) {
 			notice = true;
@@ -3052,7 +3051,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	int& targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
-	int& actionState = *reinterpret_cast<int*>(SoundBuffer_1248_ + 4);
+	int& actionState = *reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4);
 	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 
 	if (targetPartyIndex >= 0) {
@@ -3249,7 +3248,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 			(((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
 			 (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC)) <=
 			  *reinterpret_cast<int*>(mon + 0x730)))) {
-			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 			memset(mon + 0x70C, 0, 0x34);
 			*reinterpret_cast<int*>(mon + 0x6D8) = 3;
 			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
@@ -3275,7 +3274,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
-	*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+	*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 	memset(mon + 0x70C, 0, 0x34);
 }
 
@@ -3305,13 +3304,13 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 	if (state > 2) {
 		if (state == 5) {
 			if (*targetPartyIdx < 0) {
-				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 				memset(mon + 0x70C, 0, 0x34);
 				*chaseState = 0;
 				*chaseTimer = 0;
 				mon[0x6BB] = 1;
 			} else {
-				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x21;
+				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
 				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
 				if (*reinterpret_cast<int*>(mon + 0x734) != 4) {
 					memset(mon + 0x70C, 0, 0x34);
@@ -3343,7 +3342,7 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 				*reinterpret_cast<CGPartyObj**>(mon + 0x714) = partyObj;
 				if (((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
 					((object->m_stateFlags0 & 0x40) != 0)) {
-					*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+					*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
 					memset(mon + 0x70C, 0, 0x34);
 					if (*targetPartyIdx >= 0) {
 						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));

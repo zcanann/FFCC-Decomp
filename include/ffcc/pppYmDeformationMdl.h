@@ -1,6 +1,8 @@
 #ifndef _PPP_YMDEFORMATIONMDL_H_
 #define _PPP_YMDEFORMATIONMDL_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/types.h>
 
 // Forward declarations
@@ -32,8 +34,7 @@ struct pppYmDeformationMdlUnkB {
 };
 
 struct pppYmDeformationMdl {
-    char pad[0x80];
-    u8 m_workArea[1];
+    _pppPObject m_object;
 };
 
 void SetUpIndWarp(VYmDeformationMdl*);

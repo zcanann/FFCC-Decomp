@@ -30,6 +30,16 @@ extern const float kPppLensFlareAlphaScale = 0.0078125f;
 extern const float kPppLensFlareNegate = -1.0f;
 extern const float kPppLensFlareZScale = 16777215.0f;
 extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+extern const float FLOAT_80331078 = 320.0f;
+extern const float FLOAT_8033107C = 224.0f;
+extern const float FLOAT_80331080 = -0.5f;
+extern const float FLOAT_80331084 = 0.0f;
+extern const double DOUBLE_80331088 = 0.5;
+extern const double DOUBLE_80331090 = 3.0;
+extern const double DOUBLE_80331098 = 0.0;
+extern const float FLOAT_803310A0 = 0.000001f;
+extern const float FLOAT_803310A4 = 1.0f;
+extern const float FLOAT_803310A8 = 2.0f;
 extern const double kYmEnvRadToDeg;
 extern const float kYmEnvDefaultScale;
 extern "C" {

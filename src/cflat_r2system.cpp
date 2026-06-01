@@ -359,7 +359,7 @@ void CCameraPcs::SetFullScreenShadowCamLen(float len)
  */
 CFont* CMenuPcs::GetFont22()
 {
-    return *(CFont**)((char*)this + 0xF8);
+    return m_fonts[0];
 }
 
 /*
@@ -373,7 +373,7 @@ CFont* CMenuPcs::GetFont22()
  */
 void CSound::SeMaxVolume(int volume)
 {
-    *(int*)((char*)this + 0x22BC) = volume;
+    m_seMaxVolume = volume;
 }
 
 /*
@@ -458,13 +458,13 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 {
     switch (id) {
     case 0x2000:
-        return *(signed char*)((char*)this + 0x6498);
+        return m_miniGameParams[0];
     case 0x2001:
-        return *(signed char*)((char*)this + 0x6499);
+        return m_miniGameParams[1];
     case 0x2002:
-        return *(signed char*)((char*)this + 0x649A);
+        return m_miniGameParams[2];
     case 0x2003:
-        return *(signed char*)((char*)this + 0x649B);
+        return m_miniGameParams[3];
     }
 
     return 0;

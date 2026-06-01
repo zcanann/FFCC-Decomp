@@ -70,7 +70,9 @@ public:
     unsigned int m_flags; // 0x6484
 
 private:
-    u8 m_work6488[0x649C - 0x6484];
+    u8 m_work6488[0x6498 - 0x6488];
+    signed char m_miniGameParams[4]; // 0x6498
+    u8 m_work649C[0x64A0 - 0x649C];
 };
 
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);

@@ -344,11 +344,10 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
         }
     }
 
-    char* signedSelf = reinterpret_cast<char*>(this);
-    signedSelf[0x6498] = -1;
-    signedSelf[0x6499] = -1;
-    signedSelf[0x649A] = -1;
-    signedSelf[0x649B] = -1;
+    m_miniGameParams[0] = -1;
+    m_miniGameParams[1] = -1;
+    m_miniGameParams[2] = -1;
+    m_miniGameParams[3] = -1;
     self[0x6495] = 0;
     self[0x6496] = 0;
     self[0x6497] = 0;
@@ -1468,7 +1467,7 @@ void CMiniGamePcs::calc(void)
         System.Printf(const_cast<char*>(s_miniGameRaceHeader));
         for (int i = 0; i < 4; i++)
         {
-            System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(self[0x6498 + i]));
+            System.Printf(const_cast<char*>(s_miniGameRaceResultFmt), i + 1, static_cast<int>(m_miniGameParams[i]));
         }
         System.Printf(const_cast<char*>(s_miniGameSeparator));
 
@@ -1483,10 +1482,10 @@ void CMiniGamePcs::calc(void)
     {
         CFlatRuntime::CStack continueStack[3];
 
-        self[0x6498] = 0xFF;
-        self[0x6499] = 0xFF;
-        self[0x649A] = 0xFF;
-        self[0x649B] = 0xFF;
+        m_miniGameParams[0] = -1;
+        m_miniGameParams[1] = -1;
+        m_miniGameParams[2] = -1;
+        m_miniGameParams[3] = -1;
         if ((unsigned int)System.m_execParam > 2)
         {
             System.Printf(const_cast<char*>(s_miniGameContinueText));
@@ -1614,7 +1613,7 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
         }
-        self[0x6498 + player] = static_cast<unsigned char>(padCode);
+        m_miniGameParams[player] = static_cast<signed char>(padCode);
         break;
     case 0x1100:
         if (1 <= (unsigned int)System.m_execParam) {

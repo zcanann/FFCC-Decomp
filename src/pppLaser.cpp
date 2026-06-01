@@ -212,7 +212,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     emptyHistory = 0;
-    if (LaserConst(kPppLaserNegativeOne) == work->m_maxLength) {
+    f32 maxLengthDisabled = LaserConst(kPppLaserNegativeOne);
+    if (maxLengthDisabled == work->m_maxLength) {
         return;
     }
 

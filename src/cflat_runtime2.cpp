@@ -72,13 +72,6 @@ STATIC_ASSERT(sizeof(m_objQuad) == sizeof(CGQuadObj) * kFlatQuadObjCount);
 STATIC_ASSERT(sizeof(m_obj) == sizeof(CGObject) * kFlatObjectCount);
 STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
 
-extern "C" void* __vt__Q212CFlatRuntime7CObject[];
-extern "C" void* __vt__9CGBaseObj[];
-extern "C" void* __vt__8CGObject[];
-extern "C" void* __vt__8CGPrgObj[];
-extern "C" void* __vt__10CGCharaObj[];
-extern "C" void* __vt__8CGMonObj[];
-extern "C" void* __vt__10CGPartyObj[];
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
@@ -573,16 +566,8 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__8CGMonObjFv(CGMonObj* obj)
+CGMonObj::CGMonObj()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	static_cast<CFlatRuntime::CObject*>(obj)->m_flagBits.m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGCharaObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGMonObj;
 }
 
 /*
@@ -594,16 +579,8 @@ extern "C" void __ct__8CGMonObjFv(CGMonObj* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
+CGPartyObj::CGPartyObj()
 {
-	u8* self = reinterpret_cast<u8*>(obj);
-	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
-	static_cast<CFlatRuntime::CObject*>(obj)->m_flagBits.m_constructFlag = 0;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGCharaObj;
-	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGPartyObj;
 }
 
 /*

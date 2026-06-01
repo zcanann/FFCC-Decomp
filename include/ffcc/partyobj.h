@@ -41,6 +41,8 @@ struct GhostPartyWork {
 class CGPartyObj : public CGCharaObj
 {
 public:
+    CGPartyObj();
+
 	static unsigned char m_ghostWork[0x90];
 
     void onCreate();

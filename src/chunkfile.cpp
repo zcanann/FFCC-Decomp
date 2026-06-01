@@ -24,7 +24,7 @@ void CChunkFile::Align(unsigned long alignment)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChunkFile::Skip(unsigned long size)
+inline void CChunkFile::Skip(unsigned long size)
 {
     m_cursor += size;
 }

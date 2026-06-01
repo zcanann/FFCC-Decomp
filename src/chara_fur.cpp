@@ -175,79 +175,69 @@ static inline MogWorkRaw& MogWork()
     return *reinterpret_cast<MogWorkRaw*>(m_mogWork);
 }
 
-static inline unsigned char* ModelRaw(void* model)
+static inline CMaterialSet* ModelMaterialSet(CChara::CModel* model)
 {
-    return reinterpret_cast<unsigned char*>(model);
+    return model->m_data->m_materialSet;
 }
 
-static inline void* ModelRef(void* model)
+static inline FurMeshRaw* ModelMeshes(CChara::CModel* model)
 {
-    return *reinterpret_cast<void**>(ModelRaw(model) + 0xA4);
+    return model->m_meshes;
 }
 
-static inline CMaterialSet* ModelMaterialSet(void* model)
+static inline CChara::CNode* ModelNodes(CChara::CModel* model)
 {
-    return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(ModelRef(model)) + 0x20);
+    return model->m_nodes;
 }
 
-static inline FurMeshRaw* ModelMeshes(void* model)
+static inline unsigned short ModelMeshCount(CChara::CModel* model)
 {
-    return *reinterpret_cast<FurMeshRaw**>(ModelRaw(model) + 0xAC);
+    return model->m_data->m_meshCount;
 }
 
-static inline void* ModelNodes(void* model)
+static inline unsigned int ModelMeshVisibleMask(CChara::CModel* model)
 {
-    return *reinterpret_cast<void**>(ModelRaw(model) + 0xA8);
+    return model->m_meshVisibleMask;
 }
 
-static inline unsigned short ModelMeshCount(void* model)
+static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
 {
-    return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(ModelRef(model)) + 0x0A);
+    return model->m_matrix;
 }
 
-static inline unsigned int ModelMeshVisibleMask(void* model)
+static inline int ModelPosQuant(CChara::CModel* model)
 {
-    return *reinterpret_cast<unsigned int*>(ModelRaw(model) + 0x98);
+    return model->m_data->m_posQuant;
 }
 
-static inline float (*ModelDrawMtx(void* model))[4]
+static inline int ModelNormQuant(CChara::CModel* model)
 {
-    return reinterpret_cast<float(*)[4]>(ModelRaw(model) + 0x08);
+    return model->m_data->m_normQuant;
 }
 
-static inline int ModelPosQuant(void* model)
+static inline float ModelLightAlpha(CChara::CModel* model)
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(ModelRef(model)) + 0x2C);
+    return model->m_lightAlpha;
 }
 
-static inline int ModelNormQuant(void* model)
+static inline float ModelFurLenScale(CChara::CModel* model)
 {
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(ModelRef(model)) + 0x30);
+    return model->m_furLenScale;
 }
 
-static inline float ModelLightAlpha(void* model)
+static inline float ModelFurStep(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelRaw(model) + 0x9C);
+    return model->m_furStep;
 }
 
-static inline float ModelFurLenScale(void* model)
+static inline float ModelFurCur(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelRaw(model) + 0x110);
+    return model->m_furCur;
 }
 
-static inline float ModelFurStep(void* model)
+static inline unsigned char ModelFlags10C(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelRaw(model) + 0x114);
-}
-
-static inline float ModelFurCur(void* model)
-{
-    return *reinterpret_cast<float*>(ModelRaw(model) + 0x11C);
-}
-
-static inline unsigned char ModelFlags10C(void* model)
-{
-    return *(ModelRaw(model) + 0x10C);
+    return model->m_flags10C;
 }
 
 static inline float QuantizedToFloat(short value, int frac)
@@ -1468,7 +1458,7 @@ int CChara::CModel::PickFur(
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
-	void* nodes = ModelNodes(this);
+	CChara::CNode* nodes = ModelNodes(this);
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
 
@@ -1495,9 +1485,7 @@ int CChara::CModel::PickFur(
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this),
-			            reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(nodes) + mesh->m_data->m_nodeIndex * 0xC0 + 0x44),
-			            meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
@@ -1653,7 +1641,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
-	void* nodes = ModelNodes(this);
+	CChara::CNode* nodes = ModelNodes(this);
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
 	CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
@@ -1746,9 +1734,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this),
-			            reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(nodes) + mesh->m_data->m_nodeIndex * 0xC0 + 0x44),
-			            meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}

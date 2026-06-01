@@ -164,20 +164,14 @@ static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
     keyFrame = 0;
 }
 
-typedef void (*VirtualDtorFn)(void*, int);
-
-static void ReleaseRef(void* object)
+static void ReleaseRef(CRef* object)
 {
     if (object == 0) {
         return;
     }
 
-    int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
-    int nextRefCount = refCount - 1;
-    refCount = nextRefCount;
-    if (nextRefCount == 0 && object != 0) {
-        void** vtable = *reinterpret_cast<void***>(object);
-        reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
+    if (object->DecRef() == 0) {
+        delete object;
     }
 }
 
@@ -2773,7 +2767,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                 unsigned char* texturePtr = Ptr(material, 0x3C);
 
                 for (int i = 0; i < numTexture; i++) {
-                    ReleaseRef(*reinterpret_cast<void**>(texturePtr));
+                    ReleaseRef(*reinterpret_cast<CTexture**>(texturePtr));
                     *reinterpret_cast<void**>(texturePtr) = 0;
 
                     if (textureSet != 0) {
@@ -2934,15 +2928,9 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             unsigned char* textureRef = reinterpret_cast<unsigned char*>(material);
 
             for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18))); i++) {
-                void* object = *reinterpret_cast<void**>(Ptr(textureRef, 0x3C));
+                CTexture* object = *reinterpret_cast<CTexture**>(Ptr(textureRef, 0x3C));
                 if (object != 0) {
-                    int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
-                    int nextRefCount = refCount - 1;
-                    refCount = nextRefCount;
-                    if ((nextRefCount == 0) && (object != 0)) {
-                        void** vtable = *reinterpret_cast<void***>(object);
-                        reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
-                    }
+                    ReleaseRef(object);
                     *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
                 }
 
@@ -2953,13 +2941,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             }
 
             if (material != 0) {
-                int& refCount = *reinterpret_cast<int*>(Ptr(material, 4));
-                int nextRefCount = refCount - 1;
-                refCount = nextRefCount;
-                if ((nextRefCount == 0) && (material != 0)) {
-                    void** vtable = *reinterpret_cast<void***>(material);
-                    reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
-                }
+                ReleaseRef(material);
             }
             m_materials.SetAt(index, 0);
         }

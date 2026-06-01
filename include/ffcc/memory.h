@@ -17,6 +17,11 @@ public:
     class CStage
     {
     public:
+        struct CBlock
+        {
+            u8 m_bytes[0x40];
+        };
+
         CStage* m_prev;
         CStage* m_next;
         unsigned long m_heapTop;

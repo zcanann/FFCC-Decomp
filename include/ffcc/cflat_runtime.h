@@ -109,7 +109,7 @@ public:
 	virtual int Frame(int, int);
 	virtual void onNewObject(CFlatRuntime::CObject*);
 	virtual void onDeleteObject(CFlatRuntime::CObject*);
-	virtual void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	virtual CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);

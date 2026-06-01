@@ -431,7 +431,7 @@ public:
     int pppCreate0(int, int, PPPCREATEPARAM*, int);
     int pppCreate(int, int, PPPCREATEPARAM*, int);
 
-    void pppGetFreeSlot();
+    int pppGetFreeSlot();
     void pppDeleteSlot(int, int);
     void pppEndSlot(int, int);
     void pppShowSlot(int, unsigned char);

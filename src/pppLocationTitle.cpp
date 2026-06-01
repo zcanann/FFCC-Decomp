@@ -19,7 +19,7 @@ struct LocationTitleWork {
 
 struct LocationTitleParticle {
     Vec m_pos;
-    u32 m_color;
+    GXColor m_color;
     float m_frame;
     s16 m_shapeUnk;
     s16 m_shapeA;
@@ -94,12 +94,12 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
             u8 alpha;
             int fadeStep;
 
-            alpha = ((u8*)&particle->m_color)[3];
+            alpha = particle->m_color.a;
             fadeStep = alpha / fadeDivisor;
-            ((u8*)&particle->m_color)[3] = (u8)(alpha - fadeStep);
+            particle->m_color.a = static_cast<u8>(alpha - fadeStep);
         }
 
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+        GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
         GXLoadPosMtxImm(model, 0);
         pppSetBlendMode(param_2->m_blendMode);
         pppDrawShp(*shapeTable, particle->m_shapeB, ppvEnv->m_materialSetPtr, param_2->m_blendMode);
@@ -271,9 +271,9 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
-    s32* serializedOffsets;
+    int* serializedOffsets;
 
-    serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
+    serializedOffsets = param_2->m_serializedDataOffsets;
     serializedOffset = *serializedOffsets;
     stagePtr = (CMemory::CStage**)(pppLocationTitle->m_workArea + serializedOffset);
 

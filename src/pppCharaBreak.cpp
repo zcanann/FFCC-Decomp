@@ -57,7 +57,7 @@ typedef CharaBreakUnkB CharaBreakStep;
 STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
 
 struct CharaBreakWork {
-    u32 _pad0;
+    GXColor m_color;
     f32 m_value0;
     f32 m_value1;
     f32 m_value2;
@@ -141,6 +141,7 @@ STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
+STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 {
@@ -165,6 +166,11 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 {
     return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
+}
+
+static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)
+{
+    return reinterpret_cast<CharaBreakDisplayListPair***>(work->m_meshBuffers);
 }
 
 static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -202,10 +208,10 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
             1,
             0);
         _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCCLR, GX_BL_SRCCLR, GX_LO_COPY);
-        ((u8*)work)[0] = 0xFF;
-        ((u8*)work)[1] = 0xFF;
-        ((u8*)work)[2] = 0xFF;
-        ((u8*)work)[3] = colorWork[0xB];
+        work->m_color.r = 0xFF;
+        work->m_color.g = 0xFF;
+        work->m_color.b = 0xFF;
+        work->m_color.a = colorWork[0xB];
     }
 }
 /*
@@ -404,29 +410,28 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     model->SetAfterDrawMeshCallback(0);
     model->m_beforeCalcMatrixCallback = 0;
 
-    void** perMeshBuffers = (void**)work->m_meshBuffers;
-    u8* mesh = reinterpret_cast<u8*>(ModelMeshes(model));
-    void** meshBufferSlot = perMeshBuffers;
+    CharaBreakDisplayListPair*** perMeshBuffers = MeshDisplayListPairs(work);
+    CChara::CMesh* mesh = model->m_meshes;
+    CharaBreakDisplayListPair*** meshBufferSlot = perMeshBuffers;
 
     if (perMeshBuffers != NULL) {
         for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
-            u32 dlEntryBase = (u32)*meshBufferSlot;
-            int meshData = *(int*)(mesh + 8);
-            if (dlEntryBase != 0) {
-                int* dlEntries = (int*)dlEntryBase;
-                for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
-                    if ((void*)*dlEntries != NULL) {
-                        if (*(void**)*dlEntries != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)*(void**)*dlEntries);
-                            *(u32*)*dlEntries = 0;
+            CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;
+            CharaBreakMeshData* meshData = MeshData(mesh);
+            if (dlEntryBase != NULL) {
+                CharaBreakDisplayListPair** dlEntries = dlEntryBase;
+                for (u32 dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
+                    CharaBreakDisplayListPair* dlEntry = *dlEntries;
+                    if (dlEntry != NULL) {
+                        if (dlEntry->m_rewrittenDisplayList != NULL) {
+                            pppHeapUseRate((CMemory::CStage*)dlEntry->m_rewrittenDisplayList);
+                            dlEntry->m_rewrittenDisplayList = 0;
                         }
-                        if (*(void**)(*dlEntries + 0xC) != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)*(void**)(*dlEntries + 0xC));
-                            *(u32*)(*dlEntries + 0xC) = 0;
+                        if (dlEntry->m_polygonData != NULL) {
+                            pppHeapUseRate((CMemory::CStage*)dlEntry->m_polygonData);
+                            dlEntry->m_polygonData = 0;
                         }
-                    }
-                    if ((void*)*dlEntries != NULL) {
-                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
+                        pppHeapUseRate((CMemory::CStage*)dlEntry);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -435,9 +440,9 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 
             if (*meshBufferSlot != NULL) {
                 pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
-                *meshBufferSlot = NULL;
+                *meshBufferSlot = 0;
             }
-            mesh += 0x14;
+            mesh++;
             meshBufferSlot++;
         }
     }
@@ -1036,9 +1041,12 @@ static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, 
  */
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* modelData, void* meshData)
 {
-    if (*(u32*)((u8*)modelData + 0x44) == 0) {
+    CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
+    CharaBreakStep* stepData = reinterpret_cast<CharaBreakStep*>(meshData);
+
+    if (work->m_model == 0) {
         return reinterpret_cast<int>(model);
     }
 
-    return (u32)__cntlzw(1 - (u32)*((u8*)meshData + 0x42)) >> 5;
+    return (u32)__cntlzw(1 - (u32)stepData->m_worldSpaceMode) >> 5;
 }

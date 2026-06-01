@@ -87,6 +87,13 @@ static inline Mtx& CameraMatrix()
 }
 
 STATIC_ASSERT(offsetof(CGraphic, m_renderMode) == 0x71E0);
+STATIC_ASSERT(offsetof(CGraphic, m_graphicStage) == 0x4);
+STATIC_ASSERT(offsetof(CGraphic, m_scratchStage) == 0x8);
+STATIC_ASSERT(offsetof(CGraphic, m_frameReady) == 0xC);
+STATIC_ASSERT(offsetof(CGraphic, m_fifoBuffer) == 0x10);
+STATIC_ASSERT(offsetof(CGraphic, m_debugStringCount) == 0x14);
+STATIC_ASSERT(offsetof(CGraphic, m_debugStringPositions) == 0x18);
+STATIC_ASSERT(offsetof(CGraphic, m_debugStrings) == 0x1E0);
 STATIC_ASSERT(offsetof(CGraphic, m_frameBuffer) == 0x71E4);
 STATIC_ASSERT(offsetof(CGraphic, m_scratchTextureBuffer) == 0x71E8);
 STATIC_ASSERT(offsetof(CGraphic, m_savedFrameBuffer) == 0x71EC);
@@ -97,6 +104,9 @@ STATIC_ASSERT(offsetof(CGraphic, m_sphereDisplayList) == 0x71FC);
 STATIC_ASSERT(offsetof(CGraphic, m_fogColor) == 0x7200);
 STATIC_ASSERT(offsetof(CGraphic, m_fogStart) == 0x7204);
 STATIC_ASSERT(offsetof(CGraphic, m_fogEnd) == 0x7208);
+STATIC_ASSERT(offsetof(CGraphic, m_fifoIndex) == 0x734C);
+STATIC_ASSERT(offsetof(CGraphic, m_frameRateOver) == 0x7350);
+STATIC_ASSERT(offsetof(CGraphic, m_debugStringVisible) == 0x7354);
 STATIC_ASSERT(offsetof(CGraphic, m_defaultCopyClearColor) == 0x735F);
 STATIC_ASSERT(offsetof(CGraphic, m_drawDoneWaiting) == 0x7364);
 STATIC_ASSERT(offsetof(CGraphic, m_drawDoneFile) == 0x7368);
@@ -134,10 +144,10 @@ void CGraphic::Init()
     char* graphicInitData = const_cast<char*>(graphicInitData_801D6290);
     char* graphicFileName = graphicInitData + kGraphicInitSource;
 
-    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
-    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
+    m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
+    m_scratchStage = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
 
-    S32At(this, 0x14) = 0;
+    m_debugStringCount = 0;
     m_fogColor.r = 0;
     m_fogColor.g = 0;
     m_fogColor.b = 0;
@@ -166,24 +176,21 @@ void CGraphic::Init()
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    m_frameBuffer = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x86) u8[xfbBufferSize];
+    m_frameBuffer = new (m_graphicStage, graphicFileName, 0x86) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x88)
-        u8[efbBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, graphicFileName, 0x88) u8[efbBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
     renderMode = m_renderMode;
     u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
-    m_scratchTextureBuffer =
-        Memory._Alloc(scratchBufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), graphicFileName, 0xB53, 0);
+    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicFileName, 0xB53, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    PtrAt(this, 0x10) =
-        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x8B) u8[0x60000];
+    m_fifoBuffer = new (m_graphicStage, graphicFileName, 0x8B) u8[0x60000];
 
     VIConfigure(m_renderMode);
-    GXInit(PtrAt(this, 0x10), 0x60000);
+    GXInit(m_fifoBuffer, 0x60000);
 
     GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
                   static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
@@ -211,10 +218,10 @@ void CGraphic::Init()
     }
 
     m_lastRetraceCount = VIGetRetraceCount();
-    S32At(this, 0xC) = 0;
-    S32At(this, 0x734C) = 0;
-    S32At(this, 0x7350) = 0;
-    S32At(this, 0x7354) = 0;
+    m_frameReady = 0;
+    m_fifoIndex = 0;
+    m_frameRateOver = 0;
+    m_debugStringVisible = 0;
     makeSphere();
     m_blurActive = 0;
     m_blurDelayCounter = 0;
@@ -258,13 +265,13 @@ void CGraphic::Quit()
         delete[] reinterpret_cast<u8*>(m_sphereDisplayList);
         m_sphereDisplayList = nullptr;
     }
-    if (PtrAt(this, 0x10) != nullptr) {
-        delete[] reinterpret_cast<u8*>(PtrAt(this, 0x10));
-        PtrAt(this, 0x10) = nullptr;
+    if (m_fifoBuffer != nullptr) {
+        delete[] reinterpret_cast<u8*>(m_fifoBuffer);
+        m_fifoBuffer = nullptr;
     }
 
-    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)));
-    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)));
+    Memory.DestroyStage(m_scratchStage);
+    Memory.DestroyStage(m_graphicStage);
 }
 
 /*
@@ -405,7 +412,7 @@ void CGraphic::BeginFrame()
     }
 
     if ((buttons & 2) != 0) {
-        S32At(this, 0x7354) = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(S32At(this, 0x7354)))) >> 5) & 0xFF;
+        m_debugStringVisible = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_debugStringVisible))) >> 5) & 0xFF;
     }
 }
 
@@ -420,7 +427,7 @@ void CGraphic::BeginFrame()
  */
 void CGraphic::EndFrame()
 {
-    S32At(this, 0x14) = 0;
+    m_debugStringCount = 0;
 }
 
 /*
@@ -638,7 +645,7 @@ u32 CGraphic::IsFrameRateOver()
  */
 void CGraphic::Flip()
 {
-    if (S32At(this, 0xC) != 0) {
+    if (m_frameReady != 0) {
         if (m_displayCopyEnabled != 0) {
             VISetBlack(FALSE);
             m_displayCopyEnabled = 0;
@@ -669,7 +676,7 @@ void CGraphic::Flip()
 
         m_fifoIndex = 1 - m_fifoIndex;
 
-        GXInitFifoBase(&m_fifos[m_fifoIndex], PtrAt(this, 0x10), 0x60000);
+        GXInitFifoBase(&m_fifos[m_fifoIndex], m_fifoBuffer, 0x60000);
         GXInitFifoLimits(&m_fifos[m_fifoIndex], 0x5C000, 0x50000);
         GXSetCPUFifo(&m_fifos[m_fifoIndex]);
         GXSetGPFifo(&m_fifos[m_fifoIndex]);
@@ -678,9 +685,9 @@ void CGraphic::Flip()
     m_lastRetraceCount = VIGetRetraceCount();
 
     if (System.m_scenegraphStepMode == 1) {
-        S32At(this, 0xC) = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
+        m_frameReady = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
     } else {
-        S32At(this, 0xC) = 1;
+        m_frameReady = 1;
     }
 }
 
@@ -695,18 +702,18 @@ void CGraphic::Flip()
  */
 void CGraphic::Printf(char* fmt, ...)
 {
-    if (*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x14) < 0x70) {
+    if (m_debugStringCount < 0x70) {
         char buffer[264];
         va_list args;
         va_start(args, fmt);
         vsprintf(buffer, fmt, args);
         va_end(args);
 
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
-        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x18) = -1;
-        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x1A) = -1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = index + 1;
-        strcpy(reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + index * 0x70 + 0x1E0), buffer);
+        int index = m_debugStringCount;
+        m_debugStringPositions[index].x = -1;
+        m_debugStringPositions[index].y = -1;
+        m_debugStringCount = index + 1;
+        strcpy(m_debugStrings[index], buffer);
     }
 }
 
@@ -721,18 +728,18 @@ void CGraphic::Printf(char* fmt, ...)
  */
 void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
 {
-    if (*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x14) < 0x70) {
+    if (m_debugStringCount < 0x70) {
         char buffer[272];
         va_list args;
         va_start(args, fmt);
         vsprintf(buffer, fmt, args);
         va_end(args);
 
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
-        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x18) = static_cast<short>(x);
-        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x1A) = static_cast<short>(y);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = index + 1;
-        strcpy(reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + index * 0x70 + 0x1E0), buffer);
+        int index = m_debugStringCount;
+        m_debugStringPositions[index].x = static_cast<short>(x);
+        m_debugStringPositions[index].y = static_cast<short>(y);
+        m_debugStringCount = index + 1;
+        strcpy(m_debugStrings[index], buffer);
     }
 }
 
@@ -785,11 +792,10 @@ void CGraphic::DrawDebugString()
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 
     s16 y = 0x10;
-    u8* base = reinterpret_cast<u8*>(this);
-    for (u32 i = 0; i < *reinterpret_cast<u32*>(base + 0x14); ++i) {
-        s16 xCell = *reinterpret_cast<s16*>(base + 0x18 + i * 4);
-        s16 yCell = *reinterpret_cast<s16*>(base + 0x1A + i * 4);
-        char* text = reinterpret_cast<char*>(base + 0x1E0 + i * 0x70);
+    for (u32 i = 0; i < static_cast<u32>(m_debugStringCount); ++i) {
+        s16 xCell = m_debugStringPositions[i].x;
+        s16 yCell = m_debugStringPositions[i].y;
+        char* text = m_debugStrings[i];
 
         if (xCell == -1) {
             DrawDebugStringDirect(0x10, static_cast<u32>(y), text, 0xC);
@@ -2031,8 +2037,8 @@ void CGraphic::CreateTempBuffer()
 	u16 efbHeight = renderMode->efbHeight;
 	u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
 	m_scratchTextureBuffer =
-	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-	                  const_cast<char*>(sGraphicSourceStrings), 0xB53, 0);
+	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, m_scratchStage, const_cast<char*>(sGraphicSourceStrings),
+	                  0xB53, 0);
 	memset(m_scratchTextureBuffer, 0, 0x46004);
 }
 

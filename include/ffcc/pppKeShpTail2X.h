@@ -8,6 +8,8 @@ struct pppKeShpTail2X
     u8 _pad0[0xc];
     _pppPObjectHead pppPObject;
     pppFMATRIX field_0x40;
+    u8 field_0x70[0x10];
+    u8 m_workArea[1];
 };
 
 struct pppKeShpTail2XUnkB;

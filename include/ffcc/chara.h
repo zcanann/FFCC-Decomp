@@ -295,12 +295,29 @@ public:
     void CalcMogScore();
     void ChangeMogMode(int);
 public:
+    struct MogFurState
+    {
+        u16 m_texels[0x1000];                 // 0x0000
+        u32 m_dirty;                          // 0x2000
+        u32 m_unused2004;                     // 0x2004
+        u32 m_cursorX;                        // 0x2008
+        u32 m_cursorY;                        // 0x200C
+        int m_timestamp;                      // 0x2010
+        int m_score[3];                       // 0x2014
+        int m_bitScore[3];                    // 0x2020
+        int m_lineScore[3];                   // 0x202C
+        int m_circleScore[3];                 // 0x2038
+        int m_radarLevel[3];                  // 0x2044
+        int m_alphaScore;                     // 0x2050
+    };
+
     void freeFurTex();
     void makeFurTex();
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
-    Mtx& FlatPosMtx() { return m_flatPosMtx; }
+    Mtx& FlatPosMtx() { return *reinterpret_cast<Mtx*>(m_sharedState.m_storage + 0x8C); }
+    MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
 private:
     struct CDrawBuffer
@@ -309,9 +326,13 @@ private:
         u8* m_base;
     };
 
-    u8 _pad004[0x8C];                         // 0x004
-    Mtx m_flatPosMtx;                         // 0x090
-    u8 _pad0C0[0x1F98];                       // 0x0C0
+    union CSharedState
+    {
+        MogFurState m_mogFur;
+        u8 m_storage[0x2054];
+    };
+
+    CSharedState m_sharedState;               // 0x004
     CMemory::CStage* m_amemStage;             // 0x2058
     u32 m_amemSize;                           // 0x205C
     int m_drawBufferIndex;                    // 0x2060

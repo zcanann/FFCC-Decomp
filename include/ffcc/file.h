@@ -19,7 +19,6 @@ public:
 	class CHandle
 	{
 	public:
-		CHandle() {}
 		void Reset();
 		
 		CHandle* m_next;

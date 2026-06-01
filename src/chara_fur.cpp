@@ -1662,7 +1662,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	float furStep = ModelFurStep(this);
 	float furDepth = kCharaFurDepthZero;
-	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
+	Vec modelPos;
+	modelPos.x = ModelDrawMtx(this)[0][3];
+	modelPos.y = ModelDrawMtx(this)[1][3];
+	modelPos.z = ModelDrawMtx(this)[2][3];
 	Vec viewPos;
 	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
 	if (viewPos.z < kCharaFurViewDepthThreshold) {

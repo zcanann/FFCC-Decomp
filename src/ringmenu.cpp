@@ -982,32 +982,33 @@ void CRingMenu::onCalc()
 					prev = prevCandidate;
 					next = nextCandidate;
 
-					if (*trackedCmd == prevCandidate) {
-						scrollDelta = static_cast<float>(step);
-						break;
-					}
-					if (*trackedCmd == nextCandidate) {
-						scrollDelta = -static_cast<float>(step);
-						break;
-					}
-				}
-
-				if (scrollDelta == FLOAT_803309c0) {
-					int dirPos = (*trackedCmd == prev) ? 1 : 0;
-					int dirNeg = (*trackedCmd == next) ? 1 : 0;
-					if (dirPos != 0 && dirNeg != 0) {
-						unsigned short trigger = 0;
-						if ((Pad._452_4_ == 0) && !((m_menuIndex == 0) && (Pad._448_4_ != -1))) {
-							const int idx =
-								m_menuIndex &
-								~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
-							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
+					int trackedValue = *trackedCmd;
+					if (trackedValue != currentCmd) {
+						int prevDir = 0;
+						int nextDir = 0;
+						if (trackedValue == prevCandidate) {
+							prevDir = step;
 						}
-						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(dirPos) : -static_cast<float>(dirNeg);
-					} else if (dirPos != 0) {
-						scrollDelta = static_cast<float>(dirPos);
-					} else if (dirNeg != 0) {
-						scrollDelta = -static_cast<float>(dirNeg);
+						if (trackedValue == nextCandidate) {
+							nextDir = -step;
+						}
+						if ((prevDir != 0) || (nextDir != 0)) {
+							if ((prevDir != 0) && (nextDir != 0)) {
+								unsigned short trigger = 0;
+								if ((Pad._452_4_ == 0) && !((m_menuIndex == 0) && (Pad._448_4_ != -1))) {
+									const int idx =
+										m_menuIndex &
+										~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
+									trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
+								}
+								scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(prevDir) : static_cast<float>(nextDir);
+							} else if (prevDir != 0) {
+								scrollDelta = static_cast<float>(prevDir);
+							} else if (nextDir != 0) {
+								scrollDelta = static_cast<float>(nextDir);
+							}
+							break;
+						}
 					}
 				}
 			}

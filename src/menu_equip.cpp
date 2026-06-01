@@ -1110,16 +1110,14 @@ void CMenuPcs::EquipInit1()
 	short* psVar13;
 	int iVar14;
 	unsigned int uVar15;
-	s16* equipList;
 
-	equipList = GetEquipList(this);
 	fVar5 = FLOAT_80332f14;
 	fVar4 = FLOAT_80332f10;
 	fVar3 = FLOAT_80332ee0;
 	fVar2 = FLOAT_80332eb8;
 	sVar7 = 0;
-	iVar8 = (int)equipList[0];
-	psVar10 = equipList + iVar8 * 0x20 + 4;
+	iVar8 = (int)GetEquipList(this)[0];
+	psVar10 = GetEquipList(this) + iVar8 * 0x20 + 4;
 	*(int*)(psVar10 + 0xe) = 0x2e;
 	*psVar10 = 0xb8;
 	psVar10[1] = 0x28;
@@ -1134,7 +1132,7 @@ void CMenuPcs::EquipInit1()
 	*(int*)(psVar10 + 0x12) = 5;
 	*(int*)(psVar10 + 0x14) = 5;
 
-	puVar12 = equipList + (iVar8 + 1) * 0x20 + 4;
+	puVar12 = GetEquipList(this) + (iVar8 + 1) * 0x20 + 4;
 	*(int*)(puVar12 + 0xe) = 0x2f;
 	*puVar12 = 0xa0;
 	puVar12[1] = 0xe;
@@ -1146,7 +1144,7 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	puVar12 = equipList + (iVar8 + 2) * 0x20 + 4;
+	puVar12 = GetEquipList(this) + (iVar8 + 2) * 0x20 + 4;
 	*(int*)(puVar12 + 0xe) = 0x2f;
 	puVar12[2] = 0x30;
 	puVar12[3] = 0x30;
@@ -1158,7 +1156,7 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	puVar12 = equipList + (iVar8 + 3) * 0x20 + 4;
+	puVar12 = GetEquipList(this) + (iVar8 + 3) * 0x20 + 4;
 	*(int*)(puVar12 + 0x16) = 2;
 	*(int*)(puVar12 + 0xe) = 0x2e;
 	*puVar12 = 0xa0;
@@ -1170,10 +1168,10 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	psVar10 = equipList + equipList[0] * 0x20 + 4;
+	psVar10 = GetEquipList(this) + GetEquipList(this)[0] * 0x20 + 4;
 	iVar8 = 4;
 	do {
-		psVar13 = (short*)((char*)equipList + iVar11 + 8);
+		psVar13 = (short*)((char*)GetEquipList(this) + iVar11 + 8);
 		*(int*)(psVar13 + 0x16) = 2;
 		*(int*)(psVar13 + 0xe) = 0x37;
 		iVar9 = iVar9 + 2;
@@ -1189,7 +1187,7 @@ void CMenuPcs::EquipInit1()
 
 		iVar14 = iVar11 + 0x48;
 		iVar11 = iVar11 + 0x80;
-		psVar13 = (short*)((char*)equipList + iVar14);
+		psVar13 = (short*)((char*)GetEquipList(this) + iVar14);
 		*(int*)(psVar13 + 0x16) = 2;
 		*(int*)(psVar13 + 0xe) = 0x37;
 		*psVar13 = *psVar10 + 0x24;
@@ -1205,8 +1203,8 @@ void CMenuPcs::EquipInit1()
 		iVar8 = iVar8 - 1;
 	} while (iVar8 != 0);
 
-	equipList[1] = (short)iVar9;
-	psVar10 = equipList;
+	GetEquipList(this)[1] = (short)iVar9;
+	psVar10 = GetEquipList(this);
 	uVar6 = (unsigned int)((int)psVar10[1] - (int)*psVar10);
 	psVar10 = psVar10 + *psVar10 * 0x20 + 4;
 	if (0 < (int)uVar6) {

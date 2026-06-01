@@ -24,7 +24,6 @@ extern "C" const float FLOAT_803306e8 = 0.0f;
 extern "C" const float FLOAT_803306ec = 1.0f;
 
 extern "C" const char s_fontman_cpp[] = "fontman.cpp";
-static const char s_CFontMan[] = "CFontMan";
 
 CFontMan FontMan;
 
@@ -865,7 +864,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>("CFontMan"), 0);
 	m_stage = stage;
 
 	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;

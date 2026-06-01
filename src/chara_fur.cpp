@@ -30,6 +30,18 @@ extern const float kPppLensFlareAlphaScale = 0.0078125f;
 extern const float kPppLensFlareNegate = -1.0f;
 extern const float kPppLensFlareZScale = 16777215.0f;
 extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+extern const float FLOAT_80331078 = 320.0f;
+extern const float FLOAT_8033107C = 224.0f;
+extern const float FLOAT_80331080 = -0.5f;
+extern const float FLOAT_80331084 = 0.0f;
+extern const double DOUBLE_80331088 = 0.5;
+extern const double DOUBLE_80331090 = 3.0;
+extern const double DOUBLE_80331098 = 0.0;
+extern const float FLOAT_803310A0 = 0.000001f;
+extern const float FLOAT_803310A4 = 1.0f;
+extern const float FLOAT_803310A8 = 2.0f;
+extern const double kYmEnvRadToDeg;
+extern const float kYmEnvDefaultScale;
 extern "C" {
 double atan2(double, double);
 double sqrt(double);
@@ -65,7 +77,7 @@ public:
 
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
-extern "C" char sMogFurTextureName[];
+extern "C" char sMogFurTextureName[8];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
 void* DAT_8032EDEC;
@@ -73,6 +85,7 @@ void* gMogFurTexBuffer;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
+extern float FLOAT_80331120;
 extern float FLOAT_80331130;
 extern float FLOAT_80331134;
 extern float FLOAT_8033113C;
@@ -573,7 +586,8 @@ static int FurColorMatch(CColor src, CColor ref)
 	}
 	db += 7 - static_cast<int>(src.color.a);
 
-	return (dr < 6 && dg < 6 && db < 6) ? 1 : 0;
+	int hits = (dr < 6) + (dg < 6) + (db < 6);
+	return static_cast<unsigned int>(__cntlzw(3 - hits)) >> 5;
 }
 
 /*
@@ -615,19 +629,15 @@ void CChara::CalcMogScore()
 			CColor srcColor(static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b),
 			                static_cast<unsigned char>(a));
 
-			fur.m_alphaScore += a;
-
 			int colorHit[3];
 			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2));
 			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2));
 			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2));
+			fur.m_alphaScore += a;
 
 			const int ring = dist % 12;
-			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
+			int angle = static_cast<int>(kYmEnvRadToDeg * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
 			angle %= 0x2D;
-			if (angle < 0) {
-				angle += 0x2D;
-			}
 
 			for (int i = 0; i < 3; i++) {
 				if (ring >= i * 4 && ring < (i + 1) * 4) {
@@ -687,11 +697,11 @@ void CChara::CalcMogScore()
 		const int b1 = fur.m_score[1];
 		const int b2 = fur.m_score[2];
 
-		if (b0 > 2 && 0.75f * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+		if (b0 > 2 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (b1 > 2 && 0.75f * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+		} else if (b1 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
-		} else if (b2 > 2 && 0.75f * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+		} else if (b2 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
 			Game.m_gameWork.m_mogScoreRadarType = 0;
@@ -802,18 +812,18 @@ static inline unsigned short PackFurTexel(int r, int g, int b, int a)
 	return static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((a & 7) << 12));
 }
 
-static float FurRand01(unsigned int& rng)
+static inline float FurRand01(unsigned int& rng)
 {
 	rng = rng * 0x41C64E6D + 0x3039;
 	return static_cast<float>((rng >> 16) & 0x7FFF) / 32767.0f;
 }
 
-static float FurRandSigned(unsigned int& rng)
+static inline float FurRandSigned(unsigned int& rng)
 {
 	return FurRand01(rng) * 2.0f - 1.0f;
 }
 
-static int FurBlendNibble(int base, int add, float t)
+static inline int FurBlendNibble(int base, int add, float t)
 {
 	int value = static_cast<int>(base + (add - base) * t);
 	if (value < 0) {
@@ -854,7 +864,7 @@ static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b
 	*texel = PackFurTexel(r, g, b, a);
 }
 
-static void FurInitTextureDefaults()
+static inline void FurInitTextureDefaults()
 {
 	if (!s_mogFurBaseColorsInit) {
 		s_mogFurBaseColor = CColor(0x80, 0x80, 0x80, 0xFF).color;
@@ -897,7 +907,7 @@ static void FurInitTextureDefaults()
 	}
 }
 
-static void FurSetupTextureCopyEnv()
+static inline void FurSetupTextureCopyEnv()
 {
 	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
 	GXSetAlphaUpdate(GX_TRUE);
@@ -926,7 +936,7 @@ static void FurSetupTextureCopyEnv()
 	GXSetProjection(projection, GX_ORTHOGRAPHIC);
 }
 
-static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
+static inline void FurInitHairSet(CHairSet& hair, unsigned int& rng)
 {
 	float velocityScale = FurRandSigned(rng);
 	hair.m_vec0.x = s_mogFurVelocity.x + s_mogFurVelocityRand.x * velocityScale;
@@ -1054,7 +1064,7 @@ static inline void StopMogLoopSe(MogWorkRaw& work)
 	}
 }
 
-static CTexture* FindMogFurTexture(void* model)
+static inline CTexture* FindMogFurTexture(void* model)
 {
 	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
@@ -1064,7 +1074,7 @@ static CTexture* FindMogFurTexture(void* model)
 	return (*textureArray)[textureIdx];
 }
 
-static void CopyMogTextureFromChara(void* model)
+static inline void CopyMogTextureFromChara(void* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
@@ -1136,28 +1146,34 @@ static void OpenMogHintMessage(int messageId)
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
-	int i = 0;
+	MogFurState& charaFur = Chara.MogFur();
+	unsigned char* texels = reinterpret_cast<unsigned char*>(charaFur.m_texels);
+	int rowCount = 0;
 	int row = 0;
 	do {
 		int inner = 0;
-		for (int count = 8; count != 0; count--) {
+		int byteOffset = row << 1;
+		int count = 8;
+		do {
 			int idxBase = inner + row;
-			fur.m_texels[idxBase] = 0x7FFF;
-			fur.m_texels[idxBase + 1] = 0x7FFF;
-			fur.m_texels[idxBase + 2] = 0x7FFF;
-			fur.m_texels[idxBase + 3] = 0x7FFF;
-			fur.m_texels[idxBase + 4] = 0x7FFF;
-			fur.m_texels[idxBase + 5] = 0x7FFF;
-			fur.m_texels[idxBase + 6] = 0x7FFF;
-			fur.m_texels[idxBase + 7] = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + byteOffset) = 0x7FFF;
+			byteOffset += 0x10;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 2) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 6) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 8) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 10) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 12) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(texels + idxBase * 2 + 14) = 0x7FFF;
 			inner += 8;
-		}
-		i++;
+			count--;
+		} while (count != 0);
+		rowCount++;
 		row += 0x40;
-	} while (i < 0x40);
+	} while (rowCount < 0x40);
 
 	fur.m_dirty = 0;
-	fur.m_timestamp = System.m_frameCounter;
+	charaFur.m_timestamp = System.m_frameCounter;
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }
@@ -1227,8 +1243,7 @@ void CChara::CModel::InitMogFurTex()
 		}
 
 		texture->InitTexObj();
-		unsigned char flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0);
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0) = (flags & 0xBF) | 0x40;
+		m_flagsA0 = static_cast<unsigned char>(__rlwimi(m_flagsA0, 1, 6, 25, 25));
 	}
 }
 
@@ -1647,7 +1662,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	float furStep = ModelFurStep(this);
 	float furDepth = kCharaFurDepthZero;
-	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
+	Vec modelPos;
+	modelPos.x = ModelDrawMtx(this)[0][3];
+	modelPos.y = ModelDrawMtx(this)[1][3];
+	modelPos.z = ModelDrawMtx(this)[2][3];
 	Vec viewPos;
 	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
 	if (viewPos.z < kCharaFurViewDepthThreshold) {
@@ -1957,14 +1975,15 @@ void CChara::makeFurTex()
  */
 void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
+	int dy;
+
+	CColor defaultColor(0x0f, 0x0f, 0x0f, 0);
+	*centerAfter = defaultColor.color;
+	*centerBefore = *centerAfter;
+
 	int texelCountBytes = width * height * 2;
 	int centerX = (int)((float)width * fx);
 	int centerY = (int)((float)height * fy);
-	int dy;
-
-	static const _GXColor defaultColor = {0x0f, 0x0f, 0x0f, 0};
-	*centerAfter = defaultColor;
-	*centerBefore = *centerAfter;
 
 	DCInvalidateRange(pixels, texelCountBytes);
 
@@ -2007,7 +2026,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 					a = 0;
 				}
 			} else {
-				float k = (float)(7 - targetColor.a) * 0.125f + (float)(distance / 4);
+				float k = (float)(7 - targetColor.a) / FLOAT_80331120 + (float)(distance / 4);
 				if (k > 1.0f) {
 					k = 1.0f;
 				}

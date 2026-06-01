@@ -366,7 +366,7 @@ maptexanim.cpp:
 	.rodata     start:0x801D7E98 end:0x801D7EE0
 	.data       start:0x801EA998 end:0x801EA9B0
 	.sdata      start:0x8032E688 end:0x8032E698
-	.sdata2     start:0x8032FCD0 end:0x8032FCDC
+	.sdata2     start:0x8032FD40 end:0x8032FD68
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0

@@ -35,13 +35,6 @@ typedef CChara::CMesh EmissionMeshRef;
 
 struct EmissionState;
 
-struct EmissionModelView {
-    u8 _pad0[0xA4];
-    CCharaModelData* m_data;
-    u8 _padA8[0x4];
-    EmissionMeshRef* m_meshes;
-};
-
 struct EmissionState {
     void* m_particles;
     int m_texture;
@@ -69,16 +62,14 @@ struct EmissionParticle {
     u8 m_padF;
 };
 
-STATIC_ASSERT(offsetof(EmissionModelView, m_data) == 0xA4);
-STATIC_ASSERT(offsetof(EmissionModelView, m_meshes) == 0xAC);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
 
-static inline EmissionMeshData* EmissionMeshAt(EmissionModelView* modelView, int meshIndex)
+static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {
-    return modelView->m_meshes[meshIndex].m_data;
+    return model->m_meshes[meshIndex].m_data;
 }
 
 static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, pppEmissionUnkB* step)
@@ -331,10 +322,9 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
     Graphic.SetDrawDoneDebugData(0x66);
 
-    EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
-    EmissionMeshData* meshData = EmissionMeshAt(modelView, meshIndex);
+    EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
         u32 drawTevBits = 0xACE0F;
@@ -382,7 +372,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
-                    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                    MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
@@ -435,7 +425,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
-                    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                    MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
@@ -476,8 +466,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
     Graphic.SetDrawDoneDebugData(0x64);
 
-    EmissionModelView* modelView = (EmissionModelView*)model;
-    EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
+    EmissionMeshData* meshData = model->m_meshes[meshIndex].m_data;
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
@@ -487,7 +476,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
         meshData->m_colors[2] = 0;
         meshData->m_colors[3] = 0;
     } else {
-        MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+        MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
         Graphic.SetDrawDoneDebugData(0x65);
     }

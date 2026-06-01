@@ -85,19 +85,9 @@ typedef CChara::CMesh::CDisplayList CharaBreakDisplayList;
 typedef CChara::CMesh::CRefData CharaBreakMeshData;
 typedef CChara::CMesh CharaBreakMeshRef;
 
-struct CharaBreakModelView {
-    u8 _pad0[0xA4];
-    CCharaModelData* m_data;
-    void* m_nodes;
-    CharaBreakMeshRef* m_meshes;
-};
-
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
 STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
 STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
@@ -110,7 +100,7 @@ STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 {
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x8);
+    return model->m_matrix;
 }
 
 static inline CCharaModelData* ModelData(CChara::CModel* model)
@@ -120,17 +110,17 @@ static inline CCharaModelData* ModelData(CChara::CModel* model)
 
 static inline void* ModelNodes(CChara::CModel* model)
 {
-    return *reinterpret_cast<void**>(reinterpret_cast<u8*>(model) + 0xA8);
+    return model->m_nodes;
 }
 
 static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
 {
-    return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
+    return model->m_meshes;
 }
 
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 {
-    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
+    return mesh->m_data;
 }
 
 static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)

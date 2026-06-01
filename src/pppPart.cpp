@@ -281,13 +281,17 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800573f0
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppCopyVector(Vec& dest, Vec source)
 { 
-	float y = source.y;
 	float x = source.x;
+	float y = source.y;
 	dest.x = x;
 	float z = source.z;
 	dest.y = y;

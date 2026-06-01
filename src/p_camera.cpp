@@ -109,9 +109,9 @@ unsigned int CCameraPcs::m_table_desc21[3] = {0, 0xFFFFFFFF, reinterpret_cast<un
 unsigned int CCameraPcs::m_table_desc22[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
 unsigned int CCameraPcs::m_table_desc23[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
 unsigned int CCameraPcs::m_table_desc24[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
+CProcessTable CCameraPcs::m_table[7] = {
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_GAME_801D7860)),
+        const_cast<char*>(s_CCameraPcs_GAME_801D7860),
         m_table_desc0[0],
         m_table_desc0[1],
         m_table_desc0[2],
@@ -131,7 +131,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         m_table_desc4[2],
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_CHARA_801D7874)),
+        const_cast<char*>(s_CCameraPcs_CHARA_801D7874),
         m_table_desc5[0],
         m_table_desc5[1],
         m_table_desc5[2],
@@ -145,7 +145,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x4,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_MAP_801D7888)),
+        const_cast<char*>(s_CCameraPcs_MAP_801D7888),
         m_table_desc8[0],
         m_table_desc8[1],
         m_table_desc8[2],
@@ -159,7 +159,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x4,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_MATERIALEDITOR_801D7898)),
+        const_cast<char*>(s_CCameraPcs_MATERIALEDITOR_801D7898),
         m_table_desc11[0],
         m_table_desc11[1],
         m_table_desc11[2],
@@ -173,7 +173,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x4,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_FUNNYSHAPE_801D78B4)),
+        const_cast<char*>(s_CCameraPcs_FUNNYSHAPE_801D78B4),
         m_table_desc14[0],
         m_table_desc14[1],
         m_table_desc14[2],
@@ -187,7 +187,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x4,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_PART_801D78CC)),
+        const_cast<char*>(s_CCameraPcs_PART_801D78CC),
         m_table_desc17[0],
         m_table_desc17[1],
         m_table_desc17[2],
@@ -201,7 +201,7 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x4,
     },
     {
-        reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_SHADOW_801D78E0)),
+        const_cast<char*>(s_CCameraPcs_SHADOW_801D78E0),
         m_table_desc20[0],
         m_table_desc20[1],
         m_table_desc20[2],
@@ -295,7 +295,7 @@ void CCameraPcs::Quit()
  */
 int CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	return reinterpret_cast<int>(CCameraPcs::m_table[tableIndex]);
+	return reinterpret_cast<int>(&CCameraPcs::m_table[tableIndex]);
 }
 
 /*

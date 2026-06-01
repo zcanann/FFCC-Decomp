@@ -22,17 +22,6 @@ static inline unsigned short* GetItemDataPtr(int itemIdx)
 	return (unsigned short*)(Game.unkCFlatData0[2] + (itemIdx * 0x48));
 }
 
-struct GobjworkFlatTableEntry {
-	int count;
-	const char** index;
-	char* buffer;
-};
-
-struct GobjworkFlatData {
-	char pad[0x6C];
-	GobjworkFlatTableEntry table[8];
-};
-
 struct ShoukiByteFlags {
 	int upper : 1;
 	unsigned int pad0 : 2;
@@ -2293,8 +2282,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 	}
 
 	int itemId = DelCmdListAndItem(cmdListIdx);
-	const GobjworkFlatData* flatData = reinterpret_cast<const GobjworkFlatData*>(&Game.m_cFlatDataArr[1]);
-	return reinterpret_cast<int>(flatData->table[0].index[itemId * 5 + 4]);
+	return reinterpret_cast<int>(Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4]);
 }
 
 /*

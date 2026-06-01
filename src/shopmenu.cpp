@@ -164,20 +164,9 @@ static inline int& ShopMenuInt(CShopMenu* shopMenu, int offset)
     return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
 }
 
-struct ShopMenuFlatTableEntry {
-    int count;
-    const char** index;
-    char* buffer;
-};
-
-struct ShopMenuFlatData {
-    char pad[0x6C];
-    ShopMenuFlatTableEntry table[8];
-};
-
 static inline int* GetShopMenuHelpMsgTable()
 {
-    return reinterpret_cast<int*>(reinterpret_cast<ShopMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[6].index);
+    return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(6));
 }
 
 static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)

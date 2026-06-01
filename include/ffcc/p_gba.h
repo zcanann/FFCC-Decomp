@@ -4,12 +4,6 @@
 #include "ffcc/system.h"
 #include "ffcc/memory.h"
 
-struct CGbaPcsTable
-{
-    char* m_name;
-    unsigned int m_words[0x56];
-};
-
 class CGbaPcs : public CProcess
 {
 public:
@@ -32,7 +26,7 @@ public:
 
     CMemory::CStage* m_stage;
 
-    static CGbaPcsTable m_table;
+    static CProcessTable m_table;
 };
 
 extern "C" void create__7CGbaPcsFv(CGbaPcs*);

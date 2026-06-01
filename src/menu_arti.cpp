@@ -167,18 +167,6 @@ static inline CFont* GetArtiHelpFont(CMenuPcs* menu)
 }
 } // namespace
 
-struct ArtiFlatTableEntry
-{
-	int count;
-	const char** strings;
-	char* stringBuf;
-};
-
-struct ArtiFlatData
-{
-	char pad0[0x6C];
-	ArtiFlatTableEntry table[8];
-};
 static inline double IntToF64(unsigned int value)
 {
 	unsigned long long bits = ((unsigned long long)0x43300000 << 32) | (unsigned long long)(value ^ 0x80000000);
@@ -404,7 +392,6 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	short* textEntry = listStart;
-	const ArtiFlatData* flatData = reinterpret_cast<const ArtiFlatData*>(&Game.m_cFlatDataArr[1]);
 	for (int i = 0; i < 8; i++) {
 		u8 alpha = (u8)(FLOAT_80332fc0 * *(float*)(textEntry + 8));
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
@@ -416,7 +403,7 @@ void CMenuPcs::ArtiDraw()
 		if (itemCount < 1) {
 			text = GetMenuStr(0x14);
 		} else {
-			text = flatData->table[0].strings[itemCount * 5 + 4];
+			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
 			if (menuIndex == (int)*(short*)(GetArtiStateBase(this) + 0x26) + (int)*(short*)(GetArtiStateBase(this) + 0x34)) {
 				hasSelectedArtifact = 1;
 				selectedArtifactId = itemCount;

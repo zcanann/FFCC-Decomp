@@ -181,17 +181,6 @@ STATIC_ASSERT(sizeof(BonusAnimHeader) == 8);
 STATIC_ASSERT(sizeof(BonusAnimSprite) == 0x40);
 STATIC_ASSERT(sizeof(BonusAnimList) == 0x1008);
 
-struct BonusFlatTableRaw {
-	int m_numEntries;
-	char** m_strings;
-	char* m_stringBuf;
-};
-
-struct BonusFlatDataRaw {
-	unsigned char pad_0000[0x6C];
-	BonusFlatTableRaw m_table[8];
-};
-
 struct BonusMenuStateRaw {
 	unsigned char bytes[0x48];
 };
@@ -567,9 +556,8 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 	font->SetColor(color.color);
 
-	BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
 	int itemId = (int)rewardItems[selection];
-	char* title = flat->m_table[0].m_strings[itemId * 5 + 4];
+	char* title = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
 	float centerX = (float)((double)frame->x + (double)(float)frame->w * 0.5);
 	float centerY = (float)((double)frame->y + (double)(float)frame->h * 0.5);
 	font->SetPosX((float)-((double)font->GetWidth(title) * 0.5 - (double)centerX));
@@ -586,7 +574,7 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 		System.Printf(const_cast<char*>(s_bonusAllocErrorFmt), const_cast<char*>(s_bonus_menu_cpp), 0xAA8);
 	}
 	memset(converted, 0, 0x200);
-	strcpy(source, flat->m_table[6].m_strings[itemId]);
+	strcpy(source, Game.m_cFlatDataArr[1].TableStrings(6)[itemId]);
 	CMes::MakeAgbString(converted, source, 0, 0);
 	strlen(converted);
 
@@ -718,12 +706,11 @@ static inline const char* GetBonusResultLabelByActiveIndex(int activeIndex)
 		return 0;
 	}
 
-	BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
-	if (flat->m_table[7].m_strings == 0 || labelIndex >= flat->m_table[7].m_numEntries) {
+	if (Game.m_cFlatDataArr[1].TableStrings(7) == 0 || labelIndex >= Game.m_cFlatDataArr[1].Table(7).m_numEntries) {
 		return 0;
 	}
 
-	return flat->m_table[7].m_strings[labelIndex];
+	return Game.m_cFlatDataArr[1].TableStrings(7)[labelIndex];
 }
 
 } // namespace
@@ -1966,8 +1953,7 @@ void CMenuPcs::DrawResultCloseAnim()
 			if (textIndex < activePartyCount) {
 				strcpy(text, reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd));
 			} else {
-				BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
-				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
+				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
 			float y = (float)sprite->y + sprite->motionY;
@@ -2317,8 +2303,7 @@ void CMenuPcs::DrawResultCountAnim()
 			if (textIndex < activePartyCount) {
 				strcpy(text, reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd));
 			} else {
-				BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
-				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
+				strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
 			float y = (float)sprite->y + sprite->motionY;
@@ -2641,8 +2626,7 @@ void CMenuPcs::DrawResultOpenAnim()
 				if (textIndex < activePartyCount) {
 					strcpy(text, reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd));
 				} else {
-					BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
-					strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
+					strcpy(text, Game.m_cFlatDataArr[1].TableStrings(7)[(int)caravanWork->m_bonusCondition * 2 + 1]);
 				}
 
 				float y = (float)sprite->y + sprite->motionY;

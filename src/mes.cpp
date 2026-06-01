@@ -30,21 +30,6 @@ static const char s_mesEmpty[] = "";
 static char* sTag54Source;
 static char sTag54Init;
 
-struct CMesFlatTableView
-{
-	int m_numEntries;
-	char** m_strings;
-	char* m_stringBuf;
-};
-
-struct CMesFlatDataView
-{
-	int m_dataCount;
-	unsigned char _pad[0x68 - 4];
-	int m_tableCount;
-	CMesFlatTableView m_tabl[8];
-};
-
 static inline int GetMesNibbleValue(const char* data)
 {
 	int low = (unsigned char)data[1] & 0x0F;
@@ -103,7 +88,10 @@ static void ApplyCaseMode(char* text, int& caseMode)
 	caseMode = 0;
 }
 
-#define FLAT_NAME_DIRECT(tableIdx, entryIdx) (((CMesFlatDataView*)&Game.m_cFlatDataArr[1])->m_tabl[(tableIdx)].m_strings[(entryIdx)])
+static inline char* FlatNameDirect(int tableIndex, int entryIndex)
+{
+	return Game.m_cFlatDataArr[1].TableStrings(tableIndex)[entryIndex];
+}
 
 static void AdvanceMesLine(CMes* mes, CFont* font)
 {
@@ -253,7 +241,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 8:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			const char* text = FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]);
+			const char* text = FlatNameDirect(5, CMes::m_tempVar[varIndex]);
 			strcpy(dst, text);
 			dst += strlen(dst);
 			next = in + 6;
@@ -271,15 +259,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 9) || (tag == 0x37))
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 1));
+				strcpy(dst, FlatNameDirect(0, value * 5 + 1));
 			}
 			else if (tag == 0x1D)
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5));
+				strcpy(dst, FlatNameDirect(0, value * 5));
 			}
 			else if (tag == 0x39)
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 3));
+				strcpy(dst, FlatNameDirect(0, value * 5 + 3));
 			}
 			else if (tag == 0x3B)
 			{
@@ -314,15 +302,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 0x2A) || (tag == 0x38))
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 1));
+				strcpy(dst, FlatNameDirect(1, value * 5 + 1));
 			}
 			else if (tag == 0x1E)
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5));
+				strcpy(dst, FlatNameDirect(1, value * 5));
 			}
 			else if (tag == 0x3A)
 			{
-				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 3));
+				strcpy(dst, FlatNameDirect(1, value * 5 + 3));
 			}
 			else if (tag == 0x3C)
 			{
@@ -348,7 +336,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2B:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, FLAT_NAME_DIRECT(2, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FlatNameDirect(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -356,7 +344,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2C:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -364,7 +352,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2D:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex] + 0x3C));
+			strcpy(dst, FlatNameDirect(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -372,7 +360,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2E:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			strcpy(dst, FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 4;
 			break;
@@ -996,7 +984,7 @@ void CMes::addString(char** text, int branchMode)
 				{
 					*(int*)((char*)this + 0x3D28) = 6;
 				}
-				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				char* flatText = FlatNameDirect(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 				addString(&flatText, branchMode);
 				*(int*)((char*)this + 0x3D28) = oldColor;
 				break;
@@ -1022,10 +1010,10 @@ void CMes::addString(char** text, int branchMode)
 				{
 				case 9:
 				case 0x37:
-					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 1));
+					strcpy(namePtr, FlatNameDirect(0, value * 5 + 1));
 					break;
 				case 0x1D:
-					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5));
+					strcpy(namePtr, FlatNameDirect(0, value * 5));
 					break;
 				case 0x3B:
 					Game.MakeArtItemName(namePtr, value, 1);
@@ -1040,7 +1028,7 @@ void CMes::addString(char** text, int branchMode)
 					Game.MakeNumItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 					break;
 				case 0x39:
-					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 3));
+					strcpy(namePtr, FlatNameDirect(0, value * 5 + 3));
 					break;
 				}
 				ApplyCaseMode(namePtr, caseMode);
@@ -1068,11 +1056,11 @@ void CMes::addString(char** text, int branchMode)
 				switch (tag)
 				{
 				case 0x1E:
-					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5));
+					strcpy(namePtr, FlatNameDirect(1, value * 5));
 					break;
 				case 0x2A:
 				case 0x38:
-					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 1));
+					strcpy(namePtr, FlatNameDirect(1, value * 5 + 1));
 					break;
 				case 0x3C:
 					Game.MakeArtMonName(namePtr, value, 1);
@@ -1087,7 +1075,7 @@ void CMes::addString(char** text, int branchMode)
 					Game.MakeNumMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 					break;
 				case 0x3A:
-					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 3));
+					strcpy(namePtr, FlatNameDirect(1, value * 5 + 3));
 					break;
 				}
 				ApplyCaseMode(namePtr, caseMode);
@@ -1104,7 +1092,7 @@ void CMes::addString(char** text, int branchMode)
 				}
 				char name[32];
 				char* namePtr = name;
-				strcpy(namePtr, FLAT_NAME_DIRECT(2, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				strcpy(namePtr, FlatNameDirect(2, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
 				ApplyCaseMode(namePtr, caseMode);
 				addString(&namePtr, branchMode);
 				*(int*)((char*)this + 0x3D28) = oldColor;
@@ -1119,7 +1107,7 @@ void CMes::addString(char** text, int branchMode)
 				}
 				char name[32];
 				char* namePtr = name;
-				strcpy(namePtr, FLAT_NAME_DIRECT(3, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				strcpy(namePtr, FlatNameDirect(3, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
 				ApplyCaseMode(namePtr, caseMode);
 				addString(&namePtr, branchMode);
 				*(int*)((char*)this + 0x3D28) = oldColor;
@@ -1134,7 +1122,7 @@ void CMes::addString(char** text, int branchMode)
 				}
 				char name[32];
 				char* namePtr = name;
-				strcpy(namePtr, FLAT_NAME_DIRECT(3, (CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF) + 0x3C));
+				strcpy(namePtr, FlatNameDirect(3, (CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF) + 0x3C));
 				ApplyCaseMode(namePtr, caseMode);
 				addString(&namePtr, branchMode);
 				*(int*)((char*)this + 0x3D28) = oldColor;
@@ -1142,7 +1130,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2E:
 			{
-				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				char* flatText = FlatNameDirect(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 				addString(&flatText, branchMode);
 				break;
 			}

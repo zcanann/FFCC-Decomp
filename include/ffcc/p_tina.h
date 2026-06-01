@@ -37,7 +37,7 @@ public:
     static unsigned int m_table_desc16[3];
     static unsigned int m_table_desc17[3];
     static unsigned int m_table_desc18[3];
-    static unsigned int m_table[2][0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table[2];
 
     CUSBStreamData m_usbStreamData; // 0x04
 

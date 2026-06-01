@@ -42,7 +42,7 @@ inline CGbaPcs::CGbaPcs()
 	table[14] = desc3[2];
 }
 
-CGbaPcsTable CGbaPcs::m_table = {
+CProcessTable CGbaPcs::m_table = {
     const_cast<char*>(s_CGbaPcs_80330870),
     {
         0x00000000,
@@ -193,9 +193,7 @@ void CGbaPcs::create()
  */
 int CGbaPcs::GetTable(unsigned long tableIndex)
 {
-	unsigned long offset = tableIndex;
-	offset *= 0x15c;
-	return (int)(reinterpret_cast<unsigned char*>(&m_table) + offset);
+	return reinterpret_cast<int>(&m_table + tableIndex);
 }
 
 /*

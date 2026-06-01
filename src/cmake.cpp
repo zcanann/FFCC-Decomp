@@ -406,19 +406,6 @@ extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
 static CmakeInfo s_CmakeInfo;
 static char s_CmakeVillageName[0x10];
 
-struct CmakeFlatTableEntry {
-    int count;
-    char** strings;
-    char* stringBuf;
-};
-
-struct CmakeFlatDataOverlay {
-    int dataCount;
-    unsigned char data[0x64];
-    int tableCount;
-    CmakeFlatTableEntry table[8];
-};
-
 static inline char* GetCmakeNameBuffer()
 {
     return s_CmakeInfo.m_name;
@@ -475,9 +462,8 @@ static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
         }
     }
 
-    CmakeFlatDataOverlay* textData = reinterpret_cast<CmakeFlatDataOverlay*>(&Game.m_cFlatDataArr[1]);
-    char** nameTable = textData->table[2].strings;
-    int nameCount = textData->table[2].count;
+    char** nameTable = Game.m_cFlatDataArr[1].TableStrings(2);
+    int nameCount = Game.m_cFlatDataArr[1].Table(2).m_numEntries;
     for (int i = 0; i < nameCount; ++i) {
         if (nameTable[i] != nullptr && strcmp(nameTable[i], name) == 0) {
             return true;

@@ -28,11 +28,11 @@ public:
     static unsigned int m_table_desc0[3];
     static unsigned int m_table_desc1[3];
     static unsigned int m_table_desc2[3];
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     CMiniGamePcs()
     {
-        unsigned int* table = reinterpret_cast<unsigned int*>(m_table);
+        unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
         table[1] = m_table_desc0[0];
         table[2] = m_table_desc0[1];
         table[3] = m_table_desc0[2];

@@ -244,4 +244,4 @@ void __GXFlushTextureState(void) {
     gx->bpSentNot = 0;
 }
 
-const f32 GXIndTexMtxScale1024[2] = { 1024.0f, 0.0f };
+const f32 GXIndTexMtxScale1024[2] = {1024.0f, 0.0f};

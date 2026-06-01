@@ -2064,10 +2064,7 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     char* name = GetCmakeNameBuffer();
-    int nameCursor = 1;
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) != 1) {
-        nameCursor = 0;
-    }
+    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10))) >> 5;
     if (4 < *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) {
         nameCursor = 0;
     }

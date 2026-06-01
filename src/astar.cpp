@@ -79,8 +79,10 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	if ((AStar.m_flags & 1) != 0)
 	{
 		unsigned int mask = m_hitAttributeMask;
-		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
+		const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
+		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
+		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
 		CMapCylinderRaw cyl;
 		float aabbMax = LoadFloat(kPolyGroupAabbMax);
 		float aabbMin = LoadFloat(kPolyGroupAabbMin);
@@ -105,8 +107,10 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	}
 	else
 	{
-		Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-		Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
+		const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
+		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
+		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
 		CMapCylinderRaw cyl;
 		float aabbMax = LoadFloat(kPolyGroupAabbMax);
 		float aabbMin = LoadFloat(kPolyGroupAabbMin);
@@ -142,8 +146,10 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
-	Vec* base = reinterpret_cast<Vec*>(&CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ));
-	Vec* top = reinterpret_cast<Vec*>(&CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z));
+	const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
+	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
+	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
 	CMapCylinderRaw cyl;
 	float aabbMax = LoadFloat(kPolyGroupAabbMax);
 	float aabbMin = LoadFloat(kPolyGroupAabbMin);

@@ -885,7 +885,7 @@ config.libs = [
         "pad",
         [
             Object(Matching, "pad/Padclamp.c"),
-            Object(NonMatching, "pad/Pad.c"),
+            Object(Matching, "pad/Pad.c"),
         ],
     ),
     DolphinLib(
@@ -913,7 +913,7 @@ config.libs = [
             Object(Matching, "ax/AXSPB.c"),
             Object(Matching, "ax/AXVPB.c"),
             Object(Matching, "ax/AXComp.c"),
-            Object(NonMatching, "ax/DSPCode.c"),
+            Object(Matching, "ax/DSPCode.c"),
         ],
     ),
     DolphinLib(
@@ -956,7 +956,7 @@ config.libs = [
     DolphinLib(
         "dsp",
         [
-            Object(NonMatching, "dsp/dsp.c"),
+            Object(Matching, "dsp/dsp.c"),
             Object(Matching, "dsp/dsp_debug.c"),
             Object(Matching, "dsp/dsp_task.c"),
         ],
@@ -964,7 +964,7 @@ config.libs = [
     DolphinLib(
         "card",
         [
-            Object(NonMatching, "card/CARDBios.c"),
+            Object(Matching, "card/CARDBios.c"),
             Object(Matching, "card/CARDBlock.c"),
             Object(Matching, "card/CARDCheck.c"),
             Object(Matching, "card/CARDCreate.c"),
@@ -985,13 +985,13 @@ config.libs = [
         "gx",
         [
             Object(Matching, "gx/GXAttr.c"),
-            Object(NonMatching, "gx/GXBump.c"),
+            Object(Matching, "gx/GXBump.c"),
             Object(Matching, "gx/GXDisplayList.c"),
             Object(Matching, "gx/GXFifo.c"),
             Object(Matching, "gx/GXFrameBuf.c"),
             Object(Matching, "gx/GXGeometry.c"),
             Object(Matching, "gx/GXInit.c", extra_cflags=["-opt nopeephole"]),
-            Object(NonMatching, "gx/GXGet.c"),
+            Object(Matching, "gx/GXGet.c"),
             Object(
                 Matching,
                 "gx/GXLight.c",
@@ -1018,7 +1018,7 @@ config.libs = [
     DolphinLib(
         "gba",
         [
-            Object(NonMatching, "gba/GBA.c"),
+            Object(Matching, "gba/GBA.c"),
             Object(Matching, "gba/GBAGetProcessStatus.c"),
             Object(Matching, "gba/GBAJoyBoot.c"),
             Object(Matching, "gba/GBARead.c"),
@@ -1068,7 +1068,7 @@ config.libs = [
                 "Runtime.PPCEABI.H/NMWException.cp",
                 extra_cflags=["-inline auto,deferred"],
             ),
-            Object(NonMatching, "Runtime.PPCEABI.H/ptmf.c"),
+            Object(Matching, "Runtime.PPCEABI.H/ptmf.c"),
             Object(Matching, "Runtime.PPCEABI.H/runtime.c"),
         ],
     },
@@ -1118,7 +1118,7 @@ config.libs = [
                 ),
             ),
             Object(Matching, "MSL_C/PPCEABI/bare/H/misc_io.c", mw_version="GC/2.6"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
+            Object(Matching, "MSL_C/PPCEABI/bare/H/printf.c", mw_version="GC/2.6"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/rand.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/signal.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/string.c"),
@@ -1266,7 +1266,7 @@ config.libs = [
         "cflags": cflags_thp,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "thp/THPDec.c"),
+            Object(Matching, "thp/THPDec.c"),
             Object(Matching, "thp/THPAudio.c"),
         ],
     },

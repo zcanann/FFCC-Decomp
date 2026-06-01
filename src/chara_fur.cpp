@@ -1423,7 +1423,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			StopMogLoopSe(work);
 		}
 	} else {
-		StopMogLoopSe(work);
+		if (MogRadarType() < 3) {
+			StopMogLoopSe(work);
+		}
 	}
 
 	if ((triggerButtons & 0x200) != 0) {

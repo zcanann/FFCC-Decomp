@@ -32,28 +32,20 @@ static inline unsigned int& LastResult(CFlatRuntime2* runtime)
 	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x96C);
 }
 
-static inline unsigned short CallEngineFlags(void* engineObject)
+static inline unsigned short EngineClassId(void* engineObject)
 {
-	typedef unsigned short (*EngineFn)(void*);
-	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
-	EngineFn fn = reinterpret_cast<EngineFn>(vtable[3]);
-	return fn(engineObject);
+	return static_cast<unsigned short>(reinterpret_cast<CGObject*>(engineObject)->GetCID());
 }
 
-static inline unsigned int CallEngineFunc48Arg(void* engineObject, unsigned int arg0)
+static inline unsigned int EngineGetClassControl(void* engineObject, unsigned int arg0)
 {
-	typedef unsigned int (*EngineFn)(void*, unsigned int);
-	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
-	EngineFn fn = reinterpret_cast<EngineFn>(vtable[0x12]);
-	return fn(engineObject, arg0);
+	return static_cast<unsigned int>(
+	    reinterpret_cast<CGPrgObj*>(engineObject)->GetClassControl(static_cast<int>(arg0)));
 }
 
-static inline void CallEngineFunc44Arg2(void* engineObject, unsigned int arg0, unsigned int arg1)
+static inline void EngineClassControl(void* engineObject, unsigned int arg0, unsigned int arg1)
 {
-	typedef void (*EngineFn)(void*, unsigned int, unsigned int);
-	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
-	EngineFn fn = reinterpret_cast<EngineFn>(vtable[0x11]);
-	fn(engineObject, arg0, arg1);
+	reinterpret_cast<CGPrgObj*>(engineObject)->ClassControl(static_cast<int>(arg0), static_cast<int>(arg1));
 }
 
 static inline CGObject* FindRuntimeObject(CFlatRuntime2* runtime, unsigned int objectId)
@@ -191,7 +183,7 @@ static inline unsigned int LoadU32(u8* base, int offset)
 void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* object, CFlatRuntime::CStack* stack, int setMode)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object);
-	const unsigned short engineFlags = CallEngineFlags(engineObject);
+	const unsigned short engineFlags = EngineClassId(engineObject);
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -421,7 +413,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
-	const unsigned short engineFlags = CallEngineFlags(engineObject);
+	const unsigned short engineFlags = EngineClassId(engineObject);
 
 	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -1458,7 +1450,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x8F:
-			CallEngineFunc44Arg2(engineObject, object->m_localBase[0], object->m_localBase[1]);
+			EngineClassControl(engineObject, object->m_localBase[0], object->m_localBase[1]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1541,7 +1533,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x9D:
 			PushValue(
-			    this, object, CallEngineFunc48Arg(engineObject, object->m_localBase[0]));
+			    this, object, EngineGetClassControl(engineObject, object->m_localBase[0]));
 			outResult = 0;
 			break;
 		case -0x9E:

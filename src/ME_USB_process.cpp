@@ -65,14 +65,18 @@ static inline void StoreSwapNegFloat(f32* value)
     *value = -*reinterpret_cast<f32*>(&swapped);
 }
 
-static inline u16 LoadSwapU16(u16 value)
+static inline void StoreSwapU16(u16* value)
 {
-    return __lhbrx(&value, 0);
+    u16 raw = *value;
+
+    *value = __lhbrx(&raw, 0);
 }
 
-static inline s16 LoadSwapS16(s16 value)
+static inline void StoreSwapS16(s16* value)
 {
-    return __lhbrx(&value, 0);
+    s16 raw = *value;
+
+    *value = __lhbrx(&raw, 0);
 }
 
 }
@@ -177,47 +181,27 @@ void CMaterialEditorPcs::SetUSBData()
         memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
 
         for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0x70, i++) {
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02));
             StoreSwap32(reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x04));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14));
-            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16) =
-                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C));
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E) =
-                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14));
+            StoreSwapU16(reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C));
+            StoreSwapS16(reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E));
         }
         DCStoreRange(rsdItem->ptr18, usb.m_sizeBytes * 0x70);
         break;
@@ -343,14 +327,14 @@ void CMaterialEditorPcs::SetUSBData()
 
         this->m_textureHeader[this->m_loadedTextureCount] = static_cast<s16*>(headerDst);
         memcpy(headerBuffer, usb.m_data, usb.m_sizeBytes);
-        headerBuffer[0] = LoadSwapU16(headerBuffer[0]);
-        headerBuffer[1] = LoadSwapU16(headerBuffer[1]);
-        headerBuffer[2] = LoadSwapU16(headerBuffer[2]);
-        headerBuffer[3] = LoadSwapU16(headerBuffer[3]);
-        headerBuffer[4] = LoadSwapU16(headerBuffer[4]);
-        headerBuffer[5] = LoadSwapU16(headerBuffer[5]);
-        headerBuffer[6] = LoadSwapU16(headerBuffer[6]);
-        headerBuffer[7] = LoadSwapU16(headerBuffer[7]);
+        StoreSwapS16(&headerBuffer[0]);
+        StoreSwapS16(&headerBuffer[1]);
+        StoreSwapS16(&headerBuffer[2]);
+        StoreSwapS16(&headerBuffer[3]);
+        StoreSwapS16(&headerBuffer[4]);
+        StoreSwapS16(&headerBuffer[5]);
+        StoreSwapS16(&headerBuffer[6]);
+        StoreSwapS16(&headerBuffer[7]);
         DCFlushRange(headerBuffer, 0x10);
         memcpy(this->m_textureHeader[this->m_loadedTextureCount], headerBuffer, 0x10);
 

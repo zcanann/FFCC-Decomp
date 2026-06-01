@@ -3187,7 +3187,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			int diff = baseParty->m_comboFrame - partyObj->m_comboFrame;
 			int minWindow = static_cast<int>(combiCursor[slot * 3 + 1]);
 			int maxWindow = static_cast<int>(combiCursor[slot * 3 + 2]);
-			if (partyList[0] != obj && (diff < minWindow || diff > maxWindow)) {
+			if (!(partyList[0] == obj || (minWindow <= diff && diff <= maxWindow))) {
 				break;
 			}
 

@@ -1026,13 +1026,10 @@ void CMenuPcs::destroyWorld()
 	freeTexture(2, 3, 0x16, 0x2F);
 
 	{
-		int** piVar2 = reinterpret_cast<int**>(bytes + 0xBC);
-		if (*piVar2 != 0) {
-			int* obj = *piVar2;
-			if (obj != 0) {
-				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
-			}
-			*reinterpret_cast<int*>(bytes + 0xBC) = 0;
+		CMenu** menu = reinterpret_cast<CMenu**>(bytes + 0xBC);
+		if (*menu != 0) {
+			delete *menu;
+			*menu = 0;
 		}
 	}
 

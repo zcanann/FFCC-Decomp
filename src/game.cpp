@@ -233,27 +233,30 @@ CGame::~CGame()
  */
 void CGame::Init()
 {
-    switch (OSSetProgressiveMode()) {
+    int languageId;
+
+    switch (static_cast<unsigned char>(OSSetProgressiveMode())) {
     case 3:
-        m_gameWork.m_languageId = 5;
+        languageId = 5;
         break;
 
     case 1:
-        m_gameWork.m_languageId = 2;
+        languageId = 2;
         break;
 
     case 2:
-        m_gameWork.m_languageId = 4;
+        languageId = 4;
         break;
 
     case 4:
-        m_gameWork.m_languageId = 3;
+        languageId = 3;
         break;
 
     default:
-        m_gameWork.m_languageId = 1;
+        languageId = 1;
         break;
     }
+    Game.m_gameWork.m_languageId = static_cast<unsigned char>(languageId);
 
     CameraPcs.Init();
     GraphicPcs.Init();

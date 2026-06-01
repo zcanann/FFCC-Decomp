@@ -110,7 +110,7 @@ CRelProfile g_mapStage;
 CRelProfile g_mapSection;
 CRelProfile g_hit_prof;
 unsigned char g_map_calc_prof;
-unsigned char g_map_draw_prof;
+unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;

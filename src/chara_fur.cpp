@@ -1342,7 +1342,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		const unsigned char radarType = MogRadarType();
 		const _GXColor brushColor = MogBrushColor(radarType);
 		const int eraseMode = (radarType == 4) ? 1 : 0;
-		const int doPaint = (radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 0 : 1) : 1;
+		const int doPaint = (radarType == 3 || radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 1 : 0) : 1;
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;

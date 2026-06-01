@@ -220,7 +220,7 @@ CMapAnim::CMapAnim()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, int loopFrameCount)
+inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, int loopFrameCount)
 {
     CMapAnimNodeTrackKey* keys = track->keys;
     int trackCount = track->count;
@@ -452,7 +452,7 @@ void CMapAnimNode::Interp(int frame)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
+inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
 {
     unsigned int chunkData[4];
     unsigned int& chunkId = chunkData[0];
@@ -502,7 +502,7 @@ void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAnim)
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapAnimNode::~CMapAnimNode()
+inline CMapAnimNode::~CMapAnimNode()
 {
     m_mapAnim = 0;
 }
@@ -516,7 +516,7 @@ CMapAnimNode::~CMapAnimNode()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapAnimNode::CMapAnimNode()
+inline CMapAnimNode::CMapAnimNode()
 {
     m_tracks = 0;
 }
@@ -555,7 +555,7 @@ CMapAnimKeyDt::~CMapAnimKeyDt()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapAnimKeyDt::CMapAnimKeyDt()
+inline CMapAnimKeyDt::CMapAnimKeyDt()
 {
     m_positionKeys = 0;
     m_rotationKeys = 0;

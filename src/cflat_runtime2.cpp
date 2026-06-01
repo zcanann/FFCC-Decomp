@@ -1027,10 +1027,7 @@ int CFlatRuntime2::Load(char* fileName)
 	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
 	File.Close(fileHandle);
 
-	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
-	NeedDebugDataFn needDebugData = reinterpret_cast<NeedDebugDataFn>((*reinterpret_cast<void***>(this))[0x12]);
-
-	if (needDebugData(this) != 0) {
+	if (getDebugStage() != 0) {
 		int debugChunk = 0;
 		for (int debugIndex = 0;; debugIndex++) {
 			sprintf(path, sCFlatRuntime2DebugFileNameFmt, fileName);

@@ -1561,10 +1561,6 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
 	    + (static_cast<int>(object->m_codePos << 12) >> 12);
 
-	typedef unsigned int* (*GetValueFn)(CFlatRuntime*, CFlatRuntime::CObject*, int);
-	GetValueFn getSystemVal = reinterpret_cast<GetValueFn>((*reinterpret_cast<void***>(this))[10]);
-	GetValueFn getClassSystemVal = reinterpret_cast<GetValueFn>((*reinterpret_cast<void***>(this))[11]);
-
 	while (true) {
 		*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
 		*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
@@ -1578,7 +1574,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			unsigned int* value = 0;
 			if ((arg & 1) != 0) {
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+					value = reinterpret_cast<unsigned int*>(
+					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1591,8 +1588,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				--object->m_sp;
 				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
-					                          : getClassSystemVal(this, object, index + stackIndex);
+					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
+					                                            ? onSystemVal(object, index + stackIndex)
+					                                            : onClassSystemVal(object, index + stackIndex));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
@@ -1603,7 +1601,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				*object->m_sp++ = *value;
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+					value = reinterpret_cast<unsigned int*>(
+					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1623,7 +1622,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			unsigned int* value = 0;
 			if ((arg & 1) != 0) {
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+					value = reinterpret_cast<unsigned int*>(
+					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1636,8 +1636,9 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				--object->m_sp;
 				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
-					                          : getClassSystemVal(this, object, index + stackIndex);
+					value = reinterpret_cast<unsigned int*>((arg & 0x10) == 0
+					                                            ? onSystemVal(object, index + stackIndex)
+					                                            : onClassSystemVal(object, index + stackIndex));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
@@ -1648,7 +1649,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 4) != 0) {
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+					value = reinterpret_cast<unsigned int*>(
+					    (arg & 0x10) == 0 ? onSystemVal(object, index) : onClassSystemVal(object, index));
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
@@ -1806,16 +1808,11 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			}
 
 			if (((systemValue >> 12) & 1) == 0) {
-				typedef void (*SetSystemValFn)(CFlatRuntime*, int, CStack*, int);
-				reinterpret_cast<SetSystemValFn>((*reinterpret_cast<void***>(this))[12])(
-				    this, static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), setMode);
+				onSetSystemVal(static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), setMode);
 			} else {
-				typedef void* (*IntToClassFn)(CFlatRuntime*, int);
-				typedef void (*SetClassSystemValFn)(CFlatRuntime*, int, CObject*, CStack*, int);
-				CObject* target = reinterpret_cast<CObject*>(
-				    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, systemValue & 0xFFF));
-				reinterpret_cast<SetClassSystemValFn>((*reinterpret_cast<void***>(this))[13])(
-				    this, static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), setMode);
+				CObject* target = reinterpret_cast<CObject*>(intToClass(systemValue & 0xFFF));
+				onSetClassSystemVal(
+				    static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), setMode);
 			}
 			break;
 		}
@@ -1926,9 +1923,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			const u32 returnValue = *object->m_sp;
 			--object->m_sp;
 			const u32 classWord = *object->m_sp;
-			typedef void* (*IntToClassFn)(CFlatRuntime*, int);
-			CObject* target = reinterpret_cast<CObject*>(
-			    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, classWord >> 16));
+			CObject* target = reinterpret_cast<CObject*>(intToClass(classWord >> 16));
 			object->m_engineObject = target;
 			object->m_classIndex = static_cast<s16>(classWord);
 			--object->m_sp;
@@ -2162,9 +2157,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			CStopWatch watch(reinterpret_cast<char*>(-1));
 			watch.Reset();
 			watch.Start();
-			typedef int (*OnClassSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);
-			ret = reinterpret_cast<OnClassSystemFuncFn>((*reinterpret_cast<void***>(this))[8])(
-			    this, object, 1, systemIndex, &result);
+			ret = onClassSystemFunc(object, 1, systemIndex, result);
 			watch.Stop();
 			*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x4C) += watch.Get();
 			*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x44C) += 1;

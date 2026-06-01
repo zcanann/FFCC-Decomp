@@ -2221,12 +2221,13 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 	} else {
 		unsigned char* motion = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x168));
 		if (*reinterpret_cast<void**>(motion + 0xD0) != 0) {
+			int frame;
 			int period = static_cast<int>(kOneF32 + (*reinterpret_cast<float*>(motion + 0xC0) -
 				*reinterpret_cast<float*>(motion + 0xBC)));
 			if (period == 1) {
 				result = 1;
 			} else {
-				int frame = static_cast<int>(m_turnSpeed);
+				frame = static_cast<int>(m_turnSpeed);
 				int frameMod = frame % period;
 				if (m_lastBgAttr < FLOAT_80331988) {
 					result = static_cast<unsigned int>(__cntlzw(frameMod)) >> 5;

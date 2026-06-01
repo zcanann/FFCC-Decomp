@@ -279,26 +279,6 @@ CPtrArray<CMaterial*>::~CPtrArray()
     RemoveAll();
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80043aac
- * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
-{
-    if (ptrArray != 0) {
-        ptrArray->RemoveAll();
-        if (shouldDelete > 0) {
-            operator delete(ptrArray);
-        }
-    }
-    return ptrArray;
-}
-
 template <>
 void CPtrArray<CMaterial*>::RemoveAll()
 {

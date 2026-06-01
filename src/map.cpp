@@ -314,37 +314,6 @@ CPtrArray<CMapLightHolder*>::~CPtrArray()
     m_numItems = 0;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x80034414
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP14CMapLightHolder;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
-}
-
 template <>
 int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
 
@@ -742,37 +711,6 @@ CPtrArray<CMapAnimRun*>::~CPtrArray()
 
 /*
  * --INFO--
- * PAL Address: 0x800344c4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP11CMapAnimRun;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80034540
  * PAL Size: 52b
  * EN Address: TODO
@@ -810,37 +748,6 @@ CPtrArray<CMapAnim*>::~CPtrArray()
 
     m_size = 0;
     m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80034574
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP7CMapAnim;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
 }
 
 /*
@@ -886,37 +793,6 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 
 /*
  * --INFO--
- * PAL Address: 0x80034624
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800346a0
  * PAL Size: 52b
  * EN Address: TODO
@@ -954,37 +830,6 @@ CPtrArray<CMapShadow*>::~CPtrArray()
 
     m_size = 0;
     m_numItems = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800346d4
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArray, short param_2)
-{
-    if (ptrArray != 0) {
-        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = __vt__8CPtrArrayIP10CMapShadow;
-
-        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            items = 0;
-        }
-
-        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
-        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
-
-        if (0 < param_2) {
-            operator delete(ptrArray);
-        }
-    }
-
-    return ptrArray;
 }
 
 /*

@@ -86,6 +86,8 @@ extern const float kMemoryDrawOrthoFar = -100.0f;
 extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
+int s_RefCnt0Compare;
+int s_MaxRefCnt0Compare;
 
 static const int kStagePoolFullMsgOffset = 0xC0;
 static const int kStageAllocFailedMsgOffset = 0xF4;

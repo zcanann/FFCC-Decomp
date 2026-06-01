@@ -150,9 +150,8 @@ void CMenuPcs::TmpArtiDraw()
 
 			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = font->GetWidth(text);
-			float posX = (float)(((TmpArtiIntToFloat(entry->width) - width) * DOUBLE_80332f20) +
-			                       TmpArtiIntToFloat(entry->x));
-			float posY = TmpArtiIntToFloat(entry->y + 11);
+			float posX = (float)((((float)entry->width - width) * DOUBLE_80332f20) + (float)entry->x);
+			float posY = (float)(entry->y + 11);
 
 			font->SetPosX(posX);
 			font->SetPosY(posY - FLOAT_80332F38);

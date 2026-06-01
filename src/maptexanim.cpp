@@ -79,10 +79,7 @@ static inline void ReplaceRef(void** slot, void* ref)
 {
     CRef* current = reinterpret_cast<CRef*>(*slot);
     if (current != 0) {
-        int* refCountPtr = reinterpret_cast<int*>(Ptr(current, 4));
-        int refCount = *refCountPtr - 1;
-        *refCountPtr = refCount;
-        if (refCount == 0) {
+        if (current->DecRef() == 0) {
             delete current;
         }
         *slot = 0;

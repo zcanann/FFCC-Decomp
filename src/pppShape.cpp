@@ -1,6 +1,8 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 
@@ -9,24 +11,6 @@
 extern const float FLOAT_80330108;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
-class CMaterial;
-
-template <class T>
-class CPtrArray
-{
-public:
-    void** m_vtable;
-    int m_size;
-    int m_numItems;
-    int m_defaultSize;
-    T* m_items;
-    void* m_stage;
-    int m_growCapacity;
-
-    T GetAt(unsigned long index);
-    T operator[](unsigned long index);
-};
 
 /*
  * --INFO--
@@ -325,6 +309,6 @@ CTexture* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int&
     unsigned char* shape = (unsigned char*)animData + *(short*)((int)animData + 0x10) + 8;
 
     textureIndex = shape[2];
-    CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((char*)materialSet + 8))[shape[2]];
-    return *(CTexture**)((char*)material + 0x3C);
+    CMaterial* material = materialSet->m_materials[shape[2]];
+    return material->m_textures[0];
 }

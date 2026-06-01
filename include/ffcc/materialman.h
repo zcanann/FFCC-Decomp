@@ -18,6 +18,7 @@ class CTextureSet;
 class CFullScreenShadow;
 class CLightPcs;
 class CAmemCacheSet;
+struct pppShapeSt;
 struct Vec;
 struct CBound;
 
@@ -182,6 +183,7 @@ public:
 
 private:
     friend class CTexAnimSet;
+    friend struct pppShapeSt;
 
     char m_name[0x10];                    // 0x008
     unsigned short m_textureCount;        // 0x018

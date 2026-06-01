@@ -290,10 +290,11 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  */
 void pppCopyVector(Vec& dest, Vec source)
 { 
-	float x = source.x;
-	float y = source.y;
+	float* src = &source.x;
+	float x = *src++;
+	float y = *src++;
 	dest.x = x;
-	float z = source.z;
+	float z = *src;
 	dest.y = y;
 	dest.z = z;
 }
@@ -1133,6 +1134,40 @@ ScaleOnly:
 	ppvMng->m_matrix.value[2][2] = scaleAxis2.z;
 	return;
 
+ScaleOnly:
+	if (FLOAT_8032fdfc != pppMngSt->m_scale.x) {
+		scaleAxis0.x = ppvMng->m_matrix.value[0][0];
+		scaleAxis0.y = ppvMng->m_matrix.value[1][0];
+		scaleAxis0.z = ppvMng->m_matrix.value[2][0];
+		PSVECScale(&scaleAxis0, &scaleAxis0, pppMngSt->m_scale.x);
+		ppvMng->m_matrix.value[0][0] = scaleAxis0.x;
+		ppvMng->m_matrix.value[1][0] = scaleAxis0.y;
+		ppvMng->m_matrix.value[2][0] = scaleAxis0.z;
+	}
+
+	if (FLOAT_8032fdfc != pppMngSt->m_scale.y) {
+		scaleAxis1.x = ppvMng->m_matrix.value[0][1];
+		scaleAxis1.y = ppvMng->m_matrix.value[1][1];
+		scaleAxis1.z = ppvMng->m_matrix.value[2][1];
+		PSVECScale(&scaleAxis1, &scaleAxis1, pppMngSt->m_scale.y);
+		ppvMng->m_matrix.value[0][1] = scaleAxis1.x;
+		ppvMng->m_matrix.value[1][1] = scaleAxis1.y;
+		ppvMng->m_matrix.value[2][1] = scaleAxis1.z;
+	}
+
+	if (FLOAT_8032fdfc == pppMngSt->m_scale.z) {
+		return;
+	}
+
+	scaleAxis2.x = ppvMng->m_matrix.value[0][2];
+	scaleAxis2.y = ppvMng->m_matrix.value[1][2];
+	scaleAxis2.z = ppvMng->m_matrix.value[2][2];
+	PSVECScale(&scaleAxis2, &scaleAxis2, pppMngSt->m_scale.z);
+	ppvMng->m_matrix.value[0][2] = scaleAxis2.x;
+	ppvMng->m_matrix.value[1][2] = scaleAxis2.y;
+	ppvMng->m_matrix.value[2][2] = scaleAxis2.z;
+	return;
+
 MatrixMode3:
 	if (pppMngSt->m_bindNode == 0) {
 		goto LocalOnly;
@@ -1747,7 +1782,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	*head = 0;
 	if (pppProgRelocCount > 0) {
 		if (pppProgRelocCount > 8) {
-			unsigned int blocks = (unsigned int)(pppProgRelocCount - 1) >> 3;
+			int blocks = (pppProgRelocCount - 8 + 7) >> 3;
 			int* reloc = pppProgRelocs;
 			if (pppProgRelocCount - 8 > 0) {
 				do {
@@ -1780,7 +1815,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	processed = 0;
 	if (pdtRelocCount > 0) {
 		if (pdtRelocCount > 8) {
-			unsigned int blocks = (unsigned int)(pdtRelocCount - 1) >> 3;
+			int blocks = (pdtRelocCount - 8 + 7) >> 3;
 			int* reloc = pdtRelocs;
 			if (pdtRelocCount - 8 > 0) {
 				do {

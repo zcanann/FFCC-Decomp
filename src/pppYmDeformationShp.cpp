@@ -648,4 +648,3 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, ppp
 extern const float FLOAT_80330634 = 0.0f;
 extern const float FLOAT_80330638 = 0.0f;
 extern const float FLOAT_8033063c = 0.0f;
-extern const float FLOAT_80330640 = 0.01745329238474369f;

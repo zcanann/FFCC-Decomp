@@ -18,6 +18,11 @@ struct ChangeTexDisplayList {
 	u16 _pad;
 };
 
+struct ChangeTexDisplayListCopy {
+	void* m_data;
+	u32 m_size;
+};
+
 struct ChangeTexMeshData {
 	char m_name[0x14];
 	u32 m_vertexCount;
@@ -66,7 +71,7 @@ struct ChangeTexModelRaw {
 	ChangeTexMeshRef* m_meshes;
 };
 
-extern const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
+extern const char s_pppYmChangeTex_cpp[24] = "pppYmChangeTex.cpp";
 extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;
@@ -82,6 +87,7 @@ STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
+STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
@@ -197,18 +203,19 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			    const_cast<char*>(s_pppYmChangeTex_cpp), 0x168);
 
 			int dlIdx = meshList->m_data->m_displayListCount - 1;
-			int* dlInfo = (int*)meshList->m_data->m_displayLists;
-			int* dlEntry = (int*)(*(int*)((char*)state->m_displayListArrays + arrayOffset) + dlIdx * 4);
-			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
-				int dlPair = (int)pppMemAlloc(
+			ChangeTexDisplayList* dlInfo = meshList->m_data->m_displayLists;
+			ChangeTexDisplayListCopy** dlEntry =
+			    (ChangeTexDisplayListCopy**)(*(int*)((char*)state->m_displayListArrays + arrayOffset) + dlIdx * 4);
+			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 1) {
+				ChangeTexDisplayListCopy* dlPair = (ChangeTexDisplayListCopy*)pppMemAlloc(
 				    8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x172);
 				*dlEntry = dlPair;
-				*(int*)(*dlEntry + 4) = *dlInfo;
-				*(int*)*dlEntry = (int)pppMemAlloc(
-				    *dlInfo, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x174);
-				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				gUtil.ReWriteDisplayList(*(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
-				DCFlushRange(*(void**)*dlEntry, (unsigned long)dlInfo[0]);
+				(*dlEntry)->m_size = dlInfo->m_size;
+				(*dlEntry)->m_data = pppMemAlloc(
+				    dlInfo->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x174);
+				memcpy((*dlEntry)->m_data, dlInfo->m_data, dlInfo->m_size);
+				gUtil.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
+				DCFlushRange((*dlEntry)->m_data, (unsigned long)dlInfo->m_size);
 				dlEntry = dlEntry - 1;
 			}
 
@@ -321,11 +328,11 @@ freeArrays:
 	void** stageArrayOrig = stageArray;
 	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
 		int meshData = *(int*)(meshList + 8);
-			void** dlEntries = (void**)*stageArray;
+		ChangeTexDisplayListCopy** dlEntries = (ChangeTexDisplayListCopy**)*stageArray;
 		for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
-			if (*(void**)*dlEntries != 0) {
-				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)*dlEntries));
-				*(void**)*dlEntries = 0;
+			if ((*dlEntries)->m_data != 0) {
+				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>((*dlEntries)->m_data));
+				(*dlEntries)->m_data = 0;
 			}
 			if (*dlEntries != 0) {
 				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*dlEntries));
@@ -396,7 +403,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
 	ChangeTexMeshRef* meshes = modelRaw->m_meshes;
 	int displayListIdx;
-	int* displayListPtr;
+	ChangeTexDisplayListCopy* displayListPtr;
 	int dlArrayBase;
 	int dlOffset;
 	int drawTevBits;
@@ -456,8 +463,8 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 
 					MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-					displayListPtr = *(int**)(dlArrayBase + dlOffset);
-					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
+					displayListPtr = *(ChangeTexDisplayListCopy**)(dlArrayBase + dlOffset);
+					GXCallDisplayList(displayListPtr->m_data, displayListPtr->m_size);
 					dlOffset -= 4;
 					displayListIdx -= 1;
 					displayList += 1;

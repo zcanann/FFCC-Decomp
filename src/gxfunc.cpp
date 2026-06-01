@@ -71,8 +71,8 @@ GXTevOrderReg s_GXSetTevOrder_Reg[16];
 GXTevSwapModeReg s_GXSetTevSwapMode_Reg[16];
 GXTevSwapModeTableReg s_GXSetTevSwapModeTable_Reg[4];
 GXAlphaCompareReg s_GXSetAlphaCompare_Reg;
-unsigned short s_GXSetPixel_Init_Reg;
 GXBlendModeReg s_GXSetBlendMode_Reg;
+unsigned short s_GXSetNumTevStages_nStages;
 
 /*
  * --INFO--
@@ -177,7 +177,7 @@ void _InitGxFunc()
 	*(int*)&s_GXSetTevSwapModeTable_Reg[2] = -1;
 	*(int*)&s_GXSetTevSwapModeTable_Reg[3] = -1;
 	*(int*)&s_GXSetAlphaCompare_Reg = -1;
-	s_GXSetPixel_Init_Reg = 0xFFFF;
+	s_GXSetNumTevStages_nStages = 0xFFFF;
 	*(int*)&s_GXSetBlendMode_Reg = -1;
 }
 
@@ -242,6 +242,23 @@ void _GXSetTevSwapMode(_GXTevStageID stage, _GXTevSwapSel rasSel, _GXTevSwapSel 
 		entry[0] = rasSel;
 		entry[1] = texSel;
 		GXSetTevSwapMode(stage, rasSel, texSel);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void _GXSetNumTevStages(unsigned char nStages)
+{
+	if (s_GXSetNumTevStages_nStages != nStages) {
+		s_GXSetNumTevStages_nStages = nStages;
+		GXSetNumTevStages(nStages);
 	}
 }
 

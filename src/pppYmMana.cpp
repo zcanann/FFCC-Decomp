@@ -1458,8 +1458,12 @@ static int RenderWaterMesh(VYmMana* mana)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d5398
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 static void CalculateNormal(VYmMana* mana)
 {
@@ -1482,10 +1486,10 @@ static void CalculateNormal(VYmMana* mana)
     }
 
     s32 indicesOffset = 0;
-    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
-        u16 i0 = indices[indicesOffset];
-        u16 i1 = indices[indicesOffset + 1];
-        u16 i2 = indices[indicesOffset + 2];
+    for (s32 i = 0; i < 0x200; i++) {
+        u16 i0 = indices[indicesOffset++];
+        u16 i1 = indices[indicesOffset++];
+        u16 i2 = indices[indicesOffset++];
 
         edgeA.x = positions[i1].x - positions[i0].x;
         edgeA.y = positions[i1].y - positions[i0].y;
@@ -1534,7 +1538,6 @@ static void CalcWaterReflectionVector(
     float* texCoordFloat;
     float zero;
     float half;
-    float denomBase;
     long i;
 
     (void)waterOrigin;
@@ -1578,20 +1581,24 @@ static void CalcWaterReflectionVector(
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
-        denomBase = LoadFloat(FLOAT_80330e58);
-
         if (reflectionIt->z >= zero) {
+            float denomBase;
+
             colorBytes[0] = 0x80;
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
+            denomBase = LoadFloat(FLOAT_80330e58);
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
+            float denomBase;
+
             colorBytes[0] = 0x80;
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
+            denomBase = LoadFloat(FLOAT_80330e58);
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
@@ -1649,6 +1656,7 @@ void CalcReflectionVector2(
     Mtx nodeOffsetMtx;
     Mtx nodeRotMtx;
     Mtx workMtx;
+    Mtx normalMtx;
     Mtx rotateMtx;
     u16* dl = (u16*)displayList;
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
@@ -1657,7 +1665,6 @@ void CalcReflectionVector2(
     const float half = FLOAT_80330e5c;
     const float warp = FLOAT_80330e60;
     const float scale = FLOAT_80330e64;
-    char* compareName = Game.m_currentScriptName;
 
     cameraPos.x = CameraWorldX();
     cameraPos.y = CameraWorldY();
@@ -1682,10 +1689,10 @@ void CalcReflectionVector2(
     nodeRotMtx[1][3] = worldPos.y;
     nodeRotMtx[2][3] = worldPos.z;
 
-    PSMTXCopy(nodeRotMtx, workMtx);
-    workMtx[0][3] = FLOAT_80330e4c;
-    workMtx[1][3] = FLOAT_80330e4c;
-    workMtx[2][3] = FLOAT_80330e4c;
+    PSMTXCopy(nodeRotMtx, normalMtx);
+    normalMtx[0][3] = FLOAT_80330e4c;
+    normalMtx[1][3] = FLOAT_80330e4c;
+    normalMtx[2][3] = FLOAT_80330e4c;
 
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
@@ -1713,12 +1720,12 @@ void CalcReflectionVector2(
             gUtil.ConvI2FVector(position, positions[posIndex], posScale);
             gUtil.ConvI2FVector(normal, normals[normalIndex], normalScale);
             PSMTXMultVec(nodeRotMtx, &position, &position);
-            PSMTXMultVec(workMtx, &normal, &normal);
+            PSMTXMultVec(normalMtx, &normal, &normal);
 
             PSVECSubtract(&position, &cameraPos, &eyeToPos);
             C_VECReflect(&eyeToPos, &normal, &reflectionVec[posIndex]);
 
-            if (strcmp(s_ymManaRuin2Name, compareName) == 0) {
+            if (strcmp(s_ymManaRuin2Name, Game.m_currentScriptName) == 0) {
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 

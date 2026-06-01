@@ -373,6 +373,29 @@ void CTexture::FlushTlut()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::FlushExternalTlut(void* tlutData, int format)
+{
+    int numEntries;
+
+    if (format == 9) {
+        numEntries = 0x100;
+    } else if (format == 8) {
+        numEntries = 0x10;
+    } else {
+        numEntries = 0;
+    }
+    DCFlushRange(tlutData, numEntries << 2);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003AE30
  * PAL Size: 72b
  * EN Address: TODO
@@ -392,6 +415,29 @@ void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _
     unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
     tlut[index + tlutOffset] = static_cast<unsigned short>(packedColor >> 16);
     tlut[index] = static_cast<unsigned short>(packedColor);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+_GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
+{
+    unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
+    _GXColor color;
+    unsigned int packed = tlut[index] | (tlut[index + tlutOffset] << 16);
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(&packed);
+
+    color.a = bytes[0];
+    color.r = bytes[3];
+    color.g = bytes[2];
+    color.b = bytes[1];
+    return color;
 }
 
 /*
@@ -459,6 +505,24 @@ _GXColor CTexture::GetTlutColor(int index)
     color.g = bytes[2];
     color.b = bytes[1];
     return color;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CTexture::CopyTlut(_GXColor* colors)
+{
+    int numEntries = (m_format == 9) ? 0x100 : 0x10;
+
+    for (int i = 0; i < numEntries; i++) {
+        colors[i] = GetTlutColor(i);
+    }
 }
 
 /*

@@ -725,9 +725,9 @@ void CGraphicPcs::drawBar()
                 if (order->m_priority == 0x17) {
                     char extraString[256];
                     sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
-                            *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
-                            *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
-                            *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));
+                            CFlatMoveTime(), CFlatBgCollisionTime(),
+                            CFlatObjectCollisionTime(), CFlatUpdateTime(),
+                            CFlatHitTime(), CFlatPerformanceTotalTime());
                     strcat(debugString, extraString);
                 }
 

@@ -490,7 +490,7 @@ CFlatRuntime2::CFlatRuntime2()
 	}
 
 	new (runtime + 0xCF20) CFlatData;
-	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
+	CFlatSaveSceneEnabled() = 0;
 	RuntimeDebugFlags(runtime) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A4) = -1;
@@ -1430,11 +1430,11 @@ void CFlatRuntime2::Calc()
 		button = *reinterpret_cast<u16*>(PadRaw() + padIndex * 0x54 + 0x36);
 	}
 
-	if (((button & 0x400) != 0) && (*reinterpret_cast<int*>(runtime + 0x10418) != 0)) {
-		*reinterpret_cast<int*>(runtime + 0x10418) = 0;
+	if (((button & 0x400) != 0) && (CFlatSaveSceneEnabled() != 0)) {
+		CFlatSaveSceneEnabled() = 0;
 	}
 
-	if (*reinterpret_cast<int*>(runtime + 0x10418) != 0) {
+	if (CFlatSaveSceneEnabled() != 0) {
 		Graphic.Printf(2, 3, const_cast<char*>(sCFlatRuntime2SaveSceneMsg));
 
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
@@ -2655,7 +2655,7 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xEF;
 	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
-	memset(runtime + 0x1041C, 0, 0x14);
+	memset(&CFlatPartyTraceParticleSlot(0), 0, sizeof(int) * 5);
 	memset(m_boss__8CGMonObj, 0, sizeof(m_boss__8CGMonObj));
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;

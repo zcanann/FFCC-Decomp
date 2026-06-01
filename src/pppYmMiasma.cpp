@@ -613,11 +613,13 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     (void)pppPObject;
 
     randomValue = rand();
-    randomScale = FLOAT_8033065c * (float)randomValue;
+    randomScale = YmMiasmaConst(FLOAT_8033065c) * (float)randomValue;
     shape = **(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     shapeRandom = rand();
     shapeCount = *(short*)((u8*)shape + 6);
-    angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
+    angle = (s32)(YmMiasmaConst(FLOAT_80330650) *
+                  (YmMiasmaConst(FLOAT_80330654) * (YmMiasmaConst(FLOAT_80330660) * randomScale)) -
+                  YmMiasmaConst(FLOAT_80330664));
     shapeCount = (short)(shapeRandom % shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;
@@ -666,7 +668,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     angleBase = (u32)(int)speedJitter;
     signBit = angleBase >> 0x1f;
     if ((((angleBase & 1U) ^ signBit) - signBit) != 0) {
-        speedJitter = speedJitter * FLOAT_80330668;
+        speedJitter = speedJitter * YmMiasmaConst(FLOAT_80330668);
     }
     state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;
     state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;

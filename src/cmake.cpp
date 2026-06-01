@@ -1784,7 +1784,15 @@ int CMenuPcs::CmakeNameCtrl()
     if (mcState == 3) {
         int maxRow = (static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4;
         if ((repeat & 0x8) != 0) {
-            row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+            if (row == 0) {
+                if (select < 10) {
+                    row = 4;
+                } else {
+                    row = 5;
+                }
+            } else {
+                row = static_cast<short>(row - 1);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
             row = (row < maxRow) ? static_cast<short>(row + 1) : 0;

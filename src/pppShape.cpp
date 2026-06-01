@@ -309,6 +309,6 @@ CTexture* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int&
     unsigned char* shape = (unsigned char*)animData + *(short*)((int)animData + 0x10) + 8;
 
     textureIndex = shape[2];
-    CMaterial* material = materialSet->m_materials[shape[2]];
-    return material->m_textures[0];
+    CMaterial* material = materialSet->GetMaterial(shape[2]);
+    return material->GetTexture(0);
 }

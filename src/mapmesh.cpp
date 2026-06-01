@@ -2,14 +2,15 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 
 #include <string.h>
 
-class CMaterial;
 class CMapHitFace;
 
 extern "C" CMemory::CStage* g_hit_lpface_min;
@@ -19,22 +20,6 @@ extern "C" const float FLOAT_8032F934;
 
 CMemory::CStage* g_pStage;
 u32 s_insertShadowNo;
-
-template <class T>
-class CPtrArray
-{
-public:
-    void** m_vtable;
-    int m_size;
-    int m_numItems;
-    int m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-
-    T GetAt(unsigned long index);
-    T operator[](unsigned long index);
-};
 
 namespace {
 static inline unsigned char* Ptr(CMapMesh* self, unsigned int offset)
@@ -151,9 +136,8 @@ void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
         drawEntry = reinterpret_cast<unsigned int*>(m_drawEntries);
         if (*drawEntry != 0) {
             textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
-            CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                reinterpret_cast<unsigned char*>(materialSet) + 8))[*reinterpret_cast<unsigned short*>(drawEntry + 2)];
-            return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+            CMaterial* material = materialSet->GetMaterial(*reinterpret_cast<unsigned short*>(drawEntry + 2));
+            return material->GetTexture(0);
         }
     }
 
@@ -230,12 +214,9 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
-            CMaterial* material =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(mapMng->m_materialSet) + 8))[
-                    entry->m_materialIdx];
+            CMaterial* material = mapMng->m_materialSet->GetMaterial(entry->m_materialIdx);
 
-            if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
-                 0x100000) != 0) {
+            if ((material->GetTevBit() & 0x100000) != 0) {
                 MaterialMan.SetMaterialCharaShadow(material);
                 GXCallDisplayList(entry->m_displayList, entry->m_size);
             }

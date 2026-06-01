@@ -18,7 +18,6 @@ class CTextureSet;
 class CFullScreenShadow;
 class CLightPcs;
 class CAmemCacheSet;
-struct pppShapeSt;
 struct Vec;
 struct CBound;
 
@@ -176,6 +175,14 @@ public:
     void GetNumTexture();
     void SetTag(int);
     void AddTextureIdx(int, int);
+    unsigned long GetTevBit()
+    {
+        return m_tevBit;
+    }
+    CTexture* GetTexture(int index)
+    {
+        return m_textures[index];
+    }
     CTexScroll* GetTexScroll(int index)
     {
         return &m_texScroll[index];
@@ -183,7 +190,6 @@ public:
 
 private:
     friend class CTexAnimSet;
-    friend struct pppShapeSt;
 
     char m_name[0x10];                    // 0x008
     unsigned short m_textureCount;        // 0x018
@@ -233,6 +239,10 @@ public:
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
+    CMaterial* GetMaterial(long index)
+    {
+        return m_materials[index];
+    }
 #endif
 };
 

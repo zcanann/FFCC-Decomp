@@ -1535,33 +1535,42 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
     if (se3dHandle < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        return 0;
-    }
+    } else {
+        char* se = reinterpret_cast<char*>(this) + 0x2C;
+        char* found;
+        int result = 0;
+        int count;
+        for (count = 0x20; count != 0; count--) {
+            found = se;
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_se;
+            }
 
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
-    char* found;
-    int result = 0;
-    int count;
-    for (count = 0x20; count != 0; count--) {
-        if ((((static_cast<u8>(*se) >> 7) & 1) != 0 &&
-              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
-            goto found_se;
+            found += 0x28;
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_se;
+            }
+
+            found += 0x28;
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_se;
+            }
+
+            found += 0x28;
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_se;
+            }
+
+            result += 3;
+            se = found + 0x28;
         }
-        result += 3;
-        se += 0x28;
-    }
-    found = 0;
+        found = 0;
 found_se:
-    if (found != 0) {
-        *reinterpret_cast<int*>(found + 0x24) = group;
+        if (found != 0) {
+            *reinterpret_cast<int*>(found + 0x24) = group;
+        }
+        return result;
     }
-    return result;
 }
 
 /*
@@ -2065,37 +2074,28 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 
     if (se3dHandle < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        ret = 0;
     } else {
         se = reinterpret_cast<char*>(this) + 0x2C;
         ret = 0;
         for (count = 0x20; count != 0; count--) {
             found = se;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_entry;
             }
 
             found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_entry;
             }
 
             found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_entry;
             }
 
             found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
-                }
+            if ((((static_cast<u8>(*found) >> 7) & 1) != 0) && (*reinterpret_cast<int*>(found + 4) == se3dHandle)) {
+                goto found_entry;
             }
 
             ret += 3;
@@ -2108,8 +2108,8 @@ found_entry:
             *reinterpret_cast<float*>(found + 0x1C) = position->y;
             *reinterpret_cast<float*>(found + 0x20) = position->z;
         }
+        return ret;
     }
-    return ret;
 }
 
 /*

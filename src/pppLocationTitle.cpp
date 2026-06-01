@@ -133,7 +133,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleWork* work;
     LocationTitleColorBlock* colorData;
     int graphFrame;
-    long* shapeTable;
+    pppShapeAnimData* shapeAnim;
     LocationTitleParticle* particles;
     LocationTitleParticle* particle;
     float zero;
@@ -160,7 +160,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    shapeTable = static_cast<long*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -185,7 +185,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_shapeUnk = 0;
             particle->m_frame = work->m_cur;
             randomValue = rand();
-            shapeCount = *(s16*)((u8*)shapeTable + 6);
+            shapeCount = shapeAnim->m_frameCount;
             shape = randomValue % shapeCount;
             particle->m_shapeB = shape;
             particle->m_shapeA = shape;

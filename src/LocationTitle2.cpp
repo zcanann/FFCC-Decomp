@@ -56,21 +56,6 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
-struct LocationTitle2AnimRaw {
-    u8 m_pad[0x10];
-    u16 m_frameCount;
-};
-
-struct LocationTitle2ModelRaw {
-    u8 m_pad0[0xD0];
-    LocationTitle2AnimRaw* m_anim;
-};
-
-struct pppMngStLocationTitle2Raw {
-    u8 m_pad0[0xDC];
-    CGObject* m_charaObj;
-};
-
 extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
 
@@ -265,7 +250,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         CGObject* owner;
         CCharaPcs::CHandle* handle;
         CChara::CModel* model;
-        LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
         CChara::CNode* node;
         float zOffset;
@@ -287,12 +271,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             model = handle->m_model;
         }
 
-        modelRaw = (LocationTitle2ModelRaw*)model;
         nodeIndex = model->SearchNode(const_cast<char*>(s_locationNodeName));
         node = model->m_nodes + nodeIndex;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < model->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             node->CalcBind(model);

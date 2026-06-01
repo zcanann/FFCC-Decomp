@@ -120,6 +120,8 @@ public:
 		public:
 			CRefData();
 			~CRefData();
+
+			u8 m_storage[0x94];
 		};
 
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);

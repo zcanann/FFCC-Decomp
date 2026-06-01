@@ -66,6 +66,7 @@ STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x44);
 STATIC_ASSERT(offsetof(CChara::CNode, m_previousQuat) == 0x74);
 STATIC_ASSERT(offsetof(CChara::CNode, m_dynPosition) == 0xA4);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
+STATIC_ASSERT(sizeof(CChara::CNode::CRefData) == 0x94);
 
 typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
 typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);

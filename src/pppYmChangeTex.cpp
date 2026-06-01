@@ -66,7 +66,7 @@ struct ChangeTexModelRaw {
 	ChangeTexMeshRef* m_meshes;
 };
 
-extern const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
+extern const char s_pppYmChangeTex_cpp[24] = "pppYmChangeTex.cpp";
 extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;

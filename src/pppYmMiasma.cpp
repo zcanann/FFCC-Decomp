@@ -14,15 +14,16 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern float FLOAT_80330640;
-extern float FLOAT_80330644;
-extern const float FLOAT_80330650;
-extern const float FLOAT_80330654;
-extern const float FLOAT_80330658;
-extern const float FLOAT_8033065c;
-extern const float FLOAT_80330660;
-extern const float FLOAT_80330664;
-extern const float FLOAT_80330668;
+extern const float FLOAT_80330640 = 0.01745329238474369f;
+extern const float FLOAT_80330644 = 0.0f;
+extern const double DOUBLE_80330648 = 4503601774854144.0;
+extern const float FLOAT_80330650 = 32768.0f;
+extern const float FLOAT_80330654 = 3.1415927410125732f;
+extern const float FLOAT_80330658 = 1.0f;
+extern const float FLOAT_8033065c = 0.00003051850947599719f;
+extern const float FLOAT_80330660 = 2.0f;
+extern const float FLOAT_80330664 = 16384.0f;
+extern const float FLOAT_80330668 = -1.0f;
 extern "C" const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA {
@@ -389,6 +390,68 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
     work->m_prevPosition.y = fVar2;
     work->m_prevPosition.x = fVar2;
     work->m_prevPositionChanged = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+{
+    YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
+    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
+    long** shape;
+    pppFMATRIX model;
+    pppFMATRIX rotMatrix;
+    Vec worldPos;
+    GXColor amb;
+    float scale;
+    s16 shapeAngle;
+
+    (void)pppPObject;
+
+    if (pYmMiasma->m_dataValIndex == 0xffff) {
+        return;
+    }
+
+    shape = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+
+    pppUnitMatrix(model);
+    scale = state->m_speed;
+    model.value[0][0] = ppvMng->m_scale.x * scale;
+    model.value[1][1] = ppvMng->m_scale.y * scale;
+    model.value[2][2] = ppvMng->m_scale.z * scale;
+
+    shapeAngle = state->m_shapeAngle;
+    PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
+    pppMulMatrix(model, rotMatrix, model);
+
+    pppCopyVector(worldPos, state->m_position);
+    if ((s32)Game.m_currentSceneId == 7) {
+        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+    } else {
+        PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
+    }
+
+    model.value[0][3] = worldPos.x;
+    model.value[1][3] = worldPos.y;
+    model.value[2][3] = worldPos.z;
+
+    pppSetDrawEnv(
+        0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+
+    amb.r = state->m_color.m_r;
+    amb.g = state->m_color.m_g;
+    amb.b = state->m_color.m_b;
+    amb.a = state->m_color.m_a;
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+    pppSetBlendMode(step->m_blendMode);
+    pppDrawShp(*shape, state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr, step->m_blendMode);
 }
 
 /*

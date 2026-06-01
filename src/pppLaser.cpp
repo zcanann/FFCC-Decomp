@@ -13,9 +13,9 @@
 
 #include <string.h>
 
-extern const f32 kPppLaserZero;
-extern const f32 FLOAT_8033342c;
-extern const f32 FLOAT_80333430;
+extern const f32 kPppLaserZero = 0.0f;
+extern const f32 FLOAT_8033342c = 1.0f;
+extern const f32 FLOAT_80333430 = 2.0f;
 extern const f32 kMenuArtiNegativeOne;
 extern const f32 kMenuArtiDefaultScale;
 extern const f32 kMenuArtiBoundsMax;
@@ -212,7 +212,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     emptyHistory = 0;
-    if (LaserConst(kPppLaserNegativeOne) == work->m_maxLength) {
+    f32 maxLengthDisabled = LaserConst(kPppLaserNegativeOne);
+    if (maxLengthDisabled == work->m_maxLength) {
         return;
     }
 

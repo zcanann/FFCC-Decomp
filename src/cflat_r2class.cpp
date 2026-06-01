@@ -107,15 +107,7 @@ static inline CRingMenu* BattleRingMenu(int playerIndex)
 	return *reinterpret_cast<CRingMenu**>(reinterpret_cast<u8*>(&MenuPcs) + 0x13C + playerIndex * 4);
 }
 
-static inline void PushValue(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, int value)
-{
-	reinterpret_cast<CFlatRuntime*>(runtime)->push(object, value);
-}
-
-static inline void PushF32(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, float value)
-{
-	PushValue(runtime, object, *reinterpret_cast<int*>(&value));
-}
+#define PushValue(runtime, object, value) reinterpret_cast<CFlatRuntime*>(runtime)->push((object), (value))
 
 static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
@@ -1166,7 +1158,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&safePos.x);
 			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&safePos.y);
 			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&safePos.z);
-			PushF32(this, object, safeDist);
+			PushValue(this, object, *reinterpret_cast<int*>(&safeDist));
 			outResult = 0;
 			break;
 		}
@@ -1577,14 +1569,4 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 	}
 
 	return 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void SAFE_CAST_MON_WORK(CGObjWork*)
-{
-	// TODO
 }

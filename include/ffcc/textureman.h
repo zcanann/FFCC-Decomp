@@ -56,8 +56,11 @@ public:
     void CacheUnLoadTexture(CAmemCacheSet*);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
+    void FlushExternalTlut(void*, int);
     _GXColor GetTlutColor(int);
+    void CopyTlut(_GXColor*);
     void SetTlutColor(int, _GXColor);
+    static _GXColor GetExternalTlutColor(void*, int, int);
     static void SetExternalTlutColor(void*, int, int, _GXColor&);
     void FlushTlut();
     void FlushExternalTlut(void*);

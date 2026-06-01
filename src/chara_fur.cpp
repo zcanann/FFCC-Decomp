@@ -65,7 +65,7 @@ public:
 
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
-extern "C" char sMogFurTextureName[];
+extern "C" char sMogFurTextureName[8];
 extern "C" {
 extern unsigned char m_mogWork[0x2C];
 void* DAT_8032EDEC;

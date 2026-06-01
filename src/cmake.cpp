@@ -3011,7 +3011,11 @@ void CMenuPcs::CmakeResultDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXColor panelColor;
+    panelColor.r = 0xFF;
+    panelColor.g = 0xFF;
+    panelColor.b = 0xFF;
+    panelColor.a = static_cast<unsigned char>(panelAlpha);
     GXSetChanMatColor(GX_COLOR0A0, panelColor);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(

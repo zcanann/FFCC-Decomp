@@ -1494,8 +1494,7 @@ void GbaQueue::LoadPlayerStat()
 				entry[0x23] = 1;
 				entry[0xD4] = 0;
 				if (partyObj != 0) {
-					entry[0xD4] = static_cast<unsigned char>((reinterpret_cast<int (*)(CGPartyObj*)>(
-					                                             (*reinterpret_cast<void***>(partyObj))[0xB])(partyObj) != 0));
+					entry[0xD4] = static_cast<unsigned char>(partyObj->IsDispRader() != 0);
 				}
 
 				if ((caravanWork->IsOutOfShouki() != 0) && (entry[0x17] != 0)) {

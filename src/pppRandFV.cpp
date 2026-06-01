@@ -14,7 +14,7 @@ struct RandFVParams {
     u8 useNormalDistribution;
 };
 
-static inline float randf(float value, float scale)
+static float randf(float value, float scale)
 {
     return value * scale - value;
 }

@@ -1,11 +1,19 @@
 #include "ffcc/pppVertexAttend.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
+#include <stddef.h>
 
 struct VertexAttendStream
 {
     s32 sourceOffset;
     s32 destOffset;
+};
+
+struct pppVertexAttendStep
+{
+    u8 pad0[0xC];
+    s16 m_entryIndex;
 };
 
 struct VertexSetEntry
@@ -29,6 +37,8 @@ struct VertexAttendEnv
     VertexSetEntry* vertexSetTable;
 };
 
+STATIC_ASSERT(offsetof(pppVertexAttendStep, m_entryIndex) == 0xC);
+
 
 /*
  * --INFO--
@@ -39,9 +49,9 @@ struct VertexAttendEnv
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexAttend(void* r3, void* r4, void* r5)
+void pppVertexAttend(_pppPObject* object, pppVertexAttendStep* step, _pppCtrlTable* ctrl)
 {
-    s16 entryIndex = *(s16*)((u8*)r4 + 0xC);
+    s16 entryIndex = step->m_entryIndex;
     VertexAttendStream* stream;
     VertexAttendEnv* env;
     VertexSetEntry* setEntry;
@@ -56,14 +66,14 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
         return;
     }
 
-    stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
+    stream = reinterpret_cast<VertexAttendStream*>(ctrl->m_serializedDataOffsets);
     env = (VertexAttendEnv*)ppvEnv;
     setEntry = (VertexSetEntry*)((u8*)env->vertexSetTable + (entryIndex * sizeof(VertexSetEntry)));
-    sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
-    output = (f32*)((u8*)r3 + stream->destOffset + 0x80);
+    sourceIndex = *(u16*)(object->m_workArea + stream->sourceOffset);
+    output = (f32*)(object->m_workArea + stream->destOffset);
     model = env->modelTable[setEntry->modelIndex];
     sourceVertex = &model->vertexData[setEntry->vertexRemap[sourceIndex]];
-    matrix = (MtxPtr)((u8*)*(void**)((u8*)r3 + 4) + 0x10);
+    matrix = reinterpret_cast<_pppPObject*>(object->m_link.m_previous)->m_localMatrix.value;
 
     transformed = *sourceVertex;
     PSMTXMultVec(matrix, &transformed, &transformed);
@@ -72,4 +82,3 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     output[1] = transformed.y;
     output[2] = transformed.z;
 }
-

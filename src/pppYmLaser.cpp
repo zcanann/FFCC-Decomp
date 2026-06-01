@@ -7,6 +7,7 @@
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppYmLaserOne;
+extern const f64 kPppVertexApMtxDoubleBias;
 }
 #include "ffcc/util.h"
 #include "ffcc/pppPart.h"
@@ -34,6 +35,17 @@ extern "C" const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 static inline f32 LoadLaserFloat(const f32& value)
 {
 	return value;
+}
+
+static inline f64 U32ToDouble(u32 value)
+{
+	union {
+		u64 bits;
+		f64 value;
+	} conv;
+
+	conv.bits = 0x4330000000000000ULL | value;
+	return conv.value - kPppVertexApMtxDoubleBias;
 }
 
 struct CMapCylinderRaw {
@@ -192,7 +204,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		pppDrawShp(*shapeTable, work->m_shapeArg2, ppvEnv->m_materialSetPtr, step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = FLOAT_80330DC4 / (float)count;
+		uvStep = FLOAT_80330DC4 / (f32)U32ToDouble(count);
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);

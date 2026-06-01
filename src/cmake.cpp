@@ -3397,7 +3397,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         return 0;
     }
 
-    int maxRow = (static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4;
     if ((repeat & 0x8) != 0) {
         if (row == 0) {
             if (select < 10) {
@@ -3410,7 +3409,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
-        if (row < maxRow) {
+        if (row < ((static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4)) {
             row = static_cast<short>(row + 1);
         } else {
             row = 0;

@@ -30,6 +30,8 @@ extern const float kPppLensFlareAlphaScale = 0.0078125f;
 extern const float kPppLensFlareNegate = -1.0f;
 extern const float kPppLensFlareZScale = 16777215.0f;
 extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+extern const double kYmEnvRadToDeg;
+extern const float kYmEnvDefaultScale;
 extern "C" {
 double atan2(double, double);
 double sqrt(double);
@@ -623,7 +625,7 @@ void CChara::CalcMogScore()
 			fur.m_alphaScore += a;
 
 			const int ring = dist % 12;
-			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
+			int angle = static_cast<int>(kYmEnvRadToDeg * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
 			angle %= 0x2D;
 
 			for (int i = 0; i < 3; i++) {
@@ -684,11 +686,11 @@ void CChara::CalcMogScore()
 		const int b1 = fur.m_score[1];
 		const int b2 = fur.m_score[2];
 
-		if (b0 > 2 && 0.75f * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+		if (b0 > 2 && kYmEnvDefaultScale * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
 			Game.m_gameWork.m_mogScoreRadarType = 1;
-		} else if (b1 > 2 && 0.75f * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+		} else if (b1 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
 			Game.m_gameWork.m_mogScoreRadarType = 2;
-		} else if (b2 > 2 && 0.75f * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+		} else if (b2 > 2 && kYmEnvDefaultScale * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
 			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
 			Game.m_gameWork.m_mogScoreRadarType = 0;

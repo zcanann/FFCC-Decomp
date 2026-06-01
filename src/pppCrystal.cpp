@@ -46,18 +46,6 @@ struct pppCrystalColorBlock {
     pppCVECTOR m_color;
 };
 
-struct HSD_ImageBuffer {
-    u8* m_imageData;
-    GXTexFmt m_format;
-    u32 m_width;
-    u32 m_height;
-    u32 m_imageCount;
-    u32 m_bufferSize;
-};
-
-void ImageBufferSetPixel_IA8(
-    HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
-
 union CrystalFloatBits {
     float value;
     u32 bits;
@@ -389,59 +377,4 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* pa
 
 	work->m_refractionMap = 0;
 	work->m_refractionTexObj = 0;
-}
-
-void MakeRefractionMap(HSD_ImageBuffer* image)
-{
-	float yCoord = FLOAT_80330FD4;
-	float stepX = 2.0f / (float)(image->m_width - 1U);
-	float stepY = 2.0f / (float)(image->m_height - 1U);
-
-	for (u32 y = 0; y < image->m_height; y++) {
-		float ySq = yCoord * yCoord;
-		float xCoord = FLOAT_80330FD4;
-
-		for (u32 x = 0; x < image->m_width; x++) {
-			float magnitude = xCoord * xCoord + ySq;
-			if (magnitude > FLOAT_80330FD8) {
-				magnitude = CrystalSqrtPositive(magnitude);
-			} else if ((double)magnitude < kPppLensFlareZeroD) {
-				magnitude = NAN;
-			} else if (CrystalFpClassify(magnitude) == 1) {
-				magnitude = NAN;
-			}
-
-			if (magnitude > kPppLensFlareOne) {
-				magnitude = kPppLensFlareOne;
-			}
-
-			double modulation = fmod(magnitude, kPppLensFlareOcclusionStep);
-			magnitude = FLOAT_80331008 * (magnitude * (float)modulation);
-			ImageBufferSetPixel_IA8(
-				image, x, y,
-				__cvt_fp2unsigned((double)(xCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C)),
-				__cvt_fp2unsigned((double)(yCoord * magnitude * FLOAT_80331010 + FLOAT_8033100C)), 0, 0);
-			xCoord += stepX;
-		}
-
-		yCoord += stepY;
-	}
-
-	DCFlushRange(image->m_imageData, image->m_bufferSize);
-}
-
-void ImageBufferSetPixel_IA8(
-	HSD_ImageBuffer* image, unsigned long x, unsigned long y, unsigned long intensity, unsigned long alpha,
-	unsigned long, unsigned long)
-{
-	u32 yTile = y >> 2;
-	u32 yFine = (y & 3) * 4;
-	u32 xFine = x & 3;
-	u8* pixel = image->m_imageData +
-		yTile * ((image->m_width & 0x1FFFFFFCU) << 3) +
-		(x & 0x1FFFFFFC) * 8 +
-		(xFine + yFine) * 2;
-
-	pixel[0] = (u8)intensity;
-	pixel[1] = (u8)alpha;
 }

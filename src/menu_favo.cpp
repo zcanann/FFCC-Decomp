@@ -109,7 +109,7 @@ void CMenuPcs::FavoDraw()
 					x += fillW * entry->uvScale;
 				}
 
-				if (fillW > FLOAT_80333040 && fillW < w) {
+				if (fillW > FLOAT_80333040 && fillW < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -118,7 +118,8 @@ void CMenuPcs::FavoDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = static_cast<float>(DOUBLE_80333050 / static_cast<double>(entry->duration)) * w;
+					float remainW =
+					    static_cast<float>(DOUBLE_80333050 / static_cast<double>(entry->duration)) * static_cast<float>(entry->w);
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;

@@ -186,6 +186,11 @@ static inline int& S32At(CMapObj* self, unsigned int offset)
     return *reinterpret_cast<int*>(Ptr(self, offset));
 }
 
+static inline unsigned int& U32At(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(self, offset));
+}
+
 static inline float& F32At(CMapObj* self, unsigned int offset)
 {
     return *reinterpret_cast<float*>(Ptr(self, offset));
@@ -1436,20 +1441,22 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
-    if ((U8At(this, 0x15) != priority) || ((U8At(this, 0x18) & 4) == 0)) {
+    if (priority != U8At(this, 0x15)) {
         return;
     }
-
-    _GXColor mapColor;
-    _GXColor lightColor;
-    _GXColor* worldMapColor = &s_mapObjLightColor;
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    if ((U8At(this, 0x18) & 4) == 0) {
+        return;
+    }
 
     Vec lightPos;
     lightPos.x = F32At(this, 0xC4);
     lightPos.y = F32At(this, 0xD4);
     lightPos.z = F32At(this, 0xE4);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, S32At(this, 0x38));
+
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    _GXColor mapColor;
+    _GXColor lightColor;
 
     *reinterpret_cast<unsigned int*>(materialMan + 72) = 0xACE0F;
     *reinterpret_cast<unsigned int*>(materialMan + 68) = 0xFFFFFFFF;
@@ -1469,7 +1476,7 @@ void CMapObj::Draw(unsigned char priority)
     if (U8At(this, 0x22) != 0) {
         CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
     }
-    if (S32At(this, 0x3C) != 0) {
+    if (U32At(this, 0x3C) != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
                                    reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
                                    m_worldMtx);
@@ -1480,11 +1487,11 @@ void CMapObj::Draw(unsigned char priority)
     *reinterpret_cast<unsigned int*>(materialMan + 304) = *reinterpret_cast<unsigned int*>(materialMan + 292);
     *reinterpret_cast<unsigned int*>(materialMan + 64) = *reinterpret_cast<unsigned int*>(materialMan + 72);
 
-    worldMapColor->a = U8At(this, 0x23);
-    if (U8At(this, 0x21) == 0) {
-        mapColor = MapMng.m_mapColor;
-    } else {
+    s_mapObjLightColor.a = U8At(this, 0x23);
+    if (U8At(this, 0x21) != 0) {
         mapColor = m_ambientColor;
+    } else {
+        mapColor = MapMng.m_mapColor;
     }
 
     if (MapMng.m_colorScaleEnable != 0) {
@@ -1501,7 +1508,7 @@ void CMapObj::Draw(unsigned char priority)
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
-    lightColor = *worldMapColor;
+    lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),

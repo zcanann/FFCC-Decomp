@@ -90,8 +90,14 @@ union UMapHitDrawMode
     unsigned char m_byte;
 };
 
+struct CMapHitDrawMode
+{
+    unsigned char m_byte;
+};
+
 extern UMapHitDrawMode s_bitMask;
-#define gMapHitDrawMode s_bitMask
+extern CMapHitDrawMode g_MapHitDrawMode;
+#define gMapHitDrawMode g_MapHitDrawMode
 extern int g_hit_edge_idx_min;
 extern float g_hit_edge_t;
 extern float g_hit_t;
@@ -100,7 +106,8 @@ extern float g_hit_t_slide_min;
 extern CMapHitFace* g_hit_f;
 extern CMapHitFace* g_hit_lpface;
 extern CMapHitFace* g_hit_lpface_min;
-extern unsigned char gMapHitFaceFlag;
+extern unsigned char g_MapHitFaceFlag;
+#define gMapHitFaceFlag g_MapHitFaceFlag
 
 #define gMapHitFace g_hit_f
 

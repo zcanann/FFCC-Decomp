@@ -1258,10 +1258,10 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 
 			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
 			particleFlags = *reinterpret_cast<unsigned short*>(itemData + 0x0C);
-			if ((particleFlags & 0x200) == 0) {
-				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
-			} else {
+			if ((particleFlags & 0x200) != 0) {
 				CFlatRuntime2Storage().SetParticleWorkBind(sourceObj);
+			} else {
+				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
 			}
 			CFlatRuntime2Storage().PutParticleWork();
 		}

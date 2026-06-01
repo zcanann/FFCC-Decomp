@@ -34,9 +34,9 @@ public:
 	class CObject
 	{
 	public:
-		CObject() {}
+		CObject();
 		~CObject() {}
-		void onNewFinished();
+		virtual void onNewFinished();
 
 		unsigned int m_id;         // 0x0
 		void** m_freeListNode;     // 0x4
@@ -58,7 +58,14 @@ public:
 		short m_0x32;              // 0x32
 		short m_0x34;              // 0x34-0x36
 		short m_argCount;          // 0x36-0x38
-		unsigned char m_flags;     // 0x38-0x3B
+		union {
+			unsigned char m_flags;     // 0x38-0x3B
+			struct {
+				unsigned char m_flagBits0 : 3;
+				unsigned char m_constructFlag : 1;
+				unsigned char m_flagBits1 : 4;
+			} m_flagBits;
+		};
 		int m_0x3C;                // 0x3C
 		int m_0x40;                // 0x40
 		int m_0x44;                // 0x44
@@ -202,5 +209,11 @@ STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_code) == 0x34);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_systemKind) == 0x40);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
 STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
+STATIC_ASSERT(sizeof(CFlatRuntime::CObject) == 0x4C);
+
+inline CFlatRuntime::CObject::CObject()
+{
+	m_flagBits.m_constructFlag = 0;
+}
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

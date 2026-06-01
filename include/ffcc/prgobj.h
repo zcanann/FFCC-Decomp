@@ -9,6 +9,8 @@ class CGObject;
 class CGPrgObj : public CGObject
 {
 public:
+    CGPrgObj();
+
     void onCreate();
     void onDestroy();
     void onFrame();

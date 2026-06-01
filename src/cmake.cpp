@@ -3215,7 +3215,6 @@ void CMenuPcs::CmakeResultDraw1()
     short mode = *reinterpret_cast<short*>(state + 0x10);
     float alpha = CalcCmakeFadeAlpha(this);
     float popupAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
-    float textAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
 
     DrawWMFrame0(1, FLOAT_80333258);
 
@@ -3258,6 +3257,11 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333258, FLOAT_80333258);
     DrawCmakeTitle(7, FLOAT_80333258, alpha);
+
+    float textAlpha = alpha;
+    if (mode == 0) {
+        textAlpha = FLOAT_80333258;
+    }
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];

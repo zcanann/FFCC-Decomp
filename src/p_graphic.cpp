@@ -48,7 +48,7 @@ extern const char s_graphic_move_debug_fmt[];
 extern const char s_graphic_pad_input_fmt[];
 const char s_debug_pad_port_fmt[] = "%dP";
 const char s_debug_frame_fmt[] = "%d";
-static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
+extern "C" const GXColor s_debug_bar_color;
 extern "C" const char s_scenegraph_step_none[];
 extern "C" const char s_scenegraph_step_x8[];
 extern "C" const char s_scenegraph_step_x0[];

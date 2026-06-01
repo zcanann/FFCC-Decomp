@@ -43,13 +43,13 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 extern const char s_maphit_cpp[] = "maphit.cpp";
 
 int g_hit_edge_idx_min;
-float g_hit_edge_t;
-float g_hit_t_min;
 float g_hit_t;
-CMapHitFace* g_hit_lpface;
-CMapHitFace* g_hit_f;
+float g_hit_t_min;
 float g_hit_t_slide_min;
+CMapHitFace* g_hit_f;
+CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_lpface_min;
+int g_hitTgt;
 
 /*
  * --INFO--
@@ -491,15 +491,15 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
-    g_hit_edge_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     int edgeIndex = -1;
 
-    if (g_hit_edge_t > kMapHitEdgeMaxT) {
+    if (hitT > kMapHitEdgeMaxT) {
         return 0;
     }
 
-    if (!(g_hit_edge_t < kMapHitEdgeMinT) && g_hit_edge_t < g_hit_t_min) {
-        PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
+    if (!(hitT < kMapHitEdgeMinT) && hitT < g_hit_t_min) {
+        PSVECScale(hitDirection, &g_hit_hpv, hitT);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
@@ -609,7 +609,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         }
     }
 
-    if (edgeIndex != -1 || g_hit_edge_t < kMapHitEdgeMinT || g_hit_t_min <= g_hit_edge_t) {
+    if (edgeIndex != -1 || hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
         if (gMapHitDrawMode.m_byte != 0) {
             g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
         }
@@ -629,9 +629,9 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 float edgeT;
                 if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
                     edgeT < g_hit_t_min) {
-                    g_hit_edge_t = edgeT;
+                    hitT = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
+                    PSVECScale(hitDirection, &g_hit_hpv, hitT);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
                     break;
                 }
@@ -639,13 +639,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             previous = current;
         }
 
-        if (edgeIndex == -1 || g_hit_t_min <= g_hit_edge_t) {
+        if (edgeIndex == -1 || g_hit_t_min <= hitT) {
             return 0;
         }
     }
 
-    g_hit_t = g_hit_edge_t;
-    g_hit_t_min = g_hit_edge_t;
+    g_hit_t = hitT;
+    g_hit_t_min = hitT;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     if (gMapHitDrawMode.m_byte != 0) {

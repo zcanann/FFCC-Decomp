@@ -3048,20 +3048,23 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
-	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
-
-	for (; entry < linkCount; entry++, links++) {
-		CGPrgObj* link = *links;
-		if (link != 0 &&
-		    !(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-		      (link->GetCID() & 0x6D) == 0x6D &&
-		      *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(link->m_scriptHandle) + 0x3B4) != 0) &&
-		    link->m_lastStateId != 6 && link->m_lastStateId != 2) {
-			break;
+	CGCharaObj* linkCursor = this;
+	while (entry < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8)) {
+		CGPrgObj** linkSlot = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(linkCursor) + 0x6AC);
+		if (*linkSlot != 0) {
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+			    ((*linkSlot)->GetCID() & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>((*linkSlot)->m_scriptHandle) + 0x3B4) != 0) {
+				goto next_link;
+			} else if ((*linkSlot)->m_lastStateId != 6 && (*linkSlot)->m_lastStateId != 2) {
+				break;
+			}
 		}
+next_link:
+		linkCursor = reinterpret_cast<CGCharaObj*>(reinterpret_cast<unsigned char*>(linkCursor) + 4);
+		entry++;
 	}
-	if (entry == linkCount) {
+	if (entry == *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8)) {
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;

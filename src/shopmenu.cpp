@@ -40,7 +40,7 @@ void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 char s_shopmenu_cpp[] = "shopmenu.cpp";
 extern char s_shop_80332e54[];
 unsigned short gShopMenuInputLatch;
-CShopMenu* g_shopMenu;
+extern CShopMenu* g_shopMenu;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
 extern float FLOAT_80332d34;

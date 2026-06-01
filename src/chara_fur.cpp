@@ -33,8 +33,8 @@ extern "C" {
 double atan2(double, double);
 double sqrt(double);
 }
-unsigned long long g_chara_fur_1;
-unsigned long long g_chara_fur_2;
+extern const unsigned long long g_chara_fur_1;
+extern const unsigned long long g_chara_fur_2;
 
 struct Vec4d
 {

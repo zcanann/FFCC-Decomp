@@ -147,12 +147,12 @@ static inline CMaterialSet* ModelMaterialSet(CChara::CModel* model)
 
 static inline int ModelPosQuant(CChara::CModel* model)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x2C);
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x34);
 }
 
 static inline int ModelNormQuant(CChara::CModel* model)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x30);
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(ModelRef(model)) + 0x38);
 }
 
 static inline CCharaMeshRaw* ModelMeshes(CChara::CModel* model)
@@ -2370,22 +2370,23 @@ void CChara::CModel::SetFrame(float frame)
  */
 void CChara::CModel::CalcFurColor()
 {
-	float* furTarget = (float*)((u8*)this + 0x118);
-	float* furCur = (float*)((u8*)this + 0x11C);
-	float delta = *furTarget - *furCur;
+	float delta = m_furTarget - m_furCur;
 	float step = -0.01f;
-	if (delta >= -0.01f) {
+	if (!(delta < -0.01f)) {
 		step = delta;
 		if (0.01f < delta) {
 			step = 0.01f;
 		}
 	}
-	*furCur += step;
-	if (*furCur < 0.0f) {
-		*furCur = 0.0f;
-	} else if (*furCur > 1.0f) {
-		*furCur = 1.0f;
+	m_furCur += step;
+	float furColor = 0.0f;
+	if (!(m_furCur < 0.0f)) {
+		furColor = m_furCur;
+		if (1.0f < m_furCur) {
+			furColor = 1.0f;
+		}
 	}
+	m_furCur = furColor;
 }
 
 /*

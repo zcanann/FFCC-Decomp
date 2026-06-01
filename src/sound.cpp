@@ -1512,22 +1512,38 @@ void CSound::FadeOutSe(int seId, int fadeFrames)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CSound::ChangeSeVolume(int, int, int)
+void CSound::ChangeSeVolume(int seId, int volume, int frames)
 {
-	// TODO
+    if (seId < 0) {
+        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+    } else {
+        RedSound(this)->SeVolume(seId, volume, frames);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CSound::ChangeSePan(int, int, int)
+void CSound::ChangeSePan(int seId, int pan, int frames)
 {
-	// TODO
+    if (seId < 0) {
+        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+    } else {
+        RedSound(this)->SePan(seId, pan, frames);
+    }
 }
 
 /*

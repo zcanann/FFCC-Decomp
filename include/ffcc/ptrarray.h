@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "ffcc/memory.h"
+#include "ffcc/ref.h"
 #include "ffcc/system.h"
 #include <string.h>
 
@@ -123,18 +124,15 @@ void CPtrArray<T>::RemoveAll()
 template <class T>
 void CPtrArray<T>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        T item = m_items[i];
         if (item != 0) {
-            int refCount = item[1];
-            item[1] = refCount - 1;
-            if (refCount - 1 == 0 && item != 0) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            CRef* ref = reinterpret_cast<CRef*>(item);
+            if (ref->DecRef() == 0) {
+                delete ref;
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
     RemoveAll();
 }

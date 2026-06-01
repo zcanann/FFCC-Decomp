@@ -546,18 +546,16 @@ static inline void ReleaseRefCounted(void* refObject)
 		return;
 	}
 
-	int* refData = reinterpret_cast<int*>(refObject);
-	int refCount = refData[1] - 1;
-	refData[1] = refCount;
-	if (refCount == 0) {
-		(*(void (**)(void*, int))(*refData + 8))(refObject, 1);
+	CRef* ref = reinterpret_cast<CRef*>(refObject);
+	if (ref->DecRef() == 0) {
+		delete ref;
 	}
 }
 
 static inline void RetainRefCounted(void* refObject)
 {
 	if (refObject != 0) {
-		reinterpret_cast<int*>(refObject)[1]++;
+		reinterpret_cast<CRef*>(refObject)->AddRef();
 	}
 }
 

@@ -248,19 +248,15 @@ int CPtrArray<T>::GetSize()
 template <class T>
 void CPtrArray<T>::ReleaseAndRemoveAll()
 {
-    int offset = 0;
-
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        int* item = *(int**)((int)m_items + offset);
+        T item = m_items[i];
         if (item != 0) {
-            int nextRefCount = item[1] - 1;
-            item[1] = nextRefCount;
-            if (nextRefCount == 0 && item != 0) {
-                (*(void (**)(int*, int))(*item + 8))(item, 1);
+            CRef* ref = reinterpret_cast<CRef*>(item);
+            if (ref->DecRef() == 0) {
+                delete ref;
             }
-            *(unsigned int*)((int)m_items + offset) = 0;
+            m_items[i] = 0;
         }
-        offset += 4;
     }
 
     RemoveAll();
@@ -469,7 +465,7 @@ static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
         CRef* ref = reinterpret_cast<CRef*>(ptr);
-        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+        if (ref->DecRef() == 0) {
             delete ref;
         }
         ptr = 0;
@@ -480,7 +476,7 @@ template <typename T>
 static inline void AddSharedRef(T* ptr)
 {
     if (ptr != 0) {
-        reinterpret_cast<int*>(ptr)[1]++;
+        reinterpret_cast<CRef*>(ptr)->AddRef();
     }
 }
 
@@ -933,14 +929,14 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             releaseUnuseLoadModel(static_cast<int>(releaseMask));
 
             for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-                int* loadAnim = reinterpret_cast<int*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-                if (!(((loadAnim[4] < 0) && (loadAnim[1] == 1)) ||
-                      ((loadAnim[4] >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim[5])) != 0)))) {
+                CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+                if (!(((loadAnim->m_mergeFileId < 0) && (loadAnim->GetRef() == 1)) ||
+                      ((loadAnim->m_mergeFileId >= 0) && ((releaseMask & static_cast<unsigned int>(loadAnim->m_mergeFlags)) != 0)))) {
                     continue;
                 }
 
-                CRef* loadAnimRef = reinterpret_cast<CRef*>(loadAnim);
-                if (--reinterpret_cast<int*>(loadAnimRef)[1] == 0) {
+                CRef* loadAnimRef = loadAnim;
+                if (loadAnimRef->DecRef() == 0) {
                     delete loadAnimRef;
                 }
                 LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));

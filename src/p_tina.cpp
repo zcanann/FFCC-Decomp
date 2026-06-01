@@ -126,26 +126,48 @@ unsigned int CPartPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int CPartPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
 CProcessTable CPartPcs::m_table[2] = {
     {
-        const_cast<char*>(s_CPartPcs_GAME_801D7F2C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
-        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000038,
-        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040,
-        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        const_cast<char*>(s_CPartPcs_GAME_801D7F2C),
+        {
+            m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
+            m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
+            m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
+            0x15, 0,
+            m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
+            0x1D, 0,
+            m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
+            0x28, 0,
+            m_table_desc5[0], m_table_desc5[1], m_table_desc5[2],
+            0x2C, 1,
+            m_table_desc6[0], m_table_desc6[1], m_table_desc6[2],
+            0x31, 1,
+            m_table_desc7[0], m_table_desc7[1], m_table_desc7[2],
+            0x38, 1,
+            m_table_desc8[0], m_table_desc8[1], m_table_desc8[2],
+            0x3E, 1,
+            m_table_desc9[0], m_table_desc9[1], m_table_desc9[2],
+            0x40, 1,
+        },
     },
     {
-        const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000028, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000002C,
-        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000031, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x0000003E,
-        0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000040, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000, 0x00000000, 0x00000000,
+        const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C),
+        {
+            m_table_desc10[0], m_table_desc10[1], m_table_desc10[2],
+            m_table_desc11[0], m_table_desc11[1], m_table_desc11[2],
+            m_table_desc12[0], m_table_desc12[1], m_table_desc12[2],
+            0x15, 0,
+            m_table_desc13[0], m_table_desc13[1], m_table_desc13[2],
+            0x1D, 0,
+            m_table_desc14[0], m_table_desc14[1], m_table_desc14[2],
+            0x28, 0,
+            m_table_desc15[0], m_table_desc15[1], m_table_desc15[2],
+            0x2C, 1,
+            m_table_desc16[0], m_table_desc16[1], m_table_desc16[2],
+            0x31, 1,
+            m_table_desc17[0], m_table_desc17[1], m_table_desc17[2],
+            0x3E, 1,
+            m_table_desc18[0], m_table_desc18[1], m_table_desc18[2],
+            0x40, 1,
+        },
     },
 };
 char g_MsgFlashy[0x36] =
@@ -175,73 +197,8 @@ inline CPartPcs::CPartPcs()
 {
 }
 
-static inline char* InitCPartPcsTable(char* profileName)
-{
-	unsigned int* table = reinterpret_cast<unsigned int*>(&CPartPcs::m_table[0]);
-
-	table[33] = CPartPcs::m_table_desc7[1];
-	table[37] = CPartPcs::m_table_desc8[0];
-	table[38] = CPartPcs::m_table_desc8[1];
-	table[1] = CPartPcs::m_table_desc0[0];
-	table[2] = CPartPcs::m_table_desc0[1];
-	table[3] = CPartPcs::m_table_desc0[2];
-	table[4] = CPartPcs::m_table_desc1[0];
-	table[5] = CPartPcs::m_table_desc1[1];
-	table[6] = CPartPcs::m_table_desc1[2];
-	table[7] = CPartPcs::m_table_desc2[0];
-	table[8] = CPartPcs::m_table_desc2[1];
-	table[9] = CPartPcs::m_table_desc2[2];
-	table[12] = CPartPcs::m_table_desc3[0];
-	table[13] = CPartPcs::m_table_desc3[1];
-	table[14] = CPartPcs::m_table_desc3[2];
-	table[17] = CPartPcs::m_table_desc4[0];
-	table[18] = CPartPcs::m_table_desc4[1];
-	table[19] = CPartPcs::m_table_desc4[2];
-	table[22] = CPartPcs::m_table_desc5[0];
-	table[23] = CPartPcs::m_table_desc5[1];
-	table[24] = CPartPcs::m_table_desc5[2];
-	table[27] = CPartPcs::m_table_desc6[0];
-	table[28] = CPartPcs::m_table_desc6[1];
-	table[29] = CPartPcs::m_table_desc6[2];
-	table[32] = CPartPcs::m_table_desc7[0];
-	table[34] = CPartPcs::m_table_desc7[2];
-	table[39] = CPartPcs::m_table_desc8[2];
-	table[42] = CPartPcs::m_table_desc9[0];
-	table[43] = CPartPcs::m_table_desc9[1];
-	table[44] = CPartPcs::m_table_desc9[2];
-	table[119] = CPartPcs::m_table_desc17[0];
-	table[120] = CPartPcs::m_table_desc17[1];
-	table[88] = CPartPcs::m_table_desc10[0];
-	table[89] = CPartPcs::m_table_desc10[1];
-	table[90] = CPartPcs::m_table_desc10[2];
-	table[91] = CPartPcs::m_table_desc11[0];
-	table[92] = CPartPcs::m_table_desc11[1];
-	table[93] = CPartPcs::m_table_desc11[2];
-	table[94] = CPartPcs::m_table_desc12[0];
-	table[95] = CPartPcs::m_table_desc12[1];
-	table[96] = CPartPcs::m_table_desc12[2];
-	table[99] = CPartPcs::m_table_desc13[0];
-	table[100] = CPartPcs::m_table_desc13[1];
-	table[101] = CPartPcs::m_table_desc13[2];
-	table[104] = CPartPcs::m_table_desc14[0];
-	table[105] = CPartPcs::m_table_desc14[1];
-	table[106] = CPartPcs::m_table_desc14[2];
-	table[109] = CPartPcs::m_table_desc15[0];
-	table[110] = CPartPcs::m_table_desc15[1];
-	table[111] = CPartPcs::m_table_desc15[2];
-	table[114] = CPartPcs::m_table_desc16[0];
-	table[115] = CPartPcs::m_table_desc16[1];
-	table[116] = CPartPcs::m_table_desc16[2];
-	table[121] = CPartPcs::m_table_desc17[2];
-	table[124] = CPartPcs::m_table_desc18[0];
-	table[125] = CPartPcs::m_table_desc18[1];
-	table[126] = CPartPcs::m_table_desc18[2];
-
-	return profileName;
-}
-
 CPartPcs PartPcs;
-CProfile g_par_calc_prof(InitCPartPcsTable(const_cast<char*>(s_no_name_8032fdcc)));
+CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)

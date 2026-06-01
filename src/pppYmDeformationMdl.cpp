@@ -51,6 +51,11 @@ static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
 }
 
 extern const float kYmDeformationMdlZero = 0.0f;
+extern const float kYmDeformationMdlScreenWidth;
+extern const float kYmDeformationMdlScreenHeight;
+extern const float kYmDeformationMdlTexOffset;
+extern const float kYmDeformationMdlTexDepth;
+extern const float kYmDeformationMdlDegToRad;
 
 static inline Mtx& CameraMatrix()
 {
@@ -164,11 +169,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = screenMtx[0][2];
         texMtx[1][2] = screenMtx[1][2];
         texMtx[2][2] = screenMtx[2][2];
-        texMtx[0][0] = texMtx[0][0] * (320.0f / (float)width);
-        texMtx[1][1] = texMtx[1][1] * -(224.0f / (float)height);
-        texMtx[0][2] = -0.5f;
-        texMtx[1][2] = -0.5f;
-        texMtx[2][2] = -1.0f;
+        texMtx[0][0] = texMtx[0][0] * (kYmDeformationMdlScreenWidth / (float)width);
+        texMtx[1][1] = texMtx[1][1] * -(kYmDeformationMdlScreenHeight / (float)height);
+        texMtx[0][2] = kYmDeformationMdlTexOffset;
+        texMtx[1][2] = kYmDeformationMdlTexOffset;
+        texMtx[2][2] = kYmDeformationMdlTexDepth;
         PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -182,7 +187,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
             state->m_angle = 1;
         }
 
-        PSMTXRotRad(rotMtx, 'z', 0.017453292f * (float)state->m_angle);
+        PSMTXRotRad(rotMtx, 'z', kYmDeformationMdlDegToRad * (float)state->m_angle);
         indMtx[0][0] = rotMtx[0][0] * state->m_scale;
         indMtx[0][1] = rotMtx[0][1] * state->m_scale;
         indMtx[0][2] = DeformationMdlZero();

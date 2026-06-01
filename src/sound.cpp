@@ -1858,7 +1858,8 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
  */
 void CSound::StopSe3DGroup(int group)
 {
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
+    char* sound = reinterpret_cast<char*>(this);
+    char* se = sound + 0x2C;
     u32 i = 0;
 
     while (i < 0x80) {
@@ -1868,7 +1869,7 @@ void CSound::StopSe3DGroup(int group)
             if (se3dHandle < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt));
             } else {
-                char* found = reinterpret_cast<char*>(this) + 0x2C;
+                char* found = sound + 0x2C;
                 int idx = 0;
                 int count;
 
@@ -1910,7 +1911,7 @@ found_se:
                     if (playId < 0) {
                         System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
                     } else {
-                        RedSound(this)->SeStop(playId);
+                        reinterpret_cast<CRedSound*>(sound + 8)->SeStop(playId);
                     }
                     reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
                 }

@@ -1,4 +1,5 @@
 #include "ffcc/pppAngAccele.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
 
@@ -11,9 +12,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param)
+void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
 {
-    int* angularAccel = (int*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
+    int* angularAccel = (int*)(obj->m_workArea + param->m_serializedDataOffsets[1]);
 
     angularAccel[2] = 0;
     angularAccel[1] = 0;
@@ -29,10 +30,10 @@ void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngAccele(pppAngAcceleObj* obj, pppAngAcceleUnkB* param_2, pppAngAcceleUnkC* param_3)
+void pppAngAccele(_pppPObject* obj, pppAngAcceleUnkB* param_2, _pppCtrlTable* param_3)
 {
-    int* angularVelocity = (int*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
-    int* angularAccel = (int*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
+    int* angularVelocity = (int*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
+    int* angularAccel = (int*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
 
     if (gPppCalcDisabled != 0) {
         return;

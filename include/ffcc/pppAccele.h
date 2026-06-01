@@ -1,10 +1,8 @@
 #ifndef _FFCC_PPPACCELE_H_
 #define _FFCC_PPPACCELE_H_
 
-typedef struct {
-    char pad[0x0C];   // padding to offset 0x0C
-    int m_graphId;    // 0x0C
-} pppAcceleObj;
+struct _pppCtrlTable;
+struct _pppPObject;
 
 typedef struct {
     int m_graphId;          // 0x00
@@ -14,21 +12,15 @@ typedef struct {
     float m_arg3;           // 0x10
 } pppAcceleUnkB;
 
-typedef struct {
-    char pad[0x0C];           // padding to 0x0C
-    int* m_serializedDataOffsets; // 0x0C
-} pppAcceleUnkC;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppAccele(pppAcceleObj* obj, pppAcceleUnkB* param_2, pppAcceleUnkC* param_3);
-void pppAcceleCon(pppAcceleObj* obj, pppAcceleUnkC* param);
+void pppAccele(_pppPObject* obj, pppAcceleUnkB* param_2, _pppCtrlTable* param_3);
+void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

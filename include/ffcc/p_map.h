@@ -40,7 +40,7 @@ public:
     static unsigned int m_table_desc23[3];
     static unsigned int m_table[3][0x15C / sizeof(unsigned int)];
 
-    CMapPcs();
+    CMapPcs() {}
 
     void Init();
     void Quit();

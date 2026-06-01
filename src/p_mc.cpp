@@ -3,7 +3,7 @@
 #include "ffcc/math.h"
 #include "ffcc/wm_menu.h"
 
-extern const char s_CMcPcs_80331B10[] = "CMcPcs";
+extern const char s_CMcPcs_80331B10[];
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
 

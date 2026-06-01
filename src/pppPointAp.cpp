@@ -33,8 +33,8 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
     u32 srcOffset = data->srcOffset;
     u32 targetOffset = data->targetOffset;
-    Vec* src = (Vec*)((u8*)pObject + srcOffset + 0x80);
-    u8* target = (u8*)pObject + targetOffset + 0x80;
+    Vec* src = (Vec*)(pObject->m_workArea + srcOffset);
+    u8* target = pObject->m_workArea + targetOffset;
     _pppPointApStep* payload = (_pppPointApStep*)step;
 
     if (gPppCalcDisabled != 0) {
@@ -56,7 +56,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             *(_pppPObject**)((u8*)obj + 4) = pObject;
         }
 
-        Vec* dst = (Vec*)((u8*)obj + payload->m_childDstOffset + 0x80);
+        Vec* dst = (Vec*)(obj->m_workArea + payload->m_childDstOffset);
         if (payload->m_useWorldMatrix == 0) {
             dst->x = src->x;
             dst->y = src->y;
@@ -83,6 +83,6 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
     _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
-    u8* target = (u8*)pObject + data->targetOffset;
-    target[0x81] = 0;
+    u8* target = pObject->m_workArea + data->targetOffset;
+    target[1] = 0;
 }

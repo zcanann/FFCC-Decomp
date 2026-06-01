@@ -1,10 +1,8 @@
 #ifndef _FFCC_PPPANGACCELE_H_
 #define _FFCC_PPPANGACCELE_H_
 
-typedef struct {
-    char pad[0x0C];
-    int m_graphId; // 0x0C
-} pppAngAcceleObj;
+struct _pppCtrlTable;
+struct _pppPObject;
 
 typedef struct {
     int m_graphId; // 0x00
@@ -14,17 +12,12 @@ typedef struct {
     int m_z;
 } pppAngAcceleUnkB;
 
-typedef struct {
-    char pad[0x0C];
-    int* m_serializedDataOffsets;
-} pppAngAcceleUnkC;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppAngAccele(pppAngAcceleObj* obj, pppAngAcceleUnkB* param_2, pppAngAcceleUnkC* param_3);
-void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param);
+void pppAngAccele(_pppPObject* obj, pppAngAcceleUnkB* param_2, _pppCtrlTable* param_3);
+void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }

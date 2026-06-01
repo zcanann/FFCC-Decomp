@@ -1,7 +1,14 @@
 #include "ffcc/pppScale.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
 const float kPppScaleZero = 0.0f;
+
+struct PppScaleInput {
+	int m_graphId;
+	int m_padding;
+	float m_scale[3];
+};
 
 /*
  * --INFO--
@@ -12,10 +19,10 @@ const float kPppScaleZero = 0.0f;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScaleCon(void* obj, void* param)
+void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	int* data = *((int**)((char*)param + 0x0c));
-	float* value = (float*)((char*)obj + data[0] + 0x80);
+	int* data = ctrlTable->m_serializedDataOffsets;
+	float* value = (float*)(obj->m_workArea + data[0]);
 	float zero = kPppScaleZero;
 	
 	value[2] = zero;
@@ -32,20 +39,21 @@ void pppScaleCon(void* obj, void* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScale(void* obj, void* param2, void* param3)
+void pppScale(_pppPObject* obj, void* param2, _pppCtrlTable* ctrlTable)
 {
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	if (*((int*)((char*)param2 + 0x00)) != *((int*)((char*)obj + 0x0c))) {
+	PppScaleInput* input = (PppScaleInput*)param2;
+	if (input->m_graphId != obj->m_graphId) {
 		return;
 	}
 
-	int* data = *((int**)((char*)param3 + 0x0c));
-	float* scale = (float*)((char*)obj + data[0] + 0x80);
+	int* data = ctrlTable->m_serializedDataOffsets;
+	float* scale = (float*)(obj->m_workArea + data[0]);
 	
-	scale[0] += *((float*)((char*)param2 + 0x08));
-	scale[1] += *((float*)((char*)param2 + 0x0c));
-	scale[2] += *((float*)((char*)param2 + 0x10));
+	scale[0] += input->m_scale[0];
+	scale[1] += input->m_scale[1];
+	scale[2] += input->m_scale[2];
 }

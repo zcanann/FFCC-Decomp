@@ -13,7 +13,8 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(offsetof(pppYmDeformationMdl, m_workArea) == 0x80);
+STATIC_ASSERT(offsetof(pppYmDeformationMdl, m_object) == 0);
+STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
 
 struct YmDeformationMdlColorInfo {
     u32 m_unk0;
@@ -29,13 +30,6 @@ struct YmDeformationMdlState {
     float m_values[5];
 };
 
-struct pppYmDeformationMdlLayout {
-    u8 m_pad0[0x40];
-    pppFMATRIX m_modelMatrix;
-    Vec* m_drawMatrixPtr;
-    u8 m_pad74[0xC];
-};
-
 struct _pppEnvStYmDeformationMdl {
     void* m_stagePtr;
     CMaterialSet* m_materialSetPtr;
@@ -45,7 +39,7 @@ struct _pppEnvStYmDeformationMdl {
 template <typename T>
 static inline T* PppWorkArea(pppYmDeformationMdl* object, pppYmDeformationMdlUnkC* ctrl, int index)
 {
-    return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
+    return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
 static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
@@ -86,7 +80,6 @@ static inline float DeformationMdlZero()
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
-    pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2);
     YmDeformationMdlColorInfo* colorInfo;
     pppModelSt* model;
@@ -121,7 +114,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     int zEnable = (param_2->m_payloadByte2C == 0) ? 1 : 0;
     pppSetDrawEnv(
-        &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
+        &colorInfo->m_color, &pppYmDeformationMdl->m_object.m_drawMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
         param_2->m_payloadByte28, param_2->m_payloadByte29, static_cast<unsigned char>(zEnable), 1, 0);
 
     GXSetNumTevStages(1);
@@ -177,7 +170,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = kYmDeformationMdlTexOffset;
         texMtx[1][2] = kYmDeformationMdlTexOffset;
         texMtx[2][2] = kYmDeformationMdlTexDepth;
-        PSMTXConcat(texMtx, modelObject->m_modelMatrix.value, texMtx);
+        PSMTXConcat(texMtx, pppYmDeformationMdl->m_object.m_drawMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -201,7 +194,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         GXLoadTexObj(backTexture, GX_TEXMAP0);
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
-        pppDrawMesh(model, modelObject->m_drawMatrixPtr, 0);
+        pppDrawMesh(model, pppYmDeformationMdl->m_object.m_drawMatrixPtr, 0);
 
         GXSetTevDirect((GXTevStageID)1);
         GXSetNumIndStages(0);
@@ -239,10 +232,10 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
         ((state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2)),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
+            &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_scale, state->m_values[0],
             state->m_values[1], param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
         CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, state->m_values[2], state->m_values[3],
+            &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3],
             state->m_values[4], param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
 
         if (gPppInConstructor == 0) {

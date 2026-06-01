@@ -41,7 +41,6 @@ static inline short randshort(short value, float scale)
  */
 void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ctrl)
 {
-	u8* base = (u8*)basePtr;
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
@@ -62,7 +61,7 @@ void pppSRandUpHCV(_pppPObject* basePtr, SRandUpHCVParams* in, _pppCtrlTable* ct
 	}
 
 	s32 color_offset = in->sourceOffset;
-	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + color_offset + 0x80);
+	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + color_offset);
 
 	target_colors[0] += (s8)randshort(in->delta[0], target[0]);
 	target_colors[1] += (s8)randshort(in->delta[1], target[1]);

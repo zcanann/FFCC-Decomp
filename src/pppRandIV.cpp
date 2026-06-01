@@ -30,7 +30,6 @@ static inline int randint(int value, float scale)
  */
 void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     f32 value;
     f32* valuePtr;
 
@@ -55,7 +54,7 @@ void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);
     f32 scale = *valuePtr;
 
     target[0] += randint(in->blend[0], scale);

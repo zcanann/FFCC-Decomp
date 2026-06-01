@@ -35,7 +35,6 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
         return;
     }
 
-    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 baseState = basePtr->m_graphId;
@@ -58,7 +57,7 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
     }
 
     s32 sourceOffset = in->sourceOffset;
-    f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + sourceOffset);
     f32 delta = randf(in->blend[0], *valuePtr);
     f32 scale = *valuePtr;
 

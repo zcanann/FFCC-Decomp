@@ -24,7 +24,6 @@ struct RandDownShortParam {
  */
 void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     s16* target;
     f32* valuePtr;
 
@@ -51,7 +50,7 @@ void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTabl
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);
     f32 scale = (f32)in->scale;
     f32 current = *valuePtr;
     f32 scaled = scale * current;

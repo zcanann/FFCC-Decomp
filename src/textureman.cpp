@@ -52,25 +52,6 @@ CTexture::CTexture()
     m_usesExternalAddress = 0;
 }
 
-namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
-static inline unsigned short& U16At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
-}
-
-static inline CTexture* AllocTexture()
-{
-    return ::new (Memory._Alloc(sizeof(CTexture), *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
-                                const_cast<char*>(s_textureman_cpp), 0x2ED, 0)) CTexture;
-}
-
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8003A5FC
@@ -141,7 +122,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x54585452:
-            texture = AllocTexture();
+            texture = new (TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED) CTexture;
             texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
             if (texture->m_name[0] != 0) {
@@ -221,7 +202,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                         while (chunkFile.GetNextChunk(textureChunk)) {
                             switch (textureChunk.m_id) {
                             case 0x54585452:
-                                CTexture* texture = AllocTexture();
+                                CTexture* texture = new (TextureMan.m_memoryStage, const_cast<char*>(s_textureman_cpp), 0x2ED) CTexture;
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (texture->m_name[0] != 0) {

@@ -1,11 +1,14 @@
 #ifndef _PPP_SPMATRIX_H_
 #define _PPP_SPMATRIX_H_
 
+struct _pppCtrlTable;
+struct _pppPObject;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppSpMatrix(void* mtx, void* src, void* data);
+void pppSpMatrix(_pppPObject* mtx, void* src, _pppCtrlTable* data);
 
 #ifdef __cplusplus
 }

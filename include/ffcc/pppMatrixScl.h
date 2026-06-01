@@ -5,11 +5,14 @@
 #include "dolphin/types.h"
 #include "dolphin/mtx.h"
 
+struct _pppCtrlTable;
+struct _pppPObject;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixScl(f32* target, void* unused, void* param);
+void pppMatrixScl(_pppPObject* target, void* unused, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,5 @@
 #include "ffcc/pppMatrixScl.h"
+#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
 /*
@@ -10,23 +11,23 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixScl(f32* target, void* unused, void* param){
+void pppMatrixScl(_pppPObject* target, void* unused, _pppCtrlTable* param)
+{
     (void)unused;
-    Mtx* mtxPtr = (Mtx*)((u8*)target + 0x10);
 
-    void* dataPtr = ((void**)param)[3];
-    u32 index1 = ((u32*)dataPtr)[0];
-    u32 index2 = ((u32*)dataPtr)[1];
+    int* dataPtr = param->m_serializedDataOffsets;
+    u32 index1 = dataPtr[0];
+    u32 index2 = dataPtr[1];
 
-    f32* scale1 = (f32*)((u8*)target + index1 + 0x80);
-    f32* scale2 = (f32*)((u8*)target + index2 + 0x80);
+    f32* scale1 = (f32*)(target->m_workArea + index1);
+    f32* scale2 = (f32*)(target->m_workArea + index2);
 
-    PSMTXIdentity(*mtxPtr);
+    PSMTXIdentity(target->m_localMatrix.value);
 
-    target[4] = scale2[0];
-    target[9] = scale2[1];
-    target[14] = scale2[2];
-    target[7] = scale1[0];
-    target[11] = scale1[1];
-    target[15] = scale1[2];
+    target->m_localMatrix.value[0][0] = scale2[0];
+    target->m_localMatrix.value[1][1] = scale2[1];
+    target->m_localMatrix.value[2][2] = scale2[2];
+    target->m_localMatrix.value[0][3] = scale1[0];
+    target->m_localMatrix.value[1][3] = scale1[1];
+    target->m_localMatrix.value[2][3] = scale1[2];
 }

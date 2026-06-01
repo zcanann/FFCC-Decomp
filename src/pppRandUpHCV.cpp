@@ -29,7 +29,6 @@ static inline short randshort(short value, float scale)
  */
 void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     s16* target;
     f32* valuePtr;
 
@@ -54,7 +53,7 @@ void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrlTable* ctrl
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);
     f32 scale = *valuePtr;
 
     target[0] += randshort(in->delta[0], scale);

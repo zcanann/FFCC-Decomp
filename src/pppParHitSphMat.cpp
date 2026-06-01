@@ -19,7 +19,7 @@ extern const float kPppParHitSphMatZero;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
+void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTable* ctrlTable)
 {
     Vec local_88;
     Vec local_94;
@@ -34,27 +34,27 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     local_88.y = kPppParHitSphMatZero;
     local_88.x = kPppParHitSphMatZero;
 
-    if (*(u8*)(param_2 + 0xC) != 0) {
-        s32* offsets = *(s32**)(param_3 + 0xC);
-        Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
+    if (step->m_useWorkPosition != 0) {
+        int* offsets = ctrlTable->m_serializedDataOffsets;
+        Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
         local_94.x = *(float*)((u8*)ppvMng + 0x84);
         local_94.y = *(float*)((u8*)ppvMng + 0x94);
         local_94.z = *(float*)((u8*)ppvMng + 0xA4);
-        s32* offsets = *(s32**)(param_3 + 0xC);
-        Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
+        int* offsets = ctrlTable->m_serializedDataOffsets;
+        Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
         local_94.x += src->x;
         local_94.y += src->y;
         local_94.z += src->z;
     }
 
-    if (*(float*)(param_2 + 4) != kPppParHitSphMatZero) {
+    if (step->m_height != kPppParHitSphMatZero) {
         PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
     }
 
-    radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
-    pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
+    radius = *(float*)((u8*)pppMngSt + 0x64) * step->m_radiusScale;
+    pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, step->m_height);
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         local_a8.r = 0xFF;
@@ -74,4 +74,3 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         Graphic.DrawSphere(sphereMtx, local_a8);
     }
 }
-

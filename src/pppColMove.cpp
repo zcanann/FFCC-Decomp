@@ -1,4 +1,5 @@
 #include "ffcc/pppColMove.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
 
@@ -8,14 +9,6 @@ typedef struct {
     short z;
     short w;
 } pppColMoveVec4S;
-
-typedef struct {
-    short _pad[0x40];
-    short x;
-    short y;
-    short z;
-    short w;
-} pppColMoveAccum;
 
 typedef struct {
     int id;
@@ -34,8 +27,9 @@ typedef struct {
  */
 void pppColMoveCon(void* param1, void* param2)
 {
+    _pppPObject* object = (_pppPObject*)param1;
     int* data = ((int**)param2)[3];
-    pppColMoveVec4S* target = (pppColMoveVec4S*)((char*)param1 + data[1] + 0x80);
+    pppColMoveVec4S* target = (pppColMoveVec4S*)(object->m_workArea + data[1]);
 
     target->w = 0;
     target->z = 0;
@@ -54,17 +48,16 @@ void pppColMoveCon(void* param1, void* param2)
  */
 void pppColMove(void* param1, void* param2, void* param3)
 {
+    _pppPObject* object = (_pppPObject*)param1;
     pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
-    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id);
-    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad);
-    pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)&source->_pad[0x40];
-    pppColMoveVec4S* movementMove = (pppColMoveVec4S*)&movement->_pad[0x40];
+    pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)(object->m_workArea + input->id);
+    pppColMoveVec4S* movementMove = (pppColMoveVec4S*)(object->m_workArea + input->pad);
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    if (((int*)param2)[0] == ((int*)param1)[3]) {
+    if (((int*)param2)[0] == object->m_graphId) {
         pppColMoveVec4S* paramMove = (pppColMoveVec4S*)((char*)param2 + 8);
         movementMove->x += paramMove->x;
         movementMove->y += paramMove->y;

@@ -53,7 +53,7 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoo
 
     pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
 
-    if (arg2->m_index == *(s32*)((u8*)arg1 + 0xC)) {
+    if (arg2->m_index == arg1->m_graphId) {
         work->m_scale[0] += arg2->m_addScale[0];
         work->m_scale[1] += arg2->m_addScale[1];
         work->m_scale[2] += arg2->m_addScale[2];
@@ -123,26 +123,25 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoo
  */
 void pppScaleLoopAutoCon(void* arg1, void* arg2)
 {
+	_pppPObject* object = (_pppPObject*)arg1;
 	int** arg2Data = (int**)arg2;
 	int* data = arg2Data[3];
-	int* ptr = (int*)data[0];
+	int offset = data[0];
 	const float* zeroPtr = &gPppScaleLoopAutoZero;
 	float zero = *zeroPtr;
 	
-	void* targetPtr = (void*)((char*)arg1 + (int)ptr + 0x80);
-	float* targetData = (float*)targetPtr;
-	char* targetBytes = (char*)targetPtr;
+	pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)(object->m_workArea + offset);
 	
-	targetData[2] = zero;
-	targetData[1] = zero;
-	targetData[0] = zero;
-	targetData[6] = zero;
-	targetData[5] = zero;
-	targetData[4] = zero;
-	targetBytes[28] = 0;
-	targetBytes[29] = 0;
-	*(short*)(targetBytes + 30) = 0;
-	targetBytes[33] = 0;
-	targetBytes[32] = 0;
-	targetData[9] = zero;
+	work->m_scale[2] = zero;
+	work->m_scale[1] = zero;
+	work->m_scale[0] = zero;
+	work->m_baseScale[2] = zero;
+	work->m_baseScale[1] = zero;
+	work->m_baseScale[0] = zero;
+	work->m_initialized = 0;
+	work->m_step = 0;
+	work->m_angle = 0;
+	work->m_countB = 0;
+	work->m_countA = 0;
+	work->m_delta = zero;
 }

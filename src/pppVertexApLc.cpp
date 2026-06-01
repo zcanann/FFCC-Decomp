@@ -63,7 +63,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     VertexApLcData* data = (VertexApLcData*)dataRaw;
     VertexApLcCtrl* ctrl = (VertexApLcCtrl*)ctrlRaw;
     s32 stateOffset = *ctrl->stateOffset;
-    VertexApLcState* state = (VertexApLcState*)((u8*)parent + stateOffset + 0x80);
+    VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -77,7 +77,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
         int count;
         VertexApLcEnv* env = (VertexApLcEnv*)ppvEnv;
         VertexApLcEntry* entry;
-        Vec* points = *(Vec**)((u8*)parent + 0x70);
+        Vec* points = parent->m_drawMatrixPtr;
         entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
@@ -115,7 +115,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
                     dst->x = x;
                     dst->y = y;
                     dst->z = z;
@@ -146,7 +146,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
                     dst->x = x;
                     dst->y = y;
                     dst->z = z;
@@ -173,7 +173,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
 {
     s32 offset = **(s32**)((u8*)apLc + 0xC);
-    u16* state = (u16*)((u8*)obj + offset + 0x80);
+    u16* state = (u16*)(obj->m_workArea + offset);
 
     state[0] = 0;
     state[1] = 0;

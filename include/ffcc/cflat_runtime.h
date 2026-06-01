@@ -35,7 +35,6 @@ public:
 	{
 	public:
 		CObject();
-		~CObject() {}
 		virtual void onNewFinished();
 
 		unsigned int m_id;         // 0x0
@@ -184,7 +183,10 @@ private:
     u8 m_performanceBlock[0x804];   // 0x0048
     u8 m_pad_084C[0x80];            // 0x084C
     CObject m_objectSentinel;       // 0x08CC
-    u8 m_pad_0914[0x64];            // 0x0914
+    CObject m_freeObjectSentinel;   // 0x0918
+    u8 m_pad_0964[0xC];             // 0x0964
+    int m_0x970;                    // 0x0970
+    u8 m_pad_0974[4];               // 0x0974
     void** m_freeListPrev;          // 0x0978
     void** m_freeListNext;          // 0x097C
     int m_freeListCount;            // 0x0980

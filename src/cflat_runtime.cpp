@@ -10,7 +10,6 @@
 extern "C" {
 char s_cflat_runtime_newline[];
 void* __vt__12CFlatRuntime[];
-void* __vt__Q212CFlatRuntime7CObject[];
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
@@ -56,12 +55,8 @@ CFlatRuntime::CFlatRuntime()
 	const u32 clearBit = 0;
 
 	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
-	*reinterpret_cast<void***>(self + 0x914) = __vt__Q212CFlatRuntime7CObject;
-	self[0x904] = static_cast<u8>(__rlwimi(self[0x904], clearBit, 4, 27, 27));
-	*reinterpret_cast<void***>(self + 0x960) = __vt__Q212CFlatRuntime7CObject;
-	self[0x950] = static_cast<u8>(__rlwimi(self[0x950], clearBit, 4, 27, 27));
-	*reinterpret_cast<u32*>(self + 0x970) = clearBit;
-	*reinterpret_cast<u32*>(self + 0x1298) = 1;
+	m_0x970 = clearBit;
+	m_0x1298 = 1;
 
 	clear();
 }

@@ -990,7 +990,7 @@ void CGame::Calc()
     Wind.Frame();
     CFlatRuntime2Storage().Calc();
     gCFlatRuntime().ResetPerformance();
-    CFlatRuntime2Storage().Frame(1, 0);
+    CFlatRuntime2Storage().CFlatRuntime2::Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
             if (!sMapObjRotationInitialized) {
@@ -1015,7 +1015,7 @@ void CGame::Calc()
  */
 void CGame::Calc2()
 {
-	CFlatRuntime2Storage().Frame(0, 1);
+	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 1);
 }
 
 /*
@@ -1189,7 +1189,7 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
  */
 void CGame::Draw3()
 {
-	CFlatRuntime2Storage().Frame(0, 2);
+	CFlatRuntime2Storage().CFlatRuntime2::Frame(0, 2);
 	gCFlatRuntime().SystemCall(0, 1, 5, 0, 0, 0);
 }
 

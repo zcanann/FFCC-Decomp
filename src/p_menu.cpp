@@ -51,8 +51,7 @@ extern const f32 FLOAT_8033086C;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
-static const char kMenuPcsStageName[] = "CMenuPcs";
-extern "C" const char s_p_menu_cpp[];
+extern const char s_CMenuPcs_801d9d3c[] = "CMenuPcs";
 
 struct Vec4d
 {
@@ -68,7 +67,10 @@ struct MenuFontTlutPalette
     _GXColor highlight;
 };
 static const char s_win_kazari_801D9D48[] = "win_kazari";
+extern const char s_CManager_801D9D54[] = "CManager";
+extern const char s_CProcess_801D9D60[] = "CProcess";
 static const char s_dvd__smenu__s_tex_801d9d6c[] = "dvd/%smenu/%s.tex";
+extern "C" const char s_p_menu_cpp[] = "p_menu.cpp";
 static const char s_dvd__smenu_gc23_fnt_801d9d8c[] = "dvd/%smenu/gc23.fnt";
 static const char s_dvd__smenu__s_fnt_801d9da0[] = "dvd/%smenu/%s.fnt";
 static const char s_dvd__smenu_gc22_fnt_801d9db4[] = "dvd/%smenu/gc22.fnt";
@@ -138,7 +140,7 @@ unsigned int CMenuPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsig
 unsigned int CMenuPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 CProcessTable CMenuPcs::m_table = {
-    const_cast<char*>(kMenuPcsStageName),
+    const_cast<char*>(s_CMenuPcs_801d9d3c),
     {
         m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
         m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
@@ -350,7 +352,7 @@ void CMenuPcs::create()
         menuHeapSize -= FontMan.GetInternal22Size();
     }
 
-    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
+    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(s_CMenuPcs_801d9d3c), 0);
     *reinterpret_cast<int*>(self + 0x740) = -1;
 
     memset(m_textureSets, 0, sizeof(m_textureSets));

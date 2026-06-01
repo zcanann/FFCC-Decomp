@@ -1,5 +1,7 @@
 #include "ffcc/usb.h"
 
+extern const char s_CManager_801D6F90[] = "CManager";
+
 #include "ffcc/system.h"
 
 CUSB USB;

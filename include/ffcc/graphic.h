@@ -95,7 +95,8 @@ public:
     void* m_savedFrameBuffer;
     s32 m_displayCopyEnabled;
     s32 m_lastRetraceCount;
-    u8 _pad_0x71F8_to_0x71FF[0x8];
+    s32 m_sphereDisplayListSize;
+    void* m_sphereDisplayList;
     _GXColor m_fogColor;
     f32 m_fogStart;
     f32 m_fogEnd;

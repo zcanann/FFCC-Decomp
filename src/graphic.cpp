@@ -92,6 +92,8 @@ STATIC_ASSERT(offsetof(CGraphic, m_scratchTextureBuffer) == 0x71E8);
 STATIC_ASSERT(offsetof(CGraphic, m_savedFrameBuffer) == 0x71EC);
 STATIC_ASSERT(offsetof(CGraphic, m_displayCopyEnabled) == 0x71F0);
 STATIC_ASSERT(offsetof(CGraphic, m_lastRetraceCount) == 0x71F4);
+STATIC_ASSERT(offsetof(CGraphic, m_sphereDisplayListSize) == 0x71F8);
+STATIC_ASSERT(offsetof(CGraphic, m_sphereDisplayList) == 0x71FC);
 STATIC_ASSERT(offsetof(CGraphic, m_fogColor) == 0x7200);
 STATIC_ASSERT(offsetof(CGraphic, m_fogStart) == 0x7204);
 STATIC_ASSERT(offsetof(CGraphic, m_fogEnd) == 0x7208);
@@ -248,9 +250,9 @@ void CGraphic::Quit()
         delete[] reinterpret_cast<u8*>(m_scratchTextureBuffer);
         m_scratchTextureBuffer = nullptr;
     }
-    if (PtrAt(this, 0x71FC) != nullptr) {
-        delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71FC));
-        PtrAt(this, 0x71FC) = nullptr;
+    if (m_sphereDisplayList != nullptr) {
+        delete[] reinterpret_cast<u8*>(m_sphereDisplayList);
+        m_sphereDisplayList = nullptr;
     }
     if (PtrAt(this, 0x10) != nullptr) {
         delete[] reinterpret_cast<u8*>(PtrAt(this, 0x10));
@@ -961,7 +963,7 @@ void CGraphic::SaveFrameBuffer(char*)
 void CGraphic::DrawSphere()
 {
     GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
 }
 
 /*
@@ -985,7 +987,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, float scale, _GXColor* colo
     GXLoadPosMtxImm(sphereMtx, 0);
     GXSetChanMatColor((GXChannelID)4, *color);
     GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
 }
 
 /*
@@ -1009,7 +1011,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, Vec* scale, _GXColor* color
     GXLoadPosMtxImm(sphereMtx, 0);
     GXSetChanMatColor((GXChannelID)4, *color);
     GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
 }
 
 /*
@@ -1039,7 +1041,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
     GXSetChanMatColor((GXChannelID)4, color);
     GXSetChanAmbColor((GXChannelID)4, color);
     GXSetLineWidth(8, GX_TO_ZERO);
-    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXCallDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
 }
 
 /*
@@ -1077,17 +1079,17 @@ void CGraphic::makeSphere()
         }
     }
 
-    S32At(this, 0x71F8) = 0x880;
+    m_sphereDisplayListSize = 0x880;
     vertices[vertexCount * 3 + 0] = kGraphicOneF;
     vertices[vertexCount * 3 + 1] = kGraphicZeroF;
     vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
-    PtrAt(this, 0x71FC) =
+    m_sphereDisplayList =
         new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(sGraphicSourceStrings), 0x41A)
-        u8[S32At(this, 0x71F8)];
+        u8[m_sphereDisplayListSize];
 
-    DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
-    GXBeginDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    DCInvalidateRange(m_sphereDisplayList, m_sphereDisplayListSize);
+    GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
     int ringStart = 1;
@@ -1156,8 +1158,8 @@ void CGraphic::makeSphere()
         }
     }
 
-    S32At(this, 0x71F8) = GXEndDisplayList();
-    DCFlushRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    m_sphereDisplayListSize = GXEndDisplayList();
+    DCFlushRange(m_sphereDisplayList, m_sphereDisplayListSize);
 }
 
 /*

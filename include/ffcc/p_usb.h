@@ -9,7 +9,7 @@ class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;
-    static CProcessTable m_table;
+    static CSmallProcessTable m_table;
 
     CUSBPcs();
 

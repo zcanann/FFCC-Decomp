@@ -923,7 +923,7 @@ static void FurSetupTextureCopyEnv()
 	GXSetProjection(projection, GX_ORTHOGRAPHIC);
 }
 
-static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
+static inline void FurInitHairSet(CHairSet& hair, unsigned int& rng)
 {
 	float velocityScale = FurRandSigned(rng);
 	hair.m_vec0.x = s_mogFurVelocity.x + s_mogFurVelocityRand.x * velocityScale;

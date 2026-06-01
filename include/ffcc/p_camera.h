@@ -159,11 +159,20 @@ public:
     float m_fov;
     float m_nearZ;
     float m_farZ;
-    u8 _pad108[0x404 - 0x108];
+    float m_zRotate; // 0x108
+    u8 _pad10C[0x404 - 0x10C];
     u8 m_fullScreenShadowEnabled; // 0x404
-    u8 _pad405[0x414 - 0x405];
+    u8 _pad405[0x408 - 0x405];
+    Vec m_fullScreenShadowPosition; // 0x408
     CBound m_shadowRectBound; // 0x414
-    u8 _pad42C[0x4C4 - 0x42C];
+    float m_fullScreenShadowDepth; // 0x42C
+    float m_fullScreenShadowCamLen; // 0x430
+    int m_shadowAuto; // 0x434
+    int m_fromScript; // 0x438
+    float m_distance; // 0x43C
+    float m_pitch; // 0x440
+    int m_isAbsolute; // 0x444
+    u8 _pad448[0x4C4 - 0x448];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

@@ -345,7 +345,7 @@ void CGame::SetNextScriptNewGame()
  */
 void CCameraPcs::SetFullScreenShadowCamLen(float len)
 {
-    *(float*)((char*)this + 0x430) = len;
+    m_fullScreenShadowCamLen = len;
 }
 
 /*
@@ -529,7 +529,7 @@ void CGame::CGameWork::ClearEvtWork()
  */
 void CCameraPcs::SetShadowAuto(int enable)
 {
-    *(int*)((char*)this + 0x434) = enable;
+    m_shadowAuto = enable;
 }
 
 /*
@@ -1313,9 +1313,9 @@ void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
  */
 void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
 {
-    *(float*)((char*)this + 0x408) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0x40C) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0x410) = *(float*)((char*)position + 0x8);
+    m_fullScreenShadowPosition.x = position->x;
+    m_fullScreenShadowPosition.y = position->y;
+    m_fullScreenShadowPosition.z = position->z;
     *(float*)((char*)this + 0x370) = len;
 }
 
@@ -1330,7 +1330,7 @@ void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
  */
 void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
 {
-    *(unsigned char*)((char*)this + 0x404) = enable;
+    m_fullScreenShadowEnabled = enable;
 }
 
 /*
@@ -1542,7 +1542,7 @@ extern "C" float fmodf__3stdFff(float x, float y)
  */
 void CCameraPcs::SetFov(float fov)
 {
-    *(float*)((char*)this + 0xFC) = fov;
+    m_fov = fov;
 }
 
 /*
@@ -1556,7 +1556,7 @@ void CCameraPcs::SetFov(float fov)
  */
 void CCameraPcs::SetZRotate(float zRotate)
 {
-    *(float*)((char*)this + 0x108) = zRotate;
+    m_zRotate = zRotate;
 }
 
 /*
@@ -1652,7 +1652,7 @@ extern "C" float sinf__3stdFf(float x)
  */
 void CCameraPcs::SetFromScript()
 {
-    *(int*)((char*)this + 0x438) = 1;
+    m_fromScript = 1;
 }
 
 /*
@@ -1666,9 +1666,9 @@ void CCameraPcs::SetFromScript()
  */
 void CCameraPcs::SetPosition(Vec* position)
 {
-    *(float*)((char*)this + 0xE0) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0xE4) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0xE8) = *(float*)((char*)position + 0x8);
+    m_positionX = position->x;
+    m_positionY = position->y;
+    m_positionZ = position->z;
 }
 
 /*
@@ -1682,9 +1682,9 @@ void CCameraPcs::SetPosition(Vec* position)
  */
 void CCameraPcs::SetRefPosition(Vec* position)
 {
-    *(float*)((char*)this + 0xD4) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0xD8) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0xDC) = *(float*)((char*)position + 0x8);
+    m_targetX = position->x;
+    m_targetY = position->y;
+    m_targetZ = position->z;
 }
 
 /*
@@ -1718,7 +1718,7 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
  */
 int CCameraPcs::IsAbsolute()
 {
-    return *(int*)((char*)this + 0x444);
+    return m_isAbsolute;
 }
 
 /*

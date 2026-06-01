@@ -12,16 +12,16 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-extern "C" const float kFontZero = 0.0f;
-extern "C" const double DOUBLE_803306C0 = 4503601774854144.0;
-extern "C" const float kFontOne = 1.0f;
-extern "C" const double DOUBLE_803306D0 = 4503599627370496.0;
-extern "C" const float kFontOrthoHeight = 448.0f;
-extern "C" const float kFontOrthoWidth = 640.0f;
-extern "C" const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
-extern "C" const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
-extern "C" const float FLOAT_803306e8 = 0.0f;
-extern "C" const float FLOAT_803306ec = 1.0f;
+static const float kFontZero = 0.0f;
+static const double DOUBLE_803306C0 = 4503601774854144.0;
+static const float kFontOne = 1.0f;
+static const double DOUBLE_803306D0 = 4503599627370496.0;
+static const float kFontOrthoHeight = 448.0f;
+static const float kFontOrthoWidth = 640.0f;
+static const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
+static const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
+static const float FLOAT_803306e8 = 0.0f;
+static const float FLOAT_803306ec = 1.0f;
 
 extern "C" const char s_fontman_cpp[] = "fontman.cpp";
 extern "C" const char s_CFontMan_801D9CC4[] = "CFontMan";

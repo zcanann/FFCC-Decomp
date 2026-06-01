@@ -150,7 +150,7 @@ int CMenuPcs::MoneyCtrlCur()
 						if ((!started) && (iVar8 <= (int)gil)) {
 							started = true;
 						}
-						if (((started) || (iVar8 <= (int)gil)) || (6 < iVar9)) {
+						if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
 							int digit = (int)gil / iVar8;
 							if (9 < digit) {
 								digit = 9;
@@ -185,7 +185,7 @@ int CMenuPcs::MoneyCtrlCur()
 				if ((!started) && (iVar8 <= (int)gil)) {
 					started = true;
 				}
-				if (((started) || (iVar8 <= (int)gil)) || (6 < iVar9)) {
+				if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
 					int digit = (int)gil / iVar8;
 					if (9 < digit) {
 						digit = 9;
@@ -307,7 +307,7 @@ int CMenuPcs::MoneyCtrlCur()
 						if ((!started) && (iVar11 <= iVar8)) {
 							started = true;
 						}
-						if (((started) || (iVar11 <= iVar8)) || (6 < iVar9)) {
+						if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
 							int digit = iVar8 / iVar11;
 							if (9 < digit) {
 								digit = 9;
@@ -333,7 +333,7 @@ int CMenuPcs::MoneyCtrlCur()
 						if ((!started) && (iVar11 <= iVar8)) {
 							started = true;
 						}
-						if (((started) || (iVar11 <= iVar8)) || (6 < iVar9)) {
+						if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
 							int digit = iVar8 / iVar11;
 							if (9 < digit) {
 								digit = 9;
@@ -649,7 +649,7 @@ bool CMenuPcs::MoneyOpen()
 				if ((!started) && (iVar12 >= iVar8)) {
 					started = 1;
 				}
-				if (((started) || (iVar12 >= iVar8)) || (6 < iVar13)) {
+				if (((started) || (iVar12 >= iVar8)) || (iVar13 == 7)) {
 					int iVar10 = iVar12 / iVar8;
 					if (9 < iVar10) {
 						iVar10 = 9;

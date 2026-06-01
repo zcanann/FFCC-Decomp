@@ -621,13 +621,17 @@ void CMenuPcs::CalcSingCMake()
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 down = 0;
             } else {
-                down = Pad.GetPadInputs()[0].buttonDown[0];
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 repeat = 0;
             } else {
-                repeat = Pad.GetPadInputs()[0].repeatButton;
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
             }
 
             if (repeat == 0) {
@@ -717,13 +721,17 @@ void CMenuPcs::CalcSingCMake()
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 down = 0;
             } else {
-                down = Pad.GetPadInputs()[0].buttonDown[0];
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 repeat = 0;
             } else {
-                repeat = Pad.GetPadInputs()[0].repeatButton;
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
             }
 
             if (repeat == 0) {
@@ -815,13 +823,17 @@ void CMenuPcs::CalcSingCMake()
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 down = 0;
             } else {
-                down = Pad.GetPadInputs()[0].buttonDown[0];
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                down = Pad.GetPadInputs()[padIndex].buttonDown[0];
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 repeat = 0;
             } else {
-                repeat = Pad.GetPadInputs()[0].repeatButton;
+                int padIndex = 0;
+                padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+                repeat = Pad.GetPadInputs()[padIndex].repeatButton;
             }
 
             if (repeat == 0) {

@@ -619,7 +619,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 			alpha = 0xFF;
 		}
 
-		GXColor highlightColor = {0, 0, 0, static_cast<u8>(kDbgMenuHighlightAlpha)};
+		GXColor highlightColor = *reinterpret_cast<const GXColor*>(&kDbgMenuHighlightAlpha);
 		highlightColor.r = alpha;
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;
@@ -882,7 +882,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
  * JP Address: TODO
  * JP Size: TODO
  */
-CDbgMenuPcs::CDM::CDM()
+inline CDbgMenuPcs::CDM::CDM()
 {
 	memset(this, 0, sizeof(CDMParam));
 	memset(&m_status, 0, sizeof(*this) - sizeof(CDMParam));

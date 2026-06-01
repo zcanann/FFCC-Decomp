@@ -8,6 +8,7 @@ typedef struct __ptmf {
 		void* f_addr;   // function address
 		long ve_offset; // virtual function entry offset (of vtable)
 	} f_data;
+	long _reserved;
 } __ptmf;
 
 long __ptmf_test(register __ptmf* ptmf);

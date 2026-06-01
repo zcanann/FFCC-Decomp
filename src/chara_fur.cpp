@@ -616,12 +616,11 @@ void CChara::CalcMogScore()
 			CColor srcColor(static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b),
 			                static_cast<unsigned char>(a));
 
-			fur.m_alphaScore += a;
-
 			int colorHit[3];
 			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2));
 			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2));
 			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2));
+			fur.m_alphaScore += a;
 
 			const int ring = dist % 12;
 			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;

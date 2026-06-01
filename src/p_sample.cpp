@@ -31,7 +31,7 @@ inline CSamplePcs::CSamplePcs()
 	table[14] = desc3[2];
 }
 
-CSamplePcsTable CSamplePcs::m_table = {
+CProcessTable CSamplePcs::m_table = {
     const_cast<char*>("CSamplePcs"),
     {
         0,
@@ -174,7 +174,7 @@ void CSamplePcs::create()
  */
 int CSamplePcs::GetTable(unsigned long index)
 {
-	return (int)(reinterpret_cast<unsigned char*>(&m_table) + index * 0x15C);
+	return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

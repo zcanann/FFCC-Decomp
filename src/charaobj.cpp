@@ -2374,8 +2374,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 					angleOffset = FLOAT_8033198C;
 				}
 				float angle = m_rotTargetY + angleOffset;
-				*reinterpret_cast<float*>(CFlat + 0x1740) = FLOAT_80331994 * sinf(angle) + m_worldPosition.x;
-				*reinterpret_cast<float*>(CFlat + 0x1748) = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
+				CFlatParticleWorkPosition().x = FLOAT_80331994 * sinf(angle) + m_worldPosition.x;
+				CFlatParticleWorkPosition().z = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = true;
@@ -2432,9 +2432,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				Vec sidePos = { side, 0.0f, FLOAT_80331998 };
 				Vec offsetPos;
 				PSMTXMultVec(rotMtx, &sidePos, &offsetPos);
-				*reinterpret_cast<float*>(CFlat + 0x1740) = m_worldPosition.x + offsetPos.x;
-				*reinterpret_cast<float*>(CFlat + 0x1744) = m_worldPosition.y + offsetPos.y;
-				*reinterpret_cast<float*>(CFlat + 0x1748) = m_worldPosition.z + offsetPos.z;
+				CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
+				CFlatParticleWorkPosition().y = m_worldPosition.y + offsetPos.y;
+				CFlatParticleWorkPosition().z = m_worldPosition.z + offsetPos.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
 			}

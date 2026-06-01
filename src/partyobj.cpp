@@ -157,7 +157,7 @@ static inline int& CharaGhostValue(int offset)
 
 static inline int& PartyTraceParticleSlot(int port)
 {
-	return *reinterpret_cast<int*>(CFlat + 0x1041C + port * sizeof(int));
+	return CFlatPartyTraceParticleSlot(port);
 }
 
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
@@ -1076,7 +1076,7 @@ void CGPartyObj::command()
 					secondaryAvailable = true;
 					secondaryCommand = 0x17;
 				} else if (targetState == 0xC8) {
-					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+					if (CFlatCenterState() == 0) {
 						secondaryAvailable = true;
 						secondaryCommand = 0x0B;
 					} else {
@@ -1084,7 +1084,7 @@ void CGPartyObj::command()
 						primaryCommand = 0x0B;
 					}
 				} else if (targetState == 0xC9) {
-					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+					if (CFlatCenterState() == 0) {
 						secondaryAvailable = true;
 						secondaryCommand = 0x0A;
 					} else {
@@ -1092,7 +1092,7 @@ void CGPartyObj::command()
 						primaryCommand = 0x0A;
 					}
 				} else if (targetState == 0xCA) {
-					if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&CFlat) + 0x12AC) == 0) {
+					if (CFlatCenterState() == 0) {
 						secondaryAvailable = true;
 						secondaryCommand = 0x1C;
 					} else {
@@ -4406,7 +4406,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
 	if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) >= 0) ||
-	    (*reinterpret_cast<int*>(CFlat + 0x12AC) != 0) ||
+	    (CFlatCenterState() != 0) ||
 	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
 		return;
 	}

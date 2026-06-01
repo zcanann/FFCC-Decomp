@@ -299,21 +299,6 @@ static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
-struct WmMenuFlatTableView
-{
-	int count;
-	char** index;
-	char* buffer;
-};
-
-struct WmMenuFlatDataView
-{
-	int dataCount;
-	unsigned char pad[0x68 - 4];
-	int tableCount;
-	WmMenuFlatTableView table[8];
-};
-
 struct Vec4d
 {
 	float x;
@@ -10003,8 +9988,7 @@ LAB_draw:
 							strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C), sizeof(locationStr));
 						}
 					} else {
-						WmMenuFlatDataView* flatData = reinterpret_cast<WmMenuFlatDataView*>(&Game.m_cFlatDataArr[1]);
-						strcpy(locationStr, flatData->table[3].index[locationIndex]);
+						strcpy(locationStr, Game.m_cFlatDataArr[1].TableStrings(3)[locationIndex]);
 				}
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));

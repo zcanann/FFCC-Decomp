@@ -119,19 +119,6 @@ static inline unsigned int frameNibble(int value)
 	return static_cast<unsigned int>(((sign << 4) | (((value << 28) + sign) >> 28)) - sign);
 }
 
-struct RingMenuFlatTableEntry
-{
-	int count;
-	const char** strings;
-	char* stringBuf;
-};
-
-struct RingMenuFlatData
-{
-	char pad0[0x6C];
-	RingMenuFlatTableEntry table[8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800a2dd4
@@ -488,7 +475,6 @@ void CRingMenu::drawGBA()
 void CRingMenu::onDraw()
 {
 	const int menuIndex = m_menuIndex;
-	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.m_cFlatDataArr[1]);
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
 		return;
 	}
@@ -686,9 +672,9 @@ void CRingMenu::onDraw()
 
 			int labelId;
 			if ((buttonValue & 0x8000) == 0) {
-				labelId = reinterpret_cast<const int*>(flatData->table[4].strings)[buttonValue];
+				labelId = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4))[buttonValue];
 			} else {
-				labelId = reinterpret_cast<const int*>(flatData->table[0].strings)[(buttonValue & 0x7FFF) * 5 + 4];
+				labelId = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[(buttonValue & 0x7FFF) * 5 + 4];
 			}
 
 			double fade = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + button + 1]) * FLOAT_80330a78);
@@ -820,10 +806,10 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	float waveSinY;
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
+		cmdNameTable = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4));
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
-		cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
+		cmdNameTable = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4));
 		tlut = 9;
 		if (cmdIndex == 0) {
 			tlut = 1;

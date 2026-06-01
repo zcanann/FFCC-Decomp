@@ -63,7 +63,7 @@ public:
     static unsigned int m_table_desc1[3];
     static unsigned int m_table_desc2[3];
     static unsigned int m_table_desc3[3];
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CProcessTable m_table;
 
     CFunnyShapePcs();
     ~CFunnyShapePcs();

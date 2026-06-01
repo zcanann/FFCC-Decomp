@@ -34,19 +34,6 @@ extern "C" const char s_Defensa_80333518[8] = "Defensa";
 extern "C" const char s_Musica_80333520[8] = "M\372sica";
 extern "C" const char s_Apagado_80333528[8] = "Apagado";
 
-struct FavoFlatTableEntry
-{
-	int count;
-	const char** strings;
-	char* stringBuf;
-};
-
-struct FavoFlatData
-{
-	char pad0[0x6C];
-	FavoFlatTableEntry table[8];
-};
-
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 
@@ -230,13 +217,12 @@ void CMenuPcs::FavoDraw()
 	nameFont->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
-	const FavoFlatData* flatData = reinterpret_cast<const FavoFlatData*>(&Game.m_cFlatDataArr[1]);
 	rank = s_rank;
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * drawEntry->alpha)).color);
-		const char* name = flatData->table[0].strings[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
+		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank[1]) + 0x17D) * 5 + 4];
 		nameFont->SetPosX(static_cast<float>(drawEntry->x + 0x1C));
 		nameFont->SetPosY(static_cast<float>(drawEntry->y) - FLOAT_8033306C);
 		nameFont->Draw(const_cast<char*>(name));

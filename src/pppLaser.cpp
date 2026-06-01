@@ -16,17 +16,21 @@
 extern const f32 kPppLaserZero;
 extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
-static const f32 kPppLaserNegativeOne = -1.0f;
-static const f32 kPppLaserDefaultScale = 1.2f;
-static const f32 kPppLaserBoundsMax = 10000000000.0f;
-static const f32 kPppLaserBoundsMin = -10000000000.0f;
-static const f32 kPppLaserHalfTileOffset = 15.5f;
-static const f32 kPppLaserTau = 6.2831855f;
+extern const f32 kMenuArtiNegativeOne;
+extern const f32 kMenuArtiDefaultScale;
+extern const f32 kMenuArtiBoundsMax;
+extern const f32 kMenuArtiBoundsMin;
+extern const f32 kMenuArtiHalfTileOffset;
+extern const f32 kMenuArtiTau;
+
+#define kPppLaserNegativeOne kMenuArtiNegativeOne
+#define kPppLaserDefaultScale kMenuArtiDefaultScale
+#define kPppLaserBoundsMax kMenuArtiBoundsMax
+#define kPppLaserBoundsMin kMenuArtiBoundsMin
+#define kPppLaserHalfTileOffset kMenuArtiHalfTileOffset
+#define kPppLaserTau kMenuArtiTau
 
 extern "C" const char s_pppLaser_cpp[] = "pppLaser.cpp";
-extern const f32 kPppLaserZero = 0.0f;
-extern const f32 FLOAT_8033342c = 1.0f;
-extern const f32 FLOAT_80333430 = 2.0f;
 
 static inline f32 LaserConst(const f32& value)
 {

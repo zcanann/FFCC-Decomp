@@ -4,13 +4,6 @@
 class CFlatData
 {
 public:
-	CFlatData();
-	~CFlatData();
-
-	void Create(void*);
-	void Destroy();
-
-private:
     struct DataEntry
     {
         unsigned int m_size; // 0x0
@@ -27,6 +20,22 @@ private:
         char* m_stringBuf; // 0x8
     };
 
+	CFlatData();
+	~CFlatData();
+
+	void Create(void*);
+	void Destroy();
+
+    DataEntry& Data(int index) { return m_data[index]; }
+    const DataEntry& Data(int index) const { return m_data[index]; }
+    TableEntry& Table(int index) { return m_tabl[index]; }
+    const TableEntry& Table(int index) const { return m_tabl[index]; }
+    char** TableStrings(int index) { return Table(index).m_strings; }
+    char* const* TableStrings(int index) const { return Table(index).m_strings; }
+    char* Message(int index) { return m_mesPtr[index]; }
+    const char* Message(int index) const { return m_mesPtr[index]; }
+
+private:
     int m_dataCount;            // 0x0000
     DataEntry m_data[5];        // 0x0004
     int m_tableCount;           // 0x0068

@@ -107,6 +107,21 @@ static inline unsigned char*& CFlatPermanentVarValues()
     return *reinterpret_cast<unsigned char**>(CFlat + 0xC);
 }
 
+static inline u8& CFlatPermanentVarFlagByte(int offset)
+{
+    return CFlatPermanentVarDefs()[offset + 1];
+}
+
+static inline u32& CFlatPermanentVarWord(int offset)
+{
+    return *reinterpret_cast<u32*>(CFlatPermanentVarValues() + offset);
+}
+
+static inline float& CFlatPerformanceTotalTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x48);
+}
+
 static inline u32& CFlatEventFlags()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x12A0);
@@ -135,6 +150,11 @@ static inline u32& CFlatCenterState()
 static inline float& CFlatCenterDistanceScale()
 {
     return *reinterpret_cast<float*>(CFlat + 0x12B0);
+}
+
+static inline Mtx& CFlatCenterMatrix()
+{
+    return *reinterpret_cast<Mtx*>(CFlat + 0x12B4);
 }
 
 static inline u8& CFlatGameFlags()
@@ -172,9 +192,24 @@ static inline int& CFlatLetterEventEnabled()
     return *reinterpret_cast<int*>(CFlat + 0x10408);
 }
 
+static inline int& CFlatSaveSceneEnabled()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x10418);
+}
+
+static inline int& CFlatPartyTraceParticleSlot(int port)
+{
+    return *reinterpret_cast<int*>(CFlat + 0x1041C + port * sizeof(int));
+}
+
 static inline int& CFlatItemTraceParticleSlot()
 {
     return *reinterpret_cast<int*>(CFlat + 0x1042C);
+}
+
+static inline Vec& CFlatParticleWorkPosition()
+{
+    return *reinterpret_cast<Vec*>(CFlat + 0x1740);
 }
 
 static inline float& CFlatMoveTime()

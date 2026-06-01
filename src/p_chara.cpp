@@ -2741,7 +2741,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
             viewMtx[1][1] *= 0.5f;
             viewMtx[2][1] *= 0.5f;
         } else if ((flags & 8) != 0) {
-            PSMTXConcat(viewMtx, reinterpret_cast<MtxPtr>(Ptr(&CFlat, 0x12B4)), viewMtx);
+            PSMTXConcat(viewMtx, CFlatCenterMatrix(), viewMtx);
         }
     } else if (drawPass == 2) {
         Mtx* modelMtx = ModelLocalMtx(m_model);

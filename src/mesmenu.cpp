@@ -69,21 +69,6 @@ extern float FLOAT_80330980;
 extern float FLOAT_80330994;
 }
 
-struct CFlatDataTableEntryView
-{
-    int count;
-    char** index;
-    char* buffer;
-};
-
-struct CFlatDataView
-{
-    int dataCount;
-    char pad[0x68 - 4];
-    int tableCount;
-    CFlatDataTableEntryView m_table[8];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8009b4e4
@@ -589,19 +574,19 @@ void CMesMenu::onDraw()
                     (float)(((menuIndex & 2) != 0) ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                     FLOAT_803308d8);
 
-                CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
+                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)((char*)this + 0x3D98)];
                     font->SetScale(FLOAT_8033094C);
                     font->SetShadow(1);
                     font->SetMargin(FLOAT_803308d8);
-                    float textWidth = font->GetWidth(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    float textWidth = font->GetWidth(actionName);
                     font->DrawInit();
                     font->SetTlut(0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     font->SetColor(colorStorage.color);
                     font->SetPosX(iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth));
                     font->SetPosY(iconY + (float)(((menuIndex & 2) != 0) ? 8 : 31));
-                    font->Draw(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->Draw(actionName);
                     MenuPcs.DrawInit();
                 }
 
@@ -756,19 +741,19 @@ void CMesMenu::onDraw()
                     (float)(anchorY != 0 ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                     FLOAT_803308d8);
 
-                CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
+                    char* actionName = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)((char*)this + 0x3D98)];
                     font->SetScale(FLOAT_8033094C);
                     font->SetShadow(1);
                     font->SetMargin(FLOAT_803308d8);
-                    float textWidth = font->GetWidth(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    float textWidth = font->GetWidth(actionName);
                     font->DrawInit();
                     font->SetTlut(0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     font->SetColor(colorStorage.color);
                     font->SetPosX(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950));
                     font->SetPosY(iconY + (float)(anchorY != 0 ? 8 : 31));
-                    font->Draw(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->Draw(actionName);
                     MenuPcs.DrawInit();
                 }
 

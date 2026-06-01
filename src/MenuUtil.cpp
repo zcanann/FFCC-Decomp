@@ -228,20 +228,9 @@ extern const float kOptionColumnAnimStep;
 extern const float kOptionVolumeScale;
 
 namespace {
-struct MenuUtilFlatTableEntry {
-	int count;
-	const char** index;
-	char* buffer;
-};
-
-struct MenuUtilFlatData {
-	char pad[0x6C];
-	MenuUtilFlatTableEntry table[8];
-};
-
 static inline int* GetMenuHelpMsgTable()
 {
-	return reinterpret_cast<int*>(reinterpret_cast<MenuUtilFlatData*>(&Game.m_cFlatDataArr[1])->table[6].index);
+	return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(6));
 }
 
 static inline CRedSound* GetRedSoundGlobal()

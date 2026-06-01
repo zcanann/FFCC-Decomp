@@ -22,8 +22,20 @@ unsigned int CMiniGamePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u
 unsigned int CMiniGamePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int CMiniGamePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 extern const char s_CMiniGamePcs_GAME_801DD098[];
-unsigned int CMiniGamePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
+CProcessTable CMiniGamePcs::m_table = {
+    const_cast<char*>(s_CMiniGamePcs_GAME_801DD098),
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x24,
+    },
 };
 extern const char s_miniGameManagerTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
@@ -216,7 +228,7 @@ void _MngThreadMain(void* param)
  */
 int CMiniGamePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + static_cast<int>(index) * sizeof(m_table));
+    return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

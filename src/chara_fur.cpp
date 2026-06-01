@@ -1406,6 +1406,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 						work.m_eraseTicks = 0x33;
 					}
 				}
+				if ((System.m_frameCounter & 7) == 0) {
+					Sound.PlaySe(0x249f3, 0x40, 0x7F, 0);
+				}
 			} else if (radarType == 3) {
 				work.m_eraseTicks = 0;
 				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
@@ -1414,6 +1417,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 						messageId = 2;
 						work.m_offColorTicks = 0x0B;
 					}
+				}
+				if ((System.m_frameCounter & 0xF) == 0) {
+					Sound.PlaySe(0x249f4, 0x40, 0x7F, 0);
 				}
 			} else {
 				work.m_offColorTicks = 0;

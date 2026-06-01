@@ -3,6 +3,7 @@
 
 #include "dolphin/types.h"
 
+struct _pppPObject;
 struct _pppCtrlTable;
 
 struct PppMoveInput {
@@ -17,8 +18,8 @@ struct PppMoveInput {
 extern "C" {
 #endif
 
-void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable);
-void pppMove(void* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable);
+void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable);
+void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

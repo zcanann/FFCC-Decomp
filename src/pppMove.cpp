@@ -25,10 +25,10 @@ struct PppMoveOffsets {
  * JP Address: TODO  
  * JP Size: TODO
  */
-void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable)
+void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
 {
     u32 offset = static_cast<u32>(ctrlTable->m_serializedDataOffsets[1]);
-    PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
+    PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offset);
     
     // Initialize to zero (store order: z, y, x to match assembly)
     f32 zero = kPppMoveZero;
@@ -46,18 +46,18 @@ void pppMoveCon(void* basePtr, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMove(void* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
+void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
 {
     PppMoveOffsets* offsets = (PppMoveOffsets*)ctrlTable->m_serializedDataOffsets;
-    PppMoveObj* a = (PppMoveObj*)((u8*)basePtr + offsets->a + 0x80);
-    PppMoveObj* b = (PppMoveObj*)((u8*)basePtr + offsets->b + 0x80);
+    PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->a);
+    PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->b);
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     s32 inputId = *(s32*)input;
-    s32 baseId = *(s32*)((u8*)basePtr + 0xc);
+    s32 baseId = basePtr->m_graphId;
 
     if (inputId == baseId) {
         b->x += input->x;

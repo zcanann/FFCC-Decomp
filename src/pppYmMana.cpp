@@ -1534,7 +1534,6 @@ static void CalcWaterReflectionVector(
     float* texCoordFloat;
     float zero;
     float half;
-    float denomBase;
     long i;
 
     (void)waterOrigin;
@@ -1578,20 +1577,24 @@ static void CalcWaterReflectionVector(
         C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
-        denomBase = LoadFloat(FLOAT_80330e58);
-
         if (reflectionIt->z >= zero) {
+            float denomBase;
+
             colorBytes[0] = 0x80;
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
+            denomBase = LoadFloat(FLOAT_80330e58);
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
+            float denomBase;
+
             colorBytes[0] = 0x80;
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
+            denomBase = LoadFloat(FLOAT_80330e58);
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }

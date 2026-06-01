@@ -75,28 +75,6 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-class CSound::CSe3D {
-public:
-    union {
-        struct {
-            u8 m_active : 1;
-            u8 m_paused : 1;
-            u8 m_flagsRest : 6;
-        } m_bits;
-        s8 m_flags;
-    };
-    u8 m_volume;
-    u8 m_pan;
-    s8 m_lineIndex;
-    int m_handle;
-    int m_playId;
-    int m_soundId;
-    float m_nearDistance;
-    float m_farDistance;
-    Vec m_position;
-    int m_group;
-};
-
 struct CSoundLayout {
     u32 m_vtable;
     CMemory::CStage* m_stage;
@@ -109,7 +87,7 @@ struct CSoundLayout {
     int m_waveState;
     int m_waveSyncMode;
     int m_seCount;
-    u8 m_seWork[0x1400];
+    CSound::CSe3D m_seWork[128];
     CLine<10> m_lines[8];
     u8* m_streamBuffer;
     CFile::CHandle* m_streamFile;
@@ -728,7 +706,7 @@ void CSound::CheckDriver(int mode)
 void CSound::Frame()
 {
     loadWaveFrame();
-    CSe3D* se = reinterpret_cast<CSe3D*>(m_seWork);
+    CSe3D* se = m_seWork;
     u32 i = 0;
     do {
         if (se->m_bits.m_active) {
@@ -844,15 +822,13 @@ void CSound::Draw()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
     CSoundLayout& sound = SoundData(this);
-    unsigned char* se = sound.m_seWork;
-    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
-        if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
+    CSe3D* se = sound.m_seWork;
+    for (u32 i = 0; i < 0x80; i++, se++) {
+        if (se->m_bits.m_active) {
             CColor innerColor(0xC0, 0xC0, 0xC0, 0x80);
-            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
-                               reinterpret_cast<GXColor*>(&innerColor));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_nearDistance, reinterpret_cast<GXColor*>(&innerColor));
             CColor outerColor(0x80, 0x80, 0x80, 0x80);
-            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
-                               reinterpret_cast<GXColor*>(&outerColor));
+            Graphic.DrawSphere(cameraMatrix, &se->m_position, se->m_farDistance, reinterpret_cast<GXColor*>(&outerColor));
         }
     }
 
@@ -1614,7 +1590,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
 
     u8* soundObj = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
-    se = reinterpret_cast<CSe3D*>(sound.m_seWork);
+    se = sound.m_seWork;
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
         if (se->m_bits.m_active) {
@@ -1690,7 +1666,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
 
     u8* soundObj = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
-    se = reinterpret_cast<CSe3D*>(sound.m_seWork);
+    se = sound.m_seWork;
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
         if (se->m_bits.m_active) {

@@ -1429,9 +1429,8 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80333258);
 
-    CColor rgba(
-        0xFF, 0xFF, 0xFF,
-        static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha)));
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
     font->SetTlut(6);
 
@@ -1446,7 +1445,6 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
         GXColor drawColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
         GXSetChanMatColor(GX_COLOR0A0, drawColor);
 

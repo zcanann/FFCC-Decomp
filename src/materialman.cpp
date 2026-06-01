@@ -26,7 +26,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern float FLOAT_8032faf0;
@@ -2460,8 +2459,6 @@ CMaterial::~CMaterial()
         ReleaseRef(*reinterpret_cast<void**>(textureRef));
         *reinterpret_cast<void**>(textureRef) = 0;
     }
-
-    __destroy_arr(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
 }
 
 /*
@@ -2475,8 +2472,6 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    __construct_array(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
     *Ptr(this, 0xA0) = 4;

@@ -149,9 +149,35 @@ public:
     void AddTextureIdx(int, int);
     CTexScroll* GetTexScroll(int index)
     {
-        return reinterpret_cast<CTexScroll*>(reinterpret_cast<unsigned char*>(this) + 0x4C) + index;
+        return &m_texScroll[index];
     }
+
+private:
+    char m_name[0x10];                    // 0x008
+    unsigned short m_textureCount;        // 0x018
+    unsigned short m_textureIndices[5];   // 0x01A
+    unsigned long m_tevBit;               // 0x024
+    CLightPcs::CBumpLight* m_bumpLight;   // 0x028
+    float m_scaleV;                       // 0x02C
+    float m_scaleU;                       // 0x030
+    char m_texShiftU;                     // 0x034
+    char m_texShiftV;                     // 0x035
+    unsigned char m_unk36;                // 0x036
+    unsigned char m_pad37[5];             // 0x037
+    CTexture* m_textures[4];              // 0x03C
+    CTexScroll m_texScroll[4];            // 0x04C
+    int m_pdtSlotIndex;                   // 0x09C
+    unsigned char m_blendMode;            // 0x0A0
+    unsigned char m_fogEnable;            // 0x0A1
+    unsigned char m_materialType;         // 0x0A2
+    unsigned char m_bumpLightDirect;      // 0x0A3
+    unsigned char m_shadowKColorId;       // 0x0A4
+    unsigned char m_unkA5;                // 0x0A5
+    unsigned char m_unkA6;                // 0x0A6
+    unsigned char m_singleTextureFlag;    // 0x0A7
 };
+
+typedef int CMaterial_size_mismatch[(sizeof(CMaterial) == 0xA8) ? 1 : -1];
 
 class CMaterialSet : public CRef
 {

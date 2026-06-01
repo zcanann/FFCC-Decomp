@@ -89,7 +89,7 @@ public:
     void DestroyTempBuffer();
 
     u8 _pad_0x4_to_0x71DF[0x71DC];
-    void* m_renderMode;
+    GXRenderModeObj* m_renderMode;
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
     void* m_savedFrameBuffer;

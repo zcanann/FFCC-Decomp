@@ -87,6 +87,11 @@ static inline Mtx& CameraMatrix()
 }
 
 STATIC_ASSERT(offsetof(CGraphic, m_renderMode) == 0x71E0);
+STATIC_ASSERT(offsetof(CGraphic, m_frameBuffer) == 0x71E4);
+STATIC_ASSERT(offsetof(CGraphic, m_scratchTextureBuffer) == 0x71E8);
+STATIC_ASSERT(offsetof(CGraphic, m_savedFrameBuffer) == 0x71EC);
+STATIC_ASSERT(offsetof(CGraphic, m_displayCopyEnabled) == 0x71F0);
+STATIC_ASSERT(offsetof(CGraphic, m_lastRetraceCount) == 0x71F4);
 STATIC_ASSERT(offsetof(CGraphic, m_fogColor) == 0x7200);
 STATIC_ASSERT(offsetof(CGraphic, m_fogStart) == 0x7204);
 STATIC_ASSERT(offsetof(CGraphic, m_fogEnd) == 0x7208);
@@ -145,64 +150,61 @@ void CGraphic::Init()
     OSResumeThread(&m_thread);
 
     VIInit();
-    PtrAt(this, 0x71E0) = &gDefaultGXRenderMode;
-    S32At(this, 0x71F0) = 1;
+    m_renderMode = &gDefaultGXRenderMode;
+    m_displayCopyEnabled = 1;
 
-    void* renderMode = PtrAt(this, 0x71E0);
-    u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
-    u16 efbHeight = U16At(renderMode, 6);
-    u16 xfbHeight = U16At(renderMode, 8);
+    GXRenderModeObj* renderMode = m_renderMode;
+    u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
+    u16 efbHeight = renderMode->efbHeight;
+    u16 xfbHeight = renderMode->xfbHeight;
     u32 efbBufferSize = alignedWidth * efbHeight * 2;
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x86)
-        u8[xfbBufferSize];
-    memset(PtrAt(this, 0x71E4), 0, 4);
+    m_frameBuffer = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x86) u8[xfbBufferSize];
+    memset(m_frameBuffer, 0, 4);
 
-    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x88)
+    m_savedFrameBuffer = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x88)
         u8[efbBufferSize];
-    memset(PtrAt(this, 0x71EC), 0, 4);
+    memset(m_savedFrameBuffer, 0, 4);
 
-    renderMode = PtrAt(this, 0x71E0);
-    u32 scratchBufferSize = (((U16At(renderMode, 4) + 0xF) & 0xFFF0) * U16At(renderMode, 6) * 2) + 0x46000;
-    PtrAt(this, 0x71E8) =
+    renderMode = m_renderMode;
+    u32 scratchBufferSize = (((renderMode->fbWidth + 0xF) & 0xFFF0) * renderMode->efbHeight * 2) + 0x46000;
+    m_scratchTextureBuffer =
         Memory._Alloc(scratchBufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), graphicFileName, 0xB53, 0);
-    memset(PtrAt(this, 0x71E8), 0, 0x46004);
+    memset(m_scratchTextureBuffer, 0, 0x46004);
 
     PtrAt(this, 0x10) =
         new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x8B) u8[0x60000];
 
-    VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
+    VIConfigure(m_renderMode);
     GXInit(PtrAt(this, 0x10), 0x60000);
 
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(U16At(PtrAt(this, 0x71E0), 4)),
-                  static_cast<f32>(U16At(PtrAt(this, 0x71E0), 6)), kGraphicZeroF, kGraphicOneF);
-    GXSetScissor(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
-    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(PtrAt(this, 0x71E0), 6), U16At(PtrAt(this, 0x71E0), 8)));
-    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
-    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
-    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa,
-                    reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->sample_pattern, GX_TRUE,
-                    GXNtsc480IntDf.vfilter);
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(m_renderMode->fbWidth),
+                  static_cast<f32>(m_renderMode->efbHeight), kGraphicZeroF, kGraphicOneF);
+    GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
+    GXSetDispCopyYScale(GXGetYScaleFactor(m_renderMode->efbHeight, m_renderMode->xfbHeight));
+    GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
+    GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
+    GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, GXNtsc480IntDf.vfilter);
 
-    if (reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa == 0) {
+    if (m_renderMode->aa == 0) {
         GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     } else {
         GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     }
 
-    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
-    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
-    GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+    GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
+    GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
+    GXCopyDisp(m_frameBuffer, GX_TRUE);
     GXSetDispCopyGamma(GX_GM_1_0);
-    VISetNextFrameBuffer(PtrAt(this, 0x71E4));
+    VISetNextFrameBuffer(m_frameBuffer);
     VIFlush();
     VIWaitForRetrace();
     if ((*reinterpret_cast<u32*>(renderMode) & 1) != 0) {
         VIWaitForRetrace();
     }
 
-    S32At(this, 0x71F4) = VIGetRetraceCount();
+    m_lastRetraceCount = VIGetRetraceCount();
     S32At(this, 0xC) = 0;
     S32At(this, 0x734C) = 0;
     S32At(this, 0x7350) = 0;
@@ -212,7 +214,7 @@ void CGraphic::Init()
     m_blurDelayCounter = 0;
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
-    GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+    GXCopyDisp(m_frameBuffer, GX_TRUE);
     PtrAt(this, 0x7368) = graphicFileName;
     S32At(this, 0x736C) = 0xBE;
     S32At(this, 0x7364) = 1;
@@ -234,17 +236,17 @@ void CGraphic::Init()
  */
 void CGraphic::Quit()
 {
-    if (PtrAt(this, 0x71EC) != nullptr) {
-        delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71EC));
-        PtrAt(this, 0x71EC) = nullptr;
+    if (m_savedFrameBuffer != nullptr) {
+        delete[] reinterpret_cast<u8*>(m_savedFrameBuffer);
+        m_savedFrameBuffer = nullptr;
     }
-    if (PtrAt(this, 0x71E4) != nullptr) {
-        delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71E4));
-        PtrAt(this, 0x71E4) = nullptr;
+    if (m_frameBuffer != nullptr) {
+        delete[] reinterpret_cast<u8*>(m_frameBuffer);
+        m_frameBuffer = nullptr;
     }
-    if (PtrAt(this, 0x71E8) != nullptr) {
-        delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71E8));
-        PtrAt(this, 0x71E8) = nullptr;
+    if (m_scratchTextureBuffer != nullptr) {
+        delete[] reinterpret_cast<u8*>(m_scratchTextureBuffer);
+        m_scratchTextureBuffer = nullptr;
     }
     if (PtrAt(this, 0x71FC) != nullptr) {
         delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71FC));
@@ -283,13 +285,12 @@ int CGraphic::GetProgressive()
  */
 void CGraphic::ChangeProgressive(int mode)
 {
-    GXRenderModeObj** renderMode = reinterpret_cast<GXRenderModeObj**>(reinterpret_cast<u8*>(this) + 0x71E0);
     GXRenderModeObj* defaultRenderMode = &gDefaultGXRenderMode;
-    if (*renderMode != defaultRenderMode) {
-        *renderMode = defaultRenderMode;
-        GXAdjustForOverscan(*renderMode, *renderMode, 0, 0x10);
-        VIConfigure(*renderMode);
-        GXSetCopyFilter((*renderMode)->aa, (*renderMode)->sample_pattern, GX_TRUE, gDefaultGXRenderMode.vfilter);
+    if (m_renderMode != defaultRenderMode) {
+        m_renderMode = defaultRenderMode;
+        GXAdjustForOverscan(m_renderMode, m_renderMode, 0, 0x10);
+        VIConfigure(m_renderMode);
+        GXSetCopyFilter(m_renderMode->aa, m_renderMode->sample_pattern, GX_TRUE, gDefaultGXRenderMode.vfilter);
         VIFlush();
         VIWaitForRetrace();
         VIWaitForRetrace();
@@ -319,8 +320,7 @@ void CGraphic::SetCopyClear(_GXColor color, int)
  */
 void CGraphic::SetStdDispCopySrc()
 {
-    void* renderMode = PtrAt(this, 0x71E0);
-    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopySrc(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
 }
 
 /*
@@ -334,8 +334,7 @@ void CGraphic::SetStdDispCopySrc()
  */
 void CGraphic::SetStdDispCopyDst()
 {
-    void* renderMode = PtrAt(this, 0x71E0);
-    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopyDst(m_renderMode->fbWidth, m_renderMode->efbHeight);
 }
 
 /*
@@ -349,8 +348,7 @@ void CGraphic::SetStdDispCopyDst()
  */
 void CGraphic::SetStdPixelFmt()
 {
-    void* renderMode = PtrAt(this, 0x71E0);
-    if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(renderMode) + 0x19) != 0) {
+    if (m_renderMode->aa != 0) {
         GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     } else {
         GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
@@ -368,10 +366,9 @@ void CGraphic::SetStdPixelFmt()
  */
 void CGraphic::SetViewport()
 {
-    void* renderMode = PtrAt(this, 0x71E0);
-    GXSetViewport(0.0f, 0.0f, (f32)U16At(renderMode, 4), (f32)U16At(renderMode, 6), 0.0f, 1.0f);
-    renderMode = PtrAt(this, 0x71E0);
-    GXSetScissor(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetViewport(0.0f, 0.0f, static_cast<f32>(m_renderMode->fbWidth), static_cast<f32>(m_renderMode->efbHeight),
+                  0.0f, 1.0f);
+    GXSetScissor(0, 0, m_renderMode->fbWidth, m_renderMode->efbHeight);
 }
 
 /*
@@ -387,9 +384,9 @@ void CGraphic::BeginFrame()
 {
     GXSetZMode((GXBool)1, GX_LEQUAL, (GXBool)1);
     GXSetColorUpdate((GXBool)1);
-    void* renderMode = PtrAt(this, 0x71E0);
-    u16 width = U16At(renderMode, 4);
-    u16 height = U16At(renderMode, 6);
+    GXRenderModeObj* renderMode = m_renderMode;
+    u16 width = renderMode->fbWidth;
+    u16 height = renderMode->efbHeight;
     GXSetViewport(kGraphicZeroF, kGraphicZeroF, (f32)width, (f32)height, kGraphicZeroF, kGraphicOneF);
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
@@ -636,16 +633,16 @@ u32 CGraphic::IsFrameRateOver()
 void CGraphic::Flip()
 {
     if (S32At(this, 0xC) != 0) {
-        if (S32At(this, 0x71F0) != 0) {
+        if (m_displayCopyEnabled != 0) {
             VISetBlack(FALSE);
-            S32At(this, 0x71F0) = 0;
+            m_displayCopyEnabled = 0;
         }
 
         if (System.m_scenegraphStepMode != 1) {
             int retraceCount = VIGetRetraceCount();
-            if ((u32)(retraceCount - S32At(this, 0x71F4)) < 2) {
+            if ((u32)(retraceCount - m_lastRetraceCount) < 2) {
                 m_frameRateOver = 0;
-                while ((u32)((retraceCount = VIGetRetraceCount()) - S32At(this, 0x71F4)) < 2) {
+                while ((u32)((retraceCount = VIGetRetraceCount()) - m_lastRetraceCount) < 2) {
                     VIWaitForRetrace();
                 }
             } else {
@@ -654,7 +651,7 @@ void CGraphic::Flip()
         }
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-        GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+        GXCopyDisp(m_frameBuffer, GX_TRUE);
         PtrAt(this, 0x7368) = const_cast<char*>(sGraphicSourceStrings);
         S32At(this, 0x736C) = 0x26D;
         S32At(this, 0x7364) = 1;
@@ -672,7 +669,7 @@ void CGraphic::Flip()
         GXSetGPFifo(&m_fifos[m_fifoIndex]);
     }
 
-    S32At(this, 0x71F4) = VIGetRetraceCount();
+    m_lastRetraceCount = VIGetRetraceCount();
 
     if (System.m_scenegraphStepMode == 1) {
         S32At(this, 0xC) = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
@@ -745,12 +742,12 @@ void CGraphic::DrawDebugString()
     Mtx texMtx;
     GXTexObj texObj;
 
-    void* renderMode = PtrAt(this, 0x71E0);
+    GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
                kGraphicZeroF,
-               static_cast<float>(U16At(renderMode, 6)),
+               static_cast<float>(renderMode->efbHeight),
                kGraphicZeroF,
-               static_cast<float>(U16At(renderMode, 4)),
+               static_cast<float>(renderMode->fbWidth),
                kGraphicZeroF,
                kGraphicBlurAlphaScale);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
@@ -814,12 +811,12 @@ void CGraphic::InitDebugString()
     Mtx model;
     GXTexObj texObj;
 
-    void* renderMode = PtrAt(this, 0x71E0);
+    GXRenderModeObj* renderMode = m_renderMode;
     C_MTXOrtho(proj,
                kGraphicZeroF,
-               static_cast<float>(U16At(renderMode, 6)),
+               static_cast<float>(renderMode->efbHeight),
                kGraphicZeroF,
-               static_cast<float>(U16At(renderMode, 4)),
+               static_cast<float>(renderMode->fbWidth),
                kGraphicZeroF,
                kGraphicBlurAlphaScale);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
@@ -1313,9 +1310,9 @@ void CGraphic::CopySaveFrameBuffer()
 {
     GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
     GXSetTexCopyDst(0x280, 0x1C0, GX_TF_RGB565, GX_FALSE);
-    GXCopyTex(PtrAt(this, 0x71EC), GX_FALSE);
+    GXCopyTex(m_savedFrameBuffer, GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(&m_smallBackTexObj, PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&m_smallBackTexObj, m_savedFrameBuffer, 0x280, 0x1C0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     float zero = LoadFloat(kGraphicZeroF);
     GXInitTexObjLOD(&m_smallBackTexObj, GX_NEAR, GX_NEAR, zero, zero, zero, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
@@ -1351,14 +1348,14 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
     }
 
     if ((xEnd >= 0) && (yEnd >= 0)) {
-        void* renderMode = PtrAt(this, 0x71E0);
-        int efbWidth = static_cast<int>(U16At(renderMode, 4));
-        int efbHeight = static_cast<int>(U16At(renderMode, 6));
+        GXRenderModeObj* renderMode = m_renderMode;
+        int efbWidth = static_cast<int>(renderMode->fbWidth);
+        int efbHeight = static_cast<int>(renderMode->efbHeight);
 
         if ((x <= efbWidth) && (yEnd >= 0) && (y <= efbHeight) && (width > 0) && (height > 0)) {
             if (xEnd > efbWidth) {
                 width -= (xEnd - efbWidth);
-                xEnd = static_cast<int>(U16At(PtrAt(this, 0x71E0), 4));
+                xEnd = static_cast<int>(m_renderMode->fbWidth);
             }
 
             if (x < 0) {
@@ -1371,18 +1368,18 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
                 y = 0;
             }
 
-            efbHeight = static_cast<int>(U16At(PtrAt(this, 0x71E0), 6));
+            efbHeight = static_cast<int>(m_renderMode->efbHeight);
             if (yEnd > efbHeight) {
                 height -= (yEnd - efbHeight);
-                yEnd = static_cast<int>(U16At(PtrAt(this, 0x71E0), 6));
+                yEnd = static_cast<int>(m_renderMode->efbHeight);
             }
 
             if ((xEnd != x) && (yEnd != y)) {
                 int texFormat = 6;
                 int textureSize = width * height * 4;
                 int maxTextureSize =
-                    (((static_cast<int>(U16At(PtrAt(this, 0x71E0), 4)) + 0xF) & 0xFFF0) *
-                         static_cast<int>(U16At(PtrAt(this, 0x71E0), 6)) * 2) +
+                    (((static_cast<int>(m_renderMode->fbWidth) + 0xF) & 0xFFF0) *
+                         static_cast<int>(m_renderMode->efbHeight) * 2) +
                     0x46000;
                 if (maxTextureSize < textureSize) {
                     texFormat = 4;
@@ -1391,11 +1388,11 @@ _GXTexObj* CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, 
 
                 GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
                 GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
-                DCInvalidateRange(PtrAt(this, 0x71E8), textureSize);
-                GXCopyTex(PtrAt(this, 0x71E8), doClear);
+                DCInvalidateRange(m_scratchTextureBuffer, textureSize);
+                GXCopyTex(m_scratchTextureBuffer, doClear);
                 GXPixModeSync();
                 GXInvalidateTexAll();
-                GXInitTexObj(&m_backBufferTexObj, PtrAt(this, 0x71E8), width & 0xFFFF, height & 0xFFFF,
+                GXInitTexObj(&m_backBufferTexObj, m_scratchTextureBuffer, width & 0xFFFF, height & 0xFFFF,
                              static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
                 GXInitTexObjLOD(&m_backBufferTexObj, GX_LINEAR, GX_LINEAR, kGraphicZeroF, kGraphicZeroF,
                                 kGraphicZeroF, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -1428,8 +1425,8 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     int copyClear = doClear;
     int xEnd = copyX + copyWidth;
     int yEnd = copyY + copyHeight;
-    if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= U16At(PtrAt(this, 0x71E0), 4)) &&
-        ((yEnd >= 0) && (copyY <= U16At(PtrAt(this, 0x71E0), 6))) &&
+    if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= m_renderMode->fbWidth) &&
+        ((yEnd >= 0) && (copyY <= m_renderMode->efbHeight)) &&
         ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
         int textureSize = GXGetTexBufferSize((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE, GX_FALSE);
         void* textureBase =
@@ -1841,7 +1838,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     white.b = 0xFF;
     white.a = 0xFF;
 
-    GetBackBufferRect2(PtrAt(this, 0x71E8), &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
+    GetBackBufferRect2(m_scratchTextureBuffer, &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_RGBA8, 0);
     quadMin.x = 0.0f;
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
@@ -1851,7 +1848,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
-    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
+    GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
@@ -1861,7 +1858,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
-    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
+    GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = 0.0f;
     quadMin.y = static_cast<float>(halfHeight);
     quadMin.z = 0.0f;
@@ -1871,7 +1868,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXLoadTexObj(texObj, GX_TEXMAP0);
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
-    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
+    GetBackBufferRect2(m_scratchTextureBuffer, texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     quadMin.x = static_cast<float>(halfWidth);
     quadMin.y = static_cast<float>(halfHeight);
     quadMin.z = 0.0f;
@@ -1968,7 +1965,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     int negativeBlurOffset = -blurOffsetInt;
     int textureOffset = 0;
     for (int i = 0; i < static_cast<int>(m_blurTextureCount); i++) {
-        u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + textureOffset;
+        u8* textureBase = reinterpret_cast<u8*>(m_savedFrameBuffer) + textureOffset;
         GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -2003,7 +2000,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     if (m_blurDelayCounter < textureDelay) {
         m_blurDelayCounter += 1;
     } else if (System.m_scenegraphStepMode != 2) {
-        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8,
+        CreateSmallBackTexture(m_savedFrameBuffer, &texObj, 0x140, 0xE0, GX_LINEAR, GX_TF_RGBA8,
                                static_cast<unsigned long>(m_blurBufferIndex) * 0x46000);
         m_blurDelayCounter = 0;
         m_blurTextureCount += 1;
@@ -2024,13 +2021,13 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
  */
 void CGraphic::CreateTempBuffer()
 {
-	void* renderMode = PtrAt(this, 0x71E0);
-	u16 efbHeight = U16At(renderMode, 6);
-	u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
-	PtrAt(this, 0x71E8) =
+	GXRenderModeObj* renderMode = m_renderMode;
+	u16 efbHeight = renderMode->efbHeight;
+	u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
+	m_scratchTextureBuffer =
 	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
 	                  const_cast<char*>(sGraphicSourceStrings), 0xB53, 0);
-	memset(PtrAt(this, 0x71E8), 0, 0x46004);
+	memset(m_scratchTextureBuffer, 0, 0x46004);
 }
 
 /*
@@ -2040,8 +2037,8 @@ void CGraphic::CreateTempBuffer()
  */
 void CGraphic::DestroyTempBuffer()
 {
-	if (PtrAt(this, 0x71E8) != nullptr) {
-		delete[] reinterpret_cast<u8*>(PtrAt(this, 0x71E8));
-		PtrAt(this, 0x71E8) = nullptr;
+	if (m_scratchTextureBuffer != nullptr) {
+		delete[] reinterpret_cast<u8*>(m_scratchTextureBuffer);
+		m_scratchTextureBuffer = nullptr;
 	}
 }

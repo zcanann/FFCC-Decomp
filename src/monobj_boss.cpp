@@ -87,17 +87,14 @@ struct MeteoParasiteCBossWork {
             u8 m_lichRest : 6;
         } lichBits;
     };
-    u8 m_pad11[0x37];
+    u8 m_pad11[0x57];
     CGPrgObj* m_objs[4];
-    int m_coreIndex;
-    u8 m_coreFlags;
-    u8 m_pad5D[3];
-    int m_coreMode;
-    int m_coreWait;
-    u8 m_pad68[0x0C];
-    CGMonObj* m_obj;
-    int m_index;
     union {
+        int m_coreIndex;
+        int m_index;
+    };
+    union {
+        u8 m_coreFlags;
         u8 m_flags;
         struct {
             u8 m_bit80 : 1;
@@ -105,9 +102,18 @@ struct MeteoParasiteCBossWork {
             u8 m_rest : 6;
         } bits;
     };
-    u8 m_pad7D[7];
-    int m_wait;
+    u8 m_pad7D[3];
+    int m_coreMode;
+    union {
+        int m_coreWait;
+        int m_wait;
+    };
 };
+STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_objs) == 0x68);
+STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreIndex) == 0x78);
+STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreFlags) == 0x7C);
+STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreMode) == 0x80);
+STATIC_ASSERT(offsetof(MeteoParasiteCBossWork, m_coreWait) == 0x84);
 
 struct DuctBossWork {
     u8 m_pad00[0x38];
@@ -1818,37 +1824,14 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	u8* mon = reinterpret_cast<u8*>(this);
 
 	int state = prgObj->m_lastStateId;
-	if (state == 0x67) {
-		int subState = prgObj->m_subState;
-		if (subState == 0) {
-			if (prgObj->m_subFrame == 0) {
-				reinterpret_cast<CGCharaObj*>(this)->damageDelete();
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1C, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				prgObj->changeSubStat(1);
+	if (state != 0x67) {
+		if (state >= 0x67) {
+			if (state < 0x69 && prgObj->m_stateFrame == 0) {
+				prgObj->reqAnim(0x35, 1, 0);
 			}
-		} else if (subState == 1) {
-			if (prgObj->m_subFrame == 0) {
-				reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags =
-				    (reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags & 0x7F) | 0x80;
-				reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreMode = 1;
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1D, 1, 0);
-			} else if (((reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags & 0x80) == 0)) {
-				prgObj->changeSubStat(2);
-			}
-		} else if (subState == 2) {
-			if (prgObj->m_subFrame == 0) {
-				prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1E, 0, 0);
-				prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 2 + 0x11D34, 0x32, 0x96, 0, 0);
-			} else if (prgObj->isLoopAnim() != 0) {
-				reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
-				prgObj->changeStat(0, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6B4) = 0;
-				reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreWait = 0x177;
-				*reinterpret_cast<int*>(mon + 0x6C8) = 0;
-			}
+			return;
 		}
-	} else if (state < 0x67) {
+
 		if (state == 0x65) {
 			if (prgObj->m_subState == 0) {
 				if (prgObj->m_subFrame == 0) {
@@ -1891,8 +1874,37 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 				*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 			}
 		}
-	} else if (state < 0x69 && prgObj->m_stateFrame == 0) {
-		prgObj->reqAnim(0x35, 1, 0);
+		return;
+	}
+
+	int subState = prgObj->m_subState;
+	if (subState == 0) {
+		if (prgObj->m_subFrame == 0) {
+			reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1C, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			prgObj->changeSubStat(1);
+		}
+	} else if (subState == 1) {
+		if (prgObj->m_subFrame == 0) {
+			reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags =
+			    (reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags & 0x7F) | 0x80;
+			reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreMode = 1;
+			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1D, 1, 0);
+		} else if (((reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreFlags & 0x80) == 0)) {
+			prgObj->changeSubStat(2);
+		}
+	} else if (subState == 2) {
+		if (prgObj->m_subFrame == 0) {
+			prgObj->reqAnim(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 3 + 0x1E, 0, 0);
+			prgObj->playSe3D(reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex * 2 + 0x11D34, 0x32, 0x96, 0, 0);
+		} else if (prgObj->isLoopAnim() != 0) {
+			reinterpret_cast<CGObject*>(this)->SetAnimSlot(0, 0);
+			prgObj->changeStat(0, 0, 0);
+			*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+			reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreWait = 0x177;
+			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+		}
 	}
 }
 
@@ -2602,12 +2614,12 @@ void CGMonObj::logicFuncLastBoss()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
 
-	if (*reinterpret_cast<int*>(mon + 0x6B4) == 2) {
+	if (*reinterpret_cast<int*>(mon + 0x6D0) == 2) {
+		int& timer = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24);
 		timer += 1;
-		if (timer > 9) {
-			*reinterpret_cast<int*>(mon + 0x6B4) = 3;
+		if (timer >= 10) {
+			*reinterpret_cast<int*>(mon + 0x6D0) = 3;
 			nextState = 0x65;
 			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 			object->m_bgColMask &= 0xFFF7FFFF;
@@ -2615,10 +2627,10 @@ void CGMonObj::logicFuncLastBoss()
 		}
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		prgObj->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 

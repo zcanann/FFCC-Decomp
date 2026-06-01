@@ -28,7 +28,6 @@ void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTabl
         return;
     }
 
-    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 id = basePtr->m_graphId;
@@ -50,7 +49,7 @@ void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTabl
     }
 
     s32 sourceOffset = in->sourceOffset;
-    f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + sourceOffset);
     f32 delta = in->blend * *valuePtr;
     
     *source = *source + delta;

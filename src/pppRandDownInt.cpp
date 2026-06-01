@@ -28,7 +28,6 @@ void pppRandDownInt(_pppPObject* basePtr, RandDownIntParams* in, _pppCtrlTable* 
         return;
     }
 
-    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 baseState = basePtr->m_graphId;
@@ -49,7 +48,7 @@ void pppRandDownInt(_pppPObject* basePtr, RandDownIntParams* in, _pppCtrlTable* 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);
     f32 factor = (f32)in->blend;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;

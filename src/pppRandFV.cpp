@@ -34,7 +34,6 @@ void pppRandFV(_pppPObject* basePtr, RandFVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     s32 state = basePtr->m_graphId;
@@ -55,7 +54,7 @@ void pppRandFV(_pppPObject* basePtr, RandFVParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + in->sourceOffset + 0x80);
+    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);
     f32 x = in->blend[0];
     f32 scale = *valuePtr;
 

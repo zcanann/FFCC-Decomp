@@ -24,14 +24,12 @@ struct RandFloatParam {
  */
 void pppRandFloat(_pppPObject* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base;
     f32* valuePtr;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    base = (u8*)basePtrIn;
     s32 state = basePtrIn->m_graphId;
 
     if (state == 0) {
@@ -52,7 +50,7 @@ void pppRandFloat(_pppPObject* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctr
     }
 
     s32 sourceOffset = in->sourceOffset;
-    f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
+    f32* source = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtrIn->m_workArea + sourceOffset);
 
     *source = *source + (in->blend * *valuePtr - in->blend);
 }

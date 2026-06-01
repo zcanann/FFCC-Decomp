@@ -1,4 +1,5 @@
 #include "ffcc/graphic.h"
+#include "global.h"
 #include "ffcc/graphic_symbols.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/render_buffers.h"
@@ -85,6 +86,12 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
+STATIC_ASSERT(offsetof(CGraphic, m_renderMode) == 0x71E0);
+STATIC_ASSERT(offsetof(CGraphic, m_fogColor) == 0x7200);
+STATIC_ASSERT(offsetof(CGraphic, m_fogStart) == 0x7204);
+STATIC_ASSERT(offsetof(CGraphic, m_fogEnd) == 0x7208);
+STATIC_ASSERT(offsetof(CGraphic, m_defaultCopyClearColor) == 0x735F);
+
 extern "C" {
 }
 
@@ -120,18 +127,18 @@ void CGraphic::Init()
     PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
 
     S32At(this, 0x14) = 0;
-    U8At(this, 0x7200) = 0;
-    U8At(this, 0x7201) = 0;
-    U8At(this, 0x7202) = 0;
-    U8At(this, 0x7203) = 0;
+    m_fogColor.r = 0;
+    m_fogColor.g = 0;
+    m_fogColor.b = 0;
+    m_fogColor.a = 0;
 
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = kGraphicZeroF;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = kGraphicZeroF;
+    m_fogEnd = kGraphicZeroF;
+    m_fogStart = kGraphicZeroF;
 
-    U8At(this, 0x735F) = U8At(this, 0x7200);
-    U8At(this, 0x7360) = U8At(this, 0x7201);
-    U8At(this, 0x7361) = U8At(this, 0x7202);
-    U8At(this, 0x7362) = U8At(this, 0x7203);
+    m_defaultCopyClearColor.r = m_fogColor.r;
+    m_defaultCopyClearColor.g = m_fogColor.g;
+    m_defaultCopyClearColor.b = m_fogColor.b;
+    m_defaultCopyClearColor.a = m_fogColor.a;
     memset(reinterpret_cast<u8*>(this) + 0x7364, 0, 0x10);
 
     OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack + 0x4000, 0x4000, 1, 1);
@@ -297,9 +304,8 @@ void CGraphic::ChangeProgressive(int mode)
  */
 void CGraphic::SetCopyClear(_GXColor color, int)
 {
-    _GXColor* clearColor = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x735F);
-    *clearColor = color;
-    GXSetCopyClear(*clearColor, 0xFFFFFF);
+    m_defaultCopyClearColor = color;
+    GXSetCopyClear(m_defaultCopyClearColor, 0xFFFFFF);
 }
 
 /*
@@ -1233,12 +1239,12 @@ void CGraphic::SetFogColor(_GXColor color)
     const u8* colorBytes = reinterpret_cast<const u8*>(&color);
     u8 c0 = colorBytes[0];
     u8 c1 = colorBytes[1];
-    U8At(this, 0x7200) = c0;
+    m_fogColor.r = c0;
     c0 = colorBytes[2];
-    U8At(this, 0x7201) = c1;
+    m_fogColor.g = c1;
     c1 = colorBytes[3];
-    U8At(this, 0x7202) = c0;
-    U8At(this, 0x7203) = c1;
+    m_fogColor.b = c0;
+    m_fogColor.a = c1;
 }
 
 /*
@@ -1252,8 +1258,8 @@ void CGraphic::SetFogColor(_GXColor color)
  */
 void CGraphic::SetFogParam(float startZ, float endZ)
 {
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = startZ;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = endZ;
+    m_fogStart = startZ;
+    m_fogEnd = endZ;
 }
 
 /*
@@ -1282,7 +1288,7 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
     if (useGlobalColor != 0) {
         colorPtr = &gGraphicDefaultClearColor;
     } else {
-        colorPtr = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200);
+        colorPtr = &m_fogColor;
     }
 
     _GXColor fogColor = *colorPtr;
@@ -1291,8 +1297,7 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
         fogType = GX_FOG_LIN;
     }
 
-    GXSetFog(fogType, *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204),
-             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208), nearZ, farZ, fogColor);
+    GXSetFog(fogType, m_fogStart, m_fogEnd, nearZ, farZ, fogColor);
 }
 
 /*

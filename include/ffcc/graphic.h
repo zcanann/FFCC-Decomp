@@ -96,7 +96,7 @@ public:
     s32 m_displayCopyEnabled;
     s32 m_lastRetraceCount;
     u8 _pad_0x71F8_to_0x71FF[0x8];
-    u8 m_clearColor[4];
+    _GXColor m_fogColor;
     f32 m_fogStart;
     f32 m_fogEnd;
     _GXTexObj m_backBufferTexObj;

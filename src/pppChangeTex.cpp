@@ -27,8 +27,8 @@ struct ChangeTexWork {
 	float m_value0;
 	float m_value1;
 	float m_value2;
-	void* m_meshColorArrays;
-	void* m_displayListArrays;
+	GXColor** m_meshColorArrays;
+	ChangeTexDisplayListCopy*** m_displayListArrays;
 	int _pad14;
 	CGObject* m_charaObj;
 	void* m_texture;
@@ -161,10 +161,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	ChangeTexMeshRef* meshList = ChangeTexMeshes(model0);
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = LoadFloat(kPppChangeTexCachedValueInit);
-		work->m_meshColorArrays = pppMemAlloc(
+		work->m_meshColorArrays = (GXColor**)pppMemAlloc(
 		    model0->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x163);
-		work->m_displayListArrays = pppMemAlloc(
+		work->m_displayListArrays = (ChangeTexDisplayListCopy***)pppMemAlloc(
 		    model0->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x166);
 
@@ -288,10 +288,10 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 		ClearChangeTexModelCallbacks(model2);
 	}
 
-	void** stageArray = (void**)work->m_displayListArrays;
-	void** meshArray;
+	ChangeTexDisplayListCopy*** stageArray = work->m_displayListArrays;
+	GXColor** meshArray;
 	if (stageArray != 0) {
-		meshArray = (void**)work->m_meshColorArrays;
+		meshArray = work->m_meshColorArrays;
 		if (meshArray != 0) {
 			goto freeArrays;
 		}
@@ -299,13 +299,13 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	return;
 
 freeArrays:
-	int meshList = (int)ChangeTexMeshes(model);
-	void** meshArrayOrig = meshArray;
-	void** stageArrayOrig = stageArray;
-	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
-		int meshData = *(int*)(meshList + 8);
-		ChangeTexDisplayListCopy** dlEntries = (ChangeTexDisplayListCopy**)*stageArray;
-		for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
+	ChangeTexMeshRef* meshList = ChangeTexMeshes(model);
+	GXColor** meshArrayOrig = meshArray;
+	ChangeTexDisplayListCopy*** stageArrayOrig = stageArray;
+	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList++) {
+		ChangeTexMeshData* meshData = meshList->m_data;
+		ChangeTexDisplayListCopy** dlEntries = *stageArray;
+		for (unsigned int j = 0; j < meshData->m_displayListCount; j++) {
 			if ((*dlEntries)->m_data != 0) {
 				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>((*dlEntries)->m_data));
 				(*dlEntries)->m_data = 0;

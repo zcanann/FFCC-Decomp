@@ -1744,7 +1744,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	*head = 0;
 	if (pppProgRelocCount > 0) {
 		if (pppProgRelocCount > 8) {
-			unsigned int blocks = (unsigned int)(pppProgRelocCount - 1) >> 3;
+			int blocks = (pppProgRelocCount - 8 + 7) >> 3;
 			int* reloc = pppProgRelocs;
 			if (pppProgRelocCount - 8 > 0) {
 				do {
@@ -1777,7 +1777,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	processed = 0;
 	if (pdtRelocCount > 0) {
 		if (pdtRelocCount > 8) {
-			unsigned int blocks = (unsigned int)(pdtRelocCount - 1) >> 3;
+			int blocks = (pdtRelocCount - 8 + 7) >> 3;
 			int* reloc = pdtRelocs;
 			if (pdtRelocCount - 8 > 0) {
 				do {

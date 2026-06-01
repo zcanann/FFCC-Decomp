@@ -15,6 +15,8 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
+STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_workArea) == 0x80);
+
 struct KeShpTail3XStep {
     s32 m_graphId;
     u32 m_dataValIndex;
@@ -58,6 +60,12 @@ STATIC_ASSERT(offsetof(KeShpTail3XWork, m_head) == 0x1c2);
 STATIC_ASSERT(offsetof(KeShpTail3XWork, m_initialized) == 0x1c3);
 STATIC_ASSERT(sizeof(KeShpTail3XWork) == 0x1c4);
 
+struct KeShpTail3XAlphaWork {
+    u8 _pad0[6];
+    s16 m_alpha;
+};
+STATIC_ASSERT(offsetof(KeShpTail3XAlphaWork, m_alpha) == 6);
+
 inline void S4ToF32(pppFVECTOR4* dest, s16* src)
 {
     dest->x = src[0] >> 7;
@@ -96,7 +104,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
     int i;
     float scale;
 
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_2->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_2->m_serializedDataOffsets[0]);
     work->m_initialized = 0;
     work->m_head = 0;
     work->m_shapeFrame = 0;
@@ -185,7 +193,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     const float zero = kPppKeShpTail3XZero;
     s32 dataValIndex;
 
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -194,7 +202,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     count = step->m_drawCount;
 
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + param_3->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
+    alphaMul = (float)reinterpret_cast<KeShpTail3XAlphaWork*>(
+                   obj->m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
+               kPppKeShpTail3XAlphaScale;
     S4ToF32(&colorStart, &work->m_values[0]);
     S4ToF32(&colorEnd, &work->m_values[4]);
     colorStart.w *= alphaMul;
@@ -407,7 +417,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     }
 
     step = (KeShpTail3XStep*)param_2;
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         work->m_initialized = 1;

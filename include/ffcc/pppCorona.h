@@ -3,14 +3,8 @@
 
 #include <dolphin/types.h>
 
-struct pppCorona {
-    s32 m_graphId;
-};
-
-struct pppCoronaUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
+struct _pppPObject;
+struct _pppCtrlTable;
 
 struct CoronaParam {
     s32 m_graphId;
@@ -34,10 +28,10 @@ struct CoronaParam {
 extern "C" {
 #endif
 
-void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2);
-void pppDestructCorona(pppCorona* param1, pppCoronaUnkC* param2);
-void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
-void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
+void pppConstructCorona(_pppPObject* object, _pppCtrlTable* ctrl);
+void pppDestructCorona(_pppPObject* object, _pppCtrlTable* ctrl);
+void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl);
+void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl);
 
 #ifdef __cplusplus
 }

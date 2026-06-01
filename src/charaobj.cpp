@@ -3172,7 +3172,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 
 			unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
 			unsigned short reqParticle = combiCursor[slot * 3 + 0];
-			bool itemMatch = false;
+			bool itemMatch = objParticle == reqParticle;
 			if (slot == count - 1) {
 				unsigned short itemCode =
 					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48));
@@ -3180,7 +3180,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 					itemMatch = true;
 				}
 			}
-			if (!itemMatch && objParticle != reqParticle) {
+			if (!itemMatch) {
 				break;
 			}
 

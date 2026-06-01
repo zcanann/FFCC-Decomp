@@ -10,7 +10,6 @@ public:
 	int DecRef() { return --refCount; }
 	int GetRef() { return refCount; }
 
-private:
 	int refCount;
 };
 

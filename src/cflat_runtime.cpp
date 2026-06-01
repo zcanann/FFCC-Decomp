@@ -1546,19 +1546,20 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	watch.Reset();
 	watch.Start();
 
-	if (object->m_waitCounter != 0) {
-		object->m_waitCounter--;
-		watch.Stop();
-		return 1;
-	}
-
 	u8* const self = reinterpret_cast<u8*>(this);
 	u8* funcs = *reinterpret_cast<u8**>(self + 0x20);
-	u8* code = *reinterpret_cast<u8**>(
+	u8* code;
+
+	if (object->m_waitCounter != 0) {
+		goto callSystemFunction;
+	}
+
+	code = *reinterpret_cast<u8**>(
 	    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
 	    + (static_cast<int>(object->m_codePos << 12) >> 12);
 
 	while (true) {
+frameLoop:
 		*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
 		*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
 		*reinterpret_cast<u16*>(self + 0x964) = static_cast<u16>(object->m_codePos);
@@ -1738,6 +1739,128 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
 				continue;
 			}
+			break;
+		}
+		case 0x0A: {
+			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			CFunc* func = reinterpret_cast<CFunc*>(m_funcs) + (arg & 0xFFFF);
+
+			if ((static_cast<int>(arg) >> 16) >= 0) {
+				const int funcIndex = m_classes[object->m_classIndex].m_functionTable[func->m_systemIndex];
+				if (funcIndex < 0) {
+					continue;
+				}
+				func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
+			}
+
+			const unsigned int prevCodePos = object->m_codePos;
+			const u8 prevFlags = object->m_flags;
+			unsigned int* const prevLocalBase = object->m_localBase;
+			const int prevWaitCounter = object->m_waitCounter;
+			const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
+			const s16 prevArgCount = object->m_argCount;
+
+			if (func->m_useCallerArgs == 0) {
+				object->m_localBase = object->m_sp - func->m_argCount;
+				object->m_sp = object->m_localBase + func->m_localCount;
+			} else {
+				object->m_sp--;
+				object->m_argCount = static_cast<s16>(*object->m_sp);
+				object->m_localBase = object->m_sp - object->m_argCount;
+				object->m_sp = object->m_localBase + object->m_argCount;
+			}
+
+			*reinterpret_cast<u16*>(&object->m_codePos) =
+			    static_cast<u16>((static_cast<s16>(func->m_index) << 4)
+			                     | (*reinterpret_cast<u16*>(&object->m_codePos) & 0x000F));
+			object->m_codePos &= 0xFFF00000;
+			object->m_flags = static_cast<u8>(object->m_flags & 0xDF);
+			object->m_waitCounter = 0;
+			object->m_reqFlag0 = 0;
+			object->m_reqFlag1 = 0;
+			object->m_reqFlag2 = 0;
+			object->m_reqFlag3 = 0;
+
+			*object->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
+			*object->m_sp++ = prevCodePos;
+			*object->m_sp++ =
+			    static_cast<int>((static_cast<unsigned int>(prevFlags) << 26) | (static_cast<unsigned int>(prevFlags) >> 6)) >> 31;
+			*object->m_sp++ = static_cast<unsigned int>(prevArgCount)
+			                 | (static_cast<unsigned int>(prevWaitCounter) << 16)
+			                 | (static_cast<unsigned int>(prevReqFlags) << 15);
+
+			int clearCount = func->m_localCount - func->m_argCount;
+			for (unsigned int* clear = object->m_localBase + func->m_argCount; clearCount > 0; clearCount--) {
+				*clear++ = 0;
+			}
+
+			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
+				funcs = *reinterpret_cast<u8**>(self + 0x20);
+				code = *reinterpret_cast<u8**>(
+				    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+				    + (static_cast<int>(object->m_codePos << 12) >> 12);
+				continue;
+			}
+			goto callSystemFunction;
+		}
+		case 0x0B: {
+			CObject* newObject = createObject(*reinterpret_cast<int*>(code + 1));
+			CFunc* func = reinterpret_cast<CFunc*>(m_funcs)
+			              + m_classes[newObject->m_activeClassIndex].m_functionTable[0];
+
+			for (int i = 0; i < func->m_argCount; i++) {
+				newObject->m_sp[i] = object->m_sp[i - func->m_argCount];
+			}
+			newObject->m_sp += func->m_argCount;
+
+			const unsigned int prevCodePos = newObject->m_codePos;
+			const u8 prevFlags = newObject->m_flags;
+			unsigned int* const prevLocalBase = newObject->m_localBase;
+			const int prevWaitCounter = newObject->m_waitCounter;
+			const int prevReqFlags = *reinterpret_cast<int*>(&newObject->m_reqFlag0);
+			const s16 prevArgCount = newObject->m_argCount;
+
+			if (func->m_useCallerArgs == 0) {
+				newObject->m_localBase = newObject->m_sp - func->m_argCount;
+				newObject->m_sp = newObject->m_localBase + func->m_localCount;
+			} else {
+				newObject->m_sp--;
+				newObject->m_argCount = static_cast<s16>(*newObject->m_sp);
+				newObject->m_localBase = newObject->m_sp - newObject->m_argCount;
+				newObject->m_sp = newObject->m_localBase + newObject->m_argCount;
+			}
+
+			*reinterpret_cast<u16*>(&newObject->m_codePos) =
+			    static_cast<u16>((static_cast<s16>(func->m_index) << 4)
+			                     | (*reinterpret_cast<u16*>(&newObject->m_codePos) & 0x000F));
+			newObject->m_codePos &= 0xFFF00000;
+			newObject->m_flags = static_cast<u8>((newObject->m_flags & 0xDF) | 0x20);
+			newObject->m_waitCounter = 0;
+			newObject->m_reqFlag0 = 0;
+			newObject->m_reqFlag1 = 0;
+			newObject->m_reqFlag2 = 0;
+			newObject->m_reqFlag3 = 0;
+
+			*newObject->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
+			*newObject->m_sp++ = prevCodePos;
+			*newObject->m_sp++ =
+			    static_cast<int>((static_cast<unsigned int>(prevFlags) << 26) | (static_cast<unsigned int>(prevFlags) >> 6)) >> 31;
+			*newObject->m_sp++ = static_cast<unsigned int>(prevArgCount)
+			                    | (static_cast<unsigned int>(prevWaitCounter) << 16)
+			                    | (static_cast<unsigned int>(prevReqFlags) << 15);
+
+			int clearCount = func->m_localCount - func->m_argCount;
+			for (unsigned int* clear = newObject->m_localBase + func->m_argCount; clearCount > 0; clearCount--) {
+				*clear++ = 0;
+			}
+
+			objectFrame(newObject);
+			--newObject->m_sp;
+			object->m_sp -= func->m_argCount;
+			*object->m_sp++ = static_cast<int>(newObject->m_particleId);
+			request(newObject, 2, 3, 0, 0);
+			request(newObject, 2, 2, 0, 0);
+			newObject->onNewFinished();
 			break;
 		}
 		case 0x0C:
@@ -2004,6 +2127,63 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		const int current = static_cast<int>(codePos << 12) >> 12;
 		code += step;
 		object->m_codePos = (codePos & 0xFFF00000) | ((current + step) & 0x000FFFFF);
+	}
+
+callSystemFunction:
+	{
+		const int funcIndex = static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4;
+		CFunc* func = reinterpret_cast<CFunc*>(funcs) + funcIndex;
+		int systemResult;
+		const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
+
+		if (ret == 0) {
+			*object->m_sp++ = 0;
+		} else if (systemResult != 0) {
+			if ((systemResult != 2) && (object->m_waitCounter < 0x708)) {
+				object->m_waitCounter++;
+			}
+			watch.Stop();
+			*reinterpret_cast<float*>(self + 0x48) += watch.Get();
+			return 0;
+		}
+
+		const u8 oldFlags = object->m_flags;
+
+		--object->m_sp;
+		const u32 returnValue = *object->m_sp;
+		--object->m_sp;
+		const u32 packedFlags = *object->m_sp;
+		--object->m_sp;
+		const u32 previousActive = *object->m_sp;
+		--object->m_sp;
+		const u32 previousCodePos = *object->m_sp;
+		--object->m_sp;
+		unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(*object->m_sp);
+
+		object->m_sp = object->m_localBase;
+		*object->m_sp++ = returnValue;
+		object->m_localBase = previousLocalBase;
+		object->m_codePos = previousCodePos;
+		object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+		object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
+		object->m_reqFlag0 = 0;
+		object->m_reqFlag1 = 0;
+		object->m_reqFlag2 = 0;
+		object->m_reqFlag3 = static_cast<u8>((packedFlags >> 15) & 1);
+		object->m_argCount = static_cast<s16>(packedFlags);
+
+		if ((static_cast<int>(object->m_flags) << 24) < 0) {
+			return 0;
+		}
+		if ((static_cast<int>(oldFlags) << 26) < 0) {
+			return 1;
+		}
+
+		funcs = *reinterpret_cast<u8**>(self + 0x20);
+		code = *reinterpret_cast<u8**>(
+		    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+		    + (static_cast<int>(object->m_codePos << 12) >> 12);
+		goto frameLoop;
 	}
 
 	watch.Stop();
@@ -2418,5 +2598,5 @@ int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
  */
 int CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-    return 0;
+	return 0;
 }

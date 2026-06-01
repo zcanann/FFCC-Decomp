@@ -254,7 +254,7 @@ void _GXSetTevSwapMode(_GXTevStageID stage, _GXTevSwapSel rasSel, _GXTevSwapSel 
  * JP Address: TODO
  * JP Size: TODO
  */
-void _GXSetNumTevStages(unsigned char nStages)
+inline void _GXSetNumTevStages(unsigned char nStages)
 {
 	if (s_GXSetNumTevStages_nStages != nStages) {
 		s_GXSetNumTevStages_nStages = nStages;

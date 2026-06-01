@@ -8,7 +8,19 @@
 class CUSBPcs : public CProcess
 {
 public:
-    class CDataHeader;
+    class CDataHeader
+    {
+    public:
+        u32 m_packetType;
+        u32 m_packetSize;
+        u8 m_reserved08[0x1C];
+        u32 m_packetCode;
+        u32 m_elementCount;
+        u32 m_reserved2C;
+        u32 m_dataSize;
+        u8 m_reserved34[0xC];
+    };
+
     static CSmallProcessTable m_table;
 
     CUSBPcs();

@@ -355,3 +355,22 @@ void CFunnyShapePcs::SetUSBData()
     }
     }
 }
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* header)
+{
+    CUSBStreamDataHeader* usb = UsbStream(this);
+
+    usb->m_dataReady = 1;
+    usb->m_headerReady = header->m_packetSize != 0;
+    usb->m_sizeBytes = header->m_packetSize - sizeof(CUSBPcs::CDataHeader);
+    usb->m_packetCode = header->m_packetCode;
+}

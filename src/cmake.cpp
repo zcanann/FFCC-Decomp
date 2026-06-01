@@ -3045,18 +3045,23 @@ void CMenuPcs::CmakeResultDraw()
         DrawCmakeTitle(6, alpha, FLOAT_80333258);
     }
 
-    float textAlpha = alpha;
+    float crestAlpha = alpha;
     if ((mode == 2) && (resultDir < 0)) {
-        textAlpha = FLOAT_80333258;
+        crestAlpha = FLOAT_80333258;
     }
 
-    DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
+    DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, crestAlpha);
 
     int yesNoSel = 0;
     if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         yesNoSel = *reinterpret_cast<short*>(state + 0x26) + 1;
     }
     DrawCmakeYesNo(yesNoSel, alpha);
+
+    float textAlpha = alpha;
+    if ((mode == 2) && (resultDir < 0)) {
+        textAlpha = FLOAT_80333258;
+    }
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);

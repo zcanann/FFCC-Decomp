@@ -18,11 +18,6 @@ struct KeShpTailWork {
     Vec m_posHistory[31];
 };
 
-struct KeShpTailObject {
-    u8 _pad0[0xc];
-    _pppPObjectHead m_obj;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800880f0
@@ -50,9 +45,9 @@ void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTailCon(void* r3, void* r4)
+void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	KeShpTailWork* work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
+	KeShpTailWork* work = (KeShpTailWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 	work->m_field2 = 0;
 	work->m_field4 = 0;
 	work->m_field6 = 0;
@@ -71,20 +66,19 @@ void pppKeShpTailCon(void* r3, void* r4)
  */
 void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
 {
-	KeShpTailObject* tailObj = (KeShpTailObject*)obj;
 	KeShpTailWork* work;
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	work = (KeShpTailWork*)((u8*)obj + ((KeShpTailOffsets*)offsets)->m_serializedDataOffsets[0] + 0x80);
-	if (tailObj->m_obj.m_graphId == 0) {
+	work = (KeShpTailWork*)(obj->m_workArea + ((KeShpTailOffsets*)offsets)->m_serializedDataOffsets[0]);
+	if (obj->m_graphId == 0) {
 		Vec local_14 ATTRIBUTE_ALIGN(8);
 		Vec local_20;
 
-		local_20.x = tailObj->m_obj.m_localMatrix.value[0][3];
-		local_20.y = tailObj->m_obj.m_localMatrix.value[1][3];
-		local_20.z = tailObj->m_obj.m_localMatrix.value[2][3];
+		local_20.x = obj->m_localMatrix.value[0][3];
+		local_20.y = obj->m_localMatrix.value[1][3];
+		local_20.z = obj->m_localMatrix.value[2][3];
 		pppCopyVector(local_14, local_20);
 
 		Vec* tailVec = work->m_posHistory;

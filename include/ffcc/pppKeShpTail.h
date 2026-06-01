@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 void pppKeShpTail(struct _pppPObject*, struct pppKeShpTailUnkB*, struct pppKeShpTailUnkC*);
-void pppKeShpTailCon(void* r3, void* r4);
+void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable);
 void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
@@ -19,4 +19,3 @@ void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 #endif
 
 #endif // _PPP_KESHPTAIL_H_
-

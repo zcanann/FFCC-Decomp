@@ -2072,7 +2072,10 @@ void CMenuPcs::CmakeNameDraw()
         nameCursor = 0;
     }
     DrawCmakeName(0, nameCursor, name, alpha);
-    DrawCmakeDecision((4 < *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) ? 1 : 0, alpha);
+    DrawCmakeDecision(
+        (static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) >> 31) +
+            (static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28))) > 4),
+        alpha);
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
         DrawMcWin(-1, 0);

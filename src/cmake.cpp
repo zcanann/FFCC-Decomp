@@ -404,7 +404,7 @@ extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
 };
 
 static CmakeInfo s_CmakeInfo;
-static char s_CmakeVillageName[0x10];
+static char s_CmakeVillageName[0x11];
 
 static inline char* GetCmakeNameBuffer()
 {

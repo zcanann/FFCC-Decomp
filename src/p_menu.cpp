@@ -164,11 +164,9 @@ static inline void ReleaseRefObject(void* object)
         return;
     }
 
-    u32* raw = reinterpret_cast<u32*>(object);
-    int refCount = static_cast<int>(raw[1]) - 1;
-    raw[1] = static_cast<u32>(refCount);
-    if (refCount == 0) {
-        delete reinterpret_cast<CRef*>(object);
+    CRef* ref = reinterpret_cast<CRef*>(object);
+    if (ref->DecRef() == 0) {
+        delete ref;
     }
 }
 
@@ -417,13 +415,11 @@ void CMenuPcs::destroy()
     CMenuPcs* textureCursor = this;
     int i = 0;
     do {
-        int** slot = reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
-        int* refObject = *slot;
+        CRef** slot = reinterpret_cast<CRef**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
+        CRef* refObject = *slot;
         if (refObject != nullptr) {
-            int refCount = refObject[1] - 1;
-            refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            if (refObject->DecRef() == 0) {
+                delete refObject;
             }
             *slot = 0;
         }
@@ -434,13 +430,11 @@ void CMenuPcs::destroy()
     textureCursor = this;
     i = 0;
     do {
-        int** slot = reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
-        int* refObject = *slot;
+        CRef** slot = reinterpret_cast<CRef**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
+        CRef* refObject = *slot;
         if (refObject != nullptr) {
-            int refCount = refObject[1] - 1;
-            refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            if (refObject->DecRef() == 0) {
+                delete refObject;
             }
             *slot = 0;
         }
@@ -448,12 +442,9 @@ void CMenuPcs::destroy()
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 2);
 
-    int* refObject = reinterpret_cast<int*>(m_fonts[0]);
-    if (refObject != nullptr) {
-        int refCount = refObject[1] - 1;
-        refObject[1] = refCount;
-        if ((refCount == 0) && (refObject != nullptr)) {
-            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+    if (m_fonts[0] != nullptr) {
+        if (m_fonts[0]->DecRef() == 0) {
+            delete m_fonts[0];
         }
         m_fonts[0] = 0;
     }
@@ -706,12 +697,10 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 
     for (int i = 0; i < textureCount; i++) {
         int offset = (i + textureStart) * 4;
-        int* refObject = *reinterpret_cast<int**>(self + 0x18C + offset);
+        CRef* refObject = *reinterpret_cast<CRef**>(self + 0x18C + offset);
         if (refObject != nullptr) {
-            int refCount = refObject[1] - 1;
-            refObject[1] = refCount;
-            if (refCount == 0) {
-                delete reinterpret_cast<CRef*>(refObject);
+            if (refObject->DecRef() == 0) {
+                delete refObject;
             }
             *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
         }
@@ -719,12 +708,10 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
 
     for (int i = 0; i < textureSetCount; i++) {
         int offset = (i + textureSetStart) * 4;
-        int* refObject = *reinterpret_cast<int**>(self + 0x14C + offset);
+        CRef* refObject = *reinterpret_cast<CRef**>(self + 0x14C + offset);
         if (refObject != nullptr) {
-            int refCount = refObject[1] - 1;
-            refObject[1] = refCount;
-            if (refCount == 0) {
-                delete reinterpret_cast<CRef*>(refObject);
+            if (refObject->DecRef() == 0) {
+                delete refObject;
             }
             *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
         }
@@ -1640,9 +1627,8 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     CFont* font = *reinterpret_cast<CFont**>(fontSlot + 0x100);
 
     if (font != 0) {
-        u32* raw = reinterpret_cast<u32*>(font);
-        if (--raw[1] == 0) {
-            delete reinterpret_cast<CRef*>(font);
+        if (font->DecRef() == 0) {
+            delete font;
         }
         *reinterpret_cast<u32*>(fontSlot + 0x100) = 0;
     }

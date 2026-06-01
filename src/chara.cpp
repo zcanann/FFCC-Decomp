@@ -2301,18 +2301,14 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 
 	if (texSet != oldTexSet) {
 		if (oldTexSet != 0) {
-			int* refData = reinterpret_cast<int*>(oldTexSet);
-			int refCount = refData[1] - 1;
-			refData[1] = refCount;
-			if (refCount == 0) {
+			if (oldTexSet->DecRef() == 0) {
 				delete oldTexSet;
 			}
 			m_texSet = 0;
 		}
 		m_texSet = texSet;
 		if (m_texSet != 0) {
-			int* refData = reinterpret_cast<int*>(m_texSet);
-			refData[1] = refData[1] + 1;
+			m_texSet->AddRef();
 		}
 	}
 	if (m_data->m_materialSet != 0) {

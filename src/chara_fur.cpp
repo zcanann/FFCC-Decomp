@@ -823,7 +823,7 @@ static inline float FurRandSigned(unsigned int& rng)
 	return FurRand01(rng) * 2.0f - 1.0f;
 }
 
-static int FurBlendNibble(int base, int add, float t)
+static inline int FurBlendNibble(int base, int add, float t)
 {
 	int value = static_cast<int>(base + (add - base) * t);
 	if (value < 0) {

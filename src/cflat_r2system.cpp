@@ -1471,9 +1471,11 @@ CVector CVector::operator+(const CVector& other) const
  */
 void CVector::operator=(const CVector& other)
 {
-    float y = other.y;
-    x = other.x;
-    float z = other.z;
+    const float* src = &other.x;
+    float x = *src++;
+    float y = *src++;
+    this->x = x;
+    float z = *src;
     this->y = y;
     this->z = z;
 }
@@ -1489,10 +1491,11 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
-    float x = other.x;
-    float y = other.y;
+    const float* src = &other.x;
+    float x = *src++;
+    float y = *src++;
     this->x = x;
-    float z = other.z;
+    float z = *src;
     this->y = y;
     this->z = z;
 }
@@ -1695,10 +1698,11 @@ void CCameraPcs::SetRefPosition(Vec* position)
  */
 extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
 {
-    float x = other->x;
-    float y = other->y;
+    const float* src = &other->x;
+    float x = *src++;
+    float y = *src++;
     self->x = x;
-    float z = other->z;
+    float z = *src;
     self->y = y;
     self->z = z;
 }

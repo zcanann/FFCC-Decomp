@@ -860,8 +860,8 @@ void CGMonObj::frameStatFuncSaw()
 
 				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, FLOAT_80331d18, 0x1C52C);
 				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
-				memset(mon + 0x70C, 0, 0x34);
-				*reinterpret_cast<int*>(mon + 0x70C) = 0x1402;
+				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.m_flags = 0x1402;
 			} else if (prgObj->isLoopAnim() != 0) {
 				prgObj->addSubStat();
 			}
@@ -938,12 +938,11 @@ void CGMonObj::logicFuncSaw()
  */
 void CGMonObj::moveFrameFuncSaw()
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	float& phase0 = *reinterpret_cast<float*>(SoundBuffer + 1260);
 	float& phase1 = *reinterpret_cast<float*>(SoundBuffer + 1264);
 	const float wave = FLOAT_80331d1c * (FLOAT_80331d18 + sinf(phase1)) + FLOAT_80331d30;
-	*reinterpret_cast<float*>(mon + 0x718) = wave * (FLOAT_80331dac * sinf(phase0));
-	*reinterpret_cast<float*>(mon + 0x720) = wave * (FLOAT_80331d84 * cosf(phase0));
+	m_moveWork.m_targetPos.x = wave * (FLOAT_80331dac * sinf(phase0));
+	m_moveWork.m_targetPos.z = wave * (FLOAT_80331d84 * cosf(phase0));
 	phase0 = phase0 + FLOAT_80331db0 * (FLOAT_80331d30 - (wave - FLOAT_80331d30)) + FLOAT_80331d60;
 	phase1 = phase1 + FLOAT_80331db4;
 }
@@ -1001,22 +1000,22 @@ void CGMonObj::frameStatFuncLKShooter()
 state100:
 	self[0x63C] = (self[0x63C] & 0x7F) | 0x80;
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		memset(self + 0x70C, 0, 0x34);
-		*reinterpret_cast<int*>(self + 0x70C) = 0x322;
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
+		m_moveWork.m_flags = 0x322;
 
 		if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
 			CVector targetPos(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
-			*reinterpret_cast<float*>(self + 0x718) = targetPos.x;
-			*reinterpret_cast<float*>(self + 0x71C) = targetPos.y;
-			*reinterpret_cast<float*>(self + 0x720) = targetPos.z;
+			m_moveWork.m_targetPos.x = targetPos.x;
+			m_moveWork.m_targetPos.y = targetPos.y;
+			m_moveWork.m_targetPos.z = targetPos.z;
 		} else {
 			CVector targetPos(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
-			*reinterpret_cast<float*>(self + 0x718) = targetPos.x;
-			*reinterpret_cast<float*>(self + 0x71C) = targetPos.y;
-			*reinterpret_cast<float*>(self + 0x720) = targetPos.z;
+			m_moveWork.m_targetPos.x = targetPos.x;
+			m_moveWork.m_targetPos.y = targetPos.y;
+			m_moveWork.m_targetPos.z = targetPos.z;
 		}
-		*reinterpret_cast<float*>(self + 0x728) = FLOAT_80331da0;
-		*reinterpret_cast<int*>(self + 0x738) = 0x65;
+		m_moveWork.m_range = FLOAT_80331da0;
+		m_moveWork.m_changeStat = 0x65;
 	}
 
 	moveFrame();
@@ -1479,28 +1478,26 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				cappedDistance = distance;
 			}
 
-			memset(self + 0x70C, 0, 0x34);
-			*reinterpret_cast<int*>(self + 0x70C) = 0x2114;
-			*reinterpret_cast<float*>(self + 0x718) = delta.x;
-			*reinterpret_cast<float*>(self + 0x71C) = delta.y;
-			*reinterpret_cast<float*>(self + 0x720) = delta.z;
-			*reinterpret_cast<float*>(self + 0x724) = FLOAT_80331d58;
-			*reinterpret_cast<int*>(self + 0x72C) = static_cast<int>(cappedDistance * FLOAT_80331d30);
-			*reinterpret_cast<int*>(self + 0x738) = 0x67;
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x2114;
+			m_moveWork.m_targetPos = delta;
+			m_moveWork.m_speed = FLOAT_80331d58;
+			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance * FLOAT_80331d30);
+			m_moveWork.m_changeStat = 0x67;
 		}
 		moveFrame();
 	} else if (state == 0x67) {
 		if (prgObj->m_stateFrame == 0x10) {
-			memset(self + 0x70C, 0, 0x34);
-			*reinterpret_cast<int*>(self + 0x70C) = 0x2410;
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x2410;
 
 			CVector storedVec(*reinterpret_cast<Vec*>(SoundBuffer + 0x4F0));
 			CVector attackDir(-storedVec.x, -storedVec.y, -storedVec.z);
-			*reinterpret_cast<float*>(self + 0x718) = attackDir.x;
-			*reinterpret_cast<float*>(self + 0x71C) = attackDir.y;
-			*reinterpret_cast<float*>(self + 0x720) = attackDir.z;
-			*reinterpret_cast<float*>(self + 0x724) = FLOAT_80331d78;
-			*reinterpret_cast<int*>(self + 0x72C) =
+			m_moveWork.m_targetPos.x = attackDir.x;
+			m_moveWork.m_targetPos.y = attackDir.y;
+			m_moveWork.m_targetPos.z = attackDir.z;
+			m_moveWork.m_speed = FLOAT_80331d78;
+			m_moveWork.m_limitFrame =
 			    static_cast<int>((FLOAT_80331d58 * (FLOAT_80331d84 - object->m_capsuleHalfHeight)) / FLOAT_80331d78);
 		}
 		if (prgObj->m_stateFrame > 0xF) {
@@ -1627,23 +1624,22 @@ int CGMonObj::calcBranchFuncGigasLoad(int)
 void CGMonObj::frameStatFuncWifeLamia()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	u8* mon = reinterpret_cast<u8*>(this);
 
 	if (prgObj->m_lastStateId == 100) {
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
-				memset(mon + 0x70C, 0, 0x34);
-				*reinterpret_cast<u32*>(mon + 0x70C) = 0x10022;
+				memset(&m_moveWork, 0, sizeof(m_moveWork));
+				m_moveWork.m_flags = 0x10022;
 
 				CVector attackOffset(FLOAT_80331d6c, FLOAT_80331d70, FLOAT_80331d74);
-				*reinterpret_cast<float*>(mon + 0x718) = attackOffset.x;
-				*reinterpret_cast<float*>(mon + 0x71C) = attackOffset.y;
-				*reinterpret_cast<float*>(mon + 0x720) = attackOffset.z;
-				*reinterpret_cast<float*>(mon + 0x724) = FLOAT_80331d78;
-				*reinterpret_cast<float*>(mon + 0x728) = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
+				m_moveWork.m_targetPos.x = attackOffset.x;
+				m_moveWork.m_targetPos.y = attackOffset.y;
+				m_moveWork.m_targetPos.z = attackOffset.z;
+				m_moveWork.m_speed = FLOAT_80331d78;
+				m_moveWork.m_range = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
 			}
 			moveFrame();
-			if ((*reinterpret_cast<u32*>(mon + 0x710) & 1) != 0) {
+			if ((m_moveWork.m_stateFlags & 1) != 0) {
 				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 1) {

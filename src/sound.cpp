@@ -48,22 +48,22 @@ extern const char s_soundLineTableFullFmt[] =
 extern const char s_soundLineOutOfRangeFmt[] =
     "CSound: \x83\x89\x83\x43\x83\x93\x82\xaa\x91\xbd\x82\xb7\x82\xac\x82\xdc\x82\xb7"
     "\x81\x42\n";
-static const char s_soundLoadWaveErrorFmt[] =
+extern const char s_soundLoadWaveErrorFmt[] =
     "\x94\x67\x8C\x60\x83\x66\x81\x5B\x83\x5E\x82\xCC\x93\x5D\x91\x97\x92\x86\x82\xC9"
     "\x83\x4C\x83\x83\x83\x93\x83\x5A\x83\x8B\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD"
     "\x81\x42\n";
-static const char s_soundWavePathFmt[] = "dvd/sound/wave/wave%04d.wd";
-static const char s_soundLoadWaveMergeFmt[] =
+extern const char s_soundWavePathFmt[] = "dvd/sound/wave/wave%04d.wd";
+extern const char s_soundLoadWaveMergeFmt[] =
     "\x1B[31mMerge: \x94\x67\x8C\x60\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
     "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m";
-static const char s_soundSeSepPathFmt[] = "dvd/sound/se/sep/se%06d.sep";
-static const char s_soundLoadSeMergeFmt[] =
+extern const char s_soundSeSepPathFmt[] = "dvd/sound/se/sep/se%06d.sep";
+extern const char s_soundLoadSeMergeFmt[] =
     "\x1B[31mMerge: \x95\x88\x96\xCA\x82\xF0" "DVD\x82\xA9\x82\xE7\x93\xC7\x82\xDD\x8D\x9E"
     "\x82\xDD\x82\xDC\x82\xB5\x82\xBD\x81\x42%d\n\x1B[0m";
-static const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
-static const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
-static const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
-static const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
+extern const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
+extern const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
+extern const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
+extern const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
 extern "C" const char s_sound_cpp[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;

@@ -57,7 +57,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
-    return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
+    return (pppBlurCharaWork*)(blurChara->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 struct BlurCharaColorData {
@@ -84,8 +84,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
-    BlurCharaTexData* texData = reinterpret_cast<BlurCharaTexData*>((u8*)blurChara + 0x80 + texDataOffset);
-    BlurCharaColorData* colorData = reinterpret_cast<BlurCharaColorData*>((u8*)blurChara + 0x80 + colorDataOffset);
+    BlurCharaTexData* texData =
+        reinterpret_cast<BlurCharaTexData*>(blurChara->m_object.m_workArea + texDataOffset);
+    BlurCharaColorData* colorData =
+        reinterpret_cast<BlurCharaColorData*>(blurChara->m_object.m_workArea + colorDataOffset);
     int textureBase = 0;
     int objPosBase;
     _GXTexObj smallBackTex;

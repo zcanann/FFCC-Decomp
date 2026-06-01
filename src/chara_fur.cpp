@@ -1064,7 +1064,7 @@ static inline void StopMogLoopSe(MogWorkRaw& work)
 	}
 }
 
-static CTexture* FindMogFurTexture(void* model)
+static inline CTexture* FindMogFurTexture(void* model)
 {
 	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);

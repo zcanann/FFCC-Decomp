@@ -39,7 +39,6 @@ static inline char randchar(char value, float scale)
  */
 void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -64,7 +63,7 @@ void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(basePtr->m_workArea + in->sourceOffset);
     f32 scale = *valuePtr;
 
     target[0] = (u8)(target[0] + randchar(in->delta[0], scale));

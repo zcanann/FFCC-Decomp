@@ -1197,7 +1197,8 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	}
 
 	CFlatRuntime2Storage().IgnoreParticle(effectIndex, this);
-	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
+	int particleFlagOffset = particleIndex * 0x48 + 0xC;
+	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + particleFlagOffset) & 0x100) != 0) {
 		PartMng.pppEndPart(effectIndex);
 	}
 }

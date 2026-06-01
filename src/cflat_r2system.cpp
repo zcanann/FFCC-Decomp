@@ -121,7 +121,7 @@ static const char s_cflatAddNoFreeWaveFmt[] =
 static const char s_cflatLoadCompleted[] = "\212\256\227\271";
 static const char s_cflatLoadNotCompleted[] = "\226\242\212\256\227\271";
 
-static inline int RemapPadSlot(CPad* pad, unsigned int padIndex)
+static inline int RemapPadSlot(CPad* pad, int padIndex)
 {
     int activePad = pad->_448_4_;
     return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));

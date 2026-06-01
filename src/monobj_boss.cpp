@@ -777,7 +777,7 @@ void CGMonObj::frameStatFuncGoblinKing()
 	switch (prgObj->m_lastStateId) {
 	case 100:
 		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, gGoblinKingTeleportPoints,
-		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
+		         *reinterpret_cast<int*>(m_boss__8CGMonObj), *reinterpret_cast<Vec*>(m_boss__8CGMonObj + 4));
 		break;
 	}
 	return;
@@ -1897,7 +1897,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  */
 int CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	return *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78);
+	return *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78);
 }
 
 /*
@@ -1964,7 +1964,7 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 	if (scriptKind == 0x85) {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
 		CChara::CModel* model = object->m_charaModelHandle->m_model;
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_);
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj);
 		int nodeIndex = model->SearchNode(const_cast<char*>(s_to_a_obj_801dd4e8));
 		nodes[0] = model->m_nodes + nodeIndex;
 		nodes[0]->m_flags &= 0x7F;
@@ -2009,7 +2009,7 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 	if (scriptKind == 0x87) {
 		if (stat == 0x67) {
-			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74);
+			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74);
 			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(meteoC) + 0x6D0) == 1) {
 				setActionParam(-13);
 			} else {
@@ -2194,12 +2194,12 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 	case 0x85:
 		return -2;
 	case 0x86:
-		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
 			return -1;
 		}
 		return -2;
 	case 0x87:
-		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
 			return -1;
 		}
 		return -2;
@@ -2242,7 +2242,7 @@ void CGMonObj::initFinishedFuncDuct()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	initFinishedFuncDefault();
 	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
-	reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x38)[slot] = this;
+	reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x38)[slot] = this;
 }
 
 /*
@@ -2267,9 +2267,9 @@ void CGMonObj::damagedFuncDuct()
 	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
-		CGObject* bossObj = *reinterpret_cast<CGObject**>(SoundBuffer_1260_ + 0x68);
+		CGObject* bossObj = *reinterpret_cast<CGObject**>(m_boss__8CGMonObj + 0x68);
 		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
-		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_ + 0x8);
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj + 0x8);
 		int dispIndex = model->GetDispIndex(nodes[slot]);
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
@@ -2400,7 +2400,7 @@ void CGMonObj::damagedFuncLastBoss()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int& timer = *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x24);
+	int& timer = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24);
 	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6D0) == 0) {
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
@@ -2442,7 +2442,7 @@ void CGMonObj::cancelStatFuncLastBoss()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	switch (prgObj->m_lastStateId) {
 	case 0x66: {
-		CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
+		CGPartyObj** work = reinterpret_cast<CGPartyObj**>(m_boss__8CGMonObj);
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = work[i + 2];
 			if (party != 0) {
@@ -2532,7 +2532,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			}
 			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
 		} else if (stateFrame == 0x4B) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(m_boss__8CGMonObj);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];
 				if (party != 0) {
@@ -2545,7 +2545,7 @@ void CGMonObj::frameStatFuncLastBoss()
 				}
 			}
 		} else if (stateFrame == 200) {
-			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(SoundBuffer_1260_);
+			CGPartyObj** work = reinterpret_cast<CGPartyObj**>(m_boss__8CGMonObj);
 			for (int i = 0; i < 4; i++) {
 				CGPartyObj* party = work[i + 2];
 				if (party != 0) {

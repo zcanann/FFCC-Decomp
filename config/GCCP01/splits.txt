@@ -363,7 +363,7 @@ maptexanim.cpp:
 	extab       start:0x80006BB8 end:0x80006BE0
 	extabindex  start:0x8000C844 end:0x8000C880
 	.text       start:0x8004F910 end:0x800503FC
-	.rodata     start:0x801D7EC4 end:0x801D7EE0
+	.rodata     start:0x801D7E98 end:0x801D7EE0
 	.data       start:0x801EA998 end:0x801EA9B0
 	.sdata      start:0x8032E688 end:0x8032E698
 	.sdata2     start:0x8032FCD0 end:0x8032FCDC
@@ -1456,12 +1456,16 @@ baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4
 	extabindex  start:0x8000FF58 end:0x8000FFA0
 	.text       start:0x8010B150 end:0x8010B2A4
+	.rodata     start:0x801DC4F0 end:0x801DC518
+	.data       start:0x802112E8 end:0x80211320
 	.sdata      start:0x8032E920 end:0x8032E930
 
 quadobj.cpp:
 	extab       start:0x800091E4 end:0x800091EC
 	extabindex  start:0x8000FFA0 end:0x8000FFAC
 	.text       start:0x8010B2A4 end:0x8010B660
+	.rodata     start:0x801DC518 end:0x801DC548
+	.data       start:0x80211320 end:0x80211370
 	.sdata      start:0x8032E930 end:0x8032E948
 	.sdata2     start:0x80331958 end:0x80331968
 
@@ -1469,7 +1473,7 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
-	.data       start:0x802112E8 end:0x80211498
+	.data       start:0x80211370 end:0x80211498
 	.sdata      start:0x8032E948 end:0x8032E970
 	.sbss       start:0x8032EE60 end:0x8032EE70
 	.sdata2     start:0x80331968 end:0x803319C8
@@ -2083,7 +2087,7 @@ ax/AXComp.c:
 
 ax/DSPCode.c:
 	.data       start:0x80219840 end:0x8021B760
-	.sdata      start:0x8032EB58 end:0x8032EB60
+	.sdata      start:0x8032EB58 end:0x8032EB5A
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70

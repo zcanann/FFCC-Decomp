@@ -4530,35 +4530,35 @@ void CPartMng::pppSetDeltaIdx(short index, long color)
  */
 void CPartMng::pppSetDeltaSlot(int slot, long color)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    CPartMng* partMng = this;
 
     for (int i = 0; i < 0x140; i += 5) {
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 0)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 0)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 0)) = color;
+        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[0].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[0].m_envColorR) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 1)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 1)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 1)) = color;
+        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[1].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[1].m_envColorR) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 2)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 2)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 2)) = color;
+        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[2].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[2].m_envColorR) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 3)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 3)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 3)) = color;
+        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[3].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[3].m_envColorR) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 4)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 4)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 4)) = color;
+        if ((partMng->m_pppMng[4].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[4].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[4].m_envColorR) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 5)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 5)) == slot)) {
-            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 5)) = color;
+        if ((partMng->m_pppMng[5].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[5].m_paramA == slot)) {
+            *reinterpret_cast<long*>(&partMng->m_pppMng[5].m_envColorR) = color;
         }
 
-        pppMngSt += 0x810;
+        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x810);
     }
 }
 
@@ -4573,35 +4573,35 @@ void CPartMng::pppSetDeltaSlot(int slot, long color)
  */
 void CPartMng::pppSetLocSlot(int slot, Vec* position)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    CPartMng* partMng = this;
 
-    for (int i = 0; i < 0x60; i++) {
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 0)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 0)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 0)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 0)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 0)) = position->z;
+    for (int i = 0; i < 0x120; i += 3) {
+        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[0].m_paramA == slot)) {
+            partMng->m_pppMng[0].m_position.x = position->x;
+            partMng->m_pppMng[0].m_position.y = position->y;
+            partMng->m_pppMng[0].m_position.z = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 1)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 1)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 1)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 1)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 1)) = position->z;
+        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[1].m_paramA == slot)) {
+            partMng->m_pppMng[1].m_position.x = position->x;
+            partMng->m_pppMng[1].m_position.y = position->y;
+            partMng->m_pppMng[1].m_position.z = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 2)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 2)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 2)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 2)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 2)) = position->z;
+        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[2].m_paramA == slot)) {
+            partMng->m_pppMng[2].m_position.x = position->x;
+            partMng->m_pppMng[2].m_position.y = position->y;
+            partMng->m_pppMng[2].m_position.z = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 3)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 3)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 3)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 3)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 3)) = position->z;
+        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[3].m_paramA == slot)) {
+            partMng->m_pppMng[3].m_position.x = position->x;
+            partMng->m_pppMng[3].m_position.y = position->y;
+            partMng->m_pppMng[3].m_position.z = position->z;
         }
 
-        pppMngSt += 0x560;
+        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
     }
 }
 

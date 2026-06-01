@@ -16,8 +16,6 @@ class SaveDat
 class CMemoryCardMan : public CManager
 {
 public:
-    CMemoryCardMan();
-
     void Init();
     void Quit();
 

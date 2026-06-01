@@ -48,7 +48,7 @@ extern const char s_graphic_move_debug_fmt[];
 extern const char s_graphic_pad_input_fmt[];
 const char s_debug_pad_port_fmt[] = "%dP";
 const char s_debug_frame_fmt[] = "%d";
-static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
+extern "C" const GXColor s_debug_bar_color;
 extern "C" const char s_scenegraph_step_none[];
 extern "C" const char s_scenegraph_step_x8[];
 extern "C" const char s_scenegraph_step_x0[];
@@ -108,13 +108,13 @@ void CGraphicPcs::drawScreenFade()
 
     for (int slot = 0; slot < 4; slot++) {
         ScreenFadeSlot* slotData = &m_screenFade[slot];
-        const int timer = slotData->m_timer;
-        const int duration = slotData->m_duration;
         const int invert = slotData->m_invert;
 
-        if ((invert == 0) && (timer == 0)) {
+        if ((invert == 0) && (slotData->m_timer == 0)) {
             continue;
         }
+        const int timer = slotData->m_timer;
+        const int duration = slotData->m_duration;
         _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
@@ -309,30 +309,30 @@ void CGraphicPcs::drawScreenFade()
                     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
                     GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 
-                    _GXColor topColor;
-                    topColor.r = (u8)(t0 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
-                    topColor.g = (u8)(t0 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
-                    topColor.b = (u8)(t0 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
-                    topColor.a = 0xFF;
+                    CColor topColor;
+                    topColor.color.r = (u8)(t0 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
+                    topColor.color.g = (u8)(t0 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
+                    topColor.color.b = (u8)(t0 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    topColor.color.a = 0xFF;
 
-                    _GXColor bottomColor;
-                    bottomColor.r = (u8)(t1 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
-                    bottomColor.g = (u8)(t1 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
-                    bottomColor.b = (u8)(t1 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
-                    bottomColor.a = 0xFF;
+                    CColor bottomColor;
+                    bottomColor.color.r = (u8)(t1 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
+                    bottomColor.color.g = (u8)(t1 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
+                    bottomColor.color.b = (u8)(t1 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    bottomColor.color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                     GXPosition3f32((float)x, (float)y, 0.0f);
-                    GXColor1u32(*(u32*)&topColor);
+                    GXColor1u32(*(u32*)&topColor.color);
                     GXTexCoord2u16(0, 0);
                     GXPosition3f32((float)(x + 0x140), (float)y, 0.0f);
-                    GXColor1u32(*(u32*)&topColor);
+                    GXColor1u32(*(u32*)&topColor.color);
                     GXTexCoord2u16(2, 0);
                     GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), 0.0f);
-                    GXColor1u32(*(u32*)&bottomColor);
+                    GXColor1u32(*(u32*)&bottomColor.color);
                     GXTexCoord2u16(2, 2);
                     GXPosition3f32((float)x, (float)(y + 0xE0), 0.0f);
-                    GXColor1u32(*(u32*)&bottomColor);
+                    GXColor1u32(*(u32*)&bottomColor.color);
                     GXTexCoord2u16(0, 2);
                 }
                 continue;
@@ -608,14 +608,15 @@ void CGraphicPcs::drawBar()
     GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(0, 2);
 
-    const int orderCount = System.m_orderCount;
     CSystem::COrder* order = System.GetFirstOrder();
+    const int orderCount = System.m_orderCount;
+    const int lastOrder = orderCount - 1;
     float x = 0.0f;
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
-        const float width = (100.0f * order->m_lastTime) / 16.666666f;
         const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);
+        const float width = (100.0f * order->m_lastTime) / 16.666666f;
         const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 448.0f : 464.0f);
         const float y1 = drawText ? static_cast<float>(y + 8) : 456.0f;
 
@@ -651,7 +652,7 @@ void CGraphicPcs::drawBar()
             x += width;
         }
 
-        if (i == orderCount - 1) {
+        if (i == lastOrder) {
             const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
             const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
 

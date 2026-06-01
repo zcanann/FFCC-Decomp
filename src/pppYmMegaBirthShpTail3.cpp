@@ -13,6 +13,7 @@ extern const float FLOAT_803305C8;
 extern const float FLOAT_803305CC;
 extern const float FLOAT_803305D0;
 extern const float FLOAT_803305D4;
+extern const double DOUBLE_803305D8;
 }
 #include "dolphin/mtx.h"
 #include <string.h>
@@ -562,7 +563,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if ((mode < 6) && (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f)) {
+    if ((mode >= 4) && (mode < 6) && (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f)) {
         float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
         float speedRandHalf = FLOAT_803305D4 * speedRandRange;
         u8 randType = pYmMegaBirthShpTail3->m_randType;
@@ -600,19 +601,33 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                                                       Math.RandF())) -
                                              speedRandRange) -
                                             speedRandHalf;
-        } else {
+        } else if (randType == 4) {
+            particleData->m_matrix[0][0] =
+                Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) -
+                speedRandHalf;
+            particleData->m_matrix[0][1] =
+                Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) -
+                speedRandHalf;
+            particleData->m_matrix[0][2] =
+                Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) -
+                speedRandHalf;
+        } else if (randType == 2) {
             particleData->m_matrix[0][0] =
                 Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][1] =
                 Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][2] =
                 Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
+        } else {
+            particleData->m_matrix[0][0] = speedRandRange * Math.RandF() - speedRandHalf;
+            particleData->m_matrix[0][1] = speedRandRange * Math.RandF() - speedRandHalf;
+            particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         }
 
         particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->field_0x58;
         particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScale.x;
         particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScale.y;
-    } else if (mode < 10) {
+    } else if ((mode >= 6) && (mode < 10)) {
         float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
 
         if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
@@ -627,7 +642,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                 float vy;
                 float vz;
 
-                if (pYmMegaBirthShpTail3->m_randType == 0) {
+                if ((pYmMegaBirthShpTail3->m_randType == 0) || (pYmMegaBirthShpTail3->m_randType > 5)) {
                     if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
                         vYmMegaBirthShpTail3->m_pathIndex = 0;
                     }
@@ -646,13 +661,14 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                         Math.RandF();
                         sampleT = Math.RandF();
                     } else if (pYmMegaBirthShpTail3->m_randType == 3) {
-                        sampleT = FLOAT_803305B0 - (Math.RandF() * Math.RandF() * Math.RandF());
+                        sampleT = static_cast<float>(DOUBLE_803305D8 - (Math.RandF() * Math.RandF() * Math.RandF()));
                     } else if (pYmMegaBirthShpTail3->m_randType == 5) {
-                        sampleT = FLOAT_803305B0 - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF());
-                    } else if (pYmMegaBirthShpTail3->m_randType < 5) {
-                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
-                    } else {
+                        sampleT = static_cast<float>(DOUBLE_803305D8 -
+                            (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+                    } else if (pYmMegaBirthShpTail3->m_randType == 2) {
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF();
+                    } else {
+                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
                     if ((u16)vYmMegaBirthShpTail3->m_pathIndex >= (u16)pathInfo[1]) {
@@ -689,7 +705,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         } else if (randType == 2) {
             scale = Math.RandF() * (speedRandRange * Math.RandF());
         } else if (randType == 4) {
-            scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF()));
+            scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
         } else if (randType == 5) {
             scale = -(FLOAT_803305D4 * (Math.RandF() *
                               (speedRandRange * Math.RandF() * Math.RandF())) -

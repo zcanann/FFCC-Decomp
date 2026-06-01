@@ -812,7 +812,7 @@ static inline unsigned short PackFurTexel(int r, int g, int b, int a)
 	return static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((a & 7) << 12));
 }
 
-static float FurRand01(unsigned int& rng)
+static inline float FurRand01(unsigned int& rng)
 {
 	rng = rng * 0x41C64E6D + 0x3039;
 	return static_cast<float>((rng >> 16) & 0x7FFF) / 32767.0f;

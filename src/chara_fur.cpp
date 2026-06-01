@@ -626,9 +626,6 @@ void CChara::CalcMogScore()
 			const int ring = dist % 12;
 			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
 			angle %= 0x2D;
-			if (angle < 0) {
-				angle += 0x2D;
-			}
 
 			for (int i = 0; i < 3; i++) {
 				if (ring >= i * 4 && ring < (i + 1) * 4) {

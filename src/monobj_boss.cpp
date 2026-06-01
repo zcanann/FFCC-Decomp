@@ -117,6 +117,11 @@ struct DuctBossWork {
     CGMonObj* m_objs[3];
 };
 
+struct MonObjSawBossAiFlags {
+    u8 m_bit80 : 1;
+    u8 m_rest : 7;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80132f68
@@ -895,22 +900,26 @@ void CGMonObj::frameStatFuncSaw()
 void CGMonObj::logicFuncSaw()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int& bossState = CFlatBossState();
-	unsigned char& aiWork = mon[0x6D4];
+	int bossState = CFlatBossState();
 
-	if (bossState == 0 && (aiWork & 0x80) != 0) {
-		aiWork &= 0x7F;
+	if (bossState == 0 &&
+	    static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(m_boss__8CGMonObj[0x14]) << 24) & 0xC0000000) >> 31) != 0) {
+		reinterpret_cast<MonObjSawBossAiFlags*>(m_boss__8CGMonObj + 0x14)->m_bit80 = 0;
 	}
 
-	if ((bossState == 0) || ((aiWork & 0x80) != 0)) {
+	if (bossState != 0 &&
+	    static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(m_boss__8CGMonObj[0x14]) << 24) & 0xC0000000) >> 31) == 0) {
+		if (prgObj->m_lastStateId != 100) {
+			prgObj->changeStat(100, 0, 0);
+		}
+	} else {
 		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
 			prgObj->addSubStat();
 		}
-	} else if (prgObj->m_lastStateId != 100) {
-		prgObj->changeStat(100, 0, 0);
 	}
-	int& cooldown = *reinterpret_cast<int*>(SoundBuffer + 1268);
+	int& cooldown = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x8);
 	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
 }
 

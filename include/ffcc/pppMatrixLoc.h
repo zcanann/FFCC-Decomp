@@ -3,11 +3,14 @@
 
 #include <dolphin/mtx.h>
 
+struct _pppCtrlTable;
+struct _pppPObject;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixLoc(void* target, void* unused, void* param);
+void pppMatrixLoc(_pppPObject* target, void* unused, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,6 @@ struct RandCharParam {
  */
 void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -52,7 +51,7 @@ void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
     }
 
     s32 colorOffset = in->sourceOffset;
-    target = (colorOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + colorOffset + 0x80);
+    target = (colorOffset == -1) ? gPppDefaultValueBuffer : (u8*)(basePtr->m_workArea + colorOffset);
 
     u8 scale = in->scale;
     s32 delta = (s32)((f32)scale * *valuePtr - (f32)scale);

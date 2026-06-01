@@ -1,4 +1,5 @@
 #include "ffcc/pppAccele.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
 extern const float kPppAcceleZero;
@@ -14,9 +15,9 @@ extern const float kPppAcceleZero;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAcceleCon(pppAcceleObj* obj, pppAcceleUnkC* param)
+void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
 {
-	float* puVar2 = (float*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
+	float* puVar2 = (float*)(obj->m_workArea + param->m_serializedDataOffsets[1]);
 	float uVar1 = kPppAcceleZero;
 
 	puVar2[2] = uVar1;
@@ -33,10 +34,10 @@ void pppAcceleCon(pppAcceleObj* obj, pppAcceleUnkC* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAccele(pppAcceleObj* obj, pppAcceleUnkB* param_2, pppAcceleUnkC* param_3)
+void pppAccele(_pppPObject* obj, pppAcceleUnkB* param_2, _pppCtrlTable* param_3)
 {
-	float* pfVar1 = (float*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
-	float* pfVar2 = (float*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
+	float* pfVar1 = (float*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
+	float* pfVar2 = (float*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
 
 	if (gPppCalcDisabled != 0) {
 		return;

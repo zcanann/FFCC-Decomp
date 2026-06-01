@@ -421,17 +421,18 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
             if (dlEntryBase != NULL) {
                 CharaBreakDisplayListPair** dlEntries = dlEntryBase;
                 for (u32 dlIndex = 0; dlIndex < meshData->m_displayListCount; dlIndex++) {
-                    CharaBreakDisplayListPair* dlEntry = *dlEntries;
-                    if (dlEntry != NULL) {
-                        if (dlEntry->m_rewrittenDisplayList != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)dlEntry->m_rewrittenDisplayList);
-                            dlEntry->m_rewrittenDisplayList = 0;
+                    if (*dlEntries != NULL) {
+                        if ((*dlEntries)->m_rewrittenDisplayList != NULL) {
+                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_rewrittenDisplayList);
+                            (*dlEntries)->m_rewrittenDisplayList = 0;
                         }
-                        if (dlEntry->m_polygonData != NULL) {
-                            pppHeapUseRate((CMemory::CStage*)dlEntry->m_polygonData);
-                            dlEntry->m_polygonData = 0;
+                        if ((*dlEntries)->m_polygonData != NULL) {
+                            pppHeapUseRate((CMemory::CStage*)(*dlEntries)->m_polygonData);
+                            (*dlEntries)->m_polygonData = 0;
                         }
-                        pppHeapUseRate((CMemory::CStage*)dlEntry);
+                    }
+                    if (*dlEntries != NULL) {
+                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -1044,7 +1045,7 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* mode
     CharaBreakWork* work = reinterpret_cast<CharaBreakWork*>(modelData);
     CharaBreakStep* stepData = reinterpret_cast<CharaBreakStep*>(meshData);
 
-    if (work->m_model == 0) {
+    if (work->m_enabled == 0) {
         return reinterpret_cast<int>(model);
     }
 

@@ -45,12 +45,6 @@ struct VYmDeformationShp {
 	float m_values[5];
 };
 
-struct pppYmDeformationShpLayout {
-	u8 m_pad0[0x40];
-	pppFMATRIX m_modelMatrix;
-	u8 m_pad70[0x10];
-};
-
 struct _pppEnvStYmDeformationShp {
 	void* m_stagePtr;
 	CMaterialSet* m_materialSetPtr;
@@ -60,7 +54,7 @@ struct _pppEnvStYmDeformationShp {
 template <typename T>
 static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnkC* ctrl, int index)
 {
-	return reinterpret_cast<T*>(reinterpret_cast<_pppPObject*>(object)->m_workArea + ctrl->m_serializedDataOffsets[index]);
+	return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
 /*
@@ -74,7 +68,7 @@ static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnk
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	_pppPObject* object = (_pppPObject*)pppYmDeformationShp_;
+	_pppPObject* object = &pppYmDeformationShp_->m_object;
 	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	Vec2d uvs[4];
@@ -94,7 +88,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		pppSetDrawEnv(
-			&colorInfo->m_color, &((pppYmDeformationShpLayout*)pppYmDeformationShp_)->m_modelMatrix, param_2->m_drawZ,
+			&colorInfo->m_color, &object->m_drawMatrix, param_2->m_drawZ,
 			param_2->m_alpha, 0, 0, 0, 1, 1, 0);
 
 		GXSetNumTevStages(1);
@@ -162,7 +156,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = FLOAT_803305f8;
 			uvs[3].x = kPppYmDeformationShpZero;
 			uvs[3].y = FLOAT_803305f8;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
+			RenderDeformationShape(object, work, vertices, uvs);
 		} else {
 			short size = param_2->m_size;
 			short split = param_2->m_splitSize;
@@ -206,7 +200,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = uvRemainder;
 			uvs[3].x = kPppYmDeformationShpZero;
 			uvs[3].y = uvRemainder;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
+			RenderDeformationShape(object, work, vertices, uvs);
 
 			if (((s8)param_2->m_orientation) == 0) {
 				vertices[0].x = split;
@@ -244,7 +238,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			uvs[2].y = uvRemainder;
 			uvs[3].x = FLOAT_803305f8;
 			uvs[3].y = uvRemainder;
-			RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
+			RenderDeformationShape(object, work, vertices, uvs);
 
 			if (param_2->m_splitMode == 1) {
 				if (((s8)param_2->m_orientation) == 0) {
@@ -283,7 +277,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				uvs[2].y = uvSplit;
 				uvs[3].x = kPppYmDeformationShpZero;
 				uvs[3].y = uvSplit;
-				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
+				RenderDeformationShape(object, work, vertices, uvs);
 
 				if (((s8)param_2->m_orientation) == 0) {
 					vertices[0].x = split;
@@ -321,7 +315,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				uvs[2].y = FLOAT_803305f8;
 				uvs[3].x = kPppYmDeformationShpZero;
 				uvs[3].y = FLOAT_803305f8;
-				RenderDeformationShape((_pppPObject*)pppYmDeformationShp_, work, vertices, uvs);
+				RenderDeformationShape(object, work, vertices, uvs);
 			}
 		}
 
@@ -339,7 +333,6 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
  */
 int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
-	pppYmDeformationShpLayout* layout = (pppYmDeformationShpLayout*)obj;
 	Vec4d projected[4];
 	float minY;
 	float maxY;
@@ -373,7 +366,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		Vec localVertex = vertices[i];
 		Vec4d clipPos;
 		Vec worldPos;
-		PSMTXMultVec(layout->m_modelMatrix.value, &localVertex, &worldPos);
+		PSMTXMultVec(obj->m_drawMatrix.value, &localVertex, &worldPos);
 		clipPos.x = worldPos.x;
 		clipPos.y = worldPos.y;
 		clipPos.z = worldPos.z;
@@ -445,7 +438,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[1][2] = -0.5f;
 	texMtx[2][2] = -1.0f;
 
-	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
+	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
 	cameraPos.z = kPppYmDeformationShpZero;
 	cameraPos.y = kPppYmDeformationShpZero;
 	cameraPos.x = kPppYmDeformationShpZero;
@@ -454,7 +447,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	cameraPos.y = cameraPos.y / cameraPos.z;
 	texMtx[0][2] = -1.0f + cameraPos.x;
 	texMtx[1][2] = -1.0f + cameraPos.y;
-	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
+	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
 		Vec* projectedObjPtr = &projectedObj[i];
@@ -518,7 +511,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		texMtx[1][2] = texMtx[1][2] + offsetY;
 	}
 
-	PSMTXConcat(texMtx, layout->m_modelMatrix.value, texMtx);
+	PSMTXConcat(texMtx, obj->m_drawMatrix.value, texMtx);
 	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX3x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -555,10 +548,10 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 	state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
 
 	CalcGraphValue(
-		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
+		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
 		param_2->m_payload[0], param_2->m_payload[1], param_2->m_payload[2]);
 	CalcGraphValue(
-		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
+		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
 		param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
 
 	if (gPppInConstructor != 0) {

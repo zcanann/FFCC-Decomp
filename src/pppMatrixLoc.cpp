@@ -1,4 +1,5 @@
 #include "ffcc/pppMatrixLoc.h"
+#include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
 /*
@@ -10,15 +11,15 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixLoc(void* target, void* unused, void* param)
+void pppMatrixLoc(_pppPObject* target, void* unused, _pppCtrlTable* param)
 {
     (void)unused;
 
-    int* offsetPtr = *(int**)((char*)param + 0xC);
-    f32* posData = (f32*)((char*)target + *offsetPtr + 0x80);
+    int* offsetPtr = param->m_serializedDataOffsets;
+    f32* posData = (f32*)(target->m_workArea + *offsetPtr);
 
-    PSMTXIdentity((MtxPtr)((char*)target + 0x10));
-    *(f32*)((char*)target + 0x1C) = posData[0];
-    *(f32*)((char*)target + 0x2C) = posData[1];
-    *(f32*)((char*)target + 0x3C) = posData[2];
+    PSMTXIdentity(target->m_localMatrix.value);
+    target->m_localMatrix.value[0][3] = posData[0];
+    target->m_localMatrix.value[1][3] = posData[1];
+    target->m_localMatrix.value[2][3] = posData[2];
 }

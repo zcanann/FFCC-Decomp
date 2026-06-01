@@ -13,14 +13,9 @@
  */
 void pppKeDMatDraw(_pppPObject* pObject, void*, _pppCtrlTable* ctrlTable)
 {
-    int targetOffset;
-    char* object;
-    pppFMATRIX* targetMatrix;
+    int targetOffset = ctrlTable->m_serializedDataOffsets[1];
+    pppFMATRIX* targetMatrix = (pppFMATRIX*)(pObject->m_workArea + targetOffset);
 
-    object = (char*)pObject;
-    targetOffset = *(int*)(*(char**)((char*)ctrlTable + 0xC) + 4);
-    targetMatrix = (pppFMATRIX*)(object + targetOffset + 0x80);
-
-    pppMulMatrix(*(pppFMATRIX*)(object + 0x40), *(pppFMATRIX*)&ppvWorldMatrix, *(pppFMATRIX*)(object + 0x10));
-    pppCopyMatrix(*targetMatrix, *(pppFMATRIX*)(object + 0x40));
+    pppMulMatrix(pObject->m_drawMatrix, *(pppFMATRIX*)&ppvWorldMatrix, pObject->m_localMatrix);
+    pppCopyMatrix(*targetMatrix, pObject->m_drawMatrix);
 }

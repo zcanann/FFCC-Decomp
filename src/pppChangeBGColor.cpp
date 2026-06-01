@@ -12,8 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct pppChangeBGColorUnkB* param_2,
-                           _pppCtrlTable* param_3)
+void pppFrameChangeBGColor(_pppPObject* pppChangeBGColor, void* param_2, _pppCtrlTable* param_3)
 {
     unsigned char* data;
     int dataOffset;
@@ -23,7 +22,7 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
     }
 
     dataOffset = param_3->m_serializedDataOffsets[1];
-    data = reinterpret_cast<unsigned char*>(pppChangeBGColor) + dataOffset + 0x80;
+    data = pppChangeBGColor->m_workArea + dataOffset;
     MapMng.m_colorScaleEnable = 1;
     MapMng.m_colorScale.r = data[8];
     MapMng.m_colorScale.g = data[9];

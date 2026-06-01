@@ -9,6 +9,7 @@ struct pppYmLaser {
     pppFMATRIX m_localMatrix;
     pppFMATRIX m_drawMatrix;
     u8 m_pad70[0x10];
+    u8 m_workArea[1];
 };
 
 struct pppYmLaserUnkB {

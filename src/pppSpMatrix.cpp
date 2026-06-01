@@ -1,4 +1,5 @@
 #include "ffcc/pppSpMatrix.h"
+#include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
 /*
@@ -10,11 +11,11 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSpMatrix(void* mtx, void* src, void* data)
+void pppSpMatrix(_pppPObject* mtx, void* src, _pppCtrlTable* data)
 {
-    u32 offset = **((u32**)((char*)data + 0xc));
-    Mtx* mtxSrc = (Mtx*)((char*)mtx + offset + 0x80);
-    Mtx* mtxOut = (Mtx*)((char*)mtx + 0x10);
+    int offset = *data->m_serializedDataOffsets;
+    Mtx* mtxSrc = (Mtx*)(mtx->m_workArea + offset);
+    Mtx* mtxOut = &mtx->m_localMatrix.value;
 
     (void)src;
     PSMTXConcat(*mtxSrc, *mtxOut, *mtxOut);

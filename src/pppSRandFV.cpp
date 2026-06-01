@@ -60,7 +60,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
+    f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);
 
     target[0] += randfloat(in->blend[0], randVec[0]);
     target[1] += randfloat(in->blend[1], randVec[1]);

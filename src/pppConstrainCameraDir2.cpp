@@ -22,7 +22,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 {
     if (gPppCalcDisabled == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
+        float* value = (float*)(param_1->m_workArea + *param_3->m_serializedDataOffsets);
 
         CalcGraphValue((_pppPObject*)param_1, param_2->m_graphId, value[0], value[1], value[2], param_2->m_dataValIndex,
                        param_2->m_initWOrk, param_2->m_stepValue);

@@ -264,8 +264,8 @@ public:
     void SetLightSource();
     void SetBumpLightSource();
     void InitMapShadow();
-    void ReadMtx(char*);
-    void ReadMpl(char*);
+    int ReadMtx(char*);
+    int ReadMpl(char*);
     void ReadOtm(char*);
     int ReadMid(char*);
     void Calc();

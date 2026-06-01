@@ -24,7 +24,6 @@ struct RandIntParams {
  */
 void pppRandInt(_pppPObject* basePtr, RandIntParams* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     f32* valuePtr;
 
     if (gPppCalcDisabled != 0) {
@@ -50,7 +49,7 @@ void pppRandInt(_pppPObject* basePtr, RandIntParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(base + in->sourceOffset + 0x80);
+    s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);
     
     *target += (s32)((f32)in->blend * *valuePtr - (f32)in->blend);
 }

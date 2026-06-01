@@ -25,7 +25,6 @@ struct RandUpCharParam {
  */
 void pppRandUpChar(_pppPObject* basePtr, RandUpCharParam* in, _pppCtrlTable* ctrl)
 {
-    u8* base = (u8*)basePtr;
     u8* target;
     f32* valuePtr;
 
@@ -51,7 +50,7 @@ void pppRandUpChar(_pppPObject* basePtr, RandUpCharParam* in, _pppCtrlTable* ctr
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
     }
 
-    target = (in->sourceOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? gPppDefaultValueBuffer : (u8*)(basePtr->m_workArea + in->sourceOffset);
     f32 current = *valuePtr;
     f32 scaled = (f32)in->scale * current;
     s32 delta = (s32)scaled;

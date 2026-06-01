@@ -26,14 +26,15 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 	pppPointApMtxStep* payload = (pppPointApMtxStep*)step;
 	Vec pos;
 	u32* offsets = (u32*)ctrlTable->m_serializedDataOffsets;
-	Vec* source = (Vec*)((u8*)pObject + offsets[0] + 0x80);
-	Mtx* target = (Mtx*)((u8*)pObject + offsets[1] + 0x80);
+	Vec* source = (Vec*)(pObject->m_workArea + offsets[0]);
+	u8* state = pObject->m_workArea + offsets[1];
+	Mtx* target = (Mtx*)state;
 
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
-	if (((u8*)target)[1] == 0) {
+	if (state[1] == 0) {
 		u32 objectId = payload->m_createProgramIndex;
 		_pppPObject* object;
 		_pppPDataVal* objectData;
@@ -51,7 +52,7 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			*(_pppPObject**)((u8*)object + 4) = pObject;
 		}
 
-		matrix = (Mtx*)((u8*)object + payload->m_childMatrixOffset + 0x80);
+		matrix = (Mtx*)(object->m_workArea + payload->m_childMatrixOffset);
 		if (payload->m_useWorldMatrix == 0) {
 			PSMTXIdentity(*matrix);
 			(*matrix)[0][3] = source->x;
@@ -65,10 +66,10 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			(*matrix)[2][3] = pos.z;
 		}
 
-		((u8*)target)[1] = payload->m_cooldown;
+		state[1] = payload->m_cooldown;
 	}
 
-	((u8*)target)[1]--;
+	state[1]--;
 }
 
 /*
@@ -83,9 +84,8 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
 	unsigned long offset = (unsigned long)(((u32*)ctrlTable->m_serializedDataOffsets)[1]);
-	_pppPObject* object = (_pppPObject*)((char*)pObject + offset);
+	u8* state = pObject->m_workArea + offset;
 
-	*(unsigned char*)((char*)object + 0x81) = 0;
+	state[1] = 0;
 }
-
 

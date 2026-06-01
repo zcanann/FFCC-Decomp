@@ -46,6 +46,16 @@ struct VtMimeEnv
 
 extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
+static inline VtMimeState* GetVtMimeState(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VtMimeState*>(object->m_workArea + *ctrl->m_serializedDataOffsets);
+}
+
+static inline VtMimeState* GetVtMimeState(_pppPObjLink* object, _pppCtrlTable* ctrl)
+{
+    return GetVtMimeState(reinterpret_cast<_pppPObject*>(object), ctrl);
+}
+
 /*
  * --INFO--
  * PAL Address: 80065034
@@ -57,7 +67,7 @@ extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
  */
 void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeState* state = GetVtMimeState(object, ctrl);
 
     if (state->vertexBuffer != 0) {
         Graphic._WaitDrawDone(const_cast<char*>(s_pppVtMime_cpp), 0x50);
@@ -77,7 +87,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeState* state = GetVtMimeState(object, ctrl);
     float zero = kPppVtMimeZero;
 
     state->accel = zero;
@@ -96,7 +106,7 @@ void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
  */
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
+    VtMimeState* state = GetVtMimeState(object, ctrl);
     float zero = kPppVtMimeZero;
 
     state->accel = zero;
@@ -118,14 +128,14 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
     VtMimeData* data = (VtMimeData*)step;
 
-    *(void**)((char*)object + 0x70) = 0;
+    object->m_drawMatrixPtr = 0;
 
     int vertIdx1 = data->sourceA;
     if (vertIdx1 == 0xFFFF && data->sourceB == 0xFFFF) {
         return;
     }
 
-    VtMimeState* state = (VtMimeState*)(object->m_workArea + *ctrl->m_serializedDataOffsets);
+    VtMimeState* state = GetVtMimeState(object, ctrl);
     VtMimeEnv* env = (VtMimeEnv*)ppvEnv;
     void** sourceTable = env->sourceTable;
     int vertIdx2 = data->sourceB;
@@ -154,7 +164,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 
     DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));
 
-    *(void**)((char*)object + 0x70) = *memPtr;
+    object->m_drawMatrixPtr = reinterpret_cast<Vec*>(*memPtr);
 }
 
 /*
@@ -168,7 +178,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
  */
 void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 {
-    VtMimeState* state = (VtMimeState*)(object->m_workArea + *ctrl->m_serializedDataOffsets);
+    VtMimeState* state = GetVtMimeState(object, ctrl);
     VtMimeData* data = (VtMimeData*)step;
 
     if (gPppCalcDisabled != 0) {
@@ -177,7 +187,7 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
 
     state->velocity += state->accel;
     state->value += state->velocity;
-    if (data->id == *(int*)((char*)object + 0xC)) {
+    if (data->id == object->m_graphId) {
         state->value += data->addX;
         state->velocity += data->addY;
         state->accel += data->addZ;

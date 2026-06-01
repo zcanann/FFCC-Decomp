@@ -1,8 +1,20 @@
 #include "ffcc/pppSclMove.h"
+#include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
 const float kPppSclMoveZero = 0.0f;
+
+struct PppSclMoveInput {
+    int m_graphId;
+    int m_padding;
+    f32 m_scale[3];
+};
+
+struct PppSclMoveOffsets {
+    int m_scaleOffset;
+    int m_velocityOffset;
+};
 
 /*
  * --INFO--
@@ -13,11 +25,10 @@ const float kPppSclMoveZero = 0.0f;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclMoveCon(void* param1, void* param2)
+void pppSclMoveCon(_pppPObject* param1, _pppCtrlTable* param2)
 {
-    void* ptr = (void*)((int*)((char*)param2 + 0xC))[0];
-    ptr = (void*)((int*)((char*)ptr + 0x4))[0];
-    float* data1 = (float*)((char*)param1 + (int)ptr + 0x80);
+    PppSclMoveOffsets* offsets = (PppSclMoveOffsets*)param2->m_serializedDataOffsets;
+    float* data1 = (float*)(param1->m_workArea + offsets->m_velocityOffset);
     float zero = kPppSclMoveZero;
     data1[2] = zero;
     data1[1] = zero;
@@ -33,20 +44,21 @@ void pppSclMoveCon(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclMove(void* param1, void* param2, void* param3)
+void pppSclMove(_pppPObject* param1, void* param2, _pppCtrlTable* param3)
 {
-    int* data2 = *(int**)((char*)param3 + 0xC);
-    float* dataA = (float*)((char*)param1 + data2[0] + 0x80);
-    float* dataB = (float*)((char*)param1 + data2[1] + 0x80);
+    PppSclMoveOffsets* offsets = (PppSclMoveOffsets*)param3->m_serializedDataOffsets;
+    float* dataA = (float*)(param1->m_workArea + offsets->m_scaleOffset);
+    float* dataB = (float*)(param1->m_workArea + offsets->m_velocityOffset);
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    if (*(int*)param2 == *(int*)((char*)param1 + 0xC)) {
-        dataB[0] += *(float*)((char*)param2 + 0x8);
-        dataB[1] += *(float*)((char*)param2 + 0xC);
-        dataB[2] += *(float*)((char*)param2 + 0x10);
+    PppSclMoveInput* input = (PppSclMoveInput*)param2;
+    if (input->m_graphId == param1->m_graphId) {
+        dataB[0] += input->m_scale[0];
+        dataB[1] += input->m_scale[1];
+        dataB[2] += input->m_scale[2];
     }
 
     dataA[0] += dataB[0];

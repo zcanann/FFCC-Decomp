@@ -484,13 +484,9 @@ static void releaseRefCounted(void** refObj)
 	if (refObj == 0 || *refObj == 0) {
 		return;
 	}
-	int* const obj = reinterpret_cast<int*>(*refObj);
-	const int refCount = obj[1] - 1;
-	obj[1] = refCount;
-	if (refCount == 0) {
-		typedef void (*DestroyFn)(void*, int);
-		DestroyFn destroyFn = *reinterpret_cast<DestroyFn*>(reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(obj)) + 8);
-		destroyFn(obj, 1);
+	CRef* const obj = reinterpret_cast<CRef*>(*refObj);
+	if (obj->DecRef() == 0) {
+		delete obj;
 	}
 	*refObj = 0;
 }
@@ -1007,30 +1003,18 @@ void CMenuPcs::destroyWorld()
 	unsigned char* puVar5 = bytes + 0x10;
 	int iVar4 = 4;
 	do {
-		int** piVar2 = reinterpret_cast<int**>(puVar5 + 0x10C);
+		void** piVar2 = reinterpret_cast<void**>(puVar5 + 0x10C);
 		if (*piVar2 != 0) {
-			int* obj = *piVar2;
-			int refCount = obj[1] - 1;
-			obj[1] = refCount;
-			if (refCount == 0 && obj != 0) {
-				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
-			}
-			*reinterpret_cast<int*>(puVar5 + 0x10C) = 0;
+			releaseRefCounted(piVar2);
 		}
 		iVar4 = iVar4 + 1;
 		puVar5 = puVar5 + 4;
 	} while (iVar4 < 6);
 
 	{
-		int** piVar2 = reinterpret_cast<int**>(bytes + 0xFC);
+		void** piVar2 = reinterpret_cast<void**>(bytes + 0xFC);
 		if (*piVar2 != 0) {
-			int* obj = *piVar2;
-			int refCount = obj[1] - 1;
-			obj[1] = refCount;
-			if (refCount == 0 && obj != 0) {
-				reinterpret_cast<void (*)(int*, int)>(reinterpret_cast<int**>(obj[0])[2])(obj, 1);
-			}
-			*reinterpret_cast<int*>(bytes + 0xFC) = 0;
+			releaseRefCounted(piVar2);
 		}
 	}
 

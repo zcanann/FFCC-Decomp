@@ -3429,16 +3429,14 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((down & 0x40) != 0) {
-        if (table > 0) {
-            table = static_cast<short>(table - 1);
-        } else {
+        table = static_cast<short>(table - 1);
+        if (table < 0) {
             table = 2;
         }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
     } else if ((down & 0x20) != 0) {
-        if (table < 2) {
-            table = static_cast<short>(table + 1);
-        } else {
+        table = static_cast<short>(table + 1);
+        if (table > 2) {
             table = 0;
         }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);

@@ -2073,7 +2073,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		next = hpValue + delta;
 		next &= ~(static_cast<int>(next) >> 31);
 		*hp = static_cast<unsigned short>(next);
-		m_worldParam = 1.0f;
+		m_worldParam = kOneF32;
 
 		if ((cid & 0x6D) == 0x6D) {
 			if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8)) < 0) {

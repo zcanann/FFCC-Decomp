@@ -265,59 +265,408 @@ static inline void EncodeSaveData(char* saveBuffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c17b8
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMemoryCardMan::CMemoryCardMan()
+void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
+    u8* save = reinterpret_cast<u8*>(saveDat);
+    int charSlot = 0;
+
+    do
+    {
+        u8* charData = save + 0x14D0;
+        if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
+        {
+            short equippedItems[4];
+
+            for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
+            {
+                if (itemSlot >= 0x45)
+                {
+                    int equippedSlot = itemSlot - 0x45;
+                    const int word = itemSlot >> 5;
+                    const int bit = itemSlot % 32;
+                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) != 0)
+                    {
+                        equippedItems[equippedSlot] = static_cast<short>(itemSlot + 0x9F);
+                    }
+                    else
+                    {
+                        equippedItems[equippedSlot] = -1;
+                    }
+                }
+
+            }
+
+            int totalHpBonus = 0;
+            int itemData = Game.unkCFlatData0[2];
+
+            if (equippedItems[0] >= 0)
+            {
+                totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);
+            }
+            if (equippedItems[1] >= 0)
+            {
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[1] * 0x48 + 6);
+            }
+            if (equippedItems[2] >= 0)
+            {
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[2] * 0x48 + 6);
+            }
+            if (equippedItems[3] >= 0)
+            {
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
+            }
+
+            int finalHpMax = 0x10;
+            if (totalHpBonus + 8 < 0x10)
+            {
+                finalHpMax = totalHpBonus + 8;
+            }
+
+            *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;
+        }
+
+        charSlot++;
+        save += 0x9C0;
+    }
+    while (charSlot < 8);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800c4d24
+ * PAL Address: 0x800c2d28
  * PAL Size: 148b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMemoryCardMan::Init()
+unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
-    CARDInit();
+    int count;
+    unsigned char* ptr;
+    unsigned int crc;
+    unsigned char* data = (unsigned char*)saveData;
 
-    m_result = 0;
-    m_opDoneFlag = 0;
-    m_currentSlot = -1;
-    m_state = 0;
-    m_saveBuffer = (char*)nullptr;
-    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(kMemoryCardStageSize, const_cast<char*>(sMemoryCardManagerName), 0));
-    m_mountWorkArea =
-        new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x88)
-            char[kMemoryCardSaveBufferSize];
+    if (data == nullptr)
+    {
+        data = (unsigned char*)m_saveBuffer;
+    }
 
-    m_currentSlot = -1;
+    crc = 0xFFFFFFFF;
+    count = 0x1C;
+    ptr = data;
+    while (--count >= 0)
+    {
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        ptr += 1;
+    }
+
+    ptr = data + 0x20;
+    count = 0x8BB0;
+    while (--count >= 0)
+    {
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        ptr += 1;
+    }
+
+    return ~crc;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800c4ccc
- * PAL Size: 88b
+ * PAL Address: 0x800c2c70
+ * PAL Size: 184b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMemoryCardMan::Quit()
-{ 
-  m_currentSlot = -1;
-  
-  if (m_mountWorkArea != (void*)nullptr)
-  {
-    delete[] m_mountWorkArea;
-    m_mountWorkArea = (void*)nullptr;
-  }
-  
-  Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(m_stage));
+unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
+{
+    unsigned int crc;
+    unsigned char* crcData;
+    int count;
+    unsigned char* ptr;
+    unsigned char* ptr2;
+    unsigned char* data = (unsigned char*)saveData;
+
+    if (data == nullptr)
+    {
+        data = (unsigned char*)m_saveBuffer;
+	}
+
+    if (data == nullptr)
+    {
+        crcData = (unsigned char*)m_saveBuffer;
+    }
+    else
+    {
+        crcData = data;
+    }
+
+	ptr = crcData;
+	crc = 0xFFFFFFFF;
+    count = 0x1C;
+    while (--count >= 0)
+    {
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
+        ptr++;
+    }
+
+    ptr2 = crcData + 0x20;
+    count = 0x8BB0;
+    while (--count >= 0)
+    {
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr2];
+        ptr2++;
+    }
+
+    return (unsigned int)__cntlzw((~crc) - *(unsigned int*)(data + 0x1C)) >> 5;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c18fc
+ * PAL Size: 1572b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::SaveDat& dstSave, int dstChar)
+{
+    if (static_cast<unsigned int>(System.m_execParam) >= 3)
+    {
+        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
+    }
+
+    u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);
+    u8* dstSaveData = reinterpret_cast<u8*>(&dstSave);
+    u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
+    u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
+
+    if (mode != 0)
+    {
+        memset(dstCharData, 0, 0x9C0);
+
+        *reinterpret_cast<u16*>(dstCharData + 0x00) = *reinterpret_cast<u16*>(srcCharData + 0x00);
+        *reinterpret_cast<u16*>(dstCharData + 0x02) = *reinterpret_cast<u16*>(srcCharData + 0x02);
+        *reinterpret_cast<u16*>(dstCharData + 0x04) = *reinterpret_cast<u16*>(srcCharData + 0x04);
+        *reinterpret_cast<u16*>(dstCharData + 0x06) = *reinterpret_cast<u16*>(srcCharData + 0x06);
+        *reinterpret_cast<u16*>(dstCharData + 0x08) = *reinterpret_cast<u16*>(srcCharData + 0x08);
+        *reinterpret_cast<u16*>(dstCharData + 0x0A) = *reinterpret_cast<u16*>(srcCharData + 0x0A);
+        *reinterpret_cast<u16*>(dstCharData + 0x0C) = *reinterpret_cast<u16*>(srcCharData + 0x0C);
+        *reinterpret_cast<u16*>(dstCharData + 0x0E) = *reinterpret_cast<u16*>(srcCharData + 0x0E);
+        *reinterpret_cast<u16*>(dstCharData + 0x10) = *reinterpret_cast<u16*>(srcCharData + 0x10);
+        memcpy(dstCharData + 0x12, srcCharData + 0x12, 0x12);
+        *reinterpret_cast<u16*>(dstCharData + 0x24) = *reinterpret_cast<u16*>(srcCharData + 0x24);
+        *reinterpret_cast<u16*>(dstCharData + 0x26) = *reinterpret_cast<u16*>(srcCharData + 0x26);
+        *reinterpret_cast<u16*>(dstCharData + 0x2A) = *reinterpret_cast<u16*>(srcCharData + 0x2A);
+        *reinterpret_cast<u16*>(dstCharData + 0x2C) = *reinterpret_cast<u16*>(srcCharData + 0x2C);
+        *reinterpret_cast<u16*>(dstCharData + 0x2E) = *reinterpret_cast<u16*>(srcCharData + 0x2E);
+        *reinterpret_cast<u16*>(dstCharData + 0x30) = *reinterpret_cast<u16*>(srcCharData + 0x30);
+        *reinterpret_cast<u16*>(dstCharData + 0x32) = *reinterpret_cast<u16*>(srcCharData + 0x32);
+        memcpy(dstCharData + 0x34, srcCharData + 0x34, 8);
+        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
+        *reinterpret_cast<u32*>(dstCharData + 0xE8) = *reinterpret_cast<u32*>(srcCharData + 0xE8);
+        memcpy(dstCharData + 0xF0, srcCharData + 0xF0, 0x10);
+        *reinterpret_cast<u32*>(dstCharData + 0x5B4) = *reinterpret_cast<u32*>(srcCharData + 0x5B4);
+        memcpy(dstCharData + 0x5B8, srcCharData + 0x5B8, 0x100);
+        memcpy(dstCharData + 0x6B8, srcCharData + 0x6B8, 0x200);
+        *reinterpret_cast<u32*>(dstCharData + 0x8B8) = *reinterpret_cast<u32*>(srcCharData + 0x8B8);
+        *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
+        dstCharData[0x8C2] = srcCharData[0x8C2];
+        *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
+        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
+        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
+        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
+
+        u8* dstWork = dstSaveData + dstChar * 0x200;
+        for (int i = 0; i < 8; i++)
+        {
+            u8* item = dstWork + dstChar * 8;
+            int row = 0;
+            for (int j = 0; j < 2; j++)
+            {
+                item[0xC0] = ((i == 0) && (row == 0)) ? 0x32 : 0;
+                item[0xC1] = ((i == 0) && (row == -1)) ? 0x32 : 0;
+                item[0xC2] = ((i == 0) && (row == -2)) ? 0x32 : 0;
+                item[0xC3] = ((i == 0) && (row == -3)) ? 0x32 : 0;
+                row += 4;
+                item += 4;
+            }
+            dstWork += 0x40;
+        }
+
+        memset(dstCharData + 0xC8, 0xFF, 0x10);
+        memset(dstCharData + 0xD8, 0, 0x10);
+        *reinterpret_cast<u16*>(dstCharData + 0x28) = 0;
+        memset(dstCharData + 0x3C, 0xFF, 0x80);
+
+        int artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x34));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x36));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x38));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x3A));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        srcCharData[0x8C0] = 1;
+        dstCharData[0x8C1] = 1;
+        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 3;
+    }
+    else
+    {
+        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
+
+        u8* srcWork = srcSaveData + srcChar * 0x208;
+        for (int i = 0; i < 2; i++)
+        {
+            srcWork[0xC0] = 0;
+            srcWork[0xC1] = 0;
+            srcWork[0xC2] = 0;
+            srcWork[0xC3] = 0;
+            srcWork[0xC4] = 0;
+            srcWork[0xC5] = 0;
+            srcWork[0xC6] = 0;
+            srcWork[0xC7] = 0;
+            srcWork[0x100] = 0;
+            srcWork[0x101] = 0;
+            srcWork[0x102] = 0;
+            srcWork[0x103] = 0;
+            srcWork[0x104] = 0;
+            srcWork[0x105] = 0;
+            srcWork[0x106] = 0;
+            srcWork[0x107] = 0;
+            srcWork[0x140] = 0;
+            srcWork[0x141] = 0;
+            srcWork[0x142] = 0;
+            srcWork[0x143] = 0;
+            srcWork[0x144] = 0;
+            srcWork[0x145] = 0;
+            srcWork[0x146] = 0;
+            srcWork[0x147] = 0;
+            srcWork[0x180] = 0;
+            srcWork[0x181] = 0;
+            srcWork[0x182] = 0;
+            srcWork[0x183] = 0;
+            srcWork[0x184] = 0;
+            srcWork[0x185] = 0;
+            srcWork[0x186] = 0;
+            srcWork[0x187] = 0;
+            srcWork += 0x100;
+        }
+
+        dstCharData[0x8C0] = 0;
+        srcCharData[0x8C2] = 0;
+        memset(srcCharData, 0, 0x9C0);
+        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
+    }
+
+    *reinterpret_cast<u32*>(srcSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
+    *reinterpret_cast<u32*>(srcSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(srcSaveData));
+
+    *reinterpret_cast<u32*>(dstSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
+    *reinterpret_cast<u32*>(dstSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(dstSaveData));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C1F20
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::DecodeData()
+{
+    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
+    const int rotAmount = 0x20 - (reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20);
+
+    for (int count = 0; count < 0x5B6; count++)
+    {
+        u32 word = ptr[0];
+        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[1];
+        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[2];
+        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[3];
+        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[4];
+        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[5];
+        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        word = ptr[6];
+        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
+        ptr += 7;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C1FF0
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::EncodeData()
+{
+    const int rotAmount = reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20;
+    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
+
+    for (int count = 0; count < 0x5B6; count++)
+    {
+        u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
+        ptr[0] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
+        ptr[1] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
+        ptr[2] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
+        ptr[3] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
+        ptr[4] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
+        ptr[5] = __lwbrx(&rotated, 0);
+        rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
+        ptr[6] = __lwbrx(&rotated, 0);
+        ptr += 7;
+    }
 }
 
 /*
@@ -325,275 +674,134 @@ void CMemoryCardMan::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, int length)
+int CMemoryCardMan::McChkConnect(int chan)
 {
-    int success = 0;
+    long type;
+    long sectorSize;
+	int result;
+
+    // CARDProbeEx returns:
+    //  0   = ready
+    // -1   = no card
+    // -2   = busy
+    // -5   = broken
+    int probeResult = CARDProbeEx(chan, &type, &sectorSize);
+
+    if (probeResult == -1)
+    {
+        result = 1;
+    }
+    else if (probeResult == 0)
+    {
+        if (sectorSize != 0x2000)
+        {
+            result = -2;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else if (probeResult == -2)
+    {
+        result = -3;
+    }
+    else if (probeResult == -5)
+    {
+        result = -4;
+    }
+    else
+    {
+        result = -1;
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
+{
+    int total_minutes = frames / 1500;
+
+    *minutes = total_minutes % 60;
+    *hours = total_minutes / 60;
+
+    if (*hours >= 999)
+	{
+        *hours = 999;
+	}
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMemoryCardMan::DummyLoad()
+{
     int result;
-    unsigned long sectorSize;
-    CARDFileInfo fileInfo;
-    CARDStat stat;
 
-    result = CARDMount(1, m_mountWorkArea, 0);
-    if (((result != 0) && (result != -6)) || (result = CARDCheckAsync(1, 0), result >= 0))
-    {
-checkResult:
-        result = CARDGetResultCode(1);
-        if (result != 0)
-        {
-            if (((result != -6) && (result != -13)) || (isWrite != 0))
-            {
-                goto done;
-            }
-
-            System.Printf(const_cast<char*>(sDebugReadWriteFormatMsg));
-            result = CARDFormat(1);
-            if (result < 0)
-            {
-                goto done;
-            }
-
-            goto checkResult;
-        }
-
-        result = CARDGetSectorSize(1, &sectorSize);
-        if (result >= 0)
-        {
-            if (isWrite != 0)
-            {
-                result = CARDOpen(1, filename, &fileInfo);
-                if (result >= 0)
-                {
-                    goto readFile;
-                }
-
-                result = 0;
-                while (result < 0x7F)
-                {
-                    if (CARDGetStatus(1, result, &stat) < 0)
-                    {
-                        goto nextFile;
-                    }
-                    if (strcmp(filename, reinterpret_cast<char*>(&stat)) != 0)
-                    {
-                        goto nextFile;
-                    }
-                    goto foundFile;
-
-nextFile:
-                    result++;
-                }
-
-                result = -1;
-
-foundFile:
-                if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
-                {
-readFile:
-                    if (CARDRead(&fileInfo, buffer, length, 0) < 0)
-                    {
-                        goto closeFile;
-                    }
-                    goto setSuccess;
-                }
-            }
-            else
-            {
-                CARDDelete(1, filename);
-                result = CARDCreate(1, filename, length, &fileInfo);
-                if (result >= 0)
-                {
-                    result = CARDWrite(&fileInfo, buffer, length, 0);
-                    if (result >= 0)
-                    {
-setSuccess:
-                        success = 1;
-                    }
-closeFile:
-                    CARDClose(&fileInfo);
-                }
-            }
-        }
-    }
-
-done:
-    CARDUnmount(1);
-
-    if (success == 0)
-    {
-        System.Printf(const_cast<char*>(sDebugReadWriteFailedMsg));
-    }
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CMemoryCardMan::AsyncFinished()
-{ 
-	return m_opDoneFlag != 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::GetResult()
-{
-	return m_result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McMount(int chan)
-{ 
+    // Begin mount
     m_opDoneFlag = 0;
     m_state = 1;
 
-    int result = CARDMountAsync(chan, m_mountWorkArea, &Detach, &Attach);
-
-    if (result < 0)
-	{
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McUnmount(int chan)
-{
-	m_result = CARDUnmount(chan);
-	m_opDoneFlag = 1;
-	m_state = '\x02';
-	m_currentSlot = 0xff;
-
-	return m_result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McOpen(int chan)
-{ 
-	m_result = CARDOpen(chan, CardConst::MC_FNAME, &m_fileInfo);
-	m_opDoneFlag = 1;
-	m_state = 3;
-
-	return m_result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McClose()
-{
-	int chan = m_fileInfo.chan;
-
-	if (chan < 0 || chan > 1)
-	{
-		m_opDoneFlag = 1;
-		m_state = 4;
-		m_result = -3;
-
-		return m_result;
-	}
-
-	int result = CARDClose(&m_fileInfo);
-	
-	m_result = result;
-	m_opDoneFlag = 1;
-	m_state = 4;
-
-	return m_result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McCreate(int chan)
-{
-    m_opDoneFlag = 0;
-    m_state = 5;
-
-    int result = CARDCreateAsync(
-        chan,
-        CardConst::MC_FNAME,
-        0x2C000, // size
-        &m_fileInfo,
-        &Attach
-    );
-
+    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
     if (result < 0)
     {
         m_opDoneFlag = 1;
     }
-
     m_result = result;
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McGetStat(int chan)
-{
-	int result = CARDGetStatus(
-		chan,
-		m_fileInfo.fileNo,
-		&m_cardStat
-	);
+    // Busy wait for async completion
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    {
+    }
 
-	m_result = result;
-	m_opDoneFlag = 1;
-	m_state = 6;
+    // If mount failed
+    if (m_result != 0)
+    {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            // "McMount(%d) error(%d)"
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+        }
 
-	return m_result;
-}
+        result = CARDUnmount(0);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McSetStat(int chan)
-{
-	int result = CARDSetStatus(
-		chan,
-		m_fileInfo.fileNo,
-		&m_cardStat
-	);
+        return m_result;
+    }
 
-	m_result = result;
-	m_opDoneFlag = 1;
-	m_state = 7;
+    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 3;
 
-	return m_result;
-}
+    if (m_result != 0)
+    {
+        // Open failed
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            // "McOpen(%d) error(%d)"
+            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0);
+        }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::CreateMcBuff()
-{
+        result = CARDUnmount(0);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
+
+        return m_result;
+    }
+
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
@@ -605,57 +813,94 @@ void CMemoryCardMan::CreateMcBuff()
         }
     }
 
-    // Zero buffer every call, allocated or not
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-}
+    m_opDoneFlag = 0;
+    m_state = 8;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::DestroyMcBuff()
-{ 
-  if (m_saveBuffer != (char*)nullptr)
-  {
-    delete[] m_saveBuffer;
-	m_saveBuffer = (char*)nullptr;
-  }
-}
+    result = CARDReadAsync(
+        &m_fileInfo,
+        m_saveBuffer,
+        kMemoryCardSaveBufferSize,
+        0x4000,
+        &Attach
+    );
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McEnd()
-{
-    int chan = 0;
-
-    while (chan < 2)
+    if (result < 0)
     {
-        int attempt = 0;
+        m_opDoneFlag = 1;
+    }
 
-        while (attempt < 10)
+    m_result = result;
+
+    // Wait for read to finish
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    {
+    }
+
+    if (m_result != 0)
+    {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            int result = CARDUnmount(chan);
-
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            // IMPORTANT: compare m_result, not result
-            if (m_result != -1)
-            {
-                break;
-            }
-
-            attempt++;
+            // "McRead(%d) error(%d)"
+            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
         }
 
-        chan++;
+        int chan = m_fileInfo.chan;
+
+        if (chan < 0 || chan > 1)
+        {
+            m_opDoneFlag = 1;
+            m_state = 4;
+            m_result = -3;
+        }
+        else
+        {
+            result = CARDClose(&m_fileInfo);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 4;
+        }
+
+        result = CARDUnmount(0);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
+
+        if (m_saveBuffer != 0)
+        {
+            delete[] m_saveBuffer;
+            m_saveBuffer = 0;
+        }
+
+        return m_result;
     }
+
+    int chan = m_fileInfo.chan;
+
+    if (chan < 0 || chan > 1)
+    {
+        m_opDoneFlag = 1;
+        m_state = 4;
+        m_result = -3;
+    }
+    else
+    {
+        result = CARDClose(&m_fileInfo);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 4;
+    }
+
+    result = CARDUnmount(0);
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 2;
+    m_currentSlot = 0xFF;
+
+    Game.LoadInit();
+    SetLoadData();
+    Game.LoadFinished();
 
     if (m_saveBuffer != 0)
     {
@@ -663,11 +908,7 @@ void CMemoryCardMan::McEnd()
         m_saveBuffer = 0;
     }
 
-    m_result = 0;
-    m_opDoneFlag = 0;
-    m_currentSlot = 0xFF;
-    m_state = 0;
-    m_saveBuffer = 0;
+    return 0;
 }
 
 /*
@@ -675,16 +916,237 @@ void CMemoryCardMan::McEnd()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::SetMcIconImage()
+int CMemoryCardMan::DummySave()
 {
-    if (m_saveBuffer == (char*)nullptr)
+    int result;
+
+    m_opDoneFlag = 0;
+    m_state = 1;
+
+    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
+    if (result < 0)
     {
-        if (m_saveBuffer == (char*)nullptr)
+        m_opDoneFlag = 1;
+    }
+    m_result = result;
+
+    // Busy-wait for async completion
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+    {
+    }
+
+    if (m_result == -6)
+    {
+        m_opDoneFlag = 0;
+        m_state = 10;
+
+        result = CARDFormatAsync(0, &Attach);
+        if (result < 0)
+        {
+            m_opDoneFlag = 1;
+        }
+        m_result = result;
+
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        {
+        }
+
+        if (m_result != 0)
+        {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                // "%s(%d) McFormat(%d) error(%d)"
+                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0);
+            }
+
+            result = CARDUnmount(0);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            return m_result;
+        }
+    }
+
+    // Handle general mount error
+    if (m_result != 0)
+    {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            // "%s(%d) McMount(%d) error(%d)"
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
+        }
+
+        result = CARDUnmount(0);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
+
+        return m_result;
+    }
+
+    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 3;
+
+    if (m_result == -4)
+    {
+        m_opDoneFlag = 0;
+        m_state = 5;
+
+        result = CARDCreateAsync(
+            0,
+            CardConst::MC_FNAME,
+            0x2C000,
+            &m_fileInfo,
+            &Attach
+        );
+
+        if (result < 0)
+        {
+            m_opDoneFlag = 1;
+        }
+        m_result = result;
+
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        {
+        }
+
+        if (m_result != 0)
+        {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                // "McCreate(%d) error(%d)"
+                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0);
+            }
+
+            result = CARDUnmount(0);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            return m_result;
+        }
+
+        result = CARDGetStatus(0, m_fileInfo.fileNo, &m_cardStat);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 6;
+
+        if (m_result != 0)
+        {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                // "McGetStat(%d) error(%d)"
+                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0);
+            }
+
+            result = CARDUnmount(0);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            return m_result;
+        }
+
+        if (m_saveBuffer == 0)
         {
             m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
                 char[kMemoryCardSaveBufferSize];
 
-            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            }
+        }
+
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+
+        SetMcIconImage();
+
+        m_opDoneFlag = 0;
+        m_state = 9;
+
+        result = CARDWriteAsync(
+            &m_fileInfo,
+            m_saveBuffer,
+            0x4000,
+            0,
+            &Attach
+        );
+
+        if (result < 0)
+        {
+            m_opDoneFlag = 1;
+        }
+        m_result = result;
+
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
+        {
+        }
+
+        if (m_result != 0)
+        {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+            }
+
+            result = CARDUnmount(0);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            if (m_saveBuffer != 0)
+            {
+                delete[] m_saveBuffer;
+                m_saveBuffer = 0;
+            }
+
+            return m_result;
+        }
+
+        result = CARDSetStatus(0, m_fileInfo.fileNo, &m_cardStat);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 7;
+
+        if (m_result != 0)
+        {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0);
+            }
+
+            result = CARDUnmount(0);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            if (m_saveBuffer != 0)
+            {
+                delete[] m_saveBuffer;
+                m_saveBuffer = 0;
+            }
+
+            return m_result;
+        }
+    }
+    else
+    {
+        if (m_saveBuffer == 0)
+        {
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[kMemoryCardSaveBufferSize];
+
+            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
@@ -692,120 +1154,17 @@ void CMemoryCardMan::SetMcIconImage()
 
         memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
-	
-    char path[136];
 
-    const char* lang = Game.GetLangString();
-    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, CardConst::MC_ICONIMG_FNAME);
-    CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
-
-    if (h == nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
-    {
-        System.Printf(const_cast<char*>(sMemoryCardOpenErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2EF, path);
-    }
-
-    File.Read(h);
-    File.SyncCompleted(h);
-
-    int len = File.GetLength(h);
-
-    if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
-    {
-        System.Printf(const_cast<char*>(sMemoryCardDataErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2F6, path);
-    }
-
-    char* saveBuffer = m_saveBuffer;
-    memcpy(saveBuffer + 0x40, File.m_readBuffer, len);
-
-    File.Close(h);
-
-    m_cardStat.commentAddr = 0;
-    m_cardStat.iconAddr    = 0x40;
-
-    m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
-
-    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0003) | 0x0001;
-    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0003) | 0x0002;
-
-    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x000C) | 0x0004;
-    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x000C) | 0x0008;
-
-    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0030) | 0x0010;
-    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0030) | 0x0020;
-
-    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x00C0) | 0x0040;
-    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x00C0) | 0x0080;
-
-    m_cardStat.iconFormat &= ~0x0300;
-    m_cardStat.iconSpeed  &= ~0x0300;
-
-    m_cardStat.offsetIcon[4] = 0xFFFFFFFF;
-    m_cardStat.iconFormat &= ~0x0C00;
-    m_cardStat.iconSpeed  &= ~0x0C00;
-
-    m_cardStat.offsetIcon[5] = 0xFFFFFFFF;
-    m_cardStat.iconFormat &= ~0x3000;
-    m_cardStat.iconSpeed  &= ~0x3000;
-
-    m_cardStat.offsetIcon[6] = 0xFFFFFFFF;
-    m_cardStat.iconFormat &= ~0xC000;
-    m_cardStat.iconSpeed  &= ~0xC000;
-
-    m_cardStat.offsetIcon[7] = 0xFFFFFFFF;
-    m_cardStat.bannerFormat &= ~0x04;
-
-    m_cardStat.offsetIconTlut = 0x2840;
-    m_cardStat.offsetIconTlut = 0x2A40;
-
-    size_t titleLen = strlen(CardConst::MC_COMMENT);
-    memcpy(saveBuffer, CardConst::MC_COMMENT, titleLen);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McRead(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
-
-    m_opDoneFlag = 0;
-    m_state = 8;
-
-    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
-{
-    if (buffer == nullptr)
-    {
-        buffer = m_saveBuffer;
-    }
+    MakeSaveData();
 
     m_opDoneFlag = 0;
     m_state = 9;
 
-    int result = CARDWriteAsync(
+    result = CARDWriteAsync(
         &m_fileInfo,
-        buffer,
-        length,
-        offset,
+        m_saveBuffer,
+        kMemoryCardSaveBufferSize,
+        0x4000,
         &Attach
     );
 
@@ -813,342 +1172,80 @@ void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
     {
         m_opDoneFlag = 1;
     }
-
     m_result = result;
-}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McFormat(int chan)
-{
-    m_opDoneFlag = 0;
-    m_state = 10;
-	
-    int result = CARDFormatAsync(
-        chan,
-        &Attach
-    );
-
-    if (result < 0)
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
-        m_opDoneFlag = 1;
     }
 
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McCheck(int chan)
-{
-    m_opDoneFlag = 0;
-    m_state = 11;
-
-    int result = CARDCheckAsync(chan, &Attach);
-
-    if (result < 0)
+    if (m_result != 0)
     {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+        }
+
+        int chan = m_fileInfo.chan;
+
+        if (chan < 0 || chan > 1)
+        {
+            m_opDoneFlag = 1;
+            m_state = 4;
+            m_result = -3;
+        }
+        else
+        {
+            result = CARDClose(&m_fileInfo);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 4;
+        }
+
+        result = CARDUnmount(0);
+        m_result = result;
         m_opDoneFlag = 1;
+
+        m_state = 2;
+        m_currentSlot = 0xFF;
+
+        if (m_saveBuffer != 0)
+        {
+            delete[] m_saveBuffer;
+            m_saveBuffer = 0;
+        }
+
+        return m_result;
     }
 
+    int chan = m_fileInfo.chan;
+
+    if (m_saveBuffer != 0)
+    {
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
+    }
+
+    if (chan < 0 || chan > 1)
+    {
+        m_opDoneFlag = 1;
+        m_state = 4;
+        m_result = -3;
+    }
+    else
+    {
+        result = CARDClose(&m_fileInfo);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 4;
+    }
+
+    result = CARDUnmount(0);
     m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMemoryCardMan::McFreeBlocks(int chan, int* bytesFree, int* filesFree)
-{
-    int result;
-    long localBytes;
-    long localFiles;
-
-    result = CARDFreeBlocks(chan, &localBytes, &localFiles);
-
-    m_result = result;
-    *bytesFree = localBytes;
-    *filesFree = localFiles;
-    m_state = 12;
     m_opDoneFlag = 1;
-
-    return m_result;
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::McDelFile(int chan)
-{
-    m_opDoneFlag = 0;
-    m_state = 13;
-	
-    int result = CARDDeleteAsync(
-        chan,
-        CardConst::MC_FNAME,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-
-    m_result = result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-bool CMemoryCardMan::IsBrokenFile()
-{
-    if (m_cardStat.iconAddr == 0xFFFFFFFF || m_cardStat.commentAddr == 0xFFFFFFFF)
-    {
-		return 1;
-    }
+    m_state = 2;
+    m_currentSlot = 0xFF;
 
     return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c369c
- * PAL Size: 2576b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::MakeSaveData()
-{
-    if (m_saveBuffer == (char*)nullptr)
-    {
-        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[kMemoryCardSaveBufferSize];
-        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
-        }
-    }
-
-    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-
-    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = reinterpret_cast<u8*>(&Game);
-    u8* gameWork = game + 0x08;
-
-    const u64 now = OSGetTime();
-    memcpy(save + 0x8AD0, &now, sizeof(now));
-
-    memcpy(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
-    memcpy(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
-    memcpy(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
-    memcpy(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
-    save[0x10] = 'E';
-    *reinterpret_cast<u32*>(save + 0x18) = Math.Rand(0x7FFFFFFF);
-    save[0x11] = static_cast<u8>(Math.Rand(0xFF));
-    save[0x12] = 0;
-
-    int wm = Game.m_gameWork.m_wmBackupParams[0];
-    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
-    }
-    wm = Game.m_gameWork.m_wmBackupParams[1];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
-    }
-    wm = Game.m_gameWork.m_wmBackupParams[2];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
-    }
-    wm = Game.m_gameWork.m_wmBackupParams[3];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
-    }
-    if (wmWork->m_shopBusyFlag != 0)
-    {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
-    }
-
-    save[0x20] = gameWork[0x08];
-    save[0x21] = gameWork[0x09];
-    save[0x22] = gameWork[0x0A];
-    save[0x23] = gameWork[0x0B];
-    *reinterpret_cast<int*>(save + 0x24) = *reinterpret_cast<int*>(gameWork + 0x0C);
-    *reinterpret_cast<int*>(save + 0x28) = *reinterpret_cast<int*>(gameWork + 0x10);
-    *reinterpret_cast<int*>(save + 0x2C) = *reinterpret_cast<int*>(gameWork + 0x14);
-    memcpy(save + 0x30, gameWork + 0x18, 0x10);
-    memcpy(save + 0x40, gameWork + 0x28, 0x3C);
-    memcpy(save + 0x7C, gameWork + 0x64, 0x3C);
-    *reinterpret_cast<int*>(save + 0xB8) = *reinterpret_cast<int*>(gameWork + 0x10B4);
-    memcpy(save + 0xC0, gameWork + 0xA0, 0x1000);
-    memcpy(save + 0x10C0, gameWork + 0x10A0, 0x10);
-    memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
-    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    *reinterpret_cast<u32*>(save + 0x13D0) = *reinterpret_cast<u32*>(gameWork + 0x13E0);
-    *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
-    *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
-    save[0x13DC] = gameWork[0x13D6];
-    save[0x13DD] = Game.m_gameWork.m_bgmVolume;
-    save[0x13DE] = Game.m_gameWork.m_seVolume;
-    save[0x13DE] = Game.m_gameWork.m_seVolume;
-    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode()) >> 5)) >> 31);
-    save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
-    save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
-    save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);
-    save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
-    save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
-
-    for (int c = 0; c < 8; c++)
-    {
-        u8* dst = save + 0x14D0 + c * 0x9C0;
-        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
-
-        if (caravanWork->m_shopState == 0)
-        {
-            caravanWork->m_shopRandSeed = 0;
-            caravanWork->unk_0xc1e = 0;
-        }
-        else if (caravanWork->unk_0xc1e == 0)
-        {
-            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
-            caravanWork->unk_0xc1e = 1;
-        }
-
-        *reinterpret_cast<u16*>(dst + 0x00) = caravanWork->m_id;
-        *reinterpret_cast<u16*>(dst + 0x02) = caravanWork->m_param1;
-        *reinterpret_cast<u16*>(dst + 0x04) = caravanWork->m_param2;
-        *reinterpret_cast<u16*>(dst + 0x06) = caravanWork->m_maxHp;
-        *reinterpret_cast<u16*>(dst + 0x08) = caravanWork->m_hp;
-        *reinterpret_cast<u16*>(dst + 0x0A) = caravanWork->m_strength;
-        *reinterpret_cast<u16*>(dst + 0x0C) = caravanWork->m_magic;
-        *reinterpret_cast<u16*>(dst + 0x0E) = caravanWork->m_defense;
-        for (int i = 0; i < 8; i++)
-        {
-            *reinterpret_cast<u16*>(dst + 0x12 + i * 2) = caravanWork->m_letterMeta[i];
-        }
-        *reinterpret_cast<u16*>(dst + 0x24) = caravanWork->unk_0x3c8;
-        *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
-        *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->m_progressValue;
-        *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_tribeId;
-        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_genderFlag;
-        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_appearanceVariant;
-        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->unk_0x3e6;
-        *reinterpret_cast<s16*>(dst + 0x34) = caravanWork->m_equipment[0];
-        *reinterpret_cast<s16*>(dst + 0x36) = caravanWork->m_equipment[1];
-        *reinterpret_cast<s16*>(dst + 0x38) = caravanWork->m_equipment[2];
-        *reinterpret_cast<s16*>(dst + 0x3A) = caravanWork->m_equipment[3];
-        for (int i = 0; i < 64; i++)
-        {
-            *reinterpret_cast<s16*>(dst + 0x3C + i * 2) = caravanWork->m_inventoryItems[i];
-        }
-        *reinterpret_cast<u32*>(dst + 0xE8) = caravanWork->m_joybusCaravanId;
-        *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
-        memcpy(dst + 0xF0, caravanWork->unk_0x3ca_0x3dd, 0x10);
-        *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        for (int i = 0; i < 100; i++)
-        {
-            u8* dstLetter = dst + 0x104 + i * 0x0C;
-            u8* srcLetter = caravanWork->m_letter0 + i * 0x0C;
-
-            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
-            *reinterpret_cast<u16*>(dstLetter) =
-                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
-            *reinterpret_cast<u32*>(dstLetter) =
-                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(dstLetter + 2) =
-                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
-            memcpy(dstLetter + 4, srcLetter + 4, 8);
-            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
-            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
-            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
-            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
-        }
-
-        for (int artifact = 0; artifact < 96; artifact += 3)
-        {
-            const int slot = artifact >> 5;
-            const u32 bit = 1u << (artifact & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact]) > 0)
-            {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot * 4) |= bit;
-            }
-
-            const int artifact1 = artifact + 1;
-            const int slot1 = artifact1 >> 5;
-            const u32 bit1 = 1u << (artifact1 & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact1]) > 0)
-            {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot1 * 4) |= bit1;
-            }
-
-            const int artifact2 = artifact + 2;
-            const int slot2 = artifact2 >> 5;
-            const u32 bit2 = 1u << (artifact2 & 31);
-            if (static_cast<s16>(caravanWork->m_artifacts[artifact2]) > 0)
-            {
-                *reinterpret_cast<u32*>(dst + 0xBC + slot2 * 4) |= bit2;
-            }
-        }
-
-        for (int i = 0; i < 8; i++)
-        {
-            *reinterpret_cast<s16*>(dst + 0xC8 + i * 2) = caravanWork->m_commandListInventorySlotRef[i];
-            *reinterpret_cast<s16*>(dst + 0xD8 + i * 2) = caravanWork->m_commandListExtra[i];
-        }
-
-        *reinterpret_cast<int*>(dst + 0x5B4) = caravanWork->m_shopState;
-        memcpy(dst + 0x5B8, caravanWork->m_evtWorkArr, 0x100);
-        memcpy(dst + 0x6B8, caravanWork->m_evtWordArr, 0x200);
-        *reinterpret_cast<int*>(dst + 0x8B8) = caravanWork->unk_0x3a8;
-        *reinterpret_cast<int*>(dst + 0x8BC) = caravanWork->unk_0x3ac;
-        dst[0x8C0] = caravanWork->m_shopBusyFlag;
-        dst[0x8C1] = caravanWork->m_caravanLocalFlags;
-        dst[0x8C2] = caravanWork->unk_0xc1e;
-        *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
-        *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
-        *reinterpret_cast<int*>(dst + 0x8CC) = caravanWork->m_shopData2;
-        *reinterpret_cast<int*>(dst + 0x8C8) = caravanWork->m_shopData1;
-        *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
-    }
-
-    Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
-    GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
-    *reinterpret_cast<u32*>(save + 0x1C) = CalcSaveCrc(reinterpret_cast<u8*>(m_saveBuffer));
-    EncodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -1405,95 +1502,231 @@ void CMemoryCardMan::SetLoadData()
 
 /*
  * --INFO--
- * PAL Address: 0x800c2d28
- * PAL Size: 148b
+ * PAL Address: 0x800c369c
+ * PAL Size: 2576b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
+void CMemoryCardMan::MakeSaveData()
 {
-    int count;
-    unsigned char* ptr;
-    unsigned int crc;
-    unsigned char* data = (unsigned char*)saveData;
-
-    if (data == nullptr)
+    if (m_saveBuffer == (char*)nullptr)
     {
-        data = (unsigned char*)m_saveBuffer;
+        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+            char[kMemoryCardSaveBufferSize];
+        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+        }
     }
 
-    crc = 0xFFFFFFFF;
-    count = 0x1C;
-    ptr = data;
-    while (--count >= 0)
+    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+
+    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    u8* game = reinterpret_cast<u8*>(&Game);
+    u8* gameWork = game + 0x08;
+
+    const u64 now = OSGetTime();
+    memcpy(save + 0x8AD0, &now, sizeof(now));
+
+    memcpy(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
+    memcpy(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
+    memcpy(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
+    memcpy(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
+    save[0x10] = 'E';
+    *reinterpret_cast<u32*>(save + 0x18) = Math.Rand(0x7FFFFFFF);
+    save[0x11] = static_cast<u8>(Math.Rand(0xFF));
+    save[0x12] = 0;
+
+    int wm = Game.m_gameWork.m_wmBackupParams[0];
+    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
-        ptr += 1;
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
+    }
+    if (wmWork->m_shopBusyFlag != 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[0] = -1;
+    }
+    wm = Game.m_gameWork.m_wmBackupParams[1];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
+    }
+    if (wmWork->m_shopBusyFlag != 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[1] = -1;
+    }
+    wm = Game.m_gameWork.m_wmBackupParams[2];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
+    }
+    if (wmWork->m_shopBusyFlag != 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[2] = -1;
+    }
+    wm = Game.m_gameWork.m_wmBackupParams[3];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
+    }
+    if (wmWork->m_shopBusyFlag != 0)
+    {
+        Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
 
-    ptr = data + 0x20;
-    count = 0x8BB0;
-    while (--count >= 0)
+    save[0x20] = gameWork[0x08];
+    save[0x21] = gameWork[0x09];
+    save[0x22] = gameWork[0x0A];
+    save[0x23] = gameWork[0x0B];
+    *reinterpret_cast<int*>(save + 0x24) = *reinterpret_cast<int*>(gameWork + 0x0C);
+    *reinterpret_cast<int*>(save + 0x28) = *reinterpret_cast<int*>(gameWork + 0x10);
+    *reinterpret_cast<int*>(save + 0x2C) = *reinterpret_cast<int*>(gameWork + 0x14);
+    memcpy(save + 0x30, gameWork + 0x18, 0x10);
+    memcpy(save + 0x40, gameWork + 0x28, 0x3C);
+    memcpy(save + 0x7C, gameWork + 0x64, 0x3C);
+    *reinterpret_cast<int*>(save + 0xB8) = *reinterpret_cast<int*>(gameWork + 0x10B4);
+    memcpy(save + 0xC0, gameWork + 0xA0, 0x1000);
+    memcpy(save + 0x10C0, gameWork + 0x10A0, 0x10);
+    memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
+    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
+    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
+    *reinterpret_cast<u32*>(save + 0x13D0) = *reinterpret_cast<u32*>(gameWork + 0x13E0);
+    *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
+    *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
+    save[0x13DC] = gameWork[0x13D6];
+    save[0x13DD] = Game.m_gameWork.m_bgmVolume;
+    save[0x13DE] = Game.m_gameWork.m_seVolume;
+    save[0x13DE] = Game.m_gameWork.m_seVolume;
+    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode()) >> 5)) >> 31);
+    save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
+    save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
+    save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);
+    save[0x13E3] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[2]);
+    save[0x13E4] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[3]);
+
+    for (int c = 0; c < 8; c++)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
-        ptr += 1;
+        u8* dst = save + 0x14D0 + c * 0x9C0;
+        CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
+
+        if (caravanWork->m_shopState == 0)
+        {
+            caravanWork->m_shopRandSeed = 0;
+            caravanWork->unk_0xc1e = 0;
+        }
+        else if (caravanWork->unk_0xc1e == 0)
+        {
+            caravanWork->m_shopRandSeed = Math.Rand(0x7FFFFFFF);
+            caravanWork->unk_0xc1e = 1;
+        }
+
+        *reinterpret_cast<u16*>(dst + 0x00) = caravanWork->m_id;
+        *reinterpret_cast<u16*>(dst + 0x02) = caravanWork->m_param1;
+        *reinterpret_cast<u16*>(dst + 0x04) = caravanWork->m_param2;
+        *reinterpret_cast<u16*>(dst + 0x06) = caravanWork->m_maxHp;
+        *reinterpret_cast<u16*>(dst + 0x08) = caravanWork->m_hp;
+        *reinterpret_cast<u16*>(dst + 0x0A) = caravanWork->m_strength;
+        *reinterpret_cast<u16*>(dst + 0x0C) = caravanWork->m_magic;
+        *reinterpret_cast<u16*>(dst + 0x0E) = caravanWork->m_defense;
+        for (int i = 0; i < 8; i++)
+        {
+            *reinterpret_cast<u16*>(dst + 0x12 + i * 2) = caravanWork->m_letterMeta[i];
+        }
+        *reinterpret_cast<u16*>(dst + 0x24) = caravanWork->unk_0x3c8;
+        *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
+        *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->m_progressValue;
+        *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_tribeId;
+        *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_genderFlag;
+        *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_appearanceVariant;
+        *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->unk_0x3e6;
+        *reinterpret_cast<s16*>(dst + 0x34) = caravanWork->m_equipment[0];
+        *reinterpret_cast<s16*>(dst + 0x36) = caravanWork->m_equipment[1];
+        *reinterpret_cast<s16*>(dst + 0x38) = caravanWork->m_equipment[2];
+        *reinterpret_cast<s16*>(dst + 0x3A) = caravanWork->m_equipment[3];
+        for (int i = 0; i < 64; i++)
+        {
+            *reinterpret_cast<s16*>(dst + 0x3C + i * 2) = caravanWork->m_inventoryItems[i];
+        }
+        *reinterpret_cast<u32*>(dst + 0xE8) = caravanWork->m_joybusCaravanId;
+        *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
+        memcpy(dst + 0xF0, caravanWork->unk_0x3ca_0x3dd, 0x10);
+        *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
+        for (int i = 0; i < 100; i++)
+        {
+            u8* dstLetter = dst + 0x104 + i * 0x0C;
+            u8* srcLetter = caravanWork->m_letter0 + i * 0x0C;
+
+            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
+            *reinterpret_cast<u16*>(dstLetter) =
+                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
+            *reinterpret_cast<u32*>(dstLetter) =
+                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
+            *reinterpret_cast<u16*>(dstLetter + 2) =
+                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
+            memcpy(dstLetter + 4, srcLetter + 4, 8);
+            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
+            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
+            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
+            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
+        }
+
+        for (int artifact = 0; artifact < 96; artifact += 3)
+        {
+            const int slot = artifact >> 5;
+            const u32 bit = 1u << (artifact & 31);
+            if (static_cast<s16>(caravanWork->m_artifacts[artifact]) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot * 4) |= bit;
+            }
+
+            const int artifact1 = artifact + 1;
+            const int slot1 = artifact1 >> 5;
+            const u32 bit1 = 1u << (artifact1 & 31);
+            if (static_cast<s16>(caravanWork->m_artifacts[artifact1]) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot1 * 4) |= bit1;
+            }
+
+            const int artifact2 = artifact + 2;
+            const int slot2 = artifact2 >> 5;
+            const u32 bit2 = 1u << (artifact2 & 31);
+            if (static_cast<s16>(caravanWork->m_artifacts[artifact2]) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot2 * 4) |= bit2;
+            }
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            *reinterpret_cast<s16*>(dst + 0xC8 + i * 2) = caravanWork->m_commandListInventorySlotRef[i];
+            *reinterpret_cast<s16*>(dst + 0xD8 + i * 2) = caravanWork->m_commandListExtra[i];
+        }
+
+        *reinterpret_cast<int*>(dst + 0x5B4) = caravanWork->m_shopState;
+        memcpy(dst + 0x5B8, caravanWork->m_evtWorkArr, 0x100);
+        memcpy(dst + 0x6B8, caravanWork->m_evtWordArr, 0x200);
+        *reinterpret_cast<int*>(dst + 0x8B8) = caravanWork->unk_0x3a8;
+        *reinterpret_cast<int*>(dst + 0x8BC) = caravanWork->unk_0x3ac;
+        dst[0x8C0] = caravanWork->m_shopBusyFlag;
+        dst[0x8C1] = caravanWork->m_caravanLocalFlags;
+        dst[0x8C2] = caravanWork->unk_0xc1e;
+        *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
+        *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
+        *reinterpret_cast<int*>(dst + 0x8CC) = caravanWork->m_shopData2;
+        *reinterpret_cast<int*>(dst + 0x8C8) = caravanWork->m_shopData1;
+        *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
     }
 
-    return ~crc;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c2c70
- * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
-{
-    unsigned int crc;
-    unsigned char* crcData;
-    int count;
-    unsigned char* ptr;
-    unsigned char* ptr2;
-    unsigned char* data = (unsigned char*)saveData;
-
-    if (data == nullptr)
-    {
-        data = (unsigned char*)m_saveBuffer;
-	}
-
-    if (data == nullptr)
-    {
-        crcData = (unsigned char*)m_saveBuffer;
-    }
-    else
-    {
-        crcData = data;
-    }
-
-	ptr = crcData;
-	crc = 0xFFFFFFFF;
-    count = 0x1C;
-    while (--count >= 0)
-    {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
-        ptr++;
-    }
-
-    ptr2 = crcData + 0x20;
-    count = 0x8BB0;
-    while (--count >= 0)
-    {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr2];
-        ptr2++;
-    }
-
-    return (unsigned int)__cntlzw((~crc) - *(unsigned int*)(data + 0x1C)) >> 5;
+    Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
+    GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
+    *reinterpret_cast<u32*>(save + 0x1C) = CalcSaveCrc(reinterpret_cast<u8*>(m_saveBuffer));
+    EncodeSaveData(m_saveBuffer);
 }
 
 /*
@@ -1501,334 +1734,12 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
  * Address:	TODO
  * Size:	TODO
  */
-int CMemoryCardMan::DummySave()
+bool CMemoryCardMan::IsBrokenFile()
 {
-    int result;
-
-    m_opDoneFlag = 0;
-    m_state = 1;
-
-    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
-    if (result < 0)
+    if (m_cardStat.iconAddr == 0xFFFFFFFF || m_cardStat.commentAddr == 0xFFFFFFFF)
     {
-        m_opDoneFlag = 1;
+		return 1;
     }
-    m_result = result;
-
-    // Busy-wait for async completion
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-    {
-    }
-
-    if (m_result == -6)
-    {
-        m_opDoneFlag = 0;
-        m_state = 10;
-
-        result = CARDFormatAsync(0, &Attach);
-        if (result < 0)
-        {
-            m_opDoneFlag = 1;
-        }
-        m_result = result;
-
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-        {
-        }
-
-        if (m_result != 0)
-        {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcFormatErrorFmt), 0);
-            }
-
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            return m_result;
-        }
-    }
-
-    // Handle general mount error
-    if (m_result != 0)
-    {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            // "%s(%d) McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
-        }
-
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
-
-        return m_result;
-    }
-
-    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
-    m_result = result;
-    m_opDoneFlag = 1;
-    m_state = 3;
-
-    if (m_result == -4)
-    {
-        m_opDoneFlag = 0;
-        m_state = 5;
-
-        result = CARDCreateAsync(
-            0,
-            CardConst::MC_FNAME,
-            0x2C000,
-            &m_fileInfo,
-            &Attach
-        );
-
-        if (result < 0)
-        {
-            m_opDoneFlag = 1;
-        }
-        m_result = result;
-
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-        {
-        }
-
-        if (m_result != 0)
-        {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                // "McCreate(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcCreateErrorFmt), 0);
-            }
-
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            return m_result;
-        }
-
-        result = CARDGetStatus(0, m_fileInfo.fileNo, &m_cardStat);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 6;
-
-        if (m_result != 0)
-        {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                // "McGetStat(%d) error(%d)"
-                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0);
-            }
-
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            return m_result;
-        }
-
-        if (m_saveBuffer == 0)
-        {
-            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-
-            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
-            }
-        }
-
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-		
-        SetMcIconImage();
-
-        m_opDoneFlag = 0;
-        m_state = 9;
-
-        result = CARDWriteAsync(
-            &m_fileInfo,
-            m_saveBuffer,
-            0x4000,
-            0,
-            &Attach
-        );
-
-        if (result < 0)
-        {
-            m_opDoneFlag = 1;
-        }
-        m_result = result;
-
-        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-        {
-        }
-
-        if (m_result != 0)
-        {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
-            }
-
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            if (m_saveBuffer != 0)
-            {
-                delete[] m_saveBuffer;
-                m_saveBuffer = 0;
-            }
-
-            return m_result;
-        }
-
-        result = CARDSetStatus(0, m_fileInfo.fileNo, &m_cardStat);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 7;
-
-        if (m_result != 0)
-        {
-            if (static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0);
-            }
-
-            result = CARDUnmount(0);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 2;
-            m_currentSlot = 0xFF;
-
-            if (m_saveBuffer != 0)
-            {
-                delete[] m_saveBuffer;
-                m_saveBuffer = 0;
-            }
-
-            return m_result;
-        }
-    }
-    else
-    {
-        if (m_saveBuffer == 0)
-        {
-            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-                char[kMemoryCardSaveBufferSize];
-
-            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
-            {
-                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
-            }
-        }
-
-        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-    }
-
-    MakeSaveData();
-	
-    m_opDoneFlag = 0;
-    m_state = 9;
-
-    result = CARDWriteAsync(
-        &m_fileInfo,
-        m_saveBuffer,
-        kMemoryCardSaveBufferSize,
-        0x4000,
-        &Attach
-    );
-
-    if (result < 0)
-    {
-        m_opDoneFlag = 1;
-    }
-    m_result = result;
-
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-    {
-    }
-
-    if (m_result != 0)
-    {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
-        }
-
-        int chan = m_fileInfo.chan;
-
-        if (chan < 0 || chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
-
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-
-        m_state = 2;
-        m_currentSlot = 0xFF;
-
-        if (m_saveBuffer != 0)
-        {
-            delete[] m_saveBuffer;
-            m_saveBuffer = 0;
-        }
-
-        return m_result;
-    }
-
-    int chan = m_fileInfo.chan;
-
-    if (m_saveBuffer != 0)
-    {
-        delete[] m_saveBuffer;
-        m_saveBuffer = 0;
-    }
-
-    if (chan < 0 || chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
-
-    result = CARDUnmount(0);
-    m_result = result;
-    m_opDoneFlag = 1;
-    m_state = 2;
-    m_currentSlot = 0xFF;
 
     return 0;
 }
@@ -1838,67 +1749,305 @@ int CMemoryCardMan::DummySave()
  * Address:	TODO
  * Size:	TODO
  */
-int CMemoryCardMan::DummyLoad()
+void CMemoryCardMan::McDelFile(int chan)
 {
-    int result;
-
-    // Begin mount
     m_opDoneFlag = 0;
-    m_state = 1;
+    m_state = 13;
 
-    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
+    int result = CARDDeleteAsync(
+        chan,
+        CardConst::MC_FNAME,
+        &Attach
+    );
+
     if (result < 0)
     {
         m_opDoneFlag = 1;
     }
+
     m_result = result;
+}
 
-    // Busy wait for async completion
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-    {
-    }
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMemoryCardMan::McFreeBlocks(int chan, int* bytesFree, int* filesFree)
+{
+    int result;
+    long localBytes;
+    long localFiles;
 
-    // If mount failed
-    if (m_result != 0)
-    {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            // "McMount(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
-        }
+    result = CARDFreeBlocks(chan, &localBytes, &localFiles);
 
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
-
-        return m_result;
-    }
-
-    result = CARDOpen(0, CardConst::MC_FNAME, &m_fileInfo);
     m_result = result;
+    *bytesFree = localBytes;
+    *filesFree = localFiles;
+    m_state = 12;
     m_opDoneFlag = 1;
-    m_state = 3;
 
-    if (m_result != 0)
+    return m_result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McCheck(int chan)
+{
+    m_opDoneFlag = 0;
+    m_state = 11;
+
+    int result = CARDCheckAsync(chan, &Attach);
+
+    if (result < 0)
     {
-        // Open failed
-        if (static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            // "McOpen(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0);
-        }
-
-        result = CARDUnmount(0);
-        m_result = result;
         m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
-
-        return m_result;
     }
 
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McFormat(int chan)
+{
+    m_opDoneFlag = 0;
+    m_state = 10;
+
+    int result = CARDFormatAsync(
+        chan,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 9;
+
+    int result = CARDWriteAsync(
+        &m_fileInfo,
+        buffer,
+        length,
+        offset,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McRead(char* buffer, int length, int offset)
+{
+    if (buffer == nullptr)
+    {
+        buffer = m_saveBuffer;
+    }
+
+    m_opDoneFlag = 0;
+    m_state = 8;
+
+    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
+
+    if (result < 0)
+    {
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::SetMcIconImage()
+{
+    if (m_saveBuffer == (char*)nullptr)
+    {
+        if (m_saveBuffer == (char*)nullptr)
+        {
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[kMemoryCardSaveBufferSize];
+
+            if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+            {
+                System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
+            }
+        }
+
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
+    }
+
+    char path[136];
+
+    const char* lang = Game.GetLangString();
+    sprintf(path, const_cast<char*>(sMemoryCardIconPathFmt), lang, CardConst::MC_ICONIMG_FNAME);
+    CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
+
+    if (h == nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
+    {
+        System.Printf(const_cast<char*>(sMemoryCardOpenErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2EF, path);
+    }
+
+    File.Read(h);
+    File.SyncCompleted(h);
+
+    int len = File.GetLength(h);
+
+    if (len != 0x2A00 && static_cast<unsigned int>(System.m_execParam) >= 1)
+    {
+        System.Printf(const_cast<char*>(sMemoryCardDataErrorFmt), const_cast<char*>(sMemoryCardSourceFile), 0x2F6, path);
+    }
+
+    char* saveBuffer = m_saveBuffer;
+    memcpy(saveBuffer + 0x40, File.m_readBuffer, len);
+
+    File.Close(h);
+
+    m_cardStat.commentAddr = 0;
+    m_cardStat.iconAddr    = 0x40;
+
+    m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
+
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0003) | 0x0001;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0003) | 0x0002;
+
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x000C) | 0x0004;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x000C) | 0x0008;
+
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0030) | 0x0010;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0030) | 0x0020;
+
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x00C0) | 0x0040;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x00C0) | 0x0080;
+
+    m_cardStat.iconFormat &= ~0x0300;
+    m_cardStat.iconSpeed  &= ~0x0300;
+
+    m_cardStat.offsetIcon[4] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0x0C00;
+    m_cardStat.iconSpeed  &= ~0x0C00;
+
+    m_cardStat.offsetIcon[5] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0x3000;
+    m_cardStat.iconSpeed  &= ~0x3000;
+
+    m_cardStat.offsetIcon[6] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0xC000;
+    m_cardStat.iconSpeed  &= ~0xC000;
+
+    m_cardStat.offsetIcon[7] = 0xFFFFFFFF;
+    m_cardStat.bannerFormat &= ~0x04;
+
+    m_cardStat.offsetIconTlut = 0x2840;
+    m_cardStat.offsetIconTlut = 0x2A40;
+
+    size_t titleLen = strlen(CardConst::MC_COMMENT);
+    memcpy(saveBuffer, CardConst::MC_COMMENT, titleLen);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McEnd()
+{
+    int chan = 0;
+
+    while (chan < 2)
+    {
+        int attempt = 0;
+
+        while (attempt < 10)
+        {
+            int result = CARDUnmount(chan);
+
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
+
+            // IMPORTANT: compare m_result, not result
+            if (m_result != -1)
+            {
+                break;
+            }
+
+            attempt++;
+        }
+
+        chan++;
+    }
+
+    if (m_saveBuffer != 0)
+    {
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
+    }
+
+    m_result = 0;
+    m_opDoneFlag = 0;
+    m_currentSlot = 0xFF;
+    m_state = 0;
+    m_saveBuffer = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::DestroyMcBuff()
+{
+  if (m_saveBuffer != (char*)nullptr)
+  {
+    delete[] m_saveBuffer;
+	m_saveBuffer = (char*)nullptr;
+  }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::CreateMcBuff()
+{
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
@@ -1910,15 +2059,65 @@ int CMemoryCardMan::DummyLoad()
         }
     }
 
+    // Zero buffer every call, allocated or not
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
-    m_opDoneFlag = 0;
-    m_state = 8;
+}
 
-    result = CARDReadAsync(
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMemoryCardMan::McSetStat(int chan)
+{
+	int result = CARDSetStatus(
+		chan,
+		m_fileInfo.fileNo,
+		&m_cardStat
+	);
+
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 7;
+
+	return m_result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMemoryCardMan::McGetStat(int chan)
+{
+	int result = CARDGetStatus(
+		chan,
+		m_fileInfo.fileNo,
+		&m_cardStat
+	);
+
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 6;
+
+	return m_result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McCreate(int chan)
+{
+    m_opDoneFlag = 0;
+    m_state = 5;
+
+    int result = CARDCreateAsync(
+        chan,
+        CardConst::MC_FNAME,
+        0x2C000, // size
         &m_fileInfo,
-        m_saveBuffer,
-        kMemoryCardSaveBufferSize,
-        0x4000,
         &Attach
     );
 
@@ -1928,84 +2127,6 @@ int CMemoryCardMan::DummyLoad()
     }
 
     m_result = result;
-
-    // Wait for read to finish
-    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
-    {
-    }
-
-    if (m_result != 0)
-    {
-        if (static_cast<unsigned int>(System.m_execParam) >= 1)
-        {
-            // "McRead(%d) error(%d)"
-            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
-        }
-
-        int chan = m_fileInfo.chan;
-
-        if (chan < 0 || chan > 1)
-        {
-            m_opDoneFlag = 1;
-            m_state = 4;
-            m_result = -3;
-        }
-        else
-        {
-            result = CARDClose(&m_fileInfo);
-            m_result = result;
-            m_opDoneFlag = 1;
-            m_state = 4;
-        }
-
-        result = CARDUnmount(0);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 2;
-        m_currentSlot = 0xFF;
-
-        if (m_saveBuffer != 0)
-        {
-            delete[] m_saveBuffer;
-            m_saveBuffer = 0;
-        }
-
-        return m_result;
-    }
-
-    int chan = m_fileInfo.chan;
-
-    if (chan < 0 || chan > 1)
-    {
-        m_opDoneFlag = 1;
-        m_state = 4;
-        m_result = -3;
-    }
-    else
-    {
-        result = CARDClose(&m_fileInfo);
-        m_result = result;
-        m_opDoneFlag = 1;
-        m_state = 4;
-    }
-
-    result = CARDUnmount(0);
-    m_result = result;
-    m_opDoneFlag = 1;
-    m_state = 2;
-    m_currentSlot = 0xFF;
-
-    Game.LoadInit();
-    SetLoadData();
-    Game.LoadFinished();
-
-    if (m_saveBuffer != 0)
-    {
-        delete[] m_saveBuffer;
-        m_saveBuffer = 0;
-    }
-
-    return 0;
 }
 
 /*
@@ -2013,17 +2134,26 @@ int CMemoryCardMan::DummyLoad()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
+int CMemoryCardMan::McClose()
 {
-    int total_minutes = frames / 1500;
-	
-    *minutes = total_minutes % 60;
-    *hours = total_minutes / 60;
-	
-    if (*hours >= 999)
+	int chan = m_fileInfo.chan;
+
+	if (chan < 0 || chan > 1)
 	{
-        *hours = 999;
+		m_opDoneFlag = 1;
+		m_state = 4;
+		m_result = -3;
+
+		return m_result;
 	}
+
+	int result = CARDClose(&m_fileInfo);
+
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 4;
+
+	return m_result;
 }
 
 /*
@@ -2031,371 +2161,13 @@ void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
  * Address:	TODO
  * Size:	TODO
  */
-int CMemoryCardMan::McChkConnect(int chan)
+int CMemoryCardMan::McOpen(int chan)
 {
-    long type;
-    long sectorSize;
-	int result;
+	m_result = CARDOpen(chan, CardConst::MC_FNAME, &m_fileInfo);
+	m_opDoneFlag = 1;
+	m_state = 3;
 
-    // CARDProbeEx returns:
-    //  0   = ready
-    // -1   = no card
-    // -2   = busy
-    // -5   = broken
-    int probeResult = CARDProbeEx(chan, &type, &sectorSize);
-
-    if (probeResult == -1)
-    {
-        result = 1;
-    }
-    else if (probeResult == 0)
-    {
-        if (sectorSize != 0x2000)
-        {
-            result = -2;
-        }
-        else
-        {
-            result = 0;
-        }
-    }
-    else if (probeResult == -2)
-    {
-        result = -3;
-    }
-    else if (probeResult == -5)
-    {
-        result = -4;
-    }
-    else
-    {
-        result = -1;
-    }
-
-    return result;
-}
-
-inline int rotlwi(int, int)
-{
-	return 0;
-}
-
-inline int rotrwi(int, int)
-{
-	return 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800C1FF0
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::EncodeData()
-{
-    const int rotAmount = reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20;
-    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 rotated = __rlwnm(ptr[0], rotAmount, 0, 31);
-        ptr[0] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[1], rotAmount, 0, 31);
-        ptr[1] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[2], rotAmount, 0, 31);
-        ptr[2] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[3], rotAmount, 0, 31);
-        ptr[3] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[4], rotAmount, 0, 31);
-        ptr[4] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[5], rotAmount, 0, 31);
-        ptr[5] = __lwbrx(&rotated, 0);
-        rotated = __rlwnm(ptr[6], rotAmount, 0, 31);
-        ptr[6] = __lwbrx(&rotated, 0);
-        ptr += 7;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800C1F20
- * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::DecodeData()
-{
-    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
-    const int rotAmount = 0x20 - (reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20);
-
-    for (int count = 0; count < 0x5B6; count++)
-    {
-        u32 word = ptr[0];
-        ptr[0] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[1];
-        ptr[1] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[2];
-        ptr[2] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[3];
-        ptr[3] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[4];
-        ptr[4] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[5];
-        ptr[5] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        word = ptr[6];
-        ptr[6] = __rlwnm(__lwbrx(&word, 0), rotAmount, 0, 31);
-        ptr += 7;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c17b8
- * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
-{
-    u8* save = reinterpret_cast<u8*>(saveDat);
-    int charSlot = 0;
-
-    do
-    {
-        u8* charData = save + 0x14D0;
-        if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
-        {
-            short equippedItems[4];
-
-            for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
-            {
-                if (itemSlot >= 0x45)
-                {
-                    int equippedSlot = itemSlot - 0x45;
-                    const int word = itemSlot >> 5;
-                    const int bit = itemSlot % 32;
-                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) != 0)
-                    {
-                        equippedItems[equippedSlot] = static_cast<short>(itemSlot + 0x9F);
-                    }
-                    else
-                    {
-                        equippedItems[equippedSlot] = -1;
-                    }
-                }
-
-            }
-
-            int totalHpBonus = 0;
-            int itemData = Game.unkCFlatData0[2];
-
-            if (equippedItems[0] >= 0)
-            {
-                totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);
-            }
-            if (equippedItems[1] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[1] * 0x48 + 6);
-            }
-            if (equippedItems[2] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[2] * 0x48 + 6);
-            }
-            if (equippedItems[3] >= 0)
-            {
-                totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
-            }
-
-            int finalHpMax = 0x10;
-            if (totalHpBonus + 8 < 0x10)
-            {
-                finalHpMax = totalHpBonus + 8;
-            }
-
-            *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;
-        }
-
-        charSlot++;
-        save += 0x9C0;
-    }
-    while (charSlot < 8);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800c18fc
- * PAL Size: 1572b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::SaveDat& dstSave, int dstChar)
-{
-    if (static_cast<unsigned int>(System.m_execParam) >= 3)
-    {
-        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
-    }
-
-    u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);
-    u8* dstSaveData = reinterpret_cast<u8*>(&dstSave);
-    u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
-    u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
-
-    if (mode != 0)
-    {
-        memset(dstCharData, 0, 0x9C0);
-
-        *reinterpret_cast<u16*>(dstCharData + 0x00) = *reinterpret_cast<u16*>(srcCharData + 0x00);
-        *reinterpret_cast<u16*>(dstCharData + 0x02) = *reinterpret_cast<u16*>(srcCharData + 0x02);
-        *reinterpret_cast<u16*>(dstCharData + 0x04) = *reinterpret_cast<u16*>(srcCharData + 0x04);
-        *reinterpret_cast<u16*>(dstCharData + 0x06) = *reinterpret_cast<u16*>(srcCharData + 0x06);
-        *reinterpret_cast<u16*>(dstCharData + 0x08) = *reinterpret_cast<u16*>(srcCharData + 0x08);
-        *reinterpret_cast<u16*>(dstCharData + 0x0A) = *reinterpret_cast<u16*>(srcCharData + 0x0A);
-        *reinterpret_cast<u16*>(dstCharData + 0x0C) = *reinterpret_cast<u16*>(srcCharData + 0x0C);
-        *reinterpret_cast<u16*>(dstCharData + 0x0E) = *reinterpret_cast<u16*>(srcCharData + 0x0E);
-        *reinterpret_cast<u16*>(dstCharData + 0x10) = *reinterpret_cast<u16*>(srcCharData + 0x10);
-        memcpy(dstCharData + 0x12, srcCharData + 0x12, 0x12);
-        *reinterpret_cast<u16*>(dstCharData + 0x24) = *reinterpret_cast<u16*>(srcCharData + 0x24);
-        *reinterpret_cast<u16*>(dstCharData + 0x26) = *reinterpret_cast<u16*>(srcCharData + 0x26);
-        *reinterpret_cast<u16*>(dstCharData + 0x2A) = *reinterpret_cast<u16*>(srcCharData + 0x2A);
-        *reinterpret_cast<u16*>(dstCharData + 0x2C) = *reinterpret_cast<u16*>(srcCharData + 0x2C);
-        *reinterpret_cast<u16*>(dstCharData + 0x2E) = *reinterpret_cast<u16*>(srcCharData + 0x2E);
-        *reinterpret_cast<u16*>(dstCharData + 0x30) = *reinterpret_cast<u16*>(srcCharData + 0x30);
-        *reinterpret_cast<u16*>(dstCharData + 0x32) = *reinterpret_cast<u16*>(srcCharData + 0x32);
-        memcpy(dstCharData + 0x34, srcCharData + 0x34, 8);
-        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
-        *reinterpret_cast<u32*>(dstCharData + 0xE8) = *reinterpret_cast<u32*>(srcCharData + 0xE8);
-        memcpy(dstCharData + 0xF0, srcCharData + 0xF0, 0x10);
-        *reinterpret_cast<u32*>(dstCharData + 0x5B4) = *reinterpret_cast<u32*>(srcCharData + 0x5B4);
-        memcpy(dstCharData + 0x5B8, srcCharData + 0x5B8, 0x100);
-        memcpy(dstCharData + 0x6B8, srcCharData + 0x6B8, 0x200);
-        *reinterpret_cast<u32*>(dstCharData + 0x8B8) = *reinterpret_cast<u32*>(srcCharData + 0x8B8);
-        *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
-        dstCharData[0x8C2] = srcCharData[0x8C2];
-        *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
-        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
-        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
-
-        u8* dstWork = dstSaveData + dstChar * 0x200;
-        for (int i = 0; i < 8; i++)
-        {
-            u8* item = dstWork + dstChar * 8;
-            int row = 0;
-            for (int j = 0; j < 2; j++)
-            {
-                item[0xC0] = ((i == 0) && (row == 0)) ? 0x32 : 0;
-                item[0xC1] = ((i == 0) && (row == -1)) ? 0x32 : 0;
-                item[0xC2] = ((i == 0) && (row == -2)) ? 0x32 : 0;
-                item[0xC3] = ((i == 0) && (row == -3)) ? 0x32 : 0;
-                row += 4;
-                item += 4;
-            }
-            dstWork += 0x40;
-        }
-
-        memset(dstCharData + 0xC8, 0xFF, 0x10);
-        memset(dstCharData + 0xD8, 0, 0x10);
-        *reinterpret_cast<u16*>(dstCharData + 0x28) = 0;
-        memset(dstCharData + 0x3C, 0xFF, 0x80);
-
-        int artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x34));
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
-        }
-
-        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x36));
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
-        }
-
-        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x38));
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
-        }
-
-        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x3A));
-        if (artifact >= 0 && artifact < 0x40)
-        {
-            artifact = artifact * 2 + 0x3C;
-            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
-            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
-        }
-
-        srcCharData[0x8C0] = 1;
-        dstCharData[0x8C1] = 1;
-        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 3;
-    }
-    else
-    {
-        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
-
-        u8* srcWork = srcSaveData + srcChar * 0x208;
-        for (int i = 0; i < 2; i++)
-        {
-            srcWork[0xC0] = 0;
-            srcWork[0xC1] = 0;
-            srcWork[0xC2] = 0;
-            srcWork[0xC3] = 0;
-            srcWork[0xC4] = 0;
-            srcWork[0xC5] = 0;
-            srcWork[0xC6] = 0;
-            srcWork[0xC7] = 0;
-            srcWork[0x100] = 0;
-            srcWork[0x101] = 0;
-            srcWork[0x102] = 0;
-            srcWork[0x103] = 0;
-            srcWork[0x104] = 0;
-            srcWork[0x105] = 0;
-            srcWork[0x106] = 0;
-            srcWork[0x107] = 0;
-            srcWork[0x140] = 0;
-            srcWork[0x141] = 0;
-            srcWork[0x142] = 0;
-            srcWork[0x143] = 0;
-            srcWork[0x144] = 0;
-            srcWork[0x145] = 0;
-            srcWork[0x146] = 0;
-            srcWork[0x147] = 0;
-            srcWork[0x180] = 0;
-            srcWork[0x181] = 0;
-            srcWork[0x182] = 0;
-            srcWork[0x183] = 0;
-            srcWork[0x184] = 0;
-            srcWork[0x185] = 0;
-            srcWork[0x186] = 0;
-            srcWork[0x187] = 0;
-            srcWork += 0x100;
-        }
-
-        dstCharData[0x8C0] = 0;
-        srcCharData[0x8C2] = 0;
-        memset(srcCharData, 0, 0x9C0);
-        *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
-    }
-
-    *reinterpret_cast<u32*>(srcSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
-    *reinterpret_cast<u32*>(srcSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(srcSaveData));
-
-    *reinterpret_cast<u32*>(dstSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
-    *reinterpret_cast<u32*>(dstSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(dstSaveData));
+	return m_result;
 }
 
 /*
@@ -2403,10 +2175,54 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  * Address:	TODO
  * Size:	TODO
  */
-void Detach(long currentSlot, long result)
-{ 
-	MemoryCardMan.m_result = result;
-	MemoryCardMan.m_opDoneFlag = 1;
+int CMemoryCardMan::McUnmount(int chan)
+{
+	m_result = CARDUnmount(chan);
+	m_opDoneFlag = 1;
+	m_state = '\x02';
+	m_currentSlot = 0xff;
+
+	return m_result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::McMount(int chan)
+{
+    m_opDoneFlag = 0;
+    m_state = 1;
+
+    int result = CARDMountAsync(chan, m_mountWorkArea, &Detach, &Attach);
+
+    if (result < 0)
+	{
+        m_opDoneFlag = 1;
+    }
+
+    m_result = result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMemoryCardMan::GetResult()
+{
+	return m_result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+bool CMemoryCardMan::AsyncFinished()
+{
+	return m_opDoneFlag != 0;
 }
 
 /*
@@ -2425,4 +2241,167 @@ void Attach(long currentSlot, long result)
         return;
 
     MemoryCardMan.m_currentSlot = (char)currentSlot;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void Detach(long currentSlot, long result)
+{
+	MemoryCardMan.m_result = result;
+	MemoryCardMan.m_opDoneFlag = 1;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, int length)
+{
+    int success = 0;
+    int result;
+    unsigned long sectorSize;
+    CARDFileInfo fileInfo;
+    CARDStat stat;
+
+    result = CARDMount(1, m_mountWorkArea, 0);
+    if (((result != 0) && (result != -6)) || (result = CARDCheckAsync(1, 0), result >= 0))
+    {
+checkResult:
+        result = CARDGetResultCode(1);
+        if (result != 0)
+        {
+            if (((result != -6) && (result != -13)) || (isWrite != 0))
+            {
+                goto done;
+            }
+
+            System.Printf(const_cast<char*>(sDebugReadWriteFormatMsg));
+            result = CARDFormat(1);
+            if (result < 0)
+            {
+                goto done;
+            }
+
+            goto checkResult;
+        }
+
+        result = CARDGetSectorSize(1, &sectorSize);
+        if (result >= 0)
+        {
+            if (isWrite != 0)
+            {
+                result = CARDOpen(1, filename, &fileInfo);
+                if (result >= 0)
+                {
+                    goto readFile;
+                }
+
+                result = 0;
+                while (result < 0x7F)
+                {
+                    if (CARDGetStatus(1, result, &stat) < 0)
+                    {
+                        goto nextFile;
+                    }
+                    if (strcmp(filename, reinterpret_cast<char*>(&stat)) != 0)
+                    {
+                        goto nextFile;
+                    }
+                    goto foundFile;
+
+nextFile:
+                    result++;
+                }
+
+                result = -1;
+
+foundFile:
+                if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
+                {
+readFile:
+                    if (CARDRead(&fileInfo, buffer, length, 0) < 0)
+                    {
+                        goto closeFile;
+                    }
+                    goto setSuccess;
+                }
+            }
+            else
+            {
+                CARDDelete(1, filename);
+                result = CARDCreate(1, filename, length, &fileInfo);
+                if (result >= 0)
+                {
+                    result = CARDWrite(&fileInfo, buffer, length, 0);
+                    if (result >= 0)
+                    {
+setSuccess:
+                        success = 1;
+                    }
+closeFile:
+                    CARDClose(&fileInfo);
+                }
+            }
+        }
+    }
+
+done:
+    CARDUnmount(1);
+
+    if (success == 0)
+    {
+        System.Printf(const_cast<char*>(sDebugReadWriteFailedMsg));
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c4ccc
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::Quit()
+{
+  m_currentSlot = -1;
+
+  if (m_mountWorkArea != (void*)nullptr)
+  {
+    delete[] m_mountWorkArea;
+    m_mountWorkArea = (void*)nullptr;
+  }
+
+  Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(m_stage));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c4d24
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::Init()
+{
+    CARDInit();
+
+    m_result = 0;
+    m_opDoneFlag = 0;
+    m_currentSlot = -1;
+    m_state = 0;
+    m_saveBuffer = (char*)nullptr;
+    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(kMemoryCardStageSize, const_cast<char*>(sMemoryCardManagerName), 0));
+    m_mountWorkArea =
+        new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x88)
+            char[kMemoryCardSaveBufferSize];
+
+    m_currentSlot = -1;
 }

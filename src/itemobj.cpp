@@ -275,8 +275,8 @@ void CGItemObj::DrawOmoideName(CFont* font)
  */
 void CGItemObj::onNewFinished()
 {
-	*(float*)((u8*)this + 0x568) = *(float*)((u8*)this + 0x144);
-	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
+	m_savedBodyRadius = m_bodyEllipsoidRadius;
+	m_createFlags = static_cast<u16>((gItemObjCreateFlags >> 3) & 1);
 	loadModel();
 }
 

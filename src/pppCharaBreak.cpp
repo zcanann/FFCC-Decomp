@@ -547,12 +547,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
 
                         if (needsMtxUpdate) {
-                            S16Vec worldPos;
                             Vec transformedPos;
-                            worldPos.x = srcPos->x;
-                            worldPos.y = srcPos->y;
-                            worldPos.z = srcPos->z;
-                            gUtil.ConvI2FVector(transformedPos, worldPos, ModelData(model)->m_posQuant);
+                            gUtil.ConvI2FVector(transformedPos, *srcPos, ModelData(model)->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
@@ -679,12 +675,11 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         }
 
                         for (int i = 0; i < 3; i++) {
-                            Vec translated;
                             float wobbleScale;
 
-                            PSVECSubtract(&verts[i], &center, &translated);
-                            PSMTXMultVec(rotMtx, &translated, &translated);
-                            PSVECAdd(&translated, &center, &verts[i]);
+                            PSVECSubtract(&verts[i], &center, &verts[i]);
+                            PSMTXMultVec(rotMtx, &verts[i], &verts[i]);
+                            PSVECAdd(&verts[i], &center, &verts[i]);
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
@@ -860,19 +855,16 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
                     gUtil.ConvI2FVector(posFloat, posQuantized, ModelData(model)->m_posQuant);
                     PSMTXMultVec(meshMtx, &posFloat, &posFloat);
-                    gUtil.ConvF2IVector(*reinterpret_cast<S16Vec*>((u8*)polygonData + (outVertex * 6) + 0x10), posFloat,
+                    gUtil.ConvF2IVector(polygonData->m_pos[outVertex], posFloat,
                         ModelData(model)->m_posQuant);
                 } else {
                     S16Vec* sourcePos = workPositions + posIndex;
-                    s32 positionOffset = outVertex * 6;
-                    *(s16*)((u8*)polygonData + positionOffset + 0x10) = sourcePos->x;
-                    *(s16*)((u8*)polygonData + positionOffset + 0x12) = sourcePos->y;
-                    *(s16*)((u8*)polygonData + positionOffset + 0x14) = sourcePos->z;
+                    polygonData->m_pos[outVertex] = *sourcePos;
                 }
 
-                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x22) = posIndex;
-                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x2E) = texIndex;
-                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x28) = nrmIndex;
+                polygonData->m_posIndices[outVertex] = posIndex;
+                polygonData->m_texIndices[outVertex] = texIndex;
+                polygonData->m_nrmIndices[outVertex] = nrmIndex;
                 outVertex++;
                 stripRestart = previousRestart;
 

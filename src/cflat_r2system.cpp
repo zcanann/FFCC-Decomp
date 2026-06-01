@@ -944,7 +944,10 @@ done_check:
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    m_viewerChoiceColor[shadeIndex].color = color.color;
+    m_viewerChoiceColor[shadeIndex].color.r = color.color.r;
+    m_viewerChoiceColor[shadeIndex].color.g = color.color.g;
+    m_viewerChoiceColor[shadeIndex].color.b = color.color.b;
+    m_viewerChoiceColor[shadeIndex].color.a = color.color.a;
 }
 
 /*

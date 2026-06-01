@@ -4276,14 +4276,13 @@ int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam,
  */
 void CPartMng::pppGetFreeSlot()
 {
-    _pppEnvSt* env = &m_pppEnvSt;
-    int slot = env->m_mngStCount + 1;
-    env->m_mngStCount = slot;
+    int slot = m_pppEnvSt.m_mngStCount + 1;
+    m_pppEnvSt.m_mngStCount = slot;
 
     if (slot < 0x7fffffff) {
         return;
     }
-    env->m_mngStCount = 0x10;
+    m_pppEnvSt.m_mngStCount = 0x10;
 }
 
 /*

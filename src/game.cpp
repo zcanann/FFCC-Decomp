@@ -41,10 +41,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-const float kGamePartyBoundsMinInit = 1.0E+10;
-const float kGamePartyBoundsMaxInit = -1.0E+10;
-const float kGameZero = 0.0;
-const float kGameSmallDelta = 0.001;
+extern const float kGamePartyBoundsMinInit = 1.0E+10;
+extern const float kGamePartyBoundsMaxInit = -1.0E+10;
+extern const float kGameZero = 0.0;
+extern const float kGameSmallDelta = 0.001;
 extern "C" {
 const char s_defaultScriptName[] = "ffcc_0";
 const char s_gameDebugMarker[] = "*\n";

@@ -188,6 +188,7 @@ public:
     void ChgPlayModeFromScript(bool);
 
     CTexture* GetTexture(TEX);
+    McCtrl* GetMcCtrl() { return reinterpret_cast<McCtrl*>(&m_mcCtrl); }
 
     void WmInit();
     void createWorld();

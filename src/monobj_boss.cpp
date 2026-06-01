@@ -2592,12 +2592,12 @@ void CGMonObj::logicFuncLastBoss()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
 
-	if (*reinterpret_cast<int*>(mon + 0x6B4) == 2) {
+	if (*reinterpret_cast<int*>(mon + 0x6D0) == 2) {
+		int& timer = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24);
 		timer += 1;
-		if (timer > 9) {
-			*reinterpret_cast<int*>(mon + 0x6B4) = 3;
+		if (timer >= 10) {
+			*reinterpret_cast<int*>(mon + 0x6D0) = 3;
 			nextState = 0x65;
 			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 			object->m_bgColMask &= 0xFFF7FFFF;
@@ -2605,10 +2605,10 @@ void CGMonObj::logicFuncLastBoss()
 		}
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		prgObj->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 

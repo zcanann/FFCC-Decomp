@@ -3264,7 +3264,7 @@ CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
  */
 int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
 {
-    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    int objCount = m_mapObjCount;
     int objIndex = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
@@ -3327,10 +3327,8 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
-        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
-    CPtrArray<CMapAnim*>* mapAnimArray =
-        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
+    CPtrArray<CMapAnim*>* mapAnimArray = &m_mapAnimArray;
     CMapAnimRun* foundMapAnimRun = 0;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
@@ -3367,8 +3365,7 @@ startMapObjAnim:
 #pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
-        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
     CMapAnimRun* mapAnimRun = 0;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 

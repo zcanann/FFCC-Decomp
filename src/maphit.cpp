@@ -317,11 +317,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (kMapHitEdgeBackoff / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t_slide_min - (kMapHitEdgeBackoff / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (kMapHitFaceBackoff / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t_slide_min - (kMapHitFaceBackoff / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }
@@ -388,12 +388,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         }
 
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (kMapHitFaceBackoff / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t_slide_min - (kMapHitFaceBackoff / len));
         return 0;
     }
 
     if (gMapHitFace->m_normal.y < y) {
-        if (g_hit_t <= kMapHitSlideTLimit) {
+        if (g_hit_t_slide_min <= kMapHitSlideTLimit) {
             out->z = kMapHitZero;
             out->y = kMapHitZero;
             out->x = kMapHitZero;
@@ -410,7 +410,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     }
 
     float len = PSVECMag(&g_hit_cyl_min.m_axis);
-    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (kMapHitFaceBackoff / len));
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t_slide_min - (kMapHitFaceBackoff / len));
     return 0;
 }
 
@@ -646,6 +646,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     g_hit_t = hitT;
+    g_hit_t_slide_min = hitT;
     g_hit_t_min = hitT;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;

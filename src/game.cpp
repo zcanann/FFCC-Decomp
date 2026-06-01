@@ -280,7 +280,7 @@ void CGame::Init()
     memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
-    gCFlatRuntime().Init();
+    gCFlatRuntime().CFlatRuntime::Init();
     unkFloat_0xca10 = kGameSmallDelta;
 }
 
@@ -295,7 +295,7 @@ void CGame::Init()
  */
 void CGame::Quit()
 {
-	gCFlatRuntime().Quit();
+	gCFlatRuntime().CFlatRuntime::Quit();
 
 	if (m_debugStage != 0) {
 		Memory.DestroyStage(m_debugStage);
@@ -571,7 +571,7 @@ void CGame::clearWork()
     int i;
     int j;
 
-    CFlatRuntime2Storage().Destroy();
+    CFlatRuntime2Storage().CFlatRuntime2::Destroy();
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
@@ -727,7 +727,7 @@ void CGame::CheckScriptChange()
 
     if (strcmp(m_nextScript.m_name, s_defaultScriptName) != 0) {
         if (m_cfdLoadedFlag == 0) {
-            CFlatRuntime2Storage().Destroy();
+            CFlatRuntime2Storage().CFlatRuntime2::Destroy();
             loadCfd();
             m_cfdLoadedFlag = 1;
 
@@ -1325,7 +1325,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
     }
 
     runtime = &CFlatRuntime2Storage();
-    baseObj = reinterpret_cast<CGBaseObj*>(runtime->intToClass((int)ifParam.m_classId));
+    baseObj = reinterpret_cast<CGBaseObj*>(runtime->CFlatRuntime2::intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {
         return 0;

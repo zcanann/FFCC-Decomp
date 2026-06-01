@@ -637,6 +637,7 @@ CGQuadObj::CGQuadObj()
 
 CGBaseObj::CGBaseObj()
 {
+	m_flagBits.m_constructFlag = 0;
 }
 
 /*

@@ -407,8 +407,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		half = DOUBLE_80332f20;
 		int row = 0;
 		entry = this->m_tmpArtiList->entries;
-		int pairCount = 2;
-		do {
+		for (int pairCount = 0; pairCount < 2; pairCount++) {
 			entry[0].tex = 0x37;
 			entry[0].width = 200;
 			entry[0].height = 0x28;
@@ -428,8 +427,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			entry[1].startFrame = row++;
 			entry[1].duration = 3;
 			entry += 2;
-			pairCount--;
-		} while (pairCount != 0);
+		}
 		this->m_tmpArtiList->count = 4;
 		this->m_tmpArtiState->unk_26 = 0;
 		this->m_tmpArtiState->initialized = 1;

@@ -907,7 +907,7 @@ static inline void FurInitTextureDefaults()
 	}
 }
 
-static void FurSetupTextureCopyEnv()
+static inline void FurSetupTextureCopyEnv()
 {
 	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
 	GXSetAlphaUpdate(GX_TRUE);

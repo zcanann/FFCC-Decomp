@@ -75,6 +75,7 @@ void* gMogFurTexBuffer;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
+extern float FLOAT_80331120;
 extern float FLOAT_80331130;
 extern float FLOAT_80331134;
 extern float FLOAT_8033113C;
@@ -2012,7 +2013,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 					a = 0;
 				}
 			} else {
-				float k = (float)(7 - targetColor.a) * 0.125f + (float)(distance / 4);
+				float k = (float)(7 - targetColor.a) / FLOAT_80331120 + (float)(distance / 4);
 				if (k > 1.0f) {
 					k = 1.0f;
 				}

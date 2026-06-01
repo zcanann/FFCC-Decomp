@@ -29,6 +29,13 @@ struct RSDLISTITEM {
     int flag;
 };
 
+struct CMaterialEditorPcsTable
+{
+    char* m_name;
+    unsigned int m_words[(0x15C - sizeof(char*)) / sizeof(unsigned int)];
+};
+typedef int CMaterialEditorPcsTable_size_mismatch[(sizeof(CMaterialEditorPcsTable) == 0x15C) ? 1 : -1];
+
 class CMaterialEditorPcs : public CProcess
 {
 public:
@@ -36,7 +43,7 @@ public:
     static unsigned int m_table_desc1[3];
     static unsigned int m_table_desc2[3];
     static unsigned int m_table_desc3[3];
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static CMaterialEditorPcsTable m_table;
 
     CMaterialEditorPcs() {}
     ~CMaterialEditorPcs();
@@ -129,10 +136,6 @@ public:
     unsigned char _pad3BD[0x3E0 - 0x3BD];
 };
 
-#ifdef FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
-extern u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
-#else
 extern CMaterialEditorPcs MaterialEditorPcs;
-#endif
 
 #endif // _FFCC_P_MATERIALEDITOR_H_

@@ -22,6 +22,13 @@ struct McListInfo
     void operator=(const McListInfo&);
 };
 
+struct CMenuPcsTable
+{
+    char* m_name;
+    unsigned int m_words[(0x15C - sizeof(char*)) / sizeof(unsigned int)];
+};
+typedef int CMenuPcsTable_size_mismatch[(sizeof(CMenuPcsTable) == 0x15C) ? 1 : -1];
+
 class CMenuPcs : public CProcess
 {
 public:
@@ -31,7 +38,7 @@ public:
     static unsigned int m_table_desc3[3];
     static unsigned int m_table_desc4[3];
     static unsigned int m_table_desc5[3];
-    static unsigned int m_table[0x57];
+    static CMenuPcsTable m_table;
 
     struct BattleHudState
     {

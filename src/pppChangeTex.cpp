@@ -92,7 +92,7 @@ STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 extern const float kPppChangeTexCachedValueInit = -10000.0f;
 extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float kPppChangeTexAlphaScale = 255.0f;
-extern "C" const char s_pppChangeTex_cpp[24] = "pppChangeTex.cpp";
+extern "C" const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

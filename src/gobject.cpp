@@ -189,13 +189,12 @@ static bool sBgCollisionActive;
 extern "C" const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_l_item2[] = "l_item2";
 static const char s_r_item[] = "r_item";
-extern "C" float FLOAT_80330338;
-static const float sAnimFrameOffset = 1.0f;           // FLOAT_80330338
+extern "C" float sAnimFrameOffset;                    // FLOAT_80330338
 static const float sHugeCylinderExtent = 10000000000.0f; // FLOAT_8033033c
 static const float sNegHugeCylinderExtent = -10000000000.0f; // FLOAT_80330340
 static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
 static const double sLoopBias = 1.2;                  // DOUBLE_80330378
-extern "C" const float sZeroFloat = 0.0f;             // FLOAT_80330350
+extern "C" const float sZeroFloat;                    // FLOAT_80330350
 static const float sPushDistance = 1000.0f;           // FLOAT_80330354
 static const float sDownProbeDistance = -10000.0f;    // FLOAT_8033035c
 static const float sStepProbeHeight = 5.0f;           // FLOAT_80330360
@@ -3493,7 +3492,7 @@ void CGObject::onAnimPoint(int, int)
  */
 float CGObject::onAlphaUpdate()
 {
-	return FLOAT_80330338;
+	return sAnimFrameOffset;
 }
 
 /*

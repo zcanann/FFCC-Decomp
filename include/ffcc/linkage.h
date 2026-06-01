@@ -184,7 +184,7 @@ static inline u32& CFlatSpawnBitHi(int index)
 
 static inline int& CFlatItemCarryMode()
 {
-    return *reinterpret_cast<int*>(CFlat + 0x4780);
+    return *reinterpret_cast<int*>(CFlat + 0x12AC);
 }
 
 static inline int& CFlatLetterEventEnabled()

@@ -24,6 +24,7 @@ extern "C" const float FLOAT_803306e8 = 0.0f;
 extern "C" const float FLOAT_803306ec = 1.0f;
 
 extern "C" const char s_fontman_cpp[] = "fontman.cpp";
+extern "C" const char s_CFontMan_801D9CC4[] = "CFontMan";
 
 CFontMan FontMan;
 

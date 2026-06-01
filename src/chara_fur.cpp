@@ -1074,7 +1074,7 @@ static inline CTexture* FindMogFurTexture(void* model)
 	return (*textureArray)[textureIdx];
 }
 
-static void CopyMogTextureFromChara(void* model)
+static inline void CopyMogTextureFromChara(void* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {

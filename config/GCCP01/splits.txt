@@ -959,7 +959,7 @@ pppYmDeformationShp.cpp:
 	extab       start:0x80007AF8 end:0x80007B10
 	extabindex  start:0x8000DDC8 end:0x8000DDEC
 	.text       start:0x8008EEC8 end:0x800905DC
-	.sdata2     start:0x80330600 end:0x80330644
+	.sdata2     start:0x80330600 end:0x80330640
 
 pppWDrawMatrix.cpp:
 	extab       start:0x80007B10 end:0x80007B18
@@ -981,6 +981,7 @@ pppYmMiasma.cpp:
 	extabindex  start:0x8000DE10 end:0x8000DE4C
 	.text       start:0x800907C4 end:0x8009159C
 	.rodata     start:0x801D9CA8 end:0x801D9CB8
+	.sdata2     start:0x80330640 end:0x8033066C
 
 pppYmDeformationScreen.cpp:
 	extab       start:0x80007B50 end:0x80007B60

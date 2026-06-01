@@ -14,15 +14,16 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern float FLOAT_80330640;
-extern float FLOAT_80330644;
-extern const float FLOAT_80330650;
-extern const float FLOAT_80330654;
-extern const float FLOAT_80330658;
-extern const float FLOAT_8033065c;
-extern const float FLOAT_80330660;
-extern const float FLOAT_80330664;
-extern const float FLOAT_80330668;
+extern const float FLOAT_80330640 = 0.01745329238474369f;
+extern const float FLOAT_80330644 = 0.0f;
+extern const double DOUBLE_80330648 = 4503601774854144.0;
+extern const float FLOAT_80330650 = 32768.0f;
+extern const float FLOAT_80330654 = 3.1415927410125732f;
+extern const float FLOAT_80330658 = 1.0f;
+extern const float FLOAT_8033065c = 0.00003051850947599719f;
+extern const float FLOAT_80330660 = 2.0f;
+extern const float FLOAT_80330664 = 16384.0f;
+extern const float FLOAT_80330668 = -1.0f;
 extern "C" const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA {

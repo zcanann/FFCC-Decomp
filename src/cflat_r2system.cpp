@@ -1298,8 +1298,8 @@ void CMapPcs::IsHitDrawMode(char drawMode)
  */
 void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
 {
-    *(float*)((char*)this + 0x364) = rotX;
-    *(float*)((char*)this + 0x368) = rotY;
+    m_fullScreenShadowRotX = rotX;
+    m_fullScreenShadowRotY = rotY;
 }
 
 /*
@@ -1316,7 +1316,7 @@ void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
     m_fullScreenShadowPosition.x = position->x;
     m_fullScreenShadowPosition.y = position->y;
     m_fullScreenShadowPosition.z = position->z;
-    *(float*)((char*)this + 0x370) = len;
+    m_fullScreenShadowScale = len;
 }
 
 /*

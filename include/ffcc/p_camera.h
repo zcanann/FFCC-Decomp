@@ -169,7 +169,12 @@ public:
     float m_nearZ;
     float m_farZ;
     float m_zRotate; // 0x108
-    u8 _pad10C[0x404 - 0x10C];
+    u8 _pad10C[0x364 - 0x10C];
+    float m_fullScreenShadowRotX; // 0x364
+    float m_fullScreenShadowRotY; // 0x368
+    float m_fullScreenShadowSpan; // 0x36C
+    float m_fullScreenShadowScale; // 0x370
+    u8 _pad374[0x404 - 0x374];
     u8 m_fullScreenShadowEnabled; // 0x404
     u8 _pad405[0x408 - 0x405];
     Vec m_fullScreenShadowPosition; // 0x408

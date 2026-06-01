@@ -818,7 +818,7 @@ static float FurRand01(unsigned int& rng)
 	return static_cast<float>((rng >> 16) & 0x7FFF) / 32767.0f;
 }
 
-static float FurRandSigned(unsigned int& rng)
+static inline float FurRandSigned(unsigned int& rng)
 {
 	return FurRand01(rng) * 2.0f - 1.0f;
 }

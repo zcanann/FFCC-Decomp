@@ -142,6 +142,15 @@ static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
 static const char s_nameNoSep[4] = "";
 
+struct GameNameRow
+{
+    char* m_prefix;
+    char* m_name;
+    char* m_artPrefix;
+    char* m_artName;
+    char* m_namePlural;
+};
+
 struct GameSoundLayout
 {
     u8 m_pad[0x22BC];
@@ -1397,10 +1406,10 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
-    char** itemEntry = m_cFlatDataArr[1].Table(0).m_strings + itemIndex * 5;
+    GameNameRow* itemTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].TableStrings(0));
     unsigned char hasSeparator = 0;
-    char* prefix = itemEntry[2];
-    char* itemName = itemEntry[3];
+    char* prefix = itemTable[itemIndex].m_artPrefix;
+    char* itemName = itemTable[itemIndex].m_artName;
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
@@ -1496,10 +1505,10 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
  */
 char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
-    char** monEntry = m_cFlatDataArr[1].Table(1).m_strings + monIndex * 5;
+    GameNameRow* monTable = reinterpret_cast<GameNameRow*>(m_cFlatDataArr[1].TableStrings(1));
     unsigned char hasSeparator = 0;
-    char* prefix = monEntry[2];
-    char* monName = monEntry[3];
+    char* prefix = monTable[monIndex].m_artPrefix;
+    char* monName = monTable[monIndex].m_artName;
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;

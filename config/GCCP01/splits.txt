@@ -52,6 +52,7 @@ graphic.cpp:
 	.bss        start:0x80230E48 end:0x8023C4D8
 	.sdata      start:0x8032E3E8 end:0x8032E400
 	.sbss       start:0x8032EC48 end:0x8032EC55
+	.sdata2     start:0x8032F6E8 end:0x8032F718
 
 main.cpp:
 	extab       start:0x80005920 end:0x80005930
@@ -139,6 +140,7 @@ usb.cpp:
 	.data       start:0x801E8898 end:0x801E88B4
 	.bss        start:0x802455C0 end:0x80245640
 	.sdata      start:0x8032E478 end:0x8032E488
+	.sdata2     start:0x8032F880 end:0x8032F885
 
 util.cpp:
 	extab       start:0x80005D30 end:0x80005E00

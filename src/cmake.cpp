@@ -3045,7 +3045,7 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     float textAlpha = alpha;
-    if ((*reinterpret_cast<short*>(state + 0x10) == 2) && (*reinterpret_cast<short*>(state + 0x1E) < 0)) {
+    if ((mode == 2) && (resultDir < 0)) {
         textAlpha = FLOAT_80333258;
     }
 

@@ -135,6 +135,7 @@ PRs should summarize:
 - Notes belong in the agent workspace, not the project tree.
 - Branch from `main`, never from another PR branch.
 - When in doubt, bias towards what the actual source code looked like.
+- UNUSED functions should be marked as inline if they cause extab regressions. This trick allows us to keep functions we know exist and are UNUSED without score regressions.
 
 ## Operating Principle
 Do not treat the selected symbol as a tiny sandbox. Treat it as the center of a dependency cluster.

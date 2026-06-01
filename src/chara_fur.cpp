@@ -503,10 +503,10 @@ static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayList
  */
 void CChara::TimeMogFur()
 {
-	MogFurState& fur = MogFur();
+	const int frameCounter = static_cast<int>(System.m_frameCounter);
 
-	if (fur.m_timestamp + 0x1A5E0 < static_cast<int>(System.m_frameCounter)) {
-		fur.m_timestamp = static_cast<int>(System.m_frameCounter);
+	if (MogFur().m_timestamp + 0x1A5E0 < frameCounter) {
+		MogFur().m_timestamp = frameCounter;
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
@@ -518,6 +518,7 @@ void CChara::TimeMogFur()
 		}
 	}
 
+	MogFurState& fur = MogFur();
 	unsigned short* const texels = fur.m_texels;
 	memset(fur.m_score, 0, 0x40);
 

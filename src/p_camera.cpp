@@ -263,6 +263,12 @@ STATIC_ASSERT(offsetof(CCameraPcs, m_viewer) == 0x448);
 STATIC_ASSERT(sizeof(CCameraPcs::ViewerState) == 0x24);
 STATIC_ASSERT(offsetof(CCameraPcs, m_viewerOverride) == 0x46C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_mapRotX) == 0x470);
+STATIC_ASSERT(offsetof(CCameraPcs, m_quake) == 0x490);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_state) == 0x04);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_positionAmplitude) == 0x14);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_jitterAmplitude) == 0x20);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_startTimer) == 0x2C);
+STATIC_ASSERT(sizeof(CCameraPcs::QuakeState) == 0x34);
 STATIC_ASSERT(sizeof(CCameraPcs) == 0x4C4);
 
 static inline void CopyCameraState(u8* dst, u8* src)
@@ -353,22 +359,22 @@ void CCameraPcs::create()
     m_fullScreenShadowCamLen = valueb4;
     m_shadowAuto = 1;
     m_fromScript = 0;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x494) = 0;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x498) = 0;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4AC) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A8) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A4) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B8) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B4) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B0) = value18;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BC) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BE) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C0) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C2) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4A0) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49E) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49C) = 0;
-    *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x490) = 0;
+    m_quake.m_state = 0;
+    m_quake.m_keepMoving = 0;
+    m_quake.m_positionAmplitude.z = value18;
+    m_quake.m_positionAmplitude.y = value18;
+    m_quake.m_positionAmplitude.x = value18;
+    m_quake.m_jitterAmplitude.z = value18;
+    m_quake.m_jitterAmplitude.y = value18;
+    m_quake.m_jitterAmplitude.x = value18;
+    m_quake.m_startTimer = 0;
+    m_quake.m_startDuration = 0;
+    m_quake.m_endTimer = 0;
+    m_quake.m_endDuration = 0;
+    m_quake.m_signZ = 0;
+    m_quake.m_signY = 0;
+    m_quake.m_signX = 0;
+    m_quake.m_mode = 0;
 }
 
 /*
@@ -442,62 +448,60 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
                                    float posAmpX, float posAmpY, float posAmpZ,
                                    float jitterAmpX, float jitterAmpY, float jitterAmpZ, int immediate)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (immediate != 0) {
-        *reinterpret_cast<s32*>(self + 0x494) = quakeState;
+        m_quake.m_state = quakeState;
         if (quakeState != 0) {
-            self[0x490] = 2;
-            *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-            *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-            *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-            *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-            *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-            *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+            m_quake.m_mode = 2;
+            m_quake.m_positionAmplitude.x = posAmpX;
+            m_quake.m_positionAmplitude.y = posAmpY;
+            m_quake.m_positionAmplitude.z = posAmpZ;
+            m_quake.m_jitterAmplitude.x = jitterAmpX;
+            m_quake.m_jitterAmplitude.y = jitterAmpY;
+            m_quake.m_jitterAmplitude.z = jitterAmpZ;
             return;
         }
 
-        self[0x490] = 0;
-        *reinterpret_cast<float*>(self + 0x4AC) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4A8) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4A4) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B8) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B4) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B0) = FLOAT_8032fa34;
+        m_quake.m_mode = 0;
+        m_quake.m_positionAmplitude.z = FLOAT_8032fa34;
+        m_quake.m_positionAmplitude.y = FLOAT_8032fa34;
+        m_quake.m_positionAmplitude.x = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.z = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.y = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.x = FLOAT_8032fa34;
         return;
     }
 
-    if ((*reinterpret_cast<s32*>(self + 0x494) == 0) && (quakeState != 0)) {
-        *reinterpret_cast<s32*>(self + 0x494) = 1;
-        self[0x490] = 1;
-        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
-        *reinterpret_cast<s16*>(self + 0x4BC) = startTime;
-        *reinterpret_cast<s16*>(self + 0x4BE) = startTime;
-        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
-        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
-        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+    if ((m_quake.m_state == 0) && (quakeState != 0)) {
+        m_quake.m_state = 1;
+        m_quake.m_mode = 1;
+        m_quake.m_keepMoving = keepMoving;
+        m_quake.m_startTimer = startTime;
+        m_quake.m_startDuration = startTime;
+        m_quake.m_endTimer = endTime;
+        m_quake.m_endDuration = endTime;
+        m_quake.m_positionAmplitude.x = posAmpX;
+        m_quake.m_positionAmplitude.y = posAmpY;
+        m_quake.m_positionAmplitude.z = posAmpZ;
+        m_quake.m_jitterAmplitude.x = jitterAmpX;
+        m_quake.m_jitterAmplitude.y = jitterAmpY;
+        m_quake.m_jitterAmplitude.z = jitterAmpZ;
         return;
     }
 
-    if ((*reinterpret_cast<s32*>(self + 0x494) == 1) && (quakeState == 0)) {
-        *reinterpret_cast<s32*>(self + 0x494) = 0;
-        self[0x490] = 1;
-        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
-        *reinterpret_cast<s16*>(self + 0x4BC) = 0;
-        *reinterpret_cast<s16*>(self + 0x4BE) = 0;
-        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
-        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
-        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+    if ((m_quake.m_state == 1) && (quakeState == 0)) {
+        m_quake.m_state = 0;
+        m_quake.m_mode = 1;
+        m_quake.m_keepMoving = keepMoving;
+        m_quake.m_startTimer = 0;
+        m_quake.m_startDuration = 0;
+        m_quake.m_endTimer = endTime;
+        m_quake.m_endDuration = endTime;
+        m_quake.m_positionAmplitude.x = posAmpX;
+        m_quake.m_positionAmplitude.y = posAmpY;
+        m_quake.m_positionAmplitude.z = posAmpZ;
+        m_quake.m_jitterAmplitude.x = jitterAmpX;
+        m_quake.m_jitterAmplitude.y = jitterAmpY;
+        m_quake.m_jitterAmplitude.z = jitterAmpZ;
     }
 }
 
@@ -517,36 +521,36 @@ void CCameraPcs::CalcQuake()
     Vec jitter;
     float zero = FLOAT_8032fa34;
 
-    if ((System.m_scenegraphStepMode == 2) || ((self[0x490] == 2) && (*reinterpret_cast<s32*>(self + 0x494) == 0))) {
+    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0))) {
         return;
     }
 
     s32 randomValue = rand();
     s16 randomSign = static_cast<s16>(randomValue >> 0x1F);
-    *reinterpret_cast<u16*>(self + 0x49C) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    m_quake.m_signX = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
 
-    *reinterpret_cast<s16*>(self + 0x49E) = 1 - *reinterpret_cast<s16*>(self + 0x49E);
+    m_quake.m_signY = 1 - m_quake.m_signY;
 
     randomValue = rand();
     randomSign = static_cast<s16>(randomValue >> 0x1F);
-    *reinterpret_cast<u16*>(self + 0x4A0) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    m_quake.m_signZ = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
 
-    if (*reinterpret_cast<s16*>(self + 0x49C) == 0) {
-        offset.x = -*reinterpret_cast<float*>(self + 0x4A4);
+    if (m_quake.m_signX == 0) {
+        offset.x = -m_quake.m_positionAmplitude.x;
     } else {
-        offset.x = *reinterpret_cast<float*>(self + 0x4A4);
+        offset.x = m_quake.m_positionAmplitude.x;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x49E) == 0) {
-        offset.y = -*reinterpret_cast<float*>(self + 0x4A8);
+    if (m_quake.m_signY == 0) {
+        offset.y = -m_quake.m_positionAmplitude.y;
     } else {
-        offset.y = *reinterpret_cast<float*>(self + 0x4A8);
+        offset.y = m_quake.m_positionAmplitude.y;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x4A0) == 0) {
-        offset.z = -*reinterpret_cast<float*>(self + 0x4AC);
+    if (m_quake.m_signZ == 0) {
+        offset.z = -m_quake.m_positionAmplitude.z;
     } else {
-        offset.z = *reinterpret_cast<float*>(self + 0x4AC);
+        offset.z = m_quake.m_positionAmplitude.z;
     }
 
     jitter.x = FLOAT_8032fa34;
@@ -561,24 +565,24 @@ void CCameraPcs::CalcQuake()
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
 
     if (((randX & 1) ^ signX) == signX) {
-        jitter.x = Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
+        jitter.x = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
-        jitter.x = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
+        jitter.x = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
 
     if (((randY & 1) ^ signY) == signY) {
-        jitter.y = Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
+        jitter.y = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
-        jitter.y = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
+        jitter.y = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
 
     if (((randZ & 1) ^ signZ) == signZ) {
-        jitter.z = Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
+        jitter.z = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
-        jitter.z = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
+        jitter.z = -Math.RandF(m_quake.m_jitterAmplitude.z);
     }
 
-    if (self[0x490] == 2) {
+    if (m_quake.m_mode == 2) {
         PSVECAdd(&offset, &jitter, &offset);
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
         offset.z = FLOAT_8032fa34;
@@ -586,32 +590,32 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (self[0x490] != 1) {
+    if (m_quake.m_mode != 1) {
         return;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x4BC) < 1) {
-        if (*reinterpret_cast<s32*>(self + 0x494) == 0) {
-            if (*reinterpret_cast<s16*>(self + 0x4C0) < 1) {
-                *reinterpret_cast<s32*>(self + 0x494) = 0;
-                *reinterpret_cast<s16*>(self + 0x4BC) = 0;
-                *reinterpret_cast<s16*>(self + 0x4BE) = 0;
-                *reinterpret_cast<s16*>(self + 0x4C0) = 0;
-                *reinterpret_cast<s16*>(self + 0x4C2) = 0;
-                *reinterpret_cast<float*>(self + 0x4AC) = zero;
-                *reinterpret_cast<float*>(self + 0x4A8) = zero;
-                *reinterpret_cast<float*>(self + 0x4A4) = zero;
-                *reinterpret_cast<float*>(self + 0x4B8) = zero;
-                *reinterpret_cast<float*>(self + 0x4B4) = zero;
-                *reinterpret_cast<float*>(self + 0x4B0) = zero;
+    if (m_quake.m_startTimer < 1) {
+        if (m_quake.m_state == 0) {
+            if (m_quake.m_endTimer < 1) {
+                m_quake.m_state = 0;
+                m_quake.m_startTimer = 0;
+                m_quake.m_startDuration = 0;
+                m_quake.m_endTimer = 0;
+                m_quake.m_endDuration = 0;
+                m_quake.m_positionAmplitude.z = zero;
+                m_quake.m_positionAmplitude.y = zero;
+                m_quake.m_positionAmplitude.x = zero;
+                m_quake.m_jitterAmplitude.z = zero;
+                m_quake.m_jitterAmplitude.y = zero;
+                m_quake.m_jitterAmplitude.x = zero;
             } else {
-                float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C0)) /
-                              static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C2));
+                float ratio = static_cast<float>(m_quake.m_endTimer) /
+                              static_cast<float>(m_quake.m_endDuration);
                 PSVECScale(&offset, &offset, ratio);
                 PSVECSubtract(&offset, &jitter, &offset);
                 PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
                 PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
-                *reinterpret_cast<s16*>(self + 0x4C0) = *reinterpret_cast<s16*>(self + 0x4C0) - 1;
+                m_quake.m_endTimer = m_quake.m_endTimer - 1;
             }
         } else {
             PSVECAdd(&offset, &jitter, &offset);
@@ -619,16 +623,16 @@ void CCameraPcs::CalcQuake()
             PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
         }
     } else {
-        float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BC)) /
-                      static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BE));
+        float ratio = static_cast<float>(m_quake.m_startTimer) /
+                      static_cast<float>(m_quake.m_startDuration);
         PSVECScale(&offset, &offset, ratio);
         PSVECAdd(&offset, &jitter, &offset);
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
-        *reinterpret_cast<s16*>(self + 0x4BC) = *reinterpret_cast<s16*>(self + 0x4BC) - 1;
+        m_quake.m_startTimer = m_quake.m_startTimer - 1;
 
-        if ((*reinterpret_cast<s16*>(self + 0x4BC) == 0) && (*reinterpret_cast<s32*>(self + 0x498) == 0)) {
-            *reinterpret_cast<s32*>(self + 0x494) = 0;
+        if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
+            m_quake.m_state = 0;
         }
     }
 }
@@ -2150,14 +2154,14 @@ void CCameraPcs::calcPart()
     Mtx invCamera;
     Vec pos;
 
-    if (*reinterpret_cast<int*>(self + 0x494) != 0) {
+    if (m_quake.m_state != 0) {
         CalcQuake();
 
         pos.x = ppvCameraMatrix0[0][3];
         pos.y = ppvCameraMatrix0[1][3];
         pos.z = ppvCameraMatrix0[2][3];
 
-        PSVECAdd(reinterpret_cast<Vec*>(self + 0x4A4), &pos, &pos);
+        PSVECAdd(&m_quake.m_positionAmplitude, &pos, &pos);
 
         ppvCameraMatrix0[0][3] = pos.x;
         ppvCameraMatrix0[1][3] = pos.y;

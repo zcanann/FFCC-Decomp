@@ -3442,85 +3442,83 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         Sound.PlaySe(4, 0x40, 0x7f, 0);
     }
 
-    if ((repeat & 0xF) != 0) {
-        return 0;
-    }
-
-    if ((down & 0x40) != 0) {
-        table = static_cast<short>(table - 1);
-        if (table < 0) {
-            table = 2;
+    if ((repeat & 0xF) == 0) {
+        if ((down & 0x40) != 0) {
+            table = static_cast<short>(table - 1);
+            if (table < 0) {
+                table = 2;
+            }
+            Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+        } else if ((down & 0x20) != 0) {
+            table = static_cast<short>(table + 1);
+            if (table > 2) {
+                table = 0;
+            }
+            Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
         }
-        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-    } else if ((down & 0x20) != 0) {
-        table = static_cast<short>(table + 1);
-        if (table > 2) {
-            table = 0;
+
+        if ((down & 0x1000) != 0) {
+            select = 0xB;
+            row = 5;
+            Sound.PlaySe(2, 0x40, 0x7f, 0);
+            return 0;
         }
-        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-    }
 
-    if ((down & 0x1000) != 0) {
-        select = 0xB;
-        row = 5;
-        Sound.PlaySe(2, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    if ((down & 0x200) != 0) {
-        if (len == 0) {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
-        } else {
-            s_CmakeInfo.m_name[len - 1] = '\0';
-            Sound.PlaySe(3, 0x40, 0x7f, 0);
+        if ((down & 0x200) != 0) {
+            if (len == 0) {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+            } else {
+                s_CmakeInfo.m_name[len - 1] = '\0';
+                Sound.PlaySe(3, 0x40, 0x7f, 0);
+            }
+            return 0;
         }
-        return 0;
-    }
 
-    if ((down & 0x100) == 0) {
-        return 0;
-    }
+        if ((down & 0x100) == 0) {
+            return 0;
+        }
 
-    if (row > 4) {
-        if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
+        if (row > 4) {
+            if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
+                return 0;
+            }
+
+            StoreCmakeVillageName();
+            Sound.PlaySe(2, 0x40, 0x7f, 0);
+            *reinterpret_cast<short*>(villageWork + 0x1E) = 1;
+            return 1;
+        }
+
+        if (len >= 7) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
             return 0;
         }
 
-        StoreCmakeVillageName();
+        const char* rowText = s_NameEntryStr[table * 5 + row];
+        int rowLen = strlen(rowText);
+        if (select < 0 || select >= rowLen) {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+            return 0;
+        }
+
+        memset(picked, 0, 3);
+        picked[0] = '\0';
+        picked[0] = rowText[select];
+        picked[1] = '\0';
+        if (picked[0] == '\0') {
+            Sound.PlaySe(4, 0x40, 0x7f, 0);
+            return 0;
+        }
+
+        strcat(s_CmakeInfo.m_name, picked, 0x11);
+        if (strlen(s_CmakeInfo.m_name) > 6) {
+            select = 0xB;
+            row = 5;
+        }
+
         Sound.PlaySe(2, 0x40, 0x7f, 0);
-        *reinterpret_cast<short*>(villageWork + 0x1E) = 1;
-        return 1;
     }
-
-    if (len >= 7) {
-        Sound.PlaySe(4, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    const char* rowText = s_NameEntryStr[table * 5 + row];
-    int rowLen = strlen(rowText);
-    if (select < 0 || select >= rowLen) {
-        Sound.PlaySe(4, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    memset(picked, 0, 3);
-    picked[0] = '\0';
-    picked[0] = rowText[select];
-    picked[1] = '\0';
-    if (picked[0] == '\0') {
-        Sound.PlaySe(4, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    strcat(s_CmakeInfo.m_name, picked, 0x11);
-    if (strlen(s_CmakeInfo.m_name) > 6) {
-        select = 0xB;
-        row = 5;
-    }
-
-    Sound.PlaySe(2, 0x40, 0x7f, 0);
     return 0;
 }
 

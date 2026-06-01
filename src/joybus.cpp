@@ -6863,29 +6863,29 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
 int JoyBus::DelItem(int portIndex, unsigned char itemId)
 {
     unsigned int cmd = ((0x17u << 16) | (itemId << 8) | 0xFF) & 0xFF3FFFFF;
-
-    if (m_threadRunningMask == 0)
-    {
-        return 0;
-    }
-
-    const unsigned int port = m_threadParams[portIndex].m_portIndex;
-
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-
+    unsigned int port;
     int result = 0;
 
-    if ((int)m_cmdCount[port] < 0x40)
+    if (m_threadRunningMask != 0)
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-        m_cmdCount[port]++;
-    }
-    else
-    {
-        result = -1;
+        OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+
+        port = m_threadParams[portIndex].m_portIndex;
+        if ((int)m_cmdCount[port] < 0x40)
+        {
+            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            port = m_threadParams[portIndex].m_portIndex;
+            m_cmdCount[port]++;
+            OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+            result = 0;
+        }
+        else
+        {
+            OSSignalSemaphore(m_accessSemaphores + port);
+            result = -1;
+        }
     }
 
-    OSSignalSemaphore(&m_accessSemaphores[port]);
     return result;
 }
 

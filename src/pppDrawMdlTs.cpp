@@ -4,42 +4,74 @@
 #include "ffcc/pppPart.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
+#include <stddef.h>
 
 extern const float kPppKeShpTail2XZero = 0.0f;
 extern const float FLOAT_803304F0;
 
-// Use simple forward declarations and casting approach
+struct PDrawMdlTs {
+    s32 m_graphId;             // 0x00
+    u32 m_modelIndex;          // 0x04
+    u8 m_pad8;                 // 0x08
+    u8 m_blendMode;            // 0x09
+    u8 m_drawB;                // 0x0A
+    u8 m_drawD;                // 0x0B
+    u8 m_drawE;                // 0x0C
+    u8 m_drawF;                // 0x0D
+    u8 m_drawG;                // 0x0E
+    u8 m_padF;                 // 0x0F
+    f32 m_texScale;            // 0x10
+    f32 m_texCoordAdd[6];      // 0x14
+    u8 m_drawA;                // 0x2C
+};
+
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_graphId) == 0x00);
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_modelIndex) == 0x04);
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_blendMode) == 0x09);
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_texScale) == 0x10);
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_texCoordAdd) == 0x14);
+STATIC_ASSERT(offsetof(PDrawMdlTs, m_drawA) == 0x2C);
+
+static inline f32* PppDrawMdlTsTexCoords(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<f32*>(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
+
+static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppCVECTOR*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0] + 8);
+}
 
 /*
  * --INFO--
  * PAL Address: 0x800880c0
  * PAL Size: 48b
  */
-void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
+void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
     f32 zero = FLOAT_803304F0;
 
-    *(f32*)(ptr + 0x14) = zero;
-    *(f32*)(ptr + 0x10) = zero;
-    *(f32*)(ptr + 0x0C) = zero;
-    *(f32*)(ptr + 0x08) = zero;
-    *(f32*)(ptr + 0x04) = zero;
-    *(f32*)(ptr + 0x00) = zero;
+    texCoords[5] = zero;
+    texCoords[4] = zero;
+    texCoords[3] = zero;
+    texCoords[2] = zero;
+    texCoords[1] = zero;
+    texCoords[0] = zero;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800880a0  
+ * PAL Address: 0x800880a0
  * PAL Size: 32b
  */
-void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
+void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
     f32 zero = FLOAT_803304F0;
 
-    *(f32*)(ptr + 0x14) = zero;
-    *(f32*)(ptr + 0x08) = zero;
+    texCoords[5] = zero;
+    texCoords[2] = zero;
 }
 
 /*
@@ -49,39 +81,27 @@ void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
  */
 void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    _pppCtrlTable* stream = ctrl;
-    PDrawMdlTs* input = data;
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
 
-    // Get texture coordinate offset 
-    void* inner = *((void**)((char*)stream + 0xc));
-    void* inner2 = *((void**)((char*)inner + 0x8));
-    float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
-    
-    // Check global flag - return early if set
     if (gPppCalcDisabled != 0) {
         return;
     }
-    
-    // Update texture coordinates by adding param values
-    texCoords[1] += texCoords[2];  // offset 0x4 += offset 0x8
-    texCoords[0] += texCoords[1];  // offset 0x0 += offset 0x4
-    texCoords[4] += texCoords[5];  // offset 0x10 += offset 0x14
-    texCoords[3] += texCoords[4];  // offset 0xc += offset 0x10
-    
-    // Check if object id matches
-    int objId = *((int*)input);
-    int objFieldC = *((int*)((char*)obj + 0xc));
-    if (objId != objFieldC) {
+
+    texCoords[1] += texCoords[2];
+    texCoords[0] += texCoords[1];
+    texCoords[4] += texCoords[5];
+    texCoords[3] += texCoords[4];
+
+    if (data->m_graphId != obj->m_graphId) {
         return;
     }
-    
-    // Apply parameter offsets to texture coordinates
-    texCoords[0] += *((float*)((char*)input + 0x14));  // offset 0x0
-    texCoords[1] += *((float*)((char*)input + 0x18));  // offset 0x4
-    texCoords[2] += *((float*)((char*)input + 0x1c));  // offset 0x8
-    texCoords[3] += *((float*)((char*)input + 0x20));  // offset 0xc
-    texCoords[4] += *((float*)((char*)input + 0x24));  // offset 0x10
-    texCoords[5] += *((float*)((char*)input + 0x28));  // offset 0x14
+
+    texCoords[0] += data->m_texCoordAdd[0];
+    texCoords[1] += data->m_texCoordAdd[1];
+    texCoords[2] += data->m_texCoordAdd[2];
+    texCoords[3] += data->m_texCoordAdd[3];
+    texCoords[4] += data->m_texCoordAdd[4];
+    texCoords[5] += data->m_texCoordAdd[5];
 }
 
 /*
@@ -96,31 +116,31 @@ void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
 
 /*
  * --INFO--
- * PAL Address: 0x80087ef0 
+ * PAL Address: 0x80087ef0
  * PAL Size: 224b
  */
 void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    if ((s32)*(u32*)((u8*)data + 4) == 0xFFFF) {
+    if ((s32)data->m_modelIndex == 0xFFFF) {
         return;
     }
 
     pppSetDrawEnv(
-        reinterpret_cast<pppCVECTOR*>((u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88),
-        reinterpret_cast<pppFMATRIX*>((u8*)obj + 0x40),
-        *(float*)((u8*)data + 0x10),
-        *(u8*)((u8*)data + 0x2C),
-        *(u8*)((u8*)data + 0xA),
-        *(u8*)((u8*)data + 0x9),
-        *(u8*)((u8*)data + 0xB),
-        *(u8*)((u8*)data + 0xC),
-        *(u8*)((u8*)data + 0xD),
-        *(u8*)((u8*)data + 0xE));
+        PppDrawMdlTsColor(obj, ctrl),
+        &obj->m_drawMatrix,
+        data->m_texScale,
+        data->m_drawA,
+        data->m_drawB,
+        data->m_blendMode,
+        data->m_drawD,
+        data->m_drawE,
+        data->m_drawF,
+        data->m_drawG);
 
-    f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
     MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
 
-    pppSetBlendMode(*(u8*)((u8*)data + 0x9));
+    pppSetBlendMode(data->m_blendMode);
 
-    pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[*(u32*)((u8*)data + 0x4)], obj->m_drawMatrixPtr, 1);
+    pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[data->m_modelIndex], obj->m_drawMatrixPtr, 1);
 }

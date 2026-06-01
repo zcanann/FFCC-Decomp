@@ -50,6 +50,7 @@ public:
 	~CAStar();
 
 	void reset();
+	void addAstar(Vec& pos, int groupA, int groupB);
 	void addAstar(float x, float y, float z, int groupA, int groupB);
 	void check(int current, int goal, CATemp& temp);
 	void calcAStar();

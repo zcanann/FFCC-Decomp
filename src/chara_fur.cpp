@@ -1141,9 +1141,11 @@ void CChara::InitFurTexBuffer()
 	int row = 0;
 	do {
 		int inner = 0;
+		int texelOffset = row;
 		for (int count = 8; count != 0; count--) {
 			int idxBase = inner + row;
-			charaFur.m_texels[idxBase] = 0x7FFF;
+			charaFur.m_texels[texelOffset] = 0x7FFF;
+			texelOffset += 8;
 			charaFur.m_texels[idxBase + 1] = 0x7FFF;
 			charaFur.m_texels[idxBase + 2] = 0x7FFF;
 			charaFur.m_texels[idxBase + 3] = 0x7FFF;

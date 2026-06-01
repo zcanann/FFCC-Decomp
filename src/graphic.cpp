@@ -702,16 +702,16 @@ void CGraphic::Flip()
  */
 void CGraphic::Printf(char* fmt, ...)
 {
-    if (m_debugStringCount < 0x70) {
-        char buffer[264];
+    if (static_cast<u32>(m_debugStringCount) < 0x70) {
+        char buffer[248];
         va_list args;
         va_start(args, fmt);
         vsprintf(buffer, fmt, args);
         va_end(args);
 
+        m_debugStringPositions[m_debugStringCount].x = -1;
+        m_debugStringPositions[m_debugStringCount].y = -1;
         int index = m_debugStringCount;
-        m_debugStringPositions[index].x = -1;
-        m_debugStringPositions[index].y = -1;
         m_debugStringCount = index + 1;
         strcpy(m_debugStrings[index], buffer);
     }
@@ -728,16 +728,16 @@ void CGraphic::Printf(char* fmt, ...)
  */
 void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
 {
-    if (m_debugStringCount < 0x70) {
-        char buffer[272];
+    if (static_cast<u32>(m_debugStringCount) < 0x70) {
+        char buffer[256];
         va_list args;
         va_start(args, fmt);
         vsprintf(buffer, fmt, args);
         va_end(args);
 
+        m_debugStringPositions[m_debugStringCount].x = static_cast<short>(x);
+        m_debugStringPositions[m_debugStringCount].y = static_cast<short>(y);
         int index = m_debugStringCount;
-        m_debugStringPositions[index].x = static_cast<short>(x);
-        m_debugStringPositions[index].y = static_cast<short>(y);
         m_debugStringCount = index + 1;
         strcpy(m_debugStrings[index], buffer);
     }

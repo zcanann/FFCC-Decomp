@@ -29,7 +29,7 @@ struct LocationTitle2Work {
 
 struct LocationTitle2Particle {
     Vec m_pos;
-    u32 m_color;
+    GXColor m_color;
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
@@ -171,7 +171,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
                 GXSetColorUpdate(GX_TRUE);
             }
 
-            GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
+            GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
             pppDrawShp(*shapeTable, particle->m_shape, ppvEnv->m_materialSetPtr, unkB->m_blendMode);
         }
 

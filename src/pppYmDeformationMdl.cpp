@@ -1,4 +1,5 @@
 #include "ffcc/pppYmDeformationMdl.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/mapmesh.h"
@@ -11,6 +12,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
+
+STATIC_ASSERT(offsetof(pppYmDeformationMdl, m_workArea) == 0x80);
 
 struct YmDeformationMdlColorInfo {
     u32 m_unk0;
@@ -42,7 +45,7 @@ struct _pppEnvStYmDeformationMdl {
 template <typename T>
 static inline T* PppWorkArea(pppYmDeformationMdl* object, pppYmDeformationMdlUnkC* ctrl, int index)
 {
-    return reinterpret_cast<T*>(reinterpret_cast<_pppPObject*>(object)->m_workArea + ctrl->m_serializedDataOffsets[index]);
+    return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
 static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()

@@ -33,6 +33,7 @@ struct pppYmDeformationMdlUnkB {
 
 struct pppYmDeformationMdl {
     char pad[0x80];
+    u8 m_workArea[1];
 };
 
 void SetUpIndWarp(VYmDeformationMdl*);

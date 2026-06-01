@@ -152,15 +152,15 @@ int CMenuPcs::ItemCtrlCur()
 
     if (mode == 0) {
         if ((hold & 8) != 0) {
-            if (this->itemMenuState->selectedIndex == 0) {
+            if (this->itemMenuState->selectedIndex != 0) {
+                this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex - 1;
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            } else {
                 if (this->itemMenuState->scroll == 0) {
                     this->itemMenuState->scroll = 0x3F;
                 } else {
                     this->itemMenuState->scroll = this->itemMenuState->scroll - 1;
                 }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-            } else {
-                this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex - 1;
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
         } else if ((hold & 4) != 0) {
@@ -169,7 +169,7 @@ int CMenuPcs::ItemCtrlCur()
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 s16 scroll = this->itemMenuState->scroll;
-                if (scroll > 0x3E) {
+                if (scroll >= 0x3F) {
                     this->itemMenuState->scroll = 0;
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
@@ -196,7 +196,7 @@ int CMenuPcs::ItemCtrlCur()
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else if ((press & 0x100) != 0) {
                 int idx = this->itemMenuState->scroll + this->itemMenuState->selectedIndex;
-                if (idx > 0x3F) {
+                if (idx >= 0x40) {
                     idx -= 0x40;
                 }
 
@@ -245,10 +245,10 @@ int CMenuPcs::ItemCtrlCur()
         int optBase = (int)this->itemMenuState + mode * 2;
 
         if ((hold & 8) != 0) {
-            if (*(s16*)(optBase + 0x26) == 0) {
-                *(s16*)(optBase + 0x26) = 3;
-            } else {
+            if (*(s16*)(optBase + 0x26) != 0) {
                 *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+            } else {
+                *(s16*)(optBase + 0x26) = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((hold & 4) != 0) {
@@ -267,7 +267,7 @@ int CMenuPcs::ItemCtrlCur()
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {
                     int idx = this->itemMenuState->scroll + this->itemMenuState->selectedIndex;
-                    if (idx > 0x3F) {
+                    if (idx >= 0x40) {
                         idx -= 0x40;
                     }
 

@@ -2298,75 +2298,80 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
-	for (int i = 0; i < static_cast<int>(letterCount); i++) {
+	unsigned int curLetterBase = scriptFood;
+	for (int i = 0; i < caravanWork->m_letterCount; i++) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
-		const unsigned int* cur = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + i * 0xC);
+		const unsigned int* cur = reinterpret_cast<const unsigned int*>(curLetterBase + 0x3EC);
 		const unsigned int curWord = cur[0];
 		const unsigned short curHalf = *reinterpret_cast<const unsigned short*>(cur);
+		const unsigned int npcId = (curWord >> 9) & 0x1FF;
+		const unsigned int subjectId = (curHalf >> 2) & 0x1FF;
 
+		unsigned int prevLetterBase = scriptFood;
 		for (int j = 0; j < i; j++) {
-			const unsigned int* prev = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + j * 0xC);
-			if (((curWord >> 9) & 0x1FF) == ((prev[0] >> 9) & 0x1FF)) {
+			const unsigned int* prev = reinterpret_cast<const unsigned int*>(prevLetterBase + 0x3EC);
+			if (npcId == ((prev[0] >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
-			if (((curHalf >> 2) & 0x1FF) == ((*reinterpret_cast<const unsigned short*>(prev) >> 2) & 0x1FF)) {
+			if (subjectId == ((*reinterpret_cast<const unsigned short*>(prev) >> 2) & 0x1FF)) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {
 				break;
 			}
+			prevLetterBase += 0xC;
 		}
 
-		if (matchedNpc == -1) {
+		if (matchedNpc != -1) {
+			(reinterpret_cast<unsigned char*>(entryWrite))[5] =
+				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedNpc * 2))[5];
+		} else {
 			if (npcCount > 0x7F && (unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, npcTable[(curWord >> 9) & 0x1FF]);
+			strcpy(tempName, npcTable[npcId]);
 			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
 			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
-			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
-			npcCount++;
-		} else {
-			(reinterpret_cast<unsigned char*>(entryWrite))[5] =
-				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedNpc * 2))[5];
+			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount++);
 		}
 
-		if (matchedSubject == -1) {
+		if (matchedSubject != -1) {
+			(reinterpret_cast<unsigned char*>(entryWrite))[4] =
+				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedSubject * 2))[4];
+		} else {
 			if (subjectCount > 0xFF && (unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 
 			memset(tempName, 0, sizeof(tempName));
-			strcpy(tempName, subjectTable[(curHalf >> 2) & 0x1FF]);
+			strcpy(tempName, subjectTable[subjectId]);
 			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
 			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
-			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
-			subjectCount++;
-		} else {
-			(reinterpret_cast<unsigned char*>(entryWrite))[4] =
-				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedSubject * 2))[4];
+			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount++);
 		}
 
 		unsigned char flags = 0;
-		if ((curWord & 0x80000000U) != 0) {
+		const unsigned char curFlags = *reinterpret_cast<const unsigned char*>(cur);
+		if (static_cast<char>(curFlags) < 0) {
 			flags |= 1;
 		}
-		if ((curWord & 0x40) != 0) {
+		if (((curFlags >> 6) & 1) != 0) {
 			flags |= 2;
 		}
-		if ((curWord & 0x20) != 0) {
+		if (((curFlags >> 5) & 1) != 0) {
 			flags |= 4;
 		}
-		if ((curWord & 0x10) != 0) {
+		if (((curFlags >> 4) & 1) != 0) {
 			flags |= 8;
 		}
 
-		const unsigned int value = *reinterpret_cast<const unsigned short*>(scriptFood + 0x3EE + i * 0xC) & 0x1FF;
-		if ((curWord & 8) == 0) {
+		const unsigned int value = *reinterpret_cast<const unsigned short*>(curLetterBase + 0x3EE) & 0x1FF;
+		const unsigned char valueIsMoney = (curFlags >> 3) & 1;
+		if (valueIsMoney == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
 					flags |= 0x10;
@@ -2375,12 +2380,15 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp), 0x810, channel, i);
 				}
 			}
-		} else if (value != 0) {
-			flags |= 0x20;
-			entryWrite[0] = SwapU32(value * 100);
+		} else {
+			if (value != 0) {
+				flags |= 0x20;
+				entryWrite[0] = SwapU32(value * 100);
+			}
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
+		curLetterBase += 0xC;
 		entryWrite += 2;
 	}
 

@@ -290,10 +290,11 @@ void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
  */
 void pppCopyVector(Vec& dest, Vec source)
 { 
-	float x = source.x;
-	float y = source.y;
+	float* src = &source.x;
+	float x = *src++;
+	float y = *src++;
 	dest.x = x;
-	float z = source.z;
+	float z = *src;
 	dest.y = y;
 	dest.z = z;
 }

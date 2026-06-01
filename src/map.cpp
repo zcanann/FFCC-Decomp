@@ -3341,7 +3341,7 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
 
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
             CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
-            if (reinterpret_cast<CMapObj*>(*reinterpret_cast<int*>(mapAnimNode)) == mapObj) {
+            if (mapAnimNode->m_node == reinterpret_cast<CMapAnimTargetNode*>(mapObj)) {
                 foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
             }

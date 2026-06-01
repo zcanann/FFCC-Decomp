@@ -7201,38 +7201,41 @@ void JoyBus::RestartThread()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a6620
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
 {
-    unsigned char argLo = static_cast<unsigned char>(param_4 & 0xFF);
-    unsigned char argHi = static_cast<unsigned char>((param_4 >> 8) & 0xFF);
-    unsigned short opcode = static_cast<unsigned short>(0x1F00 | (param_3 & 0xFF));
-    unsigned int cmd = MakeJoyCmd16(opcode, argLo, argHi);
+    unsigned int cmd = ((0x1F00 | static_cast<unsigned char>(param_3)) << 16) |
+                       (static_cast<unsigned char>(param_4) << 8) |
+                       static_cast<unsigned char>(param_4 >> 8);
+    int result = 0;
 
     if (m_threadRunningMask == 0)
 	{
         return 0;
 	}
 
-    const unsigned int port = m_threadParams[portIndex].m_portIndex;
+    OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
-
-    int result = 0;
-
+    unsigned int port = m_threadParams[portIndex].m_portIndex;
     if ((int)m_cmdCount[port] < 0x40)
     {
         m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+        port = m_threadParams[portIndex].m_portIndex;
         m_cmdCount[port]++;
+        OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+        result = 0;
     }
     else
     {
+        OSSignalSemaphore(m_accessSemaphores + port);
         result = -1;
     }
-
-    OSSignalSemaphore(&m_accessSemaphores[port]);
 
     return result;
 }

@@ -59,6 +59,7 @@ void CMenuPcs::MLstDraw()
 			float y = (float)item->y;
 			float w = (float)item->width;
 			float h = (float)item->height;
+			float zero = FLOAT_803333D0;
 			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -69,18 +70,18 @@ void CMenuPcs::MLstDraw()
 			color.a = (unsigned char)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			float v = 0.0f;
+			float v = zero;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				x = (float)(x + 20.0);
 				v += (float)((double)item->height);
 			}
 
-			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, v, item->z, item->z, 0.0f);
+			MenuPcs.DrawRect(0, x, y, w, h, zero, v, item->z, item->z, zero);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
 			float iconX = (float)item->x;
 			float iconY = (float)(item->y - 6);
-			v = 0.0f;
+			v = zero;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				v += (float)((double)item->height);
 			}
@@ -90,11 +91,11 @@ void CMenuPcs::MLstDraw()
 				iconY,
 				40.0f,
 				40.0f,
-				0.0f,
+				zero,
 				v,
 				item->z,
 				item->z,
-				0.0f);
+				zero);
 		}
 		item++;
 	}

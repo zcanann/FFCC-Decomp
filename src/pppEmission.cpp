@@ -49,16 +49,11 @@ struct EmissionMeshRef {
     u8 _pad1[8];
 };
 
-struct EmissionModelData {
-    u8 _pad0[0x24];
-    CMaterialSet* m_materialSet;
-};
-
 struct EmissionState;
 
 struct EmissionModelView {
     u8 _pad0[0xA4];
-    EmissionModelData* m_data;
+    CCharaModelData* m_data;
     u8 _padA8[0x4];
     EmissionMeshRef* m_meshes;
 };
@@ -95,7 +90,7 @@ STATIC_ASSERT(offsetof(EmissionModelView, m_meshes) == 0xAC);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(EmissionModelData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
 
 static inline EmissionMeshData* EmissionMeshAt(EmissionModelView* modelView, int meshIndex)
 {

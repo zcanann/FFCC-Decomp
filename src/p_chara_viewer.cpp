@@ -88,32 +88,6 @@ struct CharaViewerSRT {
 
 typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1];
 
-struct CharaViewerModelData {
-    u8 _pad00[0x08];
-    u16 nodeCount;
-    u16 meshCount;
-    u8 _pad0C[0x28];
-    int frameShift;
-};
-
-struct CharaViewerModel {
-    u8 _pad00[0xA4];
-    CharaViewerModelData* data;
-    u8 _padA8[0x08];
-    CTextureSet* textureSet;
-    float currentFrame;
-    u8 _padB8[0x18];
-    CChara::CAnim* anim;
-    CTexAnimSet* texAnimSet;
-};
-
-typedef char CharaViewerModel_size_check[(sizeof(CharaViewerModel) == 0xD8) ? 1 : -1];
-
-static inline CharaViewerModel* ViewerModel(CChara::CModel* model)
-{
-    return reinterpret_cast<CharaViewerModel*>(model);
-}
-
 template <class T>
 static inline void ReleaseShared(T*& ptr)
 {
@@ -156,12 +130,12 @@ static inline CTextureSet*& ViewerModelTextureSet(CChara::CModel* model)
 
 static inline int ViewerModelNodeCount(CChara::CModel* model)
 {
-    return ViewerModel(model)->data->nodeCount;
+    return model->m_data->m_nodeCount;
 }
 
-static inline int ViewerModelFrameShift(CChara::CModel* model)
+static inline int ViewerModelPosQuant(CChara::CModel* model)
 {
-    return ViewerModel(model)->data->frameShift;
+    return model->m_data->m_posQuant;
 }
 
 static inline float LoadFloat(const float& value)
@@ -584,8 +558,8 @@ void CCharaPcs::calcViewer()
 
         float translateX = LoadFloat(kCharaViewerZero);
         if ((i != 0) && (self->m_viewerModel[0] != 0)) {
-            int frameShift = ViewerModelFrameShift(self->m_viewerModel[0]);
-            translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
+            int posQuant = ViewerModelPosQuant(self->m_viewerModel[0]);
+            translateX = static_cast<float>((1 << (15 - posQuant)) / 8);
         }
 
         if ((i == 0) && (self->m_viewerTexAnimDirty != 0)) {

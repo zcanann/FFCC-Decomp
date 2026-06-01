@@ -24,14 +24,9 @@ struct EraseCharaPartsMesh {
     u8 _padC[0x8];
 };
 
-struct EraseCharaPartsModelData {
-    u8 _pad0[0x24];
-    CMaterialSet* m_materialSet;
-};
-
 struct EraseCharaPartsModelView {
     u8 _pad0[0xA4];
-    EraseCharaPartsModelData* m_data;
+    CCharaModelData* m_data;
     u8 _padA8[0x4];
     EraseCharaPartsMesh* m_meshes;
 };

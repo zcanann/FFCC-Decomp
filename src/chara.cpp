@@ -85,25 +85,7 @@ struct CCharaMeshRaw
 	u8 _padC[8];
 };
 
-struct CCharaModelRefRaw
-{
-	u8 _pad0[0x8];
-	u16 m_nodeCount;
-	u16 m_meshCount;
-	u8 _padC[0xA];
-	u16 m_headNodeIndex;
-	u16 m_chest3NodeIndex;
-	u16 m_chest2NodeIndex;
-	u16 m_chest1NodeIndex;
-	CMaterialSet* m_materialSet;
-	void* m_textureAnimSet;
-	float m_baseScale;
-	u32 m_positionQuantize;
-	u32 m_normalQuantize;
-	void* m_dynParams;
-	u32 m_dynCount;
-	u8 _pad3C[0x8];
-};
+typedef CCharaModelData CCharaModelRefRaw;
 
 STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
 
@@ -763,8 +745,8 @@ CChara::CModel::CRefData::CRefData()
 	ref->m_chest2NodeIndex = 0xFFFF;
 	ref->m_chest1NodeIndex = 0xFFFF;
 	ref->m_baseScale = 1.0f;
-	ref->m_positionQuantize = 7;
-	ref->m_normalQuantize = 0xC;
+	ref->m_posQuant = 7;
+	ref->m_normQuant = 0xC;
 }
 
 /*

@@ -19,13 +19,22 @@ struct Vec;
 
 struct CCharaModelData
 {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x14];
+    u8 _pad0[0x8];
+    u16 m_nodeCount;
+    u16 m_meshCount;
+    u8 _pad0C[0xA];
+    u16 m_headNodeIndex;
+    u16 m_chest3NodeIndex;
+    u16 m_chest2NodeIndex;
+    u16 m_chest1NodeIndex;
     CMaterialSet* m_materialSet;
-    u8 _pad28[0xC];
+    void* m_textureAnimSet;
+    float m_baseScale;
     u32 m_posQuant;
     u32 m_normQuant;
+    void* m_dynParams;
+    u32 m_dynCount;
+    u8 _pad3C[0x8];
 };
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);

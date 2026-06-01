@@ -40,15 +40,6 @@ struct ChangeTexMeshRef {
 	u8 _pad10[0x14 - 0x10];
 };
 
-struct ChangeTexModelData {
-	u8 _pad0[0xC];
-	u32 m_meshCount;
-	u8 _pad10[0x14];
-	CMaterialSet* m_materialSet;
-	u8 _pad28[0xC];
-	s32 m_frameShift;
-};
-
 struct pppYmChangeTexState {
 	float m_value0;
 	float m_value1;
@@ -66,7 +57,7 @@ struct ChangeTexModelRaw {
 	u8 _pad0[0x68];
 	Mtx m_matrix;
 	u8 _pad98[0xC];
-	ChangeTexModelData* m_data;
+	CCharaModelData* m_data;
 	u8 _padA8[0x4];
 	ChangeTexMeshRef* m_meshes;
 };
@@ -84,9 +75,9 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
-STATIC_ASSERT(offsetof(ChangeTexModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
+STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
+STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -232,7 +223,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	Mtx modelMtx;
 
 	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
-	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_frameShift));
+	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_posQuant));
 	short frameShort = (short)frame;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);
 

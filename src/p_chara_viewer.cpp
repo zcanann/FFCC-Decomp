@@ -226,8 +226,9 @@ void CCharaPcs::drawViewer()
     if ((self->m_viewerBackTextureSet != 0) &&
         (static_cast<unsigned int>(reinterpret_cast<CPtrArray<CTexture*>*>(
              reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize()) != 0)) {
-        C_MTXOrtho(projMtx, kCharaViewerZero, kCharaViewerBackOrthoRight, kCharaViewerZero,
-                   kCharaViewerBackOrthoBottom, kCharaViewerZero, kCharaViewerGridMax);
+        C_MTXOrtho(projMtx, LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoRight),
+                   LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoBottom), LoadFloat(kCharaViewerZero),
+                   LoadFloat(kCharaViewerGridMax));
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
         PSMTXIdentity(backCameraMtx);
         GXLoadPosMtxImm(backCameraMtx, 0);
@@ -784,8 +785,8 @@ void CCharaPcs::createViewer()
         self->m_viewerDiffuseColor[0][i].g = c;
         self->m_viewerDiffuseColor[0][i].b = c;
         self->m_viewerDiffuseColor[0][i].a = 0xFF;
-        self->m_viewerDiffusePos[i].x = kCharaViewerZero;
-        self->m_viewerDiffusePos[i].y = kCharaViewerZero;
+        self->m_viewerDiffusePos[i].x = LoadFloat(kCharaViewerZero);
+        self->m_viewerDiffusePos[i].y = LoadFloat(kCharaViewerZero);
         self->m_viewerDiffusePos[i].z = LoadFloat(kCharaViewerFineStep);
     }
 
@@ -826,7 +827,7 @@ void CCharaPcs::createViewer()
     self->m_viewerStepMode = 0;
     self->m_viewerDrawGrid = 1;
     self->m_viewerStoreSavedAnim = 0;
-    self->m_viewerSavedFrame = kCharaViewerZero;
+    self->m_viewerSavedFrame = LoadFloat(kCharaViewerZero);
     self->m_viewerSavedAnimState = 0;
     self->m_viewerIFrameEnabled = 0;
     self->m_viewerResetIFrame = 0;
@@ -874,8 +875,8 @@ void CCharaPcs::createViewer()
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0;
     bumpLight.m_bumpShade[3] = 0xFF;
-    bumpLight.m_offsetX = kCharaViewerZero;
-    bumpLight.m_offsetZ = kCharaViewerZero;
+    bumpLight.m_offsetX = LoadFloat(kCharaViewerZero);
+    bumpLight.m_offsetZ = LoadFloat(kCharaViewerZero);
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
         &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
 

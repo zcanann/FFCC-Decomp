@@ -394,7 +394,12 @@ public:
     short* m_artiState;
     unsigned char m_pad830[0x850 - 0x830];
     short* m_artiList;
-    unsigned char m_pad854[0x864 - 0x854];
+    unsigned char m_pad854[0x859 - 0x854];
+    unsigned char m_singleMenuStageActive;
+    unsigned char m_singleMenuInitialized;
+    unsigned char m_pad85B[0x85C - 0x85B];
+    int m_singleMenuTextureLoadIndex;
+    int m_singleMenuTextureLoadState;
     unsigned short m_battleStateFlag;
     unsigned char m_pad866[0x8A0 - 0x866];
 };

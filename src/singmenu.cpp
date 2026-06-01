@@ -80,6 +80,10 @@ STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(SingleMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(SingleMenuWindowRaw) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 
 struct SingMenuStaticMessageInfo
 {
@@ -906,7 +910,7 @@ void CMenuPcs::createSingleMenu()
     *reinterpret_cast<s16*>(self + 0x866) = 0;
     gSingMenuAsyncLoadCompleted = 0;
     if (Game.m_gameWork.m_menuStageMode == 0) {
-        if (static_cast<s8>(self[0x859]) != 0) {
+        if (m_singleMenuStageActive != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
 
             void* font = *reinterpret_cast<void**>(self + 0x108);
@@ -918,20 +922,20 @@ void CMenuPcs::createSingleMenu()
                 *reinterpret_cast<void**>(self + 0x108) = 0;
             }
 
-            self[0x859] = 0;
-            self[0x85A] = 0;
+            m_singleMenuStageActive = 0;
+            m_singleMenuInitialized = 0;
         }
     } else {
-        if (static_cast<s8>(self[0x859]) == 0) {
+        if (m_singleMenuStageActive == 0) {
             *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xD4);
-            self[0x859] = 1;
+            m_singleMenuStageActive = 1;
         }
 
         char path[128];
         sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
         loadFont(1, path, 4, -1);
 
-        self[0x85A] = 0;
+        m_singleMenuInitialized = 0;
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
@@ -977,8 +981,8 @@ void CMenuPcs::destroySingleMenu()
     freeTexture(5, 2, 0x2D, 0x33);
 
     *reinterpret_cast<int*>(self + 0xF0) = 0;
-    self[0x85A] = 0;
-    self[0x859] = 0;
+    m_singleMenuInitialized = 0;
+    m_singleMenuStageActive = 0;
     gSingMenuForcedSelection = -1;
 
     void* ptr = *reinterpret_cast<void**>(self + 0x814);
@@ -1025,7 +1029,8 @@ void CMenuPcs::SingMenuInit()
     Graphic.DestroyTempBuffer();
 
     *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
-    memset(self + 0x85C, 0, 8);
+    m_singleMenuTextureLoadIndex = 0;
+    m_singleMenuTextureLoadState = 0;
     *reinterpret_cast<void**>(self + 0x774) = 0;
 
     CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
@@ -1116,7 +1121,7 @@ void CMenuPcs::SingMenuInit()
     FLOAT_8032ea78 = FLOAT_803329b8;
     *reinterpret_cast<int*>(self + 0x874) = -1;
     *(self + 0x872) = 1;
-    *(self + 0x85A) = 1;
+    m_singleMenuInitialized = 1;
 }
 
 /*
@@ -1174,7 +1179,7 @@ void CMenuPcs::drawSingleMenu()
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
             Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
-            self[0x85A] = 0;
+            m_singleMenuInitialized = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {
                 File.Close(gSingMenuAsyncFileHandle);
@@ -1358,37 +1363,37 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 
     gSingMenuHasScriptFoodBase = static_cast<int>(*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) != 0);
     if (Game.m_gameWork.m_menuStageMode == 0) {
-        if (self[0x859] == 0) {
+        if (m_singleMenuStageActive == 0) {
             return;
         }
 
         *reinterpret_cast<int*>(self + 0xF0) = 0;
-        self[0x859] = 0;
-        self[0x85A] = 0;
+        m_singleMenuStageActive = 0;
+        m_singleMenuInitialized = 0;
         return;
     }
 
-    if (self[0x859] == 0) {
+    if (m_singleMenuStageActive == 0) {
         createSingleMenu();
     }
     if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
         return;
     }
-    if (self[0x85A] == 0) {
+    if (m_singleMenuInitialized == 0) {
         SingMenuInit();
     }
 
     if (*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) == 0) {
-        int loadIndex = *reinterpret_cast<int*>(self + 0x85C);
+        int loadIndex = m_singleMenuTextureLoadIndex;
         if (loadIndex < 2) {
-            if (*reinterpret_cast<int*>(self + 0x860) == 0) {
+            if (m_singleMenuTextureLoadState == 0) {
                 char path[260];
                 const char* language = Game.GetLangString();
                 sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
-                *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
-            } else if (*reinterpret_cast<int*>(self + 0x860) == 1) {
+                m_singleMenuTextureLoadState = m_singleMenuTextureLoadState + 1;
+            } else if (m_singleMenuTextureLoadState == 1) {
                 if (!File.IsCompleted(gSingMenuAsyncFileHandle)) {
                     gSingMenuAsyncLoadCompleted = 0;
                     goto post_texture_load;
@@ -1410,11 +1415,11 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
-                *reinterpret_cast<int*>(self + 0x860) = 0;
-                *reinterpret_cast<int*>(self + 0x85C) = *reinterpret_cast<int*>(self + 0x85C) + 1;
+                m_singleMenuTextureLoadState = 0;
+                m_singleMenuTextureLoadIndex = m_singleMenuTextureLoadIndex + 1;
             }
 
-            if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
+            if (m_singleMenuTextureLoadIndex < 2) {
                 gSingMenuAsyncLoadCompleted = 0;
             } else {
                 SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;

@@ -66,6 +66,12 @@ struct MenuFontTlutPalette
     _GXColor shadow;
     _GXColor highlight;
 };
+
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
+
 static const char s_win_kazari_801D9D48[] = "win_kazari";
 extern const char s_CManager_801D9D54[] = "CManager";
 extern const char s_CProcess_801D9D60[] = "CProcess";
@@ -224,7 +230,7 @@ void CMenuPcs::Init()
     memset(m_textures, 0, sizeof(m_textures));
     memset(self + 0x04, 0, 0x1C);
 
-    self[0x859] = 0;
+    m_singleMenuStageActive = 0;
     *reinterpret_cast<u16*>(self + 0x86C) = 0;
     *reinterpret_cast<u32*>(self + 0x830) = 0;
     m_artiList = 0;
@@ -407,37 +413,15 @@ void CMenuPcs::create()
 void CMenuPcs::destroy()
 {
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
-
     u8* self = reinterpret_cast<u8*>(this);
-    CMenuPcs* textureCursor = this;
-    int i = 0;
-    do {
-        CRef** slot = reinterpret_cast<CRef**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
-        CRef* refObject = *slot;
-        if (refObject != nullptr) {
-            if (refObject->DecRef() == 0) {
-                delete refObject;
-            }
-            *slot = 0;
-        }
-        i++;
-        textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
-    } while (i < 0x16);
 
-    textureCursor = this;
-    i = 0;
-    do {
-        CRef** slot = reinterpret_cast<CRef**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
-        CRef* refObject = *slot;
-        if (refObject != nullptr) {
-            if (refObject->DecRef() == 0) {
-                delete refObject;
-            }
-            *slot = 0;
-        }
-        i++;
-        textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
-    } while (i < 2);
+    for (int i = 0; i < 0x16; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(&m_textures[i]));
+    }
+
+    for (int i = 0; i < 2; i++) {
+        ReleaseRefSlot(reinterpret_cast<void**>(&m_textureSets[i]));
+    }
 
     if (m_fonts[0] != nullptr) {
         if (m_fonts[0]->DecRef() == 0) {
@@ -447,9 +431,9 @@ void CMenuPcs::destroy()
     }
 
     Memory.DestroyStage(m_menuStage);
-    if (*reinterpret_cast<s8*>(self + 0x859) != 0) {
+    if (m_singleMenuStageActive != 0) {
         m_stageF0 = 0;
-        *(self + 0x859) = 0;
+        m_singleMenuStageActive = 0;
     }
 }
 
@@ -723,46 +707,46 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
     int i;
-    CMenuPcs* slotMenu;
+    void** slot;
 
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
+    if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
-        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
                 if ((currentMode != -1) && (-2 < currentMode)) {
-                    ReleaseRefSlot(reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xFC));
+                    ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
 
                     i = 0;
-                    slotMenu = this;
+                    slot = reinterpret_cast<void**>(&m_textures[0x16]);
                     do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4));
+                        ReleaseRefSlot(slot);
                         i++;
-                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                        slot++;
                     } while (i < 10);
 
                     i = 0;
-                    slotMenu = this;
+                    slot = reinterpret_cast<void**>(&m_textureSets[2]);
                     do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x154));
+                        ReleaseRefSlot(slot);
                         i++;
-                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                        slot++;
                     } while (i < 2);
 
                     i = 0;
-                    slotMenu = this;
+                    slot = reinterpret_cast<void**>(m_battleRingMenus);
                     do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x13C));
+                        ReleaseRefSlot(slot);
                         i++;
-                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                        slot++;
                     } while (i < 4);
 
                     i = 0;
-                    slotMenu = this;
+                    slot = reinterpret_cast<void**>(m_battleMesMenus);
                     do {
-                        ReleaseRefSlot(reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x10C));
+                        ReleaseRefSlot(slot);
                         i++;
-                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                        slot++;
                     } while (i < 12);
 
                     destroySingleMenu();
@@ -775,8 +759,8 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
             destroyWorld();
         }
 
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) = static_cast<int>(mode);
-        currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        m_mode = static_cast<int>(mode);
+        currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
                 if ((currentMode != -1) && (-2 < currentMode)) {
@@ -901,7 +885,7 @@ void CMenuPcs::draw()
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 
     {
-        int mode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+        int mode = m_mode;
 
         if (mode == 1) {
             drawWorld();
@@ -916,7 +900,7 @@ void CMenuPcs::draw()
     }
 
     if (((CFlatEventFlags() & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+        CTexture* texture = m_textures[1];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
         float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
@@ -1726,8 +1710,7 @@ void CMenuPcs::createBattle()
  */
 void CMenuPcs::destroyBattle()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    void** slot = reinterpret_cast<void**>(self + 0x1E4);
+    void** slot = reinterpret_cast<void**>(&m_textures[0x16]);
     for (int i = 0; i < 10; i++, slot++) {
         ReleaseRefSlot(slot);
     }

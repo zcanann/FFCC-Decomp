@@ -143,7 +143,13 @@ public:
     CFont* m_infoPanelFont;
     unsigned char _pad1[0x108 - 0xFC];
     CFont* m_labelFont;
-    unsigned char _pad2[0x878 - 0x10C];
+    unsigned char _pad2[0x859 - 0x10C];
+    unsigned char m_singleMenuStageActive;
+    unsigned char m_singleMenuInitialized;
+    unsigned char _pad3[0x85C - 0x85B];
+    int m_singleMenuTextureLoadIndex;
+    int m_singleMenuTextureLoadState;
+    unsigned char _pad4[0x878 - 0x864];
     void* m_shopMenu;
 };
 

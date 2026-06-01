@@ -40,29 +40,9 @@ struct RawVec {
     u32 z;
 };
 
-struct ScreenBreakDisplayList {
-    u32 m_size;
-    void* m_data;
-    u16 m_material;
-};
-
-struct ScreenBreakMeshData {
-    char m_name[0x10];
-    u8 m_flags;
-    u8 _pad11[3];
-    u32 m_vertexCount;
-    S16Vec* m_vertices;
-    u8 _pad1C[0x34];
-    ScreenBreakDisplayList* m_displayLists;
-    u8 _pad54[0x8];
-    s32 m_nodeIndex;
-};
-
-struct ScreenBreakMeshRef {
-    u8 _pad0[0x8];
-    ScreenBreakMeshData* m_data;
-    u8 _padC[0x8];
-};
+typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
+typedef CChara::CMesh::CRefData ScreenBreakMeshData;
+typedef CChara::CMesh ScreenBreakMeshRef;
 
 struct ScreenBreakModelView {
     u8 _pad0[0x68];
@@ -99,7 +79,7 @@ STATIC_ASSERT(offsetof(ScreenBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(ScreenBreakModelView, m_meshes) == 0xAC);
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
-STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x5C);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x60);
 
 template <class T>
 class CPtrArray

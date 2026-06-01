@@ -35,13 +35,7 @@ extern "C" const char s_chara_cpp[];
 
 namespace {
 
-struct CCharaDisplayListRaw
-{
-	void* m_data;
-	s32 m_size;
-	u16 m_material;
-	u16 _padA;
-};
+typedef CChara::CMesh::CDisplayList CCharaDisplayListRaw;
 
 struct SRTView
 {
@@ -50,40 +44,15 @@ struct SRTView
 	Vec m_scale;
 };
 
-struct CCharaMeshRefRaw
-{
-	char m_name[0x10];
-	u8 m_flags;
-	u8 _pad11[3];
-	u32 m_vertexCount;
-	S16Vec* m_vertices;
-	u32 m_normalCount;
-	S16Vec* m_normals;
-	u32 m_colorCount;
-	void* m_colors;
-	u32 m_uvCount;
-	void* m_uvs;
-	u32 m_oneWeightCountOrSize;
-	void* m_oneWeightData;
-	u32 m_twoWeightCountOrSize;
-	void* m_twoWeightData;
-	u32 m_threeWeightCountOrSize;
-	void* m_threeWeightData;
-	u32 m_displayListCount;
-	CCharaDisplayListRaw* m_displayLists;
-	u32 m_skinCount;
-	CLightPcs::CBumpLight* m_skins;
-	u32 m_infoWord1;
-	u32 m_nodeIndex;
-};
+typedef CChara::CMesh::CRefData CCharaMeshRefRaw;
+typedef CChara::CMesh CCharaMeshRaw;
 
-struct CCharaMeshRaw
-{
-	CCharaMeshRefRaw* m_data;
-	S16Vec* m_workPositions;
-	S16Vec* m_workNormals;
-	u8 _padC[8];
-};
+STATIC_ASSERT(sizeof(CCharaDisplayListRaw) == 0xC);
+STATIC_ASSERT(sizeof(CCharaMeshRefRaw) == 0x64);
+STATIC_ASSERT(sizeof(CCharaMeshRaw) == 0x14);
+STATIC_ASSERT(offsetof(CCharaMeshRaw, m_data) == 0x8);
+STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workPositions) == 0xC);
+STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workNormals) == 0x10);
 
 typedef CCharaModelData CCharaModelRefRaw;
 
@@ -2640,8 +2609,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			break;
 		case 0x434F4C52:
 			meshRef->m_colorCount = chunkInfo.m_size >> 2;
-			meshRef->m_colors =
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7E6, 0);
+			meshRef->m_colors = static_cast<u8*>(
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7E6, 0));
 			if (meshRef->m_colors != 0) {
 				memcpy(meshRef->m_colors, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_colors, meshRef->m_colorCount << 2);
@@ -2649,8 +2618,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			break;
 		case 0x55562020:
 			meshRef->m_uvCount = chunkInfo.m_size >> 2;
-			meshRef->m_uvs =
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7EE, 0);
+			meshRef->m_uvs = static_cast<u8*>(
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7EE, 0));
 			if (meshRef->m_uvs != 0) {
 				memcpy(meshRef->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_uvs, meshRef->m_uvCount << 2);
@@ -2669,8 +2638,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x534B494E: {
 			meshRef->m_skinCount = chunkInfo.m_arg0;
 			if (meshRef->m_skinCount != 0) {
-				meshRef->m_skins = reinterpret_cast<CLightPcs::CBumpLight*>(
-				    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[meshRef->m_skinCount]);
+				meshRef->m_skins =
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[meshRef->m_skinCount];
 				if (meshRef->m_skins != 0) {
 					memset(meshRef->m_skins, 0, meshRef->m_skinCount * 0x64);
 				}
@@ -3076,11 +3045,11 @@ CChara::CMesh::CRefData::~CRefData()
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
-		delete[] reinterpret_cast<CChara::CMesh::CDisplayList*>(ref->m_displayLists);
+		delete[] ref->m_displayLists;
 		ref->m_displayLists = 0;
 	}
 	if (ref->m_skins != 0) {
-		delete[] reinterpret_cast<CChara::CSkin*>(ref->m_skins);
+		delete[] ref->m_skins;
 		ref->m_skins = 0;
 	}
 }
@@ -3096,9 +3065,9 @@ CChara::CMesh::CRefData::~CRefData()
  */
 CChara::CMesh::CDisplayList::CDisplayList()
 {
-	*(void**)this = 0;
-	*(s32*)((u8*)this + 4) = 0;
-	*(u16*)((u8*)this + 8) = 0xFFFF;
+	m_data = 0;
+	m_size = 0;
+	m_material = 0xFFFF;
 }
 
 /*
@@ -3112,10 +3081,9 @@ CChara::CMesh::CDisplayList::CDisplayList()
  */
 CChara::CMesh::CDisplayList::~CDisplayList()
 {
-	void** data = (void**)((u8*)this + 4);
-	if (data[0] != 0) {
-		operator delete[](data[0]);
-		data[0] = 0;
+	if (m_data != 0) {
+		operator delete[](m_data);
+		m_data = 0;
 	}
 }
 

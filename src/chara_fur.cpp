@@ -131,48 +131,9 @@ struct FurMaterialRaw
     unsigned char m_furEnable;
 };
 
-struct FurDisplayListRaw
-{
-    void* m_data;
-    int m_size;
-    unsigned short m_material;
-    unsigned short m_padA;
-};
-
-struct FurMeshRefRaw
-{
-    char m_name[0x10];
-    unsigned char m_flags;
-    unsigned char m_pad11[3];
-    unsigned int m_vertexCount;
-    S16Vec* m_vertices;
-    unsigned int m_normalCount;
-    S16Vec* m_normals;
-    unsigned int m_colorCount;
-    void* m_colors;
-    unsigned int m_uvCount;
-    void* m_uvs;
-    unsigned int m_oneWeightCountOrSize;
-    void* m_oneWeightData;
-    unsigned int m_twoWeightCountOrSize;
-    void* m_twoWeightData;
-    unsigned int m_threeWeightCountOrSize;
-    void* m_threeWeightData;
-    unsigned int m_displayListCount;
-    FurDisplayListRaw* m_displayLists;
-    unsigned int m_skinCount;
-    void* m_skins;
-    unsigned int m_infoWord1;
-    unsigned int m_nodeIndex;
-};
-
-struct FurMeshRaw
-{
-    FurMeshRefRaw* m_data;
-    S16Vec* m_workPositions;
-    S16Vec* m_workNormals;
-    unsigned char m_padC[8];
-};
+typedef CChara::CMesh::CDisplayList FurDisplayListRaw;
+typedef CChara::CMesh::CRefData FurMeshRefRaw;
+typedef CChara::CMesh FurMeshRaw;
 
 struct FurTexCoordRaw
 {

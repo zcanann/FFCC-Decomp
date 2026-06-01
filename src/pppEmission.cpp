@@ -29,25 +29,9 @@ extern "C" const char s_pppEmission_cpp[] = "pppEmission.cpp";
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
-struct EmissionDisplayList {
-    u32 m_size;
-    void* m_data;
-    u16 m_material;
-};
-
-struct EmissionMeshData {
-    u8 _pad0[0x28];
-    u8* m_colors;
-    u8 _pad1[0x20];
-    u32 m_displayListCount;
-    EmissionDisplayList* m_displayLists;
-};
-
-struct EmissionMeshRef {
-    u8 _pad0[8];
-    EmissionMeshData* m_data;
-    u8 _pad1[8];
-};
+typedef CChara::CMesh::CDisplayList EmissionDisplayList;
+typedef CChara::CMesh::CRefData EmissionMeshData;
+typedef CChara::CMesh EmissionMeshRef;
 
 struct EmissionState;
 

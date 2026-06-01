@@ -258,18 +258,47 @@ public:
 		CMesh();
 		~CMesh();
 
-		class CRefData
-		{
-		public:
-			CRefData();
-			~CRefData();
-		};
-
 		class CDisplayList
 		{
 		public:
 			CDisplayList();
 			~CDisplayList();
+
+			void* m_data;
+			s32 m_size;
+			u16 m_material;
+			u16 _padA;
+		};
+
+		class CRefData
+		{
+		public:
+			CRefData();
+			~CRefData();
+
+			char m_name[0x10];
+			u8 m_flags;
+			u8 _pad11[3];
+			u32 m_vertexCount;
+			S16Vec* m_vertices;
+			u32 m_normalCount;
+			S16Vec* m_normals;
+			u32 m_colorCount;
+			u8* m_colors;
+			u32 m_uvCount;
+			u8* m_uvs;
+			u32 m_oneWeightCountOrSize;
+			void* m_oneWeightData;
+			u32 m_twoWeightCountOrSize;
+			void* m_twoWeightData;
+			u32 m_threeWeightCountOrSize;
+			void* m_threeWeightData;
+			u32 m_displayListCount;
+			CDisplayList* m_displayLists;
+			u32 m_skinCount;
+			CSkin* m_skins;
+			u32 m_infoWord1;
+			u32 m_nodeIndex;
 		};
 
 		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);

@@ -11,34 +11,15 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-struct ChangeTexDisplayList {
-	u32 m_size;
-	void* m_data;
-	u16 m_material;
-	u16 _pad;
-};
+typedef CChara::CMesh::CDisplayList ChangeTexDisplayList;
 
 struct ChangeTexDisplayListCopy {
 	void* m_data;
 	u32 m_size;
 };
 
-struct ChangeTexMeshData {
-	char m_name[0x14];
-	u32 m_vertexCount;
-	u8 _pad18[0x8];
-	void* m_normals;
-	u8 _pad1[0x28];
-	s32 m_displayListCount;
-	ChangeTexDisplayList* m_displayLists;
-};
-
-struct ChangeTexMeshRef {
-	u8 _pad0[0x8];
-	ChangeTexMeshData* m_data;
-	S16Vec* m_points;
-	u8 _pad10[0x14 - 0x10];
-};
+typedef CChara::CMesh::CRefData ChangeTexMeshData;
+typedef CChara::CMesh ChangeTexMeshRef;
 
 struct pppYmChangeTexState {
 	float m_value0;
@@ -74,7 +55,7 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
+STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
 STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
@@ -82,6 +63,11 @@ STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
+
+static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
+{
+	return model->m_meshes;
+}
 
 void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -177,7 +163,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 	state->m_texture = texObj;
 
-	ChangeTexMeshRef* meshList = model0Raw->m_meshes;
+	ChangeTexMeshRef* meshList = ChangeTexMeshes(model0);
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
 		state->m_meshColorArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
@@ -216,13 +202,13 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			memset((void*)*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount << 2);
 			arrayOffset = arrayOffset + 4;
 			meshColorArrays = meshColorArrays + 1;
-			meshList = (ChangeTexMeshRef*)((char*)meshList + sizeof(ChangeTexMeshRef));
+			meshList++;
 		}
 	}
 
 	Mtx modelMtx;
 
-	ChangeTexMeshRef* curMesh = model0Raw->m_meshes;
+	ChangeTexMeshRef* curMesh = ChangeTexMeshes(model0);
 	int frame = (int)(state->m_value0 * (float)(1 << model0Raw->m_data->m_posQuant));
 	short frameShort = (short)frame;
 	PSMTXCopy(model0Raw->m_matrix, modelMtx);
@@ -242,7 +228,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		int pointOffset = 0;
 		int vertColors = *(int*)((char*)state->m_meshColorArrays + meshOffset);
 		for (unsigned int v = 0; v < curMesh->m_data->m_vertexCount; v++) {
-			int delta = (int)frameShort - (int)*(short*)((char*)curMesh->m_points + pointOffset + 2);
+			int delta = (int)frameShort - (int)*(short*)((char*)curMesh->m_workPositions + pointOffset + 2);
 			if (delta >= 0) {
 				int level = 0;
 				float threshold = ChangeTexConst(FLOAT_80330df8);
@@ -267,7 +253,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		}
 
 		meshOffset = meshOffset + 4;
-		curMesh = (ChangeTexMeshRef*)((char*)curMesh + sizeof(ChangeTexMeshRef));
+		curMesh++;
 	}
 }
 

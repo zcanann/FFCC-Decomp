@@ -7,22 +7,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 
-struct EraseCharaPartsDisplayList {
-    u32 m_size;
-    void* m_data;
-    u16 m_material;
-};
-
-struct EraseCharaPartsMeshData {
-    u8 _pad0[0x50];
-    EraseCharaPartsDisplayList* m_displayLists;
-};
-
-struct EraseCharaPartsMesh {
-    u8 _pad0[0x8];
-    EraseCharaPartsMeshData* m_data;
-    u8 _padC[0x8];
-};
+typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
+typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
+typedef CChara::CMesh EraseCharaPartsMesh;
 
 struct EraseCharaPartsModelView {
     u8 _pad0[0xA4];

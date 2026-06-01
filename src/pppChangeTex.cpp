@@ -13,34 +13,15 @@ extern const float kPppChangeTexInit;
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 
-struct ChangeTexDisplayList {
-	u32 m_size;
-	void* m_data;
-	u16 m_material;
-	u16 _pad;
-};
+typedef CChara::CMesh::CDisplayList ChangeTexDisplayList;
 
 struct ChangeTexDisplayListCopy {
 	void* m_data;
 	u32 m_size;
 };
 
-struct ChangeTexMeshData {
-	char m_name[0x14];
-	u32 m_vertexCount;
-	u8 _pad18[0x8];
-	void* m_normals;
-	u8 _pad1[0x28];
-	s32 m_displayListCount;
-	ChangeTexDisplayList* m_displayLists;
-};
-
-struct ChangeTexMeshRef {
-	u8 _pad0[0x8];
-	ChangeTexMeshData* m_data;
-	S16Vec* m_points;
-	u8 _pad10[0x14 - 0x10];
-};
+typedef CChara::CMesh::CRefData ChangeTexMeshData;
+typedef CChara::CMesh ChangeTexMeshRef;
 
 struct ChangeTexWork {
 	float m_value0;
@@ -63,7 +44,7 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_points) == 0xC);
+STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 extern const float kPppChangeTexCachedValueInit = -10000.0f;
@@ -75,7 +56,7 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 
 static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
 {
-	return reinterpret_cast<ChangeTexMeshRef*>(model->m_meshes);
+	return model->m_meshes;
 }
 
 static inline float LoadFloat(const float& value)
@@ -192,7 +173,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
-				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_points,
+				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_workPositions,
 				    meshData->m_vertexCount, model0->m_data->m_posQuant);
 			}
 
@@ -223,7 +204,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 			arrayOffset += 4;
 			meshColorArrays = meshColorArrays + 1;
-			meshList = (ChangeTexMeshRef*)((char*)meshList + sizeof(ChangeTexMeshRef));
+			meshList++;
 		}
 	}
 
@@ -252,13 +233,13 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		unsigned int vertCount;
 		for (unsigned int v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
 			if (step->m_payload[0] == 1) {
-				if (*(short*)((char*)meshList->m_points + pointOffset + 2) < splitY) {
+				if (*(short*)((char*)meshList->m_workPositions + pointOffset + 2) < splitY) {
 					*(char*)(colorPtr + 3) = (char)(int)alphaBase;
 				} else {
 					*(char*)(colorPtr + 3) = 0;
 				}
 			} else if (step->m_payload[0] == 2) {
-				if (*(short*)((char*)meshList->m_points + pointOffset + 2) > splitY) {
+				if (*(short*)((char*)meshList->m_workPositions + pointOffset + 2) > splitY) {
 					*(char*)(colorPtr + 3) = (char)(int)alphaBase;
 				} else {
 					*(char*)(colorPtr + 3) = 0;
@@ -271,7 +252,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 		DCFlushRange((void*)colorBase, vertCount << 2);
 		arrayOffset += 4;
-		meshList = (ChangeTexMeshRef*)((char*)meshList + sizeof(ChangeTexMeshRef));
+		meshList++;
 	}
 }
 

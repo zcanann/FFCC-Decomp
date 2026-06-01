@@ -84,22 +84,6 @@ enum {
 	kLetterTextScratchSize = 0x400,
 };
 
-struct FlatDataTableView {
-	int m_numEntries;
-	char** m_strings;
-	char* m_stringBuf;
-};
-
-struct FlatDataView {
-	int m_dataCount;
-	unsigned char _pad[0x68 - 4];
-	int m_tableCount;
-	FlatDataTableView m_tabl[8];
-	int m_mesCount;
-	char* m_mesBuffer;
-	char* m_mesPtr[1122];
-};
-
 struct LetterAnimStorage {
 	s16 count;
 	s16 pad_02;
@@ -117,6 +101,11 @@ static inline int GetLetterStateBase(CMenuPcs* menu)
 static inline LetterAnimStorage* GetLetterAnimStorage(CMenuPcs* menu)
 {
 	return *reinterpret_cast<LetterAnimStorage**>(reinterpret_cast<char*>(menu) + 0x850);
+}
+
+static inline int GetLetterItemValue(int itemId)
+{
+	return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemId];
 }
 
 static inline int GetLetterAnimBase(CMenuPcs* menu)
@@ -313,9 +302,8 @@ void CMenuPcs::LetterInit2()
 
 	int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
 	if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
-		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 		int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
-		int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
+		int value = GetLetterItemValue(itemId);
 		if (Game.m_gameWork.m_languageId == 2) {
 			sprintf(info, s_letterItemInfoFmt,
 			        GetMenuStr(0x23),
@@ -375,8 +363,7 @@ void CMenuPcs::LetterInit3()
 	memset(workText, 0, kLetterTextScratchSize);
 
 	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-	strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
+	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 	s_ReplyMax = 0;
@@ -428,11 +415,9 @@ void CMenuPcs::LetterInit4()
 	unsigned char languageId = Game.m_gameWork.m_languageId;
 	char lines[8][0x80];
 	memset(lines, 0, sizeof(lines));
-
-	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 	unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-	char** subjectTable = flatData->m_tabl[2].m_strings;
-	char** itemTable = flatData->m_tabl[0].m_strings;
+	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
+	char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
 
 	const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 	if (languageId == 3) {
@@ -454,7 +439,7 @@ void CMenuPcs::LetterInit4()
 		if (languageId == 2) {
 			if (s_Attach == 0) {
 				sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
-				        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
+				        GetLetterItemValue(s_AttachItem * 5 + 4),
 				        GetMenuStr(0x24));
 			} else if (s_Attach == 1) {
 				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
@@ -746,9 +731,8 @@ int CMenuPcs::LetterCtrl()
 				s16 winH;
 				int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
 				if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
-					FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 					int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
-					int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
+					int value = GetLetterItemValue(itemId);
 					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, s_letterItemInfoFmt,
 						        GetMenuStr(0x23),
@@ -1302,9 +1286,8 @@ void CMenuPcs::LetterItemWinOpen()
 
 		int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
 		if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
-			FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 			int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
-			int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
+			int value = GetLetterItemValue(itemId);
 			if (Game.m_gameWork.m_languageId == 2) {
 				sprintf(info, s_letterItemInfoFmt,
 				        GetMenuStr(0x23),
@@ -1405,8 +1388,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
 			caravanWork + s_SelLetter * 0xC + 0x3EC);
-		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-		strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
+		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 		CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 		s_ReplyMax = 0;
@@ -1561,11 +1543,9 @@ bool CMenuPcs::LetterConfirmOpen()
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
-
-		FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 		unsigned int letterWord = *reinterpret_cast<unsigned int*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-		char** subjectTable = flatData->m_tabl[2].m_strings;
-		char** itemTable = flatData->m_tabl[0].m_strings;
+		char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
+		char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
 
 		const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 		if (languageId == 3) {
@@ -1607,7 +1587,7 @@ bool CMenuPcs::LetterConfirmOpen()
 			if (languageId == 2) {
 				if (s_Attach == 0) {
 					sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
-					        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
+					        GetLetterItemValue(s_AttachItem * 5 + 4),
 					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
 					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
@@ -1745,7 +1725,6 @@ void CMenuPcs::LetterListDraw()
 
 	const unsigned int caravanWork = Game.m_scriptFoodBase[0];
 	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));
-	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
 
 	int y = 0x60;
 	for (int row = 0; row < 9; ++row) {
@@ -1764,12 +1743,12 @@ void CMenuPcs::LetterListDraw()
 
 		font->SetTlut(tlut);
 
-		const char* from = flatData->m_tabl[5].m_strings[(letterWord & 0x7FC) >> 2];
+		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letterWord & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
 		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
 		font->Draw(from);
 
-		const char* subject = flatData->m_tabl[2].m_strings[(letterWord >> 7) & 0x1FF];
+		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letterWord >> 7) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
 		font->SetPosY(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)));
 		font->Draw(subject);
@@ -1910,8 +1889,7 @@ void CMenuPcs::LetterMessDraw()
 	memset(workText, 0, kLetterTextScratchSize);
 
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-	strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x10]);
+	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 	char* curLine = workText;
@@ -2191,8 +2169,7 @@ int CMenuPcs::LetterCtrlCur()
 				memset(workText, 0, kLetterTextScratchSize);
 
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-				FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
-				strcpy(srcText, flatData->m_mesPtr[((msgIndex & 0x7FC) >> 1) + 0x11]);
+				strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
 				CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 				char* line = workText;

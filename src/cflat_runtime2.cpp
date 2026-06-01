@@ -2053,9 +2053,9 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::PutParticleWork()
+int CFlatRuntime2::PutParticleWork()
 {
-	PartMng.pppCreate(
+	return PartMng.pppCreate(
 		ParticleWorkNoHi(this), ParticleWorkNoLo(this),
 		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
 }

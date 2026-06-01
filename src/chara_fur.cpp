@@ -15,6 +15,8 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
+#include "ffcc/p_tina.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pad.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
@@ -85,6 +87,7 @@ void* gMogFurTexBuffer;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
+extern float FLOAT_8033111C;
 extern float FLOAT_80331120;
 extern float FLOAT_80331130;
 extern float FLOAT_80331134;
@@ -1424,6 +1427,32 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 			} else {
 				work.m_offColorTicks = 0;
 				work.m_eraseTicks = 0;
+			}
+
+			int particleNo = 0;
+			int emitParticle = 0;
+			_GXColor particleColor = centerBefore;
+			if (radarType < 3) {
+				particleNo = 0x73;
+				particleColor = brushColor;
+				emitParticle = ((System.m_frameCounter & 1) == 0);
+			} else if (eraseMode != 0) {
+				particleNo = 0x72;
+				emitParticle = 1;
+			} else if (radarType == 3) {
+				particleNo = 0x74;
+				emitParticle = ((System.m_frameCounter & 7) == 0);
+			}
+			if (emitParticle != 0) {
+				CFlatRuntime2Storage().ResetParticleWork(particleNo | 0x100, 0);
+				CFlatRuntime2Storage().SetParticleWorkPos(worldPos, kCharaFurDepthZero);
+				const int particleIndex = CFlatRuntime2Storage().PutParticleWork();
+				pppFVECTOR4 color;
+				color.x = static_cast<float>(particleColor.r) / FLOAT_8033111C;
+				color.y = static_cast<float>(particleColor.g) / FLOAT_8033111C;
+				color.z = static_cast<float>(particleColor.b) / FLOAT_8033111C;
+				color.w = static_cast<float>(particleColor.a) / FLOAT_80331120;
+				PartPcs.SetParColIdx(particleIndex, color);
 			}
 		}
 

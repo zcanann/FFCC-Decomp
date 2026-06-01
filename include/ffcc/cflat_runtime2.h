@@ -125,7 +125,7 @@ public:
 	void drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int);
 
 	void PutParticle(int, Vec&, float);
-	void PutParticleWork();
+	int PutParticleWork();
 	void ResetParticleWork(int, int);
 
 	void SetParticleWorkNo(int);

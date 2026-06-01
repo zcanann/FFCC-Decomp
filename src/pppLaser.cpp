@@ -13,9 +13,9 @@
 
 #include <string.h>
 
-extern const f32 kPppLaserZero = 0.0f;
-extern const f32 FLOAT_8033342c = 1.0f;
-extern const f32 FLOAT_80333430 = 2.0f;
+extern const f32 kPppLaserZero;
+extern const f32 FLOAT_8033342c;
+extern const f32 FLOAT_80333430;
 extern const f32 kMenuArtiNegativeOne;
 extern const f32 kMenuArtiDefaultScale;
 extern const f32 kMenuArtiBoundsMax;

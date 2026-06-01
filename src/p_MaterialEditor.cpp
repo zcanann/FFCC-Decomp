@@ -37,7 +37,7 @@ unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_
 CMaterialEditorPcs MaterialEditorPcs;
 char* q;
 
-CMaterialEditorPcsTable CMaterialEditorPcs::m_table = {
+CProcessTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
     {
         m_table_desc0[0],

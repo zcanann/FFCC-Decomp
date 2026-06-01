@@ -7,8 +7,20 @@ extern const char s_CMcPcs_80331B10[] = "CMcPcs";
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
 
-unsigned int CMcPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMcPcs_80331B10)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
+CProcessTable CMcPcs::m_table = {
+    const_cast<char*>(s_CMcPcs_80331B10),
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x1B,
+    },
 };
 
 CMcPcs McPcs;
@@ -132,7 +144,7 @@ void CMcPcs::create()
  */
 int CMcPcs::GetTable(unsigned long index)
 {
-	return (int)(reinterpret_cast<unsigned char*>(m_table) + (index * 0x15c));
+	return reinterpret_cast<int>(&m_table + index);
 }
 
 /*

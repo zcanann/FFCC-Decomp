@@ -3,19 +3,21 @@
 #include "ffcc/p_dbgmenu.h"
 
 CSystemPcs SystemPcs;
-unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>("CSystemPcs"),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x16,
-    0x8
+CProcessTable CSystemPcs::m_table = {
+    "CSystemPcs",
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x16,
+        0x8,
+    },
 };
 /*
  * --INFO--
@@ -90,9 +92,7 @@ void CSystemPcs::create()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	unsigned char* table = reinterpret_cast<unsigned char*>(CSystemPcs::m_table);
-	unsigned long offset = index * 0x15c;
-	return (int)(table + offset);
+	return reinterpret_cast<int>(&CSystemPcs::m_table + index);
 }
 
 /*

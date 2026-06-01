@@ -133,7 +133,7 @@ unsigned int CMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsig
 unsigned int CMenuPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
 unsigned int CMenuPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
-CMenuPcsTable CMenuPcs::m_table = {
+CProcessTable CMenuPcs::m_table = {
     const_cast<char*>(kMenuPcsStageName),
     {
         m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],

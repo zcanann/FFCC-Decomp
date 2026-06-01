@@ -28,18 +28,20 @@ inline CUSBPcs::CUSBPcs()
     table[9] = desc2[2];
 }
 
-unsigned int CUSBPcs::m_table[0x11C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(sUsbPcsClassName)),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x12,
+CSmallProcessTable CUSBPcs::m_table = {
+    const_cast<char*>(sUsbPcsClassName),
+    {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0x12,
+    },
 };
 extern const char s_p_usb_cpp[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
@@ -233,7 +235,7 @@ void CUSBPcs::IsBigAlloc(int param_2)
  */
 int CUSBPcs::GetTable(unsigned long param)
 {
-    return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + (param * 0x15c));
+    return reinterpret_cast<int>(reinterpret_cast<char*>(&m_table) + (param * 0x15c));
 }
 
 /*

@@ -11,7 +11,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 #include "ffcc/line_constants.h"
-#include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
 #include "dolphin/ar.h"
 #include "dolphin/gx.h"

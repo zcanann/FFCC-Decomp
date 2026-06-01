@@ -535,7 +535,7 @@ config.libs = [
             Object(NonMatching, "maphit.cpp"),
             Object(NonMatching, "maplight.cpp"),
             Object(NonMatching, "mapmesh.cpp", extra_cflags=["-sdata 8"]),
-            Object(NonMatching, "mapobj.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "mapobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
             Object(NonMatching, "mapocttree.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "mapshadow.cpp"),
             Object(NonMatching, "maptexanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),

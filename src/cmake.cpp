@@ -2073,7 +2073,7 @@ void CMenuPcs::CmakeNameDraw()
         int cursorX = static_cast<int>(
             FLOAT_803332c0 * static_cast<float>(*reinterpret_cast<short*>(state + 0x26)) +
             static_cast<float>(FLOAT_803332c8));
-        DrawCursor(cursorX + (System.m_frameCounter & 7),
+        DrawCursor(cursorX + (static_cast<int>(System.m_frameCounter) % 8),
             *reinterpret_cast<short*>(state + 0x28) * 0x20 + 0x70, FLOAT_80333258);
     }
 

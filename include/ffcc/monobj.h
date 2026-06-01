@@ -24,6 +24,19 @@ public:
     {
     public:
         void Clear();
+
+        unsigned int m_flags;       // 0x00
+        unsigned int m_stateFlags;  // 0x04
+        CGCharaObj* m_target;       // 0x08
+        Vec m_targetPos;            // 0x0C
+        float m_speed;              // 0x18
+        float m_range;              // 0x1C
+        unsigned int m_limitFrame;  // 0x20
+        int m_frame;                // 0x24
+        int m_mode;                 // 0x28
+        int m_changeStat;           // 0x2C
+        short m_routeFrom;          // 0x30
+        short m_routePrev;          // 0x32
     };
 	
     void onCreate();
@@ -249,6 +262,11 @@ public:
 
     unsigned char m_unk6B8[0x50]; // 0x6B8
     MonAiFuncTable* m_funcs;      // 0x708
+    CMoveWork m_moveWork;         // 0x70C
 };
+
+STATIC_ASSERT(sizeof(CGMonObj::CMoveWork) == 0x34);
+STATIC_ASSERT(offsetof(CGMonObj, m_moveWork) == 0x70C);
+STATIC_ASSERT(sizeof(CGMonObj) == 0x740);
 
 #endif // _FFCC_MONOBJ_H_

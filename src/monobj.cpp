@@ -81,7 +81,7 @@ void CGMonObj::onCreate()
 	*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
 	mon[0x6BB] = 0;
 	*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
-	memset(mon + 0x70C, 0, 0x34);
+	memset(&m_moveWork, 0, sizeof(m_moveWork));
 	*reinterpret_cast<unsigned int*>(mon + 0x6E0) = 0;
 	mon[0x6C1] = 0;
 }
@@ -684,8 +684,8 @@ void CGMonObj::onCancelStat(int state)
 
 	case 0x21:
 		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-		memset(mon + 0x70C, 0, 0x34);
-		if ((*reinterpret_cast<unsigned int*>(mon + 0x710) & 2) == 0) {
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
+		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
 		}
 		break;
@@ -721,7 +721,7 @@ void CGMonObj::isValidTarget()
 	if ((*reinterpret_cast<int*>(mon + 0x6C4) >= 0) &&
 	    ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0)) {
 		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-		memset(mon + 0x70C, 0, 0x34);
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		*reinterpret_cast<int*>(mon + 0x6D8) = 2;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 1;
@@ -731,7 +731,7 @@ void CGMonObj::isValidTarget()
 	if (((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
 		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-		memset(mon + 0x70C, 0, 0x34);
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 1;
@@ -740,17 +740,15 @@ void CGMonObj::isValidTarget()
 
 	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
 		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
-		if (*reinterpret_cast<int*>(mon + 0x734) != 3) {
-			memset(mon + 0x70C, 0, 0x34);
-			*reinterpret_cast<int*>(mon + 0x70C) = 0x806;
-			*reinterpret_cast<int*>(mon + 0x734) = 3;
+		if (m_moveWork.m_mode != 3) {
+			memset(&m_moveWork, 0, sizeof(m_moveWork));
+			m_moveWork.m_flags = 0x806;
+			m_moveWork.m_mode = 3;
 		}
-		*reinterpret_cast<int*>(mon + 0x718) = *reinterpret_cast<int*>(mon + 0x6F8);
-		*reinterpret_cast<int*>(mon + 0x71C) = *reinterpret_cast<int*>(mon + 0x6FC);
-		*reinterpret_cast<int*>(mon + 0x720) = *reinterpret_cast<int*>(mon + 0x700);
+		m_moveWork.m_targetPos = *reinterpret_cast<Vec*>(mon + 0x6F8);
 	}
 
-	if (((*reinterpret_cast<short*>(script9 + 0x10C) != 1) || (*reinterpret_cast<int*>(mon + 0x730) < 0x19)) &&
+	if (((*reinterpret_cast<short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
 	    ((*reinterpret_cast<short*>(script9 + 0x10C) == 1) || (FLOAT_80331A34 * maxDist <= homeDist))) {
 		goto check_home;
 	}
@@ -793,7 +791,7 @@ check_home:
 		*reinterpret_cast<int*>(mon + 0x6FC) = *reinterpret_cast<int*>(mon + 0x160);
 		*reinterpret_cast<int*>(mon + 0x700) = *reinterpret_cast<int*>(mon + 0x164);
 		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-		memset(mon + 0x70C, 0, 0x34);
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		*reinterpret_cast<int*>(mon + 0x6D8) = 0;
 		*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 1;
@@ -2200,58 +2198,58 @@ void CGMonObj::InitFinished()
 
 	switch (reinterpret_cast<unsigned int>(classId)) {
 	case 0x5B:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsGiantCrab;
+		m_funcs = &funcsGiantCrab;
 		break;
 	case 0x5F:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsMolbol;
+		m_funcs = &funcsMolbol;
 		break;
 	case 0x63:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsOrcKing;
+		m_funcs = &funcsOrcKing;
 		break;
 	case 0x67:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsGoblinKing;
+		m_funcs = &funcsGoblinKing;
 		break;
 	case 0x6B:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsArmstrong;
+		m_funcs = &funcsArmstrong;
 		break;
 	case 0x6F:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsGigasLoad;
+		m_funcs = &funcsGigasLoad;
 		break;
 	case 0x70:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsWifeLamia;
+		m_funcs = &funcsWifeLamia;
 		break;
 	case 0x71:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsGolem;
+		m_funcs = &funcsGolem;
 		break;
 	case 0x73:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsLizardmanKing;
+		m_funcs = &funcsLizardmanKing;
 		break;
 	case 0x74:
 	case 0x75:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsLKShooter;
+		m_funcs = &funcsLKShooter;
 		break;
 	case 0x77:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsCaveWorm;
+		m_funcs = &funcsCaveWorm;
 		break;
 	case 0x79:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsTetsukyojin;
+		m_funcs = &funcsTetsukyojin;
 		break;
 	case 0x7B:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsAntrion;
+		m_funcs = &funcsAntrion;
 		break;
 	case 0x7F:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsLich;
+		m_funcs = &funcsLich;
 		break;
 	case 0x83:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsDragonZombie;
+		m_funcs = &funcsDragonZombie;
 		break;
 	case 0x85:
 	case 0x86:
 	case 0x87:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsMeteoParasite;
+		m_funcs = &funcsMeteoParasite;
 		break;
 	case 0x88:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsMeteoParasiteC;
+		m_funcs = &funcsMeteoParasiteC;
 		break;
 	case 0x8E:
 	case 0x8F:
@@ -2265,19 +2263,19 @@ void CGMonObj::InitFinished()
 	case 0x97:
 	case 0x98:
 	case 0x99:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsDuct;
+		m_funcs = &funcsDuct;
 		break;
 	case 0x9A:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsLastBoss;
+		m_funcs = &funcsLastBoss;
 		break;
 	case 0x9B:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsRamoe;
+		m_funcs = &funcsRamoe;
 		break;
 	case 0x9E:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsSaw;
+		m_funcs = &funcsSaw;
 		break;
 	default:
-		*reinterpret_cast<void**>(mon + 0x708) = &funcsDefault;
+		m_funcs = &funcsDefault;
 		break;
 	}
 
@@ -2494,7 +2492,7 @@ void CGMonObj::setRepop(int mode)
 		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 0;
 		*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
-		memset(mon + 0x70C, 0, 0x34);
+		memset(&m_moveWork, 0, sizeof(m_moveWork));
 	}
 
 	enableAttackCol(0, 0, 0);
@@ -2638,12 +2636,11 @@ void CGMonObj::statMove()
  */
 void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 
-	unsigned int moveFlags = *reinterpret_cast<unsigned int*>(mon + 0x70C);
-	short& routeFrom = *reinterpret_cast<short*>(mon + 0x73C);
-	short& routePrev = *reinterpret_cast<short*>(mon + 0x73E);
+	unsigned int moveFlags = m_moveWork.m_flags;
+	short& routeFrom = m_moveWork.m_routeFrom;
+	short& routePrev = m_moveWork.m_routePrev;
 
 	if (((moveFlags & 0x30000) == 0) || (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) == 0)) {
 		return;
@@ -2714,19 +2711,18 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
  */
 void CGMonObj::moveFrame()
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 
-	unsigned int& moveStateFlags = *reinterpret_cast<unsigned int*>(mon + 0x710);
-	unsigned int& moveFlags = *reinterpret_cast<unsigned int*>(mon + 0x70C);
-	Vec& moveTarget = *reinterpret_cast<Vec*>(mon + 0x718);
-	float& moveSpeed = *reinterpret_cast<float*>(mon + 0x724);
-	float& moveRange = *reinterpret_cast<float*>(mon + 0x728);
-	unsigned int& moveLimitFrame = *reinterpret_cast<unsigned int*>(mon + 0x72C);
-	int& moveFrame = *reinterpret_cast<int*>(mon + 0x730);
-	int& moveChangeStat = *reinterpret_cast<int*>(mon + 0x738);
-	float& moveSpeedRate = *reinterpret_cast<float*>(mon + 0x690);
-	short& aStarGroupId = *reinterpret_cast<short*>(mon + 0x6A4);
+	unsigned int& moveStateFlags = m_moveWork.m_stateFlags;
+	unsigned int& moveFlags = m_moveWork.m_flags;
+	Vec& moveTarget = m_moveWork.m_targetPos;
+	float& moveSpeed = m_moveWork.m_speed;
+	float& moveRange = m_moveWork.m_range;
+	unsigned int& moveLimitFrame = m_moveWork.m_limitFrame;
+	int& moveFrame = m_moveWork.m_frame;
+	int& moveChangeStat = m_moveWork.m_changeStat;
+	float& moveSpeedRate = m_pushScale;
+	short& aStarGroupId = m_aStarGroupId;
 
 	Vec local_68;
 	Vec local_74;
@@ -2739,12 +2735,12 @@ void CGMonObj::moveFrame()
 	(this->*m_funcs->moveFrame)();
 
 	if ((moveFlags & 1) != 0) {
-		unsigned char* target = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(mon + 0x714));
-		local_68 = *reinterpret_cast<Vec*>(target + 0x15C);
+		CGCharaObj* target = m_moveWork.m_target;
+		local_68 = target->m_worldPosition;
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
-			short targetAStarGroupId = *reinterpret_cast<short*>(target + 0x6A4);
+			short targetAStarGroupId = target->m_aStarGroupId;
 			moveAStar(aStarGroupId, targetAStarGroupId, local_68);
 		}
 	} else if ((moveFlags & 2) != 0) {
@@ -3066,7 +3062,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 			int nextAction = CGMonObj_SelectActionFromAIScript(monObj, targetPartyIndex);
 			if (nextAction == -2) {
 				actionState = 0;
-				memset(mon + 0x70C, 0, 0x34);
+				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 				*reinterpret_cast<int*>(mon + 0x6D8) = 0;
 				*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 				mon[0x6BB] = 1;
@@ -3094,9 +3090,9 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 				if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
 					((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x100) == 0)) {
 					actionState = 0x21;
-					if (*reinterpret_cast<int*>(mon + 0x734) != 1) {
-						memset(mon + 0x70C, 0, 0x34);
-						*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x205;
+					if (monObj->m_moveWork.m_mode != 1) {
+						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+						monObj->m_moveWork.m_flags = 0x205;
 						if (aiState == 0) {
 							aiScript = script;
 						} else {
@@ -3104,16 +3100,16 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 								(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
-							*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x10000;
+							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						*reinterpret_cast<int*>(mon + 0x734) = 1;
+						monObj->m_moveWork.m_mode = 1;
 					}
-					*reinterpret_cast<void**>(mon + 0x714) = Game.m_partyObjArr[targetPartyIndex];
-					if (((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+					monObj->m_moveWork.m_target = Game.m_partyObjArr[targetPartyIndex];
+					if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 						(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
-						 *reinterpret_cast<int*>(mon + 0x730))) {
+						 monObj->m_moveWork.m_frame)) {
 						actionState = 0;
-						memset(mon + 0x70C, 0, 0x34);
+						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 						*reinterpret_cast<int*>(mon + 0x6D8) = 3;
 						*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 						mon[0x6BB] = 1;
@@ -3122,7 +3118,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 				}
 
 				actionState = 0;
-				memset(mon + 0x70C, 0, 0x34);
+				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 				*reinterpret_cast<int*>(mon + 0x6D8) = 2;
 				*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 				mon[0x6BB] = 1;
@@ -3144,11 +3140,11 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 					if ((*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110) & 0x20) != 0) {
 						actionState = 0x21;
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-						if (*reinterpret_cast<int*>(mon + 0x734) != 4) {
-							memset(mon + 0x70C, 0, 0x34);
-							*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x855;
+						if (monObj->m_moveWork.m_mode != 4) {
+							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+							monObj->m_moveWork.m_flags = 0x855;
 							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-								*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x400;
+								monObj->m_moveWork.m_flags |= 0x400;
 							}
 							if (aiState == 0) {
 								aiScript = script;
@@ -3157,15 +3153,13 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 									(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 							}
 							if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x80) != 0) {
-								*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x20000;
+								monObj->m_moveWork.m_flags |= 0x20000;
 							}
-							*reinterpret_cast<int*>(mon + 0x734) = 4;
-							*reinterpret_cast<float*>(mon + 0x728) =
-								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
-							*reinterpret_cast<unsigned int*>(mon + 0x72C) =
-								*reinterpret_cast<unsigned short*>(script + 0x1B6);
+							monObj->m_moveWork.m_mode = 4;
+							monObj->m_moveWork.m_range = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
+							monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
 						}
-						*reinterpret_cast<CGPartyObj**>(mon + 0x714) = target;
+						monObj->m_moveWork.m_target = target;
 						*reinterpret_cast<int*>(mon + 0x6D8) = 5;
 						*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 						mon[0x6BB] = 1;
@@ -3188,9 +3182,9 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 					short actionParam = *reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
 					actionState = 0x21;
 					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-					if (*reinterpret_cast<int*>(mon + 0x734) != 2) {
-						memset(mon + 0x70C, 0, 0x34);
-						*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x325;
+					if (monObj->m_moveWork.m_mode != 2) {
+						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+						monObj->m_moveWork.m_flags = 0x325;
 						if (aiState == 0) {
 							aiScript = script;
 						} else {
@@ -3198,13 +3192,13 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 								(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
-							*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x10000;
+							monObj->m_moveWork.m_flags |= 0x10000;
 						}
-						*reinterpret_cast<int*>(mon + 0x734) = 2;
+						monObj->m_moveWork.m_mode = 2;
 					}
-					*reinterpret_cast<CGPartyObj**>(mon + 0x714) = target;
-					*reinterpret_cast<float*>(mon + 0x728) = actionRange;
-					*reinterpret_cast<int*>(mon + 0x738) = static_cast<int>(actionParam);
+					monObj->m_moveWork.m_target = target;
+					monObj->m_moveWork.m_range = actionRange;
+					monObj->m_moveWork.m_changeStat = static_cast<int>(actionParam);
 				}
 			} else {
 				actionState = nextAction - 0xE;
@@ -3218,7 +3212,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 
 	targetPartyIndex = -1;
 	actionState = 0;
-	memset(mon + 0x70C, 0, 0x34);
+	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 	*reinterpret_cast<int*>(mon + 0x6D8) = 3;
 	*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 	mon[0x6BB] = 1;
@@ -3241,11 +3235,11 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 		unsigned char* script = reinterpret_cast<unsigned char*>(
 			reinterpret_cast<CGObject*>(monObj)->m_scriptHandle[9]);
 		if ((*reinterpret_cast<short*>(script + 0x10C) == 1) &&
-			(((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 			 (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC)) <=
-			  *reinterpret_cast<int*>(mon + 0x730)))) {
+			  monObj->m_moveWork.m_frame))) {
 			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-			memset(mon + 0x70C, 0, 0x34);
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 			*reinterpret_cast<int*>(mon + 0x6D8) = 3;
 			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
 			mon[0x6BB] = 1;
@@ -3269,9 +3263,8 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
  */
 extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-	memset(mon + 0x70C, 0, 0x34);
+	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 }
 
 /*
@@ -3301,19 +3294,19 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 		if (state == 5) {
 			if (*targetPartyIdx < 0) {
 				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-				memset(mon + 0x70C, 0, 0x34);
+				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 				*chaseState = 0;
 				*chaseTimer = 0;
 				mon[0x6BB] = 1;
 			} else {
 				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
 				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
-				if (*reinterpret_cast<int*>(mon + 0x734) != 4) {
-					memset(mon + 0x70C, 0, 0x34);
-					*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x855;
+				if (monObj->m_moveWork.m_mode != 4) {
+					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+					monObj->m_moveWork.m_flags = 0x855;
 					unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 					if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
-						*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x400;
+						monObj->m_moveWork.m_flags |= 0x400;
 					}
 					unsigned char* aiData;
 					if (*reinterpret_cast<short*>(mon + 0x6E4) == 0) {
@@ -3326,20 +3319,19 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 							0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
-						*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x20000;
+						monObj->m_moveWork.m_flags |= 0x20000;
 					}
-					*reinterpret_cast<int*>(mon + 0x734) = 4;
-					*reinterpret_cast<float*>(mon + 0x728) =
+					monObj->m_moveWork.m_mode = 4;
+					monObj->m_moveWork.m_range =
 						static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) -
 										  DOUBLE_803319E0);
-					*reinterpret_cast<unsigned int*>(mon + 0x72C) =
-						*reinterpret_cast<unsigned short*>(script + 0x1B6);
+					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
 				}
-				*reinterpret_cast<CGPartyObj**>(mon + 0x714) = partyObj;
-				if (((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+				monObj->m_moveWork.m_target = partyObj;
+				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					((object->m_stateFlags0 & 0x40) != 0)) {
 					*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
-					memset(mon + 0x70C, 0, 0x34);
+					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 					if (*targetPartyIdx >= 0) {
 						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
 					}
@@ -3576,7 +3568,7 @@ void CGMonObj::footSe()
  */
 void CGMonObj::CMoveWork::Clear()
 {
-	// TODO
+	memset(this, 0, sizeof(*this));
 }
 
 /*

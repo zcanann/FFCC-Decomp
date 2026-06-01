@@ -2,6 +2,7 @@
 #define _GRAPHIC_H_
 
 #include "ffcc/manager.h"
+#include "ffcc/memory.h"
 #include <dolphin/gx.h>
 
 // Forward declarations
@@ -27,6 +28,11 @@ void std_cosf(float);
 class CGraphic : public CManager
 {
 public:
+    struct DebugStringPosition
+    {
+        s16 x;
+        s16 y;
+    };
 
     void Init();
     void Quit();
@@ -88,7 +94,15 @@ public:
     void CreateTempBuffer();
     void DestroyTempBuffer();
 
-    u8 _pad_0x4_to_0x71DF[0x71DC];
+    CMemory::CStage* m_graphicStage;
+    CMemory::CStage* m_scratchStage;
+    s32 m_frameReady;
+    void* m_fifoBuffer;
+    s32 m_debugStringCount;
+    DebugStringPosition m_debugStringPositions[0x70];
+    u8 _pad_0x1D8_to_0x1DF[0x8];
+    char m_debugStrings[0x70][0x70];
+    u8 _pad_0x32E0_to_0x71DF[0x3F00];
     GXRenderModeObj* m_renderMode;
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
@@ -105,7 +119,7 @@ public:
     GXFifoObj m_fifos[2];
     s32 m_fifoIndex;
     u32 m_frameRateOver;
-    u8 _pad_0x7354_to_0x7357[0x4];
+    s32 m_debugStringVisible;
     int m_blurActive;
     u8 m_blurDelayCounter;
     u8 m_blurBufferIndex;

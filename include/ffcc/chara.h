@@ -40,6 +40,7 @@ public:
 
 	class CSkin
 	{
+	public:
 		CSkin();
 		~CSkin();
 
@@ -105,6 +106,7 @@ public:
 
 		class CRefData
 		{
+		public:
 			CRefData();
 			~CRefData();
 		};
@@ -138,6 +140,7 @@ public:
 
 		class CRefData : public CRef
 		{
+		public:
 			CRefData();
 			~CRefData();
 		};
@@ -248,12 +251,14 @@ public:
 
 		class CRefData
 		{
+		public:
 			CRefData();
 			~CRefData();
 		};
 
 		class CDisplayList
 		{
+		public:
 			CDisplayList();
 			~CDisplayList();
 		};

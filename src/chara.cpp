@@ -11,15 +11,10 @@
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
 
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <math.h>
 #include <string.h>
 
-extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
-extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
-extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
-extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
@@ -790,12 +785,12 @@ CChara::CModel::CRefData::~CRefData()
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x10);
 	if (*ptr != 0) {
-		__destroy_new_array(*ptr, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CNode8CRefDataFv));
+		delete[] reinterpret_cast<CChara::CNode::CRefData*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x14);
 	if (*ptr != 0) {
-		__destroy_new_array(*ptr, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CMesh8CRefDataFv));
+		delete[] reinterpret_cast<CChara::CMesh::CRefData*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x18);
@@ -1004,10 +999,8 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				const u32 nodeCapacity = chunk.m_arg0;
 				*(u16*)((u8*)ref + 0x08) = 0;
 				if (nodeCapacity != 0) {
-					void* nodeRefs = new u8[nodeCapacity * 0x94];
-					void* nodes = new u8[nodeCapacity * 0xC0];
-					memset(nodeRefs, 0, nodeCapacity * 0x94);
-					memset(nodes, 0, nodeCapacity * 0xC0);
+					CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
+					CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
 					*(void**)((u8*)ref + 0x0C) = nodeRefs;
 					*(void**)((u8*)this + 0xA8) = nodes;
 				}
@@ -1029,10 +1022,8 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				const u32 meshCapacity = chunk.m_arg0;
 				*(u16*)((u8*)ref + 0x0A) = 0;
 				if (meshCapacity != 0) {
-					void* meshRefs = new u8[meshCapacity * sizeof(CCharaMeshRefRaw)];
-					void* meshes = new u8[meshCapacity * sizeof(CMesh)];
-					memset(meshRefs, 0, meshCapacity * sizeof(CCharaMeshRefRaw));
-					memset(meshes, 0, meshCapacity * sizeof(CMesh));
+					CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
+					CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
 					*(void**)((u8*)ref + 0x10) = meshRefs;
 					*(void**)((u8*)this + 0xAC) = meshes;
 				}
@@ -2697,8 +2688,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x534B494E: {
 			meshRef->m_skinCount = chunkInfo.m_arg0;
 			if (meshRef->m_skinCount != 0) {
-				meshRef->m_skins = static_cast<CLightPcs::CBumpLight*>(
-				    Memory._Alloc(meshRef->m_skinCount * 0x64, stage, const_cast<char*>(s_chara_cpp), 0x7F8, 0));
+				meshRef->m_skins = reinterpret_cast<CLightPcs::CBumpLight*>(
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[meshRef->m_skinCount]);
 				if (meshRef->m_skins != 0) {
 					memset(meshRef->m_skins, 0, meshRef->m_skinCount * 0x64);
 				}
@@ -2746,15 +2737,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x444C4844: {
 			meshRef->m_displayListCount = chunkInfo.m_arg0 & 0xFFFF;
 			if (meshRef->m_displayListCount != 0) {
-				meshRef->m_displayLists = static_cast<CCharaDisplayListRaw*>(Memory._Alloc(
-				    meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw), stage,
-				    const_cast<char*>(s_chara_cpp), 0x820, 0));
-				if (meshRef->m_displayLists != 0) {
-					memset(meshRef->m_displayLists, 0, meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw));
-					for (u32 i = 0; i < meshRef->m_displayListCount; i++) {
-						meshRef->m_displayLists[i].m_material = 0xFFFF;
-					}
-				}
+				meshRef->m_displayLists = reinterpret_cast<CCharaDisplayListRaw*>(
+				    new (stage, const_cast<char*>(s_chara_cpp), 0x820) CChara::CMesh::CDisplayList[meshRef->m_displayListCount]);
 			}
 
 			u32 displayIndex = 0;
@@ -3111,11 +3095,11 @@ CChara::CMesh::CRefData::~CRefData()
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
-		__destroy_new_array(ref->m_displayLists, reinterpret_cast<ConstructorDestructor>(__dt__Q36CChara5CMesh12CDisplayListFv));
+		delete[] reinterpret_cast<CChara::CMesh::CDisplayList*>(ref->m_displayLists);
 		ref->m_displayLists = 0;
 	}
 	if (ref->m_skins != 0) {
-		__destroy_new_array(ref->m_skins, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CSkinFv));
+		delete[] reinterpret_cast<CChara::CSkin*>(ref->m_skins);
 		ref->m_skins = 0;
 	}
 }

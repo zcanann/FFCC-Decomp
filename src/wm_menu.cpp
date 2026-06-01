@@ -32,9 +32,6 @@
 #include "ffcc/fontman.h"
 
 extern "C" char* strstr(const char*, const char*);
-extern "C" void* __vt__Q212CFlatRuntime7CObject[];
-extern "C" void* __vt__9CGBaseObj[];
-extern "C" void* __vt__8CGObject[];
 extern "C" int DAT_801dc118[];
 extern "C" int DAT_801dc140;
 extern float* gWmModelYOffsetSpline;
@@ -509,20 +506,6 @@ static void releaseRefCounted(void** refObj)
  */
 CMenuPcs::EffectInfo::EffectInfo()
 {
-	struct EffectInfoFlags {
-		unsigned char pad[0x44];
-		unsigned char pad44_0 : 3;
-		unsigned char flag44_10 : 1;
-		unsigned char pad44_4 : 4;
-	};
-
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	void*** const vtable = reinterpret_cast<void***>(bytes + 0x54);
-
-	*vtable = __vt__Q212CFlatRuntime7CObject;
-	reinterpret_cast<EffectInfoFlags*>(this)->flag44_10 = 0;
-	*vtable = __vt__9CGBaseObj;
-	*vtable = __vt__8CGObject;
 }
 
 /*

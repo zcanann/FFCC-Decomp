@@ -2862,56 +2862,62 @@ void CMenuPcs::CreateShopMenu()
 void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
                         _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
-    Mtx screenMtx;
     Mtx44 projectionMtx;
-
-    long* animData = 0;
-    int shapeTableBase = *reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]);
-    if (shapeTableBase != 0) {
-        pppShapeSt* shapeSt = *reinterpret_cast<pppShapeSt**>(shapeTableBase + shapeNo * 4);
-        if ((shapeSt != 0) && (shapeSt->m_animData != 0)) {
-            animData = reinterpret_cast<long*>(shapeSt->m_animData);
-        }
-    }
-
-    tagOAN3_SHAPE* shape = 0;
-    if ((animData != 0) && (groupNo >= 0)) {
-        unsigned char* animBytes = reinterpret_cast<unsigned char*>(animData);
-        if (groupNo < *reinterpret_cast<short*>(animBytes + 6)) {
-            shape = reinterpret_cast<tagOAN3_SHAPE*>(
-                animBytes + *reinterpret_cast<short*>(animBytes + groupNo * 8 + 0x10));
-        }
-    }
-    if (shape == 0) {
-        return;
-    }
+    Mtx screenMtx;
 
     PSMTXIdentity(screenMtx);
     screenMtx[0][0] = scaleX;
     screenMtx[1][1] = -scaleY;
+    screenMtx[2][2] = FLOAT_80332d78;
     screenMtx[0][3] = static_cast<float>(x);
     screenMtx[1][3] = static_cast<float>(y);
-    screenMtx[2][2] = FLOAT_80332d78;
     GXLoadPosMtxImm(screenMtx, 0);
     GXSetCurrentMtx(0);
 
-    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
-    projectionMtx[2][3] += 0.0f;
+    C_MTXOrtho(projectionMtx, FLOAT_80332d9c, FLOAT_80332dec, FLOAT_80332d9c, FLOAT_80332df0, FLOAT_80332d9c,
+               FLOAT_80332d28);
+    projectionMtx[2][3] += FLOAT_80332d9c;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    GXSetColorUpdate(GX_TRUE);
+
+    _GXColor matColor;
+    *reinterpret_cast<unsigned int*>(&matColor) = reinterpret_cast<unsigned int>(g_shopMenu);
+
+    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
+    tagOAN3_SHAPE* shape =
+        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
 
     _GXColor drawColor = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-    GXSetChanMatColor(GX_COLOR0A0, drawColor);
+    GXSetChanMatColor(GX_COLOR0A0, matColor);
+
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
@@ -2922,7 +2928,17 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
 
     Vec minPos;
     Vec maxPos;
-    pppGetShapePos(animData, static_cast<short>(groupNo), minPos, maxPos, 0);
+    int vertexData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shape) + 0xC);
+    *reinterpret_cast<unsigned int*>(&minPos.x) = *reinterpret_cast<unsigned int*>(vertexData + 3);
+    *reinterpret_cast<unsigned int*>(&minPos.y) = *reinterpret_cast<unsigned int*>(vertexData + 7);
+    minPos.z = FLOAT_80332d9c;
+    *reinterpret_cast<unsigned int*>(&maxPos.x) = *reinterpret_cast<unsigned int*>(vertexData + 0x2B);
+    *reinterpret_cast<unsigned int*>(&maxPos.y) = *reinterpret_cast<unsigned int*>(vertexData + 0x2F);
+    maxPos.z = FLOAT_80332d9c;
+
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     Graphic.RenderTexQuadGrouad(minPos, maxPos, colorA, colorB, colorC, colorD);
 }
 /*
@@ -2938,9 +2954,9 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     PSMTXIdentity(screenMtx);
     screenMtx[0][0] = scaleX;
     screenMtx[1][1] = -scaleY;
+    screenMtx[2][2] = FLOAT_80332d78;
     screenMtx[0][3] = static_cast<float>(x);
     screenMtx[1][3] = static_cast<float>(y);
-    screenMtx[2][2] = FLOAT_80332d78;
     GXLoadPosMtxImm(screenMtx, 0);
     GXSetCurrentMtx(0);
 
@@ -2949,11 +2965,17 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332d9c;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
+    _GXColor mat;
+    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
+
     int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
     *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
     *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
     *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
@@ -2973,9 +2995,6 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     _GXColor amb;
     *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
-
-    _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

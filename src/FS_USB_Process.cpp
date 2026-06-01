@@ -1,7 +1,7 @@
 #include "ffcc/FS_USB_Process.h"
 #include "ffcc/FunnyShape.h"
+#define FFCC_P_FUNNYSHAPE_REAL_PTRARRAY
 #include "ffcc/p_FunnyShape.h"
-#include "ffcc/USBStreamData.h"
 #include "ffcc/p_usb.h"
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/gx/GXTexture.h"
@@ -12,21 +12,12 @@
 extern "C" const char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
 
 namespace {
-
-struct CUSBStreamDataHeader {
-    u8* m_data;
-    int m_headerReady;
-    int m_dataReady;
-    u32 m_sizeBytes;
-    u32 m_packetCode;
-};
-
 struct DisplayTail {
     u8 m_bytes[0xB];
 };
 
-static inline CUSBStreamDataHeader* UsbStream(CFunnyShapePcs* self) {
-    return reinterpret_cast<CUSBStreamDataHeader*>(&self->m_usbStreamDataStorage);
+static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self) {
+    return &self->m_usbStreamDataStorage;
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
@@ -74,7 +65,7 @@ static inline u16 LoadSwapU16(u16 value) {
  */
 void CFunnyShapePcs::SetUSBData()
 {
-    CUSBStreamDataHeader* usb = UsbStream(this);
+    CUSBStreamData* usb = UsbStream(this);
 
     switch (usb->m_packetCode) {
     case 4:
@@ -367,7 +358,7 @@ void CFunnyShapePcs::SetUSBData()
  */
 void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* header)
 {
-    CUSBStreamDataHeader* usb = UsbStream(this);
+    CUSBStreamData* usb = UsbStream(this);
 
     usb->m_dataReady = 1;
     usb->m_headerReady = header->m_packetSize != 0;

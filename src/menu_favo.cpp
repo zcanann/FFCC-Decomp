@@ -542,22 +542,15 @@ void CMenuPcs::FavoInit0()
  */
 void CMenuPcs::FavoInit()
 {
-	unsigned char uVar1;
-	unsigned char uVar2;
-	unsigned int uVar3;
 	float fVar4;
 	float fVar5;
 	float fVar7;
-	int iVar8;
 	short sVar9;
 	short sVar10;
 	short sVar11;
-	unsigned char* puVar12;
-	unsigned char* puVar13;
 	int iVar16;
 	int iVar17;
 
-	uVar3 = Game.m_scriptFoodBase[0];
 	memset(favoList, 0, sizeof(*favoList));
 	FavoEntry* entry = favoList->entries;
 	iVar16 = 8;
@@ -695,62 +688,46 @@ void CMenuPcs::FavoInit()
 	favoList->count = sVar11;
 
 	memset(s_rank, 0, sizeof(s_rank));
-	iVar8 = 0;
-	puVar13 = s_rank;
-	s_rank[1] = 0;
-	*(unsigned short*)&s_rank[2] = *(unsigned short*)(uVar3 + 0x3b8);
-	s_rank[5] = 1;
-	*(unsigned short*)&s_rank[6] = *(unsigned short*)(uVar3 + 0x3ba);
-	s_rank[9] = 2;
-	*(unsigned short*)&s_rank[10] = *(unsigned short*)(uVar3 + 0x3bc);
-	s_rank[0xd] = 3;
-	*(unsigned short*)&s_rank[14] = *(unsigned short*)(uVar3 + 0x3be);
-	s_rank[0x11] = 4;
-	*(unsigned short*)&s_rank[18] = *(unsigned short*)(uVar3 + 0x3c0);
-	s_rank[0x15] = 5;
-	*(unsigned short*)&s_rank[22] = *(unsigned short*)(uVar3 + 0x3c2);
-	s_rank[0x19] = 6;
-	*(unsigned short*)&s_rank[26] = *(unsigned short*)(uVar3 + 0x3c4);
-	s_rank[0x1d] = 7;
-	*(unsigned short*)&s_rank[30] = *(unsigned short*)(uVar3 + 0x3c6);
+	FoodRank* ranks = reinterpret_cast<FoodRank*>(s_rank);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	for (int foodId = 0; foodId < 8; foodId++) {
+		ranks[foodId].foodId = foodId;
+		ranks[foodId].score = caravanWork->m_letterMeta[foodId];
+	}
 
+	int rankIndex = 0;
+	FoodRank* rank = ranks;
 	do {
-		iVar17 = iVar8 + 1;
+		iVar17 = rankIndex + 1;
 		iVar16 = 8 - iVar17;
-		puVar12 = s_rank + iVar17 * 4;
+		FoodRank* compareRank = ranks + iVar17;
 		if (iVar17 < 8) {
 			do {
-				sVar9 = *(short*)(puVar13 + 2);
-				if (sVar9 < *(short*)(puVar12 + 2)) {
-					uVar1 = *puVar13;
-					uVar2 = puVar13[1];
-					*puVar13 = *puVar12;
-					puVar13[1] = puVar12[1];
-					*(short*)(puVar13 + 2) = *(short*)(puVar12 + 2);
-					*puVar12 = uVar1;
-					puVar12[1] = uVar2;
-					*(short*)(puVar12 + 2) = sVar9;
+				if (rank->score < compareRank->score) {
+					FoodRank tmp = *rank;
+					*rank = *compareRank;
+					*compareRank = tmp;
 				}
-				puVar12 = puVar12 + 4;
-				iVar16 = iVar16 - 1;
+				compareRank++;
+				iVar16--;
 			} while (iVar16 != 0);
 		}
-		iVar8 = iVar8 + 1;
-		puVar13 = puVar13 + 4;
-	} while (iVar8 < 8);
+		rankIndex++;
+		rank++;
+	} while (rankIndex < 8);
 
-	iVar8 = 0;
+	int place = 0;
 	iVar17 = 0;
 	iVar16 = 8;
-	puVar13 = s_rank;
+	rank = ranks;
 	do {
-		if ((iVar17 != 0) && (*(short*)(puVar13 - 2) != *(short*)(puVar13 + 2))) {
-			iVar8 = iVar17;
+		if ((iVar17 != 0) && (rank[-1].score != rank->score)) {
+			place = iVar17;
 		}
-		iVar17 = iVar17 + 1;
-		*puVar13 = iVar8 + 1;
-		puVar13 = puVar13 + 4;
-		iVar16 = iVar16 - 1;
+		iVar17++;
+		rank->place = place + 1;
+		rank++;
+		iVar16--;
 	} while (iVar16 != 0);
 
 	singMenuState->selectedIndex = 0;

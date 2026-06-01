@@ -498,7 +498,8 @@ void CGCharaObj::onChangeStat(int state)
 	}
 
 clear_ignore:
-	reinterpret_cast<unsigned char*>(this)[0x63C] &= 0x7F;
+	reinterpret_cast<unsigned char*>(this)[0x63C] =
+		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x63C] << 1) >> 1;
 }
 
 /*

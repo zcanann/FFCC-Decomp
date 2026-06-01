@@ -143,7 +143,7 @@ static void __AXDSPDoneCallback(void* task) {
 
 void __AXOutInitDSP(void) {
     __AXDSPTask.iram_mmem_addr = axDspSlave;
-    __AXDSPTask.iram_length = axDspSlaveLength;
+    __AXDSPTask.iram_length = axDspSlaveLength[0];
     __AXDSPTask.iram_addr = 0;
     __AXDSPTask.dram_mmem_addr = __AXDramImage;
     __AXDSPTask.dram_length = 0x2000;

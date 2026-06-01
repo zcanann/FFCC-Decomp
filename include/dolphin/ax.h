@@ -319,7 +319,7 @@ void AXSetVoiceLpfCoefs(AXVPB* p, u16 a0, u16 b0);
 void AXGetLpfCoefs(u16 freq, u16* a0, u16* b0);
 
 // DSPCode
-extern u16 axDspSlaveLength;
+extern u16 axDspSlaveLength[4];
 extern u16 axDspSlave[AX_DSP_SLAVE_LENGTH];
 
 #ifdef __cplusplus

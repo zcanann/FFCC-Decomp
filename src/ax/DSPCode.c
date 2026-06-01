@@ -501,4 +501,9 @@ u16 axDspSlave[AX_DSP_SLAVE_LENGTH] ATTRIBUTE_ALIGN(32) = {
     0x02DF, 0x27FE, 0x03C0, 0x8000, 0x029C, 0x0F89, 0x02DF, 0x0000,
 };
 
-u16 axDspSlaveLength = sizeof(axDspSlave);
+u16 axDspSlaveLength[4] = {
+    sizeof(axDspSlave),
+    0,
+    0,
+    0,
+};

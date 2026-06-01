@@ -1981,9 +1981,7 @@ void CMenuPcs::CmakeNameDraw()
         0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    if (((gCmakePreviousStep == 2) && (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 0)) ||
-        ((*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 2) &&
-         (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x1E) != -1))) {
+    if ((gCmakePreviousStep == 2) && (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 0)) {
         DrawNamePreviewChara(this, FLOAT_80333258, 0xFF);
         DrawCmakeTitle(1, alpha, FLOAT_80333258);
     } else if ((*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) != 2) ||

@@ -197,17 +197,15 @@ void CFlatRuntime::clear()
 	*reinterpret_cast<short*>(self + 0x968) =
 	    static_cast<short>((*reinterpret_cast<short*>(self + 0x968) & 0x000F) | (clearMaskBits << 4));
 
-	*reinterpret_cast<void**>(self + 0x8EC) = self + 0x8CC;
-	*reinterpret_cast<void**>(self + 0x8F0) = self + 0x8CC;
-	*reinterpret_cast<short*>(self + 0x8FE) = 0x10;
+	m_objectSentinel.m_previous = &m_objectSentinel;
+	m_objectSentinel.m_next = &m_objectSentinel;
+	m_objectSentinel.m_0x32 = 0x10;
 
 	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
 	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
 	m_freeListCount = 0x5220;
 	m_0x984 = 0;
 	m_objectPoolBase = self + 0x1288;
-
-	*reinterpret_cast<void**>(self + 0x988) = self + 0x1288;
 	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
 
 	u8* const freeNodes = self + 0x998;
@@ -216,24 +214,24 @@ void CFlatRuntime::clear()
 		u8* const node = freeNodes + block * 0x30;
 
 		*reinterpret_cast<void**>(node + 0x00) =
-		    (baseIndex == 0) ? static_cast<void*>(self + 0x988)
+		    (baseIndex == 0) ? static_cast<void*>(&m_objectPoolBase)
 		                     : static_cast<void*>(freeNodes + (baseIndex - 1) * 0x10);
 		*reinterpret_cast<void**>(node + 0x04) =
-		    (baseIndex == 0x8F) ? static_cast<void*>(self + 0x988)
+		    (baseIndex == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
 		                        : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
 
 		*reinterpret_cast<void**>(node + 0x10) =
-		    ((baseIndex + 1) == 0) ? static_cast<void*>(self + 0x988)
+		    ((baseIndex + 1) == 0) ? static_cast<void*>(&m_objectPoolBase)
 		                           : static_cast<void*>(freeNodes + baseIndex * 0x10);
 		*reinterpret_cast<void**>(node + 0x14) =
-		    ((baseIndex + 1) == 0x8F) ? static_cast<void*>(self + 0x988)
+		    ((baseIndex + 1) == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
 		                              : static_cast<void*>(freeNodes + (baseIndex + 2) * 0x10);
 
 		*reinterpret_cast<void**>(node + 0x20) =
-		    ((baseIndex + 2) == 0) ? static_cast<void*>(self + 0x988)
+		    ((baseIndex + 2) == 0) ? static_cast<void*>(&m_objectPoolBase)
 		                           : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
 		*reinterpret_cast<void**>(node + 0x24) =
-		    ((baseIndex + 2) == 0x8F) ? static_cast<void*>(self + 0x988)
+		    ((baseIndex + 2) == 0x8F) ? static_cast<void*>(&m_objectPoolBase)
 		                              : static_cast<void*>(freeNodes + (baseIndex + 3) * 0x10);
 	}
 
@@ -573,8 +571,7 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
  */
 int CFlatRuntime::Frame(int unused, int mode)
 {
-	u8* const self = reinterpret_cast<u8*>(this);
-	CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
+	CObject* const root = &m_objectSentinel;
 	CObject* object = root->m_next;
 	int hasParticle = 0;
 
@@ -664,8 +661,8 @@ int CFlatRuntime::Frame(int unused, int mode)
 			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-			object->m_freeListNode[1] = *reinterpret_cast<void***>(self + 0x98C);
-			*reinterpret_cast<void***>(self + 0x98C) = object->m_freeListNode;
+			object->m_freeListNode[1] = m_objectFreeListHead;
+			m_objectFreeListHead = object->m_freeListNode;
 
 			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, 0, 4, 27, 27));
 
@@ -755,7 +752,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	u8* const self = reinterpret_cast<u8*>(this);
 	CClass* classBase = 0;
 	if (classIndex != -1) {
-		classBase = reinterpret_cast<CClass*>(*reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C));
+		classBase = &m_classes[classIndex];
 	}
 
 	int varCount = 0;
@@ -765,10 +762,10 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	CObject* object = getFreeObject(varCount);
 
-	object->m_previous = reinterpret_cast<CObject*>(self + 0x8CC)->m_previous;
-	object->m_next = reinterpret_cast<CObject*>(self + 0x8CC);
-	reinterpret_cast<CObject*>(self + 0x8CC)->m_previous->m_next = object;
-	reinterpret_cast<CObject*>(self + 0x8CC)->m_previous = object;
+	object->m_previous = m_objectSentinel.m_previous;
+	object->m_next = &m_objectSentinel;
+	m_objectSentinel.m_previous->m_next = object;
+	m_objectSentinel.m_previous = object;
 
 	object->m_flags &= 0x7F;
 	object->m_flags &= 0xDF;
@@ -802,8 +799,8 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		}
 	}
 
-	void** const freeNode = *reinterpret_cast<void***>(self + 0x98C);
-	*reinterpret_cast<void***>(self + 0x98C) = reinterpret_cast<void**>(freeNode[1]);
+	void** const freeNode = m_objectFreeListHead;
+	m_objectFreeListHead = reinterpret_cast<void**>(freeNode[1]);
 	freeNode[0] = scanNode;
 	freeNode[1] = *reinterpret_cast<void**>(scanNode + 4);
 	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
@@ -2169,7 +2166,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		engineObject->m_next->m_previous = engineObject->m_previous;
 		engineObject->m_previous->m_next = engineObject->m_next;
 
-		CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
+		CObject* const root = &m_objectSentinel;
 		CObject* begin = root->m_next;
 		CObject* it = begin;
 		do {
@@ -2200,24 +2197,20 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			}
 
 			if (-5 < systemIndex) {
-				u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
-				if (engineObject != reinterpret_cast<u8*>(object)) {
-					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x20) + 0x24) =
-					    *reinterpret_cast<void**>(engineObject + 0x24);
-					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x24) + 0x20) =
-					    *reinterpret_cast<void**>(engineObject + 0x20);
-					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x00) + 0x04) =
-					    *reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04);
-					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04) + 0x00) =
-					    *reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x00);
+				CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
+				if (engineObject != object) {
+					engineObject->m_previous->m_next = engineObject->m_next;
+					engineObject->m_next->m_previous = engineObject->m_previous;
 
-					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04) =
-					    *reinterpret_cast<void**>(self + 0x98C);
-					*reinterpret_cast<void**>(self + 0x98C) = *reinterpret_cast<void**>(engineObject + 0x04);
-					*reinterpret_cast<u8*>(engineObject + 0x38) =
-					    static_cast<u8>(__rlwimi(*reinterpret_cast<u8*>(engineObject + 0x38), 0, 4, 27, 27));
+					*reinterpret_cast<void**>(reinterpret_cast<u8*>(*engineObject->m_freeListNode) + 0x04) =
+					    engineObject->m_freeListNode[1];
+					*reinterpret_cast<void**>(engineObject->m_freeListNode[1]) = *engineObject->m_freeListNode;
 
-					onDeleteObject(reinterpret_cast<CFlatRuntime::CObject*>(engineObject));
+					engineObject->m_freeListNode[1] = m_objectFreeListHead;
+					m_objectFreeListHead = engineObject->m_freeListNode;
+					engineObject->m_flags = static_cast<u8>(__rlwimi(engineObject->m_flags, 0, 4, 27, 27));
+
+					onDeleteObject(engineObject);
 				} else {
 					object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
 				}

@@ -58,17 +58,6 @@ struct ItemMenuAnimList {
     MenuItemOpenAnim anims[64];
 };
 
-struct ItemFlatTableEntry {
-    int count;
-    const char** index;
-    char* buffer;
-};
-
-struct ItemFlatData {
-    char pad[0x6C];
-    ItemFlatTableEntry table[8];
-};
-
 STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, itemMenuState) == 0x82C);
@@ -454,7 +443,6 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    const ItemFlatData* flatData = reinterpret_cast<const ItemFlatData*>(&Game.m_cFlatDataArr[1]);
     s16* textEntry = listStart;
     for (int i = 0; i < 8; i++, textEntry += 0x20) {
         int menuIndex = i + itemState->scroll;
@@ -467,7 +455,7 @@ void CMenuPcs::ItemDraw()
 
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            const char* text = flatData->table[0].index[itemId * 5 + 4];
+            const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
             int selectedIndex = itemState->selectedIndex + itemState->scroll;
             if (selectedIndex > 0x3F) {
                 selectedIndex -= 0x40;

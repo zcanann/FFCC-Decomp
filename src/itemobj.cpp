@@ -74,17 +74,6 @@ enum ItemObjStringOffset {
 	kItemObjStrMemoryMagiciteCreateFailedMsg = 0x1CC,
 };
 
-struct ItemObjFlatTableEntry {
-	int count;
-	const char** index;
-	char* buffer;
-};
-
-struct ItemObjFlatData {
-	char pad[0x6c];
-	ItemObjFlatTableEntry table[8];
-};
-
 struct CMapCylinderRaw {
 	Vec m_bottom;
 	Vec m_top;
@@ -247,8 +236,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
 			font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaInt).color);
 
-			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
-			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
+			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)(self + 0x570)];
 			float width = font->GetWidth(name);
 			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
 			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;

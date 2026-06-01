@@ -37,19 +37,6 @@ extern "C" const char s_MenuOptionMonoIt_803334D8[] = "Mono";
 extern "C" const char s_MenuOptionContr_803334E0[] = "Contr.";
 extern "C" const char s_MenuOptionNorm_803334E8[] = "Norm.";
 
-struct CompaFlatTableEntry
-{
-	int count;
-	const char** strings;
-	char* stringBuf;
-};
-
-struct CompaFlatData
-{
-	char pad0[0x6C];
-	CompaFlatTableEntry table[8];
-};
-
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
 /*
@@ -260,7 +247,6 @@ void CMenuPcs::CompaDraw()
 	GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333010 * globalAlpha)).color;
 	font->SetColor(textColor);
 
-	const CompaFlatData* flatData = reinterpret_cast<const CompaFlatData*>(&Game.m_cFlatDataArr[1]);
 	memberIndex = 0;
 	shown = 0;
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
@@ -281,7 +267,7 @@ void CMenuPcs::CompaDraw()
 		font->Draw(name);
 
 		short food = caravanWork->m_evtWordArr[19 + drawIndex];
-		const char* value = flatData->table[2].strings[food];
+		const char* value = Game.m_cFlatDataArr[1].TableStrings(2)[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
 		font->Draw(value);

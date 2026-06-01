@@ -3830,13 +3830,16 @@ void CMenuPcs::CalcSingleCMakeChara()
         Mtx scaleMtx;
         Mtx rotXMtx;
         Mtx rotYMtx;
+        float posY = FLOAT_80333260;
+        float posXZ = FLOAT_80333254;
+        float scale = FLOAT_80333264;
 
-        *reinterpret_cast<float*>(modelWork + 0x1C) = FLOAT_80333254;
-        *reinterpret_cast<float*>(modelWork + 0x20) = FLOAT_80333260;
-        *reinterpret_cast<float*>(modelWork + 0x24) = FLOAT_80333254;
-        *reinterpret_cast<float*>(modelWork + 0x34) = FLOAT_80333264;
-        *reinterpret_cast<float*>(modelWork + 0x38) = FLOAT_80333264;
-        *reinterpret_cast<float*>(modelWork + 0x3C) = FLOAT_80333264;
+        *reinterpret_cast<float*>(modelWork + 0x1C) = posXZ;
+        *reinterpret_cast<float*>(modelWork + 0x20) = posY;
+        *reinterpret_cast<float*>(modelWork + 0x24) = posXZ;
+        *reinterpret_cast<float*>(modelWork + 0x34) = scale;
+        *reinterpret_cast<float*>(modelWork + 0x38) = scale;
+        *reinterpret_cast<float*>(modelWork + 0x3C) = scale;
 
         PSMTXScale(scaleMtx,
             *reinterpret_cast<float*>(modelWork + 0x34),

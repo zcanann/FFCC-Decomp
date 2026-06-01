@@ -540,16 +540,21 @@ static inline u8 ModelAttachMode(CChara::CModel* model)
 	return *(reinterpret_cast<u8*>(model) + 0xA1);
 }
 
+static inline void ReleaseRefCountedNonNull(void* refObject)
+{
+	CRef* ref = reinterpret_cast<CRef*>(refObject);
+	if (ref->DecRef() == 0) {
+		delete ref;
+	}
+}
+
 static inline void ReleaseRefCounted(void* refObject)
 {
 	if (refObject == 0) {
 		return;
 	}
 
-	CRef* ref = reinterpret_cast<CRef*>(refObject);
-	if (ref->DecRef() == 0) {
-		delete ref;
-	}
+	ReleaseRefCountedNonNull(refObject);
 }
 
 static inline void RetainRefCounted(void* refObject)
@@ -798,7 +803,7 @@ CChara::CModel::CRefData::~CRefData()
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x24);
 	if (*ptr != 0) {
-		ReleaseRefCounted(*ptr);
+		ReleaseRefCountedNonNull(*ptr);
 		*ptr = 0;
 	}
 }
@@ -840,27 +845,27 @@ CChara::CModel::CModel()
  */
 CChara::CModel::~CModel()
 {
-	void*& texSet = *reinterpret_cast<void**>((u8*)this + 0xB4);
+	void*& texSet = reinterpret_cast<void*&>(m_texSet);
 	if (texSet != 0) {
-		ReleaseRefCounted(texSet);
+		ReleaseRefCountedNonNull(texSet);
 		texSet = 0;
 	}
 
 	void*& anim = *reinterpret_cast<void**>((u8*)this + 0xD0);
 	if (anim != 0) {
-		ReleaseRefCounted(anim);
+		ReleaseRefCountedNonNull(anim);
 		anim = 0;
 	}
 
 	void*& texAnimSet = *reinterpret_cast<void**>((u8*)this + 0xD4);
 	if (texAnimSet != 0) {
-		ReleaseRefCounted(texAnimSet);
+		ReleaseRefCountedNonNull(texAnimSet);
 		texAnimSet = 0;
 	}
 
 	void*& refData = *reinterpret_cast<void**>((u8*)this + 0xA4);
 	if (refData != 0) {
-		ReleaseRefCounted(refData);
+		ReleaseRefCountedNonNull(refData);
 		refData = 0;
 	}
 

@@ -164,15 +164,20 @@ static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
     keyFrame = 0;
 }
 
+static void ReleaseRefNonNull(CRef* object)
+{
+    if (object->DecRef() == 0) {
+        delete object;
+    }
+}
+
 static void ReleaseRef(CRef* object)
 {
     if (object == 0) {
         return;
     }
 
-    if (object->DecRef() == 0) {
-        delete object;
-    }
+    ReleaseRefNonNull(object);
 }
 
 struct RawPtrArray {
@@ -2930,7 +2935,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18))); i++) {
                 CTexture* object = *reinterpret_cast<CTexture**>(Ptr(textureRef, 0x3C));
                 if (object != 0) {
-                    ReleaseRef(object);
+                    ReleaseRefNonNull(object);
                     *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
                 }
 
@@ -2941,7 +2946,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
             }
 
             if (material != 0) {
-                ReleaseRef(material);
+                ReleaseRefNonNull(material);
             }
             m_materials.SetAt(index, 0);
         }

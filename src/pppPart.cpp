@@ -1028,8 +1028,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
  */
 void pppSetMatrix(_pppMngSt* pppMngSt)
 {
-	Mtx nodeMtx;
 	Vec tmpPos;
+	Mtx nodeMtx ATTRIBUTE_ALIGN(8);
 	Vec scaleAxis0;
 	Vec scaleAxis1;
 	Vec scaleAxis2;
@@ -1092,13 +1092,13 @@ MatrixMode2:
 		goto LocalOnly;
 	}
 	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-ApplyMatrixWithRotatedPosition:
+
+ApplyRotatedMatrix:
 	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	nodeMtx[0][3] += tmpPos.x;
 	nodeMtx[1][3] += tmpPos.y;
 	nodeMtx[2][3] += tmpPos.z;
 	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
-	goto ScaleOnly;
 
 ScaleOnly:
 	if (FLOAT_8032fdfc != pppMngSt->m_scale.x) {
@@ -1141,8 +1141,8 @@ MatrixMode3:
 
 	if (pppMngSt->m_ownerFacing == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		pppMngSt->m_ownerFacing =
-		    static_cast<u8>(static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		pppMngSt->m_ownerFacing = static_cast<u8>(
+		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1157,12 +1157,12 @@ MatrixMode3:
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
 		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
-		bool hasModelScale = false;
+		u8 hasModelScale = 0;
 		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
-			hasModelScale = true;
+			hasModelScale = 1;
 		}
 		float ownerScale;
-		if (hasModelScale) {
+		if (hasModelScale != 0) {
 			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
 		} else {
 			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
@@ -1179,11 +1179,12 @@ MatrixMode3:
 
 	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
-	goto ApplyMatrixWithRotatedPosition;
+	goto ApplyRotatedMatrix;
 
 MatrixMode4:
 	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-ApplyMatrixWithPosition:
+
+ApplyTranslatedMatrix:
 	nodeMtx[0][3] += ppvMng->m_position.x;
 	nodeMtx[1][3] += ppvMng->m_position.y;
 	nodeMtx[2][3] += ppvMng->m_position.z;
@@ -1197,8 +1198,8 @@ MatrixMode5:
 
 	if (pppMngSt->m_ownerFacing == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		pppMngSt->m_ownerFacing =
-		    static_cast<u8>(static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		pppMngSt->m_ownerFacing = static_cast<u8>(
+		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1213,12 +1214,12 @@ MatrixMode5:
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
 		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
-		bool hasModelScale = false;
+		u8 hasModelScale = 0;
 		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
-			hasModelScale = true;
+			hasModelScale = 1;
 		}
 		float ownerScale;
-		if (hasModelScale) {
+		if (hasModelScale != 0) {
 			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
 		} else {
 			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
@@ -1235,7 +1236,7 @@ MatrixMode5:
 
 	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
-	goto ApplyMatrixWithPosition;
+	goto ApplyTranslatedMatrix;
 
 MatrixMode6:
 	if (pppMngSt->m_bindNode == 0) {
@@ -1244,8 +1245,8 @@ MatrixMode6:
 
 	if (pppMngSt->m_ownerFacing == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		pppMngSt->m_ownerFacing =
-		    static_cast<u8>(static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		pppMngSt->m_ownerFacing = static_cast<u8>(
+		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1260,12 +1261,12 @@ MatrixMode6:
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
 		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
-		bool hasModelScale = false;
+		u8 hasModelScale = 0;
 		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
-			hasModelScale = true;
+			hasModelScale = 1;
 		}
 		float ownerScale;
-		if (hasModelScale) {
+		if (hasModelScale != 0) {
 			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
 		} else {
 			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
@@ -1285,7 +1286,7 @@ MatrixMode6:
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[2]), reinterpret_cast<Vec*>(nodeMtx[2]));
-	goto ApplyMatrixWithRotatedPosition;
+	goto ApplyRotatedMatrix;
 
 MatrixMode7:
 	if (pppMngSt->m_bindNode == 0) {
@@ -1294,8 +1295,8 @@ MatrixMode7:
 
 	if (pppMngSt->m_ownerFacing == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		pppMngSt->m_ownerFacing =
-		    static_cast<u8>(static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		pppMngSt->m_ownerFacing = static_cast<u8>(
+		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1310,12 +1311,12 @@ MatrixMode7:
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
 		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
 		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
-		bool hasModelScale = false;
+		u8 hasModelScale = 0;
 		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
-			hasModelScale = true;
+			hasModelScale = 1;
 		}
 		float ownerScale;
-		if (hasModelScale) {
+		if (hasModelScale != 0) {
 			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
 		} else {
 			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);

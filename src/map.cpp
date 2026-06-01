@@ -54,7 +54,6 @@ extern const float kMapHitWireZOffset = -0.1f;
 extern char g_MsgFlashy[];
 extern const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
-extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 
 static const char s_mapMidPathFmt[] = "%s.mid";
 static const char s_mapOtmPathFmt[] = "%s.otm";
@@ -2216,8 +2215,8 @@ void CMapMng::ReadOtm(char* mapName)
             continue;
         }
 
-        unsigned char lightRaw[0xB0];
-        __ct__Q29CLightPcs6CLightFv(lightRaw);
+        CLightPcs::CLight light;
+        unsigned char* lightRaw = reinterpret_cast<unsigned char*>(&light);
         *reinterpret_cast<int*>(lightRaw + 0x8) = 1;
         *reinterpret_cast<float*>(lightRaw + 0xC) = MapObjWorldX(obj);
         *reinterpret_cast<float*>(lightRaw + 0x10) = MapObjWorldY(obj);
@@ -2249,7 +2248,7 @@ void CMapMng::ReadOtm(char* mapName)
         lightRaw[0x5B] = atr[11];
 
         CLightPcs::CBumpLight* bump = LightPcs.AddBump(
-            reinterpret_cast<CLightPcs::CLight*>(lightRaw),
+            &light,
             static_cast<CLightPcs::TARGET>(1),
             m_stage,
             1);

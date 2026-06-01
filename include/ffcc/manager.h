@@ -7,6 +7,4 @@ public:
     virtual void Quit();
 };
 
-extern void* __vt__8CManager[];
-
 #endif // _FFCC_MANAGER_H

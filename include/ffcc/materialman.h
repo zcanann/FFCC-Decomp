@@ -101,12 +101,12 @@ public:
     void SetShadowBound(CMapShadow::TARGET, CBound*, float(*)[4]);
     void InitVtxFmt(int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
     void IncNumTevStage();
-    void GetTexMtxCur();
-    void GetTexCoordIdCur();
+    int GetTexMtxCur();
+    int GetTexCoordIdCur();
     int IncTexCoordIdCur();
     int IncTexMtxCur();
     int IncTexMapIdCur();
-    void GetTexMapIdCur();
+    int GetTexMapIdCur();
     void SetStdEnv();
     void DecTexCoordIdCur();
     void SetTevBit(CMaterialMan::TEV_BIT);

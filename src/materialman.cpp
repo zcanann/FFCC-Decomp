@@ -2191,9 +2191,9 @@ void CMaterialMan::IncNumTevStage()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetTexMtxCur()
+int CMaterialMan::GetTexMtxCur()
 {
-	// TODO
+    return GetMaterialManTexState(this)->texMtxCur;
 }
 
 /*
@@ -2201,9 +2201,9 @@ void CMaterialMan::GetTexMtxCur()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetTexCoordIdCur()
+int CMaterialMan::GetTexCoordIdCur()
 {
-	// TODO
+    return GetMaterialManTexState(this)->texCoordIdCur;
 }
 
 /*
@@ -2261,9 +2261,9 @@ int CMaterialMan::IncTexMapIdCur()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetTexMapIdCur()
+int CMaterialMan::GetTexMapIdCur()
 {
-	// TODO
+    return m_texMapIdCur;
 }
 
 /*

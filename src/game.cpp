@@ -1397,10 +1397,12 @@ char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
-    char** itemTable = m_cFlatDataArr[1].TableStrings(0);
+    char* result = out;
     unsigned char hasSeparator = 0;
-    char* prefix = itemTable[itemIndex * 5 + 2];
-    char* itemName = itemTable[itemIndex * 5 + 3];
+    char** itemTable = m_cFlatDataArr[1].TableStrings(0);
+    int nameIndex = itemIndex * 5;
+    char* prefix = itemTable[nameIndex + 2];
+    char* itemName = itemTable[nameIndex + 3];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
@@ -1414,8 +1416,8 @@ char* CGame::MakeArtsItemNames(char* out, int itemIndex)
         separator = s_nameSep;
     }
 
-    sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
-    return out;
+    sprintf(result, s_nameJoinFmt, prefix, separator, itemName);
+    return result;
 }
 
 /*
@@ -1496,10 +1498,12 @@ char* CGame::MakeArtMonName(char* out, int monIndex, int count)
  */
 char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
-    char** monTable = m_cFlatDataArr[1].TableStrings(1);
+    char* result = out;
     unsigned char hasSeparator = 0;
-    char* prefix = monTable[monIndex * 5 + 2];
-    char* monName = monTable[monIndex * 5 + 3];
+    char** monTable = m_cFlatDataArr[1].TableStrings(1);
+    int nameIndex = monIndex * 5;
+    char* prefix = monTable[nameIndex + 2];
+    char* monName = monTable[nameIndex + 3];
 
     if (strlen(prefix) != 0) {
         unsigned char languageId = m_gameWork.m_languageId;
@@ -1513,8 +1517,8 @@ char* CGame::MakeArtsMonNames(char* out, int monIndex)
         separator = s_nameSep;
     }
 
-    sprintf(out, s_nameJoinFmt, prefix, separator, monName);
-    return out;
+    sprintf(result, s_nameJoinFmt, prefix, separator, monName);
+    return result;
 }
 
 /*

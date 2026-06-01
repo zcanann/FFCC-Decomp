@@ -3398,28 +3398,28 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     }
 
-    if ((repeat & 0x1) != 0) {
-        if (row < 5) {
-            if (select > 0) {
-                select = static_cast<short>(select - 1);
+    if ((repeat & 0x1) == 0) {
+        if ((repeat & 0x2) != 0) {
+            if (row < 5) {
+                if (select < 0xB) {
+                    select = static_cast<short>(select + 1);
+                } else {
+                    select = 0;
+                }
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
             } else {
-                select = 0xB;
+                Sound.PlaySe(4, 0x40, 0x7f, 0);
             }
-            Sound.PlaySe(1, 0x40, 0x7f, 0);
-        } else {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
         }
-    } else if ((repeat & 0x2) != 0) {
-        if (row < 5) {
-            if (select < 0xB) {
-                select = static_cast<short>(select + 1);
-            } else {
-                select = 0;
-            }
-            Sound.PlaySe(1, 0x40, 0x7f, 0);
+    } else if (row < 5) {
+        if (select > 0) {
+            select = static_cast<short>(select - 1);
         } else {
-            Sound.PlaySe(4, 0x40, 0x7f, 0);
+            select = 0xB;
         }
+        Sound.PlaySe(1, 0x40, 0x7f, 0);
+    } else {
+        Sound.PlaySe(4, 0x40, 0x7f, 0);
     }
 
     if ((repeat & 0xF) != 0) {

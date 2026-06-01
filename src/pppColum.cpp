@@ -8,6 +8,7 @@
 #include "ffcc/textureman.h"
 
 #include <math.h>
+#include <stddef.h>
 
 struct Vec2d {
     float x;
@@ -115,11 +116,12 @@ static inline float ColumSqrtPositive(float value)
 void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    u8* workArea = column->m_object.m_workArea;
+    u8* object = (u8*)column;
     pppColumValue* values;
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(workArea + serializedDataOffsets[3]);
+    pppColumFrameWork* frameWork =
+        (pppColumFrameWork*)(object + serializedDataOffsets[3] + offsetof(_pppPObject, m_workArea));
     pppColumPositionWork* positionWork =
-        (pppColumPositionWork*)(workArea + serializedDataOffsets[2]);
+        (pppColumPositionWork*)(object + serializedDataOffsets[2] + offsetof(_pppPObject, m_workArea));
     int textureIndex = 0;
     pppCVECTOR color;
 

@@ -104,6 +104,11 @@ DbgMenuDef tWork[] = {
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
 GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8012d260
@@ -482,8 +487,9 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 	do {
 		m_currentMenu = current;
-		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
-		              kDbgMenuViewportNear, kDbgMenuViewportFar);
+		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, LoadFloat(kDbgMenuViewportWidth),
+		              LoadFloat(kDbgMenuViewportHeight), LoadFloat(kDbgMenuViewportNear),
+		              LoadFloat(kDbgMenuViewportFar));
 
 		switch (current->m_type) {
 		case 0:

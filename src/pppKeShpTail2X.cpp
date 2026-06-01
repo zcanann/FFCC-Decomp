@@ -1,4 +1,5 @@
 #include "ffcc/pppKeShpTail2X.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -11,6 +12,8 @@ extern const float FLOAT_80330508;
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 #include <string.h>
+
+STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_workArea) == 0x80);
 
 struct KeShpTail2XStep {
     u8 _pad0[4];
@@ -56,6 +59,12 @@ struct KeShpTail2XWork {
     Vec m_posHistory[31];
 };
 
+struct KeShpTail2XAlphaWork {
+    u8 _pad0[6];
+    s16 m_alpha;
+};
+STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
+
 /*
  * --INFO--
  * PAL Address: 0x80088698
@@ -67,7 +76,8 @@ struct KeShpTail2XWork {
  */
 void pppKeShpTail2XDes(void* obj, _pppCtrlTable* param_2)
 {
-    KeShpTail2XWork* work = (KeShpTail2XWork*)((u8*)obj + param_2->m_serializedDataOffsets[0] + 0x80);
+    KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
+        reinterpret_cast<_pppPObject*>(obj)->m_workArea + param_2->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -88,7 +98,8 @@ void pppKeShpTail2XDes(void* obj, _pppCtrlTable* param_2)
  */
 void pppKeShpTail2XCon(void* obj, _pppCtrlTable* param_2)
 {
-    KeShpTail2XWork* work = (KeShpTail2XWork*)((u8*)obj + param_2->m_serializedDataOffsets[0] + 0x80);
+    KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
+        reinterpret_cast<_pppPObject*>(obj)->m_workArea + param_2->m_serializedDataOffsets[0]);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -163,7 +174,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
 
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + param_3->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
+    alphaMul = (float)reinterpret_cast<KeShpTail2XAlphaWork*>(
+                   obj->m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
+               kPppKeShpTail2XAlphaScale;
     colorStart.w = step->m_colorStartA;
     colorEnd.w = step->m_colorEndA;
     colorStart.x = step->m_colorStartR;
@@ -194,7 +207,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    work = (KeShpTail2XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
     shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
 
@@ -356,7 +369,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     }
 
     step = (KeShpTail2XStep*)param_2;
-    work = (KeShpTail2XWork*)((u8*)obj + param_3->m_serializedDataOffsets[0] + 0x80);
+    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
 
     if (obj->pppPObject.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {

@@ -37,20 +37,6 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-RSDITEM* CMaterialEditorPcs::GetReadRsd()
-{
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStream.m_stageLoad)))->rsdItem;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8004dd10
  * PAL Size: 96b
  * EN Address: TODO
@@ -126,86 +112,6 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
     listItem->flag = 1;
     zlist->AddTail(listItem);
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount)
-{
-    ZCANMGRP* entry = *colAnmData;
-
-    if (entry != (ZCANMGRP*)0) {
-        int i = 0;
-        while (i < colAnmCount) {
-            if (entry->ptr != (u8*)0) {
-                delete[] entry->ptr;
-                entry->ptr = (u8*)0;
-            }
-            entry = entry + 1;
-            i = i + 1;
-        }
-        delete[] reinterpret_cast<u8*>(*colAnmData);
-        *colAnmData = (ZCANMGRP*)0;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
-{
-    RSDITEM* rsdItem = listItem->rsdItem;
-
-    if (rsdItem != (RSDITEM*)0) {
-        if (rsdItem->ptrC != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptrC);
-            rsdItem->ptrC = 0;
-        }
-        if (rsdItem->ptr10 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr10);
-            rsdItem->ptr10 = 0;
-        }
-        if (rsdItem->ptr14 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr14);
-            rsdItem->ptr14 = 0;
-        }
-        if (rsdItem->ptr18 != (void*)0) {
-            delete[] static_cast<u8*>(rsdItem->ptr18);
-            rsdItem->ptr18 = 0;
-        }
-        delete rsdItem;
-        listItem->rsdItem = (RSDITEM*)0;
-    }
-
-    DeleteColAnmData(&listItem->colAnmData, listItem->colAnmCount);
-    delete listItem;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-RSDLISTITEM* CMaterialEditorPcs::GetRsdItemR()
-{
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 }
 
 /*

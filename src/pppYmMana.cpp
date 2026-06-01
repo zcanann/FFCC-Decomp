@@ -1485,8 +1485,9 @@ static void CalculateNormal(VYmMana* mana)
         normals[i].x = zero;
     }
 
-    s32 indicesOffset = 0;
-    for (s32 i = 0; i < 0x200; i++) {
+    s32 i = 0;
+    s32 indicesOffset = i;
+    for (; i < 0x200; i++) {
         u16 i0 = indices[indicesOffset++];
         u16 i1 = indices[indicesOffset++];
         u16 i2 = indices[indicesOffset++];
@@ -1507,7 +1508,7 @@ static void CalculateNormal(VYmMana* mana)
         PSVECAdd(&normals[i2], &faceNormal, &normals[i2]);
     }
 
-    for (s32 i = 0; i < 0x121; i++) {
+    for (i = 0; i < 0x121; i++) {
         PSVECNormalize(&normals[i], &normals[i]);
     }
 

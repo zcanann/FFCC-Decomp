@@ -424,7 +424,7 @@ static void StoreCmakeVillageName()
 
 static bool IsCmakeNameBlank(const char* name)
 {
-    if (name == nullptr || name[0] == '\0') {
+    if (name[0] == '\0') {
         return true;
     }
 
@@ -439,7 +439,7 @@ static bool IsCmakeNameBlank(const char* name)
 
 static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
-    if (name == nullptr || name[0] == '\0') {
+    if (name[0] == '\0') {
         return false;
     }
 

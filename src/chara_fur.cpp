@@ -1340,6 +1340,12 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 
 	if ((heldButtons & 0x100) != 0) {
 		const unsigned char radarType = MogRadarType();
+		if (Chara.MogFur().m_prevRadarType != radarType) {
+			Chara.MogFur().m_prevRadarType = radarType;
+			work.m_pickTicks = 0;
+			Sound.StopSe(work.m_loopSeHandle);
+			work.m_loopSeHandle = 0;
+		}
 		const _GXColor brushColor = MogBrushColor(radarType);
 		const int eraseMode = (radarType == 4) ? 1 : 0;
 		const int doPaint = (radarType == 3 || radarType == 4) ? (((System.m_frameCounter & 3U) == 0) ? 1 : 0) : 1;

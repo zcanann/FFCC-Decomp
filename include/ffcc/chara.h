@@ -299,7 +299,7 @@ public:
     {
         u16 m_texels[0x1000];                 // 0x0000
         u32 m_dirty;                          // 0x2000
-        u32 m_unused2004;                     // 0x2004
+        u32 m_prevRadarType;                  // 0x2004
         u32 m_cursorX;                        // 0x2008
         u32 m_cursorY;                        // 0x200C
         int m_timestamp;                      // 0x2010

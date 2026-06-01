@@ -5,12 +5,13 @@
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
 extern "C" {
-extern const f32 kFunnyShapeNdcMax;
-extern const f32 kFunnyShapeNdcMin;
-extern const f32 kFunnyShapeOrthoFarZ;
-extern const f32 kFunnyShapeViewportOrigin;
-extern const f32 kFunnyShapeViewportWidth;
-extern const f32 kFunnyShapeViewportHeight;
+extern const f32 kFunnyShapeNdcMax = 1.0f;
+extern const f32 kFunnyShapeNdcMin = -1.0f;
+extern const f32 kFunnyShapeOrthoFarZ = 100.0f;
+extern const char s_funnyShapeSpinner[5] = "|/-\\";
+extern const f32 kFunnyShapeViewportOrigin = 0.0f;
+extern const f32 kFunnyShapeViewportWidth = 640.0f;
+extern const f32 kFunnyShapeViewportHeight = 448.0f;
 }
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/mtx.h"
@@ -31,7 +32,6 @@ extern "C" const char sFunnyShapePcsProcessClassName[] = "CProcess";
 extern "C" const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 extern "C" const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
 extern "C" const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
-extern "C" const char s_funnyShapeSpinner[5];
 
 inline void* operator new(unsigned long, void* ptr)
 {

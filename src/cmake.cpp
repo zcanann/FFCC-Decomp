@@ -3526,7 +3526,7 @@ void CMenuPcs::CmakeVillageDraw()
     } else if (mode == 1) {
         alpha = FLOAT_80333258;
     } else {
-        alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
+        alpha = static_cast<float>(-(DOUBLE_80333268 * static_cast<double>(frame) - DOUBLE_80333270));
     }
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

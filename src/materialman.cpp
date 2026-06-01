@@ -180,16 +180,6 @@ static void ReleaseRef(CRef* object)
     ReleaseRefNonNull(object);
 }
 
-struct RawPtrArray {
-    void** vtable;
-    unsigned long size;
-    unsigned long numItems;
-    unsigned long defaultSize;
-    void** items;
-    CMemory::CStage* stage;
-    int growCapacity;
-};
-
 struct MaterialManTevState {
     unsigned int stdEnvTevBit;
     unsigned int activeEnvTevBit;
@@ -462,7 +452,7 @@ void CMaterialMan::Quit()
  */
 void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
 {
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
@@ -1164,7 +1154,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 {
     SetStdEnv();
 
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
     g_drawMaterial = material;
     int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
@@ -1262,7 +1252,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     m_texCoordIdCurShadow = m_stdTexCoordId;
     m_curEnvTevBit = m_stdEnvTevBit;
 
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
@@ -1538,7 +1528,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
 {
     SetStdEnv();
 
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
@@ -1772,7 +1762,7 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
 void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shadowIndex, unsigned long materialFlag)
 {
     CMaterialSet* materialSet = MapMng.m_materialSet;
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
     unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
@@ -2001,7 +1991,7 @@ int CMaterialMan::GetCharaShadow(
     float maxZ = position->z + rangeXZ;
 
     CMaterialSet* materialSet = MapMng.m_materialSet;
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     int shadowCandidates[384];
@@ -2403,20 +2393,20 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    memset(Ptr(this, 0x8), 0, 0x10);
-    *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
-    *Ptr(this, 0xA0) = 4;
-    *Ptr(this, 0xA1) = 1;
-    *Ptr(this, 0xA2) = 0;
-    *Ptr(this, 0xA4) = 0;
-    *reinterpret_cast<void**>(Ptr(this, 0x3C)) = 0;
-    *reinterpret_cast<void**>(Ptr(this, 0x40)) = 0;
-    *reinterpret_cast<void**>(Ptr(this, 0x44)) = 0;
-    *reinterpret_cast<void**>(Ptr(this, 0x48)) = 0;
-    *Ptr(this, 0x34) = 0;
-    *Ptr(this, 0x35) = 0;
-    *Ptr(this, 0x36) = 0;
-    *Ptr(this, 0xA5) = 0;
+    memset(m_name, 0, sizeof(m_name));
+    m_pdtSlotIndex = -1;
+    m_blendMode = 4;
+    m_fogEnable = 1;
+    m_materialType = 0;
+    m_shadowKColorId = 0;
+    m_textures[0] = 0;
+    m_textures[1] = 0;
+    m_textures[2] = 0;
+    m_textures[3] = 0;
+    m_texShiftU = 0;
+    m_texShiftV = 0;
+    m_unk36 = 0;
+    m_unkA5 = 0;
 }
 
 /*
@@ -2894,14 +2884,14 @@ next:
  */
 void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
 {
-    *reinterpret_cast<unsigned long*>(Ptr(this, 0x24)) = static_cast<unsigned long>(tevBit);
+    m_tevBit = static_cast<unsigned long>(tevBit);
     float scale = FLOAT_8032faf0;
-    *reinterpret_cast<void**>(Ptr(this, 0x28)) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = 0;
-    *reinterpret_cast<float*>(Ptr(this, 0x30)) = scale;
-    *reinterpret_cast<float*>(Ptr(this, 0x2C)) = scale;
-    *Ptr(this, 0xA7) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) = static_cast<unsigned short>(tag);
+    m_bumpLight = 0;
+    m_textureCount = 0;
+    m_scaleU = scale;
+    m_scaleV = scale;
+    m_singleTextureFlag = 0;
+    m_textureCount = static_cast<unsigned short>(tag);
 }
 
 /*
@@ -3208,11 +3198,11 @@ int CMaterial::Set(_GXTexMapID texMapId)
     Mtx texMtx;
     PSMTXIdentity(texMtx);
 
-    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    int textureCount = static_cast<int>(m_textureCount);
     CTexScroll* scroll = GetTexScroll(0);
     MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
     MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
-    unsigned char* textureSlot = Ptr(this, 0x3C);
+    CTexture** textureSlot = m_textures;
     int i = 0;
 
     bool hasDualScroll = false;
@@ -3225,8 +3215,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
     }
 
     for (; i < textureCount; i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(textureSlot);
-        if ((texture != 0) && ((*Ptr(this, 0xA7) == 0) || (i < 1))) {
+        CTexture* texture = *textureSlot;
+        if ((texture != 0) && ((m_singleTextureFlag == 0) || (i < 1))) {
             TextureMan.SetTexture(texMapId, texture);
             texMapId = static_cast<_GXTexMapID>(static_cast<int>(texMapId) + 1);
 
@@ -3267,7 +3257,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
             }
         }
 
-        textureSlot += 4;
+        textureSlot++;
         scroll++;
     }
 

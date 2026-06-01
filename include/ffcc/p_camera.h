@@ -29,6 +29,33 @@ public:
         
     };
 
+    struct ViewerState
+    {
+        Vec m_position;
+        float m_rotX;
+        float m_rotY;
+        float m_distance;
+        Vec m_scale;
+    };
+
+    struct QuakeState
+    {
+        unsigned char m_mode;
+        unsigned char m_pad01[3];
+        int m_state;
+        int m_keepMoving;
+        short m_signX;
+        short m_signY;
+        short m_signZ;
+        unsigned char m_pad12[2];
+        Vec m_positionAmplitude;
+        Vec m_jitterAmplitude;
+        short m_startTimer;
+        short m_startDuration;
+        short m_endTimer;
+        short m_endDuration;
+    };
+
     CCameraPcs()
     {
         m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
@@ -159,11 +186,31 @@ public:
     float m_fov;
     float m_nearZ;
     float m_farZ;
-    u8 _pad108[0x404 - 0x108];
+    float m_zRotate; // 0x108
+    u8 _pad10C[0x364 - 0x10C];
+    float m_fullScreenShadowRotX; // 0x364
+    float m_fullScreenShadowRotY; // 0x368
+    float m_fullScreenShadowSpan; // 0x36C
+    float m_fullScreenShadowScale; // 0x370
+    u8 _pad374[0x404 - 0x374];
     u8 m_fullScreenShadowEnabled; // 0x404
-    u8 _pad405[0x414 - 0x405];
+    u8 _pad405[0x408 - 0x405];
+    Vec m_fullScreenShadowPosition; // 0x408
     CBound m_shadowRectBound; // 0x414
-    u8 _pad42C[0x4C4 - 0x42C];
+    float m_fullScreenShadowDepth; // 0x42C
+    float m_fullScreenShadowCamLen; // 0x430
+    int m_shadowAuto; // 0x434
+    int m_fromScript; // 0x438
+    float m_distance; // 0x43C
+    float m_pitch; // 0x440
+    int m_isAbsolute; // 0x444
+    ViewerState m_viewer; // 0x448
+    int m_viewerOverride; // 0x46C
+    float m_mapRotX; // 0x470
+    float m_mapRotY; // 0x474
+    float m_mapRotZ; // 0x478
+    u8 _pad47C[0x490 - 0x47C];
+    QuakeState m_quake; // 0x490
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

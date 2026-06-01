@@ -247,6 +247,30 @@ struct CameraStateCopy {
     u8 bytes[0x108];
 };
 
+STATIC_ASSERT(offsetof(CCameraPcs, m_cameraMatrix) == 0x04);
+STATIC_ASSERT(offsetof(CCameraPcs, m_worldMapMatrix) == 0x34);
+STATIC_ASSERT(offsetof(CCameraPcs, m_zRotate) == 0x108);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowRotX) == 0x364);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowRotY) == 0x368);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowSpan) == 0x36C);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowScale) == 0x370);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowEnabled) == 0x404);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowPosition) == 0x408);
+STATIC_ASSERT(offsetof(CCameraPcs, m_shadowRectBound) == 0x414);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowDepth) == 0x42C);
+STATIC_ASSERT(offsetof(CCameraPcs, m_isAbsolute) == 0x444);
+STATIC_ASSERT(offsetof(CCameraPcs, m_viewer) == 0x448);
+STATIC_ASSERT(sizeof(CCameraPcs::ViewerState) == 0x24);
+STATIC_ASSERT(offsetof(CCameraPcs, m_viewerOverride) == 0x46C);
+STATIC_ASSERT(offsetof(CCameraPcs, m_mapRotX) == 0x470);
+STATIC_ASSERT(offsetof(CCameraPcs, m_quake) == 0x490);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_state) == 0x04);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_positionAmplitude) == 0x14);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_jitterAmplitude) == 0x20);
+STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_startTimer) == 0x2C);
+STATIC_ASSERT(sizeof(CCameraPcs::QuakeState) == 0x34);
+STATIC_ASSERT(sizeof(CCameraPcs) == 0x4C4);
+
 static inline void CopyCameraState(u8* dst, u8* src)
 {
     *reinterpret_cast<CameraStateCopy*>(dst) = *reinterpret_cast<CameraStateCopy*>(src);
@@ -310,47 +334,47 @@ void CCameraPcs::create()
     float value18 = FLOAT_8032fa18;
     float valueb0 = FLOAT_8032fab0;
 
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xDC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xD8) = zero;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xD4) = zero;
+    m_targetZ = FLOAT_8032fa34;
+    m_targetY = zero;
+    m_targetX = zero;
 
     float valueb4 = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xF8) = value18;
+    m_yaw = value18;
 
     float value8c = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x43C) = value5c;
+    m_distance = value5c;
 
     float valueb8 = FLOAT_8032fab8;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x440) = valueb0;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0xFC) = valueb4;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x100) = value8c;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x104) = valueb8;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x444) = 0;
+    m_pitch = valueb0;
+    m_fov = valueb4;
+    m_nearZ = value8c;
+    m_farZ = valueb8;
+    m_isAbsolute = 0;
 
-    PSMTXIdentity(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(this) + 0x34));
+    PSMTXIdentity(m_worldMapMatrix);
 
     valueb4 = FLOAT_8032fab8;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x42C) = FLOAT_8032fa38;
+    m_fullScreenShadowDepth = FLOAT_8032fa38;
     value18 = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x430) = valueb4;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x434) = 1;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x438) = 0;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x494) = 0;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x498) = 0;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4AC) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A8) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4A4) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B8) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B4) = value18;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x4B0) = value18;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BC) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4BE) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C0) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4C2) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x4A0) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49E) = 0;
-    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x49C) = 0;
-    *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x490) = 0;
+    m_fullScreenShadowCamLen = valueb4;
+    m_shadowAuto = 1;
+    m_fromScript = 0;
+    m_quake.m_state = 0;
+    m_quake.m_keepMoving = 0;
+    m_quake.m_positionAmplitude.z = value18;
+    m_quake.m_positionAmplitude.y = value18;
+    m_quake.m_positionAmplitude.x = value18;
+    m_quake.m_jitterAmplitude.z = value18;
+    m_quake.m_jitterAmplitude.y = value18;
+    m_quake.m_jitterAmplitude.x = value18;
+    m_quake.m_startTimer = 0;
+    m_quake.m_startDuration = 0;
+    m_quake.m_endTimer = 0;
+    m_quake.m_endDuration = 0;
+    m_quake.m_signZ = 0;
+    m_quake.m_signY = 0;
+    m_quake.m_signX = 0;
+    m_quake.m_mode = 0;
 }
 
 /*
@@ -374,7 +398,7 @@ void CCameraPcs::destroy()
  */
 void CCameraPcs::onScriptChanging(char*)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x444) = 0;
+    m_isAbsolute = 0;
 }
 
 /*
@@ -391,20 +415,20 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
-    PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
+    PSMTXCopy(mathMtx, m_worldMapMatrix);
     PSMTXInverse(mathMtx, m_cameraWorldMtx);
 
     float refValue = FLOAT_8032fa88;
     float zero;
-    *reinterpret_cast<float*>(self + 0xDC) = zero = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xD8) = zero;
-    *reinterpret_cast<float*>(self + 0xD4) = zero;
-    *reinterpret_cast<float*>(self + 0xE0) = zero;
-    *reinterpret_cast<float*>(self + 0xE4) = refValue;
-    *reinterpret_cast<float*>(self + 0xE8) = refValue;
+    m_targetZ = zero = FLOAT_8032fa34;
+    m_targetY = zero;
+    m_targetX = zero;
+    m_positionX = zero;
+    m_positionY = refValue;
+    m_positionZ = refValue;
 
     if (fromScript != 0) {
-        *reinterpret_cast<int*>(self + 0x444) = 1;
+        m_isAbsolute = 1;
     }
 
     memset(self + 0x47C, 0, 0x14);
@@ -424,62 +448,60 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
                                    float posAmpX, float posAmpY, float posAmpZ,
                                    float jitterAmpX, float jitterAmpY, float jitterAmpZ, int immediate)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (immediate != 0) {
-        *reinterpret_cast<s32*>(self + 0x494) = quakeState;
+        m_quake.m_state = quakeState;
         if (quakeState != 0) {
-            self[0x490] = 2;
-            *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-            *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-            *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-            *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-            *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-            *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+            m_quake.m_mode = 2;
+            m_quake.m_positionAmplitude.x = posAmpX;
+            m_quake.m_positionAmplitude.y = posAmpY;
+            m_quake.m_positionAmplitude.z = posAmpZ;
+            m_quake.m_jitterAmplitude.x = jitterAmpX;
+            m_quake.m_jitterAmplitude.y = jitterAmpY;
+            m_quake.m_jitterAmplitude.z = jitterAmpZ;
             return;
         }
 
-        self[0x490] = 0;
-        *reinterpret_cast<float*>(self + 0x4AC) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4A8) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4A4) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B8) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B4) = FLOAT_8032fa34;
-        *reinterpret_cast<float*>(self + 0x4B0) = FLOAT_8032fa34;
+        m_quake.m_mode = 0;
+        m_quake.m_positionAmplitude.z = FLOAT_8032fa34;
+        m_quake.m_positionAmplitude.y = FLOAT_8032fa34;
+        m_quake.m_positionAmplitude.x = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.z = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.y = FLOAT_8032fa34;
+        m_quake.m_jitterAmplitude.x = FLOAT_8032fa34;
         return;
     }
 
-    if ((*reinterpret_cast<s32*>(self + 0x494) == 0) && (quakeState != 0)) {
-        *reinterpret_cast<s32*>(self + 0x494) = 1;
-        self[0x490] = 1;
-        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
-        *reinterpret_cast<s16*>(self + 0x4BC) = startTime;
-        *reinterpret_cast<s16*>(self + 0x4BE) = startTime;
-        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
-        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
-        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+    if ((m_quake.m_state == 0) && (quakeState != 0)) {
+        m_quake.m_state = 1;
+        m_quake.m_mode = 1;
+        m_quake.m_keepMoving = keepMoving;
+        m_quake.m_startTimer = startTime;
+        m_quake.m_startDuration = startTime;
+        m_quake.m_endTimer = endTime;
+        m_quake.m_endDuration = endTime;
+        m_quake.m_positionAmplitude.x = posAmpX;
+        m_quake.m_positionAmplitude.y = posAmpY;
+        m_quake.m_positionAmplitude.z = posAmpZ;
+        m_quake.m_jitterAmplitude.x = jitterAmpX;
+        m_quake.m_jitterAmplitude.y = jitterAmpY;
+        m_quake.m_jitterAmplitude.z = jitterAmpZ;
         return;
     }
 
-    if ((*reinterpret_cast<s32*>(self + 0x494) == 1) && (quakeState == 0)) {
-        *reinterpret_cast<s32*>(self + 0x494) = 0;
-        self[0x490] = 1;
-        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
-        *reinterpret_cast<s16*>(self + 0x4BC) = 0;
-        *reinterpret_cast<s16*>(self + 0x4BE) = 0;
-        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
-        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
-        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
-        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
-        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
-        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
-        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
-        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+    if ((m_quake.m_state == 1) && (quakeState == 0)) {
+        m_quake.m_state = 0;
+        m_quake.m_mode = 1;
+        m_quake.m_keepMoving = keepMoving;
+        m_quake.m_startTimer = 0;
+        m_quake.m_startDuration = 0;
+        m_quake.m_endTimer = endTime;
+        m_quake.m_endDuration = endTime;
+        m_quake.m_positionAmplitude.x = posAmpX;
+        m_quake.m_positionAmplitude.y = posAmpY;
+        m_quake.m_positionAmplitude.z = posAmpZ;
+        m_quake.m_jitterAmplitude.x = jitterAmpX;
+        m_quake.m_jitterAmplitude.y = jitterAmpY;
+        m_quake.m_jitterAmplitude.z = jitterAmpZ;
     }
 }
 
@@ -499,36 +521,36 @@ void CCameraPcs::CalcQuake()
     Vec jitter;
     float zero = FLOAT_8032fa34;
 
-    if ((System.m_scenegraphStepMode == 2) || ((self[0x490] == 2) && (*reinterpret_cast<s32*>(self + 0x494) == 0))) {
+    if ((System.m_scenegraphStepMode == 2) || ((m_quake.m_mode == 2) && (m_quake.m_state == 0))) {
         return;
     }
 
     s32 randomValue = rand();
     s16 randomSign = static_cast<s16>(randomValue >> 0x1F);
-    *reinterpret_cast<u16*>(self + 0x49C) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    m_quake.m_signX = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
 
-    *reinterpret_cast<s16*>(self + 0x49E) = 1 - *reinterpret_cast<s16*>(self + 0x49E);
+    m_quake.m_signY = 1 - m_quake.m_signY;
 
     randomValue = rand();
     randomSign = static_cast<s16>(randomValue >> 0x1F);
-    *reinterpret_cast<u16*>(self + 0x4A0) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+    m_quake.m_signZ = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
 
-    if (*reinterpret_cast<s16*>(self + 0x49C) == 0) {
-        offset.x = -*reinterpret_cast<float*>(self + 0x4A4);
+    if (m_quake.m_signX == 0) {
+        offset.x = -m_quake.m_positionAmplitude.x;
     } else {
-        offset.x = *reinterpret_cast<float*>(self + 0x4A4);
+        offset.x = m_quake.m_positionAmplitude.x;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x49E) == 0) {
-        offset.y = -*reinterpret_cast<float*>(self + 0x4A8);
+    if (m_quake.m_signY == 0) {
+        offset.y = -m_quake.m_positionAmplitude.y;
     } else {
-        offset.y = *reinterpret_cast<float*>(self + 0x4A8);
+        offset.y = m_quake.m_positionAmplitude.y;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x4A0) == 0) {
-        offset.z = -*reinterpret_cast<float*>(self + 0x4AC);
+    if (m_quake.m_signZ == 0) {
+        offset.z = -m_quake.m_positionAmplitude.z;
     } else {
-        offset.z = *reinterpret_cast<float*>(self + 0x4AC);
+        offset.z = m_quake.m_positionAmplitude.z;
     }
 
     jitter.x = FLOAT_8032fa34;
@@ -543,24 +565,24 @@ void CCameraPcs::CalcQuake()
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
 
     if (((randX & 1) ^ signX) == signX) {
-        jitter.x = Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
+        jitter.x = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
-        jitter.x = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
+        jitter.x = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
 
     if (((randY & 1) ^ signY) == signY) {
-        jitter.y = Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
+        jitter.y = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
-        jitter.y = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
+        jitter.y = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
 
     if (((randZ & 1) ^ signZ) == signZ) {
-        jitter.z = Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
+        jitter.z = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
-        jitter.z = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
+        jitter.z = -Math.RandF(m_quake.m_jitterAmplitude.z);
     }
 
-    if (self[0x490] == 2) {
+    if (m_quake.m_mode == 2) {
         PSVECAdd(&offset, &jitter, &offset);
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
         offset.z = FLOAT_8032fa34;
@@ -568,32 +590,32 @@ void CCameraPcs::CalcQuake()
         return;
     }
 
-    if (self[0x490] != 1) {
+    if (m_quake.m_mode != 1) {
         return;
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x4BC) < 1) {
-        if (*reinterpret_cast<s32*>(self + 0x494) == 0) {
-            if (*reinterpret_cast<s16*>(self + 0x4C0) < 1) {
-                *reinterpret_cast<s32*>(self + 0x494) = 0;
-                *reinterpret_cast<s16*>(self + 0x4BC) = 0;
-                *reinterpret_cast<s16*>(self + 0x4BE) = 0;
-                *reinterpret_cast<s16*>(self + 0x4C0) = 0;
-                *reinterpret_cast<s16*>(self + 0x4C2) = 0;
-                *reinterpret_cast<float*>(self + 0x4AC) = zero;
-                *reinterpret_cast<float*>(self + 0x4A8) = zero;
-                *reinterpret_cast<float*>(self + 0x4A4) = zero;
-                *reinterpret_cast<float*>(self + 0x4B8) = zero;
-                *reinterpret_cast<float*>(self + 0x4B4) = zero;
-                *reinterpret_cast<float*>(self + 0x4B0) = zero;
+    if (m_quake.m_startTimer < 1) {
+        if (m_quake.m_state == 0) {
+            if (m_quake.m_endTimer < 1) {
+                m_quake.m_state = 0;
+                m_quake.m_startTimer = 0;
+                m_quake.m_startDuration = 0;
+                m_quake.m_endTimer = 0;
+                m_quake.m_endDuration = 0;
+                m_quake.m_positionAmplitude.z = zero;
+                m_quake.m_positionAmplitude.y = zero;
+                m_quake.m_positionAmplitude.x = zero;
+                m_quake.m_jitterAmplitude.z = zero;
+                m_quake.m_jitterAmplitude.y = zero;
+                m_quake.m_jitterAmplitude.x = zero;
             } else {
-                float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C0)) /
-                              static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C2));
+                float ratio = static_cast<float>(m_quake.m_endTimer) /
+                              static_cast<float>(m_quake.m_endDuration);
                 PSVECScale(&offset, &offset, ratio);
                 PSVECSubtract(&offset, &jitter, &offset);
                 PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
                 PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
-                *reinterpret_cast<s16*>(self + 0x4C0) = *reinterpret_cast<s16*>(self + 0x4C0) - 1;
+                m_quake.m_endTimer = m_quake.m_endTimer - 1;
             }
         } else {
             PSVECAdd(&offset, &jitter, &offset);
@@ -601,16 +623,16 @@ void CCameraPcs::CalcQuake()
             PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
         }
     } else {
-        float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BC)) /
-                      static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BE));
+        float ratio = static_cast<float>(m_quake.m_startTimer) /
+                      static_cast<float>(m_quake.m_startDuration);
         PSVECScale(&offset, &offset, ratio);
         PSVECAdd(&offset, &jitter, &offset);
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
         PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
-        *reinterpret_cast<s16*>(self + 0x4BC) = *reinterpret_cast<s16*>(self + 0x4BC) - 1;
+        m_quake.m_startTimer = m_quake.m_startTimer - 1;
 
-        if ((*reinterpret_cast<s16*>(self + 0x4BC) == 0) && (*reinterpret_cast<s32*>(self + 0x498) == 0)) {
-            *reinterpret_cast<s32*>(self + 0x494) = 0;
+        if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
+            m_quake.m_state = 0;
         }
     }
 }
@@ -642,11 +664,10 @@ void CCameraPcs::calc()
     }
 
     if ((buttons & 0x20) != 0) {
-        *reinterpret_cast<unsigned int*>(self + 0x444) =
-            (static_cast<unsigned int>(__cntlzw(*reinterpret_cast<unsigned int*>(self + 0x444))) >> 5) & 0xFF;
+        m_isAbsolute = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_isAbsolute))) >> 5) & 0xFF;
     }
 
-    if (*reinterpret_cast<int*>(self + 0x444) == 0) {
+    if (m_isAbsolute == 0) {
         float stickH = FLOAT_8032fa34;
         float stickV = FLOAT_8032fa34;
         float triggerL = FLOAT_8032fa34;
@@ -666,12 +687,12 @@ void CCameraPcs::calc()
             moveInOut = *reinterpret_cast<float*>(pad + 0x40);
         }
 
-        *reinterpret_cast<float*>(self + 0xF8) += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
-        *reinterpret_cast<float*>(self + 0x440) += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
-        *reinterpret_cast<float*>(self + 0x43C) += FLOAT_8032fabc * triggerL;
+        m_yaw += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
+        m_pitch += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
+        m_distance += FLOAT_8032fabc * triggerL;
 
-        const double rotY = static_cast<double>(*reinterpret_cast<float*>(self + 0x440));
-        const double rotX = static_cast<double>(*reinterpret_cast<float*>(self + 0xF8));
+        const double rotY = static_cast<double>(m_pitch);
+        const double rotX = static_cast<double>(m_yaw);
         const double camMove = static_cast<double>(FLOAT_8032fa8c * moveInOut);
         const double lateral = -static_cast<double>(FLOAT_8032fabc * triggerR - FLOAT_8032fabc * triggerL);
         const double sinX = static_cast<double>(sin(rotX));
@@ -681,37 +702,28 @@ void CCameraPcs::calc()
         const double sinXCosY = static_cast<double>(static_cast<float>(sinX * cosY));
         const double cosXCosY = static_cast<double>(static_cast<float>(cosX * cosY));
 
-        *reinterpret_cast<float*>(self + 0xD4) =
-            static_cast<float>(sinXCosY * camMove + static_cast<double>(*reinterpret_cast<float*>(self + 0xD4)));
-        *reinterpret_cast<float*>(self + 0xD8) = static_cast<float>(
-            static_cast<double>(*reinterpret_cast<float*>(self + 0xD8)) + (sinY * camMove + lateral));
-        *reinterpret_cast<float*>(self + 0xDC) =
-            -static_cast<float>(cosXCosY * camMove - static_cast<double>(*reinterpret_cast<float*>(self + 0xDC)));
+        m_targetX = static_cast<float>(sinXCosY * camMove + static_cast<double>(m_targetX));
+        m_targetY = static_cast<float>(static_cast<double>(m_targetY) + (sinY * camMove + lateral));
+        m_targetZ = -static_cast<float>(cosXCosY * camMove - static_cast<double>(m_targetZ));
 
-        const double distance = static_cast<double>(*reinterpret_cast<float*>(self + 0x43C));
-        *reinterpret_cast<float*>(self + 0xE0) =
-            static_cast<float>(distance * sinXCosY + static_cast<double>(*reinterpret_cast<float*>(self + 0xD4)));
-        *reinterpret_cast<float*>(self + 0xE4) =
-            static_cast<float>(distance * sinY + static_cast<double>(*reinterpret_cast<float*>(self + 0xD8)));
-        *reinterpret_cast<float*>(self + 0xE8) =
-            -static_cast<float>(distance * cosXCosY - static_cast<double>(*reinterpret_cast<float*>(self + 0xDC)));
+        const double distance = static_cast<double>(m_distance);
+        m_positionX = static_cast<float>(distance * sinXCosY + static_cast<double>(m_targetX));
+        m_positionY = static_cast<float>(distance * sinY + static_cast<double>(m_targetY));
+        m_positionZ = -static_cast<float>(distance * cosXCosY - static_cast<double>(m_targetZ));
     } else {
-        *reinterpret_cast<float*>(self + 0xF8) = static_cast<float>(atan2(
-            static_cast<double>(*reinterpret_cast<float*>(self + 0xE0) - *reinterpret_cast<float*>(self + 0xD4)),
-            static_cast<double>(*reinterpret_cast<float*>(self + 0xDC) - *reinterpret_cast<float*>(self + 0xE8))));
+        m_yaw = static_cast<float>(atan2(static_cast<double>(m_positionX - m_targetX),
+                                         static_cast<double>(m_targetZ - m_positionZ)));
     }
 
     CalcQuake();
 
-    float fov = *reinterpret_cast<float*>(self + 0xFC);
+    float fov = m_fov;
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
         System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
-                     *reinterpret_cast<float*>(self + 0x100),
-                     *reinterpret_cast<float*>(self + 0x104));
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     up.x = FLOAT_8032fa34;
     up.y = FLOAT_8032fa1c;
@@ -720,7 +732,7 @@ void CCameraPcs::calc()
     C_MTXLookAt(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xE0), &up, reinterpret_cast<Vec*>(self + 0xD4));
 
     if (Game.m_currentMapId == 0x21) {
-        PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), worldMapMtx);
+        PSMTXCopy(m_worldMapMatrix, worldMapMtx);
         if (*reinterpret_cast<short*>(self + 0x47E) != 0 && *reinterpret_cast<short*>(self + 0x480) != 0) {
             const double t = static_cast<double>(FLOAT_8032fa18 * (
                 FLOAT_8032fa1c - (static_cast<float>(static_cast<double>((0x4330000000000000ULL |
@@ -747,7 +759,7 @@ void CCameraPcs::calc()
         PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);
     }
 
-    PSMTXRotRad(zRotMtx, 'z', *reinterpret_cast<float*>(self + 0x108));
+    PSMTXRotRad(zRotMtx, 'z', m_zRotate);
     PSMTXConcat(zRotMtx, m_cameraMatrix, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, invMtx);
 
@@ -755,7 +767,7 @@ void CCameraPcs::calc()
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
     PSMTXMultVecSR(invMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
-    *reinterpret_cast<int*>(self + 0x438) = 0;
+    m_fromScript = 0;
 }
 
 /*
@@ -769,18 +781,15 @@ void CCameraPcs::calc()
  */
 void CCameraPcs::SetStdProjectionMatrix()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    float fov = *reinterpret_cast<float*>(self + 0xFC);
+    float fov = m_fov;
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
         System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
-                     *reinterpret_cast<float*>(self + 0x100),
-                     *reinterpret_cast<float*>(self + 0x104));
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 }
 
 /*
@@ -800,7 +809,7 @@ void CCameraPcs::draw()
     unsigned int redColor;
     unsigned int magentaColor;
 
-    if ((*reinterpret_cast<int*>(self + 0x444) == 0) ||
+    if ((m_isAbsolute == 0) ||
         ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
@@ -817,7 +826,7 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         CColor drawColor(0xFF, 0xFF, 0xFF, 0xFF);
-        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc, &drawColor.color);
+        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(&m_targetX), FLOAT_8032fabc, &drawColor.color);
     }
 
     if (g_map_draw_prof != 0) {
@@ -890,7 +899,7 @@ void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT*)
  */
 void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
-    u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
+    u32* dst = reinterpret_cast<u32*>(&m_viewer);
     const u32* src = reinterpret_cast<const u32*>(srt);
     u32 value1;
     u32 value0 = *src++;
@@ -911,7 +920,7 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
     value1 = src[7];
     dst[7] = value2;
     dst[8] = value1;
-    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x46C) = 1;
+    m_viewerOverride = 1;
 }
 
 /*
@@ -932,27 +941,27 @@ void CCameraPcs::createChara()
 
     self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<s32*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar6 = FLOAT_8032fac0;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    m_viewer.m_position.y = fVar2;
     fVar7 = FLOAT_8032fac4;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
+    m_viewer.m_position.x = fVar2;
     fVar4 = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
+    m_viewer.m_distance = fVar2;
     fVar3 = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
+    m_viewer.m_rotY = fVar2;
     fVar5 = FLOAT_8032fab8;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar6;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar7;
-    *reinterpret_cast<float*>(self + 0xFC) = fVar4;
-    *reinterpret_cast<float*>(self + 0x100) = fVar3;
-    *reinterpret_cast<float*>(self + 0x104) = fVar5;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar6;
+    m_viewer.m_distance = fVar7;
+    m_fov = fVar4;
+    m_nearZ = fVar3;
+    m_farZ = fVar5;
 }
 
 /*
@@ -986,11 +995,10 @@ void CCameraPcs::calcChara()
     Vec scaledDir;
     Vec targetPos;
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), *reinterpret_cast<float*>(self + 0xFC), FLOAT_8032fa3c,
-                     *reinterpret_cast<float*>(self + 0x100), *reinterpret_cast<float*>(self + 0x104));
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (*reinterpret_cast<int*>(self + 0x46C) == 0) {
+    if (m_viewerOverride == 0) {
         if (Pad._452_4_ == 0) {
             padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
                                                             ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
@@ -999,10 +1007,10 @@ void CCameraPcs::calcChara()
         }
 
         if ((padButtons & 4) != 0) {
-            *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+            m_viewer.m_position.y += FLOAT_8032fa20;
         }
         if ((padButtons & 8) != 0) {
-            *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+            m_viewer.m_position.y -= FLOAT_8032fa20;
         }
 
         stick = FLOAT_8032fa34;
@@ -1010,43 +1018,38 @@ void CCameraPcs::calcChara()
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x458) =
-            FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+        m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x454) =
-            -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+        m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x45C) =
-            -((FLOAT_8032fabc * stick) - *reinterpret_cast<float*>(self + 0x45C));
+        m_viewer.m_distance = -((FLOAT_8032fabc * stick) - m_viewer.m_distance);
 
         stick = FLOAT_8032fa34;
         if (Pad._452_4_ == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                               ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
         }
-        *reinterpret_cast<float*>(self + 0x45C) =
-            FLOAT_8032fabc * stick + *reinterpret_cast<float*>(self + 0x45C);
+        m_viewer.m_distance = FLOAT_8032fabc * stick + m_viewer.m_distance;
     } else {
-        *reinterpret_cast<int*>(self + 0x46C) = 0;
+        m_viewerOverride = 0;
     }
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
@@ -1055,17 +1058,17 @@ void CCameraPcs::calcChara()
     *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
     PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
 
-    *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x448);
-    *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x44C);
-    *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x450);
+    m_targetX = m_viewer.m_position.x;
+    m_targetY = m_viewer.m_position.y;
+    m_targetZ = m_viewer.m_position.z;
 
     eyeDir = *reinterpret_cast<Vec*>(self + 0xEC);
     PSVECScale(&eyeDir, &scaledDir, FLOAT_8032fa88);
-    PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), &scaledDir, &targetPos);
+    PSVECAdd(reinterpret_cast<Vec*>(&m_targetX), &scaledDir, &targetPos);
 
-    *reinterpret_cast<float*>(self + 0xE0) = targetPos.x;
-    *reinterpret_cast<float*>(self + 0xE4) = targetPos.y;
-    *reinterpret_cast<float*>(self + 0xE8) = targetPos.z;
+    m_positionX = targetPos.x;
+    m_positionY = targetPos.y;
+    m_positionZ = targetPos.z;
 }
 
 /*
@@ -1089,22 +1092,22 @@ void CCameraPcs::createMap()
 
     fVar1 = FLOAT_8032fa34;
     fVar2 = FLOAT_8032fa5c;
-    *reinterpret_cast<float*>(self + 0x478) = fVar1;
+    m_mapRotZ = fVar1;
     fVar4 = FLOAT_8032fab0;
-    *reinterpret_cast<float*>(self + 0x474) = fVar1;
+    m_mapRotY = fVar1;
     fVar5 = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x470) = fVar1;
+    m_mapRotX = fVar1;
     fVar3 = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0xE8) = fVar1;
+    m_positionZ = fVar1;
     fVar6 = FLOAT_8032fab8;
-    *reinterpret_cast<float*>(self + 0xE4) = fVar1;
-    *reinterpret_cast<float*>(self + 0xE0) = fVar1;
-    *reinterpret_cast<float*>(self + 0xF8) = fVar1;
-    *reinterpret_cast<float*>(self + 0x43C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x440) = fVar4;
-    *reinterpret_cast<float*>(self + 0xFC) = fVar5;
-    *reinterpret_cast<float*>(self + 0x100) = fVar3;
-    *reinterpret_cast<float*>(self + 0x104) = fVar6;
+    m_positionY = fVar1;
+    m_positionX = fVar1;
+    m_yaw = fVar1;
+    m_distance = fVar2;
+    m_pitch = fVar4;
+    m_fov = fVar5;
+    m_nearZ = fVar3;
+    m_farZ = fVar6;
 }
 
 /*
@@ -1185,12 +1188,12 @@ void CCameraPcs::calcMap()
         triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
     }
 
-    *reinterpret_cast<float*>(self + 0xFC) += triggerL;
-    *reinterpret_cast<float*>(self + 0x470) -= stickV;
-    *reinterpret_cast<float*>(self + 0x474) -= stickH;
+    m_fov += triggerL;
+    m_mapRotX -= stickV;
+    m_mapRotY -= stickH;
 
-    PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(self + 0x470));
-    PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(self + 0x474));
+    PSMTXRotRad(rotXMtx, 'x', m_mapRotX);
+    PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
@@ -1253,10 +1256,8 @@ void CCameraPcs::calcMap()
         }
     }
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), *reinterpret_cast<float*>(self + 0xFC), FLOAT_8032fa3c,
-                     *reinterpret_cast<float*>(self + 0x100),
-                     *reinterpret_cast<float*>(self + 0x104));
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC));
 
@@ -1345,10 +1346,10 @@ void CCameraPcs::createFullShadow()
     f32 shadowAlpha = FLOAT_8032faa4;
     m_fullScreenShadowEnabled = 1;
     f32 zero = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x364) = shadowAlpha;
+    m_fullScreenShadowRotX = shadowAlpha;
     shadowAlpha = FLOAT_8032faa8;
-    *reinterpret_cast<float*>(self + 0x368) = zero;
-    *reinterpret_cast<float*>(self + 0x370) = shadowAlpha;
+    m_fullScreenShadowRotY = zero;
+    m_fullScreenShadowScale = shadowAlpha;
 }
 
 /*
@@ -1524,12 +1525,12 @@ void CCameraPcs::drawShadowBegin()
                                                (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
         }
 
-        *reinterpret_cast<float*>(self + 0x368) += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
-        *reinterpret_cast<float*>(self + 0x364) += FLOAT_8032fa70 * FLOAT_8032fa4c * stickY;
+        m_fullScreenShadowRotY += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
+        m_fullScreenShadowRotX += FLOAT_8032fa70 * FLOAT_8032fa4c * stickY;
     }
 
-    PSMTXRotRad(rotX, 'x', -*reinterpret_cast<float*>(self + 0x364));
-    PSMTXRotRad(rotY, 'y', *reinterpret_cast<float*>(self + 0x368));
+    PSMTXRotRad(rotX, 'x', -m_fullScreenShadowRotX);
+    PSMTXRotRad(rotY, 'y', m_fullScreenShadowRotY);
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
@@ -1540,46 +1541,44 @@ void CCameraPcs::drawShadowBegin()
         m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
         m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
 
-        if (*reinterpret_cast<int*>(self + 0x434) == 1 && GetShadowRect(*reinterpret_cast<CBound*>(self + 0x414)) != 0) {
-            *reinterpret_cast<float*>(self + 0xD4) = (*reinterpret_cast<float*>(self + 0x414) +
-                                                      *reinterpret_cast<float*>(self + 0x420)) * FLOAT_8032fa20;
-            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
-            *reinterpret_cast<float*>(self + 0xDC) = (*reinterpret_cast<float*>(self + 0x41C) +
-                                                      *reinterpret_cast<float*>(self + 0x428)) * FLOAT_8032fa20;
+        if (m_shadowAuto == 1 && GetShadowRect(m_shadowRectBound) != 0) {
+            m_targetX = (m_shadowRectBound.m_min.x + m_shadowRectBound.m_max.x) * FLOAT_8032fa20;
+            m_targetY = m_fullScreenShadowPosition.y;
+            m_targetZ = (m_shadowRectBound.m_min.z + m_shadowRectBound.m_max.z) * FLOAT_8032fa20;
 
-            double w = static_cast<double>(*reinterpret_cast<float*>(self + 0x420) - *reinterpret_cast<float*>(self + 0x414));
-            double h = static_cast<double>(*reinterpret_cast<float*>(self + 0x428) - *reinterpret_cast<float*>(self + 0x41C));
+            double w = static_cast<double>(m_shadowRectBound.m_max.x - m_shadowRectBound.m_min.x);
+            double h = static_cast<double>(m_shadowRectBound.m_max.z - m_shadowRectBound.m_min.z);
             if (w < h) {
                 w = h;
             }
-            *reinterpret_cast<float*>(self + 0x36C) = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
+            m_fullScreenShadowSpan = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
             depth = w;
-        } else if (*reinterpret_cast<int*>(self + 0x434) == 2) {
-            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
-            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
-            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
-            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &delta);
-            depth = static_cast<double>(*reinterpret_cast<float*>(self + 0x430));
-            *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa80 * *reinterpret_cast<float*>(self + 0x370);
+        } else if (m_shadowAuto == 2) {
+            m_targetX = m_fullScreenShadowPosition.x;
+            m_targetY = m_fullScreenShadowPosition.y;
+            m_targetZ = m_fullScreenShadowPosition.z;
+            PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
+            depth = static_cast<double>(m_fullScreenShadowCamLen);
+            m_fullScreenShadowSpan = FLOAT_8032fa80 * m_fullScreenShadowScale;
         } else {
-            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
-            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
-            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
-            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &delta);
+            m_targetX = m_fullScreenShadowPosition.x;
+            m_targetY = m_fullScreenShadowPosition.y;
+            m_targetZ = m_fullScreenShadowPosition.z;
+            PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
             depth = static_cast<double>(PSVECMag(&delta));
-            *reinterpret_cast<float*>(self + 0x36C) = static_cast<float>(depth * static_cast<double>(*reinterpret_cast<float*>(self + 0x370)));
+            m_fullScreenShadowSpan = static_cast<float>(depth * static_cast<double>(m_fullScreenShadowScale));
         }
 
-        double currentDepth = static_cast<double>(*reinterpret_cast<float*>(self + 0x42C));
+        double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
         if (static_cast<double>(FLOAT_8032fa34) <= currentDepth) {
-            *reinterpret_cast<float*>(self + 0x42C) = static_cast<float>(currentDepth +
-                                                   static_cast<double>((static_cast<float>(depth - currentDepth)) * FLOAT_8032fa84));
+            m_fullScreenShadowDepth = static_cast<float>(currentDepth +
+                                                         static_cast<double>((static_cast<float>(depth - currentDepth)) * FLOAT_8032fa84));
         } else {
-            *reinterpret_cast<float*>(self + 0x42C) = static_cast<float>(depth);
+            m_fullScreenShadowDepth = static_cast<float>(depth);
         }
     } else {
-        *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa88;
-        *reinterpret_cast<float*>(self + 0x42C) = FLOAT_8032fa8c;
+        m_fullScreenShadowSpan = FLOAT_8032fa88;
+        m_fullScreenShadowDepth = FLOAT_8032fa8c;
     }
 
     up.x = FLOAT_8032fa34;
@@ -1589,7 +1588,7 @@ void CCameraPcs::drawShadowBegin()
 
     *reinterpret_cast<float*>(self + 0x2F0) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0x2F4) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x2F8) = *reinterpret_cast<float*>(self + 0x42C);
+    *reinterpret_cast<float*>(self + 0x2F8) = m_fullScreenShadowDepth;
     PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
 
     if (Game.m_currentMapId == 0x21) {
@@ -1602,13 +1601,13 @@ void CCameraPcs::drawShadowBegin()
     *reinterpret_cast<float*>(self + 0x2E8) = *reinterpret_cast<float*>(self + 0xD8);
     *reinterpret_cast<float*>(self + 0x2EC) = *reinterpret_cast<float*>(self + 0xDC);
     *reinterpret_cast<float*>(self + 0x310) = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0x314) = FLOAT_8032fa4c * *reinterpret_cast<float*>(self + 0x42C);
+    *reinterpret_cast<float*>(self + 0x314) = FLOAT_8032fa4c * m_fullScreenShadowDepth;
 
     C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x214), reinterpret_cast<Vec*>(self + 0x2F0), &up,
                 reinterpret_cast<Vec*>(self + 0x2E4));
     C_MTXOrtho(reinterpret_cast<Mtx44Ptr>(self + 0x2A4),
-               *reinterpret_cast<float*>(self + 0x36C), -*reinterpret_cast<float*>(self + 0x36C),
-               -*reinterpret_cast<float*>(self + 0x36C), *reinterpret_cast<float*>(self + 0x36C),
+               m_fullScreenShadowSpan, -m_fullScreenShadowSpan,
+               -m_fullScreenShadowSpan, m_fullScreenShadowSpan,
                *reinterpret_cast<float*>(self + 0x310), *reinterpret_cast<float*>(self + 0x314));
 
     g_shadow_pos.x = *reinterpret_cast<float*>(self + 0x2F0);
@@ -1719,7 +1718,7 @@ void CCameraPcs::drawShadowEnd()
     GXSetCullMode(GX_CULL_BACK);
 
     {
-        float span = *reinterpret_cast<float*>(self + 0x36C);
+        float span = m_fullScreenShadowSpan;
         float depthSpan = *reinterpret_cast<float*>(self + 0x314) - *reinterpret_cast<float*>(self + 0x310);
         C_MTXLightOrtho(reinterpret_cast<MtxPtr>(self + 0x374), -span, span, -span, span,
                         FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20);
@@ -1878,22 +1877,21 @@ void CCameraPcs::createMaterialEditor()
     float fVar3;
     float fVar1;
     float fVar2;
-    u8* self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar3 = FLOAT_8032fa50;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x450) = fVar3;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.x = fVar2;
+    m_viewer.m_distance = fVar2;
+    m_viewer.m_rotY = fVar2;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.z = fVar3;
 }
 
 /*
@@ -1940,10 +1938,10 @@ void CCameraPcs::calcMaterialEditor()
     }
 
     if ((padButtons & 8) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+        m_viewer.m_position.y += FLOAT_8032fa20;
     }
     if ((padButtons & 4) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+        m_viewer.m_position.y -= FLOAT_8032fa20;
     }
 
     stick = FLOAT_8032fa34;
@@ -1951,40 +1949,35 @@ void CCameraPcs::calcMaterialEditor()
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x458) =
-        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x454) =
-        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
@@ -2008,22 +2001,21 @@ void CCameraPcs::createFunnyShape()
     float fVar3;
     float fVar1;
     float fVar2;
-    u8* self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
-    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    m_viewer.m_position.z = fVar2;
     fVar3 = FLOAT_8032fa50;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x448) = fVar2;
-    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x458) = fVar2;
-    *reinterpret_cast<float*>(self + 0x454) = fVar2;
-    *reinterpret_cast<float*>(self + 0x468) = fVar1;
-    *reinterpret_cast<float*>(self + 0x464) = fVar1;
-    *reinterpret_cast<float*>(self + 0x460) = fVar1;
-    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
-    *reinterpret_cast<float*>(self + 0x450) = fVar3;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.x = fVar2;
+    m_viewer.m_distance = fVar2;
+    m_viewer.m_rotY = fVar2;
+    m_viewer.m_rotX = fVar2;
+    m_viewer.m_scale.z = fVar1;
+    m_viewer.m_scale.y = fVar1;
+    m_viewer.m_scale.x = fVar1;
+    m_viewer.m_position.y = fVar2;
+    m_viewer.m_position.z = fVar3;
 }
 
 /*
@@ -2070,10 +2062,10 @@ void CCameraPcs::calcFunnyShape()
     }
 
     if ((padButtons & 8) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+        m_viewer.m_position.y += FLOAT_8032fa20;
     }
     if ((padButtons & 4) != 0) {
-        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+        m_viewer.m_position.y -= FLOAT_8032fa20;
     }
 
     stick = FLOAT_8032fa34;
@@ -2081,40 +2073,35 @@ void CCameraPcs::calcFunnyShape()
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x458) =
-        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x454) =
-        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad._452_4_ == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
     }
-    *reinterpret_cast<float*>(self + 0x45C) =
-        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
-    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
-               *reinterpret_cast<float*>(self + 0x450));
-    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
+    PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXRotRad(mtxB, 'x', m_viewer.m_rotX);
     PSMTXConcat(mtxB, mtxA, mtxA);
-    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -m_viewer.m_distance);
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
@@ -2167,14 +2154,14 @@ void CCameraPcs::calcPart()
     Mtx invCamera;
     Vec pos;
 
-    if (*reinterpret_cast<int*>(self + 0x494) != 0) {
+    if (m_quake.m_state != 0) {
         CalcQuake();
 
         pos.x = ppvCameraMatrix0[0][3];
         pos.y = ppvCameraMatrix0[1][3];
         pos.z = ppvCameraMatrix0[2][3];
 
-        PSVECAdd(reinterpret_cast<Vec*>(self + 0x4A4), &pos, &pos);
+        PSVECAdd(&m_quake.m_positionAmplitude, &pos, &pos);
 
         ppvCameraMatrix0[0][3] = pos.x;
         ppvCameraMatrix0[1][3] = pos.y;

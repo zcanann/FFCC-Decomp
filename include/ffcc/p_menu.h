@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
+#include "ffcc/mcctrl.h"
 #include "ffcc/gobject.h"
 #include "ffcc/p_sample.h"
 #include "ffcc/system.h"
@@ -90,16 +91,14 @@ public:
 
     CMenuPcs()
     {
-        unsigned int* mcCtrl = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x20);
-
-        mcCtrl[0] = 0;
-        mcCtrl[1] = 0;
-        mcCtrl[3] = 0;
-        mcCtrl[5] = 0;
-        mcCtrl[7] = 0;
-        mcCtrl[6] = 0;
-        mcCtrl[2] = 0;
-        mcCtrl[4] = 0;
+        m_mcCtrl.m_previousState = 0;
+        m_mcCtrl.m_state = 0;
+        m_mcCtrl.m_lastResult = 0;
+        m_mcCtrl.m_iteration = 0;
+        m_mcCtrl.m_userBuffer = 0;
+        m_mcCtrl.m_createFlag = 0;
+        m_mcCtrl.m_cardChannel = 0;
+        m_mcCtrl.m_saveIndex = 0;
     }
     ~CMenuPcs();
 
@@ -189,6 +188,7 @@ public:
     void ChgPlayModeFromScript(bool);
 
     CTexture* GetTexture(TEX);
+    McCtrl* GetMcCtrl() { return reinterpret_cast<McCtrl*>(&m_mcCtrl); }
 
     void WmInit();
     void createWorld();
@@ -375,7 +375,8 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
-    unsigned char m_pad04[0x48 - 0x04];
+    unsigned char m_pad04[0x20 - 0x04];
+    McCtrlData m_mcCtrl;
     BattleHudState m_battleHud;
     unsigned char m_pad70[0xEC - 0x70];
     CMemory::CStage* m_menuStage;
@@ -393,7 +394,12 @@ public:
     short* m_artiState;
     unsigned char m_pad830[0x850 - 0x830];
     short* m_artiList;
-    unsigned char m_pad854[0x864 - 0x854];
+    unsigned char m_pad854[0x859 - 0x854];
+    unsigned char m_singleMenuStageActive;
+    unsigned char m_singleMenuInitialized;
+    unsigned char m_pad85B[0x85C - 0x85B];
+    int m_singleMenuTextureLoadIndex;
+    int m_singleMenuTextureLoadState;
     unsigned short m_battleStateFlag;
     unsigned char m_pad866[0x8A0 - 0x866];
 };

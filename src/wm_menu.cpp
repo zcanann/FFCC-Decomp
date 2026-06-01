@@ -1466,7 +1466,7 @@ void CMenuPcs::CalcDiaryMenu()
 void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	McCtrl& mcCtrl = *GetMcCtrl();
 
 	bool bVar1 = false;
 	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
@@ -2268,7 +2268,7 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	McCtrl& mcCtrl = *GetMcCtrl();
 	bytes[0x86E] = 0;
 
 	bool bVar1 = false;
@@ -3827,7 +3827,7 @@ void CMenuPcs::DrawMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx m_cameraMatrix;
-	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	McCtrl& mcCtrl = *GetMcCtrl();
 	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 	short state = *reinterpret_cast<short*>(worldState + 0x10);
 
@@ -4464,7 +4464,7 @@ void CMenuPcs::DrawLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx m_cameraMatrix;
-	McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(bytes + 0x20);
+	McCtrl& mcCtrl = *GetMcCtrl();
 	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 	if (*reinterpret_cast<char*>(worldState + 8) == 0) {
 		return;
@@ -5236,7 +5236,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		}
 		break;
 	case 0x12: {
-		McCtrl* mc = reinterpret_cast<McCtrl*>(bytes + 0x20);
+		McCtrl* mc = GetMcCtrl();
 		mc->m_previousState = 0;
 		mc->m_state = 0;
 		mc->m_lastResult = 0;
@@ -5248,7 +5248,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	}
 	case 0x13: {
-		McCtrl* mc = reinterpret_cast<McCtrl*>(bytes + 0x20);
+		McCtrl* mc = GetMcCtrl();
 		mc->m_previousState = 0;
 		mc->m_state = 0;
 		mc->m_lastResult = 0;
@@ -10843,13 +10843,13 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 					}
 				} else {
 					int len = strlen(lbl_80210D54[languageIndex]);
-					slotText[len - 1] += reinterpret_cast<McCtrl*>(bytes + 0x20)->m_cardChannel;
+					slotText[len - 1] += GetMcCtrl()->m_cardChannel;
 				}
 			} else {
 				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);
 				if (dataText != 0) {
 					int len = strlen(lbl_80210D68[languageIndex]);
-					dataText[len - 1] += reinterpret_cast<McCtrl*>(bytes + 0x20)->m_saveIndex;
+					dataText[len - 1] += GetMcCtrl()->m_saveIndex;
 				}
 			}
 			font->Draw(textBuf);

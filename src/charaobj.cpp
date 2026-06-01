@@ -310,15 +310,6 @@ static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned s
 	return particleClass;
 }
 
-static void CharaObjCallStateCallback(CGCharaObj* charaObj, int vtableOffset)
-{
-	typedef void (*VCall)(void*);
-
-	unsigned char* self = reinterpret_cast<unsigned char*>(charaObj);
-	VCall fn = *reinterpret_cast<VCall*>(*reinterpret_cast<int*>(self + 0x48) + vtableOffset);
-	fn(charaObj);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8010b67c
@@ -551,9 +542,7 @@ void CGCharaObj::onCancelStat(int)
 	m_comboFrame = 0;
 	m_comboState = 0;
 
-	typedef void (*VCall90)(void*, int, int, int);
-	VCall90 fn = *reinterpret_cast<VCall90*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x90);
-	fn(this, 0, 0, 0);
+	enableAttackCol(0, 0, 0);
 }
 
 /*
@@ -889,10 +878,7 @@ void CGCharaObj::onFrameStat()
 				}
 			}
 
-			typedef void (*StateCallback)(void*);
-			StateCallback stateCallback84 =
-			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x84);
-			stateCallback84(this);
+			onStatMagic();
 			break;
 
 		case 4:
@@ -945,9 +931,7 @@ void CGCharaObj::onFrameStat()
 				}
 			}
 
-			StateCallback stateCallback8C =
-			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x8C);
-			stateCallback8C(this);
+			onStatShield();
 			break;
 
 		case 9:
@@ -966,9 +950,7 @@ void CGCharaObj::onFrameStat()
 				}
 			}
 
-			StateCallback stateCallback7C =
-			    *reinterpret_cast<StateCallback*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x7C);
-			stateCallback7C(this);
+			onStatDie();
 			break;
 
 		case 0xA:
@@ -1112,8 +1094,6 @@ void CGCharaObj::damageDelete()
  */
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
-	typedef int (*VCall80)(void*, void*, int, int, int, Vec*);
-
 	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		sourceCid = sourceObj->GetCID();
@@ -1154,8 +1134,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 
 	sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x2D) == 0x2D) {
-		VCall80 onHitVCall = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x80);
-		onHitVCall(sourceObj, this, m_itemId, hitArg, hitType, hitPos);
+		static_cast<CGCharaObj*>(sourceObj)->onDamage(this, m_itemId, hitArg, hitType, hitPos);
 	}
 
 	return 1;
@@ -1172,9 +1151,6 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
  */
 void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec* hitPos, PPPIFPARAM* hitParam)
 {
-	typedef void (*VCall80)(void*, void*, int, int, int, Vec*);
-
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned short cid = GetCID();
 
 	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
@@ -1192,8 +1168,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	unsigned int sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
-		VCall80 hitFn = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(self + 0x48) + 0x80);
-		hitFn(this, sourceObj, particleIndex, -1, colliderIndex, hitPos);
+		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}
 
 	CFlatRuntime2Storage().IgnoreParticle(effectIndex, this);
@@ -1842,10 +1817,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 		case 0x66:
 			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
 			if (sourceObj != 0) {
-				typedef void (*VCall4C)(void*, int, int, void*);
-				VCall4C fn = *reinterpret_cast<VCall4C*>(
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x4C);
-				fn(sourceObj, 0x16, amount, this);
+				sourceObj->bonus(0x16, amount, this);
 			}
 			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
@@ -2506,10 +2478,6 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	typedef void (*VCall88)(void*, int);
-	typedef void (*VCall90)(void*, int, int, int);
-
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned int cid = GetCID();
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
@@ -2523,8 +2491,7 @@ void CGCharaObj::statAttack()
 		}
 	}
 
-	VCall88 vcall88 = *reinterpret_cast<VCall88*>(*reinterpret_cast<int*>(self + 0x48) + 0x88);
-	vcall88(this, 0);
+	onStatAttack(0);
 
 	if (m_stateFrame == 0) {
 		m_ignoreHit[0].m_flag &= 0x7F;
@@ -2541,12 +2508,11 @@ void CGCharaObj::statAttack()
 		reqAnim(m_attackAnimId, 0, 0);
 	}
 
-	VCall90 vcall90 = *reinterpret_cast<VCall90*>(*reinterpret_cast<int*>(self + 0x48) + 0x90);
 	if (m_stateFrame == static_cast<unsigned int>(m_castFrameStart)) {
-		vcall90(this, 1, 0, 0);
+		enableAttackCol(1, 0, 0);
 	}
 	if (m_stateFrame == static_cast<unsigned int>(m_castFrameEnd)) {
-		vcall90(this, 0, 0, 0);
+		enableAttackCol(0, 0, 0);
 	}
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
@@ -2573,7 +2539,7 @@ void CGCharaObj::statAttack()
 		}
 	}
 
-	vcall88(this, 1);
+	onStatAttack(1);
 }
 
 /*

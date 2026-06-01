@@ -89,14 +89,15 @@ public:
     void DestroyTempBuffer();
 
     u8 _pad_0x4_to_0x71DF[0x71DC];
-    void* m_renderMode;
+    GXRenderModeObj* m_renderMode;
     void* m_frameBuffer;
     void* m_scratchTextureBuffer;
     void* m_savedFrameBuffer;
     s32 m_displayCopyEnabled;
     s32 m_lastRetraceCount;
-    u8 _pad_0x71F8_to_0x71FF[0x8];
-    u8 m_clearColor[4];
+    s32 m_sphereDisplayListSize;
+    void* m_sphereDisplayList;
+    _GXColor m_fogColor;
     f32 m_fogStart;
     f32 m_fogEnd;
     _GXTexObj m_backBufferTexObj;
@@ -110,7 +111,11 @@ public:
     u8 m_blurBufferIndex;
     u8 m_blurTextureCount;
     _GXColor m_defaultCopyClearColor;
-    u8 _pad_0x7363_to_0x7373[0x11];
+    u8 _pad_0x7363[0x1];
+    s32 m_drawDoneWaiting;
+    char* m_drawDoneFile;
+    s32 m_drawDoneLine;
+    s32 m_drawDoneCounter;
 };
 
 extern CGraphic Graphic;

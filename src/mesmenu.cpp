@@ -80,8 +80,8 @@ extern float FLOAT_80330994;
  */
 void CMesMenu::SetPos(float x, float y)
 {
-	*(float*)((char*)this + 0x3d74) = x;
-	*(float*)((char*)this + 0x3d78) = y;
+	m_offsetX = x;
+	m_offsetY = y;
 }
 
 /*
@@ -97,25 +97,25 @@ void CMesMenu::CloseRequest(int closeReason)
 {
     CFlatRuntime::CStack stack[2];
 
-    *(int*)((char*)this + 0x3DA4) = closeReason;
-    if (*(int*)((char*)this + 0x0C) <= 1) {
-        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) != 0) {
+    m_closeReason = closeReason;
+    if (m_state <= 1) {
+        if ((m_flags & 0x40) != 0) {
             m_mes.Set(0, 0);
-            stack[0].m_word = *(int*)((char*)this + 0x18);
-            stack[1].m_word = *(int*)((char*)this + 0x3DA4);
+            stack[0].m_word = m_menuIndex;
+            stack[1].m_word = m_closeReason;
             gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
-            *(int*)((char*)this + 0x0C) = 4;
-            *(int*)((char*)this + 0x08) = 0;
-            if (*(int*)((char*)this + 0x18) < 4) {
-                int menuIndex = *(int*)((char*)this + 0x18);
+            m_state = 4;
+            m_active = 0;
+            if (m_menuIndex < 4) {
+                int menuIndex = m_menuIndex;
                 MenuPcs.m_battleRingMenus[menuIndex]->SetFade(1);
             }
         } else {
-            *(int*)((char*)this + 0x0C) = 2;
-            *(int*)((char*)this + 0x10) = 0;
-            *(int*)((char*)this + 0x14) = 4;
-            if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
-                ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+            m_state = 2;
+            m_stateTimer = 0;
+            m_stateTimerMax = 4;
+            if (((m_flags & 1) == 0) &&
+                ((m_flags & 0x4000) == 0)) {
                 Sound.PlaySe(6, 0x40, 0x7F, 0);
             }
         }
@@ -139,72 +139,72 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     double dVar4;
 
     fVar1 = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D74) = fVar1;
-    *(int*)((char*)this + 0x08) = 1;
-    *(int*)((char*)this + 0x3DA4) = 0;
-    *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
+    m_offsetY = FLOAT_803308d8;
+    m_offsetX = fVar1;
+    m_active = 1;
+    m_closeReason = 0;
+    m_flags = (unsigned int)flags;
 
-    if (*(int*)((char*)this + 0x18) >= 4) {
-        *(float*)((char*)this + 0x3D6C) = (float)x;
-        *(float*)((char*)this + 0x3D70) = (float)y;
-        *(int*)((char*)this + 0x3D88) = 1;
+    if (m_menuIndex >= 4) {
+        m_baseX = (float)x;
+        m_baseY = (float)y;
+        m_fromScriptPosition = 1;
         uVar2 = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
         fVar1 = FLOAT_803308dc;
-        *(float*)((char*)this + 0x3D9C) = fVar1;
-        *(float*)((char*)this + 0x3DA0) = fVar1;
+        m_marginX = fVar1;
+        m_marginY = fVar1;
         int flagMask = -(flags >> 1 & 1);
         int displayOffset = 0x1C;
         displayOffset &= flagMask;
         *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)displayOffset;
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     } else {
-        MenuPcs.m_battleRingMenus[*(int*)((char*)this + 0x18)]->SetFade(0);
+        MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(0);
         fVar1 = FLOAT_803308e0;
         float scaleY = FLOAT_803308e4;
-        *(float*)((char*)this + 0x3D9C) = fVar1;
-        *(float*)((char*)this + 0x3DA0) = scaleY;
+        m_marginX = fVar1;
+        m_marginY = scaleY;
     }
 
-    *(int*)((char*)this + 0x3D90) = unk1;
-    *(int*)((char*)this + 0x3D94) = unk2;
-    *(int*)((char*)this + 0x3D98) = unk3;
+    m_buttonMask = unk1;
+    m_itemIndex = unk2;
+    m_nameIndex = unk3;
     m_mes.Set(script, flags & 0x20);
 
     fVar1 = FLOAT_803308e8;
-    *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
-    *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
+    m_windowWidth = FLOAT_803308e8 * m_marginX + *(float*)((char*)this + 0x3CC0);
+    m_windowHeight = fVar1 * m_marginY + *(float*)((char*)this + 0x3CC4);
 
-    if (*(int*)((char*)this + 0x18) >= 4) {
+    if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {
             fVar1 = FLOAT_803308ec;
-            *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
-            *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+            m_baseX = -(FLOAT_803308ec * m_windowWidth - m_baseX);
+            m_baseY = -(fVar1 * m_windowHeight - m_baseY);
         } else if ((flags & 0x8000) != 0) {
-            *(float*)((char*)this + 0x3D6C) -= *(float*)((char*)this + 0x3D7C);
+            m_baseX -= m_windowWidth;
         }
     } else if ((flags & 0x100) == 0) {
-        fVar1 = *(float*)((char*)this + 0x3D7C);
+        fVar1 = m_windowWidth;
         if (fVar1 < FLOAT_803308f0) {
             fVar1 = FLOAT_803308f0;
         }
-        *(float*)((char*)this + 0x3D7C) = fVar1;
+        m_windowWidth = fVar1;
     }
 
-    uVar2 = (unsigned int)*(int*)((char*)this + 0x18);
+    uVar2 = (unsigned int)m_menuIndex;
     if ((int)uVar2 < 4) {
         if ((uVar2 & 2) != 0) {
-            dVar4 = (double)(((*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
-                              *(float*)((char*)this + 0x3D78) + *(float*)((char*)this + 0x3DA0)) -
-                             *(float*)((char*)this + 0x3D80));
+            dVar4 = (double)(((m_baseY - FLOAT_803308f4) +
+                              m_offsetY + m_marginY) -
+                             m_windowHeight);
         } else {
-            dVar4 = (double)((*(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78) +
-                              *(float*)((char*)this + 0x3DA0)) +
+            dVar4 = (double)((m_baseY + m_offsetY +
+                              m_marginY) +
                              FLOAT_803308f8);
         }
     } else {
-        dVar4 = (double)((*(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78)) +
-                         *(float*)((char*)this + 0x3DA0));
+        dVar4 = (double)((m_baseY + m_offsetY) +
+                         m_marginY);
     }
 
     bVar3 = false;
@@ -212,25 +212,25 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         bVar3 = true;
     }
     if (bVar3) {
-        fVar1 = ((*(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) +
-                 *(float*)((char*)this + 0x3D9C)) -
-                *(float*)((char*)this + 0x3D7C);
+        fVar1 = ((m_baseX + m_offsetX) +
+                 m_marginX) -
+                m_windowWidth;
     } else {
-        fVar1 = (*(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) +
-                *(float*)((char*)this + 0x3D9C);
+        fVar1 = (m_baseX + m_offsetX) +
+                m_marginX;
     }
     m_mes.SetPosition(fVar1, (float)dVar4);
 
     unsigned int state;
-    if (*(int*)((char*)this + 0x18) < 4) {
+    if (m_menuIndex < 4) {
         state = ((unsigned int)flags >> 4) & 1;
     } else {
         state = (flags & 0x10) != 0;
     }
-    *(unsigned int*)((char*)this + 0x0C) = state;
-    *(int*)((char*)this + 0x10) = 0;
-    *(int*)((char*)this + 0x14) = 8;
-    if ((flags & 0x11) == 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+    m_state = state;
+    m_stateTimer = 0;
+    m_stateTimerMax = 8;
+    if ((flags & 0x11) == 0 && ((m_flags & 0x4000) == 0)) {
         Sound.PlaySe(5, 0x40, 0x7F, 0);
     }
 }
@@ -367,78 +367,78 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::CalcHeart()
 {
-    unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
     if (scriptFood == 0) {
         return;
     }
 
     unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
     int targetValue = (int)(foodCount * 6);
-    if (*(int*)((char*)this + 0x3DAC) < targetValue) {
-        *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);
-    } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
-        *(int*)((char*)this + 0x3DAC) -= *(int*)((char*)this + 0x3DAC) - targetValue;
+    if (m_heartTarget < targetValue) {
+        m_heartTarget += targetValue - m_heartTarget;
+    } else if (targetValue < m_heartTarget) {
+        m_heartTarget -= m_heartTarget - targetValue;
     }
 
-    int currentValue = *(int*)((char*)this + 0x3DA8);
-    if (currentValue < *(int*)((char*)this + 0x3DAC)) {
+    int currentValue = m_heartValue;
+    if (currentValue < m_heartTarget) {
         int index = currentValue / 0xC;
-        int base = (int)this + index * 4;
-        if (*(int*)(base + 0x3DB0) == 0) {
-            *(int*)(base + 0x3DB0) = 0x10;
+        if (m_heartGrowTimers[index] == 0) {
+            m_heartGrowTimers[index] = 0x10;
         }
 
-        int nextValue = *(int*)((char*)this + 0x3DA8) + 2;
-        int maxValue = *(int*)((char*)this + 0x3DAC);
+        int nextValue = m_heartValue + 2;
+        int maxValue = m_heartTarget;
         if (nextValue < maxValue) {
             maxValue = nextValue;
         }
-        *(int*)((char*)this + 0x3DA8) = maxValue;
-    } else if (*(int*)((char*)this + 0x3DAC) < currentValue) {
-        *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
+        m_heartValue = maxValue;
+    } else if (m_heartTarget < currentValue) {
+        m_heartValue = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
 
-        int decValue = *(int*)((char*)this + 0x3DA8);
+        int decValue = m_heartValue;
         int index = decValue / 0xC;
-        int base = (int)this + index * 4;
-        if (*(int*)(base + 0x3DD0) == 0) {
-            *(int*)(base + 0x3DD0) = 0x10;
+        if (m_heartDropTimers[index] == 0) {
+            m_heartDropTimers[index] = 0x10;
         }
-        if (*(int*)((char*)this + 0x3DF0) == 0) {
-            *(int*)((char*)this + 0x3DF0) = 0x10;
+        if (m_foodShakeTimer == 0) {
+            m_foodShakeTimer = 0x10;
         }
     }
 
-    int base = (int)this;
+    int* growTimer = m_heartGrowTimers;
+    int* dropTimer = m_heartDropTimers;
     for (int i = 0; i < 2; i++) {
-        unsigned int value = *(int*)(base + 0x3DB0) - 1;
-        *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
+        unsigned int value = growTimer[0] - 1;
+        growTimer[0] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DD0) - 1;
-        *(unsigned int*)(base + 0x3DD0) = value & ~((int)value >> 0x1F);
+        value = dropTimer[0] - 1;
+        dropTimer[0] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DB4) - 1;
-        *(unsigned int*)(base + 0x3DB4) = value & ~((int)value >> 0x1F);
+        value = growTimer[1] - 1;
+        growTimer[1] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DD4) - 1;
-        *(unsigned int*)(base + 0x3DD4) = value & ~((int)value >> 0x1F);
+        value = dropTimer[1] - 1;
+        dropTimer[1] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DB8) - 1;
-        *(unsigned int*)(base + 0x3DB8) = value & ~((int)value >> 0x1F);
+        value = growTimer[2] - 1;
+        growTimer[2] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DD8) - 1;
-        *(unsigned int*)(base + 0x3DD8) = value & ~((int)value >> 0x1F);
+        value = dropTimer[2] - 1;
+        dropTimer[2] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DBC) - 1;
-        *(unsigned int*)(base + 0x3DBC) = value & ~((int)value >> 0x1F);
+        value = growTimer[3] - 1;
+        growTimer[3] = value & ~((int)value >> 0x1F);
 
-        value = *(int*)(base + 0x3DDC) - 1;
-        *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
+        value = dropTimer[3] - 1;
+        dropTimer[3] = value & ~((int)value >> 0x1F);
 
-        base += 0x10;
+        growTimer += 4;
+        dropTimer += 4;
     }
 
-    unsigned int value = *(int*)((char*)this + 0x3DF0) - 1;
-    *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
+    unsigned int value = m_foodShakeTimer - 1;
+    m_foodShakeTimer = value & ~((int)value >> 0x1F);
 }
 
 /*

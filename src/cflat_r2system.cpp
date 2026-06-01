@@ -345,7 +345,7 @@ void CGame::SetNextScriptNewGame()
  */
 void CCameraPcs::SetFullScreenShadowCamLen(float len)
 {
-    *(float*)((char*)this + 0x430) = len;
+    m_fullScreenShadowCamLen = len;
 }
 
 /*
@@ -359,7 +359,7 @@ void CCameraPcs::SetFullScreenShadowCamLen(float len)
  */
 CFont* CMenuPcs::GetFont22()
 {
-    return *(CFont**)((char*)this + 0xF8);
+    return m_fonts[0];
 }
 
 /*
@@ -373,7 +373,7 @@ CFont* CMenuPcs::GetFont22()
  */
 void CSound::SeMaxVolume(int volume)
 {
-    *(int*)((char*)this + 0x22BC) = volume;
+    m_seMaxVolume = volume;
 }
 
 /*
@@ -458,13 +458,13 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 {
     switch (id) {
     case 0x2000:
-        return *(signed char*)((char*)this + 0x6498);
+        return m_miniGameParams[0];
     case 0x2001:
-        return *(signed char*)((char*)this + 0x6499);
+        return m_miniGameParams[1];
     case 0x2002:
-        return *(signed char*)((char*)this + 0x649A);
+        return m_miniGameParams[2];
     case 0x2003:
-        return *(signed char*)((char*)this + 0x649B);
+        return m_miniGameParams[3];
     }
 
     return 0;
@@ -529,7 +529,7 @@ void CGame::CGameWork::ClearEvtWork()
  */
 void CCameraPcs::SetShadowAuto(int enable)
 {
-    *(int*)((char*)this + 0x434) = enable;
+    m_shadowAuto = enable;
 }
 
 /*
@@ -1298,8 +1298,8 @@ void CMapPcs::IsHitDrawMode(char drawMode)
  */
 void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
 {
-    *(float*)((char*)this + 0x364) = rotX;
-    *(float*)((char*)this + 0x368) = rotY;
+    m_fullScreenShadowRotX = rotX;
+    m_fullScreenShadowRotY = rotY;
 }
 
 /*
@@ -1313,10 +1313,10 @@ void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
  */
 void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
 {
-    *(float*)((char*)this + 0x408) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0x40C) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0x410) = *(float*)((char*)position + 0x8);
-    *(float*)((char*)this + 0x370) = len;
+    m_fullScreenShadowPosition.x = position->x;
+    m_fullScreenShadowPosition.y = position->y;
+    m_fullScreenShadowPosition.z = position->z;
+    m_fullScreenShadowScale = len;
 }
 
 /*
@@ -1330,7 +1330,7 @@ void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
  */
 void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
 {
-    *(unsigned char*)((char*)this + 0x404) = enable;
+    m_fullScreenShadowEnabled = enable;
 }
 
 /*
@@ -1542,7 +1542,7 @@ extern "C" float fmodf__3stdFff(float x, float y)
  */
 void CCameraPcs::SetFov(float fov)
 {
-    *(float*)((char*)this + 0xFC) = fov;
+    m_fov = fov;
 }
 
 /*
@@ -1556,7 +1556,7 @@ void CCameraPcs::SetFov(float fov)
  */
 void CCameraPcs::SetZRotate(float zRotate)
 {
-    *(float*)((char*)this + 0x108) = zRotate;
+    m_zRotate = zRotate;
 }
 
 /*
@@ -1652,7 +1652,7 @@ extern "C" float sinf__3stdFf(float x)
  */
 void CCameraPcs::SetFromScript()
 {
-    *(int*)((char*)this + 0x438) = 1;
+    m_fromScript = 1;
 }
 
 /*
@@ -1666,9 +1666,9 @@ void CCameraPcs::SetFromScript()
  */
 void CCameraPcs::SetPosition(Vec* position)
 {
-    *(float*)((char*)this + 0xE0) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0xE4) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0xE8) = *(float*)((char*)position + 0x8);
+    m_positionX = position->x;
+    m_positionY = position->y;
+    m_positionZ = position->z;
 }
 
 /*
@@ -1682,9 +1682,9 @@ void CCameraPcs::SetPosition(Vec* position)
  */
 void CCameraPcs::SetRefPosition(Vec* position)
 {
-    *(float*)((char*)this + 0xD4) = *(float*)((char*)position + 0x0);
-    *(float*)((char*)this + 0xD8) = *(float*)((char*)position + 0x4);
-    *(float*)((char*)this + 0xDC) = *(float*)((char*)position + 0x8);
+    m_targetX = position->x;
+    m_targetY = position->y;
+    m_targetZ = position->z;
 }
 
 /*
@@ -1718,7 +1718,7 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
  */
 int CCameraPcs::IsAbsolute()
 {
-    return *(int*)((char*)this + 0x444);
+    return m_isAbsolute;
 }
 
 /*
@@ -3823,25 +3823,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0xC6:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 72) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 88) = 0x40;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 96) = object->m_localBase[1];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100) = object->m_localBase[2];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 108) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 100);
+        MenuPcs.m_battleHud.m_visible = *object->m_localBase;
+        MenuPcs.m_battleHud.m_fadeCounter = 0x40;
+        MenuPcs.m_battleHud.m_width = object->m_localBase[1];
+        MenuPcs.m_battleHud.m_gaugeMax = object->m_localBase[2];
+        MenuPcs.m_battleHud.m_gaugeTarget = MenuPcs.m_battleHud.m_gaugeMax;
+        MenuPcs.m_battleHud.m_gaugeValue = MenuPcs.m_battleHud.m_gaugeMax;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0xC7:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 76) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 80) = object->m_localBase[1];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 84) = object->m_localBase[2];
-        if (object->m_localBase[3] < *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104)) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 92) = 0x10;
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
+        MenuPcs.m_battleHud.m_worldPos[1] = localFloats[1];
+        MenuPcs.m_battleHud.m_worldPos[2] = localFloats[2];
+        if (object->m_localBase[3] < MenuPcs.m_battleHud.m_gaugeTarget) {
+            MenuPcs.m_battleHud.m_gaugeCounter = 0x10;
         }
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&MenuPcs) + 104) = object->m_localBase[3];
+        MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
         runtime->push(object, 0);
         outResult = 0;
         return 1;

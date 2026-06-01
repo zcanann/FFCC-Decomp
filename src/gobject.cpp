@@ -76,18 +76,12 @@ static inline Mtx& FlatPosMtx()
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
-    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
-    void** vtable = *reinterpret_cast<void***>(self);
-    Fn fn = reinterpret_cast<Fn>(vtable[5]);
-    fn(self, other, arg);
+    self->onPush(other, arg);
 }
 
 static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
 {
-    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
-    void** vtable = *reinterpret_cast<void***>(self);
-    Fn fn = reinterpret_cast<Fn>(vtable[6]);
-    fn(self, other, arg);
+    self->onTalk(other, arg);
 }
 
 static inline bool HasLoadedModel(CCharaPcs::CHandle* handle)
@@ -2635,8 +2629,6 @@ void CGObject::Turn(float targetRot, int turnFrames)
  */
 void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int colliderIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-    typedef void (*OnHitParticleFn)(CGObject*, int, int, int, int, Vec*, PPPIFPARAM*);
-
     CFlatRuntime::CStack stack[9];
     stack[0].m_word = effectIndex;
     stack[1].m_word = kind;
@@ -2650,9 +2642,7 @@ void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int collide
 
     gCFlatRuntime().SystemCall(this, 2, 0xB, 9, stack, 0);
 
-    OnHitParticleFn onHitParticle = *reinterpret_cast<OnHitParticleFn*>(
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x3C);
-    onHitParticle(this, effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
+    onHitParticle(effectIndex, kind, nodeIndex, colliderIndex, pos, hitParam);
 }
 
 /*
@@ -3115,14 +3105,10 @@ void CGObject::DrawDebug(CFont* font)
         float screenX[2];
         screenX[0] = -(sDebugScreenX * m_projection.z * invDepth - sDebugScreenX);
 
-        typedef void (*OnDrawDebugFn)(CGObject*, CFont*, float, float&, float);
-        void** vtable = *reinterpret_cast<void***>(this);
-        OnDrawDebugFn fn = reinterpret_cast<OnDrawDebugFn>(vtable[16]);
-        fn(this,
-           font,
-           sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
-           screenX[0],
-           m_projection.w * invDepth);
+        onDrawDebug(font,
+                    sDebugScreenY * m_projection.y * invDepth + sDebugScreenY,
+                    screenX[0],
+                    m_projection.w * invDepth);
     }
 }
 

@@ -29,8 +29,6 @@ extern "C" const char s_CFontMan_801D9CC4[] = "CFontMan";
 CFontMan FontMan;
 
 namespace {
-typedef void (*VirtualDtorFn)(void*, int);
-
 struct CFontRenderFlagBits
 {
 	signed char shadow : 1;

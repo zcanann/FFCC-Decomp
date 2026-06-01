@@ -916,7 +916,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     u8 flags;
 
     spread = (float)(unsigned int)reinterpret_cast<YmBreathParams*>(pYmBreath)->m_spread;
-    range = LoadFloat(kYmBreathSpreadScale) * spread;
+    range = spread * LoadFloat(kYmBreathSpreadScale);
 
     memset(particleData, 0, sizeof(PARTICLE_DATA));
     if (particleWmat != NULL) {
@@ -1036,10 +1036,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_rotationVelocityY += particle->m_rotationAccelY;
     }
 
+    float zero = kCharaAnimZero;
     particle->m_scale = params->m_groupSpeed;
-    if (params->m_scaleRandomRange != kCharaAnimZero) {
+    if (zero != params->m_scaleRandomRange) {
         float rand = Math.RandF();
-        float scaledRange = LoadFloat(kYmBreathSpreadScale) * params->m_scaleRandomRange;
+        float scaledRange = params->m_scaleRandomRange * LoadFloat(kYmBreathSpreadScale);
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 

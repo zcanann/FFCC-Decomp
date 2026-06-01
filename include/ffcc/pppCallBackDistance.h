@@ -3,9 +3,7 @@
 
 #include <dolphin/types.h>
 
-struct pppCallBackDistance {
-    u32 m_graphId;
-};
+struct _pppPObject;
 
 struct pppCallBackDistanceUnkB {
     u32 m_unk0;
@@ -22,9 +20,9 @@ struct pppCallBackDistanceUnkC {
 extern "C" {
 #endif
 
-void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2);
-void pppDestructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2);
-void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3);
+void pppConstructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable);
+void pppDestructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable);
+void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, pppCallBackDistanceUnkC* ctrlTable);
 
 #ifdef __cplusplus
 }

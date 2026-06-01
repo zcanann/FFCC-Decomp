@@ -1,5 +1,6 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppShape.h"
@@ -56,7 +57,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = **(int**)(*(int*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
+    int shapeTable = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x57])) >> 5);
     pppSetDrawEnv(
         0, &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x0C],
@@ -423,8 +424,10 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
                  (Vec*)(color + historyIndex * sizeof(VColor) + 0x40));
 
     frameIndex = *(u16*)(color + 0x1e);
-    colorTable = **(int**)(*(int*)&ppvEnv->m_particleColors[0] +
-                           *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4) * 4);
+    colorTable = reinterpret_cast<int>(
+        ppvEnv->m_resourceTables
+            .m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
+            ->m_animData);
     *(u16*)(color + 0x20) = frameIndex;
 
     frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;

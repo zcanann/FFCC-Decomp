@@ -23,7 +23,16 @@ extern const double DOUBLE_80333420 = 216.0;
 
 static inline float TmpArtiIntToFloat(int value)
 {
-    return (float)value;
+    union {
+        double d;
+        struct {
+            unsigned int hi;
+            unsigned int lo;
+        } words;
+    } conv;
+    conv.words.hi = 0x43300000;
+    conv.words.lo = value ^ 0x80000000;
+    return (float)(conv.d - DOUBLE_80332f40);
 }
 
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
@@ -424,7 +433,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			entry[0].tex = 0x37;
 			entry[0].width = 200;
 			entry[0].height = 0x28;
-			entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
+			entry[0].x = (short)(int)-((TmpArtiIntToFloat(entry[0].width) * half) - center);
 			entry[0].y = row * (entry[0].height - 8) + 0x60;
 			entry[0].s = zero;
 			entry[0].t = zero;
@@ -433,7 +442,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			entry[1].tex = 0x37;
 			entry[1].width = 200;
 			entry[1].height = 0x28;
-			entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
+			entry[1].x = (short)(int)-((TmpArtiIntToFloat(entry[1].width) * half) - center);
 			entry[1].y = row * (entry[1].height - 8) + 0x60;
 			entry[1].s = zero;
 			entry[1].t = zero;

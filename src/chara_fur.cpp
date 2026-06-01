@@ -1958,14 +1958,15 @@ void CChara::makeFurTex()
  */
 void brush(unsigned short* pixels, int width, int height, float fx, float fy, int mode, _GXColor targetColor, _GXColor* centerBefore, _GXColor* centerAfter)
 {
+	int dy;
+
+	CColor defaultColor(0x0f, 0x0f, 0x0f, 0);
+	*centerAfter = defaultColor.color;
+	*centerBefore = *centerAfter;
+
 	int texelCountBytes = width * height * 2;
 	int centerX = (int)((float)width * fx);
 	int centerY = (int)((float)height * fy);
-	int dy;
-
-	static const _GXColor defaultColor = {0x0f, 0x0f, 0x0f, 0};
-	*centerAfter = defaultColor;
-	*centerBefore = *centerAfter;
 
 	DCInvalidateRange(pixels, texelCountBytes);
 

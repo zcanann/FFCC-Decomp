@@ -1262,7 +1262,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     DrawInit();
 
     if (yesNoSel != 0) {
-        int frame = System.m_frameCounter & 7;
+        int frame = static_cast<int>(System.m_frameCounter) % 8;
         DrawCursor(static_cast<int>(tx) - 0x20 + frame, cursorY, alpha);
     }
 }

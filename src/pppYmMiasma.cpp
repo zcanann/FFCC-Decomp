@@ -26,6 +26,11 @@ extern const float FLOAT_80330664 = 16384.0f;
 extern const float FLOAT_80330668 = -1.0f;
 extern "C" const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
+static inline float YmMiasmaConst(const float& value)
+{
+    return *reinterpret_cast<const float*>(&value);
+}
+
 struct PARTICLE_DATA {
     Mtx m_matrix;
     Vec m_velocity;
@@ -354,9 +359,9 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
-    float fVar1 = FLOAT_80330644;
+    float fVar1 = YmMiasmaConst(FLOAT_80330644);
 
-    work->m_radius = FLOAT_80330644;
+    work->m_radius = YmMiasmaConst(FLOAT_80330644);
     work->m_radiusVelocity = fVar1;
     work->m_radiusAcceleration = fVar1;
 }

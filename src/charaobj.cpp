@@ -703,13 +703,13 @@ void CGCharaObj::onFramePreCalc()
 	m_pushScale = 1.0f;
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	if (*reinterpret_cast<short*>(script + 0x4E) != 0) {
-		m_pushScale *= CharaObjGetStatusMultiplier(0x34);
+		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + kOneF32;
 	}
 	if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
-		m_pushScale *= CharaObjGetStatusMultiplier(0x36);
+		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x36)) * 0.01f) + kOneF32;
 	}
 	if (*reinterpret_cast<short*>(script + 0x40) != 0) {
-		m_pushScale *= CharaObjGetStatusMultiplier(0x40);
+		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + kOneF32;
 	}
 	if (m_pushScale > 1.5f) {
 		m_pushScale = 1.5f;

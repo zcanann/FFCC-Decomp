@@ -1,13 +1,9 @@
 #include "ffcc/p_game.h"
 
-extern const char sGamePcsClassName[] = "CGamePcs";
-static const char sGameManagerClassName[] = "CManager";
-static const char sGameProcessClassName[] = "CProcess";
-
 CProcessTable CGamePcs::m_table = {
-    const_cast<char*>(sGamePcsClassName),
+    "CGamePcs",
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
         0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C,
     },
 };

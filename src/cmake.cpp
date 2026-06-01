@@ -2292,8 +2292,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         down = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
     }
 
     padBusy = false;
@@ -2303,8 +2304,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         repeat = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        repeat = Pad.GetPadInputs()[0].repeatButton;
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+        repeat = Pad.GetPadInputs()[padIndex].repeatButton;
     }
 
     if (repeat == 0) {

@@ -646,6 +646,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     g_hit_t = hitT;
+    g_hit_t_slide_min = hitT;
     g_hit_t_min = hitT;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;

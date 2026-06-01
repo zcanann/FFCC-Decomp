@@ -1136,20 +1136,21 @@ static void OpenMogHintMessage(int messageId)
 void CChara::InitFurTexBuffer()
 {
 	MogFurState& fur = MogFur();
+	MogFurState& charaFur = Chara.MogFur();
 	int i = 0;
 	int row = 0;
 	do {
 		int inner = 0;
 		for (int count = 8; count != 0; count--) {
 			int idxBase = inner + row;
-			fur.m_texels[idxBase] = 0x7FFF;
-			fur.m_texels[idxBase + 1] = 0x7FFF;
-			fur.m_texels[idxBase + 2] = 0x7FFF;
-			fur.m_texels[idxBase + 3] = 0x7FFF;
-			fur.m_texels[idxBase + 4] = 0x7FFF;
-			fur.m_texels[idxBase + 5] = 0x7FFF;
-			fur.m_texels[idxBase + 6] = 0x7FFF;
-			fur.m_texels[idxBase + 7] = 0x7FFF;
+			charaFur.m_texels[idxBase] = 0x7FFF;
+			charaFur.m_texels[idxBase + 1] = 0x7FFF;
+			charaFur.m_texels[idxBase + 2] = 0x7FFF;
+			charaFur.m_texels[idxBase + 3] = 0x7FFF;
+			charaFur.m_texels[idxBase + 4] = 0x7FFF;
+			charaFur.m_texels[idxBase + 5] = 0x7FFF;
+			charaFur.m_texels[idxBase + 6] = 0x7FFF;
+			charaFur.m_texels[idxBase + 7] = 0x7FFF;
 			inner += 8;
 		}
 		i++;
@@ -1157,7 +1158,7 @@ void CChara::InitFurTexBuffer()
 	} while (i < 0x40);
 
 	fur.m_dirty = 0;
-	fur.m_timestamp = System.m_frameCounter;
+	charaFur.m_timestamp = System.m_frameCounter;
 	memset(fur.m_score, 0, 0x40);
 	CalcMogScore();
 }

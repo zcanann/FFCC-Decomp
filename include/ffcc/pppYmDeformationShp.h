@@ -1,14 +1,19 @@
 #ifndef _PPP_YMDEFORMATIONSHP_H_
 #define _PPP_YMDEFORMATIONSHP_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/types.h>
 
-struct _pppPObject;
-struct pppYmDeformationShp;
 struct VYmDeformationShp;
 struct Vec;
 struct Vec2d;
 struct Vec4d;
+
+struct pppYmDeformationShp {
+    _pppPObject m_object;
+};
+
 struct pppYmDeformationShpUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;

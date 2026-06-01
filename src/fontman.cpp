@@ -118,7 +118,7 @@ found_fallback_glyph:
 	if (glyph != 0) {
 		goto found_fallback;
 	}
-	return kFontZero;
+	return LoadFloat(kFontZero);
 }
 
 /*
@@ -133,7 +133,7 @@ found_fallback_glyph:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = kFontZero;
+	float width = LoadFloat(kFontZero);
 	unsigned short ch;
 	int hasChar;
 
@@ -197,7 +197,7 @@ use_fallback_glyph:
 		if (glyph != 0) {
 			goto use_glyph;
 		}
-		charWidth = kFontZero;
+		charWidth = LoadFloat(kFontZero);
 
 add_width:
 		width += charWidth;
@@ -302,14 +302,14 @@ found_fallback:
 	posX += advance;
 
 	if (glyphInfo[0] == 0) {
-		u0 += kFontOne;
+		u0 += LoadFloat(kFontOne);
 	}
 	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
-		u1 -= kFontOne;
+		u1 -= LoadFloat(kFontOne);
 	}
 
-	v0 += kFontOne;
-	v1 -= kFontOne;
+	v0 += LoadFloat(kFontOne);
+	v1 -= LoadFloat(kFontOne);
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);
@@ -795,14 +795,14 @@ CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = kFontZero;
-	posZ = kFontZero;
-	posY = kFontZero;
-	posX = kFontZero;
+	margin = LoadFloat(kFontZero);
+	posZ = LoadFloat(kFontZero);
+	posY = LoadFloat(kFontZero);
+	posX = LoadFloat(kFontZero);
 	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
 	bits.shadow = 0;
-	scaleY = kFontOne;
-	scaleX = kFontOne;
+	scaleY = LoadFloat(kFontOne);
+	scaleX = LoadFloat(kFontOne);
 	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;

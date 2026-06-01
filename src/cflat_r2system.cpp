@@ -2910,7 +2910,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             outResult = 0;
             return 1;
         }
-        return 0;
+        return 1;
     }
     case -0x4E: {
         CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
@@ -4267,6 +4267,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     default:
         return 0;
     }
+
+    return 1;
 }
 
 /*

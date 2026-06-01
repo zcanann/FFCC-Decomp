@@ -40,6 +40,11 @@ static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObject* object
     return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
+static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* object, _pppCtrlTable* ctrl)
+{
+    return GetYmDrawMdlTexAnmWork(reinterpret_cast<_pppPObject*>(object), ctrl);
+}
+
 static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(_pppPObject* object,
                                                                          _pppCtrlTable* ctrl)
 {
@@ -199,7 +204,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     s32 frameU;
     u32 tilesU;
 
-    work = GetYmDrawMdlTexAnmWork(reinterpret_cast<_pppPObject*>(object), ctrl);
+    work = GetYmDrawMdlTexAnmWork(object, ctrl);
     if ((work->m_frame != 0) && ((mapMesh = GetMapMeshTable()[0]) != NULL)) {
         for (uvByteOffset = i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
             uvByteOffsetV = uvByteOffset + 2;
@@ -239,7 +244,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     pppModelSt* model;
     f32 per;
 
-    work = GetYmDrawMdlTexAnmWork(reinterpret_cast<_pppPObject*>(object), ctrl);
+    work = GetYmDrawMdlTexAnmWork(object, ctrl);
     work->m_frame = 0;
     work->m_wait = 0x200;
 

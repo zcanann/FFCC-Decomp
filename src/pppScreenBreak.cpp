@@ -205,7 +205,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     color[3] = colorSource[11];
     DCFlushRange(value + 10, 4);
 
-    CalcGraphValue(reinterpret_cast<_pppPObject*>(pppScreenBreak), param_2->m_graphId, value[0], value[1], value[2],
+    CalcGraphValue(&pppScreenBreak->m_object, param_2->m_graphId, value[0], value[1], value[2],
                    param_2->m_stepValue, param_2->m_arg3, *reinterpret_cast<float*>(param_2->m_payload));
 
     void* pieceStorage = *(void**)&value[3];
@@ -293,7 +293,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
  */
 void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
-    s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
     s32 dataOffset = serializedDataOffsets[2];
     u8* pppData = GetScreenBreakWork(pppScreenBreak, dataOffset);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);

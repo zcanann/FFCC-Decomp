@@ -4,18 +4,16 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-#include "ffcc/p_sample.h"
+#include "ffcc/system.h"
 
 struct Vec;
 
 extern const float kMapBoundsCenterScale;
 extern const float kMapCameraCenterYOffset;
 
-class CMapPcs : public CSamplePcs
+class CMapPcs : public CProcess
 {
 public:
-    CMapPcs();
-
     static unsigned int m_table_desc0[3];
     static unsigned int m_table_desc1[3];
     static unsigned int m_table_desc2[3];
@@ -41,6 +39,8 @@ public:
     static unsigned int m_table_desc22[3];
     static unsigned int m_table_desc23[3];
     static unsigned int m_table[3][0x15C / sizeof(unsigned int)];
+
+    CMapPcs();
 
     void Init();
     void Quit();

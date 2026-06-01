@@ -67,13 +67,12 @@ struct CMapCylinderRaw {
 
 static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltWork*>(reinterpret_cast<u8*>(ymMelt) + *offsets->m_serializedDataOffsets + 0x80);
+    return reinterpret_cast<YmMeltWork*>(ymMelt->m_object.m_workArea + *offsets->m_serializedDataOffsets);
 }
 
 static inline YmMeltColorWork* GetYmMeltColorWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltColorWork*>(
-        reinterpret_cast<u8*>(ymMelt) + offsets->m_serializedDataOffsets[1] + 0x80);
+    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_object.m_workArea + offsets->m_serializedDataOffsets[1]);
 }
 
 #define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
@@ -285,7 +284,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
     work = GetYmMeltWork(ymMelt, offsets);
     colorOffset = offsets->m_serializedDataOffsets[1];
-    colorWork = reinterpret_cast<YmMeltColorWork*>(reinterpret_cast<u8*>(ymMelt) + colorOffset + 0x80);
+    colorWork = reinterpret_cast<YmMeltColorWork*>(ymMelt->m_object.m_workArea + colorOffset);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = ppvMng->m_matrix.value[1][3];
@@ -330,7 +329,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;
     work->m_phase = work->m_phase + work->m_phaseVelocity;
 
-    if (ctrl->m_graphId == ymMelt->m_graphId) {
+    if (ctrl->m_graphId == ymMelt->m_object.m_graphId) {
         work->m_phase += *(float*)&ctrl->m_payload[0];
         work->m_phaseVelocity += *(float*)&ctrl->m_payload[4];
         work->m_phaseAccel += *(float*)&ctrl->m_payload[8];

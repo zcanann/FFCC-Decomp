@@ -30,10 +30,10 @@ struct PppAngMoveInput {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
+void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
 {
     int offset = ctrlTable->m_serializedDataOffsets[1];
-    int* ptr = (int*)((char*)dest + offset + 0x80);
+    int* ptr = (int*)(dest->m_workArea + offset);
     ptr[2] = 0;
     ptr[1] = 0;
     ptr[0] = 0;
@@ -48,11 +48,11 @@ void pppAngMoveCon(void* dest, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
+void pppAngMove(_pppPObject* basePtr, void* input, _pppCtrlTable* ctrlTable)
 {
     PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDataOffsets;
-    PppAngMoveObj* a = (PppAngMoveObj*)((char*)basePtr + offsets->a + 0x80);
-    PppAngMoveObj* b = (PppAngMoveObj*)((char*)basePtr + offsets->b + 0x80);
+    PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets->a);
+    PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->b);
     PppAngMoveInput* inputData = (PppAngMoveInput*)input;
 
     if (gPppCalcDisabled != 0) {
@@ -60,7 +60,7 @@ void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
     }
 
     int inputId = *(int*)inputData;
-    int baseId = *(int*)((char*)basePtr + 0xc);
+    int baseId = basePtr->m_graphId;
 
     if (inputId == baseId) {
         b->x += inputData->x;

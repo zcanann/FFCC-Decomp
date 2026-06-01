@@ -2,19 +2,14 @@
 #define _PPPEMISSION_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
 
 #include <dolphin/types.h>
 
 class CMaterialMan;
 
 struct pppEmission {
-    u32 m_graphId;
-
-    u8 _pad0[0x84];
-    u8 field_0x88;
-    u8 field_0x89;
-    u8 field_0x8a;
-    u8 field_0x8b;
+    _pppPObject m_object;
 };
 
 struct PEmission {

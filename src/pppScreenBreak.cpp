@@ -399,7 +399,6 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 {
     s32 iVar5;
     s32 iVar6;
-    s32 iVar14;
     u32 uVar15;
     Vec* inVec;
     s32 iVar16;
@@ -430,12 +429,11 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
     for (uVar15 = 0; uVar15 < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC);) {
         ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
-        iVar14 = reinterpret_cast<s32>(meshData);
         iVar5 = reinterpret_cast<s32>(model->m_nodes) + (meshData->m_nodeIndex * 0xC0);
         ((ScreenBreakNode*)iVar5)->m_disabled = 0;
         PSMTXIdentity((float(*)[4])(iVar5 + 0x14));
 
-        iVar5 = *(s32*)(iVar14 + 0x14);
+        u32 vertexCount = meshData->m_vertexCount;
         iVar6 = 0;
         S16Vec meshMax;
         meshMax.x = -0x7FFF;
@@ -446,29 +444,29 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMin.y = 0x7FFF;
         meshMin.z = 0x7FFF;
 
-        for (; iVar5 > 0; iVar5--) {
-            s16 x = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
+        for (; vertexCount != 0; vertexCount--) {
+            s16 x = *(s16*)((u8*)meshData->m_vertices + iVar6);
             s16 globalX = globalMax.x;
             if (globalX < x) {
                 globalX = x;
             }
             globalMax.x = globalX;
 
-            s16 y = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
+            s16 y = *(s16*)((u8*)meshData->m_vertices + iVar6 + 2);
             s16 globalY = globalMax.y;
             if (globalY < y) {
                 globalY = y;
             }
             globalMax.y = globalY;
 
-            s16 z = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
+            s16 z = *(s16*)((u8*)meshData->m_vertices + iVar6 + 4);
             s16 globalZ = globalMax.z;
             if (globalZ < z) {
                 globalZ = z;
             }
             globalMax.z = globalZ;
 
-            s16* vertex = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
+            s16* vertex = (s16*)((u8*)meshData->m_vertices + iVar6);
 
             s16 minCandidateX = vertex[0];
             if (meshMin.x < vertex[0]) {
@@ -494,14 +492,14 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
             }
             meshMax.x = maxCandidateX;
 
-            s16* vertexY = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
+            s16* vertexY = (s16*)((u8*)meshData->m_vertices + iVar6);
             s16 maxCandidateY = meshMax.y;
             if (maxCandidateY < vertexY[1]) {
                 maxCandidateY = vertexY[1];
             }
             meshMax.y = maxCandidateY;
 
-            s16* vertexZ = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
+            s16* vertexZ = (s16*)((u8*)meshData->m_vertices + iVar6);
             s16 maxCandidateZ = meshMax.z;
             if (maxCandidateZ < vertexZ[2]) {
                 maxCandidateZ = vertexZ[2];

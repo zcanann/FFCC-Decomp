@@ -188,17 +188,15 @@ static inline float LoadFloat(const float& value)
  */
 CMenuPcs::~CMenuPcs()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    if (self + 0x20 != nullptr) {
-        *reinterpret_cast<u32*>(self + 0x20) = 0;
-        *reinterpret_cast<u32*>(self + 0x24) = 0;
-        *reinterpret_cast<u32*>(self + 0x2C) = 0;
-        *reinterpret_cast<u32*>(self + 0x34) = 0;
-        *reinterpret_cast<u32*>(self + 0x3C) = 0;
-        *reinterpret_cast<u32*>(self + 0x38) = 0;
-        *reinterpret_cast<u32*>(self + 0x28) = 0;
-        *reinterpret_cast<u32*>(self + 0x30) = 0;
+    if (&m_mcCtrl != nullptr) {
+        m_mcCtrl.m_previousState = 0;
+        m_mcCtrl.m_state = 0;
+        m_mcCtrl.m_lastResult = 0;
+        m_mcCtrl.m_iteration = 0;
+        m_mcCtrl.m_userBuffer = 0;
+        m_mcCtrl.m_createFlag = 0;
+        m_mcCtrl.m_cardChannel = 0;
+        m_mcCtrl.m_saveIndex = 0;
     }
 }
 

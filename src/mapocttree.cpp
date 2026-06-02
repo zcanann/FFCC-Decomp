@@ -2177,11 +2177,11 @@ void CMaterialMan::InitEnv()
  */
 int CBound::CheckCross(CBound& other)
 {
-	bool overlap;
+	int overlap;
 	bool xyOverlap;
 	int xOverlap;
 
-	overlap = false;
+	overlap = 0;
 	xyOverlap = false;
 	if (m_min.x < other.m_min.x) {
 		xOverlap = other.m_min.x <= m_max.x;
@@ -2221,7 +2221,7 @@ int CBound::CheckCross(CBound& other)
 		}
 
 		if (xOverlap) {
-			overlap = true;
+			overlap = 1;
 		}
 	}
 

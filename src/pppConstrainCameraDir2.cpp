@@ -42,13 +42,13 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
             float cameraPosZ = CameraPcs.m_positionZ;
             float localX;
             float localY;
-            float scale = ((CameraPcs.m_fov - 0.8f) / 0.8f) + 64.0f;
+            float scale = ((CameraPcs.m_fov - 25.0f) / 25.0f) + 1.0f;
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 
-            pppMngSt->m_scale.x = 56.0f * scale;
+            pppMngSt->m_scale.x = 1.3333f * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = 64.0f;
+            pppMngSt->m_scale.z = 1.0f;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -96,3 +96,5 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
         }
     }
 }
+
+extern const float kConstrainCameraDirLocalZero = 0.0f;

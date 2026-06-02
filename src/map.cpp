@@ -94,11 +94,6 @@ static const char s_map_ptrarray_grow_error[] =
 static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
 static inline float MapObjWorldX(CMapObj* mapObj)
 {
     return mapObj->m_worldMtx[0][3];
@@ -3114,14 +3109,12 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
  */
 void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-    int offset = mapObjIndex * 0xF0;
-    CMapMng* self = this;
-    PSMTXCopy(source, reinterpret_cast<MtxPtr>(Ptr(self, offset + 0x9DC)));
+    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
+    PSMTXCopy(source, mapObj->m_localMtx);
 
-    u8* mapObj = Ptr(self, offset);
-    mapObj[0x970] = 1;
-    mapObj[0x96F] = 1;
-    mapObj[0x970] = 0;
+    mapObj->m_localMtxDirty = 1;
+    mapObj->m_calcMtxPending = 1;
+    mapObj->m_localMtxDirty = 0;
 }
 
 /*

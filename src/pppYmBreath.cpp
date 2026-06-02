@@ -1068,11 +1068,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void get_rand()
 {
+    Math.RandF();
 }
-#endif
 
 /*
  * --INFO--
@@ -1083,12 +1082,22 @@ void get_rand()
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
+void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PARTICLE_DATA* particleData,
+                       PARTICLE_WMAT* particleWmat)
 {
-	// TODO
+    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
+    Mtx workMtx;
+
+    PSMTXCopy(vYmBreath->m_matrix, particleWmat->m_matrix);
+    PSMTXCopy(particleWmat->m_matrix, workMtx);
+    workMtx[0][3] = 0.0f;
+    workMtx[1][3] = 0.0f;
+    workMtx[2][3] = 0.0f;
+
+    PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
+    PSVECNormalize(&particle->m_direction, &particle->m_direction);
+    PSMTXConcat(particleWmat->m_matrix, pppObject->m_localMatrix.value, particleWmat->m_matrix);
 }
-#endif
 
 /*
  * --INFO--
@@ -1099,37 +1108,35 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
 {
     int i;
-    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)groupIndex * 0x5C;
     bool isDead = true;
     float zero = 0.0f;
-    int* groupData = (int*)groupTable;
+    YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
+    YmBreathParticleGroup* groupData = &vBreathModel->m_groups[(int)groupIndex];
 
-    for (i = 0; i < *(unsigned short*)((unsigned char*)pYmBreath + 0x12); i++) {
-        if ((*(signed char*)(groupData[1] + i) != -1) || (*(signed char*)(groupData[2] + i) != 1)) {
+    for (i = 0; i < params->m_slotCount; i++) {
+        if ((groupData->particleIndices[i] != -1) || (groupData->particleStates[i] != 1)) {
             isDead = false;
             break;
         }
     }
 
     if (isDead) {
-        for (i = 0; i < *(unsigned short*)((unsigned char*)pYmBreath + 0x12); i++) {
-            *(unsigned char*)(groupData[2] + i) = 0xFF;
-            groupData[3] = (int)zero;
-            groupData[4] = (int)zero;
-            groupData[5] = (int)zero;
-            groupData[6] = (int)zero;
-            groupData[7] = (int)zero;
-            groupData[8] = (int)zero;
-            groupData[9] = (int)zero;
+        for (i = 0; i < params->m_slotCount; i++) {
+            groupData->particleStates[i] = -1;
         }
-        groupData[0] = 0;
+        groupData->position.x = zero;
+        groupData->position.y = zero;
+        groupData->position.z = zero;
+        groupData->direction.x = zero;
+        groupData->direction.y = zero;
+        groupData->direction.z = zero;
+        groupData->speed = zero;
+        groupData->active = 0;
     }
 }
-#endif
 
 /*
  * --INFO--
@@ -1140,28 +1147,27 @@ void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short grou
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
 {
-    int groupTable = *(int*)((unsigned char*)vYmBreath + 0x3C);
+    YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
+    YmBreathParticleGroup* groupTable = vYmBreath->m_groups;
     short g;
     short s;
 
-    for (g = 0; g < *(unsigned short*)((unsigned char*)pYmBreath + 0x14); g++) {
-        for (s = 0; s < *(unsigned short*)((unsigned char*)pYmBreath + 0x12); s++) {
-            if ((int)particleIndex == (int)*(signed char*)(*(int*)(groupTable + 4) + s)) {
+    for (g = 0; g < params->m_groupCount; g++) {
+        for (s = 0; s < params->m_slotCount; s++) {
+            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
                 slotIndex = s;
                 groupIndex = g;
                 return;
             }
         }
-        groupTable += 0x5C;
+        groupTable++;
     }
 
     slotIndex = -1;
     groupIndex = -1;
 }
-#endif
 
 /*
  * --INFO--
@@ -1172,17 +1178,13 @@ void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, s
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
 void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
 {
     short slotIndex;
     short groupIndex;
-    int* groupArray;
 
     SearchIndex(pYmBreath, vYmBreath, slotIndex, groupIndex, particleIndex);
     if (groupIndex != -1) {
-        groupArray = *(int**)((unsigned char*)vYmBreath + 0x3C);
-        *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
+        vYmBreath->m_groups[groupIndex].particleIndices[slotIndex] = -1;
     }
 }
-#endif

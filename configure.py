@@ -726,7 +726,7 @@ config.libs = [
             Object(NonMatching, "pppWDrawMatrixFront.cpp"),
             Object(NonMatching, "pppWDrawMatrixFrontLoop.cpp"),
             Object(NonMatching, "pppWDrawMatrixLoop.cpp"),
-            Object(NonMatching, "pppYmBreath.cpp"),
+            Object(NonMatching, "pppYmBreath.cpp", cflags=cflags_game),
             Object(NonMatching, "pppYmCallBack.cpp"),
             Object(NonMatching, "pppYmChangeTex.cpp"),
             Object(NonMatching, "pppYmCheckBGHeight.cpp"),

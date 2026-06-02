@@ -13,10 +13,12 @@ struct VertexApMtxEntry
 	u16* vertexIndices;
 };
 
+struct VertexApMtxSource;
+
 struct VertexApMtxEnv
 {
 	u8 unk0[0x8];
-	void* unk8;
+	VertexApMtxSource** sourceTable;
 	u8 unkC[0x4];
 	VertexApMtxEntry* entries;
 };
@@ -87,8 +89,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		entry = &env->entries[data->entryIndex];
 
 		if (points == 0) {
-			u32* srcTable = *(u32**)((u8*)env + 0x8);
-			VertexApMtxSource* src = *(VertexApMtxSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
+			VertexApMtxSource* src = env->sourceTable[entry->vertexSetIndex];
 			points = src->points;
 		}
 

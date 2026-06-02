@@ -1125,7 +1125,7 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CAStar::addAstar(Vec& pos, int groupA, int groupB)
+inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
 {
 	int groupLow = groupA;
 	int groupHigh = groupB;

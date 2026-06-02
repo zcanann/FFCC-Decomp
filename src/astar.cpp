@@ -202,15 +202,14 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
 	double aheadBestDist = behindBestDist;
-	CAPos* portal = m_portals;
 	int i = 0;
 
 	do
 	{
-		unsigned char otherGroup = portal->m_groupA;
+		unsigned char otherGroup = m_portals[i].m_groupA;
 		bool exists = false;
 
-		if (otherGroup != 0 && portal->m_groupB != 0)
+		if (otherGroup != 0 && m_portals[i].m_groupB != 0)
 		{
 			exists = true;
 		}
@@ -219,7 +218,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		{
 			bool connected = false;
 
-			if (otherGroup == startGroup || portal->m_groupB == startGroup)
+			if (otherGroup == startGroup || m_portals[i].m_groupB == startGroup)
 			{
 				connected = true;
 			}
@@ -228,13 +227,13 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 			{
 				if (otherGroup == startGroup)
 				{
-					otherGroup = portal->m_groupB;
+					otherGroup = m_portals[i].m_groupB;
 				}
 
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					CVector portalDirPos(portal->m_position);
+					CVector portalDirPos(m_portals[i].m_position);
 					CVector dirToPortalSource;
 					Vec portalVec;
 
@@ -251,7 +250,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					CVector distPortal(portal->m_position);
+					CVector distPortal(m_portals[i].m_position);
 					CVector distVecSource;
 
 					PSVECSubtract(reinterpret_cast<Vec*>(&distPortal),
@@ -268,13 +267,13 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					{
 						if (behindBestDist < dist)
 						{
-							behindBest = portal;
+							behindBest = &m_portals[i];
 							behindBestDist = dist;
 						}
 					}
 					else if (aheadBestDist < dist)
 					{
-						aheadBest = portal;
+						aheadBest = &m_portals[i];
 						aheadBestDist = dist;
 					}
 				}
@@ -282,7 +281,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		}
 
 		++i;
-		++portal;
 	} while (i < 64);
 
 	if (aheadBest != (CAPos*)0)

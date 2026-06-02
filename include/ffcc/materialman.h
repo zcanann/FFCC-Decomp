@@ -155,6 +155,10 @@ public:
     {
         return m_geometryArraySource;
     }
+    float (*GetObjTextureMtx()) [4]
+    {
+        return m_objTextureMtx;
+    }
     void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, _GXTexObj* paraboloidTexObj1, unsigned int tevBit)
     {
         m_manaReflectionVec = reflectionVec;
@@ -276,6 +280,28 @@ public:
         m_stdTexCoordId = 0;
         m_stdEnvTevBit = stdTevBit;
     }
+    void SetEmissionTextureEnv(unsigned int tevBit)
+    {
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_curEnvTevBit = tevBit;
+        m_texMapIdCur = 0;
+        m_texMtxCur = 0x1E;
+        m_texCoordIdCur = 0;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+        m_curEnvTevBit |= 0x40000;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_stdEnvTevBit = m_curEnvTevBit;
+    }
 
 private:
     void* m_geometryArraySource;        // 0x04
@@ -295,7 +321,9 @@ private:
     _GXTexObj* m_manaParaboloidTexObj1;  // 0xDC
     unsigned char m_pad0E0[0x04];
     unsigned char m_manaAlpha;           // 0xE4
-    unsigned char m_pad0E5[0x37];
+    unsigned char m_pad0E5[0x03];
+    Mtx m_objTextureMtx;                  // 0xE8
+    unsigned char m_pad118[0x04];
     int m_texMapIdCur;                   // 0x11C
     int m_texMtxCur;                     // 0x120
     int m_texCoordIdCur;                 // 0x124

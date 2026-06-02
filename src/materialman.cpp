@@ -1653,7 +1653,7 @@ void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
     tmp1[1][3] = FLOAT_8032faf4;
     tmp1[2][3] = FLOAT_8032faf4;
     GXLoadNrmMtxImm(tmp1, GX_PNMTX0);
-    PSMTXCopy(tmp1, reinterpret_cast<MtxPtr>(Ptr(this, 0xE8)));
+    PSMTXCopy(tmp1, m_objTextureMtx);
 }
 
 /*

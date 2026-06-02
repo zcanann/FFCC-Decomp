@@ -2840,9 +2840,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 		int countBase = labelBase + activePartyCount;
-		InitAnimSprite(&sprites[countBase], 0x19, (short)((0x280 - 0x140) >> 1), 0x10, 0x140, 0x28, sprites[1].startFrame, 8);
+		InitAnimSprite(&sprites[countBase], 0x19, (short)((0x280 - 0x140) >> 1), 0x10, 0x140, 0x28, sprites[1].startFrame, 10);
 		sprites[countBase].alpha = 0.0f;
-		sprites[countBase].duration = 10;
 		sprites[countBase].depth = 1.0f;
 		int countTop = labelBase + activePartyCount + 1;
 		s_CntTop = (unsigned char)countTop;

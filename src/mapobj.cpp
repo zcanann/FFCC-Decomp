@@ -59,6 +59,25 @@ static inline Mtx& MapObjHitDrawMtx()
     return MapMng.m_viewMtx;
 }
 
+struct CMapCylinderRaw {
+    CMapCylinderRaw()
+    {
+        m_boundsMin.z = kMapObjBoundMinInit;
+        m_boundsMin.y = kMapObjBoundMinInit;
+        m_boundsMin.x = kMapObjBoundMinInit;
+        m_boundsMax.z = kMapObjBoundMaxInit;
+        m_boundsMax.y = kMapObjBoundMaxInit;
+        m_boundsMax.x = kMapObjBoundMaxInit;
+    }
+
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    float m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
 }
 
 /*
@@ -1519,7 +1538,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        CMapCylinder localCylinder;
+        CMapCylinderRaw localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1579,7 +1598,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             Vec localMove;
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
+            if (mapHit->CheckHitCylinder((CMapCylinder*)&localCylinder, &localMove, mask) != 0) {
                 return 1;
             }
         }
@@ -1604,7 +1623,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Vec localMove;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        CMapCylinder localCylinder;
+        CMapCylinderRaw localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1663,7 +1682,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         if (hitBounds) {
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            mapHit->CheckHitCylinderNear(&localCylinder, &localMove, mask);
+            mapHit->CheckHitCylinderNear((CMapCylinder*)&localCylinder, &localMove, mask);
         }
     }
 

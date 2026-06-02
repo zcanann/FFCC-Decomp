@@ -2398,8 +2398,7 @@ int CMapMng::ReadMid(char* mapName)
             CMapObj* mapObj = nextMapObj;
             int mapObjIndex = 0;
             while (mapObjIndex < m_mapObjCount) {
-                unsigned char* objRaw = reinterpret_cast<unsigned char*>(mapObj);
-                if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                     short& octTreeCount = m_octTreeCount;
                     if (octTreeCount > 0xF) {
                         return 0;
@@ -2409,11 +2408,11 @@ int CMapMng::ReadMid(char* mapName)
                     octTree->ReadOtmOctTree(chunkFile);
                     *reinterpret_cast<CMapObj**>(Ptr(octTree, 8)) = mapObj;
 
-                    if (*reinterpret_cast<int*>(objRaw + 0xC) == 0) {
+                    if (mapObj->m_mapData == 0) {
                         if (System.m_execParam != 0) {
                             System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
                         }
-                    } else if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                    } else if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                         nextMapObj = mapObj + 1;
                         octTreeCount += 1;
                         break;
@@ -3011,10 +3010,10 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                 mapObj->m_drawPriority = 2;
                 *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
             }
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = 0x4000;
+            mapObj->m_cameraSemiTransTargetAlpha = 0x4000;
             found = 1;
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x28)) = 0x4000;
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2C)) = 0;
+            mapObj->m_cameraSemiTransAlpha = 0x4000;
+            mapObj->m_cameraSemiTransStep = 0;
         }
         mapObj++;
     }

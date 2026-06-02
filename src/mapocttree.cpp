@@ -203,11 +203,11 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             unsigned short objIndex = chunkFile.Get2();
 
             m_mapObject = GetMapObjByIndex(objIndex);
-            if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 4) {
-                *reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x15)) = 0xFF;
-                *reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x14)) = 0xFF;
+            if (m_mapObject->m_meshType == 4) {
+                m_mapObject->m_drawPriority = 0xFF;
+                m_mapObject->m_baseDrawPriority = 0xFF;
                 *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
-            } else if (*reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E)) == 3) {
+            } else if (m_mapObject->m_meshType == 3) {
                 *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
             }
             break;
@@ -215,7 +215,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
         case 'NODN': {
             m_nodeCount = chunkFile.Get2();
-            signed char mapObjType = *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E));
+            signed char mapObjType = m_mapObject->m_meshType;
             if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
                 System.Printf(const_cast<char*>(sMapOctTreeNodeMeshTypeFmt), m_nodeCount, mapObjType);
             }
@@ -891,7 +891,7 @@ void COctTree::SetDrawFlag()
 {
 	Mtx localMtx;
 
-	if (((m_drawFlags & 1) == 0) && (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1D)) == 1)) {
+	if (((m_drawFlags & 1) == 0) && (m_mapObject->m_mapDataType == 1)) {
 		PSMTXConcat(MapMng.m_scaledViewMtxPrimary,
 		            m_mapObject->m_worldMtx, reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
 		PSMTXConcat(MapMng.m_viewMtx,

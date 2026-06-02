@@ -219,7 +219,9 @@ public:
     char m_pad19[2];
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
-    char m_pad1D[0x0B];
+    unsigned char m_mapDataType; // 0x1D
+    unsigned char m_meshType;    // 0x1E
+    char m_pad1F[0x09];
     short m_cameraSemiTransAlpha;       // 0x28
     short m_cameraSemiTransTargetAlpha; // 0x2A
     short m_cameraSemiTransStep;        // 0x2C

@@ -64,10 +64,8 @@ extern const char sAmemCacheStateUse[] = "USE  ";
 extern const char sAmemCacheStateNoUse[] = "NOUSE";
 extern const char sMemoryClassName[] = "CMemory";
 extern const char sAmemCacheSeparator[3] = "\n\n";
-extern char sMemoryNoNameStopwatchName[8] = "no name";
-extern char sEmptyAllocSourceName[4] = "";
-extern const char sHeapWalkerNewline[] = "\n";
-extern char sHeapWalkerSlashLine[] = "//\n";
+extern const char sMemoryNoNameStopwatchName[8] = "no name";
+extern const char sEmptyAllocSourceName[4] = "";
 extern const char* s_amemCacheTypeNames_801E8470[] = {
     sAmemCacheTypeTexture,
     sAmemCacheTypeModel,
@@ -79,10 +77,14 @@ extern const char* s_amemCacheStateNames_8032E410[2] = {
 };
 extern const float kMemoryDmaTimeout = 9000.0f;
 extern const float kMemoryDrawZero = 0.0f;
+extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
+extern const char sHeapWalkerNewline[] = "\n";
+static const char sHeapWalkerFree[] = "FREE";
+static const char sHeapWalkerUsed[] = "USED";
 extern const float kMemoryDrawOrthoBottom = 448.0f;
 extern const float kMemoryDrawOrthoRight = 640.0f;
 extern const float kMemoryDrawOrthoFar = -100.0f;
-extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
+extern const char sHeapWalkerSlashLine[] = "//\n";
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
 int s_RefCnt0Compare;
@@ -195,7 +197,7 @@ static inline void stageDestroyInternal(CMemory::CStage* stage)
  */
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : sEmptyAllocSourceName, line, 0);
+    return stage->alloc(size, file != (char*)nullptr ? file : const_cast<char*>(sEmptyAllocSourceName), line, 0);
 }
 
 /*
@@ -209,7 +211,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : sEmptyAllocSourceName, line, 0);
+    return stage->alloc(size, file != (char*)nullptr ? file : const_cast<char*>(sEmptyAllocSourceName), line, 0);
 }
 
 /*
@@ -700,7 +702,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                         *reinterpret_cast<unsigned int*>(stageBytes + 8) + alignedSize;
 
                     if (source == (char*)nullptr) {
-                        source = sEmptyAllocSourceName;
+                        source = const_cast<char*>(sEmptyAllocSourceName);
                     }
                     strcpy(reinterpret_cast<char*>(stageBytes + 0x10), source);
                     stage->m_allocationMode = mode;
@@ -813,7 +815,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  */
 void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-    return stage->alloc(size, source != (char*)nullptr ? source : sEmptyAllocSourceName, line, noError);
+    return stage->alloc(size, source != (char*)nullptr ? source : const_cast<char*>(sEmptyAllocSourceName), line, noError);
 }
 
 /*
@@ -921,7 +923,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
-    CStopWatch watch(sMemoryNoNameStopwatchName);
+    CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
@@ -943,7 +945,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
-    CStopWatch watch(sMemoryNoNameStopwatchName);
+    CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
     float timeout = kMemoryDmaTimeout;
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
@@ -1037,7 +1039,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     memset(reinterpret_cast<void*>(node + 0x1A), 0, 0x24);
 
                     if (source == (char*)nullptr) {
-                        source = sEmptyAllocSourceName;
+                        source = const_cast<char*>(sEmptyAllocSourceName);
                     }
                     strncpy(reinterpret_cast<char*>(node + 0x1A), source, 0x23);
 
@@ -1066,7 +1068,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
     if ((noError == 0) && (allocated == 0)) {
         if (source == (char*)nullptr) {
-            source = sEmptyAllocSourceName;
+            source = const_cast<char*>(sEmptyAllocSourceName);
         }
         System.Printf(
             const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), allocSize, source, line);
@@ -1167,7 +1169,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
+                        const_cast<char*>(sHeapWalkerEntryFmt), freeCount, sHeapWalkerFree, 0, top - blockTail, totalSize, 0, 0, 0,
                         sEmptyAllocSourceName, 0);
                 }
                 usedSize += size;
@@ -1179,7 +1181,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 if ((flag & 2) != 0) {
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), usedCount, "USED",
+                        const_cast<char*>(sHeapWalkerEntryFmt), usedCount, sHeapWalkerUsed,
                         *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
                         *reinterpret_cast<int*>(node + 4), 0, 0, reinterpret_cast<char*>(node + 0x1A),
                         *reinterpret_cast<unsigned short*>(node + 0x18));
@@ -1199,7 +1201,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 bool isUsed = (nodeFlags & 4) != 0;
                 if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
-                    const char* kind = isUsed ? "USED" : "FREE";
+                    const char* kind = isUsed ? sHeapWalkerUsed : sHeapWalkerFree;
                     unsigned char level = isUsed ? *reinterpret_cast<unsigned char*>(node + 3) : 0;
                     const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : sEmptyAllocSourceName;
                     unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
@@ -1742,7 +1744,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
             if (entry.m_dmaCopy != 0) {
                 char* allocSource = source;
                 if (allocSource == 0) {
-                    allocSource = sEmptyAllocSourceName;
+                    allocSource = const_cast<char*>(sEmptyAllocSourceName);
                 }
 
                 entry.m_cacheData =
@@ -1752,7 +1754,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 } else {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch(sMemoryNoNameStopwatchName);
+                    CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
                     watch.Start();
                     float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
@@ -1862,7 +1864,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         } else {
             int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                    reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch(sMemoryNoNameStopwatchName);
+            CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
             watch.Start();
             while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                 watch.Stop();
@@ -1918,7 +1920,7 @@ checksum_done_copy:
     } else {
         int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-        CStopWatch watch(sMemoryNoNameStopwatchName);
+        CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
         watch.Start();
         while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
             watch.Stop();

@@ -89,7 +89,7 @@ STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
 STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x30);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);

@@ -7,7 +7,7 @@
 #include <stddef.h>
 
 extern const float kPppKeShpTail2XZero = 0.0f;
-extern const float FLOAT_803304F0;
+extern const float FLOAT_803304F0[2];
 
 struct PDrawMdlTs {
     s32 m_graphId;             // 0x00
@@ -50,7 +50,7 @@ static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctr
 void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = FLOAT_803304F0;
+    f32 zero = FLOAT_803304F0[0];
 
     texCoords[5] = zero;
     texCoords[4] = zero;
@@ -68,7 +68,7 @@ void pppDrawMdlTsCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 void pppDrawMdlTsCon3(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    f32 zero = FLOAT_803304F0;
+    f32 zero = FLOAT_803304F0[0];
 
     texCoords[5] = zero;
     texCoords[2] = zero;
@@ -138,7 +138,7 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         data->m_drawG);
 
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
-    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
+    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0[0], FLOAT_803304F0[0]);
 
     pppSetBlendMode(data->m_blendMode);
 

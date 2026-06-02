@@ -56,7 +56,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             obj = 0;
         } else {
             obj = (_pppPObject*)pppCreatePObject(ppvMng, objData);
-            *(_pppPObject**)((u8*)obj + 0x4) = pObject;
+            obj->m_link.m_previous = &pObject->m_link;
         }
 
         float* trig = gPppTrigTable;

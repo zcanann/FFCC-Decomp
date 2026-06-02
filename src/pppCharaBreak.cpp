@@ -149,7 +149,7 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
-static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     return reinterpret_cast<CharaBreakWork*>(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
 }
@@ -181,7 +181,7 @@ static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
+void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTable* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
@@ -217,7 +217,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBreakUnkC* data)
+void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtrlTable* data)
 {
     CharaBreakStep* stepData;
     CharaBreakWork* work;
@@ -383,7 +383,7 @@ fail:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);
 
@@ -444,7 +444,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     float fVar1 = FLOAT_80332048;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
@@ -466,7 +466,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
     float fVar1 = FLOAT_80332048;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);

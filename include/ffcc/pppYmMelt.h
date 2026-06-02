@@ -38,7 +38,18 @@ struct YmMeltCtrl {
     u8 m_blendMode;
     u8 _pad11;
     s16 m_phasePeriod;
-    u8 m_payload[0x20];
+    union {
+        u8 m_payload[0x20];
+        struct Payload {
+            f32 m_phaseDelta;
+            f32 m_phaseVelocityDelta;
+            f32 m_phaseAccelDelta;
+            u8 m_pad0C[0x0C];
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+            u8 m_pad1A[0x06];
+        } m_melt;
+    };
 };
 
 void InitPolygonData(PYmMelt*, VERTEX_DATA*, short);

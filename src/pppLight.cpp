@@ -13,7 +13,7 @@ extern u8 gPppDefaultValueBuffer[];
 
 struct pppLightTarget {
 	int unk0;
-	unsigned char* obj;
+	_pppPObject* obj;
 	int unk8;
 	int unkC;
 };
@@ -46,14 +46,27 @@ struct PppLightWork {
 };
 
 struct PppLightStep {
-	s32 sourceId;
-	u8 unk4[0x40];
-	u32 targetIndex;
-	u8 unk48[0x10];
-	u8 type;
-	u8 color0Enabled;
-	u8 color1Enabled;
-	u8 color2Enabled;
+	s32 m_sourceId;
+	u8 m_pad04[0x4];
+	s16 m_colorDeltas[12];
+	f32 m_attenFalloff;
+	f32 m_attenFalloffVelocity;
+	f32 m_attenFalloffAccel;
+	f32 m_attenRadius;
+	f32 m_attenRadiusVelocity;
+	f32 m_attenRadiusAccel;
+	f32 m_spotScale;
+	f32 m_spotScaleVelocity;
+	f32 m_spotScaleAccel;
+	u32 m_targetIndex;
+	u8 m_pad48[0x4];
+	f32 m_specularScale;
+	f32 m_specularScaleVelocity;
+	f32 m_specularScaleAccel;
+	u8 m_type;
+	u8 m_color0Enabled;
+	u8 m_color1Enabled;
+	u8 m_color2Enabled;
 };
 
 struct PppLightMngProgramInfo {
@@ -65,6 +78,11 @@ STATIC_ASSERT(offsetof(PppLightWork, attenFalloffAccel) == 0x20);
 STATIC_ASSERT(offsetof(PppLightWork, attenRadiusAccel) == 0x2C);
 STATIC_ASSERT(offsetof(PppLightWork, spotScaleAccel) == 0x38);
 STATIC_ASSERT(offsetof(PppLightWork, specularScaleAccel) == 0x44);
+STATIC_ASSERT(offsetof(PppLightStep, m_colorDeltas) == 0x8);
+STATIC_ASSERT(offsetof(PppLightStep, m_attenFalloff) == 0x20);
+STATIC_ASSERT(offsetof(PppLightStep, m_targetIndex) == 0x44);
+STATIC_ASSERT(offsetof(PppLightStep, m_specularScale) == 0x4C);
+STATIC_ASSERT(offsetof(PppLightStep, m_type) == 0x58);
 
 static inline PppLightWork* GetPppLightWork(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
@@ -138,14 +156,13 @@ void pppLightCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppLight(_pppPObject* param1, void* param2, void* param3)
+void pppLight(_pppPObject* object, void* stepData, void* ctrlData)
 {
-	u8* pObject = (u8*)param1;
-	PppLightStep* step = (PppLightStep*)param2;
-	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
+	PppLightStep* step = (PppLightStep*)stepData;
+	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)ctrlData;
 
 	if (ppvUserStopPartF == 0) {
-		PppLightWork* work = (PppLightWork*)(param1->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
+		PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
 		if (ppvUserStopPartF != 0) {
 			goto create_light;
@@ -170,42 +187,39 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		work->color0B += work->color1B;
 		work->color0A += work->color1A;
 
-		if (step->sourceId == *(s32*)(pObject + 0xc)) {
-			const s16* stepColor = (const s16*)((u8*)step + 0x8);
-			const f32* stepFloat = (const f32*)((u8*)step + 0x20);
-
-			work->color0R += stepColor[0];
-			work->color0G += stepColor[1];
-			work->color0B += stepColor[2];
-			work->color0A += stepColor[3];
-			work->color1R += stepColor[4];
-			work->color1G += stepColor[5];
-			work->color1B += stepColor[6];
-			work->color1A += stepColor[7];
-			work->color2R += stepColor[8];
-			work->color2G += stepColor[9];
-			work->color2B += stepColor[10];
-			work->color2A += stepColor[11];
-			work->attenFalloff += stepFloat[0];
-			work->attenFalloffVelocity += stepFloat[1];
-			work->attenFalloffAccel += stepFloat[2];
-			work->attenRadius += stepFloat[3];
-			work->attenRadiusVelocity += stepFloat[4];
-			work->attenRadiusAccel += stepFloat[5];
-			work->spotScale += stepFloat[6];
-			work->spotScaleVelocity += stepFloat[7];
-			work->spotScaleAccel += stepFloat[8];
-			work->specularScale += *(f32*)((u8*)step + 0x4c);
-			work->specularScaleVelocity += *(f32*)((u8*)step + 0x50);
-			work->specularScaleAccel += *(f32*)((u8*)step + 0x54);
+		if (step->m_sourceId == object->m_graphId) {
+			work->color0R += step->m_colorDeltas[0];
+			work->color0G += step->m_colorDeltas[1];
+			work->color0B += step->m_colorDeltas[2];
+			work->color0A += step->m_colorDeltas[3];
+			work->color1R += step->m_colorDeltas[4];
+			work->color1G += step->m_colorDeltas[5];
+			work->color1B += step->m_colorDeltas[6];
+			work->color1A += step->m_colorDeltas[7];
+			work->color2R += step->m_colorDeltas[8];
+			work->color2G += step->m_colorDeltas[9];
+			work->color2B += step->m_colorDeltas[10];
+			work->color2A += step->m_colorDeltas[11];
+			work->attenFalloff += step->m_attenFalloff;
+			work->attenFalloffVelocity += step->m_attenFalloffVelocity;
+			work->attenFalloffAccel += step->m_attenFalloffAccel;
+			work->attenRadius += step->m_attenRadius;
+			work->attenRadiusVelocity += step->m_attenRadiusVelocity;
+			work->attenRadiusAccel += step->m_attenRadiusAccel;
+			work->spotScale += step->m_spotScale;
+			work->spotScaleVelocity += step->m_spotScaleVelocity;
+			work->spotScaleAccel += step->m_spotScaleAccel;
+			work->specularScale += step->m_specularScale;
+			work->specularScaleVelocity += step->m_specularScaleVelocity;
+			work->specularScaleAccel += step->m_specularScaleAccel;
 		}
 
 	create_light:
 		CLightPcs::CLight light;
 
-		light.m_position.x = *(f32*)(pObject + 0x1c);
-		light.m_position.y = *(f32*)(pObject + 0x2c);
-		light.m_position.z = *(f32*)(pObject + 0x3c);
+		light.m_position.x = object->m_localMatrix.value[0][3];
+		light.m_position.y = object->m_localMatrix.value[1][3];
+		light.m_position.z = object->m_localMatrix.value[2][3];
 		PSMTXMultVec(ppvMng->m_matrix.value, (Vec*)&light.m_position, (Vec*)&light.m_position);
 
 		light.m_attenRadius = work->attenRadius;
@@ -219,24 +233,24 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		*(u32*)&light.m_bumpShade[0] = 0;
 		light.m_part = ppvMng;
 
-		if (step->color1Enabled != 0) {
+		if (step->m_color1Enabled != 0) {
 			light.m_targetColor[1] = light.m_targetColor[0];
 		} else {
 			*(u32*)&light.m_targetColor[1] = 0;
 		}
 
-		if (step->color2Enabled != 0) {
+		if (step->m_color2Enabled != 0) {
 			light.m_targetColor[2] = light.m_targetColor[0];
 		} else {
 			*(u32*)&light.m_targetColor[2] = 0;
 		}
 
-		if (step->color0Enabled == 0) {
+		if (step->m_color0Enabled == 0) {
 			*(u32*)&light.m_targetColor[0] = 0;
 		}
 
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
-			if (step->type == 0) {
+			if (step->m_type == 0) {
 				light.m_type = 0;
 				light.m_direction.x = 0.0f;
 				light.m_direction.y = 0.0f;
@@ -244,23 +258,23 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 				light.m_spotScale = 0.7853982f;
 				LightPcs.Add(&light);
 			} else {
-				unsigned char* obj;
+				_pppPObject* obj;
 
 				light.m_type = 1;
-				obj = (step->targetIndex == 0xFFFFFFFF)
-						  ? &gPppDefaultValueBuffer[0]
-						  : ((PppLightMngProgramInfo*)ppvMng)->programInfoTable[step->targetIndex].obj;
+				obj = (step->m_targetIndex == 0xFFFFFFFF)
+						  ? reinterpret_cast<_pppPObject*>(&gPppDefaultValueBuffer[0])
+						  : ((PppLightMngProgramInfo*)ppvMng)->programInfoTable[step->m_targetIndex].obj;
 
-					light.m_targetPosition.x = *(f32*)(obj + 0x1c);
-					light.m_targetPosition.y = *(f32*)(obj + 0x2c);
-					light.m_targetPosition.z = *(f32*)(obj + 0x3c);
+					light.m_targetPosition.x = obj->m_localMatrix.value[0][3];
+					light.m_targetPosition.y = obj->m_localMatrix.value[1][3];
+					light.m_targetPosition.z = obj->m_localMatrix.value[2][3];
 					PSMTXMultVec(ppvMng->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
 
 					PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
 					PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);
 					light.m_spotScale = 0.017453292f * work->spotScale;
 
-					if (step->type == 2) {
+					if (step->m_type == 2) {
 						light.m_specularScale = work->specularScale;
 						light.m_specularMode = 1;
 					}

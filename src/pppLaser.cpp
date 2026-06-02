@@ -71,6 +71,11 @@ struct LaserColorData {
     pppCVECTOR m_color;
 };
 
+static inline LaserWork* GetLaserWork(pppLaser* laser, _pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<LaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+}
+
 struct LaserMapCylinder {
     Vec m_bottom;
     Vec m_top;
@@ -95,7 +100,7 @@ STATIC_ASSERT(sizeof(LaserMapCylinder) == sizeof(CMapCylinder));
 void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = LaserConst(kPppLaserZero);
-    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = GetLaserWork(pppLaser, param_2);
     int local_24;
     int local_28;
     int iVar2;
@@ -154,7 +159,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
     f32 fVar1 = LaserConst(kPppLaserZero);
-    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = GetLaserWork(pppLaser, param_2);
 
     work->m_graphValue3 = LaserConst(kPppLaserZero);
     work->m_graphValue2 = fVar1;
@@ -179,7 +184,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
  */
 void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
 {
-    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + param_2->m_serializedDataOffsets[2]);
+    LaserWork* work = GetLaserWork(pppLaser, param_2);
     void* alloc = work->m_points;
     if (alloc != 0) {
         pppHeapUseRate(static_cast<CMemory::CStage*>(alloc));
@@ -216,7 +221,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         return;
     }
 
-    work = (LaserWork*)(pppLaser->m_workArea + param_3->m_serializedDataOffsets[2]);
+    work = GetLaserWork(pppLaser, param_3);
     emptyHistory = 0;
     f32 maxLengthDisabled = LaserConst(kPppLaserNegativeOne);
     if (maxLengthDisabled == work->m_maxLength) {
@@ -376,7 +381,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 {
     pppLaserUnkB* step = param_2;
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    LaserWork* work = (LaserWork*)(pppLaser->m_workArea + serializedDataOffsets[2]);
+    LaserWork* work = GetLaserWork(pppLaser, param_3);
     int colorOffset = serializedDataOffsets[1];
     LaserColorData* colorData = (LaserColorData*)(pppLaser->m_workArea + colorOffset);
     s32 dataValIndex = step->m_dataValIndex;

@@ -151,7 +151,7 @@ struct YmMiasmaFrameStep : PYmMiasma {
 };
 
 template <typename T>
-static inline T* PppWorkArea(_pppPObject* object, pppYmMiasmaUnkC* ctrl, int index)
+static inline T* PppWorkArea(_pppPObject* object, _pppCtrlTable* ctrl, int index)
 {
     return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
@@ -165,7 +165,7 @@ static inline T* PppWorkArea(_pppPObject* object, pppYmMiasmaUnkC* ctrl, int ind
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppYmMiasmaUnkC* param_3)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _pppCtrlTable* param_3)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_3, 2);
     PARTICLE_DATA* particleData = work->m_particles;
@@ -231,7 +231,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmMiasmaUnkC* param_3)
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCtrlTable* param_3)
 {
     VYmMiasma* work;
     PARTICLE_DATA* particle;
@@ -335,7 +335,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     void* heap = work->m_particles;
@@ -354,7 +354,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     float fVar1 = YmMiasmaConst(FLOAT_80330644);
@@ -373,7 +373,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
+void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     float fVar1;
@@ -469,8 +469,7 @@ inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTIC
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    VYmMiasma* vData =
-        PppWorkArea<VYmMiasma>(pppPObject, reinterpret_cast<pppYmMiasmaUnkC*>(pppCtrlTable), 2);
+    VYmMiasma* vData = PppWorkArea<VYmMiasma>(pppPObject, pppCtrlTable, 2);
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 frameCount;
     s16 decayCount;

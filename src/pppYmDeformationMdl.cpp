@@ -38,7 +38,7 @@ struct _pppEnvStYmDeformationMdl {
 };
 
 template <typename T>
-static inline T* PppWorkArea(pppYmDeformationMdl* object, pppYmDeformationMdlUnkC* ctrl, int index)
+static inline T* PppWorkArea(pppYmDeformationMdl* object, _pppCtrlTable* ctrl, int index)
 {
     return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
@@ -79,7 +79,7 @@ static inline float DeformationMdlZero()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3)
 {
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2);
     YmDeformationMdlColorInfo* colorInfo;
@@ -225,7 +225,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3)
 {
     YmDeformationMdlState* state;
 
@@ -264,7 +264,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
+void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
 {
     return;
 }
@@ -278,7 +278,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
     const float& value = kYmDeformationMdlZero;
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
@@ -300,7 +300,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
+void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
     const float& zero = kYmDeformationMdlZero;
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);

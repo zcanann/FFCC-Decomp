@@ -65,6 +65,11 @@ struct pppYmLaserColorData {
 	pppCVECTOR m_color;
 };
 
+static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+}
+
 struct pppYmLaserCylinder {
 	Vec m_bottom;
 	Vec m_top;
@@ -89,7 +94,7 @@ STATIC_ASSERT(sizeof(pppYmLaserCylinder) == sizeof(CMapCylinder));
 extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
 	int* serializedDataOffsets = data->m_serializedDataOffsets;
-	pppYmLaserWork* work = (pppYmLaserWork*)(laser->m_workArea + serializedDataOffsets[2]);
+	pppYmLaserWork* work = GetYmLaserWork(laser, data);
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)(laser->m_workArea + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
@@ -368,7 +373,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	int fillIndex;
 
 	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
-	work = (pppYmLaserWork*)(laser->m_workArea + data->m_serializedDataOffsets[2]);
+	work = GetYmLaserWork(laser, data);
 	emptyHistory = 0;
 
 	if (work->m_points == 0) {
@@ -517,7 +522,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
  */
 extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaserWork* work = (pppYmLaserWork*)(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 	void* stage = work->m_points;
 
 	if (stage != 0) {
@@ -538,7 +543,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 one = kPppYmLaserOne;
-	pppYmLaserWork* work = (pppYmLaserWork*)(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 
 	work->m_graphValue3 = one;
 	work->m_graphValue2 = one;
@@ -565,7 +570,7 @@ extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	f32 one = kPppYmLaserOne;
 	f32 randArg = FLOAT_80330df0[0];
-	pppYmLaserWork* work = (pppYmLaserWork*)(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 
 	work->m_length = one;
 	work->m_graphValue3 = one;

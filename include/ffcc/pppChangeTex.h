@@ -23,20 +23,15 @@ struct pppChangeTexUnkB {
     u8 _pad1[1];
 };
 
-struct pppChangeTexUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructChangeTex(pppChangeTex*, pppChangeTexUnkC*);
-void pppConstruct2ChangeTex(pppChangeTex*, pppChangeTexUnkC*);
-void pppDestructChangeTex(pppChangeTex*, pppChangeTexUnkC*);
-void pppFrameChangeTex(pppChangeTex*, pppChangeTexUnkB*, pppChangeTexUnkC*);
-void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB*, pppChangeTexUnkC*);
+void pppConstructChangeTex(pppChangeTex*, _pppCtrlTable*);
+void pppConstruct2ChangeTex(pppChangeTex*, _pppCtrlTable*);
+void pppDestructChangeTex(pppChangeTex*, _pppCtrlTable*);
+void pppFrameChangeTex(pppChangeTex*, pppChangeTexUnkB*, _pppCtrlTable*);
+void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

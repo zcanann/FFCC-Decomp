@@ -48,10 +48,6 @@ struct VYmMegaBirthShpTail2
 };
 
 struct pppYmMegaBirthShpTail2UnkB;
-struct pppYmMegaBirthShpTail2UnkC {
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
 
 void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
@@ -60,10 +56,10 @@ void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_
 extern "C" {
 #endif
 
-void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, pppYmMegaBirthShpTail2UnkC*);
-void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, pppYmMegaBirthShpTail2UnkC*);
-void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, pppYmMegaBirthShpTail2UnkC*);
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, pppYmMegaBirthShpTail2UnkB*, pppYmMegaBirthShpTail2UnkC*);
+void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, _pppCtrlTable*);
+void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, _pppCtrlTable*);
+void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _pppCtrlTable*);
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, pppYmMegaBirthShpTail2UnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -112,9 +112,9 @@ static inline float ColumSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
+void pppRenderColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param_3)
 {
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     pppColumValue* values;
     pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
     pppColumPositionWork* positionWork =
@@ -254,9 +254,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
+void pppFrameColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param_3)
 {
-    s32* serializedDataOffsets;
+        int* serializedDataOffsets;
     pppColumValue* values;
     pppColumFrameWork* work;
     int i;
@@ -301,9 +301,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
+void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
 {
-    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_2->m_serializedDataOffsets;
     pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
 
     if (work->m_values != 0) {
@@ -321,9 +321,9 @@ void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
+void pppConstructColum(pppColum *column, _pppCtrlTable *param_2)
 {
-    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_2->m_serializedDataOffsets;
     pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
     work->m_shapeC = 0;
     work->m_shapeB = 0;

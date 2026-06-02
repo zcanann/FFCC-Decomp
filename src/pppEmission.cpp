@@ -72,7 +72,7 @@ STATIC_ASSERT(offsetof(EmissionState, m_field1C) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
 
-static inline EmissionState* GetEmissionState(pppEmission* emission, pppEmissionUnkC* ctrl)
+static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<EmissionState*>(
         emission->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
@@ -106,7 +106,7 @@ static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
+void pppRenderEmission(pppEmission*, pppEmissionUnkB*, _pppCtrlTable*) {
     pppInitBlendMode();
 }
 /*
@@ -118,12 +118,12 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEmissionUnkC* param_3) {
+void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppCtrlTable* param_3) {
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     EmissionState* state = GetEmissionState(pppEmission_, param_3);
     u8* dataSet = pppEmission_->m_object.m_workArea + serializedDataOffsets[1];
 
@@ -235,7 +235,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+void pppDestructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
     float baseScale;
     EmissionState* state = GetEmissionState(pppEmission_, param_2);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
@@ -265,7 +265,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+void pppConstruct2Emission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
     float baseScale = FLOAT_803311f8;
     EmissionState* state = GetEmissionState(pppEmission_, param_2);
     state->m_scale2 = baseScale;
@@ -282,7 +282,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
+void pppConstructEmission(pppEmission* pppEmission_, _pppCtrlTable* param_2) {
     float baseScale = FLOAT_803311f8;
     EmissionState* state = GetEmissionState(pppEmission_, param_2);
 

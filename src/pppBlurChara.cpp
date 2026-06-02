@@ -52,7 +52,7 @@ extern const double DOUBLE_80331058;
 
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
-static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
+static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* data) {
     return (pppBlurCharaWork*)(blurChara->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 }
 
@@ -76,7 +76,7 @@ struct BlurCharaTexData {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
+void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _pppCtrlTable* param_3)
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
@@ -238,7 +238,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
+void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _pppCtrlTable* param_3)
 {
     pppBlurCharaWork* work;
     CCharaPcs::CHandle* handle;
@@ -278,7 +278,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
+void pppDestructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
@@ -310,7 +310,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
+void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     CGObject* ownerObj = ppvMng->m_lookTarget;

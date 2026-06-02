@@ -53,7 +53,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             obj = 0;
         } else {
             obj = pppCreatePObject(ppvMng, objData);
-            *(_pppPObject**)((u8*)obj + 4) = pObject;
+            obj->m_link.m_previous = &pObject->m_link;
         }
 
         Vec* dst = (Vec*)(obj->m_workArea + payload->m_childDstOffset);

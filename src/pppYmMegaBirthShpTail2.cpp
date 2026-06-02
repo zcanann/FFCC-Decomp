@@ -36,14 +36,14 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, pppYmMegaBirthShpTail2UnkC* offsets)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, _pppCtrlTable* offsets)
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
     const u32 dataValIndex = *(u32*)(step + 4);
     const s32 colorOffset = offsets->m_serializedDataOffsets[1];
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
-    VColor* colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
+    VColor* colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
@@ -57,7 +57,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+    pppShapeAnimData* shapeAnim =
+        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x57])) >> 5);
     pppSetDrawEnv(
         0, &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x0C],
@@ -74,7 +75,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             Vec managerPos;
             Vec zeroVec;
             GXColor amb;
-            const s16 shapeOffset = *(s16*)(shapeTable + (u16)*(u16*)(particle + 0x20) * 8 + 0x10);
+            const u16 shapeFrameIndex = *(u16*)(particle + 0x20);
+            pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
+            tagOAN3_SHAPE* shape =
+                reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeFrame->m_shapeOffset);
             const u8 trailReadIndex = *(u8*)(particle + 0x38);
             const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
             u8 trailNextIndex = (u8)(trailReadIndex + 1);
@@ -153,8 +157,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     amb.b = (u8)fadeB;
                     amb.a = (u8)(fadeA * (FLOAT_8033056C * (FLOAT_80330570 - *(float*)(particle + 0x30))));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
-                    pppDrawShp(
-                        reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), ppvEnv->m_materialSetPtr, payload[0x5A]);
+                    pppDrawShp(shape, ppvEnv->m_materialSetPtr, payload[0x5A]);
                 }
 
                 frameCount--;
@@ -220,7 +223,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
  * PAL Address: 0x8008b3f4
  * PAL Size: 1072b
  */
-void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, pppYmMegaBirthShpTail2UnkC* offsets)
+void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, _pppCtrlTable* offsets)
 {
     s8 hasRequiredMemory;
     u32 i;
@@ -233,8 +236,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     VYmMegaBirthShpTail2* const work =
-        (VYmMegaBirthShpTail2*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
-    VColor* const colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
+        (VYmMegaBirthShpTail2*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + offsets->m_serializedDataOffsets[2]);
+    VColor* const colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -380,8 +383,8 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
     u8 fadeInFrames;
     u8 historyIndex;
     u16 frameIndex;
-    int colorTable;
-    int frameEntry;
+    pppShapeAnimData* shapeAnim;
+    pppShapeAnimFrame* frameEntry;
     Vec scaled;
 
     *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
@@ -424,25 +427,26 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
                  (Vec*)(color + historyIndex * sizeof(VColor) + 0x40));
 
     frameIndex = *(u16*)(color + 0x1e);
-    colorTable = reinterpret_cast<int>(
+    shapeAnim =
+        static_cast<pppShapeAnimData*>(
         ppvEnv->m_resourceTables
             .m_shapeTablePtr[*reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 4)]
             ->m_animData);
     *(u16*)(color + 0x20) = frameIndex;
 
-    frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
+    frameEntry = &shapeAnim->m_frames[frameIndex];
     *(u16*)(color + 0x1c) =
         *(u16*)(color + 0x1c) + *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
     int elapsedFrame = *(u16*)(color + 0x1c);
-    int frameDuration = *(s16*)(frameEntry + 2);
+    int frameDuration = frameEntry->m_duration;
     if ((int)elapsedFrame < frameDuration) {
         return;
     }
 
     *(u16*)(color + 0x1c) = (u16)(elapsedFrame - frameDuration);
     *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
-    if ((int)*(u16*)(color + 0x1e) >= *(s16*)(colorTable + 6)) {
-        if ((*(u8*)(frameEntry + 4) & 0x80) != 0) {
+    if ((int)*(u16*)(color + 0x1e) >= shapeAnim->m_frameCount) {
+        if ((frameEntry->m_flags & 0x80) != 0) {
             *(u16*)(color + 0x1e) = 0;
             *(u16*)(color + 0x1c) = 0;
         } else {
@@ -545,7 +549,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][1] *= param->m_speedScale.x;
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
     } else if (mode < 10) {
-        float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
+        float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
             short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + param->m_tail2PathIndex * 8);
@@ -685,9 +689,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
+void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
-    u8* work = (u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2];
+    u8* work = reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2];
     void** ptrBc = (void**)(work + 0x3c);
     void** ptrC0 = (void**)(work + 0x40);
     void** ptrC4 = (void**)(work + 0x44);
@@ -715,9 +719,9 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBir
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
+void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
-    pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
+    pppFMATRIX* work = (pppFMATRIX*)(reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix(*work);

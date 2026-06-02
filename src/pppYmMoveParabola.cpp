@@ -15,7 +15,7 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
-static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, pppYmMoveParabolaUnkC* ctrl)
+static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
@@ -39,7 +39,7 @@ static inline Vec* ParabolaBasePosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
+extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData)
 {
     if (ppvUserStopPartF != 0) {
         return;
@@ -109,7 +109,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
+extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
 {
     const f32 zero = gPppYmMoveParabolaZero;
     _pppMngSt* pppMngSt = ppvMng;

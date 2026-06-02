@@ -142,8 +142,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XWork* work;
-    long* shapeEntry;
-    u8* shapeData;
+    tagOAN3_SHAPE* shapeEntry;
+    pppShapeAnimData* shapeAnim;
     int count;
     float alphaMul;
     float colorR;
@@ -170,8 +170,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segDz;
     u16 rng;
     int life;
-    s32 shapeSetCount;
-    s32 shapeCount;
+    s32 shapeFrameDuration;
+    s32 shapeFrameCount;
     float shapeScale;
     float shapeScaleStep;
     float trailStep;
@@ -228,7 +228,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    shapeData = static_cast<u8*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -265,9 +265,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     segRemain = segLen;
     segCursor = kPppKeShpTail3XZero;
     life = work->m_shapeData;
-    shapeSetCount = *(s16*)(shapeData + 0x12);
+    shapeFrameDuration = shapeAnim->m_frames[0].m_duration;
     rng = work->m_rand;
-    shapeCount = *(s16*)(shapeData + 6);
+    shapeFrameCount = shapeAnim->m_frameCount;
 
     if (step->m_drawFirst == 0) {
         goto update_step;
@@ -281,8 +281,9 @@ draw_loop:
         rng = (u16)lcg;
         drawScale *= -(((float)rng / kPppKeShpTail3XRandomMax) * step->m_randomScale - kPppKeShpTail3XOne);
         {
-            u32 shapeIdx = (u32)(life + rng) / shapeSetCount;
-            shapeEntry = (long*)(shapeData + *(s16*)(shapeData + (shapeIdx % (u32)shapeCount) * 8 + 0x10));
+            u32 shapeIdx = (u32)(life + rng) / shapeFrameDuration;
+            pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeIdx % (u32)shapeFrameCount];
+            shapeEntry = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
         }
     }
 
@@ -334,7 +335,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), ppvEnv->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(shapeEntry, ppvEnv->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;

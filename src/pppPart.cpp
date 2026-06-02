@@ -2075,13 +2075,13 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
 		{
 			_pppPObjLink* next = obj->m_next;
-			if (((u8*)obj)[0x7C] == 0)
+			if (((_pppPObject*)obj)->m_field7C == 0)
 			{
 				_pppPDataVal* owner = (_pppPDataVal*)obj->m_owner;
 				_pppProgSetDef* progSet = owner->m_programSetDef;
 				int stageIdx = 0;
 
-				*(u32*)(((u8*)obj) + 0x0C) += 0x1000;
+				((_pppPObject*)obj)->m_graphId += 0x1000;
 
 				for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 				{
@@ -2089,23 +2089,23 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 					u32* stageSlot = *(u32**)(((u8*)obj) + stageSlotOffset);
 					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
-					if (*nextSlot == *(u32*)(((u8*)obj) + 0x0C))
+					if (*nextSlot == (u32)((_pppPObject*)obj)->m_graphId)
 					{
 						*(u32**)(((u8*)obj) + stageSlotOffset) = nextSlot;
 					}
 				}
 
 				if (mng->m_loopMode != 0 &&
-					*(u32*)(((u8*)obj) + 0x0C) >= progSet->m_loopFrame &&
+					(u32)((_pppPObject*)obj)->m_graphId >= (u32)progSet->m_loopFrame &&
 					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
 				{
-					*(u32*)(((u8*)obj) + 0x0C) = progSet->m_endFrame;
+					((_pppPObject*)obj)->m_graphId = progSet->m_endFrame;
 					callCon2Prog((_pppPObject*)obj);
 				}
 				else
 				{
 					maxDeleteFrame |= progSet->m_deadFrame;
-					if (*(u32*)(((u8*)obj) + 0x0C) >= progSet->m_deadFrame)
+					if ((u32)((_pppPObject*)obj)->m_graphId >= (u32)progSet->m_deadFrame)
 					{
 						prev->m_next = next;
 

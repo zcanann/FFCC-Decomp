@@ -8,11 +8,6 @@
 // Forward declarations
 struct VYmDeformationMdl;
 
-struct pppYmDeformationMdlUnkC {
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
 struct pppYmDeformationMdlUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -43,11 +38,11 @@ void SetUpIndWarp(VYmDeformationMdl*);
 extern "C" {
 #endif
 
-void pppConstructYmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
-void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
-void pppDestructYmDeformationMdl(pppYmDeformationMdl*, struct pppYmDeformationMdlUnkC*);
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3);
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3);
+void pppConstructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
+void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*);
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3);
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

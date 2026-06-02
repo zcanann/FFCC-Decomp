@@ -13,7 +13,6 @@ extern const float FLOAT_80331020;
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
-#include <stddef.h>
 extern const char s_pppRain_cpp[] = "pppRain.cpp";
 
 struct RainColorData {
@@ -59,8 +58,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 {
     int i;
     int colorOffset;
-    int workOffset;
     RainColorData* colorData;
+    RainWork* work;
     RainDrop* drop;
     float tex1;
     float tex0;
@@ -70,8 +69,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     Vec segment;
 
     colorOffset = param_3->m_serializedDataOffsets[1];
-    workOffset = param_3->m_serializedDataOffsets[2] + offsetof(_pppPObject, m_workArea);
     colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
+    work = GetRainWork(pppRain, param_3);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -93,7 +92,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
     gUtil.SetVtxFmt_POS_CLR_TEX();
 
-    drop = *(RainDrop**)((u8*)pppRain + workOffset);
+    drop = work->drops;
     baseX = ppvMng->m_matrix.value[0][3];
     baseY = ppvMng->m_matrix.value[1][3];
     baseZ = ppvMng->m_matrix.value[2][3];

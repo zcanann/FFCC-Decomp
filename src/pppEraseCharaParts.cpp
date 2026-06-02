@@ -26,11 +26,11 @@ static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s3
  * JP Size: TODO
  */
 void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2,
-                             pppEraseCharaPartsUnkC* param_3)
+                             _pppCtrlTable* param_3)
 {
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    s32* offsets;
+    int* offsets;
     int colorIndex;
     u8* dstColor;
     u8* srcColor;
@@ -63,7 +63,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
+void pppDestructEraseCharaParts(pppEraseCharaParts*, _pppCtrlTable*)
 {
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -83,9 +83,9 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkC* param_2)
+void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, _pppCtrlTable* param_2)
 {
-    s32* serializedDataOffsets;
+    int* serializedDataOffsets;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     u8* colorPtr;

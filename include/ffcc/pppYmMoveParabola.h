@@ -16,19 +16,12 @@ struct pppYmMoveParabolaUnkB {
     f32 m_payload;
 };
 
-struct pppYmMoveParabolaUnkC {
-    u32 _pad0x00;
-    u32 _pad0x04;
-    u32 _pad0x08;
-    s32* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr);
-void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData);
+void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr);
+void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData);
 
 #ifdef __cplusplus
 }

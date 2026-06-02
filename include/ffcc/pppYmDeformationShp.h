@@ -30,22 +30,17 @@ struct pppYmDeformationShpUnkB {
     u8 m_alpha;
     u8 m_pad_0x32[0xA];
 };
-struct pppYmDeformationShpUnkC {
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
 int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
-void pppConstruct2YmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
-void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
-void pppFrameYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
-void pppRenderYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
+void pppConstructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*);
+void pppConstruct2YmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*);
+void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*);
+void pppFrameYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, _pppCtrlTable*);
+void pppRenderYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

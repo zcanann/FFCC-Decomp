@@ -6,16 +6,13 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+struct _pppCtrlTable;
 struct PYmMana;
 struct VYmMana;
 struct CTexture;
 struct CGObject;
 struct Vec2d;
 struct pppYmManaUnkB;
-struct pppYmManaUnkC {
-    u8 _pad0[0x0c];
-    s32* m_serializedDataOffsets;
-};
 
 void SetEnvMap(PYmMana*, VYmMana*);
 void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
@@ -28,10 +25,10 @@ void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned
 extern "C" {
 #endif
 
-void pppConstructYmMana(PYmMana*, pppYmManaUnkC*);
-void pppDestructYmMana(PYmMana*, pppYmManaUnkC*);
-void pppFrameYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*);
-void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*);
+void pppConstructYmMana(PYmMana*, _pppCtrlTable*);
+void pppDestructYmMana(PYmMana*, _pppCtrlTable*);
+void pppFrameYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*);
+void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -31,11 +31,6 @@ struct pppYmTracer2UnkB {
     };
 };
 
-struct pppYmTracer2UnkC {
-    u8 _pad[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 struct pppYmTracer2 {
     _pppPObject m_object;
 };
@@ -44,11 +39,11 @@ struct pppYmTracer2 {
 extern "C" {
 #endif
 
-void pppConstructYmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);
-void pppConstruct2YmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);
-void pppDestructYmTracer2(pppYmTracer2*, pppYmTracer2UnkC*);
-void pppFrameYmTracer2(pppYmTracer2*, pppYmTracer2UnkB*, pppYmTracer2UnkC*);
-void pppRenderYmTracer2(pppYmTracer2*, pppYmTracer2UnkB*, pppYmTracer2UnkC*);
+void pppConstructYmTracer2(pppYmTracer2*, _pppCtrlTable*);
+void pppConstruct2YmTracer2(pppYmTracer2*, _pppCtrlTable*);
+void pppDestructYmTracer2(pppYmTracer2*, _pppCtrlTable*);
+void pppFrameYmTracer2(pppYmTracer2*, pppYmTracer2UnkB*, _pppCtrlTable*);
+void pppRenderYmTracer2(pppYmTracer2*, pppYmTracer2UnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

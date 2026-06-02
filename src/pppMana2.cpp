@@ -886,8 +886,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     s32 i;
 
     work = static_cast<VMana2*>(param_2);
+    pppMana2UnkB* step = static_cast<pppMana2UnkB*>(param_3);
     baseParaboloidTexObjs = work->m_baseParaboloidTexObjs;
-    if (*(u8*)((char*)param_3 + 0x1C) == 0) {
+    if (step->m_type == 0) {
         return;
     }
 
@@ -921,7 +922,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
     sourceTexObjs = work->m_sourceTexObjs;
 
-    if (*(u8*)((char*)param_3 + 0x38) != 0) {
+    if (step->m_rippleLevel != 0) {
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
@@ -1008,7 +1009,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     }
 
     envTexObj0 = &work->m_envTexture0->m_texObj;
-    if (*(u8*)((char*)param_3 + 0x38) == 0) {
+    if (step->m_rippleLevel == 0) {
         if (work->m_paraboloidReady == 0) {
             GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
                          (_GXTexWrapMode)1, GX_FALSE);
@@ -1050,7 +1051,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
+void pppRenderMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*)
 {
     Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
     GXSetNumTevStages(1);
@@ -1069,7 +1070,7 @@ void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* param_3)
+void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
     VMana2* mana2Work;
@@ -1090,9 +1091,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    mana2Work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
+    mana2Work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_3->m_serializedDataOffsets[2]);
     setupOffset = param_3->m_serializedDataOffsets[1];
-    setup = (u8*)pppMana2 + 0x80 + setupOffset;
+    setup = reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + setupOffset;
     if (gObject == NULL) {
         return;
     }
@@ -1306,7 +1308,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     VMana2* work;
     CGObject* gObject;
@@ -1317,7 +1319,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 i;
     u32 j;
 
-    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_2->m_serializedDataOffsets[2]);
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
@@ -1457,7 +1460,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     CGObject* gObject;
     CCharaPcs::CHandle* handle;
@@ -1466,7 +1469,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     s32 workOffset;
 
     workOffset = param_2->m_serializedDataOffsets[2];
-    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + workOffset);
+    work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + workOffset);
     gObject = (CGObject*)ppvMng->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
@@ -1531,7 +1535,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     VMana2* mana2 = (VMana2*)work;
-    int type = *(u8*)((char*)step + 0x1C);
+    pppMana2UnkB* stepData = static_cast<pppMana2UnkB*>(step);
+    int type = stepData->m_type;
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;
     u32* dlEntry = (u32*)(meshData->m_displayLists + dlIndex);
@@ -1554,8 +1559,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     int waterCmp = strcmp(shape, s_manaShapeObj4);
-    if ((waterCmp == 0 && *(u8*)((char*)step + 0x1C) == 1) ||
-        (strcmp(shape, s_manaShapeObj2) == 0 && *(u8*)((char*)step + 0x1C) == 2)) {
+    if ((waterCmp == 0 && type == 1) || (strcmp(shape, s_manaShapeObj2) == 0 && type == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
@@ -1572,7 +1576,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         PSMTXConcat(mtx, rotMtx, mtx);
 
         offset.x = LoadFloat(FLOAT_80331898);
-        offset.y = *(float*)((char*)step + 0x30);
+        offset.y = stepData->m_waterScale;
         offset.z = LoadFloat(FLOAT_80331898);
         PSMTXMultVec(mtx, &offset, &offset);
 

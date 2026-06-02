@@ -10,10 +10,12 @@ struct VertexApLcEntry
     u16* vertexIndices;
 };
 
+struct VertexApLcSource;
+
 struct VertexApLcEnv
 {
     u8 unk0[0x8];
-    void* unk8;
+    VertexApLcSource** sourceTable;
     u8 unkC[0x4];
     VertexApLcEntry* entries;
 };
@@ -81,8 +83,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
         entry = &env->entries[data->entryIndex];
 
         if (points == 0) {
-            u32* srcTable = *(u32**)((u8*)env + 0x8);
-            VertexApLcSource* src = *(VertexApLcSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
+            VertexApLcSource* src = env->sourceTable[entry->vertexSetIndex];
             points = src->points;
         }
 
@@ -112,7 +113,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         child = 0;
                     } else {
                         child = pppCreatePObject(ppvMng, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
+                        child->m_link.m_previous = &parent->m_link;
                     }
 
                     Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);
@@ -143,7 +144,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         child = 0;
                     } else {
                         child = pppCreatePObject(ppvMng, childData);
-                        *(void**)((u8*)child + 0x4) = parent;
+                        child->m_link.m_previous = &parent->m_link;
                     }
 
                     Vec* dst = (Vec*)(child->m_workArea + data->childPosOffset);

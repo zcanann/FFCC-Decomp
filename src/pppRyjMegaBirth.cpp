@@ -936,7 +936,7 @@ void birth(
 	} else if (*(s8*)(payload + 0x2A) < 10) {
 		u8 speedMode = payload[0xE8];
 		s16 pathIndex = *s16_at(payload, 0xF0);
-		Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
+		Vec* pathBase = reinterpret_cast<Vec*>(pObject->m_drawMatrixPtr);
 
 		if (pathIndex >= 0) {
 			s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);

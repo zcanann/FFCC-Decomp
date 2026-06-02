@@ -8,7 +8,6 @@ struct POLYGON_DATA;
 struct PCharaBreak;
 struct VCharaBreak;
 struct CharaBreakUnkB;
-struct CharaBreakUnkC;
 
 void CreatePolygon(POLYGON_DATA*, void*, unsigned long, CChara::CModel*, CChara::CMesh*);
 void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned long, CChara::CModel*, CChara::CMesh*);
@@ -39,20 +38,15 @@ struct CharaBreakUnkB {
     u8 _pad43;
 };
 
-struct CharaBreakUnkC {
-    unsigned char _pad0[0xC];
-    int* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructCharaBreak(pppCharaBreak*, CharaBreakUnkC*);
-void pppConstruct2CharaBreak(pppCharaBreak*, CharaBreakUnkC*);
-void pppDestructCharaBreak(pppCharaBreak*, CharaBreakUnkC*);
-void pppFrameCharaBreak(pppCharaBreak*, CharaBreakUnkB*, CharaBreakUnkC*);
-void pppRenderCharaBreak(pppCharaBreak*, CharaBreakUnkB*, CharaBreakUnkC*);
+void pppConstructCharaBreak(pppCharaBreak*, _pppCtrlTable*);
+void pppConstruct2CharaBreak(pppCharaBreak*, _pppCtrlTable*);
+void pppDestructCharaBreak(pppCharaBreak*, _pppCtrlTable*);
+void pppFrameCharaBreak(pppCharaBreak*, CharaBreakUnkB*, _pppCtrlTable*);
+void pppRenderCharaBreak(pppCharaBreak*, CharaBreakUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

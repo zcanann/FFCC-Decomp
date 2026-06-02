@@ -2530,10 +2530,10 @@ void CGCharaObj::statAttack()
 		reqAnim(m_attackAnimId, 0, 0);
 	}
 
-	if (m_stateFrame == static_cast<unsigned int>(m_castFrameStart)) {
+	if (m_stateFrame == m_castFrameStart) {
 		enableAttackCol(1, 0, 0);
 	}
-	if (m_stateFrame == static_cast<unsigned int>(m_castFrameEnd)) {
+	if (m_stateFrame == m_castFrameEnd) {
 		enableAttackCol(0, 0, 0);
 	}
 

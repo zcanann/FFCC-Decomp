@@ -31,6 +31,16 @@ extern "C" const double DOUBLE_80332FA0 = 0.5;
 unsigned int s_Money = 0;
 signed char s_place[16];
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
 STATIC_ASSERT(offsetof(CMenuPcs, moneyFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, singWindowInfo) == 0x848);
@@ -508,18 +518,18 @@ bool CMenuPcs::MoneyClose()
 		}
 
 		if (anim->startFrame + anim->duration <= frame) {
-			float zero = FLOAT_80332f64;
+			float zero = LoadFloat(FLOAT_80332f64);
 			finished++;
 			anim->alpha = zero;
 			anim->dx = zero;
 			anim->dy = zero;
 		} else {
 			anim->frame++;
-			double one = DOUBLE_80332F90;
+			double one = LoadDouble(DOUBLE_80332F90);
 			double duration = (double)anim->duration;
 			double animFrame = (double)anim->frame;
-			double rate = DOUBLE_80332F90 / duration;
-			anim->alpha = (float)(DOUBLE_80332F90 - rate * animFrame);
+			double rate = one / duration;
+			anim->alpha = (float)(one - rate * animFrame);
 			if ((anim->flags & 2) == 0) {
 				duration = (double)anim->duration;
 				animFrame = (double)anim->frame;
@@ -575,7 +585,7 @@ int CMenuPcs::MoneyCtrl()
 
 	if (result != 0) {
 		MoneyMenuAnim* anim = this->moneyPanel->anims;
-		anim->alpha = FLOAT_80332f70;
+		anim->alpha = LoadFloat(FLOAT_80332f70);
 		anim->startFrame = 0;
 		anim->duration = 10;
 		anim->frame = 0;

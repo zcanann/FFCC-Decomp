@@ -40,6 +40,16 @@ extern "C" const char s_MenuOptionNorm_803334E8[];
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -317,16 +327,16 @@ bool CMenuPcs::CompaClose()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = FLOAT_80332FF8;
-                entry->dx = FLOAT_80332FF8;
-                entry->dy = FLOAT_80332FF8;
+                entry->alpha = LoadFloat(FLOAT_80332FF8);
+                entry->dx = LoadFloat(FLOAT_80332FF8);
+                entry->dy = LoadFloat(FLOAT_80332FF8);
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
-                    (float)(DOUBLE_80333008 - (DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                    (float)(LoadDouble(DOUBLE_80333008) - (LoadDouble(DOUBLE_80333008) / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
                     float step =
-                        (float)(DOUBLE_80333008 - (DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                        (float)(LoadDouble(DOUBLE_80333008) - (LoadDouble(DOUBLE_80333008) / (double)entry->duration) * (double)entry->frame);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
                     entry->dx = dx * step;
@@ -458,7 +468,7 @@ noReset:
 		CompaOpenAnim* entry = compaList->entries;
 		while (entryCount != 0) {
 			entry->frame = 0;
-			entry->alpha = FLOAT_80333000;
+			entry->alpha = LoadFloat(FLOAT_80333000);
 			entry++;
 			entryCount--;
 		}
@@ -494,14 +504,14 @@ bool CMenuPcs::CompaOpen()
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
-                entry->alpha = FLOAT_80333000;
-                entry->dx = FLOAT_80332FF8;
-                entry->dy = FLOAT_80332FF8;
+                entry->alpha = LoadFloat(FLOAT_80333000);
+                entry->dx = LoadFloat(FLOAT_80332FF8);
+                entry->dy = LoadFloat(FLOAT_80332FF8);
             } else {
                 entry->frame = entry->frame + 1;
-                entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                entry->alpha = (float)((LoadDouble(DOUBLE_80333008) / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
-                    float step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                    float step = (float)((LoadDouble(DOUBLE_80333008) / (double)entry->duration) * (double)entry->frame);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
                     entry->dx = dx * step;
@@ -532,16 +542,17 @@ void CMenuPcs::CompaInit()
 	memset(this->compaList, 0, sizeof(*this->compaList));
 
 	CompaOpenAnim* entry = this->compaList->entries;
+	float one = LoadFloat(FLOAT_80333000);
 	int count = 8;
 	do {
-		entry[0].uvScale = FLOAT_80333000;
-		entry[1].uvScale = FLOAT_80333000;
-		entry[2].uvScale = FLOAT_80333000;
-		entry[3].uvScale = FLOAT_80333000;
-		entry[4].uvScale = FLOAT_80333000;
-		entry[5].uvScale = FLOAT_80333000;
-		entry[6].uvScale = FLOAT_80333000;
-		entry[7].uvScale = FLOAT_80333000;
+		entry[0].uvScale = one;
+		entry[1].uvScale = one;
+		entry[2].uvScale = one;
+		entry[3].uvScale = one;
+		entry[4].uvScale = one;
+		entry[5].uvScale = one;
+		entry[6].uvScale = one;
+		entry[7].uvScale = one;
 		entry += 8;
 	} while (--count != 0);
 

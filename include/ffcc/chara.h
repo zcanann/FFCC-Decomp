@@ -20,8 +20,7 @@ struct Vec;
 struct CCharaModelData
 {
     u8 _pad0[0x8];
-    u16 m_nodeCount;
-    u16 _pad0A;
+    u32 m_nodeCount;
     u32 m_meshCount;
     void* m_nodeRefData;
     void* m_meshRefData;
@@ -124,36 +123,25 @@ public:
 		class CRefData
 		{
 		public:
-			struct InfoFields
-			{
-				u8 _bindPad[0x28];          // 0x3C
-				u8 m_dynParamIndex;         // 0x64
-				u8 _pad65[0x03];            // 0x65
-				s16 m_parentIndex;          // 0x68
-				u8 m_childCount;            // 0x6A
-				u8 _pad6B;                  // 0x6B
-				u16 m_childBankOffset;      // 0x6C
-				u8 m_usesParentLenX;        // 0x6E
-				u8 _pad6F;                  // 0x6F
-				float m_boneLen;            // 0x70
-				char m_name[0x10];          // 0x74
-				char m_altName[0x10];       // 0x84
-			};
-
 			CRefData();
 			~CRefData();
 
-			u16 m_index;                    // 0x00
-			u8 m_type;                      // 0x02
-			u8 _pad03;                      // 0x03
-			s8 m_displayIndex;              // 0x04
-			u8 _pad05[0x07];                // 0x05
-			Mtx m_localMtx;                 // 0x0C
-			union
-			{
-				Mtx m_bindMtx;              // 0x3C
-				InfoFields m_info;          // 0x3C
-			};
+			Mtx m_localMtx;                 // 0x00
+			Mtx m_bindMtx;                  // 0x30
+			float m_boneLen;                // 0x60
+			s16 m_childBankOffset;          // 0x64
+			u16 m_index;                    // 0x66
+			s16 m_parentIndex;              // 0x68
+			char m_name[0x10];              // 0x6A
+			char m_altName[0x10];           // 0x7A
+			u8 m_childCount;                // 0x8A
+			u8 m_type;                      // 0x8B
+			u8 m_bindFlags;                 // 0x8C
+			s8 m_displayIndex;              // 0x8D
+			u8 m_miscFlags;                 // 0x8E
+			u8 m_usesParentLenX;            // 0x8F
+			u8 m_dynParamIndex;             // 0x90
+			u8 _pad91[0x03];                // 0x91
 		};
 
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);

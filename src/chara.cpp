@@ -71,6 +71,7 @@ STATIC_ASSERT(offsetof(CChara::CAnimNode, m_flags) == 0x14);
 typedef CCharaModelData CCharaModelRefRaw;
 
 STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeCount) == 0x08);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshCount) == 0x0C);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x10);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x14);
@@ -85,15 +86,21 @@ STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x6C);
 STATIC_ASSERT(offsetof(CChara::CNode, m_dynPosition) == 0xA4);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(CChara::CNode::CRefData) == 0x94);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_localMtx) == 0x0C);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_bindMtx) == 0x3C);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_info) == 0x3C);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_dynParamIndex) == 0x28);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_parentIndex) == 0x2C);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_childBankOffset) == 0x30);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_boneLen) == 0x34);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_name) == 0x38);
-STATIC_ASSERT(offsetof(CChara::CNode::CRefData::InfoFields, m_altName) == 0x48);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_localMtx) == 0x00);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_bindMtx) == 0x30);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_boneLen) == 0x60);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_childBankOffset) == 0x64);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_index) == 0x66);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_parentIndex) == 0x68);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_name) == 0x6A);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_altName) == 0x7A);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_childCount) == 0x8A);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_type) == 0x8B);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_bindFlags) == 0x8C);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_displayIndex) == 0x8D);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_miscFlags) == 0x8E);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_usesParentLenX) == 0x8F);
+STATIC_ASSERT(offsetof(CChara::CNode::CRefData, m_dynParamIndex) == 0x90);
 
 typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
 typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
@@ -118,7 +125,7 @@ static inline u16 ModelMeshCount(CChara::CModel* model)
 	return model->m_data->m_meshCount;
 }
 
-static inline u16 ModelNodeCount(CChara::CModel* model)
+static inline u32 ModelNodeCount(CChara::CModel* model)
 {
 	return model->m_data->m_nodeCount;
 }
@@ -355,17 +362,17 @@ static inline u32 CharaFourCC(char a, char b, char c, char d)
 
 static inline char* NodeRefName(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_name;
+	return node->m_refData->m_name;
 }
 
 static inline char* NodeRefAltName(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_altName;
+	return node->m_refData->m_altName;
 }
 
 static inline u8& NodeDynParamIndex(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_dynParamIndex;
+	return node->m_refData->m_dynParamIndex;
 }
 
 static inline u16 NodeRefIndex(CChara::CNode* node)
@@ -375,27 +382,27 @@ static inline u16 NodeRefIndex(CChara::CNode* node)
 
 static inline s16 NodeParentIndex(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_parentIndex;
+	return node->m_refData->m_parentIndex;
 }
 
 static inline u8 NodeChildCount(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_childCount;
+	return node->m_refData->m_childCount;
 }
 
-static inline u16 NodeChildBankOffset(CChara::CNode* node)
+static inline s16 NodeChildBankOffset(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_childBankOffset;
+	return node->m_refData->m_childBankOffset;
 }
 
 static inline u8 NodeUsesParentLenX(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_usesParentLenX;
+	return node->m_refData->m_usesParentLenX;
 }
 
 static inline float NodeBoneLen(CChara::CNode* node)
 {
-	return node->m_refData->m_info.m_boneLen;
+	return node->m_refData->m_boneLen;
 }
 
 static inline MtxPtr NodeWorldMtx(CChara::CNode* node)
@@ -1841,9 +1848,8 @@ int CChara::CModel::SearchNode(char* name)
 {
 	u32 index = 0;
 	CNode* node = ModelNodes(this);
-	u32 nodeCount = ModelNodeCount(this);
 
-	while (index < nodeCount) {
+	while (index < ModelNodeCount(this)) {
 		if (strcmp(NodeRefName(node), name) == 0) {
 			return (int)index;
 		}
@@ -1868,8 +1874,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 	if (*name == '_') {
 		if (name[1] == 's' && name[2] == 'k') {
 			CNode* node = ModelNodes(this);
-			u32 nodeCount = ModelNodeCount(this);
-			for (u32 i = 0; i < nodeCount; i++) {
+			for (u32 i = 0; i < ModelNodeCount(this); i++) {
 				char* nodeName = NodeRefName(node);
 				int len = strlen(nodeName);
 				if ((len - 3) > 0 && strcmp(nodeName + len - 3, name) == 0) {
@@ -1879,8 +1884,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 			}
 		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
 			CNode* node = ModelNodes(this);
-			u32 nodeCount = ModelNodeCount(this);
-			for (u32 i = 0; i < nodeCount; i++) {
+			for (u32 i = 0; i < ModelNodeCount(this); i++) {
 				char* nodeName = NodeRefName(node);
 				int len = strlen(nodeName);
 				if ((len - 5) > 0 && strcmp(nodeName + len - 5, name) == 0) {
@@ -1891,8 +1895,7 @@ int CChara::CModel::SearchNodeSk(char* name)
 		}
 	} else {
 		CNode* node = ModelNodes(this);
-		u32 nodeCount = ModelNodeCount(this);
-		for (u32 i = 0; i < nodeCount; i++) {
+		for (u32 i = 0; i < ModelNodeCount(this); i++) {
 			if (strcmp(NodeRefName(node), name) == 0) {
 				return (int)i;
 			}
@@ -2446,41 +2449,40 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 	void* nodeRefBase = modelRef->m_nodeRefData;
 	u8* nodeRef = reinterpret_cast<u8*>((u8*)nodeRefBase + (idx * 0x94));
 	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(nodeRef);
-	*reinterpret_cast<u16*>(nodeRef + 0x0) = idx;
-	*(nodeRef + 0x2) = static_cast<u8>(type);
-	*(nodeRef + 0x4) = 0xFF;
-	*(nodeRef + 0x64) = 0;
+	m_refData->m_index = idx;
+	m_refData->m_type = static_cast<u8>(type);
+	m_refData->m_dynParamIndex = 0xFF;
+	m_refData->m_bindFlags = 0;
 
 	CChunkFile::CChunk chunkInfo;
 	chunk.PushChunk();
 	while (chunk.GetNextChunk(chunkInfo)) {
 		switch (chunkInfo.m_id) {
 		case 0x494E464F:
-			*reinterpret_cast<u16*>(nodeRef + 0x68) = static_cast<u16>(chunk.Get4());
-			*(nodeRef + 0x6A) = static_cast<u8>(chunk.Get4());
-			*reinterpret_cast<u16*>(nodeRef + 0x6C) = static_cast<u16>(chunk.Get4());
-			*(nodeRef + 0x6E) = static_cast<u8>(chunk.Get4());
+			m_refData->m_parentIndex = static_cast<s16>(chunk.Get4());
+			m_refData->m_childCount = static_cast<u8>(chunk.Get4());
+			m_refData->m_childBankOffset = static_cast<s16>(chunk.Get4());
+			m_refData->m_usesParentLenX = static_cast<u8>(chunk.Get4());
 			break;
 		case 0x42494E46:
-			*(nodeRef + 0x64) = static_cast<u8>(chunk.Get4());
-			*reinterpret_cast<float*>(nodeRef + 0x70) = chunk.GetF4();
+			m_refData->m_bindFlags = static_cast<u8>(chunk.Get4());
+			m_refData->m_boneLen = chunk.GetF4();
 			break;
 		case 0x4E414D45:
-			strcpy(reinterpret_cast<char*>(nodeRef + 0x74), chunk.GetString());
+			strcpy(m_refData->m_name, chunk.GetString());
 			break;
 		case 0x4E414D32:
-			strcpy(reinterpret_cast<char*>(nodeRef + 0x84), chunk.GetString());
+			strcpy(m_refData->m_altName, chunk.GetString());
 			break;
 		case 0x5446524D:
-			chunk.Get(nodeRef + 0xC, 0x30);
-			if (*reinterpret_cast<u16*>(nodeRef + 0x68) == 0xFFFF) {
+			chunk.Get(m_refData->m_localMtx, 0x30);
+			if (m_refData->m_parentIndex == -1) {
 				float baseScale = modelRef->m_baseScale;
-				PSMTXScaleApply(reinterpret_cast<float(*)[4]>(nodeRef + 0xC), reinterpret_cast<float(*)[4]>(nodeRef + 0xC),
-				               baseScale, baseScale, baseScale);
+				PSMTXScaleApply(m_refData->m_localMtx, m_refData->m_localMtx, baseScale, baseScale, baseScale);
 			}
 			break;
 		case 0x4D494458:
-			*(nodeRef + 0x90) = static_cast<u8>(chunk.Get4());
+			m_refData->m_displayIndex = static_cast<s8>(chunk.Get4());
 			break;
 		}
 	}

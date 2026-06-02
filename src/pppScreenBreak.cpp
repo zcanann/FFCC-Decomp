@@ -148,7 +148,7 @@ extern const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
 extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
-static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68); }
+static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline ScreenBreakModelData* ScreenBreakModelRef(CChara::CModel* model) { return reinterpret_cast<ScreenBreakModelData*>(model->m_data); }
 static inline u8* GetScreenBreakWork(PScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(PScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
@@ -722,9 +722,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 
     PSMTXInverse(cameraMtx, invCameraMtx);
     PSMTXConcat(invCameraMtx, ScreenBreakModelMtx(model), ScreenBreakModelMtx(model));
-    ScreenBreakModelMtx(model)[0][3] = translation.x;
-    ScreenBreakModelMtx(model)[1][3] = translation.y;
-    ScreenBreakModelMtx(model)[2][3] = translation.z;
+    model->m_drawMtx[0][3] = translation.x;
+    model->m_drawMtx[1][3] = translation.y;
+    model->m_drawMtx[2][3] = translation.z;
 
     mesh = model->m_meshes;
     if (step->m_gravityAmount != zero) {

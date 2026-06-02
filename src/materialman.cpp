@@ -131,37 +131,13 @@ static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
-static inline void DestroyTexScrollKeyFrame(void* keyFrame)
+static inline void DestroyTexScrollKeyFrame(CMapKeyFrame* keyFrame)
 {
     if (keyFrame == 0) {
         return;
     }
 
-    void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x18));
-    if (table0 != 0) {
-        operator delete(table0);
-        table0 = 0;
-    }
-
-    void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x1C));
-    if (table1 != 0) {
-        operator delete(table1);
-        table1 = 0;
-    }
-
-    void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x20));
-    if (table2 != 0) {
-        operator delete(table2);
-        table2 = 0;
-    }
-
-    void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x24));
-    if (table3 != 0) {
-        operator delete(table3);
-        table3 = 0;
-    }
-
-    operator delete(keyFrame);
+    delete keyFrame;
 }
 
 static void ReleaseRefNonNull(CRef* object)
@@ -543,8 +519,9 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetIndTexOrder(static_cast<GXIndTexStageID>(0),
                      static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]),
                      static_cast<GXTexMapID>(m_bumpTexMapIds[0]));
-    GXSetIndTexCoordScale((GXIndTexStageID)0, *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x34)),
-                          *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x35)));
+    GXSetIndTexCoordScale(static_cast<GXIndTexStageID>(0),
+                          static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftU),
+                          static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftV));
 
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
@@ -583,7 +560,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     IncNumTevStage();
 
     tevStage = m_numTevStage;
-    if (*reinterpret_cast<char*>(Ptr(g_drawMaterial, 0xA3)) == 0) {
+    if (g_drawMaterial->m_bumpLightDirect == 0) {
         _GXSetTevOrder(
             tevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
         _GXSetTevColorIn(tevStage,
@@ -2307,18 +2284,18 @@ void CMaterialMan::ErrorTexMapIdCur()
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        void* keyFrame = *reinterpret_cast<void**>(&m_u1);
+        CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(&m_u1);
         if (keyFrame != 0) {
             DestroyTexScrollKeyFrame(keyFrame);
-            *reinterpret_cast<void**>(&m_u1) = 0;
+            *reinterpret_cast<CMapKeyFrame**>(&m_u1) = 0;
         }
     }
 
     if (m_type1 == 2) {
-        void* keyFrame = *reinterpret_cast<void**>(&m_v1);
+        CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(&m_v1);
         if (keyFrame != 0) {
             DestroyTexScrollKeyFrame(keyFrame);
-            *reinterpret_cast<void**>(&m_v1) = 0;
+            *reinterpret_cast<CMapKeyFrame**>(&m_v1) = 0;
         }
     }
 }

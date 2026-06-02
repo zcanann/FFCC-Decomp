@@ -17,12 +17,12 @@
 extern const f32 kPppLaserZero = 0.0f;
 extern const f32 FLOAT_8033342c = 1.0f;
 extern const f32 FLOAT_80333430 = 2.0f;
-extern const f32 kMenuArtiNegativeOne;
-extern const f32 kMenuArtiDefaultScale;
-extern const f32 kMenuArtiBoundsMax;
-extern const f32 kMenuArtiBoundsMin;
-extern const f32 kMenuArtiHalfTileOffset;
-extern const f32 kMenuArtiTau;
+extern const f32 kMenuArtiNegativeOne = -1.0f;
+extern const f32 kMenuArtiDefaultScale = 1.2f;
+extern const f32 kMenuArtiBoundsMax = 10000000000.0f;
+extern const f32 kMenuArtiBoundsMin = -10000000000.0f;
+extern const f32 kMenuArtiHalfTileOffset = 15.5f;
+extern const f32 kMenuArtiTau = 6.2831855f;
 
 #define kPppLaserNegativeOne kMenuArtiNegativeOne
 #define kPppLaserDefaultScale kMenuArtiDefaultScale

@@ -2763,8 +2763,8 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 {
 	unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 	unsigned char* workEntry;
-	GbaQueue* semaphoreIter;
 	int i;
+	GbaQueue* semaphoreIter;
 	int outSize;
 	unsigned int drawFlags;
 
@@ -2796,28 +2796,21 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	outData[4] = static_cast<unsigned char>(drawFlags >> 24);
 
 	for (i = 0; i < mapObjWork[0]; i++) {
-		outData[outSize] = workEntry[8];
-		outSize++;
-		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xC));
-		outSize++;
-		outData[outSize] =
+		unsigned char* outEntry = outData + outSize;
+		outSize += 9;
+		outEntry[0] = workEntry[8];
+		outEntry[1] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xC));
+		outEntry[2] =
 			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xC)) >> 8);
-		outSize++;
-		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xE));
-		outSize++;
-		outData[outSize] =
+		outEntry[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xE));
+		outEntry[4] =
 			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xE)) >> 8);
-		outSize++;
-		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x10));
-		outSize++;
-		outData[outSize] =
+		outEntry[5] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x10));
+		outEntry[6] =
 			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x10)) >> 8);
-		outSize++;
-		outData[outSize] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x12));
-		outSize++;
-		outData[outSize] =
+		outEntry[7] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x12));
+		outEntry[8] =
 			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x12)) >> 8);
-		outSize++;
 
 		workEntry += 0xC;
 	}

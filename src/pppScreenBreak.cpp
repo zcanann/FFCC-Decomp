@@ -66,8 +66,26 @@ struct RawVec {
 };
 
 typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
-typedef CChara::CMesh::CRefData ScreenBreakMeshData;
 typedef CChara::CMesh ScreenBreakMeshRef;
+
+struct ScreenBreakMeshData {
+    u8 _pad0[0x14];
+    u32 m_vertexCount;
+    S16Vec* m_vertices;
+    u8 _pad1C[0x30];
+    u32 m_displayListCount;
+    ScreenBreakDisplayList* m_displayLists;
+    u32 m_skinCount;
+    void* m_skins;
+    u32 m_nodeIndex;
+};
+
+struct ScreenBreakModelData {
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x24];
+    u32 m_posQuant;
+};
 
 struct pppScreenBreakUnkB {
     s32 m_graphId;
@@ -93,8 +111,11 @@ struct pppScreenBreakUnkC {
 };
 
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(ScreenBreakModelData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(ScreenBreakModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
-STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x60);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_displayLists) == 0x50);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x5C);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(ScreenBreakPiece) == 0x3C);
@@ -127,6 +148,7 @@ extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68); }
+static inline ScreenBreakModelData* ScreenBreakModelRef(CChara::CModel* model) { return reinterpret_cast<ScreenBreakModelData*>(model->m_data); }
 static inline u8* GetScreenBreakWork(PScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(PScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 
@@ -201,8 +223,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     ScreenBreakPiece* pieceStorage = value->m_pieces;
     if (pieceStorage == 0) {
-        pieceStorage = static_cast<ScreenBreakPiece*>(pppMemAlloc(model->m_data->m_meshCount * sizeof(ScreenBreakPiece), ppvEnv->m_stagePtr,
-                                                                  const_cast<char*>(s_pppScreenBreak_cpp), 0x25E));
+        pieceStorage = static_cast<ScreenBreakPiece*>(
+            pppMemAlloc(ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece), ppvEnv->m_stagePtr,
+                        const_cast<char*>(s_pppScreenBreak_cpp), 0x25E));
         value->m_pieces = pieceStorage;
         value->m_backBufferTexObj = static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr,
                                                                       const_cast<char*>(s_pppScreenBreak_cpp), 0x25F));
@@ -214,7 +237,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     float sx = two * value->m_extentX;
     float sy = two * value->m_extentY;
     ScreenBreakPiece* piece = value->m_pieces;
-    for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
+    for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
         switch (param_2->m_initWOrk) {
         case 0:
             piece->m_active = 1;
@@ -403,7 +426,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     S16Vec globalMax;
     u32 uStack_b4;
 
-    memset(work->m_pieces, 0, model->m_data->m_meshCount * sizeof(ScreenBreakPiece));
+    memset(work->m_pieces, 0, ScreenBreakModelRef(model)->m_meshCount * sizeof(ScreenBreakPiece));
     dVar19 = FLOAT_80331cc8;
     CChara::CMesh* mesh = model->m_meshes;
     dVar18 = -dVar19;
@@ -417,8 +440,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     dVar24 = FLOAT_80331cc0;
     dVar25 = FLOAT_80331cd8;
 
-    for (uVar15 = 0; uVar15 < model->m_data->m_meshCount;) {
-        ScreenBreakMeshData* meshData = mesh->m_data;
+    for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
+        ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
         CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
         node->m_flags &= 0xFE;
         PSMTXIdentity(node->m_localRuntimeMtx);
@@ -502,7 +525,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMax.x += meshMin.x;
         meshMax.y += meshMin.y;
         meshMax.z += meshMin.z;
-        gUtil.ConvI2FVector(piece->m_translation, meshMax, model->m_data->m_posQuant);
+        gUtil.ConvI2FVector(piece->m_translation, meshMax, ScreenBreakModelRef(model)->m_posQuant);
         PSVECScale(&piece->m_translation, &piece->m_translation, FLOAT_80331ccc);
 
         dVar17 = piece->m_translation.x;
@@ -541,7 +564,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece++;
     }
 
-    gUtil.ConvI2FVector(*reinterpret_cast<Vec*>(&work->m_extentX), globalMax, model->m_data->m_posQuant);
+    gUtil.ConvI2FVector(*reinterpret_cast<Vec*>(&work->m_extentX), globalMax, ScreenBreakModelRef(model)->m_posQuant);
 }
 
 /*
@@ -558,7 +581,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
     ScreenBreakMeshRef* mesh = model->m_meshes;
     mesh += meshIndex;
-    ScreenBreakMeshData* meshData = mesh->m_data;
+    ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
     ScreenBreakDisplayList* displayList = meshData->m_displayLists;
 
     displayList += drawListIndex;
@@ -713,8 +736,8 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
         PSVECScale(&step->m_gravityDir, &gravityAdd, step->m_gravityAmount);
     }
 
-    for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
-        ScreenBreakMeshData* meshData = mesh->m_data;
+    for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
+        ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
         if (pieceData->m_active != 0) {
             MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
 

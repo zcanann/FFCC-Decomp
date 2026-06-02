@@ -45,9 +45,9 @@ STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
+STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 STATIC_ASSERT(sizeof(GXColor) == 0x4);
 
@@ -459,9 +459,10 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 {
 	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
-	int textureInfo = (int)state->m_texture;
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
-	ChangeTexMeshData* meshData = meshes[meshIdx].m_data;
+	meshes += meshIdx;
+	int textureInfo = (int)state->m_texture;
+	ChangeTexMeshData* meshData = meshes->m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
 
 	if (step->m_payload[0] == 0) {

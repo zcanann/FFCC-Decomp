@@ -92,6 +92,50 @@ void CMapAnim::Calc(long frame)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapAnimNode::~CMapAnimNode()
+{
+    m_mapAnim = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapAnimNode::CMapAnimNode()
+{
+    m_tracks = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CMapAnimKeyDt::CMapAnimKeyDt()
+{
+    m_positionKeys = 0;
+    m_rotationKeys = 0;
+    m_scaleKeys = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004a5d8
  * PAL Size: 728b
  * EN Address: TODO
@@ -109,7 +153,6 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     int hasChunk;
     CMapAnimNode* item;
     CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray;
-    CMapAnimKeyDt* keyData;
     int nodeIdx;
 
     chunkFile.PushChunk();
@@ -128,29 +171,27 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     nodeIdx = static_cast<int>(chunkFile.Get4());
                     item->m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
                 } else if (innerChunkId == 0x5452414E) {
-                    keyData = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
+                    CMapAnimKeyDt* tracks = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
 
-                    item->m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(keyData);
-                    mapAnimKeyDtArray->Add(keyData);
-                    keyData->m_positionCount = innerChunkSize >> 4;
-                    keyData->m_positionKeys =
+                    item->m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(tracks);
+                    mapAnimKeyDtArray->Add(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks));
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionCount = innerChunkSize >> 4;
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
-                            CMapAnimNodeTrackKey[keyData->m_positionCount];
-                    memcpy(keyData->m_positionKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionCount];
+                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionKeys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x524F5420) {
-                    CMapAnimKeyDt* tracks = reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks);
-                    tracks->m_rotationCount = innerChunkSize >> 4;
-                    tracks->m_rotationKeys =
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationCount = innerChunkSize >> 4;
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
-                            CMapAnimNodeTrackKey[tracks->m_rotationCount];
-                    memcpy(tracks->m_rotationKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationCount];
+                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationKeys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x5343414C) {
-                    CMapAnimKeyDt* tracks = reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks);
-                    tracks->m_scaleCount = innerChunkSize >> 4;
-                    tracks->m_scaleKeys =
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleCount = innerChunkSize >> 4;
+                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
-                            CMapAnimNodeTrackKey[tracks->m_scaleCount];
-                    memcpy(tracks->m_scaleKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleCount];
+                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleKeys, chunkFile.GetAddress(), innerChunkSize);
                 }
             }
             chunkFile.PopChunk();
@@ -483,34 +524,6 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CMapAnimNode::~CMapAnimNode()
-{
-    m_mapAnim = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CMapAnimNode::CMapAnimNode()
-{
-    m_tracks = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8004ad98
  * PAL Size: 148b
  * EN Address: TODO
@@ -532,22 +545,6 @@ CMapAnimKeyDt::~CMapAnimKeyDt()
         delete[] m_scaleKeys;
         m_scaleKeys = 0;
     }
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CMapAnimKeyDt::CMapAnimKeyDt()
-{
-    m_positionKeys = 0;
-    m_rotationKeys = 0;
-    m_scaleKeys = 0;
 }
 
 /*

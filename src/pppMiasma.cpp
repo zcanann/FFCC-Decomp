@@ -644,7 +644,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 _GXSetTevColorOp(0, 0, 0, 0, 1, 0);
                 _GXSetTevAlphaIn(0, 7, 6, 4, 6);
                 _GXSetTevAlphaOp(0, 1, 0, 0, 1, 0);
-                texGenCount = 1;
 
                 GXSetTevDirect((GXTevStageID)1);
                 _GXSetTevOrder(1, 0, 0, 4);
@@ -653,6 +652,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 _GXSetTevColorOp(1, 0, 0, 0, 1, 0);
                 _GXSetTevAlphaIn(1, 7, 0, 4, 7);
                 _GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+                texGenCount = 1;
 
                 GXSetTevDirect((GXTevStageID)2);
                 _GXSetTevSwapMode(2, 0, 0);

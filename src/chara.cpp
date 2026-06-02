@@ -80,8 +80,8 @@ STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
 STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
-STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x44);
-STATIC_ASSERT(offsetof(CChara::CNode, m_previousQuat) == 0x74);
+STATIC_ASSERT(offsetof(CChara::CNode, m_previousQuat) == 0x44);
+STATIC_ASSERT(offsetof(CChara::CNode, m_mtx) == 0x6C);
 STATIC_ASSERT(offsetof(CChara::CNode, m_dynPosition) == 0xA4);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(CChara::CNode::CRefData) == 0x94);
@@ -565,8 +565,7 @@ static inline void RetainRefCounted(void* refObject)
 static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 {
 	dst->m_refData = src->m_refData;
-	PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
-	          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+	PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
 	PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
 	NodePreviousQuat(dst) = NodePreviousQuat(src);
 	NodePreviousPosition(dst) = NodePreviousPosition(src);

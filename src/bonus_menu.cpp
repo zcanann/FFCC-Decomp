@@ -2736,8 +2736,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->y = (short)(0x28 + i * 0x60);
 			sprite->w = 0x60;
 			sprite->h = 0x58;
-			sprite->mulX = (partySlot & 1) ? (float)sprite->w : 0.0f;
-			sprite->mulY = ((int)partySlot >> 1) ? (float)sprite->h : 0.0f;
+			int texX = (partySlot & 1) ? (int)sprite->w : 0;
+			sprite->mulX = (float)texX;
+			int texY = ((int)partySlot >> 1) ? (int)sprite->h : 0;
+			sprite->mulY = (float)texY;
 			if (i == 0) {
 				sprite->startFrame = sprites[frameBase].startFrame + sprites[frameBase].duration + 0x18;
 			} else {

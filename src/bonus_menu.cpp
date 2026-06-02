@@ -1211,7 +1211,7 @@ void CMenuPcs::CalcSelectWait()
 
 			if ((repeat & 0xf) == 0) {
 				if ((down & 0x100) != 0) {
-					unsigned char bit = (unsigned char)(1 << selection);
+					int bit = 1 << selection;
 					if ((unavailableMask & bit) == 0) {
 						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;

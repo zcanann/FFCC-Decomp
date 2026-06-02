@@ -23,8 +23,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern unsigned char ARRAY_8030918c[];
-extern "C" const char s_monObjTexAnimU1[3] = "u1";
-extern "C" const char s_monObjTexAnimU0[3] = "u0";
 extern "C" {
 u8 m_aiWork__8CGMonObj[0xC];
 u8 m_boss__8CGMonObj[0x8C];
@@ -32,16 +30,34 @@ u8 m_boss__8CGMonObj[0x8C];
 
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
-extern float FLOAT_803319D8;
-extern float FLOAT_803319F8;
-extern float FLOAT_80331A20;
-extern float FLOAT_80331A34;
-extern float FLOAT_80331A38;
-extern float FLOAT_80331A3C;
-extern float FLOAT_80331A40;
-extern double DOUBLE_803319E0;
-extern double DOUBLE_80331A10;
-extern double DOUBLE_80331A18;
+extern "C" const float FLOAT_803319C8 = 0.0000001f;
+extern "C" const float FLOAT_803319CC = 0.01f;
+extern "C" const double DOUBLE_803319D0 = 0.000009999999747378752;
+extern "C" const float FLOAT_803319D8 = 0.0f;
+extern "C" const double DOUBLE_803319E0 = 4503599627370496.0;
+extern "C" const float FLOAT_803319E8 = 0.4f;
+extern "C" const char s_monObjTexAnimU1[3] = "u1";
+extern "C" const char s_monObjHeadNode[] = "head";
+extern "C" const float FLOAT_803319F8 = 10.0f;
+extern "C" const float FLOAT_803319FC = 2.0f;
+extern "C" const float FLOAT_80331A00 = 0.25f;
+extern "C" const float FLOAT_80331A04 = 0.2f;
+extern "C" const double DOUBLE_80331A08 = 4503601774854144.0;
+extern "C" const double DOUBLE_80331A10 = 10000.0;
+extern "C" const double DOUBLE_80331A18 = 180.0;
+extern "C" const float FLOAT_80331A20 = 0.017453292f;
+extern "C" const float FLOAT_80331A24 = 57.29578f;
+extern "C" const char s_monObjPassThroughText[] = "\x92\xca\x89\xdf\x81\x42\n";
+extern "C" const float FLOAT_80331A30 = 1.5707964f;
+extern "C" const float FLOAT_80331A34 = 0.5f;
+extern "C" const float FLOAT_80331A38 = 10000000000.0f;
+extern "C" const float FLOAT_80331A3C = -10000000000.0f;
+extern "C" const float FLOAT_80331A40 = 20.0f;
+extern "C" const float FLOAT_80331A44 = 0.1f;
+extern "C" const float FLOAT_80331A48 = 2.0943952f;
+extern "C" const char s_monObjTexAnimU0[3] = "u0";
+extern "C" const float FLOAT_80331A50 = 100.0f;
+extern "C" const float FLOAT_80331a54 = 1.0f;
 static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
 static const char s_monObjDistanceFmt[] = "%d %d %d";
 

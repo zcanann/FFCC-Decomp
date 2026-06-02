@@ -32,6 +32,11 @@ struct pppCrystal2ColorBlock {
     pppCVECTOR m_color;
 };
 
+static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<Crystal2Work*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
+
 union Crystal2FloatBits {
     float value;
     u32 bits;
@@ -90,8 +95,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     s32 dataValIndex = param_2->m_dataValIndex;
-    Crystal2Work* work =
-        reinterpret_cast<Crystal2Work*>(pppCrystal2->m_object.m_workArea + serializedDataOffsets[2]);
+    Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_3);
     pppCrystal2ColorBlock* colorBlock =
         reinterpret_cast<pppCrystal2ColorBlock*>(pppCrystal2->m_object.m_workArea + serializedDataOffsets[1]);
     pppModelSt* model;
@@ -216,7 +220,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
         return;
     }
 
-    work = reinterpret_cast<Crystal2Work*>(pppCrystal2->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
+    work = GetCrystal2Work(pppCrystal2, param_3);
     if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc(
             sizeof(Crystal2RefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
@@ -291,8 +295,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
  */
 void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
-    Crystal2Work* work = reinterpret_cast<Crystal2Work*>(
-        pppCrystal2->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_2);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
 
     if (work->m_refractionTexObj != 0) {
@@ -321,8 +324,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
  */
 void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
-    Crystal2Work* work = reinterpret_cast<Crystal2Work*>(
-        pppCrystal2->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_2);
 
     work->m_refractionMap = 0;
     work->m_refractionTexObj = 0;

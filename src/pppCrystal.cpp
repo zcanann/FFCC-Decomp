@@ -46,6 +46,11 @@ struct pppCrystalColorBlock {
     pppCVECTOR m_color;
 };
 
+static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<CrystalWork*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
+
 union CrystalFloatBits {
     float value;
     u32 bits;
@@ -106,7 +111,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	float texH;
 	int* serializedDataOffsets = param_3->m_serializedDataOffsets;
 	s32 dataValIndex = param_2->m_dataValIndex;
-	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
+	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
 	pppCrystalColorBlock* colorBlock =
 		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[1]);
 
@@ -246,7 +251,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		return;
 	}
 
-	work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
+	work = GetCrystalWork(pppCrystal, param_3);
 	s32 dataValIndex = param_2->m_dataValIndex;
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -344,8 +349,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
  */
 void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
-	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
+	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
 	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
 
 	if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
@@ -372,8 +376,7 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* par
  */
 void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
-	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
+	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
 
 	work->m_refractionMap = 0;
 	work->m_refractionTexObj = 0;

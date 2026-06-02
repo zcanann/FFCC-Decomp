@@ -1796,16 +1796,16 @@ void CalcReflectionVector2(
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 
-            if (reflectionVec[posIndex].z < zero) {
-                colorBytes[0] = 0;
-                colorBytes[1] = 0;
-                colorBytes[2] = 0;
-                colorBytes[3] = 0;
-            } else {
+            if (zero <= reflectionVec[posIndex].z) {
                 colorBytes[0] = 0xFF;
                 colorBytes[1] = 0xFF;
                 colorBytes[2] = 0xFF;
                 colorBytes[3] = 0xFF;
+            } else {
+                colorBytes[0] = 0;
+                colorBytes[1] = 0;
+                colorBytes[2] = 0;
+                colorBytes[3] = 0;
             }
 
             denom = denomBias + reflectionVec[posIndex].z;

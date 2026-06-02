@@ -553,6 +553,7 @@ void CMenuPcs::CmdInit2()
 
 	uVar4 = 0x2f;
 	psVar7 = GetCmdList(this);
+	int listBase = GetCmdListBase(this);
 	sVar1 = *psVar7;
 	iVar3 = (int)sVar1;
 	(psVar7 + iVar3 * 0x20 + 0x12)[0] = 0;
@@ -561,7 +562,7 @@ void CMenuPcs::CmdInit2()
 	(psVar7 + iVar3 * 0x20 + 0x16)[1] = 2;
 	(psVar7 + iVar3 * 0x20 + 0x18)[0] = 0;
 	(psVar7 + iVar3 * 0x20 + 0x18)[1] = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 1) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 1) * 0x40 + 8;
 	if (GetCmdLayoutFlag(this) == 0) {
 		uVar4 = 0x46;
 	}
@@ -569,61 +570,61 @@ void CMenuPcs::CmdInit2()
 	*(u32*)(iVar6 + 0x24) = 7;
 	uVar4 = 0x2f;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 2) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 2) * 0x40 + 8;
 	if (GetCmdLayoutFlag(this) == 0) {
 		uVar4 = 0x46;
 	}
 	*(u32*)(iVar6 + 0x1c) = uVar4;
 	*(u32*)(iVar6 + 0x24) = 7;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 3) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 3) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x2e;
 	*(u32*)(iVar6 + 0x24) = 7;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 4) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 4) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 5) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 5) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 6) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 6) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 7) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 7) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 8) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 8) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 9) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 9) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
 	fVar2 = FLOAT_80332a70;
-	iVar6 = GetCmdListBase(this) + (iVar3 + 10) * 0x40 + 8;
+	iVar6 = listBase + (iVar3 + 10) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar3 = GetCmdListBase(this) + (iVar3 + 0xb) * 0x40 + 8;
+	iVar3 = listBase + (iVar3 + 0xb) * 0x40 + 8;
 	*(u32*)(iVar3 + 0x2c) = 2;
 	*(u32*)(iVar3 + 0x1c) = 0x37;
 	*(u32*)(iVar3 + 0x24) = 0;
 	*(u32*)(iVar3 + 0x28) = 5;
-	*(s16*)(GetCmdListBase(this) + 2) = sVar1 + 0xc;
-	psVar7 = GetCmdList(this);
+	*(s16*)(listBase + 2) = sVar1 + 0xc;
+	psVar7 = reinterpret_cast<s16*>(listBase);
 	uVar5 = (u32)((int)psVar7[1] - (int)*psVar7);
 	psVar7 = psVar7 + *psVar7 * 0x20 + 4;
 	if ((int)uVar5 > 0) {

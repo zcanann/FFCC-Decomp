@@ -6,6 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 extern "C" {
 extern const float FLOAT_803305f0;
 extern const float kPppYmDeformationShpZero;
@@ -81,8 +82,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		YmDeformationShpColorInfo* colorInfo =
 			(YmDeformationShpColorInfo*)(object->m_workArea + param_3->m_serializedDataOffsets[1]);
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
-		int textureBase =
-			reinterpret_cast<int>(env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex));
+		CTexture* texture =
+			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);
 
 		PSMTXIdentity(rotMtx);
 		pppSetBlendMode(1);
@@ -98,7 +99,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		gUtil.SetVtxFmt_POS_TEX0_TEX1();
-		GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
+		GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
 		GXSetNumIndStages(1);
 		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
 		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);

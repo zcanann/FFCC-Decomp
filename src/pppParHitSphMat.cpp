@@ -10,6 +10,11 @@ extern const float kPppParHitSphMatZero;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8014139c
@@ -39,9 +44,9 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
         Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
-        local_94.x = *(float*)((u8*)ppvMng + 0x84);
-        local_94.y = *(float*)((u8*)ppvMng + 0x94);
-        local_94.z = *(float*)((u8*)ppvMng + 0xA4);
+        local_94.x = ppvMng->m_matrix.value[0][3];
+        local_94.y = ppvMng->m_matrix.value[1][3];
+        local_94.z = ppvMng->m_matrix.value[2][3];
         int* offsets = ctrlTable->m_serializedDataOffsets;
         Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
         local_94.x += src->x;
@@ -50,10 +55,10 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     }
 
     if (step->m_height != kPppParHitSphMatZero) {
-        PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
+        PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &local_88);
     }
 
-    radius = *(float*)((u8*)pppMngSt + 0x64) * step->m_radiusScale;
+    radius = pppMngSt->m_previousPosition.z * step->m_radiusScale;
     pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, step->m_height);
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {

@@ -482,8 +482,9 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
         dstCharData[0x8C2] = srcCharData[0x8C2];
         *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
-        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
+        u32 serial0 = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
         *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
+        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = serial0;
         *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
 
         u8* dstWork = dstSaveData + dstChar * 0x200;
@@ -1445,8 +1446,9 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->unk_0xc1e = src[0x8C2];
         caravanWork->m_shopRandSeed = *reinterpret_cast<int*>(src + 0x8C4);
         caravanWork->m_shopData0 = *reinterpret_cast<int*>(src + 0x8D0);
+        int shopData1 = *reinterpret_cast<int*>(src + 0x8C8);
         caravanWork->m_shopData2 = *reinterpret_cast<int*>(src + 0x8CC);
-        caravanWork->m_shopData1 = *reinterpret_cast<int*>(src + 0x8C8);
+        caravanWork->m_shopData1 = shopData1;
         caravanWork->m_baseDataIndex = *reinterpret_cast<int*>(src + 0x8D4);
         caravanWork->m_maxHp = caravanWork->GetArtifactIncludeHpMax();
 
@@ -1716,8 +1718,9 @@ void CMemoryCardMan::MakeSaveData()
         dst[0x8C2] = caravanWork->unk_0xc1e;
         *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
         *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
+        int shopData1 = caravanWork->m_shopData1;
         *reinterpret_cast<int*>(dst + 0x8CC) = caravanWork->m_shopData2;
-        *reinterpret_cast<int*>(dst + 0x8C8) = caravanWork->m_shopData1;
+        *reinterpret_cast<int*>(dst + 0x8C8) = shopData1;
         *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
     }
 

@@ -23,12 +23,9 @@ extern const float kAStarEscapeInitialBestDist = -1000000.0f;
 extern const char kAStarGroupDebugLabel[] = "//A*\n";
 extern const float kDrawAStarSphereRadius;
 extern const float kInfiniteCost;
-extern const char kAStarStepDebugFormat[];
-extern const char kAStarNewLine[];
+extern const char kAStarStepDebugFormat[4];
+extern const char kAStarNewLine[2];
 }
-static const float kAStarCalcInfiniteCost = 10000000.0f;
-static const char kAStarCalcStepDebugFormat[] = "%d ";
-static const char kAStarCalcNewLine[] = "\n";
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
@@ -358,16 +355,14 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	int prev = m_previousGroup;
-	int curr = m_currentGroup;
+	int groupLow = m_currentGroup;
+	int groupHigh = m_previousGroup;
 
-	int groupLow  = curr;
-	int groupHigh = prev;
-
-	if (prev < curr)
+	if (groupHigh < groupLow)
 	{
-		groupHigh = curr;
-		groupLow  = prev;
+		int groupSwap = groupLow;
+		groupLow = groupHigh;
+		groupHigh = groupSwap;
 	}
 
 	int portalIndex = 0;
@@ -582,13 +577,13 @@ void CAStar::calcAStar()
 				continue;
 			}
 
-			m_bestPath.m_cost = LoadFloat(kAStarCalcInfiniteCost);
+			m_bestPath.m_cost = LoadFloat(kInfiniteCost);
 
 			CATemp temp;
 
 			check(from, to, temp);
 
-			if (m_bestPath.m_cost < LoadFloat(kAStarCalcInfiniteCost))
+			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
 			{
 				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
 
@@ -611,10 +606,10 @@ void CAStar::calcAStar()
 
 					current = static_cast<unsigned char>(next);
 
-					System.Printf(const_cast<char*>(kAStarCalcStepDebugFormat), current);
+					System.Printf(const_cast<char*>(kAStarStepDebugFormat), current);
 				}
 
-				System.Printf(const_cast<char*>(kAStarCalcNewLine));
+				System.Printf(const_cast<char*>(kAStarNewLine));
 			}
 		}
 	}
@@ -1125,7 +1120,7 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CAStar::addAstar(Vec& pos, int groupA, int groupB)
+inline void CAStar::addAstar(Vec& pos, int groupA, int groupB)
 {
 	int groupLow = groupA;
 	int groupHigh = groupB;

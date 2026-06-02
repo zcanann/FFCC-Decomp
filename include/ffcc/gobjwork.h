@@ -98,8 +98,6 @@ public:
     int ShopRequest(int, int, int, int, int, int, int);
     void CallShop(int, int, int, int, int);
     void SafeDeleteTempItem();
-    void ClampStatus(short&, unsigned short&);
-    void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
     void CalcStatus();
     int CanPlayerUseItem();
     void ValidCmdList(int);
@@ -109,7 +107,7 @@ public:
     int IsSelectedCmdList(int);
     unsigned int GetMagicCharge(int, int&, int&);
     int GetCmdListItemName(int, int*, int*);
-    int GetWeaponAttrib(int);
+    const char* GetWeaponAttrib(int);
     int GetCmdListItem(int);
     int DelCmdListAndItem(int);
     void SearchCombiTop(int);

@@ -873,7 +873,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
  * Address:	TODO
  * Size:	TODO
  */
-int CFlatRuntime::getTopBit(unsigned int value)
+inline int CFlatRuntime::getTopBit(unsigned int value)
 {
 	int bitBase = 0x1F;
 	int scanCount = 4;

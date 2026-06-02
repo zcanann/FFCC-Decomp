@@ -1937,21 +1937,25 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 						pppProgOperationCallback fn = (pppProgOperationCallback)prog->m_pppFunctionOperation;
 						if (fn != 0)
 						{
-							u16 count = pDataVal->m_activeCount;
+							u32 count = pDataVal->m_activeCount;
 							_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 
-							while (count != 0)
+							do
 							{
-								_pppPObjLink* next = obj->m_next;
-								if (*((u8*)obj + 0x7C) == 0)
+								if (((_pppPObject*)obj)->m_field7C == 0)
 								{
+									_pppPObjLink* next = obj->m_next;
 									fn((_pppPObject*)obj,
 									   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
 									   stageIter);
+									obj = next;
 								}
-								count--;
-								obj = next;
+								else
+								{
+									obj = obj->m_next;
+								}
 							}
+							while (--count != 0);
 						}
 					}
 					else
@@ -1989,26 +1993,27 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 	{
 		_pppPDataVal* pDataVal = (_pppPDataVal*)((u8*)pppMngSt->m_pppPDataVals + pDataValOffset);
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0 &&
-		    pDataVal->m_programSetDef->m_drawFlags < 0x80 && pDataVal->m_activeCount > 0)
+		    (int)((u32)pDataVal->m_programSetDef->m_drawFlags << 24) >= 0 && pDataVal->m_activeCount > 0)
 		{
 			s32 workOffsetStep = 0;
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
-			_pppCtrlTable* stageIter = progSet->m_stages;
+			_pppProgSetDef* stageSet = progSet;
 
 			for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 			{
+				_pppCtrlTable* stageIter = stageSet->m_stages;
 				pppProg* prog = stageIter->m_prog;
 				if (prog != 0)
 				{
 					pppProgRenderCallback fn = (pppProgRenderCallback)prog->m_pppFunctionRender;
 					if (fn != 0)
 					{
-						u16 count = pDataVal->m_activeCount;
+						u32 count = pDataVal->m_activeCount;
 						_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 
-						while (count != 0)
+						do
 						{
-							if (*((u8*)obj + 0x7C) == 0)
+							if (((_pppPObject*)obj)->m_field7C == 0)
 							{
 								fn((_pppPObject*)obj,
 								   *(void**)(((u8*)obj) + progSet->m_workBaseOffset + workOffsetStep),
@@ -2017,6 +2022,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							count--;
 							obj = obj->m_next;
 						}
+						while (count != 0);
 
 						Graphic.SetDrawDoneDebugDataPartControl(0x7FFF);
 					}
@@ -2026,7 +2032,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 					printf(s_ERROR_prog_NULL);
 				}
 
-				stageIter++;
+				stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 				workOffsetStep += 4;
 			}
 		}

@@ -39,17 +39,6 @@ static inline f32 LoadLaserFloat(const f32& value)
 	return value;
 }
 
-static inline f64 U32ToDouble(u32 value)
-{
-	union {
-		u64 bits;
-		f64 value;
-	} conv;
-
-	conv.bits = 0x4330000000000000ULL | value;
-	return conv.value - kPppVertexApMtxDoubleBias;
-}
-
 struct pppYmLaserWork {
 	float m_length;
 	float m_lengthStep;
@@ -208,7 +197,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		           step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = FLOAT_80330DC4 / (f32)U32ToDouble(count);
+		uvStep = FLOAT_80330DC4 / (f32)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -378,7 +367,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	int emptyHistory;
 	int fillIndex;
 
-	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
+	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
 	work = (pppYmLaserWork*)(laser->m_workArea + data->m_serializedDataOffsets[2]);
 	emptyHistory = 0;
 

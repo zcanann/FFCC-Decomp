@@ -20,14 +20,6 @@ struct ConformBgNormalState {
     u8 m_initialized;
 };
 
-struct ConformMapCylinder {
-    Vec m_bottom;
-    Vec m_top;
-    Vec m_axis;
-    f32 m_radius;
-    Vec m_boundsMin;
-    Vec m_boundsMax;
-};
 STATIC_ASSERT(sizeof(ConformMapCylinder) == sizeof(CMapCylinder));
 
 struct WeaponNodeFlagBits {

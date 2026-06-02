@@ -108,9 +108,7 @@ private:
     int m_seqIndex;
     float m_frame;
     int m_mode;
-    float m_texGenS;
-    float m_texGenT;
-    float m_chin;
+    Vec m_texGen;
 };
 
 #endif // _FFCC_PPP_TEXANIM_H_

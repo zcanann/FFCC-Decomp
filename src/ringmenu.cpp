@@ -643,17 +643,17 @@ void CRingMenu::onDraw()
 				int prev2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (prev1 + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(prev1, -1);
+
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - FLOAT_803309cc),
+				            static_cast<float>(labelAlphaScale));
 				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(cmdIndex, 1);
 				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (next1 + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(next1, 1);
-
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
-				            static_cast<float>(labelAlphaScale));
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - FLOAT_803309cc),
-				            static_cast<float>(labelAlphaScale));
 				drawCommand(menuIndex, font, posX, posY, caravanWork, next2, static_cast<float>(scroll + FLOAT_80330a28),
 				            static_cast<float>(labelAlphaScale));
 				drawCommand(menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + FLOAT_803309cc),

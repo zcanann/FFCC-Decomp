@@ -546,6 +546,7 @@ void CMenuPcs::FavoInit()
 	int iVar16;
 	int iVar17;
 
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	memset(favoList, 0, sizeof(*favoList));
 	FavoEntry* entry = favoList->entries;
 	iVar16 = 8;
@@ -684,7 +685,6 @@ void CMenuPcs::FavoInit()
 
 	memset(s_rank, 0, sizeof(s_rank));
 	FoodRank* ranks = s_rank;
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	for (int foodId = 0; foodId < 8; foodId++) {
 		ranks[foodId].foodId = foodId;
 		ranks[foodId].score = caravanWork->m_letterMeta[foodId];

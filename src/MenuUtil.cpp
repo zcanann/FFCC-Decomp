@@ -21,6 +21,27 @@ struct Vec2d {
 
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern char lbl_801E3058[];
+extern "C" const char s_MenuOptionMusic[] = "Music";
+extern "C" const char s_MenuOptionOn[] = "On";
+extern "C" const char s_MenuOptionOff[] = "Off";
+extern "C" const char s_MenuOptionStereo[] = "Stereo";
+extern "C" const char s_MenuOptionMin[] = "Min";
+extern "C" const char s_MenuOptionMax[] = "Max";
+extern "C" const char s_MenuOptionStrengthDe[] = {'S', 't', '\xe4', 'r', 'k', 'e', '\0', '\0'};
+extern "C" const char s_MenuOptionDefenceDe[] = "Abwehr";
+extern "C" const char s_MenuOptionMusicDe[] = "Musik";
+extern "C" const char s_MenuOptionOnDe[] = "AN";
+extern "C" const char s_MenuOptionOffDe[] = "AUS";
+extern "C" const char s_MenuOptionStereoDe[] = "STEREO";
+extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
+extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";
+extern "C" const char s_MenuOptionForza_803334B8[] = "Forza";
+extern "C" const char s_MenuOptionDifesa_803334C0[] = "Difesa";
+extern "C" const char s_MenuOptionSonoro_803334C8[] = "Sonoro";
+extern "C" const char s_MenuOptionMusica_803334D0[] = "Musica";
+extern "C" const char s_MenuOptionMonoIt_803334D8[] = "Mono";
+extern "C" const char s_MenuOptionContr_803334E0[] = "Contr.";
+extern "C" const char s_MenuOptionNorm_803334E8[] = "Norm.";
 extern "C" const float FLOAT_80333614 = 196.0f;
 extern "C" const float FLOAT_80333618 = 168.0f;
 extern "C" const float FLOAT_8033361C = 24.0f;
@@ -150,27 +171,27 @@ extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
 extern char s_MenuOptionEstandar_801E36C4[];
-extern char s_MenuOptionMusic[];
-extern char s_MenuOptionOn[];
-extern char s_MenuOptionOff[];
-extern char s_MenuOptionStereo[];
-extern char s_MenuOptionMin[];
-extern char s_MenuOptionMax[];
-extern char s_MenuOptionStrengthDe[];
-extern char s_MenuOptionDefenceDe[];
-extern char s_MenuOptionMusicDe[];
-extern char s_MenuOptionOnDe[];
-extern char s_MenuOptionOffDe[];
-extern char s_MenuOptionStereoDe[];
-extern char s_MenuOptionMonoUpper_803334A8[];
-extern char s_MenuOptionNormalIt_803334B0[];
-extern char s_MenuOptionForza_803334B8[];
-extern char s_MenuOptionDifesa_803334C0[];
-extern char s_MenuOptionSonoro_803334C8[];
-extern char s_MenuOptionMusica_803334D0[];
-extern char s_MenuOptionMonoIt_803334D8[];
-extern char s_MenuOptionContr_803334E0[];
-extern char s_MenuOptionNorm_803334E8[];
+extern const char s_MenuOptionMusic[];
+extern const char s_MenuOptionOn[];
+extern const char s_MenuOptionOff[];
+extern const char s_MenuOptionStereo[];
+extern const char s_MenuOptionMin[];
+extern const char s_MenuOptionMax[];
+extern const char s_MenuOptionStrengthDe[];
+extern const char s_MenuOptionDefenceDe[];
+extern const char s_MenuOptionMusicDe[];
+extern const char s_MenuOptionOnDe[];
+extern const char s_MenuOptionOffDe[];
+extern const char s_MenuOptionStereoDe[];
+extern const char s_MenuOptionMonoUpper_803334A8[];
+extern const char s_MenuOptionNormalIt_803334B0[];
+extern const char s_MenuOptionForza_803334B8[];
+extern const char s_MenuOptionDifesa_803334C0[];
+extern const char s_MenuOptionSonoro_803334C8[];
+extern const char s_MenuOptionMusica_803334D0[];
+extern const char s_MenuOptionMonoIt_803334D8[];
+extern const char s_MenuOptionContr_803334E0[];
+extern const char s_MenuOptionNorm_803334E8[];
 extern const char s_Force_803334F0[];
 extern const char s_Musique_803334F8[];
 extern const char s_Active_80333500[];
@@ -184,30 +205,30 @@ extern const char s_MenuOptionMinEs_80333538[];
 extern const char s_MenuOptionMaxEs_80333540[];
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
-	s_MenuOptionMusic, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
+	const_cast<char*>(s_MenuOptionMusic), s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
 	s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100,
 	s_Select_stereo_or_monaural_sound_801E313C, s_Adjust_volume_of_background_music_801E3160,
 	s_Adjust_volume_of_sound_effects_801E3184, s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4,
-	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_Monaural_801E31D0,
-	s_MenuOptionMin, s_MenuOptionMax, s_Enhanced_801E31DC, s_Standard_801E31E8,
-	s_MenuOptionStrengthDe, s_MenuOptionDefenceDe, s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
-	s_MenuOptionMusicDe, s_MenuOptionSoundEffectsDe_801E3214, s_Farbeinstellung_801E3224,
+	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), s_Monaural_801E31D0,
+	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), s_Enhanced_801E31DC, s_Standard_801E31E8,
+	const_cast<char*>(s_MenuOptionStrengthDe), const_cast<char*>(s_MenuOptionDefenceDe), s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
+	const_cast<char*>(s_MenuOptionMusicDe), s_MenuOptionSoundEffectsDe_801E3214, s_Farbeinstellung_801E3224,
 	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
 	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, s_Lautstaerke_der_Musik_aendern_801E3294, s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4,
-	s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, s_MenuOptionMonoUpper_803334A8,
-	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, s_MenuOptionNormalIt_803334B0,
-	s_MenuOptionForza_803334B8, s_MenuOptionDifesa_803334C0, s_Indicatori_di_posizione_801E3318, s_MenuOptionSonoro_803334C8,
-	s_MenuOptionMusica_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
+	s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC, const_cast<char*>(s_MenuOptionOnDe), const_cast<char*>(s_MenuOptionOffDe), const_cast<char*>(s_MenuOptionStereoDe), const_cast<char*>(s_MenuOptionMonoUpper_803334A8),
+	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), s_Erweitert_801E330C, const_cast<char*>(s_MenuOptionNormalIt_803334B0),
+	const_cast<char*>(s_MenuOptionForza_803334B8), const_cast<char*>(s_MenuOptionDifesa_803334C0), s_Indicatori_di_posizione_801E3318, const_cast<char*>(s_MenuOptionSonoro_803334C8),
+	const_cast<char*>(s_MenuOptionMusica_803334D0), s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
 	s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354,
 	s_Scegli_tra_sonoro_mono_o_stereo_801E3390, s_Regola_il_volume_della_musica_801E33B4,
 	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
-	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
-	s_MenuOptionContr_803334E0, s_MenuOptionNorm_803334E8,
+	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_MenuOptionMonoIt_803334D8), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
+	const_cast<char*>(s_MenuOptionContr_803334E0), const_cast<char*>(s_MenuOptionNorm_803334E8),
 	const_cast<char*>(s_Force_803334F0), s_ResistanceFr_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
 	const_cast<char*>(s_Musique_803334F8), s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
 	s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4, s_Reglez_le_volume_de_la_musique_801E34E0, s_Reglez_le_volume_des_effets_sonores_801E3500, s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524, const_cast<char*>(s_Active_80333500),
-	s_MenuOptionDesactive_801E355C, const_cast<char*>(s_Stereo_80333508), s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
+	s_MenuOptionDesactive_801E355C, const_cast<char*>(s_Stereo_80333508), const_cast<char*>(s_MenuOptionMonoIt_803334D8), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
 	s_MenuOptionAmeliore_801E3568, s_Standard_801E31E8,
 	const_cast<char*>(s_Fuerza_80333510), const_cast<char*>(s_Defensa_80333518), s_Aro_de_posicion_801E3574, s_Tipo_de_sonido_801E3584,
 	const_cast<char*>(s_Musica_80333520), s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,

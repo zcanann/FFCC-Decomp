@@ -330,46 +330,16 @@ found:
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int blocks = 4;
+	int checked = 0;
 	WindObject* scan = m_objects;
 	WindObject* obj;
 
-	do {
+	for (; checked < 32; checked++, scan++) {
 		if (GetWindActiveFlag(scan) == 0) {
 			obj = scan;
 			goto found;
 		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-		if (GetWindActiveFlag(++scan) == 0) {
-			obj = scan;
-			goto found;
-		}
-
-		scan++;
-	} while (--blocks != 0);
+	}
 
 	obj = 0;
 

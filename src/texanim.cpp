@@ -89,9 +89,9 @@ inline CTexAnim::CTexAnim()
     m_seqIndex = 0;
     m_frame = zero;
     m_mode = -2;
-    m_chin = zero;
-    m_texGenT = zero;
-    m_texGenS = zero;
+    m_texGen.z = zero;
+    m_texGen.y = zero;
+    m_texGen.x = zero;
 }
 
 /*
@@ -177,15 +177,15 @@ CTexAnim::~CTexAnim()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::SetTexGen()
+inline void CTexAnim::SetTexGen()
 {
     const float zero = FLOAT_8032fb38;
     CMaterial* material = m_refData->m_material;
 
     if (material != 0) {
         CTexScroll* texScroll = material->GetTexScroll(m_refData->m_texSrtIndex);
-        texScroll->m_u0 = m_texGenS;
-        texScroll->m_v0 = m_texGenT;
+        texScroll->m_u0 = m_texGen.x;
+        texScroll->m_v0 = m_texGen.y;
         texScroll->m_u1 = zero;
         texScroll->m_v1 = zero;
         if (zero == texScroll->m_u1) {
@@ -226,7 +226,7 @@ void CTexAnimSet::SetTexGen()
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnim::Find(char* name)
+inline int CTexAnim::Find(char* name)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
         CTexAnimSeq* seq = m_refData->m_texAnimSeqs[i];
@@ -246,7 +246,7 @@ int CTexAnim::Find(char* name)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
+inline void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
     m_seqIndex = seqIndex;
     m_frame = frame;
@@ -285,7 +285,7 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnimSeq::Interp(float frame, Vec& texGen)
+inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
 {
     float currentFrame = (float)fmod((double)frame, (double)(float)m_totalFrames);
     unsigned int keyCount = m_keyCount;
@@ -307,12 +307,13 @@ void CTexAnimSeq::Interp(float frame, Vec& texGen)
         if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
             float t = FLOAT_8032fb38;
             float frameSpan = nextFrame - (float)keyData->m_frame;
-            if (frameSpan != FLOAT_8032fb38) {
+            if (frameSpan == FLOAT_8032fb38) {
+            } else {
                 t = (currentFrame - (float)keyData->m_frame) / frameSpan;
             }
 
-            Vec v1;
             Vec v0;
+            Vec v1;
             PSVECScale(&keyData->m_texGen, &v0, FLOAT_8032fb3c - t);
             PSVECScale(&nextKeyData->m_texGen, &v1, t);
             PSVECAdd(&v0, &v1, &texGen);
@@ -336,7 +337,7 @@ void CTexAnimSeq::Interp(float frame, Vec& texGen)
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnimSeq::IsChin()
+inline int CTexAnimSeq::IsChin()
 {
     return IsTexAnimChinFlag(m_flags);
 }
@@ -349,7 +350,7 @@ int CTexAnimSeq::IsChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnim::IsChin()
+inline int CTexAnim::IsChin()
 {
     CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
     return seq->IsChin();
@@ -363,9 +364,9 @@ int CTexAnim::IsChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-float CTexAnim::GetChin()
+inline float CTexAnim::GetChin()
 {
-    return m_chin;
+    return m_texGen.z;
 }
 
 /*
@@ -376,7 +377,7 @@ float CTexAnim::GetChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-unsigned int CTexAnimSeq::GetTotalFrame()
+inline unsigned int CTexAnimSeq::GetTotalFrame()
 {
     return m_totalFrames;
 }
@@ -389,7 +390,7 @@ unsigned int CTexAnimSeq::GetTotalFrame()
  * EN Size: TODO
  * JP Address: TODO
  */
-char* CTexAnimSeq::GetName()
+inline char* CTexAnimSeq::GetName()
 {
     return m_name;
 }
@@ -402,17 +403,13 @@ char* CTexAnimSeq::GetName()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::AddFrame(float frameStep)
+inline void CTexAnim::AddFrame(float frameStep)
 {
     CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
 
     if (!IsTexAnimE1Flag(seq->m_flags) || !IsTexAnimE1Flag(seq->m_flags) ||
         (FLOAT_8032fb3c != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
-        Vec texGen;
-        seq->Interp(m_frame, texGen);
-        m_texGenS = texGen.x;
-        m_texGenT = texGen.y;
-        m_chin = texGen.z;
+        seq->Interp(m_frame, m_texGen);
 
         if (m_mode != -3) {
             m_frame = m_frame + frameStep;
@@ -472,7 +469,7 @@ void CTexAnimSet::AddFrame()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
+inline void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
 {
     int materialIndex;
     CMaterial* material = m_refData->m_material;
@@ -521,7 +518,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  * EN Size: TODO
  * JP Address: TODO
  */
-CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
+inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
 {
     CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
 
@@ -530,9 +527,9 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
     copy->m_seqIndex = m_seqIndex;
     copy->m_frame = m_frame;
     copy->m_mode = m_mode;
-    copy->m_texGenS = m_texGenS;
-    copy->m_texGenT = m_texGenT;
-    copy->m_chin = m_chin;
+    copy->m_texGen.x = m_texGen.x;
+    copy->m_texGen.y = m_texGen.y;
+    copy->m_texGen.z = m_texGen.z;
 
     return copy;
 }
@@ -545,12 +542,12 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
-    char* seqName = m_name;
 
     chunkFile.PushChunk();
+    char* seqName = m_name;
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id != 'KEY ') {
             if (chunk.m_id != 'INFO') {
@@ -588,7 +585,7 @@ void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
     CRef* ref = m_refData;
@@ -606,16 +603,16 @@ void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
+        case 'NAME':
+            m_refData->m_texSrtIndex = chunk.m_arg0;
+            strcpy(m_refData->m_name, chunkFile.GetString());
+            break;
         case 'SEQ ': {
             CTexAnimSeq* seq = new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq;
             seq->Create(chunkFile, stage);
             m_refData->m_texAnimSeqs.Add(seq);
             break;
         }
-        case 'NAME':
-            m_refData->m_texSrtIndex = chunk.m_arg0;
-            strcpy(m_refData->m_name, chunkFile.GetString());
-            break;
         default:
             break;
         }

@@ -562,7 +562,7 @@ static inline void RetainRefCounted(void* refObject)
 	}
 }
 
-static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
+static inline void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 {
 	dst->m_refData = src->m_refData;
 	PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
@@ -619,7 +619,7 @@ static bool s_charaMeshWorkOverflowSeen = false;
  * JP Address: TODO
  * JP Size: TODO
  */
-void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
+inline void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 {
 	for (int r = 0; r < 3; r++) {
 		for (int c = 0; c < 3; c++) {

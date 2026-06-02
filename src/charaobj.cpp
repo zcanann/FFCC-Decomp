@@ -120,7 +120,7 @@ static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 	if (charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
 		return -1;
 	}
-	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];
+	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 }
 
 struct CharaObjModelAnimState

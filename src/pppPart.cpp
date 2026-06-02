@@ -86,8 +86,6 @@ Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 extern "C" const char s_pppPart_cpp[];
 extern "C" const char s_ERROR_prog_NULL[];
 extern "C" const char s_CPartPcs_heap_801D821C[];
@@ -2330,11 +2328,11 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 	GXSetArray((GXAttr)0xB, *(void**)((u8*)model + 0x3C), 4);
 	GXSetArray((GXAttr)0xD, *(void**)((u8*)model + 0x38), 4);
 	GXSetArray((GXAttr)0xE, *(void**)((u8*)model + 0x38), 4);
-	*(void**)(MaterialManRaw() + 4) = *(void**)((u8*)model + 0x30);
+	MaterialMan.SetGeometryArraySource(*(void**)((u8*)model + 0x30));
 
 	if (usePartMaterial == 0)
 	{
-		GXSetArray((GXAttr)10, *(void**)(MaterialManRaw() + 4), 6);
+		GXSetArray((GXAttr)10, MaterialMan.GetGeometryArraySource(), 6);
 	}
 
 	model->DrawPart(ppvEnv->m_materialSetPtr, usePartMaterial);
@@ -2429,21 +2427,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 
-	*(u32*)(MaterialManRaw() + 0x48) = 0x000ACE0F;
-	*(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
-	*(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-	*(u32*)(MaterialManRaw() + 0x11C) = 0;
-	*(u32*)(MaterialManRaw() + 0x120) = 0x1E;
-	*(u32*)(MaterialManRaw() + 0x124) = 0;
-	*(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-	*(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-	*(u32*)(MaterialManRaw() + 0x58) = 0;
-	*(u32*)(MaterialManRaw() + 0x5C) = 0;
-	*(u8*)(MaterialManRaw() + 0x208) = 0;
-	*(u32*)(MaterialManRaw() + 0x128) = 0;
-	*(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
-	*(u32*)(MaterialManRaw() + 0x130) = 0;
-	*(u32*)(MaterialManRaw() + 0x40) = 0x000ACE0F;
+	MaterialMan.SetDefaultStdDrawEnv(0x000ACE0F);
 
 	if (s_light_mode != lightTarget) {
 		s_light_mode = lightTarget;

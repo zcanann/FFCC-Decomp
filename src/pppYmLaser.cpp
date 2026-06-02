@@ -39,17 +39,6 @@ static inline f32 LoadLaserFloat(const f32& value)
 	return value;
 }
 
-static inline f64 U32ToDouble(u32 value)
-{
-	union {
-		u64 bits;
-		f64 value;
-	} conv;
-
-	conv.bits = 0x4330000000000000ULL | value;
-	return conv.value - kPppVertexApMtxDoubleBias;
-}
-
 struct pppYmLaserWork {
 	float m_length;
 	float m_lengthStep;
@@ -81,7 +70,17 @@ static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* c
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 }
 
+struct pppYmLaserCylinder {
+	Vec m_bottom;
+	Vec m_top;
+	Vec m_axis;
+	float m_radius;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
+};
+
 STATIC_ASSERT(offsetof(struct pppYmLaser, m_workArea) == 0x80);
+STATIC_ASSERT(sizeof(pppYmLaserCylinder) == sizeof(CMapCylinder));
 
 /*
  * --INFO--
@@ -203,7 +202,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		           step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = FLOAT_80330DC4 / (f32)U32ToDouble(count);
+		uvStep = FLOAT_80330DC4 / (f32)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -369,11 +368,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Vec localA;
 	Mtx tempMtx;
 	Mtx charaMtx;
-	CMapCylinder cyl;
+	pppYmLaserCylinder cyl;
 	int emptyHistory;
 	int fillIndex;
 
-	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 0xFFFF)) {
+	if ((ppvUserStopPartF == 0) && (step->m_stepValue != 0xFFFF)) {
 	work = GetYmLaserWork(laser, data);
 	emptyHistory = 0;
 
@@ -444,7 +443,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

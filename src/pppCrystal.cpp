@@ -247,7 +247,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	CMapMesh* mapMesh;
 	int textureIndex;
 
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

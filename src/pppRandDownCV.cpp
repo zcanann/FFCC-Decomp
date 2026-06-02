@@ -41,7 +41,7 @@ void pppRandDownCV(_pppPObject* basePtr, RandDownCVParams* in, _pppCtrlTable* ct
     u8* target;
     f32* valuePtr;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

@@ -43,7 +43,7 @@ void pppSclAccele(_pppPObject* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3
     float* scale = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
     float* accel = (float*)(arg1->m_workArea + arg3->m_serializedDataOffsets[1]);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

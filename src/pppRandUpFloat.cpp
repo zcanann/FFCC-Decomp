@@ -23,7 +23,7 @@ struct RandUpFloatParam {
  * JP Size: TODO
  */
 void pppRandUpFloat(_pppPObject* basePtr, RandUpFloatParam* in, _pppCtrlTable* ctrl) {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

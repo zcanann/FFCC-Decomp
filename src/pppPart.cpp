@@ -2069,7 +2069,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	pppMngStDeadRaw* mng = (pppMngStDeadRaw*)pppMngSt;
 	u32 maxDeleteFrame = 0;
 
-	if (gPppCalcDisabled == 0)
+	if (ppvUserStopPartF == 0)
 	{
 		_pppPObjLink* prev = &mng->m_objHead;
 		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
@@ -2181,7 +2181,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		}
 	}
 
-	if (gPppCalcDisabled == 0)
+	if (ppvUserStopPartF == 0)
 	{
 		mng->m_prevFrame = mng->m_currentFrame;
 		mng->m_currentFrame += 0x1000;
@@ -2216,7 +2216,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
  */
 void _pppInitPart(_pppMngSt* pppMngSt)
 {
-	if (gPppCalcDisabled != 0)
+	if (ppvUserStopPartF != 0)
 	{
 		return;
 	}

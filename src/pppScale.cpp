@@ -41,7 +41,7 @@ void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  */
 void pppScale(_pppPObject* obj, void* param2, _pppCtrlTable* ctrlTable)
 {
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

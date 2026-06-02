@@ -161,10 +161,10 @@ void pppLight(_pppPObject* object, void* stepData, void* ctrlData)
 	PppLightStep* step = (PppLightStep*)stepData;
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)ctrlData;
 
-	if (gPppCalcDisabled == 0) {
+	if (ppvUserStopPartF == 0) {
 		PppLightWork* work = (PppLightWork*)(object->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
 
-		if (gPppCalcDisabled != 0) {
+		if (ppvUserStopPartF != 0) {
 			goto create_light;
 		}
 

@@ -1410,7 +1410,7 @@ void CMapObj::Draw(unsigned char priority)
 
     lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
+                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
                               reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
 
@@ -1421,9 +1421,8 @@ void CMapObj::Draw(unsigned char priority)
         GXSetZMode(1, GX_LEQUAL, 0);
     }
 
-    CMapMesh* mapMesh = reinterpret_cast<CMapMesh*>(m_mapData);
-    mapMesh->SetRenderArray();
-    mapMesh->Draw(0);
+    reinterpret_cast<CMapMesh*>(m_mapData)->SetRenderArray();
+    reinterpret_cast<CMapMesh*>(m_mapData)->Draw(0);
 
     if (U8At(this, 0x27) != 0) {
         GXSetZMode(1, GX_LEQUAL, 1);

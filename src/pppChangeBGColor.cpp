@@ -17,7 +17,7 @@ void pppFrameChangeBGColor(_pppPObject* pppChangeBGColor, void* param_2, _pppCtr
     unsigned char* data;
     int dataOffset;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

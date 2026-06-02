@@ -22,6 +22,10 @@ extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 extern const double DOUBLE_80330CA0 = 4503599627370496.0;
 extern const float kYmBreathSpreadScale = 2.0f;
 extern const double kYmBreathHalfChance = 0.5;
+extern "C" const char s_CardGameCode_80330CB8[] = "FFCC";
+extern "C" const char s_CardMakerCode_80330CC0[] = "GDS";
+extern "C" const char s_CardMachineCode_80330CC4[] = "GC";
+extern "C" const char s_CardVersion_80330CC8[] = "1.00";
 
 static inline float LoadFloat(const float& value)
 {
@@ -512,7 +516,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Vec origin;
     Vec target;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -673,7 +677,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     spawnCount = 0;
     emitFrameCounter = &vYmBreath->m_emitFrameCounter;
 
-    if ((gPppCalcDisabled == 0) && (params->m_shapeStepValue != 0xFFFF)) {
+    if ((ppvUserStopPartF == 0) && (params->m_shapeStepValue != 0xFFFF)) {
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {
@@ -1059,11 +1063,6 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particleColor->m_colorFrameDeltas[3] = params->m_colorFrameDelta3;
     }
 }
-
-extern "C" const char s_CardGameCode_80330CB8[] = "FFCC";
-extern "C" const char s_CardMakerCode_80330CC0[] = "GDS";
-extern "C" const char s_CardMachineCode_80330CC4[] = "GC";
-extern "C" const char s_CardVersion_80330CC8[] = "1.00";
 
 /*
  * --INFO--

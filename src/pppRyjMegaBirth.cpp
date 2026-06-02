@@ -648,7 +648,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	colorData = work->m_colorBlock;
 	maxParticles = work->m_numParticles;
 
-	if ((gPppCalcDisabled == 0) && (param->m_shapeIndex != 0xFFFF))
+	if ((ppvUserStopPartF == 0) && (param->m_shapeIndex != 0xFFFF))
 	{
 		work->m_emitTimer = work->m_emitTimer + 1;
 

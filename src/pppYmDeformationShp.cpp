@@ -58,6 +58,49 @@ static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnk
 	return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
+static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
+{
+	uvs[0].x = left;
+	uvs[0].y = top;
+	uvs[1].x = right;
+	uvs[1].y = top;
+	uvs[2].x = right;
+	uvs[2].y = bottom;
+	uvs[3].x = left;
+	uvs[3].y = bottom;
+}
+
+static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float top, float right, float bottom)
+{
+	if (orientation == 0) {
+		vertices[0].x = left;
+		vertices[0].y = top;
+		vertices[0].z = kPppYmDeformationShpZero;
+		vertices[1].x = right;
+		vertices[1].y = top;
+		vertices[1].z = kPppYmDeformationShpZero;
+		vertices[2].x = right;
+		vertices[2].y = bottom;
+		vertices[2].z = kPppYmDeformationShpZero;
+		vertices[3].x = left;
+		vertices[3].y = bottom;
+		vertices[3].z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		vertices[0].x = left;
+		vertices[0].y = kPppYmDeformationShpZero;
+		vertices[0].z = top;
+		vertices[1].x = right;
+		vertices[1].y = kPppYmDeformationShpZero;
+		vertices[1].z = top;
+		vertices[2].x = right;
+		vertices[2].y = kPppYmDeformationShpZero;
+		vertices[2].z = bottom;
+		vertices[3].x = left;
+		vertices[3].y = kPppYmDeformationShpZero;
+		vertices[3].z = bottom;
+	}
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8008eec8
@@ -121,42 +164,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		if (param_2->m_splitMode == 0) {
 			u8 size = param_2->m_size;
 			float quadSize = (float)size;
-			if (((s8)param_2->m_orientation) == 0) {
-				vertices[0].x = -quadSize;
-				vertices[0].y = quadSize;
-				vertices[0].z = kPppYmDeformationShpZero;
-				vertices[1].x = quadSize;
-				vertices[1].y = quadSize;
-				vertices[1].z = kPppYmDeformationShpZero;
-				vertices[2].x = quadSize;
-				vertices[2].y = -quadSize;
-				vertices[2].z = kPppYmDeformationShpZero;
-				vertices[3].x = -quadSize;
-				vertices[3].y = -quadSize;
-				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (((s8)param_2->m_orientation) == 1) {
-				vertices[0].x = -quadSize;
-				vertices[0].y = kPppYmDeformationShpZero;
-				vertices[0].z = -quadSize;
-				vertices[1].x = quadSize;
-				vertices[1].y = kPppYmDeformationShpZero;
-				vertices[1].z = -quadSize;
-				vertices[2].x = quadSize;
-				vertices[2].y = kPppYmDeformationShpZero;
-				vertices[2].z = quadSize;
-				vertices[3].x = -quadSize;
-				vertices[3].y = kPppYmDeformationShpZero;
-				vertices[3].z = quadSize;
-			}
-
-			uvs[0].x = kPppYmDeformationShpZero;
-			uvs[0].y = kPppYmDeformationShpZero;
-			uvs[1].x = FLOAT_803305f8;
-			uvs[1].y = kPppYmDeformationShpZero;
-			uvs[2].x = FLOAT_803305f8;
-			uvs[2].y = FLOAT_803305f8;
-			uvs[3].x = kPppYmDeformationShpZero;
-			uvs[3].y = FLOAT_803305f8;
+			setVertexPos(vertices, (s8)param_2->m_orientation, -quadSize, quadSize, quadSize, -quadSize);
+			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, FLOAT_803305f8, FLOAT_803305f8);
 			RenderDeformationShape(object, work, vertices, uvs);
 		} else {
 			short size = param_2->m_size;
@@ -164,158 +173,22 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			float uvSplit = (FLOAT_803305f8 / (float)(size + size)) * (float)(size - split);
 			float uvRemainder;
 
-			if (((s8)param_2->m_orientation) == 0) {
-				vertices[0].x = -size;
-				vertices[0].y = -split;
-				vertices[0].z = kPppYmDeformationShpZero;
-				vertices[1].x = -split;
-				vertices[1].y = -split;
-				vertices[1].z = kPppYmDeformationShpZero;
-				vertices[2].x = -split;
-				vertices[2].y = split;
-				vertices[2].z = kPppYmDeformationShpZero;
-				vertices[3].x = -size;
-				vertices[3].y = split;
-				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (((s8)param_2->m_orientation) == 1) {
-				vertices[0].x = -size;
-				vertices[0].y = kPppYmDeformationShpZero;
-				vertices[0].z = -split;
-				vertices[1].x = -split;
-				vertices[1].y = kPppYmDeformationShpZero;
-				vertices[1].z = -split;
-				vertices[2].x = -split;
-				vertices[2].y = kPppYmDeformationShpZero;
-				vertices[2].z = split;
-				vertices[3].x = -size;
-				vertices[3].y = kPppYmDeformationShpZero;
-				vertices[3].z = split;
-			}
-
+			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);
 			uvRemainder = FLOAT_803305f8 - uvSplit;
-			uvs[0].x = kPppYmDeformationShpZero;
-			uvs[0].y = kPppYmDeformationShpZero;
-			uvs[1].x = uvSplit;
-			uvs[1].y = kPppYmDeformationShpZero;
-			uvs[2].x = uvSplit;
-			uvs[2].y = uvRemainder;
-			uvs[3].x = kPppYmDeformationShpZero;
-			uvs[3].y = uvRemainder;
+			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, uvSplit, uvRemainder);
 			RenderDeformationShape(object, work, vertices, uvs);
 
-			if (((s8)param_2->m_orientation) == 0) {
-				vertices[0].x = split;
-				vertices[0].y = -split;
-				vertices[0].z = kPppYmDeformationShpZero;
-				vertices[1].x = size;
-				vertices[1].y = -split;
-				vertices[1].z = kPppYmDeformationShpZero;
-				vertices[2].x = size;
-				vertices[2].y = split;
-				vertices[2].z = kPppYmDeformationShpZero;
-				vertices[3].x = split;
-				vertices[3].y = split;
-				vertices[3].z = kPppYmDeformationShpZero;
-			} else if (((s8)param_2->m_orientation) == 1) {
-				vertices[0].x = split;
-				vertices[0].y = kPppYmDeformationShpZero;
-				vertices[0].z = -split;
-				vertices[1].x = size;
-				vertices[1].y = kPppYmDeformationShpZero;
-				vertices[1].z = -split;
-				vertices[2].x = size;
-				vertices[2].y = kPppYmDeformationShpZero;
-				vertices[2].z = split;
-				vertices[3].x = split;
-				vertices[3].y = kPppYmDeformationShpZero;
-				vertices[3].z = split;
-			}
-
-			uvs[0].x = FLOAT_803305f8;
-			uvs[0].y = uvSplit;
-			uvs[1].x = uvRemainder;
-			uvs[1].y = uvSplit;
-			uvs[2].x = uvRemainder;
-			uvs[2].y = uvRemainder;
-			uvs[3].x = FLOAT_803305f8;
-			uvs[3].y = uvRemainder;
+			setVertexPos(vertices, (s8)param_2->m_orientation, split, -split, size, split);
+			setVertexUV(uvs, FLOAT_803305f8, uvSplit, uvRemainder, uvRemainder);
 			RenderDeformationShape(object, work, vertices, uvs);
 
 			if (param_2->m_splitMode == 1) {
-				if (((s8)param_2->m_orientation) == 0) {
-					vertices[0].x = -size;
-					vertices[0].y = -size;
-					vertices[0].z = kPppYmDeformationShpZero;
-					vertices[1].x = size;
-					vertices[1].y = -size;
-					vertices[1].z = kPppYmDeformationShpZero;
-					vertices[2].x = size;
-					vertices[2].y = -split;
-					vertices[2].z = kPppYmDeformationShpZero;
-					vertices[3].x = -size;
-					vertices[3].y = -split;
-					vertices[3].z = kPppYmDeformationShpZero;
-				} else if (((s8)param_2->m_orientation) == 1) {
-					vertices[0].x = -size;
-					vertices[0].y = kPppYmDeformationShpZero;
-					vertices[0].z = -size;
-					vertices[1].x = size;
-					vertices[1].y = kPppYmDeformationShpZero;
-					vertices[1].z = -size;
-					vertices[2].x = size;
-					vertices[2].y = kPppYmDeformationShpZero;
-					vertices[2].z = -split;
-					vertices[3].x = -size;
-					vertices[3].y = kPppYmDeformationShpZero;
-					vertices[3].z = -split;
-				}
-
-				uvs[0].x = kPppYmDeformationShpZero;
-				uvs[0].y = kPppYmDeformationShpZero;
-				uvs[1].x = FLOAT_803305f8;
-				uvs[1].y = kPppYmDeformationShpZero;
-				uvs[2].x = FLOAT_803305f8;
-				uvs[2].y = uvSplit;
-				uvs[3].x = kPppYmDeformationShpZero;
-				uvs[3].y = uvSplit;
+				setVertexPos(vertices, (s8)param_2->m_orientation, -size, -size, size, -split);
+				setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, FLOAT_803305f8, uvSplit);
 				RenderDeformationShape(object, work, vertices, uvs);
 
-				if (((s8)param_2->m_orientation) == 0) {
-					vertices[0].x = split;
-					vertices[0].y = -size;
-					vertices[0].z = kPppYmDeformationShpZero;
-					vertices[1].x = size;
-					vertices[1].y = -size;
-					vertices[1].z = kPppYmDeformationShpZero;
-					vertices[2].x = size;
-					vertices[2].y = size;
-					vertices[2].z = kPppYmDeformationShpZero;
-					vertices[3].x = split;
-					vertices[3].y = size;
-					vertices[3].z = kPppYmDeformationShpZero;
-				} else if (((s8)param_2->m_orientation) == 1) {
-					vertices[0].x = split;
-					vertices[0].y = kPppYmDeformationShpZero;
-					vertices[0].z = -size;
-					vertices[1].x = size;
-					vertices[1].y = kPppYmDeformationShpZero;
-					vertices[1].z = -size;
-					vertices[2].x = size;
-					vertices[2].y = kPppYmDeformationShpZero;
-					vertices[2].z = size;
-					vertices[3].x = split;
-					vertices[3].y = kPppYmDeformationShpZero;
-					vertices[3].z = size;
-				}
-
-				uvs[0].x = kPppYmDeformationShpZero;
-				uvs[0].y = uvRemainder;
-				uvs[1].x = FLOAT_803305f8;
-				uvs[1].y = uvRemainder;
-				uvs[2].x = FLOAT_803305f8;
-				uvs[2].y = FLOAT_803305f8;
-				uvs[3].x = kPppYmDeformationShpZero;
-				uvs[3].y = FLOAT_803305f8;
+				setVertexPos(vertices, (s8)param_2->m_orientation, split, -size, size, size);
+				setVertexUV(uvs, kPppYmDeformationShpZero, uvRemainder, FLOAT_803305f8, FLOAT_803305f8);
 				RenderDeformationShape(object, work, vertices, uvs);
 			}
 		}
@@ -542,7 +415,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 {
 	VYmDeformationShp* state;
 
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

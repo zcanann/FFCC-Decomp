@@ -580,6 +580,8 @@ void CSound::Realloc(int isMinMemoryMode)
         return;
     }
 
+    char sePath[256];
+
     if (m_redSound.ReentryWaveData(0) == -1) {
         if (m_waveFile != 0) {
             File.Close(m_waveFile);
@@ -629,7 +631,6 @@ void CSound::Realloc(int isMinMemoryMode)
     }
 
     for (int i = 0; i < 4; i++) {
-        char sePath[260];
         sprintf(sePath, s_soundSeBlockPathFmt, i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {

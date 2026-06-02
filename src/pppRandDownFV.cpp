@@ -31,7 +31,7 @@ static inline float randf(float value, float scale)
  */
 void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

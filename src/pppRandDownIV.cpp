@@ -39,7 +39,7 @@ static inline int randint(int value, float scale)
  */
 void pppRandDownIV(_pppPObject* basePtr, RandDownIVParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

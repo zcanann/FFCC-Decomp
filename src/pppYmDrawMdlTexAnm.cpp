@@ -131,7 +131,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     s32 i;
 
     work = GetYmDrawMdlTexAnmWork(object, ctrl);
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -194,14 +194,12 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     CMapMesh* mapMesh;
     s32 i;
     s32 frameU;
-    u32 tilesU;
 
     work = GetYmDrawMdlTexAnmWork(object, ctrl);
     if ((work->m_frame != 0) && ((mapMesh = GetMapMeshTable()[0]) != NULL)) {
         for (i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
-            tilesU = work->m_tilesU;
-            frameU = work->m_frame / tilesU;
-            s32 frameModU = work->m_frame - frameU * tilesU;
+            frameU = work->m_frame / work->m_tilesU;
+            s32 frameModU = work->m_frame - frameU * work->m_tilesU;
 
             mapMesh->m_uvPairs[i].m_u =
                 (s16)(int)-(((f32)frameModU * work->m_perU) - (f32)mapMesh->m_uvPairs[i].m_u);

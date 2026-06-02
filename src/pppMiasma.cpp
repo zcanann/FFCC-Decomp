@@ -128,7 +128,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlT
 {
     MiasmaFrameWork* work;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -263,7 +263,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     Mtx secondLocalMtx;
     Mtx secondScaleMtx;
     GXColor stepColor;
-    GXColor* modelColor;
 
     Graphic.SetDrawDoneDebugData(0x31);
 
@@ -358,13 +357,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
         GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
-        modelColor = static_cast<GXColor*>(model->m_colors);
-        modelColor->r = 0xFF;
-        modelColor->g = 0xFF;
-        modelColor->b = 0xFF;
-        modelColor->a = 0xFF;
-        GXSetChanAmbColor(GX_COLOR0A0, *modelColor);
-        GXSetChanMatColor(GX_COLOR0A0, *modelColor);
+        static_cast<GXColor*>(model->m_colors)->r = 0xFF;
+        static_cast<GXColor*>(model->m_colors)->g = 0xFF;
+        static_cast<GXColor*>(model->m_colors)->b = 0xFF;
+        static_cast<GXColor*>(model->m_colors)->a = 0xFF;
+        GXSetChanAmbColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
+        GXSetChanMatColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
         GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
@@ -432,13 +430,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
             GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
 
-            modelColor = static_cast<GXColor*>(model->m_colors);
-            modelColor->r = 0xFF;
-            modelColor->g = 0xFF;
-            modelColor->b = 0xFF;
-            modelColor->a = 0xFF;
-            GXSetChanAmbColor(GX_COLOR0A0, *modelColor);
-            GXSetChanMatColor(GX_COLOR0A0, *modelColor);
+            static_cast<GXColor*>(model->m_colors)->r = 0xFF;
+            static_cast<GXColor*>(model->m_colors)->g = 0xFF;
+            static_cast<GXColor*>(model->m_colors)->b = 0xFF;
+            static_cast<GXColor*>(model->m_colors)->a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
+            GXSetChanMatColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
             GXSetNumTevStages(1);

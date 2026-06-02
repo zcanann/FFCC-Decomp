@@ -112,11 +112,41 @@ CRelProfile g_hit_prof;
 unsigned char g_map_calc_prof;
 unsigned char g_map_draw_prof;
 extern const float DrawRangeDefault;
+extern const float kPMapBoundMinInit;
+extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern const char s_p_map_cpp[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
+
+namespace {
+struct PMapBound
+{
+    PMapBound()
+    {
+        m_min.z = kPMapBoundMinInit;
+        m_min.y = kPMapBoundMinInit;
+        m_min.x = kPMapBoundMinInit;
+        m_max.z = kPMapBoundMaxInit;
+        m_max.y = kPMapBoundMaxInit;
+        m_max.x = kPMapBoundMaxInit;
+    }
+
+    void operator=(const CBound& other)
+    {
+        *this = *reinterpret_cast<const PMapBound*>(&other);
+    }
+
+    CBound& AsBound()
+    {
+        return *reinterpret_cast<CBound*>(this);
+    }
+
+    Vec m_min;
+    Vec m_max;
+};
+}
 
 /*
  * --INFO--
@@ -756,8 +786,9 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound = CameraPcs.m_shadowRectBound;
-                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                PMapBound bound;
+                bound = CameraPcs.m_shadowRectBound;
+                Graphic.DrawBound(bound.AsBound(), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -805,10 +836,11 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBound bound = CameraPcs.m_shadowRectBound;
+                PMapBound bound;
+                bound = CameraPcs.m_shadowRectBound;
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
-                Graphic.DrawBound(bound, color);
+                Graphic.DrawBound(bound.AsBound(), color);
             }
         }
     }

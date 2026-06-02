@@ -53,7 +53,7 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
     f32 sinAngle;
     f32 cosAngle;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

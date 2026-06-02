@@ -1104,8 +1104,8 @@ void CMaterialMan::SetUnderWaterTex()
     int width = 0x280;
     int height = 0x1C0;
 
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = reinterpret_cast<int>(Graphic.GetBackBufferRect(x, y, width, height, 1));
-    if (*reinterpret_cast<int*>(Ptr(this, 0xC)) == 0) {
+    m_underWaterTexture = Graphic.GetBackBufferRect(x, y, width, height, 1);
+    if (m_underWaterTexture == 0) {
         return;
     }
 
@@ -1113,9 +1113,8 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx matrixB;
     Mtx44 screenMtx;
     PSMTXIdentity(matrixA);
-    unsigned char* cameraPcs = reinterpret_cast<unsigned char*>(&CameraPcs);
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x94), screenMtx);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(cameraPcs + 0x4), matrixB);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
 
     matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
     matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));
@@ -1127,7 +1126,7 @@ void CMaterialMan::SetUnderWaterTex()
     matrixA[1][2] = FLOAT_8032fb10;
     matrixA[2][2] = FLOAT_8032fb14;
 
-    PSMTXConcat(matrixA, matrixB, reinterpret_cast<MtxPtr>(Ptr(this, 0x10)));
+    PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
 
 /*

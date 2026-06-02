@@ -306,7 +306,8 @@ public:
 private:
     void* m_geometryArraySource;        // 0x04
     Vec* m_manaReflectionVec;           // 0x08
-    unsigned char m_pad00C[0x34];
+    _GXTexObj* m_underWaterTexture;      // 0x0C
+    Mtx m_underWaterTexMtx;              // 0x10
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48

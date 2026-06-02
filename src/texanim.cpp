@@ -548,9 +548,9 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
 void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
-    char* seqName = m_name;
 
     chunkFile.PushChunk();
+    char* seqName = m_name;
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id != 'KEY ') {
             if (chunk.m_id != 'INFO') {
@@ -606,16 +606,16 @@ void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
+        case 'NAME':
+            m_refData->m_texSrtIndex = chunk.m_arg0;
+            strcpy(m_refData->m_name, chunkFile.GetString());
+            break;
         case 'SEQ ': {
             CTexAnimSeq* seq = new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq;
             seq->Create(chunkFile, stage);
             m_refData->m_texAnimSeqs.Add(seq);
             break;
         }
-        case 'NAME':
-            m_refData->m_texSrtIndex = chunk.m_arg0;
-            strcpy(m_refData->m_name, chunkFile.GetString());
-            break;
         default:
             break;
         }

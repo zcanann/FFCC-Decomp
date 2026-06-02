@@ -2806,10 +2806,11 @@ void CMenuPcs::CalcResultOpenAnim()
 		sprites[countBase].alpha = 0.0f;
 		sprites[countBase].duration = 10;
 		sprites[countBase].depth = 1.0f;
-		s_CntTop = (unsigned char)(labelBase + activePartyCount + 1);
+		int countTop = labelBase + activePartyCount + 1;
+		s_CntTop = (unsigned char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[(int)s_CntTop + i];
+			BonusAnimSprite* sprite = &sprites[countTop + i];
 			BonusAnimSprite* count = &sprites[countBase];
 			sprite->kind = 0x19;
 			sprite->x = 0x200;
@@ -2846,7 +2847,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		entryOffset = activePartyCount * 0x50;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[(int)s_CntTop + i];
+			BonusAnimSprite* sprite = &sprites[countTop + i];
 			int extent = sprite->w * 3 + 0x20;
 			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
@@ -2875,7 +2876,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		header->count = (short)((int)s_CntTop + activePartyCount);
+		header->count = (short)(countTop + activePartyCount);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		header->finished = 0;
 		return;

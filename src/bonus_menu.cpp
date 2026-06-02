@@ -2032,7 +2032,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 100.0f;
-			sprite->x = (short)((float)sprite->x - sprite->motionX);
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
@@ -2058,7 +2058,7 @@ void CMenuPcs::CalcResultCloseAnim()
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;
 			sprite->motionX = 100.0f;
-			sprite->x = (short)((float)sprite->x - sprite->motionX);
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
 		}
 
 		int countTop = digitEchoBase + activePartyCount + 1;

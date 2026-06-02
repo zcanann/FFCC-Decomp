@@ -412,7 +412,7 @@ void CCharaPcs::calcViewer()
                 }
                 self->m_viewerLoadAnim = 0;
             } else {
-                for (i = 0; i < static_cast<unsigned int>(self->m_viewerAnimRequestedCount); i++) {
+                for (int animIndex = 0; animIndex < self->m_viewerAnimRequestedCount; animIndex++) {
                     sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, self->m_viewerAnimLoadedCount);
                     System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);

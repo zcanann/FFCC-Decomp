@@ -639,7 +639,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                                   GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
                 }
             } else {
-                unsigned int mipmap = (1 - m_maxLod) >> 31;
+                int mipmap = (1 - m_maxLod) >> 31;
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                              static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
@@ -805,7 +805,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                           GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         }
     } else {
-        unsigned int mipmap = (1 - m_maxLod) >> 31;
+        int mipmap = (1 - m_maxLod) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                      static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
@@ -841,7 +841,7 @@ void CTexture::InitTexObj()
                           GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         }
     } else {
-        unsigned int mipmap = (1 - m_maxLod) >> 31;
+        int mipmap = (1 - m_maxLod) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                      static_cast<GXTexWrapMode>(m_wrapMode), mipmap);

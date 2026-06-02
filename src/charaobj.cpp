@@ -2709,11 +2709,16 @@ int CGCharaObj::calcCastTime(int itemId)
 
 	if (itemNo != 0x1F8 && itemType == 2) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
-		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			int stageLevel = 2;
-			if (stage < 2) {
-				stageLevel = stage;
+		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
+			int stageLevel;
+			if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+				stageLevel = 2;
+				if (stage < 2) {
+					stageLevel = stage;
+				}
+			} else {
+				stageLevel = 0;
 			}
 			if (stageLevel > 0) {
 				castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stageLevel * 2));

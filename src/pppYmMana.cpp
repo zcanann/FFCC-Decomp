@@ -76,8 +76,6 @@ struct Vec2d {
 
 extern "C" const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 static inline float LoadFloat(const float& value)
 {
     return value;
@@ -349,24 +347,10 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
             GXSetArray((GXAttr)0xB, *(void**)((u8*)work + 0x68), 4);
             GXSetArray((GXAttr)0xD, *(void**)((u8*)work + 0x6C), 4);
             GXSetArray((GXAttr)0xE, *(void**)((u8*)work + 0x70), 4);
-            *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((u8*)work + 0x64);
-            *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
-            *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-            *(u32*)(MaterialManRaw() + 0x11C) = 0;
-            *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
-            *(u32*)(MaterialManRaw() + 0x124) = 0;
-            *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-            *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-            *(u32*)(MaterialManRaw() + 0x58) = 0;
-            *(u32*)(MaterialManRaw() + 0x5C) = 0;
-            *(u8*)(MaterialManRaw() + 0x208) = 0;
-            *(u32*)(MaterialManRaw() + 0x48) = 0xAEE0F;
-            *(u32*)(MaterialManRaw() + 0x128) = 0;
-            *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
-            *(u32*)(MaterialManRaw() + 0x130) = 0;
-            *(u32*)(MaterialManRaw() + 0x40) = 0xAEE0F;
-            *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((u8*)work + 0x28);
-            *(u32*)(MaterialManRaw() + 0xDC) = *(u32*)((u8*)work + 0x2C);
+            MaterialMan.SetManaReflectionEnv(
+                reinterpret_cast<Vec*>(*(void**)((u8*)work + 0x64)),
+                reinterpret_cast<GXTexObj*>(*(void**)((u8*)work + 0x28)),
+                reinterpret_cast<GXTexObj*>(*(void**)((u8*)work + 0x2C)), 0xAEE0F);
             GXSetCullMode((GXCullMode)1);
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
             MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((u8*)model + 0xA4) + 0x24)),
@@ -523,8 +507,7 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     model = GetCharaModelPtr(handle);
     ClearManaModelCallbacks(model);
     Graphic._WaitDrawDone(const_cast<char*>(s_pppYmMana_cpp), 0x2CE);
-    *(u32*)(MaterialManRaw() + 0xD0) = 0;
-    *(u32*)(MaterialManRaw() + 0xDC) = 0;
+    MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
@@ -705,11 +688,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
 
     SetManaModelCallbacks(model, work, param_2);
 
-    MaterialManRaw()[0xE4] = (u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer);
+    MaterialMan.SetManaAlpha((u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer));
     if (Game.m_currentMapId == 0x21) {
-        MaterialManRaw()[0xE4] = (u8)(gObject->m_lookAtTimer * (float)*((u8*)pppYmMana + 0x8B + setupOffset));
+        MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*((u8*)pppYmMana + 0x8B + setupOffset)));
     }
-    *((u8*)work + 0xE8) = MaterialManRaw()[0xE4];
+    *((u8*)work + 0xE8) = MaterialMan.GetManaAlpha();
 
     if (*(s32*)pppYmMana != 0) {
         return;

@@ -96,7 +96,15 @@ public:
         m_manaParaboloidTexObj0 = 0;
         m_manaParaboloidTexObj1 = 0;
     }
-    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj, unsigned int tevBit)
+    void SetManaAlpha(unsigned char alpha)
+    {
+        m_manaAlpha = alpha;
+    }
+    unsigned char GetManaAlpha()
+    {
+        return m_manaAlpha;
+    }
+    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, _GXTexObj* paraboloidTexObj1, unsigned int tevBit)
     {
         m_manaReflectionVec = reflectionVec;
         m_activeEnvTevBit = 0xFFFFFFFF;
@@ -114,7 +122,8 @@ public:
         m_stdTexMtx = 0x1E;
         m_stdTexCoordId = 0;
         m_stdEnvTevBit = tevBit;
-        m_manaParaboloidTexObj0 = paraboloidTexObj;
+        m_manaParaboloidTexObj0 = paraboloidTexObj0;
+        m_manaParaboloidTexObj1 = paraboloidTexObj1;
     }
 
 private:

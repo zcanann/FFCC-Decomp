@@ -20,7 +20,7 @@
 void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
                                  _pppCtrlTable* param_3)
 {
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
         float* value = (float*)(param_1->m_workArea + *param_3->m_serializedDataOffsets);
 

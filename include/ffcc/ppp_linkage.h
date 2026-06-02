@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 extern int gPppCalcDisabled;
+extern int ppvUserStopPartF;
 extern unsigned char gPppInConstructor;
 extern unsigned char gPppInSubFrameCalc;
 

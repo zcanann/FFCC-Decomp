@@ -30,7 +30,7 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 	u8* state = pObject->m_workArea + offsets[1];
 	Mtx* target = (Mtx*)state;
 
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

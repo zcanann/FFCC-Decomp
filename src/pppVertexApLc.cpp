@@ -65,7 +65,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     s32 stateOffset = *ctrl->stateOffset;
     VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

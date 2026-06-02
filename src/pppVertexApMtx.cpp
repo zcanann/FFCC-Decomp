@@ -71,7 +71,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	s32 stateOffset = *ctrl->stateOffset;
 	VertexApMtxState* state = (VertexApMtxState*)(parent->m_workArea + stateOffset);
 
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		goto exitStub;
 	}
 

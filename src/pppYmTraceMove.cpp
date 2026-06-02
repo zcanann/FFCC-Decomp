@@ -48,7 +48,7 @@ static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)
  */
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, pppYmTraceMoveCtrl* param_3)
 {
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

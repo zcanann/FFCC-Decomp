@@ -24,7 +24,7 @@ struct RandDownCharParams {
  */
 void pppRandDownChar(_pppPObject* basePtr, RandDownCharParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

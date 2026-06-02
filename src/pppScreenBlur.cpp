@@ -42,7 +42,7 @@ void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* blurParam, _pppCt
  */
 void pppFrameScreenBlur(_pppPObject*, void*, _pppCtrlTable*)
 {
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         return;
     }
     return;

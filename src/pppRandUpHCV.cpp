@@ -32,7 +32,7 @@ void pppRandUpHCV(_pppPObject* basePtr, RandUpHCVParams* in, _pppCtrlTable* ctrl
     s16* target;
     f32* valuePtr;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

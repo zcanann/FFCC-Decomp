@@ -9,6 +9,8 @@
 #include "ffcc/textureman.h"
 extern "C" {
 extern const float kPppChangeTexInit;
+extern int ppvUserStopPartF;
+extern unsigned char ppvIsLoopCalc;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
@@ -209,7 +211,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		}
 	}
 
-	if (gPppInConstructor != 0) {
+	if (ppvIsLoopCalc != 0) {
 		return;
 	}
 
@@ -411,12 +413,12 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 				*(int*)(MaterialManRaw() + 0xD0) = (int)texture + 0x28;
 				drawTevBits = 0xACE0F;
 				fullTevBits = drawTevBits | 0x1000;
-				MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
 				displayListIdx = meshData->m_displayListCount - 1;
 				while (displayListIdx >= 0) {
+					ChangeTexDisplayListCopy** displayListCopies = work->m_displayListArrays[meshIdx];
 					MaterialMan.SetChangeTexReflectionState(drawTevBits, fullTevBits);
 					MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-					displayListPtr = work->m_displayListArrays[meshIdx][displayListIdx];
+					displayListPtr = displayListCopies[displayListIdx];
 					GXCallDisplayList(displayListPtr->m_data, displayListPtr->m_size);
 					displayListIdx -= 1;
 					displayList += 1;

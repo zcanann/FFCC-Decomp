@@ -2127,7 +2127,7 @@ void CMaterialMan::IncNumTevStage()
  */
 int CMaterialMan::GetTexMtxCur()
 {
-    return GetMaterialManTexState(this)->texMtxCur;
+    return m_texMtxCur;
 }
 
 /*
@@ -2137,7 +2137,7 @@ int CMaterialMan::GetTexMtxCur()
  */
 int CMaterialMan::GetTexCoordIdCur()
 {
-    return GetMaterialManTexState(this)->texCoordIdCur;
+    return m_texCoordIdCur;
 }
 
 /*
@@ -2151,9 +2151,8 @@ int CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    MaterialManTexState* state = GetMaterialManTexState(this);
-    int texCoordId = state->texCoordIdCur;
-    state->texCoordIdCur = texCoordId + 1;
+    int texCoordId = m_texCoordIdCur;
+    m_texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2168,9 +2167,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    MaterialManTexState* state = GetMaterialManTexState(this);
-    int texMtx = state->texMtxCur;
-    state->texMtxCur = texMtx + 3;
+    int texMtx = m_texMtxCur;
+    m_texMtxCur = texMtx + 3;
     return texMtx;
 }
 
@@ -2211,19 +2209,17 @@ int CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    MaterialManTexState* texState = GetMaterialManTexState(this);
-    MaterialManTevState* tevState = GetMaterialManTevState(this);
-    int stdValue = texState->stdTexMapId;
+    int stdValue = m_stdTexMapId;
 
-    texState->texMapIdCur = stdValue;
-    texState->texMapIdCurShadow = stdValue;
-    stdValue = texState->stdTexMtx;
-    texState->texMtxCur = stdValue;
-    texState->texMtxCurShadow = stdValue;
-    stdValue = texState->stdTexCoordId;
-    texState->texCoordIdCur = stdValue;
-    texState->texCoordIdCurShadow = stdValue;
-    tevState->curEnvTevBit = tevState->stdEnvTevBit;
+    m_texMapIdCur = stdValue;
+    m_texMapIdCurShadow = stdValue;
+    stdValue = m_stdTexMtx;
+    m_texMtxCur = stdValue;
+    m_texMtxCurShadow = stdValue;
+    stdValue = m_stdTexCoordId;
+    m_texCoordIdCur = stdValue;
+    m_texCoordIdCurShadow = stdValue;
+    m_curEnvTevBit = m_stdEnvTevBit;
 }
 
 /*

@@ -443,19 +443,18 @@ void CTexAnimSet::AddFrame()
     unsigned int i = 0;
 
     while (i < static_cast<unsigned int>(m_texAnims.GetSize())) {
-        CTexAnim* texAnim = m_texAnims[i];
         float frameStep;
 
-        if (texAnim->IsChin()) {
+        if (m_texAnims[i]->IsChin()) {
             frameStep = FLOAT_8032fb4c;
         } else {
             frameStep = FLOAT_8032fb3c;
         }
 
-        texAnim->AddFrame(frameStep);
+        m_texAnims[i]->AddFrame(frameStep);
 
-        if (texAnim->IsChin()) {
-            m_chin = texAnim->GetChin();
+        if (m_texAnims[i]->IsChin()) {
+            m_chin = m_texAnims[i]->GetChin();
         } else {
             m_chin = FLOAT_8032fb38;
         }

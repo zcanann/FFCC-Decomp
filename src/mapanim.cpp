@@ -120,9 +120,6 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
-            if (item != 0) {
-                item->m_tracks = 0;
-            }
             item->m_mapAnim = reinterpret_cast<CMapAnimData*>(this);
 
             chunkFile.PushChunk();
@@ -132,11 +129,6 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     item->m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
-                    if (keyData != 0) {
-                        keyData->m_positionKeys = 0;
-                        keyData->m_rotationKeys = 0;
-                        keyData->m_scaleKeys = 0;
-                    }
 
                     item->m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(keyData);
                     mapAnimKeyDtArray->Add(keyData);

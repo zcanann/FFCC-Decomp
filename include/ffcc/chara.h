@@ -24,7 +24,7 @@ struct CCharaModelData
     u16 m_meshCount;
     void* m_nodeRefData;
     void* m_meshRefData;
-    u8 _pad14[0x2];
+    void* m_bank;
     u16 m_headNodeIndex;
     u16 m_chest3NodeIndex;
     u16 m_chest2NodeIndex;
@@ -273,8 +273,8 @@ public:
 			CDisplayList();
 			~CDisplayList();
 
-			void* m_data;
 			s32 m_size;
+			void* m_data;
 			u16 m_material;
 			u16 _padA;
 		};

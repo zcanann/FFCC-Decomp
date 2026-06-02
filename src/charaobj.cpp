@@ -871,18 +871,20 @@ void CGCharaObj::onFrameStat()
 				if (m_subFrame == 0) {
 					reqAnim(m_unk554, 1, 0);
 				}
-			} else if (m_subState == 0) {
-				if (m_subFrame == 0) {
-					reqAnim(m_attackAnimId, 0, 0);
-				}
-
-				if (isLoopAnim() != 0) {
-					if (m_itemId == 0x103) {
-						changeSubStat(2);
-					} else {
-						changeSubStat(1);
+			} else if (m_subState < 1) {
+				if (m_subState >= 0) {
+					if (m_subFrame == 0) {
+						reqAnim(m_attackAnimId, 0, 0);
 					}
-					return;
+
+					if (isLoopAnim() != 0) {
+						if (m_itemId == 0x103) {
+							changeSubStat(2);
+						} else {
+							changeSubStat(1);
+						}
+						return;
+					}
 				}
 			} else if (m_subState < 3) {
 				if (m_subFrame == 0) {

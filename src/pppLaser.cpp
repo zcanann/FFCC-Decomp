@@ -2,6 +2,7 @@
 #include "ffcc/pppLaser.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/game.h"
 #include "ffcc/gobject.h"
 #include "ffcc/partyobj.h"
@@ -12,6 +13,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 
 #include <string.h>
@@ -39,15 +41,6 @@ static inline f32 LaserConst(const f32& value)
 {
     return *reinterpret_cast<const f32*>(&value);
 }
-
-struct CMapCylinderRaw {
-    Vec m_bottom;
-    u8 m_pad0C[0x0C];
-    Vec m_direction;
-    f32 m_radius;
-    Vec m_top;
-    Vec m_direction2;
-};
 
 struct LaserWork {
     float m_length;
@@ -201,7 +194,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     Vec localA;
     Mtx tempMtx;
     Mtx charaMtx;
-    CMapCylinderRaw cyl;
+    CMapCylinder cyl;
 
     int emptyHistory;
     int fillIndex;
@@ -272,17 +265,17 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, LaserConst(kPppLaserDefaultScale));
 
-        cyl.m_top.z = LaserConst(kPppLaserBoundsMax);
-        cyl.m_top.y = LaserConst(kPppLaserBoundsMax);
-        cyl.m_top.x = LaserConst(kPppLaserBoundsMax);
-        cyl.m_direction2.z = LaserConst(kPppLaserBoundsMin);
-        cyl.m_direction2.y = LaserConst(kPppLaserBoundsMin);
-        cyl.m_direction2.x = LaserConst(kPppLaserBoundsMin);
+        cyl.m_boundsMin.z = LaserConst(kPppLaserBoundsMax);
+        cyl.m_boundsMin.y = LaserConst(kPppLaserBoundsMax);
+        cyl.m_boundsMin.x = LaserConst(kPppLaserBoundsMax);
+        cyl.m_boundsMax.z = LaserConst(kPppLaserBoundsMin);
+        cyl.m_boundsMax.y = LaserConst(kPppLaserBoundsMin);
+        cyl.m_boundsMax.x = LaserConst(kPppLaserBoundsMin);
         cyl.m_bottom = work->m_origin;
-        cyl.m_direction = localA;
+        cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);
 
-        int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
+        int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
         int hit = 0;
         if (check != 0) {
             hit = 1;
@@ -342,7 +335,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     created = 0;
                 } else {
                     created = pppCreatePObject(ppvMng, dataVal);
-                    *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)pppLaser;
+                    created->m_link.m_previous = &pppLaser->m_link;
                 }
 
                 Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);
@@ -398,13 +391,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     Vec spherePos;
     Vec debugSource;
     _GXColor color;
-    int tex;
+    CTexture* texture;
 
     if (dataValIndex == 0xFFFF) {
         return;
     }
 
-    tex = GetTextureFromRSD(dataValIndex, ppvEnv);
+    texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(dataValIndex, ppvEnv));
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -423,7 +416,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     gUtil.SetVtxFmt_POS_CLR_TEX();
-    GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+    GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
     halfWidth = work->m_halfWidth;
     length = work->m_length;
@@ -486,9 +479,9 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         } else {
-            tex = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
+            texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_initWOrk, ppvEnv));
             _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-            GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+            GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
         }
 
         GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);

@@ -1498,14 +1498,12 @@ void CMenuPcs::DrawSelectOpenAnim()
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
-
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(unsigned char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xb) == 0) {
+		int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 		int idx;
 		int iconBase;
 		int detailBase;
@@ -1513,7 +1511,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
-		*(short*)(statePtr + 0x22) = 0;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x22) = 0;
 
 		idx = 0;
 		sprites[idx].kind = 0x16;
@@ -1663,8 +1661,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		header->count = (short)idx;
 		header->finished = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xb) = 1;
 	}
+
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);

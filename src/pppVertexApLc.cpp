@@ -170,9 +170,9 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
+void pppVertexApLcCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    s32 offset = **(s32**)((u8*)apLc + 0xC);
+    s32 offset = *ctrl->m_serializedDataOffsets;
     u16* state = (u16*)(obj->m_workArea + offset);
 
     state[0] = 0;

@@ -15,7 +15,7 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
-STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_workArea) == 0x80);
+STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
 struct KeShpTail3XStep {
     s32 m_graphId;
@@ -104,7 +104,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
     int i;
     float scale;
 
-    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_2->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + param_2->m_serializedDataOffsets[0]);
     work->m_initialized = 0;
     work->m_head = 0;
     work->m_shapeFrame = 0;
@@ -142,7 +142,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XWork* work;
-    long** shapeTable;
     long* shapeEntry;
     u8* shapeData;
     int count;
@@ -193,7 +192,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     const float zero = kPppKeShpTail3XZero;
     s32 dataValIndex;
 
-    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -203,7 +202,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)reinterpret_cast<KeShpTail3XAlphaWork*>(
-                   obj->m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
+                   obj->m_object.m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
                kPppKeShpTail3XAlphaScale;
     S4ToF32(&colorStart, &work->m_values[0]);
     S4ToF32(&colorEnd, &work->m_values[4]);
@@ -229,10 +228,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
-    shapeData = (u8*)*shapeTable;
+    shapeData = static_cast<u8*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
 
-    pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
+    pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
 
     shapeScale = (float)step->m_stepValue;
@@ -293,16 +291,16 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
+        PSMTXScaleApply(obj->m_object.m_localMatrix.value, obj->m_object.m_drawMatrix.value,
                         localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
                         localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
                         localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-            pppMulMatrix(obj->field_0x40, rotMtx, obj->field_0x40);
+            pppMulMatrix(obj->m_object.m_drawMatrix, rotMtx, obj->m_object.m_drawMatrix);
         }
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-        PSMTXCopy(obj->field_0x40.value, drawMtx.value);
+        PSMTXCopy(obj->m_object.m_drawMatrix.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
@@ -417,17 +415,17 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     }
 
     step = (KeShpTail3XStep*)param_2;
-    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
 
-    if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
+    if ((obj->m_object.m_graphId == 0) && (((u8*)&obj->m_object)[offsetof(_pppPObject, m_pad7D)] != 0)) {
         work->m_initialized = 1;
 
         if (step->m_worldSpaceMode == 0) {
-            initPos.x = obj->pppPObject.m_localMatrix.value[0][3];
-            initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
-            initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
+            initPos.x = obj->m_object.m_localMatrix.value[0][3];
+            initPos.y = obj->m_object.m_localMatrix.value[1][3];
+            initPos.z = obj->m_object.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
+            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->m_object.m_localMatrix);
             initPos.x = outMatrix.value[0][3];
             initPos.y = outMatrix.value[1][3];
             initPos.z = outMatrix.value[2][3];
@@ -449,11 +447,11 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     work->m_head--;
 
     if (step->m_worldSpaceMode == 0) {
-        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+        pos.x = obj->m_object.m_localMatrix.value[0][3];
+        pos.y = obj->m_object.m_localMatrix.value[1][3];
+        pos.z = obj->m_object.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
+        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->m_object.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
@@ -478,7 +476,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     work->m_values[0x13] += work->m_values[0x17];
     work->m_values[7] += work->m_values[0x13];
 
-    if (obj->pppPObject.m_graphId == step->m_graphId) {
+    if (obj->m_object.m_graphId == step->m_graphId) {
         work->m_values[0] += step->m_valueSteps[0];
         work->m_values[1] += step->m_valueSteps[1];
         work->m_values[2] += step->m_valueSteps[2];

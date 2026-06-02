@@ -233,9 +233,9 @@ functionEnd:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
+void pppVertexApMtxCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-	s32 offset = **(s32**)((u8*)vtx + 0xC);
+	s32 offset = *ctrl->m_serializedDataOffsets;
 	u16* state = (u16*)(obj->m_workArea + offset);
 
 	state[0] = 0;

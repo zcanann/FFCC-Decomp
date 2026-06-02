@@ -2,6 +2,7 @@
 #define _PPP_VERTEXAPAT_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 class PVertexApAt;
 class PVertexApLc;
 
@@ -11,7 +12,7 @@ void apea(_pppPObject*, PVertexApAt*, unsigned short);
 extern "C" {
 #endif
 
-void pppVertexApAtCon(_pppPObject*, PVertexApAt*);
+void pppVertexApAtCon(_pppPObject*, _pppCtrlTable*);
 void pppVertexApAt(_pppPObject*, PVertexApAt*, void*);
 
 #ifdef __cplusplus

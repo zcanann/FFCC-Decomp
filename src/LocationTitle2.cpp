@@ -56,21 +56,6 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
-struct LocationTitle2AnimRaw {
-    u8 m_pad[0x10];
-    u16 m_frameCount;
-};
-
-struct LocationTitle2ModelRaw {
-    u8 m_pad0[0xD0];
-    LocationTitle2AnimRaw* m_anim;
-};
-
-struct pppMngStLocationTitle2Raw {
-    u8 m_pad0[0xDC];
-    CGObject* m_charaObj;
-};
-
 extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
 
@@ -110,7 +95,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     int serializedOffset;
     int graphFrame;
     int graphId;
-    long** shapeTable;
+    pppShapeSt* shape;
     LocationTitle2Particle* particle;
     LocationTitle2Work* work;
 
@@ -123,7 +108,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
 
     particle = (LocationTitle2Particle*)work->m_particles;
     graphId = locationTitle->m_graphId;
-    shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
     graphFrame = GetGraphFrameFromId(graphId);
 
     pppSetBlendMode(unkB->m_blendMode);
@@ -206,7 +191,8 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
             }
 
             GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
-            pppDrawShp(*shapeTable, particle->m_shape, ppvEnv->m_materialSetPtr, unkB->m_blendMode);
+            pppDrawShp(static_cast<long*>(shape->m_animData), particle->m_shape, ppvEnv->m_materialSetPtr,
+                       unkB->m_blendMode);
         }
 
         particle++;
@@ -264,7 +250,6 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         CGObject* owner;
         CCharaPcs::CHandle* handle;
         CChara::CModel* model;
-        LocationTitle2ModelRaw* modelRaw;
         int nodeIndex;
         CChara::CNode* node;
         float zOffset;
@@ -286,12 +271,11 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             model = handle->m_model;
         }
 
-        modelRaw = (LocationTitle2ModelRaw*)model;
         nodeIndex = model->SearchNode(const_cast<char*>(s_locationNodeName));
         node = model->m_nodes + nodeIndex;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < model->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             node->CalcBind(model);

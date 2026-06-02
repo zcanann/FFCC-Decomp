@@ -19,13 +19,24 @@ struct Vec;
 
 struct CCharaModelData
 {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x14];
+    u8 _pad0[0x8];
+    u16 m_nodeCount;
+    u16 m_meshCount;
+    void* m_nodeRefData;
+    void* m_meshRefData;
+    u8 _pad14[0x2];
+    u16 m_headNodeIndex;
+    u16 m_chest3NodeIndex;
+    u16 m_chest2NodeIndex;
+    u16 m_chest1NodeIndex;
     CMaterialSet* m_materialSet;
-    u8 _pad28[0xC];
+    void* m_textureAnimSet;
+    float m_baseScale;
     u32 m_posQuant;
     u32 m_normQuant;
+    void* m_dynParams;
+    u32 m_dynCount;
+    u8 _pad3C[0x8];
 };
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
@@ -109,17 +120,24 @@ public:
 		public:
 			CRefData();
 			~CRefData();
+
+			u8 m_storage[0x94];
 		};
 
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
 
-		u8 _pad0[0x14];
+		CRefData* m_refData;
+		CMesh* m_displayMesh;
+		u8 _pad08[0x0C];
 		Mtx m_localRuntimeMtx;
-		u8 _pad44[0x28];
 		Mtx m_mtx;
-		u8 _pad9C[0x8];
+		Quaternion m_previousQuat;
+		Vec m_previousPosition;
+		Vec m_previousScale;
+		CAnimNode* m_animNode0;
+		CAnimNode* m_animNode1;
 		CVector m_dynPosition;
 		CVector m_dynVel;
 		u8 m_flags;
@@ -249,18 +267,47 @@ public:
 		CMesh();
 		~CMesh();
 
-		class CRefData
-		{
-		public:
-			CRefData();
-			~CRefData();
-		};
-
 		class CDisplayList
 		{
 		public:
 			CDisplayList();
 			~CDisplayList();
+
+			void* m_data;
+			s32 m_size;
+			u16 m_material;
+			u16 _padA;
+		};
+
+		class CRefData
+		{
+		public:
+			CRefData();
+			~CRefData();
+
+			char m_name[0x10];
+			u8 m_flags;
+			u8 _pad11[3];
+			u32 m_vertexCount;
+			S16Vec* m_vertices;
+			u32 m_normalCount;
+			S16Vec* m_normals;
+			u32 m_colorCount;
+			u8* m_colors;
+			u32 m_uvCount;
+			u8* m_uvs;
+			u32 m_oneWeightCountOrSize;
+			void* m_oneWeightData;
+			u32 m_twoWeightCountOrSize;
+			void* m_twoWeightData;
+			u32 m_threeWeightCountOrSize;
+			void* m_threeWeightData;
+			u32 m_displayListCount;
+			CDisplayList* m_displayLists;
+			u32 m_skinCount;
+			CSkin* m_skins;
+			u32 m_infoWord1;
+			u32 m_nodeIndex;
 		};
 
 		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);

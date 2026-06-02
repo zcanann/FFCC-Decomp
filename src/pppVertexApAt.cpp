@@ -139,9 +139,9 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApAtCon(_pppPObject* obj, PVertexApAt* data)
+void pppVertexApAtCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    s32 offset = **(s32**)((u8*)data + 0xC);
+    s32 offset = *ctrl->m_serializedDataOffsets;
     u16* state = (u16*)(obj->m_workArea + offset);
     state[0] = 0;
     state[1] = 0;

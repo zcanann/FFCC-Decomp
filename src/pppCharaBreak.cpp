@@ -81,71 +81,26 @@ struct CharaBreakDisplayListPair {
     POLYGON_DATA* m_polygonData;
 };
 
-struct CharaBreakDisplayList {
-    u32 m_size;
-    void* m_data;
-    u16 m_material;
-    u16 _padA;
-};
-
-struct CharaBreakMeshData {
-    char m_name[0x10];
-    u8 m_flags;
-    u8 _pad11[3];
-    u32 m_vertexCount;
-    S16Vec* m_vertices;
-    u32 m_normalCount;
-    S16Vec* m_normals;
-    u32 m_colorCount;
-    void* m_colors;
-    u32 m_uvCount;
-    void* m_uvs;
-    u32 m_oneWeightCountOrSize;
-    void* m_oneWeightData;
-    u32 m_twoWeightCountOrSize;
-    void* m_twoWeightData;
-    u32 m_threeWeightCountOrSize;
-    void* m_threeWeightData;
-    s32 m_displayListCount;
-    CharaBreakDisplayList* m_displayLists;
-    u32 m_skinCount;
-    void* m_skins;
-    s32 m_nodeIndex;
-};
-
-struct CharaBreakMeshRef {
-    u8 _pad0[8];
-    CharaBreakMeshData* m_data;
-    S16Vec* m_workPositions;
-    S16Vec* m_workNormals;
-};
-
-struct CharaBreakModelView {
-    u8 _pad0[0xA4];
-    CCharaModelData* m_data;
-    void* m_nodes;
-    CharaBreakMeshRef* m_meshes;
-};
+typedef CChara::CMesh::CDisplayList CharaBreakDisplayList;
+typedef CChara::CMesh::CRefData CharaBreakMeshData;
+typedef CChara::CMesh CharaBreakMeshRef;
 
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
-STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
-STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
+STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xA);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
+STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x30);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x60);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
 {
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x8);
+    return model->m_matrix;
 }
 
 static inline CCharaModelData* ModelData(CChara::CModel* model)
@@ -155,17 +110,17 @@ static inline CCharaModelData* ModelData(CChara::CModel* model)
 
 static inline void* ModelNodes(CChara::CModel* model)
 {
-    return *reinterpret_cast<void**>(reinterpret_cast<u8*>(model) + 0xA8);
+    return model->m_nodes;
 }
 
 static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
 {
-    return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
+    return model->m_meshes;
 }
 
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 {
-    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
+    return mesh->m_data;
 }
 
 static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)

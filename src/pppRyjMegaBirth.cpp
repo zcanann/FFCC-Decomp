@@ -364,7 +364,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 		break;
 	}
 
-	long** animDataSet = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + params->m_shapeIndex * 4);
+	pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeIndex];
 	int useTexture = params->m_textureMode == 0;
 	float drawScale = params->m_drawDepthEnabled != 0 ? params->m_drawDepth : kPppRyjMegaBirthZero;
 
@@ -372,7 +372,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 		(pppCVECTOR*)0, (pppFMATRIX*)0, drawScale, params->m_lightTarget, params->m_fogIndex, params->m_blendMode, 0, useTexture, 1,
 		0);
 
-	long* animData = *animDataSet;
+	long* animData = static_cast<long*>(shape->m_animData);
 	int baseRed = baseColor->m_red;
 	int baseGreen = baseColor->m_green;
 	int baseBlue = baseColor->m_blue;
@@ -632,8 +632,8 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 {
 	s16 duration;
 	u16 frame;
-	s32 colorSet;
-	s32 frameData;
+	pppShapeAnimData* shapeAnim;
+	pppShapeAnimFrame* frameData;
 	_PARTICLE_DATA* particle;
 	PARTICLE_WMAT* worldMats;
 	_PARTICLE_COLOR* colorData;
@@ -658,22 +658,23 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 				calc(work, param, particle, color, colorData);
 
 				frame = *(u16*)((u8*)particle + 0x1E);
-				colorSet = (s32)**(s32***)(*(s32*)&ppvEnv->m_particleColors[0] + param->m_shapeIndex * 4);
+				shapeAnim =
+					static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param->m_shapeIndex]->m_animData);
 				*(u16*)((u8*)particle + 0x20) = frame;
-				frameData = colorSet + (u32)frame * 8 + 0x10;
+				frameData = &shapeAnim->m_frames[frame];
 
 				*(u16*)((u8*)particle + 0x1C) = *(u16*)((u8*)particle + 0x1C) + param->m_frameStep;
 				frame = *(u16*)((u8*)particle + 0x1C);
-				duration = *(s16*)(frameData + 2);
+				duration = frameData->m_duration;
 
 				if ((s32)frame >= (s32)duration)
 				{
 					*(u16*)((u8*)particle + 0x1C) = frame - duration;
 					*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) + 1;
 
-					if ((s32)*(u16*)((u8*)particle + 0x1E) >= (s32)*(s16*)(colorSet + 6))
+					if ((s32)*(u16*)((u8*)particle + 0x1E) >= (s32)shapeAnim->m_frameCount)
 					{
-						if ((*(u8*)(frameData + 4) & 0x80) != 0)
+						if ((frameData->m_pad4[0] & 0x80) != 0)
 						{
 							*(u16*)((u8*)particle + 0x1E) = 0;
 							*(u16*)((u8*)particle + 0x1C) = 0;

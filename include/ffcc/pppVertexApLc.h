@@ -2,6 +2,7 @@
 #define _PPP_VERTEXAPLC_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 class PVertexApLc;
 struct Vec;
 
@@ -9,7 +10,7 @@ struct Vec;
 extern "C" {
 #endif
 
-void pppVertexApLcCon(_pppPObject*, PVertexApLc*);
+void pppVertexApLcCon(_pppPObject*, _pppCtrlTable*);
 void pppVertexApLc(_pppPObject*, PVertexApLc*, void*);
 
 #ifdef __cplusplus

@@ -108,6 +108,26 @@ int CTextureSet::Find(char* name)
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+CTexture* CTextureSet::GetTexture(long index)
+{
+    return m_textureArray[static_cast<unsigned long>(index)];
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+int CTextureSet::GetNumTexture()
+{
+    return m_textureArray.GetSize();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003A77C
  * PAL Size: 560b
  * EN Address: TODO
@@ -544,6 +564,33 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 int CTexture::CheckName(char* name)
 {
     return strcmp(m_name, name) == 0;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        if (GetRef() <= 1) {
+            m_imageData = 0;
+        }
+        amemCacheSet->Release(m_cacheId);
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        amemCacheSet->RefCnt0Up(m_cacheId);
+    }
 }
 
 /*

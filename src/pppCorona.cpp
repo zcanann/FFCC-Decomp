@@ -75,7 +75,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
     pppFMATRIX mtx;
     Vec fromOrigin;
     Vec viewDir;
-    long** shape;
+    pppShapeSt* shape;
     s32 shapeId;
     float mag;
     float scale;
@@ -89,7 +89,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)ppvEnv + 0xC) + shapeId * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
 
     PSMTXIdentity(mtx.value);
 
@@ -125,7 +125,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
     pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmEnvZero, data->m_drawA, data->m_drawB, data->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(data->m_blendMode);
-    pppDrawShp(*shape, work->m_shapeY, ppvEnv->m_materialSetPtr, data->m_blendMode);
+    pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeY, ppvEnv->m_materialSetPtr, data->m_blendMode);
 }
 
 /*
@@ -140,7 +140,7 @@ void pppRenderCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl
 void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
 {
     CoronaWork* work;
-    long** shape;
+    pppShapeSt* shape;
     s32 shapeId;
 
     if (gPppCalcDisabled != 0) {
@@ -156,8 +156,8 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)ppvEnv + 0xC) + shapeId * 4);
-    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, data->m_shapeStep);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[shapeId];
+    pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeX, work->m_shapeY, work->m_shapeZ, data->m_shapeStep);
 
     if (data->m_graphId == object->m_graphId) {
         work->m_scaleX += data->m_addX;

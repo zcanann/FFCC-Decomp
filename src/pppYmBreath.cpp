@@ -10,6 +10,7 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
 
 extern const float kCharaAnimZero;
@@ -289,7 +290,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     YmBreathParticleGroup* groupData;
     int i;
     int groupCount;
-    long** shape;
+    pppShapeSt* shape;
     int colorR;
     int colorG;
     int colorB;
@@ -318,8 +319,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         return;
     }
 
-    shape = *(long***)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(ppvEnv) + 0xC) +
-                       params->m_shapeStepValue * 4);
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeStepValue];
     pppSetBlendMode(params->m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -393,7 +393,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             drawColor.b = (unsigned char)b;
             drawColor.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-            pppDrawShp(*shape, particle->m_shapeFrame2, ppvEnv->m_materialSetPtr, params->m_blendMode);
+            pppDrawShp(static_cast<long*>(shape->m_animData), particle->m_shapeFrame2, ppvEnv->m_materialSetPtr,
+                       params->m_blendMode);
         }
 
         if (matrixList != 0) {
@@ -679,10 +680,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         for (i = 0; i < maxParticleCount; i++) {
             if (particleData->m_life > 0) {
                 UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, particleColor);
-                pppCalcFrameShape(**(long***)(*(int*)((unsigned char*)ppvEnv + 0xC) +
-                                             params->m_shapeStepValue * 4),
-                                  particleData->m_shapeFrame1, particleData->m_shapeFrame2,
-                                  particleData->m_shapeFrame0, params->m_shapeFrameArg);
+                pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[params->m_shapeStepValue];
+                pppCalcFrameShape(static_cast<long*>(shape->m_animData), particleData->m_shapeFrame1,
+                                  particleData->m_shapeFrame2, particleData->m_shapeFrame0,
+                                  params->m_shapeFrameArg);
             } else {
                 float zero = 0.0f;
 

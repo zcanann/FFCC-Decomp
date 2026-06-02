@@ -735,12 +735,12 @@ int CShopMenu::getItemHaveCnt(int itemNo)
 
 static long* GetShopMenuShapeAnimData(int shapeNo)
 {
-    int shapeTableBase = *reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]);
-    if (shapeTableBase == 0) {
+    pppShapeSt** shapeTable = ppvEnv->m_resourceTables.m_shapeTablePtr;
+    if (shapeTable == 0) {
         return 0;
     }
 
-    pppShapeSt* shape = *reinterpret_cast<pppShapeSt**>(shapeTableBase + shapeNo * 4);
+    pppShapeSt* shape = shapeTable[shapeNo];
     if ((shape == 0) || (shape->m_animData == 0)) {
         return 0;
     }
@@ -754,14 +754,13 @@ static tagOAN3_SHAPE* GetShopMenuFrameShape(long* animData, int groupNo)
         return 0;
     }
 
-    unsigned char* animBytes = reinterpret_cast<unsigned char*>(animData);
-    int frameCount = *reinterpret_cast<short*>(animBytes + 6);
-    if (groupNo >= frameCount) {
+    pppShapeAnimData* shapeAnim = reinterpret_cast<pppShapeAnimData*>(animData);
+    if (groupNo >= shapeAnim->m_frameCount) {
         return 0;
     }
 
-    int shapeOffset = *reinterpret_cast<short*>(animBytes + groupNo * 8 + 0x10);
-    return reinterpret_cast<tagOAN3_SHAPE*>(animBytes + shapeOffset);
+    int shapeOffset = shapeAnim->m_frames[groupNo].m_shapeOffset;
+    return reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + shapeOffset);
 }
 
 static void SetupShopMenuShapeDrawColor(unsigned char alpha)
@@ -2871,7 +2870,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXColor matColor;
     *reinterpret_cast<unsigned int*>(&matColor) = reinterpret_cast<unsigned int>(g_shopMenu);
 
-    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -2957,7 +2956,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     _GXColor mat;
     *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
 
-    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3053,7 +3052,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
+    int shapeData = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[shapeNo]->m_animData);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 

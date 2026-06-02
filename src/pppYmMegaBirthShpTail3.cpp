@@ -1,5 +1,6 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/math.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppShape.h"
@@ -52,7 +53,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = **(int**)(*(int*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
+    int shapeTable = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     u16 workRand = *(u16*)((u8*)object + 0x80 + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(

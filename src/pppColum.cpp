@@ -123,8 +123,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     pppCVECTOR color;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
-        pppShapeSt* shapeSt =
-            *(pppShapeSt**)(*(int*)&ppvEnv->m_particleColors[0] + param_2->m_dataValIndex * 4);
+        pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex];
         CTexture* texture;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
@@ -284,8 +283,8 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         }
 
         if (param_2->m_dataValIndex != 0xFFFF) {
-            long* animData =
-                **(long***)(*(int*)&ppvEnv->m_particleColors[0] + param_2->m_dataValIndex * 4);
+            pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex];
+            long* animData = static_cast<long*>(shapeSt->m_animData);
             pppCalcFrameShape(
                 animData,
                 work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);

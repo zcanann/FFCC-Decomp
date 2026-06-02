@@ -12,6 +12,11 @@ extern const float FLOAT_80330108;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
+static inline pppShapeAnimData* ShapeAnimData(long* animData)
+{
+    return reinterpret_cast<pppShapeAnimData*>(animData);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80065678
@@ -24,16 +29,17 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, short& frameTime,
                        short deltaTime)
 {
-    char* frameData = (char*)animData + (currentFrame << 3) + 0x10;
+    pppShapeAnimData* shapeAnim = ShapeAnimData(animData);
+    pppShapeAnimFrame* frameData = &shapeAnim->m_frames[currentFrame];
 
     drawFrame = currentFrame;
     frameTime += deltaTime;
-    if (frameTime < *(short*)(frameData + 2)) {
+    if (frameTime < frameData->m_duration) {
         return;
     }
-    frameTime -= *(short*)(frameData + 2);
+    frameTime -= frameData->m_duration;
     currentFrame += 1;
-    if (currentFrame < *(short*)((int)animData + 6)) {
+    if (currentFrame < shapeAnim->m_frameCount) {
         return;
     }
     currentFrame = 0;

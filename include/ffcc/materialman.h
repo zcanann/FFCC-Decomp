@@ -129,6 +129,26 @@ public:
         m_manaParaboloidTexObj0 = paraboloidTexObj0;
         m_manaParaboloidTexObj1 = paraboloidTexObj1;
     }
+    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, unsigned int tevBit)
+    {
+        m_manaReflectionVec = reflectionVec;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_texMapIdCur = 0;
+        m_texMtxCur = 0x1E;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+        m_curEnvTevBit = tevBit;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_stdEnvTevBit = tevBit;
+        m_manaParaboloidTexObj0 = paraboloidTexObj0;
+    }
     void SetChangeTexReflectionEnv(void* arraySource, _GXTexObj* texObj, unsigned int tevBit)
     {
         m_geometryArraySource = arraySource;

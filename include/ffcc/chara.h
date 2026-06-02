@@ -32,11 +32,11 @@ struct CCharaModelData
     CMaterialSet* m_materialSet;
     void* m_textureAnimSet;
     float m_baseScale;
+    u8 _pad2C[0x8];
     u32 m_posQuant;
     u32 m_normQuant;
-    void* m_dynParams;
     u32 m_dynCount;
-    u8 _pad3C[0x8];
+    void* m_dynParams;
 };
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);

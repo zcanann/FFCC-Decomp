@@ -54,7 +54,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 
 	_pppMngSt* pppMngSt = ppvMng;
 	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
-	CGObject* owner = pppMngSt->m_owner;
+	CGObject* lookTarget = pppMngSt->m_lookTarget;
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;
@@ -73,11 +73,11 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		work->m_acceleration = work->m_acceleration + param_2->m_arg3;
 	}
 
-	if (owner == nullptr) {
+	if (lookTarget == nullptr) {
 		pppCopyVector(local_20, work->m_direction);
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
-		local_8c = owner->m_worldPosition;
+		local_8c = lookTarget->m_worldPosition;
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 		local_20.y = local_20.y + param_2->m_payload;
 		pppNormalize(local_20, local_20);

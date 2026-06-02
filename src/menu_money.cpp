@@ -119,6 +119,7 @@ int CMenuPcs::MoneyCtrlCur()
 	int caravanWork = Game.m_scriptFoodBase[0];
 	int menuState = (int)this->moneyState;
 	int mode = (int)*(s16*)(menuState + 0x30);
+	int optBase = menuState + mode * 2;
 	int maxDigits = 1;
 	int maxGil = *(int*)(caravanWork + 0x200);
 	int digitPlace = 10;
@@ -134,13 +135,63 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		int cursor = *(s16*)(menuState + 0x26);
+		unsigned int cursor = *(s16*)(optBase + 0x26);
 		unsigned int placeValue = 1;
-		for (int i = 0; i < cursor; i++) {
-			placeValue *= 10;
+		if ((int)cursor > 0) {
+			unsigned int chunks = cursor >> 3;
+			if (chunks != 0) {
+				do {
+					placeValue *= 100000000;
+					chunks--;
+				} while (chunks != 0);
+				cursor &= 7;
+			}
+			if (cursor != 0) {
+				do {
+					placeValue *= 10;
+					cursor--;
+				} while (cursor != 0);
+			}
 		}
 
-		if ((hold & 8) == 0) {
+		if ((hold & 8) != 0) {
+			if (*(int*)(caravanWork + 0x200) == 0) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			} else {
+				unsigned int gil = s_Money + placeValue;
+				if ((unsigned int)*(int*)(caravanWork + 0x200) < gil) {
+					gil = 0;
+				}
+				s_Money = gil;
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+				gil = s_Money;
+
+				int iVar9 = 0;
+				int iVar8 = 10000000;
+				signed char* puVar10 = s_place;
+				int iVar11 = 8;
+				bool started = false;
+				do {
+					if ((!started) && (iVar8 <= (int)gil)) {
+						started = true;
+					}
+					if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
+						int digit = (int)gil / iVar8;
+						if (9 < digit) {
+							digit = 9;
+						}
+						puVar10[8] = static_cast<signed char>(digit);
+						gil = gil - ((int)gil / iVar8) * iVar8;
+					} else {
+						puVar10[8] = -1;
+					}
+					puVar10 = puVar10 + 1;
+					iVar9 = iVar9 + 1;
+					iVar8 /= 10;
+					iVar11 = iVar11 + -1;
+				} while (iVar11 != 0);
+			}
+		} else {
 			if ((hold & 4) != 0) {
 				unsigned int gil = *(unsigned int*)(caravanWork + 0x200);
 				if (gil == 0) {
@@ -177,55 +228,24 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
-		} else if (*(int*)(caravanWork + 0x200) == 0) {
-			Sound.PlaySe(4, 0x40, 0x7F, 0);
-		} else {
-			unsigned int gil = s_Money + placeValue;
-			if ((unsigned int)*(int*)(caravanWork + 0x200) < gil) {
-				gil = *(int*)(caravanWork + 0x200);
-			}
-			int iVar9 = 0;
-			int iVar8 = 10000000;
-			signed char* puVar10 = s_place + 8;
-			int iVar11 = 8;
-			bool started = false;
-			s_Money = gil;
-			do {
-				if ((!started) && (iVar8 <= (int)gil)) {
-					started = true;
-				}
-				if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
-					int digit = (int)gil / iVar8;
-					if (9 < digit) {
-						digit = 9;
-					}
-					*puVar10 = static_cast<signed char>(digit);
-					gil = gil - ((int)gil / iVar8) * iVar8;
-				} else {
-					*puVar10 = -1;
-				}
-				puVar10 = puVar10 + 1;
-				iVar9 = iVar9 + 1;
-				iVar8 /= 10;
-				iVar11 = iVar11 + -1;
-			} while (iVar11 != 0);
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
-		if ((hold & 1) == 0) {
+		if ((hold & 1) != 0) {
+			if (*(s16*)(optBase + 0x26) < maxDigits - 1) {
+				*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
+			}
+		} else {
 			if ((hold & 2) != 0) {
-				if (*(s16*)(menuState + 0x26) == 0) {
+				if (*(s16*)(optBase + 0x26) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					*(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) - 1;
+					*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
-		} else if (*(s16*)(menuState + 0x26) < maxDigits - 1) {
-			*(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) + 1;
-			Sound.PlaySe(1, 0x40, 0x7F, 0);
-		} else {
-			Sound.PlaySe(4, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xF) == 0) {
@@ -243,15 +263,6 @@ int CMenuPcs::MoneyCtrlCur()
 					return 1;
 				}
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			} else if ((press & 0x200) != 0) {
-				if (attachFlag < 0) {
-					*(u8*)(menuState + 0xD) = 1;
-					Sound.PlaySe(3, 0x40, 0x7F, 0);
-					return 1;
-				}
-				LetterSetAttachItem(0, 0xFFFFFFFF);
-				Sound.PlaySe(3, 0x40, 0x7F, 0);
-				return 1;
 			} else if ((press & 0x100) != 0) {
 				if (s_Money < 1) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -274,11 +285,18 @@ int CMenuPcs::MoneyCtrlCur()
 					*(s16*)(menuState + 0x30) = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
+			} else if ((press & 0x200) != 0) {
+				if (attachFlag < 0) {
+					*(u8*)(menuState + 0xD) = 1;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+					return 1;
+				}
+				LetterSetAttachItem(0, 0xFFFFFFFF);
+				Sound.PlaySe(3, 0x40, 0x7F, 0);
+				return 1;
 			}
 		}
 	} else {
-		int optBase = menuState + mode * 2;
-
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
 				if (*(s16*)(optBase + 0x26) < 1) {
@@ -301,66 +319,66 @@ int CMenuPcs::MoneyCtrlCur()
 			if ((press & 0x100) != 0) {
 				if (((int)this->moneyState->messageMask & (1 << *(s16*)(optBase + 0x26))) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
-					return 0;
-				}
-				if (*(s16*)(optBase + 0x26) == 0) {
-					reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutGil(static_cast<int>(s_Money));
-					s_Money = 0;
-					int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
-					int iVar9 = 0;
-					int iVar11 = 10000000;
-					bool started = false;
-					signed char* puVar10 = s_place;
-					int count = 8;
-					do {
-						if ((!started) && (iVar11 <= iVar8)) {
-							started = true;
-						}
-						if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
-							int digit = iVar8 / iVar11;
-							if (9 < digit) {
-								digit = 9;
+				} else {
+					if (*(s16*)(optBase + 0x26) == 0) {
+						reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutGil(static_cast<int>(s_Money));
+						s_Money = 0;
+						int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
+						int iVar9 = 0;
+						int iVar11 = 10000000;
+						bool started = false;
+						signed char* puVar10 = s_place;
+						int count = 8;
+						do {
+							if ((!started) && (iVar11 <= iVar8)) {
+								started = true;
 							}
-							*puVar10 = static_cast<signed char>(digit);
-							iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
-						} else {
-							*puVar10 = -1;
-						}
-						puVar10 = puVar10 + 1;
-						iVar9 = iVar9 + 1;
-						iVar11 /= 10;
-						count = count + -1;
-					} while (count != 0);
+							if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
+								int digit = iVar8 / iVar11;
+								if (9 < digit) {
+									digit = 9;
+								}
+								*puVar10 = static_cast<signed char>(digit);
+								iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
+							} else {
+								*puVar10 = -1;
+							}
+							puVar10 = puVar10 + 1;
+							iVar9 = iVar9 + 1;
+							iVar11 /= 10;
+							count = count + -1;
+						} while (count != 0);
 
-					iVar8 = 0;
-					iVar9 = 0;
-					iVar11 = 10000000;
-					started = false;
-					puVar10 = s_place + 8;
-					count = 8;
-					do {
-						if ((!started) && (iVar11 <= iVar8)) {
-							started = true;
-						}
-						if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
-							int digit = iVar8 / iVar11;
-							if (9 < digit) {
-								digit = 9;
+						iVar8 = 0;
+						iVar9 = 0;
+						iVar11 = 10000000;
+						started = false;
+						puVar10 = s_place + 8;
+						count = 8;
+						do {
+							if ((!started) && (iVar11 <= iVar8)) {
+								started = true;
 							}
-							*puVar10 = static_cast<signed char>(digit);
-							iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
-						} else {
-							*puVar10 = -1;
-						}
-						puVar10 = puVar10 + 1;
-						iVar9 = iVar9 + 1;
-						iVar11 /= 10;
-						count = count + -1;
-					} while (count != 0);
+							if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
+								int digit = iVar8 / iVar11;
+								if (9 < digit) {
+									digit = 9;
+								}
+								*puVar10 = static_cast<signed char>(digit);
+								iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
+							} else {
+								*puVar10 = -1;
+							}
+							puVar10 = puVar10 + 1;
+							iVar9 = iVar9 + 1;
+							iVar11 /= 10;
+							count = count + -1;
+						} while (count != 0);
+					}
+					this->singWindowInfo[5] = 2;
+					*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
-				this->singWindowInfo[5] = 2;
-				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
-				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			} else if ((press & 0x200) != 0) {
 				this->singWindowInfo[5] = 2;
 				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;

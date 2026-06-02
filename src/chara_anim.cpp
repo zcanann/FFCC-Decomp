@@ -223,7 +223,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 			m_nodes = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F) CChara::CAnimNode[nodeCount];
 
-			int nodeIndex = 0;
+			CAnimNode* node = m_nodes;
 			chunkFile.PushChunk();
 			while (chunkFile.GetNextChunk(chunk)) {
 				chunkId = static_cast<int>(chunk.m_id);
@@ -244,15 +244,15 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_quantizeZ = static_cast<unsigned char>(chunkFile.Get4());
 					break;
 				case 0x4E4F4445: {
-					CAnimNode* node = &m_nodes[nodeIndex];
-					nodeIndex++;
+					CAnimNode* currentNode = node;
+					node++;
 
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(nodeChunk)) {
 						int nodeChunkId = static_cast<int>(nodeChunk.m_id);
 						switch (nodeChunkId) {
 						case 0x4E414D45:
-							strcpy(node->m_name, chunkFile.GetString());
+							strcpy(currentNode->m_name, chunkFile.GetString());
 							break;
 						case 0x44415441: {
 							int i = 0;
@@ -271,14 +271,14 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 								unsigned int dataOffset = chunkFile.Get4();
 								if (i == 0) {
-									node->m_dataOffset = dataOffset;
+									currentNode->m_dataOffset = dataOffset;
 								}
 
-								unsigned int flags = ((node->m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
-								node->m_flags = __rlwimi(node->m_flags, flags, 13, 1, 18);
+								unsigned int flags = ((currentNode->m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
+								currentNode->m_flags = __rlwimi(currentNode->m_flags, flags, 13, 1, 18);
 
 								if ((i >= 6) && (type != 0)) {
-									unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&node->m_flags);
+									unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&currentNode->m_flags);
 									*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
 								}
 

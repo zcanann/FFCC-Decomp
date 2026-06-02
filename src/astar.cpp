@@ -311,9 +311,10 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 
 	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
 
+	int padLock = Pad._452_4_;
 	bool padBusy = false;
 
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
+	if (padLock != 0 || Pad._448_4_ != -1)
 	{
 		padBusy = true;
 	}
@@ -325,7 +326,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		int padIndex = padBusy;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
 		trig1 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
 	}
@@ -336,7 +337,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 
 	padBusy = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1)
+	if (padLock != 0 || Pad._448_4_ != -1)
 	{
 		padBusy = true;
 	}
@@ -348,7 +349,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		int padIndex = padBusy;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
 		trig2 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 4);
 	}
@@ -386,9 +387,11 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	// If none, find a free slot
 	if (portalIndex == 64)
 	{
-		for (int i = 0; i < 64; ++i)
+		portalIndex = 0;
+
+		for (; portalIndex < 64; ++portalIndex)
 		{
-			CAPos& p = m_portals[i];
+			CAPos& p = m_portals[portalIndex];
 
 			bool used = false;
 			if (p.m_groupA != 0 && p.m_groupB != 0)
@@ -398,7 +401,6 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 
 			if (!used)
 			{
-				portalIndex = i;
 				m_portalCount++;
 				break;
 			}
@@ -411,8 +413,8 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	portal.m_position.y = m_lastGroupPos.y;
 	portal.m_position.z = m_lastGroupPos.z;
 
-	portal.m_groupA = groupLow;
-	portal.m_groupB = groupHigh;
+	m_portals[portalIndex].m_groupA = groupLow;
+	m_portals[portalIndex].m_groupB = groupHigh;
 
 	System.Printf(const_cast<char*>(kAStarGroupDebugLabel));
 

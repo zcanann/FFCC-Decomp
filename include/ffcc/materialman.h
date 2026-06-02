@@ -21,6 +21,7 @@ class CTextureSet;
 class CFullScreenShadow;
 class CLightPcs;
 class CAmemCacheSet;
+class CMapKeyFrame;
 struct Vec;
 struct CBound;
 
@@ -35,9 +36,16 @@ public:
     unsigned char m_pad[2];
     float m_u0;
     float m_v0;
-    float m_u1;
-    float m_v1;
+    union {
+        float m_u1;
+        CMapKeyFrame* m_uKeyFrame;
+    };
+    union {
+        float m_v1;
+        CMapKeyFrame* m_vKeyFrame;
+    };
 };
+typedef char CTexScroll_size_check[(sizeof(CTexScroll) == 0x14) ? 1 : -1];
 
 class CMaterialMan : public CManager
 {

@@ -2280,18 +2280,18 @@ void CMaterialMan::ErrorTexMapIdCur()
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(&m_u1);
+        CMapKeyFrame* keyFrame = m_uKeyFrame;
         if (keyFrame != 0) {
             DestroyTexScrollKeyFrame(keyFrame);
-            *reinterpret_cast<CMapKeyFrame**>(&m_u1) = 0;
+            m_uKeyFrame = 0;
         }
     }
 
     if (m_type1 == 2) {
-        CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(&m_v1);
+        CMapKeyFrame* keyFrame = m_vKeyFrame;
         if (keyFrame != 0) {
             DestroyTexScrollKeyFrame(keyFrame);
-            *reinterpret_cast<CMapKeyFrame**>(&m_v1) = 0;
+            m_vKeyFrame = 0;
         }
     }
 }
@@ -2645,7 +2645,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 texScroll->m_type0 = (valueU == FLOAT_8032faf4) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_u1) = keyFrameU;
+                                texScroll->m_uKeyFrame = keyFrameU;
                                 texScroll->m_type0 = 2;
                             }
 
@@ -2655,7 +2655,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 texScroll->m_type1 = (valueV == FLOAT_8032faf4) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1) = keyFrameV;
+                                texScroll->m_vKeyFrame = keyFrameV;
                                 texScroll->m_type1 = 2;
                             }
                         } break;
@@ -3147,7 +3147,7 @@ void CMaterialSet::Calc()
                         offsetU += 1.0f;
                     }
                 } else if (texScroll->m_type0 == 2) {
-                    CMapKeyFrame* keyFrameU = *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_u1);
+                    CMapKeyFrame* keyFrameU = texScroll->m_uKeyFrame;
                     texScroll->m_u0 = keyFrameU->Get();
                     keyFrameU->Calc();
                 }
@@ -3161,7 +3161,7 @@ void CMaterialSet::Calc()
                         offsetV += 1.0f;
                     }
                 } else if (texScroll->m_type1 == 2) {
-                    CMapKeyFrame* keyFrameV = *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1);
+                    CMapKeyFrame* keyFrameV = texScroll->m_vKeyFrame;
                     texScroll->m_v0 = keyFrameV->Get();
                     keyFrameV->Calc();
                 }

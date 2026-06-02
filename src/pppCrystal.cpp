@@ -123,7 +123,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	CTexture* indirectTex = 0;
 	int texSlot = 0;
 	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, texSlot));
-	if (param_2->m_payload[0] == 0) {
+	if (param_2->m_crystal.m_refractionMode == 0) {
 		if (param_2->m_initWOrk == 0xFFFF) {
 			return;
 		}
@@ -140,15 +140,15 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		return;
 	}
 
-	pppSetBlendMode(param_2->m_payload[1]);
+	pppSetBlendMode(param_2->m_crystal.m_blendMode);
 	pppSetDrawEnv(
 		&colorBlock->m_color, &pppCrystal->m_object.m_drawMatrix, param_2->m_arg3,
-		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
+		param_2->m_crystal.m_drawEnvColor1, param_2->m_crystal.m_drawEnvColor0, param_2->m_crystal.m_blendMode, param_2->m_crystal.m_drawFlag, 1, 1, param_2->m_crystal.m_zMode);
 
 	Mtx lightMtx;
 	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
-	if (param_2->m_payload[0] == 1) {
+	if (param_2->m_crystal.m_refractionMode == 1) {
 		texW = CRYSTAL_REFRACTION_SIZE;
 		texH = CRYSTAL_REFRACTION_SIZE;
 	}
@@ -194,7 +194,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	_GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
 	_GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	if (param_2->m_payload[0] == 1) {
+	if (param_2->m_crystal.m_refractionMode == 1) {
 		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
 	} else {
 		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
@@ -261,7 +261,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	textureIndex = 0;
 	mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
-	if (param_2->m_payload[0] == 0) {
+	if (param_2->m_crystal.m_refractionMode == 0) {
 		if (param_2->m_initWOrk == 0xFFFF) {
 			return;
 		}
@@ -270,7 +270,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 	}
 
-	if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
+	if ((param_2->m_crystal.m_refractionMode == 1) && (work->m_refractionMap == 0)) {
 		work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc(
 			sizeof(CrystalRefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xA7);
 

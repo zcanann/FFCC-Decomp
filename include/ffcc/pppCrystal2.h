@@ -30,7 +30,18 @@ struct pppCrystal2UnkB {
     s32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[8];
+    union {
+        u8 m_payload[8];
+        struct Payload {
+            u8 m_refractionMode;
+            u8 m_blendMode;
+            u8 m_drawFlag;
+            u8 m_zMode;
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+            u8 m_pad06[2];
+        } m_crystal;
+    };
     f32 m_perspectiveScale;
 };
 

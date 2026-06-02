@@ -516,6 +516,7 @@ extern CPartMng PartMng;
 
 extern _pppEnvSt* ppvEnv;
 extern _pppMngSt* ppvMng;
+extern int ppvUserStopPartF;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 

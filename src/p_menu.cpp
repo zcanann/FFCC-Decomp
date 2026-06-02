@@ -413,13 +413,21 @@ void CMenuPcs::destroy()
     changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
     u8* self = reinterpret_cast<u8*>(this);
 
-    for (int i = 0; i < 0x16; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(&m_textures[i]));
-    }
+    int i = 0;
+    CTexture** textureSlot = m_textures;
+    do {
+        ReleaseRefSlot(reinterpret_cast<void**>(textureSlot));
+        textureSlot++;
+        i++;
+    } while (i < 0x16);
 
-    for (int i = 0; i < 2; i++) {
-        ReleaseRefSlot(reinterpret_cast<void**>(&m_textureSets[i]));
-    }
+    i = 0;
+    CTextureSet** textureSetSlot = m_textureSets;
+    do {
+        ReleaseRefSlot(reinterpret_cast<void**>(textureSetSlot));
+        textureSetSlot++;
+        i++;
+    } while (i < 2);
 
     if (m_fonts[0] != nullptr) {
         if (m_fonts[0]->DecRef() == 0) {

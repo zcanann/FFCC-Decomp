@@ -23,6 +23,53 @@ struct Vec2d {
     float y;
 };
 
+struct VMana2 {
+    CGObject* m_object;
+    void* m_manager;
+    CTexture* m_sourceTextures[6];
+    GXTexObj* m_baseParaboloidTexObjs;
+    void* m_paraboloidMap;
+    GXTexObj* m_generatedTexObj0;
+    GXTexObj* m_generatedTexObj1;
+    void* m_generatedTexture0;
+    void* m_generatedTexture1;
+    GXColor m_runtimeColor;
+    Vec* m_positions;
+    Vec* m_normals;
+    Vec* m_reflectionVec;
+    float* m_waterHeightA;
+    float* m_waterHeightB;
+    u16* m_indices;
+    Vec2d* m_texCoord0;
+    Vec2d* m_texCoord1;
+    GXColor* m_colors;
+    void** m_displayListCopies;
+    Vec* m_meshReflectionVec;
+    GXColor* m_meshColors;
+    S16Vec2d* m_meshTexCoords;
+    pppMana2UnkB* m_step;
+    GXTexObj* m_sourceTexObjs;
+    CTexture* m_envTexture0;
+    CTexture* m_envTexture1;
+    Mtx m_waterMtx;
+    Mtx m_reflectionMtx;
+    u8 m_waterAlpha;
+    u8 _padE1[3];
+    u32 m_paraboloidMapSize;
+    u32 m_displayListSize;
+    u8 m_paraboloidReady;
+};
+
+STATIC_ASSERT(offsetof(VMana2, m_runtimeColor) == 0x38);
+STATIC_ASSERT(offsetof(VMana2, m_positions) == 0x3C);
+STATIC_ASSERT(offsetof(VMana2, m_indices) == 0x50);
+STATIC_ASSERT(offsetof(VMana2, m_displayListCopies) == 0x60);
+STATIC_ASSERT(offsetof(VMana2, m_step) == 0x70);
+STATIC_ASSERT(offsetof(VMana2, m_waterMtx) == 0x80);
+STATIC_ASSERT(offsetof(VMana2, m_reflectionMtx) == 0xB0);
+STATIC_ASSERT(offsetof(VMana2, m_waterAlpha) == 0xE0);
+STATIC_ASSERT(offsetof(VMana2, m_paraboloidReady) == 0xEC);
+
 extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 extern "C" const char s_pppMana2_cpp[] = "pppMana2.cpp";
 extern const float FLOAT_80331898 = 0.0f;
@@ -232,9 +279,9 @@ static void CalculateNormal(VMana2* mana2)
     Vec edgeB;
     Vec faceNormal;
 
-    positions = *(Vec**)((u8*)mana2 + 0x3C);
-    normals = *(Vec**)((u8*)mana2 + 0x40);
-    indices = *(u16**)((u8*)mana2 + 0x50);
+    positions = mana2->m_positions;
+    normals = mana2->m_normals;
+    indices = mana2->m_indices;
 
     float zero = FLOAT_80331898;
     for (s32 i = 0; i < 0x121; i++) {
@@ -284,15 +331,14 @@ static void CalculateNormal(VMana2* mana2)
  */
 static int RenderWaterMesh(VMana2* mana2)
 {
-    u8* work = (u8*)mana2;
-    void* positions = *(void**)(work + 0x3C);
-    void* normals = *(void**)(work + 0x40);
-    void* texCoord0 = *(void**)(work + 0x54);
-    void* texCoord1 = *(void**)(work + 0x58);
-    u16* indices = *(u16**)(work + 0x50);
-    void* colors = *(void**)(work + 0x5C);
-    void* texObj0 = *(void**)(work + 0x28);
-    void* texObj2;
+    void* positions = mana2->m_positions;
+    void* normals = mana2->m_normals;
+    void* texCoord0 = mana2->m_texCoord0;
+    void* texCoord1 = mana2->m_texCoord1;
+    u16* indices = mana2->m_indices;
+    void* colors = mana2->m_colors;
+    GXTexObj* texObj0 = mana2->m_generatedTexObj0;
+    CTexture* texObj2;
     _GXColor blendColor;
     _GXColor modulateColor;
 
@@ -324,10 +370,10 @@ static int RenderWaterMesh(VMana2* mana2)
     GXSetArray((GXAttr)0xB, colors, 4);
     GXSetArray((GXAttr)0xD, texCoord0, 8);
     GXSetArray((GXAttr)0xE, texCoord1, 8);
-    texObj2 = *(void**)(work + 0x7C);
+    texObj2 = mana2->m_envTexture1;
     GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
     GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
-    u8 alpha = *(u8*)(work + 0xE0);
+    u8 alpha = mana2->m_waterAlpha;
     blendColor.r = 0x80;
     blendColor.g = 0x80;
     blendColor.b = 0x80;
@@ -340,7 +386,7 @@ static int RenderWaterMesh(VMana2* mana2)
     GXSetTevDirect((GXTevStageID)0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXLoadTexObj((GXTexObj*)((u8*)texObj2 + 0x28), GX_TEXMAP0);
+    GXLoadTexObj(&texObj2->m_texObj, GX_TEXMAP0);
     GXSetTevKColor((GXTevKColorID)1, modulateColor);
     GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
     GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
@@ -352,7 +398,7 @@ static int RenderWaterMesh(VMana2* mana2)
     GXSetTevDirect((GXTevStageID)1);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x28), GX_TEXMAP1);
+    GXLoadTexObj(mana2->m_generatedTexObj0, GX_TEXMAP1);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
@@ -364,7 +410,7 @@ static int RenderWaterMesh(VMana2* mana2)
     GXSetTevDirect((GXTevStageID)2);
     _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD1, GX_TEXMAP2, GX_COLOR0A0);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x2C), GX_TEXMAP2);
+    GXLoadTexObj(mana2->m_generatedTexObj1, GX_TEXMAP2);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
@@ -419,7 +465,6 @@ static int RenderWaterMesh(VMana2* mana2)
  */
 static int UpdateWaterMesh(VMana2* mana2)
 {
-    u8* work;
     float* waterHeightA;
     float* waterHeightB;
     Vec* positions;
@@ -427,10 +472,9 @@ static int UpdateWaterMesh(VMana2* mana2)
     float currentScale;
     float neighborScale;
 
-    work = (u8*)mana2;
-    waterHeightA = *(float**)(work + 0x48);
-    positions = *(Vec**)(work + 0x3C);
-    waterHeightB = *(float**)(work + 0x4C);
+    waterHeightA = mana2->m_waterHeightA;
+    positions = mana2->m_positions;
+    waterHeightB = mana2->m_waterHeightB;
     if (waterHeightA == NULL) {
         return 0;
     }
@@ -500,11 +544,11 @@ static int UpdateWaterMesh(VMana2* mana2)
     DCFlushRange(positions, 0xD8C);
     CalculateNormal(mana2);
 
-    origin.x = *(float*)(work + 0x8C);
-    origin.y = *(float*)(work + 0x9C);
-    origin.z = *(float*)(work + 0xAC);
-    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
-                              (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    origin.x = mana2->m_waterMtx[0][3];
+    origin.y = mana2->m_waterMtx[1][3];
+    origin.z = mana2->m_waterMtx[2][3];
+    CalcWaterReflectionVector(mana2->m_reflectionVec, mana2->m_positions, mana2->m_normals, 0x121, origin,
+                              mana2->m_waterMtx, mana2->m_colors, mana2->m_texCoord1);
     return 1;
 }
 
@@ -1472,30 +1516,32 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
  */
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
+    VMana2* mana2 = (VMana2*)work;
     int type = *(u8*)((char*)step + 0x1C);
-    int shape = *(int*)(*(int*)((char*)model + 0xAC) + partIndex * 0x14 + 8);
-    u32* dlEntry = (u32*)(*(int*)(shape + 0x50) + dlIndex * 0xC);
+    CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
+    const char* shape = meshData->m_name;
+    u32* dlEntry = (u32*)(meshData->m_displayLists + dlIndex);
     int draw = 0;
 
     if (type == 2) {
-        if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj3) == 0) {
+        if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
             draw = 1;
         }
     } else if (type < 2) {
         if (type == 0) {
-            if (strcmp((char*)shape, s_manaShapeObj) == 0) {
+            if (strcmp(shape, s_manaShapeObj) == 0) {
                 draw = 1;
             }
-        } else if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj5) == 0) {
+        } else if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
             draw = 1;
         }
-    } else if (type < 4 && (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj1) == 0)) {
+    } else if (type < 4 && (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0)) {
         draw = 1;
     }
 
-    int waterCmp = strcmp((char*)shape, s_manaShapeObj4);
+    int waterCmp = strcmp(shape, s_manaShapeObj4);
     if ((waterCmp == 0 && *(u8*)((char*)step + 0x1C) == 1) ||
-        (strcmp((char*)shape, s_manaShapeObj2) == 0 && *(u8*)((char*)step + 0x1C) == 2)) {
+        (strcmp(shape, s_manaShapeObj2) == 0 && *(u8*)((char*)step + 0x1C) == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
@@ -1522,24 +1568,24 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
 
         PSMTXConcat(cameraMtx, mtx, posMtx);
         GXLoadPosMtxImm(posMtx, 0);
-        PSMTXCopy(mtx, (float(*)[4])((char*)work + 0x80));
+        PSMTXCopy(mtx, mana2->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-        RenderWaterMesh((VMana2*)work);
+        RenderWaterMesh(mana2);
         GXSetCullMode((GXCullMode)1);
     }
 
     if (draw) {
-        if (strcmp((char*)shape, s_manaShapeObj) != 0) {
-            PSMTXCopy(mtx, (float(*)[4])((char*)work + 0xB0));
-            if (*(char*)((char*)work + 0xEC) != 0) {
-                *(u8*)((char*)work + 0x38) = **(u8**)(shape + 0x28);
-                *(u8*)((char*)work + 0x39) = *((u8*)(*(int*)(shape + 0x28)) + 1);
-                *(u8*)((char*)work + 0x3A) = *((u8*)(*(int*)(shape + 0x28)) + 2);
-                *(u8*)((char*)work + 0x3B) = 0x80;
-                DCFlushRange((u8*)work + 0x38, 4);
-                GXSetArray((GXAttr)0xB, *(void**)((char*)work + 0x68), 4);
-                GXSetArray((GXAttr)0xD, *(void**)((char*)work + 0x6C), 4);
-                *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((char*)work + 0x64);
+        if (strcmp(shape, s_manaShapeObj) != 0) {
+            PSMTXCopy(mtx, mana2->m_reflectionMtx);
+            if (mana2->m_paraboloidReady != 0) {
+                mana2->m_runtimeColor.r = meshData->m_colors[0];
+                mana2->m_runtimeColor.g = meshData->m_colors[1];
+                mana2->m_runtimeColor.b = meshData->m_colors[2];
+                mana2->m_runtimeColor.a = 0x80;
+                DCFlushRange(&mana2->m_runtimeColor, 4);
+                GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
+                GXSetArray((GXAttr)0xD, mana2->m_meshTexCoords, 4);
+                *(u32*)(MaterialManRaw() + 0x08) = (u32)mana2->m_meshReflectionVec;
                 *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
                 *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
                 *(u32*)(MaterialManRaw() + 0x11C) = 0;
@@ -1555,18 +1601,15 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
                 *(u32*)(MaterialManRaw() + 0x130) = 0;
                 *(u32*)(MaterialManRaw() + 0x40) = 0x2ACE0F;
-                *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((char*)work + 0x20);
+                *(u32*)(MaterialManRaw() + 0xD0) = (u32)mana2->m_baseParaboloidTexObjs;
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                MaterialMan.SetMaterial(
-                    reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((char*)model + 0xA4) + 0x24)),
-                    *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
-                GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
+                GXCallDisplayList(mana2->m_displayListCopies[dlIndex], *dlEntry);
             }
         } else {
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((char*)model + 0xA4) + 0x24)),
-                                    *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
+            MaterialMan.SetMaterial(model->m_data->m_materialSet, *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
             GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
         }
     }

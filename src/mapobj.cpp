@@ -49,18 +49,6 @@ static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
     return reinterpret_cast<unsigned char*>(self) + offset;
 }
 
-struct MapObjCylinderLayout
-{
-    Vec m_bottom;
-    Vec m_top;
-    Vec m_axis;
-    float m_radius;
-    Vec m_boundsMin;
-    Vec m_boundsMax;
-};
-
-STATIC_ASSERT(sizeof(MapObjCylinderLayout) == 0x40);
-
 static inline void*& PtrAt(CMapObj* self, unsigned int offset)
 {
     return *reinterpret_cast<void**>(Ptr(self, offset));
@@ -1574,13 +1562,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        MapObjCylinderLayout localCylinder;
-        localCylinder.m_boundsMin.z = kMapObjBoundMinInit;
-        localCylinder.m_boundsMin.y = kMapObjBoundMinInit;
-        localCylinder.m_boundsMin.x = kMapObjBoundMinInit;
-        localCylinder.m_boundsMax.z = kMapObjBoundMaxInit;
-        localCylinder.m_boundsMax.y = kMapObjBoundMaxInit;
-        localCylinder.m_boundsMax.x = kMapObjBoundMaxInit;
+        CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1640,7 +1622,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             Vec localMove;
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            if (mapHit->CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&localCylinder), &localMove, mask) != 0) {
+            if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
                 return 1;
             }
         }
@@ -1665,13 +1647,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Vec localMove;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
-        MapObjCylinderLayout localCylinder;
-        localCylinder.m_boundsMin.z = kMapObjBoundMinInit;
-        localCylinder.m_boundsMin.y = kMapObjBoundMinInit;
-        localCylinder.m_boundsMin.x = kMapObjBoundMinInit;
-        localCylinder.m_boundsMax.z = kMapObjBoundMaxInit;
-        localCylinder.m_boundsMax.y = kMapObjBoundMaxInit;
-        localCylinder.m_boundsMax.x = kMapObjBoundMaxInit;
+        CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
@@ -1730,7 +1706,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         if (hitBounds) {
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            mapHit->CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&localCylinder), &localMove, mask);
+            mapHit->CheckHitCylinderNear(&localCylinder, &localMove, mask);
         }
     }
 

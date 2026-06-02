@@ -113,10 +113,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     pppSetBlendMode(0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    int zEnable = (param_2->m_payloadByte2C == 0) ? 1 : 0;
+    int zEnable = (param_2->m_disableZ == 0) ? 1 : 0;
     pppSetDrawEnv(
-        &colorInfo->m_color, &pppYmDeformationMdl->m_object.m_drawMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, static_cast<unsigned char>(zEnable), 1, 0);
+        &colorInfo->m_color, &pppYmDeformationMdl->m_object.m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
+        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode, static_cast<unsigned char>(zEnable), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -130,11 +130,11 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-    pppSetBlendMode(param_2->m_payloadByte28);
-    if (param_2->m_payloadByte28 == 0) {
+    pppSetBlendMode(param_2->m_blendMode);
+    if (param_2->m_blendMode == 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
     }
-    if (param_2->m_payloadByte28 == 3) {
+    if (param_2->m_blendMode == 3) {
         _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
         _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
     }
@@ -234,20 +234,22 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
             &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_scale, state->m_values[0],
-            state->m_values[1], param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
+            state->m_values[1], param_2->m_scaleValueAdd, param_2->m_scaleVelocityAdd,
+            param_2->m_scaleAccelerationAdd);
         CalcGraphValue(
             &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3],
-            state->m_values[4], param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
+            state->m_values[4], param_2->m_angleValueAdd, param_2->m_angleVelocityAdd,
+            param_2->m_angleAccelerationAdd);
 
         if (ppvIsLoopCalc == 0) {
             if (state->m_direction != 0) {
                 state->m_angle = state->m_angle + (int)state->m_values[2];
-                if (state->m_angle > param_2->m_payload3) {
+                if (state->m_angle > param_2->m_angleLimit) {
                     state->m_direction = 0;
                 }
             } else {
                 state->m_angle = state->m_angle - (int)state->m_values[2];
-                if ((int)state->m_angle < -(int)param_2->m_payload3) {
+                if ((int)state->m_angle < -(int)param_2->m_angleLimit) {
                     state->m_direction = 1;
                 }
             }

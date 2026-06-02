@@ -140,8 +140,6 @@ static inline Mtx44& CameraScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 static inline float LoadFloat(const float& value)
 {
     return value;
@@ -1320,8 +1318,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 j;
 
     work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
-    *(u32*)(MaterialManRaw() + 0xD0) = 0;
-    *(u32*)(MaterialManRaw() + 0xDC) = 0;
+    MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
         pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj0);
@@ -1602,23 +1599,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 DCFlushRange(&mana2->m_runtimeColor, 4);
                 GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
                 GXSetArray((GXAttr)0xD, mana2->m_meshTexCoords, 4);
-                *(u32*)(MaterialManRaw() + 0x08) = (u32)mana2->m_meshReflectionVec;
-                *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
-                *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                *(u32*)(MaterialManRaw() + 0x11C) = 0;
-                *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
-                *(u32*)(MaterialManRaw() + 0x124) = 0;
-                *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                *(u32*)(MaterialManRaw() + 0x58) = 0;
-                *(u32*)(MaterialManRaw() + 0x5C) = 0;
-                *(u8*)(MaterialManRaw() + 0x208) = 0;
-                *(u32*)(MaterialManRaw() + 0x48) = 0x2ACE0F;
-                *(u32*)(MaterialManRaw() + 0x128) = 0;
-                *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
-                *(u32*)(MaterialManRaw() + 0x130) = 0;
-                *(u32*)(MaterialManRaw() + 0x40) = 0x2ACE0F;
-                *(u32*)(MaterialManRaw() + 0xD0) = (u32)mana2->m_baseParaboloidTexObjs;
+                MaterialMan.SetManaReflectionEnv(mana2->m_meshReflectionVec, mana2->m_baseParaboloidTexObjs, 0, 0x2ACE0F);
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
                 MaterialMan.SetMaterial(model->m_data->m_materialSet, *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);

@@ -1184,7 +1184,7 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
             m_vtxDescMode = 1;
         }
-        GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 0x12);
+        GXSetArray(GX_VA_NRM, m_geometryArraySource, 0x12);
     } else {
         if ((tevBit & 0x20002) == 0) {
             if ((bumpLight != 0) || ((tevBit & 1) == 0)) {
@@ -1196,7 +1196,7 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                     m_vtxDescMode = 0;
                 }
-                GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
+                GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
             } else {
                 if (m_vtxDescMode != 3) {
                     GXClearVtxDesc();
@@ -1205,7 +1205,7 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                     m_vtxDescMode = 3;
                 }
-                GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
+                GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
             }
         } else {
             if (m_vtxDescMode != 2) {
@@ -1217,7 +1217,7 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
                 GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
                 m_vtxDescMode = 2;
             }
-            GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
+            GXSetArray(GX_VA_NRM, m_geometryArraySource, 6);
         }
     }
 }
@@ -1255,7 +1255,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     }
 
     m_activeEnvTevBit = tevBit;
-    GXSetArray(GX_VA_TEX0, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
+    GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
 
@@ -1533,7 +1533,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     }
 
     m_activeEnvTevBit = tevBit;
-    GXSetArray(GX_VA_TEX0, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
+    GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
 

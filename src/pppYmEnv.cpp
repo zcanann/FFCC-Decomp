@@ -517,7 +517,7 @@ CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle* handle)
  * JP Address: TODO
  * JP Size: TODO
  */
-int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
+CTexture* GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 {
     _pppEnvStYmEnv* ymEnv = (_pppEnvStYmEnv*)env;
     int textureIndex;
@@ -531,7 +531,7 @@ int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
     mapMeshArray = ymEnv->m_mapMeshPtr;
     mapMesh = mapMeshArray[mapMeshIndex];
     textureIndex = 0;
-    return reinterpret_cast<int>(mapMesh->GetTexture(ymEnv->m_materialSetPtr, textureIndex));
+    return static_cast<CTexture*>(mapMesh->GetTexture(ymEnv->m_materialSetPtr, textureIndex));
 }
 
 /*

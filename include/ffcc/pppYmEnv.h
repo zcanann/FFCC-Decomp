@@ -16,7 +16,7 @@ struct Vec;
 CChara::CModel* GetModelPtr(CGObject*);
 int GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*)[4]);
 void CalcGraphValue(_pppPObject*, long, float&, float&, float&, float, float&, float&);
-int GetTextureFromRSD(int, _pppEnvSt*);
+CTexture* GetTextureFromRSD(int, _pppEnvSt*);
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 void DisableIndWarp(_GXTevStageID, _GXIndTexStageID);

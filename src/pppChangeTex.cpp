@@ -136,7 +136,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 	work->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, work, step);
 
-	work->m_texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
+	work->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
@@ -154,7 +154,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		return;
 	}
 
-	CTexture* texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
+	CTexture* texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 	if (texture == 0) {
 		return;
 	}

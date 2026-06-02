@@ -6,6 +6,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -29,7 +30,7 @@ struct pppYmChangeTexState {
 	ChangeTexDisplayListCopy*** m_displayListArrays;
 	int _pad14;
 	CGObject* m_charaObj;
-	void* m_texture;
+	CTexture* m_texture;
 	int _pad20;
 	void* m_context;
 };
@@ -130,7 +131,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	state->m_charaObj = ppvMng->m_owner;
 	state->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, state, step);
-	state->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
+	state->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(state->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(state->m_charaObj, 2);
@@ -155,11 +156,11 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		state->m_value2 = state->m_value2 + step->m_arg3;
 	}
 
-	void* texObj = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
-	if (texObj == 0) {
+	CTexture* texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
+	if (texture == 0) {
 		return;
 	}
-	state->m_texture = texObj;
+	state->m_texture = texture;
 
 	ChangeTexMeshRef* meshList = ChangeTexMeshes(model0);
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
@@ -386,7 +387,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 
 	if (step->m_changeTex.m_mode != 0) {
 		meshColorArrays = state->m_meshColorArrays;
-		dlOffset = (int)state->m_texture;
+		dlOffset = reinterpret_cast<int>(state->m_texture);
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
@@ -398,7 +399,8 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 3)) {
 					MaterialMan.SetChangeTexReflectionTexture(0);
 				} else {
-					MaterialMan.SetChangeTexReflectionTexture(reinterpret_cast<GXTexObj*>(dlOffset + 0x28));
+					MaterialMan.SetChangeTexReflectionTexture(
+					    reinterpret_cast<GXTexObj*>(dlOffset + offsetof(CTexture, m_texObj)));
 				}
 
 				drawTevBits = 0xACE0F;
@@ -437,14 +439,15 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += meshIdx;
-	int textureInfo = (int)state->m_texture;
+	int textureInfo = reinterpret_cast<int>(state->m_texture);
 	ChangeTexMeshData* meshData = meshes->m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
 
 	if (step->m_changeTex.m_mode == 0) {
 		int drawTevBits = 0xACE0F;
 		int fullTevBits = drawTevBits | 0x1000;
-		MaterialMan.SetChangeTexReflectionState(reinterpret_cast<GXTexObj*>(textureInfo + 0x28), drawTevBits, fullTevBits);
+		MaterialMan.SetChangeTexReflectionState(
+		    reinterpret_cast<GXTexObj*>(textureInfo + offsetof(CTexture, m_texObj)), drawTevBits, fullTevBits);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

@@ -801,6 +801,7 @@ next:
  */
 void CSound::Draw()
 {
+    CSoundLayout& sound = SoundData(this);
     Mtx cameraMatrix;
     GXColor lineColor;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
@@ -820,7 +821,6 @@ void CSound::Draw()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    CSoundLayout& sound = SoundData(this);
     CSe3D* se = sound.m_seWork;
     for (u32 i = 0; i < 0x80; i++, se++) {
         if (se->m_bits.m_active) {

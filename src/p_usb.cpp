@@ -28,7 +28,7 @@ inline CUSBPcs::CUSBPcs()
     table[9] = desc2[2];
 }
 
-CProcessTable CUSBPcs::m_table = {
+CSmallProcessTable CUSBPcs::m_table = {
     const_cast<char*>(sUsbPcsClassName),
     {
         0,

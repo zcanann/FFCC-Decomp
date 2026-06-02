@@ -61,6 +61,7 @@ struct pppScreenBreakUnkC {
 
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_infoWord1) == 0x5C);
 STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x60);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
@@ -392,7 +393,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
     for (uVar15 = 0; uVar15 < model->m_data->m_meshCount;) {
         ScreenBreakMeshData* meshData = mesh->m_data;
-        CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
+        CChara::CNode* node = &model->m_nodes[meshData->m_infoWord1];
         node->m_flags &= 0xFE;
         PSMTXIdentity(node->m_localRuntimeMtx);
 
@@ -687,7 +688,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (*(u8*)((u8*)pieceData + 0x38) != 0) {
-            MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
+            MtxPtr nodeMtx = model->m_nodes[meshData->m_infoWord1].m_localRuntimeMtx;
 
             nodeMtx[0][3] = zero;
             nodeMtx[1][3] = zero;

@@ -1356,7 +1356,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	    CharaObjCanFrontGuard(this, sourceObj)) {
 		playSe3D(0x1D, 0x32, 0x96, 0, 0);
 		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
-		if (sourceObj != 0 && CharaObjIsPlayerCid(sourceObj->GetCID())) {
+		if (CharaObjIsPlayerCid(sourceObj->GetCID())) {
 			sourceObj->changeStat(0x13, 0, 0);
 		}
 		if (CharaObjIsPlayerCid(cid)) {

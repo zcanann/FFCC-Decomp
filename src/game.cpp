@@ -354,7 +354,7 @@ void CGame::Exec()
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&SystemPcs), 0);
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&GraphicPcs), 0);
 	System.AddScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
-	System.AddScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
+	System.AddScenegraph(reinterpret_cast<CProcess*>(&DbgMenuPcs), 0);
 
 	do {
 		m_cfdLoadedFlag = 0;
@@ -371,7 +371,7 @@ void CGame::Exec()
 		if (sceneId >= 0 && sceneId < 9) {
 			System.Printf(const_cast<char*>(sGameExecSceneFmt), m_tStatus[sceneId]);
 		} else {
-			System.Printf(const_cast<char*>(sGameInvalidSceneFmt), sceneId);
+			System.Printf(const_cast<char*>(sGameInvalidSceneFmt));
 		}
 
 		switch (m_currentSceneId) {
@@ -393,7 +393,7 @@ void CGame::Exec()
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&Game), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&GbaPcs), 0);
-			System.AddScenegraph(reinterpret_cast<CProcess*>(&DbgMenuPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&McPcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&SoundPcs), 0);
 			break;
@@ -461,7 +461,7 @@ void CGame::Exec()
 		Memory.DecHeapWalkerLevel();
 	} while (m_sceneId != 0);
 
-	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
+	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&DbgMenuPcs), 0);
 	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
 	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&GraphicPcs), 0);
 	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&SystemPcs), 0);

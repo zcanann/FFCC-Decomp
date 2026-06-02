@@ -21,7 +21,8 @@ struct CCharaModelData
 {
     u8 _pad0[0x8];
     u16 m_nodeCount;
-    u16 m_meshCount;
+    u16 _pad0A;
+    u32 m_meshCount;
     void* m_nodeRefData;
     void* m_meshRefData;
     void* m_bank;
@@ -29,14 +30,13 @@ struct CCharaModelData
     u16 m_chest3NodeIndex;
     u16 m_chest2NodeIndex;
     u16 m_chest1NodeIndex;
-    void* m_textureAnimSet;
     CMaterialSet* m_materialSet;
     float m_baseScale;
+    u8 _pad2C[0x8];
     u32 m_posQuant;
     u32 m_normQuant;
-    void* m_dynParams;
     u32 m_dynCount;
-    u8 _pad3C[0x8];
+    void* m_dynParams;
 };
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);

@@ -2001,58 +2001,55 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 {
     if (se3dHandle < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        return 0;
-    }
+    } else {
+        char* found = reinterpret_cast<char*>(this) + 0x2C;
+        int ret = 0;
+        int count;
 
-    char* found = reinterpret_cast<char*>(this) + 0x2C;
-    int ret = 0;
-    int count;
-
-    for (count = 0x20; count != 0; count--) {
-        if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-            if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                goto found_entry;
+        for (count = 0x20; count != 0; count--) {
+            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
             }
-        }
 
-        found += 0x28;
-        if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-            if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                goto found_entry;
+            found += 0x28;
+            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
             }
-        }
 
-        found += 0x28;
-        if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-            if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                goto found_entry;
+            found += 0x28;
+            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
             }
-        }
 
-        found += 0x28;
-        if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-            if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                goto found_entry;
+            found += 0x28;
+            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
+                    goto found_entry;
+                }
             }
-        }
 
-        ret += 3;
-        found += 0x28;
-    }
-    found = 0;
+            ret += 3;
+            found += 0x28;
+        }
+        found = 0;
 
 found_entry:
-    if (found != 0) {
-        const int playId = *reinterpret_cast<int*>(found + 8);
-        if (playId < 0) {
-            System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
-        } else {
-            RedSound(this)->SeFadeOut(playId, fadeFrames);
+        if (found != 0) {
+            const int playId = *reinterpret_cast<int*>(found + 8);
+            if (playId < 0) {
+                System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
+            } else {
+                RedSound(this)->SeFadeOut(playId, fadeFrames);
+            }
+            reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
         }
-        reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
     }
-
-    return 0;
 }
 
 /*

@@ -141,3 +141,8 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl*
 	work->m_velocity = zero;
 	work->m_distance = zero;
 }
+
+extern "C" {
+extern const float kPppYmTraceMoveZero = 0.0f;
+extern const float kPppYmTraceMoveOne = 1.0f;
+}

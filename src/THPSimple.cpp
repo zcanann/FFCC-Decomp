@@ -76,7 +76,13 @@ static u16 VolumeTable[0x80] = {
 s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
 
 extern const char sTHPMagic[4];
-extern const float kTHPSimpleDefaultVolume;
+extern const float kTHPSimpleDefaultVolume = 127.0f;
+extern const GXColorS10 kTHPYuvToRgbTevColor = {-90, 0, -114, 135};
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
 
 /*
  * --INFO--
@@ -966,8 +972,8 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.curVolume = kTHPSimpleDefaultVolume;
-    SimpleControl.targetVolume = kTHPSimpleDefaultVolume;
+    SimpleControl.curVolume = LoadFloat(kTHPSimpleDefaultVolume);
+    SimpleControl.targetVolume = LoadFloat(kTHPSimpleDefaultVolume);
     SimpleControl.rampCount = 0;
 
     return 1;

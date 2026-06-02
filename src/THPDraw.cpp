@@ -4,9 +4,9 @@
 #include "ffcc/gxfunc.h"
 extern "C" {
 extern const f32 kThpDrawLodBias;
+extern const GXColorS10 kTHPYuvToRgbTevColor;
 }
 
-static const GXColorS10 sTevColor = {-90, 0, -114, 135};
 static const GXColor sKColor0 = {0, 0, 226, 88};
 static const GXColor sKColor1 = {179, 0, 0, 182};
 static const GXColor sKColor2 = {255, 0, 255, 128};
@@ -122,7 +122,7 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
 
-    GXSetTevColorS10(GX_TEVREG0, sTevColor);
+    GXSetTevColorS10(GX_TEVREG0, kTHPYuvToRgbTevColor);
 
     GXSetTevKColor(GX_KCOLOR0, sKColor0);
 
@@ -165,4 +165,9 @@ void THPGXRestore(void) {
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_GREEN, GX_CH_GREEN, GX_CH_GREEN, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetAlphaCompare(GX_GEQUAL, 0, GX_AOP_AND, GX_ALWAYS, 0);
+}
+
+extern "C" {
+extern const f32 sTHPDrawZero = 0.0f;
+extern const f32 sTHPDrawNegativeOne = -1.0f;
 }

@@ -276,7 +276,7 @@ void RedDelete(void* address)
  * JP Address: TODO
  * JP Size: TODO
  */
-int RedResize(int address, int size)
+inline int RedResize(int address, int size)
 {
 	unsigned int interrupts;
 	RedMemoryBlock* blockPtr;
@@ -319,7 +319,7 @@ int RedResize(int address, int size)
  * JP Address: TODO
  * JP Size: TODO
  */
-void* RedResize(void* address, int size)
+inline void* RedResize(void* address, int size)
 {
 	return (void*)RedResize(RedMemoryAddress(address), size);
 }
@@ -484,7 +484,7 @@ void RedDeleteA(void* address)
  * JP Address: TODO
  * JP Size: TODO
  */
-int RedResizeA(int address, int size)
+inline int RedResizeA(int address, int size)
 {
 	unsigned int interrupts;
 	RedMemoryBlock* blockPtr;
@@ -527,7 +527,7 @@ int RedResizeA(int address, int size)
  * JP Address: TODO
  * JP Size: TODO
  */
-void* RedResizeA(void* address, int size)
+inline void* RedResizeA(void* address, int size)
 {
 	return (void*)RedResizeA(RedMemoryAddress(address), size);
 }

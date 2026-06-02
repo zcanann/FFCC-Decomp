@@ -24,7 +24,6 @@ extern "C" {
 extern float ppvScreenMatrixXbuff;
 extern float ppvScreenMatrixYbuff;
 extern float ppvScreenMatrixZbuff;
-extern int gPppHeapUseRateWords[3];
 }
 #include "ffcc/stopwatch.h"
 
@@ -65,6 +64,8 @@ extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
 extern int ppvUserStopPartF;
+unsigned char gPppDefaultValueBuffer[0x40] = {0};
+int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
 extern int ppvEmptyLoop;

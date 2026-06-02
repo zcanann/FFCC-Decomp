@@ -1254,16 +1254,20 @@ void CMenuPcs::CalcSelectWait()
 			delay = 0;
 		}
 	} else if (promptMode == 1) {
-		if ((repeat & 3) != 0) {
+		if ((repeat & 3) == 0) {
+			if ((down & 0x100) == 0) {
+				if ((down & 0x200) != 0) {
+					promptMode = 2;
+					confirmSel = 1;
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+				}
+			} else {
+				promptMode = 2;
+				Sound.PlaySe(2, 0x40, 0x7f, 0);
+			}
+		} else {
 			confirmSel = (short)(confirmSel ^ 1);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((down & 0x100) != 0) {
-			promptMode = 2;
-			Sound.PlaySe(2, 0x40, 0x7f, 0);
-		} else if ((down & 0x200) != 0) {
-			promptMode = 2;
-			confirmSel = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}
 	} else if (promptMode == 2) {
 		if (*(short*)(auxPtr + 8) == 1 && confirmSel == 0) {

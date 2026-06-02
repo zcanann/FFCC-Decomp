@@ -319,6 +319,3 @@ CMapTexAnim::~CMapTexAnim()
         m_keyFrame.Destroy();
     }
 }
-
-extern "C" const float FLOAT_8032fd48 = 1.0f;
-extern "C" const float FLOAT_8032fd4c = 0.0f;

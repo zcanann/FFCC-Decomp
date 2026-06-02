@@ -96,6 +96,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
+    CTexture* GetTexture(long);
+    int GetNumTexture();
 
 #ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
     CPtrArray<CTexture*> m_textureArray;

@@ -108,6 +108,26 @@ int CTextureSet::Find(char* name)
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+CTexture* CTextureSet::GetTexture(long index)
+{
+    return m_textureArray[static_cast<unsigned long>(index)];
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+int CTextureSet::GetNumTexture()
+{
+    return m_textureArray.GetSize();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003A77C
  * PAL Size: 560b
  * EN Address: TODO

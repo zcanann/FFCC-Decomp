@@ -2,6 +2,7 @@
 #define _FFCC_MAPOBJ_H_
 
 #include "ffcc/mapkeyframe.h"
+#include "ffcc/p_light.h"
 
 #include <dolphin/gx/GXStruct.h>
 
@@ -67,7 +68,7 @@ public:
     CMapObjAtrSpotLight()
     {
         m_type = SPOT_LIGHT;
-        *reinterpret_cast<int*>(m_pad38) = 0;
+        m_light = 0;
         m_intensity = 1.0f;
         m_falloff = 1.0f;
         m_colorMode = 0;
@@ -109,7 +110,7 @@ public:
     unsigned char m_keyFrameCount; // 0x30
     unsigned char m_pad31[3];
     _GXColor m_baseColor;          // 0x34
-    unsigned char m_pad38[4];
+    CLightPcs::CLight* m_light;    // 0x38
     unsigned char m_colorCount;    // 0x3C
     unsigned char m_altColorCount; // 0x3D
     unsigned char m_pad3E[2];

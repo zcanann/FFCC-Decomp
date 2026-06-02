@@ -4,7 +4,6 @@
 #include "global.h"
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
-#include <stddef.h>
 
 /*
  * --INFO--
@@ -17,18 +16,18 @@
  */
 void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* blurParam, _pppCtrlTable* ctrlTable)
 {
-    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1] + offsetof(_pppPObject, m_workArea);
-    u8* blurObjectBytes = (u8*)blur;
+    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1];
+    u8* blurActive = blur->m_workArea + blurActiveOffset;
     u8* blurValuePtr = blur->m_workArea + ctrlTable->m_serializedDataOffsets[0];
     u32 blurMask;
 
     blurParam->m_blurB = 0;
-    blurMask = __cntlzw((u32)blurObjectBytes[blurActiveOffset]);
+    blurMask = __cntlzw((u32)*blurActive);
     Graphic.RenderBlur(blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG, blurParam->m_blurB,
                        blurValuePtr[0x0B], blurParam->m_initWOrk);
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
-    blurObjectBytes[blurActiveOffset] = 1;
+    *blurActive = 1;
 }
 
 /*
@@ -87,9 +86,9 @@ void pppCon2ScreenBlur(_pppPObject*)
  */
 void pppConScreenBlur(_pppPObject* blur, _pppCtrlTable* ctrlTable)
 {
-    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1] + offsetof(_pppPObject, m_workArea);
-    u8* blurObjectBytes = (u8*)blur;
+    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1];
+    u8* blurActive = blur->m_workArea + blurOffset;
 
     Graphic.InitBlurParameter();
-    blurObjectBytes[blurOffset] = 0;
+    *blurActive = 0;
 }

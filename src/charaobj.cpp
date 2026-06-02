@@ -1600,6 +1600,18 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				playSe3D(seNo, 0x32, 0x96, 0, 0);
 			}
 		}
+
+		sourceObj->onAttacked(this);
+	}
+
+	if (itemEffect != 0x1F8 && *reinterpret_cast<unsigned short*>(itemData + 0x0E) == 2 &&
+	    (allowEffect != 0 || damageAmount != 0) &&
+	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
+		bonus(0x14, resolvedItemId, sourceObj);
+		sourceObj->bonus(0x10, resolvedItemId, this);
+		if (*reinterpret_cast<unsigned short*>(script + 7) != 0) {
+			sourceObj->bonus(0x0B, resolvedItemId, this);
+		}
 	}
 
 	if (staType == 0x1C || staType == 4 || staType < 2) {

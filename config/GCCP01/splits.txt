@@ -1651,18 +1651,19 @@ astar.cpp:
 	.ctors      start:0x801D5444 end:0x801D5448
 	.rodata     start:0x801DD6A8 end:0x801DD6F8
 	.bss        start:0x80309178 end:0x8030B62C
-	.sdata2     start:0x80332088 end:0x803320C8
+	.sdata2     start:0x80332088 end:0x803320A8
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04
 	extabindex  start:0x80010EC4 end:0x80010ED0
 	.text       start:0x80143098 end:0x801432E0
-	.sdata2     start:0x803331E0 end:0x803331F0
+	.sdata2     start:0x803320A8 end:0x803320B8
 
 pppFilter.cpp:
 	extab       start:0x80009C04 end:0x80009C0C
 	extabindex  start:0x80010ED0 end:0x80010EDC
 	.text       start:0x801432E0 end:0x801433B8
+	.sdata2     start:0x803320B8 end:0x803320C8
 
 monobj_table.cpp:
 	extab       start:0x80009C0C end:0x80009C14
@@ -1679,7 +1680,7 @@ singmenu.cpp:
 	.bss        start:0x8030B630 end:0x8030BA48
 	.sdata      start:0x8032EA78 end:0x8032EA80
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
-	.sdata2     start:0x803331F0 end:0x80333278
+	.sdata2     start:0x803320C8 end:0x80332A50
 
 menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94
@@ -1689,7 +1690,7 @@ menu_cmd.cpp:
 	.data       start:0x80214D28 end:0x80214D90
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
-	.sdata2     start:0x80333278 end:0x80333338
+	.sdata2     start:0x80332A50 end:0x80332B40
 
 shopmenu.cpp:
 	extab       start:0x80009D94 end:0x80009E54
@@ -1697,26 +1698,26 @@ shopmenu.cpp:
 	.text       start:0x801503C8 end:0x80159654
 	.data       start:0x80214D90 end:0x80214FE0
 	.sbss       start:0x8032EED0 end:0x8032EED9
-	.sdata2     start:0x80333338 end:0x80333388
+	.sdata2     start:0x80332B40 end:0x80332E60
 	.sbss2      start:0x80333E00 end:0x80333E04
 
 menu_item.cpp:
 	extab       start:0x80009E54 end:0x80009E8C
 	extabindex  start:0x80011248 end:0x8001129C
 	.text       start:0x80159654 end:0x8015B158
-	.sdata2     start:0x80333388 end:0x803333A8
+	.sdata2     start:0x80332E60 end:0x80332EB8
 
 menu_equip.cpp:
 	extab       start:0x80009E8C end:0x80009ED4
 	extabindex  start:0x8001129C end:0x80011308
 	.text       start:0x8015B158 end:0x8015D798
-	.sdata2     start:0x803333A8 end:0x80333418
+	.sdata2     start:0x80332EB8 end:0x80332F20
 
 menu_tmparti.cpp:
 	extab       start:0x80009ED4 end:0x80009EF4
 	extabindex  start:0x80011308 end:0x80011338
 	.text       start:0x8015D798 end:0x8015E37C
-	.sdata2     start:0x80333418 end:0x80333428
+	.sdata2     start:0x80332F20 end:0x80332F60
 
 menu_money.cpp:
 	extab       start:0x80009EF4 end:0x80009F1C
@@ -1724,27 +1725,27 @@ menu_money.cpp:
 	.text       start:0x8015E37C end:0x8015FA28
 	.bss        start:0x8030BA58 end:0x8030BA68
 	.sbss       start:0x8032EEE0 end:0x8032EEE4
-	.sdata2     start:0x80333428 end:0x80333448
+	.sdata2     start:0x80332F60 end:0x80332FA8
 
 menu_arti.cpp:
 	extab       start:0x80009F1C end:0x80009F54
 	extabindex  start:0x80011374 end:0x800113C8
 	.text       start:0x8015FA28 end:0x80160EDC
-	.sdata2     start:0x80333448 end:0x803334A8
+	.sdata2     start:0x80332FA8 end:0x80332FF8
 
 menu_compa.cpp:
 	extab       start:0x80009F54 end:0x80009F7C
 	extabindex  start:0x800113C8 end:0x80011404
 	.text       start:0x80160EDC end:0x80162360
 	.rodata     start:0x801DEDC8 end:0x801DEDF8
-	.sdata2     start:0x803334A8 end:0x803334F0
+	.sdata2     start:0x80332FF8 end:0x80333038
 
 menu_favo.cpp:
 	extab       start:0x80009F7C end:0x80009FAC
 	extabindex  start:0x80011404 end:0x8001144C
 	.text       start:0x80162360 end:0x8016394C
 	.bss        start:0x8030BA68 end:0x8030BA88
-	.sdata2     start:0x803334F0 end:0x80333530
+	.sdata2     start:0x80333038 end:0x80333080
 
 menu_letter.cpp:
 	extab       start:0x80009FAC end:0x8000A004
@@ -1752,12 +1753,13 @@ menu_letter.cpp:
 	.text       start:0x8016394C end:0x80167DD4
 	.bss        start:0x8030BA88 end:0x8030BB08
 	.sbss       start:0x8032EEE8 end:0x8032EF08
-	.sdata2     start:0x80333530 end:0x8033355C
+	.sdata2     start:0x80333080 end:0x803331A8
 
 pppConstrainCameraForLoc.cpp:
 	extab       start:0x8000A004 end:0x8000A01C
 	extabindex  start:0x800114D0 end:0x800114F4
 	.text       start:0x80167DD4 end:0x80168130
+	.sdata2     start:0x803331A8 end:0x803331B0
 
 goout.cpp:
 	extab       start:0x8000A01C end:0x8000A06C
@@ -1767,18 +1769,19 @@ goout.cpp:
 	.data       start:0x80214FE0 end:0x80215968
 	.bss        start:0x8030BB08 end:0x8030BB58
 	.sbss       start:0x8032EF08 end:0x8032EF10
-	.sdata2     start:0x8033355C end:0x80333574
+	.sdata2     start:0x803331B0 end:0x803331D8
 
 pppDrawMatrixLoc.cpp:
 	extab       start:0x8000A06C end:0x8000A074
 	extabindex  start:0x8001156C end:0x80011578
 	.text       start:0x8016C9E8 end:0x8016CA80
+	.sdata2     start:0x803331D8 end:0x803331E0
 
 pppConstrainCameraDir2.cpp:
 	extab       start:0x8000A074 end:0x8000A07C
 	extabindex  start:0x80011578 end:0x80011584
 	.text       start:0x8016CA80 end:0x8016CD30
-	.sdata2     start:0x80333574 end:0x80333580
+	.sdata2     start:0x803331E0 end:0x803331F0
 
 pppFovAdjustMatrix.cpp:
 	.text       start:0x8016CD30 end:0x8016CD3C
@@ -1790,25 +1793,27 @@ cmake.cpp:
 	.rodata     start:0x801E3038 end:0x801E3048
 	.data       start:0x80215968 end:0x80215A48
 	.bss        start:0x8030BB58 end:0x8030BB80
-	.sdata2     start:0x80333580 end:0x80333614
+	.sdata2     start:0x803331F0 end:0x803333D0
 
 menu_lst.cpp:
 	extab       start:0x8000A12C end:0x8000A14C
 	extabindex  start:0x8001168C end:0x800116BC
 	.text       start:0x8017474C end:0x801754E0
+	.sdata2     start:0x803333D0 end:0x80333428
 
 pppLaser.cpp:
 	extab       start:0x8000A14C end:0x8000A16C
 	extabindex  start:0x800116BC end:0x800116EC
 	.text       start:0x801754E0 end:0x8017683C
 	.rodata     start:0x801E3048 end:0x801E3058
+	.sdata2     start:0x80333428 end:0x80333460
 
 MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC
 	extabindex  start:0x800116EC end:0x8001177C
 	.text       start:0x8017683C end:0x8017AF14
 	.data       start:0x80215A48 end:0x80215BD8
-	.sdata2     start:0x80333614 end:0x80333680
+	.sdata2     start:0x80333460 end:0x803336D8
 
 wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC

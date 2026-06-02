@@ -410,7 +410,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     Vec initPos ATTRIBUTE_ALIGN(8);
     Vec pos ATTRIBUTE_ALIGN(8);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

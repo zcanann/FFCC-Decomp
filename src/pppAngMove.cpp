@@ -55,7 +55,7 @@ void pppAngMove(_pppPObject* basePtr, void* input, _pppCtrlTable* ctrlTable)
     PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->b);
     PppAngMoveInput* inputData = (PppAngMoveInput*)input;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

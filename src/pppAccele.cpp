@@ -39,7 +39,7 @@ void pppAccele(_pppPObject* obj, pppAcceleUnkB* param_2, _pppCtrlTable* param_3)
 	float* pfVar1 = (float*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
 	float* pfVar2 = (float*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
 
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

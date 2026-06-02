@@ -1905,10 +1905,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         return;
     case 0x14:
-        gPppCalcDisabled = 0;
+        ppvUserStopPartF = 0;
         return;
     case 0x15:
-        gPppCalcDisabled = 1;
+        ppvUserStopPartF = 1;
         return;
     case 0x16:
         memcpy(self + kCmd16PayloadOffset, payload, 8);
@@ -2161,7 +2161,7 @@ void CPartMng::pppEditPartCalc()
         model->CalcMatrix();
         model->CalcSkin();
         model->SetFrame(*reinterpret_cast<float*>(self + 0x23564));
-        if (gPppCalcDisabled == 0) {
+        if (ppvUserStopPartF == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
     }

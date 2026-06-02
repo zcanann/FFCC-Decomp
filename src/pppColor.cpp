@@ -40,7 +40,7 @@ void pppColor(_pppPObject* param1, void* param2, _pppCtrlTable* param3){
     _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
     pppColorStep* step = static_cast<pppColorStep*>(param2);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

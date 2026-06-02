@@ -70,7 +70,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrl
  */
 void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
 {
-	volatile int* stateFlag = &gPppCalcDisabled;
+	volatile int* stateFlag = &ppvUserStopPartF;
 	if (*stateFlag == 0) {
 		return;
 	}

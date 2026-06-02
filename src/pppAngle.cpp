@@ -29,7 +29,7 @@ void pppAngleCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
  */
 void pppAngle(_pppPObject* dest, void* src, _pppCtrlTable* ctrlTable)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

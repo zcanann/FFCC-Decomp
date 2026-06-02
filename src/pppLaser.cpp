@@ -209,7 +209,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     int emptyHistory;
     int fillIndex;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
     if (step->m_stepValue == 0xFFFF) {

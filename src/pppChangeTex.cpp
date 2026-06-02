@@ -445,8 +445,8 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
 
 	if (step->m_payload[0] == 0) {
-		int drawTevBits = 0xACE0F;
-		int fullTevBits = drawTevBits | 0x1000;
+		int drawTevBits = 0xADE0F;
+		int fullTevBits = drawTevBits;
 		MaterialMan.SetChangeTexReflectionState(&texture->m_texObj, drawTevBits, fullTevBits);
 	}
 

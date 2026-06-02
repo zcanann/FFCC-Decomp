@@ -2870,8 +2870,43 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     bool restoreFog = false;
     if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
-        _GXColor fogColor = CharaPcs.m_texShadowColor;
-        GXSetFog(GX_FOG_PERSP_LIN, m_fogBlend, m_fogBlend + 2.0f, 0.0f, 1024.0f, fogColor);
+        float invBlend = FLOAT_8033028c - m_fogBlend;
+        float fogBlend = FLOAT_8033028c - invBlend * invBlend;
+        float fogRemainder = FLOAT_8033028c - fogBlend;
+
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        CColor whitePart;
+        whitePart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * fogBlend));
+        whitePart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * fogBlend));
+        whitePart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * fogBlend));
+        whitePart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * fogBlend));
+        CColor whitePartCopy(whitePart);
+
+        _GXColor graphicFogColor = Graphic.m_fogColor;
+        CColor fogBase(graphicFogColor);
+        CColor fogPart;
+        fogPart.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.r) * fogRemainder));
+        fogPart.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.g) * fogRemainder));
+        fogPart.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.b) * fogRemainder));
+        fogPart.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(fogBase.color.a) * fogRemainder));
+        CColor fogPartCopy(fogPart);
+
+        CColor blendedFog;
+        blendedFog.color.r = fogPartCopy.color.r + whitePartCopy.color.r;
+        blendedFog.color.g = fogPartCopy.color.g + whitePartCopy.color.g;
+        blendedFog.color.b = fogPartCopy.color.b + whitePartCopy.color.b;
+        blendedFog.color.a = fogPartCopy.color.a + whitePartCopy.color.a;
+        CColor blendedFogCopy(blendedFog);
+
+        float nearZ = CameraPcs.m_nearZ;
+        float farZ = CameraPcs.m_farZ;
+        _GXColor fogColor = blendedFogCopy.color;
+        GXSetFog(GX_FOG_PERSP_LIN,
+                 Graphic.m_fogStart * fogRemainder + nearZ * fogBlend,
+                 (Graphic.m_fogEnd + FLOAT_8033028c) * fogRemainder + (nearZ + FLOAT_8033028c) * fogBlend,
+                 nearZ,
+                 farZ,
+                 fogColor);
         restoreFog = true;
     }
 

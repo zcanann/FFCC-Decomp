@@ -10,7 +10,9 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
@@ -94,23 +96,6 @@ extern float FLOAT_80331154;
 extern float FLOAT_80331158;
 
 namespace {
-
-struct FurPtrArrayRaw
-{
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    void** m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-
-struct FurMaterialSetRaw
-{
-    void* m_vtable;
-    int m_refCount;
-    FurPtrArrayRaw m_materials;
-};
 
 struct FurMaterialRaw
 {
@@ -1446,8 +1431,6 @@ int CChara::CModel::PickFur(
 	FurMeshRaw* mesh = ModelMeshes(this);
 	CChara::CNode* nodes = ModelNodes(this);
 
-	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-
 	const unsigned short meshCount = ModelMeshCount(this);
 	const float cursorX = static_cast<float>(Chara.MogFur().m_cursorX);
 	const float cursorY = static_cast<float>(Chara.MogFur().m_cursorY);
@@ -1486,8 +1469,7 @@ int CChara::CModel::PickFur(
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
-			CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[displayList->m_material]);
 			int paintableMaterial = 0;
 			if (material->m_pickTexture != 0 && material->m_pickTexture->m_format == 5) {
 				paintableMaterial = 1;
@@ -1629,13 +1611,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	FurMeshRaw* mesh = ModelMeshes(this);
 	CChara::CNode* nodes = ModelNodes(this);
 
-	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
-	const int materialCount = materials->GetSize();
+	const int materialCount = materialSet->m_materials.GetSize();
 
 	bool hasFurMaterial = false;
 	for (int i = 0; i < materialCount; i++) {
-		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[i]);
+		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[i]);
 		if (material->m_furEnable != 0) {
 			hasFurMaterial = true;
 			break;
@@ -1761,7 +1741,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[displayList->m_material]);
 			if (material->m_furEnable == 0) {
 				continue;
 			}

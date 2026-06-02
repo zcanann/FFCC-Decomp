@@ -152,6 +152,14 @@ public:
     void IncNumTexture();
     void SetTevBit(CMaterialMan::TEV_BIT);
     void GetNumTexture();
+    unsigned short GetTextureCount() const
+    {
+        return m_textureCount;
+    }
+    unsigned char GetMaterialId() const
+    {
+        return m_unkA6;
+    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
@@ -236,6 +244,10 @@ public:
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
+    int GetNumMaterial()
+    {
+        return m_materials.GetSize();
+    }
 #ifdef FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
     CMaterial* GetMaterial(long);
 #else

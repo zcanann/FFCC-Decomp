@@ -3,7 +3,9 @@
 #include "ffcc/graphic.h"
 #include "ffcc/color.h"
 #include "ffcc/gxfunc.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
@@ -531,12 +533,12 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
     displayList += drawListIndex;
 
     if (work[0x24] != 0) {
-        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((u8*)model->m_data->m_materialSet + 8))[displayList->m_material];
+        CMaterial* material = model->m_data->m_materialSet->m_materials[displayList->m_material];
 
         MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
         GXSetArray((GXAttr)0xB, work + 0x28, 4);
 
-        if (*(u16*)((u8*)material + 0x18) == 1) {
+        if (material->GetTextureCount() == 1) {
             GXSetNumChans(1);
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
             GXSetTevKColor((GXTevKColorID)0, CColor(0xA0, 0xA0, 0xA0, 0xA0).color);

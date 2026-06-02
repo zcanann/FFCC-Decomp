@@ -8,7 +8,9 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/textureman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
@@ -229,9 +231,10 @@ float CMapKeyFrame::Get()
  * JP Size: TODO
  */
 #pragma dont_inline on
-extern "C" unsigned long UnkMaterialSetGetter(void* ptrArray)
+template <>
+int CPtrArray<CMaterial*>::GetSize()
 {
-    return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(ptrArray) + 4);
+    return m_numItems;
 }
 #pragma dont_inline reset
 
@@ -2175,10 +2178,8 @@ void CMapMng::ReadOtm(char* mapName)
                         new (m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     m_materialSet = materialSet;
                     if (materialSet != 0) {
-                        reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
-                            ->SetDefaultSize(0x180);
-                        reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
-                            ->SetGrow(0);
+                        materialSet->m_materials.SetDefaultSize(0x180);
+                        materialSet->m_materials.SetGrow(0);
                         materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     }
                 }
@@ -3099,14 +3100,12 @@ int CMapMng::GetMapObjIdx(unsigned short id)
  */
 CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
-    unsigned char* materialSet = reinterpret_cast<unsigned char*>(m_materialSet);
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materialSet + 8)) {
-        if ((*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index] != 0
-            && materialId == reinterpret_cast<unsigned char*>(
-                                (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index])[0xA6]) {
-            return (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index];
+    while (index < static_cast<unsigned long>(m_materialSet->GetNumMaterial())) {
+        CMaterial* material = m_materialSet->GetMaterial(index);
+        if ((material != 0) && (materialId == material->GetMaterialId())) {
+            return material;
         }
         index++;
     }

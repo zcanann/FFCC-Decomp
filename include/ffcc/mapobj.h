@@ -222,7 +222,7 @@ public:
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
     unsigned char m_meshType;    // 0x1E
-    char m_pad1F;
+    signed char m_octTreeIndex;      // 0x1F
     char m_pad20;
     unsigned char m_useAmbientColor; // 0x21
     unsigned char m_enableFullScreenShadow; // 0x22

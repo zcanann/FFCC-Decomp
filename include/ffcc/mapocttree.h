@@ -82,6 +82,8 @@ public:
 	void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
 	void SetOctTreeMapObj(int);
 	COctNode* GetRootNode() { return m_nodePool; }
+	CMapObj* GetMapObject() { return m_mapObject; }
+	void SetMapObject(CMapObj* mapObject) { m_mapObject = mapObject; }
 
 private:
 	u8 m_type;              // 0x00

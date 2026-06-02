@@ -313,7 +313,7 @@ void CMapObj::Init()
 
     m_drawPriority = 0x7E;
     m_baseDrawPriority = 0x7E;
-    S8At(this, 0x1F) = -1;
+    m_octTreeIndex = -1;
     U8At(this, 0x20) = 0;
     m_disableZWrite = 0;
     m_useAmbientColor = 0;
@@ -1241,16 +1241,16 @@ void CMapObj::Calc()
     }
 
     if ((static_cast<unsigned int>(m_mapDataType) == 1U) && (m_mapData != 0) &&
-        (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
+        (m_octTreeIndex == -1) &&
         ((m_showFlags & 1) != 0)) {
         if ((m_cameraSemiTransMaxAlpha < kMapObjOne) && (m_cameraSemiTransMinAlpha >= kMapObjInitNegOne)) {
             m_drawPriority = m_baseDrawPriority;
             m_cameraSemiTransBeyondMax = 1;
             m_cameraSemiTransActive = 0;
         } else {
-            pos.x = F32At(this, 0xC4);
-            pos.y = F32At(this, 0xD4);
-            pos.z = F32At(this, 0xE4);
+            pos.x = m_worldMtx[0][3];
+            pos.y = m_worldMtx[1][3];
+            pos.z = m_worldMtx[2][3];
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
@@ -1388,9 +1388,9 @@ void CMapObj::Draw(unsigned char priority)
     }
 
     Vec lightPos;
-    lightPos.x = F32At(this, 0xC4);
-    lightPos.y = F32At(this, 0xD4);
-    lightPos.z = F32At(this, 0xE4);
+    lightPos.x = m_worldMtx[0][3];
+    lightPos.y = m_worldMtx[1][3];
+    lightPos.z = m_worldMtx[2][3];
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
@@ -1486,7 +1486,7 @@ void CMapObj::SetDrawFlag()
     m_showFlags &= ~4;
 
     if ((m_mapDataType == 1) && (m_mapData != 0)) {
-        if ((static_cast<signed char>(U8At(this, 0x1F)) == -1) && ((m_showFlags & 1) != 0)) {
+        if ((m_octTreeIndex == -1) && ((m_showFlags & 1) != 0)) {
             Mtx concatMtx;
 
             PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
@@ -1560,7 +1560,7 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((m_mapDataType == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
@@ -1644,7 +1644,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((m_mapDataType == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
         Vec localMove;
 

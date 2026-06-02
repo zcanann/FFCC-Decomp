@@ -2406,7 +2406,7 @@ int CMapMng::ReadMid(char* mapName)
 
                     COctTree* octTree = GetOctTreeArray() + octTreeCount;
                     octTree->ReadOtmOctTree(chunkFile);
-                    *reinterpret_cast<CMapObj**>(Ptr(octTree, 8)) = mapObj;
+                    octTree->SetMapObject(mapObj);
 
                     if (mapObj->m_mapData == 0) {
                         if (System.m_execParam != 0) {
@@ -2469,9 +2469,9 @@ int CMapMng::ReadMid(char* mapName)
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
-        unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(octTree, 8)));
-        if (obj != 0) {
-            obj[0x1F] = static_cast<unsigned char>(i);
+        CMapObj* mapObj = octTree->GetMapObject();
+        if (mapObj != 0) {
+            mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
@@ -2612,7 +2612,7 @@ void CMapMng::DrawBefore()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0xFE);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         const short octTreeCount = m_octTreeCount;
@@ -2663,7 +2663,7 @@ void CMapMng::Draw()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0x40);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         PartPcs.DrawShoki();
@@ -2677,7 +2677,7 @@ void CMapMng::Draw()
         mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         octTree = GetOctTreeArray();
@@ -2720,13 +2720,13 @@ void CMapMng::Draw()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitWire();
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitNormal();
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);
@@ -2780,7 +2780,7 @@ void CMapMng::DrawAfter()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(2);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
     }
 }
@@ -2822,7 +2822,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
+            m_hitMapObj = octTree->GetMapObject();
             return 1;
         }
     }
@@ -2880,7 +2880,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         octTree->CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
+            m_hitMapObj = octTree->GetMapObject();
         }
     }
 
@@ -3004,7 +3004,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             mapObj->m_cameraSemiTransFadeRange = fadeRange;
             mapObj->m_cameraSemiTransMinAlpha = minAlpha;
             mapObj->m_cameraSemiTransMaxAlpha = maxAlpha;
-            if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
+            if (mapObj->m_mapData != 0 && mapObj->m_octTreeIndex != -1) {
                 mapObj->m_cameraSemiTransMinAlpha = kMapCameraSemiTransMinSentinel;
                 mapObj->m_cameraSemiTransMaxAlpha = kMapCameraSemiTransMaxSentinel;
                 mapObj->m_drawPriority = 2;

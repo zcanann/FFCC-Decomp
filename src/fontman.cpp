@@ -12,16 +12,16 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-static const float kFontZero = 0.0f;
-static const double DOUBLE_803306C0 = 4503601774854144.0;
-static const float kFontOne = 1.0f;
-static const double DOUBLE_803306D0 = 4503599627370496.0;
-static const float kFontOrthoHeight = 448.0f;
-static const float kFontOrthoWidth = 640.0f;
-static const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
-static const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
-static const float FLOAT_803306e8 = 0.0f;
-static const float FLOAT_803306ec = 1.0f;
+extern const float kFontZero = 0.0f;
+extern const double DOUBLE_803306C0 = 4503601774854144.0;
+extern const float kFontOne = 1.0f;
+extern const double DOUBLE_803306D0 = 4503599627370496.0;
+extern const float kFontOrthoHeight = 448.0f;
+extern const float kFontOrthoWidth = 640.0f;
+extern const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
+extern const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
+extern const float FLOAT_803306e8 = 0.0f;
+extern const float FLOAT_803306ec = 1.0f;
 
 extern "C" const char s_fontman_cpp[] = "fontman.cpp";
 extern "C" const char s_CFontMan_801D9CC4[] = "CFontMan";
@@ -66,10 +66,11 @@ float CFont::GetWidth(unsigned short ch)
 	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+			glyph += 4;
+		} else {
 			goto found_glyph;
 		}
-		glyph += 4;
 	}
 	glyph = 0;
 
@@ -103,10 +104,11 @@ find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	unsigned short* fallbackGlyph = glyphBucket + 1;
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) == 0) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) != 0) {
+			fallbackGlyph += 4;
+		} else {
 			goto found_fallback_glyph;
 		}
-		fallbackGlyph += 4;
 	}
 	fallbackGlyph = 0;
 found_fallback_glyph:
@@ -142,10 +144,11 @@ float CFont::GetWidth(char* text)
 		float charWidth;
 
 		for (; count > 0; count--) {
-			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+				glyph += 4;
+			} else {
 				goto found_glyph;
 			}
-			glyph += 4;
 		}
 		glyph = 0;
 
@@ -180,10 +183,11 @@ find_fallback:
 		unsigned short* fallbackGlyph = glyphBucket + 1;
 		count = static_cast<int>(*glyphBucket);
 		for (; count > 0; count--) {
-			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) == 0) {
+			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
+				fallbackGlyph += 4;
+			} else {
 				goto use_fallback_glyph;
 			}
-			fallbackGlyph += 4;
 		}
 		fallbackGlyph = 0;
 use_fallback_glyph:
@@ -225,10 +229,11 @@ void CFont::Draw(unsigned short ch)
 	int count = static_cast<int>(m_glyphBuckets[ch & 0xFF][0]);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+			glyph += 4;
+		} else {
 			goto found_glyph;
 		}
-		glyph += 4;
 	}
 	glyph = 0;
 
@@ -237,10 +242,11 @@ found_glyph:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		glyph = glyphBucket + 1;
 		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == 0) {
+			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != 0) {
+				glyph += 4;
+			} else {
 				goto found_fallback;
 			}
-			glyph += 4;
 		}
 		glyph = 0;
 
@@ -254,8 +260,8 @@ found_fallback:
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
-	int glyphInfoOffset = (static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3;
-	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) + glyphInfoOffset;
+	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
+	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
 	int glyphIndex;
 	int row;
 	float u0;

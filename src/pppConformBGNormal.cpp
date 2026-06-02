@@ -31,6 +31,15 @@ struct WeaponNodeFlagBits {
     signed char m_unk01 : 1;
 };
 
+struct ConformBgNormalCylinder {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    float m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
 static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
 {
     return reinterpret_cast<Vec*>(&owner->m_hitNormal.y);
@@ -66,8 +75,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f64 trigValue;
     Mtx basisMtx;
     Mtx scaleMtx;
-    CMapCylinder firstCylinder;
-    CMapCylinder secondCylinder;
+    ConformBgNormalCylinder firstCylinder;
+    ConformBgNormalCylinder secondCylinder;
     Vec local_140;
     Vec local_14c;
     Vec local_158;
@@ -127,7 +136,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 firstCylinder.m_axis.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
-                checkResult = MapMng.CheckHitCylinderNear(&firstCylinder, &firstRayDirection, 0xffffffff);
+                checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
                 if (checkResult != 0) {
                     MapMng.m_hitMapObj->CalcHitPosition(&local_170);
@@ -236,7 +245,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_axis.z = kPppConformBgNormalZero;
                     secondCylinder.m_radius = kPppConformBgNormalZero;
 
-                    hitFound = MapMng.CheckHitCylinderNear(&secondCylinder, &secondRayDirection, 0xffffffff);
+                    hitFound = MapMng.CheckHitCylinderNear((CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         MapMng.m_hitMapObj->CalcHitPosition(&local_170);
                         ppvMng->m_matrix.value[0][3] = local_170.x;

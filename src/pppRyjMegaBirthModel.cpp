@@ -334,7 +334,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
     maxParticles = work->m_numParticles;
     emitTimer = &work->m_emitTimer;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         float posX = pObject->m_localMatrix.value[0][3];
         float posY = pObject->m_localMatrix.value[1][3];
         float posZ = pObject->m_localMatrix.value[2][3];

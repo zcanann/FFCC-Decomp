@@ -266,7 +266,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	float cameraZ;
 	YmDeformationScreenStep* step;
 
-	if (gPppCalcDisabled == 0) {
+	if (ppvUserStopPartF == 0) {
 		step = (YmDeformationScreenStep*)param2;
 		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
 		work = (VYmDeformationScreen*)(param1->m_object.m_workArea + serializedDataOffsets[2]);

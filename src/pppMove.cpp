@@ -52,7 +52,7 @@ void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable
     PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->a);
     PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->b);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

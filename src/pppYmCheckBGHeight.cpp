@@ -59,7 +59,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     float bottomY;
     float bottomZ;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         pppMngSt = ppvMng;
         zero = 0.0f;
         probeY = -2000.0f;

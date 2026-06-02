@@ -53,7 +53,7 @@ void pppColMove(void* param1, void* param2, void* param3)
     pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)(object->m_workArea + input->id);
     pppColMoveVec4S* movementMove = (pppColMoveVec4S*)(object->m_workArea + input->pad);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

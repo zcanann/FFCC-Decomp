@@ -30,14 +30,14 @@ STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
                                 _pppCtrlTable* param_3)
 {
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
         float* value = (float*)(pppConstrainCameraDir->m_workArea + *param_3->m_serializedDataOffsets);
 
         CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
                        param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
 
-        if ((gPppInConstructor != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
+        if ((ppvIsLoopCalc != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
             float cameraDirX = CameraPcs.m_directionX;
             float cameraDirY = CameraPcs.m_directionY;
             float cameraDirZ = CameraPcs.m_directionZ;

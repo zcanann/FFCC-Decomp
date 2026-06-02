@@ -126,7 +126,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						child = 0;
 					} else {
 						child = pppCreatePObject(ppvMng, childData);
-						*(void**)((u8*)child + 0x4) = parent;
+						child->m_link.m_previous = &parent->m_link;
 					}
 
 					pos.x = x;
@@ -179,7 +179,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						child = 0;
 					} else {
 						child = pppCreatePObject(ppvMng, childData);
-						*(void**)((u8*)child + 0x4) = parent;
+						child->m_link.m_previous = &parent->m_link;
 					}
 
 					pos.x = x;

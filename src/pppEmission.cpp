@@ -319,7 +319,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
-    if ((strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
+    if ((strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         int texture = reinterpret_cast<int>(state->m_texture);
         u32 drawTevBits = 0xACE0F;
 
@@ -429,7 +429,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
-    if (strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) {
+    if (strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

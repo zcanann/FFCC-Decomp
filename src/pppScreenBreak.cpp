@@ -267,7 +267,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
         model->SetDrawMeshDLCallback(0);
         model->SetBeforeMeshLockEnvCallback(0);
         model->SetCallbackContext(0, 0);
-        model->m_beforeCalcMatrixCallback = 0;
+        model->SetBeforeCalcMatrixCallback(0);
     }
     if (*(void**)(pppData + 0xC) != NULL) {
         pppHeapUseRate(static_cast<CMemory::CStage*>(*(void**)(pppData + 0xC)));
@@ -320,7 +320,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     const float& f = FLOAT_80331cc4;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
     model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
-    model->m_beforeCalcMatrixCallback = SB_BeforeCalcMatrixCallback;
+    model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
     *(void**)(pppData + 0xC) = NULL;
     *(void**)(pppData + 0x10) = NULL;
     value[8] = f;

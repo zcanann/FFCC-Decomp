@@ -2698,8 +2698,7 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 		if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 			routePrev = routeFrom;
 			routeFrom = routeStep[0];
-			escapePos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) +
-				AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1];
+			escapePos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1]];
 		}
 
 		float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
@@ -2719,12 +2718,11 @@ void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 	}
 
 	unsigned char* routeStep = AStar.m_routeTable[currentRoute - 1][forbiddenGroup + 0x36];
-	CAStar::CAPos* portalPos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) + routeStep[1];
+	CAStar::CAPos* portalPos = &AStar.m_portals[routeStep[1]];
 	float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
 	if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
 		routeFrom = routeStep[0];
-		portalPos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) +
-			AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1];
+		portalPos = &AStar.m_portals[AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1]];
 	}
 
 	targetPos.x = portalPos->m_position.x;

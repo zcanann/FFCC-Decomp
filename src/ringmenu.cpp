@@ -643,17 +643,17 @@ void CRingMenu::onDraw()
 				int prev2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (prev1 + 4) % 5
 				                : caravanWork->GetNextCmdListIdx(prev1, -1);
+
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - FLOAT_803309cc),
+				            static_cast<float>(labelAlphaScale));
 				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(cmdIndex, 1);
 				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (next1 + 1) % 5
 				                : caravanWork->GetNextCmdListIdx(next1, 1);
-
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
-				            static_cast<float>(labelAlphaScale));
-				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - FLOAT_803309cc),
-				            static_cast<float>(labelAlphaScale));
 				drawCommand(menuIndex, font, posX, posY, caravanWork, next2, static_cast<float>(scroll + FLOAT_80330a28),
 				            static_cast<float>(labelAlphaScale));
 				drawCommand(menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + FLOAT_803309cc),
@@ -670,11 +670,11 @@ void CRingMenu::onDraw()
 				continue;
 			}
 
-			int labelId;
+			const char* label;
 			if ((buttonValue & 0x8000) == 0) {
-				labelId = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4))[buttonValue];
+				label = Game.m_cFlatDataArr[1].TableStrings(4)[buttonValue];
 			} else {
-				labelId = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[(buttonValue & 0x7FFF) * 5 + 4];
+				label = Game.m_cFlatDataArr[1].TableStrings(0)[(buttonValue & 0x7FFF) * 5 + 4];
 			}
 
 			double fade = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + button + 1]) * FLOAT_80330a78);
@@ -702,7 +702,7 @@ void CRingMenu::onDraw()
 			font->SetScaleX(textScale);
 			font->SetScaleY(textScale);
 
-			const float width = static_cast<float>(font->GetWidth(labelId));
+			const float width = static_cast<float>(font->GetWidth(label));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
 			if ((group == 2) && (m_battleButtons[2] >= 0)) {
 				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
@@ -728,7 +728,7 @@ void CRingMenu::onDraw()
 			font->SetPosY(textY);
 			font->SetPosZ(FLOAT_803309c0);
 			if (group != 2) {
-				font->Draw(labelId);
+				font->Draw(label);
 			}
 			MenuPcs.DrawInit();
 
@@ -797,8 +797,8 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	int waveDirection;
 	float clampedAlpha;
 	int tlut;
-	int* cmdNameTable;
-	int commandLabel;
+	char** cmdNameTable;
+	const char* commandLabel;
 	double waveX;
 	double waveY;
 	double textWidth;
@@ -806,10 +806,10 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	float waveSinY;
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		cmdNameTable = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4));
+		cmdNameTable = Game.m_cFlatDataArr[1].TableStrings(4);
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
-		cmdNameTable = reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(4));
+		cmdNameTable = Game.m_cFlatDataArr[1].TableStrings(4);
 		tlut = 9;
 		if (cmdIndex == 0) {
 			tlut = 1;
@@ -857,7 +857,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	}
 
 	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
-	textWidth = static_cast<double>(font->GetWidth(reinterpret_cast<const char*>(commandLabel)));
+	textWidth = static_cast<double>(font->GetWidth(commandLabel));
 	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
 	textHeight = static_cast<double>(static_cast<float>(font->m_glyphHeight) * font->scaleY);
 
@@ -878,7 +878,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 				textHeight * static_cast<double>(FLOAT_803309c4) -
 				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))));
 	font->SetPosZ(FLOAT_803309c0);
-	font->Draw(reinterpret_cast<const char*>(commandLabel));
+	font->Draw(commandLabel);
 }
 
 /*

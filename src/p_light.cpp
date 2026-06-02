@@ -94,6 +94,45 @@ static inline double U32ToDouble(unsigned int value)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 556b
+ * EN Address: 0x800568fc
+ * EN Size: 240b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CLightPcs::CLight::Set(CLightPcs::CLight* light)
+{
+    *this = *light;
+
+    if (m_attenFalloff >= FLOAT_8032fc10) {
+        m_attenFalloff = m_attenRadius;
+    }
+
+    m_unkAC = m_attenRadius * m_attenRadius;
+    m_range = m_attenRadius;
+    if (m_range < FLOAT_8032fc14) {
+        m_range = -m_range;
+    }
+    m_range = m_range * FLOAT_8032fc18 * m_radius;
+
+    m_targetEnable[3] = 1;
+    m_targetEnable[2] = 1;
+    m_targetEnable[1] = 1;
+    m_targetEnable[0] = 1;
+    if (*(u32*)&m_targetColor[0] == 0) {
+        m_targetEnable[0] = 0;
+    }
+    if (*(u32*)&m_targetColor[1] == 0) {
+        m_targetEnable[1] = 0;
+    }
+    if (*(u32*)&m_targetColor[2] == 0) {
+        m_targetEnable[2] = 0;
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004a294
  * PAL Size: 180b
  * EN Address: TODO
@@ -444,6 +483,45 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     }
 
     return bumpLight;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: 0x80054a34
+ * EN Size: 96b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
+{
+    CBumpLight* bumpLights = &m_bumpLights[target * 8];
+
+    for (int i = 0; i < 8; i++) {
+        if (bumpLights[i].m_hasTexture == 0) {
+            return &bumpLights[i];
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 28b
+ * EN Address: 0x8005475c
+ * EN Size: 28b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CLightPcs::Clear()
+{
+    m_numDiffuse = 0;
+    m_loadedLightCount = 0;
+    m_loadedLightMask = 0;
+    m_sceneLightCount = 0;
 }
 
 /*
@@ -807,6 +885,44 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
             octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CLightPcs::SetForEmissionModel(CLightPcs::TARGET target, void* part)
+{
+    GXAttnFn attnFn = GX_AF_SPOT;
+    CLight* light = m_sceneLights;
+    m_loadedLightCount = 0;
+    m_loadedLightMask = 0;
+
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
+        if ((light->m_targetEnable[target] != 0) && (light->m_part == part)) {
+            GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
+            GXLoadLightObjImm(&light->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
+
+            if (light->m_specularMode != 0) {
+                attnFn = GX_AF_NONE;
+            }
+
+            m_loadedLightMask |= 1 << m_loadedLightCount;
+            m_loadedLightCount += 1;
+            if (m_loadedLightCount >= 8) {
+                break;
+            }
+        }
+    }
+
+    GXSetNumChans(GX_TRUE);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, m_loadedLightMask, GX_DF_CLAMP, attnFn);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_SPEC);
 }
 
 /*

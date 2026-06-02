@@ -175,6 +175,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		    model0->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x166);
 
+		GXColor** colorArray = work->m_meshColorArrays;
 		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
@@ -183,11 +184,11 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 			}
 
 			work->m_displayListArrays[meshIdx] = static_cast<ChangeTexDisplayListCopy**>(
-			    pppMemAlloc(meshData->m_displayListCount * sizeof(ChangeTexDisplayListCopy*), ppvEnv->m_stagePtr,
+			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*), ppvEnv->m_stagePtr,
 			                const_cast<char*>(s_pppChangeTex_cpp), 0x181));
 
-			int dlIdx = meshData->m_displayListCount - 1;
-			ChangeTexDisplayList* dlInfo = meshData->m_displayLists;
+			int dlIdx = meshList->m_data->m_displayListCount - 1;
+			ChangeTexDisplayList* dlInfo = meshList->m_data->m_displayLists;
 			ChangeTexDisplayListCopy** dlEntry = &work->m_displayListArrays[meshIdx][dlIdx];
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 1) {
 				ChangeTexDisplayListCopy* dlPair = static_cast<ChangeTexDisplayListCopy*>(
@@ -202,11 +203,12 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 				dlEntry = dlEntry - 1;
 			}
 
-			work->m_meshColorArrays[meshIdx] = static_cast<GXColor*>(
-			    pppMemAlloc(meshData->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
+			*colorArray = static_cast<GXColor*>(
+			    pppMemAlloc(meshList->m_data->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
 			                const_cast<char*>(s_pppChangeTex_cpp), 0x196));
-			memset(work->m_meshColorArrays[meshIdx], 0, meshData->m_vertexCount * sizeof(GXColor));
+			memset(*colorArray, 0, meshList->m_data->m_vertexCount * sizeof(GXColor));
 
+			colorArray++;
 			meshList++;
 		}
 	}

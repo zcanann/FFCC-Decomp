@@ -1014,7 +1014,8 @@ void CRingMenu::onCalc()
 			}
 
 			*trackedCmd = currentCmd;
-			m_spinAccumulator = (m_spinAccumulator + static_cast<float>(scrollDelta)) * FLOAT_80330ae8;
+			float nextSpinAccumulator = m_spinAccumulator + scrollDelta;
+			m_spinAccumulator = nextSpinAccumulator * FLOAT_80330ae8;
 		}
 	}
 }

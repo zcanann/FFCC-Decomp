@@ -23,7 +23,7 @@ extern const float kPppLensFlareOne;
 extern const double kPppLensFlareOcclusionStep;
 extern const float FLOAT_80331008;
 extern const float FLOAT_8033100C;
-extern const float FLOAT_80331010;
+extern const float FLOAT_80331010[2];
 
 #define CRYSTAL_REFRACTION_SIZE 32.0f
 #define CRYSTAL_HALF_NEGATIVE -0.5f
@@ -290,7 +290,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		maxMagnitude = kPppLensFlareOne;
 		coordOffset = FLOAT_8033100C;
 		modulationScale = FLOAT_80331008;
-		coordScale = FLOAT_80331010;
+		coordScale = FLOAT_80331010[0];
 
 		for (y = 0; y < (u32)textureInfo->m_height; y++) {
 			yTile = y >> 2;

@@ -2,7 +2,7 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
 extern "C" {
-extern const float kVectorZero;
+extern const float kVectorZero[2];
 }
 
 /*
@@ -12,7 +12,7 @@ extern const float kVectorZero;
  */
 float CVector::GetRotateY()
 {
-    const float zero = kVectorZero;
+    const float zero = kVectorZero[0];
     if (zero == this->x && zero == this->z)
     {
         return zero;
@@ -38,7 +38,7 @@ void CVector::Normalize()
  */
 void CVector::Identity()
 {
-	const float zero = kVectorZero;
+	const float zero = kVectorZero[0];
 	this->z = zero;
 	this->y = zero;
 	this->x = zero;

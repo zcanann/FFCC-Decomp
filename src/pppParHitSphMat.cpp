@@ -4,7 +4,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern const float kPppParHitSphMatZero;
+extern const float kPppParHitSphMatZero[2];
 }
 
 #include <dolphin/gx.h>
@@ -35,9 +35,9 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    local_88.z = kPppParHitSphMatZero;
-    local_88.y = kPppParHitSphMatZero;
-    local_88.x = kPppParHitSphMatZero;
+    local_88.z = kPppParHitSphMatZero[0];
+    local_88.y = kPppParHitSphMatZero[0];
+    local_88.x = kPppParHitSphMatZero[0];
 
     if (step->m_useWorkPosition != 0) {
         int* offsets = ctrlTable->m_serializedDataOffsets;
@@ -54,7 +54,7 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
         local_94.z += src->z;
     }
 
-    if (step->m_height != kPppParHitSphMatZero) {
+    if (step->m_height != kPppParHitSphMatZero[0]) {
         PSVECSubtract(&pppMngSt->m_position, ParHitSphMatPreviousPosition(pppMngSt), &local_88);
     }
 

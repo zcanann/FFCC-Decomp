@@ -24,16 +24,16 @@ public:
         float m_amplitude;   // 0x28
     };
 
-    static u32 m_table_desc0[3];
-    static u32 m_table_desc1[3];
-    static u32 m_table_desc2[3];
-    static u32 m_table_desc3[3];
-    static u32 m_table_desc4[3];
-    static u32 m_table_desc5[3];
-    static u32 m_table_desc6[3];
-    static u32 m_table_desc7[3];
-    static u32 m_table_desc8[3];
-    static u32 m_table_desc9[3];
+    static CProcessTableCallback m_table_desc0;
+    static CProcessTableCallback m_table_desc1;
+    static CProcessTableCallback m_table_desc2;
+    static CProcessTableCallback m_table_desc3;
+    static CProcessTableCallback m_table_desc4;
+    static CProcessTableCallback m_table_desc5;
+    static CProcessTableCallback m_table_desc6;
+    static CProcessTableCallback m_table_desc7;
+    static CProcessTableCallback m_table_desc8;
+    static CProcessTableCallback m_table_desc9;
     static CProcessTable m_table;
 
     void Init();

@@ -61,27 +61,27 @@ extern const char sDbgMenuOn[] = "ON";
 extern const char sDbgMenuOff[] = "OFF";
 extern const char sDbgMenuUnknown[] = "?";
 
-static u32 m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-static u32 m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-static u32 m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-static u32 m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+static CProcessTableCallback m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+static CProcessTableCallback m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+static CProcessTableCallback m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+static CProcessTableCallback m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 CProcessTable CDbgMenuPcs::m_table = {
     const_cast<char*>(sCDbgMenuPcs),
     {
-        m_table_desc0[0],
-        m_table_desc0[1],
-        m_table_desc0[2],
-        m_table_desc1[0],
-        m_table_desc1[1],
-        m_table_desc1[2],
-        m_table_desc2[0],
-        m_table_desc2[1],
-        m_table_desc2[2],
+        m_table_desc0.m_thisOffset,
+        m_table_desc0.m_virtualOffset,
+        m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset,
+        m_table_desc1.m_virtualOffset,
+        m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset,
+        m_table_desc2.m_virtualOffset,
+        m_table_desc2.m_function,
         0x11,
         0,
-        m_table_desc3[0],
-        m_table_desc3[1],
-        m_table_desc3[2],
+        m_table_desc3.m_thisOffset,
+        m_table_desc3.m_virtualOffset,
+        m_table_desc3.m_function,
         0x4A,
         1,
     },

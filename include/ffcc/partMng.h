@@ -226,6 +226,14 @@ struct _pppDataHead
     unsigned int m_shapeGroups;       // 0x1c
 }; // Size 0x20
 
+struct _pppFieldParticleData
+{
+    unsigned char m_pad00[0x2C];
+    int m_autoCreateMarker;           // 0x2c
+    unsigned char m_pad30[0x60 - 0x30];
+}; // Size 0x60
+typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) == 0x60) ? 1 : -1];
+
 struct pppShapeGroupRaw
 {
     u16 m_groupId;     // 0x0

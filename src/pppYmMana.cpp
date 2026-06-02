@@ -524,10 +524,10 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     work->m_displayListCopies = 0;
     work->m_reflectionVec = 0;
     work->m_colors = 0;
-    work->m_envTexture0 = 0;
     work->m_captureTexObjs = 0;
-    work->m_envTexture1 = 0;
     work->m_step = 0;
+    work->m_envTexture0 = 0;
+    work->m_envTexture1 = 0;
     work->m_meshReflectionVec = 0;
     work->m_meshColors = 0;
     work->m_meshTexCoords0 = 0;

@@ -3081,7 +3081,7 @@ void CGObject::SetDispItemName(int showName)
 {
     u8 flags = *((u8*)&m_shieldNodeFlags);
     u8 masked = flags;
-    masked = (u8)__rlwimi(masked, (signed char)showName, 4, 27, 27);
+    masked = (u8)__rlwimi(masked, showName, 4, 27, 27);
     *((u8*)&m_shieldNodeFlags) = masked;
     m_dispItemTimer = 13;
 }

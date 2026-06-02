@@ -2808,6 +2808,21 @@ void CMenuPcs::CalcResultOpenAnim()
 		sprites[countBase].depth = 1.0f;
 		s_CntTop = (unsigned char)(labelBase + activePartyCount + 1);
 
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[(int)s_CntTop + i];
+			BonusAnimSprite* count = &sprites[countBase];
+			sprite->kind = 0x19;
+			sprite->x = 0x200;
+			sprite->y = (short)(count->y + 0xC);
+			sprite->w = 0x20;
+			sprite->h = 0x28;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 80.0f;
+			sprite->startFrame = count->startFrame + count->duration;
+			sprite->duration = 8;
+			sprite->depth = 1.0f;
+		}
+
 		int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 		int entryOffset = 0;
 		for (int i = 0; i < activePartyCount; i++) {
@@ -2836,7 +2851,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		header->count = (short)(labelBase + activePartyCount);
+		header->count = (short)((int)s_CntTop + activePartyCount);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		header->finished = 0;
 		return;

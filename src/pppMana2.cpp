@@ -1090,9 +1090,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    mana2Work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
+    mana2Work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_3->m_serializedDataOffsets[2]);
     setupOffset = param_3->m_serializedDataOffsets[1];
-    setup = (u8*)pppMana2 + 0x80 + setupOffset;
+    setup = reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + setupOffset;
     if (gObject == NULL) {
         return;
     }
@@ -1317,7 +1318,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 i;
     u32 j;
 
-    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_2->m_serializedDataOffsets[2]);
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
@@ -1466,7 +1468,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     s32 workOffset;
 
     workOffset = param_2->m_serializedDataOffsets[2];
-    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + workOffset);
+    work =
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + workOffset);
     gObject = (CGObject*)ppvMng->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 

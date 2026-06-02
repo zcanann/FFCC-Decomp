@@ -455,9 +455,9 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 	}
 }
 
-static inline unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
+static inline int GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
 {
-	return (unsigned char)(*(unsigned char*)(statePtr + 9) | s_Rinfo->m_missingArtifactMask | (unsigned char)summary->m_ownedArtifactMask);
+	return (int)(signed char)(*(unsigned char*)(statePtr + 9) | s_Rinfo->m_missingArtifactMask) | summary->m_ownedArtifactMask;
 }
 
 static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
@@ -1191,7 +1191,7 @@ void CMenuPcs::CalcSelectWait()
 		int resolvedPadSlot = (Pad._448_4_ == padSlot) ? 0 : padSlot;
 		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 	}
-	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
+	int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
 	if (promptMode == 3) {
 		if (delay == 0 && currentPartyIndex < activePartyCount) {

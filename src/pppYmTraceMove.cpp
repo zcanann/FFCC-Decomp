@@ -1,4 +1,5 @@
 #include "ffcc/pppYmTraceMove.h"
+#include "ffcc/gobject.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
 extern const float kPppYmTraceMoveZero;
@@ -52,7 +53,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
 	pppYmTraceMoveWork* work =
 	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_3->m_serializedDataOffsets);
-	void* owner = pppMngSt->m_owner;
+	CGObject* owner = (CGObject*)pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;
@@ -75,11 +76,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		pppCopyVector(local_20, work->m_direction);
 		pppCopyVector(local_2c, work->m_previousDirection);
 	} else {
-		u8* ownerBytes = (u8*)owner;
-
-		local_8c.x = *(f32*)(ownerBytes + 0x15c);
-		local_8c.y = *(f32*)(ownerBytes + 0x160);
-		local_8c.z = *(f32*)(ownerBytes + 0x164);
+		local_8c = owner->m_worldPosition;
 		pppSubVector(local_20, local_8c, pppMngSt->m_position);
 		local_20.y = local_20.y + param_2->m_payload;
 		pppNormalize(local_20, local_20);

@@ -189,12 +189,9 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
         for (int pass = 0; pass < 2; pass++) {
-            unsigned char* polygons = reinterpret_cast<unsigned char*>(model->ptr18);
+            MaterialEditorPolygon* polygon = static_cast<MaterialEditorPolygon*>(model->ptr18);
 
-            for (u32 polyIndex = 0, polygonOffset = 0; polyIndex < model->countC;
-                 polyIndex++, polygonOffset += sizeof(MaterialEditorPolygon)) {
-                MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(polygons + polygonOffset);
-
+            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++, polygon++) {
                 if ((polygon->flags & 0x200) == 0) {
                     GXSetCullMode(GX_CULL_BACK);
                 } else {

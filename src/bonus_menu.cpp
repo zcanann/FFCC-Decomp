@@ -2187,15 +2187,15 @@ void CMenuPcs::CalcResultCloseAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int modelIndex = 0;
-	int lastKind = 0;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int modelIndex = 0;
+	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);

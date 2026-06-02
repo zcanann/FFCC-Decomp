@@ -2704,8 +2704,8 @@ void CMenuPcs::CalcResultOpenAnim()
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
 		sprites[0].kind = 0x16;
-		sprites[0].x = 0;
 		sprites[0].y = 0;
+		sprites[0].x = 0;
 		sprites[0].w = 0x280;
 		sprites[0].h = 0x1c0;
 		sprites[0].mulX = 0.0f;

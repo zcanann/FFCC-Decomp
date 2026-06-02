@@ -355,6 +355,11 @@ static inline CFlatRuntime::CObject*& ParticleWorkTrace(CFlatRuntime2* runtime)
 	return ParticleWork(runtime).m_trace;
 }
 
+static inline CFlatRuntime::CObject* FlatObjectFirst(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x8F0);
+}
+
 static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
 {
 	return ParticleWork(runtime).m_color0;
@@ -1051,7 +1056,7 @@ CGObject* CFlatRuntime2::FindGObjFirst()
 {
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
-	CFlatRuntime::CObject* object = root->m_next->m_next;
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
@@ -1137,7 +1142,7 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 {
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
-	CFlatRuntime::CObject* object = root->m_next->m_next;
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
@@ -1203,7 +1208,7 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 {
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
-	CFlatRuntime::CObject* object = root->m_next->m_next;
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
@@ -1269,7 +1274,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 {
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
-	CFlatRuntime::CObject* object = root->m_next->m_next;
+	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {

@@ -36,6 +36,7 @@ extern const f32 kMenuArtiTau = 6.2831855f;
 #define kPppLaserTau kMenuArtiTau
 
 extern "C" const char s_pppLaser_cpp[] = "pppLaser.cpp";
+extern "C" int ppvUserStopPartF;
 
 static inline f32 LaserConst(const f32& value)
 {
@@ -209,7 +210,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     int emptyHistory;
     int fillIndex;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
     if (step->m_stepValue == 0xFFFF) {

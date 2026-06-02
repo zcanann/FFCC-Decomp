@@ -8,7 +8,7 @@ extern const float kConstrainCameraDirWideAspect = 1.3333f;
 extern const float kConstrainCameraDirZero = 0.0f;
 extern const float kPppFilterScreenMin;
 extern const float kPppFilterScreenMaxX;
-extern const float kPppFilterScreenMaxY;
+extern const float kPppFilterScreenMaxY[2];
 }
 #include "ffcc/util.h"
 #include <stddef.h>
@@ -43,7 +43,8 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrl
 
     if (step->dataValIndex == 0xFFFF) {
         gUtil.RenderColorQuad(
-            kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY, serializedData->m_color);
+            kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY[0],
+            serializedData->m_color);
         return;
     }
 
@@ -51,7 +52,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrl
     CTexture* textureInfo = (CTexture*)ppvEnv->m_mapMeshPtr[step->dataValIndex]->GetTexture(
         ppvEnv->m_materialSetPtr, textureIndex);
     gUtil.RenderTextureQuad(
-        kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY, &textureInfo->m_texObj,
+        kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY[0], &textureInfo->m_texObj,
         0, 0, &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 

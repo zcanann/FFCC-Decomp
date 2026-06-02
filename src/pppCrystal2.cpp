@@ -203,10 +203,10 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3)
 {
-    u32 x;
     u32 y;
-    u32 yTile;
     Crystal2Work* work;
+    u32 x;
+    u32 yTile;
     Crystal2RefractionMap* textureInfo;
     u32 textureSize;
     float magnitude;

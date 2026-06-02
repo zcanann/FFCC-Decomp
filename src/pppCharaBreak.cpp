@@ -40,6 +40,11 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
+static inline int LoadInt(const int& value)
+{
+    return value;
+}
+
 struct POLYGON_DATA {
     u8 m_enabled;
     u8 m_alpha;
@@ -519,9 +524,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                 if (polygon->m_enabled == 0) {
                     int flags[3];
-                    flags[0] = kCharaBreakInitialVertexFlag0;
-                    flags[1] = kCharaBreakInitialVertexFlag1;
-                    flags[2] = kCharaBreakInitialVertexFlag2;
+                    flags[0] = LoadInt(kCharaBreakInitialVertexFlag0);
+                    flags[1] = LoadInt(kCharaBreakInitialVertexFlag1);
+                    flags[2] = LoadInt(kCharaBreakInitialVertexFlag2);
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
@@ -600,8 +605,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     if (avgX >= -0x7530 && avgX <= 0x7530 && avgY >= -0x7530 && avgY <= 0x7530 && avgZ >= -0x7530 &&
                         avgZ <= 0x7530) {
                         Vec verts[3];
-                        S16Vec normalA;
-                        S16Vec normalB;
                         Vec axis;
                         Vec velocity;
                         Quaternion rotQuat;
@@ -617,11 +620,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                         PSVECScale(&center, &center, FLOAT_80332058);
 
-                        normalB = polygon->m_normalB;
-                        gUtil.ConvI2FVector(axis, normalB, ModelData(model)->m_normQuant);
-
-                        normalA = polygon->m_normalA;
-                        gUtil.ConvI2FVector(velocity, normalA, ModelData(model)->m_normQuant);
+                        gUtil.ConvI2FVector(axis, polygon->m_normalB, ModelData(model)->m_normQuant);
+                        gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);

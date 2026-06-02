@@ -2316,10 +2316,7 @@ void _pppDrawPart(_pppMngSt* pppMngSt)
  */
 void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 {
-	*(u32*)(MaterialManRaw() + 0x128) = *(u32*)(MaterialManRaw() + 0x11C);
-	*(u32*)(MaterialManRaw() + 0x12C) = *(u32*)(MaterialManRaw() + 0x120);
-	*(u32*)(MaterialManRaw() + 0x130) = *(u32*)(MaterialManRaw() + 0x124);
-	*(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
+	MaterialMan.SaveCurrentEnvAsStd();
 
 	if (positions == 0)
 	{

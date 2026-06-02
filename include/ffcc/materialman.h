@@ -157,6 +157,13 @@ public:
     {
         m_manaParaboloidTexObj0 = texObj;
     }
+    void SaveCurrentEnvAsStd()
+    {
+        m_stdTexMapId = m_texMapIdCur;
+        m_stdTexMtx = m_texMtxCur;
+        m_stdTexCoordId = m_texCoordIdCur;
+        m_stdEnvTevBit = m_curEnvTevBit;
+    }
     void SetChangeTexReflectionState(unsigned int tevBit, unsigned int stdTevBit)
     {
         m_curEnvTevBit = tevBit;

@@ -463,11 +463,7 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
  */
 void CGraphicPcs::stdDrawEnvInit()
 {
-	unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-	*(u32*)(materialMan + 0x128) = *(u32*)(materialMan + 0x11C);
-	*(u32*)(materialMan + 0x12C) = *(u32*)(materialMan + 0x120);
-	*(u32*)(materialMan + 0x130) = *(u32*)(materialMan + 0x124);
-	*(u32*)(materialMan + 0x40) = *(u32*)(materialMan + 0x48);
+	MaterialMan.SaveCurrentEnvAsStd();
 }
 
 /*

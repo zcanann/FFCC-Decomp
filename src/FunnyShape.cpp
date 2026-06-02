@@ -436,11 +436,8 @@ void CFunnyShape::RenderShape()
     GXSetChanMatColor(GX_COLOR0, color);
 
     Vec2d offsetCopy;
-    Vec2d offset;
     offsetCopy.x = LoadFloat(kFunnyShapeDefaultOffsetX);
     offsetCopy.y = LoadFloat(kFunnyShapeDefaultOffsetY);
-    offset.x = offsetCopy.x;
-    offset.y = offsetCopy.y;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
     RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeBoundsMaxInitial));
 }
@@ -578,11 +575,8 @@ void CFunnyShape::Render()
 
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;
-        Vec2d pos;
         posCopy.x = kFunnyShapeAnimOffsetX + work->x;
         posCopy.y = kFunnyShapeAnimOffsetY + work->y;
-        pos.x = posCopy.x;
-        pos.y = posCopy.y;
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         s16 frame = work->frame;

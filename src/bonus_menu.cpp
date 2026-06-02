@@ -1692,7 +1692,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
-			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
 		}

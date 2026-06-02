@@ -53,8 +53,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	}
 
 	_pppMngSt* pppMngSt = ppvMng;
+	CGObject* owner = pppMngSt->m_lookTarget;
 	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
-	CGObject* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;

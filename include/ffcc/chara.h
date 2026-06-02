@@ -132,10 +132,10 @@ public:
 		CMesh* m_displayMesh;
 		u8 _pad08[0x0C];
 		Mtx m_localRuntimeMtx;
-		Mtx m_mtx;
 		Quaternion m_previousQuat;
 		Vec m_previousPosition;
 		Vec m_previousScale;
+		Mtx m_mtx;
 		CAnimNode* m_animNode0;
 		CAnimNode* m_animNode1;
 		CVector m_dynPosition;

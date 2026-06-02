@@ -805,8 +805,7 @@ void CPartPcs::drawAfter()
 {
     CGame* game = &Game;
 
-    if (game->m_gameWork.m_gamePaused == 0 &&
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this)      + 0x30) == 0) {
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -828,7 +827,7 @@ void CPartPcs::drawAfter()
  */
 void CPartPcs::DrawMenu(int fpNo)
 {
-    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetFog(1, 0);
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(0);
@@ -878,7 +877,7 @@ void CPartPcs::DrawShoki()
  */
 void CPartPcs::DrawMenuIdx(int index)
 {
-    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);

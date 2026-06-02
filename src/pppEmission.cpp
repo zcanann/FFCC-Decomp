@@ -140,7 +140,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
     CalcGraphValue(
         &pppEmission_->m_object, param_2->m_graphId,
         state->m_scale0, state->m_scale1, state->m_scale2,
-        param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
+        param_2->m_stepValue, param_2->m_arg3, param_2->m_emission.m_scaleAccelerationAdd);
 
     if (gPppInConstructor != 0) {
         return;
@@ -154,10 +154,10 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
     state->m_texture =
         reinterpret_cast<int>(ppvEnv->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex));
 
-    u8* payload = param_2->m_payload;
-    if (payload[9] != 0) {
+    PEmissionPayload& payload = param_2->m_emission;
+    if (payload.m_particleMode != 0) {
         if (state->m_particles == 0) {
-            state->m_field1C = payload[0xB] / payload[0xC];
+            state->m_field1C = payload.m_targetAlpha / payload.m_fadeOutFrames;
             state->m_particles = static_cast<EmissionParticle*>(pppMemAlloc(
                 (unsigned long)param_2->m_initWOrk << 4,
                 ppvEnv->m_stagePtr,
@@ -168,30 +168,30 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
             for (int i = 0; i < param_2->m_initWOrk; i++) {
                 Math.RandF(FLOAT_803311e4);
 
-                s16 lifeJitter = (s16)(rand() % payload[0xD]);
+                s16 lifeJitter = (s16)(rand() % payload.m_lifeJitterFrames);
                 s16 safeJitter = (lifeJitter >= 1) ? lifeJitter : 1;
 
-                particle->m_fieldC = payload[0xF] + safeJitter;
-                s16 fade = (u16)payload[0xC] + safeJitter;
+                particle->m_fieldC = payload.m_fadeInFrames + safeJitter;
+                s16 fade = (u16)payload.m_fadeOutFrames + safeJitter;
                 particle->m_fieldA = particle->m_fieldC + safeJitter + fade;
-                particle->m_scale = ((float)i * Math.RandF(*(float*)(payload + 4))) + FLOAT_803311e4;
+                particle->m_scale = ((float)i * Math.RandF(payload.m_scaleRandomRange)) + FLOAT_803311e4;
                 particle->m_alpha = 0;
-                particle->m_fieldE = (u8)((int)payload[0xB] / (int)fade);
+                particle->m_fieldE = (u8)((int)payload.m_targetAlpha / (int)fade);
                 particle++;
             }
         }
 
         EmissionParticle* particle = state->m_particles;
         for (int i = 0; i < param_2->m_initWOrk; i++) {
-            particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(*(float*)(payload + 4)));
+            particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(payload.m_scaleRandomRange));
 
             int delay = particle->m_fieldC;
             if (delay > 0) {
                 particle->m_fieldC = delay - 1;
-                particle->m_alpha = particle->m_alpha + (payload[0xB] / payload[0xF]);
+                particle->m_alpha = particle->m_alpha + (payload.m_targetAlpha / payload.m_fadeInFrames);
             } else {
-                if (payload[0xC] <= particle->m_fieldA) {
-                    particle->m_alpha = payload[0xB];
+                if (payload.m_fadeOutFrames <= particle->m_fieldA) {
+                    particle->m_alpha = payload.m_targetAlpha;
                 } else {
                     particle->m_alpha = particle->m_alpha - particle->m_fieldE;
                 }
@@ -204,15 +204,15 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
 
             if (particle->m_fieldA <= 0) {
                 int jitter = 0;
-                if (payload[0xD] != 0) {
-                    jitter = rand() % payload[0xD];
+                if (payload.m_lifeJitterFrames != 0) {
+                    jitter = rand() % payload.m_lifeJitterFrames;
                 }
 
-                particle->m_fieldC = payload[0xF];
-                particle->m_fieldA = payload[0xF] + payload[0xE] + jitter + payload[0xC];
-                particle->m_scale = FLOAT_803311e4 + Math.RandF(*(float*)(payload + 4));
+                particle->m_fieldC = payload.m_fadeInFrames;
+                particle->m_fieldA = payload.m_fadeInFrames + payload.m_holdFrames + jitter + payload.m_fadeOutFrames;
+                particle->m_scale = FLOAT_803311e4 + Math.RandF(payload.m_scaleRandomRange);
                 particle->m_alpha = 0;
-                particle->m_fieldE = payload[0xB] / payload[0xC];
+                particle->m_fieldE = payload.m_targetAlpha / payload.m_fadeOutFrames;
             }
 
             particle->m_colorR = dataSet[8];
@@ -324,7 +324,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         u32 drawTevBits = 0xACE0F;
 
         pppInitBlendMode();
-        pppSetBlendMode(step->m_payload[8]);
+        pppSetBlendMode(step->m_emission.m_blendMode);
         *(int*)(MaterialManRaw() + 0xD0) = texture + 0x28;
 
         Mtx viewMtx0;
@@ -334,7 +334,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         Mtx texMtx0;
         Mtx texMtx1;
 
-        if (step->m_payload[9] == 0) {
+        if (step->m_emission.m_particleMode == 0) {
             EmissionDisplayList* displayList;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = FLOAT_803311e4;
@@ -368,14 +368,14 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-                    if (step->m_payload[10] == 0) {
+                    if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx0);
                         GXLoadTexMtxImm(texMtx0, 0x1E, GX_MTX3x4);
-                        if (step->m_payload[10] == 1) {
+                        if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (step->m_payload[10] == 2) {
+                        } else if (step->m_emission.m_texGenMode == 2) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
                         }
                     }
@@ -387,7 +387,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     displayList++;
                 }
             }
-        } else if (step->m_payload[9] == 1) {
+        } else if (step->m_emission.m_particleMode == 1) {
             EmissionParticle* particle = state->m_particles;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
@@ -421,14 +421,14 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-                    if (step->m_payload[10] == 0) {
+                    if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
                         PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx1);
                         GXLoadTexMtxImm(texMtx1, 0x1E, GX_MTX3x4);
-                        if (step->m_payload[10] == 1) {
+                        if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-                        } else if (step->m_payload[10] == 2) {
+                        } else if (step->m_emission.m_texGenMode == 2) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)1, 0x1E, GX_FALSE, 0x7D);
                         }
                     }

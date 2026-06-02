@@ -60,6 +60,19 @@ struct VMana2 {
     u8 m_paraboloidReady;
 };
 
+struct pppMana2UnkB {
+    u8 _pad00[0x4];
+    s32 m_sourceTextureIds[6];
+    u8 m_type;
+    u8 _pad1D[0x7];
+    s32 m_envTextureId0;
+    s32 m_envTextureId1;
+    u8 _pad2C[0x4];
+    float m_waterScale;
+    u8 _pad34[0x4];
+    u8 m_rippleLevel;
+};
+
 STATIC_ASSERT(offsetof(VMana2, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VMana2, m_positions) == 0x3C);
 STATIC_ASSERT(offsetof(VMana2, m_indices) == 0x50);
@@ -69,6 +82,12 @@ STATIC_ASSERT(offsetof(VMana2, m_waterMtx) == 0x80);
 STATIC_ASSERT(offsetof(VMana2, m_reflectionMtx) == 0xB0);
 STATIC_ASSERT(offsetof(VMana2, m_waterAlpha) == 0xE0);
 STATIC_ASSERT(offsetof(VMana2, m_paraboloidReady) == 0xEC);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_sourceTextureIds) == 0x04);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_type) == 0x1C);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_envTextureId0) == 0x24);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_envTextureId1) == 0x28);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_waterScale) == 0x30);
+STATIC_ASSERT(offsetof(pppMana2UnkB, m_rippleLevel) == 0x38);
 
 extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 extern "C" const char s_pppMana2_cpp[] = "pppMana2.cpp";
@@ -1063,8 +1082,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     s32 i;
     s32 setupOffset;
     u8* setup;
-    s32 meshData;
-    s32 meshShape;
+    CChara::CMesh* mesh;
+    CChara::CMesh::CRefData* meshData;
     s32 dlOffset;
     u32 meshIndex;
     u32 vertexIndex;
@@ -1083,10 +1102,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    *((u8*)param_2 + 0x38) = 0;
+    param_2->m_rippleLevel = 0;
     work[0x1C] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
-        *((u8*)param_2 + 0x38) = 0;
+        param_2->m_rippleLevel = 0;
     }
 
     SetMana2ModelCallbacks(model, work, param_2);
@@ -1100,14 +1119,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
     work[0] = (u32)gObject;
     SetMana2ModelCallbacks(model, work, param_2);
-    work[2] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x4), ppvEnv));
-    work[3] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x8), ppvEnv));
-    work[4] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0xC), ppvEnv));
-    work[5] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x10), ppvEnv));
-    work[6] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x14), ppvEnv));
-    work[7] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x18), ppvEnv));
-    work[0x1E] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x24), ppvEnv));
-    work[0x1F] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x28), ppvEnv));
+    work[2] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv));
+    work[3] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[1], ppvEnv));
+    work[4] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[2], ppvEnv));
+    work[5] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[3], ppvEnv));
+    work[6] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[4], ppvEnv));
+    work[7] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[5], ppvEnv));
+    work[0x1E] = static_cast<u32>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
+    work[0x1F] = static_cast<u32>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
 
     if (work[0x1D] == 0) {
         work[0x1D] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7);
@@ -1153,22 +1172,22 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         genParaboloidMap((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
     }
 
-    meshData = *(s32*)(model + 0xAC);
+    mesh = model->m_meshes;
     if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
-        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
-            meshShape = *(s32*)(meshData + 8);
-            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+        for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
+            meshData = mesh->m_data;
+            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, s_manaShapeObj1) == 0)) {
+            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
                 if (work[0x19] == 0) {
                     work[0x19] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, ppvEnv->m_stagePtr,
+                        (u32)pppMemAlloc(meshData->m_vertexCount * 0xC, ppvEnv->m_stagePtr,
                                          const_cast<char*>(s_pppMana2_cpp), 0x232);
                     Vec* reflectionVec = (Vec*)work[0x19];
                     float zero = FLOAT_80331898;
-                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                    for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
                         reflectionVec->x = zero;
@@ -1178,10 +1197,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
                 if (work[0x1A] == 0) {
                     work[0x1A] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, ppvEnv->m_stagePtr,
+                        (u32)pppMemAlloc(meshData->m_vertexCount << 2, ppvEnv->m_stagePtr,
                                          const_cast<char*>(s_pppMana2_cpp), 0x23B);
                     u8* color = (u8*)work[0x1A];
-                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                    for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         color[0] = 0xFF;
                         color[1] = 0xFF;
                         color[2] = 0xFF;
@@ -1192,21 +1211,21 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
                 if (work[0x1B] == 0) {
                     work[0x1B] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 6, ppvEnv->m_stagePtr,
+                        (u32)pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
                                          const_cast<char*>(s_pppMana2_cpp), 0x244);
                     u16* texCoord = (u16*)work[0x1B];
-                    for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
+                    for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         texCoord[1] = 0;
                         texCoord[0] = 0;
                         texCoord += 3;
                     }
                 }
 
-                work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, ppvEnv->m_stagePtr,
+                work[0x18] = (u32)pppMemAlloc(meshData->m_displayListCount << 2, ppvEnv->m_stagePtr,
                                               const_cast<char*>(s_pppMana2_cpp), 0x24B);
-                u32* dlInfo = *(u32**)(meshShape + 0x50);
-                dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
-                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+                u32* dlInfo = (u32*)meshData->m_displayLists;
+                dlOffset = (meshData->m_displayListCount - 1) * 4;
+                for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     *(u32*)(work[0x18] + dlOffset) =
                         (u32)pppMemAlloc(dlInfo[0], ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
                     *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
@@ -1219,8 +1238,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 }
             }
 
-            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj4) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj2) == 0)) {
+            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
+                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
                 work[0xF] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A);
                 work[0x10] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B);
                 work[0x17] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C);
@@ -1240,43 +1259,43 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 }
 
                 CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
-                                *(float*)((u8*)param_2 + 0x30));
+                                param_2->m_waterScale);
             }
 
-            meshData += 0x14;
+            mesh++;
         }
     }
 
-    if ((*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) && work[0x12] != 0) {
-        *(u32*)(work[0x12] + 0x240) = *(u32*)((u8*)param_2 + 0x38);
+    if ((param_2->m_type == 1 || param_2->m_type == 2) && work[0x12] != 0) {
+        *(u32*)(work[0x12] + 0x240) = param_2->m_rippleLevel;
     }
 
-    if (*(u8*)((u8*)param_2 + 0x1C) != 0) {
-        if (*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) {
+    if (param_2->m_type != 0) {
+        if (param_2->m_type == 1 || param_2->m_type == 2) {
             UpdateWaterMesh((VMana2*)work);
         }
 
-        meshData = *(s32*)(model + 0xAC);
-        for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
-            meshShape = *(s32*)(meshData + 8);
-            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+        mesh = model->m_meshes;
+        for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
+            meshData = mesh->m_data;
+            u8 type = param_2->m_type;
 
-            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj5) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj3) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, s_manaShapeObj1) == 0)) {
-                dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
-                for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+            if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
+                ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
+                ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
+                dlOffset = (meshData->m_displayListCount - 1) * 4;
+                for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
-                        (Vec*)work[0x19], *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
-                        *(s32*)(meshShape + 0x14), *(u32*)(*(s32*)(model + 0xA4) + 0x34),
-                        *(u32*)(*(s32*)(model + 0xA4) + 0x38), (float(*)[4])(model + 8),
+                        (Vec*)work[0x19], meshData->m_vertices, meshData->m_normals,
+                        meshData->m_vertexCount, model->m_data->m_posQuant,
+                        model->m_data->m_normQuant, model->m_matrix,
                         *(void**)(work[0x18] + dlOffset), work[0x3A], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
-                        (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0));
+                        &model->m_nodes[meshData->m_nodeIndex]);
                     dlOffset -= 4;
                 }
             }
 
-            meshData += 0x14;
+            mesh++;
         }
     }
 }
@@ -1295,9 +1314,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     CGObject* gObject;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    u8* modelBytes;
-    s32 meshEntry;
-    s32 step;
+    CChara::CMesh* mesh;
+    pppMana2UnkB* step;
     u32 i;
     u32 j;
 
@@ -1384,18 +1402,17 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     gObject = (CGObject*)ppvMng->m_lookTarget;
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    modelBytes = reinterpret_cast<u8*>(model);
     model->m_afterMeshDrawCallback = 0;
     model->SetDrawMeshDLCallback(0);
-    meshEntry = *(s32*)(modelBytes + 0xAC);
-    step = work[0x1C];
-    for (i = 0; i < *(u32*)(*(s32*)(modelBytes + 0xA4) + 0xC); i++, meshEntry += 0x14) {
-        u8 stepType = *(u8*)(step + 0x1C);
-        s32 shape = *(s32*)(meshEntry + 8);
+    mesh = model->m_meshes;
+    step = (pppMana2UnkB*)work[0x1C];
+    for (i = 0; i < model->m_data->m_meshCount; i++, mesh++) {
+        u8 stepType = step->m_type;
+        CChara::CMesh::CRefData* meshData = mesh->m_data;
 
         if (stepType == 1) {
-            if (strcmp((char*)shape, s_manaShapeObj5) == 0) {
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+            if (strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
+                for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
                         *(u32*)(work[0x18] + j * 4) = 0;
@@ -1407,8 +1424,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
                 }
             }
         } else if (stepType == 2) {
-            if (strcmp((char*)shape, s_manaShapeObj3) == 0) {
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+            if (strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
+                for (j = 0; j < meshData->m_displayListCount; j++) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
                         *(u32*)(work[0x18] + j * 4) = 0;
@@ -1419,8 +1436,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
                     work[0x18] = 0;
                 }
             }
-        } else if (stepType == 3 && strcmp((char*)shape, s_manaShapeObj1) == 0) {
-            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+        } else if (stepType == 3 && strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
+            for (j = 0; j < meshData->m_displayListCount; j++) {
                 if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                     pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
                     *(u32*)(work[0x18] + j * 4) = 0;

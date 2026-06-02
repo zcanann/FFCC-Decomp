@@ -74,6 +74,66 @@ struct Vec2d {
     float y;
 };
 
+struct VYmMana {
+    CGObject* m_object;
+    void* m_manager;
+    CTexture* m_sourceTextures[6];
+    GXTexObj* m_baseParaboloidTexObjs;
+    void* m_paraboloidMap;
+    GXTexObj* m_generatedTexObj0;
+    GXTexObj* m_generatedTexObj1;
+    void* m_generatedTexture0;
+    void* m_generatedTexture1;
+    GXColor m_runtimeColor;
+    Vec* m_positions;
+    Vec* m_normals;
+    Vec* m_reflectionVec;
+    float* m_waterHeightA;
+    float* m_waterHeightB;
+    u16* m_indices;
+    Vec2d* m_texCoord0;
+    Vec2d* m_texCoord1;
+    GXColor* m_colors;
+    void** m_displayListCopies;
+    Vec* m_meshReflectionVec;
+    GXColor* m_meshColors;
+    S16Vec2d* m_meshTexCoords0;
+    S16Vec2d* m_meshTexCoords1;
+    pppYmManaUnkB* m_step;
+    GXTexObj* m_captureTexObjs;
+    CTexture* m_envTexture0;
+    CTexture* m_envTexture1;
+    u8 _pad84[4];
+    Mtx m_waterMtx;
+    Mtx m_reflectionMtx;
+    u8 m_manaAlpha;
+    u8 _padE9[3];
+    u32 m_paraboloidMapSize;
+    u32 m_displayListSize;
+    u8 m_paraboloidReady;
+    u8 _padF5[3];
+    CGObject* m_attachedObject;
+    GXColor m_shadowColor;
+    GXColor m_baseColor;
+};
+
+STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
+STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);
+STATIC_ASSERT(offsetof(VYmMana, m_meshReflectionVec) == 0x64);
+STATIC_ASSERT(offsetof(VYmMana, m_meshColors) == 0x68);
+STATIC_ASSERT(offsetof(VYmMana, m_meshTexCoords0) == 0x6C);
+STATIC_ASSERT(offsetof(VYmMana, m_meshTexCoords1) == 0x70);
+STATIC_ASSERT(offsetof(VYmMana, m_step) == 0x74);
+STATIC_ASSERT(offsetof(VYmMana, m_captureTexObjs) == 0x78);
+STATIC_ASSERT(offsetof(VYmMana, m_envTexture1) == 0x80);
+STATIC_ASSERT(offsetof(VYmMana, m_waterMtx) == 0x88);
+STATIC_ASSERT(offsetof(VYmMana, m_reflectionMtx) == 0xB8);
+STATIC_ASSERT(offsetof(VYmMana, m_manaAlpha) == 0xE8);
+STATIC_ASSERT(offsetof(VYmMana, m_paraboloidReady) == 0xF4);
+STATIC_ASSERT(offsetof(VYmMana, m_attachedObject) == 0xF8);
+STATIC_ASSERT(offsetof(VYmMana, m_shadowColor) == 0xFC);
+STATIC_ASSERT(offsetof(VYmMana, m_baseColor) == 0x100);
+
 extern "C" const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
 static inline float LoadFloat(const float& value)
@@ -114,17 +174,14 @@ static void CalcWaterReflectionVector(
  */
 void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 {
-    unsigned char* vYmManaBytes = (unsigned char*)vYmMana;
-
     GXSetNumChans(1);
     GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
     GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
 
-    GXTexObj* texObjA = *(GXTexObj**)(vYmManaBytes + 0x2c);
-    GXTexObj* texObjB = *(GXTexObj**)(vYmManaBytes + 0x28);
-    void* texObjCData = *(void**)(vYmManaBytes + 0x80);
-    GXTexObj* texObjC = (GXTexObj*)((unsigned char*)texObjCData + 0x28);
-    unsigned char alpha = *(unsigned char*)(vYmManaBytes + 0xe8);
+    GXTexObj* texObjA = vYmMana->m_generatedTexObj1;
+    GXTexObj* texObjB = vYmMana->m_generatedTexObj0;
+    GXTexObj* texObjC = &vYmMana->m_envTexture1->m_texObj;
+    unsigned char alpha = vYmMana->m_manaAlpha;
 
     _GXColor white = {0xff, 0xff, 0xff, 0xff};
     _GXColor alphaOnly = {0x00, 0x00, 0x00, alpha};
@@ -247,24 +304,24 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
  */
 void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
 {
-    u8* workBytes = (u8*)work;
-    u8* vYmManaBytes = (u8*)vYmMana;
+    VYmMana* mana = static_cast<VYmMana*>(work);
+    VYmMana* sourceMana = static_cast<VYmMana*>(vYmMana);
     s32 meshData = *(s32*)((u8*)model + 0xAC);
-    u8 alpha = vYmManaBytes[0x3B];
+    u8 alpha = sourceMana->m_runtimeColor.a;
     if (alpha != 0) {
-        workBytes[0xFC] = 0xFF;
-        workBytes[0xFD] = 0xFF;
-        workBytes[0xFE] = 0xFF;
-        workBytes[0xFF] = vYmManaBytes[0x3B];
+        mana->m_shadowColor.r = 0xFF;
+        mana->m_shadowColor.g = 0xFF;
+        mana->m_shadowColor.b = 0xFF;
+        mana->m_shadowColor.a = sourceMana->m_runtimeColor.a;
     } else if (alpha == 0) {
-        workBytes[0xFC] = 0xFF;
-        workBytes[0xFD] = 0xFF;
-        workBytes[0xFE] = 0xFF;
-        workBytes[0xFF] = 0xFF;
+        mana->m_shadowColor.r = 0xFF;
+        mana->m_shadowColor.g = 0xFF;
+        mana->m_shadowColor.b = 0xFF;
+        mana->m_shadowColor.a = 0xFF;
     }
 
-    DCFlushRange(workBytes + 0xFC, 4);
-    GXSetArray((GXAttr)0xB, workBytes + 0xFC, 4);
+    DCFlushRange(&mana->m_shadowColor, 4);
+    GXSetArray((GXAttr)0xB, &mana->m_shadowColor, 4);
 
     meshData += meshIndex * 0x14;
     s32 mesh = *(s32*)(meshData + 8);
@@ -287,6 +344,7 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
  */
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
+    VYmMana* mana = static_cast<VYmMana*>(work);
     u8 type = *(u8*)((u8*)step + 0x1C);
     int mesh = *(int*)(*(int*)((u8*)model + 0xAC) + partIndex * 0x14 + 8);
     u32* dl = (u32*)(*(int*)(mesh + 0x50) + dlIndex * 0xC);
@@ -317,7 +375,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         Mtx worldMtx;
 
         PSMTXCopy(ppvCameraMatrix0, cameraMtx);
-        PSMTXCopy(mtx, (float (*)[4])((u8*)work + 0x88));
+        PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
         PSMTXRotRad(rotXMtx, 'x', FLOAT_80330e48);
@@ -329,7 +387,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
         PSMTXConcat(mtx, offsetMtx, offsetMtx);
         PSMTXConcat(cameraMtx, offsetMtx, worldMtx);
         GXLoadPosMtxImm(worldMtx, 0);
-        RenderWaterMesh((VYmMana*)work);
+        RenderWaterMesh(mana);
     }
 
     if (!draw) {
@@ -337,26 +395,23 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (strcmp((char*)mesh, s_ymManaShapeObj) != 0) {
-        PSMTXCopy(mtx, (float (*)[4])((u8*)work + 0xB8));
-        if (*(u8*)((u8*)work + 0xF4) != 0) {
-            *(u8*)((u8*)work + 0x38) = **(u8**)(mesh + 0x28);
-            *(u8*)((u8*)work + 0x39) = *((u8*)(*(int*)(mesh + 0x28)) + 1);
-            *(u8*)((u8*)work + 0x3A) = *((u8*)(*(int*)(mesh + 0x28)) + 2);
-            *(u8*)((u8*)work + 0x3B) = 0x80;
-            DCFlushRange((u8*)work + 0x38, 4);
-            GXSetArray((GXAttr)0xB, *(void**)((u8*)work + 0x68), 4);
-            GXSetArray((GXAttr)0xD, *(void**)((u8*)work + 0x6C), 4);
-            GXSetArray((GXAttr)0xE, *(void**)((u8*)work + 0x70), 4);
-            MaterialMan.SetManaReflectionEnv(
-                reinterpret_cast<Vec*>(*(void**)((u8*)work + 0x64)),
-                reinterpret_cast<GXTexObj*>(*(void**)((u8*)work + 0x28)),
-                reinterpret_cast<GXTexObj*>(*(void**)((u8*)work + 0x2C)), 0xAEE0F);
+        PSMTXCopy(mtx, mana->m_reflectionMtx);
+        if (mana->m_paraboloidReady != 0) {
+            mana->m_runtimeColor.r = **(u8**)(mesh + 0x28);
+            mana->m_runtimeColor.g = *((u8*)(*(int*)(mesh + 0x28)) + 1);
+            mana->m_runtimeColor.b = *((u8*)(*(int*)(mesh + 0x28)) + 2);
+            mana->m_runtimeColor.a = 0x80;
+            DCFlushRange(&mana->m_runtimeColor, 4);
+            GXSetArray((GXAttr)0xB, mana->m_meshColors, 4);
+            GXSetArray((GXAttr)0xD, mana->m_meshTexCoords0, 4);
+            GXSetArray((GXAttr)0xE, mana->m_meshTexCoords1, 4);
+            MaterialMan.SetManaReflectionEnv(mana->m_meshReflectionVec, mana->m_generatedTexObj0, mana->m_generatedTexObj1, 0xAEE0F);
             GXSetCullMode((GXCullMode)1);
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
             MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((u8*)model + 0xA4) + 0x24)),
                                     *(u16*)((u8*)dl + 8), 0, (_GXTevScale)0);
             SetEnvMap((PYmMana*)step, (VYmMana*)work);
-            GXCallDisplayList(*(void**)(*(int*)((u8*)work + 0x60) + dlIndex * 4), dl[0]);
+            GXCallDisplayList(mana->m_displayListCopies[dlIndex], dl[0]);
             for (int i = 0; i < 16; i++) {
                 GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
                 GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
@@ -366,31 +421,31 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = FLOAT_80330ec0 * *(float*)(*(int*)work + 0x4B0);
+        float alphaScale = FLOAT_80330ec0 * mana->m_object->m_lookAtTimer;
         int alpha = (int)alphaScale;
-        *(u8*)((u8*)work + 0x100) = 0xFF;
-        *(u8*)((u8*)work + 0x101) = 0xFF;
-        *(u8*)((u8*)work + 0x102) = 0xFF;
-        *(u8*)((u8*)work + 0x103) = (u8)alpha;
+        mana->m_baseColor.r = 0xFF;
+        mana->m_baseColor.g = 0xFF;
+        mana->m_baseColor.b = 0xFF;
+        mana->m_baseColor.a = (u8)alpha;
     } else {
-        *(u8*)((u8*)work + 0x100) = *(u8*)((u8*)step + 0x3C);
-        *(u8*)((u8*)work + 0x101) = *(u8*)((u8*)step + 0x3D);
-        *(u8*)((u8*)work + 0x102) = *(u8*)((u8*)step + 0x3E);
-        *(u8*)((u8*)work + 0x103) = 0xFF;
+        mana->m_baseColor.r = *(u8*)((u8*)step + 0x3C);
+        mana->m_baseColor.g = *(u8*)((u8*)step + 0x3D);
+        mana->m_baseColor.b = *(u8*)((u8*)step + 0x3E);
+        mana->m_baseColor.a = 0xFF;
         if (*(u8*)((u8*)step + 0x3C) == 0) {
-            *(u8*)((u8*)work + 0x100) = 0xFF;
+            mana->m_baseColor.r = 0xFF;
         }
         if (*(u8*)((u8*)step + 0x3D) == 0) {
-            *(u8*)((u8*)work + 0x101) = 0xFF;
+            mana->m_baseColor.g = 0xFF;
         }
         if (*(u8*)((u8*)step + 0x3E) == 0) {
-            *(u8*)((u8*)work + 0x102) = 0xFF;
+            mana->m_baseColor.b = 0xFF;
         }
     }
 
     GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-    DCFlushRange((u8*)work + 0x100, 4);
-    GXSetArray((GXAttr)0xB, (u8*)work + 0x100, 4);
+    DCFlushRange(&mana->m_baseColor, 4);
+    GXSetArray((GXAttr)0xB, &mana->m_baseColor, 4);
     MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((u8*)model + 0xA4) + 0x24)),
                             *(u16*)((u8*)dl + 8), 0, (_GXTevScale)0);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);

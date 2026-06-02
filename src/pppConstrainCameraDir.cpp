@@ -12,9 +12,8 @@ extern const float kDrawAStarSphereRadius = 10.0f;
 extern const float kInfiniteCost = 10000000.0f;
 extern const char kAStarStepDebugFormat[] = "%d ";
 extern const char kAStarNewLine[] = "\n";
+extern const float kConstrainCameraDirBaseFov;
 }
-
-static const float kConstrainCameraDirBaseFov = 25.0f;
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 

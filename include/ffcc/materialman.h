@@ -108,6 +108,23 @@ public:
     {
         return m_manaAlpha;
     }
+    void SetDefaultDrawEnv(unsigned int tevBit)
+    {
+        m_curEnvTevBit = tevBit;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_stdTexMapId = 0;
+        m_texMapIdCur = 0;
+        m_stdTexMtx = 0x1E;
+        m_texMtxCur = 0x1E;
+        m_stdTexCoordId = 0;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+    }
     void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj0, _GXTexObj* paraboloidTexObj1, unsigned int tevBit)
     {
         m_manaReflectionVec = reflectionVec;

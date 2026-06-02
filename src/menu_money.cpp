@@ -624,7 +624,8 @@ bool CMenuPcs::MoneyOpen()
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
 
-		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[0];
+		iVar15 = 0;
+		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[iVar15];
 		firstAnim->tex = 0x3b;
 		firstAnim->y = 0x68;
 		firstAnim->w = 0xf8;
@@ -641,7 +642,6 @@ bool CMenuPcs::MoneyOpen()
 		unsigned int scriptFood = Game.m_scriptFoodBase[0];
 		s_Money = 0;
 		signed char* puVar9 = s_place;
-		iVar15 = 0;
 		do {
 			iVar8 = 10000000;
 			int iVar12;

@@ -278,7 +278,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			&param1->m_object, step->m_graphId, work->m_values[2], work->m_values[3], work->m_values[4],
 			step->m_payload0, step->m_payload1, step->m_payload2);
 
-		if (gPppInConstructor == 0) {
+		if (ppvIsLoopCalc == 0) {
 			if (work->m_direction != 0) {
 				work->m_angle += (int)work->m_values[2];
 				if (work->m_angle > step->m_payload3) {

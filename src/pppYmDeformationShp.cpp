@@ -5,6 +5,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 extern "C" {
@@ -428,7 +429,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
 		param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
 
-	if (gPppInConstructor != 0) {
+	if (ppvIsLoopCalc != 0) {
 		return;
 	}
 

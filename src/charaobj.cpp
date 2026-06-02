@@ -483,29 +483,22 @@ void CGCharaObj::ClearAllSta()
  */
 void CGCharaObj::onChangeStat(int state)
 {
-	if (state != 6) {
-		if (state < 6) {
-			if (state != 2) {
-				goto clear_ignore;
-			}
-		} else if (state == 9) {
+	switch (state) {
+		case 9:
 			for (int i = 0; i < 0x27; i++) {
 				setSta(i, 0);
 			}
 			m_displayFlags |= 2;
-			goto clear_ignore;
-		} else {
-			goto clear_ignore;
-		}
+			break;
+
+		case 2:
+		case 6:
+			m_castTimeTick = 0;
+			m_stateResetCounter = 0;
+			m_stateResetLimit = -1;
+			break;
 	}
 
-	{
-		m_castTimeTick = 0;
-		m_stateResetCounter = 0;
-		m_stateResetLimit = -1;
-	}
-
-clear_ignore:
 	reinterpret_cast<unsigned char*>(this)[0x63C] =
 		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x63C] << 1) >> 1;
 }

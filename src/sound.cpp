@@ -2311,9 +2311,11 @@ void CSound::PlayStreamASync()
         break;
     case 1:
     case 5:
-        volume = sound.m_bgmMasterVolume;
+        int bgmVolume;
+        bgmVolume = sound.m_bgmMasterVolume;
+        volume = bgmVolume;
         if (streamId == 1) {
-            volume -= (volume * 0x19) / 0x7f;
+            volume = bgmVolume - (bgmVolume * 0x19) / 0x7f;
         }
         break;
     default:
@@ -2322,17 +2324,7 @@ void CSound::PlayStreamASync()
     }
     void* streamBuffer = sound.m_streamBuffer;
     CRedSound* redSound = RedSound(this);
-    int clampedVolume;
-    if (volume < 0) {
-        clampedVolume = 0;
-    } else {
-        clampedVolume = 0x7f;
-        if (volume <= 0x7f) {
-            clampedVolume = volume;
-        }
-    }
-
-    int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, clampedVolume);
+    int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, volume < 0 ? 0 : (volume <= 0x7f ? volume : 0x7f));
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
 }

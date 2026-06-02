@@ -1527,32 +1527,12 @@ void CMiniGamePcs::calc(void)
         self[0x649C] = 1;
         while (self[0x649C] != 0)
         {
-            MiniGameAlarm alarm;
-
-            OSCreateAlarm(&alarm.alarm);
-            OSSetAlarmTag(&alarm.alarm, 1);
-            OSThread* currentThread = OSGetCurrentThread();
-            alarm.thread = currentThread;
-
-            BOOL interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(alarm.thread);
-            OSRestoreInterrupts(interruptLevel);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
 
         while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
         {
-            MiniGameAlarm alarm;
-
-            OSCreateAlarm(&alarm.alarm);
-            OSSetAlarmTag(&alarm.alarm, 1);
-            OSThread* currentThread = OSGetCurrentThread();
-            alarm.thread = currentThread;
-
-            BOOL interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&alarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
-            OSSuspendThread(alarm.thread);
-            OSRestoreInterrupts(interruptLevel);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
@@ -1781,16 +1761,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
     while (true)
     {
-        MiniGameAlarm alarm;
-        OSCreateAlarm(&alarm.alarm);
-        OSSetAlarmTag(&alarm.alarm, 1);
-        OSThread* currentThread = OSGetCurrentThread();
-        alarm.thread = currentThread;
-
-        BOOL interruptLevel = OSDisableInterrupts();
-        OSSetAlarm(&alarm.alarm, OSMillisecondsToTicks(1), GbaThreadAlarmHandler);
-        OSSuspendThread(alarm.thread);
-        OSRestoreInterrupts(interruptLevel);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
 
         if (self[0x649C] != 0)
         {
@@ -1798,41 +1769,17 @@ void CMiniGamePcs::MngThreadMain(void*)
 
             for (int i = 0; i < 4; i++)
             {
-                MiniGameAlarm sleepAlarm;
-                OSCreateAlarm(&sleepAlarm.alarm);
-                OSSetAlarmTag(&sleepAlarm.alarm, 1);
-                currentThread = OSGetCurrentThread();
-                sleepAlarm.thread = currentThread;
-                interruptLevel = OSDisableInterrupts();
-                OSSetAlarm(&sleepAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
-                OSSuspendThread(sleepAlarm.thread);
-                OSRestoreInterrupts(interruptLevel);
+                MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
 
                 unsigned char* threadParam = self + 0x138C + i * 200;
                 OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(1), 1);
             }
 
-            MiniGameAlarm settleAlarm;
-            OSCreateAlarm(&settleAlarm.alarm);
-            OSSetAlarmTag(&settleAlarm.alarm, 1);
-            currentThread = OSGetCurrentThread();
-            settleAlarm.thread = currentThread;
-            interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&settleAlarm.alarm, OSMillisecondsToTicks(200), GbaThreadAlarmHandler);
-            OSSuspendThread(settleAlarm.thread);
-            OSRestoreInterrupts(interruptLevel);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(200));
 
             while (self[0x649D] != 0x0F)
             {
-                MiniGameAlarm waitAlarm;
-                OSCreateAlarm(&waitAlarm.alarm);
-                OSSetAlarmTag(&waitAlarm.alarm, 1);
-                currentThread = OSGetCurrentThread();
-                waitAlarm.thread = currentThread;
-                interruptLevel = OSDisableInterrupts();
-                OSSetAlarm(&waitAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
-                OSSuspendThread(waitAlarm.thread);
-                OSRestoreInterrupts(interruptLevel);
+                MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
             }
 
             while (true)
@@ -1850,15 +1797,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
                 if (allTerminated)
                 {
-                    MiniGameAlarm endAlarm;
-                    OSCreateAlarm(&endAlarm.alarm);
-                    OSSetAlarmTag(&endAlarm.alarm, 1);
-                    currentThread = OSGetCurrentThread();
-                    endAlarm.thread = currentThread;
-                    interruptLevel = OSDisableInterrupts();
-                    OSSetAlarm(&endAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
-                    OSSuspendThread(endAlarm.thread);
-                    OSRestoreInterrupts(interruptLevel);
+                    MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
 
                     self[0x649C] = 0;
                     OSExitThread(0);

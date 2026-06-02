@@ -125,12 +125,15 @@ struct PMapBound
 {
     PMapBound()
     {
-        m_min.z = kPMapBoundMinInit;
-        m_min.y = kPMapBoundMinInit;
-        m_min.x = kPMapBoundMinInit;
-        m_max.z = kPMapBoundMaxInit;
-        m_max.y = kPMapBoundMaxInit;
-        m_max.x = kPMapBoundMaxInit;
+        float min = kPMapBoundMinInit;
+        float max = kPMapBoundMaxInit;
+
+        m_min.z = min;
+        m_min.y = min;
+        m_min.x = min;
+        m_max.z = max;
+        m_max.y = max;
+        m_max.x = max;
     }
 
     void operator=(const CBound& other)

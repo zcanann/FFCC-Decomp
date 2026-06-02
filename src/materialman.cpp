@@ -1,4 +1,5 @@
 #define FFCC_MATERIALMAN_DEFINE_LAYOUT
+#define FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"
 #include "ffcc/map.h"
@@ -3138,6 +3139,20 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
     if (material != 0) {
         material->CacheLoadTexture(amemCacheSet);
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterial* CMaterialSet::GetMaterial(long materialIndex)
+{
+    return m_materials[static_cast<unsigned long>(materialIndex)];
 }
 
 /*

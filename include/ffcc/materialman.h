@@ -239,10 +239,16 @@ public:
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
+#ifdef FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
+    CMaterial* GetMaterial(long);
+#else
     CMaterial* GetMaterial(long index)
     {
         return m_materials[index];
     }
+#endif
+#else
+    CMaterial* GetMaterial(long);
 #endif
 };
 

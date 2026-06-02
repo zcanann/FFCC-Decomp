@@ -177,7 +177,7 @@ CTexAnim::~CTexAnim()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::SetTexGen()
+inline void CTexAnim::SetTexGen()
 {
     const float zero = FLOAT_8032fb38;
     CMaterial* material = m_refData->m_material;
@@ -226,7 +226,7 @@ void CTexAnimSet::SetTexGen()
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnim::Find(char* name)
+inline int CTexAnim::Find(char* name)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_refData->m_texAnimSeqs.GetSize()); i++) {
         CTexAnimSeq* seq = m_refData->m_texAnimSeqs[i];
@@ -246,7 +246,7 @@ int CTexAnim::Find(char* name)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
+inline void CTexAnim::Change(int seqIndex, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
     m_seqIndex = seqIndex;
     m_frame = frame;
@@ -285,7 +285,7 @@ void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnimSeq::Interp(float frame, Vec& texGen)
+inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
 {
     float currentFrame = (float)fmod((double)frame, (double)(float)m_totalFrames);
     unsigned int keyCount = m_keyCount;
@@ -336,7 +336,7 @@ void CTexAnimSeq::Interp(float frame, Vec& texGen)
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnimSeq::IsChin()
+inline int CTexAnimSeq::IsChin()
 {
     return IsTexAnimChinFlag(m_flags);
 }
@@ -349,7 +349,7 @@ int CTexAnimSeq::IsChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-int CTexAnim::IsChin()
+inline int CTexAnim::IsChin()
 {
     CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
     return seq->IsChin();
@@ -363,7 +363,7 @@ int CTexAnim::IsChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-float CTexAnim::GetChin()
+inline float CTexAnim::GetChin()
 {
     return m_chin;
 }
@@ -376,7 +376,7 @@ float CTexAnim::GetChin()
  * EN Size: TODO
  * JP Address: TODO
  */
-unsigned int CTexAnimSeq::GetTotalFrame()
+inline unsigned int CTexAnimSeq::GetTotalFrame()
 {
     return m_totalFrames;
 }
@@ -389,7 +389,7 @@ unsigned int CTexAnimSeq::GetTotalFrame()
  * EN Size: TODO
  * JP Address: TODO
  */
-char* CTexAnimSeq::GetName()
+inline char* CTexAnimSeq::GetName()
 {
     return m_name;
 }
@@ -402,7 +402,7 @@ char* CTexAnimSeq::GetName()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::AddFrame(float frameStep)
+inline void CTexAnim::AddFrame(float frameStep)
 {
     CTexAnimSeq* seq = m_refData->m_texAnimSeqs[m_seqIndex];
 
@@ -472,7 +472,7 @@ void CTexAnimSet::AddFrame()
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
+inline void CTexAnim::AttachMaterialSet(CMaterialSet* materialSet)
 {
     int materialIndex;
     CMaterial* material = m_refData->m_material;
@@ -521,7 +521,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
  * EN Size: TODO
  * JP Address: TODO
  */
-CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
+inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
 {
     CTexAnim* copy = new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim;
 
@@ -545,7 +545,7 @@ CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
     char* seqName = m_name;
@@ -588,7 +588,7 @@ void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
  * EN Size: TODO
  * JP Address: TODO
  */
-void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
+inline void CTexAnim::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
     CChunkFile::CChunk chunk;
     CRef* ref = m_refData;

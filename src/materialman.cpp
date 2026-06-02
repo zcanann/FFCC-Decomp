@@ -231,9 +231,7 @@ static CMaterial* AllocMaterial()
 
 static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 {
-    const unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
-    *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(numTexture + 1);
-    *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (numTexture << 1))) = textureIndex;
+    material->AddTextureIdx(material->GetTextureCount(), textureIndex);
 }
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
@@ -3348,6 +3346,8 @@ inline void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMaterial::AddTextureIdx(int, int)
+inline void CMaterial::AddTextureIdx(int index, int textureIndex)
 {
+    m_textureCount = static_cast<unsigned short>(index + 1);
+    m_textureIndices[index] = static_cast<unsigned short>(textureIndex);
 }

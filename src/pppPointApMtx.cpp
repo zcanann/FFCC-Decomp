@@ -12,6 +12,11 @@ struct pppPointApMtxStep {
 	u8 m_useWorldMatrix;
 };
 
+struct pppPointApMtxOffsets {
+	u32 m_srcOffset;
+	u32 m_stateOffset;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800de210  
@@ -25,9 +30,9 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 {
 	pppPointApMtxStep* payload = (pppPointApMtxStep*)step;
 	Vec pos;
-	u32* offsets = (u32*)ctrlTable->m_serializedDataOffsets;
-	Vec* source = (Vec*)(pObject->m_workArea + offsets[0]);
-	u8* state = pObject->m_workArea + offsets[1];
+	pppPointApMtxOffsets* offsets = (pppPointApMtxOffsets*)ctrlTable->m_serializedDataOffsets;
+	Vec* source = (Vec*)(pObject->m_workArea + offsets->m_srcOffset);
+	u8* state = pObject->m_workArea + offsets->m_stateOffset;
 	Mtx* target = (Mtx*)state;
 
 	if (ppvUserStopPartF != 0) {
@@ -48,8 +53,8 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 		if (objectData == 0) {
 			object = 0;
 		} else {
-			object = (_pppPObject*)pppCreatePObject(ppvMng, objectData);
-			*(_pppPObject**)((u8*)object + 4) = pObject;
+			object = pppCreatePObject(ppvMng, objectData);
+			object->m_link.m_previous = &pObject->m_link;
 		}
 
 		matrix = (Mtx*)(object->m_workArea + payload->m_childMatrixOffset);
@@ -83,9 +88,8 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
  */
 void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	unsigned long offset = (unsigned long)(((u32*)ctrlTable->m_serializedDataOffsets)[1]);
-	u8* state = pObject->m_workArea + offset;
+	pppPointApMtxOffsets* offsets = (pppPointApMtxOffsets*)ctrlTable->m_serializedDataOffsets;
+	u8* state = pObject->m_workArea + offsets->m_stateOffset;
 
 	state[1] = 0;
 }
-

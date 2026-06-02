@@ -3,7 +3,6 @@
 #include "ffcc/game.h"
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
-#include <stddef.h>
 
 /*
  * --INFO--
@@ -17,7 +16,8 @@
 void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt = ppvMng;
-    s32 distanceOffset = *ctrlTable->m_serializedDataOffsets + offsetof(_pppPObject, m_workArea);
+    s32 distanceOffset = *ctrlTable->m_serializedDataOffsets;
+    f32* distancePtr = (f32*)(object->m_workArea + distanceOffset);
     f32 distance;
     Vec local_1c;
     Vec local_28;
@@ -27,8 +27,7 @@ void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step
     local_1c.z = pppMngSt->m_matrix.value[2][3];
     distance = PSVECDistance(&local_1c, &pppMngSt->m_paramVec0);
 
-    if ((distance <= step->m_dataValIndex) ||
-        (*(f32*)((u8*)object + distanceOffset) <= distance)) {
+    if ((distance <= step->m_dataValIndex) || (*distancePtr <= distance)) {
         s32 partIndex;
         s32 graphFrame;
         s32 m_kind;

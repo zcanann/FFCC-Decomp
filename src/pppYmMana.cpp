@@ -1198,16 +1198,6 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800d5f7c
  * PAL Size: 404b
  * EN Address: TODO

@@ -1740,26 +1740,6 @@ void CCaravanWork::SafeDeleteTempItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::ClampStatus(short&, unsigned short&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::CalcArtifactStatus(int, int, int&, int&, int&, int&, int&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8009fa44
  * PAL Size: 1996b
  * EN Address: TODO

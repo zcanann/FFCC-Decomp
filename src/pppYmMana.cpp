@@ -74,6 +74,26 @@ struct Vec2d {
     float y;
 };
 
+struct pppYmManaUnkB {
+    u8 _pad00[4];
+    s32 m_sourceTextureId2;
+    s32 m_sourceTextureId1;
+    s32 m_sourceTextureId0;
+    s32 m_sourceTextureId3;
+    s32 m_sourceTextureId4;
+    s32 m_sourceTextureId5;
+    u8 m_type;
+    u8 _pad1D[7];
+    s32 m_envTextureId0;
+    s32 m_envTextureId1;
+    float m_waterScale;
+    u8 _pad30[4];
+    u32 m_rippleLevel;
+    u8 m_map21Flag;
+    u8 _pad39[3];
+    GXColor m_baseColor;
+};
+
 struct VYmMana {
     CGObject* m_object;
     void* m_manager;
@@ -133,6 +153,14 @@ STATIC_ASSERT(offsetof(VYmMana, m_paraboloidReady) == 0xF4);
 STATIC_ASSERT(offsetof(VYmMana, m_attachedObject) == 0xF8);
 STATIC_ASSERT(offsetof(VYmMana, m_shadowColor) == 0xFC);
 STATIC_ASSERT(offsetof(VYmMana, m_baseColor) == 0x100);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_sourceTextureId2) == 0x04);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_type) == 0x1C);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_envTextureId0) == 0x24);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_envTextureId1) == 0x28);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_waterScale) == 0x2C);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_rippleLevel) == 0x34);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_map21Flag) == 0x38);
+STATIC_ASSERT(offsetof(pppYmManaUnkB, m_baseColor) == 0x3C);
 
 extern "C" const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
@@ -707,9 +735,9 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* param_3)
 {
     u32 texBufferSize;
+    VYmMana* mana;
     u32* work;
-    void* dstBuffer;
-    u32* texList;
+    GXTexObj* dstTexObj;
     s32 meshData;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -725,94 +753,99 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
 
     gObject = ppvMng->m_owner;
     setupOffset = param_3->m_serializedDataOffsets[1];
-    work = (u32*)((u8*)pppYmMana + 0x80 + param_3->m_serializedDataOffsets[2]);
+    mana = reinterpret_cast<VYmMana*>((u8*)pppYmMana + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work = reinterpret_cast<u32*>(mana);
     if (gObject == NULL) {
         return;
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    work[0x1D] = (u32)param_2;
+    mana->m_step = param_2;
     if (Game.m_currentMapId == 0x21) {
-        *((u8*)param_2 + 0x38) = 0;
+        param_2->m_map21Flag = 0;
     }
 
     if ((*(u8*)&gObject->m_weaponNodeFlags & 1) != 0) {
-        work[0x3E] = (u32)gObject->m_attachOwner;
+        mana->m_attachedObject = gObject->m_attachOwner;
     }
 
-    SetManaModelCallbacks(model, work, param_2);
+    SetManaModelCallbacks(model, mana, param_2);
 
     MaterialMan.SetManaAlpha((u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer));
     if (Game.m_currentMapId == 0x21) {
         MaterialMan.SetManaAlpha((u8)(gObject->m_lookAtTimer * (float)*((u8*)pppYmMana + 0x8B + setupOffset)));
     }
-    *((u8*)work + 0xE8) = MaterialMan.GetManaAlpha();
+    mana->m_manaAlpha = MaterialMan.GetManaAlpha();
 
     if (*(s32*)pppYmMana != 0) {
         return;
     }
 
-    work[0] = (u32)gObject;
-    SetManaModelCallbacks(model, work, param_2);
-    work[2] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x0C), ppvEnv);
-    work[3] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x08), ppvEnv);
-    work[4] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x04), ppvEnv);
-    work[5] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x10), ppvEnv);
-    work[6] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x14), ppvEnv);
-    work[7] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x18), ppvEnv);
-    work[0x1F] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x24), ppvEnv);
-    work[0x20] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x28), ppvEnv);
+    mana->m_object = gObject;
+    SetManaModelCallbacks(model, mana, param_2);
+    mana->m_sourceTextures[0] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId0, ppvEnv));
+    mana->m_sourceTextures[1] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId1, ppvEnv));
+    mana->m_sourceTextures[2] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId2, ppvEnv));
+    mana->m_sourceTextures[3] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId3, ppvEnv));
+    mana->m_sourceTextures[4] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId4, ppvEnv));
+    mana->m_sourceTextures[5] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId5, ppvEnv));
+    mana->m_envTexture0 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
+    mana->m_envTexture1 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
 
-    *(u32*)(work[0x1F] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
-    *(u32*)(work[0x20] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x20])->InitTexObj();
+    mana->m_envTexture0->m_format = 0;
+    mana->m_envTexture0->InitTexObj();
+    mana->m_envTexture1->m_format = 0;
+    mana->m_envTexture1->InitTexObj();
 
-    if (work[0x1E] == 0) {
-        work[0x1E] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x38F);
+    if (mana->m_captureTexObjs == 0) {
+        mana->m_captureTexObjs =
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x38F));
     }
-    if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x395);
+    if (mana->m_generatedTexObj0 == 0) {
+        mana->m_generatedTexObj0 =
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x395));
     }
-    if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x399);
+    if (mana->m_generatedTexObj1 == 0) {
+        mana->m_generatedTexObj1 =
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x399));
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
-    if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A1);
+    if (mana->m_generatedTexture0 == 0) {
+        mana->m_generatedTexture0 =
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A1);
     }
-    if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A3);
+    if (mana->m_generatedTexture1 == 0) {
+        mana->m_generatedTexture1 =
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3A3);
     }
 
-    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, (GXTexWrapMode)1,
+    GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, (GXTexWrapMode)1,
                  (GXTexWrapMode)1, GX_FALSE);
-    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, (GXTexWrapMode)1,
+    GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, (GXTexWrapMode)1,
                  (GXTexWrapMode)1, GX_FALSE);
 
-    if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3B0);
+    if (mana->m_baseParaboloidTexObjs == 0) {
+        mana->m_baseParaboloidTexObjs =
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3B0));
     }
-    dstBuffer = (void*)work[8];
-    texList = &work[2];
+    dstTexObj = mana->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
-        *(u32*)(texList[0] + 0x6C) = 0;
-        reinterpret_cast<CTexture*>(texList[0])->InitTexObj();
-        memcpy(dstBuffer, (void*)(texList[0] + 0x28), 0x20);
-        dstBuffer = (void*)((u8*)dstBuffer + 0x20);
-        texList++;
+        mana->m_sourceTextures[i]->m_format = 0;
+        mana->m_sourceTextures[i]->InitTexObj();
+        memcpy(dstTexObj, &mana->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
+        dstTexObj++;
     }
 
-    *(u32*)(work[0x1F] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
-    *(u32*)(work[0x20] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x20])->InitTexObj();
+    mana->m_envTexture0->m_format = 0;
+    mana->m_envTexture0->InitTexObj();
+    mana->m_envTexture1->m_format = 0;
+    mana->m_envTexture1->InitTexObj();
 
-    if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);
-        genParaboloidMap((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
+    if (mana->m_paraboloidMap == 0) {
+        mana->m_paraboloidMap = pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3CB);
+        genParaboloidMap(mana->m_paraboloidMap, &mana->m_paraboloidMapSize, 0x1E, GX_VTXFMT7);
     }
 
     meshData = *(s32*)(model + 0xAC);
@@ -973,7 +1006,8 @@ void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
  */
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
-    u32* work = (u32*)workPtr;
+    VYmMana* mana = static_cast<VYmMana*>(workPtr);
+    pppYmManaUnkB* stepData = static_cast<pppYmManaUnkB*>(step);
     Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
@@ -988,9 +1022,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     CChara::CModel* model;
     u32 depthTexSize;
     u32 texBufferStride;
-    u32 sourceTexObjs;
-    u32 captureTexObjs;
-    u32 targetTexObjs;
+    GXTexObj* sourceTexObjs;
+    GXTexObj* captureTexObjs;
+    GXTexObj* targetTexObj;
     s32 i;
     f32 savedViewport[6];
 
@@ -998,8 +1032,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         return;
     }
 
-    sourceTexObjs = work[8];
-    if (*(u8*)((u8*)step + 0x1C) == 0) {
+    sourceTexObjs = mana->m_baseParaboloidTexObjs;
+    if (stepData->m_type == 0) {
         return;
     }
 
@@ -1013,7 +1047,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    gObject = (CGObject*)work[0];
+    gObject = mana->m_object;
     if (gObject == NULL) {
         return;
     }
@@ -1032,9 +1066,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
-    captureTexObjs = work[0x1E];
+    captureTexObjs = mana->m_captureTexObjs;
 
-    if (*(u8*)((u8*)step + 0x38) != 0) {
+    if (stepData->m_map21Flag != 0) {
         char* compareName = Game.m_currentScriptName;
         C_MTXPerspective(projectionMtx, FLOAT_80330E7C, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330E80);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
@@ -1086,7 +1120,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x80, 0x80);
             gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84,
-                                    (GXTexObj*)sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+                                    sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, FLOAT_80330e4c, FLOAT_80330e58);
             GXSetScissor(0, 0, 0x80, 0x80);
@@ -1098,7 +1132,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 CChara::CModel* ownerModel = owner->m_model;
 
-                ownerModel->SetCallbackContext(work, step);
+                ownerModel->SetCallbackContext(mana, step);
                 owner->m_model->m_beforeDrawShadowLockEnvCallback = Mana_BeforeDrawShadowLockEnvCallback;
                 owner->m_model->m_drawShadowMeshDLCallback = Chara_DrawShadowMeshDLCallback;
                 owner->Draw(1);
@@ -1108,11 +1142,11 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)captureTexObjs, 0, 0, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, captureTexObjs, 0, 0, 0x80, 0x80,
                                        depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
-            sourceTexObjs += 0x20;
-            captureTexObjs += 0x20;
+            sourceTexObjs++;
+            captureTexObjs++;
         }
 
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1123,35 +1157,35 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
             _GXSetTevSwapMode((GXTevStageID)i, GX_TEV_SWAP0, GX_TEV_SWAP0);
         }
-        *((u8*)work + 0xF4) = 1;
+        mana->m_paraboloidReady = 1;
     }
 
-    targetTexObjs = work[0x1F];
-    if (*(u8*)((u8*)step + 0x38) != 0) {
-        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD((GXTexObj*)work[10], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD((GXTexObj*)work[11], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        drawParaboloidMap((GXTexObj*)work[0x1E], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
-                          (GXTexObj*)(targetTexObjs + 0x28), 1);
-        drawParaboloidMap((GXTexObj*)work[0x1E], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
-                          (GXTexObj*)(targetTexObjs + 0x28), 0);
+    targetTexObj = &mana->m_envTexture0->m_texObj;
+    if (stepData->m_map21Flag != 0) {
+        GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(mana->m_generatedTexObj0, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(mana->m_generatedTexObj1, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          targetTexObj, 1);
+        drawParaboloidMap(mana->m_captureTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap, mana->m_paraboloidMapSize,
+                          targetTexObj, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
         gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
                                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
     } else {
-        if (*((u8*)work + 0xF4) == 0) {
-            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
-                              (GXTexObj*)(targetTexObjs + 0x28), 1);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
-                              (GXTexObj*)(targetTexObjs + 0x28), 0);
+        if (mana->m_paraboloidReady == 0) {
+            GXInitTexObj(mana->m_generatedTexObj0, mana->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj(mana->m_generatedTexObj1, mana->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj1, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, targetTexObj, 1);
+            drawParaboloidMap(mana->m_baseParaboloidTexObjs, mana->m_generatedTexObj0, mana->m_paraboloidMap,
+                              mana->m_paraboloidMapSize, targetTexObj, 0);
             gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
                                     0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
-            *((u8*)work + 0xF4) = 1;
+            mana->m_paraboloidReady = 1;
         }
     }
 

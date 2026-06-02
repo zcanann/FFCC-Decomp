@@ -531,25 +531,37 @@ void CGCharaObj::onCancelStat(int)
 	goto cancel_done;
 
 cancel_state18:
-	for (int i = 0; i < 0x16; i++) {
-		if (((1U << i) & 1U) != 0) {
-			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+	{
+		unsigned char* self = reinterpret_cast<unsigned char*>(this);
+		int i = 0;
+		for (; i < 0x16; i++, self += 4) {
+			if (((1U << i) & 1U) != 0) {
+				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+			}
 		}
 	}
 	goto cancel_done;
 
 cancel_state2:
-	for (int i = 0; i < 0x16; i++) {
-		if (((1U << i) & 0x18U) != 0) {
-			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+	{
+		unsigned char* self = reinterpret_cast<unsigned char*>(this);
+		int i = 0;
+		for (; i < 0x16; i++, self += 4) {
+			if (((1U << i) & 0x18U) != 0) {
+				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+			}
 		}
 	}
 	goto cancel_done;
 
 cancel_damage:
-	for (int i = 0; i < 0x16; i++) {
-		if (((1U << i) & 0x138U) != 0) {
-			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
+	{
+		unsigned char* self = reinterpret_cast<unsigned char*>(this);
+		int i = 0;
+		for (; i < 0x16; i++, self += 4) {
+			if (((1U << i) & 0x138U) != 0) {
+				CFlatRuntime2Storage().EndParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
+			}
 		}
 	}
 	m_damageParticle = -1;

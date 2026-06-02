@@ -662,7 +662,7 @@ config.libs = [
             Object(NonMatching, "pppParHitSphMat.cpp"),
             Object(NonMatching, "pppParMatrix.cpp"),
             Object(NonMatching, "pppParMoveLine.cpp"),
-            Object(NonMatching, "pppParMoveMatrix.cpp", cflags=cflags_game),
+            Object(NonMatching, "pppParMoveMatrix.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppPart.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "pppPObjPoint.cpp"),
             Object(NonMatching, "pppPoint.cpp"),

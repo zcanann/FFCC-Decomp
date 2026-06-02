@@ -180,7 +180,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
 extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     BreathParticleGroup* group;
-    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
+    VBreathModel* state =
+        (VBreathModel*)(reinterpret_cast<_pppPObject*>(pppBreathModel)->m_workArea + *param_2->m_serializedDataOffsets);
 
     if (state->m_particleData != NULL) {
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_particleData));
@@ -227,7 +228,8 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
  */
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
-    VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
+    VBreathModel* state =
+        (VBreathModel*)(reinterpret_cast<_pppPObject*>(pppBreathModel)->m_workArea + *param_2->m_serializedDataOffsets);
     PSMTXIdentity(state->m_matrix);
     float zero = 0.0f;
 
@@ -287,8 +289,8 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     object = reinterpret_cast<_pppPObject*>(breathModel);
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + workOffset);
-    color = reinterpret_cast<VColor*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
+    work = reinterpret_cast<VBreathModel*>(object->m_workArea + workOffset);
+    color = reinterpret_cast<VColor*>(object->m_workArea + colorOffset);
     particleData = reinterpret_cast<BreathParticleData*>(work->m_particleData);
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;
@@ -493,8 +495,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = ppvMng;
     colorOffset = dataOffsets[1];
-    work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
+    work = reinterpret_cast<VBreathModel*>(object->m_workArea + dataOffsets[0]);
+    color = (VColor*)(object->m_workArea + colorOffset);
 
     if (work->m_particleData == NULL) {
         BreathParticleGroup* groupTable;

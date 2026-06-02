@@ -359,7 +359,7 @@ void CTexture::FlushTlut()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CTexture::FlushExternalTlut(void* tlutData, int format)
+inline void CTexture::FlushExternalTlut(void* tlutData, int format)
 {
     int numEntries;
 
@@ -405,7 +405,7 @@ void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _
  * JP Address: TODO
  * JP Size: TODO
  */
-_GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
+inline _GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, int index)
 {
     unsigned short* tlut = reinterpret_cast<unsigned short*>(tlutData);
     _GXColor color;
@@ -495,7 +495,7 @@ _GXColor CTexture::GetTlutColor(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CTexture::CopyTlut(_GXColor* colors)
+inline void CTexture::CopyTlut(_GXColor* colors)
 {
     int numEntries = (m_format == 9) ? 0x100 : 0x10;
 

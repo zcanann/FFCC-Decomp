@@ -2523,12 +2523,10 @@ void CGCharaObj::statAttack()
 		m_ignoreHit[2].m_flag &= 0x7F;
 		m_ignoreHit[3].m_flag &= 0x7F;
 
-		int pdt = m_itemId;
-		int dataNo = m_particleSlots[0];
-		putParticleFromItem(pdt, 0, dataNo, 0);
-		putParticleFromItem(pdt, 1, dataNo, 0);
-		putParticleFromItem(pdt, 2, dataNo, 0);
-		putParticleFromItem(pdt, 3, dataNo, 0);
+		putParticleFromItem(m_itemId, 0, m_particleSlots[0], 0);
+		putParticleFromItem(m_itemId, 1, m_particleSlots[0], 0);
+		putParticleFromItem(m_itemId, 2, m_particleSlots[0], 0);
+		putParticleFromItem(m_itemId, 3, m_particleSlots[0], 0);
 		reqAnim(m_attackAnimId, 0, 0);
 	}
 

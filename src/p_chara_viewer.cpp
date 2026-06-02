@@ -65,6 +65,7 @@ extern "C" const float kCharaSharedZeroF = 0.0f;
 extern "C" const float kCharaSharedOneF = 1.0f;
 extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 
+extern "C" CLightPcs::CBumpLight* g_pLight = 0;
 
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>

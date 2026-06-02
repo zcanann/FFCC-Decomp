@@ -2419,16 +2419,16 @@ int CMapMng::ReadMid(char* mapName)
 
     const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        unsigned char* obj = reinterpret_cast<unsigned char*>(GetMapObjArray() + i);
-        unsigned char type = obj[0x1D];
-        CMapHit* hit = *reinterpret_cast<CMapHit**>(obj + 0xC);
+        CMapObj* obj = GetMapObjArray() + i;
+        unsigned char type = obj->m_mapDataType;
+        CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
             if (m_mapHitCount <= hitIndex) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }
-                *reinterpret_cast<CMapHit**>(obj + 0xC) = 0;
+                obj->m_mapData = 0;
             }
         }
     }

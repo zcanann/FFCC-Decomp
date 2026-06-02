@@ -2061,14 +2061,14 @@ void CMenuPcs::CalcResultCloseAnim()
 		s_CntTop = (unsigned char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[(int)s_CntTop + i];
+			BonusAnimSprite* sprite = &sprites[countTop + i];
 			sprite->startFrame = 8;
 			sprite->duration = 8;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = &sprites[closeCount + 1 + i];
-			BonusAnimSprite* source = &sprites[(int)s_CntTop + i];
+			BonusAnimSprite* source = &sprites[countTop + i];
 			sprite->startFrame = source->startFrame;
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;

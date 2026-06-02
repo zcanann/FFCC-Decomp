@@ -33,7 +33,7 @@ extern const float FLOAT_80332060;
 extern const float FLOAT_80332064;
 extern const double DOUBLE_80332068;
 extern const double DOUBLE_80332070;
-extern const float FLOAT_80332078;
+extern const float FLOAT_80332078[2];
 
 static inline Mtx& CameraMatrix()
 {
@@ -733,9 +733,9 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
-            normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
-            normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078;
+            normal.x *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
+            normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
+            normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
             PSVECNormalize(&normal, &normal);
             gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {

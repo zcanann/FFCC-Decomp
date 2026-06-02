@@ -5,7 +5,7 @@ extern float gPppTrigTable[];
 
 extern float gPppPointRApRandomAngleRange;
 extern float gPppPointRApRandomAngleBias;
-extern float gPppPointRApSpinScale;
+extern const float gPppPointRApSpinScale[2];
 
 extern const float gPppScaleLoopAutoZero;
 
@@ -36,7 +36,7 @@ extern const float kPppKeLnsZero[2];
 extern const float kPppMoveZero[2];
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;
-extern float kPppVtMimeZero;
+extern const float kPppVtMimeZero[2];
 
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;

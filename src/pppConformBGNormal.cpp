@@ -2,6 +2,7 @@
 #include "types.h"
 #include "ffcc/game.h"
 #include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/gobject.h"
@@ -27,15 +28,6 @@ struct ConformBgNormalState {
     u8 m_initialized;
 };
 
-struct CMapCylinderRaw {
-    Vec m_bottom;
-    u8 m_pad0C[0x0C];
-    Vec m_direction;
-    f32 m_radius;
-    Vec m_top;
-    Vec m_direction2;
-};
-
 struct WeaponNodeFlagBits {
     signed char m_prg : 1;
     signed char m_unk40 : 1;
@@ -46,6 +38,11 @@ struct WeaponNodeFlagBits {
     signed char m_unk02 : 1;
     signed char m_unk01 : 1;
 };
+
+static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
+{
+    return reinterpret_cast<Vec*>(&owner->m_hitNormal.y);
+}
 
 /*
  * --INFO--
@@ -77,8 +74,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f64 trigValue;
     Mtx basisMtx;
     Mtx scaleMtx;
-    CMapCylinderRaw firstCylinder;
-    CMapCylinderRaw secondCylinder;
+    CMapCylinder firstCylinder;
+    CMapCylinder secondCylinder;
     Vec local_140;
     Vec local_14c;
     Vec local_158;
@@ -109,9 +106,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 
             if (mode == 0) {
                 if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
-                    local_164.x = *(f32*)((u8*)owner + 0x4ec);
-                    local_164.y = *(f32*)((u8*)owner + 0x4f0);
-                    local_164.z = *(f32*)((u8*)owner + 0x4f4);
+                    local_164 = *ConformBgNormalHitNormal(owner);
                 } else {
                     local_164.x = kPppConformBgNormalZero;
                     local_164.y = kPppConformBgNormalOne;
@@ -126,21 +121,21 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 firstRayDirection.z = kPppConformBgNormalZero;
 
                 cylinderY = matrixY + param2->m_arg3;
-                firstCylinder.m_top.z = 10000000000.0f;
-                firstCylinder.m_top.y = 10000000000.0f;
-                firstCylinder.m_top.x = 10000000000.0f;
-                firstCylinder.m_direction2.z = -10000000000.0f;
-                firstCylinder.m_direction2.y = -10000000000.0f;
-                firstCylinder.m_direction2.x = -10000000000.0f;
+                firstCylinder.m_boundsMin.z = 10000000000.0f;
+                firstCylinder.m_boundsMin.y = 10000000000.0f;
+                firstCylinder.m_boundsMin.x = 10000000000.0f;
+                firstCylinder.m_boundsMax.z = -10000000000.0f;
+                firstCylinder.m_boundsMax.y = -10000000000.0f;
+                firstCylinder.m_boundsMax.x = -10000000000.0f;
                 firstCylinder.m_bottom.x = matrixX;
                 firstCylinder.m_bottom.y = cylinderY;
                 firstCylinder.m_bottom.z = matrixZ;
-                firstCylinder.m_direction.x = kPppConformBgNormalZero;
-                firstCylinder.m_direction.y = -2000.0f;
-                firstCylinder.m_direction.z = kPppConformBgNormalZero;
+                firstCylinder.m_axis.x = kPppConformBgNormalZero;
+                firstCylinder.m_axis.y = -2000.0f;
+                firstCylinder.m_axis.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
-                checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
+                checkResult = MapMng.CheckHitCylinderNear(&firstCylinder, &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
                 if (checkResult != 0) {
                     MapMng.m_hitMapObj->CalcHitPosition(&local_170);
@@ -235,22 +230,21 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondRayDirection.y = -2000.0f;
                     secondRayDirection.z = kPppConformBgNormalZero;
 
-                    secondCylinder.m_top.z = 10000000000.0f;
-                    secondCylinder.m_top.y = 10000000000.0f;
-                    secondCylinder.m_top.x = 10000000000.0f;
-                    secondCylinder.m_direction2.z = -10000000000.0f;
-                    secondCylinder.m_direction2.y = -10000000000.0f;
-                    secondCylinder.m_direction2.x = -10000000000.0f;
+                    secondCylinder.m_boundsMin.z = 10000000000.0f;
+                    secondCylinder.m_boundsMin.y = 10000000000.0f;
+                    secondCylinder.m_boundsMin.x = 10000000000.0f;
+                    secondCylinder.m_boundsMax.z = -10000000000.0f;
+                    secondCylinder.m_boundsMax.y = -10000000000.0f;
+                    secondCylinder.m_boundsMax.x = -10000000000.0f;
                     secondCylinder.m_bottom.x = bottomX;
                     secondCylinder.m_bottom.y = bottomY;
                     secondCylinder.m_bottom.z = bottomZ;
-                    secondCylinder.m_direction.x = kPppConformBgNormalZero;
-                    secondCylinder.m_direction.y = -2000.0f;
-                    secondCylinder.m_direction.z = kPppConformBgNormalZero;
+                    secondCylinder.m_axis.x = kPppConformBgNormalZero;
+                    secondCylinder.m_axis.y = -2000.0f;
+                    secondCylinder.m_axis.z = kPppConformBgNormalZero;
                     secondCylinder.m_radius = kPppConformBgNormalZero;
 
-                    hitFound = MapMng.CheckHitCylinderNear(
-                        (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
+                    hitFound = MapMng.CheckHitCylinderNear(&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         MapMng.m_hitMapObj->CalcHitPosition(&local_170);
                         ppvMng->m_matrix.value[0][3] = local_170.x;

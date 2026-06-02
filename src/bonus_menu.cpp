@@ -1221,7 +1221,7 @@ void CMenuPcs::CalcSelectWait()
 
 			if ((repeat & 0xf) == 0) {
 				if ((down & 0x100) != 0) {
-					unsigned char bit = (unsigned char)(1 << (selection & 7));
+					unsigned char bit = (unsigned char)(1 << selection);
 					if ((unavailableMask & bit) == 0) {
 						*(unsigned char*)(statePtr + 8) = 1;
 						delay = 10;
@@ -1242,12 +1242,12 @@ void CMenuPcs::CalcSelectWait()
 		} else if (currentPartyIndex < activePartyCount) {
 			delay = (short)(delay - 1);
 			if (delay == 0 && *(signed char*)(statePtr + 8) > 0) {
-				unsigned char bit = (unsigned char)(1 << (selection & 7));
-				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection & 7];
+				unsigned char bit = (unsigned char)(1 << selection);
+				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection];
 				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);
 				*(unsigned char*)(statePtr + 8) = 0;
 				currentParty->m_selectedItemId = itemId;
-				currentParty->m_selectedSlot = selection & 7;
+				currentParty->m_selectedSlot = selection;
 				currentPartyIndex = (short)(currentPartyIndex + 1);
 			}
 		} else {

@@ -1348,24 +1348,10 @@ void CMapObj::Draw(unsigned char priority)
     lightPos.z = m_worldMtx[2][3];
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
     _GXColor mapColor;
     _GXColor lightColor;
 
-    *reinterpret_cast<unsigned int*>(materialMan + 72) = 0xACE0F;
-    *reinterpret_cast<unsigned int*>(materialMan + 68) = 0xFFFFFFFF;
-    *(materialMan + 76) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 296) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 284) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 300) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 288) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 304) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 292) = 0;
-    *(materialMan + 517) = 0xFF;
-    *(materialMan + 518) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 88) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 92) = 0;
-    *(materialMan + 520) = 0;
+    MaterialMan.SetDefaultDrawEnv(0xACE0F);
 
     if (m_enableFullScreenShadow != 0) {
         CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
@@ -1376,10 +1362,7 @@ void CMapObj::Draw(unsigned char priority)
                                    m_worldMtx);
     }
 
-    *reinterpret_cast<unsigned int*>(materialMan + 296) = *reinterpret_cast<unsigned int*>(materialMan + 284);
-    *reinterpret_cast<unsigned int*>(materialMan + 300) = *reinterpret_cast<unsigned int*>(materialMan + 288);
-    *reinterpret_cast<unsigned int*>(materialMan + 304) = *reinterpret_cast<unsigned int*>(materialMan + 292);
-    *reinterpret_cast<unsigned int*>(materialMan + 64) = *reinterpret_cast<unsigned int*>(materialMan + 72);
+    MaterialMan.SaveCurrentEnvAsStd();
 
     s_mapObjLightColor.a = m_lightAlpha;
     if (m_useAmbientColor != 0) {

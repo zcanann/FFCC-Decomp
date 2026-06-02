@@ -202,9 +202,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *para
                         alpha = (u8)((float)baseAlpha * fadeAmount);
                     }
                 }
-                color.rgba[0] = *((u8*)&param_2->m_stepValue + 0) + values->m_colorR;
-                color.rgba[1] = *((u8*)&param_2->m_stepValue + 1) + values->m_colorG;
-                color.rgba[2] = *((u8*)&param_2->m_stepValue + 2) + values->m_colorB;
+                color.rgba[0] = param_2->m_baseColor[0] + values->m_colorR;
+                color.rgba[1] = param_2->m_baseColor[1] + values->m_colorG;
+                color.rgba[2] = param_2->m_baseColor[2] + values->m_colorB;
                 color.rgba[3] = alpha;
 
                 pppSetDrawEnv(

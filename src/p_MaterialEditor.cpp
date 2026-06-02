@@ -668,7 +668,7 @@ void CMaterialEditorPcs::Quit()
 void CMaterialEditorPcs::Init()
 {
     unsigned char* self;
-    int remaining;
+    int textureIndex;
 
     self = reinterpret_cast<unsigned char*>(this);
     self[0x8] = 0x7f;
@@ -715,63 +715,20 @@ void CMaterialEditorPcs::Init()
     *reinterpret_cast<float*>(self + 0x5c) = one;
     *reinterpret_cast<float*>(self + 0x58) = one;
     *reinterpret_cast<float*>(self + 0x54) = one;
-    *reinterpret_cast<u32*>(self + 0xbc) = 0;
+    m_rsdIndex = 0;
 
-    remaining = 2;
-    while (remaining != 0) {
-        *reinterpret_cast<u32*>(self + 0x2bc) = 0;
-        *reinterpret_cast<u32*>(self + 0x2fc) = 0;
-        *reinterpret_cast<u32*>(self + 0x23c) = 0;
-        *reinterpret_cast<u32*>(self + 0x33c) = 0;
-        *reinterpret_cast<u32*>(self + 0x37c) = 0;
-        *reinterpret_cast<u32*>(self + 0x27c) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c0) = 0;
-        *reinterpret_cast<u32*>(self + 0x300) = 0;
-        *reinterpret_cast<u32*>(self + 0x240) = 0;
-        *reinterpret_cast<u32*>(self + 0x340) = 0;
-        *reinterpret_cast<u32*>(self + 0x380) = 0;
-        *reinterpret_cast<u32*>(self + 0x280) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c4) = 0;
-        *reinterpret_cast<u32*>(self + 0x304) = 0;
-        *reinterpret_cast<u32*>(self + 0x244) = 0;
-        *reinterpret_cast<u32*>(self + 0x344) = 0;
-        *reinterpret_cast<u32*>(self + 0x384) = 0;
-        *reinterpret_cast<u32*>(self + 0x284) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c8) = 0;
-        *reinterpret_cast<u32*>(self + 0x308) = 0;
-        *reinterpret_cast<u32*>(self + 0x248) = 0;
-        *reinterpret_cast<u32*>(self + 0x348) = 0;
-        *reinterpret_cast<u32*>(self + 0x388) = 0;
-        *reinterpret_cast<u32*>(self + 0x288) = 0;
-        *reinterpret_cast<u32*>(self + 0x2cc) = 0;
-        *reinterpret_cast<u32*>(self + 0x30c) = 0;
-        *reinterpret_cast<u32*>(self + 0x24c) = 0;
-        *reinterpret_cast<u32*>(self + 0x34c) = 0;
-        *reinterpret_cast<u32*>(self + 0x38c) = 0;
-        *reinterpret_cast<u32*>(self + 0x28c) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d0) = 0;
-        *reinterpret_cast<u32*>(self + 0x310) = 0;
-        *reinterpret_cast<u32*>(self + 0x250) = 0;
-        *reinterpret_cast<u32*>(self + 0x350) = 0;
-        *reinterpret_cast<u32*>(self + 0x390) = 0;
-        *reinterpret_cast<u32*>(self + 0x290) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d4) = 0;
-        *reinterpret_cast<u32*>(self + 0x314) = 0;
-        *reinterpret_cast<u32*>(self + 0x254) = 0;
-        *reinterpret_cast<u32*>(self + 0x354) = 0;
-        *reinterpret_cast<u32*>(self + 0x394) = 0;
-        *reinterpret_cast<u32*>(self + 0x294) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d8) = 0;
-        *reinterpret_cast<u32*>(self + 0x318) = 0;
-        *reinterpret_cast<u32*>(self + 0x258) = 0;
-        *reinterpret_cast<u32*>(self + 0x358) = 0;
-        *reinterpret_cast<u32*>(self + 0x398) = 0;
-        *reinterpret_cast<u32*>(self + 0x298) = 0;
-        self += 0x20;
-        remaining--;
+    textureIndex = 0;
+    while (textureIndex < 0x10) {
+        m_textureData[textureIndex] = 0;
+        m_tlutData[textureIndex] = 0;
+        m_texObj[textureIndex] = 0;
+        m_tlutObj0[textureIndex] = 0;
+        m_tlutObj1[textureIndex] = 0;
+        m_textureHeader[textureIndex] = 0;
+        textureIndex++;
     }
 
-    reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
+    m_loadedTextureCount = 0;
 }
 /*
  * --INFO--

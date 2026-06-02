@@ -10,8 +10,6 @@
 
 extern const float FLOAT_80330108;
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 static inline pppShapeAnimData* ShapeAnimData(long* animData)
 {
     return reinterpret_cast<pppShapeAnimData*>(animData);
@@ -240,10 +238,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     int shapePtr;
     int shapeCount;
 
-    *(int*)(MaterialManRaw() + 296) = *(int*)(MaterialManRaw() + 284);
-    *(int*)(MaterialManRaw() + 300) = *(int*)(MaterialManRaw() + 288);
-    *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
-    *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
+    MaterialMan.SaveCurrentEnvAsStd();
 
     MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)((int)shape + 10), 0);
 
@@ -279,10 +274,7 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     int shapePtr = (int)animData;
     shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
 
-    *(int*)(MaterialManRaw() + 296) = *(int*)(MaterialManRaw() + 284);
-    *(int*)(MaterialManRaw() + 300) = *(int*)(MaterialManRaw() + 288);
-    *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
-    *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
+    MaterialMan.SaveCurrentEnvAsStd();
 
     MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)(shapePtr + 10), 0);
 

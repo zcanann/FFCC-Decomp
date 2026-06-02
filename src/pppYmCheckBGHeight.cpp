@@ -11,12 +11,12 @@ extern "C" {
 
 static inline Vec* CheckBGHeightPreviousPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+    return &mng->UserPosition();
 }
 
 static inline Vec* CheckBGHeightBasePosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+    return &mng->BasePosition();
 }
 
 static inline Vec* CheckBGHeightTargetPosition(_pppMngSt* mng)

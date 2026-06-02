@@ -13,12 +13,12 @@ struct ParMoveLineParams {
 
 static inline Vec* MoveLineCurrentPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+    return &mng->UserPosition();
 }
 
 static inline Vec* MoveLinePreviousPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+    return &mng->BasePosition();
 }
 
 /*

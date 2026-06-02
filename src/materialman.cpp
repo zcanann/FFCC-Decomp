@@ -3,6 +3,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"
 #include "ffcc/map.h"
+#include "ffcc/mapobj.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
@@ -1017,10 +1018,10 @@ void CMaterialMan::addtev_full_shadow(long index)
 {
     int stageOffset = static_cast<int>(index) * 4;
 
-    GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x64)),
+    GXLoadTexMtxImm(m_fullScreenShadowMtx0,
                     *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
                     GX_MTX3x4);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC4)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
+    GXLoadTexObj(m_fullScreenShadowTexObj0, *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1A4)),
                       GX_TG_MTX3x4,
                       GX_TG_POS,
@@ -1028,10 +1029,10 @@ void CMaterialMan::addtev_full_shadow(long index)
                       GX_FALSE,
                       0x7D);
 
-    GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x94)),
+    GXLoadTexMtxImm(m_fullScreenShadowMtx1,
                     *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
                     GX_MTX3x4);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC8)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
+    GXLoadTexObj(m_fullScreenShadowTexObj1, *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1BC)),
                       GX_TG_MTX3x4,
                       GX_TG_POS,
@@ -1103,8 +1104,8 @@ void CMaterialMan::SetUnderWaterTex()
     int width = 0x280;
     int height = 0x1C0;
 
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = reinterpret_cast<int>(Graphic.GetBackBufferRect(x, y, width, height, 1));
-    if (*reinterpret_cast<int*>(Ptr(this, 0xC)) == 0) {
+    m_underWaterTexture = Graphic.GetBackBufferRect(x, y, width, height, 1);
+    if (m_underWaterTexture == 0) {
         return;
     }
 
@@ -1112,9 +1113,8 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx matrixB;
     Mtx44 screenMtx;
     PSMTXIdentity(matrixA);
-    unsigned char* cameraPcs = reinterpret_cast<unsigned char*>(&CameraPcs);
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x94), screenMtx);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(cameraPcs + 0x4), matrixB);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, matrixB);
 
     matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
     matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));
@@ -1126,7 +1126,7 @@ void CMaterialMan::SetUnderWaterTex()
     matrixA[1][2] = FLOAT_8032fb10;
     matrixA[2][2] = FLOAT_8032fb14;
 
-    PSMTXConcat(matrixA, matrixB, reinterpret_cast<MtxPtr>(Ptr(this, 0x10)));
+    PSMTXConcat(matrixA, matrixB, m_underWaterTexMtx);
 }
 
 /*
@@ -1653,7 +1653,7 @@ void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
     tmp1[1][3] = FLOAT_8032faf4;
     tmp1[2][3] = FLOAT_8032faf4;
     GXLoadNrmMtxImm(tmp1, GX_PNMTX0);
-    PSMTXCopy(tmp1, reinterpret_cast<MtxPtr>(Ptr(this, 0xE8)));
+    PSMTXCopy(tmp1, m_objTextureMtx);
 }
 
 /*
@@ -1725,14 +1725,12 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
     if (cameraEnable != 0) {
         m_curEnvTevBit |= 0x80;
 
-        unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x64)));
+        PSMTXConcat(shadow.m_shadowTexMtx, viewMtx, m_fullScreenShadowMtx0);
+        GXTexObj* texObj = &shadow.m_texObjs[flags];
+        m_fullScreenShadowTexObj0 = texObj;
 
-        int frameDataBase = reinterpret_cast<int>(shadowPtr) + flags * 0x20;
-        *reinterpret_cast<int*>(Ptr(this, 0xC4)) = frameDataBase + 8;
-
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x88), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x94)));
-        *reinterpret_cast<int*>(Ptr(this, 0xC8)) = frameDataBase + 0x28;
+        PSMTXConcat(shadow.m_depthMtx, viewMtx, m_fullScreenShadowMtx1);
+        m_fullScreenShadowTexObj1 = texObj + 1;
     }
 }
 
@@ -1749,7 +1747,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 {
     CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
+    CMaterial* material = (*materials)[shadow.m_materialIndex];
 
     unsigned long useShadowBit32 = materialFlag & material->m_tevBit & 0x8000;
     if (useShadowBit32 != 0) {
@@ -1766,14 +1764,14 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
         int materialNum = m_shadowMaterialCount;
 
         m_curEnvTevBit |= 0x10;
-        m_shadowMaterialType[materialNum] = *Ptr(&shadow, 8);
+        m_shadowMaterialType[materialNum] = shadow.m_shadowMaterialType;
         m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
         m_shadowTexMapIds[materialNum] = m_texMapIdCur;
         m_shadowTexMtxIds[materialNum] = m_texMtxCur;
         m_shadowTexCoordIds[materialNum] = m_texCoordIdCur;
 
         Mtx texMtx;
-        PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&shadow, 0x78)), viewMtx, texMtx);
+        PSMTXConcat(shadow.m_shadowMtx, viewMtx, texMtx);
         GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
         int texMtxCur = m_texMtxCur;
@@ -1818,14 +1816,13 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
-        unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
 
-        if (*(shadowBytes + 0xF0) == 0) {
+        if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
 
         unsigned int bitMask = 1u << (i & 0x1F);
-        if ((*(shadowBytes + 7) == 1) || ((shadowBit32[i >> 5] & bitMask) != 0)) {
+        if ((shadow->m_materialMode == 1) || ((shadowBit32[i >> 5] & bitMask) != 0)) {
             SetShadow(*shadow, viewMtx, static_cast<int>(i), 0xFFFFFFFF);
         }
     }
@@ -1863,34 +1860,32 @@ void CMaterialMan::SetPosition(
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[i];
-            unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
 
-            if (*(shadowBytes + 0xF0) == 0) {
+            if (shadow->m_targetEnabled[0] == 0) {
                 continue;
             }
 
-            int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
             Vec shadowPos;
-            shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
-            shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
-            shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+            shadowPos.x = shadow->m_modelA->m_worldMtx[0][3];
+            shadowPos.y = shadow->m_modelA->m_worldMtx[1][3];
+            shadowPos.z = shadow->m_modelA->m_worldMtx[2][3];
 
             Mtx scaledShadowMtx;
             PSMTXScaleApply(
-                reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+                shadow->m_shadowMtx,
                 scaledShadowMtx,
                 FLOAT_8032faf8,
                 FLOAT_8032faf8,
                 FLOAT_8032faf0);
 
-            if (*(shadowBytes + 7) == 1) {
+            if (shadow->m_materialMode == 1) {
                 SetShadow(*shadow, viewMtx, i, 0);
                 continue;
             }
 
             bool yFilterPass =
-                ((*(shadowBytes + 9) != 1) || (shadowPos.y <= position->y)) &&
-                ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
+                ((shadow->m_yFilterMode != 1) || (shadowPos.y <= position->y)) &&
+                ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
                  (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
@@ -1920,30 +1915,27 @@ void CMaterialMan::SetPosition(
             SetShadow(*reinterpret_cast<CMapShadow*>(nearest[0]), viewMtx, nearest[2], 0xFFFFFFFF);
         }
     } else {
-        int targetOffset = static_cast<int>(target);
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[i];
-            unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
 
-            if (*(shadowBytes + targetOffset + 0xF0) == 0) {
+            if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
             }
 
-            int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
             Vec shadowPos;
-            shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
-            shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
-            shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+            shadowPos.x = shadow->m_modelA->m_worldMtx[0][3];
+            shadowPos.y = shadow->m_modelA->m_worldMtx[1][3];
+            shadowPos.z = shadow->m_modelA->m_worldMtx[2][3];
 
             Mtx scaledShadowMtx;
             PSMTXScaleApply(
-                reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+                shadow->m_shadowMtx,
                 scaledShadowMtx,
                 FLOAT_8032faf8,
                 FLOAT_8032faf8,
                 FLOAT_8032faf0);
 
-            if ((*(shadowBytes + 7) == 1) ||
+            if ((shadow->m_materialMode == 1) ||
                 (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
                 SetShadow(*shadow, viewMtx, i, 0);
             }
@@ -1987,38 +1979,35 @@ int CMaterialMan::GetCharaShadow(
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
-        unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
-        if (*(shadowBytes + 0xF0) == 0) {
+        if (shadow->m_targetEnabled[0] == 0) {
             continue;
         }
 
-        int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
         Vec shadowPos;
-        shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
-        shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
-        shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+        shadowPos.x = shadow->m_modelA->m_worldMtx[0][3];
+        shadowPos.y = shadow->m_modelA->m_worldMtx[1][3];
+        shadowPos.z = shadow->m_modelA->m_worldMtx[2][3];
 
         Mtx scaledShadowMtx;
         PSMTXScaleApply(
-            reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+            shadow->m_shadowMtx,
             scaledShadowMtx,
             FLOAT_8032faf8,
             FLOAT_8032faf8,
             FLOAT_8032faf0);
 
-        if (*(shadowBytes + 7) == 1) {
+        if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
-                unsigned short materialIndex = *reinterpret_cast<unsigned short*>(shadowBytes + 4);
-                materialsOut[outputCount] = (*materials)[materialIndex];
-                shadowMtxOut[outputCount] = reinterpret_cast<float(*)[4]>(shadowBytes + 0x78);
+                materialsOut[outputCount] = (*materials)[shadow->m_materialIndex];
+                shadowMtxOut[outputCount] = shadow->m_shadowMtx;
                 outputCount++;
             }
             continue;
         }
 
         bool yFilterPass =
-            ((*(shadowBytes + 9) != 1) || (shadowPos.y <= position->y)) &&
-            ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
+            ((shadow->m_yFilterMode != 1) || (shadowPos.y <= position->y)) &&
+            ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
              (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
@@ -2045,10 +2034,9 @@ int CMaterialMan::GetCharaShadow(
 
     if ((nearest != 0) && (outputCount < maxShadows)) {
         nearest[1] = static_cast<int>(FLOAT_8032fb04);
-        unsigned char* nearestShadowBytes = reinterpret_cast<unsigned char*>(nearest[0]);
-        unsigned short materialIndex = *reinterpret_cast<unsigned short*>(nearestShadowBytes + 4);
-        materialsOut[outputCount] = (*materials)[materialIndex];
-        shadowMtxOut[outputCount] = reinterpret_cast<float(*)[4]>(nearestShadowBytes + 0x78);
+        CMapShadow* nearestShadow = reinterpret_cast<CMapShadow*>(nearest[0]);
+        materialsOut[outputCount] = (*materials)[nearestShadow->m_materialIndex];
+        shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;
         outputCount++;
     }
 
@@ -2071,21 +2059,20 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
 
-        if (*reinterpret_cast<unsigned char*>(Ptr(shadow, static_cast<int>(target) + 0xF0)) == 0) {
+        if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
             continue;
         }
 
-        int model = *reinterpret_cast<int*>(Ptr(shadow, 0xC));
         Vec position;
         Mtx scaledShadowMtx;
 
-        position.x = *reinterpret_cast<float*>(model + 0xC4);
-        position.y = *reinterpret_cast<float*>(model + 0xD4);
-        position.z = *reinterpret_cast<float*>(model + 0xE4);
-        PSMTXScaleApply(reinterpret_cast<float(*)[4]>(Ptr(shadow, 0x78)), scaledShadowMtx, FLOAT_8032faf8,
+        position.x = shadow->m_modelA->m_worldMtx[0][3];
+        position.y = shadow->m_modelA->m_worldMtx[1][3];
+        position.z = shadow->m_modelA->m_worldMtx[2][3];
+        PSMTXScaleApply(shadow->m_shadowMtx, scaledShadowMtx, FLOAT_8032faf8,
                         FLOAT_8032faf8, FLOAT_8032faf0);
 
-        if ((*reinterpret_cast<unsigned char*>(Ptr(shadow, 7)) == 1) ||
+        if ((shadow->m_materialMode == 1) ||
             (bound->CheckFrustum(position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
             SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }

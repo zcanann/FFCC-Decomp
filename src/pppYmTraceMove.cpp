@@ -24,7 +24,7 @@ static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, 
 
 static inline Vec* GetYmTraceMovePreviousPosition(_pppMngSt* pppMngSt)
 {
-	return reinterpret_cast<Vec*>(&pppMngSt->m_userFloat0);
+	return &pppMngSt->UserPosition();
 }
 
 static inline f32 GetYmTraceMoveScale(_pppMngSt* pppMngSt)
@@ -34,7 +34,7 @@ static inline f32 GetYmTraceMoveScale(_pppMngSt* pppMngSt)
 
 static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)
 {
-	return reinterpret_cast<Vec*>(&pppMngSt->m_savedPosition.z);
+	return &pppMngSt->BasePosition();
 }
 
 /*

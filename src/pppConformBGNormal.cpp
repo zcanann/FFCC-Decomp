@@ -42,7 +42,7 @@ struct ConformBgNormalCylinder {
 
 static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
 {
-    return reinterpret_cast<Vec*>(&owner->m_hitNormal.y);
+    return &owner->HitFaceNormal();
 }
 
 /*
@@ -115,7 +115,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             } else if (mode == 1) {
                 hitFound = 1;
-                Game.GetTargetCursor(*(s32*)((u8*)ppvMng + 0x130), local_170, local_164);
+                Game.GetTargetCursor(ppvMng->m_hitParams.m_particleIndex, local_170, local_164);
             } else if (mode == 2) {
                 firstRayDirection.x = kPppConformBgNormalZero;
                 firstRayDirection.y = -2000.0f;

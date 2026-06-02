@@ -82,7 +82,6 @@ static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_x1_4,
     s_scenegraph_step_x1_2,
 };
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 /*
  * --INFO--
@@ -463,11 +462,7 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
  */
 void CGraphicPcs::stdDrawEnvInit()
 {
-	unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-	*(u32*)(materialMan + 0x128) = *(u32*)(materialMan + 0x11C);
-	*(u32*)(materialMan + 0x12C) = *(u32*)(materialMan + 0x120);
-	*(u32*)(materialMan + 0x130) = *(u32*)(materialMan + 0x124);
-	*(u32*)(materialMan + 0x40) = *(u32*)(materialMan + 0x48);
+	MaterialMan.SaveCurrentEnvAsStd();
 }
 
 /*
@@ -481,20 +476,7 @@ void CGraphicPcs::stdDrawEnvInit()
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-    *(u32*)(MaterialManRaw() + 0x48) = 0x000ACE0F;
-    *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
-    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-    *(u32*)(MaterialManRaw() + 0x128) = 0;
-    *(u32*)(MaterialManRaw() + 0x11C) = 0;
-    *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
-    *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
-    *(u32*)(MaterialManRaw() + 0x130) = 0;
-    *(u32*)(MaterialManRaw() + 0x124) = 0;
-    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-    *(u32*)(MaterialManRaw() + 0x58) = 0;
-    *(u32*)(MaterialManRaw() + 0x5C) = 0;
-    *(u8*)(MaterialManRaw() + 0x208) = 0;
+    MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
 }
 
 /*

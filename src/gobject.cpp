@@ -1051,7 +1051,7 @@ void CGObject::bgNormalCollision()
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
-        MapMng.m_hitMapObj->GetHitFaceNormal(reinterpret_cast<Vec*>(&m_hitNormal.y));
+        MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
 
     if (CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &move) != 0) {
@@ -1172,7 +1172,7 @@ void CGObject::bgWorldCollision()
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
-        MapMng.m_hitMapObj->GetHitFaceNormal(reinterpret_cast<Vec*>(&m_hitNormal.y));
+        MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
 }
 

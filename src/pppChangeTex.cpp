@@ -66,11 +66,6 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
-static inline unsigned char* MaterialManRaw()
-{
-	return reinterpret_cast<unsigned char*>(&MaterialMan);
-}
-
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
@@ -412,7 +407,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 			if (meshColorArray != 0) {
 				MaterialMan.SetChangeTexReflectionArray(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
-				*(int*)(MaterialManRaw() + 0xD0) = (int)texture + 0x28;
+				MaterialMan.SetChangeTexReflectionTexture(reinterpret_cast<GXTexObj*>((int)texture + 0x28));
 				drawTevBits = 0xACE0F;
 				fullTevBits = drawTevBits | 0x1000;
 				displayListIdx = meshData->m_displayListCount - 1;
@@ -450,33 +445,9 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
 
 	if (step->m_changeTex.m_mode == 0) {
-		int zero = 0;
 		int drawTevBits = 0xACE0F;
 		int fullTevBits = drawTevBits | 0x1000;
-		int allOnes = -1;
-		int tevScale = 0x1E;
-		u8 fullByte = 0xFF;
-
-		*(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x44) = allOnes;
-		*(u8*)(MaterialManRaw() + 0x4c) = fullByte;
-		*(int*)(MaterialManRaw() + 0x11c) = zero;
-		*(int*)(MaterialManRaw() + 0x120) = tevScale;
-		*(int*)(MaterialManRaw() + 0x124) = zero;
-		*(u8*)(MaterialManRaw() + 0x205) = fullByte;
-		*(u8*)(MaterialManRaw() + 0x206) = fullByte;
-		*(int*)(MaterialManRaw() + 0x58) = zero;
-		*(int*)(MaterialManRaw() + 0x5c) = zero;
-		*(char*)(MaterialManRaw() + 0x208) = zero;
-		*(int*)(MaterialManRaw() + 0x48) = fullTevBits;
-		*(int*)(MaterialManRaw() + 0xD0) = textureInfo + 0x28;
-		*(int*)(MaterialManRaw() + 0x128) = zero;
-		*(int*)(MaterialManRaw() + 0x12c) = tevScale;
-		*(int*)(MaterialManRaw() + 0x130) = zero;
-		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
+		MaterialMan.SetChangeTexReflectionState(reinterpret_cast<GXTexObj*>(textureInfo + 0x28), drawTevBits, fullTevBits);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

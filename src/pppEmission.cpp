@@ -26,7 +26,6 @@ extern const double DOUBLE_80331128 = 4503599627370496.0;
 extern const float FLOAT_80331130 = 10000000.0f;
 extern "C" const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
 typedef CChara::CMesh::CDisplayList EmissionDisplayList;
@@ -325,7 +324,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        *(int*)(MaterialManRaw() + 0xD0) = texture + 0x28;
+        MaterialMan.SetChangeTexReflectionTexture(reinterpret_cast<GXTexObj*>(texture + 0x28));
 
         Mtx viewMtx0;
         Mtx objMtx0;
@@ -347,31 +346,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 displayList = meshData->m_displayLists;
                 int remaining = meshData->m_displayListCount - 1;
                 while (remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(u32*)(MaterialManRaw() + 0x48) |= 0x40000;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
+                    MaterialMan.SetEmissionTextureEnv(drawTevBits);
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx0);
+                        PSMTXCopy(MaterialMan.GetObjTextureMtx(), texMtx0);
                         GXLoadTexMtxImm(texMtx0, 0x1E, GX_MTX3x4);
                         if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
@@ -400,31 +381,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = meshData->m_displayListCount - 1;
                 EmissionDisplayList* displayList = meshData->m_displayLists;
                 while (remaining >= 0) {
-                    *(int*)(MaterialManRaw() + 0x44) = -1;
-                    *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x48) = drawTevBits;
-                    *(int*)(MaterialManRaw() + 0x11C) = 0;
-                    *(int*)(MaterialManRaw() + 0x120) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x124) = 0;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                    *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                    *(int*)(MaterialManRaw() + 0x58) = 0;
-                    *(int*)(MaterialManRaw() + 0x5C) = 0;
-                    *(u8*)(MaterialManRaw() + 0x208) = 0;
-                    *(u32*)(MaterialManRaw() + 0x48) |= 0x40000;
-                    *(int*)(MaterialManRaw() + 0x128) = 0;
-                    *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
-                    *(int*)(MaterialManRaw() + 0x130) = 0;
-                    *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
+                    MaterialMan.SetEmissionTextureEnv(drawTevBits);
                     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_emission.m_texGenMode == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
                     } else {
-                        PSMTXCopy((float(*)[4])(MaterialManRaw() + 0xE8), texMtx1);
+                        PSMTXCopy(MaterialMan.GetObjTextureMtx(), texMtx1);
                         GXLoadTexMtxImm(texMtx1, 0x1E, GX_MTX3x4);
                         if (step->m_emission.m_texGenMode == 1) {
                             GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);

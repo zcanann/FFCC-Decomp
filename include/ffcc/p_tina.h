@@ -18,25 +18,25 @@ unsigned char pppAmemRefCntError(unsigned long);
 class CPartPcs : public CProcess
 {
 public:
-    static unsigned int m_table_desc0[3];
-    static unsigned int m_table_desc1[3];
-    static unsigned int m_table_desc2[3];
-    static unsigned int m_table_desc3[3];
-    static unsigned int m_table_desc4[3];
-    static unsigned int m_table_desc5[3];
-    static unsigned int m_table_desc6[3];
-    static unsigned int m_table_desc7[3];
-    static unsigned int m_table_desc8[3];
-    static unsigned int m_table_desc9[3];
-    static unsigned int m_table_desc10[3];
-    static unsigned int m_table_desc11[3];
-    static unsigned int m_table_desc12[3];
-    static unsigned int m_table_desc13[3];
-    static unsigned int m_table_desc14[3];
-    static unsigned int m_table_desc15[3];
-    static unsigned int m_table_desc16[3];
-    static unsigned int m_table_desc17[3];
-    static unsigned int m_table_desc18[3];
+    static CProcessTableCallback m_table_desc0;
+    static CProcessTableCallback m_table_desc1;
+    static CProcessTableCallback m_table_desc2;
+    static CProcessTableCallback m_table_desc3;
+    static CProcessTableCallback m_table_desc4;
+    static CProcessTableCallback m_table_desc5;
+    static CProcessTableCallback m_table_desc6;
+    static CProcessTableCallback m_table_desc7;
+    static CProcessTableCallback m_table_desc8;
+    static CProcessTableCallback m_table_desc9;
+    static CProcessTableCallback m_table_desc10;
+    static CProcessTableCallback m_table_desc11;
+    static CProcessTableCallback m_table_desc12;
+    static CProcessTableCallback m_table_desc13;
+    static CProcessTableCallback m_table_desc14;
+    static CProcessTableCallback m_table_desc15;
+    static CProcessTableCallback m_table_desc16;
+    static CProcessTableCallback m_table_desc17;
+    static CProcessTableCallback m_table_desc18;
     static CProcessTable m_table[2];
 
     CUSBStreamData m_usbStreamData; // 0x04

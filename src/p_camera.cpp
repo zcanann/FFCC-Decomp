@@ -84,138 +84,138 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-unsigned int CCameraPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createChara__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyChara__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcChara__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMap__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMap__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMap__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc10[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMaterialEditor__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc11[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMaterialEditor__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc12[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMaterialEditor__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc13[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFunnyShape__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc14[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFunnyShape__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc15[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcFunnyShape__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc16[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createPart__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyPart__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcPart__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc19[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFullShadow__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc20[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFullShadow__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc21[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowBegin__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc22[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc23[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
-unsigned int CCameraPcs::m_table_desc24[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createChara__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyChara__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcChara__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMap__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMap__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMap__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMaterialEditor__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMaterialEditor__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMaterialEditor__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFunnyShape__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFunnyShape__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcFunnyShape__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createPart__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyPart__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcPart__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc19 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFullShadow__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc20 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFullShadow__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowBegin__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
+CProcessTableCallback CCameraPcs::m_table_desc24 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
 CProcessTable CCameraPcs::m_table[7] = {
     {
         const_cast<char*>(s_CCameraPcs_GAME_801D7860),
-        m_table_desc0[0],
-        m_table_desc0[1],
-        m_table_desc0[2],
-        m_table_desc1[0],
-        m_table_desc1[1],
-        m_table_desc1[2],
-        m_table_desc2[0],
-        m_table_desc2[1],
-        m_table_desc2[2],
+        m_table_desc0.m_thisOffset,
+        m_table_desc0.m_virtualOffset,
+        m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset,
+        m_table_desc1.m_virtualOffset,
+        m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset,
+        m_table_desc2.m_virtualOffset,
+        m_table_desc2.m_function,
         0x18,
         0x4,
-        m_table_desc3[0],
-        m_table_desc3[1],
-        m_table_desc3[2],
-        m_table_desc4[0],
-        m_table_desc4[1],
-        m_table_desc4[2],
+        m_table_desc3.m_thisOffset,
+        m_table_desc3.m_virtualOffset,
+        m_table_desc3.m_function,
+        m_table_desc4.m_thisOffset,
+        m_table_desc4.m_virtualOffset,
+        m_table_desc4.m_function,
     },
     {
         const_cast<char*>(s_CCameraPcs_CHARA_801D7874),
-        m_table_desc5[0],
-        m_table_desc5[1],
-        m_table_desc5[2],
-        m_table_desc6[0],
-        m_table_desc6[1],
-        m_table_desc6[2],
-        m_table_desc7[0],
-        m_table_desc7[1],
-        m_table_desc7[2],
+        m_table_desc5.m_thisOffset,
+        m_table_desc5.m_virtualOffset,
+        m_table_desc5.m_function,
+        m_table_desc6.m_thisOffset,
+        m_table_desc6.m_virtualOffset,
+        m_table_desc6.m_function,
+        m_table_desc7.m_thisOffset,
+        m_table_desc7.m_virtualOffset,
+        m_table_desc7.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(s_CCameraPcs_MAP_801D7888),
-        m_table_desc8[0],
-        m_table_desc8[1],
-        m_table_desc8[2],
-        m_table_desc9[0],
-        m_table_desc9[1],
-        m_table_desc9[2],
-        m_table_desc10[0],
-        m_table_desc10[1],
-        m_table_desc10[2],
+        m_table_desc8.m_thisOffset,
+        m_table_desc8.m_virtualOffset,
+        m_table_desc8.m_function,
+        m_table_desc9.m_thisOffset,
+        m_table_desc9.m_virtualOffset,
+        m_table_desc9.m_function,
+        m_table_desc10.m_thisOffset,
+        m_table_desc10.m_virtualOffset,
+        m_table_desc10.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(s_CCameraPcs_MATERIALEDITOR_801D7898),
-        m_table_desc11[0],
-        m_table_desc11[1],
-        m_table_desc11[2],
-        m_table_desc12[0],
-        m_table_desc12[1],
-        m_table_desc12[2],
-        m_table_desc13[0],
-        m_table_desc13[1],
-        m_table_desc13[2],
+        m_table_desc11.m_thisOffset,
+        m_table_desc11.m_virtualOffset,
+        m_table_desc11.m_function,
+        m_table_desc12.m_thisOffset,
+        m_table_desc12.m_virtualOffset,
+        m_table_desc12.m_function,
+        m_table_desc13.m_thisOffset,
+        m_table_desc13.m_virtualOffset,
+        m_table_desc13.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(s_CCameraPcs_FUNNYSHAPE_801D78B4),
-        m_table_desc14[0],
-        m_table_desc14[1],
-        m_table_desc14[2],
-        m_table_desc15[0],
-        m_table_desc15[1],
-        m_table_desc15[2],
-        m_table_desc16[0],
-        m_table_desc16[1],
-        m_table_desc16[2],
+        m_table_desc14.m_thisOffset,
+        m_table_desc14.m_virtualOffset,
+        m_table_desc14.m_function,
+        m_table_desc15.m_thisOffset,
+        m_table_desc15.m_virtualOffset,
+        m_table_desc15.m_function,
+        m_table_desc16.m_thisOffset,
+        m_table_desc16.m_virtualOffset,
+        m_table_desc16.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(s_CCameraPcs_PART_801D78CC),
-        m_table_desc17[0],
-        m_table_desc17[1],
-        m_table_desc17[2],
-        m_table_desc18[0],
-        m_table_desc18[1],
-        m_table_desc18[2],
-        m_table_desc19[0],
-        m_table_desc19[1],
-        m_table_desc19[2],
+        m_table_desc17.m_thisOffset,
+        m_table_desc17.m_virtualOffset,
+        m_table_desc17.m_function,
+        m_table_desc18.m_thisOffset,
+        m_table_desc18.m_virtualOffset,
+        m_table_desc18.m_function,
+        m_table_desc19.m_thisOffset,
+        m_table_desc19.m_virtualOffset,
+        m_table_desc19.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(s_CCameraPcs_SHADOW_801D78E0),
-        m_table_desc20[0],
-        m_table_desc20[1],
-        m_table_desc20[2],
-        m_table_desc21[0],
-        m_table_desc21[1],
-        m_table_desc21[2],
-        m_table_desc22[0],
-        m_table_desc22[1],
-        m_table_desc22[2],
+        m_table_desc20.m_thisOffset,
+        m_table_desc20.m_virtualOffset,
+        m_table_desc20.m_function,
+        m_table_desc21.m_thisOffset,
+        m_table_desc21.m_virtualOffset,
+        m_table_desc21.m_function,
+        m_table_desc22.m_thisOffset,
+        m_table_desc22.m_virtualOffset,
+        m_table_desc22.m_function,
         0x2E,
         0x1,
-        m_table_desc23[0],
-        m_table_desc23[1],
-        m_table_desc23[2],
+        m_table_desc23.m_thisOffset,
+        m_table_desc23.m_virtualOffset,
+        m_table_desc23.m_function,
         0x32,
         0x1,
         0,
@@ -223,9 +223,9 @@ CProcessTable CCameraPcs::m_table[7] = {
         0,
         0x39,
         0x1,
-        m_table_desc24[0],
-        m_table_desc24[1],
-        m_table_desc24[2],
+        m_table_desc24.m_thisOffset,
+        m_table_desc24.m_virtualOffset,
+        m_table_desc24.m_function,
         0x43,
         0x1,
     }

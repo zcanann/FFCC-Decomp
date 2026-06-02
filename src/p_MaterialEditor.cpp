@@ -133,34 +133,6 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  * JP Address: TODO
  * JP Size: TODO
  */
-struct MaterialEditorPolygon {
-    u16 flags;
-    u16 blendMode;
-    u32 _04;
-    u16 index0;
-    u16 index1;
-    u16 index2;
-    u16 index3;
-    u16 _10;
-    u16 _12;
-    u16 _14;
-    u16 _16;
-    u8 _18;
-    char textureMarker;
-    u8 _1a[4];
-    s16 textureIndex;
-    s16 u0;
-    s16 v0;
-    s16 u1;
-    s16 v1;
-    s16 u2;
-    s16 v2;
-    s16 u3;
-    s16 v3;
-    u8 _30[0x20];
-    float texCoord[4][2];
-};
-
 void CMaterialEditorPcs::drawViewer()
 {
     static int color;

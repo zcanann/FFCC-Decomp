@@ -16,9 +16,11 @@ inline CUSBPcs::CUSBPcs()
     static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
     static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
 
-    m_table.m_fields.m_create = desc0;
-    m_table.m_fields.m_destroy = desc1;
-    m_table.m_fields.m_entries[0].m_callback = desc2;
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = desc0;
+    table->m_fields.m_destroy = desc1;
+    table->m_fields.m_entries[0].m_callback = desc2;
 }
 
 CProcessTable CUSBPcs::m_table = {

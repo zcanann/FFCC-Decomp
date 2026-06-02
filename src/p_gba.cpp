@@ -27,10 +27,12 @@ inline CGbaPcs::CGbaPcs()
 	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
 	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
 
-	m_table.m_fields.m_create = desc0;
-	m_table.m_fields.m_destroy = desc1;
-	m_table.m_fields.m_entries[0].m_callback = desc2;
-	m_table.m_fields.m_entries[1].m_callback = desc3;
+	CProcessTable* table = &m_table;
+
+	table->m_fields.m_create = desc0;
+	table->m_fields.m_destroy = desc1;
+	table->m_fields.m_entries[0].m_callback = desc2;
+	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
 CProcessTable CGbaPcs::m_table = {

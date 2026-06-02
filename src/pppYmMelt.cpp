@@ -12,6 +12,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
 extern const float kPppYmMeltZero;
+extern int ppvUserStopPartF;
 u32 g_ymMelt;
 }
 extern const float FLOAT_80330af4;
@@ -297,7 +298,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     float z;
     Mtx rotMtx;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

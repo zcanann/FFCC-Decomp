@@ -253,10 +253,7 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
 
 static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 {
-    *Ptr(material, 0x48) = static_cast<unsigned char>((rgba >> 24) & 0xFF);
-    *Ptr(material, 0x49) = static_cast<unsigned char>((rgba >> 16) & 0xFF);
-    *Ptr(material, 0x4A) = static_cast<unsigned char>((rgba >> 8) & 0xFF);
-    *Ptr(material, 0x4B) = static_cast<unsigned char>(rgba & 0xFF);
+    material->SetMaterialColor(rgba);
 }
 }
 
@@ -2588,7 +2585,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
 
                     material->m_bumpLight = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    bumpLight->m_useViewSpace = material->m_materialType;
                     material->m_tevBit |= 4;
                 }
             } break;
@@ -2617,7 +2614,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
                     material->m_bumpLight = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    bumpLight->m_useViewSpace = material->m_materialType;
                     material->m_tevBit |= 0x4000;
                     SetMaterialColor(material, rgba);
                     material->m_bumpLightDirect = 1;
@@ -2645,7 +2642,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
                     material->m_bumpLight = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    bumpLight->m_useViewSpace = material->m_materialType;
                     material->m_blendMode = 4;
                     SetMaterialColor(material, rgba);
 

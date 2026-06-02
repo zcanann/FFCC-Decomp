@@ -91,9 +91,36 @@ public:
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
     CMemory::CStage* GetMemoryStage();
+    void ClearManaParaboloidTexObjs()
+    {
+        m_manaParaboloidTexObj0 = 0;
+        m_manaParaboloidTexObj1 = 0;
+    }
+    void SetManaReflectionEnv(Vec* reflectionVec, _GXTexObj* paraboloidTexObj, unsigned int tevBit)
+    {
+        m_manaReflectionVec = reflectionVec;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_texMapIdCur = 0;
+        m_texMtxCur = 0x1E;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+        m_curEnvTevBit = tevBit;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_stdEnvTevBit = tevBit;
+        m_manaParaboloidTexObj0 = paraboloidTexObj;
+    }
 
 private:
-    unsigned char m_pad004[0x3C];
+    unsigned char m_pad004[0x04];
+    Vec* m_manaReflectionVec;           // 0x08
+    unsigned char m_pad00C[0x34];
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
@@ -102,7 +129,13 @@ private:
     int m_shadowMaterialCount;           // 0x58
     int m_shadowTextureCount;            // 0x5C
     unsigned int m_numTevStage;          // 0x60
-    unsigned char m_pad064[0xB8];
+    unsigned char m_pad064[0x6C];
+    _GXTexObj* m_manaParaboloidTexObj0;  // 0xD0
+    unsigned char m_pad0D4[0x08];
+    _GXTexObj* m_manaParaboloidTexObj1;  // 0xDC
+    unsigned char m_pad0E0[0x04];
+    unsigned char m_manaAlpha;           // 0xE4
+    unsigned char m_pad0E5[0x37];
     int m_texMapIdCur;                   // 0x11C
     int m_texMtxCur;                     // 0x120
     int m_texCoordIdCur;                 // 0x124

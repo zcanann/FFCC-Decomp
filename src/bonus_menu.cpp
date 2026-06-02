@@ -1191,10 +1191,14 @@ void CMenuPcs::CalcSelectWait()
 	unsigned short down;
 	if (Pad._452_4_ != 0 || (padSlot == 0 && Pad._448_4_ != -1)) {
 		repeat = 0;
-		down = 0;
 	} else {
 		int resolvedPadSlot = (Pad._448_4_ == padSlot) ? 0 : padSlot;
 		repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
+	}
+	if (Pad._452_4_ != 0 || (padSlot == 0 && Pad._448_4_ != -1)) {
+		down = 0;
+	} else {
+		int resolvedPadSlot = (Pad._448_4_ == padSlot) ? 0 : padSlot;
 		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 	}
 	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);

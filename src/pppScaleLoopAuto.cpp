@@ -102,7 +102,7 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoo
 
     {
         s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 180.0f);
-        f32 sinVal = *(f32*)((u8*)gPppTrigTable + (tableAngle & 0xFFFC));
+        f32 sinVal = *(f32*)((u8*)ppvSinTbl + (tableAngle & 0xFFFC));
         f32 delta = (arg2->m_amplitude * sinVal) * arg2->m_scale;
 
         work->m_delta = delta;

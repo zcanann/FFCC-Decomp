@@ -26,7 +26,7 @@ extern const float kFunnyShapeTextureViewportOrigin = 20.0f;
 extern const float kFunnyShapeAnimOffsetX = 320.0f;
 extern const float kFunnyShapeAnimOffsetY;
 extern const float kFunnyShapePi;
-extern const float kFunnyShapeHalfTurnDegrees;
+extern const float kFunnyShapeHalfTurnDegrees[2];
 extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 
@@ -628,7 +628,7 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
-                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
+                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees[0];
 
                 r = rand();
                 if ((r % 2) != 0) {
@@ -696,7 +696,7 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         work->angle = static_cast<float>(r % 0x168);
-        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
+        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees[0];
 
         r = rand();
         if ((r % 2) != 0) {

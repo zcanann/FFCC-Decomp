@@ -94,44 +94,19 @@ static const char s_map_ptrarray_grow_error[] =
 static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";
 
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
+static inline float MapObjWorldX(CMapObj* mapObj)
 {
-    return reinterpret_cast<unsigned char*>(p) + offset;
+    return mapObj->m_worldMtx[0][3];
 }
 
-struct MapObjAttachAttr
+static inline float MapObjWorldY(CMapObj* mapObj)
 {
-    void* vtable;
-    int type;
-    char name[1];
-};
-
-struct MapObjAttachObj
-{
-    char pad_00[0x0C];
-    CMapHit* mapHit;
-    char pad_10[0xDC];
-    MapObjAttachAttr* attr;
-};
-
-static inline CMapObj* MapObjFromBytes(unsigned char* mapObj)
-{
-    return reinterpret_cast<CMapObj*>(mapObj);
+    return mapObj->m_worldMtx[1][3];
 }
 
-static inline float MapObjWorldX(unsigned char* mapObj)
+static inline float MapObjWorldZ(CMapObj* mapObj)
 {
-    return MapObjFromBytes(mapObj)->m_worldMtx[0][3];
-}
-
-static inline float MapObjWorldY(unsigned char* mapObj)
-{
-    return MapObjFromBytes(mapObj)->m_worldMtx[1][3];
-}
-
-static inline float MapObjWorldZ(unsigned char* mapObj)
-{
-    return MapObjFromBytes(mapObj)->m_worldMtx[2][3];
+    return mapObj->m_worldMtx[2][3];
 }
 }
 
@@ -1495,32 +1470,34 @@ void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray());
+    CMapObj* mapObj = GetMapObjArray();
 
     goto search;
     while (true) {
-        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
-            mapObj->mapHit = mapHit;
+        CMapObjAtrMeshName* meshName = static_cast<CMapObjAtrMeshName*>(mapObj->m_attribute);
+        if (strcmp(mapHitName, meshName->m_name) == 0) {
+            mapObj->m_mapData = mapHit;
 
-            MapObjAttachAttr* mapObjAtr = mapObj->attr;
+            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
             if (mapObjAtr != 0) {
-                delete reinterpret_cast<CMapObjAtr*>(mapObjAtr);
-                mapObj->attr = 0;
+                delete mapObjAtr;
+                mapObj->m_attribute = 0;
             }
         }
 
         mapObj++;
 
 search:
-        unsigned int stride = 0xF0;
-        MapObjAttachObj* mapObjEnd = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray()) + m_mapObjCount;
+        unsigned int stride = sizeof(CMapObj);
+        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
 
         if (mapObj < mapObjEnd) {
             do {
-                if (mapObj->attr != 0 && mapObj->attr->type == CMapObjAtr::MESH_NAME) {
+                CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+                if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
                     goto found;
                 }
                 mapObj++;
@@ -1547,33 +1524,33 @@ found:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray());
+    CMapObj* mapObj = GetMapObjArray();
 
     goto search;
     while (true) {
-        unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-        if (*(mapObjAtr + 8) == playStaNo) {
+        CMapObjAtrPlaySta* mapObjAtr = static_cast<CMapObjAtrPlaySta*>(mapObj->m_attribute);
+        if (mapObjAtr->m_playStaNo == playStaNo) {
             vec->x = MapObjWorldX(mapObj);
             vec->y = MapObjWorldY(mapObj);
             vec->z = MapObjWorldZ(mapObj);
             return 1;
         }
-        mapObj += 0xF0;
+        mapObj++;
 
 search:
         unsigned int stride = sizeof(CMapObj);
-        unsigned char* mapObjEnd = reinterpret_cast<unsigned char*>(GetMapObjArray() + m_mapObjCount);
+        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
 
         if (mapObj < mapObjEnd) {
             do {
-                unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-                if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == CMapObjAtr::PLAY_STA) {
+                CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+                if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::PLAY_STA) {
                     goto found;
                 }
-                mapObj += 0xF0;
+                mapObj++;
                 remaining--;
             } while (remaining != 0);
         }
@@ -1602,16 +1579,17 @@ void CMapMng::SetLightSource()
 {
     int mapLightIndex = 0;
     const short mapObjCount = m_mapObjCount;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray());
-    unsigned char* mapObjEnd = reinterpret_cast<unsigned char*>(GetMapObjArray() + mapObjCount);
+    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObjEnd = GetMapObjArray() + mapObjCount;
 
     while (mapObj < mapObjEnd) {
-        unsigned char* atr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
-        if (atr != 0) {
-            const int type = *reinterpret_cast<int*>(atr + 4);
+        CMapObjAtr* attr = mapObj->m_attribute;
+        if (attr != 0) {
+            const int type = attr->m_type;
 
             if (type == CMapObjAtr::SPOT_LIGHT) {
-                if (*reinterpret_cast<int*>(atr + 0x34) == 0) {
+                CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
                     CLightPcs::CLight light;
                     light.m_type = 1;
                     light.m_position.x = MapObjWorldX(mapObj);
@@ -1622,7 +1600,7 @@ void CMapMng::SetLightSource()
                     light.m_direction.y = 0.0f;
                     light.m_direction.z = 1.0f;
 
-                    unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+                    CMapObj* targetObj = spotAttr->m_target;
                     light.m_targetPosition.x = MapObjWorldX(targetObj);
                     light.m_targetPosition.y = MapObjWorldY(targetObj);
                     light.m_targetPosition.z = MapObjWorldZ(targetObj);
@@ -1632,32 +1610,23 @@ void CMapMng::SetLightSource()
                                   reinterpret_cast<Vec*>(&light.m_direction));
                     PSVECNormalize(reinterpret_cast<Vec*>(&light.m_direction), reinterpret_cast<Vec*>(&light.m_direction));
 
-                    light.m_attenRadius = *reinterpret_cast<float*>(atr + 0x14);
-                    light.m_range = *reinterpret_cast<float*>(atr + 0x18);
-                    light.m_attenFalloff = *reinterpret_cast<float*>(atr + 0x1C);
+                    light.m_attenRadius = spotAttr->m_radius;
+                    light.m_range = spotAttr->m_nearRange;
+                    light.m_attenFalloff = spotAttr->m_farRange;
 
-                    light.m_targetColor[0].r = atr[0x8];
-                    light.m_targetColor[0].g = atr[0x9];
-                    light.m_targetColor[0].b = atr[0xA];
-                    light.m_targetColor[0].a = atr[0xB];
-                    light.m_targetColor[1].r = atr[0xC];
-                    light.m_targetColor[1].g = atr[0xD];
-                    light.m_targetColor[1].b = atr[0xE];
-                    light.m_targetColor[1].a = atr[0xF];
+                    light.m_targetColor[0] = spotAttr->m_color;
+                    light.m_targetColor[1] = spotAttr->m_altColor;
 
-                    light.m_spotFn = atr[0x2C];
-                    light.m_unk4D = (atr[0x2D] == 0) ? 4 : 2;
-                    light.m_directionMode = atr[0x30];
+                    light.m_spotFn = spotAttr->m_colorMode;
+                    light.m_unk4D = (spotAttr->m_useAltColor == 0) ? 4 : 2;
+                    light.m_directionMode = spotAttr->m_keyFrameCount;
                     light.m_partMask = 1 << mapLightIndex;
                     *(u32*)light.m_targetEnable = 0;
                     LightPcs.Add(&light);
                 } else {
-                    CLightPcs::CLight* light = *reinterpret_cast<CLightPcs::CLight**>(atr + 0x38);
+                    CLightPcs::CLight* light = spotAttr->m_light;
                     light->m_type = 1;
-                    light->m_targetColor[1].r = atr[0x8];
-                    light->m_targetColor[1].g = atr[0x9];
-                    light->m_targetColor[1].b = atr[0xA];
-                    light->m_targetColor[1].a = atr[0xB];
+                    light->m_targetColor[1] = spotAttr->m_color;
                     light->m_position.x = MapObjWorldX(mapObj);
                     light->m_position.y = MapObjWorldY(mapObj);
                     light->m_position.z = MapObjWorldZ(mapObj);
@@ -1665,7 +1634,7 @@ void CMapMng::SetLightSource()
                     light->m_direction.y = 0.0f;
                     light->m_direction.z = 1.0f;
 
-                    unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+                    CMapObj* targetObj = spotAttr->m_target;
                     light->m_targetPosition.x = MapObjWorldX(targetObj);
                     light->m_targetPosition.y = MapObjWorldY(targetObj);
                     light->m_targetPosition.z = MapObjWorldZ(targetObj);
@@ -1676,6 +1645,7 @@ void CMapMng::SetLightSource()
                 }
                 mapLightIndex += 1;
             } else if (type == CMapObjAtr::POINT_LIGHT) {
+                CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
                 CLightPcs::CLight light;
                 light.m_type = 0;
                 light.m_position.x = MapObjWorldX(mapObj);
@@ -1685,27 +1655,21 @@ void CMapMng::SetLightSource()
                 light.m_direction.y = 0.0f;
                 light.m_direction.z = 1.0f;
                 light.m_partMask = 1 << mapLightIndex;
-                light.m_attenRadius = *reinterpret_cast<float*>(atr + 0x10);
-                light.m_range = *reinterpret_cast<float*>(atr + 0x14);
+                light.m_attenRadius = pointAttr->m_radius;
+                light.m_range = pointAttr->m_intensity;
                 light.m_attenFalloff = 1.0f;
-                light.m_targetColor[0].r = atr[0x8];
-                light.m_targetColor[0].g = atr[0x9];
-                light.m_targetColor[0].b = atr[0xA];
-                light.m_targetColor[0].a = atr[0xB];
-                light.m_targetColor[1].r = atr[0xC];
-                light.m_targetColor[1].g = atr[0xD];
-                light.m_targetColor[1].b = atr[0xE];
-                light.m_targetColor[1].a = atr[0xF];
+                light.m_targetColor[0] = pointAttr->m_color;
+                light.m_targetColor[1] = pointAttr->m_altColor;
                 *(u32*)light.m_targetEnable = 0;
-                light.m_spotFn = atr[0x1C];
+                light.m_spotFn = pointAttr->m_colorMode;
                 light.m_unk4D = 4;
-                light.m_directionMode = atr[0x20];
+                light.m_directionMode = pointAttr->m_unknown20;
                 LightPcs.Add(&light);
                 mapLightIndex += 1;
             }
         }
 
-        mapObj += 0xF0;
+        mapObj++;
     }
 }
 
@@ -2191,9 +2155,10 @@ void CMapMng::ReadOtm(char* mapName)
 
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        unsigned char* octTreeRaw = reinterpret_cast<unsigned char*>(GetOctTreeArray() + i);
-        if (*reinterpret_cast<void**>(octTreeRaw + 8) != 0) {
-            *reinterpret_cast<char*>(octTreeRaw + 0x1F) = static_cast<char>(i);
+        COctTree* octTree = GetOctTreeArray() + i;
+        CMapObj* mapObj = octTree->GetMapObject();
+        if (mapObj != 0) {
+            mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
@@ -2227,12 +2192,17 @@ void CMapMng::ReadOtm(char* mapName)
 
     const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        unsigned char* obj = reinterpret_cast<unsigned char*>(GetMapObjArray() + i);
-        unsigned char* atr = *reinterpret_cast<unsigned char**>(obj + 0xEC);
-        if (atr == 0) {
+        CMapObj* obj = GetMapObjArray() + i;
+        CMapObjAtr* attr = obj->m_attribute;
+        if (attr == 0) {
             continue;
         }
-        if (*reinterpret_cast<int*>(atr + 4) != CMapObjAtr::SPOT_LIGHT || *reinterpret_cast<int*>(atr + 0x34) == 0) {
+        if (attr->m_type != CMapObjAtr::SPOT_LIGHT) {
+            continue;
+        }
+
+        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+        if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
             continue;
         }
 
@@ -2243,7 +2213,7 @@ void CMapMng::ReadOtm(char* mapName)
         *reinterpret_cast<float*>(lightRaw + 0x10) = MapObjWorldY(obj);
         *reinterpret_cast<float*>(lightRaw + 0x14) = MapObjWorldZ(obj);
 
-        unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+        CMapObj* targetObj = spotAttr->m_target;
         Vec source;
         source.x = MapObjWorldX(targetObj);
         source.y = MapObjWorldY(targetObj);
@@ -2259,26 +2229,26 @@ void CMapMng::ReadOtm(char* mapName)
         *reinterpret_cast<float*>(lightRaw + 0x40) = dir.x;
         *reinterpret_cast<float*>(lightRaw + 0x44) = dir.y;
         *reinterpret_cast<float*>(lightRaw + 0x48) = dir.z;
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x4C) = *reinterpret_cast<unsigned int*>(atr + 0x34);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x20) = *reinterpret_cast<unsigned int*>(atr + 0x20);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x24) = *reinterpret_cast<unsigned int*>(atr + 0x24);
-        *reinterpret_cast<unsigned int*>(lightRaw + 0x28) = *reinterpret_cast<unsigned int*>(atr + 0x28);
-        lightRaw[0x58] = atr[8];
-        lightRaw[0x59] = atr[9];
-        lightRaw[0x5A] = atr[10];
-        lightRaw[0x5B] = atr[11];
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x4C) = *reinterpret_cast<unsigned int*>(&spotAttr->m_baseColor);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x20) = *reinterpret_cast<unsigned int*>(&spotAttr->m_intensity);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x24) = *reinterpret_cast<unsigned int*>(&spotAttr->m_falloff);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x28) = *reinterpret_cast<unsigned int*>(&spotAttr->m_angle);
+        lightRaw[0x58] = spotAttr->m_color.r;
+        lightRaw[0x59] = spotAttr->m_color.g;
+        lightRaw[0x5A] = spotAttr->m_color.b;
+        lightRaw[0x5B] = spotAttr->m_color.a;
 
         CLightPcs::CBumpLight* bump = LightPcs.AddBump(
             &light,
             static_cast<CLightPcs::TARGET>(1),
             m_stage,
             1);
-        *reinterpret_cast<CLightPcs::CBumpLight**>(atr + 0x38) = bump;
+        spotAttr->m_light = bump;
 
         for (int j = 0; j < mapObjCount; j++) {
-            unsigned char* scan = reinterpret_cast<unsigned char*>(GetMapObjArray() + j);
-            if (*reinterpret_cast<short*>(scan + 0x16) == i) {
-                *reinterpret_cast<CLightPcs::CBumpLight**>(scan + 0x10) = bump;
+            CMapObj* scan = GetMapObjArray() + j;
+            if (scan->m_bumpObjId == i) {
+                scan->m_bumpLight = bump;
             }
         }
 
@@ -2398,8 +2368,7 @@ int CMapMng::ReadMid(char* mapName)
             CMapObj* mapObj = nextMapObj;
             int mapObjIndex = 0;
             while (mapObjIndex < m_mapObjCount) {
-                unsigned char* objRaw = reinterpret_cast<unsigned char*>(mapObj);
-                if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                     short& octTreeCount = m_octTreeCount;
                     if (octTreeCount > 0xF) {
                         return 0;
@@ -2407,13 +2376,13 @@ int CMapMng::ReadMid(char* mapName)
 
                     COctTree* octTree = GetOctTreeArray() + octTreeCount;
                     octTree->ReadOtmOctTree(chunkFile);
-                    *reinterpret_cast<CMapObj**>(Ptr(octTree, 8)) = mapObj;
+                    octTree->SetMapObject(mapObj);
 
-                    if (*reinterpret_cast<int*>(objRaw + 0xC) == 0) {
+                    if (mapObj->m_mapData == 0) {
                         if (System.m_execParam != 0) {
                             System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
                         }
-                    } else if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
+                    } else if (mapObj->m_meshType == 1 || mapObj->m_meshType == 2) {
                         nextMapObj = mapObj + 1;
                         octTreeCount += 1;
                         break;
@@ -2445,16 +2414,16 @@ int CMapMng::ReadMid(char* mapName)
 
     const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        unsigned char* obj = reinterpret_cast<unsigned char*>(GetMapObjArray() + i);
-        unsigned char type = obj[0x1D];
-        CMapHit* hit = *reinterpret_cast<CMapHit**>(obj + 0xC);
+        CMapObj* obj = GetMapObjArray() + i;
+        unsigned char type = obj->m_mapDataType;
+        CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = hit - GetMapHitArray();
             if (m_mapHitCount <= hitIndex) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }
-                *reinterpret_cast<CMapHit**>(obj + 0xC) = 0;
+                obj->m_mapData = 0;
             }
         }
     }
@@ -2470,9 +2439,9 @@ int CMapMng::ReadMid(char* mapName)
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
-        unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(octTree, 8)));
-        if (obj != 0) {
-            obj[0x1F] = static_cast<unsigned char>(i);
+        CMapObj* mapObj = octTree->GetMapObject();
+        if (mapObj != 0) {
+            mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 
@@ -2613,7 +2582,7 @@ void CMapMng::DrawBefore()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0xFE);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         const short octTreeCount = m_octTreeCount;
@@ -2664,7 +2633,7 @@ void CMapMng::Draw()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0x40);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         PartPcs.DrawShoki();
@@ -2678,7 +2647,7 @@ void CMapMng::Draw()
         mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         octTree = GetOctTreeArray();
@@ -2721,13 +2690,13 @@ void CMapMng::Draw()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitWire();
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitNormal();
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
 
         CameraPcs.SetOffsetZBuff(kMapZero);
@@ -2781,7 +2750,7 @@ void CMapMng::DrawAfter()
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(2);
-            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+            mapObj++;
         }
     }
 }
@@ -2823,7 +2792,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
-            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
+            m_hitMapObj = octTree->GetMapObject();
             return 1;
         }
     }
@@ -2881,7 +2850,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         octTree->CheckHitCylinderNear(cylinder, move, mask);
         if (gMapHitFaceFlag != 0) {
             hit = 1;
-            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
+            m_hitMapObj = octTree->GetMapObject();
         }
     }
 
@@ -3000,21 +2969,21 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 
     for (int i = 0; i < m_mapObjCount; i++) {
         if (mapObj->m_meshId == id) {
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x44)) = nearRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x48)) = farRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x54)) = fadeRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = minAlpha;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = maxAlpha;
-            if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = kMapCameraSemiTransMinSentinel;
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = kMapCameraSemiTransMaxSentinel;
-                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = 2;
-                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
+            mapObj->m_cameraSemiTransNear = nearRange;
+            mapObj->m_cameraSemiTransFar = farRange;
+            mapObj->m_cameraSemiTransFadeRange = fadeRange;
+            mapObj->m_cameraSemiTransMinAlpha = minAlpha;
+            mapObj->m_cameraSemiTransMaxAlpha = maxAlpha;
+            if (mapObj->m_mapData != 0 && mapObj->m_octTreeIndex != -1) {
+                mapObj->m_cameraSemiTransMinAlpha = kMapCameraSemiTransMinSentinel;
+                mapObj->m_cameraSemiTransMaxAlpha = kMapCameraSemiTransMaxSentinel;
+                mapObj->m_drawPriority = 2;
+                mapObj->m_cameraSemiTransActive = 1;
             }
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = 0x4000;
+            mapObj->m_cameraSemiTransTargetAlpha = 0x4000;
             found = 1;
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x28)) = 0x4000;
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2C)) = 0;
+            mapObj->m_cameraSemiTransAlpha = 0x4000;
+            mapObj->m_cameraSemiTransStep = 0;
         }
         mapObj++;
     }
@@ -3140,14 +3109,12 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
  */
 void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-    int offset = mapObjIndex * 0xF0;
-    CMapMng* self = this;
-    PSMTXCopy(source, reinterpret_cast<MtxPtr>(Ptr(self, offset + 0x9DC)));
+    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
+    PSMTXCopy(source, mapObj->m_localMtx);
 
-    u8* mapObj = Ptr(self, offset);
-    mapObj[0x970] = 1;
-    mapObj[0x96F] = 1;
-    mapObj[0x970] = 0;
+    mapObj->m_localMtxDirty = 1;
+    mapObj->m_calcMtxPending = 1;
+    mapObj->m_localMtxDirty = 0;
 }
 
 /*
@@ -3389,22 +3356,19 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
     objIndex = -1;
 
 found:
-    const unsigned int packedColor = *reinterpret_cast<unsigned int*>(&color);
+    const _GXColor spotColor = color;
     const float posX = position.x;
     const float posY = position.y;
     const float posZ = position.z;
     CMapObj* mapObj = GetMapObjArray() + objIndex;
-    unsigned char* mapObjLight = reinterpret_cast<unsigned char*>(mapObj->m_attribute);
+    CMapObjAtr* attr = mapObj->m_attribute;
 
-    if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::SPOT_LIGHT) {
-        const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
-        *reinterpret_cast<unsigned char*>(mapObjLight + 8) = colorBytes[0];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 10) = colorBytes[2];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 11) = colorBytes[3];
-        mapObj->m_worldMapLightX = posX;
-        mapObj->m_worldMapLightY = posY;
-        mapObj->m_worldMapLightZ = posZ;
+    if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
+        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+        spotAttr->m_color = spotColor;
+        mapObj->m_localRotationX = posX;
+        mapObj->m_localRotationY = posY;
+        mapObj->m_localRotationZ = posZ;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
     }
@@ -3441,8 +3405,8 @@ void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = &m_mapObjArray[i];
         if (static_cast<int>(mapObj->m_objId) == id) {
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = prio;
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x14)) = prio;
+            mapObj->m_drawPriority = prio;
+            mapObj->m_baseDrawPriority = prio;
         }
     }
 }

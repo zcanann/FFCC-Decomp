@@ -2,6 +2,7 @@
 #define _FFCC_MAPOBJ_H_
 
 #include "ffcc/mapkeyframe.h"
+#include "ffcc/p_light.h"
 
 #include <dolphin/gx/GXStruct.h>
 
@@ -67,7 +68,7 @@ public:
     CMapObjAtrSpotLight()
     {
         m_type = SPOT_LIGHT;
-        *reinterpret_cast<int*>(m_pad38) = 0;
+        m_light = 0;
         m_intensity = 1.0f;
         m_falloff = 1.0f;
         m_colorMode = 0;
@@ -109,7 +110,7 @@ public:
     unsigned char m_keyFrameCount; // 0x30
     unsigned char m_pad31[3];
     _GXColor m_baseColor;          // 0x34
-    unsigned char m_pad38[4];
+    CLightPcs::CLight* m_light;    // 0x38
     unsigned char m_colorCount;    // 0x3C
     unsigned char m_altColorCount; // 0x3D
     unsigned char m_pad3E[2];
@@ -211,12 +212,26 @@ public:
     CMapObj* m_child;             // 0x04
     CMapObj* m_next;              // 0x08
     void* m_mapData;              // 0x0C
-    char m_pad10[0x08];
+    void* m_bumpLight;            // 0x10
+    unsigned char m_baseDrawPriority; // 0x14
+    unsigned char m_drawPriority;     // 0x15
+    short m_bumpObjId;            // 0x16
     unsigned char m_showFlags;      // 0x18
-    char m_pad19[2];
+    unsigned char m_unknown19;     // 0x19
+    unsigned char m_bumpTexMatrixMode; // 0x1A
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
-    char m_pad1D[0x0B];
+    unsigned char m_mapDataType; // 0x1D
+    unsigned char m_meshType;    // 0x1E
+    signed char m_octTreeIndex;      // 0x1F
+    unsigned char m_unknown20;     // 0x20
+    unsigned char m_useAmbientColor; // 0x21
+    unsigned char m_enableFullScreenShadow; // 0x22
+    unsigned char m_lightAlpha;      // 0x23
+    unsigned char m_colorAlphaRate;  // 0x24
+    unsigned char m_cameraSemiTransBeyondMax; // 0x25
+    unsigned char m_cameraSemiTransActive; // 0x26
+    unsigned char m_disableZWrite;   // 0x27
     short m_cameraSemiTransAlpha;       // 0x28
     short m_cameraSemiTransTargetAlpha; // 0x2A
     short m_cameraSemiTransStep;        // 0x2C
@@ -224,15 +239,27 @@ public:
     unsigned short m_effectId;      // 0x30
     unsigned short m_groupId;       // 0x32
     unsigned short m_meshId;        // 0x34
-    char m_pad36[0x22];
+    char m_pad36[0x02];
+    int m_lightSetIndex;            // 0x38
+    unsigned long m_shadowTarget;   // 0x3C
+    float m_zBufferOffset;          // 0x40
+    float m_cameraSemiTransNear;    // 0x44
+    float m_cameraSemiTransFar;     // 0x48
+    float m_cameraSemiTransMinAlpha; // 0x4C
+    float m_cameraSemiTransMaxAlpha; // 0x50
+    float m_cameraSemiTransFadeRange; // 0x54
     float m_transRateX;             // 0x58
     float m_transRateY;             // 0x5C
     float m_transRateZ;             // 0x60
-    char m_pad64[0x0C];
-    float m_worldMapLightX;         // 0x70
-    float m_worldMapLightY;         // 0x74
-    float m_worldMapLightZ;         // 0x78
-    char m_pad7C[0x0C];
+    float m_localTranslateX;        // 0x64
+    float m_localTranslateY;        // 0x68
+    float m_localTranslateZ;        // 0x6C
+    float m_localRotationX;         // 0x70
+    float m_localRotationY;         // 0x74
+    float m_localRotationZ;         // 0x78
+    float m_localScaleX;            // 0x7C
+    float m_localScaleY;            // 0x80
+    float m_localScaleZ;            // 0x84
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
     _GXColor m_ambientColor;        // 0xE8

@@ -1,7 +1,7 @@
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
 extern "C" {
-extern const float kPppMoveZero;
+extern const float kPppMoveZero[2];
 }
 
 
@@ -31,7 +31,7 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
     PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offset);
     
     // Initialize to zero (store order: z, y, x to match assembly)
-    f32 zero = kPppMoveZero;
+    f32 zero = kPppMoveZero[0];
     moveObj->z = zero;
     moveObj->y = zero;
     moveObj->x = zero;

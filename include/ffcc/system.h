@@ -11,10 +11,35 @@ struct OSThread;
 struct CScenegraphDesc;
 struct CScenegraphEntry;
 
+struct CProcessTableCallback
+{
+    u32 m_thisOffset;
+    u32 m_virtualOffset;
+    u32 m_function;
+};
+typedef int CProcessTableCallback_size_mismatch[(sizeof(CProcessTableCallback) == 0xC) ? 1 : -1];
+
+struct CProcessTableEntry
+{
+    CProcessTableCallback m_callback;
+    u32 m_priority;
+    u32 m_flags;
+};
+typedef int CProcessTableEntry_size_mismatch[(sizeof(CProcessTableEntry) == 0x14) ? 1 : -1];
+
 struct CProcessTable
 {
     char* m_name;
-    u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
+    union
+    {
+        u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
+        struct Fields
+        {
+            CProcessTableCallback m_create;
+            CProcessTableCallback m_destroy;
+            CProcessTableEntry m_entries[16];
+        } m_fields;
+    };
 };
 typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];
 

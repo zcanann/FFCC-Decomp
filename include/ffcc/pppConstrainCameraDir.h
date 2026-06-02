@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 extern const float kConstrainCameraDirScaleOne;
+extern const float kConstrainCameraDirBaseFov;
 extern const float kConstrainCameraDirWideAspect;
 extern const float kConstrainCameraDirZero;
 

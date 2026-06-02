@@ -1,7 +1,7 @@
 #include "ffcc/KeLns.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern const float kKeLnsLineDefaultLength;
+extern const float kKeLnsLineDefaultLength[2];
 }
 
 /*
@@ -16,5 +16,5 @@ extern const float kKeLnsLineDefaultLength;
 void KeLnsLp_Init(_KeLnsLp* kelnsLp)
 {
 	pppUnitMatrix(kelnsLp->matrix);
-	kelnsLp->field_0x9c = kKeLnsLineDefaultLength;
+	kelnsLp->field_0x9c = kKeLnsLineDefaultLength[0];
 }

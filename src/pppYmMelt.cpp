@@ -19,7 +19,7 @@ extern const float FLOAT_80330b08;
 extern const float FLOAT_80330b0c;
 extern const float FLOAT_80330b10;
 extern const float FLOAT_80330b14;
-extern const float FLOAT_80330b18;
+extern const float FLOAT_80330b18[2];
 
 struct YmMeltVertex
 {
@@ -429,7 +429,7 @@ extern "C" void CalcPolygonHeight(
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
-    expand = FLOAT_80330b18;
+    expand = FLOAT_80330b18[0];
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 

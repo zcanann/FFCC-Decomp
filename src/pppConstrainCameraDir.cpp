@@ -14,8 +14,6 @@ extern const char kAStarStepDebugFormat[] = "%d ";
 extern const char kAStarNewLine[] = "\n";
 }
 
-static const float kConstrainCameraDirBaseFov = 25.0f;
-
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
 /*

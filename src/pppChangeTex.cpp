@@ -8,7 +8,7 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 extern "C" {
-extern const float kPppChangeTexInit;
+extern const float kPppChangeTexInit[2];
 extern int ppvUserStopPartF;
 extern unsigned char ppvIsLoopCalc;
 }
@@ -348,7 +348,7 @@ freeArrays:
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
-	float init = kPppChangeTexInit;
+	float init = kPppChangeTexInit[0];
 
 	work->m_value0 = init;
 	work->m_value2 = init;
@@ -366,7 +366,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	float init = kPppChangeTexInit;
+	float init = kPppChangeTexInit[0];
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 
 	work->m_value0 = init;

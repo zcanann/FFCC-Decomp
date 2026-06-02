@@ -88,7 +88,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kPppVtMimeZero;
+    float zero = kPppVtMimeZero[0];
 
     state->accel = zero;
     state->velocity = zero;
@@ -107,7 +107,7 @@ void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kPppVtMimeZero;
+    float zero = kPppVtMimeZero[0];
 
     state->accel = zero;
     state->velocity = zero;

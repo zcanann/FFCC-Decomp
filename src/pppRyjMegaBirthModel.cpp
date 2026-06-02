@@ -11,16 +11,6 @@ extern const float FLOAT_80330498;
 extern const float FLOAT_8033049c;
 extern const float FLOAT_803304a0;
 extern const float FLOAT_803304a4;
-extern const float FLOAT_803304a8;
-extern const float FLOAT_803304b4;
-extern const float FLOAT_803304bc;
-extern const float FLOAT_803304c0;
-extern const float FLOAT_803304c4;
-extern const float FLOAT_803304c8;
-extern const float FLOAT_803304CC;
-extern const float FLOAT_803304D0;
-extern const double DOUBLE_803304E0;
-extern const float FLOAT_803304E8[2];
 
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
@@ -115,17 +105,17 @@ static inline u8* u8_at(void* base, s32 off)
 
 static inline float MegaBirthSpeedFalloff()
 {
-    return *reinterpret_cast<const float*>(&FLOAT_803304CC);
+    return FLOAT_803304CC;
 }
 
 static inline float MegaBirthHalf()
 {
-    return *reinterpret_cast<const float*>(&FLOAT_803304D0);
+    return FLOAT_803304D0;
 }
 
 static inline double MegaBirthHalfDouble()
 {
-    return *reinterpret_cast<const double*>(&DOUBLE_803304E0);
+    return DOUBLE_803304E0;
 }
 
 static inline unsigned char clamp_u8(float value)

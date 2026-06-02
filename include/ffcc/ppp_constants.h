@@ -1,11 +1,11 @@
 #ifndef FFCC_PPP_CONSTANTS_H
 #define FFCC_PPP_CONSTANTS_H
 
-extern float gPppTrigTable[];
+extern float ppvSinTbl[];
 
 extern float gPppPointRApRandomAngleRange;
 extern float gPppPointRApRandomAngleBias;
-extern float gPppPointRApSpinScale;
+extern const float gPppPointRApSpinScale[2];
 
 extern const float gPppScaleLoopAutoZero;
 
@@ -31,12 +31,12 @@ extern const float kPppGetRotMatrixZZero;
 extern const float kPppGetRotMatrixZOne;
 extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
-extern float kPppChangeTexInit;
-extern float kPppKeLnsZero;
-extern float kPppMoveZero;
+extern const float kPppChangeTexInit[2];
+extern const float kPppKeLnsZero[2];
+extern const float kPppMoveZero[2];
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;
-extern float kPppVtMimeZero;
+extern const float kPppVtMimeZero[2];
 
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;

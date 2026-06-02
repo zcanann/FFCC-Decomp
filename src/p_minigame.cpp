@@ -18,22 +18,22 @@ extern "C" {
 int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
 int g_errCt = 0;
 }
-unsigned int CMiniGamePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
-unsigned int CMiniGamePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
-unsigned int CMiniGamePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+CProcessTableCallback CMiniGamePcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
+CProcessTableCallback CMiniGamePcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
+CProcessTableCallback CMiniGamePcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 extern const char s_CMiniGamePcs_GAME_801DD098[];
 CProcessTable CMiniGamePcs::m_table = {
     const_cast<char*>(s_CMiniGamePcs_GAME_801DD098),
     {
-        m_table_desc0[0],
-        m_table_desc0[1],
-        m_table_desc0[2],
-        m_table_desc1[0],
-        m_table_desc1[1],
-        m_table_desc1[2],
-        m_table_desc2[0],
-        m_table_desc2[1],
-        m_table_desc2[2],
+        m_table_desc0.m_thisOffset,
+        m_table_desc0.m_virtualOffset,
+        m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset,
+        m_table_desc1.m_virtualOffset,
+        m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset,
+        m_table_desc2.m_virtualOffset,
+        m_table_desc2.m_function,
         0x24,
     },
 };

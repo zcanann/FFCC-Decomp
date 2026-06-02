@@ -22,36 +22,36 @@
 CGraphicPcs GraphicPcs;
 extern const char s_CGraphicPcs[];
 
-u32 CGraphicPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawWait__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawFlip__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBegin__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
-u32 CGraphicPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawWait__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawFlip__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBegin__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
 CProcessTable CGraphicPcs::m_table = {
     const_cast<char*>(s_CGraphicPcs),
     {
-        m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
-        m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
-        m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
+        m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
         0x22, 0x8,
-        m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
+        m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
         0x26, 0x9,
-        m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
+        m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
         0x27, 0xC,
-        m_table_desc5[0], m_table_desc5[1], m_table_desc5[2],
+        m_table_desc5.m_thisOffset, m_table_desc5.m_virtualOffset, m_table_desc5.m_function,
         0x29, 0x9,
-        m_table_desc6[0], m_table_desc6[1], m_table_desc6[2],
+        m_table_desc6.m_thisOffset, m_table_desc6.m_virtualOffset, m_table_desc6.m_function,
         0x48, 1,
-        m_table_desc7[0], m_table_desc7[1], m_table_desc7[2],
+        m_table_desc7.m_thisOffset, m_table_desc7.m_virtualOffset, m_table_desc7.m_function,
         0x4B, 0x9,
-        m_table_desc8[0], m_table_desc8[1], m_table_desc8[2],
+        m_table_desc8.m_thisOffset, m_table_desc8.m_virtualOffset, m_table_desc8.m_function,
         0x2B, 0x9,
-        m_table_desc9[0], m_table_desc9[1], m_table_desc9[2],
+        m_table_desc9.m_thisOffset, m_table_desc9.m_virtualOffset, m_table_desc9.m_function,
         0x34, 0x9,
     },
 };

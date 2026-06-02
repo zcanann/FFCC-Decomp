@@ -44,54 +44,9 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
-static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(self) + offset;
-}
-
-static inline void*& PtrAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<void**>(Ptr(self, offset));
-}
-
-static inline unsigned char& U8At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned char*>(Ptr(self, offset));
-}
-
-static inline signed char& S8At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<signed char*>(Ptr(self, offset));
-}
-
-static inline unsigned short& U16At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
-}
-
-static inline short& S16At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<short*>(Ptr(self, offset));
-}
-
-static inline int& S32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<int*>(Ptr(self, offset));
-}
-
-static inline unsigned int& U32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned int*>(Ptr(self, offset));
-}
-
-static inline float& F32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<float*>(Ptr(self, offset));
-}
-
 static inline CMapObj* NextSlot(CMapObj* obj)
 {
-    return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));
+    return obj + 1;
 }
 
 static inline CMapObj* MapObjArrayStart()
@@ -311,43 +266,43 @@ void CMapObj::Init()
     m_mapData = 0;
     m_attribute = 0;
 
-    U8At(this, 0x15) = 0x7E;
-    U8At(this, 0x14) = 0x7E;
-    S8At(this, 0x1F) = -1;
-    U8At(this, 0x20) = 0;
-    U8At(this, 0x27) = 0;
-    U8At(this, 0x21) = 0;
+    m_drawPriority = 0x7E;
+    m_baseDrawPriority = 0x7E;
+    m_octTreeIndex = -1;
+    m_unknown20 = 0;
+    m_disableZWrite = 0;
+    m_useAmbientColor = 0;
 
-    U16At(this, 0x2E) = 0xFFFF;
+    m_objId = 0xFFFF;
     m_effectId = 0xFFFF;
     m_groupId = 0xFFFF;
-    U8At(this, 0x18) = 1;
-    U8At(this, 0x19) = 1;
-    U16At(this, 0x34) = 0xFFFF;
+    m_showFlags = 1;
+    m_unknown19 = 1;
+    m_meshId = 0xFFFF;
 
-    F32At(this, 0x48) = kMapObjInitNegOne;
-    F32At(this, 0x44) = kMapObjInitNegOne;
-    F32At(this, 0x4C) = kMapObjInitNegOne;
-    F32At(this, 0x50) = kMapObjInitValue50;
+    m_cameraSemiTransFar = kMapObjInitNegOne;
+    m_cameraSemiTransNear = kMapObjInitNegOne;
+    m_cameraSemiTransMinAlpha = kMapObjInitNegOne;
+    m_cameraSemiTransMaxAlpha = kMapObjInitValue50;
 
-    U16At(this, 0x2C) = 0;
-    U16At(this, 0x2A) = 0;
-    U16At(this, 0x28) = 0;
-    U8At(this, 0x24) = 0xFF;
-    U8At(this, 0x23) = 0xFF;
-    S32At(this, 0x10) = 0;
-    S16At(this, 0x16) = -1;
-    U8At(this, 0x22) = 1;
-    S32At(this, 0x3C) = -1;
+    m_cameraSemiTransStep = 0;
+    m_cameraSemiTransTargetAlpha = 0;
+    m_cameraSemiTransAlpha = 0;
+    m_colorAlphaRate = 0xFF;
+    m_lightAlpha = 0xFF;
+    m_bumpLight = 0;
+    m_bumpObjId = -1;
+    m_enableFullScreenShadow = 1;
+    m_shadowTarget = -1;
 
-    F32At(this, 0x60) = kMapObjOne;
-    F32At(this, 0x5C) = kMapObjOne;
-    F32At(this, 0x58) = kMapObjOne;
-    U8At(this, 0x1A) = 0;
-    F32At(this, 0x40) = kMapObjOne;
-    U8At(this, 0x25) = 1;
-    U8At(this, 0x26) = 0;
-    S32At(this, 0x38) = -1;
+    m_transRateZ = kMapObjOne;
+    m_transRateY = kMapObjOne;
+    m_transRateX = kMapObjOne;
+    m_bumpTexMatrixMode = 0;
+    m_zBufferOffset = kMapObjOne;
+    m_cameraSemiTransBeyondMax = 1;
+    m_cameraSemiTransActive = 0;
+    m_lightSetIndex = -1;
 }
 
 /*
@@ -448,7 +403,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == CHUNK_BOBJ) {
-            U16At(this, 0x16) = chunkFile.Get2();
+            m_bumpObjId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_GBID) {
             m_groupId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_EFID) {
@@ -456,53 +411,53 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         } else if (chunk.m_id == CHUNK_FSDW) {
             CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {
-            U16At(this, 0x2E) = chunkFile.Get2();
+            m_objId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_MSID) {
-            U16At(this, 0x34) = static_cast<unsigned short>(chunkFile.Get4());
+            m_meshId = static_cast<unsigned short>(chunkFile.Get4());
         } else if (chunk.m_id == CHUNK_PRIO) {
             unsigned char priority = chunkFile.Get1();
-            U8At(this, 0x15) = priority;
-            U8At(this, 0x14) = priority;
+            m_drawPriority = priority;
+            m_baseDrawPriority = priority;
         } else if (chunk.m_id == CHUNK_AMBI) {
             m_ambientColor.r = chunkFile.Get1();
             m_ambientColor.g = chunkFile.Get1();
             m_ambientColor.b = chunkFile.Get1();
             m_ambientColor.a = chunkFile.Get1();
-            U8At(this, 0x21) = 1;
+            m_useAmbientColor = 1;
         } else if (chunk.m_id == CHUNK_GEOM) {
-            F32At(this, 0x40) = chunkFile.GetF4();
-            U8At(this, 0x1A) = chunkFile.Get1();
-            U8At(this, 0x27) = chunkFile.Get1();
+            m_zBufferOffset = chunkFile.GetF4();
+            m_bumpTexMatrixMode = chunkFile.Get1();
+            m_disableZWrite = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_LTST) {
             if (chunk.m_version == 1) {
-                S32At(this, 0x38) = static_cast<int>(chunkFile.Get4());
+                m_lightSetIndex = static_cast<int>(chunkFile.Get4());
             } else if (chunkFile.Get1() == 0) {
-                S32At(this, 0x38) = 0;
+                m_lightSetIndex = 0;
             }
         } else if (chunk.m_id == CHUNK_SDST) {
             if (chunk.m_version == 2) {
-                U8At(this, 0x22) = chunkFile.Get1();
+                m_enableFullScreenShadow = chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
-                S32At(this, 0x3C) = static_cast<int>(chunkFile.Get4());
+                m_shadowTarget = static_cast<int>(chunkFile.Get4());
             } else if (chunk.m_version == 1) {
-                U8At(this, 0x22) = chunkFile.Get1();
+                m_enableFullScreenShadow = chunkFile.Get1();
                 if (chunkFile.Get1() == 0) {
-                    S32At(this, 0x3C) = 0;
+                    m_shadowTarget = 0;
                 } else {
-                    S32At(this, 0x3C) = -1;
+                    m_shadowTarget = -1;
                 }
             } else {
-                U8At(this, 0x22) = chunkFile.Get1();
-                S32At(this, 0x3C) = -1;
+                m_enableFullScreenShadow = chunkFile.Get1();
+                m_shadowTarget = -1;
             }
         } else if (chunk.m_id == CHUNK_PIDX) {
             short parentIdx = static_cast<short>(chunkFile.Get2());
             short meshOrHitIdx = static_cast<short>(chunkFile.Get2());
 
-            U8At(this, 0x1E) = chunkFile.Get1();
-            U8At(this, 0x1D) = chunkFile.Get1();
+            m_meshType = chunkFile.Get1();
+            m_mapDataType = chunkFile.Get1();
 
             if (parentIdx == -1) {
                 m_parent = 0;
@@ -512,15 +467,15 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
-            } else if (U8At(this, 0x1D) == 1) {
+            } else if (m_mapDataType == 1) {
                 m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
-                U8At(this, 0x14) = 0;
-                U8At(this, 0x15) = 0;
-            } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
+                m_baseDrawPriority = 0;
+                m_drawPriority = 0;
+            } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, "mapobj.cpp", 0x84) CMapObjAtrMeshName();
-                    PtrAt(this, 0xEC) = meshName;
+                    m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     if (meshName != 0) {
                         strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
@@ -532,41 +487,41 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
 
             if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (static_cast<signed char>(U8At(this, 0x1E)) > 7) && (static_cast<signed char>(U8At(this, 0x1E)) < 10)) {
-                F32At(this, 0x58) = kMapObjZero;
-                F32At(this, 0x5C) = kMapObjOne;
-                F32At(this, 0x60) = kMapObjZero;
+                (static_cast<signed char>(m_meshType) > 7) && (static_cast<signed char>(m_meshType) < 10)) {
+                m_transRateX = kMapObjZero;
+                m_transRateY = kMapObjOne;
+                m_transRateZ = kMapObjZero;
             }
         } else if (chunk.m_id == CHUNK_TRNS) {
-            F32At(this, 0x58) = chunkFile.GetF4();
-            F32At(this, 0x5C) = chunkFile.GetF4();
-            F32At(this, 0x60) = chunkFile.GetF4();
+            m_transRateX = chunkFile.GetF4();
+            m_transRateY = chunkFile.GetF4();
+            m_transRateZ = chunkFile.GetF4();
         } else if (chunk.m_id == CHUNK_TFRM) {
-            F32At(this, 0x64) = chunkFile.GetF4();
-            F32At(this, 0x68) = chunkFile.GetF4();
-            F32At(this, 0x6C) = chunkFile.GetF4();
-            F32At(this, 0x70) = chunkFile.GetF4();
-            F32At(this, 0x74) = chunkFile.GetF4();
-            F32At(this, 0x78) = chunkFile.GetF4();
-            F32At(this, 0x7C) = chunkFile.GetF4();
-            F32At(this, 0x80) = chunkFile.GetF4();
-            F32At(this, 0x84) = chunkFile.GetF4();
+            m_localTranslateX = chunkFile.GetF4();
+            m_localTranslateY = chunkFile.GetF4();
+            m_localTranslateZ = chunkFile.GetF4();
+            m_localRotationX = chunkFile.GetF4();
+            m_localRotationY = chunkFile.GetF4();
+            m_localRotationZ = chunkFile.GetF4();
+            m_localScaleX = chunkFile.GetF4();
+            m_localScaleY = chunkFile.GetF4();
+            m_localScaleZ = chunkFile.GetF4();
 
-            if (((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) &&
-                ((F32At(this, 0x7C) != kMapObjZero) || (F32At(this, 0x80) != kMapObjZero) || (F32At(this, 0x84) != kMapObjZero))) {
-                if (PtrAt(this, 0xEC) == 0) {
+            if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
+                ((m_localScaleX != kMapObjZero) || (m_localScaleY != kMapObjZero) || (m_localScaleZ != kMapObjZero))) {
+                if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
                 } else {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x84),
-                                  reinterpret_cast<unsigned char*>(PtrAt(this, 0xEC)) + 0x8);
+                                  reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
-                F32At(this, 0x7C) = kMapObjZero;
-                F32At(this, 0x80) = kMapObjZero;
-                F32At(this, 0x84) = kMapObjZero;
+                m_localScaleX = kMapObjZero;
+                m_localScaleY = kMapObjZero;
+                m_localScaleZ = kMapObjZero;
             }
 
-            U8At(this, 0x1C) = 1;
-            U8At(this, 0x1B) = 1;
+            m_localMtxDirty = 1;
+            m_calcMtxPending = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
             CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
                 operator new(sizeof(CMapAnimRun), MapMng.m_stage, "mapobj.cpp", 0x21E));
@@ -585,7 +540,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 MapMng.GetMapAnimRunArray().Add(animRun);
             }
         } else if (chunk.m_id == CHUNK_MIME) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
@@ -654,9 +609,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
             chunkFile.PopChunk();
-            PtrAt(this, 0xEC) = mimeAttr;
+            m_attribute = mimeAttr;
         } else if (chunk.m_id == CHUNK_PLIT) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPointLight* pointLightAttr =
@@ -709,9 +664,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
                 chunkFile.PopChunk();
             }
-            PtrAt(this, 0xEC) = pointLightAttr;
+            m_attribute = pointLightAttr;
         } else if (chunk.m_id == CHUNK_SLIT) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrSpotLight* spotLightAttr =
@@ -781,9 +736,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
                 chunkFile.PopChunk();
             }
-            PtrAt(this, 0xEC) = spotLightAttr;
+            m_attribute = spotLightAttr;
         } else if (chunk.m_id == CHUNK_PSTA) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
@@ -791,7 +746,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (playSta != 0) {
                 playSta->m_playStaNo = chunkFile.Get1();
             }
-            PtrAt(this, 0xEC) = playSta;
+            m_attribute = playSta;
         }
     }
     chunkFile.PopChunk();
@@ -816,17 +771,17 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
     do {
         unsigned char dirty = inDirty;
 
-        if (U8At(obj, 0x1B) != 0) {
-            U8At(obj, 0x1B) = 0;
-            if (U8At(obj, 0x1C) != 0) {
-                PSMTXScale(obj->m_localMtx, F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
-                PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * F32At(obj, 0x70));
+        if (obj->m_calcMtxPending != 0) {
+            obj->m_calcMtxPending = 0;
+            if (obj->m_localMtxDirty != 0) {
+                PSMTXScale(obj->m_localMtx, obj->m_localScaleX, obj->m_localScaleY, obj->m_localScaleZ);
+                PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * obj->m_localRotationX);
                 PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * F32At(obj, 0x74));
+                PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * obj->m_localRotationY);
                 PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * F32At(obj, 0x78));
+                PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * obj->m_localRotationZ);
                 PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
-                PSMTXTrans(mtx2, F32At(obj, 0x64), F32At(obj, 0x68), F32At(obj, 0x6C));
+                PSMTXTrans(mtx2, obj->m_localTranslateX, obj->m_localTranslateY, obj->m_localTranslateZ);
                 PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
             }
 
@@ -842,17 +797,17 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             do {
                 unsigned char childDirty = dirty;
 
-                if (U8At(child, 0x1B) != 0) {
-                    U8At(child, 0x1B) = 0;
-                    if (U8At(child, 0x1C) != 0) {
-                        PSMTXScale(child->m_localMtx, F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
-                        PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
+                if (child->m_calcMtxPending != 0) {
+                    child->m_calcMtxPending = 0;
+                    if (child->m_localMtxDirty != 0) {
+                        PSMTXScale(child->m_localMtx, child->m_localScaleX, child->m_localScaleY, child->m_localScaleZ);
+                        PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * child->m_localRotationX);
                         PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
+                        PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * child->m_localRotationY);
                         PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
+                        PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * child->m_localRotationZ);
                         PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                        PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
+                        PSMTXTrans(mtx1, child->m_localTranslateX, child->m_localTranslateY, child->m_localTranslateZ);
                         PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     }
 
@@ -868,18 +823,18 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     do {
                         unsigned char grandChildDirty = childDirty;
 
-                        if (U8At(grandChild, 0x1B) != 0) {
-                            U8At(grandChild, 0x1B) = 0;
-                            if (U8At(grandChild, 0x1C) != 0) {
+                        if (grandChild->m_calcMtxPending != 0) {
+                            grandChild->m_calcMtxPending = 0;
+                            if (grandChild->m_localMtxDirty != 0) {
                                 PSMTXScale(
-                                    grandChild->m_localMtx, F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
-                                PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
+                                    grandChild->m_localMtx, grandChild->m_localScaleX, grandChild->m_localScaleY, grandChild->m_localScaleZ);
+                                PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * grandChild->m_localRotationX);
                                 PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
+                                PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * grandChild->m_localRotationY);
                                 PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
+                                PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * grandChild->m_localRotationZ);
                                 PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                                PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
+                                PSMTXTrans(mtx0, grandChild->m_localTranslateX, grandChild->m_localTranslateY, grandChild->m_localTranslateZ);
                                 PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                             }
 
@@ -921,81 +876,81 @@ void CMapObj::SetShow_r(int show)
 
     do {
         if (show != 0) {
-            U8At(root, 0x18) |= 1;
+            root->m_showFlags |= 1;
         } else {
-            U8At(root, 0x18) &= 0xFE;
+            root->m_showFlags &= 0xFE;
         }
 
         CMapObj* c0 = root->m_child;
         if (c0 != 0) {
             do {
                 if (show != 0) {
-                    U8At(c0, 0x18) |= 1;
+                    c0->m_showFlags |= 1;
                 } else {
-                    U8At(c0, 0x18) &= 0xFE;
+                    c0->m_showFlags &= 0xFE;
                 }
 
                 CMapObj* c1 = c0->m_child;
                 if (c1 != 0) {
                     do {
                         if (show != 0) {
-                            U8At(c1, 0x18) |= 1;
+                            c1->m_showFlags |= 1;
                         } else {
-                            U8At(c1, 0x18) &= 0xFE;
+                            c1->m_showFlags &= 0xFE;
                         }
 
                         CMapObj* c2 = c1->m_child;
                         if (c2 != 0) {
                             do {
                                 if (show != 0) {
-                                    U8At(c2, 0x18) |= 1;
+                                    c2->m_showFlags |= 1;
                                 } else {
-                                    U8At(c2, 0x18) &= 0xFE;
+                                    c2->m_showFlags &= 0xFE;
                                 }
 
                                 CMapObj* c3 = c2->m_child;
                                 if (c3 != 0) {
                                     do {
                                         if (show != 0) {
-                                            U8At(c3, 0x18) |= 1;
+                                            c3->m_showFlags |= 1;
                                         } else {
-                                            U8At(c3, 0x18) &= 0xFE;
+                                            c3->m_showFlags &= 0xFE;
                                         }
 
                                         CMapObj* c4 = c3->m_child;
                                         if (c4 != 0) {
                                             do {
                                                 if (show != 0) {
-                                                    U8At(c4, 0x18) |= 1;
+                                                    c4->m_showFlags |= 1;
                                                 } else {
-                                                    U8At(c4, 0x18) &= 0xFE;
+                                                    c4->m_showFlags &= 0xFE;
                                                 }
 
                                                 CMapObj* c5 = c4->m_child;
                                                 if (c5 != 0) {
                                                     do {
                                                         if (show != 0) {
-                                                            U8At(c5, 0x18) |= 1;
+                                                            c5->m_showFlags |= 1;
                                                         } else {
-                                                            U8At(c5, 0x18) &= 0xFE;
+                                                            c5->m_showFlags &= 0xFE;
                                                         }
 
                                                         CMapObj* c6 = c5->m_child;
                                                         if (c6 != 0) {
                                                             do {
                                                                 if (show != 0) {
-                                                                    U8At(c6, 0x18) |= 1;
+                                                                    c6->m_showFlags |= 1;
                                                                 } else {
-                                                                    U8At(c6, 0x18) &= 0xFE;
+                                                                    c6->m_showFlags &= 0xFE;
                                                                 }
 
                                                                 CMapObj* c7 = c6->m_child;
                                                                 if (c7 != 0) {
                                                                     do {
                                                                         if (show != 0) {
-                                                                            U8At(c7, 0x18) |= 1;
+                                                                            c7->m_showFlags |= 1;
                                                                         } else {
-                                                                            U8At(c7, 0x18) &= 0xFE;
+                                                                            c7->m_showFlags &= 0xFE;
                                                                         }
 
                                                                         if (c7->m_child != 0) {
@@ -1050,9 +1005,9 @@ void CMapObj::SetShow_r(int show)
 void CMapObj::SetShow(int show)
 {
     if (show != 0) {
-        U8At(this, 0x18) |= 1;
+        m_showFlags |= 1;
     } else {
-        U8At(this, 0x18) &= 0xFE;
+        m_showFlags &= 0xFE;
     }
 
     if (m_child != 0) {
@@ -1234,34 +1189,34 @@ void CMapObj::Calc()
         }
 
         if (m_cameraSemiTransAlpha != 0) {
-            U8At(this, 0x15) = 2;
+            m_drawPriority = 2;
         } else {
-            U8At(this, 0x15) = U8At(this, 0x14);
+            m_drawPriority = m_baseDrawPriority;
         }
     }
 
-    if ((static_cast<unsigned int>(U8At(this, 0x1D)) == 1U) && (m_mapData != 0) &&
-        (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
-        ((U8At(this, 0x18) & 1) != 0)) {
-        if ((F32At(this, 0x50) < kMapObjOne) && (F32At(this, 0x4C) >= kMapObjInitNegOne)) {
-            U8At(this, 0x15) = U8At(this, 0x14);
-            U8At(this, 0x25) = 1;
-            U8At(this, 0x26) = 0;
+    if ((static_cast<unsigned int>(m_mapDataType) == 1U) && (m_mapData != 0) &&
+        (m_octTreeIndex == -1) &&
+        ((m_showFlags & 1) != 0)) {
+        if ((m_cameraSemiTransMaxAlpha < kMapObjOne) && (m_cameraSemiTransMinAlpha >= kMapObjInitNegOne)) {
+            m_drawPriority = m_baseDrawPriority;
+            m_cameraSemiTransBeyondMax = 1;
+            m_cameraSemiTransActive = 0;
         } else {
-            pos.x = F32At(this, 0xC4);
-            pos.y = F32At(this, 0xD4);
-            pos.z = F32At(this, 0xE4);
+            pos.x = m_worldMtx[0][3];
+            pos.y = m_worldMtx[1][3];
+            pos.z = m_worldMtx[2][3];
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 
-            U8At(this, 0x25) = static_cast<unsigned char>(posCam.z > F32At(this, 0x50));
-            if (posCam.z < F32At(this, 0x4C)) {
-                U8At(this, 0x26) = 1;
-                U8At(this, 0x15) = 2;
+            m_cameraSemiTransBeyondMax = static_cast<unsigned char>(posCam.z > m_cameraSemiTransMaxAlpha);
+            if (posCam.z < m_cameraSemiTransMinAlpha) {
+                m_cameraSemiTransActive = 1;
+                m_drawPriority = 2;
             } else {
-                U8At(this, 0x26) = 1;
-                U8At(this, 0x15) = U8At(this, 0x14);
+                m_cameraSemiTransActive = 1;
+                m_drawPriority = m_baseDrawPriority;
             }
         }
     }
@@ -1341,9 +1296,9 @@ void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
 
-    s_mapObjLightColor.a = U8At(this, 0x23);
+    s_mapObjLightColor.a = m_lightAlpha;
 
-    if (U8At(this, 0x21) != 0) {
+    if (m_useAmbientColor != 0) {
         mapColor = m_ambientColor;
     } else {
         mapColor = MapMng.m_mapColor;
@@ -1356,16 +1311,17 @@ void CMapObj::SetDrawEnv()
         mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
-    if (U8At(this, 0x24) != 0xFF) {
-        int alphaRate = U8At(this, 0x24);
+    if (m_colorAlphaRate != 0xFF) {
+        int alphaRate = m_colorAlphaRate;
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
     _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
+                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
 }
 
 /*
@@ -1379,18 +1335,18 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
-    if (priority != U8At(this, 0x15)) {
+    if (priority != m_drawPriority) {
         return;
     }
-    if ((U8At(this, 0x18) & 4) == 0) {
+    if ((m_showFlags & 4) == 0) {
         return;
     }
 
     Vec lightPos;
-    lightPos.x = F32At(this, 0xC4);
-    lightPos.y = F32At(this, 0xD4);
-    lightPos.z = F32At(this, 0xE4);
-    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, S32At(this, 0x38));
+    lightPos.x = m_worldMtx[0][3];
+    lightPos.y = m_worldMtx[1][3];
+    lightPos.z = m_worldMtx[2][3];
+    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
     _GXColor mapColor;
@@ -1411,10 +1367,10 @@ void CMapObj::Draw(unsigned char priority)
     *reinterpret_cast<unsigned int*>(materialMan + 92) = 0;
     *(materialMan + 520) = 0;
 
-    if (U8At(this, 0x22) != 0) {
+    if (m_enableFullScreenShadow != 0) {
         CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
     }
-    if (U32At(this, 0x3C) != 0) {
+    if (m_shadowTarget != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
                                    reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
                                    m_worldMtx);
@@ -1425,8 +1381,8 @@ void CMapObj::Draw(unsigned char priority)
     *reinterpret_cast<unsigned int*>(materialMan + 304) = *reinterpret_cast<unsigned int*>(materialMan + 292);
     *reinterpret_cast<unsigned int*>(materialMan + 64) = *reinterpret_cast<unsigned int*>(materialMan + 72);
 
-    s_mapObjLightColor.a = U8At(this, 0x23);
-    if (U8At(this, 0x21) != 0) {
+    s_mapObjLightColor.a = m_lightAlpha;
+    if (m_useAmbientColor != 0) {
         mapColor = m_ambientColor;
     } else {
         mapColor = MapMng.m_mapColor;
@@ -1439,34 +1395,35 @@ void CMapObj::Draw(unsigned char priority)
         mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
-    if (U8At(this, 0x24) != 0xFF) {
-        unsigned int alphaRate = U8At(this, 0x24);
+    if (m_colorAlphaRate != 0xFF) {
+        unsigned int alphaRate = m_colorAlphaRate;
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
     lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
-    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
-                              reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
+                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
+    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
+                              reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 
-    if (kMapObjOne != F32At(this, 0x40)) {
-        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    if (kMapObjOne != m_zBufferOffset) {
+        CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
-    if (U8At(this, 0x27) != 0) {
+    if (m_disableZWrite != 0) {
         GXSetZMode(1, GX_LEQUAL, 0);
     }
 
     reinterpret_cast<CMapMesh*>(m_mapData)->SetRenderArray();
     reinterpret_cast<CMapMesh*>(m_mapData)->Draw(0);
 
-    if (U8At(this, 0x27) != 0) {
+    if (m_disableZWrite != 0) {
         GXSetZMode(1, GX_LEQUAL, 1);
     }
-    if (kMapObjOne != F32At(this, 0x40)) {
-        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    if (kMapObjOne != m_zBufferOffset) {
+        CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
 }
 
@@ -1481,16 +1438,16 @@ void CMapObj::Draw(unsigned char priority)
  */
 void CMapObj::SetDrawFlag()
 {
-    U8At(this, 0x18) &= ~4;
+    m_showFlags &= ~4;
 
-    if ((U8At(this, 0x1D) == 1) && (m_mapData != 0)) {
-        if ((static_cast<signed char>(U8At(this, 0x1F)) == -1) && ((U8At(this, 0x18) & 1) != 0)) {
+    if ((m_mapDataType == 1) && (m_mapData != 0)) {
+        if ((m_octTreeIndex == -1) && ((m_showFlags & 1) != 0)) {
             Mtx concatMtx;
 
             PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
             if (reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC)
                     ->CheckFrustum(MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
-                U8At(this, 0x18) |= 4;
+                m_showFlags |= 4;
             }
         }
     }
@@ -1507,7 +1464,7 @@ void CMapObj::SetDrawFlag()
  */
 void CMapObj::DrawHit()
 {
-    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
@@ -1524,7 +1481,7 @@ void CMapObj::DrawHit()
  */
 void CMapObj::DrawHitWire()
 {
-    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
@@ -1541,7 +1498,7 @@ void CMapObj::DrawHitWire()
  */
 void CMapObj::DrawHitNormal()
 {
-    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0)) {
         MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
@@ -1558,7 +1515,7 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
 
         PSMTXInverse(m_worldMtx, inverseMtx);
@@ -1642,7 +1599,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
+    if ((m_mapDataType == 2) && (m_mapData != 0) && (m_octTreeIndex == -1)) {
         Mtx inverseMtx;
         Vec localMove;
 
@@ -1772,7 +1729,7 @@ void CMapObj::CalcHitPosition(Vec* out)
  */
 void CMapObj::SetMime(int mode, int target, int type)
 {
-    CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(PtrAt(this, 0xEC));
+    CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(m_attribute);
 
     mime->m_keyFrame.m_startFrame = mode;
     mime->m_keyFrame.m_currentFrame = mode;

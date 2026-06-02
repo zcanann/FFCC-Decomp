@@ -138,25 +138,25 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 FLOAT_8033086C = 0.125f;
 
-unsigned int CMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-unsigned int CMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-unsigned int CMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-unsigned int CMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-unsigned int CMenuPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-unsigned int CMenuPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
+CProcessTableCallback CMenuPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
+CProcessTableCallback CMenuPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
+CProcessTableCallback CMenuPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
+CProcessTableCallback CMenuPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
+CProcessTableCallback CMenuPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
+CProcessTableCallback CMenuPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 CProcessTable CMenuPcs::m_table = {
     const_cast<char*>(s_CMenuPcs_801d9d3c),
     {
-        m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
-        m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
-        m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
+        m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
         0x1A, 0,
-        m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
+        m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
         0x49, 0x1,
-        m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
+        m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
         0x1A, 0x10,
-        m_table_desc5[0], m_table_desc5[1], m_table_desc5[2],
+        m_table_desc5.m_thisOffset, m_table_desc5.m_virtualOffset, m_table_desc5.m_function,
         0x49, 0x11,
     },
 };

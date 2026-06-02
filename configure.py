@@ -583,6 +583,7 @@ config.libs = [
             Object(NonMatching, "p_usb.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "partMng.cpp"),
+            Object(Matching, "pppsintbl.cpp"),
             Object(NonMatching, "partyobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "pppAccele.cpp"),
             Object(NonMatching, "pppAlignmentScale.cpp"),

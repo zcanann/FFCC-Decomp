@@ -22,14 +22,34 @@ CMemory::CStage* g_pStage;
 u32 s_insertShadowNo;
 
 namespace {
-static inline unsigned char* Ptr(CMapMesh* self, unsigned int offset)
+static inline void AddMeshDataBase(void*& ptr, void* base)
 {
-    return reinterpret_cast<unsigned char*>(self) + offset;
+    ptr = reinterpret_cast<void*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
 }
 
-static inline int& S32At(CMapMesh* self, unsigned int offset)
+static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
-    return *reinterpret_cast<int*>(Ptr(self, offset));
+    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
+}
+
+static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
+{
+    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
+}
+
+static inline void SubMeshDataBase(void*& ptr, void* base)
+{
+    ptr = reinterpret_cast<void*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
+}
+
+static inline void SubMeshDataBase(CMapMeshUvPair*& ptr, void* base)
+{
+    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
+}
+
+static inline void SubMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
+{
+    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
 }
 
 static inline unsigned int Align32(unsigned int value)
@@ -514,12 +534,12 @@ void CMapMesh::Off2Ptr()
     int iVar2;
     int iVar3;
 
-    S32At(this, 0x2C) += reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x30) += reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x34) += reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x38) += reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x3C) += reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x40) += reinterpret_cast<int>(m_meshData);
+    AddMeshDataBase(m_vertices, m_meshData);
+    AddMeshDataBase(m_normals, m_meshData);
+    AddMeshDataBase(m_nbt, m_meshData);
+    AddMeshDataBase(m_uvPairs, m_meshData);
+    AddMeshDataBase(m_colors, m_meshData);
+    AddMeshDataBase(m_drawEntries, m_meshData);
 
     iVar3 = 0;
     iVar1 = 0;
@@ -548,12 +568,12 @@ void CMapMesh::Ptr2Off()
         return;
     }
 
-    S32At(this, 0x2C) -= reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x30) -= reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x34) -= reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x38) -= reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x3C) -= reinterpret_cast<int>(m_meshData);
-    S32At(this, 0x40) -= reinterpret_cast<int>(m_meshData);
+    SubMeshDataBase(m_vertices, m_meshData);
+    SubMeshDataBase(m_normals, m_meshData);
+    SubMeshDataBase(m_nbt, m_meshData);
+    SubMeshDataBase(m_uvPairs, m_meshData);
+    SubMeshDataBase(m_colors, m_meshData);
+    SubMeshDataBase(m_drawEntries, m_meshData);
 }
 
 /*

@@ -11,24 +11,15 @@
  */
 inline CSamplePcs::CSamplePcs()
 {
-	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
+	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
+	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
+	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
+	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
 
-	table[1] = desc0[0];
-	table[2] = desc0[1];
-	table[3] = desc0[2];
-	table[4] = desc1[0];
-	table[5] = desc1[1];
-	table[6] = desc1[2];
-	table[7] = desc2[0];
-	table[8] = desc2[1];
-	table[9] = desc2[2];
-	table[12] = desc3[0];
-	table[13] = desc3[1];
-	table[14] = desc3[2];
+	m_table.m_fields.m_create = desc0;
+	m_table.m_fields.m_destroy = desc1;
+	m_table.m_fields.m_entries[0].m_callback = desc2;
+	m_table.m_fields.m_entries[1].m_callback = desc3;
 }
 
 CProcessTable CSamplePcs::m_table = {

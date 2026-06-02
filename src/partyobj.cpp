@@ -180,7 +180,7 @@ static unsigned short getPadHeldForSlot(int slot)
 	}
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
-	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x4 + idx * 0x54);
+	return Pad.GetPadInputs()[idx].button[0];
 }
 
 static unsigned short getPadTrigForSlot(int slot)
@@ -190,7 +190,7 @@ static unsigned short getPadTrigForSlot(int slot)
 	}
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
-	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+	return Pad.GetPadInputs()[idx].buttonDown[0];
 }
 
 static int getPadConnectedForSlot(int slot)
@@ -200,7 +200,7 @@ static int getPadConnectedForSlot(int slot)
 	}
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+	return Pad.GetPadInputs()[idx].gbaMode;
 }
 
 static bool isMenuPcsCommandBusy()
@@ -227,14 +227,24 @@ static unsigned short getItemKindFromCfd(int itemId)
 	return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 }
 
-static float getPadAxisForSlot(int slot, int offset)
+static float getPadLeftStickXForSlot(int slot)
 {
 	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
 		return 0.0f;
 	}
 
 	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
-	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + offset + idx * 0x54);
+	return Pad.GetPadInputs()[idx].stickXF;
+}
+
+static float getPadLeftStickYForSlot(int slot)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0.0f;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return Pad.GetPadInputs()[idx].stickYF;
 }
 
 static bool isBossArtifactStage()
@@ -2035,7 +2045,7 @@ void CGPartyObj::onStatShield()
 			unsigned int padIndex =
 			    padSlot &
 			    ~((int)~(selectedPort - padSlot | padSlot - selectedPort) >> 31);
-			trig = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + padIndex * 0x54);
+			trig = Pad.GetPadInputs()[padIndex].button[0];
 		}
 		if ((trig & 0x100) == 0) {
 			changeSubStat(3);
@@ -2245,8 +2255,8 @@ void CGPartyObj::checkTargetParticle()
 
 	if (!isGhostPartyTargetMode(this)) {
 		if ((MiniGamePcs.m_flags & 0x100) != 0) {
-			input.x -= getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x24);
-			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
+			input.x -= getPadLeftStickXForSlot(static_cast<unsigned char>(m_animStateMisc));
+			input.z += getPadLeftStickYForSlot(static_cast<unsigned char>(m_animStateMisc));
 		}
 
 			if (input.x == 0.0f && input.z == 0.0f) {

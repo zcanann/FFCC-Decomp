@@ -274,7 +274,7 @@ void CMenuPcs::TmpArtiCtrl()
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar3 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
+		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	if (uVar3 == 0) {

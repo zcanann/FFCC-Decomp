@@ -39,7 +39,7 @@ void CSystemPcs::calc()
     } else {
         debugPad = (int)Pad._1c0_4_;
         stepPad = (debugPad == 4) ? 0 : 4;
-        buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
+        buttons = Pad.GetPadInputs()[stepPad].lockedButton[1];
     }
 
     if ((buttons & 0x1000) != 0) {

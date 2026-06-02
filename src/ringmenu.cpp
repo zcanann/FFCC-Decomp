@@ -999,7 +999,7 @@ void CRingMenu::onCalc()
 									const int idx =
 										m_menuIndex &
 										~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
-									trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
+									trigger = Pad.GetPadInputs()[idx].button[0];
 								}
 								scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(prevDir) : static_cast<float>(nextDir);
 							} else if (prevDir != 0) {

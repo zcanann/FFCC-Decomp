@@ -1049,7 +1049,7 @@ input_check_done:
         result = 0;
     } else {
         u32 clamped = (Pad._448_4_ == port) ? 0 : port;
-        result = *(u16*)((u8*)&Pad + 0x8 + clamped * 0x54);
+        result = Pad.GetPadInputs()[clamped].buttonDown[0];
     }
 
     return result;
@@ -1084,7 +1084,7 @@ repeat_check_done:
         result = 0;
     } else {
         u32 clamped = (Pad._448_4_ == port) ? 0 : port;
-        result = *(u16*)((u8*)&Pad + 0x14 + clamped * 0x54);
+        result = Pad.GetPadInputs()[clamped].repeatButton;
     }
 
     return result;

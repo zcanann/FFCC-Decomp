@@ -308,7 +308,7 @@ int CMenuPcs::EquipCtrlCur()
 	} else {
 		int padIndex = blocked;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
+		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	blocked = false;
@@ -320,7 +320,7 @@ int CMenuPcs::EquipCtrlCur()
 	} else {
 		int padIndex = blocked;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
+		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 
 	if (hold == 0) {

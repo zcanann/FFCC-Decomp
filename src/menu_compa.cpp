@@ -377,7 +377,7 @@ activePress:
 		unsigned int port = 0;
 		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
 		port &= ~mask;
-		rawPress = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + port * 0x54 + 8);
+		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
 	}
 	press = rawPress & 0xffff;
 
@@ -397,7 +397,7 @@ activeHold:
 		unsigned int port = 0;
 		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
 		port &= ~mask;
-		rawHold = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + port * 0x54 + 0x14);
+		rawHold = Pad.GetPadInputs()[port].repeatButton;
 	}
 	hold = rawHold & 0xffff;
 

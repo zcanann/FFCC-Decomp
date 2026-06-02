@@ -327,7 +327,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	{
 		int padIndex = padBusy;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
-		trig1 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 8);
+		trig1 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	if ((trig1 & 0x20) == 0)
@@ -350,7 +350,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	{
 		int padIndex = padBusy;
 		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
-		trig2 = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 4);
+		trig2 = Pad.GetPadInputs()[padIndex].button[0];
 	}
 
 	if ((trig2 & 0x40) == 0)

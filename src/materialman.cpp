@@ -130,7 +130,7 @@ static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
-static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
+static inline void DestroyTexScrollKeyFrame(void* keyFrame)
 {
     if (keyFrame == 0) {
         return;
@@ -161,7 +161,6 @@ static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
     }
 
     operator delete(keyFrame);
-    keyFrame = 0;
 }
 
 static void ReleaseRefNonNull(CRef* object)
@@ -2324,11 +2323,19 @@ void CMaterialMan::ErrorTexMapIdCur()
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(&m_u1));
+        void* keyFrame = *reinterpret_cast<void**>(&m_u1);
+        if (keyFrame != 0) {
+            DestroyTexScrollKeyFrame(keyFrame);
+            *reinterpret_cast<void**>(&m_u1) = 0;
+        }
     }
 
     if (m_type1 == 2) {
-        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(&m_v1));
+        void* keyFrame = *reinterpret_cast<void**>(&m_v1);
+        if (keyFrame != 0) {
+            DestroyTexScrollKeyFrame(keyFrame);
+            *reinterpret_cast<void**>(&m_v1) = 0;
+        }
     }
 }
 

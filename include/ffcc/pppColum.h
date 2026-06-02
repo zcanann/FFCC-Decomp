@@ -17,7 +17,10 @@ struct pppColumUnkB {
     s32 m_dataValIndex;    // 0x04
     s16 m_initWOrk;        // 0x08
     u16 m_unkA;            // 0x0A
-    u32 m_stepValue;       // 0x0C
+    union {
+        u32 m_stepValue;       // 0x0C
+        u8 m_baseColor[4];     // 0x0C
+    };
     u8 m_arg3;             // 0x10
     u8 m_count;            // 0x11
     u8 m_unk12;            // 0x12

@@ -4,11 +4,26 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct pppColorDelta
+{
+    short r;
+    short g;
+    short b;
+    short a;
+};
+
+struct pppColAcceleStep
+{
+    int m_graphId;
+    int m_pad4;
+    pppColorDelta m_acceleration;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppColAccele(_pppPObject* object, void* data, _pppCtrlTable* ctrlTable);
+void pppColAccele(_pppPObject* object, pppColAcceleStep* data, _pppCtrlTable* ctrlTable);
 void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus

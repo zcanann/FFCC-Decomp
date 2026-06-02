@@ -849,59 +849,69 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), obj->m_localMtx, obj->m_worldMtx);
         }
 
-        for (CMapObj* child = obj->m_child; child != 0; child = child->m_next) {
-            unsigned char childDirty = dirty;
+        CMapObj* child = obj->m_child;
+        if (child != 0) {
+            do {
+                unsigned char childDirty = dirty;
 
-            if (U8At(child, 0x1B) != 0) {
-                U8At(child, 0x1B) = 0;
-                if (U8At(child, 0x1C) != 0) {
-                    PSMTXScale(child->m_localMtx, F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
-                    PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
-                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                    PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
-                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                    PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
-                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                    PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
-                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
-                }
-
-                childDirty = 1;
-            }
-
-            if (childDirty != 0) {
-                PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
-            }
-
-            for (CMapObj* grandChild = child->m_child; grandChild != 0; grandChild = grandChild->m_next) {
-                unsigned char grandChildDirty = childDirty;
-
-                if (U8At(grandChild, 0x1B) != 0) {
-                    U8At(grandChild, 0x1B) = 0;
-                    if (U8At(grandChild, 0x1C) != 0) {
-                        PSMTXScale(
-                            grandChild->m_localMtx, F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
-                        PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
-                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                        PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
-                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                        PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
-                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
-                        PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
-                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
+                if (U8At(child, 0x1B) != 0) {
+                    U8At(child, 0x1B) = 0;
+                    if (U8At(child, 0x1C) != 0) {
+                        PSMTXScale(child->m_localMtx, F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
+                        PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
+                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
+                        PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
+                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
+                        PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
+                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
+                        PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
+                        PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     }
 
-                    grandChildDirty = 1;
+                    childDirty = 1;
                 }
 
-                if (grandChildDirty != 0) {
-                    PSMTXConcat(child->m_worldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
+                if (childDirty != 0) {
+                    PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
                 }
 
-                if (grandChild->m_child != 0) {
-                    grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
+                CMapObj* grandChild = child->m_child;
+                if (grandChild != 0) {
+                    do {
+                        unsigned char grandChildDirty = childDirty;
+
+                        if (U8At(grandChild, 0x1B) != 0) {
+                            U8At(grandChild, 0x1B) = 0;
+                            if (U8At(grandChild, 0x1C) != 0) {
+                                PSMTXScale(
+                                    grandChild->m_localMtx, F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
+                                PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
+                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
+                                PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
+                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
+                                PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
+                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
+                                PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
+                                PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
+                            }
+
+                            grandChildDirty = 1;
+                        }
+
+                        if (grandChildDirty != 0) {
+                            PSMTXConcat(child->m_worldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
+                        }
+
+                        if (grandChild->m_child != 0) {
+                            grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
+                        }
+
+                        grandChild = grandChild->m_next;
+                    } while (grandChild != 0);
                 }
-            }
+
+                child = child->m_next;
+            } while (child != 0);
         }
 
         obj = obj->m_next;

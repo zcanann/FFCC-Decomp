@@ -10,8 +10,6 @@
 
 extern const float FLOAT_80330108;
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 static inline pppShapeAnimData* ShapeAnimData(long* animData)
 {
     return reinterpret_cast<pppShapeAnimData*>(animData);

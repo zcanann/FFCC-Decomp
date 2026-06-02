@@ -89,9 +89,9 @@ inline CTexAnim::CTexAnim()
     m_seqIndex = 0;
     m_frame = zero;
     m_mode = -2;
-    m_chin = zero;
-    m_texGenT = zero;
-    m_texGenS = zero;
+    m_texGen.z = zero;
+    m_texGen.y = zero;
+    m_texGen.x = zero;
 }
 
 /*
@@ -184,8 +184,8 @@ inline void CTexAnim::SetTexGen()
 
     if (material != 0) {
         CTexScroll* texScroll = material->GetTexScroll(m_refData->m_texSrtIndex);
-        texScroll->m_u0 = m_texGenS;
-        texScroll->m_v0 = m_texGenT;
+        texScroll->m_u0 = m_texGen.x;
+        texScroll->m_v0 = m_texGen.y;
         texScroll->m_u1 = zero;
         texScroll->m_v1 = zero;
         if (zero == texScroll->m_u1) {
@@ -307,12 +307,13 @@ inline void CTexAnimSeq::Interp(float frame, Vec& texGen)
         if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
             float t = FLOAT_8032fb38;
             float frameSpan = nextFrame - (float)keyData->m_frame;
-            if (frameSpan != FLOAT_8032fb38) {
+            if (frameSpan == FLOAT_8032fb38) {
+            } else {
                 t = (currentFrame - (float)keyData->m_frame) / frameSpan;
             }
 
-            Vec v1;
             Vec v0;
+            Vec v1;
             PSVECScale(&keyData->m_texGen, &v0, FLOAT_8032fb3c - t);
             PSVECScale(&nextKeyData->m_texGen, &v1, t);
             PSVECAdd(&v0, &v1, &texGen);
@@ -365,7 +366,7 @@ inline int CTexAnim::IsChin()
  */
 inline float CTexAnim::GetChin()
 {
-    return m_chin;
+    return m_texGen.z;
 }
 
 /*
@@ -408,11 +409,7 @@ inline void CTexAnim::AddFrame(float frameStep)
 
     if (!IsTexAnimE1Flag(seq->m_flags) || !IsTexAnimE1Flag(seq->m_flags) ||
         (FLOAT_8032fb3c != m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
-        Vec texGen;
-        seq->Interp(m_frame, texGen);
-        m_texGenS = texGen.x;
-        m_texGenT = texGen.y;
-        m_chin = texGen.z;
+        seq->Interp(m_frame, m_texGen);
 
         if (m_mode != -3) {
             m_frame = m_frame + frameStep;
@@ -530,9 +527,9 @@ inline CTexAnim* CTexAnim::Duplicate(CMemory::CStage* stage)
     copy->m_seqIndex = m_seqIndex;
     copy->m_frame = m_frame;
     copy->m_mode = m_mode;
-    copy->m_texGenS = m_texGenS;
-    copy->m_texGenT = m_texGenT;
-    copy->m_chin = m_chin;
+    copy->m_texGen.x = m_texGen.x;
+    copy->m_texGen.y = m_texGen.y;
+    copy->m_texGen.z = m_texGen.z;
 
     return copy;
 }

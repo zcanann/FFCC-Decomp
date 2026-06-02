@@ -1,4 +1,5 @@
 #include "ffcc/pppYmCheckBGHeight.h"
+#include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
@@ -24,6 +25,21 @@ static inline Vec* CheckBGHeightTargetPosition(_pppMngSt* mng)
     return &mng->m_paramVec0;
 }
 
+struct CMapCylinderRaw {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    f32 m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
+STATIC_ASSERT(sizeof(CMapCylinderRaw) == 0x40);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_axis) == 0x18);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_radius) == 0x24);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_boundsMin) == 0x28);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_boundsMax) == 0x34);
+
 /*
  * --INFO--
  * PAL Address: 0x800d8abc
@@ -38,7 +54,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 {
     _pppMngSt* pppMngSt;
     Vec direction;
-    CMapCylinder cylinder;
+    CMapCylinderRaw cylinder;
     Vec hitPos;
     float nextY;
     float zero;
@@ -79,7 +95,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cylinder.m_axis.z = zero;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(&cylinder, &direction, (unsigned long)-1) != 0) {
+        if (MapMng.CheckHitCylinderNear((CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             if ((nextY - param_2->m_unk0xC) > hitPos.y) {
                 finalY = nextY;

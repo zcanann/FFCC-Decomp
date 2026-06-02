@@ -2062,9 +2062,7 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		int countTop = digitEchoBase + activePartyCount + 1;
-		if (digitEchoBase + activePartyCount < (int)header->count) {
-			sprites[digitEchoBase + activePartyCount].startFrame = sprites[1].startFrame;
-		}
+		sprites[digitEchoBase + activePartyCount].startFrame = sprites[1].startFrame;
 		if (countTop + activePartyCount > (int)header->count) {
 			countTop = (int)header->count - activePartyCount;
 		}

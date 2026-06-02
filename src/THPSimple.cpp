@@ -967,8 +967,11 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.curVolume = kTHPSimpleDefaultVolume;
-    SimpleControl.targetVolume = kTHPSimpleDefaultVolume;
+    {
+        const f32* defaultVolume = &kTHPSimpleDefaultVolume;
+        SimpleControl.curVolume = *defaultVolume;
+        SimpleControl.targetVolume = *defaultVolume;
+    }
     SimpleControl.rampCount = 0;
 
     return 1;

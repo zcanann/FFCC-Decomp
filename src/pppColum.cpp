@@ -261,7 +261,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
     pppColumFrameWork* work;
     int i;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         serializedDataOffsets = param_3->m_serializedDataOffsets;
         work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
         if (work->m_values == 0) {

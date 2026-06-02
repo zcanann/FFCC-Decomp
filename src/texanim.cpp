@@ -276,37 +276,37 @@ void CTexAnimSet::AddFrame()
             (FLOAT_8032fb3c != texAnim->m_frame) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
             float currentFrame = (float)fmod((double)texAnim->m_frame, (double)(float)seq->m_totalFrames);
             unsigned int keyCount = seq->m_keyCount;
-            unsigned int* keys = seq->m_keys;
+            CTexAnimKey* keys = seq->m_keys;
             unsigned int keyIndex = 0;
             unsigned int lastKeyIndex = keyCount - 1;
 
             while (keyIndex < keyCount) {
-                unsigned int* keyData = keys + keyIndex * 0xC;
-                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[0xC] : seq->m_totalFrames);
-                unsigned int* nextKeyData;
+                CTexAnimKey* keyData = &keys[keyIndex];
+                float nextFrame = (float)((keyIndex < lastKeyIndex) ? keyData[1].m_frame : seq->m_totalFrames);
+                CTexAnimKey* nextKeyData;
 
                 if (keyIndex < lastKeyIndex) {
-                    nextKeyData = keys + (keyIndex + 1) * 0xC;
+                    nextKeyData = &keys[keyIndex + 1];
                 } else {
                     nextKeyData = keys;
                 }
 
-                if (((float)keyData[0] <= currentFrame) && (currentFrame < nextFrame)) {
+                if (((float)keyData->m_frame <= currentFrame) && (currentFrame < nextFrame)) {
                     float t = FLOAT_8032fb38;
-                    float frameSpan = nextFrame - (float)keyData[0];
+                    float frameSpan = nextFrame - (float)keyData->m_frame;
                     if (frameSpan != FLOAT_8032fb38) {
-                        t = (currentFrame - (float)keyData[0]) / frameSpan;
+                        t = (currentFrame - (float)keyData->m_frame) / frameSpan;
                     }
 
                     Vec v1;
                     Vec v0;
-                    PSVECScale(reinterpret_cast<Vec*>(keyData + 9), &v0, FLOAT_8032fb3c - t);
-                    PSVECScale(reinterpret_cast<Vec*>(nextKeyData + 9), &v1, t);
+                    PSVECScale(&keyData->m_texGen, &v0, FLOAT_8032fb3c - t);
+                    PSVECScale(&nextKeyData->m_texGen, &v1, t);
                     PSVECAdd(&v0, &v1, reinterpret_cast<Vec*>(&texAnim->m_texGenS));
 
                     if (!IsTexAnimInterpFlag(seq->m_flags)) {
-                        texAnim->m_texGenS = reinterpret_cast<float*>(keyData)[9];
-                        texAnim->m_texGenT = reinterpret_cast<float*>(keyData)[10];
+                        texAnim->m_texGenS = keyData->m_texGen.x;
+                        texAnim->m_texGenT = keyData->m_texGen.y;
                     }
                     break;
                 }
@@ -486,7 +486,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                     }
                 } else {
                     seq->m_keyCount = innerChunk.m_size / 0x30;
-                    seq->m_keys = reinterpret_cast<unsigned int*>(
+                    seq->m_keys = static_cast<CTexAnimKey*>(
                         Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
                     memcpy(seq->m_keys, chunkFile.GetAddress(), innerChunk.m_size);
                     continue;

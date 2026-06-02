@@ -167,7 +167,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
             uv = (f32)mapMesh->m_uvPairs[i].m_v;
             mapMesh->m_uvPairs[i].m_v = (s16)(uv + perV);
         }
-        if (work->m_frame >= (u32)(step->m_texAnm.m_tilesU * step->m_texAnm.m_tilesV)) {
+        if ((u32)(step->m_texAnm.m_tilesU * step->m_texAnm.m_tilesV) <= work->m_frame) {
             mapMesh->m_uvPairs[i].m_v = (s16)(-((perV * (f32)step->m_texAnm.m_tilesV) -
                                                 (f32)mapMesh->m_uvPairs[i].m_v));
         }

@@ -329,9 +329,9 @@ int CCameraPcs::GetTable(unsigned long tableIndex)
  */
 void CCameraPcs::create()
 {
+    float value18 = FLOAT_8032fa18;
     float value5c = FLOAT_8032fa5c;
     float zero = FLOAT_8032fa34;
-    float value18 = FLOAT_8032fa18;
     float valueb0 = FLOAT_8032fab0;
 
     m_targetZ = FLOAT_8032fa34;

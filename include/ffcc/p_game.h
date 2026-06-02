@@ -33,15 +33,17 @@ public:
         static CProcessTableCallback desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw2__8CGamePcsFv)};
         static CProcessTableCallback desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc2__8CGamePcsFv)};
 
-        m_table.m_fields.m_create = desc0;
-        m_table.m_fields.m_destroy = desc1;
-        m_table.m_fields.m_entries[0].m_callback = desc2;
-        m_table.m_fields.m_entries[1].m_callback = desc3;
-        m_table.m_fields.m_entries[2].m_callback = desc4;
-        m_table.m_fields.m_entries[3].m_callback = desc5;
-        m_table.m_fields.m_entries[4].m_callback = desc6;
-        m_table.m_fields.m_entries[5].m_callback = desc7;
-        m_table.m_fields.m_entries[6].m_callback = desc8;
+        CProcessTable* table = &m_table;
+
+        table->m_fields.m_create = desc0;
+        table->m_fields.m_destroy = desc1;
+        table->m_fields.m_entries[0].m_callback = desc2;
+        table->m_fields.m_entries[1].m_callback = desc3;
+        table->m_fields.m_entries[2].m_callback = desc4;
+        table->m_fields.m_entries[3].m_callback = desc5;
+        table->m_fields.m_entries[4].m_callback = desc6;
+        table->m_fields.m_entries[5].m_callback = desc7;
+        table->m_fields.m_entries[6].m_callback = desc8;
     }
 
     void Init();

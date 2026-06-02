@@ -64,14 +64,6 @@ extern "C" const float FLOAT_8032FCC8 = 1.0f;
 extern "C" const float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
 
-static inline void WriteU32(void* base, unsigned int offset, unsigned int value) {
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
-}
-
-static inline void WriteF32(void* base, unsigned int offset, float value) {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
-}
-
 static inline float LoadFloat(const float& value)
 {
     return value;
@@ -587,7 +579,6 @@ void CMaterialEditorPcs::destroyViewer()
  */
 void CMaterialEditorPcs::createViewer()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
         Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs), 0));
     GXColor clear;
@@ -602,15 +593,15 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    WriteU32(self, 0x98, 1);
+    m_usbStream.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
     m_displayTextureEnabled = 0;
-    memset(self + 0xec, 0, 0x120);
+    memset(&field_0xec, 0, 0x120);
 
     fVar1 = LoadFloat(FLOAT_8032FCC8);
-    WriteF32(self, 0x128, fVar1);
-    WriteF32(self, 0x114, fVar1);
-    WriteF32(self, 0x100, fVar1);
-    WriteF32(self, 0xec, fVar1);
+    field_0x128 = fVar1;
+    field_0x114 = fVar1;
+    field_0x100 = fVar1;
+    field_0xec = fVar1;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();

@@ -36,11 +36,15 @@ struct PRyjMegaBirthModel
     float m_speed;                // 0x12C
     u8 m_speedMode;               // 0x130
     u8 m_enableParticleColor;     // 0x131
-    u8 _pad132[0x04];
+    u8 m_rotationRandomFlags;     // 0x132
+    u8 m_scaleRandomFlags;        // 0x133
+    u8 m_texScaleRandomMode;      // 0x134
+    u8 m_matrixMode;              // 0x135
     u8 m_enableWorldMatrix;       // 0x136
-    u8 _pad137[0x03];
+    u8 m_matrixFinalizeMode;      // 0x137
+    u8 _pad138[0x02];
     u8 m_zEnable;                 // 0x13A
-    u8 _pad13B;
+    u8 m_clampDirectionalSpeed;   // 0x13B
     u8 m_blendMode;               // 0x13C
     u8 m_cullMode;                // 0x13D
     u8 _pad13E;

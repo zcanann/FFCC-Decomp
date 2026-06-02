@@ -37,7 +37,13 @@ struct PRyjMegaBirthModel
     Vec m_baseDirection;          // 0xE8
     u8 _padF4[0x04];
     Vec m_accelerationAxis;       // 0xF8
-    u8 _pad104[0x1C];
+    u8 _pad104[0x04];
+    float m_directionVelocityStart; // 0x108
+    float m_directionVelocityStep;  // 0x10C
+    float m_directionVelocityRandom; // 0x110
+    float m_acceleration;          // 0x114
+    float m_accelerationStep;      // 0x118
+    u8 _pad11C[0x04];
     Vec m_directionScale;         // 0x120
     float m_speed;                // 0x12C
     u8 m_speedMode;               // 0x130

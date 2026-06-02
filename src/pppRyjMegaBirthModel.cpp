@@ -62,6 +62,11 @@ RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorDeltaAdds) == 0x3C);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorFrameDeltas) == 0xBC);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_baseDirection) == 0xE8);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationAxis) == 0xF8);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStart) == 0x108);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStep) == 0x10C);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityRandom) == 0x110);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_acceleration) == 0x114);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationStep) == 0x118);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionScale) == 0x120);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speed) == 0x12C);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speedMode) == 0x130);
@@ -717,10 +722,12 @@ void birth(
         *f32_at(particleBytes, 0x80) += *f32_at(particleBytes, 0x8C);
     }
 
-    *f32_at(particleBytes, 0x84) = *(float*)(payload + 0x10C);
-    *f32_at(particleBytes, 0x88) = *(float*)(payload + 0x114);
-    if (*(float*)(payload + 0x110) != FLOAT_80330498) {
-        *f32_at(particleBytes, 0x84) += FLOAT_803304c0 * *(float*)(payload + 0x110) * Math.RandF() - *(float*)(payload + 0x110);
+    *f32_at(particleBytes, 0x84) = params->m_directionVelocityStep;
+    *f32_at(particleBytes, 0x88) = params->m_acceleration;
+    if (params->m_directionVelocityRandom != FLOAT_80330498) {
+        *f32_at(particleBytes, 0x84) +=
+            FLOAT_803304c0 * params->m_directionVelocityRandom * Math.RandF() -
+            params->m_directionVelocityRandom;
     }
     *f32_at(particleBytes, 0x8C) = *(float*)(payload + 0xDC);
     *f32_at(particleBytes, 0x90) = *(float*)(payload + 0xE0);
@@ -815,23 +822,23 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         *f32_at(p, 0x70) += *(float*)(payload + 0xB8);
     }
 
-    *f32_at(p, 0x80) += *(float*)(payload + 0x10C);
+    *f32_at(p, 0x80) += pRyjMegaBirthModel->m_directionVelocityStep;
     if (pRyjMegaBirthModel->m_clampDirectionalSpeed == 0) {
-        if ((FLOAT_80330498 < *(float*)(payload + 0x108)) &&
-            (*(float*)(payload + 0x10C) < FLOAT_80330498)) {
+        if ((FLOAT_80330498 < pRyjMegaBirthModel->m_directionVelocityStart) &&
+            (pRyjMegaBirthModel->m_directionVelocityStep < FLOAT_80330498)) {
             if (*f32_at(p, 0x80) < FLOAT_80330498) {
                 *f32_at(p, 0x80) = FLOAT_80330498;
             }
         } else {
-            if ((*(float*)(payload + 0x108) < FLOAT_80330498) &&
-                (FLOAT_80330498 < *(float*)(payload + 0x10C)) &&
+            if ((pRyjMegaBirthModel->m_directionVelocityStart < FLOAT_80330498) &&
+                (FLOAT_80330498 < pRyjMegaBirthModel->m_directionVelocityStep) &&
                 (FLOAT_80330498 < *f32_at(p, 0x80))) {
                 *f32_at(p, 0x80) = FLOAT_80330498;
             }
         }
     }
 
-    *f32_at(p, 0x84) += *(float*)(payload + 0x118);
+    *f32_at(p, 0x84) += pRyjMegaBirthModel->m_accelerationStep;
     direction.x = particleData->m_matrix[0][1];
     direction.y = particleData->m_matrix[1][1];
     direction.z = particleData->m_matrix[2][1];

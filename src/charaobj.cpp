@@ -1468,7 +1468,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
 	}
 
-	int current = *reinterpret_cast<short*>(script + 0x3E + (staIndex * 2));
+	short current = *reinterpret_cast<short*>(script + 0x3E + (staIndex * 2));
 	value &= ~(value >> 31);
 
 	if (current == 0 && value != 0) {

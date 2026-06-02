@@ -28,12 +28,6 @@ extern const float FLOAT_80332fec;
 extern const float FLOAT_80332ff0;
 
 extern "C" {
-extern const float kMenuArtiNegativeOne = -1.0f;
-extern const float kMenuArtiDefaultScale = 1.2f;
-extern const float kMenuArtiBoundsMax = 10000000000.0f;
-extern const float kMenuArtiBoundsMin = -10000000000.0f;
-extern const float kMenuArtiHalfTileOffset = 15.5f;
-extern const float kMenuArtiTau = 6.2831855f;
 extern const char s_MenuOptionMusic[] = "Music";
 extern const char s_MenuOptionOn[] = "On";
 extern const char s_MenuOptionOff[] = "Off";

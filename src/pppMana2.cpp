@@ -1075,7 +1075,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 {
     u32 texBufferSize;
     VMana2* mana2Work;
-    u32* work;
     void* dstBuffer;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -1085,7 +1084,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     u8* setup;
     CChara::CMesh* mesh;
     CChara::CMesh::CRefData* meshData;
-    s32 dlOffset;
     u32 meshIndex;
     u32 vertexIndex;
 
@@ -1095,7 +1093,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
     mana2Work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
-    work = reinterpret_cast<u32*>(mana2Work);
     setupOffset = param_3->m_serializedDataOffsets[1];
     setup = (u8*)pppMana2 + 0x80 + setupOffset;
     if (gObject == NULL) {
@@ -1177,7 +1174,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     mesh = model->m_meshes;
-    if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
+    if (mana2Work->m_positions == 0 && mana2Work->m_normals == 0 && mana2Work->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < model->m_data->m_meshCount; meshIndex++) {
             meshData = mesh->m_data;
             u8 type = param_2->m_type;
@@ -1185,11 +1182,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
             if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
                 ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
                 ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
-                if (work[0x19] == 0) {
-                    work[0x19] =
-                        (u32)pppMemAlloc(meshData->m_vertexCount * 0xC, ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x232);
-                    Vec* reflectionVec = (Vec*)work[0x19];
+                if (mana2Work->m_meshReflectionVec == 0) {
+                    mana2Work->m_meshReflectionVec =
+                        static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
+                                                      const_cast<char*>(s_pppMana2_cpp), 0x232));
+                    Vec* reflectionVec = mana2Work->m_meshReflectionVec;
                     float zero = FLOAT_80331898;
                     for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         reflectionVec->z = zero;
@@ -1199,11 +1196,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                     }
                 }
 
-                if (work[0x1A] == 0) {
-                    work[0x1A] =
-                        (u32)pppMemAlloc(meshData->m_vertexCount << 2, ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x23B);
-                    u8* color = (u8*)work[0x1A];
+                if (mana2Work->m_meshColors == 0) {
+                    mana2Work->m_meshColors =
+                        static_cast<GXColor*>(pppMemAlloc(meshData->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
+                                                          const_cast<char*>(s_pppMana2_cpp), 0x23B));
+                    u8* color = reinterpret_cast<u8*>(mana2Work->m_meshColors);
                     for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         color[0] = 0xFF;
                         color[1] = 0xFF;
@@ -1213,11 +1210,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                     }
                 }
 
-                if (work[0x1B] == 0) {
-                    work[0x1B] =
-                        (u32)pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppMana2_cpp), 0x244);
-                    u16* texCoord = (u16*)work[0x1B];
+                if (mana2Work->m_meshTexCoords == 0) {
+                    mana2Work->m_meshTexCoords =
+                        static_cast<S16Vec2d*>(pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
+                                                           const_cast<char*>(s_pppMana2_cpp), 0x244));
+                    u16* texCoord = reinterpret_cast<u16*>(mana2Work->m_meshTexCoords);
                     for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         texCoord[1] = 0;
                         texCoord[0] = 0;
@@ -1225,58 +1222,58 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                     }
                 }
 
-                work[0x18] = (u32)pppMemAlloc(meshData->m_displayListCount << 2, ppvEnv->m_stagePtr,
-                                              const_cast<char*>(s_pppMana2_cpp), 0x24B);
-                u32* dlInfo = (u32*)meshData->m_displayLists;
-                dlOffset = (meshData->m_displayListCount - 1) * 4;
+                mana2Work->m_displayListCopies =
+                    static_cast<void**>(pppMemAlloc(meshData->m_displayListCount * sizeof(void*), ppvEnv->m_stagePtr,
+                                                    const_cast<char*>(s_pppMana2_cpp), 0x24B));
+                CChara::CMesh::CDisplayList* displayList = meshData->m_displayLists;
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
-                    *(u32*)(work[0x18] + dlOffset) =
-                        (u32)pppMemAlloc(dlInfo[0], ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
-                    *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
-                    work[0x3A] = dlInfo[0];
-                    memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
-                    DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    gUtil.ReWriteDisplayList((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
-                    dlOffset -= 4;
-                    dlInfo += 3;
+                    void* copiedDisplayList =
+                        pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
+                    copiedDisplayList = reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
+                    mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana2Work->m_displayListSize = displayList->m_size;
+                    memcpy(copiedDisplayList, displayList->m_data, displayList->m_size);
+                    DCFlushRange(copiedDisplayList, displayList->m_size);
+                    gUtil.ReWriteDisplayList(copiedDisplayList, displayList->m_size, 1);
+                    displayList++;
                 }
             }
 
             if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj4) == 0) ||
                 ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj2) == 0)) {
-                work[0xF] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A);
-                work[0x10] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B);
-                work[0x17] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C);
-                work[0x15] = (u32)pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26D);
-                work[0x16] = (u32)pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26E);
-                work[0x12] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26F);
-                work[0x13] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x270);
-                work[0x14] = (u32)pppMemAlloc(0xC00, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x271);
-                work[0x11] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x272);
+                mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A));
+                mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B));
+                mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C));
+                mana2Work->m_texCoord0 = static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26D));
+                mana2Work->m_texCoord1 = static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26E));
+                mana2Work->m_waterHeightA = static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26F));
+                mana2Work->m_waterHeightB = static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x270));
+                mana2Work->m_indices = static_cast<u16*>(pppMemAlloc(0xC00, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x271));
+                mana2Work->m_reflectionVec = static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x272));
 
-                float* waterHeightA = (float*)work[0x12];
-                float* waterHeightB = (float*)work[0x13];
+                float* waterHeightA = mana2Work->m_waterHeightA;
+                float* waterHeightB = mana2Work->m_waterHeightB;
                 float zero = FLOAT_80331898;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
                 }
 
-                CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
-                                param_2->m_waterScale);
+                CreateWaterMesh(mana2Work->m_positions, mana2Work->m_normals, mana2Work->m_texCoord0,
+                                mana2Work->m_indices, param_2->m_waterScale);
             }
 
             mesh++;
         }
     }
 
-    if ((param_2->m_type == 1 || param_2->m_type == 2) && work[0x12] != 0) {
-        *(u32*)(work[0x12] + 0x240) = param_2->m_rippleLevel;
+    if ((param_2->m_type == 1 || param_2->m_type == 2) && mana2Work->m_waterHeightA != 0) {
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana2Work->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
     }
 
     if (param_2->m_type != 0) {
         if (param_2->m_type == 1 || param_2->m_type == 2) {
-            UpdateWaterMesh((VMana2*)work);
+            UpdateWaterMesh(mana2Work);
         }
 
         mesh = model->m_meshes;
@@ -1287,15 +1284,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
             if (((type == 1) && strcmp(meshData->m_name, s_manaShapeObj5) == 0) ||
                 ((type == 2) && strcmp(meshData->m_name, s_manaShapeObj3) == 0) ||
                 ((type == 3) && strcmp(meshData->m_name, s_manaShapeObj1) == 0)) {
-                dlOffset = (meshData->m_displayListCount - 1) * 4;
                 for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
-                        (Vec*)work[0x19], meshData->m_vertices, meshData->m_normals,
+                        mana2Work->m_meshReflectionVec, meshData->m_vertices, meshData->m_normals,
                         meshData->m_vertexCount, model->m_data->m_posQuant,
                         model->m_data->m_normQuant, model->m_matrix,
-                        *(void**)(work[0x18] + dlOffset), work[0x3A], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
+                        mana2Work->m_displayListCopies[dlIndex], mana2Work->m_displayListSize,
+                        mana2Work->m_meshColors, mana2Work->m_meshTexCoords,
                         &model->m_nodes[meshData->m_nodeIndex]);
-                    dlOffset -= 4;
                 }
             }
 

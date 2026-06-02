@@ -3,7 +3,49 @@
 
 #include "ffcc/partMng.h"
 
-struct PRyjMegaBirthModel : _PARTICLE_DATA {}; // Size 0x140
+struct PRyjMegaBirthModel
+{
+    u8 _pad00[0x04];
+    s32 m_modelIndex;             // 0x04
+    u8 _pad08;
+    u8 m_fogIndex;                // 0x09
+    u8 _pad0A[0x03];
+    u8 m_useEnvDepth;             // 0x0D
+    u8 _pad0E[0x0A];
+    float m_drawDepth;            // 0x18
+    u8 _pad1C[0x04];
+    u16 m_maxParticles;           // 0x20
+    union {
+        u16 m_emitCount;          // 0x22
+        struct EmitFields {
+            u8 m_fadeOutFrames;   // 0x22
+            u8 m_emitCountHigh;
+        } m_emit;
+    };
+    u16 m_emitInterval;           // 0x24
+    s16 m_life;                   // 0x26
+    u8 _pad28;
+    u8 m_fadeInFrames;            // 0x29
+    u8 m_spawnMode;               // 0x2A
+    u8 m_spread;                  // 0x2B
+    u8 m_colorRandom[4];          // 0x2C
+    u8 _pad30[0xC8];
+    Vec m_accelerationAxis;       // 0xF8
+    u8 _pad104[0x1C];
+    Vec m_directionScale;         // 0x120
+    float m_speed;                // 0x12C
+    u8 m_speedMode;               // 0x130
+    u8 m_enableParticleColor;     // 0x131
+    u8 _pad132[0x04];
+    u8 m_enableWorldMatrix;       // 0x136
+    u8 _pad137[0x03];
+    u8 m_zEnable;                 // 0x13A
+    u8 _pad13B;
+    u8 m_blendMode;               // 0x13C
+    u8 m_cullMode;                // 0x13D
+    u8 _pad13E;
+    u8 m_lightTarget;             // 0x13F
+}; // Size 0x140
 
 struct VRyjMegaBirthModel
 {

@@ -112,31 +112,11 @@ CRelProfile g_hit_prof;
 unsigned char g_map_calc_prof;
 unsigned char g_map_draw_prof;
 extern const float DrawRangeDefault;
-extern const float kPMapBoundMinInit;
-extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 extern const char s_p_map_cpp[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
-
-struct CBoundHack {
-    Vec m_min;
-    Vec m_max;
-
-    CBoundHack()
-    {
-        float min = kPMapBoundMinInit;
-        m_min.z = min;
-        m_min.y = min;
-        m_min.x = min;
-
-        float max = kPMapBoundMaxInit;
-        m_max.z = max;
-        m_max.y = max;
-        m_max.x = max;
-    }
-};
 
 /*
  * --INFO--
@@ -776,9 +756,8 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBoundHack bound;
-                bound = *reinterpret_cast<CBoundHack*>(&CameraPcs.m_shadowRectBound);
-                Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                CBound bound = CameraPcs.m_shadowRectBound;
+                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -826,11 +805,10 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                CBoundHack bound;
-                bound = *reinterpret_cast<CBoundHack*>(&CameraPcs.m_shadowRectBound);
+                CBound bound = CameraPcs.m_shadowRectBound;
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
-                Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), color);
+                Graphic.DrawBound(bound, color);
             }
         }
     }

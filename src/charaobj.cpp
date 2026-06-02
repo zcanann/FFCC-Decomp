@@ -913,7 +913,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(4, 0, 0);
@@ -966,7 +966,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(6, 1, 0);
@@ -995,7 +995,7 @@ void CGCharaObj::onFrameStat()
 					Sound.StopSe3DGroup(m_particleId);
 					for (int i = 0; i < 0x16; i++) {
 						if ((0x3BU & (1U << i)) != 0) {
-							gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+							CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					reqAnim(0x1A, 0, 0);
@@ -1024,7 +1024,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+						CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(0x1D, 0, 0);

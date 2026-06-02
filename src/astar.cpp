@@ -26,7 +26,6 @@ extern const float kInfiniteCost;
 extern const char kAStarStepDebugFormat[];
 extern const char kAStarNewLine[];
 }
-static const float kAStarCalcInfiniteCost = 10000000.0f;
 static const char kAStarCalcStepDebugFormat[] = "%d ";
 static const char kAStarCalcNewLine[] = "\n";
 #include "ffcc/system.h"
@@ -582,13 +581,13 @@ void CAStar::calcAStar()
 				continue;
 			}
 
-			m_bestPath.m_cost = LoadFloat(kAStarCalcInfiniteCost);
+			m_bestPath.m_cost = LoadFloat(kInfiniteCost);
 
 			CATemp temp;
 
 			check(from, to, temp);
 
-			if (m_bestPath.m_cost < LoadFloat(kAStarCalcInfiniteCost))
+			if (m_bestPath.m_cost < LoadFloat(kInfiniteCost))
 			{
 				System.Printf(const_cast<char*>(kAStarCostDebugFormat), from, to, m_bestPath.m_cost);
 

@@ -67,6 +67,3 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 		pppSetFpMatrix(pppMngSt);
 	}
 }
-
-extern const float gPppParMoveMatrixZero = 0.0f;
-extern const float gPppParMoveMatrixOne = 1.0f;

@@ -20,6 +20,8 @@ extern "C" {
 extern u8* gCharaPartWorkPtr;
 extern const double kCharaViewerColorCenterBias;
 extern const float kCharaViewerZero;
+extern const float kCharaViewerBackOrthoRight;
+extern const float kCharaViewerBackOrthoBottom;
 extern const float kCharaViewerGridMax;
 extern const float kCharaViewerUnitStep;
 extern const float kCharaViewerGridSpacing;
@@ -36,11 +38,6 @@ extern const float kCharaViewerLightTargetY;
 extern const float kCharaViewerLightTargetZ;
 }
 
-extern "C" const double kCharaViewerColorCenterBias = 4503601774854144.0;
-extern "C" const float kCharaViewerZero = 0.0f;
-extern "C" const float kCharaViewerBackOrthoRight = 448.0f;
-extern "C" const float kCharaViewerBackOrthoBottom = 640.0f;
-extern "C" const float kCharaViewerGridMax = -100.0f;
 extern "C" const float kCharaViewerUnitStep = 1.0f;
 extern "C" const float kCharaViewerGridSpacing = 10.0f;
 extern "C" const float kCharaViewerGridMin = 100.0f;

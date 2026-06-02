@@ -335,9 +335,8 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
 {
     VYmMana* mana = static_cast<VYmMana*>(work);
     VYmMana* sourceMana = static_cast<VYmMana*>(vYmMana);
-    CChara::CMesh::CRefData* meshData = model->m_meshes[meshIndex].m_data;
-    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     u8 alpha = sourceMana->m_runtimeColor.a;
+    CChara::CMesh* meshes = model->m_meshes;
     if (alpha != 0) {
         mana->m_shadowColor.r = 0xFF;
         mana->m_shadowColor.g = 0xFF;
@@ -353,7 +352,10 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
     DCFlushRange(&mana->m_shadowColor, 4);
     GXSetArray((GXAttr)0xB, &mana->m_shadowColor, 4);
 
-    MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+    CMaterialSet* materialSet = model->m_data->m_materialSet;
+    CChara::CMesh::CRefData* meshData = meshes[meshIndex].m_data;
+    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
+    MaterialMan.SetMaterial(materialSet, displayList->m_material, 0, (_GXTevScale)0);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
 

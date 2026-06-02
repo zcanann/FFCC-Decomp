@@ -360,6 +360,42 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 	}
 }
 
+static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
+{
+	unsigned int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackKind * 0x48 + 0xA);
+	if (delay == 0xFFFF) {
+		delay = 0;
+	}
+
+	int stageRank = 0;
+	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+		if (2 < stageRank) {
+			stageRank = 2;
+		}
+	}
+
+	if (0 < stageRank) {
+		delay -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + stageRank * 2 + 0x58);
+		delay &= ~((int)delay >> 31);
+	}
+
+	if (delay == 0) {
+		reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0, 0, 0);
+		return;
+	}
+
+	int range = (int)delay / 5 + ((int)delay >> 31);
+	range -= range >> 31;
+	if (range < 1) {
+		range = 1;
+	}
+
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	*reinterpret_cast<unsigned int*>(mon + 0x6F0) = delay + Math.Rand(range);
+	reinterpret_cast<CGPrgObj*>(monObj)->changeStat(0x11, 0, 0);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80119A64
@@ -426,14 +462,14 @@ void CGMonObj::onStatAttack(int state)
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
 			}
 			if (prgObj->isLoopAnim() != 0) {
-				setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+				CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 			}
 		}
 		return;
 	}
 
 	if ((prgObj->m_stateArg == 0) && (prgObj->isLoopAnim() != 0)) {
-		setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 	}
 }
 
@@ -448,38 +484,7 @@ void CGMonObj::onStatAttack(int state)
  */
 void CGMonObj::setAttackAfter(int attackKind)
 {
-	unsigned int delay = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + attackKind * 0x48 + 0xA);
-	if (delay == 0xFFFF) {
-		delay = 0;
-	}
-
-	int stageRank = 0;
-	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		stageRank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-		if (2 < stageRank) {
-			stageRank = 2;
-		}
-	}
-
-	if (0 < stageRank) {
-		delay -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + stageRank * 2 + 0x58);
-		delay &= ~((int)delay >> 31);
-	}
-
-	if (delay == 0) {
-		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
-		return;
-	}
-
-	int range = (int)delay / 5 + ((int)delay >> 31);
-	range -= range >> 31;
-	if (range < 1) {
-		range = 1;
-	}
-
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<unsigned int*>(mon + 0x6F0) = delay + Math.Rand(range);
-	reinterpret_cast<CGPrgObj*>(this)->changeStat(0x11, 0, 0);
+	CGMonObj_SetAttackAfter(this, attackKind);
 }
 
 /*

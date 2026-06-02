@@ -2,6 +2,10 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/textureman.h"
 extern "C" {
+extern const float kConstrainCameraDirScaleOne = 1.0f;
+extern const float kConstrainCameraDirBaseFov = 25.0f;
+extern const float kConstrainCameraDirWideAspect = 1.3333f;
+extern const float kConstrainCameraDirZero = 0.0f;
 extern const float kPppFilterScreenMin;
 extern const float kPppFilterScreenMaxX;
 extern const float kPppFilterScreenMaxY;

@@ -40,7 +40,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 	float* value;
 	CChara::CModel* model;
 
-	if (gPppCalcDisabled == 0) {
+	if (ppvUserStopPartF == 0) {
 		value = GetConstrainCameraWork(constrainCameraForLoc, data);
 		CGObject* obj = ppvMng->m_owner;
 		model = GetModelPtr(obj);

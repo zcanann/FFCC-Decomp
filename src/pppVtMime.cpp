@@ -181,7 +181,7 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeState* state = GetVtMimeState(object, ctrl);
     VtMimeData* data = (VtMimeData*)step;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

@@ -43,7 +43,7 @@ static inline char randchar(char value, float scale)
  */
 void pppSRandDownCV(_pppPObject* basePtr, SRandDownCVParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

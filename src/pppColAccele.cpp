@@ -40,7 +40,7 @@ void pppColAccele(_pppPObject* object, void* data, _pppCtrlTable* ctrlTable)
     int frameData;
     short* accel2 = (short*)(object->m_workArea + offset1);
     
-    if (gPppCalcDisabled != 0)
+    if (ppvUserStopPartF != 0)
         return;
     
     frameData = *(int*)data;

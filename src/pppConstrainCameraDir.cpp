@@ -30,7 +30,7 @@ STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
                                 _pppCtrlTable* param_3)
 {
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
         float* value = (float*)(pppConstrainCameraDir->m_workArea + *param_3->m_serializedDataOffsets);
 

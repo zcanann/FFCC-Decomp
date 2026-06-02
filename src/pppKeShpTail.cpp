@@ -67,7 +67,7 @@ void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
 {
 	KeShpTailWork* work;
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

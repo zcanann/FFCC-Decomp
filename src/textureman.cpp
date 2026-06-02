@@ -548,6 +548,33 @@ int CTexture::CheckName(char* name)
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        if (GetRef() <= 1) {
+            m_imageData = 0;
+        }
+        amemCacheSet->Release(m_cacheId);
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+{
+    if (m_cacheId != -1) {
+        amemCacheSet->RefCnt0Up(m_cacheId);
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003B05C
  * PAL Size: 52b
  * EN Address: TODO

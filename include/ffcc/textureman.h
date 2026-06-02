@@ -54,6 +54,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);
     void CacheUnLoadTexture(CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(CAmemCacheSet*);
+    void CacheDumpTexture(CAmemCacheSet*);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     void FlushExternalTlut(void*, int);

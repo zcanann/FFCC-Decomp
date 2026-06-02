@@ -2919,21 +2919,16 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 
     while (index < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[index];
-        if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
-            unsigned char* textureIndex = reinterpret_cast<unsigned char*>(material);
-            unsigned char* textureRef = reinterpret_cast<unsigned char*>(material);
-
-            for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18))); i++) {
-                CTexture* object = *reinterpret_cast<CTexture**>(Ptr(textureRef, 0x3C));
+        if ((material != 0) && (material->m_pdtSlotIndex == pdtSlotIndex)) {
+            for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
+                CTexture* object = material->m_textures[i];
                 if (object != 0) {
                     ReleaseRefNonNull(object);
-                    *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
+                    material->m_textures[i] = 0;
                 }
 
-                textureSet->ReleaseTextureIdx(static_cast<int>(*reinterpret_cast<short*>(Ptr(textureIndex, 0x1A))), amemCacheSet);
-                *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
-                textureRef += 4;
-                textureIndex += 2;
+                textureSet->ReleaseTextureIdx(static_cast<int>(material->m_textureIndices[i]), amemCacheSet);
+                material->m_textures[i] = 0;
             }
 
             if (material != 0) {
@@ -3171,16 +3166,13 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
     while (materialIndex < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            CMaterial* textureSlot = material;
-
-            for (int slot = 0; slot < static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)))); slot++) {
-                if ((*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)))->CheckName(textureName)) {
+            for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
+                if (material->m_textures[slot]->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }
                     return materialIndex;
                 }
-                textureSlot = reinterpret_cast<CMaterial*>(Ptr(textureSlot, 4));
             }
         }
         materialIndex++;
@@ -3258,7 +3250,7 @@ unsigned long CMaterialSet::Find(char* name)
 
     while (index < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[index];
-        if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
+        if ((material != 0) && (strcmp(material->m_name, name) == 0)) {
             return index;
         }
         index++;

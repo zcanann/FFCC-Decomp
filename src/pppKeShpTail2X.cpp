@@ -43,13 +43,6 @@ struct KeShpTail2XStep {
     float m_envDepth;
 };
 
-struct KeShpTail2XShapeFrame {
-    s16 m_shapeOffset;
-    s16 m_duration;
-    u8 m_flags;
-    u8 _pad5[3];
-};
-
 struct KeShpTail2XWork {
     u8 m_count;
     u8 m_head;
@@ -215,8 +208,8 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
 
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
-    shapeEntry = (long*)((u8*)shape->m_animData +
-                         *(s16*)((u8*)shape->m_animData + (work->m_shapePrevFrame << 3) + 0x10));
+    pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
+    shapeEntry = (long*)((u8*)shapeAnim + shapeAnim->m_frames[work->m_shapePrevFrame].m_shapeOffset);
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -419,19 +412,20 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     pppCopyVector(work->m_posHistory[work->m_head], pos);
 
     {
-        u8* shape = static_cast<u8*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex]->m_animData);
+        pppShapeAnimData* shape =
+            static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex]->m_animData);
         u16 shapeFrame;
-        KeShpTail2XShapeFrame* frameEntry;
+        pppShapeAnimFrame* frameEntry;
 
         shapeFrame = work->m_shapeFrame;
         work->m_shapePrevFrame = shapeFrame;
 
         work->m_frameAcc += step->m_frameStep;
-        frameEntry = reinterpret_cast<KeShpTail2XShapeFrame*>(shape + ((u32)shapeFrame << 3) + 0x10);
+        frameEntry = &shape->m_frames[shapeFrame];
         if (work->m_frameAcc >= frameEntry->m_duration) {
             work->m_frameAcc -= frameEntry->m_duration;
             work->m_shapeFrame++;
-            if (work->m_shapeFrame >= *(s16*)(shape + 6)) {
+            if (work->m_shapeFrame >= shape->m_frameCount) {
                 if ((frameEntry->m_flags & 0x80) != 0) {
                     work->m_shapeFrame = 0;
                     work->m_frameAcc = 0;

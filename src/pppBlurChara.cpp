@@ -1,6 +1,7 @@
 #include "ffcc/pppBlurChara.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/gobject.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
@@ -10,6 +11,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/math.h"
 
@@ -30,14 +32,9 @@ struct Vec4d {
 
 struct pppBlurCharaWork {
     void* m_captureBuffer;
-    void* m_ownerObj;
-    _GXTexObj* m_smallTexObj;
+    CGObject* m_ownerObj;
+    GXTexObj* m_smallTexObj;
     float m_savedModelField;
-};
-
-struct pppMngStBlurCharaRaw {
-    char _padding0[0xDC];
-    void* m_charaObj;
 };
 
 extern const f32 FLOAT_80331030;
@@ -53,8 +50,6 @@ extern const f32 FLOAT_80331054;
 extern const double DOUBLE_80330FE8 = 3.0;
 extern const double DOUBLE_80331058;
 
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
@@ -69,7 +64,7 @@ struct BlurCharaColorData {
 struct BlurCharaTexData {
     u8 _pad0[4];
     CGObject* m_objPosBase;
-    _GXTexObj* m_texObj;
+    GXTexObj* m_texObj;
 };
 
 /*
@@ -89,7 +84,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         reinterpret_cast<BlurCharaTexData*>(blurChara->m_object.m_workArea + texDataOffset);
     BlurCharaColorData* colorData =
         reinterpret_cast<BlurCharaColorData*>(blurChara->m_object.m_workArea + colorDataOffset);
-    int textureBase = 0;
+    CTexture* texture = 0;
     CGObject* objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
@@ -117,8 +112,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         if (param_2->m_initWOrk == 0xFFFF) {
             return;
         }
-        textureBase = reinterpret_cast<int>(
-            ((CMapMesh**)ppvEnv->m_mapMeshPtr)[param_2->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex));
+        texture = ((CMapMesh**)ppvEnv->m_mapMeshPtr)[param_2->m_initWOrk]->GetTexture(
+            ppvEnv->m_materialSetPtr, textureIndex);
     } else {
         Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / param_2->m_smallTextureDiv,
                                        0xE0 / param_2->m_smallTextureDiv, GX_LINEAR, GX_TF_RGBA8, 0);
@@ -179,7 +174,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     if (param_2->m_textureMode == 1) {
-        GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
+        GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
     } else {
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);
     }
@@ -254,7 +249,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(((pppMngStBlurCharaRaw*)ppvMng)->m_charaObj), 0);
+    handle = GetCharaHandlePtr(ppvMng->m_lookTarget, 0);
     model = GetCharaModelPtr(handle);
 
     model->m_callbackContext = work;
@@ -286,7 +281,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(work->m_ownerObj), 0);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
     model->m_afterDrawModelCallback = 0;
@@ -318,12 +313,12 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = ((pppMngStBlurCharaRaw*)ppvMng)->m_charaObj;
+    CGObject* ownerObj = ppvMng->m_lookTarget;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
 
     work->m_ownerObj = ownerObj;
-    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ownerObj), 0);
+    handle = GetCharaHandlePtr(ownerObj, 0);
     model = GetCharaModelPtr(handle);
 
     model->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
@@ -347,7 +342,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
     int width;
     int height;
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(work->m_ownerObj), 0);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
@@ -444,5 +439,5 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    *(unsigned int*)(MaterialManRaw() + 0x48) |= 0x10000;
+    MaterialMan.OrCurrentEnvTevBit(0x10000);
 }

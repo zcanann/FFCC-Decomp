@@ -8,6 +8,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/math.h"
 
@@ -104,14 +105,14 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	float quadRight;
 	float zero;
 	pppCVECTOR color;
-	int textureBase;
+	CTexture* texture;
 
 	if (step->m_dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	textureBase = reinterpret_cast<int>(
-		((CMapMesh**)ppvEnv->m_mapMeshPtr)[step->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex));
+	texture = ((CMapMesh**)ppvEnv->m_mapMeshPtr)[step->m_dataValIndex]->GetTexture(
+		ppvEnv->m_materialSetPtr, textureIndex);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -181,12 +182,12 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 	}
 
-	texU = (float)(0x280 / *(unsigned int*)(textureBase + 100));
-	texV = (float)(0x1C0 / *(unsigned int*)(textureBase + 0x68));
+	texU = (float)(0x280 / texture->m_width);
+	texV = (float)(0x1C0 / texture->m_height);
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
-	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
+	GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	zero = kYmDeformationScreenZero;
 	quadRight = kYmDeformationScreenQuadRight;

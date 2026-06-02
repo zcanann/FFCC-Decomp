@@ -1,6 +1,7 @@
 #include "ffcc/pppScreenBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/gobject.h"
 #include "ffcc/color.h"
 #include "ffcc/gxfunc.h"
 #define FFCC_MATERIALMAN_DEFINE_LAYOUT
@@ -44,12 +45,10 @@ struct VScreenBreak {
     ScreenBreakPiece* m_pieces;
     GXTexObj* m_backBufferTexObj;
     u8 m_pad14[4];
-    float m_extentX;
-    float m_extentY;
-    float m_unknown20;
+    Vec m_extent;
     u8 m_backBufferReady;
     u8 m_pad25[3];
-    u8 m_color[4];
+    GXColor m_color;
 };
 
 struct Vec4d {
@@ -57,12 +56,6 @@ struct Vec4d {
     float y;
     float z;
     float w;
-};
-
-struct RawVec {
-    u32 x;
-    u32 y;
-    u32 z;
 };
 
 typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
@@ -110,6 +103,11 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
+struct ScreenBreakColorData {
+    u8 m_pad0[8];
+    GXColor m_color;
+};
+
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(ScreenBreakModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(ScreenBreakModelData, m_posQuant) == 0x34);
@@ -123,8 +121,10 @@ STATIC_ASSERT(offsetof(ScreenBreakPiece, m_translation) == 0x24);
 STATIC_ASSERT(offsetof(ScreenBreakPiece, m_active) == 0x38);
 STATIC_ASSERT(offsetof(VScreenBreak, m_pieces) == 0x0C);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferTexObj) == 0x10);
+STATIC_ASSERT(offsetof(VScreenBreak, m_extent) == 0x18);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferReady) == 0x24);
 STATIC_ASSERT(offsetof(VScreenBreak, m_color) == 0x28);
+STATIC_ASSERT(offsetof(ScreenBreakColorData, m_color) == 0x08);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_graphPayload) == 0x14);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityScale) == 0x18);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityDir) == 0x20);
@@ -205,18 +205,16 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, serializedDataOffsets[2]);
-    u8* colorSource = GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[0]);
+    ScreenBreakColorData* colorSource = reinterpret_cast<ScreenBreakColorData*>(
+        GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[0]));
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetCallbackContext(value, param_2);
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    value->m_color[0] = colorSource[8];
-    value->m_color[1] = colorSource[9];
-    value->m_color[2] = colorSource[10];
-    value->m_color[3] = colorSource[11];
-    DCFlushRange(value->m_color, 4);
+    value->m_color = colorSource->m_color;
+    DCFlushRange(&value->m_color, sizeof(value->m_color));
 
     CalcGraphValue(&pppScreenBreak->m_object, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
                    param_2->m_stepValue, param_2->m_arg3, param_2->m_graphPayload);
@@ -234,8 +232,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     const float& two = FLOAT_80331cc0;
-    float sx = two * value->m_extentX;
-    float sy = two * value->m_extentY;
+    float sx = two * value->m_extent.x;
+    float sy = two * value->m_extent.y;
     ScreenBreakPiece* piece = value->m_pieces;
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
         switch (param_2->m_initWOrk) {
@@ -243,30 +241,30 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             piece->m_active = 1;
             break;
         case 1:
-            if (-piece->m_translation.y < (value->m_graphValue0 * sy) - value->m_extentY) {
+            if (-piece->m_translation.y < (value->m_graphValue0 * sy) - value->m_extent.y) {
                 piece->m_active = 1;
             }
             break;
         case 2:
             float pieceY = piece->m_translation.y;
-            if (-pieceY > value->m_extentY - (value->m_graphValue0 * sy)) {
+            if (-pieceY > value->m_extent.y - (value->m_graphValue0 * sy)) {
                 piece->m_active = 1;
             }
             break;
         case 3:
-            if (-piece->m_translation.x < (value->m_graphValue0 * sx) + -value->m_extentX) {
+            if (-piece->m_translation.x < (value->m_graphValue0 * sx) + -value->m_extent.x) {
                 piece->m_active = 1;
             }
             break;
         case 4:
             float pieceX = piece->m_translation.x;
-            if (-pieceX > value->m_extentX - (value->m_graphValue0 * sx)) {
+            if (-pieceX > value->m_extent.x - (value->m_graphValue0 * sx)) {
                 piece->m_active = 1;
             }
             break;
         case 5: {
-            sx = value->m_extentX;
-            sy = value->m_extentY;
+            sx = value->m_extent.x;
+            sy = value->m_extent.y;
             float x = value->m_graphValue0 * sx;
             float y = value->m_graphValue0 * sy;
             float pieceX = piece->m_translation.x;
@@ -277,9 +275,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
             break;
         }
         case 6: {
-            sx = value->m_extentX;
+            sx = value->m_extent.x;
             float x = value->m_graphValue0 * sx;
-            sy = value->m_extentY;
+            sy = value->m_extent.y;
             float y = value->m_graphValue0 * sy;
             if ((-piece->m_translation.x >= sx - x) || (-piece->m_translation.x <= -sx + x) ||
                 (-piece->m_translation.y >= sy - y) || (-piece->m_translation.y <= -sy + y)) {
@@ -361,10 +359,10 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
-    void* gObject = ppvMng->m_owner;
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
+    CGObject* gObject = ppvMng->m_owner;
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(gObject, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
-    *(u32*)((u8*)gObject + 0x60) |= 0x40;
+    gObject->m_displayFlags |= 0x40;
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
     const float& f = FLOAT_80331cc4;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
@@ -372,17 +370,17 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
     value->m_pieces = 0;
     value->m_backBufferTexObj = 0;
-    value->m_unknown20 = f;
-    value->m_extentY = f;
-    value->m_extentX = f;
+    value->m_extent.z = f;
+    value->m_extent.y = f;
+    value->m_extent.x = f;
     value->m_graphValue2 = f;
     value->m_graphValue1 = f;
     value->m_graphValue0 = f;
     value->m_backBufferReady = 0;
-    value->m_color[0] = 0xFF;
-    value->m_color[1] = 0xFF;
-    value->m_color[2] = 0xFF;
-    value->m_color[3] = 0xFF;
+    value->m_color.r = 0xFF;
+    value->m_color.g = 0xFF;
+    value->m_color.b = 0xFF;
+    value->m_color.a = 0xFF;
 }
 
 /*
@@ -540,12 +538,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece->m_velocity.y = dVar20;
         piece->m_velocity.z = dVar21;
         PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
-        Vec upVec;
-        const volatile RawVec* upRaw = (const volatile RawVec*)&kScreenBreakPieceUpVector;
-        ((RawVec*)&upVec)->x = upRaw->x;
-        ((RawVec*)&upVec)->y = upRaw->y;
-        ((RawVec*)&upVec)->z = upRaw->z;
-        PSVECCrossProduct(&piece->m_velocity, &upVec, &piece->m_axis);
+        PSVECCrossProduct(&piece->m_velocity, &kScreenBreakPieceUpVector, &piece->m_axis);
 
         dVar17 = Math.RandF(stepData->m_speedRand);
         PSVECScale(&piece->m_velocity, &piece->m_velocity, stepData->m_speedBase + dVar17);
@@ -564,7 +557,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece++;
     }
 
-    gUtil.ConvI2FVector(*reinterpret_cast<Vec*>(&work->m_extentX), globalMax, ScreenBreakModelRef(model)->m_posQuant);
+    gUtil.ConvI2FVector(work->m_extent, globalMax, ScreenBreakModelRef(model)->m_posQuant);
 }
 
 /*
@@ -590,7 +583,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
         CMaterial* material = model->m_data->m_materialSet->m_materials[displayList->m_material];
 
         MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 1, (_GXTevScale)0);
-        GXSetArray((GXAttr)0xB, work->m_color, 4);
+        GXSetArray((GXAttr)0xB, &work->m_color, 4);
 
         if (material->GetTextureCount() == 1) {
             GXSetNumChans(1);
@@ -604,7 +597,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
             _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
             _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevKColor((GXTevKColorID)1, CColor(0x60, 0x60, 0x60, work->m_color[3]).color);
+            GXSetTevKColor((GXTevKColorID)1, CColor(0x60, 0x60, 0x60, work->m_color.a).color);
             GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xD);
             GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1D);
             _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_KONST, GX_CC_CPREV, GX_CC_ZERO);
@@ -712,9 +705,9 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     PSVECCrossProduct(&cameraForward, &basis, &cameraOffset);
     PSVECNormalize(&cameraOffset, &cameraOffset);
 
-    screenOffset.x = work->m_extentX * cameraOffset.x + cameraPos.x;
+    screenOffset.x = work->m_extent.x * cameraOffset.x + cameraPos.x;
     screenOffset.y = cameraPos.y;
-    screenOffset.z = work->m_extentX * cameraOffset.z + cameraPos.z;
+    screenOffset.z = work->m_extent.x * cameraOffset.z + cameraPos.z;
 
     PSMTXMultVec(cameraMtx, &screenOffset, (Vec*)&clipInput);
     clipInput.w = 1.0f;

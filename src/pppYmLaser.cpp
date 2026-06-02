@@ -4,6 +4,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppYmLaserOne;
@@ -13,6 +14,7 @@ extern const f64 kPppVertexApMtxDoubleBias;
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 
 #include <string.h>
 
@@ -47,15 +49,6 @@ static inline f64 U32ToDouble(u32 value)
 	conv.bits = 0x4330000000000000ULL | value;
 	return conv.value - kPppVertexApMtxDoubleBias;
 }
-
-struct CMapCylinderRaw {
-	Vec m_bottom;
-	u8 m_pad0C[0x0C];
-	Vec m_direction;
-	float m_radius;
-	Vec m_top;
-	Vec m_direction2;
-};
 
 struct pppYmLaserWork {
 	float m_length;
@@ -122,13 +115,13 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	Vec spherePos;
 	Vec debugSource;
 	_GXColor color;
-	int tex;
+	CTexture* texture;
 
 	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	tex = GetTextureFromRSD(dataValIndex, ppvEnv);
+	texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(dataValIndex, ppvEnv));
 	pppSetBlendMode(step->m_laser.m_blendMode);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	pppSetDrawEnv(
@@ -147,7 +140,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
 	_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+	GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 
 	halfWidth = work->m_halfWidth;
 	length = work->m_length;
@@ -210,9 +203,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 		} else {
-			tex = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
+			texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_initWOrk, ppvEnv));
 			_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-			GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+			GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
 		}
 
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
@@ -371,7 +364,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Vec localA;
 	Mtx tempMtx;
 	Mtx charaMtx;
-	CMapCylinderRaw cyl;
+	CMapCylinder cyl;
 	int emptyHistory;
 	int fillIndex;
 
@@ -436,17 +429,17 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, YmLaserConst(FLOAT_80330de4));
 
-		cyl.m_top.z = YmLaserConst(FLOAT_80330de8);
-		cyl.m_top.y = YmLaserConst(FLOAT_80330de8);
-		cyl.m_top.x = YmLaserConst(FLOAT_80330de8);
-		cyl.m_direction2.z = YmLaserConst(FLOAT_80330dec);
-		cyl.m_direction2.y = YmLaserConst(FLOAT_80330dec);
-		cyl.m_direction2.x = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMin.z = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMin.y = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMin.x = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMax.z = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMax.y = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMax.x = YmLaserConst(FLOAT_80330dec);
 		cyl.m_bottom = work->m_origin;
-		cyl.m_direction = localA;
+		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;
@@ -495,7 +488,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 					created = 0;
 				} else {
 					created = pppCreatePObject(ppvMng, dataVal);
-					*(_pppPObject**)((u8*)created + 4) = (_pppPObject*)laser;
+					created->m_link.m_previous = &laser->m_link;
 				}
 
 				Vec* createdPos = (Vec*)(created->m_workArea + step->m_laser.m_spawnPositionOffset);

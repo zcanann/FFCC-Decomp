@@ -10,7 +10,8 @@ struct pppShapeAnimFrame
 {
     short m_shapeOffset; // 0x0
     short m_duration;    // 0x2
-    char m_pad4[4];      // 0x4
+    unsigned char m_flags; // 0x4
+    char m_pad5[3];        // 0x5
 }; // Size 0x8
 
 struct pppShapeAnimData

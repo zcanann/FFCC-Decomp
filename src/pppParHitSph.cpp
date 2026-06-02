@@ -10,6 +10,17 @@ extern const char s_pppParHitSphWin[] = "win";
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+struct ParHitSphParams {
+    u8 m_pad0[4];
+    float m_cylinderScale;
+    float m_radiusScale;
+};
+
+static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+}
+
 /*
  * --INFO--
  * PAL Address: 80093d04
@@ -21,6 +32,7 @@ extern const char s_pppParHitSphWin[] = "win";
  */
 void pppParHitSph(struct _pppPObject* param_1, int param_2)
 {
+    ParHitSphParams* params = reinterpret_cast<ParHitSphParams*>(param_2);
     Vec local_88;
     Vec local_94;
     Vec local_a0;
@@ -30,17 +42,17 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    PSVECSubtract((Vec*)((u8*)ppvMng + 0x8), (Vec*)((u8*)ppvMng + 0x48), &local_88);
+    PSVECSubtract(&ppvMng->m_position, ParHitSphPreviousPosition(ppvMng), &local_88);
     local_94.x = ppvMng->m_matrix.value[0][3];
     local_94.y = ppvMng->m_matrix.value[1][3];
     local_94.z = ppvMng->m_matrix.value[2][3];
-    radius = pppMngSt->m_previousPosition.z * *(float*)(param_2 + 8);
+    radius = pppMngSt->m_previousPosition.z * params->m_radiusScale;
 
     if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&
         (kPppParHitSphZero == local_88.z)) {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, kPppParHitSphZero);
     } else {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
+        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, params->m_cylinderScale);
     }
 
     if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {

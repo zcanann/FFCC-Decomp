@@ -8,6 +8,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/pppTypes.h"
+#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -97,7 +98,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     int width;
     int height;
     _GXTexObj* backTexture;
-    int textureBase;
+    CTexture* texture;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
@@ -106,7 +107,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _pppEnvStYmDeformationMdl* env = DeformationMdlEnv();
     model = (pppModelSt*)env->m_mapMeshPtr[param_2->m_dataValIndex];
     colorInfo = PppWorkArea<YmDeformationMdlColorInfo>(pppYmDeformationMdl, param_3, 1);
-    textureBase = reinterpret_cast<int>(reinterpret_cast<CMapMesh*>(model)->GetTexture(env->m_materialSetPtr, textureIndex));
+    texture = reinterpret_cast<CMapMesh*>(model)->GetTexture(env->m_materialSetPtr, textureIndex);
 
     PSMTXIdentity(indWarpMtx);
     pppSetBlendMode(0);
@@ -193,7 +194,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
         GXLoadTexObj(backTexture, GX_TEXMAP0);
-        GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
+        GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
         pppDrawMesh(model, pppYmDeformationMdl->m_object.m_drawMatrixPtr, 0);
 
         GXSetTevDirect((GXTevStageID)1);

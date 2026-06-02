@@ -9,6 +9,7 @@ class CChunkFile;
 class CMaterialSet;
 class CMaterialMan;
 class CMaterial;
+class CTexture;
 class CAmemCacheSet;
 
 struct CMapMeshDrawEntry
@@ -41,7 +42,7 @@ public:
     void DrawMeshCharaShadow(unsigned short, unsigned short);
     void Draw(CMaterialSet*);
     void DrawPart(CMaterialSet*, int);
-    void* GetTexture(CMaterialSet*, int&);
+    CTexture* GetTexture(CMaterialSet*, int&);
     void SetDisplayListMaterial(CMaterialSet*, char**, CAmemCacheSet*);
     void pppCacheLoadModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*);

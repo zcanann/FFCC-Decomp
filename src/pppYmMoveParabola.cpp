@@ -20,6 +20,16 @@ static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, ppp
     return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
+static inline Vec* ParabolaPreviousPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+}
+
+static inline Vec* ParabolaBasePosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d4278
@@ -56,7 +66,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         direction.x = yOffset;
         direction.z = direction.y = zero;
     } else {
-        PSVECSubtract(&pppMngSt->m_paramVec0, (Vec*)((u8*)pppMngSt + 0x58), &direction);
+        PSVECSubtract(&pppMngSt->m_paramVec0, ParabolaBasePosition(pppMngSt), &direction);
     }
 
     Vec normalizedSource = direction;
@@ -75,12 +85,12 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         Vec basePosition = work->m_basePosition;
         pppAddVector(newPosition, newPosition, basePosition);
     } else {
-        Vec basePosition = *(Vec*)((u8*)pppMngSt + 0x58);
+        Vec basePosition = *ParabolaBasePosition(pppMngSt);
         pppAddVector(newPosition, newPosition, basePosition);
     }
 
     Vec oldPosition = pppMngSt->m_position;
-    pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), oldPosition);
+    pppCopyVector(*ParabolaPreviousPosition(pppMngSt), oldPosition);
     pppCopyVector(pppMngSt->m_position, newPosition);
 
     ppvMng->m_matrix.value[0][3] = newPosition.x;
@@ -113,7 +123,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
     if ((s32)Game.m_currentSceneId == 7) {
         Vec matrixOffset;
 
-        pppCopyVector(work->m_basePosition, *(Vec*)((u8*)pppMngSt + 0x58));
+        pppCopyVector(work->m_basePosition, *ParabolaBasePosition(pppMngSt));
 
         matrixOffset.x = ppvMng->m_matrix.value[0][3];
         matrixOffset.y = ppvMng->m_matrix.value[1][3];

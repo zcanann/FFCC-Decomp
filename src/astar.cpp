@@ -202,15 +202,14 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
 	double aheadBestDist = behindBestDist;
-	CAPos* portal = m_portals;
 	int i = 0;
 
 	do
 	{
-		unsigned char otherGroup = portal->m_groupA;
+		unsigned char otherGroup = m_portals[i].m_groupA;
 		bool exists = false;
 
-		if (otherGroup != 0 && portal->m_groupB != 0)
+		if (otherGroup != 0 && m_portals[i].m_groupB != 0)
 		{
 			exists = true;
 		}
@@ -219,7 +218,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		{
 			bool connected = false;
 
-			if (otherGroup == startGroup || portal->m_groupB == startGroup)
+			if (otherGroup == startGroup || m_portals[i].m_groupB == startGroup)
 			{
 				connected = true;
 			}
@@ -228,13 +227,13 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 			{
 				if (otherGroup == startGroup)
 				{
-					otherGroup = portal->m_groupB;
+					otherGroup = m_portals[i].m_groupB;
 				}
 
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					CVector portalDirPos(portal->m_position);
+					CVector portalDirPos(m_portals[i].m_position);
 					CVector dirToPortalSource;
 					Vec portalVec;
 
@@ -251,7 +250,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					CVector distPortal(portal->m_position);
+					CVector distPortal(m_portals[i].m_position);
 					CVector distVecSource;
 
 					PSVECSubtract(reinterpret_cast<Vec*>(&distPortal),
@@ -268,13 +267,13 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					{
 						if (behindBestDist < dist)
 						{
-							behindBest = portal;
+							behindBest = &m_portals[i];
 							behindBestDist = dist;
 						}
 					}
 					else if (aheadBestDist < dist)
 					{
-						aheadBest = portal;
+						aheadBest = &m_portals[i];
 						aheadBestDist = dist;
 					}
 				}
@@ -282,7 +281,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		}
 
 		++i;
-		++portal;
 	} while (i < 64);
 
 	if (aheadBest != (CAPos*)0)
@@ -485,13 +483,12 @@ void CAStar::drawAStar()
 		}
 
 		int i = 0;
-		CAPos* portal = m_portals;
 
 		do
 		{
 			bool exists = false;
 
-			if (portal->m_groupA != 0 && portal->m_groupB != 0)
+			if (m_portals[i].m_groupA != 0 && m_portals[i].m_groupB != 0)
 			{
 				exists = true;
 			}
@@ -499,10 +496,10 @@ void CAStar::drawAStar()
 			if (exists)
 			{
 				CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-				Graphic.DrawSphere(drawMtx, &portal->m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
+				Graphic.DrawSphere(drawMtx, &m_portals[i].m_position, LoadFloat(kDrawAStarSphereRadius), &yellow.color);
 
 				int side = 0;
-				unsigned char* group = &portal->m_groupA;
+				unsigned char* group = &m_portals[i].m_groupA;
 
 				do
 				{
@@ -511,7 +508,6 @@ void CAStar::drawAStar()
 					if (groupId != 0)
 					{
 						int j = 0;
-						CAPos* other = m_portals;
 
 						do
 						{
@@ -519,7 +515,7 @@ void CAStar::drawAStar()
 							{
 								bool otherExists = false;
 
-								if (other->m_groupA != 0 && other->m_groupB != 0)
+								if (m_portals[j].m_groupA != 0 && m_portals[j].m_groupB != 0)
 								{
 									otherExists = true;
 								}
@@ -528,7 +524,7 @@ void CAStar::drawAStar()
 								{
 									bool matches = false;
 
-									if (other->m_groupA == groupId || other->m_groupB == groupId)
+									if (m_portals[j].m_groupA == groupId || m_portals[j].m_groupB == groupId)
 									{
 										matches = true;
 									}
@@ -538,19 +534,18 @@ void CAStar::drawAStar()
 										GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
 										GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
 										GXPosition3f32(
-											portal->m_position.x,
-											portal->m_position.y + kPolyGroupTopOffsetY,
-											portal->m_position.z);
+											m_portals[i].m_position.x,
+											m_portals[i].m_position.y + kPolyGroupTopOffsetY,
+											m_portals[i].m_position.z);
 										GXPosition3f32(
-											other->m_position.x,
-											other->m_position.y + kPolyGroupTopOffsetY,
-											other->m_position.z);
+											m_portals[j].m_position.x,
+											m_portals[j].m_position.y + kPolyGroupTopOffsetY,
+											m_portals[j].m_position.z);
 									}
 								}
 							}
 
 							++j;
-							++other;
 						} while (j < 64);
 					}
 
@@ -560,7 +555,6 @@ void CAStar::drawAStar()
 			}
 
 			++i;
-			++portal;
 		} while (i < 64);
 	}
 }

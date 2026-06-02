@@ -1,6 +1,7 @@
 #include "ffcc/pppBlurChara.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
+#include "ffcc/gobject.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
@@ -67,7 +68,7 @@ struct BlurCharaColorData {
 
 struct BlurCharaTexData {
     u8 _pad0[4];
-    int m_objPosBase;
+    CGObject* m_objPosBase;
     _GXTexObj* m_texObj;
 };
 
@@ -89,7 +90,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     BlurCharaColorData* colorData =
         reinterpret_cast<BlurCharaColorData*>(blurChara->m_object.m_workArea + colorDataOffset);
     int textureBase = 0;
-    int objPosBase;
+    CGObject* objPosBase;
     _GXTexObj smallBackTex;
     _GXColor drawColor;
     int textureIndex;
@@ -145,9 +146,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTXIdentity(identityMtx);
 
-    objPos.x = *(float*)(objPosBase + 0x15C);
-    objPos.y = *(float*)(objPosBase + 0x160);
-    objPos.z = *(float*)(objPosBase + 0x164);
+    objPos = objPosBase->m_worldPosition;
 
     GXProject(cameraPos.x + objPos.x, FLOAT_80331030, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);

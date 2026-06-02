@@ -1024,8 +1024,8 @@ void CPartMng::SetFp()
         unsigned int m_objHitMask;           // 0xBC
         unsigned int m_cylinderAttribute;    // 0xC0
         unsigned char m_padC4[0xD8 - 0xC4];
-        void* m_owner;                       // 0xD8
-        void* m_lookTarget;                  // 0xDC
+        CGObject* m_owner;                   // 0xD8
+        CGObject* m_lookTarget;              // 0xDC
         void* m_bindNode;                    // 0xE0
         unsigned char m_padE4[0xEB - 0xE4];
         unsigned char m_matrixMode;          // 0xEB
@@ -4206,9 +4206,9 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     mng->m_userFloat0 = FLOAT_8032fe18;
     mng->m_userFloat1 = FLOAT_8032fe18;
     mng->m_useOwnerScaleSign = 0;
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = 0;
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
+    reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
+    reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
+    reinterpret_cast<_pppMngSt*>(mng)->m_bindNode = 0;
 
     const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
     if (mode == 2 || mode == 4) {
@@ -4216,12 +4216,12 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     } else if (mode >= 3 && mode <= 8) {
         mng->m_ownerFacing = 0;
         CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
-        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = owner;
-        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
+        reinterpret_cast<_pppMngSt*>(mng)->m_owner = owner;
+        reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;
         if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
             int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
             if (node >= 0) {
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
+                reinterpret_cast<_pppMngSt*>(mng)->m_bindNode = 0;
             }
         }
     }

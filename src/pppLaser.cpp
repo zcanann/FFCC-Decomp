@@ -3,6 +3,8 @@
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/game.h"
+#include "ffcc/gobject.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -123,10 +125,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     if (iVar2 != 0) {
         Game.GetTargetCursor(local_28, work->m_targetPosition, local_20);
 
-        u8* partyObj = reinterpret_cast<u8*>(Game.GetPartyObj(local_28));
-        local_14.x = *(f32*)(partyObj + 0x15c);
-        local_14.y = *(f32*)(partyObj + 0x160);
-        local_14.z = *(f32*)(partyObj + 0x164);
+        CGPartyObj* partyObj = Game.GetPartyObj(local_28);
+        local_14 = partyObj->m_worldPosition;
         if (local_24 == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {

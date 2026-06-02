@@ -1,6 +1,7 @@
 #include "ffcc/pppCallBackDistance.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
+#include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
 #include <stddef.h>
 
@@ -75,7 +76,7 @@ void pppDestructCallBackDistance(_pppPObject*, pppCallBackDistanceUnkC*)
 void pppConstructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable)
 {
     _pppMngSt* pppMngSt;
-    u8* objPosBase;
+    CGObject* lookTarget;
     Vec local_1c;
     Vec local_28;
     s32 dataOffset;
@@ -84,10 +85,8 @@ void pppConstructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* 
     pppMngSt = ppvMng;
     dataOffset = *ctrlTable->m_serializedDataOffsets;
     distancePtr = (f32*)(object->m_workArea + dataOffset);
-    objPosBase = (u8*)pppMngSt->m_lookTarget;
-    local_28.x = *(f32*)(objPosBase + 0x15C);
-    local_28.y = *(f32*)(objPosBase + 0x160);
-    local_28.z = *(f32*)(objPosBase + 0x164);
+    lookTarget = pppMngSt->m_lookTarget;
+    local_28 = lookTarget->m_worldPosition;
     local_1c.x = pppMngSt->m_paramVec0.x;
     local_1c.y = pppMngSt->m_paramVec0.y;
     local_1c.z = pppMngSt->m_paramVec0.z;

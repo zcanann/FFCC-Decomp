@@ -123,14 +123,14 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + serializedDataOffsets[2]);
 	u8* colorData = changeTex->m_object.m_workArea + serializedDataOffsets[1];
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)ppvMng->m_owner, 0);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
 	CalcGraphValue(
 	    &changeTex->m_object, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
 	    step->m_stepValue, step->m_arg3);
 
-	work->m_charaObj = (CGObject*)ppvMng->m_owner;
+	work->m_charaObj = ppvMng->m_owner;
 	work->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, work, step);
 

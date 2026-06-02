@@ -427,7 +427,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     s32* offsets = param_2->m_serializedDataOffsets;
     s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
-    CGObject* gObject = (CGObject*)ppvMng->m_owner;
+    CGObject* gObject = ppvMng->m_owner;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
 
@@ -685,7 +685,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
         return;
     }
 
-    gObject = (CGObject*)ppvMng->m_owner;
+    gObject = ppvMng->m_owner;
     setupOffset = param_3->m_serializedDataOffsets[1];
     work = (u32*)((u8*)pppYmMana + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (gObject == NULL) {

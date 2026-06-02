@@ -27,7 +27,7 @@ struct pppYmTraceMoveMngStRaw {
 	u32 _pad64;
 	Vec m_paramVec0;
 	char pad74[0x68];
-	void* m_owner;
+	CGObject* m_owner;
 };
 
 static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, pppYmTraceMoveCtrl* ctrl)
@@ -53,7 +53,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
 	pppYmTraceMoveWork* work =
 	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_3->m_serializedDataOffsets);
-	CGObject* owner = (CGObject*)pppMngSt->m_owner;
+	CGObject* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;

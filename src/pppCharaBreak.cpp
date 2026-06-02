@@ -82,8 +82,19 @@ struct CharaBreakDisplayListPair {
 };
 
 typedef CChara::CMesh::CDisplayList CharaBreakDisplayList;
-typedef CChara::CMesh::CRefData CharaBreakMeshData;
 typedef CChara::CMesh CharaBreakMeshRef;
+
+struct CharaBreakMeshData {
+    char m_name[0x10];
+    u8 _pad10[0x04];
+    u32 m_vertexCount;
+    u8 _pad18[0x34];
+    u32 m_displayListCount;
+    CharaBreakDisplayList* m_displayLists;
+    u32 m_skinCount;
+    void* m_skins;
+    u32 m_nodeIndex;
+};
 
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
@@ -95,7 +106,7 @@ STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x60);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
@@ -120,7 +131,7 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
 
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 {
-    return mesh->m_data;
+    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
 }
 
 static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)

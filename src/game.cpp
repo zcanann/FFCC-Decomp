@@ -375,6 +375,9 @@ void CGame::Exec()
 		}
 
 		switch (m_currentSceneId) {
+		case 0:
+		case 1:
+			break;
 		case 2:
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 1);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 1);
@@ -390,7 +393,7 @@ void CGame::Exec()
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 0);
-			System.AddScenegraph(reinterpret_cast<CProcess*>(&Game), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&GamePcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&GbaPcs), 0);
 			System.AddScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
@@ -419,6 +422,9 @@ void CGame::Exec()
 		System.ExecScenegraph();
 
 		switch (m_currentSceneId) {
+		case 0:
+		case 1:
+			break;
 		case 2:
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 1);
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 1);
@@ -437,7 +443,7 @@ void CGame::Exec()
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 0);
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 0);
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&GbaPcs), 0);
-			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&Game), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&GamePcs), 0);
 			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MenuPcs), 0);
 			break;
 		case 5:

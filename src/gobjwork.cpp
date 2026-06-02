@@ -2274,15 +2274,15 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
+const char* CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
-		return reinterpret_cast<int>(MenuPcs.GetSkillStr(weaponType));
+		return MenuPcs.GetSkillStr(weaponType);
 	}
 
 	int itemId = DelCmdListAndItem(cmdListIdx);
-	return reinterpret_cast<int>(Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4]);
+	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId * 5 + 4];
 }
 
 /*

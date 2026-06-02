@@ -455,9 +455,10 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 {
 	pppYmChangeTexState* state = (pppYmChangeTexState*)param_2;
 	pppYmChangeTexStep* step = (pppYmChangeTexStep*)param_3;
-	int textureInfo = (int)state->m_texture;
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
-	ChangeTexMeshData* meshData = meshes[meshIdx].m_data;
+	meshes += meshIdx;
+	int textureInfo = (int)state->m_texture;
+	ChangeTexMeshData* meshData = meshes->m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
 
 	if (step->m_payload[0] == 0) {

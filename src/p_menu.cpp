@@ -166,10 +166,6 @@ extern int sMenuTextureInfoTable[];
 
 static inline void ReleaseRefObject(void* object)
 {
-    if (object == nullptr) {
-        return;
-    }
-
     CRef* ref = reinterpret_cast<CRef*>(object);
     if (ref->DecRef() == 0) {
         delete ref;

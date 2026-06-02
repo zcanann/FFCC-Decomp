@@ -1450,7 +1450,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		return;
 	}
 
-	unsigned int cid = GetCID();
+	int cid = GetCID();
 	bool isIceJ = false;
 	bool isMon = false;
 	unsigned char* script9 = 0;

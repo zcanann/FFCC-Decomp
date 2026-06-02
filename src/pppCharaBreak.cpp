@@ -364,7 +364,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
     }
 
-    if (gPppInConstructor == 0) {
+    if (ppvIsLoopCalc == 0) {
         UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, model);
     }
     return;

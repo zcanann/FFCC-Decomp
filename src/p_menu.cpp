@@ -178,8 +178,10 @@ static inline void ReleaseRefObject(void* object)
 
 static inline void ReleaseRefSlot(void** slot)
 {
-    ReleaseRefObject(*slot);
-    *slot = nullptr;
+    if (*slot != nullptr) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
 }
 
 static inline float LoadFloat(const float& value)

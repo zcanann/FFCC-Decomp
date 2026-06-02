@@ -1,7 +1,9 @@
 #define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/texanim.h"
 #include "ffcc/chunkfile.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
 #include "ffcc/math.h"
@@ -373,7 +375,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 
         if ((materialSet != 0) &&
             ((materialIndex = materialSet->Find(texAnim->m_refData->m_name)), materialIndex >= 0)) {
-            CMaterial* foundMaterial = materialSet->GetMaterial(materialIndex);
+            CMaterial* foundMaterial = materialSet->m_materials[materialIndex];
             texAnim->m_refData->m_material = foundMaterial;
             material = texAnim->m_refData->m_material;
             material->AddRef();

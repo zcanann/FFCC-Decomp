@@ -22,6 +22,7 @@ struct Vec;
 struct CBound;
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
+#ifndef _FFCC_PTRARRAY_H_
 template <class T>
 class CPtrArray
 {
@@ -45,6 +46,7 @@ private:
     CMemory::CStage* m_stage;
     int m_growCapacity;
 };
+#endif
 #endif
 
 class CTexScroll

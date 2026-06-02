@@ -144,7 +144,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		SetChangeTexModelCallbacks(model, state, step);
 	}
 
-	if (step->m_payload[0] == 0) {
+	if (step->m_changeTex.m_mode == 0) {
 		return;
 	}
 
@@ -214,7 +214,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	unsigned char fallbackAlpha;
 	u8 negativeRamp;
-	if ((step->m_payload[0] == 2) || (step->m_payload[0] == 1)) {
+	if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 1)) {
 		fallbackAlpha = 0;
 		negativeRamp = 0xFF;
 	} else {
@@ -387,7 +387,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
-	if (step->m_payload[0] != 0) {
+	if (step->m_changeTex.m_mode != 0) {
 		meshColorArrays = state->m_meshColorArrays;
 		dlOffset = (int)state->m_texture;
 		meshData = meshes[meshIdx].m_data;
@@ -398,7 +398,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				*(void**)(MaterialManRaw() + 4) = meshData->m_normals;
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 
-				if ((step->m_payload[0] == 2) || (step->m_payload[0] == 3)) {
+				if ((step->m_changeTex.m_mode == 2) || (step->m_changeTex.m_mode == 3)) {
 					*(int*)(MaterialManRaw() + 0xd0) = 0;
 				} else {
 					*(int*)(MaterialManRaw() + 0xd0) = dlOffset + 0x28;
@@ -465,7 +465,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	ChangeTexMeshData* meshData = meshes->m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
 
-	if (step->m_payload[0] == 0) {
+	if (step->m_changeTex.m_mode == 0) {
 		int zero = 0;
 		int drawTevBits = 0xACE0F;
 		int fullTevBits = drawTevBits | 0x1000;
@@ -497,7 +497,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-	if ((step->m_payload[0] == 1) || (step->m_payload[0] == 0)) {
+	if ((step->m_changeTex.m_mode == 1) || (step->m_changeTex.m_mode == 0)) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);
 	}
 }

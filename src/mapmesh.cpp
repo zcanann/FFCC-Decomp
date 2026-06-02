@@ -128,7 +128,7 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
+CTexture* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
     unsigned int* drawEntry;
 

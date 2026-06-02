@@ -100,6 +100,10 @@ public:
     {
         m_manaAlpha = alpha;
     }
+    void OrCurrentEnvTevBit(unsigned int tevBit)
+    {
+        m_curEnvTevBit |= tevBit;
+    }
     unsigned char GetManaAlpha()
     {
         return m_manaAlpha;

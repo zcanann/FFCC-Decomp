@@ -521,10 +521,10 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     work->m_displayListCopies = 0;
     work->m_reflectionVec = 0;
     work->m_colors = 0;
-    work->m_envTexture0 = 0;
     work->m_captureTexObjs = 0;
-    work->m_envTexture1 = 0;
     work->m_step = 0;
+    work->m_envTexture0 = 0;
+    work->m_envTexture1 = 0;
     work->m_meshReflectionVec = 0;
     work->m_meshColors = 0;
     work->m_meshTexCoords0 = 0;
@@ -1537,19 +1537,20 @@ static void CalculateNormal(VYmMana* mana)
     Vec edgeA;
     Vec edgeB;
     Vec faceNormal;
+    s32 i;
 
     positions = mana->m_positions;
     normals = mana->m_normals;
     indices = mana->m_indices;
 
     float zero = FLOAT_80330e4c;
-    for (s32 i = 0; i < 0x121; i++) {
+    for (i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;
         normals[i].x = zero;
     }
 
-    s32 i = 0;
+    i = 0;
     s32 indicesOffset = i;
     for (; i < 0x200; i++) {
         u16 i0 = indices[indicesOffset++];

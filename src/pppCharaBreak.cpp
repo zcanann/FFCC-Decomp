@@ -392,11 +392,11 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 
     ClearCharaBreakModelCallbacks(model);
 
-    CharaBreakDisplayListPair*** perMeshBuffers = MeshDisplayListPairs(work);
+    CharaBreakDisplayListPair*** meshBufferSlot = MeshDisplayListPairs(work);
+    CharaBreakDisplayListPair*** perMeshBuffers = meshBufferSlot;
     CChara::CMesh* mesh = model->m_meshes;
-    CharaBreakDisplayListPair*** meshBufferSlot = perMeshBuffers;
 
-    if (perMeshBuffers != NULL) {
+    if (meshBufferSlot != NULL) {
         for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
             CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;
             CharaBreakMeshData* meshData = MeshData(mesh);

@@ -229,7 +229,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
 {
     YmDeformationMdlState* state;
 
-    if ((gPppCalcDisabled == 0) &&
+    if ((ppvUserStopPartF == 0) &&
         ((state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2)),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(

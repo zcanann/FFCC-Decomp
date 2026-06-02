@@ -42,7 +42,7 @@ static inline float randfloat(float value, float scale)
  */
 void pppSRandUpFV(_pppPObject* basePtr, SRandUpFVParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

@@ -27,7 +27,7 @@ void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleD
     Vec objPos;
     Mtx scaleMtx;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         pppMngSt = ppvMng;
         cameraPos.x = CameraPcs.m_positionX;
         cameraPos.y = CameraPcs.m_positionY;

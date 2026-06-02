@@ -37,7 +37,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     u8* target = pObject->m_workArea + targetOffset;
     _pppPointApStep* payload = (_pppPointApStep*)step;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

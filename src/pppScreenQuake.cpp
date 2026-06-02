@@ -35,7 +35,7 @@ void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, pppScreenQuakeCt
  */
 void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, pppScreenQuakeCtrl *param3)
 {
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         float *value = GetScreenQuakeWork(quake, param3);
 
         CalcGraphValue(&quake->m_object, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);

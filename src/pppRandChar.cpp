@@ -28,7 +28,7 @@ void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
     u8* target;
     f32* valuePtr;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

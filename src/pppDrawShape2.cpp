@@ -94,7 +94,7 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
  * JP Size: TODO
  */
 void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

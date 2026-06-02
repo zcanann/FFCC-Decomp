@@ -131,7 +131,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     s32 i;
 
     work = GetYmDrawMdlTexAnmWork(object, ctrl);
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

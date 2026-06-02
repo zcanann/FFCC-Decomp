@@ -91,7 +91,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Vec secondRayDirection;
     s32 dataOffset;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

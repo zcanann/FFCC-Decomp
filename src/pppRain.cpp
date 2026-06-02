@@ -143,7 +143,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     RainWork* work;
     int randA;
     int randB;
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

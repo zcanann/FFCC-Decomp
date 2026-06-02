@@ -35,7 +35,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
     u8* dstColor;
     u8* srcColor;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         offsets = param_3->m_serializedDataOffsets;
         colorIndex = offsets[0];
         dstColor = GetEraseCharaPartsWork(pppEraseCharaParts, offsets[1]);

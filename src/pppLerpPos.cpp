@@ -39,7 +39,7 @@ void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* c
     Vec local_2c;
     u32 count;
 
-    if (gPppCalcDisabled == 0) {
+    if (ppvUserStopPartF == 0) {
         pppMngSt = ppvMng;
         historyPtr = GetLerpPosHistory(object, ctrl);
         if (*historyPtr == 0) {

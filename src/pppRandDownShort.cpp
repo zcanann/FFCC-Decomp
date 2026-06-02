@@ -27,7 +27,7 @@ void pppRandDownShort(_pppPObject* basePtr, RandDownShortParam* in, _pppCtrlTabl
     s16* target;
     f32* valuePtr;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

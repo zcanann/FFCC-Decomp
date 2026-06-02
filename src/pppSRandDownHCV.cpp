@@ -41,7 +41,7 @@ static inline short randshort(short value, float scale)
  */
 void pppSRandDownHCV(_pppPObject* basePtr, SRandDownHCVParams* in, _pppCtrlTable* ctrl)
 {
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

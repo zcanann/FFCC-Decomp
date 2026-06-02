@@ -2474,7 +2474,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     material->m_tevBit |= 1;
                 } else {
                     for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(chunk.m_arg0)); i++) {
-                        material->m_textureIndices[i] = static_cast<unsigned short>(chunkFile.Get4());
+                        material->m_textureIndices[i] = static_cast<short>(chunkFile.Get4());
                     }
                     if (material->m_textureCount == 2) {
                         material->m_tevBit |= 2;
@@ -2834,7 +2834,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_scaleU = 1.0f;
             newMaterial->m_scaleV = 1.0f;
             newMaterial->m_singleTextureFlag = 0;
-            newMaterial->m_textureIndices[0] = static_cast<unsigned short>(textureIndex);
+            newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
             materialCount = static_cast<u32>(m_materials.GetSize());
@@ -3061,7 +3061,7 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
     CMaterial* material =
         m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
-        material->CacheDumpTexture(amemCacheSet);
+        material->CacheUnLoadTexture(amemCacheSet);
     }
 }
 
@@ -3349,5 +3349,5 @@ inline void CMaterial::SetTag(int)
 inline void CMaterial::AddTextureIdx(int index, int textureIndex)
 {
     m_textureCount = static_cast<unsigned short>(index + 1);
-    m_textureIndices[index] = static_cast<unsigned short>(textureIndex);
+    m_textureIndices[index] = static_cast<short>(textureIndex);
 }

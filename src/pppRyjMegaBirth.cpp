@@ -459,7 +459,8 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			GXLoadPosMtxImm(drawMatrix, 0);
 
 			u16 frame = *u16_at(particle, 0x20);
-			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + *(s16*)((u8*)animData + frame * 8 + 0x10));
+			pppShapeAnimData* shapeAnim = reinterpret_cast<pppShapeAnimData*>(animData);
+			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[frame].m_shapeOffset);
 
 			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
 			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
@@ -674,7 +675,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 					if ((s32)*(u16*)((u8*)particle + 0x1E) >= (s32)shapeAnim->m_frameCount)
 					{
-						if ((frameData->m_pad4[0] & 0x80) != 0)
+						if ((frameData->m_flags & 0x80) != 0)
 						{
 							*(u16*)((u8*)particle + 0x1E) = 0;
 							*(u16*)((u8*)particle + 0x1C) = 0;

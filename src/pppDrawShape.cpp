@@ -1,9 +1,11 @@
 #include "ffcc/pppDrawShape.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
+#include <stddef.h>
 
 
 typedef struct ShapeRuntimeData {
@@ -30,11 +32,14 @@ typedef struct ShapeControlData {
     u8 param14;
 } ShapeControlData;
 
-typedef struct ShapeSpecEntry {
-    s16 offset;
-    s16 maxValue;
-    u8 flags;
-} ShapeSpecEntry;
+typedef struct ShapePositionData {
+    u8 _pad0[8];
+    pppCVECTOR color;
+} ShapePositionData;
+
+STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
+STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
+STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
 
 /*
  * --INFO--
@@ -50,19 +55,19 @@ void pppDrawShape(void* pppShape, ShapeControlData* data, void* additionalData){
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)additionalData;
 	ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
 	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-	void* posData = object->m_workArea + runtimeData->posDataOffset;
+	ShapePositionData* posData = (ShapePositionData*)(object->m_workArea + runtimeData->posDataOffset);
 	s32 type = data->type;
 	if (type == 0xFFFF) {
 		return;
 	}
 
 	pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
-	void* shapeSpec = shapeSt->m_animData;
-	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
-	void* drawShape = (u8*)shapeSpec + shape->offset;
+	pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
+	pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->currentId];
+	void* drawShape = (u8*)shapeSpec + shape->m_shapeOffset;
 
 	pppSetDrawEnv(
-		(pppCVECTOR*)((u8*)posData + 8),
+		&posData->color,
 		&object->m_drawMatrix,
 		data->scale,
 		data->param15,
@@ -104,24 +109,24 @@ void pppCalcShape(void* pppShape, ShapeControlData* data, void* additionalData){
 	}
 
 	pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
-	void* shapeSpec = shapeSt->m_animData;
-	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
+	pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
+	pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->counter];
 
 	shapeData->currentId = shapeData->counter;
 	shapeData->value = (u16)(shapeData->value + data->step);
 	s32 value = shapeData->value;
-	s32 maxValue = shape->maxValue;
+	s32 maxValue = shape->m_duration;
 	if (value < maxValue) {
 		return;
 	}
 	shapeData->value = (u16)(value - maxValue);
 
 	shapeData->counter++;
-	if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {
+	if (shapeData->counter < shapeSpec->m_frameCount) {
 		return;
 	}
 
-	if ((shape->flags & 0x80) != 0) {
+	if ((shape->m_flags & 0x80) != 0) {
 		shapeData->counter = 0;
 		shapeData->value = 0;
 		return;

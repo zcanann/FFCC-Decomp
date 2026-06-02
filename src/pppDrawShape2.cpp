@@ -18,20 +18,6 @@ typedef struct ShapeRuntimeData {
     u32 posDataOffset;
 } ShapeRuntimeData;
 
-typedef struct ShapeSpecEntry {
-    s16 offset;
-    s16 maxValue;
-    u8 flags;
-    u8 _pad5[3];
-} ShapeSpecEntry;
-
-typedef struct ShapeSpec {
-    u8 _pad0[6];
-    s16 count;
-    u8 _pad8[8];
-    ShapeSpecEntry entries[1];
-} ShapeSpec;
-
 typedef struct ShapePositionData {
     u8 _pad0[8];
     pppCVECTOR color;
@@ -50,9 +36,8 @@ typedef struct ShapeControlData {
     u8 param15;
 } ShapeControlData;
 
-STATIC_ASSERT(sizeof(ShapeSpecEntry) == 8);
-STATIC_ASSERT(offsetof(ShapeSpec, count) == 0x6);
-STATIC_ASSERT(offsetof(ShapeSpec, entries) == 0x10);
+STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
+STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
 STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
 
 /*
@@ -77,9 +62,9 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
     }
 
     pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
-    ShapeSpec* shapeSpec = (ShapeSpec*)shapeSt->m_animData;
-    ShapeSpecEntry* shape = &shapeSpec->entries[shapeData->currentId];
-    void* drawShape = (u8*)shapeSpec + shape->offset;
+    pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
+    pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->currentId];
+    void* drawShape = (u8*)shapeSpec + shape->m_shapeOffset;
 
     pppSetDrawEnv(
         &posData->color,
@@ -124,13 +109,13 @@ void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
     }
 
     pppShapeSt* shapeSt = ppvEnv->m_resourceTables.m_shapeTablePtr[type];
-    ShapeSpec* shapeSpec = (ShapeSpec*)shapeSt->m_animData;
-    ShapeSpecEntry* shape = &shapeSpec->entries[shapeData->counter];
+    pppShapeAnimData* shapeSpec = (pppShapeAnimData*)shapeSt->m_animData;
+    pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->counter];
 
     shapeData->currentId = shapeData->counter;
     shapeData->value = (u16)(shapeData->value + param2->step);
     s32 value = shapeData->value;
-    s32 maxValue = shape->maxValue;
+    s32 maxValue = shape->m_duration;
 
     if (value < maxValue) {
         return;
@@ -138,11 +123,11 @@ void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
     shapeData->value = (u16)(value - maxValue);
 
     shapeData->counter++;
-    if (shapeData->counter < shapeSpec->count) {
+    if (shapeData->counter < shapeSpec->m_frameCount) {
         return;
     }
 
-    if ((shape->flags & 0x80) != 0) {
+    if ((shape->m_flags & 0x80) != 0) {
         shapeData->counter = 0;
         shapeData->value = 0;
         return;

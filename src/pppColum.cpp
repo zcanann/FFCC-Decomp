@@ -221,10 +221,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;
-                u8* frameData =
-                    (u8*)shapeSt->m_animData +
-                    *(short*)((u8*)shapeSt->m_animData + (frameWork->m_shapeB * 8) + 0x10);
-                for (int j = 0; j < *(short*)(frameData + 2); j++) {
+                pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shapeSt->m_animData);
+                tagOAN3_SHAPE* frameData =
+                    (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[frameWork->m_shapeB].m_shapeOffset);
+                for (int j = 0; j < frameData->m_shapeCount; j++) {
                     pppGetShapePos((long*)shapeSt->m_animData, frameWork->m_shapeB, shapePosA,
                                    shapePosB, j);
                     pppGetShapeUV((long*)shapeSt->m_animData, frameWork->m_shapeB, uvA, uvB, j);

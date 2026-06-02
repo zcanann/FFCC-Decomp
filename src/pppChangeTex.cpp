@@ -98,7 +98,7 @@ static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*)
+void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, _pppCtrlTable*)
 {
 	int textureIndex;
 
@@ -121,13 +121,13 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChangeTexUnkC* data)
+void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrlTable* data)
 {
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	s32* serializedDataOffsets = data->m_serializedDataOffsets;
+	int* serializedDataOffsets = data->m_serializedDataOffsets;
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + serializedDataOffsets[2]);
 	u8* colorData = changeTex->m_object.m_workArea + serializedDataOffsets[1];
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
@@ -261,7 +261,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
+void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp), 0x9d);
 	int dataOffset = data->m_serializedDataOffsets[2];
@@ -343,7 +343,7 @@ freeArrays:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
+void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 	float init = kPppChangeTexInit;
@@ -362,7 +362,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
+void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	float init = kPppChangeTexInit;
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);

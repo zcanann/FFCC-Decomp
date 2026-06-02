@@ -24,11 +24,6 @@ struct pppBlurCharaUnkB {
     u8 _pad1A[2];
 };
 
-struct pppBlurCharaUnkC {
-    u8 _pad0[0x0C];
-    s32* m_serializedDataOffsets;
-};
-
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 
@@ -36,10 +31,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 extern "C" {
 #endif
 
-void pppConstructBlurChara(pppBlurChara*, pppBlurCharaUnkC*);
-void pppDestructBlurChara(pppBlurChara*, pppBlurCharaUnkC*);
-void pppFrameBlurChara(pppBlurChara*, pppBlurCharaUnkB*, pppBlurCharaUnkC*);
-void pppRenderBlurChara(pppBlurChara*, pppBlurCharaUnkB*, pppBlurCharaUnkC*);
+void pppConstructBlurChara(pppBlurChara*, _pppCtrlTable*);
+void pppDestructBlurChara(pppBlurChara*, _pppCtrlTable*);
+void pppFrameBlurChara(pppBlurChara*, pppBlurCharaUnkB*, _pppCtrlTable*);
+void pppRenderBlurChara(pppBlurChara*, pppBlurCharaUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

@@ -1051,7 +1051,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
+void pppRenderMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*)
 {
     Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
     GXSetNumTevStages(1);
@@ -1070,7 +1070,7 @@ void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* param_3)
+void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
     VMana2* mana2Work;
@@ -1308,7 +1308,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     VMana2* work;
     CGObject* gObject;
@@ -1460,7 +1460,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 {
     CGObject* gObject;
     CCharaPcs::CHandle* handle;

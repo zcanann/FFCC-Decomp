@@ -428,47 +428,14 @@ unsigned int CMenuPcs::TmpArtiClose()
 void CMenuPcs::TmpArtiCtrl()
 {
 	bool hasInput;
-	unsigned short uVar3;
 	unsigned int uVar5;
 	int iVar6;
 	int iVar7;
 	int iVar8;
 	unsigned int uVar9;
 
-	hasInput = false;
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		hasInput = true;
-	}
-
-	if (hasInput) {
-		uVar3 = 0;
-	} else {
-		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
-	}
-
-	if (uVar3 == 0) {
-		hasInput = false;
-	} else if ((uVar3 & 0x20) != 0) {
-		this->m_tmpArtiState->moveDirection = 1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		hasInput = true;
-	} else if ((uVar3 & 0x40) != 0) {
-		this->m_tmpArtiState->moveDirection = -1;
-		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		hasInput = true;
-	} else if ((uVar3 & 0x100) != 0) {
-		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		hasInput = false;
-	} else if ((uVar3 & 0x200) != 0) {
-		this->m_tmpArtiState->closeRequested = 1;
-		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		hasInput = true;
-	} else {
-		hasInput = false;
-	}
+	hasInput = TmpArtiCtrlCur();
 
 	if (hasInput) {
 		float fVar2 = FLOAT_80332f30;
@@ -545,64 +512,14 @@ void CMenuPcs::TmpArtiCtrl()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
-	double half;
-	float zero;
-	float one;
-	double center;
 	int completedItems;
 	TmpArtiEntry* entry;
 	unsigned int itemCount;
 	int currentFrame;
-	unsigned int count;
 	unsigned int result;
 
 	if (this->m_tmpArtiState->initialized == '\0') {
-		memset(this->m_tmpArtiList, 0, sizeof(TmpArtiList));
-		one = FLOAT_80332f30;
-		entry = this->m_tmpArtiList->entries;
-		int i = 8;
-		do {
-			entry[0].z = one;
-			entry[1].z = one;
-			entry[2].z = one;
-			entry[3].z = one;
-			entry[4].z = one;
-			entry[5].z = one;
-			entry[6].z = one;
-			entry[7].z = one;
-			entry += 8;
-			i--;
-		} while (i != 0);
-
-		center = DOUBLE_80332f58;
-		zero = FLOAT_80332f2c;
-		half = DOUBLE_80332f20;
-		int row = 0;
-		entry = this->m_tmpArtiList->entries;
-		for (int pairCount = 0; pairCount < 2; pairCount++) {
-			entry[0].tex = 0x37;
-			entry[0].width = 200;
-			entry[0].height = 0x28;
-			entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
-			entry[0].y = row * (entry[0].height - 8) + 0x60;
-			entry[0].s = zero;
-			entry[0].t = zero;
-			entry[0].startFrame = row++;
-			entry[0].duration = 3;
-			entry[1].tex = 0x37;
-			entry[1].width = 200;
-			entry[1].height = 0x28;
-			entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
-			entry[1].y = row * (entry[1].height - 8) + 0x60;
-			entry[1].s = zero;
-			entry[1].t = zero;
-			entry[1].startFrame = row++;
-			entry[1].duration = 3;
-			entry += 2;
-		}
-		this->m_tmpArtiList->count = 4;
-		this->m_tmpArtiState->unk_26 = 0;
-		this->m_tmpArtiState->initialized = 1;
+		TmpArtiInit();
 	}
 
 	completedItems = 0;
@@ -626,49 +543,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		one = FLOAT_80332f30;
-		entry = this->m_tmpArtiList->entries;
-		count = itemCount;
-		if ((int)count > 0) {
-			itemCount = count >> 3;
-			for (; itemCount != 0; itemCount--) {
-				entry[0].startFrame = 0;
-				entry[0].duration = 1;
-				entry[0].alpha = one;
-				entry[1].startFrame = 0;
-				entry[1].duration = 1;
-				entry[1].alpha = one;
-				entry[2].startFrame = 0;
-				entry[2].duration = 1;
-				entry[2].alpha = one;
-				entry[3].startFrame = 0;
-				entry[3].duration = 1;
-				entry[3].alpha = one;
-				entry[4].startFrame = 0;
-				entry[4].duration = 1;
-				entry[4].alpha = one;
-				entry[5].startFrame = 0;
-				entry[5].duration = 1;
-				entry[5].alpha = one;
-				entry[6].startFrame = 0;
-				entry[6].duration = 1;
-				entry[6].alpha = one;
-				entry[7].startFrame = 0;
-				entry[7].duration = 1;
-				entry[7].alpha = one;
-				entry += 8;
-			}
-			count &= 7;
-			if (count != 0) {
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = one;
-					entry++;
-					count--;
-				} while (count != 0);
-			}
-		}
+		TmpArtiInit0();
 		result = 1;
 	}
 

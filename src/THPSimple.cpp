@@ -79,6 +79,11 @@ extern const char sTHPMagic[4];
 extern const float kTHPSimpleDefaultVolume = 127.0f;
 extern const GXColorS10 kTHPYuvToRgbTevColor = {-90, 0, -114, 135};
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -967,8 +972,8 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
     SimpleControl.isOpen = 1;
-    SimpleControl.curVolume = kTHPSimpleDefaultVolume;
-    SimpleControl.targetVolume = kTHPSimpleDefaultVolume;
+    SimpleControl.curVolume = LoadFloat(kTHPSimpleDefaultVolume);
+    SimpleControl.targetVolume = LoadFloat(kTHPSimpleDefaultVolume);
     SimpleControl.rampCount = 0;
 
     return 1;

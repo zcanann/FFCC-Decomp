@@ -12,10 +12,10 @@ extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
+extern const double kCharaSharedSignedIntBias;
 extern const double kCharaAnimDoubleMagic = 4503599627370496.0;
 extern const float kCharaAnimZero = 0.0f;
 extern const float kCharaAnimDegToRad = 0.01745329238474369f;
-extern const double kCharaAnimSignedDoubleMagic = 4503601774854144.0;
 extern const float kCharaAnimNegativeOne = -1.0f;
 extern const float kCharaAnimFullTurnDegrees = 360.0f;
 

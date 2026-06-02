@@ -2476,23 +2476,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     continue;
                 }
 
-                *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) = static_cast<unsigned long>(tevBit);
-                *reinterpret_cast<void**>(Ptr(material, 0x28)) = 0;
-                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = 0;
-                *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0;
-                *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0;
-                *Ptr(material, 0xA7) = 0;
-                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(chunk.m_arg0);
+                material->m_tevBit = static_cast<unsigned long>(tevBit);
+                material->m_bumpLight = 0;
+                material->m_textureCount = 0;
+                material->m_scaleU = FLOAT_8032faf0;
+                material->m_scaleV = FLOAT_8032faf0;
+                material->m_singleTextureFlag = 0;
+                material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
-                if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 1;
+                if (material->m_textureCount == 0) {
+                    material->m_tevBit |= 1;
                 } else {
                     for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(chunk.m_arg0)); i++) {
-                        *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (i << 1))) =
-                            static_cast<unsigned short>(chunkFile.Get4());
+                        material->m_textureIndices[i] = static_cast<unsigned short>(chunkFile.Get4());
                     }
-                    if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 2) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 2;
+                    if (material->m_textureCount == 2) {
+                        material->m_tevBit |= 2;
                     }
                 }
 
@@ -2504,7 +2503,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_NAME: {
                 if (material != 0) {
-                    strncpy(reinterpret_cast<char*>(Ptr(material, 8)), chunkFile.GetString(), 0x10);
+                    strncpy(material->m_name, chunkFile.GetString(), 0x10);
                 } else {
                     chunkFile.GetString();
                 }
@@ -2523,23 +2522,23 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 }
 
                 if ((flags & 1) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80;
+                    material->m_tevBit |= 0x80;
                 }
                 if ((flags & 2) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x10;
+                    material->m_tevBit |= 0x10;
                 }
                 if ((flags & 4) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                    material->m_tevBit |= 4;
                 }
                 if ((flags & 8) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x100000;
+                    material->m_tevBit |= 0x100000;
                 }
 
-                *Ptr(material, 0xA0) = chunkFile.Get1();
-                *Ptr(material, 0xA1) = chunkFile.Get1();
+                material->m_blendMode = chunkFile.Get1();
+                material->m_fogEnable = chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
-                *Ptr(material, 0xA6) = static_cast<unsigned char>(chunkFile.Get2());
+                material->m_unkA6 = static_cast<unsigned char>(chunkFile.Get2());
                 chunkFile.Get2();
                 chunkFile.GetF4();
             } break;
@@ -2547,7 +2546,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 unsigned short textureIndex = chunkFile.Get2();
                 if (material != 0) {
                     AddTextureIndex(material, textureIndex);
-                    *Ptr(material, 0xA7) = 1;
+                    material->m_singleTextureFlag = 1;
                 }
             } break;
             case CHUNK_BUMP: {
@@ -2555,7 +2554,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
                     if (material != 0) {
-                        *Ptr(material, 0xA1) = chunkFile.Get1();
+                        material->m_fogEnable = chunkFile.Get1();
                     } else {
                         chunkFile.Get1();
                     }
@@ -2576,23 +2575,23 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     AddTextureIndex(material, texture1);
                     AddTextureIndex(material, texture2);
 
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA6) = a6;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_unkA6 = a6;
                     SetMaterialColor(material, rgba);
-                    *Ptr(material, 0xA2) = 1;
+                    material->m_materialType = 1;
 
                     CLightPcs::CBumpLight* bumpLight = bumpLights;
                     if (bumpLight == 0) {
                         bumpLight = GetMapBumpLight(bumpIndex);
-                        *Ptr(material, 0xA3) = (bumpLightDirect == 0) ? 0 : 1;
+                        material->m_bumpLightDirect = (bumpLightDirect == 0) ? 0 : 1;
                     } else {
-                        *Ptr(material, 0xA3) = 1;
+                        material->m_bumpLightDirect = 1;
                     }
 
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                    material->m_bumpLight = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    material->m_tevBit |= 4;
                 }
             } break;
             case CHUNK_JIME: {
@@ -2609,21 +2608,21 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (material != 0) {
                     AddTextureIndex(material, texture0);
                     AddTextureIndex(material, texture1);
-                    *Ptr(material, 0xA1) = a1;
+                    material->m_fogEnable = a1;
                     if (useJimen != 0) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x20000;
+                        material->m_tevBit |= 0x20000;
                     }
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA2) = 3;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_materialType = 3;
 
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x4000;
+                    material->m_bumpLight = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    material->m_tevBit |= 0x4000;
                     SetMaterialColor(material, rgba);
-                    *Ptr(material, 0xA3) = 1;
+                    material->m_bumpLightDirect = 1;
                 }
             } break;
             case CHUNK_WATR: {
@@ -2640,22 +2639,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (material != 0) {
                     AddTextureIndex(material, texture0);
                     AddTextureIndex(material, texture1);
-                    *Ptr(material, 0xA1) = a1;
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA2) = 2;
+                    material->m_fogEnable = a1;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_materialType = 2;
 
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *Ptr(material, 0xA0) = 4;
+                    material->m_bumpLight = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = material->m_materialType;
+                    material->m_blendMode = 4;
                     SetMaterialColor(material, rgba);
 
-                    if ((waterMode == 0) && (*Ptr(material, 0xA1) == 0)) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 8;
+                    if ((waterMode == 0) && (material->m_fogEnable == 0)) {
+                        material->m_tevBit |= 8;
                     } else {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80000;
+                        material->m_tevBit |= 0x80000;
                     }
                 }
             } break;

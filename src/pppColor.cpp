@@ -3,6 +3,12 @@
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
 
+struct pppColorStep {
+    s32 m_graphId;
+    s32 m_padding;
+    s16 m_colors[4];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8005FF8C  
@@ -32,23 +38,23 @@ void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
  */
 void pppColor(_pppPObject* param1, void* param2, _pppCtrlTable* param3){
     _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
+    pppColorStep* step = static_cast<pppColorStep*>(param2);
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    s32 id1 = *(s32*)param2;
+    s32 id1 = step->m_graphId;
     s32 id2 = param1->m_graphId;
 
     if (id1 == id2) {
-        s16* src_colors = (s16*)((u8*)param2 + 8);
-        work->r += src_colors[0];
-        work->g += src_colors[1];
-        work->b += src_colors[2];
-        work->a += src_colors[3];
+        work->r += step->m_colors[0];
+        work->g += step->m_colors[1];
+        work->b += step->m_colors[2];
+        work->a += step->m_colors[3];
     }
 
-    if (((u8*)ppvMng)[0xef] != 0) {
+    if (ppvMng->m_useOwnerScaleSign != 0) {
         work->result.r = (u8)((float)(work->r >> 7) * ((float*)ppvMng)[14]);
         work->result.g = (u8)((float)(work->g >> 7) * ((float*)ppvMng)[15]);
         work->result.b = (u8)((float)(work->b >> 7) * ((float*)ppvMng)[16]);

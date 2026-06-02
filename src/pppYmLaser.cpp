@@ -65,12 +65,23 @@ struct pppYmLaserColorData {
 	pppCVECTOR m_color;
 };
 
+struct pppYmLaserCylinder {
+	Vec m_bottom;
+	Vec m_top;
+	Vec m_axis;
+	f32 m_radius;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
+};
+
 static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 }
 
 STATIC_ASSERT(offsetof(struct pppYmLaser, m_workArea) == 0x80);
+STATIC_ASSERT(sizeof(pppYmLaserCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(offsetof(pppYmLaserCylinder, m_boundsMin) == offsetof(CMapCylinder, m_boundsMin));
 
 /*
  * --INFO--
@@ -360,7 +371,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Vec localA;
 	Mtx tempMtx;
 	Mtx charaMtx;
-	CMapCylinder cyl;
+	pppYmLaserCylinder cyl;
 	int emptyHistory;
 	int fillIndex;
 
@@ -435,7 +446,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

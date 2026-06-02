@@ -27,30 +27,30 @@ private:
     unsigned int m_data;
 };
 
-unsigned int CMapPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc10[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc11[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc12[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc13[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc14[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc15[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc16[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc19[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc20[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc21[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc22[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-unsigned int CMapPcs::m_table_desc23[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc19 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc20 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+CProcessTableCallback CMapPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
 extern const char s_CMapPcs_GAME_801D76E0[];
 extern const char s_CMapPcs_VIEWER_801D76F0[];
@@ -59,48 +59,48 @@ extern const char s_CMapPcs_PART_801D7700[];
 CProcessTable CMapPcs::m_table[3] = {
     {
         const_cast<char*>(s_CMapPcs_GAME_801D76E0),
-        CMapPcs::m_table_desc0[0],  CMapPcs::m_table_desc0[1],  CMapPcs::m_table_desc0[2],
-        CMapPcs::m_table_desc1[0],  CMapPcs::m_table_desc1[1],  CMapPcs::m_table_desc1[2],
-        CMapPcs::m_table_desc2[0],  CMapPcs::m_table_desc2[1],  CMapPcs::m_table_desc2[2],
-        0x14,                        0,                           CMapPcs::m_table_desc3[0],
-        CMapPcs::m_table_desc3[1],  CMapPcs::m_table_desc3[2],  0x1E,
-        0,                           CMapPcs::m_table_desc4[0],  CMapPcs::m_table_desc4[1],
-        CMapPcs::m_table_desc4[2],  0x2F,                        1,
-        CMapPcs::m_table_desc5[0],  CMapPcs::m_table_desc5[1],  CMapPcs::m_table_desc5[2],
-        0x35,                        1,                           CMapPcs::m_table_desc6[0],
-        CMapPcs::m_table_desc6[1],  CMapPcs::m_table_desc6[2],  0x37,
-        1,                           CMapPcs::m_table_desc7[0],  CMapPcs::m_table_desc7[1],
-        CMapPcs::m_table_desc7[2],  0x3F,                        1,
+        CMapPcs::m_table_desc0.m_thisOffset,  CMapPcs::m_table_desc0.m_virtualOffset,  CMapPcs::m_table_desc0.m_function,
+        CMapPcs::m_table_desc1.m_thisOffset,  CMapPcs::m_table_desc1.m_virtualOffset,  CMapPcs::m_table_desc1.m_function,
+        CMapPcs::m_table_desc2.m_thisOffset,  CMapPcs::m_table_desc2.m_virtualOffset,  CMapPcs::m_table_desc2.m_function,
+        0x14,                        0,                           CMapPcs::m_table_desc3.m_thisOffset,
+        CMapPcs::m_table_desc3.m_virtualOffset,  CMapPcs::m_table_desc3.m_function,  0x1E,
+        0,                           CMapPcs::m_table_desc4.m_thisOffset,  CMapPcs::m_table_desc4.m_virtualOffset,
+        CMapPcs::m_table_desc4.m_function,  0x2F,                        1,
+        CMapPcs::m_table_desc5.m_thisOffset,  CMapPcs::m_table_desc5.m_virtualOffset,  CMapPcs::m_table_desc5.m_function,
+        0x35,                        1,                           CMapPcs::m_table_desc6.m_thisOffset,
+        CMapPcs::m_table_desc6.m_virtualOffset,  CMapPcs::m_table_desc6.m_function,  0x37,
+        1,                           CMapPcs::m_table_desc7.m_thisOffset,  CMapPcs::m_table_desc7.m_virtualOffset,
+        CMapPcs::m_table_desc7.m_function,  0x3F,                        1,
     },
     {
         const_cast<char*>(s_CMapPcs_VIEWER_801D76F0),
-        CMapPcs::m_table_desc8[0],  CMapPcs::m_table_desc8[1],  CMapPcs::m_table_desc8[2],
-        CMapPcs::m_table_desc9[0],  CMapPcs::m_table_desc9[1],  CMapPcs::m_table_desc9[2],
-        CMapPcs::m_table_desc10[0], CMapPcs::m_table_desc10[1], CMapPcs::m_table_desc10[2],
-        0x14,                        0,                           CMapPcs::m_table_desc11[0],
-        CMapPcs::m_table_desc11[1], CMapPcs::m_table_desc11[2], 0x1E,
-        0,                           CMapPcs::m_table_desc12[0], CMapPcs::m_table_desc12[1],
-        CMapPcs::m_table_desc12[2], 0x2F,                        1,
-        CMapPcs::m_table_desc13[0], CMapPcs::m_table_desc13[1], CMapPcs::m_table_desc13[2],
-        0x35,                        1,                           CMapPcs::m_table_desc14[0],
-        CMapPcs::m_table_desc14[1], CMapPcs::m_table_desc14[2], 0x37,
-        1,                           CMapPcs::m_table_desc15[0], CMapPcs::m_table_desc15[1],
-        CMapPcs::m_table_desc15[2], 0x3F,                        1,
+        CMapPcs::m_table_desc8.m_thisOffset,  CMapPcs::m_table_desc8.m_virtualOffset,  CMapPcs::m_table_desc8.m_function,
+        CMapPcs::m_table_desc9.m_thisOffset,  CMapPcs::m_table_desc9.m_virtualOffset,  CMapPcs::m_table_desc9.m_function,
+        CMapPcs::m_table_desc10.m_thisOffset, CMapPcs::m_table_desc10.m_virtualOffset, CMapPcs::m_table_desc10.m_function,
+        0x14,                        0,                           CMapPcs::m_table_desc11.m_thisOffset,
+        CMapPcs::m_table_desc11.m_virtualOffset, CMapPcs::m_table_desc11.m_function, 0x1E,
+        0,                           CMapPcs::m_table_desc12.m_thisOffset, CMapPcs::m_table_desc12.m_virtualOffset,
+        CMapPcs::m_table_desc12.m_function, 0x2F,                        1,
+        CMapPcs::m_table_desc13.m_thisOffset, CMapPcs::m_table_desc13.m_virtualOffset, CMapPcs::m_table_desc13.m_function,
+        0x35,                        1,                           CMapPcs::m_table_desc14.m_thisOffset,
+        CMapPcs::m_table_desc14.m_virtualOffset, CMapPcs::m_table_desc14.m_function, 0x37,
+        1,                           CMapPcs::m_table_desc15.m_thisOffset, CMapPcs::m_table_desc15.m_virtualOffset,
+        CMapPcs::m_table_desc15.m_function, 0x3F,                        1,
     },
     {
         const_cast<char*>(s_CMapPcs_PART_801D7700),
-        CMapPcs::m_table_desc16[0], CMapPcs::m_table_desc16[1], CMapPcs::m_table_desc16[2],
-        CMapPcs::m_table_desc17[0], CMapPcs::m_table_desc17[1], CMapPcs::m_table_desc17[2],
-        CMapPcs::m_table_desc18[0], CMapPcs::m_table_desc18[1], CMapPcs::m_table_desc18[2],
-        0x14,                        0,                           CMapPcs::m_table_desc19[0],
-        CMapPcs::m_table_desc19[1], CMapPcs::m_table_desc19[2], 0x1E,
-        0,                           CMapPcs::m_table_desc20[0], CMapPcs::m_table_desc20[1],
-        CMapPcs::m_table_desc20[2], 0x2F,                        1,
-        CMapPcs::m_table_desc21[0], CMapPcs::m_table_desc21[1], CMapPcs::m_table_desc21[2],
-        0x35,                        1,                           CMapPcs::m_table_desc22[0],
-        CMapPcs::m_table_desc22[1], CMapPcs::m_table_desc22[2], 0x37,
-        1,                           CMapPcs::m_table_desc23[0], CMapPcs::m_table_desc23[1],
-        CMapPcs::m_table_desc23[2], 0x3F,                        1,
+        CMapPcs::m_table_desc16.m_thisOffset, CMapPcs::m_table_desc16.m_virtualOffset, CMapPcs::m_table_desc16.m_function,
+        CMapPcs::m_table_desc17.m_thisOffset, CMapPcs::m_table_desc17.m_virtualOffset, CMapPcs::m_table_desc17.m_function,
+        CMapPcs::m_table_desc18.m_thisOffset, CMapPcs::m_table_desc18.m_virtualOffset, CMapPcs::m_table_desc18.m_function,
+        0x14,                        0,                           CMapPcs::m_table_desc19.m_thisOffset,
+        CMapPcs::m_table_desc19.m_virtualOffset, CMapPcs::m_table_desc19.m_function, 0x1E,
+        0,                           CMapPcs::m_table_desc20.m_thisOffset, CMapPcs::m_table_desc20.m_virtualOffset,
+        CMapPcs::m_table_desc20.m_function, 0x2F,                        1,
+        CMapPcs::m_table_desc21.m_thisOffset, CMapPcs::m_table_desc21.m_virtualOffset, CMapPcs::m_table_desc21.m_function,
+        0x35,                        1,                           CMapPcs::m_table_desc22.m_thisOffset,
+        CMapPcs::m_table_desc22.m_virtualOffset, CMapPcs::m_table_desc22.m_function, 0x37,
+        1,                           CMapPcs::m_table_desc23.m_thisOffset, CMapPcs::m_table_desc23.m_virtualOffset,
+        CMapPcs::m_table_desc23.m_function, 0x3F,                        1,
     },
 };
 

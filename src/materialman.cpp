@@ -456,12 +456,12 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
 
-    unsigned char fogEnable = *Ptr(material, 0xA1);
+    unsigned char fogEnable = material->m_fogEnable;
     if ((static_cast<int>(Game.m_currentSceneId) == 3) && (MapMng.m_fogEnable == 0)) {
         fogEnable = 0;
     }
 
-    unsigned char blendMode = *Ptr(material, 0xA0);
+    unsigned char blendMode = material->m_blendMode;
     if (m_blendOverrideMode != 0xFF) {
         if (blendMode == 0) {
             blendMode = 5;
@@ -1158,8 +1158,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
     g_drawMaterial = material;
-    int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
-    unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
+    int bumpLight = reinterpret_cast<int>(material->m_bumpLight);
+    unsigned char materialType = material->m_materialType;
 
     if (materialType == 2) {
         SetMaterialMenu(materialSet, materialIndex, setVtxDesc);
@@ -1183,9 +1183,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
  */
 void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
 {
-    unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    CLightPcs::CBumpLight* bumpLight = *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28));
-    unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
+    unsigned int tevBit = material->m_tevBit;
+    CLightPcs::CBumpLight* bumpLight = material->m_bumpLight;
+    unsigned char materialType = material->m_materialType;
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {
         if (m_vtxDescMode != 1) {
@@ -1257,8 +1257,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit &
-                          *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
+    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder(
@@ -1533,8 +1532,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit &
-                          *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
+    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder(
@@ -1766,7 +1764,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
-    unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
+    unsigned long useShadowBit32 = materialFlag & material->m_tevBit & 0x8000;
     if (useShadowBit32 != 0) {
         if (m_shadowTextureCount > 3) {
             return;
@@ -1801,13 +1799,13 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
         int texMapCur = m_texMapIdCur;
         m_texMapIdCur = texMapCur + 1;
-        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x3C)));
+        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[0]);
 
         if (useShadowBit32 != 0) {
             texMapCur = m_texMapIdCur;
             m_texMapIdCur = texMapCur + 1;
-            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
-            m_shadowKColorIds[materialNum] = *Ptr(material, 0xA4);
+            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[1]);
+            m_shadowKColorIds[materialNum] = material->m_shadowKColorId;
             m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
             m_shadowTextureCount = m_shadowTextureCount + 1;
         }

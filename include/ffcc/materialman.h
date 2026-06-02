@@ -158,6 +158,7 @@ private:
 
 class CMaterial : public CRef
 {
+    friend class CMaterialMan;
     friend class CTexAnimSet;
     friend class CMaterialSet;
 

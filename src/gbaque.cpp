@@ -3753,14 +3753,14 @@ void GbaQueue::SmithEnd(int channel)
  * JP Address: TODO
  * JP Size: TODO
  */
-void GbaQueue::MakeBuyData(int channel, char* outData)
+int GbaQueue::MakeBuyData(int channel, char* outData)
 {
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD7B);
 		}
-		return;
+		return -1;
 	}
 	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 
@@ -3769,7 +3769,7 @@ char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0
 		if (System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD84);
 		}
-		return;
+		return -1;
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
@@ -3785,7 +3785,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	for (unsigned int i = 0; i < itemCount; i++) {
 		const unsigned short itemId =
 			static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(scriptFood + i * 2 + 0xBE6));
-		const unsigned short swapped = static_cast<unsigned short>((itemId << 8) | (itemId >> 8));
+		const unsigned short swapped = SwapU16(itemId);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
 		totalSize += 2;
@@ -3801,18 +3801,14 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 	for (unsigned int i = 0; i < itemCount; i++) {
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
-		unsigned int itemPrice = static_cast<unsigned short>(
+		int itemPrice = static_cast<unsigned short>(
 			*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
-		itemPrice = static_cast<unsigned int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
-		if (static_cast<int>(itemPrice) < 1) {
+		itemPrice = static_cast<int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
+		if (itemPrice < 1) {
 			itemPrice = 1;
 		}
 
-		const unsigned int packedPrice =
-			(itemPrice << 24) |
-			(((itemPrice >> 8) & 0xFF) << 16) |
-			(((itemPrice >> 16) & 0xFF) << 8) |
-			(itemPrice >> 24);
+		const unsigned int packedPrice = SwapU32(static_cast<unsigned int>(itemPrice));
 		memcpy(writePtr, &packedPrice, 4);
 		writePtr += 4;
 		totalSize += 4;
@@ -3842,6 +3838,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	Joybus.SetLetterSize(channel, totalSize);
+	return totalSize;
 }
 
 /*
@@ -3879,15 +3876,15 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
-		unsigned int sellInfo[2];
+		unsigned short sellInfo[4];
 		if ((itemId < 1) || (itemId > 0x9E)) {
-			sellInfo[0] = 0;
-			sellInfo[1] = 0;
+			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
 			const int itemBase = flatBase + itemId * 0x48;
-			sellInfo[0] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 4));
-			sellInfo[1] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 6)) |
-				(static_cast<unsigned int>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 8))) << 16);
+			sellInfo[0] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 4));
+			sellInfo[1] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 6));
+			sellInfo[2] = SwapU16(*reinterpret_cast<unsigned short*>(itemBase + 8));
+			sellInfo[3] = 0;
 		}
 		memcpy(outData, sellInfo, 8);
 		outData += 8;
@@ -3898,19 +3895,17 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f * 0.3f));
 	for (int i = 0; i < 0x40; i++) {
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
-		unsigned int packedPrice = 0;
+		unsigned int packedPrice;
 		if (itemId > 0) {
-			unsigned int itemPrice = static_cast<unsigned short>(
+			int itemPrice = static_cast<unsigned short>(
 				*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
-			itemPrice = static_cast<unsigned int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
-			if (static_cast<int>(itemPrice) < 1) {
+			itemPrice = static_cast<int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
+			if (itemPrice < 1) {
 				itemPrice = 1;
 			}
-			packedPrice =
-				(itemPrice << 24) |
-				((itemPrice >> 8) & 0xFF) << 16 |
-				((itemPrice >> 16) & 0xFF) << 8 |
-				(itemPrice >> 24);
+			packedPrice = SwapU32(static_cast<unsigned int>(itemPrice));
+		} else {
+			packedPrice = 0;
 		}
 
 		memcpy(outData, &packedPrice, 4);

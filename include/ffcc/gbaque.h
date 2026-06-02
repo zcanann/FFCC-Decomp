@@ -116,7 +116,7 @@ public:
     void ClrSmithFlg(int);
     void ShopEnd(int);
     void SmithEnd(int);
-    void MakeBuyData(int, char*);
+    int MakeBuyData(int, char*);
     int MakeSellData(int, char*);
     int MakeSmithData(int, char*);
     unsigned int GetSellFlg(int);

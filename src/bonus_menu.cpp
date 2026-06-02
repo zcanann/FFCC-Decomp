@@ -2066,8 +2066,9 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->duration = 8;
 		}
 
+		int extraBase = closeCount + 1;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[closeCount + 1 + i];
+			BonusAnimSprite* sprite = &sprites[extraBase + i];
 			BonusAnimSprite* source = &sprites[countTop + i];
 			sprite->startFrame = source->startFrame;
 			BonusSpriteFlags(sprite) = 1;
@@ -2077,12 +2078,12 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[closeCount + 1 + activePartyCount + i]) = 0;
+			BonusSpriteFlags(&sprites[extraBase + activePartyCount + i]) = 0;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[closeCount + 1 + activePartyCount * 2 + i];
-			BonusAnimSprite* source = &sprites[closeCount + 1 + activePartyCount + i];
+			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 2 + i];
+			BonusAnimSprite* source = &sprites[extraBase + activePartyCount + i];
 			sprite->startFrame = source->startFrame;
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;
@@ -2091,12 +2092,12 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[closeCount + 1 + activePartyCount * 3 + i]) = 0;
+			BonusSpriteFlags(&sprites[extraBase + activePartyCount * 3 + i]) = 0;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[closeCount + 1 + activePartyCount * 4 + i];
-			BonusAnimSprite* source = &sprites[closeCount + 1 + activePartyCount * 3 + i];
+			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 4 + i];
+			BonusAnimSprite* source = &sprites[extraBase + activePartyCount * 3 + i];
 			sprite->startFrame = source->startFrame;
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;

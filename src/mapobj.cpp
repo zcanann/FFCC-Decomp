@@ -44,54 +44,9 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
-static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(self) + offset;
-}
-
-static inline void*& PtrAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<void**>(Ptr(self, offset));
-}
-
-static inline unsigned char& U8At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned char*>(Ptr(self, offset));
-}
-
-static inline signed char& S8At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<signed char*>(Ptr(self, offset));
-}
-
-static inline unsigned short& U16At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
-}
-
-static inline short& S16At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<short*>(Ptr(self, offset));
-}
-
-static inline int& S32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<int*>(Ptr(self, offset));
-}
-
-static inline unsigned int& U32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned int*>(Ptr(self, offset));
-}
-
-static inline float& F32At(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<float*>(Ptr(self, offset));
-}
-
 static inline CMapObj* NextSlot(CMapObj* obj)
 {
-    return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));
+    return obj + 1;
 }
 
 static inline CMapObj* MapObjArrayStart()
@@ -314,7 +269,7 @@ void CMapObj::Init()
     m_drawPriority = 0x7E;
     m_baseDrawPriority = 0x7E;
     m_octTreeIndex = -1;
-    U8At(this, 0x20) = 0;
+    m_unknown20 = 0;
     m_disableZWrite = 0;
     m_useAmbientColor = 0;
 
@@ -322,7 +277,7 @@ void CMapObj::Init()
     m_effectId = 0xFFFF;
     m_groupId = 0xFFFF;
     m_showFlags = 1;
-    U8At(this, 0x19) = 1;
+    m_unknown19 = 1;
     m_meshId = 0xFFFF;
 
     m_cameraSemiTransFar = kMapObjInitNegOne;
@@ -336,7 +291,7 @@ void CMapObj::Init()
     m_colorAlphaRate = 0xFF;
     m_lightAlpha = 0xFF;
     m_bumpLight = 0;
-    S16At(this, 0x16) = -1;
+    m_bumpObjId = -1;
     m_enableFullScreenShadow = 1;
     m_shadowTarget = -1;
 
@@ -448,7 +403,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == CHUNK_BOBJ) {
-            U16At(this, 0x16) = chunkFile.Get2();
+            m_bumpObjId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_GBID) {
             m_groupId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_EFID) {
@@ -1366,7 +1321,7 @@ void CMapObj::SetDrawEnv()
     _GXColor lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
                               m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
-                              static_cast<unsigned char>(S16At(this, 0x28) >> 7));
+                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
 }
 
 /*
@@ -1450,7 +1405,7 @@ void CMapObj::Draw(unsigned char priority)
     lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
                               m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
-                              static_cast<unsigned char>(S16At(this, 0x28) >> 7));
+                              static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
                               reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 

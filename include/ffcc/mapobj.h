@@ -214,16 +214,16 @@ public:
     void* m_bumpLight;            // 0x10
     unsigned char m_baseDrawPriority; // 0x14
     unsigned char m_drawPriority;     // 0x15
-    char m_pad16[0x02];
+    short m_bumpObjId;            // 0x16
     unsigned char m_showFlags;      // 0x18
-    char m_pad19;
+    unsigned char m_unknown19;     // 0x19
     unsigned char m_bumpTexMatrixMode; // 0x1A
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
     unsigned char m_meshType;    // 0x1E
     signed char m_octTreeIndex;      // 0x1F
-    char m_pad20;
+    unsigned char m_unknown20;     // 0x20
     unsigned char m_useAmbientColor; // 0x21
     unsigned char m_enableFullScreenShadow; // 0x22
     unsigned char m_lightAlpha;      // 0x23

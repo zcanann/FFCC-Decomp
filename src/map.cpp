@@ -2277,9 +2277,9 @@ void CMapMng::ReadOtm(char* mapName)
         *reinterpret_cast<CLightPcs::CBumpLight**>(atr + 0x38) = bump;
 
         for (int j = 0; j < mapObjCount; j++) {
-            unsigned char* scan = reinterpret_cast<unsigned char*>(GetMapObjArray() + j);
-            if (*reinterpret_cast<short*>(scan + 0x16) == i) {
-                *reinterpret_cast<CLightPcs::CBumpLight**>(scan + 0x10) = bump;
+            CMapObj* scan = GetMapObjArray() + j;
+            if (scan->m_bumpObjId == i) {
+                scan->m_bumpLight = bump;
             }
         }
 

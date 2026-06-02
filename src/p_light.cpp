@@ -101,7 +101,7 @@ static inline double U32ToDouble(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CLightPcs::CLight::Set(CLightPcs::CLight* light)
+inline void CLightPcs::CLight::Set(CLightPcs::CLight* light)
 {
     *this = *light;
 
@@ -494,7 +494,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
  * JP Address: TODO
  * JP Size: TODO
  */
-CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
+inline CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
 {
     CBumpLight* bumpLights = &m_bumpLights[target * 8];
 
@@ -516,7 +516,7 @@ CLightPcs::CBumpLight* CLightPcs::GetFreeBumpLight(CLightPcs::TARGET target)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CLightPcs::Clear()
+inline void CLightPcs::Clear()
 {
     m_numDiffuse = 0;
     m_loadedLightCount = 0;

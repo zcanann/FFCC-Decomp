@@ -9,6 +9,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_graphic.h"
+#include "ffcc/ptrarray_fwd.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/render_buffers.h"
@@ -64,13 +65,6 @@ STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x60);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
-
-template <class T>
-class CPtrArray
-{
-public:
-    T operator[](unsigned long);
-};
 
 extern const float FLOAT_80331cc0 = 2.0f;
 extern const float FLOAT_80331cc4 = 0.0f;

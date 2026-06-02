@@ -3,16 +3,9 @@
 #include "ffcc/map.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/materialman.h"
+#include "ffcc/ptrarray_fwd.h"
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
-
-template <class T>
-class CPtrArray
-{
-public:
-	int GetSize();
-	T operator[](unsigned long index);
-};
 
 extern const double kMapShadowDepthBias;
 extern const float kMapShadowScaleStep;

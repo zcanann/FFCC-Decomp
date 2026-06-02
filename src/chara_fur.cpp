@@ -18,6 +18,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pad.h"
+#include "ffcc/ptrarray_fwd.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -68,14 +69,6 @@ struct Vec4d
 };
 
 class CMaterial;
-
-template <class T>
-class CPtrArray
-{
-public:
-	int GetSize();
-	T operator[](unsigned long index);
-};
 
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];

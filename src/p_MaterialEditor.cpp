@@ -564,16 +564,14 @@ void CMaterialEditorPcs::destroyViewer()
 
     unsigned int textureIndex;
     m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-    CMaterialEditorPcs* iter = this;
     do {
-        MemFree(iter->m_textureData[0]);
-        MemFree(iter->m_tlutData[0]);
-        MemFree(iter->m_texObj[0]);
-        MemFree(iter->m_tlutObj0[0]);
-        MemFree(iter->m_tlutObj1[0]);
-        MemFree(iter->m_textureHeader[0]);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
         textureIndex += 1;
-        iter = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(iter) + 4);
     } while (textureIndex < 0x10);
 
     Memory.DestroyStage(m_stage);
@@ -639,17 +637,15 @@ void CMaterialEditorPcs::Quit()
 {
     unsigned int textureIndex;
     m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-    CMaterialEditorPcs* iter = this;
 
     do {
-        MemFree(iter->m_textureData[0]);
-        MemFree(iter->m_tlutData[0]);
-        MemFree(iter->m_texObj[0]);
-        MemFree(iter->m_tlutObj0[0]);
-        MemFree(iter->m_tlutObj1[0]);
-        MemFree(iter->m_textureHeader[0]);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
         textureIndex += 1;
-        iter = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(iter) + 4);
     } while (textureIndex < 0x10);
 
     if (m_rsdIndex != 0) {

@@ -14,6 +14,8 @@ extern const char kAStarStepDebugFormat[] = "%d ";
 extern const char kAStarNewLine[] = "\n";
 }
 
+static const float kConstrainCameraDirBaseFov = 25.0f;
+
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
 /*
@@ -46,7 +48,8 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPcs.m_positionX;
             float cameraPosY = CameraPcs.m_positionY;
             float cameraPosZ = CameraPcs.m_positionZ;
-            float scale = kConstrainCameraDirScaleOne + ((CameraPcs.m_fov - 25.0f) / 25.0f);
+            float scale = kConstrainCameraDirScaleOne +
+                          ((CameraPcs.m_fov - kConstrainCameraDirBaseFov) / kConstrainCameraDirBaseFov);
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 

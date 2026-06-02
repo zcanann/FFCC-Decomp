@@ -91,8 +91,8 @@ STATIC_ASSERT(offsetof(pppMana2UnkB, m_rippleLevel) == 0x38);
 
 extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 extern "C" const char s_pppMana2_cpp[] = "pppMana2.cpp";
-extern const float FLOAT_80331898 = 0.0f;
-extern const float FLOAT_8033189c = -1.0f;
+extern const float FLOAT_80331898;
+extern const float FLOAT_8033189c;
 extern const float FLOAT_803318a0 = 1.0f;
 extern const float FLOAT_803318a4 = 0.5f;
 extern const float FLOAT_803318A8 = 0.0625f;

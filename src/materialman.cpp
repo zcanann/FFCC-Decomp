@@ -1726,14 +1726,12 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
     if (cameraEnable != 0) {
         m_curEnvTevBit |= 0x80;
 
-        unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, m_fullScreenShadowMtx0);
+        PSMTXConcat(shadow.m_shadowTexMtx, viewMtx, m_fullScreenShadowMtx0);
+        GXTexObj* texObj = &shadow.m_texObjs[flags];
+        m_fullScreenShadowTexObj0 = texObj;
 
-        int frameDataBase = reinterpret_cast<int>(shadowPtr) + flags * 0x20;
-        m_fullScreenShadowTexObj0 = reinterpret_cast<GXTexObj*>(frameDataBase + 8);
-
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x88), viewMtx, m_fullScreenShadowMtx1);
-        m_fullScreenShadowTexObj1 = reinterpret_cast<GXTexObj*>(frameDataBase + 0x28);
+        PSMTXConcat(shadow.m_depthMtx, viewMtx, m_fullScreenShadowMtx1);
+        m_fullScreenShadowTexObj1 = texObj + 1;
     }
 }
 

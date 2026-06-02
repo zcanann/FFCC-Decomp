@@ -250,10 +250,13 @@ struct CameraStateCopy {
 STATIC_ASSERT(offsetof(CCameraPcs, m_cameraMatrix) == 0x04);
 STATIC_ASSERT(offsetof(CCameraPcs, m_worldMapMatrix) == 0x34);
 STATIC_ASSERT(offsetof(CCameraPcs, m_zRotate) == 0x108);
-STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowRotX) == 0x364);
-STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowRotY) == 0x368);
-STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowSpan) == 0x36C);
-STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowScale) == 0x370);
+STATIC_ASSERT(sizeof(CFullScreenShadow) == 0xE8);
+STATIC_ASSERT(offsetof(CFullScreenShadow, m_texObjs) == 0x08);
+STATIC_ASSERT(offsetof(CFullScreenShadow, m_rotX) == 0x48);
+STATIC_ASSERT(offsetof(CFullScreenShadow, m_shadowTexMtx) == 0x58);
+STATIC_ASSERT(offsetof(CFullScreenShadow, m_depthMtx) == 0x88);
+STATIC_ASSERT(offsetof(CFullScreenShadow, m_depthScaleMtx) == 0xB8);
+STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadow) == 0x31C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowEnabled) == 0x404);
 STATIC_ASSERT(offsetof(CCameraPcs, m_fullScreenShadowPosition) == 0x408);
 STATIC_ASSERT(offsetof(CCameraPcs, m_shadowRectBound) == 0x414);
@@ -1303,14 +1306,14 @@ void CCameraPcs::createFullShadow()
     unsigned char* rampTex;
     CMemory::CStage* stage = MapMng.m_stage;
 
-    *reinterpret_cast<void**>(self + 0x31C) = 0;
+    m_fullScreenShadow.m_shadowTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    *reinterpret_cast<void**>(self + 0x31C) = new (stage, s_p_camera_cpp, 0x3A5) u8[rampTexSize];
+    m_fullScreenShadow.m_shadowTexture = new (stage, s_p_camera_cpp, 0x3A5) u8[rampTexSize];
 
-    *reinterpret_cast<void**>(self + 0x320) = 0;
+    m_fullScreenShadow.m_rampTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
     rampTex = new (stage, s_p_camera_cpp, 0x361) u8[rampTexSize];
-    *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;
+    m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
         unsigned int i1 = i + 1;
@@ -1337,19 +1340,19 @@ void CCameraPcs::createFullShadow()
             static_cast<unsigned char>(i7);
     }
 
-    GXInitTexObj(reinterpret_cast<GXTexObj*>(self + 0x344), rampTex, 0x10, 0x10, GX_TF_I8,
+    GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
                  GX_CLAMP, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(self + 0x344), GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f,
+    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[1], GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 
     f32 shadowAlpha = FLOAT_8032faa4;
     m_fullScreenShadowEnabled = 1;
     f32 zero = FLOAT_8032fa34;
-    m_fullScreenShadowRotX = shadowAlpha;
+    m_fullScreenShadow.m_rotX = shadowAlpha;
     shadowAlpha = FLOAT_8032faa8;
-    m_fullScreenShadowRotY = zero;
-    m_fullScreenShadowScale = shadowAlpha;
+    m_fullScreenShadow.m_rotY = zero;
+    m_fullScreenShadow.m_scale = shadowAlpha;
 }
 
 /*
@@ -1365,14 +1368,14 @@ void CCameraPcs::destroyFullShadow()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (*reinterpret_cast<void**>(self + 0x31C) != 0) {
-        delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x31C));
-        *reinterpret_cast<void**>(self + 0x31C) = 0;
+    if (m_fullScreenShadow.m_shadowTexture != 0) {
+        delete static_cast<u8*>(m_fullScreenShadow.m_shadowTexture);
+        m_fullScreenShadow.m_shadowTexture = 0;
     }
 
-    if (*reinterpret_cast<void**>(self + 0x320) != 0) {
-        delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x320));
-        *reinterpret_cast<void**>(self + 0x320) = 0;
+    if (m_fullScreenShadow.m_rampTexture != 0) {
+        delete m_fullScreenShadow.m_rampTexture;
+        m_fullScreenShadow.m_rampTexture = 0;
     }
 }
 
@@ -1525,12 +1528,12 @@ void CCameraPcs::drawShadowBegin()
                                                (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
         }
 
-        m_fullScreenShadowRotY += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
-        m_fullScreenShadowRotX += FLOAT_8032fa70 * FLOAT_8032fa4c * stickY;
+        m_fullScreenShadow.m_rotY += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
+        m_fullScreenShadow.m_rotX += FLOAT_8032fa70 * FLOAT_8032fa4c * stickY;
     }
 
-    PSMTXRotRad(rotX, 'x', -m_fullScreenShadowRotX);
-    PSMTXRotRad(rotY, 'y', m_fullScreenShadowRotY);
+    PSMTXRotRad(rotX, 'x', -m_fullScreenShadow.m_rotX);
+    PSMTXRotRad(rotY, 'y', m_fullScreenShadow.m_rotY);
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
@@ -1551,7 +1554,7 @@ void CCameraPcs::drawShadowBegin()
             if (w < h) {
                 w = h;
             }
-            m_fullScreenShadowSpan = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
+            m_fullScreenShadow.m_span = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
             depth = w;
         } else if (m_shadowAuto == 2) {
             m_targetX = m_fullScreenShadowPosition.x;
@@ -1559,14 +1562,14 @@ void CCameraPcs::drawShadowBegin()
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
             depth = static_cast<double>(m_fullScreenShadowCamLen);
-            m_fullScreenShadowSpan = FLOAT_8032fa80 * m_fullScreenShadowScale;
+            m_fullScreenShadow.m_span = FLOAT_8032fa80 * m_fullScreenShadow.m_scale;
         } else {
             m_targetX = m_fullScreenShadowPosition.x;
             m_targetY = m_fullScreenShadowPosition.y;
             m_targetZ = m_fullScreenShadowPosition.z;
             PSVECSubtract(reinterpret_cast<Vec*>(&m_targetX), reinterpret_cast<Vec*>(&m_positionX), &delta);
             depth = static_cast<double>(PSVECMag(&delta));
-            m_fullScreenShadowSpan = static_cast<float>(depth * static_cast<double>(m_fullScreenShadowScale));
+            m_fullScreenShadow.m_span = static_cast<float>(depth * static_cast<double>(m_fullScreenShadow.m_scale));
         }
 
         double currentDepth = static_cast<double>(m_fullScreenShadowDepth);
@@ -1577,7 +1580,7 @@ void CCameraPcs::drawShadowBegin()
             m_fullScreenShadowDepth = static_cast<float>(depth);
         }
     } else {
-        m_fullScreenShadowSpan = FLOAT_8032fa88;
+        m_fullScreenShadow.m_span = FLOAT_8032fa88;
         m_fullScreenShadowDepth = FLOAT_8032fa8c;
     }
 
@@ -1606,8 +1609,8 @@ void CCameraPcs::drawShadowBegin()
     C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x214), reinterpret_cast<Vec*>(self + 0x2F0), &up,
                 reinterpret_cast<Vec*>(self + 0x2E4));
     C_MTXOrtho(reinterpret_cast<Mtx44Ptr>(self + 0x2A4),
-               m_fullScreenShadowSpan, -m_fullScreenShadowSpan,
-               -m_fullScreenShadowSpan, m_fullScreenShadowSpan,
+               m_fullScreenShadow.m_span, -m_fullScreenShadow.m_span,
+               -m_fullScreenShadow.m_span, m_fullScreenShadow.m_span,
                *reinterpret_cast<float*>(self + 0x310), *reinterpret_cast<float*>(self + 0x314));
 
     g_shadow_pos.x = *reinterpret_cast<float*>(self + 0x2F0);
@@ -1714,34 +1717,34 @@ void CCameraPcs::drawShadowEnd()
 
     GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
     GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE);
-    GXCopyTex(*reinterpret_cast<void**>(self + 0x31C), GX_TRUE);
+    GXCopyTex(m_fullScreenShadow.m_shadowTexture, GX_TRUE);
     GXSetCullMode(GX_CULL_BACK);
 
     {
-        float span = m_fullScreenShadowSpan;
+        float span = m_fullScreenShadow.m_span;
         float depthSpan = *reinterpret_cast<float*>(self + 0x314) - *reinterpret_cast<float*>(self + 0x310);
-        C_MTXLightOrtho(reinterpret_cast<MtxPtr>(self + 0x374), -span, span, -span, span,
+        C_MTXLightOrtho(m_fullScreenShadow.m_shadowTexMtx, -span, span, -span, span,
                         FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20);
-        PSMTXScale(reinterpret_cast<MtxPtr>(self + 0x3D4), FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34);
-        *reinterpret_cast<float*>(self + 0x3DC) = FLOAT_8032fa38 / depthSpan;
-        *reinterpret_cast<float*>(self + 0x3E0) = -(*reinterpret_cast<float*>(self + 0x310) / depthSpan);
-        *reinterpret_cast<float*>(self + 0x3EC) = *reinterpret_cast<float*>(self + 0x3DC) * FLOAT_8032fa6c;
-        *reinterpret_cast<float*>(self + 0x3F0) = *reinterpret_cast<float*>(self + 0x3E0) * FLOAT_8032fa6c;
-        *reinterpret_cast<float*>(self + 0x400) = FLOAT_8032fa1c;
-        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x374),
+        PSMTXScale(m_fullScreenShadow.m_depthScaleMtx, FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34);
+        m_fullScreenShadow.m_depthScaleMtx[0][2] = FLOAT_8032fa38 / depthSpan;
+        m_fullScreenShadow.m_depthScaleMtx[0][3] = -(*reinterpret_cast<float*>(self + 0x310) / depthSpan);
+        m_fullScreenShadow.m_depthScaleMtx[1][2] = m_fullScreenShadow.m_depthScaleMtx[0][2] * FLOAT_8032fa6c;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] = m_fullScreenShadow.m_depthScaleMtx[0][3] * FLOAT_8032fa6c;
+        m_fullScreenShadow.m_depthScaleMtx[2][3] = FLOAT_8032fa1c;
+        PSMTXConcat(m_fullScreenShadow.m_shadowTexMtx,
                     reinterpret_cast<MtxPtr>(self + 0x214),
-                    reinterpret_cast<MtxPtr>(self + 0x374));
-        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4),
+                    m_fullScreenShadow.m_shadowTexMtx);
+        PSMTXConcat(m_fullScreenShadow.m_depthScaleMtx,
                     reinterpret_cast<MtxPtr>(self + 0x214),
-                    reinterpret_cast<MtxPtr>(self + 0x3A4));
+                    m_fullScreenShadow.m_depthMtx);
     }
 
     GXSetColorUpdate(GX_TRUE);
     GXSetZMode(GX_TRUE, GX_LESS, GX_TRUE);
     GXPixModeSync();
-    GXInitTexObj(reinterpret_cast<GXTexObj*>(self + 0x324), *reinterpret_cast<void**>(self + 0x31C),
+    GXInitTexObj(&m_fullScreenShadow.m_texObjs[0], m_fullScreenShadow.m_shadowTexture,
                  0x1E0, 0x1E0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(self + 0x324), GX_NEAR, GX_NEAR, FLOAT_8032fa34,
+    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[0], GX_NEAR, GX_NEAR, FLOAT_8032fa34,
                     FLOAT_8032fa34, FLOAT_8032fa34, GX_FALSE, GX_FALSE, GX_ANISO_1);
 
     memcpy(self + 0x4, self + 0x10C, 0x108);
@@ -1763,13 +1766,13 @@ void CCameraPcs::drawShadowChrBegin()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     if (m_fullScreenShadowEnabled != 0) {
-        float shadowX = *reinterpret_cast<float*>(self + 0x3E0);
+        float shadowX = m_fullScreenShadow.m_depthScaleMtx[0][3];
         float scale = FLOAT_8032fa58;
-        *reinterpret_cast<float*>(self + 0x3E0) = shadowX * scale;
-        *reinterpret_cast<float*>(self + 0x3F0) *= scale;
-        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4),
+        m_fullScreenShadow.m_depthScaleMtx[0][3] = shadowX * scale;
+        m_fullScreenShadow.m_depthScaleMtx[1][3] *= scale;
+        PSMTXConcat(m_fullScreenShadow.m_depthScaleMtx,
                     reinterpret_cast<MtxPtr>(self + 0x214),
-                    reinterpret_cast<MtxPtr>(self + 0x3A4));
+                    m_fullScreenShadow.m_depthMtx);
     }
 }
 
@@ -1784,11 +1787,8 @@ void CCameraPcs::drawShadowChrBegin()
  */
 void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     if (m_fullScreenShadowEnabled != 0) {
-        MaterialMan.SetFullScreenShadow(*reinterpret_cast<CFullScreenShadow*>(self + 0x31C),
-                                        matrix, flags);
+        MaterialMan.SetFullScreenShadow(m_fullScreenShadow, matrix, flags);
     }
 }
 

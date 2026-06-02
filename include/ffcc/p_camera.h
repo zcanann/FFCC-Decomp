@@ -20,6 +20,21 @@ extern const float kCameraBoundsMaxInitial;
 
 void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
 
+class CFullScreenShadow
+{
+public:
+    void* m_shadowTexture;   // 0x00
+    u8* m_rampTexture;       // 0x04
+    GXTexObj m_texObjs[2];   // 0x08
+    float m_rotX;            // 0x48
+    float m_rotY;            // 0x4C
+    float m_span;            // 0x50
+    float m_scale;           // 0x54
+    Mtx m_shadowTexMtx;      // 0x58
+    Mtx m_depthMtx;          // 0x88
+    Mtx m_depthScaleMtx;     // 0xB8
+};
+
 class CCameraPcs : public CProcess
 {
 public:
@@ -187,12 +202,8 @@ public:
     float m_nearZ;
     float m_farZ;
     float m_zRotate; // 0x108
-    u8 _pad10C[0x364 - 0x10C];
-    float m_fullScreenShadowRotX; // 0x364
-    float m_fullScreenShadowRotY; // 0x368
-    float m_fullScreenShadowSpan; // 0x36C
-    float m_fullScreenShadowScale; // 0x370
-    u8 _pad374[0x404 - 0x374];
+    u8 _pad10C[0x31C - 0x10C];
+    CFullScreenShadow m_fullScreenShadow; // 0x31C
     u8 m_fullScreenShadowEnabled; // 0x404
     u8 _pad405[0x408 - 0x405];
     Vec m_fullScreenShadowPosition; // 0x408

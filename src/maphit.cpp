@@ -20,6 +20,7 @@ extern "C" const float kMapHitEdgeMinT;
 extern "C" const float kMapHitVertexOffsetScale;
 extern "C" const float kMapHitRadiusScale;
 extern "C" const double kMapHitRadiusBase;
+extern const char s_maphit_cpp[] = "maphit.cpp";
 extern "C" const char sOldMidFormat[] = {
     (char)0x8C, (char)0xC3, (char)0x82, (char)0xA2, (char)0x20, (char)0x4D, (char)0x49, (char)0x44,
     (char)0x20, (char)0x82, (char)0xCC, (char)0x8C, (char)0x60, (char)0x8E, (char)0xAE, (char)0x82,
@@ -39,8 +40,6 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 }
-
-extern const char s_maphit_cpp[] = "maphit.cpp";
 
 int g_hit_edge_idx_min;
 float g_hit_t;

@@ -565,8 +565,7 @@ static inline void RetainRefCounted(void* refObject)
 static void CopyDuplicatedNodeState(CChara::CNode* dst, CChara::CNode* src)
 {
 	dst->m_refData = src->m_refData;
-	PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
-	          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+	PSMTXCopy(NodeLocalRuntimeMtx(src), NodeLocalRuntimeMtx(dst));
 	PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
 	NodePreviousQuat(dst) = NodePreviousQuat(src);
 	NodePreviousPosition(dst) = NodePreviousPosition(src);

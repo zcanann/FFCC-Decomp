@@ -630,6 +630,8 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     }
 }
 
+extern const double DOUBLE_80333438 = 4503599627370496.0;
+extern const double DOUBLE_80333440 = 4503601774854144.0;
 extern const f32 kMenuArtiNegativeOne = -1.0f;
 extern const f32 kMenuArtiDefaultScale = 1.2f;
 extern const f32 kMenuArtiBoundsMax = 10000000000.0f;

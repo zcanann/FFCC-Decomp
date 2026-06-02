@@ -2540,7 +2540,7 @@ void CGCharaObj::statAttack()
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
 	unsigned short seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3A);
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
-		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x38);
+		unsigned int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x38);
 		if (seSpec != 0) {
 			int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 			playSe3D(seNo, 0x32, 0x96, 0, 0);

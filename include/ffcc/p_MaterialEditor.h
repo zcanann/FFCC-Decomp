@@ -67,7 +67,12 @@ public:
     RSDLISTITEM* GetRsdItem();
 
     CMemory::CStage* m_stage; // 0x04
-    unsigned char _pad08[0x7C];
+    GXColor m_viewerLightColors[4]; // 0x08
+    Vec m_viewerLightDirs[3]; // 0x18
+    Vec m_viewerSrtPosition; // 0x3C
+    Vec m_viewerSrtRotation; // 0x48
+    Vec m_viewerSrtScale; // 0x54
+    unsigned char _pad60[0x24];
     CUSBStreamData m_usbStream; // 0x84
     unsigned char _padB4[0x8];
     u32 m_rsdIndex; // 0xBC

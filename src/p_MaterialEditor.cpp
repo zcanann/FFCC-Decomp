@@ -191,10 +191,10 @@ void CMaterialEditorPcs::drawViewer()
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
         int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));
-        int model = *listData;
+        RSDITEM* model = reinterpret_cast<RSDITEM*>(*listData);
 
-        GXSetArray(GX_VA_POS, *reinterpret_cast<void**>(model + 0x10), 0xC);
-        GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(model + 0x14), 0xC);
+        GXSetArray(GX_VA_POS, model->ptr10, 0xC);
+        GXSetArray(GX_VA_NRM, model->ptr14, 0xC);
         GXSetNumChans(1);
         GXClearVtxDesc();
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -225,9 +225,9 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
         for (int pass = 0; pass < 2; pass++) {
-            unsigned char* polygons = reinterpret_cast<unsigned char*>(reinterpret_cast<RSDITEM*>(model)->ptr18);
+            unsigned char* polygons = reinterpret_cast<unsigned char*>(model->ptr18);
 
-            for (u32 polyIndex = 0, polygonOffset = 0; polyIndex < reinterpret_cast<RSDITEM*>(model)->countC;
+            for (u32 polyIndex = 0, polygonOffset = 0; polyIndex < model->countC;
                  polyIndex++, polygonOffset += sizeof(MaterialEditorPolygon)) {
                 MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(polygons + polygonOffset);
 
@@ -667,54 +667,52 @@ void CMaterialEditorPcs::Quit()
  */
 void CMaterialEditorPcs::Init()
 {
-    unsigned char* self;
     int textureIndex;
 
-    self = reinterpret_cast<unsigned char*>(this);
-    self[0x8] = 0x7f;
-    self[0x9] = 0x7f;
-    self[0xa] = 0x7f;
+    m_viewerLightColors[0].r = 0x7f;
+    m_viewerLightColors[0].g = 0x7f;
+    m_viewerLightColors[0].b = 0x7f;
     int levelMask = 0x3f;
     int level0 = __cntlzw(0);
     int level1 = __cntlzw(1);
     int level = -((level0 >> 5) & 1) & levelMask;
-    self[0xb] = 0xff;
-    self[0xc] = level;
-    self[0xd] = level;
-    self[0xe] = level;
+    m_viewerLightColors[0].a = 0xff;
+    m_viewerLightColors[1].r = level;
+    m_viewerLightColors[1].g = level;
+    m_viewerLightColors[1].b = level;
     level = -((level1 >> 5) & 1) & levelMask;
-    self[0xf] = 0xff;
+    m_viewerLightColors[1].a = 0xff;
     float minusOne = FLOAT_8032FCDC;
     float zero = FLOAT_8032FCD8;
     float one = LoadFloat(FLOAT_8032FCC8);
 
-    *reinterpret_cast<float*>(self + 0x18) = zero;
-    *reinterpret_cast<float*>(self + 0x1c) = zero;
-    *reinterpret_cast<float*>(self + 0x20) = minusOne;
-    self[0x10] = level;
-    self[0x11] = level;
-    self[0x12] = level;
+    m_viewerLightDirs[0].x = zero;
+    m_viewerLightDirs[0].y = zero;
+    m_viewerLightDirs[0].z = minusOne;
+    m_viewerLightColors[2].r = level;
+    m_viewerLightColors[2].g = level;
+    m_viewerLightColors[2].b = level;
     level = -((__cntlzw(2) >> 5) & 1) & levelMask;
-    self[0x13] = 0xff;
-    *reinterpret_cast<float*>(self + 0x24) = zero;
-    *reinterpret_cast<float*>(self + 0x28) = zero;
-    *reinterpret_cast<float*>(self + 0x2c) = minusOne;
-    self[0x14] = level;
-    self[0x15] = level;
-    self[0x16] = level;
-    self[0x17] = 0xff;
-    *reinterpret_cast<float*>(self + 0x30) = zero;
-    *reinterpret_cast<float*>(self + 0x34) = zero;
-    *reinterpret_cast<float*>(self + 0x38) = minusOne;
-    *reinterpret_cast<float*>(self + 0x44) = zero;
-    *reinterpret_cast<float*>(self + 0x40) = zero;
-    *reinterpret_cast<float*>(self + 0x3c) = zero;
-    *reinterpret_cast<float*>(self + 0x50) = zero;
-    *reinterpret_cast<float*>(self + 0x4c) = zero;
-    *reinterpret_cast<float*>(self + 0x48) = zero;
-    *reinterpret_cast<float*>(self + 0x5c) = one;
-    *reinterpret_cast<float*>(self + 0x58) = one;
-    *reinterpret_cast<float*>(self + 0x54) = one;
+    m_viewerLightColors[2].a = 0xff;
+    m_viewerLightDirs[1].x = zero;
+    m_viewerLightDirs[1].y = zero;
+    m_viewerLightDirs[1].z = minusOne;
+    m_viewerLightColors[3].r = level;
+    m_viewerLightColors[3].g = level;
+    m_viewerLightColors[3].b = level;
+    m_viewerLightColors[3].a = 0xff;
+    m_viewerLightDirs[2].x = zero;
+    m_viewerLightDirs[2].y = zero;
+    m_viewerLightDirs[2].z = minusOne;
+    m_viewerSrtPosition.z = zero;
+    m_viewerSrtPosition.y = zero;
+    m_viewerSrtPosition.x = zero;
+    m_viewerSrtRotation.z = zero;
+    m_viewerSrtRotation.y = zero;
+    m_viewerSrtRotation.x = zero;
+    m_viewerSrtScale.z = one;
+    m_viewerSrtScale.y = one;
+    m_viewerSrtScale.x = one;
     m_rsdIndex = 0;
 
     textureIndex = 0;

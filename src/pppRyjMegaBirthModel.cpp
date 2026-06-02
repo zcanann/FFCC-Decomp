@@ -60,6 +60,10 @@ RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spread) == 0x2B);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorRandom) == 0x2C);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorDeltaAdds) == 0x3C);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorFrameDeltas) == 0xBC);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStepDelta) == 0xD8);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStart) == 0xDC);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStep) == 0xE0);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStep) == 0xE4);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_baseDirection) == 0xE8);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationAxis) == 0xF8);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStart) == 0x108);
@@ -729,9 +733,9 @@ void birth(
             FLOAT_803304c0 * params->m_directionVelocityRandom * Math.RandF() -
             params->m_directionVelocityRandom;
     }
-    *f32_at(particleBytes, 0x8C) = *(float*)(payload + 0xDC);
-    *f32_at(particleBytes, 0x90) = *(float*)(payload + 0xE0);
-    *f32_at(particleBytes, 0x94) = *(float*)(payload + 0xE4);
+    *f32_at(particleBytes, 0x8C) = params->m_texScrollVStart;
+    *f32_at(particleBytes, 0x90) = params->m_texScrollUStep;
+    *f32_at(particleBytes, 0x94) = params->m_texScrollVStep;
 
     switch (params->m_texScaleRandomMode) {
     case 1:
@@ -855,8 +859,8 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
 
     *f32_at(p, 0x88) += *f32_at(p, 0x90);
     *f32_at(p, 0x8C) += *f32_at(p, 0x94);
-    *f32_at(p, 0x90) += *(float*)(payload + 0xD8);
-    *f32_at(p, 0x94) += *(float*)(payload + 0xE4);
+    *f32_at(p, 0x90) += pRyjMegaBirthModel->m_texScrollUStepDelta;
+    *f32_at(p, 0x94) += pRyjMegaBirthModel->m_texScrollVStep;
 
     if (pRyjMegaBirthModel->m_life != 0) {
         *u16_at(p, 0x30) = *u16_at(p, 0x30) - 1;

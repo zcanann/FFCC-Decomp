@@ -33,7 +33,11 @@ struct PRyjMegaBirthModel
     float m_colorDeltaAdds[4];    // 0x3C
     u8 _pad4C[0x70];
     float m_colorFrameDeltas[4];  // 0xBC
-    u8 _padCC[0x1C];
+    u8 _padCC[0x0C];
+    float m_texScrollUStepDelta;  // 0xD8
+    float m_texScrollVStart;      // 0xDC
+    float m_texScrollUStep;       // 0xE0
+    float m_texScrollVStep;       // 0xE4
     Vec m_baseDirection;          // 0xE8
     u8 _padF4[0x04];
     Vec m_accelerationAxis;       // 0xF8

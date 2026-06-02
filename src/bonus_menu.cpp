@@ -1641,11 +1641,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x34) = 1.0f;
 			*reinterpret_cast<int*>(boardPtr + entryOffset) = 0;
 			int handleOffset = entryOffset + 4;
-			int centerX = (int)((double)(float)((double)boardSprite->w * 0.5 + (double)boardSprite->x) - 320.0);
-			int centerY = (int)((double)(float)((double)boardSprite->h * 0.5 + (double)boardSprite->y) - 240.0);
 			entryOffset += 0x50;
 			*reinterpret_cast<int*>(boardPtr + handleOffset) = 0;
 			int baseOffset = entryOffset - 0x50;
+			int centerX = (int)((double)(float)((double)boardSprite->w * 0.5 + (double)boardSprite->x) - 320.0);
+			int centerY = (int)((double)(float)((double)boardSprite->h * 0.5 + (double)boardSprite->y) - 240.0);
 			*reinterpret_cast<short*>(boardPtr + baseOffset + 8) = (short)centerX;
 			*reinterpret_cast<short*>(boardPtr + baseOffset + 10) = (short)centerY;
 			*reinterpret_cast<short*>(boardPtr + baseOffset + 12) = 0x280;

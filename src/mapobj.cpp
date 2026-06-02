@@ -319,8 +319,8 @@ void CMapObj::Init()
     U8At(this, 0x21) = 0;
 
     U16At(this, 0x2E) = 0xFFFF;
-    U16At(this, 0x30) = 0xFFFF;
-    U16At(this, 0x32) = 0xFFFF;
+    m_effectId = 0xFFFF;
+    m_groupId = 0xFFFF;
     U8At(this, 0x18) = 1;
     U8At(this, 0x19) = 1;
     U16At(this, 0x34) = 0xFFFF;
@@ -450,9 +450,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         if (chunk.m_id == CHUNK_BOBJ) {
             U16At(this, 0x16) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_GBID) {
-            U16At(this, 0x32) = chunkFile.Get2();
+            m_groupId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_EFID) {
-            U16At(this, 0x30) = chunkFile.Get2();
+            m_effectId = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_FSDW) {
             CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {

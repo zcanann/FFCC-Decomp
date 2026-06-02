@@ -10,7 +10,9 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
@@ -18,6 +20,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pad.h"
+#include "ffcc/ptrarray_fwd.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -69,14 +72,6 @@ struct Vec4d
 
 class CMaterial;
 
-template <class T>
-class CPtrArray
-{
-public:
-	int GetSize();
-	T operator[](unsigned long index);
-};
-
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[8];
@@ -101,35 +96,6 @@ extern float FLOAT_80331154;
 extern float FLOAT_80331158;
 
 namespace {
-
-struct FurPtrArrayRaw
-{
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    void** m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-
-struct FurMaterialSetRaw
-{
-    void* m_vtable;
-    int m_refCount;
-    FurPtrArrayRaw m_materials;
-};
-
-struct FurMaterialRaw
-{
-    unsigned char m_pad0[0x1C];
-    short m_extraTextureIndex;
-    unsigned char m_pad1E[0x1E];
-    CTexture* m_texture0;
-    CTexture* m_pickTexture;
-    CTexture* m_textures[2];
-    unsigned char m_pad4C[0x5B];
-    unsigned char m_furEnable;
-};
 
 typedef CChara::CMesh::CDisplayList FurDisplayListRaw;
 typedef CChara::CMesh::CRefData FurMeshRefRaw;
@@ -1019,26 +985,23 @@ static inline void StopMogLoopSe(MogWorkRaw& work)
 	}
 }
 
-static inline CTexture* FindMogFurTexture(void* model)
+static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 {
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
+	CTextureSet* textureSet = model->m_texSet;
 
-	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-	return (*textureArray)[textureIdx];
+	return textureSet->GetTexture(textureIdx);
 }
 
-static inline void CopyMogTextureFromChara(void* model)
+static inline void CopyMogTextureFromChara(CChara::CModel* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
 	}
 
-	void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
-	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
+	void* dstBuffer = texture->m_imageData;
+	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
@@ -1047,16 +1010,15 @@ static inline void CopyMogTextureFromChara(void* model)
 	GXInvalidateTexAll();
 }
 
-static void CopyMogTextureToChara(void* model)
+static void CopyMogTextureToChara(CChara::CModel* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
 	}
 
-	void* srcBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
-	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
+	void* srcBuffer = texture->m_imageData;
+	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
@@ -1173,23 +1135,20 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  */
 void CChara::CModel::InitMogFurTex()
 {
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
-	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+	CTextureSet* textureSet = m_texSet;
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-	CTexture* texture = (*textureArray)[textureIdx];
+	CTexture* texture = textureSet->GetTexture(textureIdx);
 
-	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
-		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
+	if ((texture != 0) && (texture->m_format == 4)) {
+		texture->m_format = 5;
 		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 
-		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
-		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+		textureSet = m_texSet;
 		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-		CTexture* textureData = (*textureArray)[textureIdx];
+		CTexture* textureData = textureSet->GetTexture(textureIdx);
 		if (textureData != 0) {
-			void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<char*>(textureData) + 0x78);
-			int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x64) *
-			                      *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x68) * 2;
+			void* dstBuffer = textureData->m_imageData;
+			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
 
 			DCInvalidateRange(dstBuffer, texelCountBytes);
 			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
@@ -1460,8 +1419,6 @@ int CChara::CModel::PickFur(
 	FurMeshRaw* mesh = ModelMeshes(this);
 	CChara::CNode* nodes = ModelNodes(this);
 
-	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-
 	const unsigned short meshCount = ModelMeshCount(this);
 	const float cursorX = static_cast<float>(Chara.MogFur().m_cursorX);
 	const float cursorY = static_cast<float>(Chara.MogFur().m_cursorY);
@@ -1500,13 +1457,13 @@ int CChara::CModel::PickFur(
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
-			CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			CMaterial* material = materialSet->m_materials[displayList->m_material];
 			int paintableMaterial = 0;
-			if (material->m_pickTexture != 0 && material->m_pickTexture->m_format == 5) {
+			CTexture* pickTexture = material->GetFurPickTexture();
+			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;
 			}
-			const int furMaterial = material->m_furEnable != 0;
+			const int furMaterial = material->IsFurEnabled();
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
@@ -1643,14 +1600,12 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	FurMeshRaw* mesh = ModelMeshes(this);
 	CChara::CNode* nodes = ModelNodes(this);
 
-	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
-	const int materialCount = materials->GetSize();
+	const int materialCount = materialSet->m_materials.GetSize();
 
 	bool hasFurMaterial = false;
 	for (int i = 0; i < materialCount; i++) {
-		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[i]);
-		if (material->m_furEnable != 0) {
+		CMaterial* material = materialSet->m_materials[i];
+		if (material->IsFurEnabled()) {
 			hasFurMaterial = true;
 			break;
 		}
@@ -1745,8 +1700,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		if (shadowPass != 0) {
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, &modelPos, FLOAT_80331154, FLOAT_80331158, 0);
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
-				FurMaterialRaw* shadowMaterial = reinterpret_cast<FurMaterialRaw*>(shadowMaterials[shadowIndex]);
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterial->m_textures[0]);
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterials[shadowIndex]->GetFurTexture(0));
 
 				Mtx shadowTexMtx;
 				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
@@ -1775,18 +1729,19 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
-			if (material->m_furEnable == 0) {
+			CMaterial* material = materialSet->m_materials[displayList->m_material];
+			if (!material->IsFurEnabled()) {
 				continue;
 			}
 
-			TextureMan.SetTexture(GX_TEXMAP0, material->m_textures[0]);
+			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
 			unsigned int hasExtraTexture = 0;
 			int extraTextureFormat = -1;
-			if (material->m_extraTextureIndex != -1) {
-				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
+			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
+				CTexture* extraTexture = material->GetFurTexture(1);
+				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
 				hasExtraTexture = 1;
-				extraTextureFormat = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(material->m_textures[1]) + 0x60);
+				extraTextureFormat = extraTexture->m_format;
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {

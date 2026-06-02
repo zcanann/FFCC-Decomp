@@ -1426,9 +1426,9 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 for (int i = 0; i < 0x33; i++) {
                     CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
                     int texIdx = set->Find(mapping->textureName);
-                    CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
+                    CTexture* tex = set->GetTexture(static_cast<unsigned long>(texIdx));
                     *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
+                    tex->AddRef();
                     ++mapping;
                 }
                 gSingMenuAsyncLoadCompleted = 1;

@@ -1073,15 +1073,15 @@ CPtrArray<CTexture*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-bool CPtrArray<CTexture*>::Add(CTexture* item)
+int CPtrArray<CTexture*>::Add(CTexture* item)
 {
     if (setSize(m_numItems + 1) == 0) {
-        return false;
+        return 0;
     }
 
     m_items[m_numItems] = item;
     m_numItems++;
-    return true;
+    return 1;
 }
 
 /*

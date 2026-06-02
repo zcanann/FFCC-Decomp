@@ -21,6 +21,19 @@ struct RainColorData {
     pppCVECTOR color;
 };
 
+STATIC_ASSERT(offsetof(RainWork, drops) == 0x0);
+STATIC_ASSERT(offsetof(RainWork, moveY) == 0x4);
+STATIC_ASSERT(offsetof(RainWork, accelY) == 0x8);
+STATIC_ASSERT(offsetof(RainWork, accelZ) == 0xC);
+STATIC_ASSERT(sizeof(RainWork) == 0x10);
+STATIC_ASSERT(sizeof(RainDrop) == 0x20);
+STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
+
+static inline RainWork* GetRainWork(pppRain* rain, RAIN_DATA* data)
+{
+    return reinterpret_cast<RainWork*>(rain->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800dd424
@@ -270,7 +283,7 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 {
     RainWork* work;
 
-    work = (RainWork*)(pppRain->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    work = GetRainWork(pppRain, param_2);
     if (work->drops != 0) {
         pppHeapUseRate((CMemory::CStage*)work->drops);
         work->drops = 0;
@@ -292,7 +305,7 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
     RainWork* work;
 
     fVar1 = kPppRainTexCoordBase;
-    work = (RainWork*)(pppRain->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    work = GetRainWork(pppRain, param_2);
     work->drops = 0;
     work->accelZ = fVar1;
     work->accelY = fVar1;

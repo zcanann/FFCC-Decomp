@@ -6,6 +6,9 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_light.h"
+#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
+#include "ffcc/ptrarray_decl.h"
+#endif
 #include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
@@ -20,32 +23,6 @@ class CLightPcs;
 class CAmemCacheSet;
 struct Vec;
 struct CBound;
-
-#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-    int GetSize();
-    int Add(T item);
-    void RemoveAll();
-    void SetStage(CMemory::CStage* stage);
-    int setSize(unsigned long size);
-    void SetAt(unsigned long index, T item);
-    T operator[](unsigned long index);
-    T GetAt(unsigned long index);
-
-private:
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-#endif
 
 class CTexScroll
 {
@@ -175,6 +152,30 @@ public:
     void IncNumTexture();
     void SetTevBit(CMaterialMan::TEV_BIT);
     void GetNumTexture();
+    unsigned short GetTextureCount() const
+    {
+        return m_textureCount;
+    }
+    unsigned char GetMaterialId() const
+    {
+        return m_unkA6;
+    }
+    unsigned short GetTextureIndex(int index) const
+    {
+        return m_textureIndices[index];
+    }
+    int IsFurEnabled() const
+    {
+        return m_singleTextureFlag != 0;
+    }
+    CTexture* GetFurPickTexture()
+    {
+        return m_textures[1];
+    }
+    CTexture* GetFurTexture(int index)
+    {
+        return m_textures[index + 2];
+    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
@@ -259,6 +260,10 @@ public:
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
+    int GetNumMaterial()
+    {
+        return m_materials.GetSize();
+    }
 #ifdef FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
     CMaterial* GetMaterial(long);
 #else

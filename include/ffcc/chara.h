@@ -100,8 +100,14 @@ public:
 		CAnimNode();
 		~CAnimNode();
 
+		void Create(CChunkFile&);
+		void mapping(CChara::CAnim*);
 		void IsScale();
 		void Interp(CChara::CAnim*, SRT*, float);
+
+		char m_name[0x10];              // 0x00
+		u32 m_dataOffset;               // 0x10
+		u32 m_flags;                    // 0x14
 	};
 
 	class CNode
@@ -118,10 +124,36 @@ public:
 		class CRefData
 		{
 		public:
+			struct InfoFields
+			{
+				u8 _bindPad[0x28];          // 0x3C
+				u8 m_dynParamIndex;         // 0x64
+				u8 _pad65[0x03];            // 0x65
+				s16 m_parentIndex;          // 0x68
+				u8 m_childCount;            // 0x6A
+				u8 _pad6B;                  // 0x6B
+				u16 m_childBankOffset;      // 0x6C
+				u8 m_usesParentLenX;        // 0x6E
+				u8 _pad6F;                  // 0x6F
+				float m_boneLen;            // 0x70
+				char m_name[0x10];          // 0x74
+				char m_altName[0x10];       // 0x84
+			};
+
 			CRefData();
 			~CRefData();
 
-			u8 m_storage[0x94];
+			u16 m_index;                    // 0x00
+			u8 m_type;                      // 0x02
+			u8 _pad03;                      // 0x03
+			s8 m_displayIndex;              // 0x04
+			u8 _pad05[0x07];                // 0x05
+			Mtx m_localMtx;                 // 0x0C
+			union
+			{
+				Mtx m_bindMtx;              // 0x3C
+				InfoFields m_info;          // 0x3C
+			};
 		};
 
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);
@@ -209,6 +241,10 @@ public:
 		void SetAfterDrawMeshCallback(void (*callback)(CChara::CModel*, void*, void*, int, float (*)[4]))
 		{
 			m_afterDrawMeshCallback = callback;
+		}
+		void SetBeforeCalcMatrixCallback(int (*callback)(CChara::CModel*, void*, void*))
+		{
+			m_beforeCalcMatrixCallback = callback;
 		}
 		void SetCallbackContext(void* context, void* param)
 		{

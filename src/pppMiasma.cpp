@@ -39,6 +39,28 @@ struct MiasmaRadiusWork {
     float m_scale;
 };
 
+STATIC_ASSERT(offsetof(MiasmaFrameWork, m_position) == 0x00);
+STATIC_ASSERT(offsetof(MiasmaFrameWork, m_velocity) == 0x08);
+STATIC_ASSERT(offsetof(MiasmaFrameWork, m_accel) == 0x10);
+STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
+STATIC_ASSERT(offsetof(MiasmaColorWork, m_color) == 0x08);
+STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
+
+static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
+
+static inline MiasmaColorWork* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<MiasmaColorWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[1]);
+}
+
+static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[3]);
+}
+
 static inline void _GXSetTevOrder(int stage, int texCoord, int texMap, int colorChannel)
 {
     _GXSetTevOrder((_GXTevStageID)stage, (_GXTexCoordID)texCoord, (_GXTexMapID)texMap, (_GXChannelID)colorChannel);
@@ -110,7 +132,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlT
         return;
     }
 
-    work = (MiasmaFrameWork*)(pppMiasma->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
+    work = GetMiasmaFrameWork(pppMiasma, param_3);
     work->m_velocity[0] = work->m_velocity[0] + work->m_accel[0];
     work->m_position[0] = work->m_position[0] + work->m_velocity[0];
     work->m_velocity[1] = work->m_velocity[1] + work->m_accel[1];
@@ -163,12 +185,12 @@ void pppDestructMiasma(pppMiasma*, _pppCtrlTable*)
  */
 void pppConstruct2Miasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
 {
-    u8* work;
+    MiasmaFrameWork* work;
 
-    work = pppMiasma->m_object.m_workArea + param_2->m_serializedDataOffsets[2];
-    memset(work, 0, 8);
-    memset(work + 8, 0, 8);
-    memset(work + 0x10, 0, 8);
+    work = GetMiasmaFrameWork(pppMiasma, param_2);
+    memset(work->m_position, 0, sizeof(work->m_position));
+    memset(work->m_velocity, 0, sizeof(work->m_velocity));
+    memset(work->m_accel, 0, sizeof(work->m_accel));
 }
 
 /*
@@ -182,12 +204,12 @@ void pppConstruct2Miasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
  */
 void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
 {
-    u8* work;
+    MiasmaFrameWork* work;
 
-    work = pppMiasma->m_object.m_workArea + param_2->m_serializedDataOffsets[2];
-    memset(work, 0, 8);
-    memset(work + 8, 0, 8);
-    memset(work + 0x10, 0, 8);
+    work = GetMiasmaFrameWork(pppMiasma, param_2);
+    memset(work->m_position, 0, sizeof(work->m_position));
+    memset(work->m_velocity, 0, sizeof(work->m_velocity));
+    memset(work->m_accel, 0, sizeof(work->m_accel));
 }
 
 /*
@@ -244,9 +266,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
     Graphic.SetDrawDoneDebugData(0x31);
 
-    work = (MiasmaFrameWork*)(pppMiasma->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
-    colorWork = (MiasmaColorWork*)(pppMiasma->m_object.m_workArea + param_3->m_serializedDataOffsets[1]);
-    radiusWork = (MiasmaRadiusWork*)(pppMiasma->m_object.m_workArea + param_3->m_serializedDataOffsets[3]);
+    work = GetMiasmaFrameWork(pppMiasma, param_3);
+    colorWork = GetMiasmaColorWork(pppMiasma, param_3);
+    radiusWork = GetMiasmaRadiusWork(pppMiasma, param_3);
 
     textureIndex = 0;
     slice = 0;

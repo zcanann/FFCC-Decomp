@@ -49,94 +49,6 @@ static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
     return reinterpret_cast<unsigned char*>(self) + offset;
 }
 
-static inline CMapKeyFrame& KeyFrameAt(void* self, unsigned int offset)
-{
-    return *reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(self) + offset);
-}
-
-struct MapObjAttrBaseLayout
-{
-    void* vtable;
-    int type;
-};
-
-struct MapObjAttrPlayStaLayout
-{
-    void* vtable;
-    int type;
-    unsigned char playStaNo;
-    unsigned char pad09[3];
-};
-
-struct MapObjAttrMimeLayout
-{
-    void* vtable;
-    int type;
-    unsigned char vertexListCount;
-    unsigned char pad09[3];
-    float** vertexLists;
-    int vertexCount;
-    CMapKeyFrame keyFrame;
-};
-
-struct MapObjAttrPointLightLayout
-{
-    void* vtable;
-    int type;
-    _GXColor color;
-    _GXColor altColor;
-    float radius;
-    float intensity;
-    unsigned char pad18[4];
-    unsigned char colorMode;
-    unsigned char colorCount;
-    unsigned char altColorCount;
-    unsigned char useAltColor;
-    unsigned char unknown20;
-    unsigned char pad21[3];
-    _GXColor colors[16];
-    _GXColor altColors[16];
-    CMapKeyFrame colorKeyFrame;
-    CMapKeyFrame altColorKeyFrame;
-};
-
-struct MapObjAttrSpotLightLayout
-{
-    void* vtable;
-    int type;
-    _GXColor color;
-    _GXColor altColor;
-    CMapObj* target;
-    float radius;
-    float nearRange;
-    float farRange;
-    float intensity;
-    float falloff;
-    float angle;
-    unsigned char colorMode;
-    unsigned char useAltColor;
-    unsigned char unknown2E;
-    unsigned char unknown2F;
-    unsigned char keyFrameCount;
-    unsigned char pad31[3];
-    _GXColor baseColor;
-    unsigned char pad38[4];
-    unsigned char colorCount;
-    unsigned char altColorCount;
-    unsigned char pad3E[2];
-    _GXColor colors[16];
-    _GXColor altColors[16];
-    CMapKeyFrame colorKeyFrame;
-    CMapKeyFrame altColorKeyFrame;
-};
-
-struct MapObjAttrMeshNameLayout
-{
-    void* vtable;
-    int type;
-    char name[0x20];
-};
-
 struct MapObjCylinderLayout
 {
     Vec m_bottom;
@@ -147,12 +59,6 @@ struct MapObjCylinderLayout
     Vec m_boundsMax;
 };
 
-STATIC_ASSERT(sizeof(MapObjAttrBaseLayout) == 0x8);
-STATIC_ASSERT(sizeof(MapObjAttrPlayStaLayout) == 0xC);
-STATIC_ASSERT(sizeof(MapObjAttrMimeLayout) == 0x3C);
-STATIC_ASSERT(sizeof(MapObjAttrPointLightLayout) == 0xF4);
-STATIC_ASSERT(sizeof(MapObjAttrSpotLightLayout) == 0x110);
-STATIC_ASSERT(sizeof(MapObjAttrMeshNameLayout) == 0x28);
 STATIC_ASSERT(sizeof(MapObjCylinderLayout) == 0x40);
 
 static inline void*& PtrAt(CMapObj* self, unsigned int offset)
@@ -463,7 +369,7 @@ void CMapObj::Init()
  */
 inline CMapObjAtr::CMapObjAtr()
 {
-    reinterpret_cast<MapObjAttrBaseLayout*>(this)->type = -1;
+    m_type = static_cast<TYPE>(-1);
 }
 
 /*
@@ -473,10 +379,8 @@ inline CMapObjAtr::CMapObjAtr()
  */
 inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
-    MapObjAttrPlayStaLayout* self = reinterpret_cast<MapObjAttrPlayStaLayout*>(this);
-
-    self->type = CMapObjAtr::PLAY_STA;
-    self->playStaNo = 0;
+    m_type = CMapObjAtr::PLAY_STA;
+    m_playStaNo = 0;
 }
 
 /*
@@ -486,13 +390,11 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
-    MapObjAttrMimeLayout* self = reinterpret_cast<MapObjAttrMimeLayout*>(this);
-
-    self->type = CMapObjAtr::MIME;
-    self->vertexListCount = 0;
-    self->vertexLists = 0;
-    self->vertexCount = 0;
-    new (&self->keyFrame) CMapKeyFrame;
+    m_type = CMapObjAtr::MIME;
+    m_vertexListCount = 0;
+    m_vertexLists = 0;
+    m_vertexCount = 0;
+    new (&m_keyFrame) CMapKeyFrame;
 }
 
 /*
@@ -502,10 +404,8 @@ inline CMapObjAtrMime::CMapObjAtrMime()
  */
 inline CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
-    MapObjAttrMeshNameLayout* self = reinterpret_cast<MapObjAttrMeshNameLayout*>(this);
-
-    self->type = CMapObjAtr::MESH_NAME;
-    memset(self->name, 0, sizeof(self->name));
+    m_type = CMapObjAtr::MESH_NAME;
+    memset(m_name, 0, sizeof(m_name));
 }
 
 /*
@@ -702,17 +602,17 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             CMapObjAtrMime* mimeAttr =
                 new (MapMng.m_stage, "mapobj.cpp", 0x33B) CMapObjAtrMime();
-            MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(mimeAttr);
+            CMapObjAtrMime* mime = mimeAttr;
 
             if (mime != 0) {
-                mime->type = CMapObjAtr::MIME;
-                mime->vertexLists = 0;
-                mime->vertexCount = 0;
-                *reinterpret_cast<int*>(&mime->keyFrame.m_mode) = 0;
-                *reinterpret_cast<int*>(&mime->keyFrame.m_isRun) = 0;
-                mime->keyFrame.m_loop = 1;
-                mime->vertexListCount = 0;
-                mime->keyFrame.m_currentFrame = 0;
+                mime->m_type = CMapObjAtr::MIME;
+                mime->m_vertexLists = 0;
+                mime->m_vertexCount = 0;
+                *reinterpret_cast<int*>(&mime->m_keyFrame.m_mode) = 0;
+                *reinterpret_cast<int*>(&mime->m_keyFrame.m_isRun) = 0;
+                mime->m_keyFrame.m_loop = 1;
+                mime->m_vertexListCount = 0;
+                mime->m_keyFrame.m_currentFrame = 0;
             }
 
             chunkFile.PushChunk();
@@ -720,21 +620,21 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 if (mimeChunk.m_id == CHUNK_KEY) {
                     if (mime != 0) {
-                        mime->keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                        mime->m_keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
                     if (mime != 0) {
-                        mime->keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                        mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
                     if (mime != 0) {
-                        mime->keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                        mime->m_keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     if (mime != 0) {
-                        mime->vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
-                        mime->vertexLists = reinterpret_cast<float**>(
-                            operator new[](static_cast<unsigned long>(mime->vertexListCount) << 2,
+                        mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
+                        mime->m_vertexLists = reinterpret_cast<float**>(
+                            operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
                                            MapMng.m_stage, "mapobj.cpp", 0x348));
                     }
 
@@ -746,12 +646,12 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                             float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 MapMng.m_stage, "mapobj.cpp", 0x353));
-                            if ((mime != 0) && (mime->vertexLists != 0)) {
-                                mime->vertexLists[vtxTableIndex] = vtx;
+                            if ((mime != 0) && (mime->m_vertexLists != 0)) {
+                                mime->m_vertexLists[vtxTableIndex] = vtx;
                             }
                             vtxTableIndex++;
                             if (mime != 0) {
-                                mime->vertexCount = static_cast<int>(vtxChunk.m_arg0);
+                                mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
                             }
 
                             for (unsigned int i = 0; i < vtxChunk.m_arg0; i++) {
@@ -773,50 +673,50 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             CMapObjAtrPointLight* pointLightAttr =
                 new (MapMng.m_stage, "mapobj.cpp", 0xD4) CMapObjAtrPointLight();
-            MapObjAttrPointLightLayout* pointLight = reinterpret_cast<MapObjAttrPointLightLayout*>(pointLightAttr);
+            CMapObjAtrPointLight* pointLight = pointLightAttr;
 
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
                 CChunkFile::CChunk lightChunk;
                 while (chunkFile.GetNextChunk(lightChunk) != 0) {
                     if (lightChunk.m_id == CHUNK_LDAT) {
-                        pointLight->radius = chunkFile.GetF4();
-                        pointLight->intensity = chunkFile.GetF4();
-                        pointLight->colorMode = chunkFile.Get1();
-                        pointLight->useAltColor = chunkFile.Get1();
-                        pointLight->unknown20 = chunkFile.Get1();
+                        pointLight->m_radius = chunkFile.GetF4();
+                        pointLight->m_intensity = chunkFile.GetF4();
+                        pointLight->m_colorMode = chunkFile.Get1();
+                        pointLight->m_useAltColor = chunkFile.Get1();
+                        pointLight->m_unknown20 = chunkFile.Get1();
                         chunkFile.Get1();
 
-                        pointLight->colorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->colorCount); i++) {
-                            pointLight->colors[i].r = chunkFile.Get1();
-                            pointLight->colors[i].g = chunkFile.Get1();
-                            pointLight->colors[i].b = chunkFile.Get1();
-                            pointLight->colors[i].a = chunkFile.Get1();
+                        pointLight->m_colorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
+                            pointLight->m_colors[i].r = chunkFile.Get1();
+                            pointLight->m_colors[i].g = chunkFile.Get1();
+                            pointLight->m_colors[i].b = chunkFile.Get1();
+                            pointLight->m_colors[i].a = chunkFile.Get1();
                         }
 
-                        pointLight->altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->altColorCount); i++) {
-                            pointLight->altColors[i].r = chunkFile.Get1();
-                            pointLight->altColors[i].g = chunkFile.Get1();
-                            pointLight->altColors[i].b = chunkFile.Get1();
-                            pointLight->altColors[i].a = chunkFile.Get1();
+                        pointLight->m_altColorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
+                            pointLight->m_altColors[i].r = chunkFile.Get1();
+                            pointLight->m_altColors[i].g = chunkFile.Get1();
+                            pointLight->m_altColors[i].b = chunkFile.Get1();
+                            pointLight->m_altColors[i].a = chunkFile.Get1();
                         }
 
-                        pointLight->color = pointLight->colors[0];
-                        pointLight->altColor = pointLight->altColors[0];
+                        pointLight->m_color = pointLight->m_colors[0];
+                        pointLight->m_altColor = pointLight->m_altColors[0];
                     } else if (lightChunk.m_id == CHUNK_CFRM) {
-                        pointLight->altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CJUN) {
-                        pointLight->altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CKEY) {
-                        pointLight->altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MFRM) {
-                        pointLight->colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MJUN) {
-                        pointLight->colorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MKEY) {
-                        pointLight->colorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     }
                 }
                 chunkFile.PopChunk();
@@ -828,67 +728,67 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             CMapObjAtrSpotLight* spotLightAttr =
                 new (MapMng.m_stage, "mapobj.cpp", 0x139) CMapObjAtrSpotLight();
-            MapObjAttrSpotLightLayout* spotLight = reinterpret_cast<MapObjAttrSpotLightLayout*>(spotLightAttr);
+            CMapObjAtrSpotLight* spotLight = spotLightAttr;
 
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
                 CChunkFile::CChunk lightChunk;
                 while (chunkFile.GetNextChunk(lightChunk) != 0) {
                     if (lightChunk.m_id == CHUNK_LDAT) {
-                        spotLight->baseColor.r = chunkFile.Get1();
-                        spotLight->baseColor.g = chunkFile.Get1();
-                        spotLight->baseColor.b = chunkFile.Get1();
-                        spotLight->baseColor.a = chunkFile.Get1();
-                        spotLight->radius = chunkFile.GetF4();
-                        spotLight->nearRange = chunkFile.GetF4();
-                        spotLight->farRange = chunkFile.GetF4();
-                        spotLight->intensity = chunkFile.GetF4();
+                        spotLight->m_baseColor.r = chunkFile.Get1();
+                        spotLight->m_baseColor.g = chunkFile.Get1();
+                        spotLight->m_baseColor.b = chunkFile.Get1();
+                        spotLight->m_baseColor.a = chunkFile.Get1();
+                        spotLight->m_radius = chunkFile.GetF4();
+                        spotLight->m_nearRange = chunkFile.GetF4();
+                        spotLight->m_farRange = chunkFile.GetF4();
+                        spotLight->m_intensity = chunkFile.GetF4();
                         chunkFile.GetF4();
-                        spotLight->falloff = chunkFile.GetF4();
+                        spotLight->m_falloff = chunkFile.GetF4();
                         unsigned short targetIndex = chunkFile.Get2();
-                        spotLight->target = MapObjArrayStart() + targetIndex;
-                        spotLight->colorMode = chunkFile.Get1();
-                        spotLight->useAltColor = chunkFile.Get1();
-                        spotLight->angle = chunkFile.GetF4();
-                        spotLight->unknown2E = chunkFile.Get1();
-                        spotLight->unknown2F = chunkFile.Get1();
-                        spotLight->keyFrameCount = chunkFile.Get1();
+                        spotLight->m_target = MapObjArrayStart() + targetIndex;
+                        spotLight->m_colorMode = chunkFile.Get1();
+                        spotLight->m_useAltColor = chunkFile.Get1();
+                        spotLight->m_angle = chunkFile.GetF4();
+                        spotLight->m_unknown2E = chunkFile.Get1();
+                        spotLight->m_unknown2F = chunkFile.Get1();
+                        spotLight->m_keyFrameCount = chunkFile.Get1();
                         chunkFile.Get1();
                         chunkFile.Get4();
                         chunkFile.Get4();
                         chunkFile.Get4();
                         chunkFile.Get4();
 
-                        spotLight->colorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(spotLight->colorCount); i++) {
-                            spotLight->colors[i].r = chunkFile.Get1();
-                            spotLight->colors[i].g = chunkFile.Get1();
-                            spotLight->colors[i].b = chunkFile.Get1();
-                            spotLight->colors[i].a = chunkFile.Get1();
+                        spotLight->m_colorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(spotLight->m_colorCount); i++) {
+                            spotLight->m_colors[i].r = chunkFile.Get1();
+                            spotLight->m_colors[i].g = chunkFile.Get1();
+                            spotLight->m_colors[i].b = chunkFile.Get1();
+                            spotLight->m_colors[i].a = chunkFile.Get1();
                         }
 
-                        spotLight->altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(spotLight->altColorCount); i++) {
-                            spotLight->altColors[i].r = chunkFile.Get1();
-                            spotLight->altColors[i].g = chunkFile.Get1();
-                            spotLight->altColors[i].b = chunkFile.Get1();
-                            spotLight->altColors[i].a = chunkFile.Get1();
+                        spotLight->m_altColorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(spotLight->m_altColorCount); i++) {
+                            spotLight->m_altColors[i].r = chunkFile.Get1();
+                            spotLight->m_altColors[i].g = chunkFile.Get1();
+                            spotLight->m_altColors[i].b = chunkFile.Get1();
+                            spotLight->m_altColors[i].a = chunkFile.Get1();
                         }
 
-                        spotLight->color = spotLight->colors[0];
-                        spotLight->altColor = spotLight->altColors[0];
+                        spotLight->m_color = spotLight->m_colors[0];
+                        spotLight->m_altColor = spotLight->m_altColors[0];
                     } else if (lightChunk.m_id == CHUNK_CFRM) {
-                        spotLight->altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CJUN) {
-                        spotLight->altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CKEY) {
-                        spotLight->altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MFRM) {
-                        spotLight->colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MJUN) {
-                        spotLight->colorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MKEY) {
-                        spotLight->colorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     }
                 }
                 chunkFile.PopChunk();
@@ -901,7 +801,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CMapObjAtrPlaySta* playSta =
                 new (MapMng.m_stage, "mapobj.cpp", 0x39B) CMapObjAtrPlaySta();
             if (playSta != 0) {
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();
+                playSta->m_playStaNo = chunkFile.Get1();
             }
             PtrAt(this, 0xEC) = playSta;
         }
@@ -1330,20 +1230,20 @@ void CMapObj::Calc()
 
     CMapObjAtr* attr = m_attribute;
     if (attr != 0) {
-        int attrType = reinterpret_cast<MapObjAttrBaseLayout*>(attr)->type;
+        int attrType = attr->m_type;
         switch (attrType) {
         case CMapObjAtr::MIME:
-            if (reinterpret_cast<MapObjAttrMimeLayout*>(attr)->keyFrame.IsRun() != 0) {
-                MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(attr);
+            if (reinterpret_cast<CMapObjAtrMime*>(attr)->m_keyFrame.IsRun() != 0) {
+                CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(attr);
                 float blend;
                 int key0;
                 int key1;
                 Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
 
-                if (mime->keyFrame.Get(key0, key1, blend) != 0) {
-                    Vec* src0 = reinterpret_cast<Vec*>(mime->vertexLists[key0]);
-                    Vec* src1 = reinterpret_cast<Vec*>(mime->vertexLists[key1]);
-                    for (int i = 0; i < mime->vertexCount; i++) {
+                if (mime->m_keyFrame.Get(key0, key1, blend) != 0) {
+                    Vec* src0 = reinterpret_cast<Vec*>(mime->m_vertexLists[key0]);
+                    Vec* src1 = reinterpret_cast<Vec*>(mime->m_vertexLists[key1]);
+                    for (int i = 0; i < mime->m_vertexCount; i++) {
                         PSVECSubtract(src1, src0, &delta);
                         PSVECScale(&delta, &delta, blend);
                         PSVECAdd(src0, &delta, &outVerts[i]);
@@ -1351,8 +1251,8 @@ void CMapObj::Calc()
                         src1++;
                     }
                 } else {
-                    float* src = mime->vertexLists[key0];
-                    for (int i = 0; i < mime->vertexCount; i++) {
+                    float* src = mime->m_vertexLists[key0];
+                    for (int i = 0; i < mime->m_vertexCount; i++) {
                         outVerts[i].x = src[0];
                         outVerts[i].y = src[1];
                         outVerts[i].z = src[2];
@@ -1360,30 +1260,30 @@ void CMapObj::Calc()
                     }
                 }
 
-                DCFlushRange(outVerts, static_cast<unsigned long>(mime->vertexCount * 0xC));
-                mime->keyFrame.Calc();
+                DCFlushRange(outVerts, static_cast<unsigned long>(mime->m_vertexCount * 0xC));
+                mime->m_keyFrame.Calc();
             }
             break;
         case CMapObjAtr::POINT_LIGHT: {
-            MapObjAttrPointLightLayout* pointLight = reinterpret_cast<MapObjAttrPointLightLayout*>(attr);
+            CMapObjAtrPointLight* pointLight = reinterpret_cast<CMapObjAtrPointLight*>(attr);
 
-            calcColorKeyFrame(&pointLight->colorKeyFrame, pointLight->color, pointLight->colors);
-            if (pointLight->useAltColor != 0) {
-                pointLight->altColor = pointLight->color;
+            calcColorKeyFrame(&pointLight->m_colorKeyFrame, pointLight->m_color, pointLight->m_colors);
+            if (pointLight->m_useAltColor != 0) {
+                pointLight->m_altColor = pointLight->m_color;
             }
 
-            calcColorKeyFrame(&pointLight->altColorKeyFrame, pointLight->color, pointLight->colors);
+            calcColorKeyFrame(&pointLight->m_altColorKeyFrame, pointLight->m_color, pointLight->m_colors);
             break;
         }
         case CMapObjAtr::SPOT_LIGHT: {
-            MapObjAttrSpotLightLayout* spotLight = reinterpret_cast<MapObjAttrSpotLightLayout*>(attr);
+            CMapObjAtrSpotLight* spotLight = reinterpret_cast<CMapObjAtrSpotLight*>(attr);
 
-            calcColorKeyFrame(&spotLight->colorKeyFrame, spotLight->color, spotLight->colors);
-            if (spotLight->unknown2F != 0) {
-                spotLight->altColor = spotLight->color;
+            calcColorKeyFrame(&spotLight->m_colorKeyFrame, spotLight->m_color, spotLight->m_colors);
+            if (spotLight->m_unknown2F != 0) {
+                spotLight->m_altColor = spotLight->m_color;
             }
 
-            calcColorKeyFrame(&spotLight->altColorKeyFrame, spotLight->color, spotLight->colors);
+            calcColorKeyFrame(&spotLight->m_altColorKeyFrame, spotLight->m_color, spotLight->m_colors);
             break;
         }
         }
@@ -1847,18 +1747,18 @@ void CMapObj::CalcHitPosition(Vec* out)
  */
 void CMapObj::SetMime(int mode, int target, int type)
 {
-    MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(PtrAt(this, 0xEC));
+    CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(PtrAt(this, 0xEC));
 
-    mime->keyFrame.m_startFrame = mode;
-    mime->keyFrame.m_currentFrame = mode;
+    mime->m_keyFrame.m_startFrame = mode;
+    mime->m_keyFrame.m_currentFrame = mode;
 
-    if (target > mime->keyFrame.m_frameCount) {
-        target = mime->keyFrame.m_frameCount;
+    if (target > mime->m_keyFrame.m_frameCount) {
+        target = mime->m_keyFrame.m_frameCount;
     }
 
-    mime->keyFrame.m_endFrame = target;
-    mime->keyFrame.m_loop = static_cast<unsigned char>(type);
-    mime->keyFrame.m_isRun = 1;
+    mime->m_keyFrame.m_endFrame = target;
+    mime->m_keyFrame.m_loop = static_cast<unsigned char>(type);
+    mime->m_keyFrame.m_isRun = 1;
 }
 
 /*
@@ -1913,13 +1813,10 @@ CMapObjAtrMime::~CMapObjAtrMime()
         i++;
     }
 
-    MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(this);
-    if (mime->vertexLists != 0) {
-        delete mime->vertexLists;
-        mime->vertexLists = 0;
+    if (m_vertexLists != 0) {
+        delete m_vertexLists;
+        m_vertexLists = 0;
     }
-
-    mime->keyFrame.~CMapKeyFrame();
 }
 
 /*
@@ -1933,10 +1830,6 @@ CMapObjAtrMime::~CMapObjAtrMime()
  */
 CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
-    MapObjAttrSpotLightLayout* self = reinterpret_cast<MapObjAttrSpotLightLayout*>(this);
-
-    self->altColorKeyFrame.~CMapKeyFrame();
-    self->colorKeyFrame.~CMapKeyFrame();
 }
 
 /*
@@ -1950,10 +1843,6 @@ CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
  */
 CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
-    MapObjAttrPointLightLayout* self = reinterpret_cast<MapObjAttrPointLightLayout*>(this);
-
-    self->altColorKeyFrame.~CMapKeyFrame();
-    self->colorKeyFrame.~CMapKeyFrame();
 }
 
 /*

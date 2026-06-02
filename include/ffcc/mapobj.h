@@ -1,10 +1,11 @@
 #ifndef _FFCC_MAPOBJ_H_
 #define _FFCC_MAPOBJ_H_
 
+#include "ffcc/mapkeyframe.h"
+
 #include <dolphin/gx/GXStruct.h>
 
 class CChunkFile;
-class CMapKeyFrame;
 class CMapCylinder;
 class CMapShadow;
 class CMapAnimRun;
@@ -14,6 +15,7 @@ class CMapObjAtrMime;
 class CMapObjAtrSpotLight;
 class CMapObjAtrPointLight;
 class CMapObjAtrMeshName;
+class CMapObj;
 class CMaterialMan;
 class CCameraPcs;
 struct Vec;
@@ -32,6 +34,8 @@ public:
     
     CMapObjAtr();
     virtual ~CMapObjAtr();
+
+    TYPE m_type; // 0x04
 };
 
 class CMapObjAtrPlaySta : public CMapObjAtr
@@ -39,6 +43,9 @@ class CMapObjAtrPlaySta : public CMapObjAtr
 public:
     CMapObjAtrPlaySta();
     ~CMapObjAtrPlaySta();
+
+    unsigned char m_playStaNo; // 0x08
+    unsigned char m_pad09[3];
 };
 
 class CMapObjAtrMime : public CMapObjAtr
@@ -46,6 +53,12 @@ class CMapObjAtrMime : public CMapObjAtr
 public:
     CMapObjAtrMime();
     ~CMapObjAtrMime();
+
+    unsigned char m_vertexListCount; // 0x08
+    unsigned char m_pad09[3];
+    float** m_vertexLists;           // 0x0C
+    int m_vertexCount;               // 0x10
+    CMapKeyFrame m_keyFrame;         // 0x14
 };
 
 class CMapObjAtrSpotLight : public CMapObjAtr
@@ -53,34 +66,57 @@ class CMapObjAtrSpotLight : public CMapObjAtr
 public:
     CMapObjAtrSpotLight()
     {
-        unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
-        *reinterpret_cast<int*>(self + 0x4) = SPOT_LIGHT;
-        *reinterpret_cast<int*>(self + 0x38) = 0;
-        *reinterpret_cast<float*>(self + 0x20) = 1.0f;
-        *reinterpret_cast<float*>(self + 0x24) = 1.0f;
-        self[0x2C] = 0;
-        self[0x2D] = 0;
-        self[0x30] = 0;
-        *reinterpret_cast<int*>(self + 0xD8) = 0;
-        *reinterpret_cast<int*>(self + 0xDC) = 0;
-        *reinterpret_cast<int*>(self + 0xE0) = 0;
-        *reinterpret_cast<int*>(self + 0xE4) = 0;
-        self[0xC3] = 1;
-        self[0xC4] = 0;
-        *reinterpret_cast<int*>(self + 0x100) = 0;
-        *reinterpret_cast<int*>(self + 0x104) = 0;
-        *reinterpret_cast<int*>(self + 0x108) = 0;
-        *reinterpret_cast<int*>(self + 0x10C) = 0;
-        self[0xEB] = 1;
-        self[0xEC] = 0;
+        m_type = SPOT_LIGHT;
+        *reinterpret_cast<int*>(m_pad38) = 0;
+        m_intensity = 1.0f;
+        m_falloff = 1.0f;
+        m_colorMode = 0;
+        m_useAltColor = 0;
+        m_keyFrameCount = 0;
+        m_colorKeyFrame.m_endFrame = 0;
+        m_colorKeyFrame.m_frameCount = 0;
+        m_colorKeyFrame.m_junTable = 0;
+        m_colorKeyFrame.m_keyFrame = 0;
+        m_colorKeyFrame.m_loop = 1;
+        m_colorKeyFrame.m_isRun = 0;
+        m_altColorKeyFrame.m_endFrame = 0;
+        m_altColorKeyFrame.m_frameCount = 0;
+        m_altColorKeyFrame.m_junTable = 0;
+        m_altColorKeyFrame.m_keyFrame = 0;
+        m_altColorKeyFrame.m_loop = 1;
+        m_altColorKeyFrame.m_isRun = 0;
         for (int i = 0; i < 0x28; i += 4) {
-            *reinterpret_cast<int*>(self + 0xC0 + i) = 0;
-            *reinterpret_cast<int*>(self + 0xE8 + i) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_colorKeyFrame) + i) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_altColorKeyFrame) + i) = 0;
         }
     }
 
     ~CMapObjAtrSpotLight();
+
+    _GXColor m_color;              // 0x08
+    _GXColor m_altColor;           // 0x0C
+    CMapObj* m_target;             // 0x10
+    float m_radius;                // 0x14
+    float m_nearRange;             // 0x18
+    float m_farRange;              // 0x1C
+    float m_intensity;             // 0x20
+    float m_falloff;               // 0x24
+    float m_angle;                 // 0x28
+    unsigned char m_colorMode;     // 0x2C
+    unsigned char m_useAltColor;   // 0x2D
+    unsigned char m_unknown2E;     // 0x2E
+    unsigned char m_unknown2F;     // 0x2F
+    unsigned char m_keyFrameCount; // 0x30
+    unsigned char m_pad31[3];
+    _GXColor m_baseColor;          // 0x34
+    unsigned char m_pad38[4];
+    unsigned char m_colorCount;    // 0x3C
+    unsigned char m_altColorCount; // 0x3D
+    unsigned char m_pad3E[2];
+    _GXColor m_colors[16];         // 0x40
+    _GXColor m_altColors[16];      // 0x80
+    CMapKeyFrame m_colorKeyFrame;  // 0xC0
+    CMapKeyFrame m_altColorKeyFrame; // 0xE8
 };
 
 class CMapObjAtrPointLight : public CMapObjAtr
@@ -88,30 +124,44 @@ class CMapObjAtrPointLight : public CMapObjAtr
 public:
     CMapObjAtrPointLight()
     {
-        unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
-        *reinterpret_cast<int*>(self + 0x4) = POINT_LIGHT;
-        self[0x1C] = 0;
-        self[0x20] = 0;
-        *reinterpret_cast<int*>(self + 0xBC) = 0;
-        *reinterpret_cast<int*>(self + 0xC0) = 0;
-        *reinterpret_cast<int*>(self + 0xC4) = 0;
-        *reinterpret_cast<int*>(self + 0xC8) = 0;
-        self[0xA7] = 1;
-        self[0xA8] = 0;
-        *reinterpret_cast<int*>(self + 0xE4) = 0;
-        *reinterpret_cast<int*>(self + 0xE8) = 0;
-        *reinterpret_cast<int*>(self + 0xEC) = 0;
-        *reinterpret_cast<int*>(self + 0xF0) = 0;
-        self[0xCF] = 1;
-        self[0xD0] = 0;
+        m_type = POINT_LIGHT;
+        m_colorMode = 0;
+        m_unknown20 = 0;
+        m_colorKeyFrame.m_endFrame = 0;
+        m_colorKeyFrame.m_frameCount = 0;
+        m_colorKeyFrame.m_junTable = 0;
+        m_colorKeyFrame.m_keyFrame = 0;
+        m_colorKeyFrame.m_loop = 1;
+        m_colorKeyFrame.m_isRun = 0;
+        m_altColorKeyFrame.m_endFrame = 0;
+        m_altColorKeyFrame.m_frameCount = 0;
+        m_altColorKeyFrame.m_junTable = 0;
+        m_altColorKeyFrame.m_keyFrame = 0;
+        m_altColorKeyFrame.m_loop = 1;
+        m_altColorKeyFrame.m_isRun = 0;
         for (int i = 0; i < 0x28; i += 4) {
-            *reinterpret_cast<int*>(self + 0xA4 + i) = 0;
-            *reinterpret_cast<int*>(self + 0xCC + i) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_colorKeyFrame) + i) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_altColorKeyFrame) + i) = 0;
         }
     }
 
     ~CMapObjAtrPointLight();
+
+    _GXColor m_color;              // 0x08
+    _GXColor m_altColor;           // 0x0C
+    float m_radius;                // 0x10
+    float m_intensity;             // 0x14
+    unsigned char m_pad18[4];
+    unsigned char m_colorMode;     // 0x1C
+    unsigned char m_colorCount;    // 0x1D
+    unsigned char m_altColorCount; // 0x1E
+    unsigned char m_useAltColor;   // 0x1F
+    unsigned char m_unknown20;     // 0x20
+    unsigned char m_pad21[3];
+    _GXColor m_colors[16];         // 0x24
+    _GXColor m_altColors[16];      // 0x64
+    CMapKeyFrame m_colorKeyFrame;  // 0xA4
+    CMapKeyFrame m_altColorKeyFrame; // 0xCC
 };
 
 class CMapObjAtrMeshName : public CMapObjAtr
@@ -119,7 +169,16 @@ class CMapObjAtrMeshName : public CMapObjAtr
 public:
     CMapObjAtrMeshName();
     ~CMapObjAtrMeshName();
+
+    char m_name[0x20]; // 0x08
 };
+
+typedef char CMapObjAtr_size_check[(sizeof(CMapObjAtr) == 0x8) ? 1 : -1];
+typedef char CMapObjAtrPlaySta_size_check[(sizeof(CMapObjAtrPlaySta) == 0xC) ? 1 : -1];
+typedef char CMapObjAtrMime_size_check[(sizeof(CMapObjAtrMime) == 0x3C) ? 1 : -1];
+typedef char CMapObjAtrSpotLight_size_check[(sizeof(CMapObjAtrSpotLight) == 0x110) ? 1 : -1];
+typedef char CMapObjAtrPointLight_size_check[(sizeof(CMapObjAtrPointLight) == 0xF4) ? 1 : -1];
+typedef char CMapObjAtrMeshName_size_check[(sizeof(CMapObjAtrMeshName) == 0x28) ? 1 : -1];
 
 class CMapObj
 {

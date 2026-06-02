@@ -45,7 +45,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 		CGObject* obj = ppvMng->m_owner;
 		model = GetModelPtr(obj);
 		model->SetCallbackContext(value, params);
-		model->m_beforeCalcMatrixCallback = CC_BeforeCalcMatrixCallback;
+		model->SetBeforeCalcMatrixCallback(CC_BeforeCalcMatrixCallback);
 
 		CalcGraphValue(&constrainCameraForLoc->m_object, params->m_graphId, value[0], value[1], value[2],
 		               params->m_dataValIndex, params->m_initWork, params->m_stepValue);
@@ -61,7 +61,7 @@ void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
 	CGObject* obj = ppvMng->m_owner;
 	CChara::CModel* model = GetModelPtr(obj);
-	model->m_beforeCalcMatrixCallback = 0;
+	model->SetBeforeCalcMatrixCallback(0);
 }
 
 /*

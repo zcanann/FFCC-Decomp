@@ -38,6 +38,7 @@ public:
     void AddFrame();
     void Change(char*, float, ANIM_TYPE);
     void SetTexGen();
+    float GetChin() { return m_chin; }
 
 private:
     CPtrArray<CTexAnim*> m_texAnims;

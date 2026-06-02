@@ -27,7 +27,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -232,9 +231,7 @@ static CMaterial* AllocMaterial()
 
 static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 {
-    const unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
-    *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(numTexture + 1);
-    *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (numTexture << 1))) = textureIndex;
+    material->AddTextureIdx(material->GetTextureCount(), textureIndex);
 }
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
@@ -330,12 +327,6 @@ template <>
 void CPtrArray<CMaterial*>::SetAt(unsigned long index, CMaterial* item)
 {
     m_items[index] = item;
-}
-
-template <>
-int CPtrArray<CMaterial*>::GetSize()
-{
-    return m_numItems;
 }
 
 #pragma dont_inline on
@@ -2459,7 +2450,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             switch (chunk.m_id) {
             case CHUNK_TIDX: {
                 unsigned long materialIndex = 0;
-                while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materials))) {
+                while (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
                     if ((*materials)[materialIndex] == 0) {
                         break;
                     }
@@ -2490,7 +2481,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                 }
 
-                if (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materials))) {
+                if (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
                     materials->SetAt(materialIndex, material);
                 } else {
                     materials->Add(material);
@@ -2746,7 +2737,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
     CPtrArray<CMaterial*>* materialArray = &m_materials;
     unsigned long materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materialArray))) {
+    while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
         CMaterial* material = (*materialArray)[materialIndex];
         if (material != 0) {
             unsigned short numTexture = material->m_textureCount;
@@ -2828,7 +2819,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
     while (textureIndex < textureCount) {
         CTexture* texture = textureSet->GetTexture(textureIndex);
         if (texture != 0) {
-            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            u32 materialCount = static_cast<u32>(materialArray->GetSize());
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
@@ -2846,7 +2837,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_textureIndices[0] = static_cast<unsigned short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
+            materialCount = static_cast<u32>(m_materials.GetSize());
             if (materialIndex >= materialCount) {
                 materialArray->Add(newMaterial);
             } else {
@@ -2901,7 +2892,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 {
     unsigned int index = 0;
 
-    while (index < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
+    while (index < static_cast<unsigned int>(m_materials.GetSize())) {
         CMaterial* material = m_materials[index];
         if ((material != 0) && (material->m_pdtSlotIndex == pdtSlotIndex)) {
             for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
@@ -2974,7 +2965,7 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
  */
 CMaterialSet::~CMaterialSet()
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials)); i++) {
+    for (unsigned long i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
         CMaterial* const material = m_materials[i];
         if (material != 0) {
             delete material;
@@ -3147,7 +3138,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
 {
     unsigned int materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
+    while (materialIndex < static_cast<unsigned int>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
@@ -3178,7 +3169,7 @@ void CMaterialSet::Calc()
 {
     unsigned long materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
+    while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             CTexScroll* texScroll = material->GetTexScroll(0);
@@ -3232,7 +3223,7 @@ unsigned long CMaterialSet::Find(char* name)
 {
     unsigned long index = 0;
 
-    while (index < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
+    while (index < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[index];
         if ((material != 0) && (strcmp(material->m_name, name) == 0)) {
             return index;
@@ -3355,6 +3346,8 @@ inline void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-inline void CMaterial::AddTextureIdx(int, int)
+inline void CMaterial::AddTextureIdx(int index, int textureIndex)
 {
+    m_textureCount = static_cast<unsigned short>(index + 1);
+    m_textureIndices[index] = static_cast<unsigned short>(textureIndex);
 }

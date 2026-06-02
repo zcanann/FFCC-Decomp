@@ -49,6 +49,7 @@ STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
+STATIC_ASSERT(sizeof(GXColor) == 0x4);
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
@@ -61,6 +62,12 @@ static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
 static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 {
 	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68);
+}
+
+static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
+{
+	return reinterpret_cast<pppYmChangeTexState*>(
+	    ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
@@ -117,8 +124,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		return;
 	}
 
-	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	pppYmChangeTexState* state = (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + serializedDataOffsets[2]);
+	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
@@ -261,8 +267,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
  */
 void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
-	pppYmChangeTexState* state =
-	    (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(state->m_charaObj, 0);
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(state->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(state->m_charaObj, 2);
@@ -343,8 +348,7 @@ freeArrays:
 void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
 	float init = ChangeTexConst(kPppYmChangeTexInitZero);
-	pppYmChangeTexState* state =
-	    (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	pppYmChangeTexState* state = GetChangeTexState(ymChangeTex, data);
 
 	state->m_value0 = init;
 	state->m_value2 = init;

@@ -389,9 +389,8 @@ void CMenuPcs::create()
     for (int i = 0; i < 0x16; i++) {
         CTextureSet* textureSet = m_textureSets[textureInfo[0]];
         const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        CTexture* texture = textureSet->GetTexture(textureIndex);
+        texture->AddRef();
         m_textures[i] = texture;
         textureInfo += 2;
     }
@@ -657,10 +656,8 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     for (int i = 0; i < textureCount; i++) {
         const unsigned long textureIndex =
             static_cast<unsigned long>(m_textureSets[tmp->m_textureSetIndex]->Find(tmp->m_textureName));
-        CTexture* texture =
-            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(m_textureSets[tmp->m_textureSetIndex]) + 8))[textureIndex];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        CTexture* texture = m_textureSets[tmp->m_textureSetIndex]->GetTexture(textureIndex);
+        texture->AddRef();
         m_textures[textureStart + i] = texture;
         tmp++;
     }
@@ -909,8 +906,8 @@ void CMenuPcs::draw()
         CTexture* texture = m_textures[1];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
-        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        float width = static_cast<float>(texture->m_width);
+        float height = static_cast<float>(texture->m_height);
         PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / width, LoadFloat(FLOAT_80330808) / height,
                    LoadFloat(FLOAT_80330808));
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
@@ -1659,10 +1656,8 @@ void CMenuPcs::createBattle()
     for (int i = 0; i < 10; i++) {
         const unsigned long textureIndex =
             static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture =
-            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(m_textureSets[textureInfo[0]]) + 8))[textureIndex];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        CTexture* texture = m_textureSets[textureInfo[0]]->GetTexture(textureIndex);
+        texture->AddRef();
         m_textures[i + 0x16] = texture;
         textureInfo += 2;
     }
@@ -1692,7 +1687,7 @@ void CMenuPcs::createBattle()
         color.g = static_cast<u8>(((int)color.g + avg2) / 3);
         color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
-        const unsigned long tlutFmt = *reinterpret_cast<unsigned long*>(reinterpret_cast<u8*>(m_textures[0x18]) + 0x60);
+        const unsigned long tlutFmt = m_textures[0x18]->m_format;
         int tlutOffset;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;

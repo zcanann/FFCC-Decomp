@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 
 class CMapPcs;
+class CMapObj;
 class COctTree;
 class CTexture;
 
@@ -26,9 +27,9 @@ public:
     u8 m_useFrustum;         // 0x06
     u8 m_materialMode;       // 0x07
     u32 _pad08;              // 0x08
-    void* m_modelA;          // 0x0C
-    void* m_modelB;          // 0x10
-    void* m_modelC;          // 0x14
+    CMapObj* m_modelA;       // 0x0C
+    CMapObj* m_modelB;       // 0x10
+    CMapObj* m_modelC;       // 0x14
     Mtx m_viewMtx;           // 0x18
     Mtx m_lightMtx;          // 0x48
     Mtx m_shadowMtx;         // 0x78
@@ -40,6 +41,8 @@ public:
     u8 m_targetBounds[0x30]; // 0xC0
     u8 m_targetEnabled[2];   // 0xF0
 };
+
+typedef char CMapShadow_size_check[(sizeof(CMapShadow) == 0xF4) ? 1 : -1];
 
 void CMapShadowInsertOctTree(CMapShadow::TARGET, COctTree&);
 

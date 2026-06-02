@@ -1,18 +1,13 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
+#include "ffcc/mapobj.h"
 #include "ffcc/mapocttree.h"
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
+#include "ffcc/textureman.h"
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
-
-template <class T>
-class CPtrArray
-{
-public:
-	int GetSize();
-	T operator[](unsigned long index);
-};
 
 extern const double kMapShadowDepthBias;
 extern const float kMapShadowScaleStep;
@@ -45,9 +40,9 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 			if (((octTreeMask & (1U << i)) != 0) &&
 			    ((shadow = (*mapShadowArray)[i])->m_targetEnabled[(int)mapShadow] != 0) &&
 			    (shadow->m_materialMode == 0)) {
-				pos.x = *(float*)((int)shadow->m_modelA + 0xc4);
-				pos.y = *(float*)((int)shadow->m_modelA + 0xd4);
-				pos.z = *(float*)((int)shadow->m_modelA + 0xe4);
+				pos.x = shadow->m_modelA->m_worldMtx[0][3];
+				pos.y = shadow->m_modelA->m_worldMtx[1][3];
+				pos.z = shadow->m_modelA->m_worldMtx[2][3];
 
 				bound = reinterpret_cast<CBound*>(shadow->m_targetBounds + boundOffset);
 				octTree.InsertShadow(i, pos, *bound);
@@ -63,24 +58,20 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
  */
 void CMapShadow::Draw()
 {
-	int iVar1;
 	Vec local_14;
 	Vec local_20;
 	Vec local_2c;
 	Vec VStack_38;
 	
-	iVar1 = (int)m_modelA;
-	local_14.x = *(float*)(iVar1 + 0xc4);
-	local_14.y = *(float*)(iVar1 + 0xd4);
-	local_14.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = (int)m_modelC;
-	local_20.x = *(float*)(iVar1 + 0xc4);
-	local_20.y = *(float*)(iVar1 + 0xd4);
-	local_20.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = (int)m_modelB;
-	local_2c.x = *(float*)(iVar1 + 0xc4);
-	local_2c.y = *(float*)(iVar1 + 0xd4);
-	local_2c.z = *(float*)(iVar1 + 0xe4);
+	local_14.x = m_modelA->m_worldMtx[0][3];
+	local_14.y = m_modelA->m_worldMtx[1][3];
+	local_14.z = m_modelA->m_worldMtx[2][3];
+	local_20.x = m_modelC->m_worldMtx[0][3];
+	local_20.y = m_modelC->m_worldMtx[1][3];
+	local_20.z = m_modelC->m_worldMtx[2][3];
+	local_2c.x = m_modelB->m_worldMtx[0][3];
+	local_2c.y = m_modelB->m_worldMtx[1][3];
+	local_2c.z = m_modelB->m_worldMtx[2][3];
 	PSVECSubtract(&local_20, &local_14, &local_20);
 	PSVECSubtract(&local_2c, &local_14, &VStack_38);
 	C_MTXLookAt(m_viewMtx, (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
@@ -117,12 +108,11 @@ void CMapShadow::Init()
 	CMaterialSet* materialSet;
 
 	materialSet = MapMng.m_materialSet;
-	material =
-	    (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[m_materialIndex];
-	material = *reinterpret_cast<CMaterial**>(reinterpret_cast<int>(material) + 0x3c);
-	width = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x64);
-	height = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x68);
-	m_materialMode = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x6c);
+	material = materialSet->m_materials[m_materialIndex];
+	CTexture* texture = material->GetTexture(0);
+	width = (float)texture->m_width;
+	height = (float)texture->m_height;
+	m_materialMode = texture->m_wrapMode;
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
 		double scaleBias = kMapShadowDepthBias;

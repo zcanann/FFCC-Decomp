@@ -3,6 +3,9 @@
 
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
+#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
+#include "ffcc/ptrarray_decl.h"
+#endif
 #include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
@@ -12,35 +15,6 @@ class CAmemCacheSet;
 class CMemory;
 
 enum _GXTexMapID;
-
-#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    bool Add(T item);
-    void SetAt(unsigned long index, T item);
-    int GetSize();
-    void RemoveAll();
-    void ReleaseAndRemoveAll();
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    int setSize(unsigned long newSize);
-    T GetAt(unsigned long index);
-
-private:
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-#endif
 
 class CTexture : public CRef
 {

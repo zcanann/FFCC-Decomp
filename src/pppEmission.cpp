@@ -34,9 +34,10 @@ typedef CChara::CMesh::CRefData EmissionMeshData;
 typedef CChara::CMesh EmissionMeshRef;
 
 struct EmissionState;
+struct EmissionParticle;
 
 struct EmissionState {
-    void* m_particles;
+    EmissionParticle* m_particles;
     int m_texture;
     u8 m_colorR;
     u8 m_colorG;
@@ -66,6 +67,16 @@ STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(EmissionState, m_scale0) == 0xC);
+STATIC_ASSERT(offsetof(EmissionState, m_field1C) == 0x1C);
+STATIC_ASSERT(sizeof(EmissionState) == 0x20);
+STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
+
+static inline EmissionState* GetEmissionState(pppEmission* emission, pppEmissionUnkC* ctrl)
+{
+    return reinterpret_cast<EmissionState*>(
+        emission->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+}
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {
@@ -113,7 +124,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    EmissionState* state = (EmissionState*)(pppEmission_->m_object.m_workArea + serializedDataOffsets[2]);
+    EmissionState* state = GetEmissionState(pppEmission_, param_3);
     u8* dataSet = pppEmission_->m_object.m_workArea + serializedDataOffsets[1];
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
@@ -147,13 +158,13 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     if (payload[9] != 0) {
         if (state->m_particles == 0) {
             state->m_field1C = payload[0xB] / payload[0xC];
-            state->m_particles = pppMemAlloc(
+            state->m_particles = static_cast<EmissionParticle*>(pppMemAlloc(
                 (unsigned long)param_2->m_initWOrk << 4,
                 ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppEmission_cpp),
-                0x16F);
+                0x16F));
 
-            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+            EmissionParticle* particle = state->m_particles;
             for (int i = 0; i < param_2->m_initWOrk; i++) {
                 Math.RandF(FLOAT_803311e4);
 
@@ -170,7 +181,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             }
         }
 
-        EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+        EmissionParticle* particle = state->m_particles;
         for (int i = 0; i < param_2->m_initWOrk; i++) {
             particle->m_scale = particle->m_scale + (state->m_scale0 + Math.RandF(*(float*)(payload + 4)));
 
@@ -226,23 +237,23 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
  */
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
-    int* state = (int*)(pppEmission_->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    EmissionState* state = GetEmissionState(pppEmission_, param_2);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
     ClearEmissionModelCallbacks(model);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
-    CMemory::CStage* stage = (CMemory::CStage*)state[0];
+    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(state->m_particles);
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate(stage);
-        state[0] = 0;
+        state->m_particles = 0;
     }
 
     baseScale = FLOAT_803311f8;
-    *(float*)(state + 5) = FLOAT_803311f8;
-    *(float*)(state + 4) = baseScale;
-    *(float*)(state + 3) = baseScale;
+    state->m_scale2 = FLOAT_803311f8;
+    state->m_scale1 = baseScale;
+    state->m_scale0 = baseScale;
 }
 
 /*
@@ -256,11 +267,10 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  */
 void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale = FLOAT_803311f8;
-    int offset = param_2->m_serializedDataOffsets[2];
-    float* state = (float*)(pppEmission_->m_object.m_workArea + offset);
-    state[5] = baseScale;
-    state[4] = baseScale;
-    state[3] = baseScale;
+    EmissionState* state = GetEmissionState(pppEmission_, param_2);
+    state->m_scale2 = baseScale;
+    state->m_scale1 = baseScale;
+    state->m_scale0 = baseScale;
 }
 
 /*
@@ -273,41 +283,25 @@ void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) 
  * JP Size: TODO
  */
 void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
-    struct EmissionState {
-        int field0;
-        int field4;
-        u8 field8;
-        u8 field9;
-        u8 fieldA;
-        u8 fieldB;
-        float fieldC;
-        float field10;
-        float field14;
-        float field18;
-        u8 field1C;
-    };
-
     float baseScale = FLOAT_803311f8;
-    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    int offset = serializedDataOffsets[2];
-    EmissionState* state = (EmissionState*)(pppEmission_->m_object.m_workArea + offset);
+    EmissionState* state = GetEmissionState(pppEmission_, param_2);
 
-    state->field4 = 0;
-    state->field8 = 0x80;
-    state->field9 = 0x80;
-    state->fieldA = 0x80;
-    state->fieldB = 0x80;
-    state->field14 = baseScale;
-    state->field10 = baseScale;
-    state->fieldC = baseScale;
+    state->m_texture = 0;
+    state->m_colorR = 0x80;
+    state->m_colorG = 0x80;
+    state->m_colorB = 0x80;
+    state->m_colorA = 0x80;
+    state->m_scale2 = baseScale;
+    state->m_scale1 = baseScale;
+    state->m_scale0 = baseScale;
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
     model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
-    state->field0 = 0;
-    state->field18 = model->m_lightAlpha;
-    state->field1C = 0;
+    state->m_particles = 0;
+    state->m_scale3 = model->m_lightAlpha;
+    state->m_field1C = 0;
 }
 
 /*
@@ -394,7 +388,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 }
             }
         } else if (step->m_payload[9] == 1) {
-            EmissionParticle* particle = (EmissionParticle*)state->m_particles;
+            EmissionParticle* particle = state->m_particles;
             for (int i = 0; i < step->m_initWOrk; i++) {
                 float scale = particle->m_scale;
                 PSMTXScale(objMtx1, scale, scale, scale);

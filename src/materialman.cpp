@@ -156,40 +156,6 @@ static void ReleaseRef(CRef* object)
     ReleaseRefNonNull(object);
 }
 
-struct MaterialManTevState {
-    unsigned int stdEnvTevBit;
-    unsigned int activeEnvTevBit;
-    unsigned int curEnvTevBit;
-};
-
-struct MaterialManTexState {
-    int texMapIdCur;
-    int texMtxCur;
-    int texCoordIdCur;
-    int stdTexMapId;
-    int stdTexMtx;
-    int stdTexCoordId;
-    int texMapIdCurShadow;
-    int texMtxCurShadow;
-    int texCoordIdCurShadow;
-    unsigned int unknown140;
-    unsigned int texScroll0TexMtx;
-    unsigned int texScroll0TexCoord;
-    unsigned int unknown14C;
-    unsigned int texScroll1TexMtx;
-    unsigned int texScroll1TexCoord;
-};
-
-static MaterialManTevState* GetMaterialManTevState(CMaterialMan* materialMan)
-{
-    return reinterpret_cast<MaterialManTevState*>(Ptr(materialMan, 0x40));
-}
-
-static MaterialManTexState* GetMaterialManTexState(CMaterialMan* materialMan)
-{
-    return reinterpret_cast<MaterialManTexState*>(Ptr(materialMan, 0x11C));
-}
-
 static int HighestSetBit(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
@@ -577,9 +543,8 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
         return;
     }
 
-    unsigned int hasProjTex = (static_cast<unsigned int>(
-                                    static_cast<int>(*reinterpret_cast<short*>(Ptr(this, 0x20))) >> 0x1F)) ^
-                               1;
+    unsigned int hasProjTex =
+        (static_cast<unsigned int>(static_cast<int>(g_drawMaterial->m_textureIndices[3]) >> 0x1F)) ^ 1;
     if (hasProjTex != 0) {
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[6]), GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY,
                           GX_FALSE, GX_PTIDENTITY);
@@ -3214,8 +3179,6 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
     int textureCount = static_cast<int>(m_textureCount);
     CTexScroll* scroll = GetTexScroll(0);
-    MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
-    MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
     CTexture** textureSlot = m_textures;
     int i = 0;
 
@@ -3241,33 +3204,33 @@ int CMaterial::Set(_GXTexMapID texMapId)
                 texMtx[1][3] = scrollV;
 
                 if (i == 0) {
-                    tevState->curEnvTevBit |= 0x20;
-                    texState->texScroll0TexMtx = texState->texMtxCur;
-                    texState->texScroll0TexCoord = texState->texCoordIdCur;
-                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
+                    MaterialMan.m_curEnvTevBit |= 0x20;
+                    MaterialMan.m_texScroll0TexMtx = MaterialMan.m_texMtxCur;
+                    MaterialMan.m_texScroll0TexCoord = MaterialMan.m_texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
+                        static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX0,
-                        texState->texMtxCur,
+                        MaterialMan.m_texMtxCur,
                         GX_FALSE,
                         0x7D);
                 } else {
-                    tevState->curEnvTevBit |= 0x40;
-                    texState->texScroll1TexMtx = texState->texMtxCur;
-                    texState->texScroll1TexCoord = texState->texCoordIdCur;
-                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
+                    MaterialMan.m_curEnvTevBit |= 0x40;
+                    MaterialMan.m_texScroll1TexMtx = MaterialMan.m_texMtxCur;
+                    MaterialMan.m_texScroll1TexCoord = MaterialMan.m_texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, MaterialMan.m_texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
+                        static_cast<GXTexCoordID>(MaterialMan.m_texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX1,
-                        texState->texMtxCur,
+                        MaterialMan.m_texMtxCur,
                         GX_FALSE,
                         0x7D);
                 }
 
-                texState->texMtxCur += 3;
-                texState->texCoordIdCur += 1;
+                MaterialMan.m_texMtxCur += 3;
+                MaterialMan.m_texCoordIdCur += 1;
             }
         }
 

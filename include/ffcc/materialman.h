@@ -49,6 +49,8 @@ typedef char CTexScroll_size_check[(sizeof(CTexScroll) == 0x14) ? 1 : -1];
 
 class CMaterialMan : public CManager
 {
+    friend class CMaterial;
+
 public:
     enum TEV_BIT
     {

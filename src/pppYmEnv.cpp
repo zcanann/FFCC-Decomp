@@ -64,11 +64,6 @@ struct YmEnvPackedYAxisAngles {
     u32 m_oneEighty;
 };
 
-struct PartMngEditRaw {
-    u8 m_pad00[0x1C8];
-    void* m_recvBuff;
-};
-
 extern const float kYmEnvViewportWidth = 320.0f;
 extern const float kYmEnvViewportHeight = 224.0f;
 extern const float kYmEnvZero = 0.0f;
@@ -596,7 +591,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     owner = (CGObject*)mngSt->m_owner;
     if ((s32)Game.m_currentSceneId == 7) {
-        nodeNameBase = (u8*)(reinterpret_cast<PartMngEditRaw*>(&PartMng)->m_recvBuff) + mngSt->m_nodeIndex * 0x60;
+        nodeNameBase = PartMng.m_editNodeNameBuffer + mngSt->m_nodeIndex * 0x60;
     } else {
         nodeNameBase = (u8*)(*(u32*)mngSt->m_pppResSet) + mngSt->m_nodeIndex * 0x60 + 0x20;
     }

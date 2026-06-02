@@ -2240,7 +2240,7 @@ void CMenuPcs::DrawResultCountAnim()
 {
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 

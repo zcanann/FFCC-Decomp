@@ -59,10 +59,10 @@ struct CUSBStreamDataStorage
 class CFunnyShapePcs : public CProcess
 {
 public:
-    static unsigned int m_table_desc0[3];
-    static unsigned int m_table_desc1[3];
-    static unsigned int m_table_desc2[3];
-    static unsigned int m_table_desc3[3];
+    static CProcessTableCallback m_table_desc0;
+    static CProcessTableCallback m_table_desc1;
+    static CProcessTableCallback m_table_desc2;
+    static CProcessTableCallback m_table_desc3;
     static CProcessTable m_table;
 
     CFunnyShapePcs();

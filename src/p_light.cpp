@@ -58,21 +58,21 @@ extern const char sLightProcessClassName[] = "CProcess";
 extern "C" const char sLightTextureFullMsg[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
-unsigned int CLightPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
-unsigned int CLightPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
-unsigned int CLightPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
-unsigned int CLightPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
-unsigned int CLightPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
+CProcessTableCallback CLightPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
+CProcessTableCallback CLightPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
+CProcessTableCallback CLightPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
+CProcessTableCallback CLightPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
+CProcessTableCallback CLightPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
 CProcessTable CLightPcs::m_table = {
     const_cast<char*>(sLightPcsClassName),
     {
-        m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
-        m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
-        m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
+        m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
         0x1C, 0,
-        m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
+        m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
         0x2A, 0,
-        m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
+        m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
         0x2D, 1,
     },
 };

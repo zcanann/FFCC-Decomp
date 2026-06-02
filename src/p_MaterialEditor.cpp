@@ -30,30 +30,30 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-unsigned int CMaterialEditorPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
-unsigned int CMaterialEditorPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
-unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
-unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
+CProcessTableCallback CMaterialEditorPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+CProcessTableCallback CMaterialEditorPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+CProcessTableCallback CMaterialEditorPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+CProcessTableCallback CMaterialEditorPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
 char* q;
 
 CProcessTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
     {
-        m_table_desc0[0],
-        m_table_desc0[1],
-        m_table_desc0[2],
-        m_table_desc1[0],
-        m_table_desc1[1],
-        m_table_desc1[2],
-        m_table_desc2[0],
-        m_table_desc2[1],
-        m_table_desc2[2],
+        m_table_desc0.m_thisOffset,
+        m_table_desc0.m_virtualOffset,
+        m_table_desc0.m_function,
+        m_table_desc1.m_thisOffset,
+        m_table_desc1.m_virtualOffset,
+        m_table_desc1.m_function,
+        m_table_desc2.m_thisOffset,
+        m_table_desc2.m_virtualOffset,
+        m_table_desc2.m_function,
         0x20,
         0,
-        m_table_desc3[0],
-        m_table_desc3[1],
-        m_table_desc3[2],
+        m_table_desc3.m_thisOffset,
+        m_table_desc3.m_virtualOffset,
+        m_table_desc3.m_function,
         0x41,
         1,
     },
@@ -624,7 +624,7 @@ void CMaterialEditorPcs::createViewer()
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&CMaterialEditorPcs::m_table) + index * sizeof(m_table));
+    return reinterpret_cast<int>(&CMaterialEditorPcs::m_table + index);
 }
 /*
  * --INFO--

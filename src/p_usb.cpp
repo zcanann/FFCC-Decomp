@@ -228,7 +228,7 @@ void CUSBPcs::IsBigAlloc(int param_2)
  */
 int CUSBPcs::GetTable(unsigned long param)
 {
-    return reinterpret_cast<int>(reinterpret_cast<char*>(&m_table) + (param * 0x15c));
+    return reinterpret_cast<int>(&m_table + param);
 }
 
 /*

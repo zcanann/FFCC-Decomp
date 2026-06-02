@@ -36,7 +36,7 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, pppYmMegaBirthShpTail2UnkC* offsets)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, _pppCtrlTable* offsets)
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
@@ -220,7 +220,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
  * PAL Address: 0x8008b3f4
  * PAL Size: 1072b
  */
-void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, pppYmMegaBirthShpTail2UnkC* offsets)
+void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, _pppCtrlTable* offsets)
 {
     s8 hasRequiredMemory;
     u32 i;
@@ -685,7 +685,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
+void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
     u8* work = reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2];
     void** ptrBc = (void**)(work + 0x3c);
@@ -715,7 +715,7 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBir
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
+void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
     pppFMATRIX* work = (pppFMATRIX*)(reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2]);
     float initVal;

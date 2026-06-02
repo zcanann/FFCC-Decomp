@@ -99,11 +99,6 @@ struct pppScreenBreakUnkB {
     float m_speedRand;
 };
 
-struct pppScreenBreakUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 struct ScreenBreakColorData {
     u8 m_pad0[8];
     GXColor m_color;
@@ -174,7 +169,7 @@ void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned ch
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, pppScreenBreakUnkC* param_3)
+void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, _pppCtrlTable* param_3)
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
@@ -198,7 +193,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
+void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, _pppCtrlTable* param_3)
 {
     if (ppvUserStopPartF != 0) {
         return;
@@ -208,7 +203,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicPcs, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, serializedDataOffsets[2]);
     ScreenBreakColorData* colorSource = reinterpret_cast<ScreenBreakColorData*>(
         GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[0]));
@@ -308,9 +303,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
+void pppDesScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
 {
-    s32* serializedDataOffsets = param_2->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_2->m_serializedDataOffsets;
     s32 dataOffset = serializedDataOffsets[2];
     VScreenBreak* pppData = GetScreenBreakValue(pppScreenBreak, dataOffset);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
@@ -341,7 +336,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
+void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
@@ -360,7 +355,7 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
+void pppConScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);

@@ -487,9 +487,9 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
+void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
 {
-    s32* offsets = param_2->m_serializedDataOffsets;
+    int* offsets = param_2->m_serializedDataOffsets;
     s32 workOffset = offsets[2];
     VYmMana* work = reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + workOffset);
     CGObject* gObject = ppvMng->m_owner;
@@ -572,7 +572,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
+void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
 {
     VYmMana* work =
         reinterpret_cast<VYmMana*>(reinterpret_cast<_pppPObject*>(ymMana)->m_workArea + param_2->m_serializedDataOffsets[2]);
@@ -728,7 +728,7 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* param_3)
+void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
     VYmMana* mana;
@@ -987,7 +987,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
+void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*)
 {
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);

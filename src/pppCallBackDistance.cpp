@@ -14,7 +14,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, pppCallBackDistanceUnkC* ctrlTable)
+void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt = ppvMng;
     s32 distanceOffset = *ctrlTable->m_serializedDataOffsets + offsetof(_pppPObject, m_workArea);
@@ -60,7 +60,7 @@ void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCallBackDistance(_pppPObject*, pppCallBackDistanceUnkC*)
+void pppDestructCallBackDistance(_pppPObject*, _pppCtrlTable*)
 {
 }
 
@@ -73,7 +73,7 @@ void pppDestructCallBackDistance(_pppPObject*, pppCallBackDistanceUnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable)
+void pppConstructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt;
     CGObject* lookTarget;

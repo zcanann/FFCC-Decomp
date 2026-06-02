@@ -85,7 +85,7 @@ static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
+void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, _pppCtrlTable* param_3)
 {
     TracerWork* work;
     CMapMesh* mapMesh;
@@ -211,7 +211,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
+void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, _pppCtrlTable* param_3)
 {
     TracerWork* work;
     TracerColorBlock* colorData;
@@ -352,7 +352,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
+void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);
     if (work->entries != 0) {
@@ -369,7 +369,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
+void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);
 
@@ -387,7 +387,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
+void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     float fVar1 = FLOAT_80331840;
     TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);

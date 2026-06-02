@@ -23,11 +23,6 @@ struct PEmission {
 };
 typedef PEmission pppEmissionUnkB;
 
-struct pppEmissionUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
@@ -35,11 +30,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*
 extern "C" {
 #endif
 
-void pppConstructEmission(pppEmission*, pppEmissionUnkC*);
-void pppConstruct2Emission(pppEmission*, pppEmissionUnkC*);
-void pppDestructEmission(pppEmission*, pppEmissionUnkC*);
-void pppFrameEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*);
-void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*);
+void pppConstructEmission(pppEmission*, _pppCtrlTable*);
+void pppConstruct2Emission(pppEmission*, _pppCtrlTable*);
+void pppDestructEmission(pppEmission*, _pppCtrlTable*);
+void pppFrameEmission(pppEmission*, pppEmissionUnkB*, _pppCtrlTable*);
+void pppRenderEmission(pppEmission*, pppEmissionUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

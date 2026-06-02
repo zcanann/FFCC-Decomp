@@ -6,7 +6,7 @@
 class PScreenBreak;
 class VScreenBreak;
 struct pppScreenBreakUnkB;
-struct pppScreenBreakUnkC;
+struct _pppCtrlTable;
 
 int SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
@@ -18,15 +18,14 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 extern "C" {
 #endif
 
-void pppConScreenBreak(PScreenBreak*, pppScreenBreakUnkC*);
-void pppCon2ScreenBreak(PScreenBreak*, pppScreenBreakUnkC*);
-void pppDesScreenBreak(PScreenBreak*, pppScreenBreakUnkC*);
-void pppFrameScreenBreak(PScreenBreak*, pppScreenBreakUnkB*, pppScreenBreakUnkC*);
-void pppRenderScreenBreak(PScreenBreak*, pppScreenBreakUnkB*, pppScreenBreakUnkC*);
+void pppConScreenBreak(PScreenBreak*, _pppCtrlTable*);
+void pppCon2ScreenBreak(PScreenBreak*, _pppCtrlTable*);
+void pppDesScreenBreak(PScreenBreak*, _pppCtrlTable*);
+void pppFrameScreenBreak(PScreenBreak*, pppScreenBreakUnkB*, _pppCtrlTable*);
+void pppRenderScreenBreak(PScreenBreak*, pppScreenBreakUnkB*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_SCREENBREAK_H_
-

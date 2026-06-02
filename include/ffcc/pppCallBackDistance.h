@@ -4,6 +4,7 @@
 #include <dolphin/types.h>
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 struct pppCallBackDistanceUnkB {
     u32 m_unk0;
@@ -11,18 +12,13 @@ struct pppCallBackDistanceUnkB {
     s16 m_initWOrk;
 };
 
-struct pppCallBackDistanceUnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable);
-void pppDestructCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkC* ctrlTable);
-void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, pppCallBackDistanceUnkC* ctrlTable);
+void pppConstructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable);
+void pppDestructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable);
+void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

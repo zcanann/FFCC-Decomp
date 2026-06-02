@@ -97,18 +97,6 @@ extern float FLOAT_80331158;
 
 namespace {
 
-struct FurMaterialRaw
-{
-    unsigned char m_pad0[0x1C];
-    short m_extraTextureIndex;
-    unsigned char m_pad1E[0x1E];
-    CTexture* m_texture0;
-    CTexture* m_pickTexture;
-    CTexture* m_textures[2];
-    unsigned char m_pad4C[0x5B];
-    unsigned char m_furEnable;
-};
-
 typedef CChara::CMesh::CDisplayList FurDisplayListRaw;
 typedef CChara::CMesh::CRefData FurMeshRefRaw;
 typedef CChara::CMesh FurMeshRaw;
@@ -1469,12 +1457,13 @@ int CChara::CModel::PickFur(
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		int displayCount = mesh->m_data->m_displayListCount;
 		while (--displayCount >= 0) {
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[displayList->m_material]);
+			CMaterial* material = materialSet->m_materials[displayList->m_material];
 			int paintableMaterial = 0;
-			if (material->m_pickTexture != 0 && material->m_pickTexture->m_format == 5) {
+			CTexture* pickTexture = material->GetFurPickTexture();
+			if (pickTexture != 0 && pickTexture->m_format == 5) {
 				paintableMaterial = 1;
 			}
-			const int furMaterial = material->m_furEnable != 0;
+			const int furMaterial = material->IsFurEnabled();
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
@@ -1615,8 +1604,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 	bool hasFurMaterial = false;
 	for (int i = 0; i < materialCount; i++) {
-		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[i]);
-		if (material->m_furEnable != 0) {
+		CMaterial* material = materialSet->m_materials[i];
+		if (material->IsFurEnabled()) {
 			hasFurMaterial = true;
 			break;
 		}
@@ -1711,8 +1700,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		if (shadowPass != 0) {
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, &modelPos, FLOAT_80331154, FLOAT_80331158, 0);
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
-				FurMaterialRaw* shadowMaterial = reinterpret_cast<FurMaterialRaw*>(shadowMaterials[shadowIndex]);
-				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterial->m_textures[0]);
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterials[shadowIndex]->GetFurTexture(0));
 
 				Mtx shadowTexMtx;
 				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
@@ -1741,18 +1729,19 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSet->m_materials[displayList->m_material]);
-			if (material->m_furEnable == 0) {
+			CMaterial* material = materialSet->m_materials[displayList->m_material];
+			if (!material->IsFurEnabled()) {
 				continue;
 			}
 
-			TextureMan.SetTexture(GX_TEXMAP0, material->m_textures[0]);
+			TextureMan.SetTexture(GX_TEXMAP0, material->GetFurTexture(0));
 			unsigned int hasExtraTexture = 0;
 			int extraTextureFormat = -1;
-			if (material->m_extraTextureIndex != -1) {
-				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
+			if (static_cast<short>(material->GetTextureIndex(1)) != -1) {
+				CTexture* extraTexture = material->GetFurTexture(1);
+				TextureMan.SetTexture(GX_TEXMAP2, extraTexture);
 				hasExtraTexture = 1;
-				extraTextureFormat = material->m_textures[1]->m_format;
+				extraTextureFormat = extraTexture->m_format;
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {

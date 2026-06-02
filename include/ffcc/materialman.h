@@ -160,6 +160,22 @@ public:
     {
         return m_unkA6;
     }
+    unsigned short GetTextureIndex(int index) const
+    {
+        return m_textureIndices[index];
+    }
+    int IsFurEnabled() const
+    {
+        return m_singleTextureFlag != 0;
+    }
+    CTexture* GetFurPickTexture()
+    {
+        return m_textures[1];
+    }
+    CTexture* GetFurTexture(int index)
+    {
+        return m_textures[index + 2];
+    }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)

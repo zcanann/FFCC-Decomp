@@ -1131,18 +1131,14 @@ void CMenuPcs::CalcSelectCloseAnim()
  */
 void CMenuPcs::CalcSelectWait()
 {
-	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
-	int auxPtr = GetBonusMenuMembers(this).m_bonusAuxPtr;
-	BonusAnimHeader* header;
-	BonusAnimSprite* sprites;
-
-	header = (BonusAnimHeader*)animPtr;
-	sprites = (BonusAnimSprite*)(animPtr + 8);
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
-		*(short*)(auxPtr + 10) = 3;
+	if (*(signed char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xb) == 0) {
+		int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+		*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 10) = 3;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
 			BonusSpriteFlags(&sprites[i]) = 3;
@@ -1160,14 +1156,20 @@ void CMenuPcs::CalcSelectWait()
 		cursor->duration = 8;
 		cursor->depth = 1.0f;
 		header->count = (short)(header->count + 1);
-		*(short*)(statePtr + 0xe) = 0;
-		*(short*)(statePtr + 0x26) = 4;
-		*(short*)(statePtr + 0x18) = 0;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xe) = 0;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x26) = 4;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x18) = 0;
 		header->finished = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
-		*(short*)(statePtr + 0x1a) = 0;
-		*(unsigned char*)(statePtr + 8) = 0;
+		*(unsigned char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xb) = 1;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1a) = 0;
+		*(unsigned char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 8) = 0;
 	}
+
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int auxPtr = GetBonusMenuMembers(this).m_bonusAuxPtr;
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);

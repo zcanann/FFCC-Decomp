@@ -1381,9 +1381,11 @@ void CGMonObj::onStatDie()
 				void* classId = object->m_scriptHandle[4];
 				if (classId == reinterpret_cast<void*>(5)) {
 					particleId = 599;
-				} else if (classId == reinterpret_cast<void*>(4)) {
-					particleId = 0x253;
-				} else if (classId == reinterpret_cast<void*>(6)) {
+				} else if (reinterpret_cast<int>(classId) < 5) {
+					if (3 < reinterpret_cast<int>(classId)) {
+						particleId = 0x253;
+					}
+				} else if (reinterpret_cast<int>(classId) < 7) {
 					particleId = 0x25B;
 				}
 
@@ -1400,22 +1402,29 @@ void CGMonObj::onStatDie()
 		}
 
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
-		*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+		*reinterpret_cast<float*>(mon + 0x694) = FLOAT_803319D8;
 		enableAttackCol(0, 0, 0);
 		object->m_bgColMask &= 0xFFF6FFFD;
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, 20.0f * object->m_attackColRadius, 0);
-		CGItemObj::CreateFromScript(1, 0, 0, object, 0.0f, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
+		CGItemObj::CreateFromScript(1, 0, 0, object, FLOAT_803319D8, 0);
 		object->PutDropItem();
 		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
 		return;
 	}
 
-	if (subState == 2) {
+	if (0 < subState) {
+		if (2 < subState) {
+			return;
+		}
 		unsigned short repopDelay = *reinterpret_cast<unsigned short*>(mon + 0x6D6);
 		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
 			setRepop(0);
 		}
+		return;
+	}
+
+	if (subState < 0) {
 		return;
 	}
 
@@ -1433,16 +1442,16 @@ void CGMonObj::onStatDie()
 			unsigned short pId = *reinterpret_cast<unsigned short*>(aiData + 0x19E);
 			if (pId != 0xFFFF) {
 				int dataNo = -1;
-				if (object->m_charaModelHandle != nullptr && object->m_charaModelHandle->m_pdtLoadRef != nullptr) {
+				if (object->m_charaModelHandle->m_pdtLoadRef != nullptr) {
 					dataNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[5];
 				}
-				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, 20.0f * object->m_attackColRadius, 0);
+				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
 			}
 
 			int option = static_cast<short>(Game.m_gameWork.m_optionValue);
 			if (option <= 8 && *reinterpret_cast<short*>(mon + 0x6D6) == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-				unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
+				unsigned long long bit = 1ULL << shift;
 				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
 				CFlatSpawnBitLo(option) |= static_cast<unsigned int>(bit >> 32);
 			}

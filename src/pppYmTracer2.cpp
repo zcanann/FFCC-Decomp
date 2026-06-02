@@ -51,6 +51,11 @@ union PackedColor {
     u8 bytes[4];
 };
 
+struct TracerColorBlock {
+    u8 pad[8];
+    pppCVECTOR color;
+};
+
 extern const PackedColor g_pppYmTracer2_1;
 extern const PackedColor g_pppYmTracer2_2;
 
@@ -85,7 +90,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     TracerWork* work;
     CMapMesh* mapMesh;
     TRACE_POLYGON* poly;
-    u8* colorData;
+    TracerColorBlock* colorData;
     CTexture* texture;
     s32 i;
     s32 dataOffset;
@@ -104,12 +109,12 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     colorOffset = param_3->m_serializedDataOffsets[1];
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
-    colorData = pppYmTracer2->m_object.m_workArea + colorOffset;
+    colorData = reinterpret_cast<TracerColorBlock*>(pppYmTracer2->m_object.m_workArea + colorOffset);
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv(
-            reinterpret_cast<pppCVECTOR*>(colorData + 8), reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
+            &colorData->color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
             FLOAT_80331840,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
@@ -143,7 +148,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             GXSetCullMode(GX_CULL_NONE);
 
             if (work->visibleCount > 1) {
-                f32 alphaScale = (f32)colorData[0x0B] / 255.0f;
+                f32 alphaScale = (f32)colorData->color.rgba[3] / 255.0f;
 
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
@@ -209,7 +214,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
     TracerWork* work;
-    u8* colorData;
+    TracerColorBlock* colorData;
     TRACE_POLYGON* entries;
     TRACE_POLYGON* entry;
     s32 useFallback;
@@ -229,7 +234,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
 
     useFallback = 0;
     work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_3->m_serializedDataOffsets);
-    colorData = pppYmTracer2->m_object.m_workArea + param_3->m_serializedDataOffsets[1];
+    colorData = reinterpret_cast<TracerColorBlock*>(
+        pppYmTracer2->m_object.m_workArea + param_3->m_serializedDataOffsets[1]);
 
     work->initWork = (param_2->m_initWork == 0xffffffff)
                          ? gPppDefaultValueBuffer
@@ -289,9 +295,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         fVar2 = work->arg3Work[2];
         work->targetPos.z = fVar2;
         entry->targetPos.z = fVar2;
-        entry->colorR = colorData[8];
-        entry->colorG = colorData[9];
-        entry->colorB = colorData[10];
+        entry->colorR = colorData->color.rgba[0];
+        entry->colorG = colorData->color.rgba[1];
+        entry->colorB = colorData->color.rgba[2];
 
         if (i == 0) {
             PSMTXConcat(ppvMng->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);

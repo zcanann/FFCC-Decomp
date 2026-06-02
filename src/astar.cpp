@@ -358,16 +358,14 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		return;
 	}
 
-	int prev = m_previousGroup;
-	int curr = m_currentGroup;
+	int groupLow = m_currentGroup;
+	int groupHigh = m_previousGroup;
 
-	int groupLow  = curr;
-	int groupHigh = prev;
-
-	if (prev < curr)
+	if (groupHigh < groupLow)
 	{
-		groupHigh = curr;
-		groupLow  = prev;
+		int groupSwap = groupLow;
+		groupLow = groupHigh;
+		groupHigh = groupSwap;
 	}
 
 	int portalIndex = 0;

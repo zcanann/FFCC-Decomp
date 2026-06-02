@@ -242,6 +242,10 @@ public:
 		{
 			m_afterDrawMeshCallback = callback;
 		}
+		void SetBeforeCalcMatrixCallback(int (*callback)(CChara::CModel*, void*, void*))
+		{
+			m_beforeCalcMatrixCallback = callback;
+		}
 		void SetCallbackContext(void* context, void* param)
 		{
 			m_callbackContext = context;

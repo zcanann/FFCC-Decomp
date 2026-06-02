@@ -133,6 +133,29 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
+static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    return reinterpret_cast<CharaBreakWork*>(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+}
+
+static inline void SetCharaBreakModelCallbacks(CChara::CModel* model, CharaBreakWork* work, CharaBreakStep* step)
+{
+    model->SetCallbackContext(work, step);
+    model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);
+    model->SetDrawMeshDLCallback(CharaBreak_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(CharaBreak_AfterDrawMeshCallback);
+    model->SetBeforeCalcMatrixCallback(CharaBreak_BeforeCalcMatrixCallback);
+}
+
+static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
+{
+    model->SetCallbackContext(0, 0);
+    model->SetBeforeMeshLockEnvCallback(0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
+    model->SetBeforeCalcMatrixCallback(0);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8013F9D0
@@ -145,7 +168,7 @@ static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
-    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
     u8* colorWork = charaBreak->m_workArea + colorOffset;
 
     if (work->m_enabled != 0) {
@@ -192,7 +215,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         return;
     }
 
-    work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    work = GetCharaBreakWork(charaBreak, data);
     handle = ppvMng->m_owner;
     if (work->m_enabled == 0) {
         return;
@@ -220,11 +243,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                    stepData->m_payloadGraphStep,
                    stepData->m_payloadGraphStepStep);
 
-    model->SetCallbackContext(work, stepData);
-    model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);
-    model->SetDrawMeshDLCallback(CharaBreak_DrawMeshDLCallback);
-    model->SetAfterDrawMeshCallback(CharaBreak_AfterDrawMeshCallback);
-    model->m_beforeCalcMatrixCallback = CharaBreak_BeforeCalcMatrixCallback;
+    SetCharaBreakModelCallbacks(model, work, stepData);
 
     if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
@@ -336,11 +355,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
 fail:
     work->m_enabled = 0;
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeMeshLockEnvCallback(0);
-    model->SetDrawMeshDLCallback(0);
-    model->SetAfterDrawMeshCallback(0);
-    model->m_beforeCalcMatrixCallback = 0;
+    ClearCharaBreakModelCallbacks(model);
 }
 
 /*
@@ -356,14 +371,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);
 
-    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
     CChara::CModel* model = work->m_model;
 
-    model->SetCallbackContext(0, 0);
-    model->SetBeforeMeshLockEnvCallback(0);
-    model->SetDrawMeshDLCallback(0);
-    model->SetAfterDrawMeshCallback(0);
-    model->m_beforeCalcMatrixCallback = 0;
+    ClearCharaBreakModelCallbacks(model);
 
     CharaBreakDisplayListPair*** perMeshBuffers = MeshDisplayListPairs(work);
     CChara::CMesh* mesh = model->m_meshes;
@@ -420,8 +431,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
-    int dataOffset = data->m_serializedDataOffsets[2];
-    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + dataOffset);
+    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_value2 = FLOAT_80332048;
     work->m_value1 = fVar1;
@@ -443,8 +453,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
-    int dataOffset = data->m_serializedDataOffsets[2];
-    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + dataOffset);
+    CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
     work->m_value2 = fVar1;

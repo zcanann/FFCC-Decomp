@@ -47,6 +47,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
     colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
+    work = (RainWork*)(pppRain->m_object.m_workArea + workOffset);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -68,7 +69,6 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
     gUtil.SetVtxFmt_POS_CLR_TEX();
 
-    work = (RainWork*)(pppRain->m_object.m_workArea + workOffset);
     drop = work->drops;
     baseX = ppvMng->m_matrix.value[0][3];
     baseY = ppvMng->m_matrix.value[1][3];

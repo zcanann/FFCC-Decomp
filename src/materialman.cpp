@@ -1017,10 +1017,10 @@ void CMaterialMan::addtev_full_shadow(long index)
 {
     int stageOffset = static_cast<int>(index) * 4;
 
-    GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x64)),
+    GXLoadTexMtxImm(m_fullScreenShadowMtx0,
                     *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
                     GX_MTX3x4);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC4)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
+    GXLoadTexObj(m_fullScreenShadowTexObj0, *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1A4)),
                       GX_TG_MTX3x4,
                       GX_TG_POS,
@@ -1028,10 +1028,10 @@ void CMaterialMan::addtev_full_shadow(long index)
                       GX_FALSE,
                       0x7D);
 
-    GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x94)),
+    GXLoadTexMtxImm(m_fullScreenShadowMtx1,
                     *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
                     GX_MTX3x4);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC8)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
+    GXLoadTexObj(m_fullScreenShadowTexObj1, *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1BC)),
                       GX_TG_MTX3x4,
                       GX_TG_POS,
@@ -1726,13 +1726,13 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
         m_curEnvTevBit |= 0x80;
 
         unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x64)));
+        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, m_fullScreenShadowMtx0);
 
         int frameDataBase = reinterpret_cast<int>(shadowPtr) + flags * 0x20;
-        *reinterpret_cast<int*>(Ptr(this, 0xC4)) = frameDataBase + 8;
+        m_fullScreenShadowTexObj0 = reinterpret_cast<GXTexObj*>(frameDataBase + 8);
 
-        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x88), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x94)));
-        *reinterpret_cast<int*>(Ptr(this, 0xC8)) = frameDataBase + 0x28;
+        PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x88), viewMtx, m_fullScreenShadowMtx1);
+        m_fullScreenShadowTexObj1 = reinterpret_cast<GXTexObj*>(frameDataBase + 0x28);
     }
 }
 
@@ -1749,7 +1749,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 {
     CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
-    CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
+    CMaterial* material = (*materials)[shadow.m_materialIndex];
 
     unsigned long useShadowBit32 = materialFlag & material->m_tevBit & 0x8000;
     if (useShadowBit32 != 0) {
@@ -1766,14 +1766,14 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
         int materialNum = m_shadowMaterialCount;
 
         m_curEnvTevBit |= 0x10;
-        m_shadowMaterialType[materialNum] = *Ptr(&shadow, 8);
+        m_shadowMaterialType[materialNum] = shadow.m_shadowMaterialType;
         m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
         m_shadowTexMapIds[materialNum] = m_texMapIdCur;
         m_shadowTexMtxIds[materialNum] = m_texMtxCur;
         m_shadowTexCoordIds[materialNum] = m_texCoordIdCur;
 
         Mtx texMtx;
-        PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&shadow, 0x78)), viewMtx, texMtx);
+        PSMTXConcat(shadow.m_shadowMtx, viewMtx, texMtx);
         GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
         int texMtxCur = m_texMtxCur;

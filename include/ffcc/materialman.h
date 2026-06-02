@@ -315,7 +315,11 @@ private:
     int m_shadowMaterialCount;           // 0x58
     int m_shadowTextureCount;            // 0x5C
     unsigned int m_numTevStage;          // 0x60
-    unsigned char m_pad064[0x6C];
+    Mtx m_fullScreenShadowMtx0;          // 0x64
+    Mtx m_fullScreenShadowMtx1;          // 0x94
+    _GXTexObj* m_fullScreenShadowTexObj0; // 0xC4
+    _GXTexObj* m_fullScreenShadowTexObj1; // 0xC8
+    unsigned char m_pad0CC[0x04];
     _GXTexObj* m_manaParaboloidTexObj0;  // 0xD0
     unsigned char m_pad0D4[0x08];
     _GXTexObj* m_manaParaboloidTexObj1;  // 0xDC

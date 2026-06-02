@@ -26,7 +26,8 @@ public:
     u16 m_materialIndex;     // 0x04
     u8 m_useFrustum;         // 0x06
     u8 m_materialMode;       // 0x07
-    u32 _pad08;              // 0x08
+    u8 m_shadowMaterialType;  // 0x08
+    u8 _pad09[3];            // 0x09
     CMapObj* m_modelA;       // 0x0C
     CMapObj* m_modelB;       // 0x10
     CMapObj* m_modelC;       // 0x14

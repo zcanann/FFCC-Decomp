@@ -74,7 +74,7 @@ struct Vec2d {
     float y;
 };
 
-extern "C" const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
+extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

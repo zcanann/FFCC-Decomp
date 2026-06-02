@@ -53,7 +53,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = reinterpret_cast<int>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
+    pppShapeAnimData* shapeAnim =
+        static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     u16 workRand = *(u16*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
@@ -71,7 +72,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec managerPos;
                 Vec zeroVec;
                 GXColor amb;
-                const s16 shapeOffset = *(s16*)(shapeTable + (u16)*(u16*)(particle + 0x1C) * 8 + 0x10);
                 const u8 trailReadIndex = *(u8*)(particle + 0x38);
                 const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
                 u8 trailNextIndex = (u8)(trailReadIndex + 1);
@@ -106,8 +106,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float segProgress = kPppYmMegaBirthShpTail3Zero;
                 u16 frameCount = frameCountRaw;
                 u16 particleShapeFrame = *(u16*)(particle + 0x1C);
-                const u16 shapeFrameStep = *(u16*)(shapeTable + 0x12);
-                const s16 shapeFrameCount = *(s16*)(shapeTable + 6);
+                const u16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
+                const s16 shapeFrameCount = shapeAnim->m_frameCount;
 
                 if (trailReadIndex == trailMaxIndex) {
                     trailNextIndex = 0;
@@ -135,7 +135,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     if (canDraw) {
                         workRand = (u16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
-                        const s16 shapeOffset = *(s16*)(shapeTable + (shapeFrame % (u32)shapeFrameCount) * 8 + 0x10);
+                        pppShapeAnimFrame* frame = &shapeAnim->m_frames[shapeFrame % (u32)shapeFrameCount];
+                        tagOAN3_SHAPE* shape =
+                            reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
 
                         pppUnitMatrix(drawMtx);
                         drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
@@ -177,8 +179,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             amb.a = 0x7F;
                         }
                         GXSetChanAmbColor(GX_COLOR0A0, amb);
-                        pppDrawShp(
-                            reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), ppvEnv->m_materialSetPtr, payload[0x58]);
+                        pppDrawShp(shape, ppvEnv->m_materialSetPtr, payload[0x58]);
                     }
 
                     frameCount--;

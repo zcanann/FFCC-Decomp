@@ -47,7 +47,7 @@ struct pppScaleLoopAutoContext {
  * JP Size: TODO
  */
 void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoopAutoContext* arg3){
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

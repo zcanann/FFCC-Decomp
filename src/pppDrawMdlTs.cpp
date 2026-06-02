@@ -83,7 +83,7 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
 {
     f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

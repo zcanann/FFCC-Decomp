@@ -35,7 +35,7 @@ void pppAngAccele(_pppPObject* obj, pppAngAcceleUnkB* param_2, _pppCtrlTable* pa
     int* angularVelocity = (int*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
     int* angularAccel = (int*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

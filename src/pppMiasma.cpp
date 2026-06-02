@@ -128,7 +128,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlT
 {
     MiasmaFrameWork* work;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

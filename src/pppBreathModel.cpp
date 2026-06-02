@@ -484,7 +484,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Vec origin;
     Vec target;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -641,7 +641,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     spawnCount = 0;
     emitFrameCounter = &vBreathModel->m_emitFrameCounter;
 
-    if ((gPppCalcDisabled == 0) && (params->m_stepValue != 0xFFFF)) {
+    if ((ppvUserStopPartF == 0) && (params->m_stepValue != 0xFFFF)) {
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {

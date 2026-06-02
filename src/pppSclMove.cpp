@@ -50,7 +50,7 @@ void pppSclMove(_pppPObject* param1, void* param2, _pppCtrlTable* param3)
     float* dataA = (float*)(param1->m_workArea + offsets->m_scaleOffset);
     float* dataB = (float*)(param1->m_workArea + offsets->m_velocityOffset);
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

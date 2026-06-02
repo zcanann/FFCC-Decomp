@@ -120,7 +120,7 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
  */
 void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, pppYmChangeTexData* data)
 {
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

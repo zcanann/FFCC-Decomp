@@ -14,7 +14,7 @@
  */
 void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, _pppCtrlTable* param_3)
 {
-	if (gPppCalcDisabled != 0) {
+	if (ppvUserStopPartF != 0) {
 		return;
 	}
 

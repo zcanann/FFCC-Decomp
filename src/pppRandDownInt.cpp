@@ -24,7 +24,7 @@ struct RandDownIntParams {
  */
 void pppRandDownInt(_pppPObject* basePtr, RandDownIntParams* in, _pppCtrlTable* ctrl)
 {
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

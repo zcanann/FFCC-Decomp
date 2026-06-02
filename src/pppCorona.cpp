@@ -143,7 +143,7 @@ void pppFrameCorona(_pppPObject* object, CoronaParam* data, _pppCtrlTable* ctrl)
     pppShapeSt* shape;
     s32 shapeId;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

@@ -517,7 +517,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Vec origin;
     Vec target;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -678,7 +678,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     spawnCount = 0;
     emitFrameCounter = &vYmBreath->m_emitFrameCounter;
 
-    if ((gPppCalcDisabled == 0) && (params->m_shapeStepValue != 0xFFFF)) {
+    if ((ppvUserStopPartF == 0) && (params->m_shapeStepValue != 0xFFFF)) {
         *emitFrameCounter = *emitFrameCounter + 1;
 
         for (i = 0; i < maxParticleCount; i++) {

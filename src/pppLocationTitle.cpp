@@ -51,7 +51,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     int graphFrame;
     LocationTitleParticle* particle;
     LocationTitleParticle* particles;
-    long** shapeTable;
+    pppShapeSt* shape;
     int fadeDivisor;
 
     dataValIndex = param_2->m_dataValIndex;
@@ -64,8 +64,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
-    shapeTable =
-        *(long***)(*(int*)&ppvEnv->m_particleColors[0] + (dataValIndex * 4));
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
@@ -102,7 +101,8 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         GXSetChanMatColor(GX_COLOR0A0, particle->m_color);
         GXLoadPosMtxImm(model, 0);
         pppSetBlendMode(param_2->m_blendMode);
-        pppDrawShp(*shapeTable, particle->m_shapeB, ppvEnv->m_materialSetPtr, param_2->m_blendMode);
+        pppDrawShp(static_cast<long*>(shape->m_animData), particle->m_shapeB, ppvEnv->m_materialSetPtr,
+                   param_2->m_blendMode);
         particle++;
     }
 }
@@ -133,7 +133,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleWork* work;
     LocationTitleColorBlock* colorData;
     int graphFrame;
-    long* shapeTable;
+    pppShapeAnimData* shapeAnim;
     LocationTitleParticle* particles;
     LocationTitleParticle* particle;
     float zero;
@@ -160,7 +160,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    shapeTable = **(long***)(*(int*)&ppvEnv->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    shapeAnim = static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[param_2->m_dataValIndex]->m_animData);
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -185,7 +185,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
             particle->m_shapeUnk = 0;
             particle->m_frame = work->m_cur;
             randomValue = rand();
-            shapeCount = *(s16*)((u8*)shapeTable + 6);
+            shapeCount = shapeAnim->m_frameCount;
             shape = randomValue % shapeCount;
             particle->m_shapeB = shape;
             particle->m_shapeA = shape;

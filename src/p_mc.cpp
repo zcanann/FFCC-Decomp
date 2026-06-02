@@ -25,16 +25,6 @@ CProcessTable CMcPcs::m_table = {
 
 CMcPcs McPcs;
 
-struct MenuPcsMcLayout
-{
-    unsigned char unk14[0x14];
-    unsigned char field14;
-    unsigned char unk15[3];
-    signed char field18;
-    unsigned char unk19[7];
-    McCtrl m_mcCtrl;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80124998
@@ -51,11 +41,11 @@ void CMcPcs::calc()
 
     Math.Rand(0x7FFFFFFF);
 
-    if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field14 != 1)
+    if (MenuPcs.m_mcRequestLocked != 1)
     {
-        if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x13)
+        if (MenuPcs.m_mcRequest == 0x13)
         {
-            result = reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl.Format(1);
+            result = MenuPcs.GetMcCtrl()->Format(1);
             if (result != 0)
             {
                 if (result == 1)
@@ -72,11 +62,11 @@ void CMcPcs::calc()
                 }
 
                 MenuPcs.CallWorldParam(6, worldParam, 0);
-                reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
+                MenuPcs.m_mcRequest = 0;
             }
         }
-        else if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x12 &&
-                 (result = reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl.ChkEmpty(0), result != 0))
+        else if (MenuPcs.m_mcRequest == 0x12 &&
+                 (result = MenuPcs.GetMcCtrl()->ChkEmpty(0), result != 0))
         {
             if (result == 1)
             {
@@ -100,7 +90,7 @@ void CMcPcs::calc()
             }
 
             MenuPcs.CallWorldParam(5, worldParam, 0);
-            reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
+            MenuPcs.m_mcRequest = 0;
         }
     }
 }

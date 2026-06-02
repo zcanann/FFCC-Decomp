@@ -25,38 +25,6 @@ extern const char s_collection_ptrarray_h_801D7B30[];
 extern const char s_ptrarray_grow_error_801D7B14[];
 
 namespace {
-struct CMaterialSetStorage
-{
-    void* vtable;
-    int refCount;
-    CPtrArray<CMaterial*> materials;
-};
-
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-    return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
-static inline float& F32At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<float*>(Ptr(p, offset));
-}
-
-static inline int& S32At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<int*>(Ptr(p, offset));
-}
-
-static inline unsigned int& U32At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned int*>(Ptr(p, offset));
-}
-
-static inline unsigned char& U8At(void* p, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
-}
-
 static inline int IsTexAnimChinFlag(unsigned char flags)
 {
     unsigned int bits = (static_cast<unsigned int>(flags) << 25) & 0xC0000000;
@@ -386,7 +354,6 @@ void CTexAnimSet::AddFrame()
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    CMaterialSetStorage* materialSetStorage = reinterpret_cast<CMaterialSetStorage*>(materialSet);
     unsigned int texAnimIndex;
     unsigned int texAnimCount;
     int materialIndex;
@@ -406,7 +373,7 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 
         if ((materialSet != 0) &&
             ((materialIndex = materialSet->Find(texAnim->m_refData->m_name)), materialIndex >= 0)) {
-            CMaterial* foundMaterial = materialSetStorage->materials[materialIndex];
+            CMaterial* foundMaterial = materialSet->GetMaterial(materialIndex);
             texAnim->m_refData->m_material = foundMaterial;
             material = texAnim->m_refData->m_material;
             material->AddRef();

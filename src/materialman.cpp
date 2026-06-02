@@ -1,4 +1,5 @@
 #define FFCC_MATERIALMAN_DEFINE_LAYOUT
+#define FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"
 #include "ffcc/map.h"
@@ -252,10 +253,7 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
 
 static void SetMaterialColor(CMaterial* material, unsigned int rgba)
 {
-    *Ptr(material, 0x48) = static_cast<unsigned char>((rgba >> 24) & 0xFF);
-    *Ptr(material, 0x49) = static_cast<unsigned char>((rgba >> 16) & 0xFF);
-    *Ptr(material, 0x4A) = static_cast<unsigned char>((rgba >> 8) & 0xFF);
-    *Ptr(material, 0x4B) = static_cast<unsigned char>(rgba & 0xFF);
+    material->SetMaterialColor(rgba);
 }
 }
 
@@ -455,12 +453,12 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
 
-    unsigned char fogEnable = *Ptr(material, 0xA1);
+    unsigned char fogEnable = material->m_fogEnable;
     if ((static_cast<int>(Game.m_currentSceneId) == 3) && (MapMng.m_fogEnable == 0)) {
         fogEnable = 0;
     }
 
-    unsigned char blendMode = *Ptr(material, 0xA0);
+    unsigned char blendMode = material->m_blendMode;
     if (m_blendOverrideMode != 0xFF) {
         if (blendMode == 0) {
             blendMode = 5;
@@ -1157,8 +1155,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[materialIndex];
     g_drawMaterial = material;
-    int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
-    unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
+    int bumpLight = reinterpret_cast<int>(material->m_bumpLight);
+    unsigned char materialType = material->m_materialType;
 
     if (materialType == 2) {
         SetMaterialMenu(materialSet, materialIndex, setVtxDesc);
@@ -1182,9 +1180,9 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
  */
 void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
 {
-    unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    CLightPcs::CBumpLight* bumpLight = *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28));
-    unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
+    unsigned int tevBit = material->m_tevBit;
+    CLightPcs::CBumpLight* bumpLight = material->m_bumpLight;
+    unsigned char materialType = material->m_materialType;
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {
         if (m_vtxDescMode != 1) {
@@ -1256,8 +1254,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit &
-                          *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
+    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder(
@@ -1532,8 +1529,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     CMaterial* material = (*materials)[materialIndex];
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = m_curEnvTevBit &
-                          *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
+    unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder(
@@ -1765,7 +1761,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
-    unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
+    unsigned long useShadowBit32 = materialFlag & material->m_tevBit & 0x8000;
     if (useShadowBit32 != 0) {
         if (m_shadowTextureCount > 3) {
             return;
@@ -1800,13 +1796,13 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
         int texMapCur = m_texMapIdCur;
         m_texMapIdCur = texMapCur + 1;
-        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x3C)));
+        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[0]);
 
         if (useShadowBit32 != 0) {
             texMapCur = m_texMapIdCur;
             m_texMapIdCur = texMapCur + 1;
-            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
-            m_shadowKColorIds[materialNum] = *Ptr(material, 0xA4);
+            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[1]);
+            m_shadowKColorIds[materialNum] = material->m_shadowKColorId;
             m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
             m_shadowTextureCount = m_shadowTextureCount + 1;
         }
@@ -2475,23 +2471,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     continue;
                 }
 
-                *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) = static_cast<unsigned long>(tevBit);
-                *reinterpret_cast<void**>(Ptr(material, 0x28)) = 0;
-                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = 0;
-                *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0;
-                *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0;
-                *Ptr(material, 0xA7) = 0;
-                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(chunk.m_arg0);
+                material->m_tevBit = static_cast<unsigned long>(tevBit);
+                material->m_bumpLight = 0;
+                material->m_textureCount = 0;
+                material->m_scaleU = FLOAT_8032faf0;
+                material->m_scaleV = FLOAT_8032faf0;
+                material->m_singleTextureFlag = 0;
+                material->m_textureCount = static_cast<unsigned short>(chunk.m_arg0);
 
-                if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 1;
+                if (material->m_textureCount == 0) {
+                    material->m_tevBit |= 1;
                 } else {
                     for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(chunk.m_arg0)); i++) {
-                        *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (i << 1))) =
-                            static_cast<unsigned short>(chunkFile.Get4());
+                        material->m_textureIndices[i] = static_cast<unsigned short>(chunkFile.Get4());
                     }
-                    if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 2) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 2;
+                    if (material->m_textureCount == 2) {
+                        material->m_tevBit |= 2;
                     }
                 }
 
@@ -2503,7 +2498,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
             } break;
             case CHUNK_NAME: {
                 if (material != 0) {
-                    strncpy(reinterpret_cast<char*>(Ptr(material, 8)), chunkFile.GetString(), 0x10);
+                    strncpy(material->m_name, chunkFile.GetString(), 0x10);
                 } else {
                     chunkFile.GetString();
                 }
@@ -2522,23 +2517,23 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 }
 
                 if ((flags & 1) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80;
+                    material->m_tevBit |= 0x80;
                 }
                 if ((flags & 2) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x10;
+                    material->m_tevBit |= 0x10;
                 }
                 if ((flags & 4) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                    material->m_tevBit |= 4;
                 }
                 if ((flags & 8) != 0) {
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x100000;
+                    material->m_tevBit |= 0x100000;
                 }
 
-                *Ptr(material, 0xA0) = chunkFile.Get1();
-                *Ptr(material, 0xA1) = chunkFile.Get1();
+                material->m_blendMode = chunkFile.Get1();
+                material->m_fogEnable = chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
-                *Ptr(material, 0xA6) = static_cast<unsigned char>(chunkFile.Get2());
+                material->m_unkA6 = static_cast<unsigned char>(chunkFile.Get2());
                 chunkFile.Get2();
                 chunkFile.GetF4();
             } break;
@@ -2546,7 +2541,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 unsigned short textureIndex = chunkFile.Get2();
                 if (material != 0) {
                     AddTextureIndex(material, textureIndex);
-                    *Ptr(material, 0xA7) = 1;
+                    material->m_singleTextureFlag = 1;
                 }
             } break;
             case CHUNK_BUMP: {
@@ -2554,7 +2549,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
                     if (material != 0) {
-                        *Ptr(material, 0xA1) = chunkFile.Get1();
+                        material->m_fogEnable = chunkFile.Get1();
                     } else {
                         chunkFile.Get1();
                     }
@@ -2575,23 +2570,23 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     AddTextureIndex(material, texture1);
                     AddTextureIndex(material, texture2);
 
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA6) = a6;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_unkA6 = a6;
                     SetMaterialColor(material, rgba);
-                    *Ptr(material, 0xA2) = 1;
+                    material->m_materialType = 1;
 
                     CLightPcs::CBumpLight* bumpLight = bumpLights;
                     if (bumpLight == 0) {
                         bumpLight = GetMapBumpLight(bumpIndex);
-                        *Ptr(material, 0xA3) = (bumpLightDirect == 0) ? 0 : 1;
+                        material->m_bumpLightDirect = (bumpLightDirect == 0) ? 0 : 1;
                     } else {
-                        *Ptr(material, 0xA3) = 1;
+                        material->m_bumpLightDirect = 1;
                     }
 
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                    material->m_bumpLight = bumpLight;
+                    bumpLight->m_useViewSpace = material->m_materialType;
+                    material->m_tevBit |= 4;
                 }
             } break;
             case CHUNK_JIME: {
@@ -2608,21 +2603,21 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (material != 0) {
                     AddTextureIndex(material, texture0);
                     AddTextureIndex(material, texture1);
-                    *Ptr(material, 0xA1) = a1;
+                    material->m_fogEnable = a1;
                     if (useJimen != 0) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x20000;
+                        material->m_tevBit |= 0x20000;
                     }
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA2) = 3;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_materialType = 3;
 
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x4000;
+                    material->m_bumpLight = bumpLight;
+                    bumpLight->m_useViewSpace = material->m_materialType;
+                    material->m_tevBit |= 0x4000;
                     SetMaterialColor(material, rgba);
-                    *Ptr(material, 0xA3) = 1;
+                    material->m_bumpLightDirect = 1;
                 }
             } break;
             case CHUNK_WATR: {
@@ -2639,22 +2634,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 if (material != 0) {
                     AddTextureIndex(material, texture0);
                     AddTextureIndex(material, texture1);
-                    *Ptr(material, 0xA1) = a1;
-                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
-                    *Ptr(material, 0xA2) = 2;
+                    material->m_fogEnable = a1;
+                    material->m_scaleU = FLOAT_8032faf0 / scaleU;
+                    material->m_scaleV = FLOAT_8032faf0 / scaleV;
+                    material->m_materialType = 2;
 
                     CLightPcs::CBumpLight* bumpLight =
                         GetMapBumpLight(bumpIndex);
-                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
-                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
-                    *Ptr(material, 0xA0) = 4;
+                    material->m_bumpLight = bumpLight;
+                    bumpLight->m_useViewSpace = material->m_materialType;
+                    material->m_blendMode = 4;
                     SetMaterialColor(material, rgba);
 
-                    if ((waterMode == 0) && (*Ptr(material, 0xA1) == 0)) {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 8;
+                    if ((waterMode == 0) && (material->m_fogEnable == 0)) {
+                        material->m_tevBit |= 8;
                     } else {
-                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80000;
+                        material->m_tevBit |= 0x80000;
                     }
                 }
             } break;
@@ -2754,68 +2749,59 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
     while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materialArray))) {
         CMaterial* material = (*materialArray)[materialIndex];
         if (material != 0) {
-            unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
+            unsigned short numTexture = material->m_textureCount;
             if (numTexture == 0) {
-                *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 1;
+                material->m_tevBit |= 1;
             } else {
-                unsigned char* textureIndexPtr = Ptr(material, 0x1A);
-                unsigned char* texturePtr = Ptr(material, 0x3C);
-
                 for (int i = 0; i < numTexture; i++) {
-                    ReleaseRef(*reinterpret_cast<CTexture**>(texturePtr));
-                    *reinterpret_cast<void**>(texturePtr) = 0;
+                    ReleaseRef(material->m_textures[i]);
+                    material->m_textures[i] = 0;
 
                     if (textureSet != 0) {
                         CTexture* texture = 0;
-                        short textureIndex = *reinterpret_cast<short*>(textureIndexPtr);
+                        short textureIndex = static_cast<short>(material->m_textureIndices[i]);
                         if (textureIndex >= 0) {
-                            CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
-                            unsigned long textureCount = static_cast<unsigned long>(textureArray->GetSize());
+                            unsigned long textureCount = static_cast<unsigned long>(textureSet->GetNumTexture());
                             if (static_cast<unsigned long>(textureIndex) < textureCount) {
-                                texture = (*textureArray)[static_cast<unsigned long>(textureIndex)];
+                                texture = textureSet->GetTexture(textureIndex);
                             }
                         }
 
-                        *reinterpret_cast<CTexture**>(texturePtr) = texture;
+                        material->m_textures[i] = texture;
                         if (texture != 0) {
-                            *reinterpret_cast<int*>(Ptr(texture, 4)) += 1;
+                            texture->AddRef();
 
-                            unsigned long& flags = *reinterpret_cast<unsigned long*>(Ptr(material, 0x24));
-                            int format = *reinterpret_cast<int*>(Ptr(texture, 0x60));
+                            unsigned long& flags = material->m_tevBit;
+                            int format = texture->m_format;
                             if ((format == 9) || (format == 8)) {
                                 flags |= 0x200;
                             } else if (format == 1) {
                                 flags |= 0x400;
                             }
 
-                            if (*reinterpret_cast<char*>(Ptr(texture, 0x71)) != 0) {
+                            if (texture->m_isAlphaLut != 0) {
                                 flags |= 0x800;
                             }
                         }
                     }
-
-                    textureIndexPtr += 2;
-                    texturePtr += 4;
                 }
 
-                if ((*reinterpret_cast<char*>(Ptr(material, 0xA2)) != 0) &&
+                if ((material->m_materialType != 0) &&
                     (numTexture > 1) &&
-                    (*reinterpret_cast<void**>(Ptr(material, 0x3C)) != 0) &&
-                    (*reinterpret_cast<void**>(Ptr(material, 0x40)) != 0)) {
-                    void* texture0 = *reinterpret_cast<void**>(Ptr(material, 0x3C));
-                    void* texture1 = *reinterpret_cast<void**>(Ptr(material, 0x40));
+                    (material->m_textures[0] != 0) &&
+                    (material->m_textures[1] != 0)) {
+                    CTexture* texture0 = material->m_textures[0];
+                    CTexture* texture1 = material->m_textures[1];
 
                     unsigned int scaleU =
-                        *reinterpret_cast<unsigned int*>(Ptr(texture0, 0x64)) /
-                        *reinterpret_cast<unsigned int*>(Ptr(texture1, 0x64));
+                        texture0->m_width / texture1->m_width;
                     int uShift = HighestSetBit(scaleU);
-                    *reinterpret_cast<char*>(Ptr(material, 0x34)) = (uShift == -1) ? 0 : static_cast<char>(uShift);
+                    material->m_texShiftU = (uShift == -1) ? 0 : static_cast<char>(uShift);
 
                     unsigned int scaleV =
-                        *reinterpret_cast<unsigned int*>(Ptr(texture0, 0x68)) /
-                        *reinterpret_cast<unsigned int*>(Ptr(texture1, 0x68));
+                        texture0->m_height / texture1->m_height;
                     int vShift = HighestSetBit(scaleV);
-                    *reinterpret_cast<char*>(Ptr(material, 0x35)) = (vShift == -1) ? 0 : static_cast<char>(vShift);
+                    material->m_texShiftV = (vShift == -1) ? 0 : static_cast<char>(vShift);
                 }
             }
         }
@@ -2835,11 +2821,14 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
+    CPtrArray<CMaterial*>* materialArray = &m_materials;
     u32 textureIndex = 0;
+    u32 textureCount = static_cast<u32>(textureSet->GetNumTexture());
 
-    while (textureIndex < static_cast<u32>(reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8))->GetSize())) {
-        if ((*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[textureIndex] != 0) {
-            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
+    while (textureIndex < textureCount) {
+        CTexture* texture = textureSet->GetTexture(textureIndex);
+        if (texture != 0) {
+            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
@@ -2847,23 +2836,21 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 
             CMaterial* newMaterial =
                 new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
-            unsigned char* material = reinterpret_cast<unsigned char*>(newMaterial);
 
-            *reinterpret_cast<int*>(material + 0x24) = -0xACE10;
-            *reinterpret_cast<void**>(material + 0x28) = 0;
-            *reinterpret_cast<unsigned short*>(material + 0x18) = 0;
-            *reinterpret_cast<float*>(material + 0x30) = 1.0f;
-            *reinterpret_cast<float*>(material + 0x2C) = 1.0f;
-            material[0xA7] = 0;
-            *reinterpret_cast<unsigned short*>(material + 0x18) = 1;
-            *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
-            *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
+            newMaterial->m_tevBit = 0xFFF531F0;
+            newMaterial->m_bumpLight = 0;
+            newMaterial->m_textureCount = 1;
+            newMaterial->m_scaleU = 1.0f;
+            newMaterial->m_scaleV = 1.0f;
+            newMaterial->m_singleTextureFlag = 0;
+            newMaterial->m_textureIndices[0] = static_cast<unsigned short>(textureIndex);
+            newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
             materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
             if (materialIndex >= materialCount) {
-                m_materials.Add(reinterpret_cast<CMaterial*>(material));
+                materialArray->Add(newMaterial);
             } else {
-                m_materials.SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
+                materialArray->SetAt(materialIndex, newMaterial);
             }
         }
 next:
@@ -2916,21 +2903,16 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 
     while (index < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[index];
-        if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
-            unsigned char* textureIndex = reinterpret_cast<unsigned char*>(material);
-            unsigned char* textureRef = reinterpret_cast<unsigned char*>(material);
-
-            for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18))); i++) {
-                CTexture* object = *reinterpret_cast<CTexture**>(Ptr(textureRef, 0x3C));
+        if ((material != 0) && (material->m_pdtSlotIndex == pdtSlotIndex)) {
+            for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
+                CTexture* object = material->m_textures[i];
                 if (object != 0) {
                     ReleaseRefNonNull(object);
-                    *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
+                    material->m_textures[i] = 0;
                 }
 
-                textureSet->ReleaseTextureIdx(static_cast<int>(*reinterpret_cast<short*>(Ptr(textureIndex, 0x1A))), amemCacheSet);
-                *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
-                textureRef += 4;
-                textureIndex += 2;
+                textureSet->ReleaseTextureIdx(static_cast<int>(material->m_textureIndices[i]), amemCacheSet);
+                material->m_textures[i] = 0;
             }
 
             if (material != 0) {
@@ -3016,6 +2998,66 @@ CMaterialSet::CMaterialSet()
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterial::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+{
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textures[i];
+        if (texture != 0) {
+            texture->CacheDumpTexture(amemCacheSet);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterial::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+{
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textures[i];
+        if (texture != 0) {
+            texture->CacheRefCnt0UpTexture(amemCacheSet);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
+{
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textures[i];
+        if (texture != 0) {
+            texture->CacheUnLoadTexture(amemCacheSet);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterial::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
+{
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        CTexture* texture = m_textures[i];
+        if (texture != 0) {
+            texture->CacheLoadTexture(amemCacheSet);
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003c71c
  * PAL Size: 132b
  * EN Address: TODO
@@ -3025,20 +3067,38 @@ CMaterialSet::CMaterialSet()
  */
 void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    int i;
     CMaterial* material =
         m_materials[static_cast<unsigned long>(materialIndex)];
-    if (material == 0) {
-        return;
+    if (material != 0) {
+        material->CacheDumpTexture(amemCacheSet);
     }
+}
 
-    CMaterial* textureSlot = material;
-    for (i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
-        if (texture != 0) {
-            texture->CacheUnLoadTexture(amemCacheSet);
-        }
-        textureSlot = reinterpret_cast<CMaterial*>(Ptr(textureSlot, 4));
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterialSet::CacheRefCnt0UpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
+{
+    CMaterial* material =
+        m_materials[static_cast<unsigned long>(materialIndex)];
+    if (material != 0) {
+        material->CacheRefCnt0UpTexture(amemCacheSet);
+    }
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
+{
+    CMaterial* material =
+        m_materials[static_cast<unsigned long>(materialIndex)];
+    if (material != 0) {
+        material->CacheUnLoadTexture(amemCacheSet);
     }
 }
 
@@ -3053,21 +3113,25 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    int i;
     CMaterial* material =
         m_materials[static_cast<unsigned long>(materialIndex)];
-    if (material == 0) {
-        return;
+    if (material != 0) {
+        material->CacheLoadTexture(amemCacheSet);
     }
+}
 
-    CMaterial* textureSlot = material;
-    for (i = 0; i < *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)); i++) {
-        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C));
-        if (texture != 0) {
-            texture->CacheLoadTexture(amemCacheSet);
-        }
-        textureSlot = reinterpret_cast<CMaterial*>(Ptr(textureSlot, 4));
-    }
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterial* CMaterialSet::GetMaterial(long materialIndex)
+{
+    return m_materials[static_cast<unsigned long>(materialIndex)];
 }
 
 /*
@@ -3086,16 +3150,13 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
     while (materialIndex < static_cast<unsigned int>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            CMaterial* textureSlot = material;
-
-            for (int slot = 0; slot < static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)))); slot++) {
-                if ((*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)))->CheckName(textureName)) {
+            for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
+                if (material->m_textures[slot]->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }
                     return materialIndex;
                 }
-                textureSlot = reinterpret_cast<CMaterial*>(Ptr(textureSlot, 4));
             }
         }
         materialIndex++;
@@ -3173,7 +3234,7 @@ unsigned long CMaterialSet::Find(char* name)
 
     while (index < static_cast<unsigned long>(UnkMaterialSetGetter(&m_materials))) {
         CMaterial* material = m_materials[index];
-        if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
+        if ((material != 0) && (strcmp(material->m_name, name) == 0)) {
             return index;
         }
         index++;

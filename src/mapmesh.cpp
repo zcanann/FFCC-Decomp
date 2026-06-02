@@ -413,15 +413,14 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x55562020:
             m_uvCount = static_cast<unsigned short>(chunk.m_size >> 2);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            m_uvPairs = cursor;
+            m_uvPairs = reinterpret_cast<CMapMeshUvPair*>(cursor);
             cursor += chunk.m_size;
 
             int i = 0;
             offset = 0;
-            for (; i < static_cast<int>(m_uvCount); i++, offset += 4) {
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset) = reader.Get2();
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset + 2) =
-                    reader.Get2();
+            for (; i < static_cast<int>(m_uvCount); i++) {
+                m_uvPairs[i].m_u = reader.Get2();
+                m_uvPairs[i].m_v = reader.Get2();
             }
             break;
         case 0x444C4844:

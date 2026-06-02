@@ -51,7 +51,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
-		long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
+		pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
 		if (shapeBase[0x32] != 0) {
 			pppCVECTOR local_70;
 			Vec local_60;
@@ -87,7 +87,8 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 						  1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
-			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), ppvEnv->m_materialSetPtr, unkB->m_unk12);
+			pppDrawShp(static_cast<long*>(shape->m_animData), *(s16*)(shapeBase + 0x2e),
+			           ppvEnv->m_materialSetPtr, unkB->m_unk12);
 			pppSetBlendMode(3);
 		}
 	}
@@ -201,9 +202,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
-			long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + unkB->m_dataValIndex * 4);
-			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,
-							  unkB->m_initWOrk);
+			pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
+			pppCalcFrameShape(static_cast<long*>(shape->m_animData), work->m_shapeFrame0, work->m_shapeFrame1,
+			                  work->m_shapeFrame2, unkB->m_initWOrk);
 		}
 	}
 }

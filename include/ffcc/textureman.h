@@ -54,6 +54,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);
     void CacheUnLoadTexture(CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(CAmemCacheSet*);
+    void CacheDumpTexture(CAmemCacheSet*);
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     void FlushExternalTlut(void*, int);
@@ -94,6 +96,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
+    CTexture* GetTexture(long);
+    int GetNumTexture();
 
 #ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
     CPtrArray<CTexture*> m_textureArray;

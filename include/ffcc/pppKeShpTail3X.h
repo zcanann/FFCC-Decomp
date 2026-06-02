@@ -5,13 +5,7 @@
 
 struct pppKeShpTail3X
 {
-    u8 _pad0[0xc];
-    _pppPObjectHead pppPObject;
-    pppFMATRIX field_0x40;
-    u8 field_0x70[0xd];
-    u8 field_0x7d;
-    u8 field_0x7e[2];
-    u8 m_workArea[1];
+    _pppPObject m_object;
 };
 
 struct pppKeShpTail3XUnkB;

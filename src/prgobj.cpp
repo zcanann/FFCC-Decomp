@@ -24,6 +24,8 @@ static inline Vec* AsVec(const CVector& vec)
 	return reinterpret_cast<Vec*>(const_cast<CVector*>(&vec));
 }
 
+STATIC_ASSERT(offsetof(CGCharaObj, m_itemId) == 0x560);
+
 /*
  * --INFO--
  * PAL Address: 0x80127008
@@ -132,7 +134,7 @@ int CGPrgObj::GetClassControl(int classControl)
 	case 9:
 		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
 	case 10:
-		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
+		return reinterpret_cast<CGCharaObj*>(this)->m_itemId;
 	default:
 		return 0;
 	}
@@ -197,7 +199,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		break;
 	case 6:
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = value;
+		reinterpret_cast<CGCharaObj*>(this)->m_itemId = value;
 		break;
 	case 7:
 		reinterpret_cast<CGPartyObj*>(this)->setAlive(1, 0);

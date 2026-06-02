@@ -201,76 +201,6 @@ signed char s_debugSpinnerFrameCounterPad2;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
-static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
-{
-	return *(const int*)((const char*)pppMngSt + 0x14);
-}
-
-static int GetMngStKind(const _pppMngSt* pppMngSt)
-{
-	return *(const short*)((const char*)pppMngSt + 0x74);
-}
-
-static int GetMngStNodeIndex(const _pppMngSt* pppMngSt)
-{
-	return *(const short*)((const char*)pppMngSt + 0x76);
-}
-
-static unsigned char GetMngStPrio(const _pppMngSt* pppMngSt)
-{
-	return *(const unsigned char*)((const char*)pppMngSt + 0xf8);
-}
-
-static unsigned char GetMngStPrioTime(const _pppMngSt* pppMngSt)
-{
-	return *(const unsigned char*)((const char*)pppMngSt + 0xf9);
-}
-
-static float& GetMngStUserFloat0(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x38);
-}
-
-static float& GetMngStPositionX(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x8);
-}
-
-static float& GetMngStPositionY(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0xc);
-}
-
-static float& GetMngStPositionZ(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x10);
-}
-
-static float& GetMngStUserFloat1(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x3c);
-}
-
-static float& GetMngStScaleFactor(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x40);
-}
-
-static float& GetMngStOwnerScale(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x44);
-}
-
-static unsigned char& GetMngStOwnerScaleMode(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x48);
-}
-
-static unsigned char& GetMngStLockScaleFromOwner(_pppMngSt* pppMngSt)
-{
-	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x4d);
-}
-
 struct CPartPcsViewerState {
     unsigned char unk0[0x18];
     void* m_stageDefault;
@@ -875,8 +805,7 @@ void CPartPcs::drawAfter()
 {
     CGame* game = &Game;
 
-    if (game->m_gameWork.m_gamePaused == 0 &&
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this)      + 0x30) == 0) {
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -898,7 +827,7 @@ void CPartPcs::drawAfter()
  */
 void CPartPcs::DrawMenu(int fpNo)
 {
-    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetFog(1, 0);
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(0);
@@ -948,7 +877,7 @@ void CPartPcs::DrawShoki()
  */
 void CPartPcs::DrawMenuIdx(int index)
 {
-    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x30) == 0) {
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);

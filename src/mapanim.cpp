@@ -82,9 +82,8 @@ void CMapAnim::Calc(long frame)
     int nodeCount;
     int i;
 
-    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
-
-    nodeCount = nodeArray->GetSize();
+    CPtrArray<CMapAnimNode*>* nodeArray = &mapAnimNodes;
+    nodeCount = mapAnimNodes.GetSize();
     for (i = 0; i < nodeCount; i = i + 1) {
         CMapAnimNode* node = (*nodeArray)[i];
         node->Interp(frame);
@@ -108,9 +107,9 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     unsigned int& innerChunkId = innerChunkData[0];
     unsigned int& innerChunkSize = innerChunkData[3];
     int hasChunk;
-    int* item;
+    CMapAnimNode* item;
     CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray;
-    unsigned int keyData;
+    CMapAnimKeyDt* keyData;
     int nodeIdx;
 
     chunkFile.PushChunk();
@@ -120,51 +119,50 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_startFrame = static_cast<int>(chunkFile.Get4());
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
-            item = static_cast<int*>(
-                operator new(0xC, MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2));
+            item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
             if (item != 0) {
-                item[2] = 0;
+                item->m_tracks = 0;
             }
-            item[1] = reinterpret_cast<int>(this);
+            item->m_mapAnim = reinterpret_cast<CMapAnimData*>(this);
 
             chunkFile.PushChunk();
             while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
                 if (innerChunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item[0] = reinterpret_cast<int>(MapMng.GetMapObj(nodeIdx));
+                    item->m_node = reinterpret_cast<CMapAnimTargetNode*>(MapMng.GetMapObj(nodeIdx));
                 } else if (innerChunkId == 0x5452414E) {
-                    keyData = reinterpret_cast<int>(
-                        operator new(
-                            0x18, MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C));
+                    keyData = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
                     if (keyData != 0) {
-                        *reinterpret_cast<int*>(keyData + 0x4) = 0;
-                        *reinterpret_cast<int*>(keyData + 0xC) = 0;
-                        *reinterpret_cast<int*>(keyData + 0x14) = 0;
+                        keyData->m_positionKeys = 0;
+                        keyData->m_rotationKeys = 0;
+                        keyData->m_scaleKeys = 0;
                     }
 
-                    item[2] = keyData;
-                    mapAnimKeyDtArray->Add(reinterpret_cast<CMapAnimKeyDt*>(item[2]));
-                    *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
-                    *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
+                    item->m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(keyData);
+                    mapAnimKeyDtArray->Add(keyData);
+                    keyData->m_positionCount = innerChunkSize >> 4;
+                    keyData->m_positionKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
-                            CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2])]);
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x4)), chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[keyData->m_positionCount];
+                    memcpy(keyData->m_positionKeys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x524F5420) {
-                    *reinterpret_cast<unsigned int*>(item[2] + 0x8) = innerChunkSize >> 4;
-                    *reinterpret_cast<int*>(item[2] + 0xC) = reinterpret_cast<int>(
+                    CMapAnimKeyDt* tracks = reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks);
+                    tracks->m_rotationCount = innerChunkSize >> 4;
+                    tracks->m_rotationKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
-                            CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2] + 0x8)]);
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0xC)), chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[tracks->m_rotationCount];
+                    memcpy(tracks->m_rotationKeys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x5343414C) {
-                    *reinterpret_cast<unsigned int*>(item[2] + 0x10) = innerChunkSize >> 4;
-                    *reinterpret_cast<int*>(item[2] + 0x14) = reinterpret_cast<int>(
+                    CMapAnimKeyDt* tracks = reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks);
+                    tracks->m_scaleCount = innerChunkSize >> 4;
+                    tracks->m_scaleKeys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
-                            CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2] + 0x10)]);
-                    memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x14)), chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[tracks->m_scaleCount];
+                    memcpy(tracks->m_scaleKeys, chunkFile.GetAddress(), innerChunkSize);
                 }
             }
             chunkFile.PopChunk();
-            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->Add(reinterpret_cast<CMapAnimNode*>(item));
+            mapAnimNodes.Add(item);
         }
     }
     chunkFile.PopChunk();
@@ -206,9 +204,7 @@ CMapAnim::~CMapAnim()
  */
 CMapAnim::CMapAnim()
 {
-    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
-
-    nodeArray->SetStage(MapMng.m_stage);
+    mapAnimNodes.SetStage(MapMng.m_stage);
 }
 
 /*

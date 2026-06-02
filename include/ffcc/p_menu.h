@@ -375,7 +375,11 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
-    unsigned char m_pad04[0x20 - 0x04];
+    unsigned char m_pad04[0x14 - 0x04];
+    unsigned char m_mcRequestLocked;
+    unsigned char m_pad15[0x18 - 0x15];
+    signed char m_mcRequest;
+    unsigned char m_pad19[0x20 - 0x19];
     McCtrlData m_mcCtrl;
     BattleHudState m_battleHud;
     unsigned char m_pad70[0xEC - 0x70];

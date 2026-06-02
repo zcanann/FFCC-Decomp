@@ -20,6 +20,12 @@ struct CMapMeshDrawEntry
     int m_displayListOffset;          // 0x0C
 };
 
+struct CMapMeshUvPair
+{
+    s16 m_u;                           // 0x00
+    s16 m_v;                           // 0x02
+};
+
 class CMapMesh
 {
 public:
@@ -59,7 +65,7 @@ public:
     void* m_vertices;                  // 0x2C
     void* m_normals;                   // 0x30
     void* m_nbt;                       // 0x34
-    void* m_uvPairs;                   // 0x38
+    CMapMeshUvPair* m_uvPairs;         // 0x38
     void* m_colors;                    // 0x3C
     CMapMeshDrawEntry* m_drawEntries;  // 0x40
 };

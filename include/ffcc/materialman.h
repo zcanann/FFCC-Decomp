@@ -158,7 +158,9 @@ private:
 
 class CMaterial : public CRef
 {
+    friend class CMaterialMan;
     friend class CTexAnimSet;
+    friend class CMaterialSet;
 
 public:
     CMaterial();
@@ -175,6 +177,14 @@ public:
     void GetNumTexture();
     void SetTag(int);
     void AddTextureIdx(int, int);
+    void SetMaterialColor(unsigned int rgba)
+    {
+        GXColor& color = m_textureColorView.m_materialColor;
+        color.r = static_cast<unsigned char>((rgba >> 24) & 0xFF);
+        color.g = static_cast<unsigned char>((rgba >> 16) & 0xFF);
+        color.b = static_cast<unsigned char>((rgba >> 8) & 0xFF);
+        color.a = static_cast<unsigned char>(rgba & 0xFF);
+    }
     unsigned long GetTevBit()
     {
         return m_tevBit;
@@ -202,7 +212,17 @@ private:
     char m_texShiftV;                     // 0x035
     unsigned char m_unk36;                // 0x036
     unsigned char m_pad37[5];             // 0x037
-    CTexture* m_textures[4];              // 0x03C
+    struct TextureColorView
+    {
+        CTexture* m_texture0;             // 0x03C
+        CTexture* m_texture1;             // 0x040
+        CTexture* m_texture2;             // 0x044
+        GXColor m_materialColor;          // 0x048
+    };
+    union {
+        CTexture* m_textures[4];          // 0x03C
+        TextureColorView m_textureColorView;
+    };
     CTexScroll m_texScroll[4];            // 0x04C
     int m_pdtSlotIndex;                   // 0x09C
     unsigned char m_blendMode;            // 0x0A0
@@ -239,10 +259,16 @@ public:
 
 #ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
+#ifdef FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
+    CMaterial* GetMaterial(long);
+#else
     CMaterial* GetMaterial(long index)
     {
         return m_materials[index];
     }
+#endif
+#else
+    CMaterial* GetMaterial(long);
 #endif
 };
 

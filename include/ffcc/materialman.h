@@ -100,6 +100,10 @@ public:
     {
         m_manaAlpha = alpha;
     }
+    void SetBlendOverrideMode(unsigned char mode)
+    {
+        m_blendOverrideMode = mode;
+    }
     void OrCurrentEnvTevBit(unsigned int tevBit)
     {
         m_curEnvTevBit |= tevBit;

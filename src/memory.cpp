@@ -11,6 +11,7 @@
 #include <dolphin/mtx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMemory Memory;
@@ -747,9 +748,11 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                     }
 
                     if (mode == 2) {
-                        CStage* backingStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C);
+                        CStage* backingStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790);
+                        void* blockPool =
+                            backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>(s_memory_cpp), 0x228, 0);
                         *reinterpret_cast<CStage::CBlock**>(stageBytes + 0x110) =
-                            new (backingStage, const_cast<char*>(s_memory_cpp), 0x228) CStage::CBlock[0x20];
+                            static_cast<CStage::CBlock*>(__construct_new_array(blockPool, 0, 0, sizeof(CStage::CBlock), 0x20));
                         *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
                     }
 

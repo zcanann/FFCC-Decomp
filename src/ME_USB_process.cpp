@@ -13,6 +13,7 @@ extern "C" const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
 extern "C" const float FLOAT_8032FD00;
 extern "C" const float FLOAT_8032FD04;
+extern "C" const double DOUBLE_8032FD08;
 
 namespace {
 struct ViewerSRT {
@@ -77,6 +78,21 @@ static inline void StoreSwapS16(s16* value)
     s16 raw = *value;
 
     *value = __lhbrx(&raw, 0);
+}
+
+static inline f32 S32ToFloat(s32 value)
+{
+    union {
+        struct {
+            u32 hi;
+            u32 lo;
+        } words;
+        f64 value;
+    } cvt;
+
+    cvt.words.hi = 0x43300000;
+    cvt.words.lo = value ^ 0x80000000;
+    return static_cast<f32>(cvt.value - DOUBLE_8032FD08);
 }
 
 }
@@ -149,8 +165,8 @@ void CMaterialEditorPcs::SetUSBData()
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
         srt.transX = FLOAT_8032FD00;
-        srt.transY = (float)(-xDiff / 2);
-        srt.transZ = (float)(-yDiff * (xDiff / 0x14) - 10);
+        srt.transY = S32ToFloat(-xDiff / 2);
+        srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
         srt.rotX = FLOAT_8032FD00;
         srt.rotY = FLOAT_8032FD00;
         srt.rotZ = FLOAT_8032FD00;

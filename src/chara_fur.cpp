@@ -1012,26 +1012,23 @@ static inline void StopMogLoopSe(MogWorkRaw& work)
 	}
 }
 
-static inline CTexture* FindMogFurTexture(void* model)
+static inline CTexture* FindMogFurTexture(CChara::CModel* model)
 {
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
+	CTextureSet* textureSet = model->m_texSet;
 
-	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-	return (*textureArray)[textureIdx];
+	return textureSet->GetTexture(textureIdx);
 }
 
-static inline void CopyMogTextureFromChara(void* model)
+static inline void CopyMogTextureFromChara(CChara::CModel* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
 	}
 
-	void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
-	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
+	void* dstBuffer = texture->m_imageData;
+	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
@@ -1040,16 +1037,15 @@ static inline void CopyMogTextureFromChara(void* model)
 	GXInvalidateTexAll();
 }
 
-static void CopyMogTextureToChara(void* model)
+static void CopyMogTextureToChara(CChara::CModel* model)
 {
 	CTexture* texture = FindMogFurTexture(model);
 	if (texture == 0) {
 		return;
 	}
 
-	void* srcBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
-	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
+	void* srcBuffer = texture->m_imageData;
+	const int texelCountBytes = texture->m_width * texture->m_height * 2;
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(Chara.MogFur().m_texels, srcBuffer, 0x2000);
@@ -1166,23 +1162,20 @@ void CChara::LoadFurTexBuffer(unsigned short* inTexels)
  */
 void CChara::CModel::InitMogFurTex()
 {
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
-	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+	CTextureSet* textureSet = m_texSet;
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-	CTexture* texture = (*textureArray)[textureIdx];
+	CTexture* texture = textureSet->GetTexture(textureIdx);
 
-	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
-		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
+	if ((texture != 0) && (texture->m_format == 4)) {
+		texture->m_format = 5;
 		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 
-		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
-		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+		textureSet = m_texSet;
 		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
-		CTexture* textureData = (*textureArray)[textureIdx];
+		CTexture* textureData = textureSet->GetTexture(textureIdx);
 		if (textureData != 0) {
-			void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<char*>(textureData) + 0x78);
-			int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x64) *
-			                      *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x68) * 2;
+			void* dstBuffer = textureData->m_imageData;
+			int texelCountBytes = textureData->m_width * textureData->m_height * 2;
 
 			DCInvalidateRange(dstBuffer, texelCountBytes);
 			memcpy(dstBuffer, Chara.MogFur().m_texels, 0x2000);
@@ -1779,7 +1772,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			if (material->m_extraTextureIndex != -1) {
 				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
 				hasExtraTexture = 1;
-				extraTextureFormat = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(material->m_textures[1]) + 0x60);
+				extraTextureFormat = material->m_textures[1]->m_format;
 			}
 
 			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {

@@ -1877,8 +1877,7 @@ void CFlatRuntime2::drawLayer(
 		return;
 	}
 
-	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8);
-	CTexture* texture = (*textureArray)[static_cast<unsigned long>(textureIndex)];
+	CTexture* texture = textureSet->GetTexture(static_cast<unsigned long>(textureIndex));
 
 	GXSetNumChans(1);
 	GXSetChanCtrl(
@@ -1912,8 +1911,8 @@ void CFlatRuntime2::drawLayer(
 	TextureMan.SetTexture(GX_TEXMAP0, texture);
 
 	Mtx texMtx;
-	const float texW = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
-	const float texH = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+	const float texW = static_cast<float>(texture->m_width);
+	const float texH = static_cast<float>(texture->m_height);
 	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
 	GXSetNumTexGens(1);

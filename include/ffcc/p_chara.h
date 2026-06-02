@@ -23,31 +23,13 @@ class CTextureSet;
 CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 
 #ifdef FFCC_P_CHARA_DEFINE_LAYOUT
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-    bool Add(T item);
-    int GetSize();
-    void ReleaseAndRemoveAll();
-    void RemoveAt(unsigned long index);
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    void SetGrow(int growCapacity);
-    int setSize(unsigned long newSize);
-    T GetAt(unsigned long index);
-    void RemoveAll();
-};
+#define FFCC_PTRARRAY_DECL_BOOL_ADD
+#define FFCC_PTRARRAY_DECL_NO_SET_AT
+#define FFCC_PTRARRAY_DECL_REMOVE_AT
+#include "ffcc/ptrarray_decl.h"
+#undef FFCC_PTRARRAY_DECL_REMOVE_AT
+#undef FFCC_PTRARRAY_DECL_NO_SET_AT
+#undef FFCC_PTRARRAY_DECL_BOOL_ADD
 #endif
 
 class CCharaPcs : public CProcess

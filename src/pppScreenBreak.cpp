@@ -91,6 +91,7 @@ struct pppScreenBreakUnkB {
     float m_gravityScale;
     u8 m_pad1C[4];
     Vec m_gravityDir;
+    u8 m_pad2C[4];
     float m_gravityAmount;
     u8 m_angleRand;
     u8 m_pad35[3];
@@ -128,6 +129,10 @@ STATIC_ASSERT(offsetof(ScreenBreakColorData, m_color) == 0x08);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_graphPayload) == 0x14);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityScale) == 0x18);
 STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityDir) == 0x20);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityAmount) == 0x30);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_angleRand) == 0x34);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_speedBase) == 0x38);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_speedRand) == 0x3C);
 
 extern const float FLOAT_80331cc0 = 2.0f;
 extern const float FLOAT_80331cc4 = 0.0f;
@@ -441,7 +446,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
         ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
         CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
-        node->m_flags &= 0xFE;
+        node->m_flags &= 0x7F;
         PSMTXIdentity(node->m_localRuntimeMtx);
 
         u32 vertexCount = meshData->m_vertexCount;
@@ -538,7 +543,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece->m_velocity.y = dVar20;
         piece->m_velocity.z = dVar21;
         PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
-        PSVECCrossProduct(&piece->m_velocity, &kScreenBreakPieceUpVector, &piece->m_axis);
+        Vec up = kScreenBreakPieceUpVector;
+        PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
 
         dVar17 = Math.RandF(stepData->m_speedRand);
         PSVECScale(&piece->m_velocity, &piece->m_velocity, stepData->m_speedBase + dVar17);

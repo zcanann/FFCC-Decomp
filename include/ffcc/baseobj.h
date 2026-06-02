@@ -8,7 +8,6 @@ class CGBaseObj : public CFlatRuntime::CObject
 public:
 	CGBaseObj();
 
-	virtual void onNewFinished();               // vtable entry 0x8
 	virtual int GetCID();                       // vtable entry 0xC
 	virtual void InitFinished();               // vtable entry 0x10
 	virtual void onPush(CGBaseObj* other, int); // vtable entry 0x14

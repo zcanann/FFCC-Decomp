@@ -69,6 +69,9 @@ public:
     void TmpArtiCtrl();
     unsigned int TmpArtiClose();
     void TmpArtiDraw();
+    void TmpArtiInit();
+    void TmpArtiInit0();
+    int TmpArtiCtrlCur();
 
     char pad_0000[0x108];
     CFont* m_tmpArtiFont;

@@ -8,15 +8,21 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern const float FLOAT_803333D0;
-extern const float FLOAT_803333F0;
-extern const double DOUBLE_803333E8;
-extern const double DOUBLE_80333410;
-extern const double DOUBLE_80333418;
-extern const double DOUBLE_80333420;
-extern const float FLOAT_803333D0;
-extern const double DOUBLE_803333E8;
-extern const float FLOAT_803333F0;
+extern const float FLOAT_803333D0 = 0.0f;
+extern const float FLOAT_803333D4 = 255.0f;
+extern const double DOUBLE_803333D8 = 20.0;
+extern const float FLOAT_803333E0 = 40.0f;
+extern const double DOUBLE_803333E8 = 0.5;
+extern const float FLOAT_803333F0 = 1.0f;
+extern const float FLOAT_803333F4 = 4.0f;
+extern const float FLOAT_803333F8 = 320.0f;
+extern const float FLOAT_803333FC = 0.5f;
+extern const float FLOAT_80333400 = 352.0f;
+extern const float FLOAT_80333404 = 3.0f;
+extern const double DOUBLE_80333408 = 4503601774854144.0;
+extern const double DOUBLE_80333410 = 1.0;
+extern const double DOUBLE_80333418 = 0.0;
+extern const double DOUBLE_80333420 = 216.0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
@@ -130,8 +136,7 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->lstData->entries[this->lstState->cursor];
-		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * 0.5);
-		int cursorY = (int)((float)curItem->y + cursorYOffset);
+		int cursorY = (int)((double)curItem->y + (double)(curItem->height - 0x20) * 0.5);
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
 	}

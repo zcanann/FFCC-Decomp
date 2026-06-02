@@ -15,7 +15,8 @@ struct VERTEX_DATA
 {
     u8 _pad0[0xA];
     u16 m_gridSize;
-    u8 _padC[0x14];
+    f32 m_stepValue;
+    u8 _pad10[0x10];
     float m_heightBias;
     float m_collisionYOffset;
     float m_maxDropDistance;

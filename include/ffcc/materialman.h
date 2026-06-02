@@ -149,6 +149,59 @@ public:
         m_stdEnvTevBit = tevBit;
         m_manaParaboloidTexObj0 = texObj;
     }
+    void SetChangeTexReflectionArray(void* arraySource)
+    {
+        m_geometryArraySource = arraySource;
+    }
+    void SetChangeTexReflectionTexture(_GXTexObj* texObj)
+    {
+        m_manaParaboloidTexObj0 = texObj;
+    }
+    void SetChangeTexReflectionState(unsigned int tevBit, unsigned int stdTevBit)
+    {
+        m_curEnvTevBit = tevBit;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_texMapIdCur = 0;
+        m_texMtxCur = 0x1E;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+        m_curEnvTevBit = stdTevBit;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_stdEnvTevBit = stdTevBit;
+    }
+    void SetChangeTexReflectionState(_GXTexObj* texObj, unsigned int tevBit, unsigned int stdTevBit)
+    {
+        m_stdTexMapId = 0;
+        m_curEnvTevBit = tevBit;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_activeEnvTevBit = 0xFFFFFFFF;
+        m_vtxDescMode = 0xFF;
+        m_texMapIdCur = 0;
+        m_texMtxCur = 0x1E;
+        m_texCoordIdCur = 0;
+        m_blendMode = 0xFF;
+        m_fogEnable = 0xFF;
+        m_shadowMaterialCount = 0;
+        m_shadowTextureCount = 0;
+        m_shadowKColorMask = 0;
+        m_curEnvTevBit = stdTevBit;
+        m_manaParaboloidTexObj0 = texObj;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
+        m_stdEnvTevBit = stdTevBit;
+    }
 
 private:
     void* m_geometryArraySource;        // 0x04

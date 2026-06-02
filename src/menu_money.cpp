@@ -14,21 +14,20 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-extern const float FLOAT_80332f60;
-extern const float FLOAT_80332f64;
-static const float LOCAL_FLOAT_80332f64 = 0.0f;
-static const float LOCAL_FLOAT_80332f68 = 32.0f;
-static const float LOCAL_FLOAT_80332f6c = 24.0f;
-extern const float FLOAT_80332f70;
-static const float LOCAL_FLOAT_80332f70 = 1.0f;
-static const float LOCAL_FLOAT_80332f74 = 18.0f;
-static const float LOCAL_FLOAT_80332f78 = 16.0f;
-static const float LOCAL_FLOAT_80332f7c = 0.9f;
-extern const float FLOAT_80332f80;
-extern const float FLOAT_80332f84;
-extern const double DOUBLE_80332F90;
-extern const double DOUBLE_80332F98;
-extern const double DOUBLE_80332FA0;
+extern "C" const float FLOAT_80332f60 = 255.0f;
+extern "C" const float FLOAT_80332f64 = 0.0f;
+extern "C" const float FLOAT_80332f68 = 32.0f;
+extern "C" const float FLOAT_80332f6c = 24.0f;
+extern "C" const float FLOAT_80332f70 = 1.0f;
+extern "C" const float FLOAT_80332f74 = 18.0f;
+extern "C" const float FLOAT_80332f78 = 16.0f;
+extern "C" const float FLOAT_80332f7c = 0.9f;
+extern "C" const float FLOAT_80332f80 = 19.8f;
+extern "C" const float FLOAT_80332f84 = 4.0f;
+extern "C" const double DOUBLE_80332F88 = 4503601774854144.0;
+extern "C" const double DOUBLE_80332F90 = 1.0;
+extern "C" const double DOUBLE_80332F98 = 216.0;
+extern "C" const double DOUBLE_80332FA0 = 0.5;
 unsigned int s_Money = 0;
 signed char s_place[16];
 
@@ -400,7 +399,7 @@ void CMenuPcs::MoneyDraw()
 		color.a = (u8)(FLOAT_80332f60 * entry->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		float uvScale = entry->uvScale;
-		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
+		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
 	}
 
 	s16* drawBase = reinterpret_cast<s16*>(this->moneyPanel->anims);
@@ -415,16 +414,16 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	for (int i = 0; i < 2; i++) {
-		float y = (float)(drawBase[1] + 0x18) + LOCAL_FLOAT_80332f68 * (float)i;
+		float y = (float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i;
 		float x = (float)(drawBase[0] + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
-				MenuPcs.DrawRect(0, x, y, LOCAL_FLOAT_80332f6c, LOCAL_FLOAT_80332f68,
-				                 LOCAL_FLOAT_80332f6c * (float)digit, LOCAL_FLOAT_80332f68 * (float)i,
-				                 LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
+				MenuPcs.DrawRect(0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
+				                 FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)i,
+				                 FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
 			}
-			x += LOCAL_FLOAT_80332f74;
+			x += FLOAT_80332f74;
 		}
 	}
 
@@ -440,15 +439,15 @@ void CMenuPcs::MoneyDraw()
 		}
 
 		MenuPcs.DrawRect(0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
-		                 (float)(drawBase[1] + 0x5C), LOCAL_FLOAT_80332f78, LOCAL_FLOAT_80332f6c,
-		                 LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f70,
-		                 LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
+		                 (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c,
+		                 FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70,
+		                 FLOAT_80332f70, FLOAT_80332f64);
 	}
 
 	CFont* font = this->moneyFont;
-	font->SetMargin(LOCAL_FLOAT_80332f70);
+	font->SetMargin(FLOAT_80332f70);
 	font->SetShadow(0);
-	font->SetScale(LOCAL_FLOAT_80332f7c);
+	font->SetScale(FLOAT_80332f7c);
 	font->DrawInit();
 
 	{
@@ -459,7 +458,7 @@ void CMenuPcs::MoneyDraw()
 	const char* label = GetMenuStr(0x15);
 	for (int i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase[0] + 0xB6));
-		font->SetPosY((LOCAL_FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + LOCAL_FLOAT_80332f68 * (float)i)) -
+		font->SetPosY((FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i)) -
 		              FLOAT_80332f80 - FLOAT_80332f84);
 		font->Draw(label);
 	}
@@ -480,7 +479,7 @@ void CMenuPcs::MoneyDraw()
 		int frame = (int)System.m_frameCounter;
 		int frameSign = frame >> 31;
 		int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
-		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, LOCAL_FLOAT_80332f70);
+		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
 	}
 }
 

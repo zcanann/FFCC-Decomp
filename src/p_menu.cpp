@@ -166,10 +166,6 @@ extern int sMenuTextureInfoTable[];
 
 static inline void ReleaseRefObject(void* object)
 {
-    if (object == nullptr) {
-        return;
-    }
-
     CRef* ref = reinterpret_cast<CRef*>(object);
     if (ref->DecRef() == 0) {
         delete ref;
@@ -178,8 +174,10 @@ static inline void ReleaseRefObject(void* object)
 
 static inline void ReleaseRefSlot(void** slot)
 {
-    ReleaseRefObject(*slot);
-    *slot = nullptr;
+    if (*slot != nullptr) {
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
 }
 
 static inline float LoadFloat(const float& value)
@@ -707,46 +705,46 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
     int currentMode;
     int i;
-    void** slot;
+    CMenuPcs* menu;
 
     if (m_mode != static_cast<int>(mode)) {
         Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
         currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
+                if ((currentMode != -1) && (-1 < currentMode)) {
                     ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
 
                     i = 0;
-                    slot = reinterpret_cast<void**>(&m_textures[0x16]);
+                    menu = this;
                     do {
-                        ReleaseRefSlot(slot);
+                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textures[0x16]));
                         i++;
-                        slot++;
+                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
                     } while (i < 10);
 
                     i = 0;
-                    slot = reinterpret_cast<void**>(&m_textureSets[2]);
+                    menu = this;
                     do {
-                        ReleaseRefSlot(slot);
+                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_textureSets[2]));
                         i++;
-                        slot++;
+                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
                     } while (i < 2);
 
                     i = 0;
-                    slot = reinterpret_cast<void**>(m_battleRingMenus);
+                    menu = this;
                     do {
-                        ReleaseRefSlot(slot);
+                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleRingMenus[0]));
                         i++;
-                        slot++;
+                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
                     } while (i < 4);
 
                     i = 0;
-                    slot = reinterpret_cast<void**>(m_battleMesMenus);
+                    menu = this;
                     do {
-                        ReleaseRefSlot(slot);
+                        ReleaseRefSlot(reinterpret_cast<void**>(&menu->m_battleMesMenus[0]));
                         i++;
-                        slot++;
+                        menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
                     } while (i < 12);
 
                     destroySingleMenu();
@@ -763,7 +761,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
+                if ((currentMode != -1) && (-1 < currentMode)) {
                     createBattle();
                     createSingleMenu();
                 }

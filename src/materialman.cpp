@@ -2960,11 +2960,11 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
 CMaterialSet::~CMaterialSet()
 {
     for (unsigned long i = 0; i < static_cast<unsigned long>(m_materials.GetSize()); i++) {
-        CMaterial* const material = m_materials[i];
-        if (material != 0) {
-            delete material;
+        if (m_materials[i] != 0) {
+            delete m_materials[i];
         }
     }
+    m_materials.RemoveAll();
 }
 
 /*

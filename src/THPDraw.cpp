@@ -166,3 +166,8 @@ void THPGXRestore(void) {
     _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetAlphaCompare(GX_GEQUAL, 0, GX_AOP_AND, GX_ALWAYS, 0);
 }
+
+extern "C" {
+extern const f32 sTHPDrawZero = 0.0f;
+extern const f32 sTHPDrawNegativeOne = -1.0f;
+}

@@ -66,7 +66,7 @@ unsigned int CLightPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 CProcessTable CLightPcs::m_table = {
     const_cast<char*>(sLightPcsClassName),
     {
-        0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
         0, 0x2D, 1,
     },
 };

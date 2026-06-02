@@ -8,14 +8,6 @@ void* memset(void*, int, unsigned int);
 
 extern const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
 
-struct ZCANMGRP {
-    u8* ptr;
-    int unk4;
-    int unk8;
-    int unkC;
-    int unk10;
-};
-
 static inline CMemory::CStage* MaterialEditorStage()
 {
     return MaterialEditorPcs.m_stage;
@@ -60,16 +52,16 @@ inline RSDITEM* CMaterialEditorPcs::GetReadRsd()
  */
 int CMaterialEditorPcs::SetRsdIndex()
 {
-    unsigned int* rsd = reinterpret_cast<unsigned int*>(m_zlist2.GetDataIdx(m_rsdListIndex));
+    RSDLISTITEM* rsd = reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 
     if (rsd == nullptr) {
         return 0;
     }
-    if (*rsd == 0) {
+    if (rsd->rsdItem == nullptr) {
         return 0;
     }
 
-    m_rsdIndex = *rsd;
+    m_rsdIndex = reinterpret_cast<u32>(rsd->rsdItem);
     return 1;
 }
 
@@ -84,13 +76,13 @@ int CMaterialEditorPcs::SetRsdIndex()
  */
 int CMaterialEditorPcs::SetRsdFlag()
 {
-    int* rsd = reinterpret_cast<int*>(m_zlist2.GetDataIdx(m_rsdListIndex));
+    RSDLISTITEM* rsd = reinterpret_cast<RSDLISTITEM*>(m_zlist2.GetDataIdx(m_rsdListIndex));
 
-    if (rsd == 0) {
+    if (rsd == nullptr) {
         return 0;
     }
 
-    rsd[3] = m_rsdFlag;
+    rsd->flag = m_rsdFlag;
     return 1;
 }
 

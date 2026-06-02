@@ -154,8 +154,8 @@ void CMaterialEditorPcs::drawViewer()
     ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
-        int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));
-        RSDITEM* model = reinterpret_cast<RSDITEM*>(*listData);
+        RSDLISTITEM* listItem = reinterpret_cast<RSDLISTITEM*>(zlist->GetDataNext(&it));
+        RSDITEM* model = listItem->rsdItem;
 
         GXSetArray(GX_VA_POS, model->ptr10, 0xC);
         GXSetArray(GX_VA_NRM, model->ptr14, 0xC);

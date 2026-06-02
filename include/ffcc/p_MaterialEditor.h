@@ -10,7 +10,6 @@
 #include <Dolphin/gx.h>
 
 struct Vec;
-struct ZCANMGRP;
 
 struct RSDITEM {
     u32 countA;
@@ -51,6 +50,14 @@ struct MaterialEditorPolygon {
     float texCoord[4][2];
 };
 typedef int MaterialEditorPolygon_size_mismatch[(sizeof(MaterialEditorPolygon) == 0x70) ? 1 : -1];
+
+struct ZCANMGRP {
+    u8* ptr;
+    int unk4;
+    int unk8;
+    int unkC;
+    int unk10;
+};
 
 struct RSDLISTITEM {
     RSDITEM* rsdItem;

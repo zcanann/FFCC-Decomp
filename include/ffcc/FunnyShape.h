@@ -37,7 +37,9 @@ public:
 	void Render();
 	void RenderTexture();
 	void RenderShape();
+	void SetDefaultStage();
 	void ClearShapeData();
+	void Create();
 	void ClearAnmData();
 	void ClearTextureData();
 	void RenderShape(FS_tagOAN3_SHAPE*, Vec2d, float);

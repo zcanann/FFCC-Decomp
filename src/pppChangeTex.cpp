@@ -223,17 +223,16 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	meshList = ChangeTexMeshes(model0);
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 		GXColor* colors = work->m_meshColorArrays[meshIdx];
-		S16Vec* positions = meshList->m_workPositions;
 		unsigned int vertCount;
 		for (unsigned int v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
 			if (step->m_payload[0] == 1) {
-				if (positions[v].y < splitY) {
+				if (meshList->m_workPositions[v].y < splitY) {
 					colors[v].a = (u8)(int)alphaBase;
 				} else {
 					colors[v].a = 0;
 				}
 			} else if (step->m_payload[0] == 2) {
-				if (positions[v].y > splitY) {
+				if (meshList->m_workPositions[v].y > splitY) {
 					colors[v].a = (u8)(int)alphaBase;
 				} else {
 					colors[v].a = 0;

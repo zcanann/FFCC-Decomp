@@ -2859,6 +2859,15 @@ void CMenuPcs::CalcResultOpenAnim()
 			entryOffset += 0x50;
 		}
 
+		entryOffset = activePartyCount * 0xA0;
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[frameBase + i];
+			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = 0;
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+			entryOffset += 0x50;
+		}
+
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {

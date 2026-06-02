@@ -2005,7 +2005,7 @@ void CMenuPcs::CalcResultCloseAnim()
 	const int nameBase = digitEchoBase + activePartyCount;
 	const int closeCount = nameBase + activePartyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].timer = 0;
 			sprites[i].motionX = 0.0f;

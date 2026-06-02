@@ -56,6 +56,15 @@ struct Vec2d {
     f32 y;
 };
 
+struct YmMeltMapCylinder {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    float m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
 STATIC_ASSERT(sizeof(YmMeltVertex) == 0x10);
 STATIC_ASSERT(offsetof(YmMeltWork, m_vertexData) == 0x00);
 STATIC_ASSERT(offsetof(YmMeltWork, m_phaseOffset) == 0x04);
@@ -69,6 +78,7 @@ STATIC_ASSERT(sizeof(YmMeltWork) == 0x18);
 STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
+STATIC_ASSERT(sizeof(YmMeltMapCylinder) == sizeof(CMapCylinder));
 
 static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
@@ -410,7 +420,7 @@ extern "C" void CalcPolygonHeight(
     Vec rayDirection;
     Vec worldBase;
     YmMeltVertex* vertex;
-    CMapCylinder cylinder;
+    YmMeltMapCylinder cylinder;
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;
@@ -449,7 +459,7 @@ extern "C" void CalcPolygonHeight(
         cylinder.m_axis.z = rayDirection.z;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), &rayDirection, 0xFFFFFFFF) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&vertex->m_position);
             if ((previousY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
                 vertex->m_position.y = previousY;

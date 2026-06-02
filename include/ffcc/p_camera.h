@@ -53,6 +53,28 @@ public:
         Vec m_scale;
     };
 
+    struct CameraState
+    {
+        Mtx m_cameraMatrix;
+        Mtx m_worldMapMatrix;
+        Mtx m_cameraWorldMtx;
+        Mtx44 m_screenMatrix;
+        float m_targetX;
+        float m_targetY;
+        float m_targetZ;
+        float m_positionX;
+        float m_positionY;
+        float m_positionZ;
+        float m_directionX;
+        float m_directionY;
+        float m_directionZ;
+        float m_yaw;
+        float m_fov;
+        float m_nearZ;
+        float m_farZ;
+        float m_zRotate;
+    };
+
     struct QuakeState
     {
         unsigned char m_mode;
@@ -183,6 +205,10 @@ public:
     void SetWorldMapMatrix(float (*)[4]);
     void GetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
+    CameraState& CurrentCameraState()
+    {
+        return *reinterpret_cast<CameraState*>(&m_cameraMatrix);
+    }
 
     Mtx m_cameraMatrix;
     Mtx m_worldMapMatrix; // 0x34
@@ -202,7 +228,8 @@ public:
     float m_nearZ;
     float m_farZ;
     float m_zRotate; // 0x108
-    u8 _pad10C[0x31C - 0x10C];
+    CameraState m_savedCamera; // 0x10C
+    CameraState m_shadowCamera; // 0x214
     CFullScreenShadow m_fullScreenShadow; // 0x31C
     u8 m_fullScreenShadowEnabled; // 0x404
     u8 _pad405[0x408 - 0x405];

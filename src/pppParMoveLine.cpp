@@ -6,6 +6,21 @@
 
 extern const float FLOAT_80330638;
 
+struct ParMoveLineParams {
+    u8 m_pad0[4];
+    float m_speed;
+};
+
+static inline Vec* MoveLineCurrentPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+}
+
+static inline Vec* MoveLinePreviousPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800906dc
@@ -18,23 +33,25 @@ extern const float FLOAT_80330638;
 void pppParMoveLine(_pppPObject* param_1, int param_2)
 {
     _pppMngSt* pppMngSt;
+    ParMoveLineParams* params;
     Vec local_1c;
     Vec VStack_28;
     float fVar1;
     float x;
 
     pppMngSt = ppvMng;
-    PSVECSubtract((Vec*)((char*)ppvMng + 0x68), (Vec*)((char*)ppvMng + 0x58), &local_1c);
+    params = reinterpret_cast<ParMoveLineParams*>(param_2);
+    PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &local_1c);
 
     x = pppMngSt->m_position.x;
     fVar1 = FLOAT_80330638;
-    *(float*)((char*)pppMngSt + 0x48) = x;
-    *(float*)((char*)pppMngSt + 0x4C) = pppMngSt->m_position.y;
-    *(float*)((char*)pppMngSt + 0x50) = pppMngSt->m_position.z;
+    MoveLineCurrentPosition(pppMngSt)->x = x;
+    MoveLineCurrentPosition(pppMngSt)->y = pppMngSt->m_position.y;
+    MoveLineCurrentPosition(pppMngSt)->z = pppMngSt->m_position.z;
 
     if ((fVar1 != local_1c.x) || (fVar1 != local_1c.y) || (fVar1 != local_1c.z)) {
         PSVECNormalize(&local_1c, &VStack_28);
-        PSVECScale(&VStack_28, &local_1c, *(float*)(param_2 + 4) * *(float*)((char*)pppMngSt + 0x54));
+        PSVECScale(&VStack_28, &local_1c, params->m_speed * pppMngSt->m_savedPosition.y);
         PSVECAdd(&local_1c, &pppMngSt->m_position, &pppMngSt->m_position);
     }
 

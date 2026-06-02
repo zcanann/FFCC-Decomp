@@ -98,8 +98,6 @@ public:
     int ShopRequest(int, int, int, int, int, int, int);
     void CallShop(int, int, int, int, int);
     void SafeDeleteTempItem();
-    void ClampStatus(short&, unsigned short&);
-    void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
     void CalcStatus();
     int CanPlayerUseItem();
     void ValidCmdList(int);

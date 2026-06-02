@@ -130,41 +130,47 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         }
 
         if (vertexFormat == 2) {
+            u32 remaining = count;
             if (count > 0) {
-                int blocks = (u32)count >> 3;
+                u32 blocks = remaining >> 3;
 
                 if (blocks != 0) {
                     do {
                         data += 0x50;
                     } while (--blocks != 0);
 
-                    count &= 7;
-                    if (count == 0) {
+                    remaining &= 7;
+                    if (remaining == 0) {
                         continue;
                     }
                 }
 
                 do {
                     data += 10;
-                } while (--count != 0);
+                } while (--remaining != 0);
             }
-        } else if (count > 0) {
-            int blocks = (u32)count >> 3;
+        } else {
+            u32 remaining = count;
+            if (count <= 0) {
+                continue;
+            }
+
+            u32 blocks = remaining >> 3;
 
             if (blocks != 0) {
                 do {
                     data += 0x40;
                 } while (--blocks != 0);
 
-                count &= 7;
-                if (count == 0) {
+                remaining &= 7;
+                if (remaining == 0) {
                     continue;
                 }
             }
 
             do {
                 data += 8;
-            } while (--count != 0);
+            } while (--remaining != 0);
         }
     }
 

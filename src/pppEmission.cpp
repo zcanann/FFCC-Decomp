@@ -9,6 +9,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
@@ -37,7 +38,7 @@ struct EmissionParticle;
 
 struct EmissionState {
     EmissionParticle* m_particles;
-    int m_texture;
+    CTexture* m_texture;
     u8 m_colorR;
     u8 m_colorG;
     u8 m_colorB;
@@ -151,7 +152,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
     }
 
     state->m_texture =
-        reinterpret_cast<int>(ppvEnv->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex));
+        ppvEnv->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
     PEmissionPayload& payload = param_2->m_emission;
     if (payload.m_particleMode != 0) {
@@ -319,12 +320,13 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
-        int texture = state->m_texture;
+        int texture = reinterpret_cast<int>(state->m_texture);
         u32 drawTevBits = 0xACE0F;
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        MaterialMan.SetChangeTexReflectionTexture(reinterpret_cast<GXTexObj*>(texture + 0x28));
+        MaterialMan.SetChangeTexReflectionTexture(
+            reinterpret_cast<GXTexObj*>(texture + offsetof(CTexture, m_texObj)));
 
         Mtx viewMtx0;
         Mtx objMtx0;

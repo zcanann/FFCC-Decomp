@@ -216,13 +216,20 @@ public:
     unsigned char m_drawPriority;     // 0x15
     char m_pad16[0x02];
     unsigned char m_showFlags;      // 0x18
-    char m_pad19[1];
+    char m_pad19;
     unsigned char m_bumpTexMatrixMode; // 0x1A
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
     unsigned char m_meshType;    // 0x1E
-    char m_pad1F[0x08];
+    char m_pad1F;
+    char m_pad20;
+    unsigned char m_useAmbientColor; // 0x21
+    unsigned char m_enableFullScreenShadow; // 0x22
+    unsigned char m_lightAlpha;      // 0x23
+    unsigned char m_colorAlphaRate;  // 0x24
+    unsigned char m_cameraSemiTransBeyondMax; // 0x25
+    unsigned char m_cameraSemiTransActive; // 0x26
     unsigned char m_disableZWrite;   // 0x27
     short m_cameraSemiTransAlpha;       // 0x28
     short m_cameraSemiTransTargetAlpha; // 0x2A
@@ -233,9 +240,13 @@ public:
     unsigned short m_meshId;        // 0x34
     char m_pad36[0x02];
     int m_lightSetIndex;            // 0x38
-    char m_pad3C[0x04];
+    unsigned long m_shadowTarget;   // 0x3C
     float m_zBufferOffset;          // 0x40
-    char m_pad44[0x14];
+    float m_cameraSemiTransNear;    // 0x44
+    float m_cameraSemiTransFar;     // 0x48
+    float m_cameraSemiTransMinAlpha; // 0x4C
+    float m_cameraSemiTransMaxAlpha; // 0x50
+    float m_cameraSemiTransFadeRange; // 0x54
     float m_transRateX;             // 0x58
     float m_transRateY;             // 0x5C
     float m_transRateZ;             // 0x60

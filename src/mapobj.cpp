@@ -316,7 +316,7 @@ void CMapObj::Init()
     S8At(this, 0x1F) = -1;
     U8At(this, 0x20) = 0;
     m_disableZWrite = 0;
-    U8At(this, 0x21) = 0;
+    m_useAmbientColor = 0;
 
     m_objId = 0xFFFF;
     m_effectId = 0xFFFF;
@@ -325,28 +325,28 @@ void CMapObj::Init()
     U8At(this, 0x19) = 1;
     m_meshId = 0xFFFF;
 
-    F32At(this, 0x48) = kMapObjInitNegOne;
-    F32At(this, 0x44) = kMapObjInitNegOne;
-    F32At(this, 0x4C) = kMapObjInitNegOne;
-    F32At(this, 0x50) = kMapObjInitValue50;
+    m_cameraSemiTransFar = kMapObjInitNegOne;
+    m_cameraSemiTransNear = kMapObjInitNegOne;
+    m_cameraSemiTransMinAlpha = kMapObjInitNegOne;
+    m_cameraSemiTransMaxAlpha = kMapObjInitValue50;
 
     m_cameraSemiTransStep = 0;
     m_cameraSemiTransTargetAlpha = 0;
     m_cameraSemiTransAlpha = 0;
-    U8At(this, 0x24) = 0xFF;
-    U8At(this, 0x23) = 0xFF;
+    m_colorAlphaRate = 0xFF;
+    m_lightAlpha = 0xFF;
     m_bumpLight = 0;
     S16At(this, 0x16) = -1;
-    U8At(this, 0x22) = 1;
-    S32At(this, 0x3C) = -1;
+    m_enableFullScreenShadow = 1;
+    m_shadowTarget = -1;
 
     m_transRateZ = kMapObjOne;
     m_transRateY = kMapObjOne;
     m_transRateX = kMapObjOne;
     m_bumpTexMatrixMode = 0;
     m_zBufferOffset = kMapObjOne;
-    U8At(this, 0x25) = 1;
-    U8At(this, 0x26) = 0;
+    m_cameraSemiTransBeyondMax = 1;
+    m_cameraSemiTransActive = 0;
     m_lightSetIndex = -1;
 }
 
@@ -468,7 +468,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_ambientColor.g = chunkFile.Get1();
             m_ambientColor.b = chunkFile.Get1();
             m_ambientColor.a = chunkFile.Get1();
-            U8At(this, 0x21) = 1;
+            m_useAmbientColor = 1;
         } else if (chunk.m_id == CHUNK_GEOM) {
             m_zBufferOffset = chunkFile.GetF4();
             m_bumpTexMatrixMode = chunkFile.Get1();
@@ -481,21 +481,21 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
         } else if (chunk.m_id == CHUNK_SDST) {
             if (chunk.m_version == 2) {
-                U8At(this, 0x22) = chunkFile.Get1();
+                m_enableFullScreenShadow = chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
                 chunkFile.Get1();
-                S32At(this, 0x3C) = static_cast<int>(chunkFile.Get4());
+                m_shadowTarget = static_cast<int>(chunkFile.Get4());
             } else if (chunk.m_version == 1) {
-                U8At(this, 0x22) = chunkFile.Get1();
+                m_enableFullScreenShadow = chunkFile.Get1();
                 if (chunkFile.Get1() == 0) {
-                    S32At(this, 0x3C) = 0;
+                    m_shadowTarget = 0;
                 } else {
-                    S32At(this, 0x3C) = -1;
+                    m_shadowTarget = -1;
                 }
             } else {
-                U8At(this, 0x22) = chunkFile.Get1();
-                S32At(this, 0x3C) = -1;
+                m_enableFullScreenShadow = chunkFile.Get1();
+                m_shadowTarget = -1;
             }
         } else if (chunk.m_id == CHUNK_PIDX) {
             short parentIdx = static_cast<short>(chunkFile.Get2());
@@ -1243,10 +1243,10 @@ void CMapObj::Calc()
     if ((static_cast<unsigned int>(m_mapDataType) == 1U) && (m_mapData != 0) &&
         (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((m_showFlags & 1) != 0)) {
-        if ((F32At(this, 0x50) < kMapObjOne) && (F32At(this, 0x4C) >= kMapObjInitNegOne)) {
+        if ((m_cameraSemiTransMaxAlpha < kMapObjOne) && (m_cameraSemiTransMinAlpha >= kMapObjInitNegOne)) {
             m_drawPriority = m_baseDrawPriority;
-            U8At(this, 0x25) = 1;
-            U8At(this, 0x26) = 0;
+            m_cameraSemiTransBeyondMax = 1;
+            m_cameraSemiTransActive = 0;
         } else {
             pos.x = F32At(this, 0xC4);
             pos.y = F32At(this, 0xD4);
@@ -1255,12 +1255,12 @@ void CMapObj::Calc()
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 
-            U8At(this, 0x25) = static_cast<unsigned char>(posCam.z > F32At(this, 0x50));
-            if (posCam.z < F32At(this, 0x4C)) {
-                U8At(this, 0x26) = 1;
+            m_cameraSemiTransBeyondMax = static_cast<unsigned char>(posCam.z > m_cameraSemiTransMaxAlpha);
+            if (posCam.z < m_cameraSemiTransMinAlpha) {
+                m_cameraSemiTransActive = 1;
                 m_drawPriority = 2;
             } else {
-                U8At(this, 0x26) = 1;
+                m_cameraSemiTransActive = 1;
                 m_drawPriority = m_baseDrawPriority;
             }
         }
@@ -1341,9 +1341,9 @@ void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
 
-    s_mapObjLightColor.a = U8At(this, 0x23);
+    s_mapObjLightColor.a = m_lightAlpha;
 
-    if (U8At(this, 0x21) != 0) {
+    if (m_useAmbientColor != 0) {
         mapColor = m_ambientColor;
     } else {
         mapColor = MapMng.m_mapColor;
@@ -1356,16 +1356,17 @@ void CMapObj::SetDrawEnv()
         mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
-    if (U8At(this, 0x24) != 0xFF) {
-        int alphaRate = U8At(this, 0x24);
+    if (m_colorAlphaRate != 0xFF) {
+        int alphaRate = m_colorAlphaRate;
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
     _GXColor lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
+                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(S16At(this, 0x28) >> 7));
 }
 
 /*
@@ -1411,10 +1412,10 @@ void CMapObj::Draw(unsigned char priority)
     *reinterpret_cast<unsigned int*>(materialMan + 92) = 0;
     *(materialMan + 520) = 0;
 
-    if (U8At(this, 0x22) != 0) {
+    if (m_enableFullScreenShadow != 0) {
         CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
     }
-    if (U32At(this, 0x3C) != 0) {
+    if (m_shadowTarget != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
                                    reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
                                    m_worldMtx);
@@ -1425,8 +1426,8 @@ void CMapObj::Draw(unsigned char priority)
     *reinterpret_cast<unsigned int*>(materialMan + 304) = *reinterpret_cast<unsigned int*>(materialMan + 292);
     *reinterpret_cast<unsigned int*>(materialMan + 64) = *reinterpret_cast<unsigned int*>(materialMan + 72);
 
-    s_mapObjLightColor.a = U8At(this, 0x23);
-    if (U8At(this, 0x21) != 0) {
+    s_mapObjLightColor.a = m_lightAlpha;
+    if (m_useAmbientColor != 0) {
         mapColor = m_ambientColor;
     } else {
         mapColor = MapMng.m_mapColor;
@@ -1439,16 +1440,17 @@ void CMapObj::Draw(unsigned char priority)
         mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
-    if (U8At(this, 0x24) != 0xFF) {
-        unsigned int alphaRate = U8At(this, 0x24);
+    if (m_colorAlphaRate != 0xFF) {
+        unsigned int alphaRate = m_colorAlphaRate;
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
     lightColor = s_mapObjLightColor;
-    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
+                              m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
+                              static_cast<unsigned char>(S16At(this, 0x28) >> 7));
     LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
                               reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 

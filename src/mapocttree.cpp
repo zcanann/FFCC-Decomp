@@ -206,9 +206,9 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             if (m_mapObject->m_meshType == 4) {
                 m_mapObject->m_drawPriority = 0xFF;
                 m_mapObject->m_baseDrawPriority = 0xFF;
-                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
+                m_mapObject->m_enableFullScreenShadow = 0;
             } else if (m_mapObject->m_meshType == 3) {
-                *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x22)) = 0;
+                m_mapObject->m_enableFullScreenShadow = 0;
             }
             break;
         }
@@ -321,10 +321,10 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		env->m_lockedEnvTevBit = 0;
 		env->m_lockedEnvUnknown5c = 0;
 		env->m_shadowKColorMask = 0;
-		if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
+		if (m_mapObject->m_enableFullScreenShadow != 0) {
 			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 		}
-		if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
+		if (m_mapObject->m_shadowTarget != 0) {
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
 			                           m_mapObject->m_worldMtx);
 		}
@@ -362,10 +362,10 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			env->m_lockedEnvTevBit = 0;
 			env->m_lockedEnvUnknown5c = 0;
 			env->m_shadowKColorMask = 0;
-			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
+			if (m_mapObject->m_enableFullScreenShadow != 0) {
 				CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 			}
-			if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
+			if (m_mapObject->m_shadowTarget != 0) {
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar4->m_shadowFlags,
 				                           m_mapObject->m_worldMtx);
 			}
@@ -388,10 +388,10 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			if ((pCVar3->m_meshCount != 0) &&
 			    ((pCVar3->m_drawFlags & 1) != 0)) {
 				MaterialMan.InitEnv();
-				if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
+				if (m_mapObject->m_enableFullScreenShadow != 0) {
 					CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 				}
-				if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
+				if (m_mapObject->m_shadowTarget != 0) {
 					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar3->m_shadowFlags,
 					                           m_mapObject->m_worldMtx);
 				}

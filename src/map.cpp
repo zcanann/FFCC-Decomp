@@ -2999,16 +2999,16 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 
     for (int i = 0; i < m_mapObjCount; i++) {
         if (mapObj->m_meshId == id) {
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x44)) = nearRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x48)) = farRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x54)) = fadeRange;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = minAlpha;
-            *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = maxAlpha;
+            mapObj->m_cameraSemiTransNear = nearRange;
+            mapObj->m_cameraSemiTransFar = farRange;
+            mapObj->m_cameraSemiTransFadeRange = fadeRange;
+            mapObj->m_cameraSemiTransMinAlpha = minAlpha;
+            mapObj->m_cameraSemiTransMaxAlpha = maxAlpha;
             if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = kMapCameraSemiTransMinSentinel;
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = kMapCameraSemiTransMaxSentinel;
+                mapObj->m_cameraSemiTransMinAlpha = kMapCameraSemiTransMinSentinel;
+                mapObj->m_cameraSemiTransMaxAlpha = kMapCameraSemiTransMaxSentinel;
                 mapObj->m_drawPriority = 2;
-                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
+                mapObj->m_cameraSemiTransActive = 1;
             }
             mapObj->m_cameraSemiTransTargetAlpha = 0x4000;
             found = 1;

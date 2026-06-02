@@ -239,7 +239,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
             &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3],
             state->m_values[4], param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
 
-        if (gPppInConstructor == 0) {
+        if (ppvIsLoopCalc == 0) {
             if (state->m_direction != 0) {
                 state->m_angle = state->m_angle + (int)state->m_values[2];
                 if (state->m_angle > param_2->m_payload3) {

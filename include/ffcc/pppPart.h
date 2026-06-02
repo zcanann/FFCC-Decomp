@@ -46,6 +46,8 @@ struct pppCVECTOR
     unsigned char rgba[4];
 };
 
+extern int ppvUserStopPartF;
+
 _pppMngSt* pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest);
 void pppUnitMatrix(pppFMATRIX& pppFMtx);
 void pppRotMatrix(pppFMATRIX&, pppFMATRIX, Vec);

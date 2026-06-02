@@ -8,7 +8,6 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern f32 gPppDefaultValueBuffer[];
-extern int ppvUserStopPartF;
 }
 #include "ffcc/util.h"
 

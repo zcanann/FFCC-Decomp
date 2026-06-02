@@ -15,12 +15,13 @@ extern const f32 kPppConformBgNormalOne;
 #include "dolphin/gx.h"
 #include <math.h>
 
-struct ConformCylinderQuery {
-    Vec m_pos;
-    Vec m_fieldC;
-    Vec m_field18;
-    Vec m_field24;
-    f32 m_field30;
+struct ConformMapCylinder {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    f32 m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
 };
 
 struct ConformBgNormalState {

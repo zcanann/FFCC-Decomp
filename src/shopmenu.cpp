@@ -2874,25 +2874,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
+    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
     _GXColor drawColor = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanAmbColor(GX_COLOR0A0, drawColor);
@@ -2902,10 +2884,6 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
 
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
@@ -2960,22 +2938,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
+    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
     _GXColor amb;
     *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
@@ -2988,11 +2951,6 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
 
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
@@ -3053,22 +3011,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
-    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
-    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
+    MaterialMan.SetDefaultStdDrawEnv(0xACE0F);
 
     _GXColor amb;
     *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
@@ -3084,11 +3027,6 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
 
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,

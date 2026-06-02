@@ -2128,6 +2128,31 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 	}
 
+	int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
+	int entryOffset = 0;
+	for (int i = 0; i < activePartyCount; i++) {
+		BonusAnimSprite* sprite = &sprites[iconBase + i];
+		float x = (float)sprite->x + sprite->motionX;
+		float y = (float)sprite->y + sprite->motionY;
+		int screenX = (int)(x + 12.0f);
+		int screenY = (int)(y - 8.0f);
+		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) =
+		    (short)(int)((double)(float)(24.0f + (float)sprite->w * 0.5f + x) - 320.0);
+		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) =
+		    (short)(int)((double)(float)((float)sprite->h * 0.5f + y) - 224.0);
+		if (screenX < 0) {
+			screenX = 0;
+		}
+		if (screenY < 0) {
+			screenY = 0;
+		}
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = screenX;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = screenY;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
+		entryOffset += 0x50;
+	}
+
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;

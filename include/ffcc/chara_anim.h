@@ -46,6 +46,7 @@ public:
 
 		void Create(CChunkFile&);
 		void mapping(CChara::CAnim*);
+		void IsScale();
 		void Interp(CChara::CAnim*, SRT*, float);
 		char m_name[16];
 		unsigned int m_dataOffset;

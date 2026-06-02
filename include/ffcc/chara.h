@@ -100,8 +100,14 @@ public:
 		CAnimNode();
 		~CAnimNode();
 
+		void Create(CChunkFile&);
+		void mapping(CChara::CAnim*);
 		void IsScale();
 		void Interp(CChara::CAnim*, SRT*, float);
+
+		char m_name[0x10];              // 0x00
+		u32 m_dataOffset;               // 0x10
+		u32 m_flags;                    // 0x14
 	};
 
 	class CNode

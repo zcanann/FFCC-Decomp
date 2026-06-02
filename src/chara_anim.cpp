@@ -223,7 +223,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 			m_nodes = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F) CChara::CAnimNode[nodeCount];
 
-			int nodeOffset = 0;
+			int nodeIndex = 0;
 			chunkFile.PushChunk();
 			while (chunkFile.GetNextChunk(chunk)) {
 				chunkId = static_cast<int>(chunk.m_id);
@@ -244,8 +244,8 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_quantizeZ = static_cast<unsigned char>(chunkFile.Get4());
 					break;
 				case 0x4E4F4445: {
-					CAnimNode* node = reinterpret_cast<CAnimNode*>(reinterpret_cast<unsigned char*>(m_nodes) + nodeOffset);
-					nodeOffset += 0x18;
+					CAnimNode* node = &m_nodes[nodeIndex];
+					nodeIndex++;
 
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(nodeChunk)) {

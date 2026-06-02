@@ -53,6 +53,17 @@ STATIC_ASSERT(sizeof(CCharaMeshRaw) == 0x14);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workNormals) == 0x10);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_flags) == 0x08);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_interp) == 0x09);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_nodeCount) == 0x0E);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_frameCount) == 0x10);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_nodes) == 0x14);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_interpOffset) == 0x18);
+STATIC_ASSERT(offsetof(CChara::CAnim, m_bank) == 0x20);
+STATIC_ASSERT(sizeof(CChara::CAnimNode) == 0x18);
+STATIC_ASSERT(offsetof(CChara::CAnimNode, m_name) == 0x00);
+STATIC_ASSERT(offsetof(CChara::CAnimNode, m_dataOffset) == 0x10);
+STATIC_ASSERT(offsetof(CChara::CAnimNode, m_flags) == 0x14);
 
 typedef CCharaModelData CCharaModelRefRaw;
 
@@ -472,42 +483,47 @@ static inline u8& NodeRuntimeFlags(CChara::CNode* node)
 
 static inline u8 AnimFlags(CChara::CAnim* anim)
 {
-	return *(reinterpret_cast<u8*>(anim) + 0x08);
+	return anim->m_flags;
 }
 
 static inline u8 AnimInterpCount(CChara::CAnim* anim)
 {
-	return *(reinterpret_cast<u8*>(anim) + 0x09);
+	return static_cast<u8>(anim->m_interp);
+}
+
+static inline u16 AnimNodeCount(CChara::CAnim* anim)
+{
+	return anim->m_nodeCount;
 }
 
 static inline u16 AnimFrameCount(CChara::CAnim* anim)
 {
-	return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(anim) + 0x10);
+	return anim->m_frameCount;
 }
 
 static inline CChara::CAnimNode* AnimNodes(CChara::CAnim* anim)
 {
-	return *reinterpret_cast<CChara::CAnimNode**>(reinterpret_cast<u8*>(anim) + 0x14);
+	return anim->m_nodes;
 }
 
 static inline u32 AnimInterpOffset(CChara::CAnim* anim)
 {
-	return *reinterpret_cast<u32*>(reinterpret_cast<u8*>(anim) + 0x18);
+	return anim->m_interpOffset;
 }
 
 static inline void* AnimBank(CChara::CAnim* anim)
 {
-	return *reinterpret_cast<void**>(reinterpret_cast<u8*>(anim) + 0x20);
+	return anim->m_bank;
 }
 
 static inline char* AnimNodeName(CChara::CAnimNode* node)
 {
-	return reinterpret_cast<char*>(node);
+	return node->m_name;
 }
 
 static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 {
-	return *reinterpret_cast<s8*>(reinterpret_cast<u8*>(node) + 0x14) < 0;
+	return *reinterpret_cast<s8*>(&node->m_flags) < 0;
 }
 
 static inline u8 ModelAttachMode(CChara::CModel* model)
@@ -1409,7 +1425,7 @@ void CChara::CModel::calcNowFrame()
 	}
 
 	float total = 1.0f + (m_animEnd - m_animStart);
-	if ((((u8*)m_anim)[8] & 0x40) == 0) {
+	if ((AnimFlags(m_anim) & 0x40) == 0) {
 		if (m_time >= 0.0f) {
 			m_curFrame = m_animStart + static_cast<float>(fmod(m_time, total));
 		} else {
@@ -2207,12 +2223,12 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 		}
 
 		CAnimNode* animNodes = AnimNodes(m_anim);
-		u16 animNodeCount = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_anim) + 0x0E);
+		u16 animNodeCount = AnimNodeCount(m_anim);
 		char* primaryName = NodeRefName(node);
 		char* secondaryName = NodeRefAltName(node);
 
 		for (u32 animIndex = 0; animIndex < animNodeCount; animIndex++) {
-			CAnimNode* animNode = reinterpret_cast<CAnimNode*>(reinterpret_cast<u8*>(animNodes) + animIndex * 0x18);
+			CAnimNode* animNode = &animNodes[animIndex];
 			char* animName = AnimNodeName(animNode);
 
 			if (NodeAnimNode0(node) == 0 && primaryName[0] != '\0' && strcmp(primaryName, animName) == 0) {
@@ -3156,7 +3172,7 @@ void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
  */
 void CChara::CAnimNode::IsScale()
 {
-	*(u8*)this |= 0x80;
+	*reinterpret_cast<u8*>(&m_flags) |= 0x80;
 }
 
 /*

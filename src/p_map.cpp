@@ -16,7 +16,6 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-CMapPcs MapPcs;
 
 class CRelProfile
 {
@@ -104,6 +103,7 @@ CProcessTable CMapPcs::m_table[3] = {
     },
 };
 
+CMapPcs MapPcs;
 unsigned int s_loadedStageNo__7CMapPcs;
 unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;

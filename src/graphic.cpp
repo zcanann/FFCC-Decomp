@@ -1107,9 +1107,9 @@ void CGraphic::makeSphere()
     int ringStart = 1;
     for (int ring = 0; ring < 5; ring++) {
         int current = ringStart;
-        for (int pair = 0; pair < 4; pair++) {
-            int next0 = ringStart + ((pair * 2 + 1) % 8);
-            int next1 = ringStart + ((pair * 2 + 2) % 8);
+        for (int seg = 0; seg < 8; seg += 2) {
+            int next0 = ringStart + ((seg + 1) % 8);
+            int next1 = ringStart + ((seg + 2) % 8);
 
             GXWGFifo.f32 = vertices[current * 3 + 1];
             GXWGFifo.f32 = vertices[current * 3 + 0];

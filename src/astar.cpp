@@ -77,7 +77,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	if ((AStar.m_flags & 1) != 0)
 	{
 		unsigned int mask = m_hitAttributeMask;
-		const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+		const CVector& baseVec =
+		    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
@@ -105,7 +106,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	}
 	else
 	{
-		const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+		const CVector& baseVec =
+		    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
@@ -144,7 +146,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned int mask = m_hitAttributeMask;
-	const CVector& baseVec = CVector(kPolyGroupBaseXZ, kPolyGroupBaseY, kPolyGroupBaseXZ);
+	const CVector& baseVec =
+	    CVector(LoadFloat(kPolyGroupBaseXZ), LoadFloat(kPolyGroupBaseY), LoadFloat(kPolyGroupBaseXZ));
 	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));

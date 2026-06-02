@@ -9,14 +9,20 @@ extern "C" {
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
-struct CMapCylinderRaw {
-    Vec m_bottom;
-    u8 m_pad0C[0x0C];
-    Vec m_direction;
-    f32 m_radius;
-    Vec m_top;
-    Vec m_direction2;
-};
+static inline Vec* CheckBGHeightPreviousPosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+}
+
+static inline Vec* CheckBGHeightBasePosition(_pppMngSt* mng)
+{
+    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+}
+
+static inline Vec* CheckBGHeightTargetPosition(_pppMngSt* mng)
+{
+    return &mng->m_paramVec0;
+}
 
 /*
  * --INFO--
@@ -32,7 +38,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 {
     _pppMngSt* pppMngSt;
     Vec direction;
-    CMapCylinderRaw cylinder;
+    CMapCylinder cylinder;
     Vec hitPos;
     float nextY;
     float zero;
@@ -59,21 +65,21 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         bottomX = ppvMng->m_matrix.value[0][3];
         bottomZ = ppvMng->m_matrix.value[2][3];
         bottomY += param_2->m_unk0x4;
-        cylinder.m_top.z = scale;
-        cylinder.m_top.y = scale;
-        cylinder.m_top.x = scale;
-        cylinder.m_direction2.z = offset;
-        cylinder.m_direction2.y = offset;
-        cylinder.m_direction2.x = offset;
+        cylinder.m_boundsMin.z = scale;
+        cylinder.m_boundsMin.y = scale;
+        cylinder.m_boundsMin.x = scale;
+        cylinder.m_boundsMax.z = offset;
+        cylinder.m_boundsMax.y = offset;
+        cylinder.m_boundsMax.x = offset;
         cylinder.m_bottom.x = bottomX;
         cylinder.m_bottom.y = bottomY;
         cylinder.m_bottom.z = bottomZ;
-        cylinder.m_direction.x = zero;
-        cylinder.m_direction.y = probeY;
-        cylinder.m_direction.z = zero;
+        cylinder.m_axis.x = zero;
+        cylinder.m_axis.y = probeY;
+        cylinder.m_axis.z = zero;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear((CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
+        if (MapMng.CheckHitCylinderNear(&cylinder, &direction, (unsigned long)-1) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             if ((nextY - param_2->m_unk0xC) > hitPos.y) {
                 finalY = nextY;
@@ -85,9 +91,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         }
 
         pppMngSt->m_position.y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x58))->y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x68))->y = finalY;
-        ((Vec*)((u8*)pppMngSt + 0x48))->y = finalY;
+        CheckBGHeightBasePosition(pppMngSt)->y = finalY;
+        CheckBGHeightTargetPosition(pppMngSt)->y = finalY;
+        CheckBGHeightPreviousPosition(pppMngSt)->y = finalY;
 
         ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
         ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;

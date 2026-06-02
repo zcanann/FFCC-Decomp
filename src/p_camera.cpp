@@ -1386,20 +1386,19 @@ void CCameraPcs::destroyFullShadow()
  */
 int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int count = 0;
     Mtx invView;
     Mtx frustumMtx;
 
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invView);
+    PSMTXInverse(m_cameraMatrix, invView);
     Vec eyePos;
     eyePos.x = invView[0][3];
     eyePos.y = invView[1][3];
     eyePos.z = invView[2][3];
 
-    PSMTXScaleApply(reinterpret_cast<MtxPtr>(self + 0x4), frustumMtx,
-                    FLOAT_8032fa94 * *reinterpret_cast<float*>(self + 0x94),
-                    FLOAT_8032fa98 * *reinterpret_cast<float*>(self + 0xA8),
+    PSMTXScaleApply(m_cameraMatrix, frustumMtx,
+                    FLOAT_8032fa94 * m_screenMatrix[0][0],
+                    FLOAT_8032fa98 * m_screenMatrix[1][1],
                     FLOAT_8032fa1c);
     CBound::SetFrustum(eyePos, frustumMtx);
 
@@ -1913,16 +1912,14 @@ void CCameraPcs::destroyMaterialEditor()
  */
 void CCameraPcs::calcMaterialEditor()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned short padButtons;
     Mtx mtxA;
     Mtx mtxB;
     Mtx mtxInv;
     float stick;
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), FLOAT_8032fa30, FLOAT_8032fa3c,
-                     FLOAT_8032fa40, FLOAT_8032fa54);
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa54);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad._452_4_ == 0) {
         padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
@@ -1975,10 +1972,10 @@ void CCameraPcs::calcMaterialEditor()
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
-    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec().x = FLOAT_8032fa34;
+    DirectionVec().y = FLOAT_8032fa34;
+    DirectionVec().z = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, &DirectionVec(), &DirectionVec());
 }
 
 /*
@@ -2037,16 +2034,14 @@ void CCameraPcs::destroyFunnyShape()
  */
 void CCameraPcs::calcFunnyShape()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned short padButtons;
     Mtx mtxA;
     Mtx mtxB;
     Mtx mtxInv;
     float stick;
 
-    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), FLOAT_8032fa30, FLOAT_8032fa3c,
-                     FLOAT_8032fa40, FLOAT_8032fa44);
-    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa44);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad._452_4_ == 0) {
         padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
@@ -2099,10 +2094,10 @@ void CCameraPcs::calcFunnyShape()
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
-    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec().x = FLOAT_8032fa34;
+    DirectionVec().y = FLOAT_8032fa34;
+    DirectionVec().z = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, &DirectionVec(), &DirectionVec());
 }
 
 /*
@@ -2144,7 +2139,6 @@ void CCameraPcs::destroyPart()
  */
 void CCameraPcs::calcPart()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx invCamera;
     Vec pos;
 
@@ -2162,23 +2156,23 @@ void CCameraPcs::calcPart()
         ppvCameraMatrix0[2][3] = pos.z;
     }
 
-    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fa30;
+    m_fov = FLOAT_8032fa30;
 
-    pppEditGetViewPos__FP3Vec(reinterpret_cast<Vec*>(self + 0xE0));
-    pppEditGetViewMatrix__FPA4_f(reinterpret_cast<float(*)[4]>(self + 0x4));
-    pppEditGetProjectionMatrix__FPA4_f(reinterpret_cast<float(*)[4]>(self + 0x94));
-    GXSetProjection(reinterpret_cast<float(*)[4]>(self + 0x94), GX_PERSPECTIVE);
+    pppEditGetViewPos__FP3Vec(&PositionVec());
+    pppEditGetViewMatrix__FPA4_f(m_cameraMatrix);
+    pppEditGetProjectionMatrix__FPA4_f(m_screenMatrix);
+    GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invCamera);
+    PSMTXInverse(m_cameraMatrix, invCamera);
 
     float directionZ = FLOAT_8032fa38;
     float directionXY = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xEC) = directionXY;
-    *reinterpret_cast<float*>(self + 0xF0) = directionXY;
-    *reinterpret_cast<float*>(self + 0xF4) = directionZ;
+    DirectionVec().x = directionXY;
+    DirectionVec().y = directionXY;
+    DirectionVec().z = directionZ;
 
-    PSMTXMultVecSR(invCamera, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
-    PSVECAdd(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xD4));
+    PSMTXMultVecSR(invCamera, &DirectionVec(), &DirectionVec());
+    PSVECAdd(&PositionVec(), &DirectionVec(), &TargetVec());
 }
 
 /*
@@ -2192,10 +2186,9 @@ void CCameraPcs::calcPart()
  */
 void CCameraPcs::SetOffsetZBuff(float offset)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx44 projection;
 
-    PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(self + 0x94), projection);
+    PSMTX44Copy(m_screenMatrix, projection);
     projection[2][3] += offset;
     GXSetProjection(projection, GX_PERSPECTIVE);
 }

@@ -250,30 +250,26 @@ struct CharaObjIgnoreFlagBits
 static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 {
 	Vec delta;
+	Vec scaledDelta;
 	Vec facing;
-	float magSq;
-	float invMag;
+	float mag;
 	float dot;
 
 	if (sourceObj == 0) {
 		return false;
 	}
 
-	delta.x = sourceObj->m_worldPosition.x - self->m_worldPosition.x;
-	delta.y = 0.0f;
-	delta.z = sourceObj->m_worldPosition.z - self->m_worldPosition.z;
-	magSq = delta.x * delta.x + delta.z * delta.z;
-	if (magSq <= 0.0f) {
+	PSVECSubtract(&sourceObj->m_worldPosition, &self->m_worldPosition, &delta);
+	mag = PSVECMag(&delta);
+	if (mag <= 0.0f) {
 		return false;
 	}
 
-	invMag = 1.0f / sqrtf(magSq);
-	delta.x *= invMag;
-	delta.z *= invMag;
+	PSVECScale(&delta, &scaledDelta, 1.0f / mag);
 	facing.x = sinf(self->m_rotBaseY);
 	facing.y = 0.0f;
 	facing.z = cosf(self->m_rotBaseY);
-	dot = delta.x * facing.x + delta.z * facing.z;
+	dot = PSVECDotProduct(&scaledDelta, &facing);
 	return dot > 0.0f;
 }
 

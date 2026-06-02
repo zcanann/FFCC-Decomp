@@ -794,19 +794,14 @@ float CGCharaObj::onAlphaUpdate()
 		}
 	}
 
-	float clamped = 0.0f;
 	float slope = m_stepSlopeLimit;
 	if (alpha < 0.0f) {
-		goto alpha_clamped;
+		alpha = 0.0f;
 	}
-	clamped = 1.0f;
 	if (1.0f < alpha) {
-		goto alpha_clamped;
+		alpha = 1.0f;
 	}
-	clamped = alpha;
-
-alpha_clamped:
-	return slope * clamped;
+	return slope * alpha;
 }
 
 /*

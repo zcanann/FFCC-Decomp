@@ -545,7 +545,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][1] *= param->m_speedScale.x;
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
     } else if (mode < 10) {
-        float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
+        float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
             short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + param->m_tail2PathIndex * 8);

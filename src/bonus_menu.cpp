@@ -2106,7 +2106,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 4 + i];
-			BonusAnimSprite* source = &sprites[extraBase + activePartyCount * 3 + i];
+			BonusAnimSprite* source = &sprites[iconBase + i];
 			sprite->startFrame = source->startFrame;
 			BonusSpriteFlags(sprite) = 1;
 			sprite->targetX = (float)sprite->x;

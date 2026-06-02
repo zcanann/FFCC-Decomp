@@ -2827,12 +2827,13 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
-    CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
     CPtrArray<CMaterial*>* materialArray = &m_materials;
     u32 textureIndex = 0;
+    u32 textureCount = static_cast<u32>(textureSet->GetNumTexture());
 
-    while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
-        if ((*textureArray)[textureIndex] != 0) {
+    while (textureIndex < textureCount) {
+        CTexture* texture = textureSet->GetTexture(textureIndex);
+        if (texture != 0) {
             u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
@@ -2841,23 +2842,21 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 
             CMaterial* newMaterial =
                 new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
-            unsigned char* material = reinterpret_cast<unsigned char*>(newMaterial);
 
-            *reinterpret_cast<int*>(material + 0x24) = -0xACE10;
-            *reinterpret_cast<void**>(material + 0x28) = 0;
-            *reinterpret_cast<unsigned short*>(material + 0x18) = 0;
-            *reinterpret_cast<float*>(material + 0x30) = 1.0f;
-            *reinterpret_cast<float*>(material + 0x2C) = 1.0f;
-            material[0xA7] = 0;
-            *reinterpret_cast<unsigned short*>(material + 0x18) = 1;
-            *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
-            *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
+            newMaterial->m_tevBit = 0xFFF531F0;
+            newMaterial->m_bumpLight = 0;
+            newMaterial->m_textureCount = 1;
+            newMaterial->m_scaleU = 1.0f;
+            newMaterial->m_scaleV = 1.0f;
+            newMaterial->m_singleTextureFlag = 0;
+            newMaterial->m_textureIndices[0] = static_cast<unsigned short>(textureIndex);
+            newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
             materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             if (materialIndex >= materialCount) {
-                materialArray->Add(reinterpret_cast<CMaterial*>(material));
+                materialArray->Add(newMaterial);
             } else {
-                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
+                materialArray->SetAt(materialIndex, newMaterial);
             }
         }
 next:

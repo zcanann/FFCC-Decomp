@@ -1451,9 +1451,16 @@ void CGCharaObj::setSta(int staIndex, int value)
 	}
 
 	unsigned int cid = GetCID();
-	bool isMon = (cid & 0xAD) == 0xAD;
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
-	bool isIceJ = isMon && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
+	bool isIceJ = false;
+	bool isMon = false;
+	unsigned char* script9 = 0;
+	if ((cid & 0xAD) == 0xAD) {
+		isMon = true;
+		script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
+		if (*reinterpret_cast<short*>(script9 + 0xFC) == 0xB) {
+			isIceJ = true;
+		}
+	}
 	int* slots = m_particleSlots;
 	float monsterScale = 1.0f;
 

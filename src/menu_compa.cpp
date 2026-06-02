@@ -10,32 +10,33 @@
 
 typedef unsigned char u8;
 
-extern "C" const float FLOAT_80332FF8;
-extern "C" const float FLOAT_80332FFC;
-extern "C" const float FLOAT_80333000;
-extern "C" const double DOUBLE_80333008;
-extern "C" const float FLOAT_80333010;
-extern "C" const float FLOAT_80333014;
-extern "C" const float FLOAT_80333018;
-extern "C" const float FLOAT_8033301C;
-extern "C" const float FLOAT_80333020;
-extern "C" const float FLOAT_80333024;
-extern "C" const float FLOAT_80333028;
+extern "C" const float FLOAT_80332FF8 = 0.0f;
+extern "C" const float FLOAT_80332FFC = 24.0f;
+extern "C" const float FLOAT_80333000 = 1.0f;
+extern "C" const double DOUBLE_80333008 = 1.0;
+extern "C" const float FLOAT_80333010 = 255.0f;
+extern "C" const float FLOAT_80333014 = 328.0f;
+extern "C" const float FLOAT_80333018 = 40.0f;
+extern "C" const float FLOAT_8033301C = 0.8f;
+extern "C" const float FLOAT_80333020 = 4.0f;
+extern "C" const float FLOAT_80333024 = 1.2f;
+extern "C" const float FLOAT_80333028 = 2.0f;
+extern "C" const double DOUBLE_80333030 = 4503601774854144.0;
 extern "C" const float FLOAT_80333038;
 extern "C" const float FLOAT_8033303C;
 
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
 extern "C" const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
-extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
-extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";
-extern "C" const char s_MenuOptionForza_803334B8[] = "Forza";
-extern "C" const char s_MenuOptionDifesa_803334C0[] = "Difesa";
-extern "C" const char s_MenuOptionSonoro_803334C8[] = "Sonoro";
-extern "C" const char s_MenuOptionMusica_803334D0[] = "Musica";
-extern "C" const char s_MenuOptionMonoIt_803334D8[] = "Mono";
-extern "C" const char s_MenuOptionContr_803334E0[] = "Contr.";
-extern "C" const char s_MenuOptionNorm_803334E8[] = "Norm.";
+extern "C" const char s_MenuOptionMonoUpper_803334A8[];
+extern "C" const char s_MenuOptionNormalIt_803334B0[];
+extern "C" const char s_MenuOptionForza_803334B8[];
+extern "C" const char s_MenuOptionDifesa_803334C0[];
+extern "C" const char s_MenuOptionSonoro_803334C8[];
+extern "C" const char s_MenuOptionMusica_803334D0[];
+extern "C" const char s_MenuOptionMonoIt_803334D8[];
+extern "C" const char s_MenuOptionContr_803334E0[];
+extern "C" const char s_MenuOptionNorm_803334E8[];
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 

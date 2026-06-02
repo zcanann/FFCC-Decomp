@@ -88,6 +88,14 @@ struct CharaViewerSRT {
 
 typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1];
 
+struct coord {
+    Vec pos;
+    float s;
+    float t;
+};
+
+typedef char CharaViewerCoord_size_check[(sizeof(coord) == 0x14) ? 1 : -1];
+
 template <class T>
 static inline void ReleaseShared(T*& ptr)
 {
@@ -178,6 +186,21 @@ extern "C" const char s_no_texture____801da7e8[0x188] =
 #define s_default_cha_path (viewerStrings + 0x14C)
 #define s_default_tex_path (viewerStrings + 0x164)
 #define s_back_tex_fmt (viewerStrings + 0x17C)
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void sendVertex(coord* vertex)
+{
+    GXPosition3f32(vertex->pos.x, vertex->pos.y, vertex->pos.z);
+    GXTexCoord2f32(vertex->s, vertex->t);
+}
 
 /*
  * --INFO--

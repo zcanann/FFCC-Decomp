@@ -745,7 +745,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	unsigned short cid = GetCID();
-	if (CharaObjIsPlayerCid(cid)) {
+	if ((cid & 0x6D) == 0x6D) {
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) != 0) {
 			push += 10;
 		}

@@ -12,14 +12,18 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
 extern const float kPppYmMeltZero;
+extern const float FLOAT_80330af4;
+extern const float FLOAT_80330b08 = 0.5f;
+extern const float FLOAT_80330b0c = 0.017453292f;
+extern const float FLOAT_80330b10 = -2000.0f;
+extern const float FLOAT_80330b14 = 10000000000.0f;
+extern const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
+extern const u32 DAT_80330b20 = 0x00000001;
+extern const u32 DAT_80330b24 = 0x00000010;
+extern const u32 DAT_80330B28[2] = {0x0000003f, 0x00000000};
+extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
-extern const float FLOAT_80330af4;
-extern const float FLOAT_80330b08;
-extern const float FLOAT_80330b0c;
-extern const float FLOAT_80330b10;
-extern const float FLOAT_80330b14;
-extern const float FLOAT_80330b18[2];
 
 struct YmMeltVertex
 {

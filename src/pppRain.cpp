@@ -21,11 +21,23 @@ struct RainColorData {
     pppCVECTOR color;
 };
 
+struct VRain {
+    RainDrop* drops;
+    f32 moveY;
+    f32 accelY;
+    f32 accelZ;
+};
+
 STATIC_ASSERT(offsetof(RainWork, drops) == 0x0);
 STATIC_ASSERT(offsetof(RainWork, moveY) == 0x4);
 STATIC_ASSERT(offsetof(RainWork, accelY) == 0x8);
 STATIC_ASSERT(offsetof(RainWork, accelZ) == 0xC);
 STATIC_ASSERT(sizeof(RainWork) == 0x10);
+STATIC_ASSERT(offsetof(VRain, drops) == 0x0);
+STATIC_ASSERT(offsetof(VRain, moveY) == 0x4);
+STATIC_ASSERT(offsetof(VRain, accelY) == 0x8);
+STATIC_ASSERT(offsetof(VRain, accelZ) == 0xC);
+STATIC_ASSERT(sizeof(VRain) == 0x10);
 STATIC_ASSERT(sizeof(RainDrop) == 0x20);
 STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
 
@@ -310,6 +322,67 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
     work->accelZ = fVar1;
     work->accelY = fVar1;
     work->moveY = fVar1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
+{
+    work->accelY += work->accelZ;
+    work->moveY += work->accelY;
+    work->moveY += rain->m_moveYDelta;
+    work->accelY += rain->m_accelYDelta;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
+{
+    RainDrop* drop;
+
+    drop = work->drops;
+    for (int i = 0; i < (int)rain->m_dataValIndex; i++) {
+        int randA = rand();
+        int randB = rand();
+        float unitA = FLOAT_80331020 * (float)randA;
+        float unitB = FLOAT_80331020 * (float)randB;
+        float lengthDelta;
+        int lifeRemainder;
+
+        drop->posX = unitA * (rain->m_maxX - rain->m_minX) + rain->m_minX;
+        drop->posY = rain->m_maxY;
+        drop->posZ = unitB * (rain->m_maxZ - rain->m_minZ) + rain->m_minZ;
+        drop->dirX = -rain->m_initWOrk;
+        drop->dirY = rain->m_driftY;
+        drop->dirZ = -rain->m_arg3;
+        PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
+
+        lengthDelta = unitA * rain->m_lengthRand;
+        drop->length = rain->m_lengthBase;
+        lengthDelta = ((randA & 1) == 0) ? lengthDelta : -lengthDelta;
+        drop->length += lengthDelta;
+
+        lifeRemainder = randA % rain->m_lifeRange;
+        if ((randA & 1) != 0) {
+            lifeRemainder = -lifeRemainder;
+        }
+        drop->life = (s16)(rain->m_lifeBase + lifeRemainder);
+        drop++;
+    }
 }
 
 extern const float FLOAT_80330FD4 = -1.0f;

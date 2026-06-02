@@ -2961,9 +2961,6 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
-    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
-    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
     *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
     *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
     *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;

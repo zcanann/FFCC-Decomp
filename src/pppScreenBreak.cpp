@@ -76,7 +76,15 @@ struct pppScreenBreakUnkB {
     u8 _pad9[3];
     float m_stepValue;
     float m_arg3;
-    u8 m_payload[0x20];
+    float m_graphPayload;
+    float m_gravityScale;
+    u8 m_pad1C[4];
+    Vec m_gravityDir;
+    float m_gravityAmount;
+    u8 m_angleRand;
+    u8 m_pad35[3];
+    float m_speedBase;
+    float m_speedRand;
 };
 
 struct pppScreenBreakUnkC {
@@ -96,6 +104,9 @@ STATIC_ASSERT(offsetof(VScreenBreak, m_pieces) == 0x0C);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferTexObj) == 0x10);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferReady) == 0x24);
 STATIC_ASSERT(offsetof(VScreenBreak, m_color) == 0x28);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_graphPayload) == 0x14);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityScale) == 0x18);
+STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityDir) == 0x20);
 
 extern const float FLOAT_80331cc0 = 2.0f;
 extern const float FLOAT_80331cc4 = 0.0f;
@@ -186,7 +197,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     DCFlushRange(value->m_color, 4);
 
     CalcGraphValue(&pppScreenBreak->m_object, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
-                   param_2->m_stepValue, param_2->m_arg3, *reinterpret_cast<float*>(param_2->m_payload));
+                   param_2->m_stepValue, param_2->m_arg3, param_2->m_graphPayload);
 
     ScreenBreakPiece* pieceStorage = value->m_pieces;
     if (pieceStorage == 0) {
@@ -196,7 +207,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         value->m_backBufferTexObj = static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr,
                                                                       const_cast<char*>(s_pppScreenBreak_cpp), 0x25F));
         InitPieceData(model, (PScreenBreak*)param_2, (VScreenBreak*)value);
-        PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
+        PSVECNormalize(&param_2->m_gravityDir, &param_2->m_gravityDir);
     }
 
     const float& two = FLOAT_80331cc0;
@@ -378,6 +389,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 {
     s32 iVar6;
     u32 uVar15;
+    pppScreenBreakUnkB* stepData = reinterpret_cast<pppScreenBreakUnkB*>(step);
     ScreenBreakPiece* piece;
     s32 iVar16;
     float dVar17;
@@ -512,15 +524,15 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         ((RawVec*)&upVec)->z = upRaw->z;
         PSVECCrossProduct(&piece->m_velocity, &upVec, &piece->m_axis);
 
-        dVar17 = Math.RandF(*(float*)((u8*)step + 0x3C));
-        PSVECScale(&piece->m_velocity, &piece->m_velocity, *(float*)((u8*)step + 0x38) + dVar17);
+        dVar17 = Math.RandF(stepData->m_speedRand);
+        PSVECScale(&piece->m_velocity, &piece->m_velocity, stepData->m_speedBase + dVar17);
 
         piece->m_accel.z = dVar22;
         piece->m_accel.y = dVar22;
         piece->m_accel.x = dVar22;
         piece->m_timer = dVar22;
 
-        uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
+        uStack_b4 = static_cast<u32>(stepData->m_angleRand);
         dVar17 = Math.RandF((float)uStack_b4);
         mesh++;
         uVar15++;
@@ -639,6 +651,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     float zero = 0.0f;
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
+    pppScreenBreakUnkB* step = static_cast<pppScreenBreakUnkB*>(param_3);
     ScreenBreakPiece* pieceData = work->m_pieces;
     Vec translation;
     Vec cameraForward;
@@ -696,8 +709,8 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     ScreenBreakModelMtx(model)[2][3] = translation.z;
 
     mesh = model->m_meshes;
-    if (*(float*)((u8*)param_3 + 0x30) != zero) {
-        PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
+    if (step->m_gravityAmount != zero) {
+        PSVECScale(&step->m_gravityDir, &gravityAdd, step->m_gravityAmount);
     }
 
     for (u32 i = 0; i < model->m_data->m_meshCount; i++) {
@@ -727,11 +740,11 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             PSMTXConcat(quatMtx, transMtx, nodeMtx);
 
             pieceData->m_translation.x -= pieceData->m_velocity.x;
-            float gravityTerm = 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData->m_timer;
+            float gravityTerm = 0.5f * step->m_gravityScale * pieceData->m_timer;
             pieceData->m_translation.y = pieceData->m_velocity.y * pieceData->m_timer - gravityTerm * pieceData->m_timer;
             pieceData->m_translation.z -= pieceData->m_velocity.z;
 
-            if (*(float*)((u8*)param_3 + 0x30) != zero) {
+            if (step->m_gravityAmount != zero) {
                 pieceData->m_translation.x += gravityAdd.x;
                 pieceData->m_translation.z += gravityAdd.z;
             }

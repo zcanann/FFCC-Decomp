@@ -2835,15 +2835,13 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
-    CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
-    CPtrArray<CMaterial*>* materialArray = &m_materials;
     u32 textureIndex = 0;
 
-    while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
-        if ((*textureArray)[textureIndex] != 0) {
-            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+    while (textureIndex < static_cast<u32>(reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8))->GetSize())) {
+        if ((*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[textureIndex] != 0) {
+            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
             u32 materialIndex = textureIndex + 1;
-            if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
+            if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
             }
 
@@ -2861,11 +2859,11 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
             if (materialIndex >= materialCount) {
-                materialArray->Add(reinterpret_cast<CMaterial*>(material));
+                m_materials.Add(reinterpret_cast<CMaterial*>(material));
             } else {
-                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
+                m_materials.SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
             }
         }
 next:

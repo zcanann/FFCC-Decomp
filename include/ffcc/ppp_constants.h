@@ -1,7 +1,7 @@
 #ifndef FFCC_PPP_CONSTANTS_H
 #define FFCC_PPP_CONSTANTS_H
 
-extern float gPppTrigTable[];
+extern float ppvSinTbl[];
 
 extern float gPppPointRApRandomAngleRange;
 extern float gPppPointRApRandomAngleBias;

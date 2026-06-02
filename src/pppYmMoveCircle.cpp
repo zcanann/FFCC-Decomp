@@ -90,8 +90,8 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
         tableIndex = (s32)tableAngle;
     }
     nextPos.y = 0.0f;
-    sinAngle = gPppTrigTable[(tableIndex & 0xFFFC) >> 2];
-    cosAngle = gPppTrigTable[((tableIndex + 0x4000) & 0xFFFC) >> 2];
+    sinAngle = ppvSinTbl[(tableIndex & 0xFFFC) >> 2];
+    cosAngle = ppvSinTbl[((tableIndex + 0x4000) & 0xFFFC) >> 2];
     nextPos.x = work->m_radius * cosAngle;
     nextPos.z = work->m_radius * -sinAngle;
     nextPos.x += work->m_center.x;

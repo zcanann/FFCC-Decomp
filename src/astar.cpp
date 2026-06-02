@@ -26,6 +26,8 @@ extern const float kInfiniteCost;
 extern const char kAStarStepDebugFormat[4];
 extern const char kAStarNewLine[2];
 }
+static const char kAStarCalcStepDebugFormat[] = "%d ";
+static const char kAStarCalcNewLine[] = "\n";
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 

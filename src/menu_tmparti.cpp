@@ -59,6 +59,180 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline int CMenuPcs::TmpArtiCtrlCur()
+{
+    bool hasInput = false;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        hasInput = true;
+    }
+
+    unsigned short buttonDown;
+    if (hasInput) {
+        buttonDown = 0;
+    } else {
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        buttonDown = Pad.GetPadInputs()[padIndex].buttonDown[0];
+    }
+
+    if (buttonDown == 0) {
+        return 0;
+    }
+
+    if ((buttonDown & 0x20) != 0) {
+        m_tmpArtiState->moveDirection = 1;
+        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+        return 1;
+    }
+
+    if ((buttonDown & 0x40) != 0) {
+        m_tmpArtiState->moveDirection = -1;
+        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+        return 1;
+    }
+
+    if ((buttonDown & 0x100) != 0) {
+        Sound.PlaySe(4, 0x40, 0x7f, 0);
+        return 0;
+    }
+
+    if ((buttonDown & 0x200) != 0) {
+        m_tmpArtiState->closeRequested = 1;
+        Sound.PlaySe(3, 0x40, 0x7f, 0);
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::TmpArtiInit0()
+{
+    TmpArtiEntry* entry = GetTmpArtiEntries(this);
+    unsigned int count = GetTmpArtiList(this)->count;
+    float alpha = FLOAT_80332f30;
+
+    if ((int)count > 0) {
+        unsigned int blockCount = count >> 3;
+        for (; blockCount != 0; blockCount--) {
+            entry[0].startFrame = 0;
+            entry[0].duration = 1;
+            entry[0].alpha = alpha;
+            entry[1].startFrame = 0;
+            entry[1].duration = 1;
+            entry[1].alpha = alpha;
+            entry[2].startFrame = 0;
+            entry[2].duration = 1;
+            entry[2].alpha = alpha;
+            entry[3].startFrame = 0;
+            entry[3].duration = 1;
+            entry[3].alpha = alpha;
+            entry[4].startFrame = 0;
+            entry[4].duration = 1;
+            entry[4].alpha = alpha;
+            entry[5].startFrame = 0;
+            entry[5].duration = 1;
+            entry[5].alpha = alpha;
+            entry[6].startFrame = 0;
+            entry[6].duration = 1;
+            entry[6].alpha = alpha;
+            entry[7].startFrame = 0;
+            entry[7].duration = 1;
+            entry[7].alpha = alpha;
+            entry += 8;
+        }
+
+        count &= 7;
+        if (count != 0) {
+            do {
+                entry->startFrame = 0;
+                entry->duration = 1;
+                entry->alpha = alpha;
+                entry++;
+                count--;
+            } while (count != 0);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::TmpArtiInit()
+{
+    memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
+
+    float one = FLOAT_80332f30;
+    TmpArtiEntry* entry = GetTmpArtiEntries(this);
+    int i = 8;
+    do {
+        entry[0].z = one;
+        entry[1].z = one;
+        entry[2].z = one;
+        entry[3].z = one;
+        entry[4].z = one;
+        entry[5].z = one;
+        entry[6].z = one;
+        entry[7].z = one;
+        entry += 8;
+        i--;
+    } while (i != 0);
+
+    double center = DOUBLE_80332f58;
+    double half = DOUBLE_80332f20;
+    float zero = FLOAT_80332f2c;
+    int row = 0;
+    entry = GetTmpArtiEntries(this);
+    for (int pairCount = 0; pairCount < 2; pairCount++) {
+        entry[0].tex = 0x37;
+        entry[0].width = 200;
+        entry[0].height = 0x28;
+        entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
+        entry[0].y = row * (entry[0].height - 8) + 0x60;
+        entry[0].s = zero;
+        entry[0].t = zero;
+        entry[0].startFrame = row++;
+        entry[0].duration = 3;
+        entry[1].tex = 0x37;
+        entry[1].width = 200;
+        entry[1].height = 0x28;
+        entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
+        entry[1].y = row * (entry[1].height - 8) + 0x60;
+        entry[1].s = zero;
+        entry[1].t = zero;
+        entry[1].startFrame = row++;
+        entry[1].duration = 3;
+        entry += 2;
+    }
+
+    m_tmpArtiList->count = 4;
+    m_tmpArtiState->unk_26 = 0;
+    m_tmpArtiState->initialized = 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8015d798
  * PAL Size: 1056b
  * EN Address: TODO

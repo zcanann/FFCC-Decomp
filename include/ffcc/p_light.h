@@ -24,6 +24,7 @@ public:
     {
     public:
         CLight();
+        void Set(CLightPcs::CLight*);
 
         u32 m_type;               // 0x00
         Vec3f m_position;         // 0x04
@@ -87,7 +88,9 @@ public:
     void calc();
     void draw();
     void Add(CLightPcs::CLight*);
+    CLightPcs::CBumpLight* GetFreeBumpLight(CLightPcs::TARGET);
     CLightPcs::CBumpLight* AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int);
+    void Clear();
     void SetMapColorAlpha(float (*)[4], _GXColor, _GXColor, unsigned char, float, float, float, unsigned char);
     void SetAmbient(_GXColor);
     void SetAmbientAlpha(float);
@@ -98,6 +101,7 @@ public:
     void SetPosition(CLightPcs::TARGET, Vec*, unsigned long);
     void SetBit32(CLightPcs::TARGET, unsigned long*);
     void SetPart(CLightPcs::TARGET, void*, unsigned char);
+    void SetForEmissionModel(CLightPcs::TARGET, void*);
     void InsertOctTree(CLightPcs::TARGET, COctTree&);
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight*, Vec*, unsigned char);

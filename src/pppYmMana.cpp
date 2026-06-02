@@ -1299,7 +1299,6 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
  */
 static int UpdateWaterMesh(VYmMana* mana)
 {
-    u8* work;
     float* waterHeightA;
     float* waterHeightB;
     Vec* positions;
@@ -1307,10 +1306,9 @@ static int UpdateWaterMesh(VYmMana* mana)
     float currentScale;
     float neighborScale;
 
-    work = (u8*)mana;
-    waterHeightA = *(float**)(work + 0x48);
-    positions = *(Vec**)(work + 0x3C);
-    waterHeightB = *(float**)(work + 0x4C);
+    waterHeightA = mana->m_waterHeightA;
+    positions = mana->m_positions;
+    waterHeightB = mana->m_waterHeightB;
     if (waterHeightA == NULL) {
         return 0;
     }
@@ -1380,11 +1378,11 @@ static int UpdateWaterMesh(VYmMana* mana)
     DCFlushRange(positions, 0xD8C);
     CalculateNormal(mana);
 
-    origin.x = *(float*)(work + 0x94);
-    origin.y = *(float*)(work + 0xA4);
-    origin.z = *(float*)(work + 0xB4);
-    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
-                              (float(*)[4])(work + 0x88), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    origin.x = mana->m_waterMtx[0][3];
+    origin.y = mana->m_waterMtx[1][3];
+    origin.z = mana->m_waterMtx[2][3];
+    CalcWaterReflectionVector(mana->m_reflectionVec, mana->m_positions, mana->m_normals, 0x121, origin,
+                              mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
 
@@ -1399,15 +1397,14 @@ static int UpdateWaterMesh(VYmMana* mana)
  */
 static int RenderWaterMesh(VYmMana* mana)
 {
-    u8* work = (u8*)mana;
-    void* texObj0;
-    void* positions = *(void**)(work + 0x3C);
-    void* normals = *(void**)(work + 0x40);
-    void* texCoord0 = *(void**)(work + 0x54);
-    void* texCoord1 = *(void**)(work + 0x58);
-    u16* indices = *(u16**)(work + 0x50);
-    void* colors = *(void**)(work + 0x5C);
-    texObj0 = *(void**)(work + 0x28);
+    void* positions = mana->m_positions;
+    void* normals = mana->m_normals;
+    void* texCoord0 = mana->m_texCoord0;
+    void* texCoord1 = mana->m_texCoord1;
+    u16* indices = mana->m_indices;
+    void* colors = mana->m_colors;
+    GXTexObj* texObj0 = mana->m_generatedTexObj0;
+    CTexture* texObj2;
     _GXColor blendColor;
     _GXColor modulateColor;
 
@@ -1439,10 +1436,10 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetArray((GXAttr)0xB, colors, 4);
     GXSetArray((GXAttr)0xD, texCoord0, 8);
     GXSetArray((GXAttr)0xE, texCoord1, 8);
-    void* texObj2 = *(void**)(work + 0x80);
+    texObj2 = mana->m_envTexture1;
     GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
     GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
-    u8 alpha = *(u8*)(work + 0xE8);
+    u8 alpha = mana->m_manaAlpha;
     blendColor.r = 0x80;
     blendColor.g = 0x80;
     blendColor.b = 0x80;
@@ -1455,7 +1452,7 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetTevDirect((GXTevStageID)0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXLoadTexObj((GXTexObj*)((u8*)texObj2 + 0x28), GX_TEXMAP0);
+    GXLoadTexObj(&texObj2->m_texObj, GX_TEXMAP0);
     GXSetTevKColor((GXTevKColorID)1, modulateColor);
     GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
     GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
@@ -1467,7 +1464,7 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetTevDirect((GXTevStageID)1);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x28), GX_TEXMAP1);
+    GXLoadTexObj(mana->m_generatedTexObj0, GX_TEXMAP1);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
@@ -1479,7 +1476,7 @@ static int RenderWaterMesh(VYmMana* mana)
     GXSetTevDirect((GXTevStageID)2);
     _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD1, GX_TEXMAP2, GX_COLOR0A0);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x2C), GX_TEXMAP2);
+    GXLoadTexObj(mana->m_generatedTexObj1, GX_TEXMAP2);
     GXSetTevKColor((GXTevKColorID)0, blendColor);
     GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
     GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
@@ -1519,7 +1516,7 @@ static int RenderWaterMesh(VYmMana* mana)
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
     GXSetNumTevStages(1);
-    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP0);
+    GXLoadTexObj(texObj0, GX_TEXMAP0);
     return 1;
 }
 
@@ -1541,9 +1538,9 @@ static void CalculateNormal(VYmMana* mana)
     Vec edgeB;
     Vec faceNormal;
 
-    positions = *(Vec**)((u8*)mana + 0x3C);
-    normals = *(Vec**)((u8*)mana + 0x40);
-    indices = *(u16**)((u8*)mana + 0x50);
+    positions = mana->m_positions;
+    normals = mana->m_normals;
+    indices = mana->m_indices;
 
     float zero = FLOAT_80330e4c;
     for (s32 i = 0; i < 0x121; i++) {

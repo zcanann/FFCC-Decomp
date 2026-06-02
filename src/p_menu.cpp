@@ -716,7 +716,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
+                if ((currentMode != -1) && (-1 < currentMode)) {
                     ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[1]));
 
                     i = 0;
@@ -765,7 +765,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         currentMode = m_mode;
         if (currentMode != 1) {
             if (currentMode < 1) {
-                if ((currentMode != -1) && (-2 < currentMode)) {
+                if ((currentMode != -1) && (-1 < currentMode)) {
                     createBattle();
                     createSingleMenu();
                 }

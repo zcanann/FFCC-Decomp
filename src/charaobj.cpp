@@ -694,9 +694,9 @@ void CGCharaObj::onFramePreCalc()
 			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
 		} else {
 			m_partyDistance[i] = FLOAT_80331988;
-			m_partyDelta[i].x = FLOAT_80331988;
-			m_partyDelta[i].y = FLOAT_80331988;
 			m_partyDelta[i].z = FLOAT_80331988;
+			m_partyDelta[i].y = FLOAT_80331988;
+			m_partyDelta[i].x = FLOAT_80331988;
 			m_partyAngle[i] = FLOAT_80331988;
 		}
 

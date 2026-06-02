@@ -40,6 +40,11 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
+static inline int LoadInt(const int& value)
+{
+    return value;
+}
+
 struct POLYGON_DATA {
     u8 m_enabled;
     u8 m_alpha;
@@ -82,8 +87,19 @@ struct CharaBreakDisplayListPair {
 };
 
 typedef CChara::CMesh::CDisplayList CharaBreakDisplayList;
-typedef CChara::CMesh::CRefData CharaBreakMeshData;
 typedef CChara::CMesh CharaBreakMeshRef;
+
+struct CharaBreakMeshData {
+    char m_name[0x10];
+    u8 _pad10[0x04];
+    u32 m_vertexCount;
+    u8 _pad18[0x34];
+    u32 m_displayListCount;
+    CharaBreakDisplayList* m_displayLists;
+    u32 m_skinCount;
+    void* m_skins;
+    u32 m_nodeIndex;
+};
 
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
@@ -95,7 +111,7 @@ STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x60);
+STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
@@ -120,7 +136,7 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
 
 static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 {
-    return mesh->m_data;
+    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
 }
 
 static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)
@@ -508,9 +524,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                 if (polygon->m_enabled == 0) {
                     int flags[3];
-                    flags[0] = kCharaBreakInitialVertexFlag0;
-                    flags[1] = kCharaBreakInitialVertexFlag1;
-                    flags[2] = kCharaBreakInitialVertexFlag2;
+                    flags[0] = LoadInt(kCharaBreakInitialVertexFlag0);
+                    flags[1] = LoadInt(kCharaBreakInitialVertexFlag1);
+                    flags[2] = LoadInt(kCharaBreakInitialVertexFlag2);
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
@@ -589,8 +605,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     if (avgX >= -0x7530 && avgX <= 0x7530 && avgY >= -0x7530 && avgY <= 0x7530 && avgZ >= -0x7530 &&
                         avgZ <= 0x7530) {
                         Vec verts[3];
-                        S16Vec normalA;
-                        S16Vec normalB;
                         Vec axis;
                         Vec velocity;
                         Quaternion rotQuat;
@@ -606,11 +620,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                         PSVECScale(&center, &center, FLOAT_80332058);
 
-                        normalB = polygon->m_normalB;
-                        gUtil.ConvI2FVector(axis, normalB, ModelData(model)->m_normQuant);
-
-                        normalA = polygon->m_normalA;
-                        gUtil.ConvI2FVector(velocity, normalA, ModelData(model)->m_normQuant);
+                        gUtil.ConvI2FVector(axis, polygon->m_normalB, ModelData(model)->m_normQuant);
+                        gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);

@@ -1788,13 +1788,13 @@ void CMenuPcs::GetCmdItem()
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	s16* write = list;
 	s32 count = 0;
-	u32 itemIndexPtr = scriptFood + 0xb6;
+	u32 itemIndexPtr = scriptFood;
 
 	for (s32 i = 0; i < 0x40; i++) {
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if ((itemType != 1) ||
-			    (GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr)) ==
+			    (GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr + 0xb6)) ==
 			     (*reinterpret_cast<u16*>(scriptFood + 0x3e0) & 3))) {
 				write++;
 				*write = static_cast<s16>(i);

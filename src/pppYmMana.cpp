@@ -335,8 +335,7 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
 {
     VYmMana* mana = static_cast<VYmMana*>(work);
     VYmMana* sourceMana = static_cast<VYmMana*>(vYmMana);
-    CChara::CMesh::CRefData* meshData = model->m_meshes[meshIndex].m_data;
-    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
+    CChara::CMesh* meshes = model->m_meshes;
     u8 alpha = sourceMana->m_runtimeColor.a;
     if (alpha != 0) {
         mana->m_shadowColor.r = 0xFF;
@@ -353,6 +352,10 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
     DCFlushRange(&mana->m_shadowColor, 4);
     GXSetArray((GXAttr)0xB, &mana->m_shadowColor, 4);
 
+    meshes += meshIndex;
+    CChara::CMesh::CRefData* meshData = meshes->m_data;
+    CChara::CMesh::CDisplayList* displayList = meshData->m_displayLists;
+    displayList += dlIndex;
     MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
     GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
@@ -521,10 +524,10 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     work->m_displayListCopies = 0;
     work->m_reflectionVec = 0;
     work->m_colors = 0;
-    work->m_envTexture0 = 0;
     work->m_captureTexObjs = 0;
-    work->m_envTexture1 = 0;
     work->m_step = 0;
+    work->m_envTexture0 = 0;
+    work->m_envTexture1 = 0;
     work->m_meshReflectionVec = 0;
     work->m_meshColors = 0;
     work->m_meshTexCoords0 = 0;
@@ -1537,19 +1540,20 @@ static void CalculateNormal(VYmMana* mana)
     Vec edgeA;
     Vec edgeB;
     Vec faceNormal;
+    s32 i;
 
     positions = mana->m_positions;
     normals = mana->m_normals;
     indices = mana->m_indices;
 
     float zero = FLOAT_80330e4c;
-    for (s32 i = 0; i < 0x121; i++) {
+    for (i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;
         normals[i].x = zero;
     }
 
-    s32 i = 0;
+    i = 0;
     s32 indicesOffset = i;
     for (; i < 0x200; i++) {
         u16 i0 = indices[indicesOffset++];

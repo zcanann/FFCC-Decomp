@@ -262,7 +262,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         drop++;
     }
 
-    if (gPppInConstructor == 0) {
+    if (ppvIsLoopCalc == 0) {
         float posX;
         float posY;
         float posZ;

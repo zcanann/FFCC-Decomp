@@ -1679,7 +1679,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 				sprite->alpha = 0.0f;
 			}
 			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = (float)sprite->timer / (float)sprite->duration;
+				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
 			} else {
 				sprite->alpha = 1.0f;
 			}

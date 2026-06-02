@@ -76,7 +76,17 @@ struct pppYmLaserColorData {
 	pppCVECTOR m_color;
 };
 
+struct CMapCylinderRaw {
+	Vec m_bottom;
+	Vec m_top;
+	Vec m_axis;
+	float m_radius;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
+};
+
 STATIC_ASSERT(offsetof(struct pppYmLaser, m_workArea) == 0x80);
+STATIC_ASSERT(sizeof(CMapCylinderRaw) == sizeof(CMapCylinder));
 
 /*
  * --INFO--
@@ -364,7 +374,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Vec localA;
 	Mtx tempMtx;
 	Mtx charaMtx;
-	CMapCylinder cyl;
+	CMapCylinderRaw cyl;
 	int emptyHistory;
 	int fillIndex;
 
@@ -439,7 +449,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

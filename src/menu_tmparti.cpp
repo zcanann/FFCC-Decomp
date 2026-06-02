@@ -8,18 +8,16 @@
 #include "ffcc/linkage.h"
 #include <string.h>
 
-extern const double DOUBLE_80332f20;
-extern const float FLOAT_80332F28;
-extern const float FLOAT_80332f2c;
-extern const float FLOAT_80332f30;
-extern const float FLOAT_80332F34;
-extern const float FLOAT_80332F38;
-extern const double DOUBLE_80332f40;
-extern const double DOUBLE_80332f48;
-extern const double DOUBLE_80332f50;
-extern const double DOUBLE_80332f58;
-extern const double DOUBLE_80333418 = 0.0;
-extern const double DOUBLE_80333420 = 216.0;
+static const double DOUBLE_80332f20 = 0.5;
+static const float FLOAT_80332F28 = 255.0f;
+static const float FLOAT_80332f2c = 0.0f;
+static const float FLOAT_80332f30 = 1.0f;
+static const float FLOAT_80332F34 = 0.9f;
+static const float FLOAT_80332F38 = 4.0f;
+static const double DOUBLE_80332f40 = 4503601774854144.0;
+static const double DOUBLE_80332f48 = 1.0;
+static const double DOUBLE_80332f50 = 0.0;
+static const double DOUBLE_80332f58 = 216.0;
 
 static inline float TmpArtiIntToFloat(int value)
 {

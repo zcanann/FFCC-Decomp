@@ -2,6 +2,7 @@
 #define _FFCC_MAPTEXANIM_H_
 
 #include "ffcc/map.h"
+#include "ffcc/mapkeyframe.h"
 #include "ffcc/ref.h"
 
 class CChunkFile;
@@ -29,80 +30,6 @@ private:
     CMapTexAnim* m_anims[64];
     CMaterialSet* m_materialSet;
     CTextureSet* m_textureSet;
-};
-
-class CMapKeyFrameData
-{
-public:
-    float Get()
-    {
-        return reinterpret_cast<CMapKeyFrame*>(this)->Get();
-    }
-
-    int Get(int& key0, int& key1, float& blend)
-    {
-        return reinterpret_cast<CMapKeyFrame*>(this)->Get(key0, key1, blend);
-    }
-
-    void Calc()
-    {
-        reinterpret_cast<CMapKeyFrame*>(this)->Calc();
-    }
-
-    int IsRun()
-    {
-        return reinterpret_cast<CMapKeyFrame*>(this)->IsRun();
-    }
-
-    void ReadJun(CChunkFile& chunkFile, int count)
-    {
-        reinterpret_cast<CMapKeyFrame*>(this)->ReadJun(chunkFile, count);
-    }
-
-    void ReadFrame(CChunkFile& chunkFile, int count)
-    {
-        reinterpret_cast<CMapKeyFrame*>(this)->ReadFrame(chunkFile, count);
-    }
-
-    void ReadKey(CChunkFile& chunkFile, int count)
-    {
-        reinterpret_cast<CMapKeyFrame*>(this)->ReadKey(chunkFile, count);
-    }
-
-    void Destroy()
-    {
-        if (m_junTable != 0) {
-            delete m_junTable;
-            m_junTable = 0;
-        }
-        if (m_keyFrame != 0) {
-            delete m_keyFrame;
-            m_keyFrame = 0;
-        }
-        if (m_keyValue != 0) {
-            delete m_keyValue;
-            m_keyValue = 0;
-        }
-        if (m_splineTable != 0) {
-            delete m_splineTable;
-            m_splineTable = 0;
-        }
-    }
-
-    unsigned char m_mode;
-    unsigned char m_junCount;
-    unsigned char m_keyCount;
-    unsigned char m_loop;
-    unsigned char m_isRun;
-    unsigned char m_pad05[3];
-    int m_currentFrame;
-    int m_startFrame;
-    int m_endFrame;
-    int m_frameCount;
-    unsigned char* m_junTable;
-    float* m_keyFrame;
-    float* m_keyValue;
-    float* m_splineTable;
 };
 
 class CMapTexAnim : public CRef
@@ -170,7 +97,7 @@ private:
     float m_frameStep;
     float m_currentFrame;
     unsigned short* m_frameTable;
-    CMapKeyFrameData m_keyFrame;
+    CMapKeyFrame m_keyFrame;
 };
 
 #endif // _FFCC_MAPTEXANIM_H_

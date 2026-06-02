@@ -8,6 +8,11 @@ class CMapKeyFrame
 public:
     ~CMapKeyFrame()
     {
+        Destroy();
+    }
+
+    void Destroy()
+    {
         if (m_junTable != 0) {
             delete m_junTable;
             m_junTable = 0;

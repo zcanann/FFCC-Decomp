@@ -3363,19 +3363,16 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
     objIndex = -1;
 
 found:
-    const unsigned int packedColor = *reinterpret_cast<unsigned int*>(&color);
+    const _GXColor spotColor = color;
     const float posX = position.x;
     const float posY = position.y;
     const float posZ = position.z;
     CMapObj* mapObj = GetMapObjArray() + objIndex;
-    unsigned char* mapObjLight = reinterpret_cast<unsigned char*>(mapObj->m_attribute);
+    CMapObjAtr* attr = mapObj->m_attribute;
 
-    if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::SPOT_LIGHT) {
-        const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
-        *reinterpret_cast<unsigned char*>(mapObjLight + 8) = colorBytes[0];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 10) = colorBytes[2];
-        *reinterpret_cast<unsigned char*>(mapObjLight + 11) = colorBytes[3];
+    if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
+        CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
+        spotAttr->m_color = spotColor;
         mapObj->m_localRotationX = posX;
         mapObj->m_localRotationY = posY;
         mapObj->m_localRotationZ = posZ;

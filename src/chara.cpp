@@ -60,10 +60,12 @@ STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workNormals) == 0x10);
 typedef CCharaModelData CCharaModelRefRaw;
 
 STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x0C);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x10);
-STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_bank) == 0x14);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshCount) == 0x0C);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x10);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x14);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_bank) == 0x18);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_posQuant) == 0x34);
 STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
 STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);

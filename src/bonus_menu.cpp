@@ -1178,14 +1178,14 @@ void CMenuPcs::CalcSelectWait()
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
 	short& delay = *(short*)(statePtr + 0x1a);
-	BonusPartySummary* currentParty = 0;
-	for (int i = 0; i < activePartyCount; i++) {
-		if (s_Rinfo->m_party[i].m_rank == currentPartyIndex) {
-			currentParty = &s_Rinfo->m_party[i];
+	int currentPartySlot = 0;
+	for (; currentPartySlot < activePartyCount; currentPartySlot++) {
+		if (s_Rinfo->m_party[currentPartySlot].m_rank == currentPartyIndex) {
 			break;
 		}
 	}
-	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
+	BonusPartySummary* currentParty = &s_Rinfo->m_party[currentPartySlot];
+	int padSlot = currentParty->m_partySlot;
 	unsigned short repeat;
 	unsigned short down;
 	if (Pad._452_4_ != 0 || (padSlot == 0 && Pad._448_4_ != -1)) {
@@ -1199,7 +1199,7 @@ void CMenuPcs::CalcSelectWait()
 	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
 	if (promptMode == 3) {
-		if (delay == 0 && currentPartyIndex < activePartyCount && currentParty != 0) {
+		if (delay == 0 && currentPartyIndex < activePartyCount) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
 				if (selection > 7) {

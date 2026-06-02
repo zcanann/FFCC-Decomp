@@ -13,7 +13,7 @@ extern const GXColor kFunnyShapeTextureChanColor;
 extern const GXColor kFunnyShapeTextureColor;
 extern GXColor kFunnyShapeRenderColor;
 extern const float kFunnyShapeBoundsMinInitial;
-extern const float kFunnyShapeBoundsMaxInitial = -1000.0f;
+extern const float kFunnyShapeBoundsMaxInitial = 0.0f;
 extern const float kFunnyShapeZero;
 extern const float kFunnyShapeViewportScale = 2.0f;
 extern const float kFunnyShapeOne;

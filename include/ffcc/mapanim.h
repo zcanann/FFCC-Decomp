@@ -9,7 +9,6 @@ class CMapAnim;
 struct CMapAnimData;
 class CMapAnimNode;
 struct CMapAnimNodeTrackKey;
-struct CMapAnimNodeTracks;
 struct CMapAnimTargetNode;
 class CMapAnimKey;
 class CMapAnimKeyDt;
@@ -34,13 +33,6 @@ public:
     CMapAnimNodeTrackKey* keys;
 };
 
-struct CMapAnimNodeTracks
-{
-    CMapAnimNodeTrack position;
-    CMapAnimNodeTrack rotation;
-    CMapAnimNodeTrack scale;
-};
-
 struct CMapAnimData
 {
     unsigned char _00[0x1C];
@@ -61,12 +53,9 @@ struct CMapAnimTargetNode
 class CMapAnimKeyDt
 {
 public:
-    unsigned int m_positionCount;
-    CMapAnimNodeTrackKey* m_positionKeys;
-    unsigned int m_rotationCount;
-    CMapAnimNodeTrackKey* m_rotationKeys;
-    unsigned int m_scaleCount;
-    CMapAnimNodeTrackKey* m_scaleKeys;
+    CMapAnimNodeTrack position;
+    CMapAnimNodeTrack rotation;
+    CMapAnimNodeTrack scale;
 
     CMapAnimKeyDt();
     ~CMapAnimKeyDt();
@@ -77,7 +66,7 @@ class CMapAnimNode
 public:
     CMapAnimTargetNode* m_node;
     CMapAnimData* m_mapAnim;
-    CMapAnimNodeTracks* m_tracks;
+    CMapAnimKeyDt* m_tracks;
 
     CMapAnimNode();
     ~CMapAnimNode();

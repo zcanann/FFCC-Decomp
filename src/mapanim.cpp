@@ -129,9 +129,9 @@ inline CMapAnimNode::CMapAnimNode()
  */
 inline CMapAnimKeyDt::CMapAnimKeyDt()
 {
-    m_positionKeys = 0;
-    m_rotationKeys = 0;
-    m_scaleKeys = 0;
+    position.keys = 0;
+    rotation.keys = 0;
+    scale.keys = 0;
 }
 
 /*
@@ -173,25 +173,25 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                 } else if (innerChunkId == 0x5452414E) {
                     CMapAnimKeyDt* tracks = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
 
-                    item->m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(tracks);
-                    mapAnimKeyDtArray->Add(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks));
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionCount = innerChunkSize >> 4;
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionKeys =
+                    item->m_tracks = tracks;
+                    mapAnimKeyDtArray->Add(item->m_tracks);
+                    item->m_tracks->position.count = innerChunkSize >> 4;
+                    item->m_tracks->position.keys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
-                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionCount];
-                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_positionKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[item->m_tracks->position.count];
+                    memcpy(item->m_tracks->position.keys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x524F5420) {
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationCount = innerChunkSize >> 4;
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationKeys =
+                    item->m_tracks->rotation.count = innerChunkSize >> 4;
+                    item->m_tracks->rotation.keys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
-                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationCount];
-                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_rotationKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[item->m_tracks->rotation.count];
+                    memcpy(item->m_tracks->rotation.keys, chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x5343414C) {
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleCount = innerChunkSize >> 4;
-                    reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleKeys =
+                    item->m_tracks->scale.count = innerChunkSize >> 4;
+                    item->m_tracks->scale.keys =
                         new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
-                            CMapAnimNodeTrackKey[reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleCount];
-                    memcpy(reinterpret_cast<CMapAnimKeyDt*>(item->m_tracks)->m_scaleKeys, chunkFile.GetAddress(), innerChunkSize);
+                            CMapAnimNodeTrackKey[item->m_tracks->scale.count];
+                    memcpy(item->m_tracks->scale.keys, chunkFile.GetAddress(), innerChunkSize);
                 }
             }
             chunkFile.PopChunk();
@@ -498,7 +498,7 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
         } else if (chunkId == 0x5452414E) {
             CMapAnimKeyDt* keyData =
                 new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
-            m_tracks = reinterpret_cast<CMapAnimNodeTracks*>(keyData);
+            m_tracks = keyData;
             mapAnimKeyDtArray->Add(keyData);
             m_tracks->position.count = chunkSize >> 4;
             m_tracks->position.keys =
@@ -533,17 +533,17 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
  */
 CMapAnimKeyDt::~CMapAnimKeyDt()
 {
-    if (m_positionKeys != 0) {
-        delete[] m_positionKeys;
-        m_positionKeys = 0;
+    if (position.keys != 0) {
+        delete[] position.keys;
+        position.keys = 0;
     }
-    if (m_rotationKeys != 0) {
-        delete[] m_rotationKeys;
-        m_rotationKeys = 0;
+    if (rotation.keys != 0) {
+        delete[] rotation.keys;
+        rotation.keys = 0;
     }
-    if (m_scaleKeys != 0) {
-        delete[] m_scaleKeys;
-        m_scaleKeys = 0;
+    if (scale.keys != 0) {
+        delete[] scale.keys;
+        scale.keys = 0;
     }
 }
 

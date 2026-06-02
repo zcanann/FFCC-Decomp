@@ -65,6 +65,25 @@ struct CMapCylinderRaw {
     Vec m_expandBounds;
 };
 
+STATIC_ASSERT(sizeof(YmMeltVertex) == 0x10);
+STATIC_ASSERT(offsetof(YmMeltWork, m_vertexData) == 0x00);
+STATIC_ASSERT(offsetof(YmMeltWork, m_phaseOffset) == 0x04);
+STATIC_ASSERT(offsetof(YmMeltWork, m_shapeCurrentFrame) == 0x06);
+STATIC_ASSERT(offsetof(YmMeltWork, m_shapeDrawFrame) == 0x08);
+STATIC_ASSERT(offsetof(YmMeltWork, m_shapeFrameTime) == 0x0A);
+STATIC_ASSERT(offsetof(YmMeltWork, m_phase) == 0x0C);
+STATIC_ASSERT(offsetof(YmMeltWork, m_phaseVelocity) == 0x10);
+STATIC_ASSERT(offsetof(YmMeltWork, m_phaseAccel) == 0x14);
+STATIC_ASSERT(sizeof(YmMeltWork) == 0x18);
+STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
+STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
+STATIC_ASSERT(sizeof(Vec2d) == 0x08);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_rayDirection) == 0x18);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_rayPadding) == 0x24);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_topBounds) == 0x28);
+STATIC_ASSERT(offsetof(CMapCylinderRaw, m_expandBounds) == 0x34);
+STATIC_ASSERT(sizeof(CMapCylinderRaw) == 0x40);
+
 static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
     return reinterpret_cast<YmMeltWork*>(ymMelt->m_object.m_workArea + *offsets->m_serializedDataOffsets);

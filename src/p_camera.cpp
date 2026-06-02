@@ -521,7 +521,6 @@ void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTi
  */
 void CCameraPcs::CalcQuake()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     Vec offset;
     Vec jitter;
     float zero = FLOAT_8032fa34;
@@ -589,9 +588,9 @@ void CCameraPcs::CalcQuake()
 
     if (m_quake.m_mode == 2) {
         PSVECAdd(&offset, &jitter, &offset);
-        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+        PSVECAdd(&offset, &PositionVec(), &PositionVec());
         offset.z = FLOAT_8032fa34;
-        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        PSVECAdd(&offset, &TargetVec(), &TargetVec());
         return;
     }
 
@@ -618,22 +617,22 @@ void CCameraPcs::CalcQuake()
                               static_cast<float>(m_quake.m_endDuration);
                 PSVECScale(&offset, &offset, ratio);
                 PSVECSubtract(&offset, &jitter, &offset);
-                PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
-                PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+                PSVECAdd(&offset, &PositionVec(), &PositionVec());
+                PSVECAdd(&offset, &TargetVec(), &TargetVec());
                 m_quake.m_endTimer = m_quake.m_endTimer - 1;
             }
         } else {
             PSVECAdd(&offset, &jitter, &offset);
-            PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
-            PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+            PSVECAdd(&offset, &PositionVec(), &PositionVec());
+            PSVECAdd(&offset, &TargetVec(), &TargetVec());
         }
     } else {
         float ratio = static_cast<float>(m_quake.m_startTimer) /
                       static_cast<float>(m_quake.m_startDuration);
         PSVECScale(&offset, &offset, ratio);
         PSVECAdd(&offset, &jitter, &offset);
-        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
-        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        PSVECAdd(&offset, &PositionVec(), &PositionVec());
+        PSVECAdd(&offset, &TargetVec(), &TargetVec());
         m_quake.m_startTimer = m_quake.m_startTimer - 1;
 
         if ((m_quake.m_startTimer == 0) && (m_quake.m_keepMoving == 0)) {
@@ -733,8 +732,8 @@ void CCameraPcs::calc()
     up.x = FLOAT_8032fa34;
     up.y = FLOAT_8032fa1c;
     up.z = FLOAT_8032fa34;
-    PSVECDistance(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xD4));
-    C_MTXLookAt(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xE0), &up, reinterpret_cast<Vec*>(self + 0xD4));
+    PSVECDistance(&PositionVec(), &TargetVec());
+    C_MTXLookAt(m_cameraMatrix, &PositionVec(), &up, &TargetVec());
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(m_worldMapMatrix, worldMapMtx);
@@ -768,10 +767,10 @@ void CCameraPcs::calc()
     PSMTXConcat(zRotMtx, m_cameraMatrix, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, invMtx);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
-    PSMTXMultVecSR(invMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec().x = FLOAT_8032fa34;
+    DirectionVec().y = FLOAT_8032fa34;
+    DirectionVec().z = FLOAT_8032fa38;
+    PSMTXMultVecSR(invMtx, &DirectionVec(), &DirectionVec());
     m_fromScript = 0;
 }
 

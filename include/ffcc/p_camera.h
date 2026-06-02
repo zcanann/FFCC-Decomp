@@ -209,6 +209,18 @@ public:
     {
         return *reinterpret_cast<CameraState*>(&m_cameraMatrix);
     }
+    Vec& TargetVec()
+    {
+        return *reinterpret_cast<Vec*>(&m_targetX);
+    }
+    Vec& PositionVec()
+    {
+        return *reinterpret_cast<Vec*>(&m_positionX);
+    }
+    Vec& DirectionVec()
+    {
+        return *reinterpret_cast<Vec*>(&m_directionX);
+    }
 
     Mtx m_cameraMatrix;
     Mtx m_worldMapMatrix; // 0x34

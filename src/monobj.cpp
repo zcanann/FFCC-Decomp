@@ -653,7 +653,7 @@ void CGMonObj::setActionParam(int state)
 			*reinterpret_cast<unsigned int*>(mon + 0x634) = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x22);
 			*reinterpret_cast<unsigned int*>(mon + 0x638) = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x22);
 		} else if (actionType == 2) {
-			reinterpret_cast<CGCharaObj*>(this)->calcCastTime(static_cast<int>(action));
+			*reinterpret_cast<int*>(mon + 0x68C) = reinterpret_cast<CGCharaObj*>(this)->calcCastTime(static_cast<int>(action));
 		}
 	}
 }

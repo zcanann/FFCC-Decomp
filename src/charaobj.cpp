@@ -1366,7 +1366,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		effectResult = 0;
 	}
 
-	if (sourceObj != 0 && m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
+	if (m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
 		unsigned int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
@@ -1383,7 +1383,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 	}
 
-	if (sourceObj != 0 && itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
+	if (itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
 		Vec delta;
 		PSVECSubtract(&m_worldPosition, &sourceObj->m_worldPosition, &delta);

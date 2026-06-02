@@ -934,7 +934,6 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
  */
 void CCameraPcs::createChara()
 {
-    u8* self;
     float fVar6;
     float fVar5;
     float fVar4;
@@ -943,7 +942,6 @@ void CCameraPcs::createChara()
     float fVar1;
     float fVar7;
 
-    self = reinterpret_cast<u8*>(this);
     fVar2 = FLOAT_8032fa34;
     m_viewerOverride = 0;
     fVar1 = FLOAT_8032fa1c;
@@ -989,7 +987,6 @@ void CCameraPcs::destroyChara()
  */
 void CCameraPcs::calcChara()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned short padButtons;
     Mtx mtxA;
     Mtx mtxB;
@@ -1057,18 +1054,18 @@ void CCameraPcs::calcChara()
     PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
     PSMTXInverse(m_cameraMatrix, mtxInv);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
-    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec().x = FLOAT_8032fa34;
+    DirectionVec().y = FLOAT_8032fa34;
+    DirectionVec().z = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, &DirectionVec(), &DirectionVec());
 
     m_targetX = m_viewer.m_position.x;
     m_targetY = m_viewer.m_position.y;
     m_targetZ = m_viewer.m_position.z;
 
-    eyeDir = *reinterpret_cast<Vec*>(self + 0xEC);
+    eyeDir = DirectionVec();
     PSVECScale(&eyeDir, &scaledDir, FLOAT_8032fa88);
-    PSVECAdd(reinterpret_cast<Vec*>(&m_targetX), &scaledDir, &targetPos);
+    PSVECAdd(&TargetVec(), &scaledDir, &targetPos);
 
     m_positionX = targetPos.x;
     m_positionY = targetPos.y;
@@ -1139,7 +1136,6 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::calcMap()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
     u16 buttons;
     float stickH;
@@ -1200,22 +1196,22 @@ void CCameraPcs::calcMap()
     PSMTXRotRad(rotYMtx, 'y', m_mapRotY);
     PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
 
-    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa1c;
-    PSMTXMultVecSR(rotMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec().x = FLOAT_8032fa34;
+    DirectionVec().y = FLOAT_8032fa34;
+    DirectionVec().z = FLOAT_8032fa1c;
+    PSMTXMultVecSR(rotMtx, &DirectionVec(), &DirectionVec());
 
     moveDelta.x = FLOAT_8032fa34;
     moveDelta.y = FLOAT_8032fa34;
     moveDelta.z = FLOAT_8032fa34;
 
     if ((buttons & 0x100) != 0) {
-        PSVECScale(&moveDelta, reinterpret_cast<Vec*>(self + 0xEC), FLOAT_8032fa74);
+        PSVECScale(&moveDelta, &DirectionVec(), FLOAT_8032fa74);
     }
 
     moveDelta.y = FLOAT_8032fa34;
     if ((buttons & 0x800) != 0) {
-        PSVECScale(&moveDelta, reinterpret_cast<Vec*>(self + 0xEC), FLOAT_8032faac);
+        PSVECScale(&moveDelta, &DirectionVec(), FLOAT_8032faac);
         moveDelta.y = FLOAT_8032fa34;
     }
 
@@ -1247,13 +1243,13 @@ void CCameraPcs::calcMap()
             hitCylinder.radiusY = kCameraBoundsMinInitial;
             hitCylinder.height = kCameraBoundsMinInitial;
             hitCylinder.unk = FLOAT_8032fa8c;
-            hitCylinder.center = *reinterpret_cast<Vec*>(self + 0xE0);
+            hitCylinder.center = PositionVec();
             hitCylinder.delta = moveDelta;
             if (CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(
                     &MapMng, &hitCylinder, &moveDelta, 0xFFFFFFFF) == 0) {
-                *reinterpret_cast<float*>(self + 0xE0) += moveDelta.x;
-                *reinterpret_cast<float*>(self + 0xE4) += moveDelta.y;
-                *reinterpret_cast<float*>(self + 0xE8) += moveDelta.z;
+                PositionVec().x += moveDelta.x;
+                PositionVec().y += moveDelta.y;
+                PositionVec().z += moveDelta.z;
                 break;
             }
             CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &moveDelta);
@@ -1263,21 +1259,20 @@ void CCameraPcs::calcMap()
     C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC));
+    PSVECAdd(&TargetVec(), &PositionVec(), &DirectionVec());
 
     upVec.x = FLOAT_8032fa34;
     upVec.y = FLOAT_8032fa1c;
     upVec.z = FLOAT_8032fa34;
     PSMTXMultVecSR(rotMtx, &upVec, &upVec);
-    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x4), reinterpret_cast<Vec*>(self + 0xE0), &upVec,
-                reinterpret_cast<Vec*>(self + 0xD4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invViewMtx);
+    C_MTXLookAt(m_cameraMatrix, &PositionVec(), &upVec, &TargetVec());
+    PSMTXInverse(m_cameraMatrix, invViewMtx);
 
     dir.x = FLOAT_8032fa34;
     dir.y = FLOAT_8032fa34;
     dir.z = FLOAT_8032fa38;
-    *reinterpret_cast<Vec*>(self + 0xEC) = dir;
-    PSMTXMultVecSR(invViewMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    DirectionVec() = dir;
+    PSMTXMultVecSR(invViewMtx, &DirectionVec(), &DirectionVec());
 }
 
 /*

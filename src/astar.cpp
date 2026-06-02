@@ -21,14 +21,10 @@ extern const float kPolyGroupAabbMax = 10000000000.0f;
 extern const float kPolyGroupAabbMin = -10000000000.0f;
 extern const float kAStarEscapeInitialBestDist = -1000000.0f;
 extern const char kAStarGroupDebugLabel[] = "//A*\n";
-extern const float kDrawAStarSphereRadius = 10.0f;
-extern const float kInfiniteCost = 10000000.0f;
-extern const char kAStarStepDebugFormat[] = "%d ";
-extern const char kAStarNewLine[] = "\n";
-extern const float kConstrainCameraDirScaleOne = 1.0f;
-extern const float kConstrainCameraDirBaseFov = 25.0f;
-extern const float kConstrainCameraDirWideAspect = 1.3333f;
-extern const float kConstrainCameraDirZero = 0.0f;
+extern const float kDrawAStarSphereRadius;
+extern const float kInfiniteCost;
+extern const char kAStarStepDebugFormat[];
+extern const char kAStarNewLine[];
 }
 #include "ffcc/system.h"
 #include "ffcc/vector.h"

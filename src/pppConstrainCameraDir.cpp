@@ -7,7 +7,12 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
-extern const float kConstrainCameraDirFrameOne = 1.0f;
+extern "C" {
+extern const float kDrawAStarSphereRadius = 10.0f;
+extern const float kInfiniteCost = 10000000.0f;
+extern const char kAStarStepDebugFormat[] = "%d ";
+extern const char kAStarNewLine[] = "\n";
+}
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
@@ -121,5 +126,3 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
 }
-
-extern const float kConstrainCameraDirAspectScale = 1.3333f;

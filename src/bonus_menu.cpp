@@ -2066,6 +2066,16 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->duration = 8;
 		}
 
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[closeCount + 1 + i];
+			BonusAnimSprite* source = &sprites[(int)s_CntTop + i];
+			sprite->startFrame = source->startFrame;
+			BonusSpriteFlags(sprite) = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 100.0f;
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+		}
+
 		for (int i = 0; i < (int)header->count; i++) {
 			BonusAnimSprite* sprite = &sprites[i];
 			if (sprite->motionX == 0.0f) {

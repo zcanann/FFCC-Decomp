@@ -285,7 +285,7 @@ void CMapMesh::SetRenderArray()
     GXSetArray((GXAttr)0xB, m_colors, 4);
     GXSetArray((GXAttr)0xD, m_uvPairs, 4);
     GXSetArray((GXAttr)0xE, m_uvPairs, 4);
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 4) = m_normals;
+    MaterialMan.SetGeometryArraySource(m_normals);
 }
 
 /*

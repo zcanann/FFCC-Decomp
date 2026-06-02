@@ -5,13 +5,21 @@
 #include "ffcc/ref.h"
 #include "ffcc/ptrarray.h"
 
+#include <dolphin/mtx.h>
+
 class CMaterialSet;
 class CMaterial;
 class CChunkFile;
 class CMemory;
-struct Vec;
 class CTexAnim;
 class CTexAnimSeq;
+
+struct CTexAnimKey
+{
+    unsigned int m_frame;
+    unsigned char _pad04[0x24 - 0x04];
+    Vec m_texGen;
+};
 
 class CTexAnimSet : public CRef
 {
@@ -57,7 +65,7 @@ private:
     int m_keyCount;
     unsigned char m_flags;
     unsigned char m_pad111[3];
-    unsigned int* m_keys;
+    CTexAnimKey* m_keys;
 };
 
 class CTexAnim : public CRef

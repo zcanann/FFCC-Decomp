@@ -3,6 +3,8 @@
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/game.h"
+#include "ffcc/gobject.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -123,10 +125,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     if (iVar2 != 0) {
         Game.GetTargetCursor(local_28, work->m_targetPosition, local_20);
 
-        u8* partyObj = reinterpret_cast<u8*>(Game.GetPartyObj(local_28));
-        local_14.x = *(f32*)(partyObj + 0x15c);
-        local_14.y = *(f32*)(partyObj + 0x160);
-        local_14.z = *(f32*)(partyObj + 0x164);
+        CGPartyObj* partyObj = Game.GetPartyObj(local_28);
+        local_14 = partyObj->m_worldPosition;
         if (local_24 == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {
@@ -292,7 +292,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (work->m_spawnEnabled != 0) {
                 if (work->m_maxLength - LaserConst(kPppLaserHalfTileOffset) < work->m_length) {
                     _pppMngSt* mngSt = ppvMng;
-                    s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                    s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
                     work->m_length = work->m_maxLength - LaserConst(kPppLaserHalfTileOffset);
                     Game.ParticleFrameCallback(
                         partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, pppLaser->m_graphId / 0x1000,

@@ -58,11 +58,11 @@ void pppKeLnsLpCon2(void* pObject, void* pPart)
 	_pppPObject* object = (_pppPObject*)pObject;
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)pPart;
 	u32 offset = ctrlTable->m_serializedDataOffsets[0];
-	u8* keLnsLp = object->m_workArea + offset;
+	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + offset);
 	f32 zero = kPppKeLnsZero;
 
-	*(f32*)(keLnsLp + 0x8C) = zero;
-	*(f32*)(keLnsLp + 0x98) = zero;
+	keLnsLp->m_work8C = zero;
+	keLnsLp->m_work98 = zero;
 }
 
 /*
@@ -83,6 +83,6 @@ void pppKeLnsLpCon(void* pObject, void* pPart)
 
 	KeLnsLp_Init(keLnsLp);
 	f32 zero = kPppKeLnsZero;
-	*(f32*)((u8*)keLnsLp + 0x8C) = zero;
-	*(f32*)((u8*)keLnsLp + 0x98) = zero;
+	keLnsLp->m_work8C = zero;
+	keLnsLp->m_work98 = zero;
 }

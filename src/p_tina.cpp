@@ -198,6 +198,8 @@ signed char s_debugSpinnerFrameCounterPad1;
 signed char s_debugSpinnerFrameCounterPad2;
 }
 
+static const int kPppFieldParticleNoAutoCreate = -0x1000;
+
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
@@ -900,16 +902,9 @@ void CPartPcs::DrawMenuIdx(int index)
  */
 void CPartPcs::SetParLocIdx(int index, Vec& location)
 {
-	struct PartMngPosView {
-		u8 pad[0x2A20];
-		float x;
-		float y;
-		float z;
-	};
-	PartMngPosView* pppMngSt = reinterpret_cast<PartMngPosView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	pppMngSt->x = location.x;
-	pppMngSt->y = location.y;
-	pppMngSt->z = location.z;
+    PartMng.m_pppMng[index].m_position.x = location.x;
+    PartMng.m_pppMng[index].m_position.y = location.y;
+    PartMng.m_pppMng[index].m_position.z = location.z;
 }
 
 /*
@@ -923,16 +918,9 @@ void CPartPcs::SetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::GetParLocIdx(int index, Vec& location)
 {
-	struct PartMngPosView {
-		u8 pad[0x2A20];
-		float x;
-		float y;
-		float z;
-	};
-	PartMngPosView* pppMngSt = reinterpret_cast<PartMngPosView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	location.x = pppMngSt->x;
-	location.y = pppMngSt->y;
-	location.z = pppMngSt->z;
+    location.x = PartMng.m_pppMng[index].m_position.x;
+    location.y = PartMng.m_pppMng[index].m_position.y;
+    location.z = PartMng.m_pppMng[index].m_position.z;
 }
 
 /*
@@ -1109,18 +1097,20 @@ void LoadFieldPdt0(int mapId, int floorId)
         if ((pdtSlot != 0) && (PartMng.m_partLoadMode != 2) && (PartMng.m_partLoadMode != 3)) {
             _pppDataHead* pppDataHead;
             PPPCREATEPARAM* createParam;
-            int checkOff;
+            int fieldParticleOffset;
             int i;
 
             pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;
             createParam = PartMng.pppGetDefaultCreateParam();
-            checkOff = 0;
+            fieldParticleOffset = 0;
             for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                if (*reinterpret_cast<int*>(&PartMng.m_pdtSlots[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) !=
-                    -0x1000) {
+                _pppFieldParticleData* fieldParticle = reinterpret_cast<_pppFieldParticleData*>(
+                    reinterpret_cast<unsigned char*>(PartMng.m_pdtSlots[0].m_pppDataHead) + sizeof(_pppDataHead) +
+                    fieldParticleOffset);
+                if (fieldParticle->m_autoCreateMarker != kPppFieldParticleNoAutoCreate) {
                     PartMng.pppCreate(0, i, createParam, 0);
                 }
-                checkOff += 0x30;
+                fieldParticleOffset += sizeof(_pppFieldParticleData);
             }
         }
     }

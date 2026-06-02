@@ -79,7 +79,15 @@ static unsigned short CharaObjGetPadState(unsigned char slot, int baseOffset)
 	}
 
 	int idx = CharaObjGetPadSlotIndex(slot);
-	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + baseOffset + idx * 0x54);
+	const CPad::PadInput& input = Pad.GetPadInputs()[idx];
+	if (baseOffset == 0x4) {
+		return input.button[0];
+	}
+	if (baseOffset == 0x8) {
+		return input.buttonDown[0];
+	}
+
+	return input.repeatButton;
 }
 
 static unsigned short CharaObjGetPadHeld(unsigned char slot)
@@ -597,14 +605,14 @@ void CGCharaObj::onFramePostCalc()
 			bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
 			if (!useDebugPad) {
 				int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
-				padMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((MiniGamePcs.m_flags & 0x100) != 0) {
 				useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
 				unsigned short heldMask = 0;
 				if (!useDebugPad) {
 					int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
-					heldMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x10 + idx * 0x54);
+					heldMask = Pad.GetPadInputs()[idx].repeatButton;
 				}
 				padMask |= heldMask;
 			}
@@ -746,7 +754,7 @@ void CGCharaObj::onFramePreCalc()
 		bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
 		if (!useDebugPad) {
 			int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
-			padHeld = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+			padHeld = Pad.GetPadInputs()[idx].gbaMode;
 		}
 		if (padHeld != 0) {
 			push += 0x19;

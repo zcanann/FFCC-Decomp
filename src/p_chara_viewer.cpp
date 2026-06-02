@@ -633,7 +633,7 @@ void CCharaPcs::calcViewer()
         float rotY = LoadFloat(kCharaViewerZero);
         if (Pad._452_4_ == 0) {
             unsigned int padIndex = (~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31) & 4U);
-            rotY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x2C + padIndex * 0x54);
+            rotY = Pad.GetPadInputs()[padIndex].substickXF;
         }
         srt.rotY = srt.rotY + rotY;
         srt.transX = translateX;

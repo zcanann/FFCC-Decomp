@@ -119,10 +119,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
 	pppYmChangeTexState* state = (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + serializedDataOffsets[2]);
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)ppvMng->m_owner, 0);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
-	state->m_charaObj = (CGObject*)ppvMng->m_owner;
+	state->m_charaObj = ppvMng->m_owner;
 	state->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, state, step);
 	state->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));

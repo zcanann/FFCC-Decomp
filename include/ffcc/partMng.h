@@ -71,7 +71,7 @@ struct PPPCREATEPARAM
     Vec* m_extraPositionPtr;          // 0xc
     unsigned int m_paramA;            // 0x10
     unsigned int m_paramB;            // 0x14
-    void* m_lookTargetPtr;            // 0x18
+    CGObject* m_lookTargetPtr;        // 0x18
     unsigned int m_objectHitMask;     // 0x1c
     unsigned int m_cylinderAttribute; // 0x20
     float m_paramC;                   // 0x24
@@ -226,6 +226,14 @@ struct _pppDataHead
     unsigned int m_shapeGroups;       // 0x1c
 }; // Size 0x20
 
+struct _pppFieldParticleData
+{
+    unsigned char m_pad00[0x2C];
+    int m_autoCreateMarker;           // 0x2c
+    unsigned char m_pad30[0x60 - 0x30];
+}; // Size 0x60
+typedef int _pppFieldParticleData_size_mismatch[(sizeof(_pppFieldParticleData) == 0x60) ? 1 : -1];
+
 struct pppShapeGroupRaw
 {
     u16 m_groupId;     // 0x0
@@ -308,8 +316,8 @@ struct _pppMngSt
     _pppPObjLink m_pppPObjLinkHead;    // 0xC4 (size 0xC)
     void* m_programTable;              // 0xD0
     _pppPDataVal* m_pppPDataVals;      // 0xD4
-    void* m_owner;                     // 0xD8
-    void* m_lookTarget;                // 0xDC
+    CGObject* m_owner;                 // 0xD8
+    CGObject* m_lookTarget;            // 0xDC
     CChara::CNode* m_bindNode;         // 0xE0
     unsigned char m_mode;              // 0xE4
     unsigned char m_particleEnded;     // 0xE5

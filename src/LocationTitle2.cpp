@@ -18,8 +18,10 @@ static inline int GetGraphFrameFromId(s32 graphId)
     return (int)graphId / 0x1000;
 }
 
+struct LocationTitle2Particle;
+
 struct LocationTitle2Work {
-    void* m_particles;
+    LocationTitle2Particle* m_particles;
     u16 m_count;
     u16 m_pad;
     float m_cur;
@@ -106,7 +108,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         return;
     }
 
-    particle = (LocationTitle2Particle*)work->m_particles;
+    particle = work->m_particles;
     graphId = locationTitle->m_graphId;
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[unkB->m_dataValIndex];
     graphFrame = GetGraphFrameFromId(graphId);
@@ -254,15 +256,15 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         CChara::CNode* node;
         float zOffset;
 
-        work->m_particles = pppMemAlloc(
+        work->m_particles = static_cast<LocationTitle2Particle*>(pppMemAlloc(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), ppvEnv->m_stagePtr, const_cast<char*>(s_LocationTitle2_cpp),
-            0x70);
+            0x70));
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
 
         handle = 0;
-        particles = (LocationTitle2Particle*)work->m_particles;
+        particles = work->m_particles;
         model = 0;
-        owner = (CGObject*)ppvMng->m_lookTarget;
+        owner = ppvMng->m_lookTarget;
         model = 0;
         if (owner->m_charaModelHandle != 0) {
             handle = owner->m_charaModelHandle;

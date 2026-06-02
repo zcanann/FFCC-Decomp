@@ -1,12 +1,13 @@
 #include "ffcc/pppYmLookOn.h"
+#include "ffcc/gobject.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
-static inline u8** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* ctrl)
+static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* ctrl)
 {
-    return reinterpret_cast<u8**>(lookOn->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<CGObject**>(lookOn->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
 /*
@@ -21,8 +22,8 @@ static inline u8** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* ctrl)
 void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct pppYmLookOnCtrl* param_3)
 {
     struct _pppMngSt* pppMngSt;
-    u8* owner;
-    u8** work;
+    CGObject* owner;
+    CGObject** work;
     Vec local_44;
     Vec local_28;
     Vec local_34;
@@ -35,7 +36,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
     }
 
     pppMngSt = ppvMng;
-    owner = reinterpret_cast<u8*>(pppMngSt->m_lookTarget);
+    owner = pppMngSt->m_lookTarget;
     work = GetYmLookOnWork(pppYmLookOn, param_3);
     if (owner == nullptr) {
         if (*work == nullptr) {
@@ -47,9 +48,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
         owner = *work;
     }
 
-    local_4c.x = *(f32*)(owner + 0x15c);
-    local_4c.y = *(f32*)(owner + 0x160);
-    local_4c.z = *(f32*)(owner + 0x164);
+    local_4c = owner->m_worldPosition;
     local_4c.y += param_2->m_dataValIndex;
     local_58.x = ppvMng->m_matrix.value[0][3];
     local_58.y = ppvMng->m_matrix.value[1][3];

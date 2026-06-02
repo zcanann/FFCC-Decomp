@@ -65,6 +65,16 @@ struct KeShpTail2XAlphaWork {
 };
 STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
 
+static inline KeShpTail2XWork* GetKeShpTail2XWork(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
+}
+
+static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<KeShpTail2XAlphaWork*>(obj->m_workArea + ctrl->m_serializedDataOffsets[1]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80088698
@@ -76,8 +86,7 @@ STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
  */
 void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* param_2)
 {
-    KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
-        obj->m_workArea + param_2->m_serializedDataOffsets[0]);
+    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, param_2);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -98,8 +107,7 @@ void pppKeShpTail2XDes(_pppPObject* obj, _pppCtrlTable* param_2)
  */
 void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* param_2)
 {
-    KeShpTail2XWork* work = reinterpret_cast<KeShpTail2XWork*>(
-        obj->m_workArea + param_2->m_serializedDataOffsets[0]);
+    KeShpTail2XWork* work = GetKeShpTail2XWork(obj, param_2);
 
     work->m_frameAcc = 0;
     work->m_shapeFrame = 0;
@@ -174,9 +182,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
 
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)reinterpret_cast<KeShpTail2XAlphaWork*>(
-                   obj->m_object.m_workArea + param_3->m_serializedDataOffsets[1])->m_alpha /
-               kPppKeShpTail2XAlphaScale;
+    alphaMul = (float)GetKeShpTail2XAlphaWork(&obj->m_object, param_3)->m_alpha / kPppKeShpTail2XAlphaScale;
     colorStart.w = step->m_colorStartA;
     colorEnd.w = step->m_colorEndA;
     colorStart.x = step->m_colorStartR;
@@ -207,7 +213,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = GetKeShpTail2XWork(&obj->m_object, param_3);
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
     shapeEntry = (long*)((u8*)shape->m_animData +
                          *(s16*)((u8*)shape->m_animData + (work->m_shapePrevFrame << 3) + 0x10));
@@ -370,7 +376,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     }
 
     step = (KeShpTail2XStep*)param_2;
-    work = reinterpret_cast<KeShpTail2XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
+    work = GetKeShpTail2XWork(&obj->m_object, param_3);
 
     if (obj->m_object.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {

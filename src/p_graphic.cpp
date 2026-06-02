@@ -608,7 +608,7 @@ void CGraphicPcs::drawBar()
     if (!useDebugPad) {
         int padIndex = useDebugPad;
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
-        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 60);
+        padState = Pad.GetPadInputs()[padIndex].holdOverride;
     }
     const bool drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
@@ -806,7 +806,7 @@ void CGraphicPcs::drawEnd()
 			} else {
 				int selectedPort = Pad._448_4_;
 				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
-				buttons = *(u16*)((u8*)&Pad + 4 + portIndex * 0x54);
+				buttons = Pad.GetPadInputs()[portIndex].button[0];
 			}
 
 			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';

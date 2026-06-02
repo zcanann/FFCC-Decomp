@@ -116,7 +116,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     EmissionState* state = (EmissionState*)(pppEmission_->m_object.m_workArea + serializedDataOffsets[2]);
     u8* dataSet = pppEmission_->m_object.m_workArea + serializedDataOffsets[1];
 
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     SetEmissionModelCallbacks(model, state, param_2);
 
@@ -227,7 +227,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
     int* state = (int*)(pppEmission_->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
 
     ClearEmissionModelCallbacks(model);
@@ -301,7 +301,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->field10 = baseScale;
     state->fieldC = baseScale;
 
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
     model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);

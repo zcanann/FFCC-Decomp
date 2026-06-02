@@ -35,7 +35,7 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 
 static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 {
-	return reinterpret_cast<CGObject*>(pppMngSt->m_owner)->m_charaModelHandle->m_model;
+	return pppMngSt->m_owner->m_charaModelHandle->m_model;
 }
 
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0

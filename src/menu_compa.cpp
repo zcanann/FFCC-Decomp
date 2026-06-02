@@ -360,7 +360,7 @@ void CMenuPcs::CompaCtrl()
 	unsigned int rawHold;
 	short press;
 	short hold;
-	int doReset = 0;
+	int doReset;
 
 	if (padState == 0) {
 		if (Pad._448_4_ != -1) {
@@ -411,15 +411,18 @@ activeHold:
 		this->compaMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = 1;
-	} else if ((press & 0x100) != 0) {
-		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		doReset = 0;
-	} else if ((press & 0x200) != 0) {
-		this->compaMenuState->closeRequested = 1;
-		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = 1;
 	} else {
-		doReset = 0;
+		if ((press & 0x100) != 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+			goto noReset;
+		} else if ((press & 0x200) != 0) {
+			this->compaMenuState->closeRequested = 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			doReset = 1;
+		} else {
+noReset:
+			doReset = 0;
+		}
 	}
 
 	if (doReset != 0) {

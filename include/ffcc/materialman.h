@@ -222,7 +222,7 @@ public:
     {
         return m_unkA6;
     }
-    unsigned short GetTextureIndex(int index) const
+    short GetTextureIndex(int index) const
     {
         return m_textureIndices[index];
     }
@@ -266,7 +266,7 @@ private:
 
     char m_name[0x10];                    // 0x008
     unsigned short m_textureCount;        // 0x018
-    unsigned short m_textureIndices[5];   // 0x01A
+    short m_textureIndices[5];            // 0x01A
     unsigned long m_tevBit;               // 0x024
     CLightPcs::CBumpLight* m_bumpLight;   // 0x028
     float m_scaleV;                       // 0x02C

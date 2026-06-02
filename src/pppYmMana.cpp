@@ -74,6 +74,8 @@ struct Vec2d {
     float y;
 };
 
+extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
+
 struct pppYmManaUnkB {
     u8 _pad00[4];
     s32 m_sourceTextureId2;
@@ -162,8 +164,6 @@ STATIC_ASSERT(offsetof(pppYmManaUnkB, m_waterOffset) == 0x30);
 STATIC_ASSERT(offsetof(pppYmManaUnkB, m_rippleLevel) == 0x34);
 STATIC_ASSERT(offsetof(pppYmManaUnkB, m_map21Flag) == 0x38);
 STATIC_ASSERT(offsetof(pppYmManaUnkB, m_baseColor) == 0x3C);
-
-extern "C" const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
 static inline float LoadFloat(const float& value)
 {

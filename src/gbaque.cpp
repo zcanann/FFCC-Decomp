@@ -3046,6 +3046,7 @@ void GbaQueue::ClrCmakeInfo(int param_2)
  */
 void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 {
+	unsigned short crc[2];
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
 	char* obj = reinterpret_cast<char*>(this);
@@ -3092,9 +3093,13 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		return;
 	}
 
-	unsigned short crc[2];
 	crc[0] = 0xFFFF;
-	if (Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc) == localInfo.m_crc) {
+	if (Joybus.Crc16(0x10, reinterpret_cast<unsigned char*>(localInfo.m_name), crc) != localInfo.m_crc) {
+		if (System.m_execParam != 0) {
+			System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
+		}
+		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
+	} else {
 		for (int i = 0; i < 4; i++) {
 			OSWaitSemaphore(accessSemaphores + i);
 		}
@@ -3140,11 +3145,6 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + cmakeOffset) = 0;
 		OSSignalSemaphore(semaphore);
-	} else {
-		if (System.m_execParam != 0) {
-System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp), 0xAD3);
-		}
-		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	}
 }
 

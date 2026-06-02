@@ -2830,7 +2830,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
         if (texture != 0) {
             u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
             u32 materialIndex = textureIndex + 1;
-            if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
+            if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
             }
 
@@ -2846,7 +2846,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_textureIndices[0] = static_cast<unsigned short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            materialCount = static_cast<u32>(UnkMaterialSetGetter(&m_materials));
             if (materialIndex >= materialCount) {
                 materialArray->Add(newMaterial);
             } else {

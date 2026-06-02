@@ -14,10 +14,6 @@ void CGBaseObj::onDraw()
 {
 }
 
-void CGBaseObj::onFrame()
-{
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8010b15c

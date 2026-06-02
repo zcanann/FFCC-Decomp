@@ -2,8 +2,6 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-extern const float FLOAT_803331d8;
-
 /*
  * --INFO--
  * PAL Address: 0x8016c9e8
@@ -19,9 +17,9 @@ void pppDrawMatrixLoc(_pppPObject* object, void*, _pppCtrlTable*)
     Vec local_38;
     Vec local_20[2];
 
-    local_2c.z = FLOAT_803331d8;
-    local_2c.y = FLOAT_803331d8;
-    local_2c.x = FLOAT_803331d8;
+    local_2c.z = 0.0f;
+    local_2c.y = 0.0f;
+    local_2c.x = 0.0f;
     PSMTXCopy(object->m_localMatrix.value, object->m_drawMatrix.value);
     PSMTXMultVec(ppvWorldMatrix, &local_2c, &local_2c);
     local_38.x = object->m_drawMatrix.value[0][3];

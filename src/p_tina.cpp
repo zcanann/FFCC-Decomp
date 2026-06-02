@@ -105,6 +105,17 @@ static const char sTinaDeleteNoticeMsg[] = {
     (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00,
 };
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+#pragma inline_max_size(10000)
+inline CPartPcs::CPartPcs()
+{
+}
+
+CPartPcs PartPcs;
 unsigned int CPartPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
@@ -187,17 +198,6 @@ signed char s_debugSpinnerFrameCounterPad1;
 signed char s_debugSpinnerFrameCounterPad2;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-#pragma inline_max_size(10000)
-inline CPartPcs::CPartPcs()
-{
-}
-
-CPartPcs PartPcs;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 

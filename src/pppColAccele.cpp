@@ -37,12 +37,13 @@ void pppColAccele(_pppPObject* object, void* data, _pppCtrlTable* ctrlTable)
     int offset0 = offsets[0];
     int offset1 = offsets[1];
     short* accel1 = (short*)(object->m_workArea + offset0);
+    int frameData;
     short* accel2 = (short*)(object->m_workArea + offset1);
     
     if (gPppCalcDisabled != 0)
         return;
     
-    int frameData = *(int*)data;
+    frameData = *(int*)data;
     if (frameData != object->m_graphId) {
         goto accumulate;
     }

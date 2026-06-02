@@ -68,6 +68,11 @@ static inline CFunnyShapeViewerState* ViewerState(CFunnyShapePcs* self)
 {
     return reinterpret_cast<CFunnyShapeViewerState*>(self->m_viewerState);
 }
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
 } // namespace
 
 template <class T>
@@ -119,7 +124,9 @@ void CFunnyShapePcs::drawViewer()
     Point3d eye = {0.0f, 0.0f, 4.0f};
     Point3d at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    C_MTXOrtho(projection, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
+    C_MTXOrtho(projection, LoadFloat(kFunnyShapeNdcMax), LoadFloat(kFunnyShapeNdcMin),
+               LoadFloat(kFunnyShapeNdcMin), LoadFloat(kFunnyShapeNdcMax),
+               LoadFloat(kFunnyShapeNdcMax), LoadFloat(kFunnyShapeOrthoFarZ));
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     C_MTXLookAt(view, &eye, &up, &at);
     GXLoadPosMtxImm(view, GX_PNMTX0);
@@ -148,7 +155,9 @@ void CFunnyShapePcs::drawViewer()
         alive = 0;
     }
 
-    GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
+    GXSetViewport(LoadFloat(kFunnyShapeViewportOrigin), LoadFloat(kFunnyShapeViewportOrigin),
+                  LoadFloat(kFunnyShapeViewportWidth), LoadFloat(kFunnyShapeViewportHeight),
+                  LoadFloat(kFunnyShapeViewportOrigin), LoadFloat(kFunnyShapeNdcMax));
     {
         int frame = alive >> 4;
         Graphic.Printf(const_cast<char*>(s_funnyShapeFmt), pFan[frame % 4]);
@@ -274,9 +283,9 @@ void CFunnyShapePcs::Init()
         colors[i + 1].b = shade;
         colors[i + 1].a = 0xFF;
 
-        positions[i].x = kFunnyShapeViewportOrigin;
-        positions[i].y = kFunnyShapeViewportOrigin;
-        positions[i].z = kFunnyShapeNdcMin;
+        positions[i].x = LoadFloat(kFunnyShapeViewportOrigin);
+        positions[i].y = LoadFloat(kFunnyShapeViewportOrigin);
+        positions[i].z = LoadFloat(kFunnyShapeNdcMin);
     }
 }
 

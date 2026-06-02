@@ -240,7 +240,6 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     Vec matrixPos;
     float distance;
     float zero;
-    float speedDecay;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -268,9 +267,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
 
     zero = FLOAT_80330644;
     work->m_emitTimer = work->m_emitTimer + 1;
-    speedDecay = work->m_speedDecay;
-    speedDecay = speedDecay - step->m_speedDecayStep;
-    work->m_speedDecay = speedDecay;
+    work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
     if (work->m_speedDecay < zero) {
         work->m_speedDecay = zero;
     }

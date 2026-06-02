@@ -28,6 +28,19 @@ struct ConformBgNormalState {
     u8 m_initialized;
 };
 
+struct ConformBgNormalCylinder {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    f32 m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
+STATIC_ASSERT(sizeof(ConformBgNormalCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(offsetof(ConformBgNormalCylinder, m_axis) == 0x18);
+STATIC_ASSERT(offsetof(ConformBgNormalCylinder, m_boundsMin) == 0x28);
+
 struct WeaponNodeFlagBits {
     signed char m_prg : 1;
     signed char m_unk40 : 1;
@@ -74,8 +87,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     f64 trigValue;
     Mtx basisMtx;
     Mtx scaleMtx;
-    CMapCylinder firstCylinder;
-    CMapCylinder secondCylinder;
+    ConformBgNormalCylinder firstCylinder;
+    ConformBgNormalCylinder secondCylinder;
     Vec local_140;
     Vec local_14c;
     Vec local_158;
@@ -135,7 +148,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 firstCylinder.m_axis.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
-                checkResult = MapMng.CheckHitCylinderNear(&firstCylinder, &firstRayDirection, 0xffffffff);
+                checkResult = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&firstCylinder), &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
                 if (checkResult != 0) {
                     MapMng.m_hitMapObj->CalcHitPosition(&local_170);
@@ -244,7 +257,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_axis.z = kPppConformBgNormalZero;
                     secondCylinder.m_radius = kPppConformBgNormalZero;
 
-                    hitFound = MapMng.CheckHitCylinderNear(&secondCylinder, &secondRayDirection, 0xffffffff);
+                    hitFound = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&secondCylinder), &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         MapMng.m_hitMapObj->CalcHitPosition(&local_170);
                         ppvMng->m_matrix.value[0][3] = local_170.x;

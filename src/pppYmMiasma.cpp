@@ -241,7 +241,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     float distance;
     float zero;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 
@@ -292,9 +292,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
         }
 
         angleDelta += step->m_baseAngle;
-        angleScale = FLOAT_80330640 * (float)angleDelta;
-        angleScale = FLOAT_80330650 * angleScale;
-        angleScale = angleScale / FLOAT_80330654;
+        angleScale = (FLOAT_80330650 * (FLOAT_80330640 * (float)angleDelta)) / FLOAT_80330654;
         angleIdx = (s32)angleScale;
         impulseX = *(float*)((u8*)gPppTrigTable + ((angleIdx + 0x4000) & 0xfffc));
         impulseZ = *(float*)((u8*)gPppTrigTable + (angleIdx & 0xfffc));
@@ -307,8 +305,10 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
     work->m_radius = work->m_radius + work->m_radiusVelocity;
 
-    for (i = 0, particle = work->m_particles; i < step->m_particleCount; i++, particle++) {
+    particle = work->m_particles;
+    for (i = 0; i < step->m_particleCount; i++) {
         UpdateParticleData(&pppYmMiasma_->m_object, (_pppCtrlTable*)param_3, step, particle);
+        particle++;
     }
 
     matrixPos.x = ppvMng->m_matrix.value[0][3];
@@ -317,7 +317,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
     distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
-    if (distance != FLOAT_80330644) {
+    if (FLOAT_80330644 != distance) {
         work->m_prevPositionChanged = 0xff;
     } else {
         work->m_prevPositionChanged = 0;

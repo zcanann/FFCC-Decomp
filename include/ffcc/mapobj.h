@@ -250,11 +250,15 @@ public:
     float m_transRateX;             // 0x58
     float m_transRateY;             // 0x5C
     float m_transRateZ;             // 0x60
-    char m_pad64[0x0C];
-    float m_worldMapLightX;         // 0x70
-    float m_worldMapLightY;         // 0x74
-    float m_worldMapLightZ;         // 0x78
-    char m_pad7C[0x0C];
+    float m_localTranslateX;        // 0x64
+    float m_localTranslateY;        // 0x68
+    float m_localTranslateZ;        // 0x6C
+    float m_localRotationX;         // 0x70
+    float m_localRotationY;         // 0x74
+    float m_localRotationZ;         // 0x78
+    float m_localScaleX;            // 0x7C
+    float m_localScaleY;            // 0x80
+    float m_localScaleZ;            // 0x84
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
     _GXColor m_ambientColor;        // 0xE8

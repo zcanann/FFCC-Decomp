@@ -3401,9 +3401,9 @@ found:
         *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];
         *reinterpret_cast<unsigned char*>(mapObjLight + 10) = colorBytes[2];
         *reinterpret_cast<unsigned char*>(mapObjLight + 11) = colorBytes[3];
-        mapObj->m_worldMapLightX = posX;
-        mapObj->m_worldMapLightY = posY;
-        mapObj->m_worldMapLightZ = posZ;
+        mapObj->m_localRotationX = posX;
+        mapObj->m_localRotationY = posY;
+        mapObj->m_localRotationZ = posZ;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
     }

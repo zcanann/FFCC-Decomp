@@ -42,7 +42,7 @@ struct ConformBgNormalCylinder {
 
 static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
 {
-    return reinterpret_cast<Vec*>(&owner->m_hitNormal.y);
+    return &owner->HitFaceNormal();
 }
 
 /*

@@ -353,6 +353,11 @@ struct _pppMngSt
     PPPSEST m_soundEffectData;         // 0x11C
     PPPIFPARAM m_hitParams;            // 0x130
     short m_hitObjectIds[0x10];        // 0x138
+
+    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userFloat0); }
+    Vec& BasePosition() { return *reinterpret_cast<Vec*>(&m_savedPosition.z); }
+    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userFloat0); }
+    const Vec& BasePosition() const { return *reinterpret_cast<const Vec*>(&m_savedPosition.z); }
 }; // Size: 0x158
 
 void Screen2world(Vec&, Vec&);

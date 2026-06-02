@@ -12,7 +12,7 @@ extern const float kPppParHitSphMatZero[2];
 
 static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+    return &mng->UserPosition();
 }
 
 /*

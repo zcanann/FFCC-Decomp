@@ -18,7 +18,7 @@ struct ParHitSphParams {
 
 static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+    return &mng->UserPosition();
 }
 
 /*

@@ -21,12 +21,12 @@ struct pppYmMoveCircleWork {
 
 static inline Vec* MoveCirclePreviousPosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_userFloat0);
+    return &mng->UserPosition();
 }
 
 static inline Vec* MoveCircleBasePosition(_pppMngSt* mng)
 {
-    return reinterpret_cast<Vec*>(&mng->m_savedPosition.z);
+    return &mng->BasePosition();
 }
 
 static inline Vec* MoveCircleTargetPosition(_pppMngSt* mng)

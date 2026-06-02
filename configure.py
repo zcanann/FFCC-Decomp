@@ -611,7 +611,7 @@ config.libs = [
             Object(NonMatching, "pppDrawMatrix.cpp"),
             Object(NonMatching, "pppDrawMatrixFront.cpp"),
             Object(NonMatching, "pppDrawMatrixFrontLnr.cpp"),
-            Object(NonMatching, "pppDrawMatrixLoc.cpp"),
+            Object(NonMatching, "pppDrawMatrixLoc.cpp", cflags=cflags_game),
             Object(NonMatching, "pppDrawMatrixNoRot.cpp"),
             Object(NonMatching, "pppDrawMatrixWood.cpp"),
             Object(NonMatching, "pppDrawMdl.cpp"),

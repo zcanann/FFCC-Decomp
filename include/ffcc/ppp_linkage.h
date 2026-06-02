@@ -10,6 +10,8 @@ extern "C" {
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern unsigned char gPppInSubFrameCalc;
+extern int ppvUserStopPartF;
+extern unsigned char ppvIsLoopCalc;
 
 #ifdef __cplusplus
 }

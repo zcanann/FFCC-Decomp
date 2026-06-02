@@ -115,7 +115,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
         textureIndex = 0;
         ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
-        if (param_2->m_payload[0] == 0) {
+        if (param_2->m_crystal.m_refractionMode == 0) {
             if (param_2->m_initWOrk == 0xFFFF) {
                 return;
             }
@@ -129,8 +129,8 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv(
             &colorBlock->m_color, &pppCrystal2->m_object.m_drawMatrix, param_2->m_arg3,
-            param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
-            param_2->m_payload[3]);
+            param_2->m_crystal.m_drawEnvColor1, param_2->m_crystal.m_drawEnvColor0, param_2->m_crystal.m_blendMode, param_2->m_crystal.m_drawFlag, 1, 1,
+            param_2->m_crystal.m_zMode);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
         indTexMtx = s_crystal2IndTexMtxBase;
@@ -154,7 +154,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         PSMTXInverse(tmpMtx, normalMtx);
         PSMTXTranspose(normalMtx, normalMtx);
 
-        if (param_2->m_payload[0] == 0) {
+        if (param_2->m_crystal.m_refractionMode == 0) {
             GXLoadTexObj(&sourceTex->m_texObj, GX_TEXMAP1);
         } else {
             GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
@@ -221,7 +221,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
     }
 
     work = GetCrystal2Work(pppCrystal2, param_3);
-    if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
+    if ((param_2->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc(
             sizeof(Crystal2RefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
 

@@ -1070,8 +1070,7 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
     int i;
     bool isDead = true;
     float zero = 0.0f;
-    BreathParticleGroup* groupData =
-        &(*(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C))[(int)groupIndex];
+    BreathParticleGroup* groupData = &vBreathModel->m_groups[(int)groupIndex];
 
     for (i = 0; i < pBreathModel->m_slotCount; i++) {
         if ((groupData->particleIndices[i] != -1) || (groupData->particleStates[i] != 1)) {
@@ -1108,19 +1107,19 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
 #ifndef VERSION_GCCP01
 void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
 {
-    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C);
+    BreathParticleGroup* groupTable = vBreathModel->m_groups;
     short g;
     short s;
 
     for (g = 0; g < pBreathModel->m_groupCount; g++) {
         for (s = 0; s < pBreathModel->m_slotCount; s++) {
-            if ((int)particleIndex == (int)*(signed char*)(*(int*)(groupTable + 4) + s)) {
+            if ((int)particleIndex == (int)groupTable->particleIndices[s]) {
                 slotIndex = s;
                 groupIndex = g;
                 return;
             }
         }
-        groupTable += 0x5C;
+        groupTable++;
     }
 
     slotIndex = -1;
@@ -1146,7 +1145,7 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
 
     SearchIndex(pBreathModel, vBreathModel, slotIndex, groupIndex, particleIndex);
     if (groupIndex != -1) {
-        groupArray = *(BreathParticleGroup**)((unsigned char*)vBreathModel + 0x3C);
+        groupArray = vBreathModel->m_groups;
         groupArray[groupIndex].particleIndices[slotIndex] = -1;
     }
 }

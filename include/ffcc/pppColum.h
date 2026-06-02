@@ -36,6 +36,10 @@ struct pppColumUnkB {
             u8 m_noiseG;           // 0x2B
             u8 m_noiseB;           // 0x2C
         } m_colum;
+        struct {
+            u8 m_drawEnvLightTarget;
+            u8 m_pad01[0x18];
+        } m_lensFlare;
     };
 };
 

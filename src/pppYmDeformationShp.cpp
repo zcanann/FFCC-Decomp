@@ -424,10 +424,12 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 
 	CalcGraphValue(
 		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
-		param_2->m_payload[0], param_2->m_payload[1], param_2->m_payload[2]);
+		param_2->m_deformation.m_scale.m_valueAdd, param_2->m_deformation.m_scale.m_velocityAdd,
+		param_2->m_deformation.m_scale.m_accelerationAdd);
 	CalcGraphValue(
 		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
-		param_2->m_payload[3], param_2->m_payload[4], param_2->m_payload[5]);
+		param_2->m_deformation.m_angle.m_valueAdd, param_2->m_deformation.m_angle.m_velocityAdd,
+		param_2->m_deformation.m_angle.m_accelerationAdd);
 
 	if (ppvIsLoopCalc != 0) {
 		return;

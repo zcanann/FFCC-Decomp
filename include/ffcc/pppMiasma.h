@@ -32,7 +32,15 @@ typedef struct {
     float m_stepValue;
     u8 m_arg3;
     u8 m_pad_0x11[3];
-    u8 m_payload[0x1f];
+    union {
+        u8 m_payload[0x1f];
+        struct Payload {
+            u8 m_pad00[0x1C];
+            u8 m_alphaOpScale;
+            u8 m_useSecondaryMask;
+            u8 m_alphaScale;
+        } m_miasma;
+    };
 } pppMiasmaRenderStep;
 
 #ifdef __cplusplus

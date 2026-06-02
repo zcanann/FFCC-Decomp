@@ -155,7 +155,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		SetChangeTexModelCallbacks(model, work, step);
 	}
 
-	if (step->m_payload[0] == 0) {
+	if (step->m_changeTex.m_mode == 0) {
 		return;
 	}
 
@@ -234,13 +234,13 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		GXColor* colors = work->m_meshColorArrays[meshIdx];
 		unsigned int vertCount;
 		for (unsigned int v = 0; (vertCount = meshList->m_data->m_vertexCount, v < vertCount); v++) {
-			if (step->m_payload[0] == 1) {
+			if (step->m_changeTex.m_mode == 1) {
 				if (meshList->m_workPositions[v].y < splitY) {
 					colors[v].a = (u8)(int)alphaBase;
 				} else {
 					colors[v].a = 0;
 				}
-			} else if (step->m_payload[0] == 2) {
+			} else if (step->m_changeTex.m_mode == 2) {
 				if (meshList->m_workPositions[v].y > splitY) {
 					colors[v].a = (u8)(int)alphaBase;
 				} else {
@@ -402,7 +402,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
-	if (step->m_payload[0] != 0) {
+	if (step->m_changeTex.m_mode != 0) {
 		meshColorArrays = work->m_meshColorArrays;
 		CTexture* texture = work->m_texture;
 		meshData = meshes[meshIdx].m_data;
@@ -449,7 +449,7 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	ChangeTexMeshData* meshData = meshes->m_data;
 	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
 
-	if (step->m_payload[0] == 0) {
+	if (step->m_changeTex.m_mode == 0) {
 		int zero = 0;
 		int drawTevBits = 0xACE0F;
 		int fullTevBits = drawTevBits | 0x1000;

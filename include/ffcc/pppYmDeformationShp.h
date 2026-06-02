@@ -14,12 +14,24 @@ struct pppYmDeformationShp {
     _pppPObject m_object;
 };
 
+struct pppYmDeformationShpGraphArgs {
+    f32 m_valueAdd;
+    f32 m_velocityAdd;
+    f32 m_accelerationAdd;
+};
+
 struct pppYmDeformationShpUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     u8 m_size;
     u8 m_pad_0x9[3];
-    f32 m_payload[6];
+    union {
+        f32 m_payload[6];
+        struct Payload {
+            pppYmDeformationShpGraphArgs m_scale;
+            pppYmDeformationShpGraphArgs m_angle;
+        } m_deformation;
+    };
     s16 m_payload3;
     s8 m_splitMode;
     u8 m_splitSize;

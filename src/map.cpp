@@ -3120,17 +3120,10 @@ CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
  */
 int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
 {
-    int objCount = m_mapObjCount;
-    int objIndex = 0;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
-
-    while (0 < objCount) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x984) == effectId) {
-            return objIndex;
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (m_mapObjArray[i].m_effectId == effectId) {
+            return i;
         }
-        mapObj += 0xF0;
-        objIndex++;
-        objCount--;
     }
 
     return -1;
@@ -3248,7 +3241,7 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
  */
 void CMapMng::SetMapObjMime(int mapObjIndex, int mode, int target, int type)
 {
-    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    CMapObj* mapObj = &m_mapObjArray[mapObjIndex];
     mapObj->SetMime(mode, target, type);
 }
 

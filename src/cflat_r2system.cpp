@@ -44,16 +44,6 @@ static inline CUSBStreamData* UsbStream(CPartPcs* self)
     return &self->m_usbStreamData;
 }
 
-struct CMapCylinderRaw
-{
-    Vec m_bottom;
-    u8 m_pad0C[0x0C];
-    Vec m_top;
-    float m_radius;
-    Vec m_direction;
-    Vec m_direction2;
-};
-
 extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
@@ -415,20 +405,13 @@ void CMapPcs::CalcHitPosition(Vec* hitPosition)
  */
 int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
-    CMapCylinderRaw cylinder;
-
-    cylinder.m_direction.z = 0.0f;
-    cylinder.m_direction.y = 0.0f;
-    cylinder.m_direction.x = 0.0f;
-    cylinder.m_direction2.z = 1.0f;
-    cylinder.m_direction2.y = 1.0f;
-    cylinder.m_direction2.x = 1.0f;
+    CMapCylinder cylinder;
 
     cylinder.m_bottom = *cylinderBottom;
-    cylinder.m_top = *direction;
+    cylinder.m_axis = *direction;
     cylinder.m_radius = radius;
 
-    return MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), direction, hitMask);
+    return MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
 }
 
 /*

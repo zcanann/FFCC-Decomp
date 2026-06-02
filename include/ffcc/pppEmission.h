@@ -12,6 +12,20 @@ struct pppEmission {
     _pppPObject m_object;
 };
 
+struct PEmissionPayload {
+    f32 m_scaleAccelerationAdd;
+    f32 m_scaleRandomRange;
+    u8 m_blendMode;
+    u8 m_particleMode;
+    u8 m_texGenMode;
+    u8 m_targetAlpha;
+    u8 m_fadeOutFrames;
+    u8 m_lifeJitterFrames;
+    u8 m_holdFrames;
+    u8 m_fadeInFrames;
+    u8 m_pad10[0x10];
+};
+
 struct PEmission {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -19,7 +33,10 @@ struct PEmission {
     u8 _pad8[3];
     f32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[0x20];
+    union {
+        u8 m_payload[0x20];
+        PEmissionPayload m_emission;
+    };
 };
 typedef PEmission pppEmissionUnkB;
 

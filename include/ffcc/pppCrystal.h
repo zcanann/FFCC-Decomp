@@ -30,7 +30,17 @@ struct pppCrystalUnkB {
     s32 m_initWOrk;
     float m_stepValue;
     float m_arg3;
-    u8 m_payload[6];
+    union {
+        u8 m_payload[6];
+        struct Payload {
+            u8 m_refractionMode;
+            u8 m_blendMode;
+            u8 m_drawFlag;
+            u8 m_zMode;
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+        } m_crystal;
+    };
 };
 
 #ifdef __cplusplus

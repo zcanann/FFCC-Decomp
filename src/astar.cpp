@@ -31,16 +31,6 @@ extern const char kAStarNewLine[2];
 
 #include "string.h"
 
-struct CMapCylinderRaw
-{
-	Vec m_bottom;
-	Vec m_unknown;
-	Vec m_direction;
-	float m_radius;
-	Vec m_top;
-	Vec m_direction2;
-};
-
 struct CAStarTempWork
 {
 	unsigned char m_visited[64];
@@ -80,22 +70,21 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinderRaw cyl;
+		CMapCylinder cyl;
 		float aabbMin = LoadFloat(kPolyGroupAabbMin);
 		float aabbMax = LoadFloat(kPolyGroupAabbMax);
 
-		cyl.m_top.z = aabbMax;
-		cyl.m_top.y = aabbMax;
-		cyl.m_top.x = aabbMax;
-		cyl.m_direction2.z = aabbMin;
-		cyl.m_direction2.y = aabbMin;
-		cyl.m_direction2.x = aabbMin;
+		cyl.m_boundsMax.z = aabbMax;
+		cyl.m_boundsMax.y = aabbMax;
+		cyl.m_boundsMax.x = aabbMax;
+		cyl.m_boundsMin.z = aabbMin;
+		cyl.m_boundsMin.y = aabbMin;
+		cyl.m_boundsMin.x = aabbMin;
 		cyl.m_bottom = *top;
-		cyl.m_direction = *base;
+		cyl.m_axis = *base;
 		cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                base, mask) != 0)
+		if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
@@ -109,22 +98,21 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 		Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 		Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-		CMapCylinderRaw cyl;
+		CMapCylinder cyl;
 		float aabbMin = LoadFloat(kPolyGroupAabbMin);
 		float aabbMax = LoadFloat(kPolyGroupAabbMax);
 
-		cyl.m_top.z = aabbMax;
-		cyl.m_top.y = aabbMax;
-		cyl.m_top.x = aabbMax;
-		cyl.m_direction2.z = aabbMin;
-		cyl.m_direction2.y = aabbMin;
-		cyl.m_direction2.x = aabbMin;
+		cyl.m_boundsMax.z = aabbMax;
+		cyl.m_boundsMax.y = aabbMax;
+		cyl.m_boundsMax.x = aabbMax;
+		cyl.m_boundsMin.z = aabbMin;
+		cyl.m_boundsMin.y = aabbMin;
+		cyl.m_boundsMin.x = aabbMin;
 		cyl.m_bottom = *top;
-		cyl.m_direction = *base;
+		cyl.m_axis = *base;
 		cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-		                                base, hitAttributeMask) != 0)
+		if (MapMng.CheckHitCylinderNear(&cyl, base, hitAttributeMask) != 0)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
@@ -149,22 +137,21 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	const CVector& topVec = CVector(pos->x, kPolyGroupTopOffsetY + pos->y, pos->z);
 	Vec* base = reinterpret_cast<Vec*>(const_cast<CVector*>(&baseVec));
 	Vec* top = reinterpret_cast<Vec*>(const_cast<CVector*>(&topVec));
-	CMapCylinderRaw cyl;
+	CMapCylinder cyl;
 	float aabbMin = LoadFloat(kPolyGroupAabbMin);
 	float aabbMax = LoadFloat(kPolyGroupAabbMax);
 
-	cyl.m_top.z = aabbMax;
-	cyl.m_top.y = aabbMax;
-	cyl.m_top.x = aabbMax;
-	cyl.m_direction2.z = aabbMin;
-	cyl.m_direction2.y = aabbMin;
-	cyl.m_direction2.x = aabbMin;
+	cyl.m_boundsMax.z = aabbMax;
+	cyl.m_boundsMax.y = aabbMax;
+	cyl.m_boundsMax.x = aabbMax;
+	cyl.m_boundsMin.z = aabbMin;
+	cyl.m_boundsMin.y = aabbMin;
+	cyl.m_boundsMin.x = aabbMin;
 	cyl.m_bottom = *top;
-	cyl.m_direction = *base;
+	cyl.m_axis = *base;
 	cyl.m_radius = LoadFloat(kPolyGroupBaseXZ);
 
-	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
-	                                base, mask) != 0)
+	if (MapMng.CheckHitCylinderNear(&cyl, base, mask) != 0)
 	{
 		return gMapHitFace->m_groupIndex;
 	}

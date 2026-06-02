@@ -221,7 +221,8 @@ public:
     short m_cameraSemiTransTargetAlpha; // 0x2A
     short m_cameraSemiTransStep;        // 0x2C
     unsigned short m_objId;         // 0x2E
-    char m_pad30[4];
+    unsigned short m_effectId;      // 0x30
+    unsigned short m_groupId;       // 0x32
     unsigned short m_meshId;        // 0x34
     char m_pad36[0x22];
     float m_transRateX;             // 0x58

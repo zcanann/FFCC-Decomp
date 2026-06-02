@@ -275,8 +275,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     model = (pppModelSt*)(((CMapMesh**)ppvEnv->m_mapMeshPtr)[param_2->m_dataValIndex]);
     ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
-    if (param_2->m_payload[0x1E] == 0xFF) {
-        param_2->m_payload[0x1E] = 0xFE;
+    if (param_2->m_miasma.m_alphaScale == 0xFF) {
+        param_2->m_miasma.m_alphaScale = 0xFE;
     }
 
     packedColor.color = colorWork->m_color;
@@ -411,7 +411,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
                                    GX_LINEAR, GX_CTF_R8, 0);
-        if (param_2->m_payload[0x1D] != 0) {
+        if (param_2->m_miasma.m_useSecondaryMask != 0) {
             if (isCameraInside) {
                 drawColor.rgba[0] = 0xFF;
                 drawColor.rgba[1] = 0xFF;
@@ -500,7 +500,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         }
 
         if (param_2->m_arg3 != 2) {
-            tevAlphaScale = param_2->m_payload[0x1E];
+            tevAlphaScale = param_2->m_miasma.m_alphaScale;
             stepColor.r = tevAlphaScale;
             stepColor.g = tevAlphaScale;
             stepColor.b = tevAlphaScale;
@@ -600,7 +600,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             GXSetNumChans(1);
 
-            if (param_2->m_payload[0x1D] != 0) {
+            if (param_2->m_miasma.m_useSecondaryMask != 0) {
                 GXLoadTexObj(&backRgba8Tex, GX_TEXMAP0);
                 GXLoadTexObj(&backRgba8Tex2, GX_TEXMAP1);
 
@@ -627,9 +627,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 _GXSetTevColorOp(2, 0, 0, 0, 1, 0);
                 _GXSetTevAlphaIn(2, 7, 0, 5, 7);
                 tevAlphaScale = 0;
-                if (param_2->m_payload[0x1C] == 1) {
+                if (param_2->m_miasma.m_alphaOpScale == 1) {
                     tevAlphaScale = 1;
-                } else if (param_2->m_payload[0x1C] == 2) {
+                } else if (param_2->m_miasma.m_alphaOpScale == 2) {
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp(2, 0, 0, tevAlphaScale, 1, 0);
@@ -663,9 +663,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 _GXSetTevAlphaIn(2, 7, 0, 5, 7);
 
                 tevAlphaScale = 0;
-                if (param_2->m_payload[0x1C] == 1) {
+                if (param_2->m_miasma.m_alphaOpScale == 1) {
                     tevAlphaScale = 1;
-                } else if (param_2->m_payload[0x1C] == 2) {
+                } else if (param_2->m_miasma.m_alphaOpScale == 2) {
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp(2, 0, 0, tevAlphaScale, 1, 0);

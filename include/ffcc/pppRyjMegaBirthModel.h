@@ -3,7 +3,69 @@
 
 #include "ffcc/partMng.h"
 
-struct PRyjMegaBirthModel : _PARTICLE_DATA {}; // Size 0x140
+struct PRyjMegaBirthModel
+{
+    u8 _pad00[0x04];
+    s32 m_modelIndex;             // 0x04
+    u8 _pad08;
+    u8 m_fogIndex;                // 0x09
+    u8 _pad0A[0x03];
+    u8 m_useEnvDepth;             // 0x0D
+    u8 _pad0E[0x0A];
+    float m_drawDepth;            // 0x18
+    u8 _pad1C[0x04];
+    u16 m_maxParticles;           // 0x20
+    union {
+        u16 m_emitCount;          // 0x22
+        struct EmitFields {
+            u8 m_fadeOutFrames;   // 0x22
+            u8 m_emitCountHigh;
+        } m_emit;
+    };
+    u16 m_emitInterval;           // 0x24
+    s16 m_life;                   // 0x26
+    u8 _pad28;
+    u8 m_fadeInFrames;            // 0x29
+    u8 m_spawnMode;               // 0x2A
+    u8 m_spread;                  // 0x2B
+    u8 m_colorRandom[4];          // 0x2C
+    u8 _pad30[0x0C];
+    float m_colorDeltaAdds[4];    // 0x3C
+    u8 _pad4C[0x70];
+    float m_colorFrameDeltas[4];  // 0xBC
+    u8 _padCC[0x0C];
+    float m_texScrollUStepDelta;  // 0xD8
+    float m_texScrollVStart;      // 0xDC
+    float m_texScrollUStep;       // 0xE0
+    float m_texScrollVStep;       // 0xE4
+    Vec m_baseDirection;          // 0xE8
+    u8 _padF4[0x04];
+    Vec m_accelerationAxis;       // 0xF8
+    u8 _pad104[0x04];
+    float m_directionVelocityStart; // 0x108
+    float m_directionVelocityStep;  // 0x10C
+    float m_directionVelocityRandom; // 0x110
+    float m_acceleration;          // 0x114
+    float m_accelerationStep;      // 0x118
+    u8 _pad11C[0x04];
+    Vec m_directionScale;         // 0x120
+    float m_speed;                // 0x12C
+    u8 m_speedMode;               // 0x130
+    u8 m_enableParticleColor;     // 0x131
+    u8 m_rotationRandomFlags;     // 0x132
+    u8 m_scaleRandomFlags;        // 0x133
+    u8 m_texScaleRandomMode;      // 0x134
+    u8 m_matrixMode;              // 0x135
+    u8 m_enableWorldMatrix;       // 0x136
+    u8 m_matrixFinalizeMode;      // 0x137
+    u8 _pad138[0x02];
+    u8 m_zEnable;                 // 0x13A
+    u8 m_clampDirectionalSpeed;   // 0x13B
+    u8 m_blendMode;               // 0x13C
+    u8 m_cullMode;                // 0x13D
+    u8 _pad13E;
+    u8 m_lightTarget;             // 0x13F
+}; // Size 0x140
 
 struct VRyjMegaBirthModel
 {

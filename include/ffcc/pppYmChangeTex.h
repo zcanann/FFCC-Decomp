@@ -15,7 +15,13 @@ struct pppYmChangeTexStep {
     float m_initWOrk;
     float m_stepValue;
     float m_arg3;
-    u8 m_payload[6];
+    union {
+        u8 m_payload[6];
+        struct Payload {
+            u8 m_mode;
+            u8 m_pad01[5];
+        } m_changeTex;
+    };
     u8 _pad1[1];
 };
 

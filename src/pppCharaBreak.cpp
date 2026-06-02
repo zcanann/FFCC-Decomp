@@ -219,11 +219,11 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTab
  */
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtrlTable* data)
 {
-    CharaBreakStep* stepData;
     CharaBreakWork* work;
     CChara::CModel* model;
     CGObject* handle;
     CChara::CMesh* mesh;
+    CharaBreakStep* stepData;
     u32 i;
 
     stepData = (CharaBreakStep*)step;

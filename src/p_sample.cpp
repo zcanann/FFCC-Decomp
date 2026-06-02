@@ -11,15 +11,15 @@
  */
 inline CSamplePcs::CSamplePcs()
 {
-	static CProcessTableDesc desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-	static CProcessTableDesc desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-	static CProcessTableDesc desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-	static CProcessTableDesc desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
+	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
+	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
+	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
+	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
 
 	m_table.m_fields.m_create = desc0;
 	m_table.m_fields.m_destroy = desc1;
-	m_table.m_fields.m_calcInit = desc2;
-	m_table.m_fields.m_phases[0].m_desc = desc3;
+	m_table.m_fields.m_entries[0].m_callback = desc2;
+	m_table.m_fields.m_entries[1].m_callback = desc3;
 }
 
 CProcessTable CSamplePcs::m_table = {

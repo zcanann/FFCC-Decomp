@@ -12,13 +12,13 @@ char s_usbReadPollInitialized;
 extern const char sUsbPcsClassName[] = "CUSBPcs";
 inline CUSBPcs::CUSBPcs()
 {
-    static CProcessTableDesc desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
-    static CProcessTableDesc desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
-    static CProcessTableDesc desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
+    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
+    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
 
     m_table.m_fields.m_create = desc0;
     m_table.m_fields.m_destroy = desc1;
-    m_table.m_fields.m_calcInit = desc2;
+    m_table.m_fields.m_entries[0].m_callback = desc2;
 }
 
 CProcessTable CUSBPcs::m_table = {

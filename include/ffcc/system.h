@@ -11,21 +11,21 @@ struct OSThread;
 struct CScenegraphDesc;
 struct CScenegraphEntry;
 
-struct CProcessTableDesc
+struct CProcessTableCallback
 {
-    u32 m_priority;
-    u32 m_mask;
-    u32 m_callback;
+    u32 m_thisOffset;
+    u32 m_virtualOffset;
+    u32 m_function;
 };
-typedef int CProcessTableDesc_size_mismatch[(sizeof(CProcessTableDesc) == 0xC) ? 1 : -1];
+typedef int CProcessTableCallback_size_mismatch[(sizeof(CProcessTableCallback) == 0xC) ? 1 : -1];
 
-struct CProcessTablePhase
+struct CProcessTableEntry
 {
-    u32 m_order;
-    u32 m_group;
-    CProcessTableDesc m_desc;
+    CProcessTableCallback m_callback;
+    u32 m_priority;
+    u32 m_flags;
 };
-typedef int CProcessTablePhase_size_mismatch[(sizeof(CProcessTablePhase) == 0x14) ? 1 : -1];
+typedef int CProcessTableEntry_size_mismatch[(sizeof(CProcessTableEntry) == 0x14) ? 1 : -1];
 
 struct CProcessTable
 {
@@ -35,11 +35,9 @@ struct CProcessTable
         u32 m_words[(0x15C - sizeof(char*)) / sizeof(u32)];
         struct Fields
         {
-            CProcessTableDesc m_create;
-            CProcessTableDesc m_destroy;
-            CProcessTableDesc m_calcInit;
-            CProcessTablePhase m_phases[15];
-            u32 m_padding[2];
+            CProcessTableCallback m_create;
+            CProcessTableCallback m_destroy;
+            CProcessTableEntry m_entries[16];
         } m_fields;
     };
 };

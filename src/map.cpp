@@ -3008,7 +3008,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
                 *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = kMapCameraSemiTransMinSentinel;
                 *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = kMapCameraSemiTransMaxSentinel;
-                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = 2;
+                mapObj->m_drawPriority = 2;
                 *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
             }
             *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = 0x4000;
@@ -3441,8 +3441,8 @@ void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = &m_mapObjArray[i];
         if (static_cast<int>(mapObj->m_objId) == id) {
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = prio;
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x14)) = prio;
+            mapObj->m_drawPriority = prio;
+            mapObj->m_baseDrawPriority = prio;
         }
     }
 }

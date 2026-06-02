@@ -311,8 +311,8 @@ void CMapObj::Init()
     m_mapData = 0;
     m_attribute = 0;
 
-    U8At(this, 0x15) = 0x7E;
-    U8At(this, 0x14) = 0x7E;
+    m_drawPriority = 0x7E;
+    m_baseDrawPriority = 0x7E;
     S8At(this, 0x1F) = -1;
     U8At(this, 0x20) = 0;
     U8At(this, 0x27) = 0;
@@ -461,8 +461,8 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U16At(this, 0x34) = static_cast<unsigned short>(chunkFile.Get4());
         } else if (chunk.m_id == CHUNK_PRIO) {
             unsigned char priority = chunkFile.Get1();
-            U8At(this, 0x15) = priority;
-            U8At(this, 0x14) = priority;
+            m_drawPriority = priority;
+            m_baseDrawPriority = priority;
         } else if (chunk.m_id == CHUNK_AMBI) {
             m_ambientColor.r = chunkFile.Get1();
             m_ambientColor.g = chunkFile.Get1();
@@ -514,8 +514,8 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_mapData = 0;
             } else if (U8At(this, 0x1D) == 1) {
                 m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
-                U8At(this, 0x14) = 0;
-                U8At(this, 0x15) = 0;
+                m_baseDrawPriority = 0;
+                m_drawPriority = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName =
@@ -1234,9 +1234,9 @@ void CMapObj::Calc()
         }
 
         if (m_cameraSemiTransAlpha != 0) {
-            U8At(this, 0x15) = 2;
+            m_drawPriority = 2;
         } else {
-            U8At(this, 0x15) = U8At(this, 0x14);
+            m_drawPriority = m_baseDrawPriority;
         }
     }
 
@@ -1244,7 +1244,7 @@ void CMapObj::Calc()
         (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((U8At(this, 0x18) & 1) != 0)) {
         if ((F32At(this, 0x50) < kMapObjOne) && (F32At(this, 0x4C) >= kMapObjInitNegOne)) {
-            U8At(this, 0x15) = U8At(this, 0x14);
+            m_drawPriority = m_baseDrawPriority;
             U8At(this, 0x25) = 1;
             U8At(this, 0x26) = 0;
         } else {
@@ -1258,10 +1258,10 @@ void CMapObj::Calc()
             U8At(this, 0x25) = static_cast<unsigned char>(posCam.z > F32At(this, 0x50));
             if (posCam.z < F32At(this, 0x4C)) {
                 U8At(this, 0x26) = 1;
-                U8At(this, 0x15) = 2;
+                m_drawPriority = 2;
             } else {
                 U8At(this, 0x26) = 1;
-                U8At(this, 0x15) = U8At(this, 0x14);
+                m_drawPriority = m_baseDrawPriority;
             }
         }
     }
@@ -1379,7 +1379,7 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
-    if (priority != U8At(this, 0x15)) {
+    if (priority != m_drawPriority) {
         return;
     }
     if ((U8At(this, 0x18) & 4) == 0) {

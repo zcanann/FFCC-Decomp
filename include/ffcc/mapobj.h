@@ -211,7 +211,10 @@ public:
     CMapObj* m_child;             // 0x04
     CMapObj* m_next;              // 0x08
     void* m_mapData;              // 0x0C
-    char m_pad10[0x08];
+    char m_pad10[0x04];
+    unsigned char m_baseDrawPriority; // 0x14
+    unsigned char m_drawPriority;     // 0x15
+    char m_pad16[0x02];
     unsigned char m_showFlags;      // 0x18
     char m_pad19[2];
     unsigned char m_calcMtxPending; // 0x1B

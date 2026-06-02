@@ -66,6 +66,15 @@ struct RSDLISTITEM {
     int flag;
 };
 
+struct MaterialEditorUsbTransform {
+    Mtx44 m_modelMatrix;
+    Mtx m_viewMatrix;
+    Vec m_cameraPosition;
+    f32 m_cameraDistance;
+    u8 m_reserved[0xA0];
+};
+typedef int MaterialEditorUsbTransform_size_mismatch[(sizeof(MaterialEditorUsbTransform) == 0x120) ? 1 : -1];
+
 class CMaterialEditorPcs : public CProcess
 {
 public:
@@ -120,40 +129,7 @@ public:
     ZLIST m_zlist2; // 0xD8
 
     u32 m_displayTextureEnabled; // 0xE8
-    float field_0xec; // 0xEC
-    float field_0xf0;
-    float field_0xf4;
-    float field_0xf8;
-    float field_0xfc;
-    float field_0x100;
-    float field_0x104;
-    float field_0x108;
-    float field_0x10c;
-    float field_0x110;
-    float field_0x114;
-    float field_0x118;
-    float field_0x11c;
-    float field_0x120;
-    float field_0x124;
-    float field_0x128;
-
-    // Raw float words consumed by calcViewer (0x12C - 0x158)
-    float field_0x12c;
-    float field_0x130;
-    float field_0x134;
-    float field_0x138;
-    float field_0x13c;
-    float field_0x140;
-    float field_0x144;
-    float field_0x148;
-    float field_0x14c;
-    float field_0x150;
-    float field_0x154;
-    float field_0x158;
-
-    Vec field268_0x15c; // 0x15C
-    float field_0x168; // 0x168
-    unsigned char _pad16C[0xA0];
+    MaterialEditorUsbTransform m_usbTransform; // 0xEC
     pppFMATRIX m_unkMatrix; // 0x20C
     GXTexObj* m_texObj[16]; // 0x23C
     s16* m_textureHeader[16]; // 0x27C

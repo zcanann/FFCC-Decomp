@@ -434,25 +434,25 @@ void CMaterialEditorPcs::calcViewer()
     srt.scaleZ = one;
     srt.scaleY = one;
     srt.scaleX = one;
-    srt.transX = field268_0x15c.x;
-    srt.transY = field268_0x15c.y;
-    srt.transZ = -field268_0x15c.z;
+    srt.transX = m_usbTransform.m_cameraPosition.x;
+    srt.transY = m_usbTransform.m_cameraPosition.y;
+    srt.transZ = -m_usbTransform.m_cameraPosition.z;
     CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
-    m_unkMatrix.value[0][0] = field_0x12c;
-    m_unkMatrix.value[0][1] = field_0x130;
-    m_unkMatrix.value[0][2] = field_0x134;
-    m_unkMatrix.value[0][3] = field_0x138;
-    m_unkMatrix.value[1][0] = field_0x13c;
-    m_unkMatrix.value[1][1] = field_0x140;
-    m_unkMatrix.value[1][2] = field_0x144;
-    m_unkMatrix.value[1][3] = field_0x148;
-    m_unkMatrix.value[2][0] = field_0x14c;
-    m_unkMatrix.value[2][1] = field_0x150;
-    m_unkMatrix.value[2][2] = field_0x154;
-    m_unkMatrix.value[2][3] = field_0x158;
+    m_unkMatrix.value[0][0] = m_usbTransform.m_viewMatrix[0][0];
+    m_unkMatrix.value[0][1] = m_usbTransform.m_viewMatrix[0][1];
+    m_unkMatrix.value[0][2] = m_usbTransform.m_viewMatrix[0][2];
+    m_unkMatrix.value[0][3] = m_usbTransform.m_viewMatrix[0][3];
+    m_unkMatrix.value[1][0] = m_usbTransform.m_viewMatrix[1][0];
+    m_unkMatrix.value[1][1] = m_usbTransform.m_viewMatrix[1][1];
+    m_unkMatrix.value[1][2] = m_usbTransform.m_viewMatrix[1][2];
+    m_unkMatrix.value[1][3] = m_usbTransform.m_viewMatrix[1][3];
+    m_unkMatrix.value[2][0] = m_usbTransform.m_viewMatrix[2][0];
+    m_unkMatrix.value[2][1] = m_usbTransform.m_viewMatrix[2][1];
+    m_unkMatrix.value[2][2] = m_usbTransform.m_viewMatrix[2][2];
+    m_unkMatrix.value[2][3] = m_usbTransform.m_viewMatrix[2][3];
 
     PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
 
@@ -564,13 +564,13 @@ void CMaterialEditorPcs::createViewer()
 
     m_usbStream.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
     m_displayTextureEnabled = 0;
-    memset(&field_0xec, 0, 0x120);
+    memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
     fVar1 = LoadFloat(FLOAT_8032FCC8);
-    field_0x128 = fVar1;
-    field_0x114 = fVar1;
-    field_0x100 = fVar1;
-    field_0xec = fVar1;
+    m_usbTransform.m_modelMatrix[3][3] = fVar1;
+    m_usbTransform.m_modelMatrix[2][2] = fVar1;
+    m_usbTransform.m_modelMatrix[1][1] = fVar1;
+    m_usbTransform.m_modelMatrix[0][0] = fVar1;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();

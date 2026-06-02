@@ -1156,6 +1156,7 @@ void CMenuPcs::CalcSelectWait()
 		cursor->duration = 8;
 		cursor->depth = 1.0f;
 		header->count = (short)(header->count + 1);
+		BonusSpriteFlags(&sprites[2]) = 0;
 		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xe) = 0;
 		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x26) = 4;
 		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x18) = 0;

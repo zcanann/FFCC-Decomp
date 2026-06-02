@@ -3079,8 +3079,8 @@ CChara::CMesh::CRefData::~CRefData()
  */
 CChara::CMesh::CDisplayList::CDisplayList()
 {
-	m_data = 0;
 	m_size = 0;
+	m_data = 0;
 	m_material = 0xFFFF;
 }
 

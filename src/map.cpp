@@ -99,21 +99,6 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
-struct MapObjAttachAttr
-{
-    void* vtable;
-    int type;
-    char name[1];
-};
-
-struct MapObjAttachObj
-{
-    char pad_00[0x0C];
-    CMapHit* mapHit;
-    char pad_10[0xDC];
-    MapObjAttachAttr* attr;
-};
-
 static inline float MapObjWorldX(CMapObj* mapObj)
 {
     return mapObj->m_worldMtx[0][3];
@@ -1490,32 +1475,34 @@ void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray());
+    CMapObj* mapObj = GetMapObjArray();
 
     goto search;
     while (true) {
-        if (strcmp(mapHitName, mapObj->attr->name) == 0) {
-            mapObj->mapHit = mapHit;
+        CMapObjAtrMeshName* meshName = static_cast<CMapObjAtrMeshName*>(mapObj->m_attribute);
+        if (strcmp(mapHitName, meshName->m_name) == 0) {
+            mapObj->m_mapData = mapHit;
 
-            MapObjAttachAttr* mapObjAtr = mapObj->attr;
+            CMapObjAtr* mapObjAtr = mapObj->m_attribute;
             if (mapObjAtr != 0) {
-                delete reinterpret_cast<CMapObjAtr*>(mapObjAtr);
-                mapObj->attr = 0;
+                delete mapObjAtr;
+                mapObj->m_attribute = 0;
             }
         }
 
         mapObj++;
 
 search:
-        unsigned int stride = 0xF0;
-        MapObjAttachObj* mapObjEnd = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray()) + m_mapObjCount;
+        unsigned int stride = sizeof(CMapObj);
+        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
 
         if (mapObj < mapObjEnd) {
             do {
-                if (mapObj->attr != 0 && mapObj->attr->type == CMapObjAtr::MESH_NAME) {
+                CMapObjAtr* mapObjAtr = mapObj->m_attribute;
+                if (mapObjAtr != 0 && mapObjAtr->m_type == CMapObjAtr::MESH_NAME) {
                     goto found;
                 }
                 mapObj++;

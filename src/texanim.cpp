@@ -1,4 +1,5 @@
 #define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
+#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/texanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/materialman.h"

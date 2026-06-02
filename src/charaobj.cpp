@@ -1457,7 +1457,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	if ((cid & 0xAD) == 0xAD) {
 		isMon = true;
 		script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
-		if (*reinterpret_cast<short*>(script9 + 0xFC) == 0xB) {
+		if (*reinterpret_cast<unsigned short*>(script9 + 0xFC) == 0xB) {
 			isIceJ = true;
 		}
 	}

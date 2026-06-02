@@ -1832,7 +1832,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					continue;
 				}
 
-				if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
+				if (0.0f < handle->m_model->m_lightAlpha) {
 					SetProjection(modelIndex);
 					SetLight(1);
 					unsigned int oldFlags = handle->m_flags;
@@ -2584,7 +2584,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						handle = displaySlots[modelIndex - activePartyCount];
 					}
 
-					if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
+					if (0.0f < handle->m_model->m_lightAlpha) {
 						SetProjection(modelIndex);
 						SetLight(1);
 						handle->m_flags = 0x300543;

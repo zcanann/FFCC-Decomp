@@ -1095,9 +1095,11 @@ void CGCharaObj::decIgnoreHit()
 void CGCharaObj::damageDelete()
 {
 	Sound.StopSe3DGroup(m_particleId);
-	for (int i = 0; i < 0x16; i++) {
+	int i = 0;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	for (; i < 0x16; i++, self += 4) {
 		if (((1U << i) & 0x3bU) != 0) {
-			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlatRuntime2Storage().DeleteParticleSlot(*reinterpret_cast<int*>(self + 0x564), 1);
 		}
 	}
 }

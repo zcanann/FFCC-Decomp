@@ -493,7 +493,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
     s32* offsets = param_2->m_serializedDataOffsets;
     s32 workOffset = offsets[2];
-    u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
+    VYmMana* work = reinterpret_cast<VYmMana*>((u8*)ymMana + workOffset + 0x80);
     CGObject* gObject = ppvMng->m_owner;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -510,59 +510,59 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     GetCharaModelPtr(handle);
     model = handle->m_model;
     model->m_meshVisibleMask = 0x3F;
-    work[1] = (u32)ppvMng;
+    work->m_manager = ppvMng;
 
-    work[0] = 0;
-    work[1] = 0;
-    work[9] = 0;
-    work[8] = 0;
-    work[15] = 0;
-    work[16] = 0;
-    work[18] = 0;
-    work[19] = 0;
-    work[20] = 0;
-    work[21] = 0;
-    work[22] = 0;
-    work[24] = 0;
-    work[17] = 0;
-    work[23] = 0;
-    work[30] = 0;
-    work[29] = 0;
-    work[31] = 0;
-    work[32] = 0;
-    work[25] = 0;
-    work[26] = 0;
-    work[27] = 0;
-    work[28] = 0;
-    work[10] = 0;
-    work[11] = 0;
-    work[12] = 0;
-    work[13] = 0;
-    *(u8*)(work + 0x3A) = 0xFF;
-    PSMTXIdentity((float (*)[4])(work + 0x22));
-    PSMTXIdentity((float (*)[4])(work + 0x2E));
-    *(u8*)(work + 0xE) = 0xFF;
-    *((u8*)work + 0x39) = 0xFF;
-    *((u8*)work + 0x3A) = 0xFF;
-    *((u8*)work + 0x3B) = 0xFF;
-    *(u8*)(work + 0x3F) = 0xFF;
-    *((u8*)work + 0xFD) = 0xFF;
-    *((u8*)work + 0xFE) = 0xFF;
-    *((u8*)work + 0xFF) = 0xFF;
-    *(u8*)(work + 0x40) = 0xFF;
-    *((u8*)work + 0x101) = 0xFF;
-    *((u8*)work + 0x102) = 0xFF;
-    *((u8*)work + 0x103) = 0xFF;
-    work[2] = 0;
-    work[3] = 0;
-    work[4] = 0;
-    work[5] = 0;
-    work[6] = 0;
-    work[7] = 0;
-    work[0x3B] = 0;
-    work[0x3C] = 0;
-    *(u8*)(work + 0x3D) = 0;
-    work[0x3E] = 0;
+    work->m_object = 0;
+    work->m_manager = 0;
+    work->m_paraboloidMap = 0;
+    work->m_baseParaboloidTexObjs = 0;
+    work->m_positions = 0;
+    work->m_normals = 0;
+    work->m_waterHeightA = 0;
+    work->m_waterHeightB = 0;
+    work->m_indices = 0;
+    work->m_texCoord0 = 0;
+    work->m_texCoord1 = 0;
+    work->m_displayListCopies = 0;
+    work->m_reflectionVec = 0;
+    work->m_colors = 0;
+    work->m_envTexture0 = 0;
+    work->m_captureTexObjs = 0;
+    work->m_envTexture1 = 0;
+    work->m_step = 0;
+    work->m_meshReflectionVec = 0;
+    work->m_meshColors = 0;
+    work->m_meshTexCoords0 = 0;
+    work->m_meshTexCoords1 = 0;
+    work->m_generatedTexObj0 = 0;
+    work->m_generatedTexObj1 = 0;
+    work->m_generatedTexture0 = 0;
+    work->m_generatedTexture1 = 0;
+    work->m_manaAlpha = 0xFF;
+    PSMTXIdentity(work->m_waterMtx);
+    PSMTXIdentity(work->m_reflectionMtx);
+    work->m_runtimeColor.r = 0xFF;
+    work->m_runtimeColor.g = 0xFF;
+    work->m_runtimeColor.b = 0xFF;
+    work->m_runtimeColor.a = 0xFF;
+    work->m_shadowColor.r = 0xFF;
+    work->m_shadowColor.g = 0xFF;
+    work->m_shadowColor.b = 0xFF;
+    work->m_shadowColor.a = 0xFF;
+    work->m_baseColor.r = 0xFF;
+    work->m_baseColor.g = 0xFF;
+    work->m_baseColor.b = 0xFF;
+    work->m_baseColor.a = 0xFF;
+    work->m_sourceTextures[0] = 0;
+    work->m_sourceTextures[1] = 0;
+    work->m_sourceTextures[2] = 0;
+    work->m_sourceTextures[3] = 0;
+    work->m_sourceTextures[4] = 0;
+    work->m_sourceTextures[5] = 0;
+    work->m_paraboloidMapSize = 0;
+    work->m_displayListSize = 0;
+    work->m_paraboloidReady = 0;
+    work->m_attachedObject = 0;
 }
 
 /*
@@ -576,12 +576,12 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
  */
 void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
-    u32* work = (u32*)((u8*)ymMana + 0x80 + param_2->m_serializedDataOffsets[2]);
-    CGObject* gObject = (CGObject*)work[0];
+    VYmMana* work = reinterpret_cast<VYmMana*>((u8*)ymMana + 0x80 + param_2->m_serializedDataOffsets[2]);
+    CGObject* gObject = work->m_object;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     s32 meshEntry;
-    s32 step;
+    pppYmManaUnkB* step;
     u32 i;
     u32 j;
 
@@ -592,132 +592,129 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     Graphic._WaitDrawDone(const_cast<char*>(s_pppYmMana_cpp), 0x2CE);
     MaterialMan.ClearManaParaboloidTexObjs();
 
-    if (work[10] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[10]);
-        work[10] = 0;
+    if (work->m_generatedTexObj0 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj0);
+        work->m_generatedTexObj0 = 0;
     }
-    if (work[11] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[11]);
-        work[11] = 0;
+    if (work->m_generatedTexObj1 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj1);
+        work->m_generatedTexObj1 = 0;
     }
-    if (work[12] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[12]);
-        work[12] = 0;
+    if (work->m_generatedTexture0 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture0);
+        work->m_generatedTexture0 = 0;
     }
-    if (work[13] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[13]);
-        work[13] = 0;
+    if (work->m_generatedTexture1 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture1);
+        work->m_generatedTexture1 = 0;
     }
-    if (work[8] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[8]);
-        work[8] = 0;
+    if (work->m_baseParaboloidTexObjs != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_baseParaboloidTexObjs);
+        work->m_baseParaboloidTexObjs = 0;
     }
-    if (work[15] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[15]);
-        work[15] = 0;
+    if (work->m_positions != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_positions);
+        work->m_positions = 0;
     }
-    if (work[16] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[16]);
-        work[16] = 0;
+    if (work->m_normals != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_normals);
+        work->m_normals = 0;
     }
-    if (work[18] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[18]);
-        work[18] = 0;
+    if (work->m_waterHeightA != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightA);
+        work->m_waterHeightA = 0;
     }
-    if (work[19] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[19]);
-        work[19] = 0;
+    if (work->m_waterHeightB != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightB);
+        work->m_waterHeightB = 0;
     }
-    if (work[20] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[20]);
-        work[20] = 0;
+    if (work->m_indices != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_indices);
+        work->m_indices = 0;
     }
-    if (work[21] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[21]);
-        work[21] = 0;
+    if (work->m_texCoord0 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_texCoord0);
+        work->m_texCoord0 = 0;
     }
-    if (work[22] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[22]);
-        work[22] = 0;
+    if (work->m_texCoord1 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_texCoord1);
+        work->m_texCoord1 = 0;
     }
-    if (work[30] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[30]);
-        work[30] = 0;
+    if (work->m_captureTexObjs != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_captureTexObjs);
+        work->m_captureTexObjs = 0;
     }
-    if (work[9] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[9]);
-        work[9] = 0;
+    if (work->m_paraboloidMap != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_paraboloidMap);
+        work->m_paraboloidMap = 0;
     }
-    if (work[23] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[23]);
-        work[23] = 0;
+    if (work->m_colors != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_colors);
+        work->m_colors = 0;
     }
-    if (work[17] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[17]);
-        work[17] = 0;
+    if (work->m_reflectionVec != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_reflectionVec);
+        work->m_reflectionVec = 0;
     }
-    if (work[25] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[25]);
-        work[25] = 0;
+    if (work->m_meshReflectionVec != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshReflectionVec);
+        work->m_meshReflectionVec = 0;
     }
-    if (work[26] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[26]);
-        work[26] = 0;
+    if (work->m_meshColors != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshColors);
+        work->m_meshColors = 0;
     }
-    if (work[27] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[27]);
-        work[27] = 0;
+    if (work->m_meshTexCoords0 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshTexCoords0);
+        work->m_meshTexCoords0 = 0;
     }
-    if (work[28] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[28]);
-        work[28] = 0;
+    if (work->m_meshTexCoords1 != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshTexCoords1);
+        work->m_meshTexCoords1 = 0;
     }
 
     meshEntry = *(s32*)(model + 0xAC);
-    step = work[0x1D];
+    step = work->m_step;
     for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++, meshEntry += 0x14) {
-        u8 stepType = *(u8*)(step + 0x1C);
+        u8 stepType = step->m_type;
         s32 shape = *(s32*)(meshEntry + 8);
 
         if (stepType == 1) {
             if (strcmp((char*)shape, s_ymManaShapeObj5) == 0) {
-                s32 dlOffset;
-                for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
-                        *(u32*)(work[0x18] + dlOffset) = 0;
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
+                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        work->m_displayListCopies[j] = 0;
                     }
                 }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
+                if (work->m_displayListCopies != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    work->m_displayListCopies = 0;
                 }
             }
         } else if (stepType == 2) {
             if (strcmp((char*)shape, s_ymManaShapeObj3) == 0) {
-                s32 dlOffset;
-                for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
-                        *(u32*)(work[0x18] + dlOffset) = 0;
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
+                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        work->m_displayListCopies[j] = 0;
                     }
                 }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
+                if (work->m_displayListCopies != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    work->m_displayListCopies = 0;
                 }
             }
         } else if (stepType == 3 && strcmp((char*)shape, s_ymManaShapeObj1) == 0) {
-            s32 dlOffset;
-            for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
-                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
-                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
-                    *(u32*)(work[0x18] + dlOffset) = 0;
+            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                if (work->m_displayListCopies != 0 && work->m_displayListCopies[j] != NULL) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                    work->m_displayListCopies[j] = 0;
                 }
             }
-            if (work[0x18] != 0) {
-                pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                work[0x18] = 0;
+            if (work->m_displayListCopies != 0) {
+                pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                work->m_displayListCopies = 0;
             }
         }
     }
@@ -736,7 +733,6 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
 {
     u32 texBufferSize;
     VYmMana* mana;
-    u32* work;
     GXTexObj* dstTexObj;
     s32 meshData;
     CCharaPcs::CHandle* handle;
@@ -754,7 +750,6 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     gObject = ppvMng->m_owner;
     setupOffset = param_3->m_serializedDataOffsets[1];
     mana = reinterpret_cast<VYmMana*>((u8*)pppYmMana + 0x80 + param_3->m_serializedDataOffsets[2]);
-    work = reinterpret_cast<u32*>(mana);
     if (gObject == NULL) {
         return;
     }
@@ -849,7 +844,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     }
 
     meshData = *(s32*)(model + 0xAC);
-    if (work[0xF] == 0 && work[0x10] == 0 && work[0x12] == 0) {
+    if (mana->m_positions == 0 && mana->m_normals == 0 && mana->m_waterHeightA == 0) {
         for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
             s32 meshShape = *(s32*)(meshData + 8);
             u8 type = *(u8*)((u8*)param_2 + 0x1C);
@@ -857,11 +852,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
             if (((type == 1) && strcmp((char*)meshShape, s_ymManaShapeObj5) == 0) ||
                 ((type == 2) && strcmp((char*)meshShape, s_ymManaShapeObj3) == 0) ||
                 ((type == 3) && strcmp((char*)meshShape, s_ymManaShapeObj1) == 0)) {
-                if (work[0x19] == 0) {
-                    work[0x19] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppYmMana_cpp), 1000);
-                    Vec* reflectionVec = (Vec*)work[0x19];
+                if (mana->m_meshReflectionVec == 0) {
+                    mana->m_meshReflectionVec = static_cast<Vec*>(
+                        pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, ppvEnv->m_stagePtr,
+                                    const_cast<char*>(s_pppYmMana_cpp), 1000));
+                    Vec* reflectionVec = mana->m_meshReflectionVec;
                     float zero = FLOAT_80330e4c;
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         reflectionVec->z = zero;
@@ -870,11 +865,11 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
                         reflectionVec++;
                     }
                 }
-                if (work[0x1A] == 0) {
-                    work[0x1A] =
-                        (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppYmMana_cpp), 0x3F1);
-                    u8* color = (u8*)work[0x1A];
+                if (mana->m_meshColors == 0) {
+                    mana->m_meshColors = static_cast<GXColor*>(
+                        pppMemAlloc(*(s32*)(meshShape + 0x14) << 2, ppvEnv->m_stagePtr,
+                                    const_cast<char*>(s_pppYmMana_cpp), 0x3F1));
+                    u8* color = reinterpret_cast<u8*>(mana->m_meshColors);
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         color[0] = 0xFF;
                         color[1] = 0xFF;
@@ -883,12 +878,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
                         color += 4;
                     }
                 }
-                if (work[0x1B] == 0) {
+                if (mana->m_meshTexCoords0 == 0) {
                     s32 texCoordSize = *(s32*)(meshShape + 0x14) * 6;
-                    work[0x1B] = (u32)pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA);
-                    work[0x1C] = (u32)pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB);
-                    u16* texCoordA = (u16*)work[0x1B];
-                    u16* texCoordB = (u16*)work[0x1C];
+                    mana->m_meshTexCoords0 = static_cast<S16Vec2d*>(
+                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FA));
+                    mana->m_meshTexCoords1 = static_cast<S16Vec2d*>(
+                        pppMemAlloc(texCoordSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x3FB));
+                    u16* texCoordA = reinterpret_cast<u16*>(mana->m_meshTexCoords0);
+                    u16* texCoordB = reinterpret_cast<u16*>(mana->m_meshTexCoords1);
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         texCoordA[1] = 0;
                         texCoordA[0] = 0;
@@ -899,76 +896,84 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
                     }
                 }
 
-                work[0x18] = (u32)pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, ppvEnv->m_stagePtr,
-                                              const_cast<char*>(s_pppYmMana_cpp), 0x407);
+                mana->m_displayListCopies = static_cast<void**>(
+                    pppMemAlloc(*(s32*)(meshShape + 0x4C) << 2, ppvEnv->m_stagePtr,
+                                const_cast<char*>(s_pppYmMana_cpp), 0x407));
                 u32* dlInfo = *(u32**)(meshShape + 0x50);
-                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
                 for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
-                    *(u32*)(work[0x18] + dlOffset) =
-                        (u32)pppMemAlloc(dlInfo[0], ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
-                    *(u32*)(work[0x18] + dlOffset) = (*(u32*)(work[0x18] + dlOffset) + 0x1F) & 0xFFFFFFE0;
-                    work[0x3C] = dlInfo[0];
-                    memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
-                    DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    gUtil.ReWriteDisplayList((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 3);
-                    dlOffset -= 4;
+                    void* copiedDisplayList =
+                        pppMemAlloc(dlInfo[0], ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x411);
+                    copiedDisplayList =
+                        reinterpret_cast<void*>((reinterpret_cast<u32>(copiedDisplayList) + 0x1F) & 0xFFFFFFE0);
+                    mana->m_displayListCopies[dlIndex] = copiedDisplayList;
+                    mana->m_displayListSize = dlInfo[0];
+                    memcpy(copiedDisplayList, (void*)dlInfo[1], dlInfo[0]);
+                    DCFlushRange(copiedDisplayList, dlInfo[0]);
+                    gUtil.ReWriteDisplayList(copiedDisplayList, dlInfo[0], 3);
                     dlInfo += 3;
                 }
             }
 
             if (((type == 1) && strcmp((char*)meshShape, s_ymManaShapeObj4) == 0) ||
                 ((type == 2) && strcmp((char*)meshShape, s_ymManaShapeObj2) == 0)) {
-                work[0xF] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427);
-                work[0x10] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x428);
-                work[0x17] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x429);
-                work[0x15] = (u32)pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42A);
-                work[0x16] = (u32)pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42B);
-                work[0x12] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42C);
-                work[0x13] = (u32)pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42D);
-                work[0x14] = (u32)pppMemAlloc(0xC00, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42E);
-                work[0x11] = (u32)pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42F);
-                float* waterHeightA = (float*)work[0x12];
-                float* waterHeightB = (float*)work[0x13];
+                mana->m_positions =
+                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x427));
+                mana->m_normals =
+                    static_cast<Vec*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x428));
+                mana->m_reflectionVec =
+                    static_cast<Vec*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x429));
+                mana->m_texCoord0 =
+                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42A));
+                mana->m_texCoord1 =
+                    static_cast<Vec2d*>(pppMemAlloc(0x908, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42B));
+                mana->m_waterHeightA =
+                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42C));
+                mana->m_waterHeightB =
+                    static_cast<float*>(pppMemAlloc(0x484, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42D));
+                mana->m_indices =
+                    static_cast<u16*>(pppMemAlloc(0xC00, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42E));
+                mana->m_colors =
+                    static_cast<GXColor*>(pppMemAlloc(0xD8C, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp), 0x42F));
+                float* waterHeightA = mana->m_waterHeightA;
+                float* waterHeightB = mana->m_waterHeightB;
                 float zero = FLOAT_80330e4c;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
                 }
-                CreateWaterMesh((Vec*)work[0xF], (Vec*)work[0x10], (Vec2d*)work[0x15], (unsigned short*)work[0x14],
-                                *(float*)((u8*)param_2 + 0x2C));
+                CreateWaterMesh(mana->m_positions, mana->m_normals, mana->m_texCoord0, mana->m_indices,
+                                param_2->m_waterScale);
             }
 
             meshData += 0x14;
         }
     }
 
-    if ((*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) && work[0x12] != 0) {
-        *(u32*)(work[0x12] + 0x240) = *(u32*)((u8*)param_2 + 0x34);
+    if ((param_2->m_type == 1 || param_2->m_type == 2) && mana->m_waterHeightA != 0) {
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(mana->m_waterHeightA) + 0x240) = param_2->m_rippleLevel;
     }
 
-    if (*(u8*)((u8*)param_2 + 0x1C) != 0) {
-        if (*(u8*)((u8*)param_2 + 0x1C) == 1 || *(u8*)((u8*)param_2 + 0x1C) == 2) {
-            UpdateWaterMesh((VYmMana*)work);
+    if (param_2->m_type != 0) {
+        if (param_2->m_type == 1 || param_2->m_type == 2) {
+            UpdateWaterMesh(mana);
         }
 
         meshData = *(s32*)(model + 0xAC);
         for (meshIndex = 0; meshIndex < *(u32*)(*(s32*)(model + 0xA4) + 0xC); meshIndex++) {
             s32 meshShape = *(s32*)(meshData + 8);
-            u8 type = *(u8*)((u8*)param_2 + 0x1C);
+            u8 type = param_2->m_type;
 
             if (((type == 1) && strcmp((char*)meshShape, s_ymManaShapeObj5) == 0) ||
                 ((type == 2) && strcmp((char*)meshShape, s_ymManaShapeObj3) == 0) ||
                 ((type == 3) && strcmp((char*)meshShape, s_ymManaShapeObj1) == 0)) {
-                s32 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
                 for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
-                        (Vec*)work[0x19], *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
+                        mana->m_meshReflectionVec, *(S16Vec**)(meshShape + 0x18), *(S16Vec**)(meshShape + 0x20),
                         *(s32*)(meshShape + 0x14), *(u32*)(*(s32*)(model + 0xA4) + 0x34),
                         *(u32*)(*(s32*)(model + 0xA4) + 0x38), (float(*)[4])(model + 8),
-                        *(void**)(work[0x18] + dlOffset), work[0x3C], (_GXColor*)work[0x1A], (S16Vec2d*)work[0x1B],
-                        (S16Vec2d*)work[0x1C], (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0),
-                        pppYmMana, (VYmMana*)work);
-                    dlOffset -= 4;
+                        mana->m_displayListCopies[dlIndex], mana->m_displayListSize, mana->m_meshColors,
+                        mana->m_meshTexCoords0, mana->m_meshTexCoords1,
+                        (CChara::CNode*)(*(s32*)(model + 0xA8) + *(s32*)(meshShape + 0x5C) * 0xC0), pppYmMana, mana);
                 }
             }
 

@@ -40,7 +40,7 @@ void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step
         local_28.z = pppMngSt->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
-        partIndex = ((s32)((u8*)pppMngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+        partIndex = static_cast<s32>(pppMngSt - PartMng.m_pppMng);
         graphFrame = object->m_graphId / 0x1000;
         m_kind = pppMngSt->m_kind;
         m_nodeIndex = pppMngSt->m_nodeIndex;

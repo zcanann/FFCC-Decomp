@@ -292,7 +292,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             if (work->m_spawnEnabled != 0) {
                 if (work->m_maxLength - LaserConst(kPppLaserHalfTileOffset) < work->m_length) {
                     _pppMngSt* mngSt = ppvMng;
-                    s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+                    s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
                     work->m_length = work->m_maxLength - LaserConst(kPppLaserHalfTileOffset);
                     Game.ParticleFrameCallback(
                         partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, pppLaser->m_graphId / 0x1000,

@@ -26,7 +26,7 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
         position.z = mngSt->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
-        mngStIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
+        mngStIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
         Game.ParticleFrameCallback(
             mngStIndex, (s32)mngSt->m_kind, (s32)mngSt->m_nodeIndex, (s32)param_2->m_initWOrk,
             (s32)param_2->m_graphId, &position);

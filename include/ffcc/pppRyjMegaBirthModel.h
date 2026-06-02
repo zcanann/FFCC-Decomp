@@ -29,7 +29,13 @@ struct PRyjMegaBirthModel
     u8 m_spawnMode;               // 0x2A
     u8 m_spread;                  // 0x2B
     u8 m_colorRandom[4];          // 0x2C
-    u8 _pad30[0xC8];
+    u8 _pad30[0x0C];
+    float m_colorDeltaAdds[4];    // 0x3C
+    u8 _pad4C[0x70];
+    float m_colorFrameDeltas[4];  // 0xBC
+    u8 _padCC[0x1C];
+    Vec m_baseDirection;          // 0xE8
+    u8 _padF4[0x04];
     Vec m_accelerationAxis;       // 0xF8
     u8 _pad104[0x1C];
     Vec m_directionScale;         // 0x120

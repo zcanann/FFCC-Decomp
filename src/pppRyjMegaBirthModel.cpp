@@ -58,6 +58,9 @@ RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fadeInFrames) == 0x29);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spawnMode) == 0x2A);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spread) == 0x2B);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorRandom) == 0x2C);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorDeltaAdds) == 0x3C);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorFrameDeltas) == 0xBC);
+RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_baseDirection) == 0xE8);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationAxis) == 0xF8);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionScale) == 0x120);
 RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speed) == 0x12C);
@@ -441,9 +444,9 @@ void birth(
     pos.z = pObject->m_localMatrix.value[2][3];
 
     if (mode < 8) {
-        float baseDirectionX = *(float*)(payload + 0xE8);
-        float baseDirectionY = *(float*)(payload + 0xEC);
-        float baseDirectionZ = *(float*)(payload + 0xF0);
+        float baseDirectionX = params->m_baseDirection.x;
+        float baseDirectionY = params->m_baseDirection.y;
+        float baseDirectionZ = params->m_baseDirection.z;
         float randX = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
         float randY = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
         float randZ = (FLOAT_803304a4 * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
@@ -572,10 +575,10 @@ void birth(
     }
 
     if (particleColor != NULL) {
-        particleColor->m_colorFrameDeltas[0] = *(float*)(payload + 0xBC);
-        particleColor->m_colorFrameDeltas[1] = *(float*)(payload + 0xC0);
-        particleColor->m_colorFrameDeltas[2] = *(float*)(payload + 0xC4);
-        particleColor->m_colorFrameDeltas[3] = *(float*)(payload + 0xC8);
+        particleColor->m_colorFrameDeltas[0] = params->m_colorFrameDeltas[0];
+        particleColor->m_colorFrameDeltas[1] = params->m_colorFrameDeltas[1];
+        particleColor->m_colorFrameDeltas[2] = params->m_colorFrameDeltas[2];
+        particleColor->m_colorFrameDeltas[3] = params->m_colorFrameDeltas[3];
     }
 
     if (params->m_rotationRandomFlags != 0) {
@@ -772,10 +775,10 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleColor->m_color[1] = particleColor->m_color[1] + particleColor->m_colorFrameDeltas[1];
         particleColor->m_color[2] = particleColor->m_color[2] + particleColor->m_colorFrameDeltas[2];
         particleColor->m_color[3] = particleColor->m_color[3] + particleColor->m_colorFrameDeltas[3];
-        particleColor->m_colorFrameDeltas[0] = particleColor->m_colorFrameDeltas[0] + *f32_at(payload, 0x3C);
-        particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + *f32_at(payload, 0x40);
-        particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + *f32_at(payload, 0x44);
-        particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + *f32_at(payload, 0x48);
+        particleColor->m_colorFrameDeltas[0] = particleColor->m_colorFrameDeltas[0] + pRyjMegaBirthModel->m_colorDeltaAdds[0];
+        particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + pRyjMegaBirthModel->m_colorDeltaAdds[1];
+        particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + pRyjMegaBirthModel->m_colorDeltaAdds[2];
+        particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + pRyjMegaBirthModel->m_colorDeltaAdds[3];
         alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;

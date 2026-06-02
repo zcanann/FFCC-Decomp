@@ -2090,6 +2090,20 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
 		}
 
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusSpriteFlags(&sprites[closeCount + 1 + activePartyCount * 3 + i]) = 0;
+		}
+
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[closeCount + 1 + activePartyCount * 4 + i];
+			BonusAnimSprite* source = &sprites[closeCount + 1 + activePartyCount * 3 + i];
+			sprite->startFrame = source->startFrame;
+			BonusSpriteFlags(sprite) = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 100.0f;
+			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+		}
+
 		for (int i = 0; i < (int)header->count; i++) {
 			BonusAnimSprite* sprite = &sprites[i];
 			if (sprite->motionX == 0.0f) {

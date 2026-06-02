@@ -457,17 +457,7 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 
 static inline unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
 {
-	unsigned char mask = 0;
-	if (statePtr != 0) {
-		mask = *(unsigned char*)(statePtr + 9);
-	}
-	if (s_Rinfo != 0) {
-		mask = (unsigned char)(mask | s_Rinfo->m_missingArtifactMask);
-	}
-	if (summary != 0) {
-		mask = (unsigned char)(mask | (unsigned char)summary->m_ownedArtifactMask);
-	}
-	return mask;
+	return (unsigned char)(*(unsigned char*)(statePtr + 9) | s_Rinfo->m_missingArtifactMask | (unsigned char)summary->m_ownedArtifactMask);
 }
 
 static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)

@@ -2987,10 +2987,10 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
 		if ((actionFlags & 0x40) != 0) {
 			float targetRot = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x610);
 			float baseRot =
-				0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleLimit =
-				0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
+				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
 			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
 			if (angleLimit <= angleDelta) {
 				continue;
@@ -3006,9 +3006,22 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
 				continue;
 			}
 
-			if (Math.Rand(100) <= chance) {
-				selectedAction = actionIndex;
+			bool forceAction = false;
+			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
+			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
+			if (((partyState == 1) || (partyState == 7)) &&
+				(FLOAT_80331A30 < fabsf(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
 				if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+					forceAction = *reinterpret_cast<int*>(mon + 0x6E8) ==
+						*reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
+				} else {
+					forceAction = *reinterpret_cast<int*>(mon + 0x6E8) == actionIndex;
+				}
+			}
+
+			if (forceAction || (Math.Rand(100) <= chance)) {
+				selectedAction = actionIndex;
+				if ((*reinterpret_cast<short*>(baseScript + 0x10C) == 1) || forceAction) {
 					break;
 				}
 			}

@@ -877,7 +877,11 @@ void CGCharaObj::onFrameStat()
 				}
 
 				if (isLoopAnim() != 0) {
-					changeSubStat(m_itemId == 0x103 ? 2 : 1);
+					if (m_itemId == 0x103) {
+						changeSubStat(2);
+					} else {
+						changeSubStat(1);
+					}
 					return;
 				}
 			} else if (m_subState < 3) {

@@ -2191,9 +2191,10 @@ void CMapMng::ReadOtm(char* mapName)
 
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        unsigned char* octTreeRaw = reinterpret_cast<unsigned char*>(GetOctTreeArray() + i);
-        if (*reinterpret_cast<void**>(octTreeRaw + 8) != 0) {
-            *reinterpret_cast<char*>(octTreeRaw + 0x1F) = static_cast<char>(i);
+        COctTree* octTree = GetOctTreeArray() + i;
+        CMapObj* mapObj = octTree->GetMapObject();
+        if (mapObj != 0) {
+            mapObj->m_octTreeIndex = static_cast<signed char>(i);
         }
     }
 

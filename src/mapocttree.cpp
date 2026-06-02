@@ -689,9 +689,9 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	unsigned char orMask;
 	int farCount;
 
-	if ((m_localPosX <= octNode->m_boundMaxX) && (m_localPosY <= octNode->m_boundMaxY) &&
-	    (m_localPosZ <= octNode->m_boundMaxZ) && (m_localPosX >= octNode->m_boundMinX) &&
-	    (m_localPosY >= octNode->m_boundMinY) && (m_localPosZ >= octNode->m_boundMinZ)) {
+	if ((m_localPos.x <= octNode->m_boundMaxX) && (m_localPos.y <= octNode->m_boundMaxY) &&
+	    (m_localPos.z <= octNode->m_boundMaxZ) && (m_localPos.x >= octNode->m_boundMinX) &&
+	    (m_localPos.y >= octNode->m_boundMinY) && (m_localPos.z >= octNode->m_boundMinZ)) {
 		orMask = 0xF;
 	} else {
 		Vec localCorner;
@@ -712,7 +712,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 					double depth;
 
 					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
-					PSMTXMultVec(reinterpret_cast<float(*)[4]>(m_pad0C), &localCorner, &viewPos);
+					PSMTXMultVec(m_cullMtx, &localCorner, &viewPos);
 
 					if (maxDepth < viewPos.z) {
 						maxDepth = viewPos.z;
@@ -891,15 +891,14 @@ void COctTree::SetDrawFlag()
 	Mtx localMtx;
 
 	if (((m_drawFlags & 1) == 0) && (m_mapObject->m_mapDataType == 1)) {
-		PSMTXConcat(MapMng.m_scaledViewMtxPrimary,
-		            m_mapObject->m_worldMtx, reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
+		PSMTXConcat(MapMng.m_scaledViewMtxPrimary, m_mapObject->m_worldMtx, m_cullMtx);
 		PSMTXConcat(MapMng.m_viewMtx,
 		            m_mapObject->m_worldMtx, localMtx);
 		PSMTXInverse(localMtx, localMtx);
 
-		m_localPosX = localMtx[0][3];
-		m_localPosY = localMtx[1][3];
-		m_localPosZ = localMtx[2][3];
+		m_localPos.x = localMtx[0][3];
+		m_localPos.y = localMtx[1][3];
+		m_localPos.z = localMtx[2][3];
 		ClearFlag(1);
 		DrawTypeMesh_r(m_nodePool);
 	}

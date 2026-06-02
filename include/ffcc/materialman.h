@@ -347,7 +347,15 @@ private:
     int m_shadowTexMapIds[5];            // 0x158
     int m_shadowTexMtxIds[5];            // 0x16C
     int m_shadowTexCoordIds[5];          // 0x180
-    unsigned char m_pad194[0x70];
+    int m_fullScreenShadowTexMapIds0[2]; // 0x194
+    int m_fullScreenShadowTexMtxIds0[2]; // 0x19C
+    int m_fullScreenShadowTexCoordIds0[2]; // 0x1A4
+    int m_fullScreenShadowTexMapIds1[2]; // 0x1AC
+    int m_fullScreenShadowTexMtxIds1[2]; // 0x1B4
+    int m_fullScreenShadowTexCoordIds1[2]; // 0x1BC
+    int m_bumpTexMapIds[4];              // 0x1C4
+    int m_bumpTexMtxIds[5];              // 0x1D4
+    int m_bumpTexCoordIds[7];            // 0x1E8
     unsigned char m_fullShadowTevColor;  // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206

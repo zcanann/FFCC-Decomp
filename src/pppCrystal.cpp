@@ -228,10 +228,10 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
  */
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct _pppCtrlTable* param_3)
 {
-	u32 x;
 	u32 y;
-	u32 yTile;
 	CrystalWork* work;
+	u32 x;
+	u32 yTile;
 	CrystalRefractionMap* textureInfo;
 	u32 textureSize;
 	float magnitude;

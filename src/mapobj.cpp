@@ -315,7 +315,7 @@ void CMapObj::Init()
     m_baseDrawPriority = 0x7E;
     S8At(this, 0x1F) = -1;
     U8At(this, 0x20) = 0;
-    U8At(this, 0x27) = 0;
+    m_disableZWrite = 0;
     U8At(this, 0x21) = 0;
 
     m_objId = 0xFFFF;
@@ -335,19 +335,19 @@ void CMapObj::Init()
     m_cameraSemiTransAlpha = 0;
     U8At(this, 0x24) = 0xFF;
     U8At(this, 0x23) = 0xFF;
-    S32At(this, 0x10) = 0;
+    m_bumpLight = 0;
     S16At(this, 0x16) = -1;
     U8At(this, 0x22) = 1;
     S32At(this, 0x3C) = -1;
 
-    F32At(this, 0x60) = kMapObjOne;
-    F32At(this, 0x5C) = kMapObjOne;
-    F32At(this, 0x58) = kMapObjOne;
-    U8At(this, 0x1A) = 0;
-    F32At(this, 0x40) = kMapObjOne;
+    m_transRateZ = kMapObjOne;
+    m_transRateY = kMapObjOne;
+    m_transRateX = kMapObjOne;
+    m_bumpTexMatrixMode = 0;
+    m_zBufferOffset = kMapObjOne;
     U8At(this, 0x25) = 1;
     U8At(this, 0x26) = 0;
-    S32At(this, 0x38) = -1;
+    m_lightSetIndex = -1;
 }
 
 /*
@@ -470,14 +470,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_ambientColor.a = chunkFile.Get1();
             U8At(this, 0x21) = 1;
         } else if (chunk.m_id == CHUNK_GEOM) {
-            F32At(this, 0x40) = chunkFile.GetF4();
-            U8At(this, 0x1A) = chunkFile.Get1();
-            U8At(this, 0x27) = chunkFile.Get1();
+            m_zBufferOffset = chunkFile.GetF4();
+            m_bumpTexMatrixMode = chunkFile.Get1();
+            m_disableZWrite = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_LTST) {
             if (chunk.m_version == 1) {
-                S32At(this, 0x38) = static_cast<int>(chunkFile.Get4());
+                m_lightSetIndex = static_cast<int>(chunkFile.Get4());
             } else if (chunkFile.Get1() == 0) {
-                S32At(this, 0x38) = 0;
+                m_lightSetIndex = 0;
             }
         } else if (chunk.m_id == CHUNK_SDST) {
             if (chunk.m_version == 2) {
@@ -520,7 +520,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, "mapobj.cpp", 0x84) CMapObjAtrMeshName();
-                    PtrAt(this, 0xEC) = meshName;
+                    m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     if (meshName != 0) {
                         strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
@@ -533,32 +533,32 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
                 (static_cast<signed char>(m_meshType) > 7) && (static_cast<signed char>(m_meshType) < 10)) {
-                F32At(this, 0x58) = kMapObjZero;
-                F32At(this, 0x5C) = kMapObjOne;
-                F32At(this, 0x60) = kMapObjZero;
+                m_transRateX = kMapObjZero;
+                m_transRateY = kMapObjOne;
+                m_transRateZ = kMapObjZero;
             }
         } else if (chunk.m_id == CHUNK_TRNS) {
-            F32At(this, 0x58) = chunkFile.GetF4();
-            F32At(this, 0x5C) = chunkFile.GetF4();
-            F32At(this, 0x60) = chunkFile.GetF4();
+            m_transRateX = chunkFile.GetF4();
+            m_transRateY = chunkFile.GetF4();
+            m_transRateZ = chunkFile.GetF4();
         } else if (chunk.m_id == CHUNK_TFRM) {
             F32At(this, 0x64) = chunkFile.GetF4();
             F32At(this, 0x68) = chunkFile.GetF4();
             F32At(this, 0x6C) = chunkFile.GetF4();
-            F32At(this, 0x70) = chunkFile.GetF4();
-            F32At(this, 0x74) = chunkFile.GetF4();
-            F32At(this, 0x78) = chunkFile.GetF4();
+            m_worldMapLightX = chunkFile.GetF4();
+            m_worldMapLightY = chunkFile.GetF4();
+            m_worldMapLightZ = chunkFile.GetF4();
             F32At(this, 0x7C) = chunkFile.GetF4();
             F32At(this, 0x80) = chunkFile.GetF4();
             F32At(this, 0x84) = chunkFile.GetF4();
 
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
                 ((F32At(this, 0x7C) != kMapObjZero) || (F32At(this, 0x80) != kMapObjZero) || (F32At(this, 0x84) != kMapObjZero))) {
-                if (PtrAt(this, 0xEC) == 0) {
+                if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
                 } else {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x84),
-                                  reinterpret_cast<unsigned char*>(PtrAt(this, 0xEC)) + 0x8);
+                                  reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
                 F32At(this, 0x7C) = kMapObjZero;
                 F32At(this, 0x80) = kMapObjZero;
@@ -585,7 +585,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 MapMng.GetMapAnimRunArray().Add(animRun);
             }
         } else if (chunk.m_id == CHUNK_MIME) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
@@ -654,9 +654,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
             }
             chunkFile.PopChunk();
-            PtrAt(this, 0xEC) = mimeAttr;
+            m_attribute = mimeAttr;
         } else if (chunk.m_id == CHUNK_PLIT) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPointLight* pointLightAttr =
@@ -709,9 +709,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
                 chunkFile.PopChunk();
             }
-            PtrAt(this, 0xEC) = pointLightAttr;
+            m_attribute = pointLightAttr;
         } else if (chunk.m_id == CHUNK_SLIT) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrSpotLight* spotLightAttr =
@@ -781,9 +781,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
                 chunkFile.PopChunk();
             }
-            PtrAt(this, 0xEC) = spotLightAttr;
+            m_attribute = spotLightAttr;
         } else if (chunk.m_id == CHUNK_PSTA) {
-            if (PtrAt(this, 0xEC) != 0) {
+            if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
@@ -791,7 +791,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (playSta != 0) {
                 playSta->m_playStaNo = chunkFile.Get1();
             }
-            PtrAt(this, 0xEC) = playSta;
+            m_attribute = playSta;
         }
     }
     chunkFile.PopChunk();
@@ -1390,7 +1390,7 @@ void CMapObj::Draw(unsigned char priority)
     lightPos.x = F32At(this, 0xC4);
     lightPos.y = F32At(this, 0xD4);
     lightPos.z = F32At(this, 0xE4);
-    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, S32At(this, 0x38));
+    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
     _GXColor mapColor;
@@ -1449,24 +1449,24 @@ void CMapObj::Draw(unsigned char priority)
     lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), static_cast<unsigned char>(S16At(this, 0x28) >> 7));
-    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
-                              reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
+    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(m_bumpLight),
+                              reinterpret_cast<Vec*>(&m_transRateX), m_bumpTexMatrixMode);
 
-    if (kMapObjOne != F32At(this, 0x40)) {
-        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    if (kMapObjOne != m_zBufferOffset) {
+        CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
-    if (U8At(this, 0x27) != 0) {
+    if (m_disableZWrite != 0) {
         GXSetZMode(1, GX_LEQUAL, 0);
     }
 
     reinterpret_cast<CMapMesh*>(m_mapData)->SetRenderArray();
     reinterpret_cast<CMapMesh*>(m_mapData)->Draw(0);
 
-    if (U8At(this, 0x27) != 0) {
+    if (m_disableZWrite != 0) {
         GXSetZMode(1, GX_LEQUAL, 1);
     }
-    if (kMapObjOne != F32At(this, 0x40)) {
-        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    if (kMapObjOne != m_zBufferOffset) {
+        CameraPcs.SetOffsetZBuff(m_zBufferOffset);
     }
 }
 
@@ -1772,7 +1772,7 @@ void CMapObj::CalcHitPosition(Vec* out)
  */
 void CMapObj::SetMime(int mode, int target, int type)
 {
-    CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(PtrAt(this, 0xEC));
+    CMapObjAtrMime* mime = reinterpret_cast<CMapObjAtrMime*>(m_attribute);
 
     mime->m_keyFrame.m_startFrame = mode;
     mime->m_keyFrame.m_currentFrame = mode;

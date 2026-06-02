@@ -211,17 +211,19 @@ public:
     CMapObj* m_child;             // 0x04
     CMapObj* m_next;              // 0x08
     void* m_mapData;              // 0x0C
-    char m_pad10[0x04];
+    void* m_bumpLight;            // 0x10
     unsigned char m_baseDrawPriority; // 0x14
     unsigned char m_drawPriority;     // 0x15
     char m_pad16[0x02];
     unsigned char m_showFlags;      // 0x18
-    char m_pad19[2];
+    char m_pad19[1];
+    unsigned char m_bumpTexMatrixMode; // 0x1A
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
     unsigned char m_meshType;    // 0x1E
-    char m_pad1F[0x09];
+    char m_pad1F[0x08];
+    unsigned char m_disableZWrite;   // 0x27
     short m_cameraSemiTransAlpha;       // 0x28
     short m_cameraSemiTransTargetAlpha; // 0x2A
     short m_cameraSemiTransStep;        // 0x2C
@@ -229,7 +231,11 @@ public:
     unsigned short m_effectId;      // 0x30
     unsigned short m_groupId;       // 0x32
     unsigned short m_meshId;        // 0x34
-    char m_pad36[0x22];
+    char m_pad36[0x02];
+    int m_lightSetIndex;            // 0x38
+    char m_pad3C[0x04];
+    float m_zBufferOffset;          // 0x40
+    char m_pad44[0x14];
     float m_transRateX;             // 0x58
     float m_transRateY;             // 0x5C
     float m_transRateZ;             // 0x60

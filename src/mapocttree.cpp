@@ -805,34 +805,33 @@ void COctTree::Draw(unsigned char drawType)
 
 	if (m_type == 0) {
 		mapObj = m_mapObject;
-		unsigned char mapDrawType = *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15));
+		unsigned char mapDrawType = mapObj->m_drawPriority;
 		unsigned char targetDrawType = drawType;
-		if ((mapDrawType == targetDrawType) &&
-		    ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x18)) & 1) != 0)) {
+		if ((mapDrawType == targetDrawType) && ((mapObj->m_showFlags & 1) != 0)) {
 			if ((MapMng.m_underWaterTexPending != 0) &&
-			    ((*reinterpret_cast<void**>(Ptr(mapObj, 0x10)) != 0) &&
-			     (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(mapObj, 0x10)), 0xB1)) == 2))) {
+			    ((mapObj->m_bumpLight != 0) &&
+			     (reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight)->m_useViewSpace == 2))) {
 				MaterialMan.SetUnderWaterTex();
 				MapMng.m_underWaterTexPending = 0;
 			}
 
 			mapObj = m_mapObject;
 			LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx,
-			                          *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(mapObj, 0x10)),
-			                          reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
-			                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
-			if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
-				CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+			                          reinterpret_cast<CLightPcs::CBumpLight*>(mapObj->m_bumpLight),
+			                          reinterpret_cast<Vec*>(&mapObj->m_transRateX),
+			                          mapObj->m_bumpTexMatrixMode);
+			if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
+				CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
 			}
-			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
+			if (m_mapObject->m_disableZWrite != 0) {
 				GXSetZMode(1, (GXCompare)3, 0);
 			}
 			static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 			DrawTypeMeshFlag_r(m_nodePool);
-			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
+			if (m_mapObject->m_disableZWrite != 0) {
 				GXSetZMode(1, (GXCompare)3, 1);
 			}
-			float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
+			float offsetZ = m_mapObject->m_zBufferOffset;
 			if (kMapOctTreeDefaultOffsetZ != offsetZ) {
 				CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
 			}
@@ -855,23 +854,23 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 
 	if (m_type == 0) {
 		mapObj = m_mapObject;
-		unsigned char mapDrawType = *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15));
+		unsigned char mapDrawType = mapObj->m_drawPriority;
 		unsigned char targetDrawType = drawType;
 		if (mapDrawType != targetDrawType) {
 			return;
 		}
 
-		LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx, 0, reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
-		                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
+		LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx, 0, reinterpret_cast<Vec*>(&mapObj->m_transRateX),
+		                          mapObj->m_bumpTexMatrixMode);
 
-		if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
-			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
+		if (kMapOctTreeDefaultOffsetZ != m_mapObject->m_zBufferOffset) {
+			CameraPcs.SetOffsetZBuff(m_mapObject->m_zBufferOffset);
 		}
 
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
-		float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
+		float offsetZ = m_mapObject->m_zBufferOffset;
 		if (kMapOctTreeDefaultOffsetZ != offsetZ) {
 			CameraPcs.SetOffsetZBuff(kMapOctTreeDefaultOffsetZ);
 		}

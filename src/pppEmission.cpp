@@ -65,7 +65,7 @@ struct EmissionParticle {
 STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x20);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {

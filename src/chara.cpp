@@ -48,6 +48,9 @@ typedef CChara::CMesh::CRefData CCharaMeshRefRaw;
 typedef CChara::CMesh CCharaMeshRaw;
 
 STATIC_ASSERT(sizeof(CCharaDisplayListRaw) == 0xC);
+STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_size) == 0x00);
+STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_data) == 0x04);
+STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_material) == 0x08);
 STATIC_ASSERT(sizeof(CCharaMeshRefRaw) == 0x64);
 STATIC_ASSERT(sizeof(CCharaMeshRaw) == 0x14);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_data) == 0x8);
@@ -59,6 +62,8 @@ typedef CCharaModelData CCharaModelRefRaw;
 STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_nodeRefData) == 0x0C);
 STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_meshRefData) == 0x10);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_bank) == 0x14);
+STATIC_ASSERT(offsetof(CCharaModelRefRaw, m_materialSet) == 0x24);
 STATIC_ASSERT(sizeof(CChara::CNode) == 0xC0);
 STATIC_ASSERT(offsetof(CChara::CNode, m_refData) == 0x00);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);

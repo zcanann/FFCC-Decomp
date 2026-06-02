@@ -29,7 +29,7 @@ struct CCharaModelData
     u16 m_chest3NodeIndex;
     u16 m_chest2NodeIndex;
     u16 m_chest1NodeIndex;
-    u8 _pad20[0x4];
+    void* m_textureAnimSet;
     CMaterialSet* m_materialSet;
     float m_baseScale;
     u32 m_posQuant;

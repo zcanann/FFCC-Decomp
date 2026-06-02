@@ -13,7 +13,16 @@ struct pppYmDrawMdlTexAnmStep {
     s32 m_initWOrk;
     s32 m_stepValue;
     f32 m_arg3;
-    u8 m_payload[0x10];
+    union {
+        u8 m_payload[0x10];
+        struct TexAnmPayload {
+            s32 m_waitStep;
+            u32 m_tilesU;
+            u32 m_tilesV;
+            u8 m_drawEnvColor0;
+            u8 m_pad0D[3];
+        } m_texAnm;
+    };
 };
 
 #ifdef __cplusplus

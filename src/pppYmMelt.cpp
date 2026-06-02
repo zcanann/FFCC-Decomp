@@ -134,8 +134,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex];
 
-    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
-                  ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
+    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero,
+                  ctrl->m_melt.m_drawEnvColor1, ctrl->m_melt.m_drawEnvColor0, ctrl->m_blendMode, 2, 1, 1, 0);
     pppSetBlendMode(ctrl->m_blendMode);
 
     GXClearVtxDesc();
@@ -280,7 +280,6 @@ extern "C" const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
     s16 phaseWork;
-    int colorOffset;
     int gridCount;
     int vertexCount;
     int angleSeed;
@@ -302,8 +301,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     work = GetYmMeltWork(ymMelt, offsets);
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    colorWork = reinterpret_cast<YmMeltColorWork*>(ymMelt->m_object.m_workArea + colorOffset);
+    colorWork = GetYmMeltColorWork(ymMelt, offsets);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = ppvMng->m_matrix.value[1][3];
@@ -349,9 +347,9 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     work->m_phase = work->m_phase + work->m_phaseVelocity;
 
     if (ctrl->m_graphId == ymMelt->m_object.m_graphId) {
-        work->m_phase += *(float*)&ctrl->m_payload[0];
-        work->m_phaseVelocity += *(float*)&ctrl->m_payload[4];
-        work->m_phaseAccel += *(float*)&ctrl->m_payload[8];
+        work->m_phase += ctrl->m_melt.m_phaseDelta;
+        work->m_phaseVelocity += ctrl->m_melt.m_phaseVelocityDelta;
+        work->m_phaseAccel += ctrl->m_melt.m_phaseAccelDelta;
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {

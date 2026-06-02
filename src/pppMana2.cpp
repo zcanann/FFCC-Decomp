@@ -864,7 +864,7 @@ void CalcReflectionVector2(
  */
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
-    u32* work;
+    VMana2* work;
     CChara::CModel* model;
     CCharaPcs::CHandle* handle;
     CGObject* gObject;
@@ -882,12 +882,13 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     Vec quadMax;
     GXColor quadColor;
     u32 depthTexSize;
-    u32 baseParaboloidTexObjs;
-    u32 sourceTexObjs;
+    GXTexObj* baseParaboloidTexObjs;
+    GXTexObj* sourceTexObjs;
+    GXTexObj* envTexObj0;
     s32 i;
 
-    work = (u32*)param_2;
-    baseParaboloidTexObjs = work[8];
+    work = static_cast<VMana2*>(param_2);
+    baseParaboloidTexObjs = work->m_baseParaboloidTexObjs;
     if (*(u8*)((char*)param_3 + 0x1C) == 0) {
         return;
     }
@@ -897,7 +898,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    gObject = (CGObject*)work[0];
+    gObject = work->m_object;
     if (gObject == NULL) {
         return;
     }
@@ -920,7 +921,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
-    sourceTexObjs = work[0x1D];
+    sourceTexObjs = work->m_sourceTexObjs;
 
     if (*(u8*)((char*)param_3 + 0x38) != 0) {
         Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
@@ -963,9 +964,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
             gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                                    LoadFloat(FLOAT_803318c8), (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0,
+                                    LoadFloat(FLOAT_803318c8), baseParaboloidTexObjs, 0, 0, 0,
                                     (_GXBlendFactor)4, (_GXBlendFactor)5);
-            baseParaboloidTexObjs += 0x20;
+            baseParaboloidTexObjs++;
         }
 
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1005,31 +1006,31 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
                                 LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
                                 (_GXBlendFactor)5);
-        *((u8*)work + 0xEC) = 1;
+        work->m_paraboloidReady = 1;
     }
 
-    baseParaboloidTexObjs = work[0x1E];
+    envTexObj0 = &work->m_envTexture0->m_texObj;
     if (*(u8*)((char*)param_3 + 0x38) == 0) {
-        if (*((u8*)work + 0xEC) == 0) {
-            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+        if (work->m_paraboloidReady == 0) {
+            GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
                          (_GXTexWrapMode)1, GX_FALSE);
-            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+            GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
                          (_GXTexWrapMode)1, GX_FALSE);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x39],
-                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x39],
-                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
-            *((u8*)work + 0xEC) = 1;
+            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap,
+                              work->m_paraboloidMapSize, envTexObj0, 1);
+            drawParaboloidMap(work->m_baseParaboloidTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap,
+                              work->m_paraboloidMapSize, envTexObj0, 0);
+            work->m_paraboloidReady = 1;
         }
     } else {
-        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+        GXInitTexObj(work->m_generatedTexObj0, work->m_generatedTexture0, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
                      (_GXTexWrapMode)0, GX_FALSE);
-        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+        GXInitTexObj(work->m_generatedTexObj1, work->m_generatedTexture1, 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
                      (_GXTexWrapMode)0, GX_FALSE);
-        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[11], (void*)work[9], work[0x39],
-                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
-        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[10], (void*)work[9], work[0x39],
-                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
+        drawParaboloidMap(sourceTexObjs, work->m_generatedTexObj1, work->m_paraboloidMap, work->m_paraboloidMapSize,
+                          envTexObj0, 1);
+        drawParaboloidMap(sourceTexObjs, work->m_generatedTexObj0, work->m_paraboloidMap, work->m_paraboloidMapSize,
+                          envTexObj0, 0);
         Graphic.SetViewport();
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1073,9 +1074,9 @@ void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
 void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* param_3)
 {
     u32 texBufferSize;
+    VMana2* mana2Work;
     u32* work;
     void* dstBuffer;
-    u32* texList;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     CGObject* gObject;
@@ -1093,7 +1094,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    work = (u32*)((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
+    mana2Work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work = reinterpret_cast<u32*>(mana2Work);
     setupOffset = param_3->m_serializedDataOffsets[1];
     setup = (u8*)pppMana2 + 0x80 + setupOffset;
     if (gObject == NULL) {
@@ -1103,73 +1105,75 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
     param_2->m_rippleLevel = 0;
-    work[0x1C] = (u32)param_2;
+    mana2Work->m_step = param_2;
     if (Game.m_currentMapId == 0x21) {
         param_2->m_rippleLevel = 0;
     }
 
-    SetMana2ModelCallbacks(model, work, param_2);
+    SetMana2ModelCallbacks(model, mana2Work, param_2);
 
-    MaterialManRaw()[0xE4] = setup[0xB];
-    *((u8*)(work + 0x38)) = MaterialManRaw()[0xE4];
+    mana2Work->m_waterAlpha = setup[0xB];
 
     if (*(s32*)pppMana2 != 0) {
         return;
     }
 
-    work[0] = (u32)gObject;
-    SetMana2ModelCallbacks(model, work, param_2);
-    work[2] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv));
-    work[3] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[1], ppvEnv));
-    work[4] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[2], ppvEnv));
-    work[5] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[3], ppvEnv));
-    work[6] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[4], ppvEnv));
-    work[7] = static_cast<u32>(GetTextureFromRSD(param_2->m_sourceTextureIds[5], ppvEnv));
-    work[0x1E] = static_cast<u32>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
-    work[0x1F] = static_cast<u32>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
+    mana2Work->m_object = gObject;
+    SetMana2ModelCallbacks(model, mana2Work, param_2);
+    mana2Work->m_sourceTextures[0] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv));
+    mana2Work->m_sourceTextures[1] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[1], ppvEnv));
+    mana2Work->m_sourceTextures[2] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[2], ppvEnv));
+    mana2Work->m_sourceTextures[3] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[3], ppvEnv));
+    mana2Work->m_sourceTextures[4] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[4], ppvEnv));
+    mana2Work->m_sourceTextures[5] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[5], ppvEnv));
+    mana2Work->m_envTexture0 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
+    mana2Work->m_envTexture1 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
 
-    if (work[0x1D] == 0) {
-        work[0x1D] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7);
+    if (mana2Work->m_sourceTexObjs == 0) {
+        mana2Work->m_sourceTexObjs =
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7));
     }
-    if (work[10] == 0) {
-        work[10] = (u32)pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1DD);
+    if (mana2Work->m_generatedTexObj0 == 0) {
+        mana2Work->m_generatedTexObj0 =
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1DD));
     }
-    if (work[11] == 0) {
-        work[11] = (u32)pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1);
+    if (mana2Work->m_generatedTexObj1 == 0) {
+        mana2Work->m_generatedTexObj1 =
+            static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1));
     }
 
     texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
-    if (work[12] == 0) {
-        work[12] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
+    if (mana2Work->m_generatedTexture0 == 0) {
+        mana2Work->m_generatedTexture0 =
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
     }
-    if (work[13] == 0) {
-        work[13] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
+    if (mana2Work->m_generatedTexture1 == 0) {
+        mana2Work->m_generatedTexture1 =
+            pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
     }
 
-    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
-    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObj(mana2Work->m_generatedTexObj0, mana2Work->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObj(mana2Work->m_generatedTexObj1, mana2Work->m_generatedTexture1, 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
 
-    if (work[8] == 0) {
-        work[8] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6);
+    if (mana2Work->m_baseParaboloidTexObjs == 0) {
+        mana2Work->m_baseParaboloidTexObjs =
+            static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6));
     }
-    dstBuffer = (void*)work[8];
-    texList = work;
+    dstBuffer = mana2Work->m_baseParaboloidTexObjs;
     for (i = 0; i < 6; i++) {
-        memcpy(dstBuffer, (void*)(texList[2] + 0x28), 0x20);
+        memcpy(dstBuffer, &mana2Work->m_sourceTextures[i]->m_texObj, sizeof(GXTexObj));
         dstBuffer = (void*)((char*)dstBuffer + 0x20);
-        texList++;
     }
 
-    CTexture* texture = reinterpret_cast<CTexture*>(work[0x1E]);
-    CTexture* texture2 = reinterpret_cast<CTexture*>(work[0x1F]);
-    *(u32*)((u8*)texture + 0x6C) = 0;
-    texture->InitTexObj();
-    *(u32*)((u8*)texture2 + 0x6C) = 0;
-    texture2->InitTexObj();
+    mana2Work->m_envTexture0->m_format = 0;
+    mana2Work->m_envTexture0->InitTexObj();
+    mana2Work->m_envTexture1->m_format = 0;
+    mana2Work->m_envTexture1->InitTexObj();
 
-    if (work[9] == 0) {
-        work[9] = (u32)pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
-        genParaboloidMap((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
+    if (mana2Work->m_paraboloidMap == 0) {
+        mana2Work->m_paraboloidMap =
+            pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
+        genParaboloidMap(mana2Work->m_paraboloidMap, &mana2Work->m_paraboloidMapSize, 0x1E, GX_VTXFMT7);
     }
 
     mesh = model->m_meshes;
@@ -1310,7 +1314,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
  */
 void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
-    u32* work;
+    VMana2* work;
     CGObject* gObject;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
@@ -1319,85 +1323,85 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 i;
     u32 j;
 
-    work = (u32*)((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
     *(u32*)(MaterialManRaw() + 0xD0) = 0;
     *(u32*)(MaterialManRaw() + 0xDC) = 0;
 
-    if (work[10] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[10]);
-        work[10] = 0;
+    if (work->m_generatedTexObj0 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj0);
+        work->m_generatedTexObj0 = 0;
     }
-    if (work[11] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[11]);
-        work[11] = 0;
+    if (work->m_generatedTexObj1 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexObj1);
+        work->m_generatedTexObj1 = 0;
     }
-    if (work[12] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[12]);
-        work[12] = 0;
+    if (work->m_generatedTexture0 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture0);
+        work->m_generatedTexture0 = 0;
     }
-    if (work[13] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[13]);
-        work[13] = 0;
+    if (work->m_generatedTexture1 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_generatedTexture1);
+        work->m_generatedTexture1 = 0;
     }
-    if (work[8] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[8]);
-        work[8] = 0;
+    if (work->m_baseParaboloidTexObjs != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_baseParaboloidTexObjs);
+        work->m_baseParaboloidTexObjs = 0;
     }
-    if (work[15] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[15]);
-        work[15] = 0;
+    if (work->m_positions != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_positions);
+        work->m_positions = 0;
     }
-    if (work[16] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[16]);
-        work[16] = 0;
+    if (work->m_normals != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_normals);
+        work->m_normals = 0;
     }
-    if (work[18] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[18]);
-        work[18] = 0;
+    if (work->m_waterHeightA != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightA);
+        work->m_waterHeightA = 0;
     }
-    if (work[19] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[19]);
-        work[19] = 0;
+    if (work->m_waterHeightB != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_waterHeightB);
+        work->m_waterHeightB = 0;
     }
-    if (work[20] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[20]);
-        work[20] = 0;
+    if (work->m_indices != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_indices);
+        work->m_indices = 0;
     }
-    if (work[21] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[21]);
-        work[21] = 0;
+    if (work->m_texCoord0 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_texCoord0);
+        work->m_texCoord0 = 0;
     }
-    if (work[22] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[22]);
-        work[22] = 0;
+    if (work->m_texCoord1 != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_texCoord1);
+        work->m_texCoord1 = 0;
     }
-    if (work[29] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[29]);
-        work[29] = 0;
+    if (work->m_sourceTexObjs != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_sourceTexObjs);
+        work->m_sourceTexObjs = 0;
     }
-    if (work[9] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[9]);
-        work[9] = 0;
+    if (work->m_paraboloidMap != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_paraboloidMap);
+        work->m_paraboloidMap = 0;
     }
-    if (work[23] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[23]);
-        work[23] = 0;
+    if (work->m_colors != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_colors);
+        work->m_colors = 0;
     }
-    if (work[17] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[17]);
-        work[17] = 0;
+    if (work->m_reflectionVec != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_reflectionVec);
+        work->m_reflectionVec = 0;
     }
-    if (work[25] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[25]);
-        work[25] = 0;
+    if (work->m_meshReflectionVec != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshReflectionVec);
+        work->m_meshReflectionVec = 0;
     }
-    if (work[26] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[26]);
-        work[26] = 0;
+    if (work->m_meshColors != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshColors);
+        work->m_meshColors = 0;
     }
-    if (work[27] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[27]);
-        work[27] = 0;
+    if (work->m_meshTexCoords != NULL) {
+        pppHeapUseRate((CMemory::CStage*)work->m_meshTexCoords);
+        work->m_meshTexCoords = 0;
     }
     gObject = (CGObject*)ppvMng->m_lookTarget;
     handle = GetCharaHandlePtr(gObject, 0);
@@ -1405,7 +1409,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     model->m_afterMeshDrawCallback = 0;
     model->SetDrawMeshDLCallback(0);
     mesh = model->m_meshes;
-    step = (pppMana2UnkB*)work[0x1C];
+    step = work->m_step;
     for (i = 0; i < model->m_data->m_meshCount; i++, mesh++) {
         u8 stepType = step->m_type;
         CChara::CMesh::CRefData* meshData = mesh->m_data;
@@ -1413,39 +1417,39 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         if (stepType == 1) {
             if (strcmp(meshData->m_name, s_manaShapeObj5) == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
+                    if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
+                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        work->m_displayListCopies[j] = 0;
                     }
                 }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
+                if (work->m_displayListCopies != NULL) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    work->m_displayListCopies = 0;
                 }
             }
         } else if (stepType == 2) {
             if (strcmp(meshData->m_name, s_manaShapeObj3) == 0) {
                 for (j = 0; j < meshData->m_displayListCount; j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
+                    if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
+                        pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                        work->m_displayListCopies[j] = 0;
                     }
                 }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
+                if (work->m_displayListCopies != NULL) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                    work->m_displayListCopies = 0;
                 }
             }
         } else if (stepType == 3 && strcmp(meshData->m_name, s_manaShapeObj1) == 0) {
             for (j = 0; j < meshData->m_displayListCount; j++) {
-                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                    *(u32*)(work[0x18] + j * 4) = 0;
+                if (work->m_displayListCopies != NULL && work->m_displayListCopies[j] != NULL) {
+                    pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies[j]);
+                    work->m_displayListCopies[j] = 0;
                 }
             }
-            if (work[0x18] != 0) {
-                pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                work[0x18] = 0;
+            if (work->m_displayListCopies != NULL) {
+                pppHeapUseRate((CMemory::CStage*)work->m_displayListCopies);
+                work->m_displayListCopies = 0;
             }
         }
     }
@@ -1465,11 +1469,11 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     CGObject* gObject;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    u32* work;
+    VMana2* work;
     s32 workOffset;
 
     workOffset = param_2->m_serializedDataOffsets[2];
-    work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
+    work = reinterpret_cast<VMana2*>((char*)pppMana2 + 0x80 + workOffset);
     gObject = (CGObject*)ppvMng->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
@@ -1477,49 +1481,49 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     GetCharaModelPtr(handle);
     model = handle->m_model;
     model->m_meshVisibleMask = 0x3F;
-    work[1] = (u32)ppvMng;
+    work->m_manager = ppvMng;
 
-    work[0] = 0;
-    work[1] = 0;
-    work[9] = 0;
-    work[8] = 0;
-    work[15] = 0;
-    work[16] = 0;
-    work[18] = 0;
-    work[19] = 0;
-    work[20] = 0;
-    work[21] = 0;
-    work[22] = 0;
-    work[24] = 0;
-    work[17] = 0;
-    work[23] = 0;
-    work[29] = 0;
-    work[28] = 0;
-    work[30] = 0;
-    work[31] = 0;
-    work[25] = 0;
-    work[26] = 0;
-    work[27] = 0;
-    work[10] = 0;
-    work[11] = 0;
-    work[12] = 0;
-    work[13] = 0;
-    *(u8*)(work + 0x38) = 0xFF;
-    PSMTXIdentity((float (*)[4])(work + 0x20));
-    PSMTXIdentity((float (*)[4])(work + 0x2C));
-    *(u8*)(work + 0xE) = 0xFF;
-    *((u8*)work + 0x39) = 0xFF;
-    *((u8*)work + 0x3A) = 0xFF;
-    *((u8*)work + 0x3B) = 0xFF;
-    work[2] = 0;
-    work[3] = 0;
-    work[4] = 0;
-    work[5] = 0;
-    work[6] = 0;
-    work[7] = 0;
-    work[0x39] = 0;
-    work[0x3A] = 0;
-    *(u8*)(work + 0x3B) = 0;
+    work->m_object = 0;
+    work->m_manager = 0;
+    work->m_paraboloidMap = 0;
+    work->m_baseParaboloidTexObjs = 0;
+    work->m_positions = 0;
+    work->m_normals = 0;
+    work->m_waterHeightA = 0;
+    work->m_waterHeightB = 0;
+    work->m_indices = 0;
+    work->m_texCoord0 = 0;
+    work->m_texCoord1 = 0;
+    work->m_displayListCopies = 0;
+    work->m_reflectionVec = 0;
+    work->m_colors = 0;
+    work->m_sourceTexObjs = 0;
+    work->m_step = 0;
+    work->m_envTexture0 = 0;
+    work->m_envTexture1 = 0;
+    work->m_meshReflectionVec = 0;
+    work->m_meshColors = 0;
+    work->m_meshTexCoords = 0;
+    work->m_generatedTexObj0 = 0;
+    work->m_generatedTexObj1 = 0;
+    work->m_generatedTexture0 = 0;
+    work->m_generatedTexture1 = 0;
+    work->m_waterAlpha = 0xFF;
+    PSMTXIdentity(work->m_waterMtx);
+    PSMTXIdentity(work->m_reflectionMtx);
+    work->m_runtimeColor.r = 0xFF;
+    work->m_runtimeColor.g = 0xFF;
+    work->m_runtimeColor.b = 0xFF;
+    work->m_runtimeColor.a = 0xFF;
+    work->m_sourceTextures[0] = 0;
+    work->m_sourceTextures[1] = 0;
+    work->m_sourceTextures[2] = 0;
+    work->m_sourceTextures[3] = 0;
+    work->m_sourceTextures[4] = 0;
+    work->m_sourceTextures[5] = 0;
+    work->m_paraboloidMapSize = 0;
+    work->m_displayListSize = 0;
+    work->m_paraboloidReady = 0;
 }
 
 /*

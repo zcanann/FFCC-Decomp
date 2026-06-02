@@ -623,6 +623,7 @@ config.libs = [
             Object(NonMatching, "pppEraseCharaParts.cpp"),
             Object(NonMatching, "pppFilter.cpp"),
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
+            Object(Matching, "pppTrigTable.s"),
             Object(NonMatching, "pppGetRotMatrixX.cpp"),
             Object(NonMatching, "pppGetRotMatrixXYZ.cpp"),
             Object(NonMatching, "pppGetRotMatrixXZY.cpp"),

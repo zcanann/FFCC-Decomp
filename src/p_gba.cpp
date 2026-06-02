@@ -22,24 +22,15 @@ const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
  */
 inline CGbaPcs::CGbaPcs()
 {
-	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
-	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
-	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
-	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
+	static CProcessTableDesc desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CGbaPcsFv)};
+	static CProcessTableDesc desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CGbaPcsFv)};
+	static CProcessTableDesc desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CGbaPcsFv)};
+	static CProcessTableDesc desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CGbaPcsFv)};
 
-	table[1] = desc0[0];
-	table[2] = desc0[1];
-	table[3] = desc0[2];
-	table[4] = desc1[0];
-	table[5] = desc1[1];
-	table[6] = desc1[2];
-	table[7] = desc2[0];
-	table[8] = desc2[1];
-	table[9] = desc2[2];
-	table[12] = desc3[0];
-	table[13] = desc3[1];
-	table[14] = desc3[2];
+	m_table.m_fields.m_create = desc0;
+	m_table.m_fields.m_destroy = desc1;
+	m_table.m_fields.m_calcInit = desc2;
+	m_table.m_fields.m_phases[0].m_desc = desc3;
 }
 
 CProcessTable CGbaPcs::m_table = {

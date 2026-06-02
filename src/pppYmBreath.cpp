@@ -32,11 +32,6 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-struct pppYmBreathUnkC {
-    unsigned char _pad[0xC];
-    int* m_serializedDataOffsets;
-};
-
 struct pppYmBreath {
     _pppPObject m_object;
 };
@@ -181,7 +176,7 @@ extern "C" const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
+extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
     YmBreathParticleGroup* group;
     VYmBreath* state = (VYmBreath*)(ymBreath->m_object.m_workArea + *dataOffsets->m_serializedDataOffsets);
@@ -247,7 +242,7 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
+extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
     VYmBreath* state = (VYmBreath*)(ymBreath->m_object.m_workArea + *dataOffsets->m_serializedDataOffsets);
     float zero;
@@ -280,7 +275,7 @@ extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dat
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
+extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _pppCtrlTable* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     int workOffset;
@@ -489,7 +484,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
+extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _pppCtrlTable* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleGroup* groupData;

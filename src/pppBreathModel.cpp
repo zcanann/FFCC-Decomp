@@ -14,11 +14,6 @@ struct pppModelSt;
 
 extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
-struct pppBreathModelUnkC {
-    unsigned char _pad[0xC];
-    int* m_serializedDataOffsets;
-};
-
 struct pppBreathModel;
 
 struct BreathParticleGroup {
@@ -177,7 +172,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
  * PAL Address: 0x800db094
  * PAL Size: 248b
  */
-extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
+extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlTable* param_2)
 {
     BreathParticleGroup* group;
     VBreathModel* state =
@@ -226,7 +221,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
  * PAL Address: 0x800db18c
  * PAL Size: 120b
  */
-extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
+extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlTable* param_2)
 {
     VBreathModel* state =
         (VBreathModel*)(reinterpret_cast<_pppPObject*>(pppBreathModel)->m_workArea + *param_2->m_serializedDataOffsets);
@@ -258,7 +253,7 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreat
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
+extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, _pppCtrlTable* offsets)
 {
     BreathParticleData* particleData;
     PARTICLE_WMAT* matrixList;
@@ -460,7 +455,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  * PAL Address: 0x800db6e0
  * PAL Size: 1264b
  */
-extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
+extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, _pppCtrlTable* offsets)
 {
     BreathParticleGroup* groupData;
     _pppMngSt* mngSt;

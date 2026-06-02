@@ -4,8 +4,8 @@
 #include <dolphin/mtx.h>
 
 struct _pppPObject;
+struct _pppCtrlTable;
 struct pppYmBreath;
-struct pppYmBreathUnkC;
 struct VYmBreath;
 struct PYmBreath;
 struct VColor;
@@ -32,11 +32,11 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 extern "C" {
 #endif
 
-void pppFrameYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
-void pppRenderYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
-void pppConstructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
+void pppFrameYmBreath(pppYmBreath*, PYmBreath*, _pppCtrlTable*);
+void pppRenderYmBreath(pppYmBreath*, PYmBreath*, _pppCtrlTable*);
+void pppConstructYmBreath(pppYmBreath*, _pppCtrlTable*);
 void pppConstruct2YmBreath(_pppPObject* obj);
-void pppDestructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
+void pppDestructYmBreath(pppYmBreath*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

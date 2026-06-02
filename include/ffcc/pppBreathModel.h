@@ -5,8 +5,8 @@
 
 struct _pppPObject;
 struct _pppMngSt;
+struct _pppCtrlTable;
 struct pppBreathModel;
-struct pppBreathModelUnkC;
 struct VBreathModel;
 struct PBreathModel;
 struct VColor;
@@ -36,10 +36,10 @@ void IsExistGroupParticle(PBreathModel*, VBreathModel*, short);
 extern "C" {
 #endif
 
-void pppFrameBreathModel(pppBreathModel*, PBreathModel*, pppBreathModelUnkC*);
-void pppRenderBreathModel(pppBreathModel*, PBreathModel*, pppBreathModelUnkC*);
-void pppConstructBreathModel(pppBreathModel*, pppBreathModelUnkC*);
-void pppDestructBreathModel(pppBreathModel*, pppBreathModelUnkC*);
+void pppFrameBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppRenderBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppConstructBreathModel(pppBreathModel*, _pppCtrlTable*);
+void pppDestructBreathModel(pppBreathModel*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

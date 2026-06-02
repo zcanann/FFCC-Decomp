@@ -7,10 +7,6 @@ struct pppYmMiasma {
     _pppPObject m_object;
 };
 struct pppYmMiasmaUnkB;
-struct pppYmMiasmaUnkC {
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
 struct YmMiasmaRenderStep;
 struct YmMiasmaFrameStep;
 struct VYmMiasma;
@@ -32,11 +28,11 @@ void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*
 extern "C" {
 #endif
 
-void pppConstructYmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
-void pppConstruct2YmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
-void pppDestructYmMiasma(pppYmMiasma*, pppYmMiasmaUnkC*);
-void pppFrameYmMiasma(pppYmMiasma*, YmMiasmaFrameStep*, pppYmMiasmaUnkC*);
-void pppRenderYmMiasma(pppYmMiasma*, YmMiasmaRenderStep*, pppYmMiasmaUnkC*);
+void pppConstructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppConstruct2YmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppDestructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppFrameYmMiasma(pppYmMiasma*, YmMiasmaFrameStep*, _pppCtrlTable*);
+void pppRenderYmMiasma(pppYmMiasma*, YmMiasmaRenderStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

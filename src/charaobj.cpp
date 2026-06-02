@@ -255,10 +255,6 @@ static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 	float mag;
 	float dot;
 
-	if (sourceObj == 0) {
-		return false;
-	}
-
 	PSVECSubtract(&sourceObj->m_worldPosition, &self->m_worldPosition, &delta);
 	mag = PSVECMag(&delta);
 	if (mag <= 0.0f) {

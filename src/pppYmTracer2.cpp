@@ -8,6 +8,7 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern f32 gPppDefaultValueBuffer[];
+extern int ppvUserStopPartF;
 }
 #include "ffcc/util.h"
 
@@ -228,7 +229,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     Mtx MStack_78;
     float frameT;
 
-    if (gPppCalcDisabled != 0) {
+    if (ppvUserStopPartF != 0) {
         return;
     }
 

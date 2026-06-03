@@ -2228,8 +2228,8 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 int JoyBus::SendGBA(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-    unsigned int firstCmd = 0;
-    unsigned int count = 0;
+    unsigned int firstCmd;
+    unsigned int count;
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
     count = m_cmdCount[port];

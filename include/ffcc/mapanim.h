@@ -6,7 +6,6 @@
 
 class CChunkFile;
 class CMapAnim;
-struct CMapAnimData;
 class CMapAnimNode;
 struct CMapAnimNodeTrackKey;
 struct CMapAnimTargetNode;
@@ -31,13 +30,6 @@ class CMapAnimKey
 public:
     unsigned int count;
     CMapAnimNodeTrackKey* keys;
-};
-
-struct CMapAnimData
-{
-    unsigned char _00[0x1C];
-    int startFrame;
-    int endFrame;
 };
 
 struct CMapAnimTargetNode
@@ -65,7 +57,7 @@ class CMapAnimNode
 {
 public:
     CMapAnimTargetNode* m_node;
-    CMapAnimData* m_mapAnim;
+    CMapAnim* m_mapAnim;
     CMapAnimKeyDt* m_tracks;
 
     CMapAnimNode();
@@ -77,6 +69,8 @@ public:
 
 class CMapAnim
 {
+    friend class CMapAnimNode;
+
     CPtrArray<CMapAnimNode*> mapAnimNodes;
     int m_startFrame;
     int m_endFrame;

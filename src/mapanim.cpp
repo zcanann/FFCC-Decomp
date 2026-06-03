@@ -163,7 +163,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
-            item->m_mapAnim = reinterpret_cast<CMapAnimData*>(this);
+            item->m_mapAnim = this;
 
             chunkFile.PushChunk();
             while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
@@ -311,10 +311,10 @@ inline void CMapAnimNode::interp(Vec* out, CMapAnimKey* track, int frameInLoop, 
  */
 void CMapAnimNode::Interp(int frame)
 {
-    int startFrame = m_mapAnim->startFrame;
+    int startFrame = m_mapAnim->m_startFrame;
     CMapAnimNodeTrackKey* positionKeys = m_tracks->position.keys;
     int positionTrackCount = m_tracks->position.count;
-    unsigned int loopFrameCount = static_cast<unsigned int>((m_mapAnim->endFrame - startFrame) + 1);
+    unsigned int loopFrameCount = static_cast<unsigned int>((m_mapAnim->m_endFrame - startFrame) + 1);
     Vec* positionOut = &m_node->position;
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);
 
@@ -391,7 +391,7 @@ void CMapAnimNode::Interp(int frame)
                     endFrame = next->frame;
                 } else {
                     endFrame = next->frame +
-                               static_cast<unsigned int>((m_mapAnim->endFrame - m_mapAnim->startFrame) + 1);
+                               static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -442,7 +442,7 @@ void CMapAnimNode::Interp(int frame)
                     endFrame = next->frame;
                 } else {
                     endFrame = next->frame +
-                               static_cast<unsigned int>((m_mapAnim->endFrame - m_mapAnim->startFrame) + 1);
+                               static_cast<unsigned int>((m_mapAnim->m_endFrame - m_mapAnim->m_startFrame) + 1);
                 }
 
                 unsigned int currentFrame = current->frame;
@@ -489,7 +489,7 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
     CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
     int hasChunk;
 
-    m_mapAnim = reinterpret_cast<CMapAnimData*>(mapAnim);
+    m_mapAnim = mapAnim;
     chunkFile.PushChunk();
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(chunkData)))) != 0) {
         if (chunkId == 0x4E494458) {

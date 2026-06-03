@@ -21,17 +21,17 @@ u32 s_insertShadowNo;
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)
 {
-    ptr = static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr);
+    ptr = reinterpret_cast<void*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
 }
 
 static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshUvPair*>(static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr));
+    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
 }
 
 static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr));
+    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
 }
 
 static inline void SubMeshDataBase(void*& ptr, void* base)
@@ -534,11 +534,13 @@ void CMapMesh::Off2Ptr()
     AddMeshDataBase(m_colors, m_meshData);
     AddMeshDataBase(m_drawEntries, m_meshData);
 
-    void* displayListBase = (m_displayListData != 0) ? m_displayListData : m_meshData;
-    CMapMeshDrawEntry* entry = m_drawEntries;
-    for (unsigned int i = 0; i < static_cast<unsigned int>(m_displayListCount); i++) {
-        entry->m_displayList = static_cast<u8*>(displayListBase) + entry->m_displayListOffset;
-        entry++;
+    int offset = 0;
+    CMapMeshDrawEntry* entry;
+    for (int i = 0; i < static_cast<int>(m_displayListCount); i++) {
+        entry = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset);
+        offset += 0x10;
+        entry->m_displayList =
+            reinterpret_cast<void*>(reinterpret_cast<unsigned int>(m_meshData) + entry->m_displayListOffset);
     }
 }
 

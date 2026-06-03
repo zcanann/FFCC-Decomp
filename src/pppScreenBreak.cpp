@@ -73,6 +73,7 @@ extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
+static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_infoWord1; }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 
@@ -364,7 +365,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
     for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
         ScreenBreakMeshData* meshData = mesh->m_data;
-        CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
+        CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
         node->m_flags &= 0x7F;
         PSMTXIdentity(node->m_localRuntimeMtx);
 
@@ -657,7 +658,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (pieceData->m_active != 0) {
-            MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
+            MtxPtr nodeMtx = model->m_nodes[ScreenBreakMeshNodeIndex(meshData)].m_localRuntimeMtx;
 
             nodeMtx[0][3] = zero;
             nodeMtx[1][3] = zero;

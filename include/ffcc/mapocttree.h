@@ -43,11 +43,6 @@ class CBound
 {
 public:
 	CBound();
-	void operator=(const CBound& other)
-	{
-		m_min = other.m_min;
-		m_max = other.m_max;
-	}
 	static void SetFrustum(Vec&, float(*)[4]);
 	int CheckFrustum0(CBound&);
 	int CheckFrustum0(float);

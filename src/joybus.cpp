@@ -5673,16 +5673,6 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 
         int dataLen = GbaQue.GetArtifactData(threadParam->m_portIndex, artiBuf);
 
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 267)
-        {
-            dataLen = 267;
-        }
-
         const int byteLen = dataLen + 1;
         int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 

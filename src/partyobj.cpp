@@ -408,9 +408,9 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {
 			int cmdListItem =
-			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(*reinterpret_cast<int*>(self + 0x6DC));
+			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(PartyData(this).weaponItem);
 			if (cmdListItem >= 0) {
-				*reinterpret_cast<int*>(self + 0x684) = cmdListItem;
+				m_comboItemState = cmdListItem;
 			}
 		}
 		break;
@@ -1285,8 +1285,7 @@ void CGPartyObj::command()
  */
 void CGPartyObj::callCommandScript(int mode, CGObject* target)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<CGObject**>(self + 0x6E4) = target;
+	PartyData(this).target = target;
 
 	switch (mode) {
 	case 0:
@@ -1595,19 +1594,19 @@ void CGPartyObj::onFrameStat()
 			reqAnim(0x29, 0, 0);
 		}
 		if (m_stateFrame == 4) {
-			unsigned char* self = reinterpret_cast<unsigned char*>(this);
-			int weaponItem = *reinterpret_cast<int*>(self + 0x6DC);
-			int weaponRef = *reinterpret_cast<int*>(self + 0x6E0);
+			PartyObjOverlay& party = PartyData(this);
+			int weaponItem = party.weaponItem;
+			int weaponRef = party.pendingWeaponItem;
 			if (weaponItem <= 0) {
 				LoadWeapon(-1, 0);
 			} else {
 				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
 			}
-			*reinterpret_cast<int*>(self + 0x6E0) = weaponRef;
-			*reinterpret_cast<int*>(self + 0x6DC) = weaponItem;
+			party.pendingWeaponItem = weaponRef;
+			party.weaponItem = weaponItem;
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			PartyData(this).commandFlags &= 0xDF;
+			party.commandFlags &= 0xDF;
 		}
 		if (isLoopAnim() != 0) {
 			changeStat(0, 0, 0);
@@ -2086,10 +2085,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			PSVECAdd(&startPos, &rayDir, &hitPos);
 		}
 
-		*reinterpret_cast<Vec*>(self + 0x66C) = hitPos;
+		m_comboCenter = hitPos;
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder;
-		floorCylinder.m_bottom = *reinterpret_cast<Vec*>(self + 0x66C);
+		floorCylinder.m_bottom = m_comboCenter;
 		floorCylinder.m_axis = down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
@@ -2100,12 +2099,12 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_boundsMax.z = FLOAT_80331aa0;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
-			hitObj->CalcHitPosition(reinterpret_cast<Vec*>(self + 0x66C));
+			hitObj->CalcHitPosition(&m_comboCenter);
 			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =
-			    *reinterpret_cast<Vec*>(self + 0x66C);
+			    m_comboCenter;
 			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
 		}
-		*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x66C);
+		m_comboTarget = m_comboCenter;
 	}
 
 	endPSlotBit(0x10);
@@ -2113,7 +2112,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
 	                                     0x147 | 0x100,
 	                                 m_particleSlots[4]);
-	gCFlatRuntime2.SetParticleWorkPos(*reinterpret_cast<Vec*>(self + 0x66C), FLOAT_80331a78);
+	gCFlatRuntime2.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
 	gCFlatRuntime2.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
 	gCFlatRuntime2.PutParticleWork();
 }
@@ -2126,12 +2125,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 void CGPartyObj::endTargetParticle()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	party.partyFlags &= 0xAF;
-	*reinterpret_cast<int*>(self + 0x668) = 0;
-	*reinterpret_cast<int*>(self + 0x660) = 0;
-	*reinterpret_cast<Vec*>(self + 0x678) = m_worldPosition;
-	*reinterpret_cast<Vec*>(self + 0x66C) = m_worldPosition;
+	m_comboState = 0;
+	m_comboFrame = 0;
+	m_comboTarget = m_worldPosition;
+	m_comboCenter = m_worldPosition;
 }
 
 /*
@@ -2237,11 +2235,10 @@ void CGPartyObj::checkTargetParticle()
 		CGPartyObj* leader = Game.m_partyObjArr[0];
 		if (leader != nullptr &&
 		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
-		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) {
+		    leader->m_comboState != 0) {
 			Vec toLeaderTarget;
-			PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C),
-			              reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C), &toLeaderTarget);
-				toLeaderTarget.y = 0.0f;
+			PSVECSubtract(&m_comboCenter, &leader->m_comboCenter, &toLeaderTarget);
+			toLeaderTarget.y = 0.0f;
 			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
@@ -2252,8 +2249,8 @@ void CGPartyObj::checkTargetParticle()
 	if (input.x == 0.0f && input.z == 0.0f) {
 		party.partyFlags &= 0xDF;
 	} else {
-		Vec* targetPos = reinterpret_cast<Vec*>(self + 0x66C);
-		Vec* centerPos = reinterpret_cast<Vec*>(self + 0x678);
+		Vec* targetPos = &m_comboCenter;
+		Vec* centerPos = &m_comboTarget;
 		Vec move;
 		Vec fromCenter;
 		float maxRange;
@@ -2358,7 +2355,7 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	Vec delta;
-	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
+	PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
 	if (PSVECMag(&delta) > FLOAT_80331a78) {
 		m_rotationY = atan2(delta.x, delta.z);
 	}
@@ -2384,8 +2381,8 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
 
-	CVector centerPos(*reinterpret_cast<Vec*>(self + 0x678));
-	CVector targetPos(*reinterpret_cast<Vec*>(self + 0x66C));
+	CVector centerPos(m_comboTarget);
+	CVector targetPos(m_comboCenter);
 	Vec toTarget;
 	Vec movement;
 	Vec hitPos;
@@ -2462,7 +2459,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	if (m_subState == 1 && m_subFrame > 0x11) {
-		self[0x6C4] |= 0x80;
+		PartyData(this).commandFlags |= 0x80;
 	}
 
 	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
@@ -2615,8 +2612,7 @@ void CGPartyObj::commandFinished()
  */
 void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	CGObject*& carryObj = *reinterpret_cast<CGObject**>(self + 0x6F0);
+	CGObject*& carryObj = PartyData(this).carryObject;
 
 	if (carryType == 0) {
 		if (carryObj != nullptr) {
@@ -3113,7 +3109,7 @@ int CGPartyObj::canPlayerPutItem()
 	    (int)((unsigned int)weaponFlags[1] << 0x18) < 0 &&
 	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
-	    (*reinterpret_cast<int*>(self + 0x6F0) == 0)) {
+	    (PartyData(this).carryObject == nullptr)) {
 		if (Game.m_gameWork.m_menuStageMode != 0 && CGItemObj::CanCreateFromScript() == 0) {
 			return 0;
 		}
@@ -3298,10 +3294,8 @@ void CGPartyObj::statJump()
  */
 void CGPartyObj::statWeaponChange()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	changeWeapon(*reinterpret_cast<int*>(self + 0x6DC),
-	             *reinterpret_cast<int*>(self + 0x6E0),
-	             0);
+	PartyObjOverlay& party = PartyData(this);
+	changeWeapon(party.weaponItem, party.pendingWeaponItem, 0);
 
 	if (m_subFrame > 1) {
 		changeStat(0, 0, 0);
@@ -3315,9 +3309,9 @@ void CGPartyObj::statWeaponChange()
  */
 void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
-	*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
+	PartyObjOverlay& party = PartyData(this);
+	party.weaponItem = weaponRef;
+	party.pendingWeaponItem = weaponItem;
 
 	if (weaponItem <= 0) {
 		LoadWeapon(-1, 0);
@@ -3463,8 +3457,8 @@ void CGPartyObj::InitFinished()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
-	    *reinterpret_cast<int*>(self + 0x6DC),
-	    *reinterpret_cast<int*>(self + 0x6E0));
+	    PartyData(this).weaponItem,
+	    PartyData(this).pendingWeaponItem);
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
 	if ((Game.m_gameWork.m_menuStageMode != 0) &&
@@ -4166,7 +4160,7 @@ void CGPartyObj::gpmMove()
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&
-	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == chalice) {
+	    PartyData(leader).carryObject == chalice) {
 		sGhostPartyWork.settleTimer++;
 	} else {
 		sGhostPartyWork.settleTimer = 0;
@@ -4206,12 +4200,12 @@ void CGPartyObj::gpmMove()
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
 	if (sGhostPartyWork.carrySpeed <= FLOAT_80331A58) {
-		if (*reinterpret_cast<float*>(self + 0x6F0) == 0.0f) {
+		if (PartyData(this).carryObject == nullptr) {
 			sGhostPartyWork.pressure -= 4;
 		} else {
 			sGhostPartyWork.pressure -= 3;
 		}
-	} else if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+	} else if (PartyData(this).carryObject != nullptr) {
 		sGhostPartyWork.pressure += 2;
 	} else {
 		sGhostPartyWork.pressure -= 2;
@@ -4287,7 +4281,7 @@ void CGPartyObj::gpmMove()
 	int moveKind = 0;
 	if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
 		if (chalice != nullptr &&
-		    *reinterpret_cast<float*>(self + 0x6F0) == 0.0f &&
+		    PartyData(this).carryObject == nullptr &&
 		    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
 		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(chalice) + 0x550) == 0) {
 			float pickupRadius = (leader->m_bodyEllipsoidRadius + *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(chalice) + 0x144)) * 1.25f;
@@ -4314,7 +4308,7 @@ void CGPartyObj::gpmMove()
 			}
 		}
 	} else {
-		if (*reinterpret_cast<float*>(self + 0x6F0) != 0.0f) {
+		if (PartyData(this).carryObject != nullptr) {
 			sGhostPartyWork.carrySpeed = 0.0f;
 			carry(1, static_cast<CGObject*>(0), 0);
 			return;

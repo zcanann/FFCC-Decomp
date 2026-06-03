@@ -560,12 +560,12 @@ void CRingMenu::onDraw()
 			buttonAlpha = static_cast<double>(FLOAT_803309cc) - buttonAlpha;
 		}
 
-		if (group == 2) {
-			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-			buttonAlpha = static_cast<double>(-static_cast<int>(
-				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj) + 0x6F4) & 9) >>
-			                                  31);
-		}
+			if (group == 2) {
+				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+				buttonAlpha = static_cast<double>(-static_cast<int>(
+					static_cast<unsigned short>(partyObj->m_partyData.commandMode) & 9) >>
+				                                  31);
+			}
 
 		if (buttonAlpha == static_cast<double>(FLOAT_803309c0)) {
 			continue;

@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
+#include "ffcc/pppChangeTexCommon.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
@@ -11,16 +12,6 @@
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
-
-typedef CChara::CMesh::CDisplayList ChangeTexDisplayList;
-
-struct ChangeTexDisplayListCopy {
-	void* m_data;
-	u32 m_size;
-};
-
-typedef CChara::CMesh::CRefData ChangeTexMeshData;
-typedef CChara::CMesh ChangeTexMeshRef;
 
 struct pppYmChangeTexState {
 	float m_value0;
@@ -54,14 +45,9 @@ STATIC_ASSERT(sizeof(GXColor) == 0x4);
 
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
-{
-	return model->m_meshes;
-}
-
 static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 {
-	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68);
+	return model->m_drawMtx;
 }
 
 static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
@@ -78,14 +64,6 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, pppYmChange
 	model->SetCallbackContext(state, step);
 	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
 	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
-}
-
-static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
-{
-	model->SetCallbackContext(0, 0);
-	model->SetBeforeMeshLockEnvCallback(0);
-	model->SetDrawMeshDLCallback(0);
-	model->SetAfterDrawMeshCallback(0);
 }
 
 /*

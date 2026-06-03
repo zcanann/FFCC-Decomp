@@ -96,7 +96,10 @@ public:
 	int m_particleSlots[0x16];
 	float m_targetDist;
 	Vec m_targetDelta;
-	unsigned char m_unk5CC[4];
+	union {
+		unsigned char m_unk5CC[4];
+		float m_targetAngle;
+	};
 	float m_partyDistance[4];
 	Vec m_partyDelta[4];
 	float m_partyAngle[4];
@@ -109,19 +112,45 @@ public:
 	int m_comboFrame;
 	int m_comboFramePrev;
 	int m_comboState;
-	unsigned char m_unk66C[0x18];
-	int m_damageParticle;
+	Vec m_comboCenter;
+	Vec m_comboTarget;
+	union {
+		int m_damageParticle;
+		int m_comboItemState;
+	};
 	int m_unk688;
 	int m_unk68C;
 	float m_pushScale;
 	float m_alpha;
-	int m_stateResetCounter;
-	int m_stateResetLimit;
+	union {
+		int m_stateResetCounter;
+		int m_comboScriptArg;
+	};
+	union {
+		int m_stateResetLimit;
+		unsigned int m_comboScriptMode;
+	};
 	int m_stateTick;
 	short m_aStarGroupId;
 	short m_unk6A6;
-	int m_castTimeTick;
-	unsigned char m_unk6AC[0xC];
+	union {
+		int m_castTimeTick;
+		int m_comboLinkCount;
+	};
+	union {
+		unsigned char m_unk6AC[0xC];
+		CGPrgObj* m_comboLinks[3];
+	};
 };
+
+STATIC_ASSERT(offsetof(CGCharaObj, m_targetAngle) == 0x5CC);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboCenter) == 0x66C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboTarget) == 0x678);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboItemState) == 0x684);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboScriptArg) == 0x698);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboScriptMode) == 0x69C);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboLinkCount) == 0x6A8);
+STATIC_ASSERT(offsetof(CGCharaObj, m_comboLinks) == 0x6AC);
+STATIC_ASSERT(sizeof(CGCharaObj) == 0x6B8);
 
 #endif // _FFCC_CGCHARAOBJ_H_

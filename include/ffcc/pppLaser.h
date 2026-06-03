@@ -1,6 +1,7 @@
 #ifndef _PPP_LASER_H_
 #define _PPP_LASER_H_
 
+#include "ffcc/pppLaserCommon.h"
 #include "ffcc/partMng.h"
 
 struct pppLaser {
@@ -51,6 +52,10 @@ struct pppLaserUnkB {
         } m_laser;
     };
 };
+
+typedef pppLaserWork LaserWork;
+typedef pppLaserColorBlock LaserColorData;
+typedef pppLaserMapCylinder LaserMapCylinder;
 
 #ifdef __cplusplus
 extern "C" {

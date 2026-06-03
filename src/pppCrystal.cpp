@@ -46,6 +46,17 @@ struct pppCrystalColorBlock {
     pppCVECTOR m_color;
 };
 
+struct HSD_ImageBuffer {
+    u8* m_imageData;
+    GXTexFmt m_format;
+    u32 m_width;
+    u32 m_height;
+    u32 m_imageCount;
+    u32 m_bufferSize;
+};
+
+void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
+
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<CrystalWork*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
@@ -380,4 +391,96 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* pa
 
 	work->m_refractionMap = 0;
 	work->m_refractionTexObj = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+{
+    u32 y;
+    u32 x;
+    float magnitude;
+    float stepX;
+    float stepY;
+    float yCoord;
+    float xCoord;
+    float ySq;
+    float coordOffset;
+    float coordScale;
+    float modulationScale;
+    float maxMagnitude;
+
+    imageBuffer->m_format = GX_TF_IA8;
+    imageBuffer->m_width = 0x20;
+    imageBuffer->m_height = 0x20;
+    imageBuffer->m_imageCount = 0x100;
+    imageBuffer->m_bufferSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+
+    stepX = 2.0f / (float)(imageBuffer->m_width - 1U);
+    stepY = 2.0f / (float)(imageBuffer->m_height - 1U);
+    yCoord = FLOAT_80330FD4;
+    maxMagnitude = kPppLensFlareOne;
+    coordOffset = FLOAT_8033100C;
+    modulationScale = FLOAT_80331008;
+    coordScale = FLOAT_80331010[0];
+
+    for (y = 0; y < imageBuffer->m_height; y++) {
+        ySq = yCoord * yCoord;
+        xCoord = FLOAT_80330FD4;
+
+        for (x = 0; x < imageBuffer->m_width; x++) {
+            magnitude = xCoord * xCoord + ySq;
+            if (magnitude > FLOAT_80330FD8) {
+                magnitude = CrystalSqrtPositive(magnitude);
+            } else if ((double)magnitude < kPppLensFlareZeroD) {
+                magnitude = NAN;
+            } else if (CrystalFpClassify(magnitude) == 1) {
+                magnitude = NAN;
+            }
+
+            if (magnitude > maxMagnitude) {
+                magnitude = maxMagnitude;
+            }
+
+            double modulation = fmod(magnitude, kPppLensFlareOcclusionStep);
+            magnitude = modulationScale * (magnitude * (float)modulation);
+            ImageBufferSetPixel_IA8(
+                imageBuffer, x, y,
+                __cvt_fp2unsigned((double)(xCoord * magnitude * coordScale + coordOffset)),
+                __cvt_fp2unsigned((double)(yCoord * magnitude * coordScale + coordOffset)), 0, 0);
+            xCoord += stepX;
+        }
+
+        yCoord += stepY;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
+{
+    u32 yTile = y >> 2;
+    u32 yFine = (y & 3) * 4;
+    u32 xFine = x & 3;
+    u8* pixel = imageBuffer->m_imageData +
+        yTile * ((imageBuffer->m_width & 0x1FFFFFFCU) << 3) +
+        (x & 0x1FFFFFFC) * 8 +
+        (xFine + yFine) * 2;
+
+    pixel[0] = (u8)intensity;
+    pixel[1] = (u8)alpha;
 }

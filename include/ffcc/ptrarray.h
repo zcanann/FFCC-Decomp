@@ -28,6 +28,7 @@ public:
     void ReleaseAndRemoveAll();
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
+    void SetAt(unsigned long index, T item);
     void SetStage(CMemory::CStage* stage);
     void SetDefaultSize(unsigned long defaultSize);
     void SetGrow(int growCapacity);
@@ -79,6 +80,12 @@ T CPtrArray<T>::operator[](unsigned long index)
     return GetAt(index);
 }
 #endif
+
+template <class T>
+void CPtrArray<T>::SetAt(unsigned long index, T item)
+{
+    m_items[index] = item;
+}
 
 template <class T>
 void CPtrArray<T>::SetStage(CMemory::CStage* stage)

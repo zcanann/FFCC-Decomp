@@ -937,10 +937,8 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
  */
 int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
-    unsigned char* treasure = reinterpret_cast<unsigned char*>(this);
     for (int i = 0; i < 4; i++) {
-        short* slot = reinterpret_cast<short*>(treasure + offsetof(CCaravanWork, m_treasures));
-        if (*slot == -1) {
+        if (m_treasures[i] == -1) {
             m_treasures[i] = (short)itemId;
             Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
             if (outIndex != 0) {
@@ -948,7 +946,6 @@ int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
             }
             return 1;
         }
-        treasure += sizeof(short);
     }
 
     return 0;

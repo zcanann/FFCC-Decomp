@@ -21,6 +21,8 @@ void DrawGoOutMenu();
 
 class CGoOutMenu
 {
+    friend void DrawGoOutMenu();
+
 public:
     void CharaSelClose();
     void SetMemCardSlot(int, int);
@@ -55,42 +57,46 @@ public:
     void EndMemCardProc();
 
 private:
-    char field_0x0;
-    char field_0x1;
-    char field_0x2;
-    char field_0x3;
-    int field_0x4;
-    int field_0x8;
-    int field_0xc;
-    int field_0x10;
-    char field_0x14;
+    char m_lastMemCardProc;
+    char m_memCardProc;
+    char m_cardChannel;
+    char m_saveIndex;
+    int m_memCardResult;
+    void* m_memCardBuffer;
+    int m_accessCardChannel;
+    int m_accessSaveIndex;
+    char unk_0x14;
     char unk_0x15[3];
-    char field_0x18;
-    char field_0x19;
-    char field_0x1a;
-    char field_0x1b;
-    char field_0x1c;
-    char field_0x1d;
-    char field_0x1e;
-    char field_0x1f;
-    int field_0x20;
-    char field_0x24[8];
-    char field_0x2c;
-    char field_0x2d;
-    int field_0x30;
-    short field_0x34;
-    short field_0x36;
-    short field_0x38;
-    int field_0x3c;
-    int field_0x40;
-    char field_0x44;
-    char field_0x45;
-    char field_0x46;
-    char field_0x47;
-    char field_0x48;
-    char field_0x49;
-    short field74_0x4a;
-    short field75_0x4c;
+    char m_goOutMode;
+    char m_returnGoOutMode;
+    char m_odekakeCardChannel;
+    char m_odekakeSaveIndex;
+    char m_watchCardDisconnect;
+    char m_saveLoadMenuOpen;
+    char m_returnTransfer;
+    char unk_0x1f;
+    int m_selectedTransferChara;
+    signed char m_deleteMode;
+    signed char m_prevDeleteMode;
+    unsigned char m_deleteInitSelChar;
+    char unk_0x27;
+    int m_selectedChara;
+    char m_mainMode;
+    char m_nextMainMode;
+    int m_modeFrame;
+    short m_pendingMessage;
+    short m_currentMessage;
+    short m_menuStringSlot;
+    int m_pendingMessageTimer;
+    int m_messageTimer;
+    char m_messageState;
+    char m_messageWindowOpen;
+    unsigned char m_cursorChoice;
+    unsigned char m_drawCursor;
+    char m_messageCloseMode;
+    unsigned char m_cursorMode;
+    short m_cursorListY0;
+    short m_cursorListY1;
 };
 
 #endif // _GOOUT_H_

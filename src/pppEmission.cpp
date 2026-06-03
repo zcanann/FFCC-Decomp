@@ -320,13 +320,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
-        int texture = reinterpret_cast<int>(state->m_texture);
         u32 drawTevBits = 0xACE0F;
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        MaterialMan.SetChangeTexReflectionTexture(
-            reinterpret_cast<GXTexObj*>(texture + offsetof(CTexture, m_texObj)));
+        MaterialMan.SetChangeTexReflectionTexture(&state->m_texture->m_texObj);
 
         Mtx viewMtx0;
         Mtx objMtx0;

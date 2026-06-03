@@ -845,20 +845,20 @@ void CGItemObj::onFrameStat()
 {
 	unsigned char* self = (unsigned char*)this;
 	CGPrgObj* prgObj = (CGPrgObj*)this;
-	int stateId = *(int*)(self + 0x520);
+	int stateId = m_lastStateId;
 	char* itemObjStrings = const_cast<char*>(lbl_801DCE20);
 	float zero = FLOAT_80331b20;
 
 	switch (stateId) {
 	case 0x1b:
-		if (*(int*)(self + 0x528) <= 8) {
-			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));
+		if (m_stateFrame <= 8) {
+			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)m_stateFrame * FLOAT_80331b68));
 
-			*(float*)(self + 0x17c) = wobble;
-			*(float*)(self + 0x178) = wobble;
-			*(float*)(self + 0x174) = wobble;
+			m_rotationZ = wobble;
+			m_rotationY = wobble;
+			m_rotationX = wobble;
 
-			if (*(int*)(self + 0x528) == 8) {
+			if (m_stateFrame == 8) {
 				changeStat(0, 0, 0);
 			}
 		}
@@ -884,9 +884,9 @@ void CGItemObj::onFrameStat()
 
 			if (*(int*)(self + 0x94) <= 0 || distance > DOUBLE_80331ba0) {
 				System.Printf(itemObjStrings + kItemObjStrExpireByTimeOrDistanceMsg);
-				*(float*)(self + 0x4b8) = FLOAT_80331b54;
-				*(float*)(self + 0x4b4) = zero;
-				*(unsigned int*)(self + 0x1c0) = 1;
+				m_bgDownDist = FLOAT_80331b54;
+				m_stepSlopeLimit = zero;
+				m_bgColMask = 1;
 				ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
 				changeStat(9, 0, 0);
 			}
@@ -894,7 +894,7 @@ void CGItemObj::onFrameStat()
 		break;
 	}
 	case 0xB:
-		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+		if (m_stateFrame == m_carryFrame) {
 			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			bool useBossAttachName = false;
 
@@ -927,15 +927,14 @@ void CGItemObj::onFrameStat()
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(*reinterpret_cast<CGObject**>(self + 0x550), const_cast<char*>(attachName),
-			       reinterpret_cast<Vec*>(&attachOffset));
+			Attach(m_owner, const_cast<char*>(attachName), reinterpret_cast<Vec*>(&attachOffset));
 			changeStat(0, 0, 0);
-			*(float*)(self + 0x144) = FLOAT_80331b20;
+			m_bodyEllipsoidRadius = FLOAT_80331b20;
 		}
 		break;
 	case 0xC:
 	case 0xD:
-		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+		if (m_stateFrame == m_carryFrame) {
 			Vec safePos;
 			float launchSpeed;
 			bool useMenuLaunchSpeed = false;
@@ -973,9 +972,9 @@ void CGItemObj::onFrameStat()
 			}
 
 			Detach();
-			*(Vec*)(self + 0x15C) = safePos;
+			m_worldPosition = safePos;
 
-			if (*(int*)(self + 0x520) != 0xC) {
+			if (m_lastStateId != 0xC) {
 				launchSpeed = FLOAT_80331b40;
 			}
 
@@ -984,13 +983,13 @@ void CGItemObj::onFrameStat()
 			CVector moveVec(ownerSin, FLOAT_80331b54, ownerCos);
 			MoveVector(reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
 
-			*(int*)(self + 0x550) = 0;
-			*(int*)(self + 0x56C) = 8;
-			*(float*)(self + 0x144) = FLOAT_80331b20;
+			m_owner = 0;
+			m_itemJumpCountdown = 8;
+			m_bodyEllipsoidRadius = FLOAT_80331b20;
 		}
 
-		if (*(int*)(self + 0x554) <= *(int*)(self + 0x528)) {
-			int worldParamA = *(int*)(self + 0x500);
+		if (m_carryFrame <= m_stateFrame) {
+			int worldParamA = m_worldParamA;
 
 			if ((worldParamA == 0xD || worldParamA == 0xE) &&
 			    static_cast<signed char>(
@@ -1003,22 +1002,22 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0xE:
-		if (*(int*)(self + 0x528) == 0) {
+		if (m_stateFrame == 0) {
 			prgObj->m_bgColMask = 0;
 			prgObj->m_weaponNodeFlags &= 0xFFEF;
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;
-		} else if (*(int*)(self + 0x528) == 4) {
+		} else if (m_stateFrame == 4) {
 			prgObj->m_bgDownDist = FLOAT_80331b68;
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticle(prgObj->m_charaModelHandle);
-		} else if (*(int*)(self + 0x528) == 0xC) {
+		} else if (m_stateFrame == 0xC) {
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
 
-		if (7 < *(int*)(self + 0x528)) {
-			CGObject* carryObj = *(CGObject**)(self + 0x550);
+		if (7 < m_stateFrame) {
+			CGObject* carryObj = m_owner;
 
 			prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331b54;
 			prgObj->m_worldPosition.x =
@@ -1034,17 +1033,17 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x1F:
-		PartMng.pppSetLocSlot(*(int*)(self + 0x55C), &prgObj->m_worldPosition);
+		PartMng.pppSetLocSlot(m_particleSlot, &prgObj->m_worldPosition);
 
-		if (*(int*)(self + 0x52C) == 1) {
-			if (*(int*)(self + 0x530) == 0x7D) {
-				ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
+		if (m_subState == 1) {
+			if (m_subFrame == 0x7D) {
+				ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 			}
-		} else if (*(int*)(self + 0x52C) < 1 && -1 < *(int*)(self + 0x52C) && *(int*)(self + 0x530) == 0) {
+		} else if (m_subState < 1 && -1 < m_subState && m_subFrame == 0) {
 			int particleNoA;
 			int particleNoB;
 
-			if (*(int*)(self + 0x500) == 0xE) {
+			if (m_worldParamA == 0xE) {
 				particleNoA = 0x19;
 				particleNoB = 0x1E;
 			} else {
@@ -1053,7 +1052,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			putParticle(particleNoA | 0x100, 0, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
-			putParticle(particleNoB | 0x100, *(int*)(self + 0x55C), &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			putParticle(particleNoB | 0x100, m_particleSlot, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
 			playSe3D(0x1A, 0x32, 0x96, 0, 0);
 			prgObj->m_displayFlags &= ~1;
 			prgObj->m_bgColMask &= 0xFFFFFFF1;
@@ -1068,21 +1067,21 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x23:
-		if (*(int*)(self + 0x52C) != 0 && *(int*)(self + 0x52C) == 1) {
+		if (m_subState != 0 && m_subState == 1) {
 			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
 				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);
 				model[0x10C] = static_cast<unsigned char>(__rlwimi(model[0x10C], 1, 7, 24, 24));
 			}
 
-			if (*(int*)(self + 0x530) < 9) {
-				float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x530)) * FLOAT_80331b68));
+			if (m_subFrame < 9) {
+				float wobble = (float)sin((double)(FLOAT_80331b9c * (float)m_subFrame * FLOAT_80331b68));
 
 				prgObj->m_rotationZ = wobble;
 				prgObj->m_rotationY = wobble;
 				prgObj->m_rotationX = wobble;
 
-				if (*(int*)(self + 0x530) == 8) {
+				if (m_subFrame == 8) {
 					prgObj->m_bgColMask |= 0x80000;
 					changeStat(0x24, 0, 0);
 				}
@@ -1156,9 +1155,9 @@ void CGItemObj::onFrameStat()
 		prgObj->m_groundHitOffset.y = zero;
 		prgObj->m_groundHitOffset.x = zero;
 
-		if (*(int*)(self + 0x528) == 0) {
+		if (m_stateFrame == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1168,8 +1167,8 @@ void CGItemObj::onFrameStat()
 			float particleScale =
 			    FLOAT_80331b50 * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
 			    FLOAT_80331b4c;
-			putParticle((pdtNo << 8) | 4, *(int*)(self + 0x55C), this, particleScale, 0x12908);
-		} else if (*(int*)(self + 0x528) == 0xD) {
+			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
+		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
@@ -1209,9 +1208,9 @@ void CGItemObj::onFrameStat()
 		prgObj->m_groundHitOffset.y = zero;
 		prgObj->m_groundHitOffset.x = zero;
 
-		if (*(int*)(self + 0x528) == 0) {
+		if (m_stateFrame == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
+			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1221,8 +1220,8 @@ void CGItemObj::onFrameStat()
 			float particleScale =
 			    FLOAT_80331b50 * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
 			    FLOAT_80331b4c;
-			putParticle((pdtNo << 8) | 0x13, *(int*)(self + 0x55C), this, particleScale, 0x12903);
-		} else if (*(int*)(self + 0x528) == 0xD) {
+			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
+		} else if (m_stateFrame == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
@@ -1240,7 +1239,7 @@ void CGItemObj::onFrameStat()
 		break;
 	}
 	case 9:
-		if (*(int*)(self + 0x528) == 8) {
+		if (m_stateFrame == 8) {
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
 		break;

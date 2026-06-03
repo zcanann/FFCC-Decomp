@@ -45,61 +45,16 @@ static inline int LoadInt(const int& value)
     return value;
 }
 
-struct POLYGON_DATA {
-    u8 m_enabled;
-    u8 m_alpha;
-    u16 _pad2;
-    S16Vec m_normalA;
-    S16Vec m_normalB;
-    S16Vec m_pos[3];
-    u16 m_posIndices[3];
-    u16 m_nrmIndices[3];
-    u16 m_texIndices[3];
-};
-
 typedef CharaBreakUnkB CharaBreakStep;
 
+STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
 STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
-
-struct CharaBreakWork {
-    GXColor m_color;
-    f32 m_value0;
-    f32 m_value1;
-    f32 m_value2;
-    f32 m_value3;
-    f32 m_value4;
-    f32 m_value5;
-    void* m_meshBuffers;
-    Vec m_bboxMin;
-    u8 _pad2C[0x4];
-    Vec m_bboxMax;
-    f32 m_miscValue;
-    CChara::CModel* m_model;
-    u32 m_enabled;
-};
-
-struct CharaBreakDisplayListPair {
-    void* m_rewrittenDisplayList;
-    u32 m_displayListSize;
-    u16 m_polygonCount;
-    u16 _padA;
-    POLYGON_DATA* m_polygonData;
-};
+STATIC_ASSERT(sizeof(CharaBreakWork) == 0x48);
+STATIC_ASSERT(sizeof(CharaBreakDisplayListPair) == 0x10);
 
 typedef CChara::CMesh::CDisplayList CharaBreakDisplayList;
 typedef CChara::CMesh CharaBreakMeshRef;
-
-struct CharaBreakMeshData {
-    char m_name[0x10];
-    u8 _pad10[0x04];
-    u32 m_vertexCount;
-    u8 _pad18[0x34];
-    u32 m_displayListCount;
-    CharaBreakDisplayList* m_displayLists;
-    u32 m_skinCount;
-    void* m_skins;
-    u32 m_nodeIndex;
-};
+typedef CChara::CMesh::CRefData CharaBreakMeshData;
 
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workPositions) == 0xC);
@@ -108,10 +63,6 @@ STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
-STATIC_ASSERT(offsetof(CharaBreakMeshData, m_nodeIndex) == 0x5C);
 STATIC_ASSERT(offsetof(CharaBreakStep, m_worldSpaceMode) == 0x42);
 
 static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
@@ -185,14 +136,14 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTab
 {
     int colorOffset = data->m_serializedDataOffsets[0];
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
-    u8* colorWork = charaBreak->m_workArea + colorOffset;
+    _pppColorWork* colorWork = reinterpret_cast<_pppColorWork*>(charaBreak->m_workArea + colorOffset);
 
     if (work->m_enabled != 0) {
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         pppInitBlendMode();
         pppSetDrawEnv(
-            (pppCVECTOR*)(colorWork + 8),
-            (pppFMATRIX*)((u8*)charaBreak + 0x40),
+            reinterpret_cast<pppCVECTOR*>(&colorWork->result),
+            &charaBreak->m_drawMatrix,
             FLOAT_80332048,
             0,
             0,
@@ -205,7 +156,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTab
         work->m_color.r = 0xFF;
         work->m_color.g = 0xFF;
         work->m_color.b = 0xFF;
-        work->m_color.a = colorWork[0xB];
+        work->m_color.a = colorWork->result.a;
     }
 }
 /*

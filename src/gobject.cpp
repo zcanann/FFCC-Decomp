@@ -3080,10 +3080,18 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
  */
 void CGObject::SetDispItemName(int showName)
 {
-    u8 flags = *((u8*)&m_shieldNodeFlags);
-    u8 masked = flags;
-    masked = (u8)__rlwimi(masked, showName, 4, 27, 27);
-    *((u8*)&m_shieldNodeFlags) = masked;
+    struct ShieldNodeFlagBits {
+        unsigned char unk0 : 1;
+        unsigned char unk1 : 1;
+        unsigned char unk2 : 1;
+        unsigned char dispItemName : 1;
+        unsigned char unk4 : 1;
+        unsigned char unk5 : 1;
+        unsigned char unk6 : 1;
+        unsigned char unk7 : 1;
+    };
+
+    reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->dispItemName = showName;
     m_dispItemTimer = 13;
 }
 

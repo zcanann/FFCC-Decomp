@@ -628,38 +628,25 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].r = 0x7f;
     m_viewerLightColors[0].g = 0x7f;
     m_viewerLightColors[0].b = 0x7f;
-    int levelMask = 0x3f;
-    int level0 = __cntlzw(0);
-    int level1 = __cntlzw(1);
-    int level = -((level0 >> 5) & 1) & levelMask;
     m_viewerLightColors[0].a = 0xff;
-    m_viewerLightColors[1].r = level;
-    m_viewerLightColors[1].g = level;
-    m_viewerLightColors[1].b = level;
-    level = -((level1 >> 5) & 1) & levelMask;
-    m_viewerLightColors[1].a = 0xff;
+
     float minusOne = FLOAT_8032FCDC;
     float zero = FLOAT_8032FCD8;
     float one = LoadFloat(FLOAT_8032FCC8);
 
-    m_viewerLightDirs[0].x = zero;
-    m_viewerLightDirs[0].y = zero;
-    m_viewerLightDirs[0].z = minusOne;
-    m_viewerLightColors[2].r = level;
-    m_viewerLightColors[2].g = level;
-    m_viewerLightColors[2].b = level;
-    level = -((__cntlzw(2) >> 5) & 1) & levelMask;
-    m_viewerLightColors[2].a = 0xff;
-    m_viewerLightDirs[1].x = zero;
-    m_viewerLightDirs[1].y = zero;
-    m_viewerLightDirs[1].z = minusOne;
-    m_viewerLightColors[3].r = level;
-    m_viewerLightColors[3].g = level;
-    m_viewerLightColors[3].b = level;
-    m_viewerLightColors[3].a = 0xff;
-    m_viewerLightDirs[2].x = zero;
-    m_viewerLightDirs[2].y = zero;
-    m_viewerLightDirs[2].z = minusOne;
+    for (int i = 0; i < 3; i++) {
+        u8 shade = (i == 0) ? 0x3f : 0;
+
+        m_viewerLightColors[i + 1].r = shade;
+        m_viewerLightColors[i + 1].g = shade;
+        m_viewerLightColors[i + 1].b = shade;
+        m_viewerLightColors[i + 1].a = 0xff;
+
+        m_viewerLightDirs[i].x = zero;
+        m_viewerLightDirs[i].y = zero;
+        m_viewerLightDirs[i].z = minusOne;
+    }
+
     m_viewerSrtPosition.z = zero;
     m_viewerSrtPosition.y = zero;
     m_viewerSrtPosition.x = zero;

@@ -55,7 +55,7 @@ struct HSD_ImageBuffer {
     u32 m_bufferSize;
 };
 
-void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
+inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
 
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
 {
@@ -402,7 +402,7 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
 {
     u32 y;
     u32 x;
@@ -471,7 +471,7 @@ void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
  * JP Address: TODO
  * JP Size: TODO
  */
-void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
+inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
 {
     u32 yTile = y >> 2;
     u32 yFine = (y & 3) * 4;

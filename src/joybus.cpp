@@ -5173,11 +5173,11 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
     unsigned int cmd = 0;
-    unsigned int word = 0;
-
-    word = (unsigned int)0x0C << 24;
-    word |= (unsigned int)(unsigned char)a << 16;
-    word |= (unsigned int)(unsigned char)b << 8;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0C;
+    cmdBytes[1] = a;
+    cmdBytes[2] = b;
+    int result = 0;
 
     if (m_threadRunningMask != 0)
     {
@@ -5187,20 +5187,20 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 
         if ((int)m_cmdCount[p] < 0x40)
         {
-            m_cmdQueueData[p][m_cmdCount[p]] = word;
+            m_cmdQueueData[p][m_cmdCount[p]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-            cmd = 0;
+            result = 0;
         }
         else
         {
             OSSignalSemaphore(&m_accessSemaphores[p]);
-            cmd = 0xFFFFFFFF;
+            result = -1;
         }
     }
 
-    return cmd;
+    return result;
 }
 
 

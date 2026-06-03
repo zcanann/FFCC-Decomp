@@ -20,7 +20,9 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicPcs;
-extern const char s_CGraphicPcs[];
+extern const char s_CGraphicPcs[] = "CGraphicPcs";
+extern const char s_CManager_801D7B8C[] = "CManager";
+extern const char s_CProcess_801D7B98[] = "CProcess";
 
 CProcessTableCallback CGraphicPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 CProcessTableCallback CGraphicPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};

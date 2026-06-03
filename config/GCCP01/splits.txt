@@ -200,6 +200,7 @@ p_map.cpp:
 	extabindex  start:0x8000BD70 end:0x8000BE18
 	.text       start:0x80034988 end:0x80036290
 	.ctors      start:0x801D53DC end:0x801D53E0
+	.rodata     start:0x801D76E0 end:0x801D785C
 	.data       start:0x801E89B8 end:0x801E9030
 	.bss        start:0x802685E0 end:0x8026878C
 	.sdata      start:0x8032E508 end:0x8032E520

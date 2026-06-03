@@ -4695,7 +4695,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
     }
     else if (threadParam->m_subState == 0)
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[524];
 
@@ -4708,15 +4708,16 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
         int dataLen = GbaQue.GetMapObj(mapObjBuf);
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 

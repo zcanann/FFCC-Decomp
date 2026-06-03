@@ -6869,6 +6869,10 @@ int JoyBus::SendAddLetter(int portIndex)
 {
     int port;
     int result = 0;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 1;
 
     if (m_threadRunningMask != 0)
     {
@@ -6877,7 +6881,7 @@ int JoyBus::SendAddLetter(int portIndex)
         port = m_threadParams[portIndex].m_portIndex;
         if ((int)m_cmdCount[port] < 0x40)
         {
-            m_cmdQueueData[port][ m_cmdCount[port] ] = 0x14010000;
+            m_cmdQueueData[port][ m_cmdCount[port] ] = cmd;
             port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
 

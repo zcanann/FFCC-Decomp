@@ -228,11 +228,11 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 {
 	int iVar1;
-	int iVar2;
+	int iVar5;
 	COctNode* nodeIter;
 	COctNode* pCVar4;
 	COctNode* pCVar3;
-	int iVar5;
+	int iVar2;
 
 	if ((octNode->m_meshCount != 0) &&
 	    ((octNode->m_drawFlags & 1) != 0)) {
@@ -244,7 +244,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
 			                           m_mapObject->m_worldMtx);
 		}
-		MaterialMan.LockEnv();
+		MaterialMan.LockEnvInline();
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
 		m_mapObject->SetDrawEnv();
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)
@@ -268,7 +268,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar4->m_shadowFlags,
 				                           m_mapObject->m_worldMtx);
 			}
-			MaterialMan.LockEnv();
+			MaterialMan.LockEnvInline();
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar4->m_lightFlags);
 			m_mapObject->SetDrawEnv();
 			static_cast<CMapMesh*>(m_mapObject->m_mapData)

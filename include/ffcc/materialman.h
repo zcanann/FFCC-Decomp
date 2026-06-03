@@ -138,6 +138,13 @@ public:
         m_shadowTextureCount = 0;
         m_shadowKColorMask = 0;
     }
+    void LockEnvInline()
+    {
+        m_stdTexMapId = m_texMapIdCur;
+        m_stdTexMtx = m_texMtxCur;
+        m_stdTexCoordId = m_texCoordIdCur;
+        m_stdEnvTevBit = m_curEnvTevBit;
+    }
     void SetDefaultStdDrawEnv(unsigned int tevBit)
     {
         m_curEnvTevBit = tevBit;

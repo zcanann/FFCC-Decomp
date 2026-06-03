@@ -176,6 +176,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     CChara::CMesh* mesh;
     CharaBreakStep* stepData;
     u32 i;
+    u32 meshBufferOffset;
 
     stepData = (CharaBreakStep*)step;
     if (ppvUserStopPartF != 0) {
@@ -239,7 +240,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
             ((u32*)work->m_meshBuffers)[i] = 0;
         }
 
-        for (i = 0; i < ModelData(model)->m_meshCount; i++) {
+        meshBufferOffset = 0;
+        for (i = 0; i < ModelData(model)->m_meshCount; i++, meshBufferOffset += 4, mesh++) {
             {
                 CharaBreakMeshData* meshData = MeshData(mesh);
 
@@ -250,10 +252,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
                 }
             }
 
-            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
-                MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9);
-            u32 meshBuffer = ((u32*)work->m_meshBuffers)[i];
+            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(work->m_meshBuffers) + meshBufferOffset) =
+                (u32)pppMemFree__FPv(MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
+                                     const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9);
+            u32 meshBuffer =
+                *reinterpret_cast<u32*>(reinterpret_cast<u8*>(work->m_meshBuffers) + meshBufferOffset);
             if (meshBuffer == 0) {
                 goto fail;
             }
@@ -310,8 +313,6 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
                     dlEntries--;
                 }
             }
-
-            mesh++;
         }
     }
 
@@ -348,7 +349,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     CChara::CMesh* mesh = model->m_meshes;
 
     if (meshBufferSlot != NULL) {
-        for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
+        for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshBufferSlot++, meshIndex++, mesh++) {
             CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;
             CharaBreakMeshData* meshData = MeshData(mesh);
             if (dlEntryBase != NULL) {
@@ -376,8 +377,6 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
                 pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = 0;
             }
-            mesh++;
-            meshBufferSlot++;
         }
     }
 
@@ -460,7 +459,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
-            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_nodeIndex].m_mtx, meshToWorld);
+            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_infoWord1].m_mtx, meshToWorld);
         }
 
         for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
@@ -740,7 +739,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_nodeIndex].m_mtx, meshMtx);
+        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_infoWord1].m_mtx, meshMtx);
     }
     workPositions = mesh->m_workPositions;
     u16* stream = (u16*)displayList;

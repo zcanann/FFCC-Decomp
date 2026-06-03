@@ -878,16 +878,16 @@ void CGMonObj::frameStatFuncSaw()
 			if (prgObj->m_subFrame == 0x19) {
 				reinterpret_cast<CGCharaObj*>(this)->resetIgnoreHit();
 				enableAttackCol(1, 0, 0);
-				mon[0x6C0] = 0;
+				m_unk6C0 = 0;
 			}
 
-			if (prgObj->m_subFrame > 0x19 && mon[0x6C0] != 0) {
+			if (prgObj->m_subFrame > 0x19 && m_unk6C0 != 0) {
 				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 2) {
 			if (prgObj->m_subFrame == 0) {
 				enableAttackCol(0, 0, 0);
-				mon[0x6C0] = 0;
+				m_unk6C0 = 0;
 				prgObj->reqAnim(0xB, 0, 0);
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
 				prgObj->playSe3D(0x1C52D, 0x32, 0x96, 0, 0);

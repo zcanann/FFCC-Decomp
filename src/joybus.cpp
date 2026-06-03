@@ -6511,7 +6511,8 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         return 0;
 	}
 
-    unsigned char modeFlag = (controlMode != 0) ? 1 : 0;
+    unsigned char modeFlag =
+        (unsigned char)(((unsigned int)-controlMode >> 24) | ((unsigned int)controlMode >> 24)) >> 7;
     bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
 
     if (isSinglePort)
@@ -6526,21 +6527,23 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 
     if (m_threadRunningMask != 0)
     {
-        const unsigned int port = m_threadParams[portIndex].m_portIndex;
+        unsigned int port = m_threadParams[portIndex].m_portIndex;
 
         OSWaitSemaphore(&m_accessSemaphores[port]);
 
         if ((int)m_cmdCount[port] < 0x40)
         {
             m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
+            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            result = 0;
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[port]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     // If successful, update local mode tracking

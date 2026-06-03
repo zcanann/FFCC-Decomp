@@ -409,7 +409,8 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
 				drawTevBits = 0xACE0F;
-				fullTevBits = drawTevBits | 0x1000;
+				fullTevBits = drawTevBits;
+				fullTevBits |= 0x1000;
 				displayListIdx = meshData->m_displayListCount - 1;
 				while (displayListIdx >= 0) {
 					ChangeTexDisplayListCopy** displayListCopies = work->m_displayListArrays[meshIdx];
@@ -441,13 +442,16 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += param_4;
 	ChangeTexMeshData* meshData = meshes->m_data;
-	ChangeTexDisplayList* displayList = meshData->m_displayLists + param_5;
+	ChangeTexDisplayList* displayList = meshData->m_displayLists;
+	displayList += param_5;
+	CTexture* texture = work->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
 		int drawTevBits = 0xACE0F;
-		int fullTevBits = drawTevBits | 0x1000;
+		int fullTevBits = drawTevBits;
+		fullTevBits |= 0x1000;
 		MaterialMan.SetChangeTexReflectionState(
-		    &work->m_texture->m_texObj, drawTevBits, fullTevBits);
+		    &texture->m_texObj, drawTevBits, fullTevBits);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

@@ -5929,15 +5929,6 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 
         int dataLen = GbaQue.GetMapObjInfo(threadParam->m_portIndex, mapObjBuf);
 
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-        if (dataLen > 267)
-        {
-            dataLen = 267;
-        }
-
         const int byteLen = dataLen + 1;
 
         int wordCount = MakeJoyData(

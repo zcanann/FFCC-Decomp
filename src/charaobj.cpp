@@ -207,9 +207,9 @@ static CGPrgObj** CharaObjComboLinks(CGCharaObj* charaObj)
 	return charaObj->m_comboLinks;
 }
 
-static unsigned char& CharaObjComboFlags(CGCharaObj* charaObj)
+static unsigned char& CharaObjComboFlags(CGPartyObj* party)
 {
-	return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6B8);
+	return party->m_partyData.partyFlags;
 }
 
 static bool CharaObjSkipComboScript(CGPrgObj* obj)
@@ -744,7 +744,7 @@ void CGCharaObj::onFramePreCalc()
 
 	unsigned short cid = GetCID();
 	if ((cid & 0x6D) == 0x6D) {
-		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) != 0) {
+		if (static_cast<CGPartyObj*>(this)->m_partyData.carryObject != nullptr) {
 			push += 10;
 		}
 		unsigned char slot = m_animStateMisc;
@@ -2267,7 +2267,8 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		m_worldParam = kOneF32;
 
 		if ((cid & 0x6D) == 0x6D) {
-			if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8)) < 0) {
+			CGPartyObj* party = static_cast<CGPartyObj*>(this);
+			if (static_cast<signed char>(party->m_partyData.partyFlags) < 0) {
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;
@@ -2275,7 +2276,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 					reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x14, 2,
 					reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 			}
-			static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
+			party->carry(1, 0, 1);
 		}
 
 		if (sourceObj != 0) {
@@ -2294,11 +2295,12 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	changeStat(9, 0, 0);
 
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
+		CGPartyObj* party = static_cast<CGPartyObj*>(this);
 		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 		for (int i = 2; i < *reinterpret_cast<short*>(script + 0xBAA); i++) {
 			if (caravan->DelCmdListAndItem(i) == 0x125) {
 				caravan->GetNumCombi(i, 1);
-				unsigned char& flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8);
+				unsigned char& flags = party->m_partyData.partyFlags;
 				flags = (flags & 0xFB) | 4;
 				return;
 			}

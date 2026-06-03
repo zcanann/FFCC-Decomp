@@ -709,9 +709,17 @@ void CMenuPcs::FavoInit()
 		if (iVar17 < 8) {
 			do {
 				if (rank->score < compareRank->score) {
-					FoodRank tmp = *rank;
-					*rank = *compareRank;
-					*compareRank = tmp;
+					signed char place = rank->place;
+					unsigned char foodId = rank->foodId;
+					short score = rank->score;
+
+					rank->place = compareRank->place;
+					rank->foodId = compareRank->foodId;
+					rank->score = compareRank->score;
+
+					compareRank->place = place;
+					compareRank->foodId = foodId;
+					compareRank->score = score;
 				}
 				compareRank++;
 				iVar16--;

@@ -15236,7 +15236,6 @@ FLOAT_803309ec = .sdata2:0x803309EC; // type:object size:0x4 align:4 data:float
 FLOAT_803309f0 = .sdata2:0x803309F0; // type:object size:0x4 align:4 data:float
 FLOAT_803309f4 = .sdata2:0x803309F4; // type:object size:0x4 align:4 data:float
 FLOAT_803309f8 = .sdata2:0x803309F8; // type:object size:0x4 align:4 data:float
-DOUBLE_80330a00 = .sdata2:0x80330A00; // type:object size:0x8 align:8 data:double
 FLOAT_80330a08 = .sdata2:0x80330A08; // type:object size:0x4 align:4 data:float
 FLOAT_80330a0c = .sdata2:0x80330A0C; // type:object size:0x4 align:4 data:float
 FLOAT_80330a10 = .sdata2:0x80330A10; // type:object size:0x4 align:4 data:float

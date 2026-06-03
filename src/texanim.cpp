@@ -214,7 +214,21 @@ void CTexAnimSet::SetTexGen()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
         CTexAnim* texAnim = m_texAnims[i];
-        texAnim->SetTexGen();
+        CMaterial* material = texAnim->m_refData->m_material;
+
+        if (material != 0) {
+            float y = texAnim->m_texGen.y;
+            int index = texAnim->m_refData->m_texSrtIndex;
+            float x = texAnim->m_texGen.x;
+            material->m_texScroll[index].m_u0 = x;
+            material->m_texScroll[index].m_v0 = y;
+            material->m_texScroll[index].m_u1 = FLOAT_8032fb38;
+            material->m_texScroll[index].m_v1 = FLOAT_8032fb38;
+            material->m_texScroll[index].m_type0 =
+                (FLOAT_8032fb38 == material->m_texScroll[index].m_u1) ? 0 : 1;
+            material->m_texScroll[index].m_type1 =
+                (FLOAT_8032fb38 == material->m_texScroll[index].m_v1) ? 0 : 1;
+        }
     }
 }
 

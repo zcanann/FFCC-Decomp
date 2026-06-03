@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"

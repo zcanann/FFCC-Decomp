@@ -31,8 +31,8 @@ extern const float FLOAT_80332058;
 extern const float FLOAT_8033205c;
 extern const float FLOAT_80332060;
 extern const float FLOAT_80332064;
-extern const double DOUBLE_80332068 = 4503601774854144.0;
-extern const double DOUBLE_80332070 = 4503599627370496.0;
+extern const double DOUBLE_80332068;
+extern const double DOUBLE_80332070;
 extern const float FLOAT_80332078[2];
 
 static inline Mtx& CameraMatrix()

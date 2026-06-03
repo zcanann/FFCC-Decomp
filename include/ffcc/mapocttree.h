@@ -43,6 +43,15 @@ class CBound
 {
 public:
 	CBound();
+	CBound(float min, float max)
+	{
+		m_min.z = min;
+		m_min.y = min;
+		m_min.x = min;
+		m_max.z = max;
+		m_max.y = max;
+		m_max.x = max;
+	}
 	void operator=(const CBound& other)
 	{
 		m_min = other.m_min;

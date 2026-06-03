@@ -41,6 +41,17 @@ public:
         m_boundsMax.x = kMapHitBoundsMaxInit;
     }
 
+    CMapCylinder(float min, float max)
+    {
+        m_boundsMin.z = min;
+        m_boundsMin.y = min;
+        m_boundsMin.x = min;
+
+        m_boundsMax.z = max;
+        m_boundsMax.y = max;
+        m_boundsMax.x = max;
+    }
+
     CBound* GetBound() { return reinterpret_cast<CBound*>(&m_boundsMin); }
     CMapCylinderProbeView& Probe() { return *reinterpret_cast<CMapCylinderProbeView*>(&m_top); }
     const CMapCylinderProbeView& Probe() const { return *reinterpret_cast<const CMapCylinderProbeView*>(&m_top); }

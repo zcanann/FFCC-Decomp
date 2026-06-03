@@ -6011,15 +6011,17 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
  */
 int JoyBus::SendStrength(ThreadParam* threadParam)
 {
-    // Strength data returned as 3 bytes
     unsigned char strength[3];
 
-    GbaQue.GetStrengthData(threadParam->m_portIndex, (unsigned char*)&strength);
+    GbaQue.GetStrengthData(threadParam->m_portIndex, strength);
 
-    const unsigned short opcode = static_cast<unsigned short>(0x1900 | strength[0]);
-    const unsigned int cmd = MakeJoyCmd16(opcode, strength[1], strength[2]);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x19;
+    cmdBytes[1] = strength[0];
+    cmdBytes[2] = strength[1];
+    cmdBytes[3] = strength[2];
 
-    // If threads not running, return success
     if (m_threadRunningMask == 0)
 	{
         return 0;
@@ -6053,10 +6055,11 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
  */
 int JoyBus::SendRaderType(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
-    unsigned char radarType = GbaQue.GetRadarType(port);
-    unsigned short opcode = 0x140D;
-    unsigned int cmd = MakeJoyCmd16(opcode, radarType, 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x0D;
+    cmdBytes[2] = GbaQue.GetRadarType(threadParam->m_portIndex);
 
     int result = 0;
 
@@ -6088,11 +6091,11 @@ int JoyBus::SendRaderType(ThreadParam* threadParam)
  */
 int JoyBus::SendRaderMode(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
-
-    unsigned char radarMode = GbaQue.GetRadarMode(port);
-    unsigned short opcode = 0x140E;
-    unsigned int cmd = MakeJoyCmd16(opcode, radarMode, 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x0E;
+    cmdBytes[2] = GbaQue.GetRadarMode(threadParam->m_portIndex);
 
     int result = 0;
 

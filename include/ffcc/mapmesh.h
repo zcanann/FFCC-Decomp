@@ -1,6 +1,7 @@
 #ifndef _FFCC_MAPMESH_H_
 #define _FFCC_MAPMESH_H_
 
+#include "ffcc/mapocttree.h"
 #include "ffcc/memory.h"
 
 #include <dolphin/mtx.h>
@@ -48,6 +49,7 @@ public:
     void pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheDumpModelTexture(CMaterialSet*, CAmemCacheSet*);
+    CBound* GetBound() { return &m_bound; }
 
     unsigned short m_vertexCount;      // 0x00
     unsigned short m_normalCount;      // 0x02
@@ -55,12 +57,7 @@ public:
     unsigned short m_uvCount;          // 0x06
     unsigned short m_colorCount;       // 0x08
     unsigned short m_displayListCount; // 0x0A
-    float m_bboxMinX;                  // 0x0C
-    float m_bboxMinY;                  // 0x10
-    float m_bboxMinZ;                  // 0x14
-    float m_bboxMaxX;                  // 0x18
-    float m_bboxMaxY;                  // 0x1C
-    float m_bboxMaxZ;                  // 0x20
+    CBound m_bound;                    // 0x0C
     void* m_meshData;                  // 0x24
     void* m_displayListData;           // 0x28
     void* m_vertices;                  // 0x2C

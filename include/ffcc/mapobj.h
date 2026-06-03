@@ -21,6 +21,23 @@ class CMaterialMan;
 class CCameraPcs;
 struct Vec;
 
+static inline void InitMapObjAtrColorKeyFrame(CMapKeyFrame& keyFrame)
+{
+    keyFrame.m_mode = 0;
+    keyFrame.m_junCount = 0;
+    keyFrame.m_keyCount = 0;
+    keyFrame.m_loop = 1;
+    keyFrame.m_isRun = 0;
+    keyFrame.m_currentFrame = 0;
+    keyFrame.m_startFrame = 0;
+    keyFrame.m_endFrame = 0;
+    keyFrame.m_frameCount = 0;
+    keyFrame.m_junTable = 0;
+    keyFrame.m_keyFrame = 0;
+    keyFrame.m_keyValue = 0;
+    keyFrame.m_splineTable = 0;
+}
+
 class CMapObjAtr
 {
 public:
@@ -74,22 +91,8 @@ public:
         m_colorMode = 0;
         m_useAltColor = 0;
         m_keyFrameCount = 0;
-        m_colorKeyFrame.m_endFrame = 0;
-        m_colorKeyFrame.m_frameCount = 0;
-        m_colorKeyFrame.m_junTable = 0;
-        m_colorKeyFrame.m_keyFrame = 0;
-        m_colorKeyFrame.m_loop = 1;
-        m_colorKeyFrame.m_isRun = 0;
-        m_altColorKeyFrame.m_endFrame = 0;
-        m_altColorKeyFrame.m_frameCount = 0;
-        m_altColorKeyFrame.m_junTable = 0;
-        m_altColorKeyFrame.m_keyFrame = 0;
-        m_altColorKeyFrame.m_loop = 1;
-        m_altColorKeyFrame.m_isRun = 0;
-        for (int i = 0; i < 0x28; i += 4) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_colorKeyFrame) + i) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_altColorKeyFrame) + i) = 0;
-        }
+        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
+        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
     }
 
     ~CMapObjAtrSpotLight();
@@ -128,22 +131,8 @@ public:
         m_type = POINT_LIGHT;
         m_colorMode = 0;
         m_unknown20 = 0;
-        m_colorKeyFrame.m_endFrame = 0;
-        m_colorKeyFrame.m_frameCount = 0;
-        m_colorKeyFrame.m_junTable = 0;
-        m_colorKeyFrame.m_keyFrame = 0;
-        m_colorKeyFrame.m_loop = 1;
-        m_colorKeyFrame.m_isRun = 0;
-        m_altColorKeyFrame.m_endFrame = 0;
-        m_altColorKeyFrame.m_frameCount = 0;
-        m_altColorKeyFrame.m_junTable = 0;
-        m_altColorKeyFrame.m_keyFrame = 0;
-        m_altColorKeyFrame.m_loop = 1;
-        m_altColorKeyFrame.m_isRun = 0;
-        for (int i = 0; i < 0x28; i += 4) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_colorKeyFrame) + i) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&m_altColorKeyFrame) + i) = 0;
-        }
+        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
+        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
     }
 
     ~CMapObjAtrPointLight();

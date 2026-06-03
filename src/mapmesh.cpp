@@ -363,12 +363,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             m_vertices = cursor;
             cursor += chunk.m_size;
-            m_bboxMinZ = FLOAT_8032F930;
-            m_bboxMinY = FLOAT_8032F930;
-            m_bboxMinX = FLOAT_8032F930;
-            m_bboxMaxZ = FLOAT_8032F934;
-            m_bboxMaxY = FLOAT_8032F934;
-            m_bboxMaxX = FLOAT_8032F934;
+            m_bound.m_min.z = FLOAT_8032F930;
+            m_bound.m_min.y = FLOAT_8032F930;
+            m_bound.m_min.x = FLOAT_8032F930;
+            m_bound.m_max.z = FLOAT_8032F934;
+            m_bound.m_max.y = FLOAT_8032F934;
+            m_bound.m_max.x = FLOAT_8032F934;
 
             int vertexIndex = 0;
             offset = 0;
@@ -381,12 +381,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset + 8) = value;
 
                 float* vert = reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset);
-                m_bboxMinX = (m_bboxMinX < vert[0]) ? m_bboxMinX : vert[0];
-                m_bboxMinY = (m_bboxMinY < vert[1]) ? m_bboxMinY : vert[1];
-                m_bboxMinZ = (m_bboxMinZ < vert[2]) ? m_bboxMinZ : vert[2];
-                m_bboxMaxX = (m_bboxMaxX > vert[0]) ? m_bboxMaxX : vert[0];
-                m_bboxMaxY = (m_bboxMaxY > vert[1]) ? m_bboxMaxY : vert[1];
-                m_bboxMaxZ = (m_bboxMaxZ > vert[2]) ? m_bboxMaxZ : vert[2];
+                m_bound.m_min.x = (m_bound.m_min.x < vert[0]) ? m_bound.m_min.x : vert[0];
+                m_bound.m_min.y = (m_bound.m_min.y < vert[1]) ? m_bound.m_min.y : vert[1];
+                m_bound.m_min.z = (m_bound.m_min.z < vert[2]) ? m_bound.m_min.z : vert[2];
+                m_bound.m_max.x = (m_bound.m_max.x > vert[0]) ? m_bound.m_max.x : vert[0];
+                m_bound.m_max.y = (m_bound.m_max.y > vert[1]) ? m_bound.m_max.y : vert[1];
+                m_bound.m_max.z = (m_bound.m_max.z > vert[2]) ? m_bound.m_max.z : vert[2];
 
                 offset += 0xC;
             }
@@ -502,12 +502,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             float x = reader.GetF4();
             float y = reader.GetF4();
             float z = reader.GetF4();
-            m_bboxMinX -= x;
-            m_bboxMinY -= y;
-            m_bboxMinZ -= z;
-            m_bboxMaxX += x;
-            m_bboxMaxY += y;
-            m_bboxMaxZ += z;
+            m_bound.m_min.x -= x;
+            m_bound.m_min.y -= y;
+            m_bound.m_min.z -= z;
+            m_bound.m_max.x += x;
+            m_bound.m_max.y += y;
+            m_bound.m_max.z += z;
             break;
         }
         }
@@ -637,12 +637,12 @@ CMapMesh::CMapMesh()
     const float minInit = 10000000000.0f;
     const float maxInit = -10000000000.0f;
 
-    m_bboxMinZ = minInit;
-    m_bboxMinY = minInit;
-    m_bboxMinX = minInit;
-    m_bboxMaxZ = maxInit;
-    m_bboxMaxY = maxInit;
-    m_bboxMaxX = maxInit;
+    m_bound.m_min.z = minInit;
+    m_bound.m_min.y = minInit;
+    m_bound.m_min.x = minInit;
+    m_bound.m_max.z = maxInit;
+    m_bound.m_max.y = maxInit;
+    m_bound.m_max.x = maxInit;
 
     m_meshData = 0;
     m_displayListData = 0;

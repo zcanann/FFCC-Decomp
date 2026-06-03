@@ -599,11 +599,13 @@ void CFunnyShape::Render()
     }
 
     work = m_anmWork;
+    const float& baseX = kFunnyShapeAnimOffsetX;
+    const float& baseY = kFunnyShapeAnimOffsetY;
 
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;
-        posCopy.x = kFunnyShapeAnimOffsetX + work->x;
-        posCopy.y = kFunnyShapeAnimOffsetY + work->y;
+        posCopy.x = baseX + work->x;
+        posCopy.y = baseY + work->y;
 
         u8* animData = reinterpret_cast<u8*>(AnimData(this));
         s16 frame = work->frame;

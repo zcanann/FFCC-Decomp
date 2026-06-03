@@ -7,6 +7,7 @@
 #include "ffcc/textureman.h"
 #include "ffcc/ptrarray.h"
 
+#include <dolphin/gx.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
@@ -18,8 +19,12 @@ extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
 extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
 }
 extern "C" const float FLOAT_8032fd38;
-extern "C" const float FLOAT_8032fd48;
-extern "C" const float FLOAT_8032fd4c;
+extern "C" const float FLOAT_8032fd48 = 1.0f;
+extern "C" const float FLOAT_8032fd4c = 0.0f;
+extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const float lbl_8032FD64 = 1000.0f;
 
 namespace {
 static inline CMaterial* MaterialAt(CMaterialSet* materialSet, unsigned long index)

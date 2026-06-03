@@ -80,6 +80,8 @@ extern float FLOAT_8032EE78;
 extern float FLOAT_8032EE7C;
 extern float FLOAT_8032EE80;
 extern float FLOAT_8032EE84;
+int s_partyObjCreated_8032EE70;
+extern char s_partyObjCreatedInit_8032EE74;
 
 unsigned char CGPartyObj::m_ghostWork[0x90];
 #define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(CGPartyObj::m_ghostWork))
@@ -354,9 +356,13 @@ void CGPartyObj::onCreate()
 	party.unk6C0 = -1;
 	party.commandMode = 0;
 
-	static int s_created;
-	if (s_created == 0) {
-		s_created = 1;
+	if (s_partyObjCreatedInit_8032EE74 == 0) {
+		s_partyObjCreated_8032EE70 = 0;
+		s_partyObjCreatedInit_8032EE74 = 1;
+	}
+
+	if (s_partyObjCreated_8032EE70 == 0) {
+		s_partyObjCreated_8032EE70 = 1;
 	}
 }
 

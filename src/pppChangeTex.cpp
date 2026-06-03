@@ -4,6 +4,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
+#include "ffcc/pppChangeTexCommon.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
@@ -16,16 +17,6 @@ extern unsigned char ppvIsLoopCalc;
 #include "dolphin/gx.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
-
-typedef CChara::CMesh::CDisplayList ChangeTexDisplayList;
-
-struct ChangeTexDisplayListCopy {
-	void* m_data;
-	u32 m_size;
-};
-
-typedef CChara::CMesh::CRefData ChangeTexMeshData;
-typedef CChara::CMesh ChangeTexMeshRef;
 
 struct ChangeTexWork {
 	float m_value0;

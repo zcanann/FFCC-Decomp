@@ -66,10 +66,11 @@ float CFont::GetWidth(unsigned short ch)
 	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
+			glyph += 4;
+		} else {
 			goto found_glyph;
 		}
-		glyph += 4;
 	}
 	glyph = 0;
 
@@ -80,8 +81,8 @@ found_glyph:
 
 found_fallback:
 	int drawWidth;
-	float localScaleX = scaleX;
 	float localMargin = margin;
+	float localScaleX = scaleX;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
 	if (renderFlagBits.fixedWidth != 0) {
@@ -105,10 +106,11 @@ find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	unsigned short* fallbackGlyph = glyphBucket + 1;
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) == 0) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) != 0) {
+			fallbackGlyph += 4;
+		} else {
 			goto found_fallback_glyph;
 		}
-		fallbackGlyph += 4;
 	}
 	fallbackGlyph = 0;
 found_fallback_glyph:
@@ -225,8 +227,9 @@ read_char:
  */
 void CFont::Draw(unsigned short ch)
 {
-	unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
-	int count = static_cast<int>(m_glyphBuckets[ch & 0xFF][0]);
+	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
+	unsigned short* glyph = glyphBucket + 1;
+	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
 		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
@@ -260,8 +263,10 @@ found_fallback:
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
-	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
-	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
+	unsigned int glyphOffset =
+		static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
+	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) + glyphOffset;
+	glyphInfo += 3;
 	int glyphIndex;
 	int row;
 	float u0;

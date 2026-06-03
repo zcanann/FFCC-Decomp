@@ -293,7 +293,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         phaseWork = ctrl->m_phasePeriod;
         int phaseQuotient = angleSeed / phaseWork;
         work->m_phaseOffset = angleSeed - phaseQuotient * phaseWork;
-        halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
+        halfWidth = ctrl->m_stepValue * LoadFloat(FLOAT_80330b08);
         phaseWork = work->m_phaseOffset;
         step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
         rot = FLOAT_80330b0c * (f32)phaseWork;

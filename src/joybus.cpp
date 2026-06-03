@@ -2327,7 +2327,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 
@@ -2342,7 +2342,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 
@@ -2409,7 +2409,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 

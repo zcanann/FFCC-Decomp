@@ -243,9 +243,8 @@ public:
 	public:
 		u8 _pad0[0x8];
 		Mtx m_matrix;
-		u8 _pad38[0xC];
 		Mtx m_worldBaseMtx;
-		u8 _pad74[0x24];
+		Mtx m_drawMtx;
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
 		u8 m_flagsA0;

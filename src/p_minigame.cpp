@@ -272,18 +272,18 @@ void CMiniGamePcs::create()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    self[0x1348] = 0;
-    self[0x1350] = 0;
+    m_managerState = 0;
+    m_managerIndex = 0;
     *reinterpret_cast<unsigned int*>(self + 0x1354) = 0;
     *reinterpret_cast<unsigned int*>(self + 0x135C) = 0;
     self[0x134A] = 0;
-    self[0x134B] = 0xF;
+    m_playerMask = 0xF;
     self[0x649C] = 0;
     self[0x134C] = 0;
 
     for (int playerBit = 0; playerBit < 4; playerBit++)
     {
-        if ((self[0x134B] & (1 << playerBit)) != 0)
+        if ((m_playerMask & (1 << playerBit)) != 0)
         {
             self[0x134C] += 1;
         }
@@ -463,7 +463,7 @@ void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode
     gbaContext[3] = 1;
     *reinterpret_cast<unsigned int*>(gbaContext + 4) = *reinterpret_cast<unsigned int*>(self + 0x1364);
     gbaContext[0x10] = self[0x134A];
-    gbaContext[0x11] = self[0x134B];
+    gbaContext[0x11] = m_playerMask;
 
     gbaContext[0x14] = 0xFF;
     gbaContext[0x15] = 0xFF;
@@ -1429,20 +1429,20 @@ void CMiniGamePcs::calc(void)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    switch (self[0x1348]) {
+    switch (m_managerState) {
     case 0:
         return;
     case 1:
         Joybus.ExitThread();
-        self[0x1348] = 2;
+        m_managerState = 2;
     case 2:
         if (!Joybus.IsThreadRunning())
         {
             char managerFile[260];
             char managerSpFile[256];
 
-            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, self[0x1350]);
-            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, self[0x1350]);
+            sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
+            sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, m_managerIndex);
 
             if ((unsigned int)System.m_execParam > 2)
             {
@@ -1450,7 +1450,7 @@ void CMiniGamePcs::calc(void)
             }
 
             MiniGameGo(managerFile, managerSpFile);
-            self[0x1348] = 3;
+            m_managerState = 3;
         }
 
         return;
@@ -1548,7 +1548,7 @@ void CMiniGamePcs::calc(void)
         }
     }
 
-    self[0x134B] = 0xF;
+    m_playerMask = 0xF;
     if (System.m_execParam != 0)
     {
         System.Printf(const_cast<char*>(s_miniGameEnd1111Text));
@@ -1565,7 +1565,7 @@ void CMiniGamePcs::calc(void)
     }
 
     self[0x6495] = 0;
-    self[0x1348] = 0;
+    m_managerState = 0;
 }
 
 /*
@@ -1806,7 +1806,7 @@ void CMiniGamePcs::MngThreadMain(void*)
             }
         }
 
-        if (self[0x134B] != 0)
+        if (m_playerMask != 0)
         {
             unsigned int successMask = 0;
 
@@ -1816,7 +1816,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 unsigned char* threadParam = self + 0x138C + i * 200;
                 unsigned int* channelWord = reinterpret_cast<unsigned int*>(self + 0x1368 + i * 4);
 
-                if ((self[0x134B] & bit) == 0 || threadParam[0xBD] != 0)
+                if ((m_playerMask & bit) == 0 || threadParam[0xBD] != 0)
                 {
                     continue;
                 }
@@ -1873,10 +1873,10 @@ void CMiniGamePcs::MngThreadMain(void*)
                     if (OSMillisecondsToTicks(5000) < static_cast<unsigned long long>(now - startTime))
                     {
 disconnect_player:
-                        if ((self[0x134B] & bit) != 0)
+                        if ((m_playerMask & bit) != 0)
                         {
-                            self[0x134B] = static_cast<unsigned char>(self[0x134B] & ~bit);
-                            if (self[0x134B] == 0)
+                            m_playerMask = static_cast<unsigned char>(m_playerMask & ~bit);
+                            if (m_playerMask == 0)
                             {
                                 self[0x6495] = 1;
                                 continue;
@@ -1892,7 +1892,7 @@ disconnect_player:
                 }
             }
 
-            if (successMask == (self[0x134B] & 0xF))
+            if (successMask == (m_playerMask & 0xF))
             {
                 self[0x6494] = 1;
 

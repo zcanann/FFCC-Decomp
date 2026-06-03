@@ -547,31 +547,30 @@ inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     CChunkFile::CChunk chunk;
 
     chunkFile.PushChunk();
-    char* seqName = m_name;
     while ((int)chunkFile.GetNextChunk(chunk) != 0) {
-        if (chunk.m_id != 'KEY ') {
-            if (chunk.m_id != 'INFO') {
-                if (chunk.m_id == 'NAME') {
-                    strcpy(seqName, chunkFile.GetString());
-                    continue;
-                }
-            } else {
-                m_totalFrames = chunkFile.Get4();
-                chunkFile.Get4();
-                char b7 = (char)chunkFile.Get4();
-                m_flags = (unsigned char)(((int)b7 << 7) | (m_flags & 0x7F));
-                char b6 = (char)chunkFile.Get4();
-                m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (m_flags & 0xBF));
-                unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
-                m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (m_flags & 0xDF));
-                continue;
-            }
-        } else {
+        switch (chunk.m_id) {
+        case 'NAME':
+            strcpy(m_name, chunkFile.GetString());
+            continue;
+        case 'INFO': {
+            m_totalFrames = chunkFile.Get4();
+            chunkFile.Get4();
+            char b7 = (char)chunkFile.Get4();
+            m_flags = (unsigned char)(((int)b7 << 7) | (m_flags & 0x7F));
+            char b6 = (char)chunkFile.Get4();
+            m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (m_flags & 0xBF));
+            unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(m_name, s_texAnimSeqE1));
+            m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (m_flags & 0xDF));
+            continue;
+        }
+        case 'KEY ':
             m_keyCount = chunk.m_size / 0x30;
             m_keys = static_cast<CTexAnimKey*>(
                 Memory._Alloc(chunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
             memcpy(m_keys, chunkFile.GetAddress(), chunk.m_size);
             continue;
+        default:
+            break;
         }
     }
     chunkFile.PopChunk();

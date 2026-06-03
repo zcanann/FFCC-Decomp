@@ -3429,7 +3429,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
             {
-                // TODO: IsSingleMode__8GbaQueueFi(&GbaQue, port);
+                GbaQue.IsSingleMode(threadParam->m_portIndex);
 
                 if (m_threadRunningMask == 0)
                 {

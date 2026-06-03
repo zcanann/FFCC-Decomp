@@ -7408,7 +7408,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     if (playerIndex == 0 && GbaQue.IsSingleMode(0) && menuId != 0)
     {
         // MenuPcs._2148_2_ = menuId - 1; // TODO: restore when MenuPcs exists
-        // Game.gameWork._5075_1_ = 1; // TODO: restore when Game exists
+        Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
         m_ctrlModeArr[0] = 1;
 
         return 0;

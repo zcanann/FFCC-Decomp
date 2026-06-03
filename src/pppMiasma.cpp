@@ -235,7 +235,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     Vec quadB;
     Vec cameraPos;
     Vec managerPos;
-    float yStep;
     float radius;
     float maxRadius;
     float scaledRadius;
@@ -320,7 +319,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     texWidth = (int)FLOAT_80331928;
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
-    yStep = FLOAT_8033192c;
+    const float& yStep = FLOAT_8033192c;
     do {
         yPos = (float)slice * yStep;
         yOffset = (int)yPos;

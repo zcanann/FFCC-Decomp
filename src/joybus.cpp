@@ -6278,7 +6278,7 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
 void JoyBus::SendSPMode(ThreadParam* threadParam)
 {
     unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
-    const unsigned char bVar1 = (mode != 0) ? 1 : 0;
+    const unsigned char bVar1 = (unsigned char)(-((int)(mode & 0xFF)) >> 31);
     const unsigned short opcode = 0x1411;
     const unsigned int cmd = MakeJoyCmd16(opcode, bVar1, 0);
     int result = 0;

@@ -3200,6 +3200,7 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
     unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
     cmdBytes[0] = 0x0A;
     cmdBytes[1] = 0;
+    unsigned int word = cmd;
 
     unsigned int result = 0;
 
@@ -3210,7 +3211,7 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
         unsigned int queuePort = threadParam->m_portIndex;
         if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;

@@ -2,9 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
-#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>

@@ -6,9 +6,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_light.h"
-#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/ptrarray_decl.h"
-#endif
 #include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
@@ -502,7 +500,6 @@ public:
     void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
     void AddMaterial(CMaterial*, int);
 
-#ifdef FFCC_MATERIALMAN_DEFINE_LAYOUT
     CPtrArray<CMaterial*> m_materials;        // 0x008
     int GetNumMaterial()
     {
@@ -515,9 +512,6 @@ public:
     {
         return m_materials[index];
     }
-#endif
-#else
-    CMaterial* GetMaterial(long);
 #endif
 };
 

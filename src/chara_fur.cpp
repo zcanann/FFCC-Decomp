@@ -10,9 +10,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
-#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"

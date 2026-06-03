@@ -1,4 +1,3 @@
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #define FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"

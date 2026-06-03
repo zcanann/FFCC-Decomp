@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"

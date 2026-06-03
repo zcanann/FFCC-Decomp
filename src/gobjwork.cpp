@@ -1391,7 +1391,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_eventWork[sourceIdx]);
 				} else if (sourceType == 0) {
 					if (sourceIdx == 0) {
-						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_scriptSysVal0);
+							cmpValue = *reinterpret_cast<unsigned int*>(&Game.m_gameWork.m_scriptSysVal0);
 					} else if (sourceIdx == 1) {
 						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_timerA);
 					} else if (sourceIdx == 2) {

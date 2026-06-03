@@ -43,51 +43,6 @@ extern const char s_MenuOptionStereoDe[];
 }
 
 namespace {
-struct ArtiState {
-	unsigned char pad_0000[0xB];
-	char initialized;
-	unsigned char pad_000C;
-	unsigned char closeRequested;
-	unsigned char pad_000E[2];
-	short state;
-	unsigned char pad_0012[0x0C];
-	short moveDirection;
-	unsigned char pad_0020[2];
-	short frame;
-	unsigned char pad_0024[2];
-	short selections[5];
-	short currentSelection;
-	short prevSelection;
-	short scrollOffset;
-};
-
-struct ArtiOpenAnim {
-	short x;
-	short y;
-	short w;
-	short h;
-	float u;
-	float v;
-	float alpha;
-	float scale;
-	int unk;
-	int tex;
-	int step;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
-struct ArtiOpenAnimList {
-	short count;
-	unsigned char pad_0002[6];
-	ArtiOpenAnim entries[64];
-};
-
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);
 STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
@@ -117,22 +72,22 @@ STATIC_ASSERT(sizeof(ArtiOpenAnimList) == 0x1008);
 
 static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
 {
-	return reinterpret_cast<ArtiState*>(menu->m_artiState);
+	return menu->m_artiState;
 }
 
 static inline s16* GetArtiState(CMenuPcs* menu)
 {
-	return menu->m_artiState;
+	return reinterpret_cast<s16*>(menu->m_artiState);
 }
 
 static inline s16* GetArtiList(CMenuPcs* menu)
 {
-	return menu->m_artiList;
+	return reinterpret_cast<s16*>(menu->m_artiList);
 }
 
 static inline ArtiOpenAnimList* GetArtiOpenAnimList(CMenuPcs* menu)
 {
-	return reinterpret_cast<ArtiOpenAnimList*>(menu->m_artiList);
+	return menu->m_artiList;
 }
 
 static inline ArtiOpenAnim* GetArtiOpenAnim(CMenuPcs* menu, int index)
@@ -729,36 +684,28 @@ void CMenuPcs::ArtiInit1()
  */
 void CMenuPcs::ArtiInit()
 {
-	short sVar1;
-	float fVar2;
-	float fVar3;
-	float fVar4;
-	int iVar5;
-	int sVar6;
-	short sVar7;
-	short* psVar8;
-	int iVar9;
-	int iVar10;
-	int iVar11;
 	int index;
+	short yOffset;
+	short count;
 	ArtiOpenAnim* entry;
+	ArtiOpenAnimList* list;
 
 	memset(GetArtiOpenAnimList(this), 0, sizeof(*GetArtiOpenAnimList(this)));
-	fVar2 = FLOAT_80332fac;
-	iVar5 = GetArtiListBase(this) + 8;
-	iVar10 = 8;
+	float one = FLOAT_80332fac;
+	entry = GetArtiOpenAnimList(this)->entries;
+	int initCount = 8;
 	do {
-		*(float*)(iVar5 + 0x14) = fVar2;
-		*(float*)(iVar5 + 0x54) = fVar2;
-		*(float*)(iVar5 + 0x94) = fVar2;
-		*(float*)(iVar5 + 0xd4) = fVar2;
-		*(float*)(iVar5 + 0x114) = fVar2;
-		*(float*)(iVar5 + 0x154) = fVar2;
-		*(float*)(iVar5 + 0x194) = fVar2;
-		*(float*)(iVar5 + 0x1d4) = fVar2;
-		iVar5 = iVar5 + 0x200;
-		iVar10 = iVar10 - 1;
-	} while (iVar10 != 0);
+		entry[0].scale = one;
+		entry[1].scale = one;
+		entry[2].scale = one;
+		entry[3].scale = one;
+		entry[4].scale = one;
+		entry[5].scale = one;
+		entry[6].scale = one;
+		entry[7].scale = one;
+		entry += 8;
+		initCount--;
+	} while (initCount != 0);
 
 	index = 0;
 	entry = GetArtiOpenAnim(this, index++);
@@ -766,29 +713,26 @@ void CMenuPcs::ArtiInit()
 	entry->x = 0x68;
 	entry->y = 0x28;
 	entry->w = 0x78;
-	fVar2 = FLOAT_80332fe8;
 	entry->h = 0x108;
-	fVar4 = FLOAT_80332fec;
-	entry->u = fVar2;
-	fVar3 = FLOAT_80332fac;
-	entry->v = fVar4;
-	fVar2 = FLOAT_80332fa8;
-	sVar6 = 0;
-	entry->scale = fVar3;
-	fVar4 = FLOAT_80332ff0;
-	sVar7 = 4;
+	float titleAlpha = FLOAT_80332fe8;
+	float titleScale = FLOAT_80332fec;
+	float zero = FLOAT_80332fa8;
+	entry->u = titleAlpha;
+	entry->v = titleScale;
+	entry->scale = one;
+	count = 4;
 	entry->startFrame = 5;
 	entry->duration = 5;
-	iVar5 = 0x100;
+
 	entry = GetArtiOpenAnim(this, index++);
 	entry->tex = 0x44;
 	entry->x = 0x50;
 	entry->y = 0xe;
 	entry->w = 0x30;
 	entry->h = 0x30;
-	entry->u = fVar2;
-	entry->v = fVar2;
-	entry->scale = fVar3;
+	entry->u = zero;
+	entry->v = zero;
+	entry->scale = one;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
@@ -798,9 +742,10 @@ void CMenuPcs::ArtiInit()
 	entry->w = 0x30;
 	entry->h = 0x30;
 	entry->y = 0x150 - entry->h;
-	entry->u = fVar2;
-	entry->v = fVar2;
-	entry->scale = fVar4;
+	float rightScale = FLOAT_80332ff0;
+	entry->u = zero;
+	entry->v = zero;
+	entry->scale = rightScale;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
@@ -811,45 +756,48 @@ void CMenuPcs::ArtiInit()
 	entry->y = 8;
 	entry->w = 0x48;
 	entry->h = 0x140;
-	entry->u = fVar2;
-	entry->v = fVar2;
+	entry->u = zero;
+	entry->v = zero;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	iVar10 = GetArtiListBase(this);
-	iVar11 = 4;
+	list = GetArtiOpenAnimList(this);
+	yOffset = 0;
+	int listOffset = 0x100;
+	int loopCount = 4;
 	do {
-		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
-		*(int*)(psVar8 + 0x16) = 2;
-		*(int*)(psVar8 + 0xe) = 0x37;
-		sVar7 = sVar7 + 2;
-		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
-		sVar1 = sVar6 + 0x20;
-		psVar8[1] = *(short*)(iVar10 + 10) + sVar6;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		reinterpret_cast<ArtiOpenAnim*>(psVar8)->startFrame = 7;
-		reinterpret_cast<ArtiOpenAnim*>(psVar8)->duration = 5;
-		iVar9 = iVar5 + 0x48;
-		iVar5 = iVar5 + 0x80;
-		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
-		*(int*)(psVar8 + 0x16) = 2;
-		*(int*)(psVar8 + 0xe) = 0x37;
-		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
-		sVar6 = sVar6 + 0x40;
-		psVar8[1] = *(short*)(iVar10 + 10) + sVar1;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		reinterpret_cast<ArtiOpenAnim*>(psVar8)->startFrame = 7;
-		reinterpret_cast<ArtiOpenAnim*>(psVar8)->duration = 5;
-		iVar11 = iVar11 - 1;
-	} while (iVar11 != 0);
+		entry = reinterpret_cast<ArtiOpenAnim*>(reinterpret_cast<unsigned char*>(GetArtiOpenAnimList(this)) + listOffset + 8);
+		entry->flags = 2;
+		entry->tex = 0x37;
+		count = count + 2;
+		entry->x = list->entries[0].x + 0x24;
+		short nextY = yOffset + 0x20;
+		entry->y = list->entries[0].y + yOffset;
+		entry->w = 200;
+		entry->h = 0x28;
+		entry->u = zero;
+		entry->v = zero;
+		entry->startFrame = 7;
+		entry->duration = 5;
 
-	*GetArtiList(this) = sVar7;
-	*(short*)(GetArtiStateBase(this) + 0x26) = 0;
-	*(char*)(GetArtiStateBase(this) + 0xb) = 1;
+		int secondOffset = listOffset + 0x48;
+		listOffset = listOffset + 0x80;
+		entry = reinterpret_cast<ArtiOpenAnim*>(reinterpret_cast<unsigned char*>(GetArtiOpenAnimList(this)) + secondOffset);
+		entry->flags = 2;
+		entry->tex = 0x37;
+		entry->x = list->entries[0].x + 0x24;
+		yOffset = yOffset + 0x40;
+		entry->y = list->entries[0].y + nextY;
+		entry->w = 200;
+		entry->h = 0x28;
+		entry->u = zero;
+		entry->v = zero;
+		entry->startFrame = 7;
+		entry->duration = 5;
+		loopCount--;
+	} while (loopCount != 0);
+
+	GetArtiOpenAnimList(this)->count = count;
+	GetArtiStateStruct(this)->selections[0] = 0;
+	GetArtiStateStruct(this)->initialized = 1;
 }

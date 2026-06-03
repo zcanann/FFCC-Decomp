@@ -430,20 +430,20 @@ void CMenuPcs::MoneyDraw()
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
 	}
 
-	s16* drawBase = reinterpret_cast<s16*>(this->moneyPanel->anims);
+	MoneyMenuAnim* drawBase = this->moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
+		color.a = (u8)(FLOAT_80332f60 * drawBase->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
 	for (int i = 0; i < 2; i++) {
-		float y = (float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i;
-		float x = (float)(drawBase[0] + 0x20);
+		float y = (float)(drawBase->y + 0x18) + FLOAT_80332f68 * (float)i;
+		float x = (float)(drawBase->x + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
@@ -462,12 +462,12 @@ void CMenuPcs::MoneyDraw()
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
-			color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
+			color.a = (u8)(FLOAT_80332f60 * drawBase->alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		MenuPcs.DrawRect(0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
-		                 (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c,
+		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
+		                 (float)(drawBase->y + 0x5C), FLOAT_80332f78, FLOAT_80332f6c,
 		                 FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70,
 		                 FLOAT_80332f70, FLOAT_80332f64);
 	}
@@ -479,14 +479,14 @@ void CMenuPcs::MoneyDraw()
 	font->DrawInit();
 
 	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8)));
+		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * drawBase->alpha));
 		font->SetColor(color.color);
 	}
 
 	const char* label = GetMenuStr(0x15);
 	for (int i = 0; i < 2; i++) {
-		font->SetPosX((float)(drawBase[0] + 0xB6));
-		font->SetPosY((FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i)) -
+		font->SetPosX((float)(drawBase->x + 0xB6));
+		font->SetPosY((FLOAT_80332f68 + ((float)(drawBase->y + 0x18) + FLOAT_80332f68 * (float)i)) -
 		              FLOAT_80332f80 - FLOAT_80332f84);
 		font->Draw(label);
 	}
@@ -626,24 +626,23 @@ bool CMenuPcs::MoneyOpen()
 	if (this->moneyState->initialized == '\0') {
 		memset(this->moneyPanel, 0, sizeof(*this->moneyPanel));
 
-		float fVar1 = FLOAT_80332f70;
-		int iVar8 = (int)this->moneyPanel + 8;
-		int iVar15 = 8;
+		float one = FLOAT_80332f70;
+		MoneyMenuAnim* initAnim = this->moneyPanel->anims;
+		int initCount = 8;
 		do {
-			*(float *)(iVar8 + 0x14) = fVar1;
-			*(float *)(iVar8 + 0x54) = fVar1;
-			*(float *)(iVar8 + 0x94) = fVar1;
-			*(float *)(iVar8 + 0xd4) = fVar1;
-			*(float *)(iVar8 + 0x114) = fVar1;
-			*(float *)(iVar8 + 0x154) = fVar1;
-			*(float *)(iVar8 + 0x194) = fVar1;
-			*(float *)(iVar8 + 0x1d4) = fVar1;
-			iVar8 = iVar8 + 0x200;
-			iVar15 = iVar15 + -1;
-		} while (iVar15 != 0);
+			initAnim[0].uvScale = one;
+			initAnim[1].uvScale = one;
+			initAnim[2].uvScale = one;
+			initAnim[3].uvScale = one;
+			initAnim[4].uvScale = one;
+			initAnim[5].uvScale = one;
+			initAnim[6].uvScale = one;
+			initAnim[7].uvScale = one;
+			initAnim += 8;
+		} while (--initCount != 0);
 
-		iVar15 = 0;
-		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[iVar15];
+		int entryIndex = 0;
+		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[entryIndex++];
 		firstAnim->tex = 0x3b;
 		firstAnim->y = 0x68;
 		firstAnim->w = 0xf8;
@@ -659,41 +658,42 @@ bool CMenuPcs::MoneyOpen()
 
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 		s_Money = 0;
-		signed char* puVar9 = s_place;
+		signed char* place = s_place;
+		int row = 0;
 		do {
-			iVar8 = 10000000;
-			int iVar12;
-			if (iVar15 == 0) {
-				iVar12 = caravanWork->m_gil;
+			int digitPlace = 10000000;
+			int gil;
+			if (row == 0) {
+				gil = caravanWork->m_gil;
 			} else {
-				iVar12 = 0;
+				gil = 0;
 			}
-			int iVar13 = 0;
-			int iVar7 = 8;
+			int digitIndex = 0;
+			int digitCount = 8;
 			int started = 0;
-			signed char* puVar14 = puVar9;
+			signed char* digit = place;
 			do {
-				if ((!started) && (iVar12 >= iVar8)) {
+				if ((!started) && (gil >= digitPlace)) {
 					started = 1;
 				}
-				if (((started) || (iVar12 >= iVar8)) || (iVar13 == 7)) {
-					int iVar10 = iVar12 / iVar8;
-					if (9 < iVar10) {
-						iVar10 = 9;
+				if (((started) || (gil >= digitPlace)) || (digitIndex == 7)) {
+					int value = gil / digitPlace;
+					if (9 < value) {
+						value = 9;
 					}
-					*puVar14 = static_cast<signed char>(iVar10);
-					iVar12 = iVar12 - (iVar12 / iVar8) * iVar8;
+					*digit = static_cast<signed char>(value);
+					gil = gil - (gil / digitPlace) * digitPlace;
 				} else {
-					*puVar14 = -1;
+					*digit = -1;
 				}
-				puVar14 = puVar14 + 1;
-				iVar13 = iVar13 + 1;
-				iVar8 /= 10;
-				iVar7 = iVar7 + -1;
-			} while (iVar7 != 0);
-			iVar15 = iVar15 + 1;
-			puVar9 = puVar9 + 8;
-		} while (iVar15 < 2);
+				digit = digit + 1;
+				digitIndex = digitIndex + 1;
+				digitPlace /= 10;
+				digitCount = digitCount + -1;
+			} while (digitCount != 0);
+			row = row + 1;
+			place = place + 8;
+		} while (row < 2);
 
 		this->moneyState->selectedIndex = 0;
 		this->moneyState->initialized = 1;

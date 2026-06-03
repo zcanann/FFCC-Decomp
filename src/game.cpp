@@ -236,8 +236,9 @@ void CGame::Init()
     int languageId;
 
     switch (static_cast<unsigned char>(OSSetProgressiveMode())) {
-    case 3:
-        languageId = 5;
+    case 5:
+    default:
+        languageId = 1;
         break;
 
     case 1:
@@ -248,12 +249,12 @@ void CGame::Init()
         languageId = 4;
         break;
 
-    case 4:
-        languageId = 3;
+    case 3:
+        languageId = 5;
         break;
 
-    default:
-        languageId = 1;
+    case 4:
+        languageId = 3;
         break;
     }
     Game.m_gameWork.m_languageId = static_cast<unsigned char>(languageId);

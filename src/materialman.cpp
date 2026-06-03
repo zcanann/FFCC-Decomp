@@ -2935,7 +2935,7 @@ void CMaterial::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         CTexture* texture = m_textures[i];
         if (texture != 0) {
-            texture->CacheDumpTexture(amemCacheSet);
+            texture->CacheUnLoadTexture(amemCacheSet);
         }
     }
 }

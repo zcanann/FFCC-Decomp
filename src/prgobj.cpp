@@ -13,6 +13,8 @@
 extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;
 extern "C" const float FLOAT_80331BD8 = 3.1415927f;
+extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
+extern "C" const float FLOAT_80331BE8 = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {
@@ -177,7 +179,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		}
 		break;
 	case 3:
-		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = value;
+		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = static_cast<signed char>(value);
 		break;
 	case 4:
 	{
@@ -404,8 +406,6 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 
 	return handle;
 }
-
-extern "C" const float FLOAT_80331BE8 = -1.0f;
 
 /*
  * --INFO--

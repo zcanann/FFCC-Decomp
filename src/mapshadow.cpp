@@ -1,3 +1,5 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
+
 #include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
@@ -9,7 +11,11 @@
 #include <dolphin/mtx.h>
 
 extern const double kMapShadowDepthBias;
-extern const float kMapShadowScaleStep;
+extern const float kMapShadowScaleStep = 0.5f;
+extern const double DOUBLE_8032FCF8 = 4503599627370496.0;
+extern const float FLOAT_8032FD00 = 0.0f;
+extern const float FLOAT_8032FD04 = 1.0f;
+extern const double DOUBLE_8032FD08 = 4503601774854144.0;
 
 /*
  * --INFO--
@@ -27,14 +33,12 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 	int i;
 	u32 octTreeMask;
 	Vec pos;
-	CMapObj* mapObj;
 
 	octTree.ClearShadow();
-	mapObj = octTree.GetMapObject();
-	if (mapObj->m_shadowTarget != 0) {
+	if (octTree.GetMapObject()->m_shadowTarget != 0) {
         mapShadowArray = &MapMng.GetMapShadowArray();
 		for (i = 0; i < (u32)mapShadowArray->GetSize(); i++) {
-			octTreeMask = mapObj->m_shadowTarget;
+			octTreeMask = octTree.GetMapObject()->m_shadowTarget;
 			if (((octTreeMask & (1U << i)) != 0) &&
 			    ((shadow = (*mapShadowArray)[i])->m_targetEnabled[(int)mapShadow] != 0) &&
 			    (shadow->m_materialMode == 0)) {

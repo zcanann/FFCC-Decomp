@@ -905,13 +905,14 @@ void CRingMenu::onCalc()
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
+		int animCount = 9;
+		float* animFloat = &m_animFloat[0][0];
+		const float animMin = FLOAT_803309c0;
+
 		m_displayCounter = clampDecToZero(m_displayCounter);
 		m_transitionCounter = clampDecToZero(m_transitionCounter);
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = clampDecToZero(m_timerB);
-
-		const float animMin = FLOAT_803309c0;
-		int animCount = 9;
 
 		m_buttonTimers[0] = clampDecToZero(m_buttonTimers[0]);
 		m_buttonTimers[1] = clampDecToZero(m_buttonTimers[1]);
@@ -924,14 +925,22 @@ void CRingMenu::onCalc()
 		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
-		for (int i = 0; i < animCount; i++) {
-			for (int j = 0; j < 3; j++) {
-				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
-				if (m_animFloat[i][j] < animMin) {
-					m_animFloat[i][j] = animMin;
-				}
+		do {
+			animFloat[0] = animFloat[0] - animStep;
+			if (animFloat[0] < animMin) {
+				animFloat[0] = animMin;
 			}
-		}
+			animFloat[1] = animFloat[1] - animStep;
+			if (animFloat[1] < animMin) {
+				animFloat[1] = animMin;
+			}
+			animFloat[2] = animFloat[2] - animStep;
+			if (animFloat[2] < animMin) {
+				animFloat[2] = animMin;
+			}
+			animFloat += 3;
+			animCount--;
+		} while (animCount != 0);
 
 		fmod(static_cast<double>(m_spinPhase), DOUBLE_80330a98);
 		int i = 0x1B;

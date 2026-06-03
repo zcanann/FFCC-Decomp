@@ -18,8 +18,8 @@ extern const float kMapObjBoundMinInit = 10000000000.0f;
 extern const float kMapObjBoundMaxInit = -10000000000.0f;
 extern const float kMapObjZero = 1.0f;
 
-CBound s_bound;
-CMapCylinder s_cyl;
+CBound s_bound(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+CMapCylinder s_cyl(kMapObjBoundMinInit, kMapObjBoundMaxInit);
 Vec s_mvec;
 int s_light_no = 0;
 unsigned long s_shadow_no = 0;

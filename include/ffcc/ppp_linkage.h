@@ -14,6 +14,7 @@ extern unsigned char gPppInConstructor;
 extern unsigned char gPppInSubFrameCalc;
 extern int ppvUserStopPartF;
 extern unsigned char ppvIsLoopCalc;
+extern unsigned char ppvIs2ndCalc;
 
 #ifdef __cplusplus
 }

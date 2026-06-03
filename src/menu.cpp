@@ -42,6 +42,20 @@ void CMenu::ScriptChanging(char* script)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenu::ScriptChanged(char* script, int status)
+{
+	onScriptChanged(script, status);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8009b3e8
  * PAL Size: 44b
  * EN Address: TODO

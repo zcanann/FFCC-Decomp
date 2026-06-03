@@ -10,7 +10,7 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern "C" const char s_texanim_cpp[];
+extern "C" const char s_texanim_cpp[] = "texanim.cpp";
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
@@ -21,8 +21,11 @@ extern "C" const char s_scenegraph_step_x8[];
 extern "C" const char s_scenegraph_step_x0[];
 extern "C" const char s_scenegraph_step_x1_8[];
 
-extern const char s_collection_ptrarray_h_801D7B30[];
-extern const char s_ptrarray_grow_error_801D7B14[];
+extern const char s_ptrarray_grow_error_801D7B14[] = {
+    0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
+    0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
+};
+extern const char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
 
 namespace {
 static inline int IsTexAnimChinFlag(unsigned char flags)

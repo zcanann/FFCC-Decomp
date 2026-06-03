@@ -250,6 +250,7 @@ texanim.cpp:
 	extab       start:0x8000675C end:0x80006850
 	extabindex  start:0x8000C2C8 end:0x8000C3DC
 	.text       start:0x80043D70 end:0x80045178
+	.rodata     start:0x801D7AD0 end:0x801D7B80
 	.data       start:0x801E9C18 end:0x801E9C90
 	.sdata      start:0x8032E5A0 end:0x8032E5D8
 	.sdata2     start:0x8032FB38 end:0x8032FB64
@@ -325,6 +326,7 @@ mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4
 	extabindex  start:0x8000C70C end:0x8000C730
 	.text       start:0x8004C71C end:0x8004CA08
+	.sdata2     start:0x8032FCF0 end:0x8032FD10
 
 ME_USB_process.cpp:
 	extab       start:0x80006AC4 end:0x80006AD4
@@ -1639,6 +1641,7 @@ pppCharaBreak.cpp:
 	extabindex  start:0x80010DBC end:0x80010E10
 	.text       start:0x8013F9D0 end:0x80141204
 	.rodata     start:0x801DD690 end:0x801DD6A8
+	.sdata2     start:0x80332068 end:0x80332078
 
 pppCallBackDistance.cpp:
 	extab       start:0x80009B84 end:0x80009B94

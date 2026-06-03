@@ -4014,8 +4014,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         int enemyCount = 0;
 
-        // TODO
-        // GbaQueue::GetEnemyPos(&GbaQue, port, posWords, &enemyCount);
+        GbaQue.GetEnemyPos(port, posWords, &enemyCount);
 
         mobCount = (unsigned char)enemyCount;
 

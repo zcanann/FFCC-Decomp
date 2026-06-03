@@ -171,20 +171,19 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		    model0->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp), 0x160);
 
-		int* meshColorArrays = (int*)state->m_meshColorArrays;
-		int arrayOffset = 0;
+		GXColor** meshColorArrays = state->m_meshColorArrays;
 		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
-			*(int*)((char*)state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
-			    meshList->m_data->m_displayListCount << 2, ppvEnv->m_stagePtr,
-			    const_cast<char*>(s_pppYmChangeTex_cpp), 0x168);
+			state->m_displayListArrays[meshIdx] = static_cast<ChangeTexDisplayListCopy**>(
+			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*),
+			                ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x168));
 
 			int dlIdx = meshList->m_data->m_displayListCount - 1;
 			ChangeTexDisplayList* dlInfo = meshList->m_data->m_displayLists;
-			ChangeTexDisplayListCopy** dlEntry =
-			    (ChangeTexDisplayListCopy**)(*(int*)((char*)state->m_displayListArrays + arrayOffset) + dlIdx * 4);
+			ChangeTexDisplayListCopy** dlEntry = &state->m_displayListArrays[meshIdx][dlIdx];
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 1) {
-				ChangeTexDisplayListCopy* dlPair = (ChangeTexDisplayListCopy*)pppMemAlloc(
-				    8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x172);
+				ChangeTexDisplayListCopy* dlPair = static_cast<ChangeTexDisplayListCopy*>(
+				    pppMemAlloc(sizeof(ChangeTexDisplayListCopy), ppvEnv->m_stagePtr,
+				                const_cast<char*>(s_pppYmChangeTex_cpp), 0x172));
 				*dlEntry = dlPair;
 				(*dlEntry)->m_size = dlInfo->m_size;
 				(*dlEntry)->m_data = pppMemAlloc(
@@ -195,11 +194,10 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				dlEntry = dlEntry - 1;
 			}
 
-			*meshColorArrays = (int)pppMemAlloc(
-			    meshList->m_data->m_vertexCount << 2, ppvEnv->m_stagePtr,
-			    const_cast<char*>(s_pppYmChangeTex_cpp), 0x17F);
-			memset((void*)*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount << 2);
-			arrayOffset = arrayOffset + 4;
+			*meshColorArrays = static_cast<GXColor*>(
+			    pppMemAlloc(meshList->m_data->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
+			                const_cast<char*>(s_pppYmChangeTex_cpp), 0x17F));
+			memset(*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount * sizeof(GXColor));
 			meshColorArrays = meshColorArrays + 1;
 			meshList++;
 		}
@@ -222,10 +220,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		negativeRamp = 0;
 	}
 
-	int meshOffset = 0;
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 		int pointOffset = 0;
-		int vertColors = *(int*)((char*)state->m_meshColorArrays + meshOffset);
+		GXColor* vertColors = state->m_meshColorArrays[meshIdx];
 		for (unsigned int v = 0; v < curMesh->m_data->m_vertexCount; v++) {
 			int delta = (int)frameShort - (int)*(short*)((char*)curMesh->m_workPositions + pointOffset + 2);
 			if (delta >= 0) {
@@ -234,9 +231,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				for (int tries = 7; tries != 0; tries--) {
 					if ((float)delta > ChangeTexConst(FLOAT_80330dfc) * threshold) {
 						if (negativeRamp == 0xFF) {
-							*(u8*)(vertColors + 3) = negativeRamp - (level << 4);
+							vertColors->a = negativeRamp - (level << 4);
 						} else {
-							*(u8*)(vertColors + 3) = (u8)(level << 4);
+							vertColors->a = (u8)(level << 4);
 						}
 						break;
 					}
@@ -244,14 +241,13 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 					level = level + 1;
 				}
 			} else {
-				*(unsigned char*)(vertColors + 3) = fallbackAlpha;
+				vertColors->a = fallbackAlpha;
 			}
 
 			pointOffset = pointOffset + 6;
-			vertColors = vertColors + 4;
+			vertColors++;
 		}
 
-		meshOffset = meshOffset + 4;
 		curMesh++;
 	}
 }
@@ -376,22 +372,20 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
 	ChangeTexDisplayListCopy* displayListPtr;
-	int dlArrayBase;
-	int dlOffset;
 	int drawTevBits;
 	int fullTevBits;
-	void* meshColorArrays;
-	void* meshColorArray;
+	GXColor** meshColorArrays;
+	GXColor* meshColorArray;
 	ChangeTexMeshData* meshData;
 	ChangeTexDisplayList* displayList;
 
 	if (step->m_changeTex.m_mode != 0) {
 		meshColorArrays = state->m_meshColorArrays;
-		dlOffset = reinterpret_cast<int>(state->m_texture);
+		CTexture* texture = state->m_texture;
 		meshData = meshes[meshIdx].m_data;
 		displayList = meshData->m_displayLists;
 		if (meshColorArrays != 0) {
-			meshColorArray = *(void**)((u8*)meshColorArrays + meshIdx * 4);
+			meshColorArray = meshColorArrays[meshIdx];
 			if (meshColorArray != 0) {
 				MaterialMan.SetGeometryArraySource(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
@@ -400,22 +394,20 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					MaterialMan.SetChangeTexReflectionTexture(0);
 				} else {
 					MaterialMan.SetChangeTexReflectionTexture(
-					    reinterpret_cast<GXTexObj*>(dlOffset + offsetof(CTexture, m_texObj)));
+					    reinterpret_cast<GXTexObj*>(reinterpret_cast<int>(texture) + offsetof(CTexture, m_texObj)));
 				}
 
 				drawTevBits = 0xACE0F;
 				fullTevBits = drawTevBits | 0x1000;
 				displayListIdx = meshData->m_displayListCount - 1;
-				dlOffset = displayListIdx * 4;
 				while (displayListIdx >= 0) {
-					dlArrayBase = *(int*)(meshIdx * 4 + (int)state->m_displayListArrays);
+					ChangeTexDisplayListCopy** displayListCopies = state->m_displayListArrays[meshIdx];
 					MaterialMan.SetChangeTexReflectionState(drawTevBits, fullTevBits);
 
 					MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
-					displayListPtr = *(ChangeTexDisplayListCopy**)(dlArrayBase + dlOffset);
+					displayListPtr = displayListCopies[displayListIdx];
 					GXCallDisplayList(displayListPtr->m_data, displayListPtr->m_size);
-					dlOffset -= 4;
 					displayListIdx -= 1;
 					displayList += 1;
 				}

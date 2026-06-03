@@ -1,3 +1,5 @@
+#define FFCC_GOBJECT_OUT_OF_LINE_CTORS
+
 #include "ffcc/ptrarray.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"

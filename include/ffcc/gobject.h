@@ -22,7 +22,11 @@ extern const Vec sMap21TangentAxis;
 class CGObject : public CGBaseObj
 {
 public:
+#ifdef FFCC_GOBJECT_OUT_OF_LINE_CTORS
     CGObject();
+#else
+    CGObject() {}
+#endif
 
     virtual int GetCID();     // vtable entry 0x10
 	virtual void onCreate();  // vtable entry 0x1c

@@ -6,7 +6,11 @@
 class CGBaseObj : public CFlatRuntime::CObject
 {
 public:
+#ifdef FFCC_GOBJECT_OUT_OF_LINE_CTORS
 	CGBaseObj();
+#else
+	CGBaseObj() {}
+#endif
 
 	virtual int GetCID();                       // vtable entry 0xC
 	virtual void InitFinished();               // vtable entry 0x10

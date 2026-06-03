@@ -145,7 +145,7 @@ void CMenuPcs::MLstDraw()
 	int helpMessageId = this->lstState->cursor + 0x25c;
 	CFont* helpFont = this->helpFont;
 	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->lstData->entries[0].alpha));
-	float helpX = (float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8);
+	float helpX = FLOAT_803333F8;
 	float helpY = 352.0f;
 	DrawHelpMessage(
 		helpMessageId,

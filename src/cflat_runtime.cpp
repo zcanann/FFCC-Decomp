@@ -175,7 +175,7 @@ void CFlatRuntime::Destroy()
 void CFlatRuntime::clear()
 {
 	u8* const self = reinterpret_cast<u8*>(this);
-	const short clearMaskBits = static_cast<short>(-1);
+	const u32 clearMaskBits = static_cast<u32>(-1);
 
 	*reinterpret_cast<void**>(self + 0x08) = 0;
 	m_funcs = 0;
@@ -193,9 +193,9 @@ void CFlatRuntime::clear()
 	m_vstrCount = 0;
 
 	*reinterpret_cast<short*>(self + 0x964) =
-	    static_cast<short>((*reinterpret_cast<short*>(self + 0x964) & 0x000F) | (clearMaskBits << 4));
+	    static_cast<short>(__rlwimi(*reinterpret_cast<short*>(self + 0x964), clearMaskBits, 4, 16, 27));
 	*reinterpret_cast<short*>(self + 0x968) =
-	    static_cast<short>((*reinterpret_cast<short*>(self + 0x968) & 0x000F) | (clearMaskBits << 4));
+	    static_cast<short>(__rlwimi(*reinterpret_cast<short*>(self + 0x968), clearMaskBits, 4, 16, 27));
 
 	m_objectSentinel.m_previous = &m_objectSentinel;
 	m_objectSentinel.m_next = &m_objectSentinel;

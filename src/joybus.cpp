@@ -2,6 +2,7 @@
 
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/game.h"
 #include "ffcc/system.h"
 #include "global.h"
 
@@ -5537,10 +5538,36 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
         unsigned char* bonusStr = &payload[1];
         unsigned char* extraBuf = &payload[2];
 
-        (void)bonusStr;
-        (void)extraBuf;
+        int byteLen;
+        if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
+        {
+            unsigned int bonusPort;
+            if (GbaQue.IsSingleMode(port) && port == 1)
+            {
+                bonusPort = 0;
+            }
+            else
+            {
+                bonusPort = port;
+            }
 
-        int byteLen = 3; // TODO
+            int bonusIndex = GbaQue.GetBonus(bonusPort);
+            char** bonusTable = Game.m_cFlatDataArr[1].TableStrings(7);
+            strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
+
+            int firstLen = strlen((char*)bonusStr);
+            strcpy((char*)extraBuf + firstLen, bonusTable[bonusIndex * 2 + 1]);
+
+            int secondLen = strlen((char*)extraBuf + firstLen);
+            byteLen = firstLen + secondLen + 3;
+        }
+        else
+        {
+            byteLen = 3;
+            bonusStr[0] = 0;
+            extraBuf[0] = 0;
+        }
+
         int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
 
         if (wordCount < 0)

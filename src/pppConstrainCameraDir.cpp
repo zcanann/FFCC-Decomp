@@ -11,7 +11,7 @@ extern "C" {
 extern const float kDrawAStarSphereRadius = 10.0f;
 extern const float kInfiniteCost = 10000000.0f;
 extern const char kAStarStepDebugFormat[] = "%d ";
-extern const char kAStarNewLine[] = "\n";
+extern const char kAStarNewLine[4] = "\n";
 }
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);

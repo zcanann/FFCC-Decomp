@@ -176,7 +176,7 @@ extern "C" const char s_back_tex_fmt[] = "%sback.tex";
  * JP Address: TODO
  * JP Size: TODO
  */
-void sendVertex(coord* vertex)
+inline void sendVertex(coord* vertex)
 {
     GXPosition3f32(vertex->pos.x, vertex->pos.y, vertex->pos.z);
     GXTexCoord2f32(vertex->s, vertex->t);

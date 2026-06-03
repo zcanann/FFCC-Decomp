@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/pppConformBGNormal.h"
 #include "types.h"
 #include "ffcc/game.h"

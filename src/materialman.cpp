@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #define FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
 #include "ffcc/materialman.h"
 #include "ffcc/game.h"

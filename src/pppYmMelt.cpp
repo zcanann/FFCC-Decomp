@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/pppYmMelt.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"

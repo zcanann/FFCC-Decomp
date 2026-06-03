@@ -11,7 +11,6 @@
 
 class CMapHitFace;
 
-extern "C" CMemory::CStage* g_hit_lpface_min;
 extern "C" char s_mapmesh_cpp[];
 extern "C" const float FLOAT_8032F930;
 extern "C" const float FLOAT_8032F934;
@@ -57,7 +56,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return g_hit_lpface_min;
+    return g_pStage;
 }
 }
 

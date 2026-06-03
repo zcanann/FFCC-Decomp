@@ -1,4 +1,3 @@
-#define FFCC_MAP_DEFINE_MNG_LAYOUT
 #include "ffcc/map.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/math.h"

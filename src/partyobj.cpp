@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobjwork.h"

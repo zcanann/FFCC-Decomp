@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "global.h"
 #include "ffcc/pppLaser.h"
 #include "ffcc/math.h"

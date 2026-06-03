@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/p_camera.h"
 
 #include "ffcc/cflat_runtime2.h"

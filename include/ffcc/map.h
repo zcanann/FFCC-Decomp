@@ -4,7 +4,6 @@
 #include "ffcc/mapkeyframe.h"
 #include "ffcc/mapobj.h"
 #include "ffcc/memory.h"
-#ifdef FFCC_MAP_DEFINE_MNG_LAYOUT
 #include "ffcc/mapocttree.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
@@ -12,7 +11,6 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/maplight.h"
 #include "ffcc/ptrarray.h"
-#endif
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -76,7 +74,6 @@ public:
     short m_mapObjCount;               // 0x0000C
     short m_mapMeshCount;              // 0x0000E
     unsigned short m_unknown10;        // 0x00010
-#ifdef FFCC_MAP_DEFINE_MNG_LAYOUT
     unsigned char m_pad012[0x14 - 0x12];
     COctTree m_octTreeArray[16];       // 0x00014
     CMapHit m_mapHitArray[32];         // 0x004D4
@@ -92,15 +89,6 @@ public:
     CPtrArray<CMapLightHolder*> m_mapLightHolderArrays[2]; // 0x21450
     unsigned char m_pad21488[0x214E8 - 0x21488];
     CMapIdGrp m_mapIdGrpArray[256];     // 0x214E8
-#else
-    unsigned char m_pad012[0x954 - 0x12];
-    CMapObj m_mapObjArray[512];        // 0x00954
-    unsigned char m_pad1E954[0x213D4 - 0x1E954];
-    CMaterialSet* m_materialSet;       // 0x213D4
-    CTextureSet* m_textureSet;         // 0x213D8
-    CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
-    unsigned char m_pad213E0[0x228E8 - 0x213E0];
-#endif
     CMapObj* m_rootMapObj;             // 0x228E8
     Vec m_cameraPosition;              // 0x228EC
     Mtx m_viewMtx;                     // 0x228F8
@@ -118,19 +106,13 @@ public:
     float m_octTreeFrustumRange;       // 0x22A74
     CMapObj* m_hitMapObj;              // 0x22A78
 
-#ifdef FFCC_MAP_DEFINE_MNG_LAYOUT
     COctTree* GetOctTreeArray() { return m_octTreeArray; }
     CMapHit* GetMapHitArray() { return m_mapHitArray; }
-#else
-    COctTree* GetOctTreeArray() { return reinterpret_cast<COctTree*>(reinterpret_cast<unsigned char*>(this) + 0x14); }
-    CMapHit* GetMapHitArray() { return reinterpret_cast<CMapHit*>(reinterpret_cast<unsigned char*>(this) + 0x4D4); }
-#endif
     CMapObj* GetMapObjArray() { return m_mapObjArray; }
     CMapObj* GetMapObj(int index)
     {
         return &m_mapObjArray[index];
     }
-#ifdef FFCC_MAP_DEFINE_MNG_LAYOUT
     CMapMesh* GetMapMeshArray() { return m_mapMeshArray; }
     CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
     {
@@ -160,38 +142,6 @@ public:
     {
         return m_mapIdGrpArray;
     }
-#else
-    CMapMesh* GetMapMeshArray() { return reinterpret_cast<CMapMesh*>(reinterpret_cast<unsigned char*>(this) + 0x1E954); }
-    CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
-    {
-        return *reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
-    }
-    CPtrArray<CMapAnim*>& GetMapAnimArray()
-    {
-        return *reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
-    }
-    CPtrArray<CMapAnimKeyDt*>& GetMapAnimKeyDtArray()
-    {
-        return *reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(this) + 0x21418);
-    }
-    CPtrArray<CMapShadow*>& GetMapShadowArray()
-    {
-        return *reinterpret_cast<CPtrArray<CMapShadow*>*>(reinterpret_cast<unsigned char*>(this) + 0x21434);
-    }
-    CPtrArray<CMapLightHolder*>& GetMapLightHolderArray(int index)
-    {
-        return *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(
-            reinterpret_cast<unsigned char*>(this) + 0x21450 + (index * 0x1C));
-    }
-    CPtrArray<CMapLightHolder*>* GetMapLightHolderArrays()
-    {
-        return reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<unsigned char*>(this) + 0x21450);
-    }
-    CMapIdGrp* GetMapIdGrpArray()
-    {
-        return reinterpret_cast<CMapIdGrp*>(reinterpret_cast<unsigned char*>(this) + 0x214E8);
-    }
-#endif
 
     ~CMapMng();
 	

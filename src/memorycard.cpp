@@ -1313,8 +1313,9 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    Game.m_gameWork.m_mcSerial0 = *reinterpret_cast<u32*>(save + 0x13D0);
+    u32 serial0 = *reinterpret_cast<u32*>(save + 0x13D0);
     Game.m_gameWork.m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
+    Game.m_gameWork.m_mcSerial0 = serial0;
     Game.m_gameWork.m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));

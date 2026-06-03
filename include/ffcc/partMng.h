@@ -69,7 +69,7 @@ struct PPPCREATEPARAM
     Vec* m_rotationPtr;               // 0x4
     Vec* m_scalePtr;                  // 0x8
     Vec* m_extraPositionPtr;          // 0xc
-    unsigned int m_paramA;            // 0x10
+    int m_paramA;                     // 0x10
     unsigned int m_paramB;            // 0x14
     CGObject* m_lookTargetPtr;        // 0x18
     unsigned int m_objectHitMask;     // 0x1c
@@ -342,7 +342,7 @@ struct _pppMngSt
     unsigned char m_padF9;             // 0xF9
     unsigned short m_prioTime;         // 0xFA
     unsigned char m_padFC[4];          // 0xFC
-    unsigned int m_paramA;             // 0x100
+    int m_paramA;                      // 0x100
     unsigned int m_paramB;             // 0x104
     float m_cullRadiusSq;              // 0x108
     float m_cullRadius;                // 0x10C

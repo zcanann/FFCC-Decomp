@@ -64,7 +64,13 @@ public:
     void SetNumPlayer();
 
 private:
-    u8 m_work[0x6480];
+    u8 m_work[0x1344];
+    unsigned char m_managerState; // 0x1348
+    u8 m_work1349[2];
+    unsigned char m_playerMask; // 0x134B
+    u8 m_work134C[4];
+    signed char m_managerIndex; // 0x1350
+    u8 m_work1351[0x6484 - 0x1351];
 
 public:
     unsigned int m_flags; // 0x6484

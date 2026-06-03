@@ -4341,9 +4341,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaPInfo playerInfo;
             memset(&playerInfo, 0, sizeof(playerInfo));
 
-            GbaQue.GetPlayerStat(port, &playerInfo);
+            GbaQue.GetPlayerStat(threadParam->m_portIndex, &playerInfo);
 
-            m_txWordIndex[port] = 0;
+            m_txWordIndex[threadParam->m_portIndex] = 0;
 
             unsigned char classFlags[4];
             memset(classFlags, 0xFF, sizeof(classFlags));
@@ -4351,7 +4351,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char payload[0x300];
             memset(payload, 0, sizeof(payload));
 
-            ClearJoyDataPacketPayload(this, port);
+            ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
             payload[0] = 1;
 
@@ -4405,7 +4405,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));
 
-            int compatLen = GbaQue.GetCompatibility(port, compatBuf);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
 
             if (compatLen < 0)
             {
@@ -4425,20 +4425,21 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             const int byteLen = compatLen + 0xA3;
 
-            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[port] + 2));
+            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
             if (wordCount < 0)
             {
                 return wordCount;
             }
 
-            m_txWordCount[port] = wordCount;
+            m_txWordCount[threadParam->m_portIndex] = wordCount;
             threadParam->m_subState = 1;
 
             // Immediately queue the first word (same as the subState == 1 path)
-            unsigned char* base = m_joyDataPacketBuffer[port];
+            unsigned int sendPort = threadParam->m_portIndex;
+            unsigned char* base = m_joyDataPacketBuffer[sendPort];
             unsigned int* wordPtr =
-                (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+                (unsigned int*)(void*)(base + m_txWordIndex[sendPort] * 4 + 2);
             unsigned int word = *wordPtr;
 
             if (m_threadRunningMask == 0)

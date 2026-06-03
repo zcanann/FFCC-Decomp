@@ -6489,21 +6489,21 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
         if (m_threadRunningMask != 0)
         {
-            int p = m_threadParams[portIndex].m_portIndex;
+            OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-            OSWaitSemaphore(&m_accessSemaphores[p]);
-
-            if ((int)m_cmdCount[p] < 0x40)
+            unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
+            if ((int)m_cmdCount[queuePort] < 0x40)
             {
-                m_cmdQueueData[p][m_cmdCount[p]] = word;
-                m_cmdCount[p] = m_cmdCount[p] + 1;
+                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                queuePort = m_threadParams[portIndex].m_portIndex;
+                m_cmdCount[queuePort] = m_cmdCount[queuePort] + 1;
 
-                OSSignalSemaphore(&m_accessSemaphores[p]);
+                OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
                 ret = 0;
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[p]);
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                 ret = -1;
             }
         }

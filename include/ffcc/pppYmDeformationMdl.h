@@ -1,12 +1,25 @@
 #ifndef _PPP_YMDEFORMATIONMDL_H_
 #define _PPP_YMDEFORMATIONMDL_H_
 
-#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 #include <dolphin/types.h>
 
-// Forward declarations
-struct VYmDeformationMdl;
+struct YmDeformationMdlColorInfo {
+    u32 m_unk0;
+    u32 m_unk4;
+    pppCVECTOR m_color;
+};
+
+struct VYmDeformationMdl {
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad;
+    float m_scale;
+    float m_values[5];
+};
+
+typedef VYmDeformationMdl YmDeformationMdlState;
 
 struct pppYmDeformationMdlUnkB {
     s32 m_graphId;

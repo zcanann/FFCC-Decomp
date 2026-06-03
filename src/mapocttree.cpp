@@ -13,12 +13,45 @@ extern "C" {
 extern const float kMapOctTreeDefaultOffsetZ;
 }
 
+extern const float kMapObjBoundMinInit;
+extern const float kMapObjBoundMaxInit;
+extern const float kMapObjZero;
+
+struct MapOctTreeBound {
+	Vec m_min;
+	Vec m_max;
+
+	MapOctTreeBound()
+	{
+		const float& min = kMapObjBoundMinInit;
+		const float& max = kMapObjBoundMaxInit;
+
+		m_min.z = min;
+		m_min.y = min;
+		m_min.x = min;
+		m_max.z = max;
+		m_max.y = max;
+		m_max.x = max;
+	}
+
+	void operator=(const CBound& other)
+	{
+		m_min = other.m_min;
+		m_max = other.m_max;
+	}
+
+	CBound& AsBound()
+	{
+		return *reinterpret_cast<CBound*>(this);
+	}
+};
+
 // Linkage definitions from config/GCCP01/symbols.txt.
 extern const float kMapObjBoundMinInit = 10000000000.0f;
 extern const float kMapObjBoundMaxInit = -10000000000.0f;
 extern const float kMapObjZero = 1.0f;
 
-CBound s_bound;
+MapOctTreeBound s_bound;
 CMapCylinder s_cyl;
 Vec s_mvec;
 int s_light_no = 0;
@@ -1050,7 +1083,7 @@ void InsertLight_r(COctNode* node)
 					break;
 				}
 
-				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
+				if (grandChild->GetBound()->CheckCross(s_bound.AsBound()) != 0) {
 					if (grandChild->m_meshCount != 0) {
 						setbit32(&grandChild->m_lightFlags, g_pStage);
 					}
@@ -1434,7 +1467,7 @@ void InsertShadow_r(COctNode* node)
 				s_light_no++;
 				COctNode* grandChild = childIter->m_children[0];
 
-				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
+				if (grandChild->GetBound()->CheckCross(s_bound.AsBound()) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
 						setbit32(&grandChild->m_shadowFlags, s_insertShadowNo);
 					}

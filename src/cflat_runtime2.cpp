@@ -788,56 +788,45 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
  */
 CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
-	switch (classType) {
-	case 0: {
-		unsigned char* obj = m_objBase;
-		for (int i = 0; i < 0x28; i++) {
+	if (classType == 3) {
+		unsigned char* obj = m_objParty;
+		for (int i = 0; i < 4; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objBase + i * 0x50);
+				return reinterpret_cast<CGObject*>(m_objParty + i * 0x6F8);
 			}
-			obj += 0x50;
+			obj += 0x6F8;
 		}
-		return 0;
-	}
-	case 1: {
-		unsigned char* obj = m_objQuad;
-		for (int i = 0; i < 0x18; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objQuad + i * 0xAC);
+	} else if (classType < 3) {
+		if (classType == 1) {
+			unsigned char* obj = m_objQuad;
+			for (int i = 0; i < 0x18; i++) {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(m_objQuad + i * 0xAC);
+				}
+				obj += 0xAC;
 			}
-			obj += 0xAC;
-		}
-		return 0;
-	}
-	case 2: {
-		unsigned char* obj = m_obj;
-		for (int i = 0; i < 0x38; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_obj + i * 0x518);
+		} else if (classType < 1) {
+			if (classType < 0) {
+				return 0;
 			}
-			obj += 0x518;
-		}
-		return 0;
-	}
-	case 3: {
-		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
-		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
-			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
-				return reinterpret_cast<CGObject*>(obj);
+
+			unsigned char* obj = m_objBase;
+			for (int i = 0; i < 0x28; i++) {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(m_objBase + i * 0x50);
+				}
+				obj += 0x50;
 			}
-		}
-		return 0;
-	}
-	case 4: {
-		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
-		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
-			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
-				return reinterpret_cast<CGObject*>(obj);
+		} else {
+			unsigned char* obj = m_obj;
+			for (int i = 0; i < 0x38; i++) {
+				if (static_cast<signed char>(obj[0x4C]) >= 0) {
+					return reinterpret_cast<CGObject*>(m_obj + i * 0x518);
+				}
+				obj += 0x518;
 			}
 		}
-		return 0;
-	}
-	case 5: {
+	} else if (classType == 5) {
 		unsigned char* obj = m_objItem;
 		for (int i = 0; i < 0x20; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
@@ -845,11 +834,17 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 			}
 			obj += 0x57C;
 		}
-		return 0;
+	} else if (classType < 5) {
+		unsigned char* obj = m_objMon;
+		for (int i = 0; i < 0x40; i++) {
+			if (static_cast<signed char>(obj[0x4C]) >= 0) {
+				return reinterpret_cast<CGObject*>(m_objMon + i * 0x740);
+			}
+			obj += 0x740;
+		}
 	}
-	default:
-		return 0;
-	}
+
+	return 0;
 }
 
 /*

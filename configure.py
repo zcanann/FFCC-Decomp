@@ -741,7 +741,7 @@ config.libs = [
             Object(NonMatching, "pppYmMegaBirthShpTail2.cpp"),
             Object(NonMatching, "pppYmMegaBirthShpTail3.cpp"),
             Object(NonMatching, "pppYmMelt.cpp", cflags=cflags_game),
-            Object(NonMatching, "pppYmMiasma.cpp"),
+            Object(NonMatching, "pppYmMiasma.cpp", cflags=cflags_game),
             Object(NonMatching, "pppYmMoveCircle.cpp"),
             Object(NonMatching, "pppYmMoveParabola.cpp"),
             Object(NonMatching, "pppYmTraceMove.cpp"),

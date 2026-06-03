@@ -402,7 +402,7 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;

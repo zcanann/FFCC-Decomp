@@ -728,7 +728,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppPDataVal* dataVal = pppPDataVal;
 	_pppProgSetDef* programSet = dataVal->m_programSetDef;
 	s16 numStages = programSet->m_numStages;
-	u32 allocSize = programSet->m_workBaseOffset + ((u32)numStages * sizeof(u32));
+	u32 allocSize = programSet->m_workBaseOffset;
 	CMemory::CStage* stage = ppvEnv->m_stagePtr;
 	_pppPObjLink* newObj = 0;
 	bool firstFailure = true;
@@ -738,7 +738,8 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	ppvMemAllocErrorF = 0;
 	do
 	{
-		newObj = (_pppPObjLink*)Memory._Alloc(allocSize, stage, const_cast<char*>(s_pppPart_cpp), 0x305, 1);
+		newObj = (_pppPObjLink*)Memory._Alloc(allocSize + ((u32)numStages * sizeof(u32)), stage,
+		                                      const_cast<char*>(s_pppPart_cpp), 0x305, 1);
 		if (newObj != 0)
 		{
 			break;

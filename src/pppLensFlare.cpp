@@ -9,21 +9,27 @@
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
 #include "PowerPC_EABI_Support/Runtime/runtime.h"
+#include <stddef.h>
 
-struct LensFlareWork {
-    u8 _pad00[0x10];
-    f32 m_projectedX;
-    f32 m_projectedY;
-    f32 m_projectedZ;
-    f32 _pad1C;
-    Vec m_viewPosition;
-    s16 m_shapeFrame0;
-    s16 m_shapeFrame1;
-    s16 m_shapeFrame2;
-    u8 m_alpha;
-    u8 _pad33;
-    f32 m_dot;
-};
+#define LENS_FLARE_STATIC_ASSERT_JOIN_1(a, b) a##b
+#define LENS_FLARE_STATIC_ASSERT_JOIN(a, b) LENS_FLARE_STATIC_ASSERT_JOIN_1(a, b)
+#define LENS_FLARE_STATIC_ASSERT(expr) typedef char LENS_FLARE_STATIC_ASSERT_JOIN(lens_flare_static_assert_, __LINE__)[(expr) ? 1 : -1]
+
+LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_projectedX) == 0x10);
+LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
+LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
+LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
+LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
+
+static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<LensFlareWork*>(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+}
+
+static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<_pppColorWork*>(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+}
 
 extern const double kPppLensFlareZeroD = 0.0;
 extern const float kPppLensFlareOne = 1.0f;
@@ -44,15 +50,13 @@ extern const float kPppLensFlareZScale;
  */
 void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
-	int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-	u8* shapeBase = obj->m_object.m_workArea + shapeOffset;
-	u8* colorBase = obj->m_object.m_workArea + colorOffset;
+	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
+	_pppColorWork* colorWork = GetLensFlareColorWork(obj, ctrlTable);
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
 		pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
-		if (shapeBase[0x32] != 0) {
+		if (work->m_alpha != 0) {
 			pppCVECTOR local_70;
 			Vec local_60;
 			Mtx local_54;
@@ -74,21 +78,21 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 			local_54[1][3] = local_60.y;
 			local_54[2][3] = local_60.z;
 
-			pppCopyVector(*(Vec*)(shapeBase + 0x20), local_60);
+			pppCopyVector(work->m_viewPosition, local_60);
 
 			GXLoadPosMtxImm(local_54, 0);
 
-			local_70.rgba[0] = colorBase[8];
-			local_70.rgba[1] = colorBase[9];
-			local_70.rgba[2] = colorBase[10];
-			local_70.rgba[3] = shapeBase[0x32];
+			local_70.rgba[0] = colorWork->result.r;
+			local_70.rgba[1] = colorWork->result.g;
+			local_70.rgba[2] = colorWork->result.b;
+			local_70.rgba[3] = work->m_alpha;
 
 			pppSetDrawEnv(
 				&local_70, (pppFMATRIX*)0, kPppLensFlareZero, unkB->m_lensFlare.m_drawEnvLightTarget, unkB->m_unk13,
 				unkB->m_unk12, 0, 1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
-			pppDrawShp(static_cast<long*>(shape->m_animData), *(s16*)(shapeBase + 0x2e),
+			pppDrawShp(static_cast<long*>(shape->m_animData), work->m_shapeFrame1,
 			           ppvEnv->m_materialSetPtr, unkB->m_unk12);
 			pppSetBlendMode(3);
 		}
@@ -107,11 +111,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF == 0) {
-		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
-		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
-		u8* colorBase = obj->m_object.m_workArea + colorOffset;
-		LensFlareWork* work = (LensFlareWork*)(obj->m_object.m_workArea + shapeOffset);
-		u8 sourceAlpha = colorBase[0xB];
+		LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
+		_pppColorWork* colorWork = GetLensFlareColorWork(obj, ctrlTable);
+		u8 sourceAlpha = colorWork->result.a;
 		float projX = ppvMng->m_matrix.value[0][3];
 		float projY = ppvMng->m_matrix.value[1][3];
 		float projZ = ppvMng->m_matrix.value[2][3];
@@ -227,7 +229,7 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  */
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	LensFlareWork* work = (LensFlareWork*)(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
 
 	float initValue = kPppLensFlareZero;
 

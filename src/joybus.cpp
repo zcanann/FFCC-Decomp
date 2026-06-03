@@ -3153,14 +3153,16 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
  */
 int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
 {
-    const int port = threadParam->m_portIndex;
-    unsigned int cmd = MakeJoyCmd16(0x0A01, 0x00);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0A;
+    cmdBytes[1] = 1;
 
     *outCmd = cmd;
 
-    int result = 0;
+    unsigned int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -3170,11 +3172,12 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
         else
         {
             OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
     }
 
@@ -3193,10 +3196,14 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
  */
 int JoyBus::SendGBAStop(ThreadParam* threadParam)
 {
-    unsigned int cmd = MakeJoyCmd16(0x0A00, 0x00);
-    int result = 0;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0A;
+    cmdBytes[1] = 0;
 
-    if (m_threadRunningMask != 0)
+    unsigned int result = 0;
+
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -3206,11 +3213,12 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
         else
         {
             OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
     }
 
@@ -3271,10 +3279,13 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
  */
 int JoyBus::SendCancel(ThreadParam* threadParam)
 {
-    unsigned int cmd = 0x10000000u;
-    int result = 0;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x10;
 
-    if (m_threadRunningMask != 0)
+    unsigned int result = 0;
+
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -3284,11 +3295,12 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
         else
         {
             OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
     }
 

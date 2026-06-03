@@ -6,10 +6,12 @@ class CChunkFile;
 class CMapKeyFrame
 {
 public:
+#ifndef FFCC_MAPKEYFRAME_NO_DESTRUCTOR
     ~CMapKeyFrame()
     {
         Destroy();
     }
+#endif
 
     void Destroy()
     {

@@ -4810,11 +4810,6 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
         int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
 
-        if (compatLen < 0)
-        {
-            compatLen = 0;
-        }
-
         const int byteLen = compatLen + 1;
 
         int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));

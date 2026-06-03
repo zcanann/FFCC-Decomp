@@ -2999,7 +2999,7 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
     CMaterial* material =
         m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
-        material->CacheDumpTexture(amemCacheSet);
+        material->CacheUnLoadTexture(amemCacheSet);
     }
 }
 

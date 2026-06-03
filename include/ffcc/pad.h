@@ -68,6 +68,7 @@ public:
 
     void Init();
     void Quit();
+    void SaveReplayData();
     void Frame();
     unsigned short GetButtonDown(long);
     unsigned short GetGbaButtonDown(long);

@@ -63,6 +63,8 @@ enum {
 	kFlatQuadObjCount = sizeof(m_objQuad) / sizeof(CGQuadObj),
 	kFlatObjectCount = sizeof(m_obj) / sizeof(CGObject),
 	kFlatItemObjCount = sizeof(m_objItem) / sizeof(CGItemObj),
+	kFlatPartyObjCount = sizeof(m_objParty) / sizeof(CGPartyObj),
+	kFlatMonObjCount = sizeof(m_objMon) / sizeof(CGMonObj),
 	kFlatLayerResourceCount = 8,
 	kFlatSpawnBitCount = 9,
 };
@@ -71,6 +73,7 @@ STATIC_ASSERT(sizeof(m_objBase) == sizeof(CGBaseObj) * kFlatBaseObjCount);
 STATIC_ASSERT(sizeof(m_objQuad) == sizeof(CGQuadObj) * kFlatQuadObjCount);
 STATIC_ASSERT(sizeof(m_obj) == sizeof(CGObject) * kFlatObjectCount);
 STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
+STATIC_ASSERT(sizeof(m_objMon) == sizeof(CGMonObj) * kFlatMonObjCount);
 
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
@@ -508,16 +511,14 @@ CFlatRuntime2::CFlatRuntime2()
 		gObj++;
 	}
 
-	u8* partyObjBytes = reinterpret_cast<u8*>(m_objParty);
-	for (int i = 0; i < 4; i++) {
-		InitFlatObjectSlot(reinterpret_cast<CGPartyObj*>(partyObjBytes), static_cast<u16>((i + 1) | 0x300));
-		partyObjBytes += 0x6F8;
+	CGPartyObj* partyObj = reinterpret_cast<CGPartyObj*>(m_objParty);
+	for (int i = 0; i < kFlatPartyObjCount; i++, partyObj++) {
+		InitFlatObjectSlot(partyObj, static_cast<u16>((i + 1) | 0x300));
 	}
 
-	u8* monObjBytes = reinterpret_cast<u8*>(m_objMon);
-	for (int i = 0; i < 0x40; i++) {
-		InitFlatObjectSlot(reinterpret_cast<CGMonObj*>(monObjBytes), static_cast<u16>((i + 1) | 0x400));
-		monObjBytes += 0x740;
+	CGMonObj* monObj = reinterpret_cast<CGMonObj*>(m_objMon);
+	for (int i = 0; i < kFlatMonObjCount; i++, monObj++) {
+		InitFlatObjectSlot(monObj, static_cast<u16>((i + 1) | 0x400));
 	}
 
 	u8* itemObjBytes = reinterpret_cast<u8*>(m_objItem);
@@ -561,8 +562,8 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
 	__construct_array(m_objQuad, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, sizeof(CGQuadObj), kFlatQuadObjCount);
 	__construct_array(m_obj, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, sizeof(CGObject), kFlatObjectCount);
 	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, sizeof(CGItemObj), kFlatItemObjCount);
-	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
-	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
+	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, sizeof(CGPartyObj), kFlatPartyObjCount);
+	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, sizeof(CGMonObj), kFlatMonObjCount);
 }
 
 /*
@@ -744,22 +745,20 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 		return count;
 	}
 	case 3: {
-		signed char* obj = reinterpret_cast<signed char*>(m_objParty);
-		for (int i = 0; i < 4; i++) {
-			if (obj[0x4C] >= 0) {
+		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
+		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
+			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
 				count++;
 			}
-			obj += 0x6F8;
 		}
 		return count;
 	}
 	case 4: {
-		signed char* obj = reinterpret_cast<signed char*>(m_objMon);
-		for (int i = 0; i < 64; i++) {
-			if (obj[0x4C] >= 0) {
+		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
+		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
+			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
 				count++;
 			}
-			obj += 0x740;
 		}
 		return count;
 	}
@@ -821,22 +820,20 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 		return 0;
 	}
 	case 3: {
-		unsigned char* obj = m_objParty;
-		for (int i = 0; i < 4; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objParty + i * 0x6F8);
+		CGPartyObj* obj = reinterpret_cast<CGPartyObj*>(m_objParty);
+		for (int i = 0; i < kFlatPartyObjCount; i++, obj++) {
+			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
+				return reinterpret_cast<CGObject*>(obj);
 			}
-			obj += 0x6F8;
 		}
 		return 0;
 	}
 	case 4: {
-		unsigned char* obj = m_objMon;
-		for (int i = 0; i < 0x40; i++) {
-			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objMon + i * 0x740);
+		CGMonObj* obj = reinterpret_cast<CGMonObj*>(m_objMon);
+		for (int i = 0; i < kFlatMonObjCount; i++, obj++) {
+			if (reinterpret_cast<signed char*>(obj)[0x4C] >= 0) {
+				return reinterpret_cast<CGObject*>(obj);
 			}
-			obj += 0x740;
 		}
 		return 0;
 	}
@@ -877,9 +874,9 @@ void* CFlatRuntime2::intToClass(int classId)
 	case 2:
 		return m_obj + (slot - 1) * 0x518;
 	case 3:
-		return m_objParty + (slot - 1) * 0x6F8;
+		return reinterpret_cast<CGPartyObj*>(m_objParty) + (slot - 1);
 	case 4:
-		return m_objMon + (slot - 1) * 0x740;
+		return reinterpret_cast<CGMonObj*>(m_objMon) + (slot - 1);
 	case 5:
 		return m_objItem + (slot - 1) * 0x57C;
 	default:
@@ -2453,10 +2450,10 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x13: {
-		u8* party = m_objParty;
-		for (int i = 0; i < 4; i++, party += 0x6F8) {
+		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
+		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
 			if (*reinterpret_cast<unsigned int*>(party) != 0) {
-				reinterpret_cast<CGPartyObj*>(party)->sysControl(controlNo, controlValue);
+				party->sysControl(controlNo, controlValue);
 			}
 		}
 		break;
@@ -2475,17 +2472,17 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x19: {
-		u8* party = m_objParty;
-		for (int i = 0; i < 4; i++, party += 0x6F8) {
+		CGPartyObj* party = reinterpret_cast<CGPartyObj*>(m_objParty);
+		for (int i = 0; i < kFlatPartyObjCount; i++, party++) {
 			if (*reinterpret_cast<unsigned int*>(party) != 0) {
-				reinterpret_cast<CGCharaObj*>(party)->damageDelete();
+				party->damageDelete();
 			}
 		}
 
-		u8* mon = m_objMon;
-		for (int i = 0; i < 0x40; i++, mon += 0x740) {
+		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
+		for (int i = 0; i < kFlatMonObjCount; i++, mon++) {
 			if (*reinterpret_cast<unsigned int*>(mon) != 0) {
-				reinterpret_cast<CGCharaObj*>(mon)->damageDelete();
+				mon->damageDelete();
 			}
 		}
 		break;

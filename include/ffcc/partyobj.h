@@ -69,7 +69,6 @@ struct PartyObjOverlay {
     CGObject* carryObject;
     short commandMode;
     unsigned short _pad6F6;
-    int bonusCondition;
 };
 
 STATIC_ASSERT(offsetof(PartyObjOverlay, unk6BC) == 0x04);
@@ -85,7 +84,7 @@ STATIC_ASSERT(offsetof(PartyObjOverlay, unk6EC) == 0x34);
 STATIC_ASSERT(offsetof(PartyObjOverlay, carryObject) == 0x38);
 STATIC_ASSERT(offsetof(PartyObjOverlay, commandMode) == 0x3C);
 
-STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x44);
+STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x40);
 
 struct GhostPartyWork {
 	unsigned char _pad0[0x20];
@@ -218,5 +217,6 @@ public:
 };
 
 STATIC_ASSERT(offsetof(CGPartyObj, m_partyData) == 0x6B8);
+STATIC_ASSERT(sizeof(CGPartyObj) == 0x6F8);
 
 #endif

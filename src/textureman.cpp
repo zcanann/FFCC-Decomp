@@ -1155,10 +1155,9 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         CTexture* item = m_items[i];
         if (item != 0) {
-            int nextRefCount = item->refCount - 1;
-            item->refCount = nextRefCount;
-            if (nextRefCount == 0) {
-                delete item;
+            CRef* ref = item;
+            if (ref->DecRef() == 0) {
+                delete ref;
             }
             m_items[i] = 0;
         }

@@ -2706,7 +2706,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         if (threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == '(')
         {
-            unsigned int readBuf[4] = {};
+            unsigned int readBuf[4];
 
             threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
 
@@ -2818,7 +2818,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 {
                     char          h;
                     unsigned char f;
-                } tmpBuf = {};
+                } tmpBuf;
 
                 threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
                 status = threadParam->m_gbaStatus;
@@ -2880,7 +2880,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         {
             if (threadParam->m_unk3 == '(')
             {
-                unsigned int timeValue = 0;
+                unsigned int timeValue;
                 threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
                 status = threadParam->m_gbaStatus;
 

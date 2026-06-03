@@ -6990,6 +6990,8 @@ int JoyBus::SendMask(int, unsigned short)
 int JoyBus::SetMoney(int portIndex, unsigned int money)
 {
     int result = 0;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
 	// TODO: This 3E check feels like a < 40 check in shorts (ie size 20, cmp < 20). Might need to unfuck some of this.
 
@@ -7000,9 +7002,10 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
     }
 
 	{
-		const unsigned char money_hi = (money >> 24) & 0xFF;
-		const unsigned char money_mid = (money >> 16) & 0xFF;
-		const unsigned int cmdHi = MakeJoyCmd16(0x1A00, money_hi, money_mid);
+		cmdBytes[0] = 0x1A;
+		cmdBytes[1] = 0;
+		cmdBytes[2] = money >> 24;
+		cmdBytes[3] = money >> 16;
 
 		if (m_threadRunningMask != 0)
 		{
@@ -7012,7 +7015,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 
 			if ((int)m_cmdCount[port] < 0x40)
 			{
-				m_cmdQueueData[port][m_cmdCount[port]] = cmdHi;
+				m_cmdQueueData[port][m_cmdCount[port]] = cmd;
 				port = m_threadParams[portIndex].m_portIndex;
 				m_cmdCount[port]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
@@ -7032,10 +7035,10 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 	}
 
 	{
-		const unsigned char money_mid = (money >> 8) & 0xFF;
-		const unsigned char money_lo =  money       & 0xFF;
-		const unsigned short opcode = static_cast<unsigned short>(0x5A00 | money_mid);
-		const unsigned int cmdLo = MakeJoyCmd16(opcode, money_lo, 0);
+		cmd = 0;
+		cmdBytes[0] = 0x5A;
+		cmdBytes[1] = money >> 8;
+		cmdBytes[2] = money;
 
 		if (m_threadRunningMask != 0)
 		{
@@ -7045,7 +7048,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 
 			if ((int)m_cmdCount[port] < 0x40)
 			{
-				m_cmdQueueData[port][m_cmdCount[port]] = cmdLo;
+				m_cmdQueueData[port][m_cmdCount[port]] = cmd;
 				port = m_threadParams[portIndex].m_portIndex;
 				m_cmdCount[port]++;
 				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);

@@ -25,7 +25,7 @@ extern const float kFunnyShapeDefaultOffsetX = 480.0f;
 extern const float kFunnyShapeDefaultOffsetY = 336.0f;
 extern const float kFunnyShapeTextureViewportOrigin = 20.0f;
 extern const float kFunnyShapeAnimOffsetX = 320.0f;
-extern const float kFunnyShapeAnimOffsetY;
+extern const float kFunnyShapeAnimOffsetY = 224.0f;
 extern const float kFunnyShapePi;
 extern const float kFunnyShapeHalfTurnDegrees[2];
 extern const char sDebugSpinnerText[5];

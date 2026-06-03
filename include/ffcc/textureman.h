@@ -26,8 +26,21 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);
     void CacheUnLoadTexture(CAmemCacheSet*);
-    void CacheRefCnt0UpTexture(CAmemCacheSet*);
-    void CacheDumpTexture(CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+    {
+        if (m_cacheId != -1) {
+            amemCacheSet->RefCnt0Up(m_cacheId);
+        }
+    }
+    void CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+    {
+        if (m_cacheId != -1) {
+            if (GetRef() <= 1) {
+                m_imageData = 0;
+            }
+            amemCacheSet->Release(m_cacheId);
+        }
+    }
     int CheckName(char*);
     void SetExternalTlut(void*, int);
     void FlushExternalTlut(void*, int);
@@ -68,8 +81,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
-    CTexture* GetTexture(long);
-    int GetNumTexture();
+    CTexture* GetTexture(long index) { return m_textureArray[static_cast<unsigned long>(index)]; }
+    int GetNumTexture() { return m_textureArray.GetSize(); }
 
     CPtrArray<CTexture*> m_textureArray;
 };

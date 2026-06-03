@@ -1,7 +1,7 @@
 #include "ffcc/mapobj.h"
 
-extern const char s_CPtrArrayGrowError[] = "CPtrArray grow error";
-extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
+extern const char s_CPtrArrayGrowError[];
+extern const char s_CPtrArrayFile[];
 #define FFCC_PTRARRAY_GROW_ERROR s_CPtrArrayGrowError
 #define FFCC_PTRARRAY_FILE s_CPtrArrayFile
 #include "ffcc/ptrarray.h"
@@ -474,7 +474,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName =
-                        new (MapMng.m_stage, "mapobj.cpp", 0x84) CMapObjAtrMeshName();
+                        new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     if (meshName != 0) {
@@ -524,7 +524,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_calcMtxPending = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
             CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
-                operator new(sizeof(CMapAnimRun), MapMng.m_stage, "mapobj.cpp", 0x21E));
+                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
             if (animRun != 0) {
                 animRun->m_currentFrame = -1;
                 animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
@@ -544,7 +544,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
-                new (MapMng.m_stage, "mapobj.cpp", 0x33B) CMapObjAtrMime();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
 
             if (mime != 0) {
@@ -578,7 +578,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                         mime->m_vertexLists = reinterpret_cast<float**>(
                             operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                           MapMng.m_stage, "mapobj.cpp", 0x348));
+                                           MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x348));
                     }
 
                     chunkFile.PushChunk();
@@ -588,7 +588,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         if (vtxChunk.m_id == CHUNK_VTX) {
                             float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                MapMng.m_stage, "mapobj.cpp", 0x353));
+                                MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x353));
                             if ((mime != 0) && (mime->m_vertexLists != 0)) {
                                 mime->m_vertexLists[vtxTableIndex] = vtx;
                             }
@@ -615,7 +615,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPointLight* pointLightAttr =
-                new (MapMng.m_stage, "mapobj.cpp", 0xD4) CMapObjAtrPointLight();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0xD4) CMapObjAtrPointLight();
             CMapObjAtrPointLight* pointLight = pointLightAttr;
 
             if (chunk.m_version == 2) {
@@ -670,7 +670,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrSpotLight* spotLightAttr =
-                new (MapMng.m_stage, "mapobj.cpp", 0x139) CMapObjAtrSpotLight();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x139) CMapObjAtrSpotLight();
             CMapObjAtrSpotLight* spotLight = spotLightAttr;
 
             if (chunk.m_version == 6) {
@@ -742,7 +742,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
-                new (MapMng.m_stage, "mapobj.cpp", 0x39B) CMapObjAtrPlaySta();
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x39B) CMapObjAtrPlaySta();
             if (playSta != 0) {
                 playSta->m_playStaNo = chunkFile.Get1();
             }

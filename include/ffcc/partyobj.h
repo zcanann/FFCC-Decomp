@@ -72,6 +72,19 @@ struct PartyObjOverlay {
     int bonusCondition;
 };
 
+STATIC_ASSERT(offsetof(PartyObjOverlay, unk6BC) == 0x04);
+STATIC_ASSERT(offsetof(PartyObjOverlay, unk6C0) == 0x08);
+STATIC_ASSERT(offsetof(PartyObjOverlay, commandFlags) == 0x0C);
+STATIC_ASSERT(offsetof(PartyObjOverlay, attackSel) == 0x10);
+STATIC_ASSERT(offsetof(PartyObjOverlay, weaponRef) == 0x20);
+STATIC_ASSERT(offsetof(PartyObjOverlay, weaponItem) == 0x24);
+STATIC_ASSERT(offsetof(PartyObjOverlay, pendingWeaponItem) == 0x28);
+STATIC_ASSERT(offsetof(PartyObjOverlay, target) == 0x2C);
+STATIC_ASSERT(offsetof(PartyObjOverlay, targetOverride) == 0x30);
+STATIC_ASSERT(offsetof(PartyObjOverlay, unk6EC) == 0x34);
+STATIC_ASSERT(offsetof(PartyObjOverlay, carryObject) == 0x38);
+STATIC_ASSERT(offsetof(PartyObjOverlay, commandMode) == 0x3C);
+
 STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x44);
 
 struct GhostPartyWork {

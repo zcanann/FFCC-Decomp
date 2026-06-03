@@ -37,6 +37,21 @@ static inline f32 LoadLaserFloat(const f32& value)
 	return value;
 }
 
+static inline f32 YmLaserU32ToFloat(u32 value)
+{
+	union {
+		struct {
+			u32 hi;
+			u32 lo;
+		} words;
+		f64 value;
+	} cvt;
+
+	cvt.words.hi = 0x43300000;
+	cvt.words.lo = value;
+	return static_cast<f32>(cvt.value - kPppVertexApMtxDoubleBias);
+}
+
 static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
@@ -165,7 +180,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		           step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = YmLaserConst(FLOAT_80330DC4) / (f32)count;
+		uvStep = YmLaserConst(FLOAT_80330DC4) / YmLaserU32ToFloat(count);
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);

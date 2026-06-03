@@ -37,10 +37,20 @@ static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(_pppPOb
     return reinterpret_cast<pppYmDrawMdlTexAnmColorBlock*>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
 }
 
-static inline void SetUpPerUV(CMapMesh* mapMesh, f32& perU, f32& perV)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 224b
+ * EN Address: 0x8009beb8
+ * EN Size: 320b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
 {
     s32 i;
 
+    CMapMesh* mapMesh = model;
     for (i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
         if (perU < (f32)mapMesh->m_uvPairs[i].m_u) {
             perU = (f32)mapMesh->m_uvPairs[i].m_u;
@@ -135,7 +145,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     perV = work->m_perV;
     if ((perU == FLOAT_8033054c) || (perV == FLOAT_8033054c)) {
         if (mapMesh != NULL) {
-            SetUpPerUV(mapMesh, work->m_perU, work->m_perV);
+            SetUpPerUV((pppModelSt*)mapMesh, work->m_perU, work->m_perV);
         } else {
             return;
         }
@@ -229,7 +239,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     work->m_perV = per;
 
     if (model != NULL) {
-        SetUpPerUV((CMapMesh*)model, work->m_perU, work->m_perV);
+        SetUpPerUV(model, work->m_perU, work->m_perV);
     }
 }
 }

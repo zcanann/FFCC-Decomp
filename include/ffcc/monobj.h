@@ -279,6 +279,10 @@ public:
     union {
         unsigned int m_unk6D4Word;      // 0x6D4
         unsigned short m_groupTag;      // 0x6D4
+        struct {
+            unsigned short groupTag;    // 0x6D4
+            unsigned short delay;       // 0x6D6
+        } m_repop;
         unsigned char m_unk6D4[4];      // 0x6D4
     };
     int m_chaseState;             // 0x6D8
@@ -290,7 +294,7 @@ public:
     short m_aiState;              // 0x6E4
     short m_aiStatePrev;          // 0x6E6
     int m_forcedAction;           // 0x6E8
-    int m_unk6EC;                 // 0x6EC
+    unsigned int m_controlMask;   // 0x6EC
     int m_attackDelay;            // 0x6F0
     int m_aliveFrames;            // 0x6F4
     Vec m_homePosition;           // 0x6F8
@@ -302,11 +306,13 @@ public:
 STATIC_ASSERT(sizeof(CGMonObj::CMoveWork) == 0x34);
 STATIC_ASSERT(offsetof(CGMonObj, m_targetPartyIndex) == 0x6C4);
 STATIC_ASSERT(offsetof(CGMonObj, m_actionBranch) == 0x6D0);
+STATIC_ASSERT(offsetof(CGMonObj, m_repop.delay) == 0x6D6);
 STATIC_ASSERT(offsetof(CGMonObj, m_chaseState) == 0x6D8);
 STATIC_ASSERT(offsetof(CGMonObj, m_chaseTimer) == 0x6DC);
 STATIC_ASSERT(offsetof(CGMonObj, m_bind) == 0x6E0);
 STATIC_ASSERT(offsetof(CGMonObj, m_aiState) == 0x6E4);
 STATIC_ASSERT(offsetof(CGMonObj, m_forcedAction) == 0x6E8);
+STATIC_ASSERT(offsetof(CGMonObj, m_controlMask) == 0x6EC);
 STATIC_ASSERT(offsetof(CGMonObj, m_attackDelay) == 0x6F0);
 STATIC_ASSERT(offsetof(CGMonObj, m_homePosition) == 0x6F8);
 STATIC_ASSERT(offsetof(CGMonObj, m_stepSeHandle) == 0x704);

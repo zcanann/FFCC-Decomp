@@ -912,9 +912,8 @@ void CGMonObj::frameStatFuncSaw()
 void CGMonObj::logicFuncSaw()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int& bossState = CFlatBossState();
-	unsigned char& aiWork = mon[0x6D4];
+	unsigned char& aiWork = m_unk6D4[0];
 
 	if (bossState == 0 && (aiWork & 0x80) != 0) {
 		aiWork &= 0x7F;

@@ -1419,7 +1419,7 @@ void CGMonObj::onStatDie()
 		if (2 < subState) {
 			return;
 		}
-		unsigned short repopDelay = *reinterpret_cast<unsigned short*>(mon + 0x6D6);
+		unsigned short repopDelay = m_repop.delay;
 		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
 			setRepop(0);
 		}
@@ -1450,7 +1450,7 @@ void CGMonObj::onStatDie()
 		}
 
 		int option = static_cast<short>(Game.m_gameWork.m_optionValue);
-		if (option <= 8 && *reinterpret_cast<short*>(mon + 0x6D6) == 0) {
+		if (option <= 8 && static_cast<short>(m_repop.delay) == 0) {
 			int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
 			unsigned long long bit = 1ULL << shift;
 			CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
@@ -3579,12 +3579,11 @@ int CGMonObj::calcBranchFuncDefault(int branchType)
  */
 void CGMonObj::sysControl(int controlType)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 
 	switch (controlType) {
 	case 6:
-		*reinterpret_cast<unsigned short*>(mon + 0x6D6) = 0;
+		m_repop.delay = 0;
 		break;
 
 	case 7:

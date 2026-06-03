@@ -5,6 +5,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/joybus.h"
 #include "ffcc/game.h"
+#include "ffcc/monobj.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_map.h"
 #include "ffcc/pad.h"
@@ -98,18 +99,22 @@ static inline CRingMenu* BattleRingMenu(int playerIndex)
 
 #define PushValue(runtime, object, value) reinterpret_cast<CFlatRuntime*>(runtime)->push((object), (value))
 
-static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
+static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& value, int setMode)
 {
-	unsigned short* value = reinterpret_cast<unsigned short*>(base + offset);
-	stack[-1].m_word = *value;
+	stack[-1].m_word = value;
 
 	if (setMode == 0) {
-		*value = stack->m_word;
+		value = stack->m_word;
 	} else if (setMode == -1) {
-		*value = *value - stack->m_word;
+		value = value - stack->m_word;
 	} else if (setMode == 1) {
-		*value = *value + stack->m_word;
+		value = value + stack->m_word;
 	}
+}
+
+static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
+{
+	StoreU16Value(stack, *reinterpret_cast<unsigned short*>(base + offset), setMode);
 }
 
 static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
@@ -126,18 +131,22 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, i
 	}
 }
 
-static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
+static inline void StoreU32Value(CFlatRuntime::CStack* stack, unsigned int& value, int setMode)
 {
-	unsigned int* value = reinterpret_cast<unsigned int*>(base + offset);
-	stack[-1].m_word = *value;
+	stack[-1].m_word = value;
 
 	if (setMode == 0) {
-		*value = stack->m_word;
+		value = stack->m_word;
 	} else if (setMode == -1) {
-		*value -= stack->m_word;
+		value -= stack->m_word;
 	} else if (setMode == 1) {
-		*value += stack->m_word;
+		value += stack->m_word;
 	}
+}
+
+static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
+{
+	StoreU32Value(stack, *reinterpret_cast<unsigned int*>(base + offset), setMode);
 }
 
 static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
@@ -196,42 +205,34 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
-			if (systemVal <= -0xD80) {
-				if (systemVal != -0xDB8) {
-					if (systemVal < -0xDB8) {
-						if (systemVal == -0xDBA) {
-							StoreU32(stack, engineObject, 0x6EC, setMode);
-						} else if (systemVal > -0xDBB) {
-							StoreU16(stack, engineObject, 0x6D6, setMode);
-						}
-					} else if (systemVal < -0xD97) {
-						if (systemVal < -0xDA7) {
-							unsigned short* value = reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDB7) * 2 + 0xF0);
-							stack[-1].m_word = *value;
-							if (setMode == 0) {
-								*value = stack->m_word;
-							} else if (setMode < 0) {
-								if (setMode > -2) {
-									*value = *value - stack->m_word;
-								}
-							} else if (setMode < 2) {
-								*value = *value + stack->m_word;
+				if (systemVal <= -0xD80) {
+					if (systemVal != -0xDB8) {
+						if (systemVal < -0xDB8) {
+							if (systemVal == -0xDBA) {
+								StoreU32Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask, setMode);
+							} else if (systemVal > -0xDBB) {
+								StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_repop.delay, setMode);
 							}
-						} else {
-							StoreU16(stack, classData, (systemVal + 0xDA7) * 2 + 0xD0, setMode);
+						} else if (systemVal < -0xD97) {
+							if (systemVal < -0xDA7) {
+								unsigned short* value = reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDB7) * 2 + 0xF0);
+								stack[-1].m_word = *value;
+								if (setMode == 0) {
+									*value = stack->m_word;
+								} else if (setMode < 0) {
+									if (setMode > -2) {
+										*value = *value - stack->m_word;
+									}
+								} else if (setMode < 2) {
+									*value = *value + stack->m_word;
+								}
+							} else {
+								StoreU16(stack, classData, (systemVal + 0xDA7) * 2 + 0xD0, setMode);
+							}
 						}
+					} else {
+						StoreU16Value(stack, reinterpret_cast<CGMonObj*>(engineObject)->m_groupTag, setMode);
 					}
-				} else {
-					unsigned short* value = reinterpret_cast<unsigned short*>(engineObject + 0x6D4);
-					stack[-1].m_word = *value;
-					if (setMode == 0) {
-						*value = stack->m_word;
-					} else if (setMode == -1) {
-						*value = *value - stack->m_word;
-					} else if (setMode == 1) {
-						*value = *value + stack->m_word;
-					}
-				}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
@@ -426,17 +427,17 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;
 
-			if (systemVal <= -0xD80) {
-				if (systemVal < -0xD97) {
-					if (systemVal < -0xDB7) {
-						if (systemVal == -0xDBA) {
-							value = LoadU32(engineObject, 0x6EC);
+				if (systemVal <= -0xD80) {
+					if (systemVal < -0xD97) {
+						if (systemVal < -0xDB7) {
+							if (systemVal == -0xDBA) {
+								value = reinterpret_cast<CGMonObj*>(engineObject)->m_controlMask;
+							}
+						} else if (systemVal < -0xDA7) {
+							value = LoadU16(classData, (systemVal + 0xDB7) * 2 + 0xF0);
+						} else {
+							value = LoadU16(classData, (systemVal + 0xDA7) * 2 + 0xD0);
 						}
-					} else if (systemVal < -0xDA7) {
-						value = LoadU16(classData, (systemVal + 0xDB7) * 2 + 0xF0);
-					} else {
-						value = LoadU16(classData, (systemVal + 0xDA7) * 2 + 0xD0);
-					}
 				} else if (systemVal < -0xD83) {
 					if (systemVal == -0xD92) {
 						u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);

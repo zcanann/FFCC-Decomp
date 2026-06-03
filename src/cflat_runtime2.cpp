@@ -2421,11 +2421,11 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	case 0x11:
 	case 0x15:
 	case 0x16: {
-		u8* mon = m_objMon;
-		for (int i = 0; i < 0x40; i++, mon += 0x740) {
+		CGMonObj* mon = reinterpret_cast<CGMonObj*>(m_objMon);
+		for (int i = 0; i < 0x40; i++, mon++) {
 			if ((*reinterpret_cast<unsigned int*>(mon) != 0) &&
-			    ((controlValue == 0) || ((*reinterpret_cast<unsigned int*>(mon + 0x6EC) & static_cast<unsigned int>(controlValue)) != 0))) {
-				reinterpret_cast<CGMonObj*>(mon)->sysControl(controlNo);
+			    ((controlValue == 0) || ((mon->m_controlMask & static_cast<unsigned int>(controlValue)) != 0))) {
+				mon->sysControl(controlNo);
 			}
 		}
 		break;

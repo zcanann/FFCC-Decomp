@@ -5553,12 +5553,12 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
     }
     else if (threadParam->m_subState == 0)
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 1 + 258];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 7;
 
@@ -5569,13 +5569,13 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
         if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
         {
             unsigned int bonusPort;
-            if (GbaQue.IsSingleMode(port) && port == 1)
+            if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
             {
                 bonusPort = 0;
             }
             else
             {
-                bonusPort = port;
+                bonusPort = threadParam->m_portIndex;
             }
 
             int bonusIndex = GbaQue.GetBonus(bonusPort);

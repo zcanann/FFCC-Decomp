@@ -3207,7 +3207,7 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
         }
     }
 
-    mapAnimRun->Start(startFrame, endFrame, loop);
+    mapAnimRun->Start(startFrame, endFrame, static_cast<char>(loop));
 }
 #pragma dont_inline reset
 

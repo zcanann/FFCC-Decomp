@@ -43,51 +43,6 @@ extern const char s_MenuOptionStereoDe[];
 }
 
 namespace {
-struct ArtiState {
-	unsigned char pad_0000[0xB];
-	char initialized;
-	unsigned char pad_000C;
-	unsigned char closeRequested;
-	unsigned char pad_000E[2];
-	short state;
-	unsigned char pad_0012[0x0C];
-	short moveDirection;
-	unsigned char pad_0020[2];
-	short frame;
-	unsigned char pad_0024[2];
-	short selections[5];
-	short currentSelection;
-	short prevSelection;
-	short scrollOffset;
-};
-
-struct ArtiOpenAnim {
-	short x;
-	short y;
-	short w;
-	short h;
-	float u;
-	float v;
-	float alpha;
-	float scale;
-	int unk;
-	int tex;
-	int step;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
-struct ArtiOpenAnimList {
-	short count;
-	unsigned char pad_0002[6];
-	ArtiOpenAnim entries[64];
-};
-
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_artiList) == 0x850);
 STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
@@ -117,22 +72,22 @@ STATIC_ASSERT(sizeof(ArtiOpenAnimList) == 0x1008);
 
 static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
 {
-	return reinterpret_cast<ArtiState*>(menu->m_artiState);
+	return menu->m_artiState;
 }
 
 static inline s16* GetArtiState(CMenuPcs* menu)
 {
-	return menu->m_artiState;
+	return reinterpret_cast<s16*>(menu->m_artiState);
 }
 
 static inline s16* GetArtiList(CMenuPcs* menu)
 {
-	return menu->m_artiList;
+	return reinterpret_cast<s16*>(menu->m_artiList);
 }
 
 static inline ArtiOpenAnimList* GetArtiOpenAnimList(CMenuPcs* menu)
 {
-	return reinterpret_cast<ArtiOpenAnimList*>(menu->m_artiList);
+	return menu->m_artiList;
 }
 
 static inline ArtiOpenAnim* GetArtiOpenAnim(CMenuPcs* menu, int index)

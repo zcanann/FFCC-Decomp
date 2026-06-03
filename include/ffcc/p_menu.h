@@ -18,6 +18,8 @@ class CTextureSet;
 class CPad;
 class CRingMenu;
 class CMesMenu;
+struct ArtiState;
+struct ArtiOpenAnimList;
 
 struct McListInfo
 {
@@ -395,9 +397,9 @@ public:
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
     unsigned char m_pad744[0x82C - 0x744];
-    short* m_artiState;
+    ArtiState* m_artiState;
     unsigned char m_pad830[0x850 - 0x830];
-    short* m_artiList;
+    ArtiOpenAnimList* m_artiList;
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
     unsigned char m_singleMenuInitialized;

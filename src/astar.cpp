@@ -45,8 +45,8 @@ struct CMapCylinderRaw
 	Vec m_top;
 	Vec m_axis;
 	float m_radius;
-	Vec m_boundsMin;
 	Vec m_boundsMax;
+	Vec m_boundsMin;
 };
 
 static inline CAStar::CATemp& AsCATemp(CAStarTempWork& temp)

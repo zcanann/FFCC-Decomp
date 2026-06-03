@@ -164,15 +164,15 @@ void CMaterialEditorPcs::SetUSBData()
         s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
-        srt.transX = FLOAT_8032FD00;
-        srt.transY = S32ToFloat(-xDiff / 2);
-        srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
-        srt.rotX = FLOAT_8032FD00;
-        srt.rotY = FLOAT_8032FD00;
         srt.rotZ = FLOAT_8032FD00;
-        srt.scaleX = FLOAT_8032FD04;
-        srt.scaleY = FLOAT_8032FD04;
+        srt.transY = (float)(-xDiff / 2);
+        srt.rotY = FLOAT_8032FD00;
+        srt.rotX = FLOAT_8032FD00;
         srt.scaleZ = FLOAT_8032FD04;
+        srt.scaleY = FLOAT_8032FD04;
+        srt.scaleX = FLOAT_8032FD04;
+        srt.transZ = (float)(-yDiff * (xDiff / 0x14) - 10);
+        srt.transX = FLOAT_8032FD00;
         CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
         break;
     }

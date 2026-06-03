@@ -2560,38 +2560,26 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		s16 m_hitObjectIds[0x10];
 	};
 
-	struct CMapCylinderRaw
-	{
-		Vec m_bottom;
-		Vec m_direction;
-		float m_radius;
-		float m_height;
-		Vec m_top;
-		Vec m_direction2;
-		float m_radius2;
-		float m_height2;
-	};
-
 	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
 	bool hadHit = false;
 
 	if (FLOAT_8032fddc != cylScale)
 	{
-		CMapCylinderRaw cylinder;
+		CMapCylinder cylinder;
 		cylinder.m_bottom = *origin;
-		cylinder.m_direction.x = FLOAT_8032fde0;
-		cylinder.m_direction.y = FLOAT_8032fde0;
-		cylinder.m_direction.z = FLOAT_8032fde0;
-		cylinder.m_radius = radius;
-		cylinder.m_height = FLOAT_8032fde0;
-		cylinder.m_top = *vector;
-		cylinder.m_direction2.x = FLOAT_8032fde4;
-		cylinder.m_direction2.y = FLOAT_8032fde4;
-		cylinder.m_direction2.z = FLOAT_8032fde4;
-		cylinder.m_radius2 = cylScale;
-		cylinder.m_height2 = FLOAT_8032fde0;
+		cylinder.Probe().m_direction.x = FLOAT_8032fde0;
+		cylinder.Probe().m_direction.y = FLOAT_8032fde0;
+		cylinder.Probe().m_direction.z = FLOAT_8032fde0;
+		cylinder.Probe().m_radius = radius;
+		cylinder.Probe().m_height = FLOAT_8032fde0;
+		cylinder.Probe().m_top = *vector;
+		cylinder.Probe().m_direction2.x = FLOAT_8032fde4;
+		cylinder.Probe().m_direction2.y = FLOAT_8032fde4;
+		cylinder.Probe().m_direction2.z = FLOAT_8032fde4;
+		cylinder.Probe().m_radius2 = cylScale;
+		cylinder.Probe().m_height2 = FLOAT_8032fde0;
 
-		if (MapMng.CheckHitCylinder((CMapCylinder*)&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
+		if (MapMng.CheckHitCylinder(&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
 		{
 			if (Game.m_currentSceneId == 7)
 			{

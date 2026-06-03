@@ -22,6 +22,7 @@ class COctNode
 {
 public:
 	COctNode();
+	CBound* GetBound() { return reinterpret_cast<CBound*>(&m_boundMinX); }
 
 	float m_boundMinX;      // 0x00
 	float m_boundMinY;      // 0x04

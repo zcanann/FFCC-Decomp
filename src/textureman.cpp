@@ -567,10 +567,14 @@ int CTexture::CheckName(char* name)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8003EC14
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
+void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
 {
     if (m_cacheId != -1) {
         if (GetRef() <= 1) {
@@ -582,10 +586,14 @@ inline void CTexture::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8003EC68
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-inline void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
+void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
 {
     if (m_cacheId != -1) {
         amemCacheSet->RefCnt0Up(m_cacheId);

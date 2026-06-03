@@ -17,79 +17,9 @@ extern const float kMapOctTreeDefaultOffsetZ;
 extern const float kMapObjBoundMinInit = 10000000000.0f;
 extern const float kMapObjBoundMaxInit = -10000000000.0f;
 extern const float kMapObjZero = 1.0f;
-struct CBoundRaw
-{
-    CBoundRaw()
-    {
-        float min = kMapObjBoundMinInit;
-        float max = kMapObjBoundMaxInit;
-        float* bound = (float*)this;
-        bound[2] = min;
-        bound[1] = min;
-        bound[0] = min;
-        bound[5] = max;
-        bound[4] = max;
-        bound[3] = max;
-    }
 
-	void operator=(const CBound& other)
-	{
-		*this = *reinterpret_cast<const CBoundRaw*>(&other);
-	}
-
-    Vec m_min;
-    Vec m_max;
-};
-
-struct CMapCylinderRaw
-{
-    CMapCylinderRaw()
-    {
-        m_boundsMin.z = kMapObjBoundMinInit;
-        m_boundsMin.y = kMapObjBoundMinInit;
-        m_boundsMin.x = kMapObjBoundMinInit;
-        m_boundsMax.z = kMapObjBoundMaxInit;
-        m_boundsMax.y = kMapObjBoundMaxInit;
-        m_boundsMax.x = kMapObjBoundMaxInit;
-    }
-
-    Vec m_bottom;
-    Vec m_top;
-    Vec m_axis;
-    float m_radius;
-    Vec m_boundsMin;
-    Vec m_boundsMax;
-};
-
-struct CMaterialManEnvRaw
-{
-    unsigned char m_pad004[0x40];
-    unsigned int m_stdEnvTevBit;
-    unsigned int m_activeEnvTevBit;
-    unsigned int m_curEnvTevBit;
-    unsigned char m_alphaRef;
-    unsigned char m_pad04D[0x0B];
-    unsigned int m_lockedEnvTevBit;
-    unsigned int m_lockedEnvUnknown5c;
-    unsigned char m_pad060[0xBC];
-    int m_texMapIdCur;
-    int m_texMtxCur;
-    int m_texCoordIdCur;
-    int m_stdTexMapId;
-    int m_stdTexMtx;
-    int m_stdTexCoordId;
-    int m_texMapIdCurShadow;
-    int m_texMtxCurShadow;
-    int m_texCoordIdCurShadow;
-    unsigned char m_pad140[0xC5];
-    unsigned char m_blendMode;
-    unsigned char m_fogEnable;
-    unsigned char m_blendOverrideMode;
-    unsigned char m_shadowKColorMask;
-};
-
-CBoundRaw s_bound;
-CMapCylinderRaw s_cyl;
+CBound s_bound;
+CMapCylinder s_cyl;
 Vec s_mvec;
 int s_light_no = 0;
 unsigned long s_shadow_no = 0;
@@ -302,26 +232,11 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 	COctNode* nodeIter;
 	COctNode* pCVar4;
 	COctNode* pCVar3;
-	CMaterialManEnvRaw* env;
 	int iVar5;
 
 	if ((octNode->m_meshCount != 0) &&
 	    ((octNode->m_drawFlags & 1) != 0)) {
-		env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
-		env->m_curEnvTevBit = 0xACE0F;
-		env->m_activeEnvTevBit = 0xFFFFFFFF;
-		env->m_alphaRef = 0xFF;
-		env->m_stdTexMapId = 0;
-		env->m_texMapIdCur = 0;
-		env->m_stdTexMtx = 0x1E;
-		env->m_texMtxCur = 0x1E;
-		env->m_stdTexCoordId = 0;
-		env->m_texCoordIdCur = 0;
-		env->m_blendMode = 0xFF;
-		env->m_fogEnable = 0xFF;
-		env->m_lockedEnvTevBit = 0;
-		env->m_lockedEnvUnknown5c = 0;
-		env->m_shadowKColorMask = 0;
+		MaterialMan.SetDefaultDrawEnv(0xACE0F);
 		if (m_mapObject->m_enableFullScreenShadow != 0) {
 			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 		}
@@ -329,17 +244,13 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
 			                           m_mapObject->m_worldMtx);
 		}
-		env->m_stdTexMapId = env->m_texMapIdCur;
-		env->m_stdTexMtx = env->m_texMtxCur;
-		env->m_stdTexCoordId = env->m_texCoordIdCur;
-		env->m_stdEnvTevBit = env->m_curEnvTevBit;
+		MaterialMan.LockEnv();
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
 		m_mapObject->SetDrawEnv();
 		static_cast<CMapMesh*>(m_mapObject->m_mapData)
 			->DrawMesh(octNode->m_meshStart,
 			           octNode->m_meshCount);
 	}
-	env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
 	nodeIter = octNode;
 	iVar2 = 0;
 	do {
@@ -349,20 +260,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		}
 		if ((pCVar4->m_meshCount != 0) &&
 		    ((pCVar4->m_drawFlags & 1) != 0)) {
-			env->m_curEnvTevBit = 0xACE0F;
-			env->m_activeEnvTevBit = 0xFFFFFFFF;
-			env->m_alphaRef = 0xFF;
-			env->m_stdTexMapId = 0;
-			env->m_texMapIdCur = 0;
-			env->m_stdTexMtx = 0x1E;
-			env->m_texMtxCur = 0x1E;
-			env->m_stdTexCoordId = 0;
-			env->m_texCoordIdCur = 0;
-			env->m_blendMode = 0xFF;
-			env->m_fogEnable = 0xFF;
-			env->m_lockedEnvTevBit = 0;
-			env->m_lockedEnvUnknown5c = 0;
-			env->m_shadowKColorMask = 0;
+			MaterialMan.SetDefaultDrawEnv(0xACE0F);
 			if (m_mapObject->m_enableFullScreenShadow != 0) {
 				CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 			}
@@ -370,10 +268,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar4->m_shadowFlags,
 				                           m_mapObject->m_worldMtx);
 			}
-			env->m_stdTexMapId = env->m_texMapIdCur;
-			env->m_stdTexMtx = env->m_texMtxCur;
-			env->m_stdTexCoordId = env->m_texCoordIdCur;
-			env->m_stdEnvTevBit = env->m_curEnvTevBit;
+			MaterialMan.LockEnv();
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar4->m_lightFlags);
 			m_mapObject->SetDrawEnv();
 			static_cast<CMapMesh*>(m_mapObject->m_mapData)
@@ -1155,7 +1050,7 @@ void InsertLight_r(COctNode* node)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
+				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if (grandChild->m_meshCount != 0) {
 						setbit32(&grandChild->m_lightFlags, g_pStage);
 					}
@@ -1539,7 +1434,7 @@ void InsertShadow_r(COctNode* node)
 				s_light_no++;
 				COctNode* grandChild = childIter->m_children[0];
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
+				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
 						setbit32(&grandChild->m_shadowFlags, s_insertShadowNo);
 					}
@@ -1803,7 +1698,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	if (overlap) {
 		if ((node->m_meshCount != 0) &&
 			(static_cast<CMapHit*>(m_mapObject->m_mapData)
-				 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+				 ->CheckHitCylinder(&s_cyl, &s_mvec,
 									node->m_meshStart,
 									node->m_meshCount,
 									InsertShadow_level) != 0)) {
@@ -1867,7 +1762,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 				int childHit = false;
 				if ((child->m_meshCount != 0) &&
 					(static_cast<CMapHit*>(m_mapObject->m_mapData)
-						 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+						 ->CheckHitCylinder(&s_cyl, &s_mvec,
 											child->m_meshStart,
 											child->m_meshCount,
 											InsertShadow_level) != 0)) {
@@ -1879,10 +1774,10 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 							break;
 						}
 
-						if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
+						if (grandChild->GetBound()->CheckCross(*s_cyl.GetBound()) != 0) {
 							if ((grandChild->m_meshCount != 0) &&
 								(static_cast<CMapHit*>(m_mapObject->m_mapData)
-									 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
+									 ->CheckHitCylinder(&s_cyl, &s_mvec,
 														grandChild->m_meshStart,
 														grandChild->m_meshCount,
 														InsertShadow_level) != 0)) {
@@ -2044,7 +1939,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 	if (octNode->m_meshCount != 0) {
 		static_cast<CMapHit*>(m_mapObject->m_mapData)
-		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
+		    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
 		                           octNode->m_meshStart,
 		                           octNode->m_meshCount,
 		                           InsertShadow_level);
@@ -2105,7 +2000,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
 				static_cast<CMapHit*>(m_mapObject->m_mapData)
-				    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
+				    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
 				                           child->m_meshStart,
 				                           child->m_meshCount,
 				                           InsertShadow_level);
@@ -2117,10 +2012,10 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
+				if (grandChild->GetBound()->CheckCross(*s_cyl.GetBound()) != 0) {
 					if (grandChild->m_meshCount != 0) {
 						static_cast<CMapHit*>(m_mapObject->m_mapData)
-						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
+						    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
 						                           grandChild->m_meshStart,
 						                           grandChild->m_meshCount,
 						                           InsertShadow_level);
@@ -2206,12 +2101,10 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(this);
-
-	env->m_stdTexMapId = env->m_texMapIdCur;
-	env->m_stdTexMtx = env->m_texMtxCur;
-	env->m_stdTexCoordId = env->m_texCoordIdCur;
-	env->m_stdEnvTevBit = env->m_curEnvTevBit;
+	m_stdTexMapId = m_texMapIdCur;
+	m_stdTexMtx = m_texMtxCur;
+	m_stdTexCoordId = m_texCoordIdCur;
+	m_stdEnvTevBit = m_curEnvTevBit;
 }
 
 /*
@@ -2221,22 +2114,20 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(this);
-
-	env->m_curEnvTevBit = 0x000ACE0F;
-	env->m_activeEnvTevBit = 0xFFFFFFFF;
-	env->m_alphaRef = 0xFF;
-	env->m_stdTexMapId = 0;
-	env->m_texMapIdCur = 0;
-	env->m_stdTexMtx = 0x1E;
-	env->m_texMtxCur = 0x1E;
-	env->m_stdTexCoordId = 0;
-	env->m_texCoordIdCur = 0;
-	env->m_blendMode = 0xFF;
-	env->m_fogEnable = 0xFF;
-	env->m_lockedEnvTevBit = 0;
-	env->m_lockedEnvUnknown5c = 0;
-	env->m_shadowKColorMask = 0;
+	m_curEnvTevBit = 0x000ACE0F;
+	m_activeEnvTevBit = 0xFFFFFFFF;
+	m_vtxDescMode = 0xFF;
+	m_stdTexMapId = 0;
+	m_texMapIdCur = 0;
+	m_stdTexMtx = 0x1E;
+	m_texMtxCur = 0x1E;
+	m_stdTexCoordId = 0;
+	m_texCoordIdCur = 0;
+	m_blendMode = 0xFF;
+	m_fogEnable = 0xFF;
+	m_shadowMaterialCount = 0;
+	m_shadowTextureCount = 0;
+	m_shadowKColorMask = 0;
 }
 
 /*

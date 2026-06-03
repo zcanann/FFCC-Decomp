@@ -126,6 +126,13 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+struct ShadowCandidate
+{
+    CMapShadow* shadow;
+    int distance;
+    int index;
+};
+
 static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
 {
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
@@ -183,11 +190,11 @@ static CMapKeyFrame* AllocMapKeyFrame(int line)
         MaterialMan.GetMemoryStage(),
         const_cast<char*>(s_materialman_cpp),
         line));
-    if (keyFrame != 0) {
-        memset(keyFrame, 0, 0x28);
-        *reinterpret_cast<unsigned char*>(Ptr(keyFrame, 0xC)) = 1;
-    }
-    return keyFrame;
+	if (keyFrame != 0) {
+		memset(keyFrame, 0, 0x28);
+		keyFrame->m_startFrame = 1;
+	}
+	return keyFrame;
 }
 
 static void SetMaterialColor(CMaterial* material, unsigned int rgba)
@@ -1784,17 +1791,18 @@ void CMaterialMan::SetPosition(
     float (*viewMtx)[4],
     int ignoreFrustumCheck)
 {
-    float minX = position->x - rangeXZ;
-    float minY = position->y;
-    float minZ = position->z - rangeXZ;
-    float maxX = position->x + rangeXZ;
-    float maxY = minY + rangeY;
-    float maxZ = position->z + rangeXZ;
+    CBound searchBound;
+    searchBound.m_min.x = position->x - rangeXZ;
+    searchBound.m_min.y = position->y;
+    searchBound.m_min.z = position->z - rangeXZ;
+    searchBound.m_max.x = position->x + rangeXZ;
+    searchBound.m_max.y = position->y + rangeY;
+    searchBound.m_max.z = position->z + rangeXZ;
 
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     if (target == static_cast<CMapShadow::TARGET>(0)) {
-        int shadowCandidates[385];
-        int* candidateWrite = shadowCandidates;
+        ShadowCandidate shadowCandidates[128];
+        ShadowCandidate* candidateWrite = shadowCandidates;
         int candidateCount = 0;
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
@@ -1827,31 +1835,31 @@ void CMaterialMan::SetPosition(
                 ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
-                 (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
+                 (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
-                candidateWrite[0] = reinterpret_cast<int>(shadow);
-                candidateWrite[1] = static_cast<int>(PSVECSquareMag(&delta));
-                candidateWrite[2] = i;
-                candidateWrite += 3;
+                candidateWrite->shadow = shadow;
+                candidateWrite->distance = static_cast<int>(PSVECSquareMag(&delta));
+                candidateWrite->index = i;
+                candidateWrite++;
                 candidateCount++;
             }
         }
 
-        int* nearest = 0;
+        ShadowCandidate* nearest = 0;
         float nearestDist = FLOAT_8032fb00;
-        int* candidateRead = shadowCandidates;
+        ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
-            if (static_cast<float>(candidateRead[1]) < nearestDist) {
+            if (static_cast<float>(candidateRead->distance) < nearestDist) {
                 nearest = candidateRead;
-                nearestDist = static_cast<float>(candidateRead[1]);
+                nearestDist = static_cast<float>(candidateRead->distance);
             }
-            candidateRead += 3;
+            candidateRead++;
         }
 
         if (nearest != 0) {
-            nearest[1] = static_cast<int>(FLOAT_8032fb04);
-            SetShadow(*reinterpret_cast<CMapShadow*>(nearest[0]), viewMtx, nearest[2], 0xFFFFFFFF);
+            nearest->distance = static_cast<int>(FLOAT_8032fb04);
+            SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
@@ -1875,7 +1883,7 @@ void CMaterialMan::SetPosition(
                 FLOAT_8032faf0);
 
             if ((shadow->m_materialMode == 1) ||
-                (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+                (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
                 SetShadow(*shadow, viewMtx, i, 0);
             }
         }
@@ -1900,19 +1908,20 @@ int CMaterialMan::GetCharaShadow(
     float rangeY,
     int ignoreFrustumCheck)
 {
-    float minX = position->x - rangeXZ;
-    float minY = position->y;
-    float minZ = position->z - rangeXZ;
-    float maxX = position->x + rangeXZ;
-    float maxY = minY + rangeY;
-    float maxZ = position->z + rangeXZ;
+    CBound searchBound;
+    searchBound.m_min.x = position->x - rangeXZ;
+    searchBound.m_min.y = position->y;
+    searchBound.m_min.z = position->z - rangeXZ;
+    searchBound.m_max.x = position->x + rangeXZ;
+    searchBound.m_max.y = position->y + rangeY;
+    searchBound.m_max.z = position->z + rangeXZ;
 
     CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
-    int shadowCandidates[384];
-    int* candidateWrite = shadowCandidates;
+    ShadowCandidate shadowCandidates[128];
+    ShadowCandidate* candidateWrite = shadowCandidates;
     int candidateCount = 0;
     int outputCount = 0;
 
@@ -1949,31 +1958,31 @@ int CMaterialMan::GetCharaShadow(
             ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
-             (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
+             (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
-            candidateWrite[0] = reinterpret_cast<int>(shadow);
-            candidateWrite[1] = static_cast<int>(PSVECSquareMag(&delta));
-            candidateWrite[2] = i;
-            candidateWrite += 3;
+            candidateWrite->shadow = shadow;
+            candidateWrite->distance = static_cast<int>(PSVECSquareMag(&delta));
+            candidateWrite->index = i;
+            candidateWrite++;
             candidateCount++;
         }
     }
 
-    int* nearest = 0;
+    ShadowCandidate* nearest = 0;
     float nearestDist = FLOAT_8032fb00;
-    int* candidateRead = shadowCandidates;
+    ShadowCandidate* candidateRead = shadowCandidates;
     for (int i = 0; i < candidateCount; i++) {
-        if (static_cast<float>(candidateRead[1]) < nearestDist) {
+        if (static_cast<float>(candidateRead->distance) < nearestDist) {
             nearest = candidateRead;
-            nearestDist = static_cast<float>(candidateRead[1]);
+            nearestDist = static_cast<float>(candidateRead->distance);
         }
-        candidateRead += 3;
+        candidateRead++;
     }
 
     if ((nearest != 0) && (outputCount < maxShadows)) {
-        nearest[1] = static_cast<int>(FLOAT_8032fb04);
-        CMapShadow* nearestShadow = reinterpret_cast<CMapShadow*>(nearest[0]);
+        nearest->distance = static_cast<int>(FLOAT_8032fb04);
+        CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = (*materials)[nearestShadow->m_materialIndex];
         shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;
         outputCount++;
@@ -2990,7 +2999,7 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
     CMaterial* material =
         m_materials[static_cast<unsigned long>(materialIndex)];
     if (material != 0) {
-        material->CacheUnLoadTexture(amemCacheSet);
+        material->CacheDumpTexture(amemCacheSet);
     }
 }
 

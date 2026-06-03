@@ -1358,7 +1358,7 @@ void CMapObj::Draw(unsigned char priority)
     }
     if (m_shadowTarget != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
-                                   reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
+                                   reinterpret_cast<CMapMesh*>(m_mapData)->GetBound(),
                                    m_worldMtx);
     }
 
@@ -1428,8 +1428,8 @@ void CMapObj::SetDrawFlag()
             Mtx concatMtx;
 
             PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
-            if (reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC)
-                    ->CheckFrustum(MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
+            if (reinterpret_cast<CMapMesh*>(m_mapData)->GetBound()->CheckFrustum(
+                    MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
                 m_showFlags |= 4;
             }
         }

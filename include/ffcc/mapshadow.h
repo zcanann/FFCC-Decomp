@@ -1,6 +1,7 @@
 #ifndef _FFCC_MAPSHADOW_H_
 #define _FFCC_MAPSHADOW_H_
 
+#include "ffcc/mapocttree.h"
 #include "ffcc/vector.h"
 #include <Dolphin/types.h>
 #include <dolphin/mtx.h>
@@ -40,7 +41,7 @@ public:
     u8 _padB0[8];            // 0xB0
     float m_scrollStepX;     // 0xB8
     float m_scrollStepY;     // 0xBC
-    u8 m_targetBounds[0x30]; // 0xC0
+    CBound m_targetBounds[2]; // 0xC0
     u8 m_targetEnabled[2];   // 0xF0
 };
 

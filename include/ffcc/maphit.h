@@ -13,6 +13,18 @@ int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 extern "C" const float kMapHitBoundsMinInit;
 extern "C" const float kMapHitBoundsMaxInit;
 
+struct CMapCylinderProbeView
+{
+    Vec m_direction;  // 0x0c
+    float m_radius;   // 0x18
+    float m_height;   // 0x1c
+    Vec m_top;        // 0x20
+    Vec m_direction2; // 0x2c
+    float m_radius2;  // 0x38
+    float m_height2;  // 0x3c
+};
+typedef char CMapCylinderProbeView_size_check[(sizeof(CMapCylinderProbeView) == 0x34) ? 1 : -1];
+
 class CMapCylinder
 {
 public:
@@ -29,6 +41,10 @@ public:
         m_boundsMax.x = kMapHitBoundsMaxInit;
     }
 
+    CBound* GetBound() { return reinterpret_cast<CBound*>(&m_boundsMin); }
+    CMapCylinderProbeView& Probe() { return *reinterpret_cast<CMapCylinderProbeView*>(&m_top); }
+    const CMapCylinderProbeView& Probe() const { return *reinterpret_cast<const CMapCylinderProbeView*>(&m_top); }
+
     Vec m_bottom;    // 0x00
     Vec m_top;       // 0x0c
     Vec m_axis;      // 0x18
@@ -36,6 +52,7 @@ public:
     Vec m_boundsMin; // 0x28
     Vec m_boundsMax; // 0x34
 };
+typedef char CMapCylinder_size_check[(sizeof(CMapCylinder) == 0x40) ? 1 : -1];
 
 class CMapHitFace
 {

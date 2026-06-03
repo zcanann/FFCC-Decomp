@@ -18,28 +18,20 @@ extern unsigned char ppvIsLoopCalc;
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 
-struct ChangeTexWork {
-	float m_value0;
-	float m_value1;
-	float m_value2;
-	GXColor** m_meshColorArrays;
-	ChangeTexDisplayListCopy*** m_displayListArrays;
-	int _pad14;
-	CGObject* m_charaObj;
-	CTexture* m_texture;
-	int _pad20;
-	void* m_context;
-	Vec m_bboxMin;
-	int _pad34;
-	Vec m_bboxMax;
-	float m_cachedValue;
-};
-
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(ChangeTexMeshRef, m_workPositions) == 0xC);
+STATIC_ASSERT(sizeof(ChangeTexWork) == 0x48);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_meshColorArrays) == 0x0C);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_displayListArrays) == 0x10);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_charaObj) == 0x18);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_texture) == 0x1C);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_context) == 0x24);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMin) == 0x28);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
+STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 extern const float kPppChangeTexCachedValueInit = -10000.0f;
@@ -324,7 +316,7 @@ freeArrays:
  */
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 	float init = kPppChangeTexInit[0];
 
 	work->m_value0 = init;
@@ -344,7 +336,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	float init = kPppChangeTexInit[0];
-	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 
 	work->m_value0 = init;
 	work->m_value2 = init;
@@ -367,7 +359,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
  */
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	ChangeTexWork* work = (ChangeTexWork*)param_2;
+	ChangeTexWork* work = static_cast<ChangeTexWork*>(param_2);
 	pppChangeTexUnkB* step = static_cast<pppChangeTexUnkB*>(param_3);
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
@@ -419,7 +411,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
  */
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	ChangeTexWork* work = (ChangeTexWork*)param_2;
+	ChangeTexWork* work = static_cast<ChangeTexWork*>(param_2);
 	pppChangeTexUnkB* step = static_cast<pppChangeTexUnkB*>(param_3);
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += param_4;

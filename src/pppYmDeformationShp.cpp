@@ -12,6 +12,17 @@ extern "C" {
 extern const float FLOAT_803305f0;
 extern const float kPppYmDeformationShpZero;
 extern const float FLOAT_803305f8;
+extern const double DOUBLE_80330600 = 4503601774854144.0;
+extern const double DOUBLE_80330608 = 4503599627370496.0;
+extern const float FLOAT_80330610 = 320.0f;
+extern const float FLOAT_80330614 = 0.003125f;
+extern const float FLOAT_80330618 = 224.0f;
+extern const float FLOAT_8033061c = 0.004464f;
+extern const float FLOAT_80330620 = 1000.0f;
+extern const float FLOAT_80330624 = -1000.0f;
+extern const float FLOAT_80330628 = -0.5f;
+extern const float FLOAT_8033062c = -1.0f;
+extern const float FLOAT_80330630 = 0.5f;
 }
 #include "ffcc/util.h"
 
@@ -214,10 +225,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	float offsetX;
 	float offsetY;
 	float one = FLOAT_803305f8;
-	float screenCenterX = 320.0f;
-	float screenScaleX = 0.003125f;
-	float screenCenterY = 224.0f;
-	float screenScaleY = 0.004464f;
+	float screenCenterX = FLOAT_80330610;
+	float screenScaleX = FLOAT_80330614;
+	float screenCenterY = FLOAT_80330618;
+	float screenScaleY = FLOAT_8033061c;
 	int i;
 
 	for (i = 0; i < 4; i++) {
@@ -237,8 +248,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
 	}
 
-	minY = 1000.0f;
-	maxY = -1000.0f;
+	minY = FLOAT_80330620;
+	maxY = FLOAT_80330624;
 	minX = minY;
 	maxX = maxY;
 	for (i = 0; i < 4; i++) {
@@ -290,11 +301,11 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[2][0] = ppvScreenMatrix[2][0];
 	texMtx[0][1] = ppvScreenMatrix[0][1];
 	texMtx[2][1] = ppvScreenMatrix[2][1];
-	texMtx[0][0] = ppvScreenMatrix[0][0] * (320.0f / (float)width);
-	texMtx[1][1] = ppvScreenMatrix[1][1] * -(224.0f / (float)height);
-	texMtx[0][2] = -0.5f;
-	texMtx[1][2] = -0.5f;
-	texMtx[2][2] = -1.0f;
+	texMtx[0][0] = ppvScreenMatrix[0][0] * (FLOAT_80330610 / (float)width);
+	texMtx[1][1] = ppvScreenMatrix[1][1] * -(FLOAT_80330618 / (float)height);
+	texMtx[0][2] = FLOAT_80330628;
+	texMtx[1][2] = FLOAT_80330628;
+	texMtx[2][2] = FLOAT_8033062c;
 
 	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
 	cameraPos.z = kPppYmDeformationShpZero;
@@ -303,8 +314,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	PSMTXMultVec(tempMtx, &cameraPos, &cameraPos);
 	cameraPos.x = cameraPos.x / cameraPos.z;
 	cameraPos.y = cameraPos.y / cameraPos.z;
-	texMtx[0][2] = -1.0f + cameraPos.x;
-	texMtx[1][2] = -1.0f + cameraPos.y;
+	texMtx[0][2] = FLOAT_8033062c + cameraPos.x;
+	texMtx[1][2] = FLOAT_8033062c + cameraPos.y;
 	PSMTXConcat(texMtx, obj->m_drawMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
@@ -335,7 +346,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	if (left < 0) {
 		if (640 < (left + width)) {
-			texMtx[0][2] = texMtx[0][2] + (0.5f - cameraPos.x);
+			texMtx[0][2] = texMtx[0][2] + (FLOAT_80330630 - cameraPos.x);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {
@@ -354,7 +365,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	if (top < 0) {
 		if (448 < (top + height)) {
-			texMtx[1][2] = texMtx[1][2] + (0.5f - cameraPos.y);
+			texMtx[1][2] = texMtx[1][2] + (FLOAT_80330630 - cameraPos.y);
 		} else {
 			int maxIndex = 0;
 			for (i = 1; i < 4; i++) {

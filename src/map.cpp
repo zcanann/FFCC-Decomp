@@ -1,4 +1,3 @@
-#define FFCC_MAP_DEFINE_MNG_LAYOUT
 #include "ffcc/map.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/math.h"
@@ -8,9 +7,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
-#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/textureman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"

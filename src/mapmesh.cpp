@@ -2,9 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
-#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
@@ -13,7 +11,6 @@
 
 class CMapHitFace;
 
-extern "C" CMemory::CStage* g_hit_lpface_min;
 extern "C" char s_mapmesh_cpp[];
 extern "C" const float FLOAT_8032F930;
 extern "C" const float FLOAT_8032F934;
@@ -24,32 +21,32 @@ u32 s_insertShadowNo;
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)
 {
-    ptr = reinterpret_cast<void*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
+    ptr = static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr);
 }
 
 static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
+    ptr = reinterpret_cast<CMapMeshUvPair*>(static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr));
 }
 
 static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<int>(ptr) + reinterpret_cast<int>(base));
+    ptr = reinterpret_cast<CMapMeshDrawEntry*>(static_cast<u8*>(base) + reinterpret_cast<unsigned int>(ptr));
 }
 
 static inline void SubMeshDataBase(void*& ptr, void* base)
 {
-    ptr = reinterpret_cast<void*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
+    ptr = reinterpret_cast<void*>(static_cast<u8*>(ptr) - static_cast<u8*>(base));
 }
 
 static inline void SubMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
+    ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
 }
 
 static inline void SubMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
 {
-    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<int>(ptr) - reinterpret_cast<int>(base));
+    ptr = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
 }
 
 static inline unsigned int Align32(unsigned int value)
@@ -59,7 +56,7 @@ static inline unsigned int Align32(unsigned int value)
 
 static inline CMemory::CStage*& MapMeshAllocStage()
 {
-    return g_hit_lpface_min;
+    return g_pStage;
 }
 }
 
@@ -530,10 +527,6 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
  */
 void CMapMesh::Off2Ptr()
 {
-    int iVar1;
-    int iVar2;
-    int iVar3;
-
     AddMeshDataBase(m_vertices, m_meshData);
     AddMeshDataBase(m_normals, m_meshData);
     AddMeshDataBase(m_nbt, m_meshData);
@@ -541,15 +534,10 @@ void CMapMesh::Off2Ptr()
     AddMeshDataBase(m_colors, m_meshData);
     AddMeshDataBase(m_drawEntries, m_meshData);
 
-    iVar3 = 0;
-    iVar1 = 0;
-    while (iVar3 < (int)(unsigned int)m_displayListCount) {
-        int base = reinterpret_cast<int>(m_meshData);
-        int drawEntriesBase = reinterpret_cast<int>(m_drawEntries);
-        iVar2 = drawEntriesBase + iVar1;
-        iVar1 = iVar1 + 0x10;
-        *reinterpret_cast<int*>(iVar2 + 4) = base + *reinterpret_cast<int*>(iVar2 + 0xC);
-        iVar3++;
+    CMapMeshDrawEntry* entry = m_drawEntries;
+    for (unsigned int i = 0; i < static_cast<unsigned int>(m_displayListCount); i++) {
+        entry->m_displayList = static_cast<u8*>(m_meshData) + entry->m_displayListOffset;
+        entry++;
     }
 }
 

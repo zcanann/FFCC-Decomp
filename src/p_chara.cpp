@@ -1,4 +1,4 @@
-#define FFCC_P_CHARA_DEFINE_LAYOUT
+#include "ffcc/ptrarray.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
@@ -184,8 +184,6 @@ static const char s_charaDumpPdtFmt[] = "%3d %1d %3d %1d %8d %3d %08x\n";
 static const char s_charaDumpAnimHdr1[] = "ANIM\n";
 static const char s_charaDumpAnimHdr2[] = " no t num name lv mask addr banksz sum bankaddr\n";
 static const char s_charaDumpAnimFmt[] = "%3d %1d %3d %-14s %3d %08x %08x %d %08x\n";
-static char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
-static char s_p_chara_ptrarray_grow_error[] = "CPtrArray grow error";
 static const char s_charaKindPath0[] = "k00";
 static const char s_charaKindPath1[] = "k01";
 static const char s_charaKindPath2[] = "k02";
@@ -204,154 +202,6 @@ static const char* s_charaKindPathParts[][3] = {
 };
 
 #pragma dont_inline on
-
-template <class T>
-CPtrArray<T>::CPtrArray()
-{
-    m_size = 0;
-    m_numItems = 0;
-    m_defaultSize = 0x10;
-    m_items = 0;
-    m_stage = 0;
-    m_growCapacity = 1;
-}
-
-template <class T>
-CPtrArray<T>::~CPtrArray()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
-template <class T>
-bool CPtrArray<T>::Add(T item)
-{
-    if (setSize(m_numItems + 1) == 0) {
-        return false;
-    }
-
-    m_items[m_numItems] = item;
-    m_numItems = m_numItems + 1;
-    return true;
-}
-
-template <class T>
-int CPtrArray<T>::GetSize()
-{
-    return m_numItems;
-}
-
-template <class T>
-void CPtrArray<T>::ReleaseAndRemoveAll()
-{
-    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        T item = m_items[i];
-        if (item != 0) {
-            CRef* ref = reinterpret_cast<CRef*>(item);
-            if (ref->DecRef() == 0) {
-                delete ref;
-            }
-            m_items[i] = 0;
-        }
-    }
-
-    RemoveAll();
-}
-
-template <class T>
-void CPtrArray<T>::RemoveAt(unsigned long index)
-{
-    int offset = (int)(index * 4);
-
-    m_items[index] = 0;
-    for (; index < (unsigned long)m_numItems; index++) {
-        unsigned int* current = (unsigned int*)((int)m_items + offset);
-        offset += 4;
-        *current = current[1];
-    }
-
-    m_numItems = m_numItems - 1;
-}
-
-template <class T>
-T CPtrArray<T>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-
-template <class T>
-void CPtrArray<T>::SetStage(CMemory::CStage* stage)
-{
-    m_stage = stage;
-}
-
-template <class T>
-void CPtrArray<T>::SetDefaultSize(unsigned long defaultSize)
-{
-    m_defaultSize = defaultSize;
-}
-
-template <class T>
-void CPtrArray<T>::SetGrow(int growCapacity)
-{
-    m_growCapacity = growCapacity;
-}
-
-template <class T>
-int CPtrArray<T>::setSize(unsigned long newSize)
-{
-    T* newItems;
-
-    if ((unsigned long)m_size < newSize) {
-        if (m_size == 0) {
-            m_size = m_defaultSize;
-        } else {
-            if (m_growCapacity == 0) {
-                System.Printf(s_p_chara_ptrarray_grow_error);
-            }
-            m_size = m_size << 1;
-        }
-
-        newItems = static_cast<T*>(
-            Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage, s_p_chara_collection_ptrarray_h, 0xFA, 0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (m_items != 0) {
-            memcpy(newItems, m_items, m_numItems << 2);
-        }
-        if (m_items != 0) {
-            delete[] m_items;
-            m_items = 0;
-        }
-        m_items = newItems;
-    }
-
-    return 1;
-}
-
-template <class T>
-T CPtrArray<T>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-template <class T>
-void CPtrArray<T>::RemoveAll()
-{
-    if (m_items != 0) {
-        delete[] m_items;
-        m_items = 0;
-    }
-    m_size = 0;
-    m_numItems = 0;
-}
-
 template class CPtrArray<CCharaPcs::CLoadPdt*>;
 template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;

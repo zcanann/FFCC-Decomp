@@ -26,8 +26,11 @@ public:
     int Add(T item);
     void RemoveAll();
     void ReleaseAndRemoveAll();
+    void DeleteAndRemoveAll();
+    void RemoveAt(unsigned long index);
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
+    void SetAt(unsigned long index, T item);
     void SetStage(CMemory::CStage* stage);
     void SetDefaultSize(unsigned long defaultSize);
     void SetGrow(int growCapacity);
@@ -79,6 +82,12 @@ T CPtrArray<T>::operator[](unsigned long index)
     return GetAt(index);
 }
 #endif
+
+template <class T>
+void CPtrArray<T>::SetAt(unsigned long index, T item)
+{
+    m_items[index] = item;
+}
 
 template <class T>
 void CPtrArray<T>::SetStage(CMemory::CStage* stage)
@@ -135,6 +144,31 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
         }
     }
     RemoveAll();
+}
+
+template <class T>
+void CPtrArray<T>::DeleteAndRemoveAll()
+{
+    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
+        T item = m_items[i];
+        if (item != 0) {
+            delete item;
+            m_items[i] = 0;
+        }
+    }
+
+    RemoveAll();
+}
+
+template <class T>
+void CPtrArray<T>::RemoveAt(unsigned long index)
+{
+    m_items[index] = 0;
+    for (; index < m_numItems - 1; index++) {
+        m_items[index] = m_items[index + 1];
+    }
+
+    m_numItems = m_numItems - 1;
 }
 
 template <class T>

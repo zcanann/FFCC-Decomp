@@ -1,4 +1,5 @@
-#define FFCC_P_FUNNYSHAPE_REAL_PTRARRAY
+#include "ffcc/ptrarray.h"
+#include "ffcc/USBStreamData.h"
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
 #include "ffcc/graphic.h"
@@ -74,39 +75,6 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 } // namespace
-
-template <class T>
-CPtrArray<T>::CPtrArray()
-{
-    numItems = 0;
-    size = 0;
-    defaultSize = 0x10;
-    items = 0;
-    stage = 0;
-    growCapacity = 1;
-}
-
-template <class T>
-CPtrArray<T>::~CPtrArray()
-{
-    RemoveAll();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e7ac
- * PAL Size: 76b
- */
-template <>
-void CPtrArray<_GXTexObj*>::RemoveAll();
-
-/*
- * --INFO--
- * PAL Address: 0x8004e7f8
- * PAL Size: 76b
- */
-template <>
-void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll();
 
 /*
  * --INFO--
@@ -291,90 +259,6 @@ void CFunnyShapePcs::Init()
 
 /*
  * --INFO--
- * PAL Address: 0x8004e69c
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll();
-
-/*
- * --INFO--
- * PAL Address: 0x8004e724
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
-
-/*
- * --INFO--
- * PAL Address: 0x8004e69c
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
-{
-    for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
-        _GXTexObj* item = items[i];
-        if (item != 0) {
-            delete item;
-            items[i] = 0;
-        }
-    }
-    RemoveAll();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e724
- * PAL Size: 136b
- */
-template <>
-void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
-{
-    for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
-        OSFS_TEXTURE_ST* item = items[i];
-        if (item != 0) {
-            delete item;
-            items[i] = 0;
-        }
-    }
-    RemoveAll();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e7ac
- * PAL Size: 76b
- */
-template <>
-void CPtrArray<_GXTexObj*>::RemoveAll()
-{
-    if (items != 0) {
-        delete[] items;
-        items = 0;
-    }
-    numItems = 0;
-    size = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004e7f8
- * PAL Size: 76b
- */
-template <>
-void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
-{
-    if (items != 0) {
-        delete[] items;
-        items = 0;
-    }
-    numItems = 0;
-    size = 0;
-}
-
-/*
- * --INFO--
  * Address: TODO
  * Size: TODO
  */
@@ -417,14 +301,3 @@ CProcessTable CFunnyShapePcs::m_table = {
         1,
     },
 };
-template <>
-CPtrArray<_GXTexObj*>::~CPtrArray()
-{
-    RemoveAll();
-}
-
-template <>
-CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
-{
-    RemoveAll();
-}

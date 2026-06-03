@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/wm_menu.h"
 
 #include "ffcc/baseobj.h"

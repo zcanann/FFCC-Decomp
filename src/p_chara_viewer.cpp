@@ -1,8 +1,5 @@
-#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/ptrarray.h"
-#define FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/p_chara.h"
-#undef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"

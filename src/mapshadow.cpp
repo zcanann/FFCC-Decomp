@@ -3,7 +3,6 @@
 #include "ffcc/map.h"
 #include "ffcc/mapobj.h"
 #include "ffcc/mapocttree.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"

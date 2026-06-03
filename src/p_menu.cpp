@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
@@ -13,7 +14,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/ref.h"
 #include "ffcc/ringmenu.h"
 extern "C" {

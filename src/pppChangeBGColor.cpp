@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"

@@ -22,6 +22,7 @@ public:
     int GetSize();
     void RemoveAll();
     void ReleaseAndRemoveAll();
+    void DeleteAndRemoveAll();
 #ifdef FFCC_PTRARRAY_DECL_REMOVE_AT
     void RemoveAt(unsigned long index);
 #endif

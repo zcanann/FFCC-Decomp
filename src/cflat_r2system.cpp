@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
 #include "ffcc/line_constants.h"

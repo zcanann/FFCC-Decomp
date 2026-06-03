@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/chunkfile.h"

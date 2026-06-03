@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/color.h"
 #include "ffcc/linkage.h"

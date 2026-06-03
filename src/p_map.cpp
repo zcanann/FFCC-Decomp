@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
@@ -10,7 +11,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/p_light.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>

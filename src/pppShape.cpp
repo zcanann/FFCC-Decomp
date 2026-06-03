@@ -1,8 +1,6 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
-#define FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/materialman.h"
-#undef FFCC_MATERIALMAN_DEFINE_LAYOUT
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 

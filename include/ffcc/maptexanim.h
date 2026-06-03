@@ -84,6 +84,8 @@ public:
 private:
     friend class CMapTexAnimSet;
 
+    static void SetMaterialTextureSlot(CMaterial*, unsigned long, CTexture*);
+
     short m_materialIndex;
     short m_textureSlot;
     short m_frameCount;

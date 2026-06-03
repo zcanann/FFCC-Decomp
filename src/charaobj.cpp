@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/astar.h"
 #include "ffcc/cflat_runtime2.h"

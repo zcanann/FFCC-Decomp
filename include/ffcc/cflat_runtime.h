@@ -168,10 +168,6 @@ public:
 	void PrintPerformance();
 
 private:
-	struct CObjectSentinel : public CObject
-	{
-	};
-
     int m_permanentVarCount;        // 0x0004
     u8* m_permanentVarDefs;         // 0x0008
     u8* m_permanentVarValues;       // 0x000C
@@ -191,8 +187,8 @@ private:
     u16* m_vstrOffsets;             // 0x0044
     u8 m_performanceBlock[0x804];   // 0x0048
     u8 m_pad_084C[0x80];            // 0x084C
-    CObjectSentinel m_objectSentinel;       // 0x08CC
-    CObjectSentinel m_freeObjectSentinel;   // 0x0918
+    CObject m_objectSentinel;       // 0x08CC
+    CObject m_freeObjectSentinel;   // 0x0918
     u8 m_pad_0964[0xC];             // 0x0964
     int m_0x970;                    // 0x0970
     u8 m_pad_0974[4];               // 0x0974
@@ -202,11 +198,10 @@ private:
     void* m_0x984;                  // 0x0984
     void* m_objectPoolBase;         // 0x0988
     void** m_objectFreeListHead;    // 0x098C
-    u8 m_pad_0990[0x704];           // 0x0990
+    u8 m_pad_0990[0x904];           // 0x0990
     u8 m_0x1294;                    // 0x1294
     u8 m_pad_1295[3];               // 0x1295
-    u8 m_0x1298;                    // 0x1298
-	u8 m_pad_1299[3];               // 0x1299
+    int m_0x1298;                   // 0x1298
 };
 
 STATIC_ASSERT(sizeof(CFlatRuntime::CClass) == 0x22C);

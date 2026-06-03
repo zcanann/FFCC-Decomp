@@ -4339,7 +4339,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         if (threadParam->m_subState == 0)
         {
             GbaPInfo playerInfo;
-            memset(&playerInfo, 0, sizeof(playerInfo));
 
             GbaQue.GetPlayerStat(threadParam->m_portIndex, &playerInfo);
 

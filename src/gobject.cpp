@@ -3148,11 +3148,18 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         }
 
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-            CVector attrDirection(sZeroFloat, -0.5f, sZeroFloat);
-            CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+            Vec attrDirection;
+            Vec attrBottom;
             CMapCylinder attrCylinder;
-            attrCylinder.m_bottom = *reinterpret_cast<Vec*>(&attrBottom);
-            attrCylinder.Probe().m_direction = *reinterpret_cast<Vec*>(&attrDirection);
+
+            attrDirection.x = sZeroFloat;
+            attrDirection.y = -0.5f;
+            attrDirection.z = sZeroFloat;
+            attrBottom.x = m_worldPosition.x;
+            attrBottom.y = m_worldPosition.y + sStepProbeHeight;
+            attrBottom.z = m_worldPosition.z;
+            attrCylinder.m_bottom = attrBottom;
+            attrCylinder.Probe().m_direction = attrDirection;
             attrCylinder.Probe().m_radius = 0.3f;
             attrCylinder.Probe().m_height = 0.3f;
             attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;

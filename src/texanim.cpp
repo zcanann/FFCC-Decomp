@@ -211,6 +211,8 @@ inline void CTexAnim::SetTexGen()
  */
 void CTexAnimSet::SetTexGen()
 {
+    const float zero = FLOAT_8032fb38;
+
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_texAnims.GetSize()); i++) {
         CTexAnim* texAnim = m_texAnims[i];
         CMaterial* material = texAnim->m_refData->m_material;
@@ -221,12 +223,18 @@ void CTexAnimSet::SetTexGen()
             float x = texAnim->m_texGen.x;
             material->m_texScroll[index].m_u0 = x;
             material->m_texScroll[index].m_v0 = y;
-            material->m_texScroll[index].m_u1 = FLOAT_8032fb38;
-            material->m_texScroll[index].m_v1 = FLOAT_8032fb38;
-            material->m_texScroll[index].m_type0 =
-                (FLOAT_8032fb38 == material->m_texScroll[index].m_u1) ? 0 : 1;
-            material->m_texScroll[index].m_type1 =
-                (FLOAT_8032fb38 == material->m_texScroll[index].m_v1) ? 0 : 1;
+            material->m_texScroll[index].m_u1 = zero;
+            material->m_texScroll[index].m_v1 = zero;
+            if (zero == material->m_texScroll[index].m_u1) {
+                material->m_texScroll[index].m_type0 = 0;
+            } else {
+                material->m_texScroll[index].m_type0 = 1;
+            }
+            if (zero == material->m_texScroll[index].m_v1) {
+                material->m_texScroll[index].m_type1 = 0;
+            } else {
+                material->m_texScroll[index].m_type1 = 1;
+            }
         }
     }
 }

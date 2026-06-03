@@ -820,19 +820,23 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	}
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		tlut = 7;
-		if (cmdIndex == 2) {
+		switch (cmdIndex) {
+		case 0:
+			tlut = 2;
+			break;
+		case 1:
+			tlut = 1;
+			break;
+		case 2:
 			tlut = 4;
-		} else if (cmdIndex < 2) {
-			if (cmdIndex == 0) {
-				tlut = 2;
-			} else if (cmdIndex >= 0) {
-				tlut = 1;
-			}
-		} else if (cmdIndex == 4) {
-			tlut = 7;
-		} else if (cmdIndex < 4) {
+			break;
+		case 3:
 			tlut = 6;
+			break;
+		case 4:
+		default:
+			tlut = 7;
+			break;
 		}
 		font->SetTlut(tlut);
 	} else if (cmdIndex == 0) {

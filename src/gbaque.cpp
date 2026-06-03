@@ -836,8 +836,9 @@ void GbaQueue::ExecutQueue()
 					}
 				} else if (request == 6) {
 					OSWaitSemaphore(accessSemaphores + channel);
-					obj[0x2CCB] = static_cast<char>(cmdWord >> 8);
-					obj[0x2CCC] = static_cast<char>(cmdWord);
+					unsigned int cmakeOffset = channel * sizeof(GbaCMakeInfo);
+					obj[0x2CCB + cmakeOffset] = static_cast<char>(cmdWord >> 8);
+					obj[0x2CCC + cmakeOffset] = static_cast<char>(cmdWord);
 					OSSignalSemaphore(accessSemaphores + channel);
 					Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 16), 0);
 				} else if (request == 7) {

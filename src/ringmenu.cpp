@@ -84,7 +84,6 @@ extern float FLOAT_80330ac0;
 extern float FLOAT_80330aa8;
 extern float FLOAT_80330ac4;
 extern float FLOAT_80330ae8;
-extern double DOUBLE_80330a00;
 extern double DOUBLE_80330a20;
 extern double DOUBLE_80330a90;
 extern double DOUBLE_80330a98;

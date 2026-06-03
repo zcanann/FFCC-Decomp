@@ -4328,7 +4328,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     } else {
         switch (systemValue) {
         case -0x40:
-            FlatLastResult(this) = gameWork.m_scriptSysVal0;
+            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(&gameWork.m_scriptSysVal0);
             break;
         case -0x41:
             FlatLastResult(this) = gameWork.m_timerA;

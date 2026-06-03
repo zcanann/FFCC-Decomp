@@ -62,6 +62,11 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWo
 	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 }
 
+static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlTable* data)
+{
+	return reinterpret_cast<ChangeTexWork*>(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8013ef94
@@ -100,9 +105,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		return;
 	}
 
-	int* serializedDataOffsets = data->m_serializedDataOffsets;
-	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + serializedDataOffsets[2]);
-	u8* colorData = changeTex->m_object.m_workArea + serializedDataOffsets[1];
+	int colorOffset = data->m_serializedDataOffsets[1];
+	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
+	u8* colorData = changeTex->m_object.m_workArea + colorOffset;
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
@@ -239,8 +244,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp), 0x9d);
-	int dataOffset = data->m_serializedDataOffsets[2];
-	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + dataOffset);
+	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(work->m_charaObj, 0);
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
@@ -383,7 +387,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 		if (meshColorArrays != 0) {
 			meshColorArray = meshColorArrays[meshIdx];
 			if (meshColorArray != 0) {
-				MaterialMan.SetChangeTexReflectionArray(meshData->m_normals);
+				MaterialMan.SetGeometryArraySource(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
 				MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
 				drawTevBits = 0xACE0F;

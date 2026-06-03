@@ -14,7 +14,9 @@ struct pppModelSt;
 
 extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
-struct pppBreathModel;
+struct pppBreathModel {
+    _pppPObject m_object;
+};
 
 struct BreathParticleGroup {
     int active;
@@ -176,7 +178,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlT
 {
     BreathParticleGroup* group;
     VBreathModel* state =
-        (VBreathModel*)(reinterpret_cast<_pppPObject*>(pppBreathModel)->m_workArea + *param_2->m_serializedDataOffsets);
+        reinterpret_cast<VBreathModel*>(pppBreathModel->m_object.m_workArea + *param_2->m_serializedDataOffsets);
 
     if (state->m_particleData != NULL) {
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_particleData));
@@ -224,7 +226,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlT
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, _pppCtrlTable* param_2)
 {
     VBreathModel* state =
-        (VBreathModel*)(reinterpret_cast<_pppPObject*>(pppBreathModel)->m_workArea + *param_2->m_serializedDataOffsets);
+        reinterpret_cast<VBreathModel*>(pppBreathModel->m_object.m_workArea + *param_2->m_serializedDataOffsets);
     PSMTXIdentity(state->m_matrix);
     float zero = 0.0f;
 
@@ -281,7 +283,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     Mtx drawMtx;
     Mtx tempMtx;
 
-    object = reinterpret_cast<_pppPObject*>(breathModel);
+    object = &breathModel->m_object;
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(object->m_workArea + workOffset);
@@ -485,7 +487,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         return;
     }
 
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(breathModel);
+    _pppPObject* object = &breathModel->m_object;
 
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = ppvMng;
@@ -552,7 +554,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     }
 
     PSMTXCopy(ppvMng->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), work, pBreathModel, color);
+    UpdateAllParticle(&breathModel->m_object, work, pBreathModel, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;

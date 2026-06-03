@@ -402,7 +402,7 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
 {
     u32 y;
     u32 x;

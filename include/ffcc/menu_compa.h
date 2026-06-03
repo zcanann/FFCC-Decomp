@@ -70,6 +70,7 @@ public:
     void DrawSingleIcon(int, int, int, float, int, float);
 
     void CompaInit();
+    void CompaInit0();
     bool CompaOpen();
     void CompaCtrl();
     bool CompaClose();

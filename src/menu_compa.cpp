@@ -477,6 +477,54 @@ noReset:
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CompaInit0()
+{
+	CompaOpenAnimList* compaList = this->compaList;
+	int entryIndex = 0;
+	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 2;
+	setupEntry->duration = 5;
+	compaList = this->compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+	compaList = this->compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+	compaList = this->compaList;
+	setupEntry = &compaList->entries[entryIndex++];
+	setupEntry->flags = 2;
+	setupEntry->startFrame = 7;
+	setupEntry->duration = 5;
+
+	unsigned int entryCount = compaList->count;
+	CompaOpenAnim* entry = compaList->entries;
+	while (entryCount != 0) {
+		entry->frame = 0;
+		entry->alpha = LoadFloat(FLOAT_80333000);
+		entry++;
+		entryCount--;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 80161f48
  * PAL Size: 432b
  * EN Address: TODO

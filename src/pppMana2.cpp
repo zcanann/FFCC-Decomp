@@ -145,6 +145,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline u32 ManaMeshRigidNodeIndex(CChara::CMesh::CRefData* meshData)
+{
+    return meshData->m_infoWord1;
+}
+
 static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
@@ -1291,7 +1296,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* par
                         model->m_data->m_normQuant, model->m_matrix,
                         mana2Work->m_displayListCopies[dlIndex], mana2Work->m_displayListSize,
                         mana2Work->m_meshColors, mana2Work->m_meshTexCoords,
-                        &model->m_nodes[meshData->m_nodeIndex]);
+                        &model->m_nodes[ManaMeshRigidNodeIndex(meshData)]);
                 }
             }
 

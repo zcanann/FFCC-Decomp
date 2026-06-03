@@ -52,8 +52,31 @@ typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1
 
 /*
  * --INFO--
- * PAL Address: 0x80020494
- * PAL Size: 2844b
+ * PAL Address: 0x800220CC
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPad::SaveReplayData()
+{
+    ReplayBuffer* replay = reinterpret_cast<ReplayBuffer*>(_1b0_4_);
+
+    if ((replay != 0) && (replay->recordMode != 0) && (replay->cursor <= sizeof(ReplayBuffer)) &&
+        (replay->frameCount != 0)) {
+        FILE* fp = fopen(s_replay_dat, "wb");
+        if (fp != 0) {
+            fwrite(replay, 1, replay->cursor, fp);
+            fclose(fp);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80022168
+ * PAL Size: 2876b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

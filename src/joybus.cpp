@@ -7355,11 +7355,15 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
  */
 int JoyBus::SendUseItem(int portIndex, char itemId)
 {
-    unsigned int cmd = MakeJoyCmd16(0x140C, static_cast<unsigned char>(itemId), 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x0C;
+    cmdBytes[2] = itemId;
     unsigned int port;
-    int result = 0;
+    unsigned int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 
@@ -7375,7 +7379,7 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
         else
         {
             OSSignalSemaphore(m_accessSemaphores + port);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
     }
 

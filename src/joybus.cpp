@@ -3565,7 +3565,8 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B00) << 16) |
-                static_cast<unsigned int>(len);
+                (static_cast<unsigned int>(len & 0x00FF) << 8) |
+                static_cast<unsigned int>(len >> 8);
 
             if (m_threadRunningMask != 0)
             {

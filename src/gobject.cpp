@@ -3073,7 +3073,7 @@ void CGObject::SetDispItemName(int showName)
         unsigned char unk0 : 1;
         unsigned char unk1 : 1;
         unsigned char unk2 : 1;
-        unsigned char dispItemName : 1;
+        signed char dispItemName : 1;
         unsigned char unk4 : 1;
         unsigned char unk5 : 1;
         unsigned char unk6 : 1;

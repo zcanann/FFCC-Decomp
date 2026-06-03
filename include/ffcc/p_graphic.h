@@ -24,16 +24,6 @@ public:
         float m_amplitude;   // 0x28
     };
 
-    static CProcessTableCallback m_table_desc0;
-    static CProcessTableCallback m_table_desc1;
-    static CProcessTableCallback m_table_desc2;
-    static CProcessTableCallback m_table_desc3;
-    static CProcessTableCallback m_table_desc4;
-    static CProcessTableCallback m_table_desc5;
-    static CProcessTableCallback m_table_desc6;
-    static CProcessTableCallback m_table_desc7;
-    static CProcessTableCallback m_table_desc8;
-    static CProcessTableCallback m_table_desc9;
     static CProcessTable m_table;
 
     void Init();
@@ -65,7 +55,7 @@ public:
     unsigned int GetScreenFadeExecutingBit();
     void drawScreenFade();
 
-    CGraphicPcs() {}
+    CGraphicPcs();
 
     ScreenFadeSlot m_screenFade[4]; // 0x004
     int m_unkB4;                    // 0x0B4

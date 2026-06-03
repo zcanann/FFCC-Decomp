@@ -4453,7 +4453,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             }
 
             m_txWordCount[threadParam->m_portIndex] = wordCount;
-            threadParam->m_subState = 1;
+            threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
             // Immediately queue the first word (same as the subState == 1 path)
             unsigned int sendPort = threadParam->m_portIndex;

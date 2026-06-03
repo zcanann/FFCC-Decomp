@@ -177,19 +177,23 @@ CMapIdGrp::CMapIdGrp()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033c48
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 float CMapKeyFrame::Get()
 {
     switch (m_mode) {
+    case 0:
+        return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     case 1:
         return Math.Spline1D(
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
-    case 0:
-        return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     default:
-        return 0.0f;
+        return kMapZero;
     }
 }
 
@@ -972,39 +976,48 @@ CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033a20
+ * PAL Size: 552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
     switch (m_mode) {
-    case 1:
-        blend = Math.Spline1D(
-            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
-        break;
     case 0:
         blend = Math.Line1D(
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
         break;
+    case 1:
+        blend = Math.Spline1D(
+            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
+        break;
     default:
-        blend = 0.0f;
-        key0 = m_junTable[0];
-        key1 = key0;
+        blend = kMapZero;
+        {
+            unsigned char key = m_junTable[0];
+            key1 = key;
+            key0 = key;
+        }
         return 0;
     }
 
-    if (blend <= 0.0f) {
-        key0 = m_junTable[0];
-        key1 = key0;
-        blend = 0.0f;
+    if (blend <= kMapZero) {
+        unsigned char key = m_junTable[0];
+        key1 = key;
+        key0 = key;
+        blend = kMapZero;
         return 0;
     }
 
     const float junMax = static_cast<float>(m_junCount - 1);
     if (blend >= junMax) {
-        key0 = m_junTable[m_junCount - 1];
-        key1 = key0;
-        blend = 1.0f;
+        unsigned char key = m_junTable[m_junCount - 1];
+        key1 = key;
+        key0 = key;
+        blend = kMapViewScaleZ;
         return 0;
     }
 
@@ -1012,7 +1025,7 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
     key1 = static_cast<int>(1.0f + blend);
     blend = blend - static_cast<float>(key0);
     key0 = m_junTable[key0];
-    if (blend == 0.0f) {
+    if (blend == kMapZero) {
         key1 = key0;
         return 0;
     }

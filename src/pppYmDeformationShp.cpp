@@ -30,23 +30,6 @@ struct Vec4d {
 	float w;
 };
 
-struct YmDeformationShpColorInfo {
-	u32 m_unk0;
-	u32 m_unk4;
-	pppCVECTOR m_color;
-};
-
-struct VYmDeformationShp {
-	GXTexObj* m_backBuffer;
-	int m_pad0;
-	int m_pad1;
-	s16 m_angle;
-	u8 m_direction;
-	u8 m_pad2;
-	float m_scale;
-	float m_values[5];
-};
-
 struct _pppEnvStYmDeformationShp {
 	void* m_stagePtr;
 	CMaterialSet* m_materialSetPtr;

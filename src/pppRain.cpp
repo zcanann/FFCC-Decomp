@@ -388,4 +388,5 @@ inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
 
 extern const float FLOAT_80330FD4 = -1.0f;
 extern const float FLOAT_80330FD8 = 0.0f;
+extern const float FLOAT_80330FDC = 0.0f;
 extern const double DOUBLE_80330FE0 = 0.5;

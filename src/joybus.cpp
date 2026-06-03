@@ -5050,21 +5050,20 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
     else if (threadParam->m_subState == 0)
     {
         unsigned char payload[1 + 75];
-        unsigned int port = threadParam->m_portIndex;
 
         memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 4;
 
         unsigned char* favBuf = &payload[1];
 
-        int dataLen = GbaQue.GetFavorite(port, (char*)favBuf);
+        int dataLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf);
 
         int wordCount = MakeJoyData(
             (char*)payload,
             dataLen + 1,
-            (unsigned int*)(m_joyDataPacketBuffer[port] + 2)
+            (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
         );
 
         if (wordCount < 0)
@@ -5072,9 +5071,10 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
-        m_txWordIndex[port] = 0;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
+        unsigned int port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 

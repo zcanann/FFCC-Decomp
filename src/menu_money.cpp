@@ -116,12 +116,12 @@ int CMenuPcs::MoneyCtrlCur()
 		return 0;
 	}
 
-	int caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	int menuState = (int)this->moneyState;
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int optBase = menuState + mode * 2;
 	int maxDigits = 1;
-	int maxGil = *(int*)(caravanWork + 0x200);
+	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
 
 	while (maxDigits < 8) {
@@ -155,11 +155,11 @@ int CMenuPcs::MoneyCtrlCur()
 		}
 
 		if ((hold & 8) != 0) {
-			if (*(int*)(caravanWork + 0x200) == 0) {
+			if (caravanWork->m_gil == 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				unsigned int gil = s_Money + placeValue;
-				if ((unsigned int)*(int*)(caravanWork + 0x200) < gil) {
+				if ((unsigned int)caravanWork->m_gil < gil) {
 					gil = 0;
 				}
 				s_Money = gil;
@@ -193,7 +193,7 @@ int CMenuPcs::MoneyCtrlCur()
 			}
 		} else {
 			if ((hold & 4) != 0) {
-				unsigned int gil = *(unsigned int*)(caravanWork + 0x200);
+				unsigned int gil = caravanWork->m_gil;
 				if (gil == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
@@ -275,7 +275,7 @@ int CMenuPcs::MoneyCtrlCur()
 					s16 winW;
 					s16 winH;
 					this->moneyState->messageMask = 2;
-					if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0) {
+					if (caravanWork->CanPlayerPutItem() != 0) {
 						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
 					GetSingWinSize(1, &winW, &winH, 0);
@@ -321,9 +321,9 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (*(s16*)(optBase + 0x26) == 0) {
-						reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutGil(static_cast<int>(s_Money));
+						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
-						int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
+						int iVar8 = caravanWork->m_gil;
 						int iVar9 = 0;
 						int iVar11 = 10000000;
 						bool started = false;
@@ -657,14 +657,14 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
 
-		unsigned int scriptFood = Game.m_scriptFoodBase[0];
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 		s_Money = 0;
 		signed char* puVar9 = s_place;
 		do {
 			iVar8 = 10000000;
 			int iVar12;
 			if (iVar15 == 0) {
-				iVar12 = *(int *)(scriptFood + 0x200);
+				iVar12 = caravanWork->m_gil;
 			} else {
 				iVar12 = 0;
 			}

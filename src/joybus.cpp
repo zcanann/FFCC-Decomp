@@ -4937,7 +4937,10 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
         modeByte = 0;
 	}
 
-    unsigned int cmd = (0x09u << 24) | (static_cast<unsigned int>(modeByte) << 16);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 9;
+    cmdBytes[1] = modeByte;
     int result = 0;
 
     if (m_threadRunningMask != 0)
@@ -6322,8 +6325,11 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
 {
     unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
     const unsigned char bVar1 = (unsigned char)(-((int)(mode & 0xFF)) >> 31);
-    const unsigned short opcode = 0x1411;
-    const unsigned int cmd = MakeJoyCmd16(opcode, bVar1, 0);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x11;
+    cmdBytes[2] = bVar1;
     int result = 0;
 
     if (m_threadRunningMask != 0)

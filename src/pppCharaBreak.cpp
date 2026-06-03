@@ -304,7 +304,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
 
                     CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
                                   model, mesh);
-                    InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, (*dlEntries)->m_polygonData,
+                    InitPolygonParameter((PCharaBreak*)stepData, work, (*dlEntries)->m_polygonData,
                                          (*dlEntries)->m_polygonCount, model, mesh);
 
                     dlEntries--;
@@ -316,7 +316,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     }
 
     if (ppvIsLoopCalc == 0) {
-        UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, model);
+        UpdatePolygonData((PCharaBreak*)stepData, work, model);
     }
     return;
 
@@ -444,7 +444,7 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
-    CharaBreakWork* workData = (CharaBreakWork*)work;
+    CharaBreakWork* workData = work;
     CChara::CMesh* mesh = model->m_meshes;
     u32 meshIndex;
     s16 threshold;

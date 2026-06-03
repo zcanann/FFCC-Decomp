@@ -1581,10 +1581,10 @@ void CMemoryCardMan::MakeSaveData()
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
 
-    save[0x20] = gameWork[0x08];
-    save[0x21] = gameWork[0x09];
-    save[0x22] = gameWork[0x0A];
-    save[0x23] = gameWork[0x0B];
+    save[0x20] = Game.m_gameWork.m_scriptSysVal0;
+    save[0x21] = Game.m_gameWork.m_scriptSysVal1;
+    save[0x22] = Game.m_gameWork.m_scriptSysVal2;
+    save[0x23] = Game.m_gameWork.m_scriptSysVal3;
     *reinterpret_cast<int*>(save + 0x24) = *reinterpret_cast<int*>(gameWork + 0x0C);
     *reinterpret_cast<int*>(save + 0x28) = *reinterpret_cast<int*>(gameWork + 0x10);
     *reinterpret_cast<int*>(save + 0x2C) = *reinterpret_cast<int*>(gameWork + 0x14);

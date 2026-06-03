@@ -3950,7 +3950,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     unsigned char& state = threadParam->m_pposCounter;
     unsigned char& playerCount = m_cmdBuffer[port];
     unsigned char& mobCount = m_cmdBuffer[4 + port];
-    unsigned char* posBytes = m_playerPosPacketBuffer[port];
+    unsigned char* posBytes = m_playerPosPacketBuffer[port] + 2;
     unsigned int* posWords = (unsigned int*)posBytes;
     int& wordIndex = m_pposWordIndex[port];
 

@@ -173,12 +173,18 @@ void CGItemObj::ItemJump(int state, float jump)
 			CMapCylinder cylinder;
 			Vec move;
 
+			cylinder.m_bottom.x = object->m_worldPosition.x;
+			cylinder.m_bottom.z = object->m_worldPosition.z;
+			cylinder.m_bottom.y = object->m_worldPosition.y + FLOAT_80331b1c;
 			move.x = FLOAT_80331b20;
-			move.y = FLOAT_80331b24;
 			move.z = FLOAT_80331b20;
-
-			cylinder.m_bottom = object->m_worldPosition;
-			cylinder.m_bottom.y += FLOAT_80331b1c;
+			move.y = FLOAT_80331b24;
+			cylinder.m_boundsMin.z = FLOAT_80331b28;
+			cylinder.m_boundsMin.y = FLOAT_80331b28;
+			cylinder.m_boundsMin.x = FLOAT_80331b28;
+			cylinder.m_boundsMax.z = FLOAT_80331b2c;
+			cylinder.m_boundsMax.y = FLOAT_80331b2c;
+			cylinder.m_boundsMax.x = FLOAT_80331b2c;
 			cylinder.m_top.x = FLOAT_80331b20;
 			cylinder.m_top.y = FLOAT_80331b20;
 			cylinder.m_top.z = FLOAT_80331b20;
@@ -186,12 +192,6 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_axis.y = FLOAT_80331b24;
 			cylinder.m_axis.z = FLOAT_80331b20;
 			cylinder.m_radius = FLOAT_80331b20;
-			cylinder.m_boundsMin.x = FLOAT_80331b28;
-			cylinder.m_boundsMin.y = FLOAT_80331b28;
-			cylinder.m_boundsMin.z = FLOAT_80331b28;
-			cylinder.m_boundsMax.x = FLOAT_80331b2c;
-			cylinder.m_boundsMax.y = FLOAT_80331b2c;
-			cylinder.m_boundsMax.z = FLOAT_80331b2c;
 
 			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
 			    g_hit_f->m_groupIndex == state) {

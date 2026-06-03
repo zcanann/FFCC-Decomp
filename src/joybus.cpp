@@ -2276,10 +2276,9 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
         return -1;
 	}
 
-    unsigned char opcode = (firstCmd >> 24) & 0xFF;   // upper byte
-    unsigned char param = (firstCmd >> 16) & 0xFF;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&firstCmd);
 
-    if (m_stateCodeArr[port] == 0x09 && opcode == 0x09 && param == 0x01)
+    if (m_stateCodeArr[port] == 0x09 && (cmdBytes[0] & 0x3F) == 0x09 && cmdBytes[1] == 0x01)
     {
         threadParam->m_state = '!';
         threadParam->m_subState = 0;

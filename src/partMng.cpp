@@ -3913,9 +3913,10 @@ int CPartMng::pppGetFreeDataMng()
             freeSlot = &m_pdtSlots[slotIndex];
             break;
         }
+        count--;
         slot++;
         slotIndex++;
-    } while (--count != 0);
+    } while (count != 0);
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {

@@ -3230,17 +3230,19 @@ int JoyBus::SendGBAStop(ThreadParam* threadParam)
  */
 int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc, unsigned int* outCmd)
 {
-    const int port = threadParam->m_portIndex;
-    unsigned char crc_lo = static_cast<unsigned char>(crc & 0xFF);
-    unsigned char crc_hi = static_cast<unsigned char>((crc >> 8) & 0xFF);
-    unsigned char p3 = static_cast<unsigned char>(param3);
-    unsigned int cmd = (0x0Du << 24) | (static_cast<unsigned int>(p3) << 16) | (static_cast<unsigned int>(crc_lo) << 8) | static_cast<unsigned int>(crc_hi);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    unsigned short crcValue = crc;
+
+    cmdBytes[0] = 0x0D;
+    cmdBytes[1] = static_cast<unsigned char>(param3);
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&crcValue, 0);
 
     *outCmd = cmd;
 
-    int result = 0;
+    unsigned int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -3250,11 +3252,12 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            result = 0;
         }
         else
         {
             OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
     }
 

@@ -729,7 +729,7 @@ config.libs = [
             Object(NonMatching, "pppYmBreath.cpp", cflags=cflags_game),
             Object(NonMatching, "pppYmCallBack.cpp"),
             Object(NonMatching, "pppYmChangeTex.cpp"),
-            Object(NonMatching, "pppYmCheckBGHeight.cpp"),
+            Object(Matching, "pppYmCheckBGHeight.cpp"),
             Object(NonMatching, "pppYmDeformationMdl.cpp", mw_version="GC/2.0"),
             Object(NonMatching, "pppYmDeformationScreen.cpp"),
             Object(NonMatching, "pppYmDeformationShp.cpp"),

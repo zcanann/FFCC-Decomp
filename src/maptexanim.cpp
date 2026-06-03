@@ -1,6 +1,3 @@
-#define FFCC_MAPKEYFRAME_NO_DESTRUCTOR
-#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
-
 #include "ffcc/maptexanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/map.h"

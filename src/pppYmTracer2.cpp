@@ -56,8 +56,10 @@ struct TracerColorBlock {
     pppCVECTOR color;
 };
 
-extern const PackedColor g_pppYmTracer2_1 = {0};
-extern const PackedColor g_pppYmTracer2_2 = {0};
+extern PackedColor g_pppYmTracer2_1;
+extern PackedColor g_pppYmTracer2_2;
+PackedColor g_pppYmTracer2_1;
+PackedColor g_pppYmTracer2_2;
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {

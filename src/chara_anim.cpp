@@ -16,6 +16,7 @@ extern const double kCharaSharedSignedIntBias;
 extern const double kCharaAnimDoubleMagic = 4503599627370496.0;
 extern const float kCharaAnimZero = 0.0f;
 extern const float kCharaAnimDegToRad = 0.01745329238474369f;
+extern const double kCharaAnimSignedDoubleMagic = 4503601774854144.0;
 extern const float kCharaAnimNegativeOne = -1.0f;
 extern const float kCharaAnimFullTurnDegrees = 360.0f;
 

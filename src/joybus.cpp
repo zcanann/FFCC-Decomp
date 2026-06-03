@@ -3263,25 +3263,25 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
  */
 int JoyBus::SendCancel(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
     unsigned int cmd = 0x10000000u;
     int result = 0;
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;

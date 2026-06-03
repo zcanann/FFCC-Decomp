@@ -3681,7 +3681,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short len = chunkSize;
             unsigned char rowCount = static_cast<unsigned char>(chunkCount);
 
-            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) | (static_cast<unsigned int>(rowCount) << 16) | static_cast<unsigned int>(len);
+            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) |
+                                (static_cast<unsigned int>(rowCount) << 16) |
+                                (static_cast<unsigned int>(len & 0x00FF) << 8) |
+                                static_cast<unsigned int>(len >> 8);
 
             if (m_threadRunningMask == 0)
             {

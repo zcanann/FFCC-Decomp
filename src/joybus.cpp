@@ -3879,13 +3879,13 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 {
     int port = threadParam->m_portIndex;
 
-    char stageMajor[3] = { 0, 0, 0 };
-    char stageMinor[3] = { 0, 0, 0 };
+    char stageMajor[4] = {};
+    char stageMinor[4] = {};
 
     GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
 
-    unsigned char stageA = stageMajor[2];
-    unsigned char stageB = stageMinor[2];
+    unsigned char stageA = stageMajor[3];
+    unsigned char stageB = stageMinor[3];
 
     unsigned int cmd = (0x0Eu << 24) | (0x01u << 16) | (stageA << 8) | (stageB);
 

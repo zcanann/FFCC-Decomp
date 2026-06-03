@@ -376,10 +376,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
-    float fVar1;
-    float fVar2 = FLOAT_80330644;
-
-    fVar1 = FLOAT_80330658;
+    const float& fVar2 = FLOAT_80330644;
+    const float& fVar1 = FLOAT_80330658;
 
     work->m_particles = 0;
     work->m_radius = fVar2;

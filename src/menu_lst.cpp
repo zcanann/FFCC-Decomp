@@ -66,6 +66,7 @@ void CMenuPcs::MLstDraw()
 			float w = (float)item->width;
 			float h = (float)item->height;
 			float zero = FLOAT_803333D0;
+			float v = zero;
 			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -76,7 +77,6 @@ void CMenuPcs::MLstDraw()
 			color.a = (unsigned char)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			float v = zero;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				x = (float)(x + 20.0);
 				v += (float)((double)item->height);

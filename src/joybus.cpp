@@ -3976,12 +3976,12 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 1:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)playerCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {
@@ -4011,7 +4011,6 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             sent++;
         }
 
-        // Advance index by number of words we actually pushed this call
         wordIndex += sent;
 
         // Done with all player-pos words?
@@ -4050,12 +4049,12 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 3:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)mobCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {
@@ -4123,12 +4122,12 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 5:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)mobCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {

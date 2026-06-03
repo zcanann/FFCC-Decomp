@@ -4591,15 +4591,6 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 
         int itemLen = GbaQue.GetItemAll(threadParam->m_portIndex, itemBuf);
 
-        if (itemLen < 0)
-        {
-            itemLen = 0;
-        }
-        if (itemLen > 779)
-        {
-            itemLen = 779;
-        }
-
         const int byteLen = itemLen + 1; // +1 for the type byte
 
         int wordCount = MakeJoyData(

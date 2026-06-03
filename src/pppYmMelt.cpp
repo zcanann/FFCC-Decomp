@@ -94,6 +94,11 @@ static inline YmMeltColorWork* GetYmMeltColorWork(PYmMelt* ymMelt, PYmMeltDataOf
     return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_object.m_workArea + offsets->m_serializedDataOffsets[1]);
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 #define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
 extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float);
 
@@ -416,9 +421,6 @@ extern "C" void CalcPolygonHeight(
 {
     int i;
     int pointCount;
-    float expand;
-    float top;
-    float rayY;
     float zero;
     float previousY;
     Vec rayDirection;
@@ -431,9 +433,6 @@ extern "C" void CalcPolygonHeight(
     pointCount *= pointCount;
     previousY = ppvMng->m_previousPosition.x;
     zero = kPppYmMeltZero;
-    rayY = FLOAT_80330b10;
-    top = FLOAT_80330b14;
-    expand = FLOAT_80330b18[0];
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 
@@ -447,16 +446,16 @@ extern "C" void CalcPolygonHeight(
         worldBase.z = ppvMng->m_matrix.value[2][3];
         worldBase.y += vertexData->m_collisionYOffset;
         rayDirection.x = zero;
-        rayDirection.y = rayY;
+        rayDirection.y = LoadFloat(FLOAT_80330b10);
         rayDirection.z = zero;
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
-        cylinder.m_boundsMin.z = top;
-        cylinder.m_boundsMin.y = top;
-        cylinder.m_boundsMin.x = top;
-        cylinder.m_boundsMax.z = expand;
-        cylinder.m_boundsMax.y = expand;
-        cylinder.m_boundsMax.x = expand;
+        cylinder.m_boundsMin.z = LoadFloat(FLOAT_80330b14);
+        cylinder.m_boundsMin.y = LoadFloat(FLOAT_80330b14);
+        cylinder.m_boundsMin.x = LoadFloat(FLOAT_80330b14);
+        cylinder.m_boundsMax.z = FLOAT_80330b18[0];
+        cylinder.m_boundsMax.y = FLOAT_80330b18[0];
+        cylinder.m_boundsMax.x = FLOAT_80330b18[0];
         cylinder.m_bottom = vertex->m_position;
         cylinder.m_axis.x = rayDirection.x;
         cylinder.m_axis.y = rayDirection.y;

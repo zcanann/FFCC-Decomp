@@ -5334,18 +5334,19 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int sendPort = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[sendPort] + 2 + m_txWordIndex[sendPort] * 4);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)

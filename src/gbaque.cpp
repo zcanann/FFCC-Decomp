@@ -836,8 +836,9 @@ void GbaQueue::ExecutQueue()
 					}
 				} else if (request == 6) {
 					OSWaitSemaphore(accessSemaphores + channel);
-					obj[0x2CCB] = static_cast<char>(cmdWord >> 8);
-					obj[0x2CCC] = static_cast<char>(cmdWord);
+					unsigned int cmakeOffset = channel * sizeof(GbaCMakeInfo);
+					obj[0x2CCB + cmakeOffset] = static_cast<char>(cmdWord >> 8);
+					obj[0x2CCC + cmakeOffset] = static_cast<char>(cmdWord);
 					OSSignalSemaphore(accessSemaphores + channel);
 					Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 16), 0);
 				} else if (request == 7) {
@@ -2724,11 +2725,8 @@ void GbaQueue::LoadMapObj()
 
 					unsigned int mask = 1U << count;
 					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
-					if (mapObjBase[1] != 0) {
-						drawMask |= mask;
-					} else {
-						drawMask &= ~mask;
-					}
+					int drawFlag = static_cast<int>(mapObjBase[1]);
+					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
 					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
 					mapObjWork[0] = static_cast<unsigned char>(count + 1);
 				} else if (System.m_execParam > 1) {

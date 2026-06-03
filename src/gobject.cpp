@@ -2991,10 +2991,20 @@ int CGObject::IsAnimFinished(int mode)
  */
 void CGObject::CancelAnim(int keepFacing)
 {
+	struct ShieldNodeFlagBits {
+	    unsigned char unk0 : 1;
+	    unsigned char unk1 : 1;
+	    unsigned char unk2 : 1;
+	    unsigned char unk3 : 1;
+	    unsigned char unk4 : 1;
+	    unsigned char unk5 : 1;
+	    unsigned char unk6 : 1;
+	    unsigned char unk7 : 1;
+	};
+
 	m_currentAnimSlot = -1;
 
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
+	reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->unk1 = 0;
 
 	const float& zero = sZeroFloat;
 	m_turnSpeed = zero;

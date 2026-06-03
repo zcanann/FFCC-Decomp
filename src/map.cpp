@@ -3124,12 +3124,11 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
  */
 void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
-    PSMTXCopy(source, mapObj->m_localMtx);
+    PSMTXCopy(source, m_mapObjArray[mapObjIndex].m_localMtx);
 
-    mapObj->m_localMtxDirty = 1;
-    mapObj->m_calcMtxPending = 1;
-    mapObj->m_localMtxDirty = 0;
+    m_mapObjArray[mapObjIndex].m_localMtxDirty = 1;
+    m_mapObjArray[mapObjIndex].m_calcMtxPending = 1;
+    m_mapObjArray[mapObjIndex].m_localMtxDirty = 0;
 }
 
 /*
@@ -3288,13 +3287,10 @@ void CMapMng::ShowMapObjChild(int, int)
  */
 void CMapMng::ShowMapObjChildID(int id, int show)
 {
-    CMapObj* mapObj = GetMapObjArray();
-
     for (int i = 0; i < m_mapObjCount; i++) {
-        if (mapObj->m_objId == id) {
-            mapObj->SetShow(show);
+        if (m_mapObjArray[i].m_objId == id) {
+            m_mapObjArray[i].SetShow(show);
         }
-        mapObj++;
     }
 }
 

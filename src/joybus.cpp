@@ -3916,10 +3916,13 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 
     GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
 
-    unsigned char stageA = stageMajor[3];
-    unsigned char stageB = stageMinor[3];
-
-    unsigned int cmd = (0x0Eu << 24) | (0x01u << 16) | (stageA << 8) | (stageB);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x0E;
+    cmdBytes[1] = 1;
+    cmdBytes[2] = stageMajor[3];
+    cmdBytes[3] = stageMinor[3];
+    unsigned int queueCmd = cmd;
 
     int result = 0;
 
@@ -3930,7 +3933,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
         port = threadParam->m_portIndex;
         if ((int)m_cmdCount[port] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            m_cmdQueueData[port][m_cmdCount[port]] = queueCmd;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }

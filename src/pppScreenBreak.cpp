@@ -32,16 +32,7 @@ typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
 typedef CChara::CMesh ScreenBreakMeshRef;
 typedef CChara::CMesh::CRefData ScreenBreakMeshData;
 
-struct ScreenBreakModelData {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x24];
-    u32 m_posQuant;
-};
-
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
-STATIC_ASSERT(offsetof(ScreenBreakModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(ScreenBreakModelData, m_posQuant) == 0x34);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(ScreenBreakPiece) == 0x3C);
@@ -81,7 +72,7 @@ extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
-static inline ScreenBreakModelData* ScreenBreakModelRef(CChara::CModel* model) { return reinterpret_cast<ScreenBreakModelData*>(model->m_data); }
+static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 

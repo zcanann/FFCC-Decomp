@@ -484,7 +484,7 @@ noReset:
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CompaInit0()
+inline void CMenuPcs::CompaInit0()
 {
 	CompaOpenAnimList* compaList = this->compaList;
 	int entryIndex = 0;

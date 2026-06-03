@@ -20,7 +20,9 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicPcs;
-extern const char s_CGraphicPcs[];
+extern const char s_CGraphicPcs[] = "CGraphicPcs";
+extern const char s_CManager_801D7B8C[] = "CManager";
+extern const char s_CProcess_801D7B98[] = "CProcess";
 
 CProcessTableCallback CGraphicPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 CProcessTableCallback CGraphicPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
@@ -61,10 +63,10 @@ extern "C" float FLOAT_8032FBC0;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
-extern const char s_p_graphic_cpp[];
-extern const char s_graphic_order_debug_fmt[];
-extern const char s_graphic_move_debug_fmt[];
-extern const char s_graphic_pad_input_fmt[];
+extern const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
+extern const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
+extern const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
+extern const char s_p_graphic_cpp[] = "p_graphic.cpp";
 const char s_debug_pad_port_fmt[] = "%dP";
 const char s_debug_frame_fmt[] = "%d";
 extern "C" const GXColor s_debug_bar_color;

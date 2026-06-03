@@ -5389,11 +5389,6 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     const int port = threadParam->m_portIndex;
     int result = 0;
 
-    if (threadParam->m_subState != 0 && threadParam->m_subState != 1)
-    {
-        return 0;
-    }
-
     if (threadParam->m_subState == 1)
     {
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);

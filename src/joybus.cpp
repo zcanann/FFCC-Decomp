@@ -5079,6 +5079,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             return wordCount;
         }
 
+        result = 0;
         m_txWordCount[threadParam->m_portIndex] = wordCount;
         m_txWordIndex[threadParam->m_portIndex] = 0;
 

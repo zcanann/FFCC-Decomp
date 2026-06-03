@@ -4131,7 +4131,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
             if (m_threadRunningMask != 0)
             {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 unsigned int queuePort = threadParam->m_portIndex;
                 if ((int)m_cmdCount[queuePort] < 0x40)

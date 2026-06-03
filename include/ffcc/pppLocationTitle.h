@@ -2,7 +2,9 @@
 #define _PPP_LOCATIONTITLE_H_
 
 #include <dolphin/types.h>
-#include "ffcc/partMng.h"
+#include <dolphin/gx.h>
+
+#include "ffcc/pppPart.h"
 
 typedef _pppPObject pppLocationTitle;
 
@@ -25,6 +27,30 @@ struct pppLocationTitleUnkB {
 };
 
 typedef _pppCtrlTable pppLocationTitleUnkC;
+
+struct LocationTitleWork {
+    void* m_particles;
+    u16 m_count;
+    u16 m_pad;
+    float m_cur;
+    float m_vel;
+    float m_acc;
+};
+
+struct LocationTitleParticle {
+    Vec m_pos;
+    GXColor m_color;
+    float m_frame;
+    s16 m_shapeUnk;
+    s16 m_shapeA;
+    s16 m_shapeB;
+    s16 m_pad;
+};
+
+struct LocationTitleColorBlock {
+    u8 m_pad[8];
+    GXColor m_color;
+};
 
 #ifdef __cplusplus
 extern "C" {

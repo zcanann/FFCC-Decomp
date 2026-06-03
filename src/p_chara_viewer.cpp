@@ -149,41 +149,23 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-extern "C" const char s_no_texture____801da7e8[0x188] =
-    "no texture...\0\0\0"
-    "p_chara_viewer.cpp\0\0"
-    "GPU = %f.5%%(C = %.5f%% G = %.5f%%)\0"
-    "CCharaPcs.calcViewer: %s\n\0\0\0"
-    "%splot%d.cha\0\0\0\0"
-    "FRAME = %.2f SPEED=%.2f\0"
-    "I = %s IFRAME = %.2f %s\0"
-    "CONT = %d\0\0\0"
-    "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES\0"
-    "CCharaPcs LoadModel\0"
-    "CCharaPcs LoadTexture\0\0\0"
-    "CCharaPcs LoadAnim\0\0"
-    "plot/kmitsuru/plot.chm\0\0"
-    "plot/kmitsuru/plot.chd\0\0"
-    "plot/kmitsuru/plot.cha\0\0"
-    "plot/kmitsuru/plot.tex\0\0"
-    "%sback.tex";
-#define s_no_texture (viewerStrings + 0x0)
-#define s_p_chara_viewer_cpp (viewerStrings + 0x10)
-#define s_gpu_profile_fmt (viewerStrings + 0x24)
-#define s_calc_viewer_fmt (viewerStrings + 0x48)
-#define s_anim_path_fmt (viewerStrings + 0x64)
-#define s_frame_speed_fmt (viewerStrings + 0x74)
-#define s_iframe_fmt (viewerStrings + 0x8C)
-#define s_cont_fmt (viewerStrings + 0xA4)
-#define s_cpu_profile_fmt (viewerStrings + 0xB0)
-#define s_load_model (viewerStrings + 0xDC)
-#define s_load_texture (viewerStrings + 0xF0)
-#define s_load_anim (viewerStrings + 0x108)
-#define s_default_chm_path (viewerStrings + 0x11C)
-#define s_default_chd_path (viewerStrings + 0x134)
-#define s_default_cha_path (viewerStrings + 0x14C)
-#define s_default_tex_path (viewerStrings + 0x164)
-#define s_back_tex_fmt (viewerStrings + 0x17C)
+extern "C" const char s_no_texture[] = "no texture...";
+extern "C" const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
+extern "C" const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
+extern "C" const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
+extern "C" const char s_anim_path_fmt[] = "%splot%d.cha";
+extern "C" const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
+extern "C" const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
+extern "C" const char s_cont_fmt[] = "CONT = %d";
+extern "C" const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
+extern "C" const char s_load_model[] = "CCharaPcs LoadModel";
+extern "C" const char s_load_texture[] = "CCharaPcs LoadTexture";
+extern "C" const char s_load_anim[] = "CCharaPcs LoadAnim";
+extern "C" const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
+extern "C" const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
+extern "C" const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
+extern "C" const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
+extern "C" const char s_back_tex_fmt[] = "%sback.tex";
 
 /*
  * --INFO--
@@ -212,7 +194,6 @@ void sendVertex(coord* vertex)
 void CCharaPcs::drawViewer()
 {
     CCharaPcs* self = this;
-    register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx44 projMtx;
     Mtx texMtx;
     Mtx backCameraMtx;
@@ -358,7 +339,6 @@ void CCharaPcs::drawViewer()
 void CCharaPcs::calcViewer()
 {
     CCharaPcs* self = this;
-    register const char* viewerStrings = s_no_texture____801da7e8;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
 
@@ -752,7 +732,6 @@ void CCharaPcs::destroyViewer()
 void CCharaPcs::createViewer()
 {
     CCharaPcs* self = this;
-    register char* viewerStrings = const_cast<char*>(s_no_texture____801da7e8);
     unsigned int i;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -760,9 +739,9 @@ void CCharaPcs::createViewer()
     memset(&self->m_viewerModelStage, 0,
            sizeof(self->m_viewerModelStage) + sizeof(self->m_viewerTextureStage) + sizeof(self->m_viewerAnimStage) +
                sizeof(self->_pad0D8));
-    self->m_viewerModelStage = Memory.CreateStage(0x177000, s_load_model, 0);
-    self->m_viewerTextureStage = Memory.CreateStage(0x200000, s_load_texture, 0);
-    self->m_viewerAnimStage = Memory.CreateStage(0x190000, s_load_anim, 0);
+    self->m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
+    self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
+    self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
 
     self->m_viewerAmbientColor[0].r = 0x3F;
     self->m_viewerAmbientColor[0].g = 0x3F;

@@ -1,6 +1,8 @@
 #define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/ptrarray.h"
+#define FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/p_chara.h"
+#undef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
 #include "ffcc/file.h"
@@ -220,7 +222,7 @@ void CCharaPcs::drawViewer()
     Mtx cameraMtx;
 
     if ((self->m_viewerBackTextureSet != 0) &&
-        (static_cast<unsigned int>(self->m_viewerBackTextureSet->GetNumTexture()) != 0)) {
+        (static_cast<unsigned int>(self->m_viewerBackTextureSet->m_textureArray.GetSize()) != 0)) {
         C_MTXOrtho(projMtx, LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoRight),
                    LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoBottom), LoadFloat(kCharaViewerZero),
                    LoadFloat(kCharaViewerGridMax));
@@ -237,7 +239,7 @@ void CCharaPcs::drawViewer()
         PSMTXIdentity(backCameraMtx);
         GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
-        CTexture* texture = self->m_viewerBackTextureSet->GetTexture(0);
+        CTexture* texture = self->m_viewerBackTextureSet->m_textureArray[0];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
         unsigned int width = texture->m_width;
         unsigned int height = texture->m_height;

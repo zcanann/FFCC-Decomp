@@ -219,8 +219,8 @@ void CCharaPcs::drawViewer()
         GXSetCullMode(GX_CULL_NONE);
         CTexture* texture = self->m_viewerBackTextureSet->m_textureArray[0];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
-        unsigned int width = texture->m_width;
-        unsigned int height = texture->m_height;
+        int width = texture->m_width;
+        int height = texture->m_height;
         PSMTXScale(texMtx, LoadFloat(kCharaViewerUnitStep) / static_cast<float>(width),
                    LoadFloat(kCharaViewerUnitStep) / static_cast<float>(height),
                    LoadFloat(kCharaViewerUnitStep));

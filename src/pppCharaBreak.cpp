@@ -31,8 +31,8 @@ extern const float FLOAT_80332058;
 extern const float FLOAT_8033205c;
 extern const float FLOAT_80332060;
 extern const float FLOAT_80332064;
-extern const double DOUBLE_80332068;
-extern const double DOUBLE_80332070;
+extern const double DOUBLE_80332068 = 4503601774854144.0;
+extern const double DOUBLE_80332070 = 4503599627370496.0;
 extern const float FLOAT_80332078[2];
 
 static inline Mtx& CameraMatrix()
@@ -353,7 +353,8 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     CChara::CMesh* mesh = model->m_meshes;
 
     if (meshBufferSlot != NULL) {
-        for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
+        u32 meshIndex = 0;
+        while (meshIndex < ModelData(model)->m_meshCount) {
             CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;
             CharaBreakMeshData* meshData = MeshData(mesh);
             if (dlEntryBase != NULL) {
@@ -381,8 +382,9 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
                 pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = 0;
             }
-            mesh++;
             meshBufferSlot++;
+            meshIndex++;
+            mesh++;
         }
     }
 
@@ -486,14 +488,15 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
-                        S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
 
                         if (needsMtxUpdate) {
+                            S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
                             Vec transformedPos;
                             gUtil.ConvI2FVector(transformedPos, *srcPos, ModelData(model)->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
+                            S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
                             *dst = *srcPos;
                         }
 

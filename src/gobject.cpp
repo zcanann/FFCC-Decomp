@@ -2991,10 +2991,20 @@ int CGObject::IsAnimFinished(int mode)
  */
 void CGObject::CancelAnim(int keepFacing)
 {
+	struct ShieldNodeFlagBits {
+	    unsigned char unk0 : 1;
+	    unsigned char unk1 : 1;
+	    unsigned char unk2 : 1;
+	    unsigned char unk3 : 1;
+	    unsigned char unk4 : 1;
+	    unsigned char unk5 : 1;
+	    unsigned char unk6 : 1;
+	    unsigned char unk7 : 1;
+	};
+
 	m_currentAnimSlot = -1;
 
-	*((u8*)&m_shieldNodeFlags) =
-	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
+	reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->unk1 = 0;
 
 	const float& zero = sZeroFloat;
 	m_turnSpeed = zero;
@@ -3073,7 +3083,7 @@ void CGObject::SetDispItemName(int showName)
         unsigned char unk0 : 1;
         unsigned char unk1 : 1;
         unsigned char unk2 : 1;
-        unsigned char dispItemName : 1;
+        signed char dispItemName : 1;
         unsigned char unk4 : 1;
         unsigned char unk5 : 1;
         unsigned char unk6 : 1;
@@ -3148,11 +3158,18 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         }
 
         if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
-            CVector attrDirection(sZeroFloat, -0.5f, sZeroFloat);
-            CVector attrBottom(m_worldPosition.x, m_worldPosition.y + sStepProbeHeight, m_worldPosition.z);
+            Vec attrDirection;
+            Vec attrBottom;
             CMapCylinder attrCylinder;
-            attrCylinder.m_bottom = *reinterpret_cast<Vec*>(&attrBottom);
-            attrCylinder.Probe().m_direction = *reinterpret_cast<Vec*>(&attrDirection);
+
+            attrDirection.x = sZeroFloat;
+            attrDirection.y = -0.5f;
+            attrDirection.z = sZeroFloat;
+            attrBottom.x = m_worldPosition.x;
+            attrBottom.y = m_worldPosition.y + sStepProbeHeight;
+            attrBottom.z = m_worldPosition.z;
+            attrCylinder.m_bottom = attrBottom;
+            attrCylinder.Probe().m_direction = attrDirection;
             attrCylinder.Probe().m_radius = 0.3f;
             attrCylinder.Probe().m_height = 0.3f;
             attrCylinder.Probe().m_top = attrCylinder.Probe().m_direction;

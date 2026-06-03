@@ -378,31 +378,7 @@ void CLightPcs::draw()
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
     CLight sceneLight;
-    sceneLight = *light;
-    if (sceneLight.m_attenFalloff >= FLOAT_8032fc10) {
-        sceneLight.m_attenFalloff = sceneLight.m_attenRadius;
-    }
-
-    sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
-    sceneLight.m_range = sceneLight.m_attenRadius;
-    if (sceneLight.m_range < FLOAT_8032fc14) {
-        sceneLight.m_range = -sceneLight.m_range;
-    }
-    sceneLight.m_range = sceneLight.m_range * FLOAT_8032fc18 * sceneLight.m_radius;
-
-    sceneLight.m_targetEnable[3] = 1;
-    sceneLight.m_targetEnable[2] = 1;
-    sceneLight.m_targetEnable[1] = 1;
-    sceneLight.m_targetEnable[0] = 1;
-    if (*(u32*)&sceneLight.m_targetColor[0] == 0) {
-        sceneLight.m_targetEnable[0] = 0;
-    }
-    if (*(u32*)&sceneLight.m_targetColor[1] == 0) {
-        sceneLight.m_targetEnable[1] = 0;
-    }
-    if (*(u32*)&sceneLight.m_targetColor[2] == 0) {
-        sceneLight.m_targetEnable[2] = 0;
-    }
+    sceneLight.Set(light);
 
     u32 idx = m_sceneLightCount;
     m_sceneLightCount = idx + 1;

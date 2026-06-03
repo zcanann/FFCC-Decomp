@@ -2625,8 +2625,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			}
 			break;
 		case 0x494E464F:
-			meshRef->m_infoWord1 = chunk.Get4();
 			meshRef->m_nodeIndex = chunk.Get4();
+			meshRef->m_infoWord1 = chunk.Get4();
 			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0x7F) | ((chunk.Get4() != 0) ? 0x80 : 0));
 			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0xBF) | ((chunk.Get4() != 0) ? 0x40 : 0));
 			chunk.Get4();

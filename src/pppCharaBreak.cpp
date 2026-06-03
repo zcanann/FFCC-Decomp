@@ -45,6 +45,30 @@ static inline int LoadInt(const int& value)
     return value;
 }
 
+static inline double S32ToDouble(s32 value)
+{
+    union {
+        u32 words[2];
+        double value;
+    } conv;
+
+    conv.words[0] = 0x43300000;
+    conv.words[1] = value ^ 0x80000000U;
+    return conv.value - DOUBLE_80332068;
+}
+
+static inline double U32ToDouble(u32 value)
+{
+    union {
+        u32 words[2];
+        double value;
+    } conv;
+
+    conv.words[0] = 0x43300000;
+    conv.words[1] = value;
+    return conv.value - DOUBLE_80332070;
+}
+
 typedef CharaBreakUnkB CharaBreakStep;
 
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
@@ -450,7 +474,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     s16 threshold;
 
     threshold = (s32)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
-                      (float)(1 << ModelData(model)->m_posQuant));
+                      S32ToDouble(1 << ModelData(model)->m_posQuant));
 
     for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
         s32 needsMtxUpdate = 0;
@@ -575,7 +599,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
-                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);
+                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * U32ToDouble(polygon->m_alpha));
                         PSMTXQuat(rotMtx, &rotQuat);
                         cosValue = FLOAT_80332048;
                         sinValue = cosValue;
@@ -601,7 +625,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 *angleState = angle;
                             }
 
-                            s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
+                            s32 sinIndex = (s32)(S32ToDouble(*angleState << 15) / FLOAT_80332060);
                             sinValue = *(float*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC));
                             cosValue = *(float*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC));
                         }
@@ -615,12 +639,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
+                                verts[i].y += velocity.y - stepData->m_gravity * U32ToDouble(polygon->_pad2);
                                 verts[i].z += velocity.z;
                             } else if (stepData->m_spinMode == 1) {
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].x += cosValue * wobbleScale;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
+                                verts[i].y += velocity.y - stepData->m_gravity * U32ToDouble(polygon->_pad2);
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].z += sinValue * wobbleScale;
                             }

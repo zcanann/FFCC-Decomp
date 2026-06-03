@@ -20,6 +20,7 @@ extern const float kFunnyShapeOne;
 extern const float kFunnyShapeTexCoordDivisor = 4096.0f;
 extern const float kFunnyShapePaddingScale = 0.5f;
 extern const float kFunnyShapeNegativeOne;
+extern const float FLOAT_8032fd84 = 0.0f;
 extern const float kFunnyShapeDefaultOffsetX = 480.0f;
 extern const float kFunnyShapeDefaultOffsetY = 336.0f;
 extern const float kFunnyShapeTextureViewportOrigin = 20.0f;

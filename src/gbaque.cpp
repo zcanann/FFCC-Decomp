@@ -2724,11 +2724,8 @@ void GbaQueue::LoadMapObj()
 
 					unsigned int mask = 1U << count;
 					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
-					if (mapObjBase[1] != 0) {
-						drawMask |= mask;
-					} else {
-						drawMask &= ~mask;
-					}
+					int drawFlag = static_cast<int>(mapObjBase[1]);
+					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
 					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
 					mapObjWork[0] = static_cast<unsigned char>(count + 1);
 				} else if (System.m_execParam > 1) {

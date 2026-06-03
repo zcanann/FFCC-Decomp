@@ -1068,7 +1068,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
  * JP Address: TODO
  * JP Size: TODO
  */
-void get_rand()
+inline void get_rand()
 {
     Math.RandF();
 }
@@ -1082,8 +1082,8 @@ void get_rand()
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PARTICLE_DATA* particleData,
-                       PARTICLE_WMAT* particleWmat)
+inline void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PARTICLE_DATA* particleData,
+                              PARTICLE_WMAT* particleWmat)
 {
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Mtx workMtx;
@@ -1108,7 +1108,7 @@ void SetParticleMatrix(_pppPObject* pppObject, VYmBreath* vYmBreath, PARTICLE_DA
  * JP Address: TODO
  * JP Size: TODO
  */
-void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
+inline void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
 {
     int i;
     bool isDead = true;
@@ -1147,7 +1147,7 @@ void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short grou
  * JP Address: TODO
  * JP Size: TODO
  */
-void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
+inline void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleGroup* groupTable = vYmBreath->m_groups;
@@ -1178,7 +1178,7 @@ void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, s
  * JP Address: TODO
  * JP Size: TODO
  */
-void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
+inline void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
 {
     short slotIndex;
     short groupIndex;

@@ -27,7 +27,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
         CalcGraphValue((_pppPObject*)param_1, param_2->m_graphId, value[0], value[1], value[2], param_2->m_dataValIndex,
                        param_2->m_initWOrk, param_2->m_stepValue);
 
-        if ((gPppInConstructor != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
+        if ((ppvIsLoopCalc != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
             Vec resultPos;
             Vec cameraDir;
             cameraDir.x = CameraPcs.m_directionX;

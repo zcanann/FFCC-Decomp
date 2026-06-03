@@ -465,7 +465,7 @@ void CFunnyShape::RenderShape()
     offsetCopy.x = LoadFloat(kFunnyShapeDefaultOffsetX);
     offsetCopy.y = LoadFloat(kFunnyShapeDefaultOffsetY);
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeBoundsMaxInitial));
+    RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeZero));
 }
 
 /*

@@ -4840,7 +4840,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
         }
 
         m_txWordCount[threadParam->m_portIndex] = wordCount;
-        threadParam->m_subState = 1;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
         unsigned int sendPort = threadParam->m_portIndex;
         unsigned char* base = m_joyDataPacketBuffer[sendPort];

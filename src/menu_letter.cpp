@@ -1973,41 +1973,52 @@ void CMenuPcs::LetterMessDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80163fdc
+ * PAL Size: 3844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
 	unsigned int press;
 	u16 hold;
-	int caravanWork = Game.m_scriptFoodBase[0];
+	int padState = Pad._452_4_;
 
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((padState != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
-		press = Pad.GetPadInputs()[0].buttonDown[0];
+		int padIndex = 0;
+		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		padIndex &= ~mask;
+		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((padState != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = Pad.GetPadInputs()[0].repeatButton;
+		int padIndex = 0;
+		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		padIndex &= ~mask;
+		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 
 	if (hold == 0) {
 		return 0;
 	}
 
+	int caravanWork = Game.m_scriptFoodBase[0];
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
-	s16 menuMode = *reinterpret_cast<s16*>(state + 0x30);
+	int menuMode = *reinterpret_cast<s16*>(state + 0x30);
 	if (menuMode != 0) {
 		if (menuMode == 1) {
 			if ((press & 0x100) != 0) {

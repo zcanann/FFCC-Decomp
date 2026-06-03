@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
@@ -16,7 +17,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/quadobj.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"

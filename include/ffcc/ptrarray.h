@@ -26,6 +26,7 @@ public:
     int Add(T item);
     void RemoveAll();
     void ReleaseAndRemoveAll();
+    void RemoveAt(unsigned long index);
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
     void SetAt(unsigned long index, T item);
@@ -142,6 +143,17 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
         }
     }
     RemoveAll();
+}
+
+template <class T>
+void CPtrArray<T>::RemoveAt(unsigned long index)
+{
+    m_items[index] = 0;
+    for (; index < m_numItems - 1; index++) {
+        m_items[index] = m_items[index + 1];
+    }
+
+    m_numItems = m_numItems - 1;
 }
 
 template <class T>

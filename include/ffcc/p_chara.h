@@ -6,6 +6,7 @@
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
 
@@ -20,16 +21,6 @@ class CRef;
 class CTextureSet;
 
 CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
-
-#ifdef FFCC_P_CHARA_DEFINE_LAYOUT
-#define FFCC_PTRARRAY_DECL_BOOL_ADD
-#define FFCC_PTRARRAY_DECL_NO_SET_AT
-#define FFCC_PTRARRAY_DECL_REMOVE_AT
-#include "ffcc/ptrarray_decl.h"
-#undef FFCC_PTRARRAY_DECL_REMOVE_AT
-#undef FFCC_PTRARRAY_DECL_NO_SET_AT
-#undef FFCC_PTRARRAY_DECL_BOOL_ADD
-#endif
 
 class CCharaPcs : public CProcess
 {
@@ -222,14 +213,10 @@ public:
     int m_texShadowSize;                      // 0x044
     int m_texShadowDistance;                  // 0x048
     CHandle* m_handleList;                    // 0x04C
-#ifdef FFCC_P_CHARA_DEFINE_LAYOUT
     CPtrArray<CLoadModel*> m_loadModels;      // 0x050
     CPtrArray<CLoadAnim*> m_loadAnims;        // 0x06C
     CPtrArray<CLoadTexture*> m_loadTextures;  // 0x088
     CPtrArray<CLoadPdt*> m_loadPdts;          // 0x0A4
-#else
-    u8 _pad050[0x70];                         // 0x050
-#endif
     CMemory::CStage* m_stage;                 // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x0C4
     CMemory::CStage* m_amemWorkStage;         // 0x0C8

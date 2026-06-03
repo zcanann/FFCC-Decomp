@@ -112,6 +112,19 @@ static inline s16 ShapeRange(CFunnyShape* self)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 540b
+ * EN Address: 0x8005f81c
+ * EN Size: 628b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFunnyShape::SetDefaultStage()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8005051c
  * PAL Size: 2820b
  * EN Address: TODO
@@ -337,6 +350,19 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
  * JP Size: TODO
  */
 void CFunnyShape::ClearShapeData()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CFunnyShape::Create()
 {
 }
 

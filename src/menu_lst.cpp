@@ -93,7 +93,7 @@ void CMenuPcs::MLstDraw()
 			}
 			MenuPcs.DrawRect(
 				0,
-				iconX - 20.0f,
+				(float)-((FLOAT_803333E0 * DOUBLE_803333E8) - (double)iconX),
 				iconY,
 				40.0f,
 				40.0f,
@@ -145,7 +145,7 @@ void CMenuPcs::MLstDraw()
 	int helpMessageId = this->lstState->cursor + 0x25c;
 	CFont* helpFont = this->helpFont;
 	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->lstData->entries[0].alpha));
-	float helpX = (float)-((40.0f * (double)0.5f) - (double)320.0f);
+	float helpX = (float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8);
 	float helpY = 352.0f;
 	DrawHelpMessage(
 		helpMessageId,

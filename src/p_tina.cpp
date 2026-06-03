@@ -203,19 +203,6 @@ static const int kPppFieldParticleNoAutoCreate = -0x1000;
 CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
-struct CPartPcsViewerState {
-    unsigned char unk0[0x18];
-    void* m_stageDefault;
-    void* m_stageLoad;
-    void* m_stageAmem;
-    void* m_stageExtra;
-    void* m_freePtr;
-    unsigned char unk2C[2];
-    unsigned char m_blockOnFrame;
-    unsigned char m_miruraEventActive;
-    unsigned char m_disableShokiDraw;
-};
-
 /*
  * --INFO--
  * Address:	TODO
@@ -412,33 +399,33 @@ unsigned char pppAmemRefCntError(unsigned long)
  */
 void CPartPcs::create()
 {
-    CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
+    CUSBStreamData* usb = &m_usbStreamData;
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-    void* stage;
+    CMemory::CStage* stage;
 
-    viewer->m_freePtr = 0;
-    viewer->m_stageExtra = 0;
-    viewer->m_blockOnFrame = 0;
-    viewer->m_miruraEventActive = 0;
-    viewer->m_disableShokiDraw = 0;
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
         stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
-        viewer->m_stageAmem = 0;
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        usb->m_stageAmem = 0;
     } else {
         stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
         stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
-        viewer->m_stageAmem = stage;
+        usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad),
-        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem),
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
         0x400,
         pppNotAllocAmemCacheRmem,
         0,
@@ -490,34 +477,34 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::createViewer()
 {
-    CPartPcsViewerState* viewer = reinterpret_cast<CPartPcsViewerState*>(this);
+    CUSBStreamData* usb = &m_usbStreamData;
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-    void* stage;
+    CMemory::CStage* stage;
 
     USBPcs.IsBigAlloc(1);
-    viewer->m_freePtr = 0;
-    viewer->m_stageExtra = 0;
-    viewer->m_blockOnFrame = 0;
-    viewer->m_miruraEventActive = 0;
-    viewer->m_disableShokiDraw = 0;
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
         stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
-        viewer->m_stageAmem = 0;
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        usb->m_stageAmem = 0;
     } else {
         stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        viewer->m_stageLoad = stage;
-        viewer->m_stageDefault = stage;
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
         stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
-        viewer->m_stageAmem = stage;
+        usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad),
-        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem),
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
         0x400,
         pppNotAllocAmemCacheRmem,
         0,

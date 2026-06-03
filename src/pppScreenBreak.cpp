@@ -21,34 +21,6 @@
 
 #include <string.h>
 
-struct PScreenBreak {
-    _pppPObject m_object;
-};
-
-struct ScreenBreakPiece {
-    Vec m_velocity;
-    Vec m_offset;
-    Vec m_axis;
-    Vec m_translation;
-    float m_timer;
-    float m_angle;
-    u8 m_active;
-    u8 m_pad39[3];
-};
-
-struct VScreenBreak {
-    float m_graphValue0;
-    float m_graphValue1;
-    float m_graphValue2;
-    ScreenBreakPiece* m_pieces;
-    GXTexObj* m_backBufferTexObj;
-    u8 m_pad14[4];
-    Vec m_extent;
-    u8 m_backBufferReady;
-    u8 m_pad25[3];
-    GXColor m_color;
-};
-
 struct Vec4d {
     float x;
     float y;
@@ -58,56 +30,9 @@ struct Vec4d {
 
 typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
 typedef CChara::CMesh ScreenBreakMeshRef;
-
-struct ScreenBreakMeshData {
-    u8 _pad0[0x14];
-    u32 m_vertexCount;
-    S16Vec* m_vertices;
-    u8 _pad1C[0x30];
-    u32 m_displayListCount;
-    ScreenBreakDisplayList* m_displayLists;
-    u32 m_skinCount;
-    void* m_skins;
-    u32 m_nodeIndex;
-};
-
-struct ScreenBreakModelData {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x24];
-    u32 m_posQuant;
-};
-
-struct pppScreenBreakUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_initWOrk;
-    u8 _pad9[3];
-    float m_stepValue;
-    float m_arg3;
-    float m_graphPayload;
-    float m_gravityScale;
-    u8 m_pad1C[4];
-    Vec m_gravityDir;
-    u8 m_pad2C[4];
-    float m_gravityAmount;
-    u8 m_angleRand;
-    u8 m_pad35[3];
-    float m_speedBase;
-    float m_speedRand;
-};
-
-struct ScreenBreakColorData {
-    u8 m_pad0[8];
-    GXColor m_color;
-};
+typedef CChara::CMesh::CRefData ScreenBreakMeshData;
 
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
-STATIC_ASSERT(offsetof(ScreenBreakModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(ScreenBreakModelData, m_posQuant) == 0x34);
-STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
-STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_displayLists) == 0x50);
-STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x5C);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
 STATIC_ASSERT(sizeof(ScreenBreakPiece) == 0x3C);
@@ -120,13 +45,13 @@ STATIC_ASSERT(offsetof(VScreenBreak, m_extent) == 0x18);
 STATIC_ASSERT(offsetof(VScreenBreak, m_backBufferReady) == 0x24);
 STATIC_ASSERT(offsetof(VScreenBreak, m_color) == 0x28);
 STATIC_ASSERT(offsetof(ScreenBreakColorData, m_color) == 0x08);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_graphPayload) == 0x14);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityScale) == 0x18);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityDir) == 0x20);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_gravityAmount) == 0x30);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_angleRand) == 0x34);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_speedBase) == 0x38);
-STATIC_ASSERT(offsetof(pppScreenBreakUnkB, m_speedRand) == 0x3C);
+STATIC_ASSERT(offsetof(PScreenBreak, m_graphPayload) == 0x14);
+STATIC_ASSERT(offsetof(PScreenBreak, m_gravityScale) == 0x18);
+STATIC_ASSERT(offsetof(PScreenBreak, m_gravityDir) == 0x20);
+STATIC_ASSERT(offsetof(PScreenBreak, m_gravityAmount) == 0x30);
+STATIC_ASSERT(offsetof(PScreenBreak, m_angleRand) == 0x34);
+STATIC_ASSERT(offsetof(PScreenBreak, m_speedBase) == 0x38);
+STATIC_ASSERT(offsetof(PScreenBreak, m_speedRand) == 0x3C);
 
 extern const float FLOAT_80331cc0 = 2.0f;
 extern const float FLOAT_80331cc4 = 0.0f;
@@ -147,9 +72,9 @@ extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
-static inline ScreenBreakModelData* ScreenBreakModelRef(CChara::CModel* model) { return reinterpret_cast<ScreenBreakModelData*>(model->m_data); }
-static inline u8* GetScreenBreakWork(PScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
-static inline VScreenBreak* GetScreenBreakValue(PScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
+static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
+static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
+static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
 
@@ -168,10 +93,10 @@ void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned ch
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, _pppCtrlTable* param_3)
+void pppRenderScreenBreak(pppScreenBreak* screenBreak, PScreenBreak*, _pppCtrlTable* param_3)
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
-    VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, dataOffset);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SearchNode(const_cast<char*>(sF999Root));
@@ -192,7 +117,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, _pp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pppCtrlTable* param_3)
 {
     if (ppvUserStopPartF != 0) {
         return;
@@ -203,9 +128,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, serializedDataOffsets[2]);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, serializedDataOffsets[2]);
     ScreenBreakColorData* colorSource = reinterpret_cast<ScreenBreakColorData*>(
-        GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[0]));
+        GetScreenBreakWork(screenBreak, serializedDataOffsets[0]));
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     model->SetCallbackContext(value, param_2);
@@ -215,7 +140,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     value->m_color = colorSource->m_color;
     DCFlushRange(&value->m_color, sizeof(value->m_color));
 
-    CalcGraphValue(&pppScreenBreak->m_object, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
+    CalcGraphValue(&screenBreak->m_object, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
                    param_2->m_stepValue, param_2->m_arg3, param_2->m_graphPayload);
 
     ScreenBreakPiece* pieceStorage = value->m_pieces;
@@ -226,7 +151,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         value->m_pieces = pieceStorage;
         value->m_backBufferTexObj = static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr,
                                                                       const_cast<char*>(s_pppScreenBreak_cpp), 0x25F));
-        InitPieceData(model, (PScreenBreak*)param_2, (VScreenBreak*)value);
+        InitPieceData(model, param_2, value);
         PSVECNormalize(&param_2->m_gravityDir, &param_2->m_gravityDir);
     }
 
@@ -302,11 +227,11 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
+void pppDesScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
 {
     int* serializedDataOffsets = param_2->m_serializedDataOffsets;
     s32 dataOffset = serializedDataOffsets[2];
-    VScreenBreak* pppData = GetScreenBreakValue(pppScreenBreak, dataOffset);
+    VScreenBreak* pppData = GetScreenBreakValue(screenBreak, dataOffset);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
     if (model != 0) {
@@ -335,10 +260,10 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
+void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, dataOffset);
     const float& f = FLOAT_80331cc4;
     value->m_graphValue2 = f;
     value->m_graphValue1 = f;
@@ -354,10 +279,10 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenBreak(PScreenBreak* pppScreenBreak, _pppCtrlTable* param_2)
+void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    VScreenBreak* value = GetScreenBreakValue(pppScreenBreak, dataOffset);
+    VScreenBreak* value = GetScreenBreakValue(screenBreak, dataOffset);
     CGObject* gObject = ppvMng->m_owner;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(gObject, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
@@ -409,7 +334,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 {
     s32 iVar6;
     u32 uVar15;
-    pppScreenBreakUnkB* stepData = reinterpret_cast<pppScreenBreakUnkB*>(step);
+    PScreenBreak* stepData = step;
     ScreenBreakPiece* piece;
     s32 iVar16;
     float dVar17;
@@ -438,7 +363,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     dVar25 = FLOAT_80331cd8;
 
     for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
-        ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
+        ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
         node->m_flags &= 0x7F;
         PSMTXIdentity(node->m_localRuntimeMtx);
@@ -574,7 +499,7 @@ void SB_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void*, int mesh
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
     ScreenBreakMeshRef* mesh = model->m_meshes;
     mesh += meshIndex;
-    ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
+    ScreenBreakMeshData* meshData = mesh->m_data;
     ScreenBreakDisplayList* displayList = meshData->m_displayLists;
 
     displayList += drawListIndex;
@@ -667,7 +592,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     float zero = 0.0f;
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
-    pppScreenBreakUnkB* step = static_cast<pppScreenBreakUnkB*>(param_3);
+    PScreenBreak* step = static_cast<PScreenBreak*>(param_3);
     ScreenBreakPiece* pieceData = work->m_pieces;
     Vec translation;
     Vec cameraForward;
@@ -730,7 +655,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     }
 
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
-        ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
+        ScreenBreakMeshData* meshData = mesh->m_data;
         if (pieceData->m_active != 0) {
             MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
 

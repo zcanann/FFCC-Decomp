@@ -4,16 +4,22 @@
 #include "ffcc/chara.h"
 #include "ffcc/partMng.h"
 
-struct POLYGON_DATA;
 struct PCharaBreak;
-struct VCharaBreak;
 struct CharaBreakUnkB;
 
-void CreatePolygon(POLYGON_DATA*, void*, unsigned long, CChara::CModel*, CChara::CMesh*);
-void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned long, CChara::CModel*, CChara::CMesh*);
-void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*);
-
 typedef _pppPObject pppCharaBreak;
+
+struct POLYGON_DATA {
+    u8 m_enabled;
+    u8 m_alpha;
+    u16 _pad2;
+    S16Vec m_normalA;
+    S16Vec m_normalB;
+    S16Vec m_pos[3];
+    u16 m_posIndices[3];
+    u16 m_nrmIndices[3];
+    u16 m_texIndices[3];
+};
 
 struct CharaBreakUnkB {
     s32 m_graphId;
@@ -37,6 +43,37 @@ struct CharaBreakUnkB {
     u8 m_worldSpaceMode;
     u8 _pad43;
 };
+
+struct VCharaBreak {
+    GXColor m_color;
+    f32 m_value0;
+    f32 m_value1;
+    f32 m_value2;
+    f32 m_value3;
+    f32 m_value4;
+    f32 m_value5;
+    void* m_meshBuffers;
+    Vec m_bboxMin;
+    u8 _pad2C[0x4];
+    Vec m_bboxMax;
+    f32 m_miscValue;
+    CChara::CModel* m_model;
+    u32 m_enabled;
+};
+
+typedef VCharaBreak CharaBreakWork;
+
+struct CharaBreakDisplayListPair {
+    void* m_rewrittenDisplayList;
+    u32 m_displayListSize;
+    u16 m_polygonCount;
+    u16 _padA;
+    POLYGON_DATA* m_polygonData;
+};
+
+void CreatePolygon(POLYGON_DATA*, void*, unsigned long, CChara::CModel*, CChara::CMesh*);
+void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned long, CChara::CModel*, CChara::CMesh*);
+void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*);
 
 #ifdef __cplusplus
 extern "C" {

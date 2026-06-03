@@ -4,11 +4,41 @@
 #include <dolphin/gx.h>
 #include <dolphin/types.h>
 
-#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 struct PYmMelt
 {
     _pppPObject m_object;
+};
+
+struct YmMeltVertex
+{
+    Vec m_position;
+    union {
+        _GXColor m_gxColor;
+        u32 m_rawColor;
+        float m_colorValue;
+        u8 m_bytes[4];
+    } m_color;
+};
+
+struct YmMeltWork {
+    YmMeltVertex* m_vertexData;
+    s16 m_phaseOffset;
+    s16 m_shapeCurrentFrame;
+    s16 m_shapeDrawFrame;
+    s16 m_shapeFrameTime;
+    f32 m_phase;
+    f32 m_phaseVelocity;
+    f32 m_phaseAccel;
+};
+
+struct YmMeltColorWork {
+    u8 _pad0[8];
+    union {
+        pppCVECTOR m_color;
+        float m_colorValue;
+    };
 };
 
 struct VERTEX_DATA

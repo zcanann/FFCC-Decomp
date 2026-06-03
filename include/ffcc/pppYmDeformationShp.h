@@ -1,17 +1,34 @@
 #ifndef _PPP_YMDEFORMATIONSHP_H_
 #define _PPP_YMDEFORMATIONSHP_H_
 
-#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/types.h>
 
-struct VYmDeformationShp;
 struct Vec;
 struct Vec2d;
 struct Vec4d;
 
 struct pppYmDeformationShp {
     _pppPObject m_object;
+};
+
+struct YmDeformationShpColorInfo {
+    u32 m_unk0;
+    u32 m_unk4;
+    pppCVECTOR m_color;
+};
+
+struct VYmDeformationShp {
+    GXTexObj* m_backBuffer;
+    int m_pad0;
+    int m_pad1;
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad2;
+    float m_scale;
+    float m_values[5];
 };
 
 struct pppYmDeformationShpGraphArgs {

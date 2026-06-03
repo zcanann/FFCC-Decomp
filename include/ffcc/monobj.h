@@ -283,7 +283,10 @@ public:
     };
     int m_chaseState;             // 0x6D8
     int m_chaseTimer;             // 0x6DC
-    int m_unk6E0;                 // 0x6E0
+    union {
+        int m_unk6E0;             // 0x6E0
+        unsigned char* m_bind;    // 0x6E0
+    };
     short m_aiState;              // 0x6E4
     short m_aiStatePrev;          // 0x6E6
     int m_forcedAction;           // 0x6E8
@@ -301,6 +304,7 @@ STATIC_ASSERT(offsetof(CGMonObj, m_targetPartyIndex) == 0x6C4);
 STATIC_ASSERT(offsetof(CGMonObj, m_actionBranch) == 0x6D0);
 STATIC_ASSERT(offsetof(CGMonObj, m_chaseState) == 0x6D8);
 STATIC_ASSERT(offsetof(CGMonObj, m_chaseTimer) == 0x6DC);
+STATIC_ASSERT(offsetof(CGMonObj, m_bind) == 0x6E0);
 STATIC_ASSERT(offsetof(CGMonObj, m_aiState) == 0x6E4);
 STATIC_ASSERT(offsetof(CGMonObj, m_forcedAction) == 0x6E8);
 STATIC_ASSERT(offsetof(CGMonObj, m_attackDelay) == 0x6F0);

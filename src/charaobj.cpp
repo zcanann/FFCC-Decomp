@@ -763,7 +763,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	m_pushParamB = static_cast<unsigned char>(push < 0x19 ? push : 0x19);
-	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D8) == 4) {
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && static_cast<CGMonObj*>(this)->m_chaseState == 4) {
 		m_pushParamB = 100;
 	}
 
@@ -792,7 +792,7 @@ float CGCharaObj::onAlphaUpdate()
 		     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) ||
 		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		     (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
-		     reinterpret_cast<unsigned char*>(this)[0x6BA] == 0)) {
+		     static_cast<CGMonObj*>(this)->m_unk6BA == 0)) {
 			int createSerial = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x54C);
 			float alphaWave = static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(createSerial))));
 			float alphaDelta = 0.05f * alphaWave;
@@ -2248,7 +2248,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x9A) &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) == 0) {
+			    static_cast<CGMonObj*>(this)->m_actionBranch == 0) {
 				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24) -= delta;
 				delta = 0;
 			}

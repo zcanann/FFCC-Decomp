@@ -75,32 +75,31 @@ void CGMonObj::onCreate()
 {
 	CGCharaObj::onCreate();
 
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
-	*reinterpret_cast<unsigned short*>(mon + 0x6E4) = 0;
-	*reinterpret_cast<unsigned short*>(mon + 0x6E6) = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6C8) = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6D0) = 0;
-	mon[0x6B8] = 0;
-	mon[0x6B9] = 0;
-	mon[0x6BA] = 0;
-	mon[0x6BC] = 0;
-	mon[0x6BD] = 0;
-	mon[0x6BE] = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6F0) = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6F4) = 0;
-	mon[0x6BF] = 0;
-	mon[0x6C0] = 0;
-	mon[0x6C2] = 0;
-	mon[0x6C3] = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
-	mon[0x6BB] = 0;
-	*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
+	m_targetPartyIndex = -1;
+	m_aiState = 0;
+	m_aiStatePrev = 0;
+	m_unk6C8 = 0;
+	m_unk6CC = 0;
+	m_actionBranch = 0;
+	m_unk6B8 = 0;
+	m_unk6B9 = 0;
+	m_unk6BA = 0;
+	m_unk6BC = 0;
+	m_unk6BD = 0;
+	m_unk6BE = 0;
+	m_attackDelay = 0;
+	m_aliveFrames = 0;
+	m_unk6BF = 0;
+	m_unk6C0 = 0;
+	m_unk6C2 = 0;
+	m_unk6C3 = 0;
+	m_chaseState = 0;
+	m_chaseTimer = 0;
+	m_chaseDirty = 0;
+	m_stepSeHandle = 0;
 	memset(&m_moveWork, 0, sizeof(m_moveWork));
-	*reinterpret_cast<unsigned int*>(mon + 0x6E0) = 0;
-	mon[0x6C1] = 0;
+	m_unk6E0 = 0;
+	m_unk6C1 = 0;
 }
 
 /*
@@ -2485,39 +2484,37 @@ void CGMonObj::setRepop(int mode)
 	}
 
 	if (mode == 0) {
-		*reinterpret_cast<float*>(mon + 0x6F8) = object->unk_0x168;
-		*reinterpret_cast<float*>(mon + 0x6FC) = object->unk_0x16C;
-		*reinterpret_cast<float*>(mon + 0x700) = object->unk_0x170;
-		object->m_worldPosition.x = *reinterpret_cast<float*>(mon + 0x6F8);
-		object->m_worldPosition.y = *reinterpret_cast<float*>(mon + 0x6FC);
-		object->m_worldPosition.z = *reinterpret_cast<float*>(mon + 0x700);
+		m_homePosition.x = object->unk_0x168;
+		m_homePosition.y = object->unk_0x16C;
+		m_homePosition.z = object->unk_0x170;
+		object->m_worldPosition = m_homePosition;
 		object->m_rotBaseY = static_cast<float>(object->m_bgFlags);
 		object->m_rotTargetY = object->m_rotBaseY;
 
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) =
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1A);
-		*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
-		*reinterpret_cast<unsigned short*>(mon + 0x6E4) = 0;
-		*reinterpret_cast<unsigned short*>(mon + 0x6E6) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6C8) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
+		m_targetPartyIndex = -1;
+		m_aiState = 0;
+		m_aiStatePrev = 0;
+		m_unk6C8 = 0;
+		m_unk6CC = 0;
 		mon[0x6B4] = 0;
-		mon[0x6B8] = 0;
-		mon[0x6B9] = 0;
-		mon[0x6BA] = 0;
-		mon[0x6BC] = 0;
-		mon[0x6BD] = 0;
-		mon[0x6BE] = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6F0) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6F4) = 0;
-		mon[0x6BF] = 0;
-		mon[0x6C0] = 0;
-		mon[0x6C2] = 0;
-		mon[0x6C3] = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
-		mon[0x6BB] = 0;
-		*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
+		m_unk6B8 = 0;
+		m_unk6B9 = 0;
+		m_unk6BA = 0;
+		m_unk6BC = 0;
+		m_unk6BD = 0;
+		m_unk6BE = 0;
+		m_attackDelay = 0;
+		m_aliveFrames = 0;
+		m_unk6BF = 0;
+		m_unk6C0 = 0;
+		m_unk6C2 = 0;
+		m_unk6C3 = 0;
+		m_chaseState = 0;
+		m_chaseTimer = 0;
+		m_chaseDirty = 0;
+		m_stepSeHandle = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 	}
 

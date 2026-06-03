@@ -5895,7 +5895,7 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
         m_txWordIndex[threadParam->m_portIndex] = 0;
 

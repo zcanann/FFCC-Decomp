@@ -8,15 +8,6 @@ extern const float kPppYmTraceMoveOne;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-struct pppYmTraceMoveWork {
-	Vec m_direction;
-	u32 _pad0C;
-	Vec m_previousDirection;
-	f32 m_distance;
-	f32 m_velocity;
-	f32 m_acceleration;
-};
-
 static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, pppYmTraceMoveCtrl* ctrl)
 {
 	return reinterpret_cast<pppYmTraceMoveWork*>(traceMove->m_object.m_workArea + *ctrl->m_serializedDataOffsets);

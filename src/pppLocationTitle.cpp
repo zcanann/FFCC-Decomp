@@ -1,4 +1,5 @@
 #include "ffcc/pppLocationTitle.h"
+#include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 
@@ -8,29 +9,17 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-struct LocationTitleWork {
-    void* m_particles;
-    u16 m_count;
-    u16 m_pad;
-    float m_cur;
-    float m_vel;
-    float m_acc;
-};
-
-struct LocationTitleParticle {
-    Vec m_pos;
-    GXColor m_color;
-    float m_frame;
-    s16 m_shapeUnk;
-    s16 m_shapeA;
-    s16 m_shapeB;
-    s16 m_pad;
-};
-
-struct LocationTitleColorBlock {
-    u8 m_pad[8];
-    GXColor m_color;
-};
+STATIC_ASSERT(sizeof(LocationTitleWork) == 0x14);
+STATIC_ASSERT(offsetof(LocationTitleWork, m_particles) == 0x00);
+STATIC_ASSERT(offsetof(LocationTitleWork, m_count) == 0x04);
+STATIC_ASSERT(offsetof(LocationTitleWork, m_cur) == 0x08);
+STATIC_ASSERT(offsetof(LocationTitleWork, m_vel) == 0x0C);
+STATIC_ASSERT(offsetof(LocationTitleWork, m_acc) == 0x10);
+STATIC_ASSERT(sizeof(LocationTitleParticle) == 0x1C);
+STATIC_ASSERT(offsetof(LocationTitleParticle, m_color) == 0x0C);
+STATIC_ASSERT(offsetof(LocationTitleParticle, m_frame) == 0x10);
+STATIC_ASSERT(offsetof(LocationTitleParticle, m_shapeB) == 0x18);
+STATIC_ASSERT(offsetof(LocationTitleColorBlock, m_color) == 0x08);
 
 extern "C" const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
 

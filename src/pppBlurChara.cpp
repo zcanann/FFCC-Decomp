@@ -30,13 +30,6 @@ struct Vec4d {
     float w;
 };
 
-struct pppBlurCharaWork {
-    void* m_captureBuffer;
-    CGObject* m_ownerObj;
-    GXTexObj* m_smallTexObj;
-    float m_savedModelField;
-};
-
 extern const f32 FLOAT_80331030;
 extern const f32 FLOAT_80331034;
 extern const f32 FLOAT_80331038;
@@ -52,20 +45,18 @@ extern const double DOUBLE_80331058;
 
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
+STATIC_ASSERT(sizeof(pppBlurCharaWork) == 0x10);
+STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
+STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
+STATIC_ASSERT(offsetof(pppBlurCharaWork, m_smallTexObj) == 0x08);
+STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedModelField) == 0x0C);
+STATIC_ASSERT(offsetof(BlurCharaColorData, m_color) == 0x08);
+STATIC_ASSERT(offsetof(BlurCharaTexData, m_objPosBase) == 0x04);
+STATIC_ASSERT(offsetof(BlurCharaTexData, m_texObj) == 0x08);
+
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* data) {
     return (pppBlurCharaWork*)(blurChara->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 }
-
-struct BlurCharaColorData {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
-struct BlurCharaTexData {
-    u8 _pad0[4];
-    CGObject* m_objPosBase;
-    GXTexObj* m_texObj;
-};
 
 /*
  * --INFO--

@@ -297,11 +297,10 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
                     cameraPos.z = center * kMapBoundsCenterScale;
                 } else {
-                    float* mapCenter =
-                        reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
-                    cameraPos.x = mapCenter[0];
-                    cameraPos.y = mapCenter[1];
-                    cameraPos.z = mapCenter[2];
+                    CMapObj* mapObj = MapMng.GetMapObj(1);
+                    cameraPos.x = mapObj->m_localTranslateX;
+                    cameraPos.y = mapObj->m_localTranslateY;
+                    cameraPos.z = mapObj->m_localTranslateZ;
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
@@ -472,11 +471,10 @@ void CMapPcs::calc()
                     center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
                     cameraPos.z = center * kMapBoundsCenterScale;
                 } else {
-                    float* mapCenter =
-                        reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0xAA8);
-                    cameraPos.x = mapCenter[0];
-                    cameraPos.y = mapCenter[1];
-                    cameraPos.z = mapCenter[2];
+                    CMapObj* mapObj = MapMng.GetMapObj(1);
+                    cameraPos.x = mapObj->m_localTranslateX;
+                    cameraPos.y = mapObj->m_localTranslateY;
+                    cameraPos.z = mapObj->m_localTranslateZ;
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;

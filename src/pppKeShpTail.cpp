@@ -1,22 +1,14 @@
 #include "ffcc/pppKeShpTail.h"
+#include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
-struct KeShpTailOffsets {
-    u8 _pad0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
-struct KeShpTailWork {
-    u8 m_count;
-    u8 m_head;
-    u16 m_field2;
-    u16 m_field4;
-    u16 m_field6;
-    Vec m_posHistory[31];
-};
+STATIC_ASSERT(sizeof(KeShpTailWork) == 0x17C);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_count) == 0x00);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_head) == 0x01);
+STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
 
 /*
  * --INFO--
@@ -64,14 +56,14 @@ void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
+void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, _pppCtrlTable* offsets)
 {
 	KeShpTailWork* work;
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	work = (KeShpTailWork*)(obj->m_workArea + ((KeShpTailOffsets*)offsets)->m_serializedDataOffsets[0]);
+	work = (KeShpTailWork*)(obj->m_workArea + offsets->m_serializedDataOffsets[0]);
 	if (obj->m_graphId == 0) {
 		Vec local_14 ATTRIBUTE_ALIGN(8);
 		Vec local_20;

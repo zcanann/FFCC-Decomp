@@ -113,7 +113,7 @@ static inline float WindSqrtf(float x)
  * JP Address: TODO
  * JP Size: TODO
  */
-WindObject* CWind::getObj(int id)
+inline WindObject* CWind::getObj(int id)
 {
     WindObject* obj = m_objects;
 
@@ -135,7 +135,7 @@ WindObject* CWind::getObj(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-WindObject* CWind::searchFreeObj()
+inline WindObject* CWind::searchFreeObj()
 {
     WindObject* obj = m_objects;
 
@@ -157,7 +157,7 @@ WindObject* CWind::searchFreeObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-WindGrassObject* CWind::getGrass(int id)
+inline WindGrassObject* CWind::getGrass(int id)
 {
     WindGrassObject* grass = m_grass;
 
@@ -179,7 +179,7 @@ WindGrassObject* CWind::getGrass(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-WindGrassObject* CWind::searchFreeGrass()
+inline WindGrassObject* CWind::searchFreeGrass()
 {
     WindGrassObject* grass = m_grass;
 
@@ -201,7 +201,7 @@ WindGrassObject* CWind::searchFreeGrass()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CWind::AddGrass(const Vec* pos)
+inline int CWind::AddGrass(const Vec* pos)
 {
     WindGrassObject* grass = searchFreeGrass();
     if (grass == 0) {

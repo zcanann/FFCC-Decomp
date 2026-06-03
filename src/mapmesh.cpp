@@ -534,9 +534,10 @@ void CMapMesh::Off2Ptr()
     AddMeshDataBase(m_colors, m_meshData);
     AddMeshDataBase(m_drawEntries, m_meshData);
 
+    void* displayListBase = (m_displayListData != 0) ? m_displayListData : m_meshData;
     CMapMeshDrawEntry* entry = m_drawEntries;
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_displayListCount); i++) {
-        entry->m_displayList = static_cast<u8*>(m_meshData) + entry->m_displayListOffset;
+        entry->m_displayList = static_cast<u8*>(displayListBase) + entry->m_displayListOffset;
         entry++;
     }
 }

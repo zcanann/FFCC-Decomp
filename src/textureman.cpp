@@ -799,7 +799,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         tlutData = m_tlutData;
-        if (tlutData != 0) {
+        if (m_tlutData != 0) {
             GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8,
                           m_format == 9 ? 0x100 : 0x10);
             GXInitTlutObj(&m_tlutObj1,
@@ -1159,11 +1159,10 @@ template <>
 void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
 {
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        CTexture* item = m_items[i];
+        CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
-            CRef* ref = item;
-            if (ref->DecRef() == 0) {
-                delete ref;
+            if (--item->refCount == 0) {
+                delete item;
             }
             m_items[i] = 0;
         }

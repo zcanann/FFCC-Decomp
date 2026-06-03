@@ -114,6 +114,7 @@ static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv 
 static const char s_send_ppos_bad_state_fmt[] = "JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n";
 static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
 static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
+extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
 namespace JoyBusConst {
 char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
@@ -3477,6 +3478,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
+                if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+                {
+                    if (System.m_execParam != 0)
+                    {
+                        System.Printf(s_pctd_Error_send_type_error_pct02x_801DA350, threadParam->m_portIndex);
+                    }
+                    return -1;
+                }
+
                 unsigned char* letter = reinterpret_cast<unsigned char*>(m_letterBuffer[port]);
                 dataBase = letter;
                 dataPtr = letter;

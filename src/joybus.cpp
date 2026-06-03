@@ -5069,7 +5069,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
         unsigned char payload[1 + 75];
 

@@ -799,7 +799,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         tlutData = m_tlutData;
-        if (tlutData != 0) {
+        if (m_tlutData != 0) {
             GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8,
                           m_format == 9 ? 0x100 : 0x10);
             GXInitTlutObj(&m_tlutObj1,

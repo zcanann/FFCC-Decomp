@@ -64,14 +64,6 @@ extern "C" const float FLOAT_8032FCC8 = 1.0f;
 extern "C" const float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
 
-static inline void WriteU32(void* base, unsigned int offset, unsigned int value) {
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
-}
-
-static inline void WriteF32(void* base, unsigned int offset, float value) {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
-}
-
 static inline float LoadFloat(const float& value)
 {
     return value;
@@ -141,34 +133,6 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  * JP Address: TODO
  * JP Size: TODO
  */
-struct MaterialEditorPolygon {
-    u16 flags;
-    u16 blendMode;
-    u32 _04;
-    u16 index0;
-    u16 index1;
-    u16 index2;
-    u16 index3;
-    u16 _10;
-    u16 _12;
-    u16 _14;
-    u16 _16;
-    u8 _18;
-    char textureMarker;
-    u8 _1a[4];
-    s16 textureIndex;
-    s16 u0;
-    s16 v0;
-    s16 u1;
-    s16 v1;
-    s16 u2;
-    s16 v2;
-    s16 u3;
-    s16 v3;
-    u8 _30[0x20];
-    float texCoord[4][2];
-};
-
 void CMaterialEditorPcs::drawViewer()
 {
     static int color;
@@ -190,11 +154,11 @@ void CMaterialEditorPcs::drawViewer()
     ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
-        int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));
-        int model = *listData;
+        RSDLISTITEM* listItem = reinterpret_cast<RSDLISTITEM*>(zlist->GetDataNext(&it));
+        RSDITEM* model = listItem->rsdItem;
 
-        GXSetArray(GX_VA_POS, *reinterpret_cast<void**>(model + 0x10), 0xC);
-        GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(model + 0x14), 0xC);
+        GXSetArray(GX_VA_POS, model->ptr10, 0xC);
+        GXSetArray(GX_VA_NRM, model->ptr14, 0xC);
         GXSetNumChans(1);
         GXClearVtxDesc();
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -225,12 +189,9 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
         for (int pass = 0; pass < 2; pass++) {
-            unsigned char* polygons = reinterpret_cast<unsigned char*>(reinterpret_cast<RSDITEM*>(model)->ptr18);
+            MaterialEditorPolygon* polygon = static_cast<MaterialEditorPolygon*>(model->ptr18);
 
-            for (u32 polyIndex = 0, polygonOffset = 0; polyIndex < reinterpret_cast<RSDITEM*>(model)->countC;
-                 polyIndex++, polygonOffset += sizeof(MaterialEditorPolygon)) {
-                MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(polygons + polygonOffset);
-
+            for (u32 polyIndex = 0; polyIndex < model->countC; polyIndex++, polygon++) {
                 if ((polygon->flags & 0x200) == 0) {
                     GXSetCullMode(GX_CULL_BACK);
                 } else {
@@ -473,25 +434,25 @@ void CMaterialEditorPcs::calcViewer()
     srt.scaleZ = one;
     srt.scaleY = one;
     srt.scaleX = one;
-    srt.transX = field268_0x15c.x;
-    srt.transY = field268_0x15c.y;
-    srt.transZ = -field268_0x15c.z;
+    srt.transX = m_usbTransform.m_cameraPosition.x;
+    srt.transY = m_usbTransform.m_cameraPosition.y;
+    srt.transZ = -m_usbTransform.m_cameraPosition.z;
     CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
-    m_unkMatrix.value[0][0] = field_0x12c;
-    m_unkMatrix.value[0][1] = field_0x130;
-    m_unkMatrix.value[0][2] = field_0x134;
-    m_unkMatrix.value[0][3] = field_0x138;
-    m_unkMatrix.value[1][0] = field_0x13c;
-    m_unkMatrix.value[1][1] = field_0x140;
-    m_unkMatrix.value[1][2] = field_0x144;
-    m_unkMatrix.value[1][3] = field_0x148;
-    m_unkMatrix.value[2][0] = field_0x14c;
-    m_unkMatrix.value[2][1] = field_0x150;
-    m_unkMatrix.value[2][2] = field_0x154;
-    m_unkMatrix.value[2][3] = field_0x158;
+    m_unkMatrix.value[0][0] = m_usbTransform.m_viewMatrix[0][0];
+    m_unkMatrix.value[0][1] = m_usbTransform.m_viewMatrix[0][1];
+    m_unkMatrix.value[0][2] = m_usbTransform.m_viewMatrix[0][2];
+    m_unkMatrix.value[0][3] = m_usbTransform.m_viewMatrix[0][3];
+    m_unkMatrix.value[1][0] = m_usbTransform.m_viewMatrix[1][0];
+    m_unkMatrix.value[1][1] = m_usbTransform.m_viewMatrix[1][1];
+    m_unkMatrix.value[1][2] = m_usbTransform.m_viewMatrix[1][2];
+    m_unkMatrix.value[1][3] = m_usbTransform.m_viewMatrix[1][3];
+    m_unkMatrix.value[2][0] = m_usbTransform.m_viewMatrix[2][0];
+    m_unkMatrix.value[2][1] = m_usbTransform.m_viewMatrix[2][1];
+    m_unkMatrix.value[2][2] = m_usbTransform.m_viewMatrix[2][2];
+    m_unkMatrix.value[2][3] = m_usbTransform.m_viewMatrix[2][3];
 
     PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
 
@@ -564,16 +525,14 @@ void CMaterialEditorPcs::destroyViewer()
 
     unsigned int textureIndex;
     m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-    CMaterialEditorPcs* iter = this;
     do {
-        MemFree(iter->m_textureData[0]);
-        MemFree(iter->m_tlutData[0]);
-        MemFree(iter->m_texObj[0]);
-        MemFree(iter->m_tlutObj0[0]);
-        MemFree(iter->m_tlutObj1[0]);
-        MemFree(iter->m_textureHeader[0]);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
         textureIndex += 1;
-        iter = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(iter) + 4);
     } while (textureIndex < 0x10);
 
     Memory.DestroyStage(m_stage);
@@ -589,7 +548,6 @@ void CMaterialEditorPcs::destroyViewer()
  */
 void CMaterialEditorPcs::createViewer()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
         Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs), 0));
     GXColor clear;
@@ -604,15 +562,15 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    WriteU32(self, 0x98, 1);
+    m_usbStream.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
     m_displayTextureEnabled = 0;
-    memset(self + 0xec, 0, 0x120);
+    memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
     fVar1 = LoadFloat(FLOAT_8032FCC8);
-    WriteF32(self, 0x128, fVar1);
-    WriteF32(self, 0x114, fVar1);
-    WriteF32(self, 0x100, fVar1);
-    WriteF32(self, 0xec, fVar1);
+    m_usbTransform.m_modelMatrix[3][3] = fVar1;
+    m_usbTransform.m_modelMatrix[2][2] = fVar1;
+    m_usbTransform.m_modelMatrix[1][1] = fVar1;
+    m_usbTransform.m_modelMatrix[0][0] = fVar1;
 
     PSMTXIdentity(m_unkMatrix.value);
     m_usbStream.CreateBuffer();
@@ -639,17 +597,15 @@ void CMaterialEditorPcs::Quit()
 {
     unsigned int textureIndex;
     m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
-    CMaterialEditorPcs* iter = this;
 
     do {
-        MemFree(iter->m_textureData[0]);
-        MemFree(iter->m_tlutData[0]);
-        MemFree(iter->m_texObj[0]);
-        MemFree(iter->m_tlutObj0[0]);
-        MemFree(iter->m_tlutObj1[0]);
-        MemFree(iter->m_textureHeader[0]);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
         textureIndex += 1;
-        iter = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(iter) + 4);
     } while (textureIndex < 0x10);
 
     if (m_rsdIndex != 0) {
@@ -667,54 +623,52 @@ void CMaterialEditorPcs::Quit()
  */
 void CMaterialEditorPcs::Init()
 {
-    unsigned char* self;
     int textureIndex;
 
-    self = reinterpret_cast<unsigned char*>(this);
-    self[0x8] = 0x7f;
-    self[0x9] = 0x7f;
-    self[0xa] = 0x7f;
+    m_viewerLightColors[0].r = 0x7f;
+    m_viewerLightColors[0].g = 0x7f;
+    m_viewerLightColors[0].b = 0x7f;
     int levelMask = 0x3f;
     int level0 = __cntlzw(0);
     int level1 = __cntlzw(1);
     int level = -((level0 >> 5) & 1) & levelMask;
-    self[0xb] = 0xff;
-    self[0xc] = level;
-    self[0xd] = level;
-    self[0xe] = level;
+    m_viewerLightColors[0].a = 0xff;
+    m_viewerLightColors[1].r = level;
+    m_viewerLightColors[1].g = level;
+    m_viewerLightColors[1].b = level;
     level = -((level1 >> 5) & 1) & levelMask;
-    self[0xf] = 0xff;
+    m_viewerLightColors[1].a = 0xff;
     float minusOne = FLOAT_8032FCDC;
     float zero = FLOAT_8032FCD8;
     float one = LoadFloat(FLOAT_8032FCC8);
 
-    *reinterpret_cast<float*>(self + 0x18) = zero;
-    *reinterpret_cast<float*>(self + 0x1c) = zero;
-    *reinterpret_cast<float*>(self + 0x20) = minusOne;
-    self[0x10] = level;
-    self[0x11] = level;
-    self[0x12] = level;
+    m_viewerLightDirs[0].x = zero;
+    m_viewerLightDirs[0].y = zero;
+    m_viewerLightDirs[0].z = minusOne;
+    m_viewerLightColors[2].r = level;
+    m_viewerLightColors[2].g = level;
+    m_viewerLightColors[2].b = level;
     level = -((__cntlzw(2) >> 5) & 1) & levelMask;
-    self[0x13] = 0xff;
-    *reinterpret_cast<float*>(self + 0x24) = zero;
-    *reinterpret_cast<float*>(self + 0x28) = zero;
-    *reinterpret_cast<float*>(self + 0x2c) = minusOne;
-    self[0x14] = level;
-    self[0x15] = level;
-    self[0x16] = level;
-    self[0x17] = 0xff;
-    *reinterpret_cast<float*>(self + 0x30) = zero;
-    *reinterpret_cast<float*>(self + 0x34) = zero;
-    *reinterpret_cast<float*>(self + 0x38) = minusOne;
-    *reinterpret_cast<float*>(self + 0x44) = zero;
-    *reinterpret_cast<float*>(self + 0x40) = zero;
-    *reinterpret_cast<float*>(self + 0x3c) = zero;
-    *reinterpret_cast<float*>(self + 0x50) = zero;
-    *reinterpret_cast<float*>(self + 0x4c) = zero;
-    *reinterpret_cast<float*>(self + 0x48) = zero;
-    *reinterpret_cast<float*>(self + 0x5c) = one;
-    *reinterpret_cast<float*>(self + 0x58) = one;
-    *reinterpret_cast<float*>(self + 0x54) = one;
+    m_viewerLightColors[2].a = 0xff;
+    m_viewerLightDirs[1].x = zero;
+    m_viewerLightDirs[1].y = zero;
+    m_viewerLightDirs[1].z = minusOne;
+    m_viewerLightColors[3].r = level;
+    m_viewerLightColors[3].g = level;
+    m_viewerLightColors[3].b = level;
+    m_viewerLightColors[3].a = 0xff;
+    m_viewerLightDirs[2].x = zero;
+    m_viewerLightDirs[2].y = zero;
+    m_viewerLightDirs[2].z = minusOne;
+    m_viewerSrtPosition.z = zero;
+    m_viewerSrtPosition.y = zero;
+    m_viewerSrtPosition.x = zero;
+    m_viewerSrtRotation.z = zero;
+    m_viewerSrtRotation.y = zero;
+    m_viewerSrtRotation.x = zero;
+    m_viewerSrtScale.z = one;
+    m_viewerSrtScale.y = one;
+    m_viewerSrtScale.x = one;
     m_rsdIndex = 0;
 
     textureIndex = 0;

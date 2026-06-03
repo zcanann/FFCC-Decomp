@@ -106,6 +106,120 @@ static inline float WindSqrtf(float x)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: 0x800f55cc
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindObject* CWind::getObj(int id)
+{
+    WindObject* obj = m_objects;
+
+    for (int i = 0; i < 32; i++, obj++) {
+        if ((GetWindActiveFlag(obj) != 0) && (id == obj->id)) {
+            return obj;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 192b
+ * EN Address: 0x800f5564
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindObject* CWind::searchFreeObj()
+{
+    WindObject* obj = m_objects;
+
+    for (int i = 0; i < 32; i++, obj++) {
+        if (GetWindActiveFlag(obj) == 0) {
+            return obj;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: UNUSED
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindGrassObject* CWind::getGrass(int id)
+{
+    WindGrassObject* grass = m_grass;
+
+    for (int i = 0; i < 512; i++, grass++) {
+        if ((GetGrassActiveFlag(grass) != 0) && (id == grass->id)) {
+            return grass;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: UNUSED
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindGrassObject* CWind::searchFreeGrass()
+{
+    WindGrassObject* grass = m_grass;
+
+    for (int i = 0; i < 512; i++, grass++) {
+        if (GetGrassActiveFlag(grass) == 0) {
+            return grass;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 668b
+ * EN Address: UNUSED
+ * EN Size: 412b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CWind::AddGrass(const Vec* pos)
+{
+    WindGrassObject* grass = searchFreeGrass();
+    if (grass == 0) {
+        return -1;
+    }
+
+    grass->flags = static_cast<u8>(__rlwimi(grass->flags, 1, 7, 24, 24));
+    grass->pos = *pos;
+
+    int id = m_nextGrassId;
+    m_nextGrassId = id + 1;
+    grass->id = id;
+
+    return grass->id;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800d92fc
  * PAL Size: 192b
  * EN Address: TODO

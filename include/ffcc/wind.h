@@ -52,8 +52,14 @@ public:
     int AddDiffuse(const Vec*, float, float, float);
     int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
+    int AddGrass(const Vec*);
 
 private:
+    WindObject* getObj(int);
+    WindObject* searchFreeObj();
+    WindGrassObject* getGrass(int);
+    WindGrassObject* searchFreeGrass();
+
     WindObject m_objects[32];
     s32 m_nextId;
     WindGrassObject m_grass[512];

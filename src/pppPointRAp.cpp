@@ -2,6 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
+#include "ffcc/pppsintbl.h"
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
@@ -59,19 +60,18 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             obj->m_link.m_previous = &pObject->m_link;
         }
 
-        float* trig = ppvSinTbl;
         s32 angleA = (s32)(gPppPointRApRandomAngleRange * Math.RandF() - gPppPointRApRandomAngleBias);
         float scaleA = payload->m_radius;
         float yOff;
-        float planarOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
-        yOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
+        float planarOff = scaleA * pppCosFromTable(angleA);
+        yOff = scaleA * pppSinFromTable(angleA);
         float spinRand = Math.RandF();
         float spinAngle = gPppPointRApRandomAngleRange * spinRand;
         s32 angleB = (s32)(gPppPointRApSpinScale[0] * spinAngle);
         u32 childPosOffset = payload->m_childPosOffset;
         u32 childVelocityOffset = payload->m_childVelocityOffset;
-        float xOff = planarOff * *(float*)((u8*)ppvSinTbl + (angleB & 0xFFFC));
-        planarOff *= *(float*)((u8*)ppvSinTbl + ((angleB + 0x4000) & 0xFFFC));
+        float xOff = planarOff * pppSinFromTable(angleB);
+        planarOff *= pppCosFromTable(angleB);
         Vec* dstPos = (Vec*)(obj->m_workArea + childPosOffset);
         Vec* dstVel = (Vec*)(obj->m_workArea + childVelocityOffset);
 

@@ -136,7 +136,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 	work->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, work, step);
 
-	work->m_texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
+	work->m_texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
@@ -154,7 +154,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 		return;
 	}
 
-	CTexture* texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
+	CTexture* texture = GetTextureFromRSD(step->m_dataValIndex, ppvEnv);
 	if (texture == 0) {
 		return;
 	}
@@ -407,7 +407,8 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 			if (meshColorArray != 0) {
 				MaterialMan.SetChangeTexReflectionArray(meshData->m_normals);
 				GXSetArray((GXAttr)0xb, meshColorArray, 4);
-				MaterialMan.SetChangeTexReflectionTexture(reinterpret_cast<GXTexObj*>((int)texture + 0x28));
+				MaterialMan.SetChangeTexReflectionTexture(
+				    reinterpret_cast<GXTexObj*>(reinterpret_cast<int>(texture) + offsetof(CTexture, m_texObj)));
 				drawTevBits = 0xACE0F;
 				fullTevBits = drawTevBits | 0x1000;
 				displayListIdx = meshData->m_displayListCount - 1;
@@ -447,7 +448,8 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	if (step->m_changeTex.m_mode == 0) {
 		int drawTevBits = 0xACE0F;
 		int fullTevBits = drawTevBits | 0x1000;
-		MaterialMan.SetChangeTexReflectionState(reinterpret_cast<GXTexObj*>(textureInfo + 0x28), drawTevBits, fullTevBits);
+		MaterialMan.SetChangeTexReflectionState(
+		    reinterpret_cast<GXTexObj*>(textureInfo + offsetof(CTexture, m_texObj)), drawTevBits, fullTevBits);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

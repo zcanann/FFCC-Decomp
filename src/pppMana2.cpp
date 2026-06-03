@@ -1117,14 +1117,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* par
 
     mana2Work->m_object = gObject;
     SetMana2ModelCallbacks(model, mana2Work, param_2);
-    mana2Work->m_sourceTextures[0] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv));
-    mana2Work->m_sourceTextures[1] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[1], ppvEnv));
-    mana2Work->m_sourceTextures[2] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[2], ppvEnv));
-    mana2Work->m_sourceTextures[3] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[3], ppvEnv));
-    mana2Work->m_sourceTextures[4] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[4], ppvEnv));
-    mana2Work->m_sourceTextures[5] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureIds[5], ppvEnv));
-    mana2Work->m_envTexture0 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
-    mana2Work->m_envTexture1 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
+    mana2Work->m_sourceTextures[0] = GetTextureFromRSD(param_2->m_sourceTextureIds[0], ppvEnv);
+    mana2Work->m_sourceTextures[1] = GetTextureFromRSD(param_2->m_sourceTextureIds[1], ppvEnv);
+    mana2Work->m_sourceTextures[2] = GetTextureFromRSD(param_2->m_sourceTextureIds[2], ppvEnv);
+    mana2Work->m_sourceTextures[3] = GetTextureFromRSD(param_2->m_sourceTextureIds[3], ppvEnv);
+    mana2Work->m_sourceTextures[4] = GetTextureFromRSD(param_2->m_sourceTextureIds[4], ppvEnv);
+    mana2Work->m_sourceTextures[5] = GetTextureFromRSD(param_2->m_sourceTextureIds[5], ppvEnv);
+    mana2Work->m_envTexture0 = GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv);
+    mana2Work->m_envTexture1 = GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv);
 
     if (mana2Work->m_sourceTexObjs == 0) {
         mana2Work->m_sourceTexObjs =

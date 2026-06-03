@@ -412,7 +412,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         return;
     }
 
-    texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(dataValIndex, ppvEnv));
+    texture = GetTextureFromRSD(dataValIndex, ppvEnv);
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -494,7 +494,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         } else {
-            texture = reinterpret_cast<CTexture*>(GetTextureFromRSD(step->m_initWOrk, ppvEnv));
+            texture = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
             _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
         }

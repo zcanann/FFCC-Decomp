@@ -780,14 +780,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, _pppCtrlTable* p
 
     mana->m_object = gObject;
     SetManaModelCallbacks(model, mana, param_2);
-    mana->m_sourceTextures[0] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId0, ppvEnv));
-    mana->m_sourceTextures[1] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId1, ppvEnv));
-    mana->m_sourceTextures[2] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId2, ppvEnv));
-    mana->m_sourceTextures[3] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId3, ppvEnv));
-    mana->m_sourceTextures[4] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId4, ppvEnv));
-    mana->m_sourceTextures[5] = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_sourceTextureId5, ppvEnv));
-    mana->m_envTexture0 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv));
-    mana->m_envTexture1 = reinterpret_cast<CTexture*>(GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv));
+    mana->m_sourceTextures[0] = GetTextureFromRSD(param_2->m_sourceTextureId0, ppvEnv);
+    mana->m_sourceTextures[1] = GetTextureFromRSD(param_2->m_sourceTextureId1, ppvEnv);
+    mana->m_sourceTextures[2] = GetTextureFromRSD(param_2->m_sourceTextureId2, ppvEnv);
+    mana->m_sourceTextures[3] = GetTextureFromRSD(param_2->m_sourceTextureId3, ppvEnv);
+    mana->m_sourceTextures[4] = GetTextureFromRSD(param_2->m_sourceTextureId4, ppvEnv);
+    mana->m_sourceTextures[5] = GetTextureFromRSD(param_2->m_sourceTextureId5, ppvEnv);
+    mana->m_envTexture0 = GetTextureFromRSD(param_2->m_envTextureId0, ppvEnv);
+    mana->m_envTexture1 = GetTextureFromRSD(param_2->m_envTextureId1, ppvEnv);
 
     mana->m_envTexture0->m_format = 0;
     mana->m_envTexture0->InitTexObj();

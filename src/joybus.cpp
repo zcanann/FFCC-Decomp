@@ -4572,7 +4572,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
  */
 int JoyBus::SendItemAll(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port = threadParam->m_portIndex;
     int result = 0;
 
     if (threadParam->m_subState == 1)
@@ -4588,10 +4588,10 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int queuePort = threadParam->m_portIndex;
-            if ((int)m_cmdCount[queuePort] < 0x40)
+            port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
             {
-                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4599,7 +4599,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                OSSignalSemaphore(&m_accessSemaphores[port]);
                 result = -1;
             }
         }
@@ -4636,8 +4636,8 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
         m_txWordCount[threadParam->m_portIndex] = wordCount;
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned int sendPort = threadParam->m_portIndex;
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[sendPort] + 2 + m_txWordIndex[sendPort] * 4);
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -4648,10 +4648,10 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int queuePort = threadParam->m_portIndex;
-            if ((int)m_cmdCount[queuePort] < 0x40)
+            port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
             {
-                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
@@ -4659,7 +4659,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                OSSignalSemaphore(&m_accessSemaphores[port]);
                 result = -1;
             }
         }

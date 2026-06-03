@@ -1042,7 +1042,7 @@ void CPartMng::SetFp()
         unsigned char m_fpBillboard;         // 0xF9
         unsigned char m_prio;                // 0xFA
         unsigned char m_padFB[0x100 - 0xFB];
-        unsigned int m_paramA;               // 0x100
+        int m_paramA;                        // 0x100
         unsigned int m_paramB;               // 0x104
         float m_cullRadiusSq;                // 0x108
         float m_cullRadius;                  // 0x10C
@@ -4027,7 +4027,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         unsigned char m_prio;             // 0xF8
         short m_frameCounter;             // 0xF9
         unsigned char m_padFB[0x100 - 0xFB];
-        unsigned int m_paramA;            // 0x100
+        int m_paramA;                     // 0x100
         unsigned int m_paramB;            // 0x104
         float m_cullRadiusSq;             // 0x108
         float m_cullRadius;               // 0x10C
@@ -4284,7 +4284,7 @@ void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
         int baseTime = pppMngSt->m_baseTime;
-        if (baseTime != -0x1000 && static_cast<int>(pppMngSt->m_paramA) == slot) {
+        if (baseTime != -0x1000 && pppMngSt->m_paramA == slot) {
             if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
                 if (baseTime < 0) {
                     *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
@@ -4314,7 +4314,7 @@ void CPartMng::pppEndSlot(int slot, int checkHitFlags)
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
         if (pppMngSt->m_baseTime != -0x1000
-            && static_cast<int>(pppMngSt->m_paramA) == slot) {
+            && pppMngSt->m_paramA == slot) {
             if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
                 pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);

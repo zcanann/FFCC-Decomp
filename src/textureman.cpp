@@ -1159,11 +1159,10 @@ template <>
 void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
 {
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
-        CTexture* item = m_items[i];
+        CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
-            CRef* ref = item;
-            if (ref->DecRef() == 0) {
-                delete ref;
+            if (--item->refCount == 0) {
+                delete item;
             }
             m_items[i] = 0;
         }

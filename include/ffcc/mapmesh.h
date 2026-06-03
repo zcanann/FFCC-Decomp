@@ -28,6 +28,12 @@ struct CMapMeshUvPair
     s16 m_v;                           // 0x02
 };
 
+struct CMapMeshBound
+{
+    Vec m_min;                         // 0x00
+    Vec m_max;                         // 0x0C
+};
+
 class CMapMesh
 {
 public:
@@ -49,7 +55,7 @@ public:
     void pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheDumpModelTexture(CMaterialSet*, CAmemCacheSet*);
-    CBound* GetBound() { return &m_bound; }
+    CBound* GetBound() { return reinterpret_cast<CBound*>(&m_bound); }
 
     unsigned short m_vertexCount;      // 0x00
     unsigned short m_normalCount;      // 0x02
@@ -57,7 +63,7 @@ public:
     unsigned short m_uvCount;          // 0x06
     unsigned short m_colorCount;       // 0x08
     unsigned short m_displayListCount; // 0x0A
-    CBound m_bound;                    // 0x0C
+    CMapMeshBound m_bound;             // 0x0C
     void* m_meshData;                  // 0x24
     void* m_displayListData;           // 0x28
     void* m_vertices;                  // 0x2C

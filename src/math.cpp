@@ -5,6 +5,8 @@
 #include "string.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+extern const char s_CMath_8032F738[] = "CMath";
+
 CMath Math;
 Vec s_f_vpos;
 Mtx s_f_lvmtx;

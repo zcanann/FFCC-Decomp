@@ -46,7 +46,7 @@ extern const float FLOAT_80331998;
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(charaObj) + 0x5CC);
+	return charaObj->m_targetAngle;
 }
 
 static float CharaObjGetRotateY(const Vec& vector)
@@ -174,37 +174,37 @@ static void CharaObjPutMonsterScaledParticle(CGCharaObj* charaObj, int particleN
 
 static Vec& CharaObjComboCenter(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x66C);
+	return charaObj->m_comboCenter;
 }
 
 static Vec& CharaObjComboTarget(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(charaObj) + 0x678);
+	return charaObj->m_comboTarget;
 }
 
 static int& CharaObjComboItemState(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x684);
+	return charaObj->m_comboItemState;
 }
 
 static int& CharaObjComboScriptArg(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x698);
+	return charaObj->m_comboScriptArg;
 }
 
 static unsigned int& CharaObjComboScriptMode(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(charaObj) + 0x69C);
+	return charaObj->m_comboScriptMode;
 }
 
-static float& CharaObjComboLinkCount(CGCharaObj* charaObj)
+static int& CharaObjComboLinkCount(CGCharaObj* charaObj)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(charaObj) + 0x6A8);
+	return charaObj->m_comboLinkCount;
 }
 
 static CGPrgObj** CharaObjComboLinks(CGCharaObj* charaObj)
 {
-	return reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(charaObj) + 0x6AC);
+	return charaObj->m_comboLinks;
 }
 
 static unsigned char& CharaObjComboFlags(CGCharaObj* charaObj)
@@ -3219,7 +3219,7 @@ void CGCharaObj::combi2()
 
 		CharaObjComboScriptArg(party) = comboCmd;
 		CharaObjComboScriptMode(party) = comboMode;
-		CharaObjComboLinkCount(party) = 0.0f;
+		CharaObjComboLinkCount(party) = 0;
 
 		int linkCount = 0;
 		CGPrgObj** comboLinks = CharaObjComboLinks(party);
@@ -3230,7 +3230,7 @@ void CGCharaObj::combi2()
 			}
 			comboLinks[linkCount++] = other;
 		}
-		CharaObjComboLinkCount(party) = static_cast<float>(linkCount);
+		CharaObjComboLinkCount(party) = linkCount;
 	}
 
 	combi2();
@@ -3248,23 +3248,22 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	CGCharaObj* linkCursor = this;
-	while (entry < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8)) {
-		CGPrgObj** linkSlot = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(linkCursor) + 0x6AC);
-		if (*linkSlot != 0) {
+	CGPrgObj** comboLinks = CharaObjComboLinks(this);
+	while (entry < CharaObjComboLinkCount(this)) {
+		CGPrgObj* link = comboLinks[entry];
+		if (link != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    ((*linkSlot)->GetCID() & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>((*linkSlot)->m_scriptHandle) + 0x3B4) != 0) {
+			    (link->GetCID() & 0x6D) == 0x6D &&
+			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(link->m_scriptHandle) + 0x3B4) != 0) {
 				goto next_link;
-			} else if ((*linkSlot)->m_lastStateId != 6 && (*linkSlot)->m_lastStateId != 2) {
+			} else if (link->m_lastStateId != 6 && link->m_lastStateId != 2) {
 				break;
 			}
 		}
 next_link:
-		linkCursor = reinterpret_cast<CGCharaObj*>(reinterpret_cast<unsigned char*>(linkCursor) + 4);
 		entry++;
 	}
-	if (entry == *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8)) {
+	if (entry == CharaObjComboLinkCount(this)) {
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;

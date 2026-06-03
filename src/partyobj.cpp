@@ -410,7 +410,7 @@ void CGPartyObj::onChangeStat(int state)
 			int cmdListItem =
 			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(*reinterpret_cast<int*>(self + 0x6DC));
 			if (cmdListItem >= 0) {
-				*reinterpret_cast<int*>(self + 0x684) = cmdListItem;
+				m_comboItemState = cmdListItem;
 			}
 		}
 		break;
@@ -2086,10 +2086,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			PSVECAdd(&startPos, &rayDir, &hitPos);
 		}
 
-		*reinterpret_cast<Vec*>(self + 0x66C) = hitPos;
+		m_comboCenter = hitPos;
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder;
-		floorCylinder.m_bottom = *reinterpret_cast<Vec*>(self + 0x66C);
+		floorCylinder.m_bottom = m_comboCenter;
 		floorCylinder.m_axis = down;
 		floorCylinder.m_radius = FLOAT_80331a78;
 		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
@@ -2100,12 +2100,12 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_boundsMax.z = FLOAT_80331aa0;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
-			hitObj->CalcHitPosition(reinterpret_cast<Vec*>(self + 0x66C));
+			hitObj->CalcHitPosition(&m_comboCenter);
 			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =
-			    *reinterpret_cast<Vec*>(self + 0x66C);
+			    m_comboCenter;
 			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
 		}
-		*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x66C);
+		m_comboTarget = m_comboCenter;
 	}
 
 	endPSlotBit(0x10);
@@ -2113,7 +2113,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
 	                                     0x147 | 0x100,
 	                                 m_particleSlots[4]);
-	gCFlatRuntime2.SetParticleWorkPos(*reinterpret_cast<Vec*>(self + 0x66C), FLOAT_80331a78);
+	gCFlatRuntime2.SetParticleWorkPos(m_comboCenter, FLOAT_80331a78);
 	gCFlatRuntime2.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
 	gCFlatRuntime2.PutParticleWork();
 }
@@ -2126,12 +2126,11 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 void CGPartyObj::endTargetParticle()
 {
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	party.partyFlags &= 0xAF;
-	*reinterpret_cast<int*>(self + 0x668) = 0;
-	*reinterpret_cast<int*>(self + 0x660) = 0;
-	*reinterpret_cast<Vec*>(self + 0x678) = m_worldPosition;
-	*reinterpret_cast<Vec*>(self + 0x66C) = m_worldPosition;
+	m_comboState = 0;
+	m_comboFrame = 0;
+	m_comboTarget = m_worldPosition;
+	m_comboCenter = m_worldPosition;
 }
 
 /*
@@ -2237,11 +2236,10 @@ void CGPartyObj::checkTargetParticle()
 		CGPartyObj* leader = Game.m_partyObjArr[0];
 		if (leader != nullptr &&
 		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
-		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) {
+		    leader->m_comboState != 0) {
 			Vec toLeaderTarget;
-			PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C),
-			              reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C), &toLeaderTarget);
-				toLeaderTarget.y = 0.0f;
+			PSVECSubtract(&m_comboCenter, &leader->m_comboCenter, &toLeaderTarget);
+			toLeaderTarget.y = 0.0f;
 			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
@@ -2252,8 +2250,8 @@ void CGPartyObj::checkTargetParticle()
 	if (input.x == 0.0f && input.z == 0.0f) {
 		party.partyFlags &= 0xDF;
 	} else {
-		Vec* targetPos = reinterpret_cast<Vec*>(self + 0x66C);
-		Vec* centerPos = reinterpret_cast<Vec*>(self + 0x678);
+		Vec* targetPos = &m_comboCenter;
+		Vec* centerPos = &m_comboTarget;
 		Vec move;
 		Vec fromCenter;
 		float maxRange;
@@ -2358,7 +2356,7 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	Vec delta;
-	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
+	PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
 	if (PSVECMag(&delta) > FLOAT_80331a78) {
 		m_rotationY = atan2(delta.x, delta.z);
 	}
@@ -2384,8 +2382,8 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
 
-	CVector centerPos(*reinterpret_cast<Vec*>(self + 0x678));
-	CVector targetPos(*reinterpret_cast<Vec*>(self + 0x66C));
+	CVector centerPos(m_comboTarget);
+	CVector targetPos(m_comboCenter);
 	Vec toTarget;
 	Vec movement;
 	Vec hitPos;

@@ -419,7 +419,7 @@ void CGMonObj::onStatAttack(int state)
 	if (state == 0) {
 		if ((prgObj->m_stateFrame == 0) && (-1 < targetPartyIndex)) {
 			CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-			*reinterpret_cast<Vec*>(mon + 0x66C) = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
 			if ((attackFlags & 2) == 0) {
 				float rotLimit = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
@@ -1137,7 +1137,7 @@ void CGMonObj::onStatMagic()
 			int targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
 			if (targetPartyIndex >= 0) {
 				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-				*reinterpret_cast<Vec*>(mon + 0x66C) = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
 				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
 					float rotLimit = 0.01f *
@@ -2151,11 +2151,8 @@ void CGMonObj::onFrameAlways()
 			if (mon[0x6B9] == 0) {
 				for (int i = 0; i < 4; i++) {
 					CGPartyObj* party = Game.m_partyObjArr[i];
-					if (party != nullptr && *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(party) + 0x668) != 0) {
-						float dist = PSVECDistance(
-							reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(party) + 0x66C),
-							&object->m_worldPosition
-						);
+					if (party != nullptr && party->m_comboState != 0) {
+						float dist = PSVECDistance(&party->m_comboCenter, &object->m_worldPosition);
 						if (dist < 60.0f + object->m_bodyEllipsoidRadius) {
 							hasNearParty = 1;
 							break;

@@ -3080,14 +3080,14 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
 void CGObject::SetDispItemName(int showName)
 {
     struct ShieldNodeFlagBits {
-        unsigned char unk0 : 1;
-        unsigned char unk1 : 1;
-        unsigned char unk2 : 1;
+        signed char unk0 : 1;
+        signed char unk1 : 1;
+        signed char unk2 : 1;
         signed char dispItemName : 1;
-        unsigned char unk4 : 1;
-        unsigned char unk5 : 1;
-        unsigned char unk6 : 1;
-        unsigned char unk7 : 1;
+        signed char unk4 : 1;
+        signed char unk5 : 1;
+        signed char unk6 : 1;
+        signed char unk7 : 1;
     };
 
     reinterpret_cast<ShieldNodeFlagBits*>(&m_shieldNodeFlags)->dispItemName = showName;

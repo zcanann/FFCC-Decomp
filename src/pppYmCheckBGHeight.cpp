@@ -9,6 +9,15 @@ extern "C" {
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
+struct YmCheckBGHeightCylinder {
+    Vec m_bottom;
+    Vec m_top;
+    Vec m_axis;
+    float m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
+};
+
 static inline Vec* CheckBGHeightPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -38,7 +47,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 {
     _pppMngSt* pppMngSt;
     Vec direction;
-    CMapCylinder cylinder;
+    YmCheckBGHeightCylinder cylinder;
     Vec hitPos;
     float nextY;
     float zero;
@@ -79,7 +88,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cylinder.m_axis.z = zero;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(&cylinder, &direction, (unsigned long)-1) != 0) {
+        if (MapMng.CheckHitCylinderNear((CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             if ((nextY - param_2->m_unk0xC) > hitPos.y) {
                 finalY = nextY;

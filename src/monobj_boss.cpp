@@ -188,7 +188,7 @@ void CGMonObj::damagedFuncGiantCrab()
 
 	prgObj->changeStat(4, 0, 0);
 	*reinterpret_cast<int*>(mon + 0x6B4) = branch + 1;
-	*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+	m_unk6C8 = 0;
 }
 
 /*
@@ -204,13 +204,12 @@ void CGMonObj::logicFuncGiantCrab()
 {
 	int nextState = -1;
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	if (*reinterpret_cast<int*>(m_boss__8CGMonObj) != 0) {
 		*reinterpret_cast<int*>(m_boss__8CGMonObj) = 0;
-		if ((*reinterpret_cast<int*>(mon + 0x6D0) == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
-		    (*reinterpret_cast<int*>(mon + 0x6D0) == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
-		    (*reinterpret_cast<int*>(mon + 0x6D0) == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
+		if ((m_actionBranch == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
+		    (m_actionBranch == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
+		    (m_actionBranch == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
 			nextState = 100;
 		}
 	}
@@ -233,8 +232,7 @@ void CGMonObj::logicFuncGiantCrab()
  */
 int CGMonObj::calcBranchFuncGiantCrab(int)
 {
-	u8* mon = reinterpret_cast<u8*>(this);
-	return *reinterpret_cast<int*>(mon + 0x6D0);
+	return m_actionBranch;
 }
 
 /*
@@ -417,9 +415,8 @@ void CGMonObj::changeStatFuncGolem(int stat)
  */
 int CGMonObj::calcBranchFuncGolem(int)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	if (*reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+	if (m_actionBranch == 1) {
 		return 2;
 	}
 
@@ -449,7 +446,7 @@ void CGMonObj::frameStatFuncGolem()
 				} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
 					reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
 					reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
-					*reinterpret_cast<int*>(self + 0x6D0) = 1;
+					m_actionBranch = 1;
 				}
 				reinterpret_cast<CGCharaObj*>(this)->statAttack();
 				return;
@@ -462,7 +459,7 @@ void CGMonObj::frameStatFuncGolem()
 				reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
 			} else if (frame == 4) {
 				reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
-				*reinterpret_cast<int*>(self + 0x6D0) = 0;
+				m_actionBranch = 0;
 			} else if (frame == 5) {
 				reinterpret_cast<CGObject*>(this)->DispCharaParts(7);
 			}
@@ -484,11 +481,11 @@ void CGMonObj::frameStatFuncGolem()
 	if ((reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) ||
 	    ((reinterpret_cast<CGObject*>(this)->m_stateFlags0 & 0x40) != 0) ||
 	    ((state == 0x66) &&
-	     (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x6C4) * 4) <
+	     (*reinterpret_cast<float*>(self + 0x5D0 + m_targetPartyIndex * 4) <
 	      FLOAT_80331d58 * reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius))) {
 		reinterpret_cast<CGObject*>(this)->m_rotTargetY =
 		    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
-		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
+		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
 	} else {
 		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
@@ -499,7 +496,7 @@ void CGMonObj::frameStatFuncGolem()
 			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
 			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
-			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
+			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 			*reinterpret_cast<float*>(SoundBuffer + 0x4FC) = reinterpret_cast<CGObject*>(this)->m_rotTargetY + turnOffset;
 		}
 		unsigned short scriptScale =
@@ -610,7 +607,7 @@ void CGMonObj::frameStatFuncOrcKing()
 		return;
 	}
 
-	int branch = *reinterpret_cast<int*>(self + 0x6D0);
+	int branch = m_actionBranch;
 	if (branch == 0) {
 		int pdtNo;
 		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
@@ -672,7 +669,7 @@ void CGMonObj::frameStatFuncOrcKing()
 		*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
 	}
 
-	*reinterpret_cast<int*>(self + 0x6D0) = branch + 1;
+	m_actionBranch = branch + 1;
 }
 
 /*
@@ -1010,7 +1007,7 @@ state100:
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_moveWork.m_flags = 0x322;
 
-		if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
+		if (m_actionBranch == 1) {
 			CVector targetPos(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
 			m_moveWork.m_targetPos.x = targetPos.x;
 			m_moveWork.m_targetPos.y = targetPos.y;
@@ -1026,7 +1023,7 @@ state100:
 	}
 
 	moveFrame();
-	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
+	const int branch = m_actionBranch;
 	const int flatFlags = CFlatBossState();
 	if ((*reinterpret_cast<volatile signed char*>(m_boss__8CGMonObj + 0x14) < 0) ||
 	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
@@ -1037,7 +1034,7 @@ state100:
 state101:
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-		rotTarget(*reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
+		rotTarget(m_targetPartyIndex, FLOAT_80331da4);
 	}
 	if ((*reinterpret_cast<volatile signed char*>(m_boss__8CGMonObj + 0x14) < 0) ||
 	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < FLOAT_80331da8)) {
@@ -1046,13 +1043,13 @@ state101:
 	return;
 
 resetBranch:
-	if (*reinterpret_cast<int*>(self + 0x6D0) == 1) {
-		*reinterpret_cast<int*>(self + 0x6D0) = 0;
+	if (m_actionBranch == 1) {
+		m_actionBranch = 0;
 		*reinterpret_cast<volatile unsigned char*>(m_boss__8CGMonObj + 0x14) &= 0xDF;
 		*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x10) = 0xFA;
 	}
-	if (*reinterpret_cast<int*>(self + 0x6D0) == 2) {
-		*reinterpret_cast<int*>(self + 0x6D0) = 0;
+	if (m_actionBranch == 2) {
+		m_actionBranch = 0;
 		*reinterpret_cast<volatile unsigned char*>(m_boss__8CGMonObj + 0x14) &= 0xBF;
 		*reinterpret_cast<int*>(m_boss__8CGMonObj + 0xC) = 0xFA;
 	}
@@ -1070,7 +1067,6 @@ resetBranch:
 int CGMonObj::attackCheckFuncLKShooter(int)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	LKShooterBossWork* work = reinterpret_cast<LKShooterBossWork*>(m_boss__8CGMonObj);
 
 	if (work->m_stunTimer == 0) {
@@ -1080,7 +1076,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			    work->m_leftCooldown == 0) {
 				work->bits.m_bit40 = 1;
 				work->m_leftCooldown = 300;
-				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
+				m_actionBranch = 2;
 				return 100;
 			}
 		}
@@ -1089,7 +1085,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    work->m_rightCooldown == 0) {
 				work->bits.m_bit20 = 1;
-				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
+				m_actionBranch = 1;
 				return 100;
 			}
 		}
@@ -1187,8 +1183,7 @@ void CGMonObj::frameStatFuncDragonZombie()
  */
 int CGMonObj::calcBranchFuncDragonZombie(int)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	return (*reinterpret_cast<int*>(mon + 0x6D0) != 0) ? 1 : 0;
+	return (m_actionBranch != 0) ? 1 : 0;
 }
 
 /*
@@ -1302,12 +1297,12 @@ void CGMonObj::frameStatFuncLich()
 	if (((flatFlags & 1) == 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit80 != 0)) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit80 = 0;
 		reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit40 = 1;
-		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
+		m_unk6C8 = 0;
 		prgObj->playSe3D(0x1157C, 0x32, 0x96, 0, 0);
 	} else if (((flatFlags & 1) != 0) && (reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit80 == 0)) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit80 = 1;
 		reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->lichBits.m_lichBit40 = 1;
-		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
+		m_unk6C8 = 0;
 		prgObj->playSe3D(0x1157D, 0x32, 0x96, 0, 0);
 	}
 
@@ -1452,13 +1447,13 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 			if (CFlatBossSubState() == 0) {
 				*reinterpret_cast<int*>(self + 0x6B4) = 0;
-				*reinterpret_cast<int*>(self + 0x6C8) = 0;
+				m_unk6C8 = 0;
 				prgObj->changeStat(0, 0, 0);
 			}
 		}
 	} else if (state == 100) {
 		if (prgObj->m_stateFrame == 0) {
-			CVector partyPos(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]->m_worldPosition);
+			CVector partyPos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
 			CVector attackDir(-partyPos.x, -partyPos.y, -partyPos.z);
 			Vec attackVec;
 			attackVec.x = attackDir.x;
@@ -1531,7 +1526,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 					CFlatBossState() = CFlatBossState() - 1;
 				}
 				*reinterpret_cast<int*>(self + 0x6B4) = 1;
-				*reinterpret_cast<int*>(self + 0x6C8) = 0;
+				m_unk6C8 = 0;
 			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
@@ -1549,7 +1544,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
  */
 int CGMonObj::calcBranchFuncTetsukyojin(int)
 {
-	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
+	const int branch = m_actionBranch;
 	int positive;
 	if (branch >= 1) {
 		positive = 1;
@@ -1570,11 +1565,10 @@ int CGMonObj::calcBranchFuncTetsukyojin(int)
  */
 void CGMonObj::damagedFuncGigasLoad()
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	switch (*reinterpret_cast<int*>(mon + 0x6D0)) {
+	switch (m_actionBranch) {
 	case 0:
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
-		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
+		m_actionBranch = 1;
 		CFlatBossState() = 1;
 		break;
 	}
@@ -1591,12 +1585,11 @@ void CGMonObj::damagedFuncGigasLoad()
  */
 int CGMonObj::tgtFuncGigasLoad(int)
 {
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	aiTargetAttackRomMon(0x3B);
-	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
+	if (m_targetPartyIndex < 0) {
 		aiTarget();
 	}
-	return *reinterpret_cast<int*>(mon + 0x6C4);
+	return m_targetPartyIndex;
 }
 
 /*
@@ -1678,7 +1671,7 @@ void CGMonObj::damagedFuncWifeLamia()
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		object->m_bgColMask &= 0xFFF7FFFF;
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) = 1;
+		m_actionBranch = 1;
 	}
 }
 
@@ -1747,7 +1740,7 @@ void CGMonObj::frameStatFuncMolbol()
 	}
 
 	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
-		CVector pos(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]->m_worldPosition);
+		CVector pos(Game.m_partyObjArr[m_targetPartyIndex]->m_worldPosition);
 		pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
 		pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
 		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
@@ -1872,7 +1865,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 				if (2 < reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex) {
 					reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreIndex = 0;
 				}
-				*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+				m_unk6C8 = 0;
 			}
 		}
 		return;
@@ -1904,7 +1897,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 			prgObj->changeStat(0, 0, 0);
 			*reinterpret_cast<int*>(mon + 0x6B4) = 0;
 			reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj)->m_coreWait = 0x177;
-			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+			m_unk6C8 = 0;
 		}
 	}
 }
@@ -1941,7 +1934,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
 		nextState = 0x68;
 	} else {
 		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
-		if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+		if (m_actionBranch == 0) {
 			if (work->m_wait != 0) {
 				return;
 			}
@@ -1966,7 +1959,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
  */
 int CGMonObj::attackCheckFuncMeteoParasiteC(int)
 {
-	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0);
+	const int branch = m_actionBranch;
 	return (((branch - 1) | (1 - branch)) >> 31) - 1;
 }
 
@@ -2033,7 +2026,7 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 	if (scriptKind == 0x87) {
 		if (stat == 0x67) {
 			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74);
-			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(meteoC) + 0x6D0) == 1) {
+			if (meteoC->m_actionBranch == 1) {
 				setActionParam(-13);
 			} else {
 				setActionParam(-14);
@@ -2090,15 +2083,15 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 0) {
 				prgObj->changeStat(100, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6D0) = 0;
+				m_actionBranch = 0;
 			}
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 2) {
 				prgObj->changeStat(0x65, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
+				m_actionBranch = 2;
 			}
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 1) {
 				prgObj->changeStat(0x66, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
+				m_actionBranch = 1;
 			}
 			m_boss__8CGMonObj[0x7C] &= 0x7F;
 		}
@@ -2217,12 +2210,12 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 	case 0x85:
 		return -2;
 	case 0x86:
-		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 1 && m_actionBranch == 1) {
 			return -1;
 		}
 		return -2;
 	case 0x87:
-		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 2 && m_actionBranch < 2) {
 			return -1;
 		}
 		return -2;
@@ -2425,9 +2418,9 @@ void CGMonObj::damagedFuncLastBoss()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int& timer = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24);
-	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6D0) == 0) {
-		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
-		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+	if (timer >= 100 && m_actionBranch == 0) {
+		m_actionBranch = 1;
+		m_unk6C8 = 0;
 		prgObj->changeStat(100, 0, 0);
 		object->m_bgColMask &= 0xFFF7FFFF;
 		timer = 0;
@@ -2598,7 +2591,7 @@ void CGMonObj::frameStatFuncLastBoss()
 int CGMonObj::calcBranchFuncLastBoss(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	return (*reinterpret_cast<int*>(mon + 0x6D0) != 0) ? 1 : 0;
+	return (m_actionBranch != 0) ? 1 : 0;
 }
 
 /*
@@ -2617,13 +2610,13 @@ void CGMonObj::logicFuncLastBoss()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
 
-	if (*reinterpret_cast<int*>(mon + 0x6D0) == 2) {
+	if (m_actionBranch == 2) {
 		int& timer = *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24);
 		timer += 1;
 		if (timer >= 10) {
-			*reinterpret_cast<int*>(mon + 0x6D0) = 3;
+			m_actionBranch = 3;
 			nextState = 0x65;
-			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+			m_unk6C8 = 0;
 			object->m_bgColMask &= 0xFFF7FFFF;
 			timer = 0;
 		}

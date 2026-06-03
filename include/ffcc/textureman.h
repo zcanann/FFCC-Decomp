@@ -3,9 +3,7 @@
 
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
-#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/ptrarray_decl.h"
-#endif
 #include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
@@ -73,11 +71,7 @@ public:
     CTexture* GetTexture(long);
     int GetNumTexture();
 
-#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
     CPtrArray<CTexture*> m_textureArray;
-#else
-    unsigned char m_textureArray[0x1C];
-#endif
 };
 
 class CTextureMan : public CManager

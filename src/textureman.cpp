@@ -1,4 +1,3 @@
-#define FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/textureman.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/gxfunc.h"

@@ -8,7 +8,6 @@
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/ref.h"
 #include "ffcc/system.h"
-#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

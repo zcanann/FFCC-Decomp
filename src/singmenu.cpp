@@ -1,3 +1,4 @@
+#include "ffcc/ptrarray.h"
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
@@ -12,7 +13,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
-#include "ffcc/ptrarray.h"
 #include "ffcc/sound.h"
 extern "C" {
 extern u8 gSingMenuItemIconByType[];

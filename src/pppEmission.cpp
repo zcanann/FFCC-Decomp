@@ -142,7 +142,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
         state->m_scale0, state->m_scale1, state->m_scale2,
         param_2->m_stepValue, param_2->m_arg3, param_2->m_emission.m_scaleAccelerationAdd);
 
-    if (gPppInConstructor != 0) {
+    if (ppvIsLoopCalc != 0) {
         return;
     }
 
@@ -321,10 +321,11 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         u32 drawTevBits = 0xACE0F;
+        CTexture* texture = state->m_texture;
 
         pppInitBlendMode();
         pppSetBlendMode(step->m_emission.m_blendMode);
-        MaterialMan.SetChangeTexReflectionTexture(&state->m_texture->m_texObj);
+        MaterialMan.SetChangeTexReflectionTexture(&texture->m_texObj);
 
         Mtx viewMtx0;
         Mtx objMtx0;

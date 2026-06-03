@@ -365,7 +365,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
         }
 
-        model->SetFrame(0.0f);
+        model->SetFrame(kLocationTitle2WorkZero);
     }
 }
 

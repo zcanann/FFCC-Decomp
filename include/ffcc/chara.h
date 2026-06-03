@@ -329,8 +329,8 @@ public:
 			CDisplayList* m_displayLists;
 			u32 m_skinCount;
 			CSkin* m_skins;
-			u32 m_infoWord1;
 			u32 m_nodeIndex;
+			u32 m_infoWord1;
 		};
 
 		void Create(CChara::CModel*, CChunkFile&, CMemory::CStage*);

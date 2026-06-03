@@ -177,19 +177,23 @@ CMapIdGrp::CMapIdGrp()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033c48
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 float CMapKeyFrame::Get()
 {
     switch (m_mode) {
+    case 0:
+        return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     case 1:
         return Math.Spline1D(
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
-    case 0:
-        return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     default:
-        return 0.0f;
+        return kMapZero;
     }
 }
 
@@ -972,39 +976,48 @@ CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033a20
+ * PAL Size: 552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
     switch (m_mode) {
-    case 1:
-        blend = Math.Spline1D(
-            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
-        break;
     case 0:
         blend = Math.Line1D(
             static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
         break;
+    case 1:
+        blend = Math.Spline1D(
+            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
+        break;
     default:
-        blend = 0.0f;
-        key0 = m_junTable[0];
-        key1 = key0;
+        blend = kMapZero;
+        {
+            unsigned char key = m_junTable[0];
+            key1 = key;
+            key0 = key;
+        }
         return 0;
     }
 
-    if (blend <= 0.0f) {
-        key0 = m_junTable[0];
-        key1 = key0;
-        blend = 0.0f;
+    if (blend <= kMapZero) {
+        unsigned char key = m_junTable[0];
+        key1 = key;
+        key0 = key;
+        blend = kMapZero;
         return 0;
     }
 
     const float junMax = static_cast<float>(m_junCount - 1);
     if (blend >= junMax) {
-        key0 = m_junTable[m_junCount - 1];
-        key1 = key0;
-        blend = 1.0f;
+        unsigned char key = m_junTable[m_junCount - 1];
+        key1 = key;
+        key0 = key;
+        blend = kMapViewScaleZ;
         return 0;
     }
 
@@ -1012,7 +1025,7 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
     key1 = static_cast<int>(1.0f + blend);
     blend = blend - static_cast<float>(key0);
     key0 = m_junTable[key0];
-    if (blend == 0.0f) {
+    if (blend == kMapZero) {
         key1 = key0;
         return 0;
     }
@@ -3061,17 +3074,22 @@ int CMapMng::GetMapObjIdx(unsigned short id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f950
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
+    CMaterialSet* materialSet = m_materialSet;
     unsigned long index = 0;
 
-    while (index < static_cast<unsigned long>(m_materialSet->GetNumMaterial())) {
-        CMaterial* material = m_materialSet->GetMaterial(index);
-        if ((material != 0) && (materialId == material->GetMaterialId())) {
-            return material;
+    while (index < static_cast<unsigned long>(materialSet->GetNumMaterial())) {
+        if ((materialSet->GetMaterial(index) != 0) &&
+            (materialId == materialSet->GetMaterial(index)->GetMaterialId())) {
+            return materialSet->GetMaterial(index);
         }
         index++;
     }
@@ -3106,12 +3124,11 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
  */
 void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
-    PSMTXCopy(source, mapObj->m_localMtx);
+    PSMTXCopy(source, m_mapObjArray[mapObjIndex].m_localMtx);
 
-    mapObj->m_localMtxDirty = 1;
-    mapObj->m_calcMtxPending = 1;
-    mapObj->m_localMtxDirty = 0;
+    m_mapObjArray[mapObjIndex].m_localMtxDirty = 1;
+    m_mapObjArray[mapObjIndex].m_calcMtxPending = 1;
+    m_mapObjArray[mapObjIndex].m_localMtxDirty = 0;
 }
 
 /*
@@ -3270,13 +3287,10 @@ void CMapMng::ShowMapObjChild(int, int)
  */
 void CMapMng::ShowMapObjChildID(int id, int show)
 {
-    CMapObj* mapObj = GetMapObjArray();
-
     for (int i = 0; i < m_mapObjCount; i++) {
-        if (mapObj->m_objId == id) {
-            mapObj->SetShow(show);
+        if (m_mapObjArray[i].m_objId == id) {
+            m_mapObjArray[i].SetShow(show);
         }
-        mapObj++;
     }
 }
 

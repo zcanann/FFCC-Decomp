@@ -118,7 +118,7 @@ found_fallback_glyph:
 	if (glyph != 0) {
 		goto found_fallback;
 	}
-	return kFontZero;
+	return LoadFloat(kFontZero);
 }
 
 /*
@@ -133,7 +133,7 @@ found_fallback_glyph:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = kFontZero;
+	float width = LoadFloat(kFontZero);
 	unsigned short ch;
 	int hasChar;
 
@@ -197,7 +197,7 @@ use_fallback_glyph:
 		if (glyph != 0) {
 			goto use_glyph;
 		}
-		charWidth = kFontZero;
+		charWidth = LoadFloat(kFontZero);
 
 add_width:
 		width += charWidth;
@@ -795,14 +795,14 @@ CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = kFontZero;
-	posZ = kFontZero;
-	posY = kFontZero;
-	posX = kFontZero;
+	margin = LoadFloat(kFontZero);
+	posZ = LoadFloat(kFontZero);
+	posY = LoadFloat(kFontZero);
+	posX = LoadFloat(kFontZero);
 	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
 	bits.shadow = 0;
-	scaleY = kFontOne;
-	scaleX = kFontOne;
+	scaleY = LoadFloat(kFontOne);
+	scaleX = LoadFloat(kFontOne);
 	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;
@@ -862,7 +862,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>("CFontMan"), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan_801D9CC4), 0);
 	m_stage = stage;
 
 	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;

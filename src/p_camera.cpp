@@ -127,6 +127,8 @@ CProcessTable CCameraPcs::m_table[7] = {
         m_table_desc3.m_thisOffset,
         m_table_desc3.m_virtualOffset,
         m_table_desc3.m_function,
+        0x3D,
+        0x1,
         m_table_desc4.m_thisOffset,
         m_table_desc4.m_virtualOffset,
         m_table_desc4.m_function,

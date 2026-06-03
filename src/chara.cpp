@@ -53,6 +53,8 @@ STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_size) == 0x00);
 STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_data) == 0x04);
 STATIC_ASSERT(offsetof(CCharaDisplayListRaw, m_material) == 0x08);
 STATIC_ASSERT(sizeof(CCharaMeshRefRaw) == 0x64);
+STATIC_ASSERT(offsetof(CChara::CMesh::CRefData, m_nodeIndex) == 0x5C);
+STATIC_ASSERT(offsetof(CChara::CMesh::CRefData, m_infoWord1) == 0x60);
 STATIC_ASSERT(sizeof(CCharaMeshRaw) == 0x14);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workPositions) == 0xC);
@@ -2625,8 +2627,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			}
 			break;
 		case 0x494E464F:
-			meshRef->m_infoWord1 = chunk.Get4();
 			meshRef->m_nodeIndex = chunk.Get4();
+			meshRef->m_infoWord1 = chunk.Get4();
 			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0x7F) | ((chunk.Get4() != 0) ? 0x80 : 0));
 			meshRef->m_flags = static_cast<u8>((meshRef->m_flags & 0xBF) | ((chunk.Get4() != 0) ? 0x40 : 0));
 			chunk.Get4();
@@ -2999,7 +3001,7 @@ CChara::CMesh::CRefData::CRefData()
 	ref->m_threeWeightCountOrSize = 0;
 	ref->m_displayListCount = 0;
 	ref->m_skinCount = 0;
-	ref->m_nodeIndex = 0;
+	ref->m_infoWord1 = 0;
 }
 
 /*

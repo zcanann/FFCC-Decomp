@@ -3280,10 +3280,6 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
  */
 int JoyBus::SendCancel(ThreadParam* threadParam)
 {
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
-    cmdBytes[0] = 0x10;
-
     unsigned int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -3293,7 +3289,7 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
         unsigned int queuePort = threadParam->m_portIndex;
         if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = 0x10000000;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;

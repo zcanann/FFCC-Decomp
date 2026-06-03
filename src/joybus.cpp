@@ -4625,7 +4625,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
         }
 
         m_txWordCount[threadParam->m_portIndex] = wordCount;
-        threadParam->m_subState = 1;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
         unsigned int sendPort = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[sendPort] + 2 + m_txWordIndex[sendPort] * 4);

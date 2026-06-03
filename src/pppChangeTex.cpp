@@ -47,11 +47,6 @@ extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float kPppChangeTexAlphaScale = 255.0f;
 extern "C" const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
-static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
-{
-	return model->m_meshes;
-}
-
 static inline float LoadFloat(const float& value)
 {
 	return value;
@@ -65,14 +60,6 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWo
 	model->SetCallbackContext(work, step);
 	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
 	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
-}
-
-static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
-{
-	model->SetCallbackContext(0, 0);
-	model->SetBeforeMeshLockEnvCallback(0);
-	model->SetDrawMeshDLCallback(0);
-	model->SetAfterDrawMeshCallback(0);
 }
 
 /*

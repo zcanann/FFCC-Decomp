@@ -45,11 +45,6 @@ STATIC_ASSERT(sizeof(GXColor) == 0x4);
 
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
-{
-	return model->m_meshes;
-}
-
 static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 {
 	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68);
@@ -69,14 +64,6 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, pppYmChange
 	model->SetCallbackContext(state, step);
 	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
 	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
-}
-
-static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
-{
-	model->SetCallbackContext(0, 0);
-	model->SetBeforeMeshLockEnvCallback(0);
-	model->SetDrawMeshDLCallback(0);
-	model->SetAfterDrawMeshCallback(0);
 }
 
 /*

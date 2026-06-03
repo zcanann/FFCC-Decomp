@@ -203,11 +203,12 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             unsigned short objIndex = chunkFile.Get2();
 
             m_mapObject = GetMapObjByIndex(objIndex);
-            if (m_mapObject->m_meshType == 4) {
+            signed char meshType = m_mapObject->m_meshType;
+            if (meshType == 4) {
                 m_mapObject->m_drawPriority = 0xFF;
                 m_mapObject->m_baseDrawPriority = 0xFF;
                 m_mapObject->m_enableFullScreenShadow = 0;
-            } else if (m_mapObject->m_meshType == 3) {
+            } else if (meshType == 3) {
                 m_mapObject->m_enableFullScreenShadow = 0;
             }
             break;
@@ -1327,6 +1328,76 @@ void ClearShadow_r(COctNode* node)
 void COctTree::ClearShadow()
 {
 	ClearShadow_r(m_nodePool);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 500b
+ * EN Address: UNUSED
+ * EN Size: 156b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void SetShadow_r(COctNode* node)
+{
+	if (node->m_meshCount != 0) {
+		setbit32(&node->m_shadowFlags, s_shadow_no);
+	}
+
+	COctNode* nodeIter = node;
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = nodeIter->m_children[0];
+		if (child == 0) {
+			return;
+		}
+
+		if (child->m_meshCount != 0) {
+			setbit32(&child->m_shadowFlags, s_shadow_no);
+		}
+
+		COctNode* childIter = child;
+		for (int j = 0; j < 8; j++) {
+			COctNode* grandChild = childIter->m_children[0];
+			if (grandChild == 0) {
+				break;
+			}
+
+			if (grandChild->m_meshCount != 0) {
+				setbit32(&grandChild->m_shadowFlags, s_shadow_no);
+			}
+
+			COctNode* grandChildIter = grandChild;
+			for (int k = 0; k < 8; k++) {
+				COctNode* greatGrandChild = grandChildIter->m_children[0];
+				if (greatGrandChild == 0) {
+					break;
+				}
+
+				SetShadow_r(greatGrandChild);
+				grandChildIter = reinterpret_cast<COctNode*>(Ptr(grandChildIter, 4));
+			}
+
+			childIter = reinterpret_cast<COctNode*>(Ptr(childIter, 4));
+		}
+
+		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 40b
+ * EN Address: UNUSED
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void COctTree::SetShadow(long bitIndex)
+{
+	s_shadow_no = bitIndex;
+	SetShadow_r(m_nodePool);
 }
 
 /*

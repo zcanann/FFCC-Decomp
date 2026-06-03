@@ -13,6 +13,7 @@ class CBound;
 void ClearLight_r(COctNode*);
 void InsertLight_r(COctNode*);
 void ClearShadow_r(COctNode*);
+void SetShadow_r(COctNode*);
 void InsertShadow_r(COctNode*);
 void ClearFlag_r(COctNode*);
 void setbit32(unsigned long*, unsigned long);
@@ -74,6 +75,7 @@ public:
 	void ClearLight();
 	void InsertLight(long, Vec&, float, unsigned long);
 	void ClearShadow();
+	void SetShadow(long);
 	void InsertShadow(long, Vec&, CBound&);
 	void ClearFlag(unsigned long);
 	int CheckHitCylinder_r(COctNode*);

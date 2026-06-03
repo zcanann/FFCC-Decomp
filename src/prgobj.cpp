@@ -177,7 +177,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		}
 		break;
 	case 3:
-		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = value;
+		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = static_cast<signed char>(value);
 		break;
 	case 4:
 	{

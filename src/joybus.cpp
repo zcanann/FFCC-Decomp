@@ -4740,9 +4740,9 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
         {
             result = 1;
         }

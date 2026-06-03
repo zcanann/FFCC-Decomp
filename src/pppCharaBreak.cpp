@@ -348,7 +348,8 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     CChara::CMesh* mesh = model->m_meshes;
 
     if (meshBufferSlot != NULL) {
-        for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
+        u32 meshIndex = 0;
+        while (meshIndex < ModelData(model)->m_meshCount) {
             CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;
             CharaBreakMeshData* meshData = MeshData(mesh);
             if (dlEntryBase != NULL) {
@@ -376,8 +377,9 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
                 pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = 0;
             }
-            mesh++;
             meshBufferSlot++;
+            meshIndex++;
+            mesh++;
         }
     }
 

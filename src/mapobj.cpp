@@ -1763,18 +1763,14 @@ CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
  */
 CMapObjAtrMime::~CMapObjAtrMime()
 {
-    int* self = reinterpret_cast<int*>(this);
-    int offset = 0;
     int i = 0;
 
-    while (i < static_cast<int>(*reinterpret_cast<unsigned char*>(self + 2))) {
-        void* entry = *reinterpret_cast<void**>(self[3] + offset);
-        if (entry != 0) {
-            delete static_cast<float*>(entry);
-            *reinterpret_cast<void**>(self[3] + offset) = 0;
+    while (i < static_cast<int>(m_vertexListCount)) {
+        if (m_vertexLists[i] != 0) {
+            delete m_vertexLists[i];
+            m_vertexLists[i] = 0;
         }
 
-        offset += 4;
         i++;
     }
 

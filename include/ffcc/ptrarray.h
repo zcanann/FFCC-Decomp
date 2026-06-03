@@ -49,8 +49,8 @@ private:
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -60,7 +60,12 @@ CPtrArray<T>::CPtrArray()
 template <class T>
 CPtrArray<T>::~CPtrArray()
 {
-    RemoveAll();
+    if (m_items != 0) {
+        delete[] m_items;
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
 }
 
 #ifndef FFCC_PTRARRAY_NO_INLINE_ACCESSORS

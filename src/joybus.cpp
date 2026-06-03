@@ -6307,21 +6307,20 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        const unsigned int port = threadParam->m_portIndex;
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        OSWaitSemaphore(&m_accessSemaphores[port]);
-
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     // On success, update the threadParam flags

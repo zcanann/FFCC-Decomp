@@ -441,11 +441,11 @@ void CMenuPcs::TmpArtiCtrl()
 		float fVar2 = FLOAT_80332f30;
 		unsigned int uVar4 = Game.m_scriptFoodBase[0];
 
-		iVar6 = reinterpret_cast<int>(this->m_tmpArtiList) + 8;
+		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
 		for (iVar7 = 0; iVar7 < this->m_tmpArtiList->count; iVar7 = iVar7 + 1) {
-			*(float *)(iVar6 + 0x10) = fVar2;
-			*(float *)(iVar6 + 0x14) = fVar2;
-			iVar6 = iVar6 + 0x40;
+			entry->alpha = fVar2;
+			entry->z = fVar2;
+			entry++;
 		}
 
 		uVar5 = (unsigned int)*(short *)(uVar4 + 0xbaa);

@@ -6014,12 +6014,12 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
  */
 int JoyBus::SendStrength(ThreadParam* threadParam)
 {
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
     unsigned char strength[3];
 
     GbaQue.GetStrengthData(threadParam->m_portIndex, strength);
 
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = (unsigned char*)&cmd;
     cmdBytes[0] = 0x19;
     cmdBytes[1] = strength[0];
     cmdBytes[2] = strength[1];

@@ -15,7 +15,11 @@ struct CUSBStreamDataStorage
     CUSBStreamDataStorage();
     ~CUSBStreamDataStorage();
 
-    u8 m_storage[0x14];
+    u8* m_data;          // 0x00
+    int m_headerReady;   // 0x04
+    int m_dataReady;     // 0x08
+    u32 m_sizeBytes;     // 0x0C
+    u32 m_packetCode;    // 0x10
 };
 
 class CFunnyShapePcs : public CProcess

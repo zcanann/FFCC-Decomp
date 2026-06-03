@@ -177,8 +177,11 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		}
 		break;
 	case 3:
-		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = value;
+	{
+		signed char flag = value;
+		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = flag;
 		break;
+	}
 	case 4:
 	{
 		int oldState = getReplaceStat(value);

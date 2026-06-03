@@ -37,41 +37,6 @@ static inline f32 LoadLaserFloat(const f32& value)
 	return value;
 }
 
-struct pppYmLaserWork {
-	float m_length;
-	float m_lengthStep;
-	float m_graphValue0;
-	float m_graphValue1;
-	float m_halfWidth;
-	float m_graphValue2;
-	float m_graphValue3;
-	Vec* m_points;
-	Vec m_origin;
-	u8 m_shapeReady;
-	u8 m_hitFrame;
-	u8 m_unused2E;
-	u8 m_unused2F;
-	s16 m_shapeArg0;
-	s16 m_shapeArg1;
-	s16 m_shapeArg2;
-	s16 m_unused36;
-	float m_shapeRotation;
-};
-
-struct pppYmLaserColorData {
-	u8 m_pad0[8];
-	pppCVECTOR m_color;
-};
-
-struct pppYmLaserMapCylinder {
-	Vec m_bottom;
-	Vec m_top;
-	Vec m_axis;
-	float m_radius;
-	Vec m_boundsMin;
-	Vec m_boundsMax;
-};
-
 static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);

@@ -1,6 +1,7 @@
 #ifndef _PPP_YMLASER_H_
 #define _PPP_YMLASER_H_
 
+#include "ffcc/pppLaserCommon.h"
 #include "ffcc/partMng.h"
 
 struct pppYmLaser {
@@ -51,6 +52,10 @@ struct pppYmLaserUnkB {
         } m_laser;
     };
 };
+
+typedef pppLaserWorkBase pppYmLaserWork;
+typedef pppLaserColorBlock pppYmLaserColorData;
+typedef pppLaserMapCylinder pppYmLaserMapCylinder;
 
 #ifdef __cplusplus
 extern "C" {

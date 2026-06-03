@@ -4354,12 +4354,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             payload[0] = 1;
 
-            char caravanName[128];
-            memset(caravanName, 0, sizeof(caravanName));
-
-            GbaQue.GetCaravanName(caravanName);
-
-            memcpy(&payload[1], caravanName, sizeof(caravanName));
+            GbaQue.GetCaravanName((char*)&payload[1]);
 
             unsigned char* p = (unsigned char*)&playerInfo;
             unsigned char lowBits = 0;
@@ -4399,7 +4394,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 highBits += 2;
             }
 
-            memcpy(&payload[1 + sizeof(caravanName)], classFlags, sizeof(classFlags));
+            memcpy(&payload[0x81], classFlags, sizeof(classFlags));
 
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));

@@ -20,6 +20,7 @@ class CFullScreenShadow;
 class CLightPcs;
 class CAmemCacheSet;
 class CMapKeyFrame;
+class CMapTexAnim;
 struct Vec;
 struct CBound;
 
@@ -380,6 +381,7 @@ class CMaterial : public CRef
     friend class CMaterialMan;
     friend class CTexAnimSet;
     friend class CMaterialSet;
+    friend class CMapTexAnim;
 
 public:
     CMaterial();

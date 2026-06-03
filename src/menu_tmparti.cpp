@@ -429,9 +429,7 @@ void CMenuPcs::TmpArtiCtrl()
 {
 	bool hasInput;
 	unsigned int uVar5;
-	int iVar6;
 	int iVar7;
-	int iVar8;
 	unsigned int uVar9;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
@@ -450,37 +448,28 @@ void CMenuPcs::TmpArtiCtrl()
 
 		uVar5 = (unsigned int)*(short *)(uVar4 + 0xbaa);
 		iVar7 = 0;
-		iVar6 = (uVar5 - 1) * 0x40;
+		TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[uVar5 - 1];
 		if (-1 < (int)(uVar5 - 1)) {
 			uVar9 = uVar5 >> 3;
 			if (uVar9 != 0) {
 				do {
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + 8;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x38;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x78;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xb8;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xf8;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x138;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x178;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
-					iVar8 = iVar6 + -0x1b8;
-					iVar6 = iVar6 + -0x200;
-					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-					*(int *)(iVar8 + 0x24) = iVar7++;
-					*(unsigned int *)(iVar8 + 0x28) = 3;
+					setupEntry[0].startFrame = iVar7++;
+					setupEntry[0].duration = 3;
+					setupEntry[-1].startFrame = iVar7++;
+					setupEntry[-1].duration = 3;
+					setupEntry[-2].startFrame = iVar7++;
+					setupEntry[-2].duration = 3;
+					setupEntry[-3].startFrame = iVar7++;
+					setupEntry[-3].duration = 3;
+					setupEntry[-4].startFrame = iVar7++;
+					setupEntry[-4].duration = 3;
+					setupEntry[-5].startFrame = iVar7++;
+					setupEntry[-5].duration = 3;
+					setupEntry[-6].startFrame = iVar7++;
+					setupEntry[-6].duration = 3;
+					setupEntry[-7].startFrame = iVar7++;
+					setupEntry[-7].duration = 3;
+					setupEntry -= 8;
 					uVar9 = uVar9 - 1;
 				} while (uVar9 != 0);
 				uVar5 = uVar5 & 7;
@@ -489,12 +478,10 @@ void CMenuPcs::TmpArtiCtrl()
 				}
 			}
 			do {
-				iVar8 = iVar6 + 8;
-				iVar6 = iVar6 + -0x40;
-				iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-				*(int *)(iVar8 + 0x24) = iVar7;
+				setupEntry->startFrame = iVar7;
 				iVar7 = iVar7 + 1;
-				*(unsigned int *)(iVar8 + 0x28) = 3;
+				setupEntry->duration = 3;
+				setupEntry--;
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
 		}

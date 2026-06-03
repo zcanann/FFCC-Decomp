@@ -2173,7 +2173,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         return 0;
     }
 
-    unsigned int data = 0;
+    unsigned int data;
 
     threadParam->m_gbaStatus = GBARead(port, (unsigned char*)&data, &threadParam->m_unk3);
 

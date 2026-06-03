@@ -3137,18 +3137,18 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
         {
             CMapCylinder bodyCylinder;
             bodyCylinder.m_bottom = m_worldPosition;
-            bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : 0.5f;
+            bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
             bodyCylinder.Probe().m_direction.x = sZeroFloat;
-            bodyCylinder.Probe().m_direction.y = sNegativeOne;
+            bodyCylinder.Probe().m_direction.y = 1.0f;
             bodyCylinder.Probe().m_direction.z = sZeroFloat;
-            bodyCylinder.Probe().m_radius = 0.3f;
-            bodyCylinder.Probe().m_height = 0.3f;
+            bodyCylinder.Probe().m_radius = sHugeCylinderExtent;
+            bodyCylinder.Probe().m_height = sHugeCylinderExtent;
             bodyCylinder.Probe().m_top = bodyCylinder.Probe().m_direction;
-            bodyCylinder.Probe().m_direction2.x = 0.3f;
-            bodyCylinder.Probe().m_direction2.y = 0.6f;
-            bodyCylinder.Probe().m_direction2.z = 0.6f;
-            bodyCylinder.Probe().m_radius2 = 0.6f;
-            bodyCylinder.Probe().m_height2 = 0.0f;
+            bodyCylinder.Probe().m_direction2.x = sNegHugeCylinderExtent;
+            bodyCylinder.Probe().m_direction2.y = sNegHugeCylinderExtent;
+            bodyCylinder.Probe().m_direction2.z = sNegHugeCylinderExtent;
+            bodyCylinder.Probe().m_radius2 = sZeroFloat;
+            bodyCylinder.Probe().m_height2 = sZeroFloat;
 
             u32 hitMask = m_bgHitMask;
             if (MapMng.CheckHitCylinderNear(

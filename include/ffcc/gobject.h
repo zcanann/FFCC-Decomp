@@ -259,4 +259,10 @@ public:
     const Vec& HitFaceNormal() const { return *reinterpret_cast<const Vec*>(&m_hitNormal.y); }
 };
 
+#ifndef FFCC_OUT_OF_LINE_GOBJECT_CTORS
+inline CGObject::CGObject()
+{
+}
+#endif
+
 #endif // _FFCC_CGOBJECT_H_

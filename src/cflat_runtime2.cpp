@@ -1,3 +1,5 @@
+#define FFCC_OUT_OF_LINE_GOBJECT_CTORS
+
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"

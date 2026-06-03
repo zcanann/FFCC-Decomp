@@ -31,4 +31,10 @@ public:
 	};
 };
 
+#ifndef FFCC_OUT_OF_LINE_GOBJECT_CTORS
+inline CGBaseObj::CGBaseObj()
+{
+}
+#endif
+
 #endif // _FFCC_BASEOBJ_H_

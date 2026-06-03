@@ -403,7 +403,8 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += meshIdx;
 	ChangeTexMeshData* meshData = meshes->m_data;
-	ChangeTexDisplayList* displayList = meshData->m_displayLists + displayListIdx;
+	ChangeTexDisplayList* displayList = meshData->m_displayLists;
+	displayList += displayListIdx;
 	CTexture* texture = state->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {

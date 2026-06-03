@@ -210,7 +210,7 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetMargin(LoadFloat(FLOAT_80333048));
 		sprintf(textBuf, s_FavoRankFormat_80333068, static_cast<int>(rank->place));
 		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry->y) - LoadFloat(FLOAT_8033306C));
+		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - LoadFloat(FLOAT_8033306C));
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank++;
@@ -231,7 +231,7 @@ void CMenuPcs::FavoDraw()
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(LoadFloat(FLOAT_80333058) * drawEntry->alpha)).color);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
 		nameFont->SetPosX(static_cast<float>(drawEntry->x + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry->y) - LoadFloat(FLOAT_8033306C));
+		nameFont->SetPosY(static_cast<float>(drawEntry->y + 0xB) - LoadFloat(FLOAT_8033306C));
 		nameFont->Draw(const_cast<char*>(name));
 		rank++;
 		drawEntry++;
@@ -695,10 +695,22 @@ void CMenuPcs::FavoInit()
 
 	memset(s_rank, 0, sizeof(s_rank));
 	FoodRank* ranks = s_rank;
-	for (int foodId = 0; foodId < 8; foodId++) {
-		ranks[foodId].foodId = foodId;
-		ranks[foodId].score = caravanWork->m_letterMeta[foodId];
-	}
+	ranks[0].foodId = 0;
+	ranks[0].score = caravanWork->m_letterMeta[0];
+	ranks[1].foodId = 1;
+	ranks[1].score = caravanWork->m_letterMeta[1];
+	ranks[2].foodId = 2;
+	ranks[2].score = caravanWork->m_letterMeta[2];
+	ranks[3].foodId = 3;
+	ranks[3].score = caravanWork->m_letterMeta[3];
+	ranks[4].foodId = 4;
+	ranks[4].score = caravanWork->m_letterMeta[4];
+	ranks[5].foodId = 5;
+	ranks[5].score = caravanWork->m_letterMeta[5];
+	ranks[6].foodId = 6;
+	ranks[6].score = caravanWork->m_letterMeta[6];
+	ranks[7].foodId = 7;
+	ranks[7].score = caravanWork->m_letterMeta[7];
 
 	int rankIndex = 0;
 	FoodRank* rank = ranks;
@@ -709,9 +721,15 @@ void CMenuPcs::FavoInit()
 		if (iVar17 < 8) {
 			do {
 				if (rank->score < compareRank->score) {
-					FoodRank tmp = *rank;
-					*rank = *compareRank;
-					*compareRank = tmp;
+					signed char place = rank->place;
+					unsigned char foodId = rank->foodId;
+					short score = rank->score;
+					rank->place = compareRank->place;
+					rank->foodId = compareRank->foodId;
+					rank->score = compareRank->score;
+					compareRank->place = place;
+					compareRank->foodId = foodId;
+					compareRank->score = score;
 				}
 				compareRank++;
 				iVar16--;

@@ -5128,7 +5128,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
         if ((int)m_cmdCount[p] < 0x40)
         {
             m_cmdQueueData[p][m_cmdCount[p]] = word;
-            m_cmdCount[p] = m_cmdCount[p] + 1;
+            m_cmdCount[threadParam->m_portIndex]++;
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             cmd = 0;

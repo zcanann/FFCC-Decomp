@@ -502,19 +502,21 @@ void CGame::Create()
 
     if (strlen(m_startScriptName) != 0) {
         strcpy(scriptName, m_startScriptName);
-        u32* src = reinterpret_cast<u32*>(scriptName);
-        u32* dst = reinterpret_cast<u32*>(m_nextScript.m_name);
+        u32* src = reinterpret_cast<u32*>(scriptName) - 1;
+        u32* dst = reinterpret_cast<u32*>(&m_nextScript);
         int count = sizeof(scriptName) / (sizeof(u32) * 2);
         do {
-            *dst++ = *src++;
-            *dst++ = *src++;
+            dst[1] = src[1];
+            src += 2;
+            dst += 2;
+            dst[0] = src[0];
         } while (--count != 0);
         m_newGameFlag = 1;
     }
 
     if (m_newGameFlag == 0) {
-        mapId = m_currentMapId;
         mapVariant = m_currentMapVariantId;
+        mapId = m_currentMapId;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x24E);
         System.MapChanging(mapId, mapVariant);

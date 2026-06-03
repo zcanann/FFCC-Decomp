@@ -19,6 +19,8 @@ JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
 
+extern "C" const unsigned int DAT_80330b20;
+
 extern const unsigned short JoyBusCrcTable[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
@@ -6460,7 +6462,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     if (!single)
     {
-        mode ^= 1; // TODO (unsigned char)DAT_80330b20;
+        mode ^= (unsigned char)DAT_80330b20;
 
         unsigned int word = ((unsigned int)9 << 24) | ((unsigned int)mode << 16);
         int ret = 0;

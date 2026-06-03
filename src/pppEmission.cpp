@@ -142,7 +142,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
         state->m_scale0, state->m_scale1, state->m_scale2,
         param_2->m_stepValue, param_2->m_arg3, param_2->m_emission.m_scaleAccelerationAdd);
 
-    if (gPppInConstructor != 0) {
+    if (ppvIsLoopCalc != 0) {
         return;
     }
 

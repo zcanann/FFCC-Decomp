@@ -47,7 +47,7 @@ static inline float ChangeTexConst(const float& value) { return *reinterpret_cas
 
 static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 {
-	return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x68);
+	return model->m_drawMtx;
 }
 
 static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)

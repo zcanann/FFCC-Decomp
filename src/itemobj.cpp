@@ -80,6 +80,16 @@ static inline CFlatRuntime2* ItemCFlatRuntime()
 	return reinterpret_cast<CFlatRuntime2*>(CFlat);
 }
 
+struct CItemJumpCylinder
+{
+	Vec m_bottom;
+	Vec m_top;
+	Vec m_axis;
+	float m_radius;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80124b78
@@ -170,8 +180,8 @@ void CGItemObj::ItemJump(int state, float jump)
 
 		if ((object->m_objectFlags & 0x10) == 0) {
 			unsigned int mapMask = object->m_bgHitMask;
-			CMapCylinder cylinder;
 			Vec move;
+			CItemJumpCylinder cylinder;
 
 			move.x = FLOAT_80331b20;
 			move.y = FLOAT_80331b24;
@@ -193,7 +203,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_boundsMax.y = FLOAT_80331b2c;
 			cylinder.m_boundsMax.z = FLOAT_80331b2c;
 
-			if (MapMng.CheckHitCylinderNear(&cylinder, &move, mapMask) != 0 &&
+			if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
 			    g_hit_f->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}

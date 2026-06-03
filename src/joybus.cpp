@@ -5434,18 +5434,18 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     }
     else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 779];
 
         memset(payload, 0, kJoyDataLargePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 0x0c;
 
         unsigned char* cmdBuf = &payload[1];
 
-        int dataLen = GbaQue.GetCmdData(port, cmdBuf);
+        int dataLen = GbaQue.GetCmdData(threadParam->m_portIndex, cmdBuf);
 
         if (dataLen < 0)
         {

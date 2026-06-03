@@ -7405,8 +7405,7 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
  */
 int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 {
-	// TODO: restore when GbaQue exists
-    if (playerIndex == 0 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 0) */ && menuId != 0)
+    if (playerIndex == 0 && GbaQue.IsSingleMode(0) && menuId != 0)
     {
         // MenuPcs._2148_2_ = menuId - 1; // TODO: restore when MenuPcs exists
         // Game.gameWork._5075_1_ = 1; // TODO: restore when Game exists
@@ -7414,8 +7413,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
         return 0;
     }
-	// TODO: restore when GbaQue exists
-    else if (playerIndex == 1 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 1) */   && menuId == 0)
+    else if (playerIndex == 1 && GbaQue.IsSingleMode(1) && menuId == 0)
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[1].m_portIndex);
 

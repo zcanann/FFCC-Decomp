@@ -4929,70 +4929,79 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
     unsigned int flgWord = 0;
+    int result = GBARecvSend(threadParam, &flgWord);
 
-    if (GBARecvSend(threadParam, &flgWord) < 0)
+    if (result < 0)
     {
-        return -1;
-    }
-
-    GbaQue.GetMapObjDrawFlg(&flgWord);
-
-    unsigned char* data = (unsigned char*)&flgWord;
-    unsigned int crc = 0xFFFF;
-
-    for (int i = 0; i < 4; ++i)
-    {
-        unsigned char byte = data[i];
-        unsigned int index = (crc >> 8) ^ byte;
-        crc = ((crc << 8) ^ JoyBusCrcTable[index]) & 0xFFFF;
-    }
-
-    crc = (~crc) & 0xFFFF;
-
-    unsigned int cmd1 = (0x16u << 24) | ((unsigned char)(crc & 0xFF) << 16) | ((unsigned char)((crc >> 8) & 0xFF) << 8) | data[0];
-    unsigned int cmd2 = (0x56u << 24) | (data[1] << 16) | (data[2] << 8)  | (data[3]);
-
-    if (m_threadRunningMask != 0)
-    {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int port = threadParam->m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
-        {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd1;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[port]);
-            return -1;
-        }
-    }
-
-    if (m_threadRunningMask == 0)
-    {
-        return 0;
+        result = -1;
     }
     else
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+        GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        unsigned int port = threadParam->m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned char* data = (unsigned char*)&flgWord;
+        unsigned int crc = 0xFFFF;
+
+        for (int i = 0; i < 4; ++i)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd2;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            unsigned char byte = data[i];
+            unsigned int index = (crc >> 8) ^ byte;
+            crc = ((crc << 8) ^ JoyBusCrcTable[index]) & 0xFFFF;
         }
-        else
+
+        crc = (~crc) & 0xFFFF;
+
+        unsigned int cmd1 = (0x16u << 24) | ((unsigned char)(crc & 0xFF) << 16) | ((unsigned char)((crc >> 8) & 0xFF) << 8) | data[0];
+        unsigned int cmd2 = (0x56u << 24) | (data[1] << 16) | (data[2] << 8)  | (data[3]);
+
+        result = 0;
+
+        if (m_threadRunningMask != 0)
         {
-            OSSignalSemaphore(&m_accessSemaphores[port]);
-            return -1;
+            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+            unsigned int port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = cmd1;
+                m_cmdCount[threadParam->m_portIndex]++;
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+
+        if (result == 0)
+        {
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+                unsigned int port = threadParam->m_portIndex;
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = cmd2;
+                    m_cmdCount[threadParam->m_portIndex]++;
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
         }
     }
 
-    return 0;
+    return result;
 }
 
 /*

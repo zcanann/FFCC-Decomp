@@ -1495,26 +1495,24 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		CMaterialSet* materialSet = PartMng.m_materialSet;
 		short modelCount = *modelIndices;
 		short* modelList = modelIndices + 1;
 		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 
 		for (short i = 0; i < modelCount; i++, modelList++)
 		{
-			CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
-			short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+			pppModelSt* mapMesh = *(pppModelSt**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
 
-			if (ppvAmemCacheSet.IsEnable(cacheIndex) == 0)
+			if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
 			{
 				mapMesh->Ptr2Off();
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
-				    ppvAmemCacheSet.GetData(cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+				    ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5);
 				mapMesh->Off2Ptr();
 			}
 
-			ppvAmemCacheSet.AddRef(cacheIndex);
-			mapMesh->pppCacheLoadModelTexture(materialSet, &ppvAmemCacheSet);
+			ppvAmemCacheSet.AddRef(mapMesh->m_cacheId);
+			mapMesh->pppCacheLoadModelTexture(PartMng.m_materialSet, &ppvAmemCacheSet);
 		}
 
 		short shapeCount = *shapeIndices;
@@ -1524,7 +1522,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 		for (short i = 0; i < shapeCount; i++, shapeList++)
 		{
-			pppCacheLoadShapeTexture(*(pppShapeSt**)(shapeNames + *shapeList * 4), materialSet);
+			pppCacheLoadShapeTexture(*(pppShapeSt**)(shapeNames + *shapeList * 4), PartMng.m_materialSet);
 		}
 
 		pppMngSt->m_mapTexLoaded = 1;

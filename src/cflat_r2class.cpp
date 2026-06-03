@@ -476,9 +476,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 								value = LoadU16(classData, 0xBC8);
 							}
 						} else {
-							u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);
-							if (p != 0) {
-								value = static_cast<unsigned int>(*reinterpret_cast<short*>(p + 0x30));
+							CGObject* const carryObject = reinterpret_cast<CGPartyObj*>(engineObject)->m_partyData.carryObject;
+							if (carryObject != 0) {
+								value = static_cast<unsigned int>(*reinterpret_cast<short*>(reinterpret_cast<u8*>(carryObject) + 0x30));
 							} else {
 								value = 0;
 							}

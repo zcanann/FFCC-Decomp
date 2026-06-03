@@ -329,7 +329,10 @@ public:
 			CDisplayList* m_displayLists;
 			u32 m_skinCount;
 			CSkin* m_skins;
-			u32 m_infoWord1;
+			union {
+				u32 m_infoWord1;
+				u32 m_effectNodeIndex;
+			};
 			u32 m_nodeIndex;
 		};
 

@@ -364,8 +364,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
     for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
         ScreenBreakMeshData* meshData = mesh->m_data;
-        CChara::CNode* node = &model->m_nodes[meshData->m_nodeIndex];
-        node->m_flags &= 0x7F;
+        CChara::CNode* node = &model->m_nodes[meshData->m_effectNodeIndex];
+        node->m_flags &= ~0x80;
         PSMTXIdentity(node->m_localRuntimeMtx);
 
         u32 vertexCount = meshData->m_vertexCount;
@@ -657,7 +657,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     for (u32 i = 0; i < ScreenBreakModelRef(model)->m_meshCount; i++) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (pieceData->m_active != 0) {
-            MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
+            MtxPtr nodeMtx = model->m_nodes[meshData->m_effectNodeIndex].m_localRuntimeMtx;
 
             nodeMtx[0][3] = zero;
             nodeMtx[1][3] = zero;

@@ -57,6 +57,8 @@ STATIC_ASSERT(sizeof(CCharaMeshRaw) == 0x14);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workPositions) == 0xC);
 STATIC_ASSERT(offsetof(CCharaMeshRaw, m_workNormals) == 0x10);
+STATIC_ASSERT(offsetof(CCharaMeshRefRaw, m_effectNodeIndex) == 0x5C);
+STATIC_ASSERT(offsetof(CCharaMeshRefRaw, m_nodeIndex) == 0x60);
 STATIC_ASSERT(offsetof(CChara::CAnim, m_flags) == 0x08);
 STATIC_ASSERT(offsetof(CChara::CAnim, m_interp) == 0x09);
 STATIC_ASSERT(offsetof(CChara::CAnim, m_nodeCount) == 0x0E);

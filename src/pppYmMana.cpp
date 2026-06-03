@@ -971,7 +971,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, _pppCtrlTable* p
                         model->m_data->m_posQuant, model->m_data->m_normQuant, model->m_matrix,
                         mana->m_displayListCopies[dlIndex], mana->m_displayListSize, mana->m_meshColors,
                         mana->m_meshTexCoords0, mana->m_meshTexCoords1,
-                        &model->m_nodes[meshShape->m_nodeIndex], pppYmMana, mana);
+                        &model->m_nodes[meshShape->m_effectNodeIndex], pppYmMana, mana);
                 }
             }
         }

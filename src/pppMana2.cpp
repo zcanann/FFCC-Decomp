@@ -1291,7 +1291,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* par
                         model->m_data->m_normQuant, model->m_matrix,
                         mana2Work->m_displayListCopies[dlIndex], mana2Work->m_displayListSize,
                         mana2Work->m_meshColors, mana2Work->m_meshTexCoords,
-                        &model->m_nodes[meshData->m_nodeIndex]);
+                        &model->m_nodes[meshData->m_effectNodeIndex]);
                 }
             }
 

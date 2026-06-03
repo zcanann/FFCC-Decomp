@@ -10,10 +10,12 @@ extern const float FLOAT_80330564 = 16384.0f;
 extern const float FLOAT_80330568 = 0.5f;
 extern const float FLOAT_8033056C = 0.00787f;
 extern const float FLOAT_80330570 = 127.0f;
-extern const float FLOAT_80330588;
-extern const float FLOAT_8033058C;
-extern const float FLOAT_80330590;
-extern const double DOUBLE_80330598;
+extern const double DOUBLE_80330578 = 4503601774854144.0;
+extern const double DOUBLE_80330580 = 4503599627370496.0;
+extern const float FLOAT_80330588 = 2.0f;
+extern const float FLOAT_8033058C = 180.0f;
+extern const float FLOAT_80330590 = 0.7f;
+extern const double DOUBLE_80330598 = 1.0;
 }
 #include <dolphin/mtx.h>
 #include <string.h>

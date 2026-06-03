@@ -6111,11 +6111,6 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
 
         int dataLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf);
 
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
         const int byteLen = dataLen + 1;
 
         int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));

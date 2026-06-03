@@ -4674,7 +4674,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -4781,7 +4781,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -4889,7 +4889,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5131,7 +5131,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5388,7 +5388,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5497,7 +5497,7 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5633,7 +5633,7 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5741,7 +5741,7 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5849,7 +5849,7 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5961,7 +5961,7 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -6182,7 +6182,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
     {
         m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[threadParam->m_portIndex] <= m_txWordIndex[threadParam->m_portIndex])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }

@@ -110,7 +110,7 @@ int CTextureSet::Find(char* name)
  * Address: TODO
  * Size: TODO
  */
-CTexture* CTextureSet::GetTexture(long index)
+inline CTexture* CTextureSet::GetTexture(long index)
 {
     return m_textureArray[static_cast<unsigned long>(index)];
 }
@@ -120,7 +120,7 @@ CTexture* CTextureSet::GetTexture(long index)
  * Address: TODO
  * Size: TODO
  */
-int CTextureSet::GetNumTexture()
+inline int CTextureSet::GetNumTexture()
 {
     return m_textureArray.GetSize();
 }
@@ -1126,6 +1126,8 @@ int CPtrArray<CTexture*>::GetSize()
     return m_numItems;
 }
 
+#pragma dont_inline reset
+
 /*
  * --INFO--
  * PAL Address: 0x8003BF54
@@ -1176,6 +1178,8 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+
+#pragma dont_inline on
 
 /*
  * --INFO--

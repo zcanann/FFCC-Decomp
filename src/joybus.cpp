@@ -2,6 +2,7 @@
 
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/game.h"
 #include "ffcc/system.h"
 #include "global.h"
 
@@ -17,6 +18,8 @@
 JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
+
+extern "C" const unsigned int DAT_80330b20;
 
 extern const unsigned short JoyBusCrcTable[256] =
 {
@@ -113,6 +116,7 @@ static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv 
 static const char s_send_ppos_bad_state_fmt[] = "JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n";
 static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
 static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
+extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
 namespace JoyBusConst {
 char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
@@ -2169,7 +2173,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         return 0;
     }
 
-    unsigned int data = 0;
+    unsigned int data;
 
     threadParam->m_gbaStatus = GBARead(port, (unsigned char*)&data, &threadParam->m_unk3);
 
@@ -2224,8 +2228,8 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 int JoyBus::SendGBA(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-    unsigned int firstCmd = 0;
-    unsigned int count = 0;
+    unsigned int firstCmd;
+    unsigned int count;
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
     count = m_cmdCount[port];
@@ -2325,7 +2329,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 
@@ -2340,7 +2344,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 
@@ -2407,7 +2411,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
-            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int idx = m_secCmdCount[port] - 1;
             unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
             m_secCmdCount[port]--;
 
@@ -2705,7 +2709,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         if (threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == '(')
         {
-            unsigned int readBuf[4] = {};
+            unsigned int readBuf[4];
 
             threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(readBuf), &threadParam->m_unk3);
 
@@ -2817,7 +2821,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 {
                     char          h;
                     unsigned char f;
-                } tmpBuf = {};
+                } tmpBuf;
 
                 threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(&tmpBuf), &threadParam->m_unk3);
                 status = threadParam->m_gbaStatus;
@@ -2879,7 +2883,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         {
             if (threadParam->m_unk3 == '(')
             {
-                unsigned int timeValue = 0;
+                unsigned int timeValue;
                 threadParam->m_gbaStatus = GBARead(port, reinterpret_cast<unsigned char*>(&timeValue), &threadParam->m_unk3);
                 status = threadParam->m_gbaStatus;
 
@@ -3116,27 +3120,29 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
  */
 int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
-    if (m_threadRunningMask == 0) {
-        return 0;
-    }
+    int result = 0;
 
-    int port = threadParam->m_portIndex;
-
-    OSWaitSemaphore(m_accessSemaphores + port);
-
-    if ((int)m_cmdCount[port] < 0x40)
+    if (m_threadRunningMask != 0)
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = command;
-        m_cmdCount[port]++;
+        OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
 
-        OSSignalSemaphore(m_accessSemaphores + port);
+        unsigned int port = threadParam->m_portIndex;
+        if ((int)m_cmdCount[port] < 0x40)
+        {
+            m_cmdQueueData[port][m_cmdCount[port]] = command;
+            m_cmdCount[threadParam->m_portIndex]++;
 
-        return 0;
+            OSSignalSemaphore(m_accessSemaphores + threadParam->m_portIndex);
+            result = 0;
+        }
+        else
+        {
+            OSSignalSemaphore(m_accessSemaphores + port);
+            result = -1;
+        }
     }
 
-    OSSignalSemaphore(m_accessSemaphores + port);
-
-    return -1;
+    return result;
 }
 
 
@@ -3156,19 +3162,20 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     if (result == 0)
@@ -3186,25 +3193,25 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
  */
 int JoyBus::SendGBAStop(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
     unsigned int cmd = MakeJoyCmd16(0x0A00, 0x00);
     int result = 0;
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     if (result == 0)
@@ -3235,19 +3242,20 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -3260,25 +3268,25 @@ int JoyBus::SendChkCrc(ThreadParam* threadParam, int param3, unsigned short crc,
  */
 int JoyBus::SendCancel(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
     unsigned int cmd = 0x10000000u;
     int result = 0;
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -3426,7 +3434,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
             {
-                // TODO: IsSingleMode__8GbaQueueFi(&GbaQue, port);
+                GbaQue.IsSingleMode(threadParam->m_portIndex);
 
                 if (m_threadRunningMask == 0)
                 {
@@ -3474,6 +3482,15 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             }
             else
             {
+                if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+                {
+                    if (System.m_execParam != 0)
+                    {
+                        System.Printf(s_pctd_Error_send_type_error_pct02x_801DA350, threadParam->m_portIndex);
+                    }
+                    return -1;
+                }
+
                 unsigned char* letter = reinterpret_cast<unsigned char*>(m_letterBuffer[port]);
                 dataBase = letter;
                 dataPtr = letter;
@@ -3552,7 +3569,8 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
             unsigned int word =
                 (static_cast<unsigned int>(0x0B00) << 16) |
-                static_cast<unsigned int>(len);
+                (static_cast<unsigned int>(len & 0x00FF) << 8) |
+                static_cast<unsigned int>(len >> 8);
 
             if (m_threadRunningMask != 0)
             {
@@ -3667,7 +3685,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
             unsigned short len = chunkSize;
             unsigned char rowCount = static_cast<unsigned char>(chunkCount);
 
-            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) | (static_cast<unsigned int>(rowCount) << 16) | static_cast<unsigned int>(len);
+            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) |
+                                (static_cast<unsigned int>(rowCount) << 16) |
+                                (static_cast<unsigned int>(len & 0x00FF) << 8) |
+                                static_cast<unsigned int>(len >> 8);
 
             if (m_threadRunningMask == 0)
             {
@@ -3824,19 +3845,20 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmdX;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdX;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     if (result != 0)
@@ -3848,20 +3870,21 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmdY;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdY;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -3876,13 +3899,13 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 {
     int port = threadParam->m_portIndex;
 
-    char stageMajor[3] = { 0, 0, 0 };
-    char stageMinor[3] = { 0, 0, 0 };
+    char stageMajor[4];
+    char stageMinor[4];
 
     GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
 
-    unsigned char stageA = stageMajor[2];
-    unsigned char stageB = stageMinor[2];
+    unsigned char stageA = stageMajor[3];
+    unsigned char stageB = stageMinor[3];
 
     unsigned int cmd = (0x0Eu << 24) | (0x01u << 16) | (stageA << 8) | (stageB);
 
@@ -3931,7 +3954,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
     unsigned char& state = threadParam->m_pposCounter;
     unsigned char& playerCount = m_cmdBuffer[port];
     unsigned char& mobCount = m_cmdBuffer[4 + port];
-    unsigned char* posBytes = m_playerPosPacketBuffer[port];
+    unsigned char* posBytes = m_playerPosPacketBuffer[port] + 2;
     unsigned int* posWords = (unsigned int*)posBytes;
     int& wordIndex = m_pposWordIndex[port];
 
@@ -3957,28 +3980,30 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 1:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)playerCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-                if ((int)m_cmdCount[port] >= 0x40)
+                unsigned int queuePort = threadParam->m_portIndex;
+                if ((int)m_cmdCount[queuePort] < 0x40)
                 {
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
-                    result = -1;
+                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
                 }
                 else
                 {
-                    m_cmdQueueData[port][m_cmdCount[port]] = word;
-                    m_cmdCount[port]++;
-
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                    result = -1;
                 }
             }
 
@@ -3990,7 +4015,6 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             sent++;
         }
 
-        // Advance index by number of words we actually pushed this call
         wordIndex += sent;
 
         // Done with all player-pos words?
@@ -4011,8 +4035,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         int enemyCount = 0;
 
-        // TODO
-        // GbaQueue::GetEnemyPos(&GbaQue, port, posWords, &enemyCount);
+        GbaQue.GetEnemyPos(port, posWords, &enemyCount);
 
         mobCount = (unsigned char)enemyCount;
 
@@ -4030,28 +4053,30 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 3:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)mobCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-                if ((int)m_cmdCount[port] >= 0x40)
+                unsigned int queuePort = threadParam->m_portIndex;
+                if ((int)m_cmdCount[queuePort] < 0x40)
                 {
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
-                    result = -1;
+                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
                 }
                 else
                 {
-                    m_cmdQueueData[port][m_cmdCount[port]] = word;
-                    m_cmdCount[port]++;
-
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                    result = -1;
                 }
             }
 
@@ -4101,28 +4126,30 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 5:
     {
-        int sent = 0;
+        int sent = wordIndex;
         int totalWord = (int)(signed char)mobCount;
 
         while (sent < totalWord)
         {
-            unsigned int word = posWords[wordIndex + sent];
+            unsigned int word = posWords[sent];
 
             if (m_threadRunningMask != 0)
             {
-                OSWaitSemaphore(&m_accessSemaphores[port]);
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-                if ((int)m_cmdCount[port] >= 0x40)
+                unsigned int queuePort = threadParam->m_portIndex;
+                if ((int)m_cmdCount[queuePort] < 0x40)
                 {
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
-                    result = -1;
+                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
                 }
                 else
                 {
-                    m_cmdQueueData[port][m_cmdCount[port]] = word;
-                    m_cmdCount[port]++;
-
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                    result = -1;
                 }
             }
 
@@ -4292,11 +4319,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     const int port = threadParam->m_portIndex;
     int result = 0;
 
-    if (threadParam->m_subState != 0 && threadParam->m_subState != 1)
-    {
-        return 0;
-    }
-
     if (threadParam->m_subState == 1)
     {
         unsigned char* base = m_joyDataPacketBuffer[port];
@@ -4331,11 +4353,10 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
         if (threadParam->m_subState == 0)
         {
             GbaPInfo playerInfo;
-            memset(&playerInfo, 0, sizeof(playerInfo));
 
-            GbaQue.GetPlayerStat(port, &playerInfo);
+            GbaQue.GetPlayerStat(threadParam->m_portIndex, &playerInfo);
 
-            m_txWordIndex[port] = 0;
+            m_txWordIndex[threadParam->m_portIndex] = 0;
 
             unsigned char classFlags[4];
             memset(classFlags, 0xFF, sizeof(classFlags));
@@ -4343,16 +4364,11 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char payload[0x300];
             memset(payload, 0, sizeof(payload));
 
-            ClearJoyDataPacketPayload(this, port);
+            ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
             payload[0] = 1;
 
-            char caravanName[128];
-            memset(caravanName, 0, sizeof(caravanName));
-
-            GbaQue.GetCaravanName(caravanName);
-
-            memcpy(&payload[1], caravanName, sizeof(caravanName));
+            GbaQue.GetCaravanName((char*)&payload[1]);
 
             unsigned char* p = (unsigned char*)&playerInfo;
             unsigned char lowBits = 0;
@@ -4392,12 +4408,30 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 highBits += 2;
             }
 
-            memcpy(&payload[1 + sizeof(caravanName)], classFlags, sizeof(classFlags));
+            memcpy(&payload[0x81], classFlags, sizeof(classFlags));
+
+            unsigned char* playerData = playerInfo.m_data;
+            int playerOffset = threadParam->m_portIndex * 0xDC;
+
+            payload[0x85] = playerData[0x16];
+            payload[0x86] = playerData[0x17];
+            payload[0x87] = playerData[0xF2];
+            payload[0x88] = playerData[0xF3];
+            payload[0x89] = playerData[0x1CE];
+            payload[0x8A] = playerData[0x1CF];
+            payload[0x8B] = playerData[0x2AA];
+            payload[0x8C] = playerData[0x2AB];
+            payload[0x8D] = playerData[playerOffset + 2];
+
+            memcpy(&payload[0x8E], &playerData[playerOffset + 0x20], 3);
+
+            payload[0x91] = playerData[playerOffset + 0x14];
+            payload[0x92] = playerData[playerOffset + 0x15];
 
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));
 
-            int compatLen = GbaQue.GetCompatibility(port, compatBuf);
+            int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
 
             if (compatLen < 0)
             {
@@ -4415,22 +4449,31 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 memcpy(body, compatBuf, (unsigned int)compatLen);
             }
 
-            const int byteLen = compatLen + 0xA3;
+            memcpy(body + compatLen, &playerData[playerOffset + 0x18], 8);
 
-            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[port] + 2));
+            unsigned int statWord = ((unsigned int)playerData[playerOffset + 0x27] << 24) |
+                                    ((unsigned int)playerData[playerOffset + 0x26] << 16) |
+                                    ((unsigned int)playerData[playerOffset + 0x25] << 8) |
+                                     (unsigned int)playerData[playerOffset + 0x24];
+            memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
+
+            const int byteLen = compatLen + 0xAF;
+
+            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
             if (wordCount < 0)
             {
                 return wordCount;
             }
 
-            m_txWordCount[port] = wordCount;
-            threadParam->m_subState = 1;
+            m_txWordCount[threadParam->m_portIndex] = wordCount;
+            threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
             // Immediately queue the first word (same as the subState == 1 path)
-            unsigned char* base = m_joyDataPacketBuffer[port];
+            unsigned int sendPort = threadParam->m_portIndex;
+            unsigned char* base = m_joyDataPacketBuffer[sendPort];
             unsigned int* wordPtr =
-                (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+                (unsigned int*)(void*)(base + m_txWordIndex[sendPort] * 4 + 2);
             unsigned int word = *wordPtr;
 
             if (m_threadRunningMask == 0)
@@ -4441,17 +4484,18 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             {
                 OSWaitSemaphore(&m_accessSemaphores[port]);
 
-                if ((int)m_cmdCount[port] < 0x40)
+                unsigned int queuePort = threadParam->m_portIndex;
+                if ((int)m_cmdCount[queuePort] < 0x40)
                 {
-                    m_cmdQueueData[port][m_cmdCount[port]] = word;
-                    m_cmdCount[port]++;
+                    m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
 
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                     result = 0;
                 }
                 else
                 {
-                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                     result = -1;
                 }
             }
@@ -4533,130 +4577,13 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
  */
 int JoyBus::SendItemAll(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
-
-        if (m_threadRunningMask == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-        }
-    }
-    else
-    {
-        m_txWordIndex[port] = 0;
-
-        unsigned char payload[780];
-
-        memset(payload, 0, kJoyDataLargePayloadClearBytes);
-
-        ClearJoyDataPacketPayload(this, port);
-
-        payload[0] = 2;
-
-        unsigned char* itemBuf = &payload[1];
-
-        int itemLen = GbaQue.GetItemAll(port, itemBuf);
-
-        if (itemLen < 0)
-        {
-            itemLen = 0;
-        }
-        if (itemLen > 779)
-        {
-            itemLen = 779;
-        }
-
-        const int byteLen = itemLen + 1; // +1 for the type byte
-
-        int wordCount = MakeJoyData(
-            (char*)payload,
-            byteLen,
-            (unsigned int*)(m_joyDataPacketBuffer[port] + 2)
-        );
-
-        if (wordCount < 0)
-        {
-            return wordCount;
-        }
-
-        m_txWordCount[port] = wordCount;
-        threadParam->m_subState = 1;
-
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
-
-        if (m_threadRunningMask == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-        }
-    }
-
-    if (result == 0)
-    {
-        m_txWordIndex[port]++;
-
-        if (m_txWordCount[port] <= m_txWordIndex[port])
-        {
-            result = 1;
-        }
-    }
-
-    return result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int JoyBus::SendMapObj(ThreadParam* threadParam)
-{
-    int port = threadParam->m_portIndex;
-    int result = 0;
-
-    if (threadParam->m_subState == 1)
-    {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -4684,9 +4611,94 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
+
+        unsigned char payload[780];
+
+        memset(payload, 0, kJoyDataLargePayloadClearBytes);
+
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
+
+        payload[0] = 2;
+
+        unsigned char* itemBuf = &payload[1];
+
+        int itemLen = GbaQue.GetItemAll(threadParam->m_portIndex, itemBuf);
+
+        const int byteLen = itemLen + 1; // +1 for the type byte
+
+        int wordCount = MakeJoyData(
+            (char*)payload,
+            byteLen,
+            (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
+        );
+
+        if (wordCount < 0)
+        {
+            return wordCount;
+        }
+
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
+
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int word = *wordPtr;
+
+        if (m_threadRunningMask == 0)
+        {
+            result = 0;
+        }
+        else
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[threadParam->m_portIndex]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+    }
+
+    if (result == 0)
+    {
+        m_txWordIndex[threadParam->m_portIndex]++;
+
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
+        {
+            result = 1;
+        }
+    }
+
+    return result;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int JoyBus::SendMapObj(ThreadParam* threadParam)
+{
+    int port;
+    int result = 0;
+    char subState = threadParam->m_subState;
+
+    if (subState != 1)
+    {
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[524];
 
@@ -4699,15 +4711,16 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
         int dataLen = GbaQue.GetMapObj(mapObjBuf);
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -4737,12 +4750,42 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
     }
+    else
+    {
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int word = *wordPtr;
+
+        if (m_threadRunningMask == 0)
+        {
+            result = 0;
+        }
+        else
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[threadParam->m_portIndex]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+    }
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -4758,13 +4801,14 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
  */
 int JoyBus::SendCompatibility(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -4775,12 +4819,13 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -4790,39 +4835,34 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
         unsigned char payload[268];
 
-        memset(payload, 0, sizeof(payload));
+        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
 
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
         payload[0] = 5;
 
         unsigned char* compatBuf = &payload[1];
 
-        int compatLen = GbaQue.GetCompatibility(port, compatBuf);
-
-        if (compatLen < 0)
-        {
-            compatLen = 0;
-        }
+        int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
 
         const int byteLen = compatLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
-        threadParam->m_subState = 1;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -4833,12 +4873,13 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
                 result = 0;
             }
@@ -4852,9 +4893,9 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -4886,20 +4927,21 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     if (result == 0)
@@ -4918,70 +4960,79 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 {
     unsigned int flgWord = 0;
+    int result = GBARecvSend(threadParam, &flgWord);
 
-    if (GBARecvSend(threadParam, &flgWord) < 0)
+    if (result < 0)
     {
-        return -1;
-    }
-
-    GbaQue.GetMapObjDrawFlg(&flgWord);
-
-    unsigned char* data = (unsigned char*)&flgWord;
-    unsigned int crc = 0xFFFF;
-
-    for (int i = 0; i < 4; ++i)
-    {
-        unsigned char byte = data[i];
-        unsigned int index = (crc >> 8) ^ byte;
-        crc = ((crc << 8) ^ JoyBusCrcTable[index]) & 0xFFFF;
-    }
-
-    crc = (~crc) & 0xFFFF;
-
-    unsigned int cmd1 = (0x16u << 24) | ((unsigned char)(crc & 0xFF) << 16) | ((unsigned char)((crc >> 8) & 0xFF) << 8) | data[0];
-    unsigned int cmd2 = (0x56u << 24) | (data[1] << 16) | (data[2] << 8)  | (data[3]);
-
-    if (m_threadRunningMask != 0)
-    {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int port = threadParam->m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
-        {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd1;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[port]);
-            return -1;
-        }
-    }
-
-    if (m_threadRunningMask == 0)
-    {
-        return 0;
+        result = -1;
     }
     else
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+        GbaQue.GetMapObjDrawFlg(&flgWord);
 
-        unsigned int port = threadParam->m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned char* data = (unsigned char*)&flgWord;
+        unsigned int crc = 0xFFFF;
+
+        for (int i = 0; i < 4; ++i)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd2;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            unsigned char byte = data[i];
+            unsigned int index = (crc >> 8) ^ byte;
+            crc = ((crc << 8) ^ JoyBusCrcTable[index]) & 0xFFFF;
         }
-        else
+
+        crc = (~crc) & 0xFFFF;
+
+        unsigned int cmd1 = (0x16u << 24) | ((unsigned char)(crc & 0xFF) << 16) | ((unsigned char)((crc >> 8) & 0xFF) << 8) | data[0];
+        unsigned int cmd2 = (0x56u << 24) | (data[1] << 16) | (data[2] << 8)  | (data[3]);
+
+        result = 0;
+
+        if (m_threadRunningMask != 0)
         {
-            OSSignalSemaphore(&m_accessSemaphores[port]);
-            return -1;
+            OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+            unsigned int port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = cmd1;
+                m_cmdCount[threadParam->m_portIndex]++;
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+
+        if (result == 0)
+        {
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+                unsigned int port = threadParam->m_portIndex;
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = cmd2;
+                    m_cmdCount[threadParam->m_portIndex]++;
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
         }
     }
 
-    return 0;
+    return result;
 }
 
 /*
@@ -4996,8 +5047,63 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 int JoyBus::SendFavorite(ThreadParam* threadParam)
 {
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState != 1)
+    {
+        unsigned char payload[1 + 75];
+
+        memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
+
+        payload[0] = 4;
+
+        unsigned char* favBuf = &payload[1];
+
+        int dataLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf);
+
+        int wordCount = MakeJoyData(
+            (char*)payload,
+            dataLen + 1,
+            (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
+        );
+
+        if (wordCount < 0)
+        {
+            return wordCount;
+        }
+
+        result = 0;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
+
+        unsigned int port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int word = *wordPtr;
+
+        if (m_threadRunningMask != 0)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            port = threadParam->m_portIndex;
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[threadParam->m_portIndex]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
+    }
+    else
     {
         unsigned int port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
@@ -5027,66 +5133,12 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
-    {
-        unsigned char payload[1 + 75];
-        unsigned int port = threadParam->m_portIndex;
-
-        memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
-
-        payload[0] = 4;
-
-        unsigned char* favBuf = &payload[1];
-
-        int dataLen = GbaQue.GetFavorite(port, (char*)favBuf);
-
-        int wordCount = MakeJoyData(
-            (char*)payload,
-            dataLen + 1,
-            (unsigned int*)(m_joyDataPacketBuffer[port] + 2)
-        );
-
-        if (wordCount < 0)
-        {
-            return wordCount;
-        }
-
-        m_txWordCount[port] = wordCount;
-        m_txWordIndex[port] = 0;
-
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
-
-        if (m_threadRunningMask != 0)
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            port = threadParam->m_portIndex;
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                result = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-        }
-
-        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
-    }
 
     if (result == 0)
     {
-        unsigned int port = threadParam->m_portIndex;
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5118,7 +5170,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
         if ((int)m_cmdCount[p] < 0x40)
         {
             m_cmdQueueData[p][m_cmdCount[p]] = word;
-            m_cmdCount[p] = m_cmdCount[p] + 1;
+            m_cmdCount[threadParam->m_portIndex]++;
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             cmd = 0;
@@ -5250,11 +5302,13 @@ int JoyBus::SendMType(ThreadParam* threadParam, int modeType)
  */
 int JoyBus::SendEquip(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5266,12 +5320,13 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5281,44 +5336,35 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 779];
 
         memset(payload, 0, kJoyDataLargePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 6;
 
         unsigned char* equipBuf = &payload[1];
 
-        int dataLen = GbaQue.GetEquipData(port, equipBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 779)
-        {
-            dataLen = 779;
-        }
+        int dataLen = GbaQue.GetEquipData(threadParam->m_portIndex, equipBuf);
 
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5330,12 +5376,13 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5348,9 +5395,9 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5366,16 +5413,13 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
  */
 int JoyBus::SendCmd(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState != 0 && threadParam->m_subState != 1)
+    if (subState == 1)
     {
-        return 0;
-    }
-
-    if (threadParam->m_subState == 1)
-    {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5387,12 +5431,13 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5404,42 +5449,33 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
     }
     else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 779];
 
         memset(payload, 0, kJoyDataLargePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 0x0c;
 
         unsigned char* cmdBuf = &payload[1];
 
-        int dataLen = GbaQue.GetCmdData(port, cmdBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 779)
-        {
-            dataLen = 779;
-        }
+        int dataLen = GbaQue.GetCmdData(threadParam->m_portIndex, cmdBuf);
 
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5451,12 +5487,13 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5469,9 +5506,9 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5487,11 +5524,13 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
  */
 int JoyBus::SendBonusStr(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5503,12 +5542,13 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5518,35 +5558,62 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 1 + 258];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 7;
 
         unsigned char* bonusStr = &payload[1];
         unsigned char* extraBuf = &payload[2];
 
-        (void)bonusStr;
-        (void)extraBuf;
+        int byteLen;
+        if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
+        {
+            unsigned int bonusPort;
+            if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+            {
+                bonusPort = 0;
+            }
+            else
+            {
+                bonusPort = threadParam->m_portIndex;
+            }
 
-        int byteLen = 3; // TODO
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+            int bonusIndex = GbaQue.GetBonus(bonusPort);
+            char** bonusTable = Game.m_cFlatDataArr[1].TableStrings(7);
+            strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
+
+            int firstLen = strlen((char*)bonusStr);
+            strcpy((char*)extraBuf + firstLen, bonusTable[bonusIndex * 2 + 1]);
+
+            int secondLen = strlen((char*)extraBuf + firstLen);
+            byteLen = firstLen + secondLen + 3;
+        }
+        else
+        {
+            byteLen = 3;
+            bonusStr[0] = 0;
+            extraBuf[0] = 0;
+        }
+
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5558,12 +5625,13 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5576,9 +5644,9 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5594,11 +5662,13 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
  */
 int JoyBus::SendArtifact(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5610,12 +5680,13 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5625,43 +5696,34 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 267];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 8;
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = GbaQue.GetArtifactData(port, artiBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 267)
-        {
-            dataLen = 267;
-        }
+        int dataLen = GbaQue.GetArtifactData(threadParam->m_portIndex, artiBuf);
 
         const int byteLen = dataLen + 1;
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5673,12 +5735,13 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5691,9 +5754,9 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5709,11 +5772,13 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
  */
 int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5725,12 +5790,13 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5740,43 +5806,34 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 267];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 9;
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = GbaQue.GetTmpArtifactData(port, artiBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 267)
-        {
-            dataLen = 267;
-        }
+        int dataLen = GbaQue.GetTmpArtifactData(threadParam->m_portIndex, artiBuf);
 
         const int byteLen = dataLen + 1;
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5788,12 +5845,13 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5806,9 +5864,9 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5824,12 +5882,13 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
  */
 int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
-        unsigned char* base = m_joyDataPacketBuffer[port];
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5841,12 +5900,13 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5856,36 +5916,27 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[268];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 10;
 
         unsigned char* mapObjBuf = &payload[1];
 
-        int dataLen = GbaQue.GetMapObjInfo(port, mapObjBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-        if (dataLen > 267)
-        {
-            dataLen = 267;
-        }
+        int dataLen = GbaQue.GetMapObjInfo(threadParam->m_portIndex, mapObjBuf);
 
         const int byteLen = dataLen + 1;
 
         int wordCount = MakeJoyData(
             (char*)payload,
             byteLen,
-            (unsigned int*)(m_joyDataPacketBuffer[port] + 2)
+            (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
         );
 
         if (wordCount < 0)
@@ -5893,9 +5944,10 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
-        threadParam->m_subState = 1;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
+        port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -5907,12 +5959,13 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -5925,9 +5978,9 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -5957,23 +6010,22 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
         return 0;
 	}
 
-    const unsigned int port = threadParam->m_portIndex;
-
-    OSWaitSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     int result = 0;
 
-    if ((int)m_cmdCount[port] < 0x40)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-        m_cmdCount[port]++;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
     }
     else
     {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
         result = -1;
     }
-
-    OSSignalSemaphore(&m_accessSemaphores[port]);
 
     return result;
 }
@@ -5995,19 +6047,20 @@ int JoyBus::SendRaderType(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6030,19 +6083,20 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6055,13 +6109,14 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
  */
 int JoyBus::SendScouInfo(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
+    unsigned int port;
     int result = 0;
+    char subState = threadParam->m_subState;
 
-    if (threadParam->m_subState == 1)
+    if (subState == 1)
     {
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -6072,12 +6127,13 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -6087,40 +6143,35 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
             }
         }
     }
-    else if (threadParam->m_subState == 0)
+    else
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[0x400];
         memset(payload, 0, sizeof(payload));
 
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 0x0B;
 
         unsigned char* scouterBuf = &payload[1];
 
-        int dataLen = GbaQue.GetScouterInfo(port, scouterBuf);
-
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
+        int dataLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf);
 
         const int byteLen = dataLen + 1;
 
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
-        threadParam->m_subState = 1;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
+        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        port = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -6131,12 +6182,13 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
         {
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
+            port = threadParam->m_portIndex;
             if ((int)m_cmdCount[port] < 0x40)
             {
                 m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
+                m_cmdCount[threadParam->m_portIndex]++;
 
-                OSSignalSemaphore(&m_accessSemaphores[port]);
+                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
                 result = 0;
             }
             else
@@ -6149,9 +6201,9 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
 
     if (result == 0)
     {
-        m_txWordIndex[port]++;
+        m_txWordIndex[threadParam->m_portIndex]++;
 
-        if (m_txWordCount[port] <= m_txWordIndex[port])
+        if (m_txWordIndex[threadParam->m_portIndex] >= m_txWordCount[threadParam->m_portIndex])
         {
             result = 1;
         }
@@ -6183,19 +6235,20 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6223,19 +6276,20 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6249,28 +6303,27 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
 void JoyBus::SendSPMode(ThreadParam* threadParam)
 {
     unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
-    const unsigned char bVar1 = (mode != 0) ? 1 : 0;
+    const unsigned char bVar1 = (unsigned char)(-((int)(mode & 0xFF)) >> 31);
     const unsigned short opcode = 0x1411;
     const unsigned int cmd = MakeJoyCmd16(opcode, bVar1, 0);
     int result = 0;
 
     if (m_threadRunningMask != 0)
     {
-        const unsigned int port = threadParam->m_portIndex;
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        OSWaitSemaphore(&m_accessSemaphores[port]);
-
-        if ((int)m_cmdCount[port] < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if ((int)m_cmdCount[queuePort] < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     // On success, update the threadParam flags
@@ -6298,19 +6351,20 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
 
     unsigned int result = 0;
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-    if ((int)m_cmdCount[port] < 0x40)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-        m_cmdCount[port]++;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
     }
     else
     {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
         result = 0xFFFFFFFF;
     }
-
-    OSSignalSemaphore(&m_accessSemaphores[port]);
 
     return result;
 }
@@ -6329,19 +6383,20 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 
     if (m_threadRunningMask != 0)
     {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = threadParam->m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[threadParam->m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6362,23 +6417,23 @@ int JoyBus::SendStartBonus(ThreadParam* threadParam)
         return 0;
 	}
 
-    const unsigned int port = threadParam->m_portIndex;
-
-    OSWaitSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
     int result = 0;
 
-    if ((int)m_cmdCount[port] < 0x40)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-        m_cmdCount[port]++;
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
     }
     else
     {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
         result = -1;
     }
 
-    OSSignalSemaphore(&m_accessSemaphores[port]);
     return result;
 }
 
@@ -6430,28 +6485,28 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     if (!single)
     {
-        mode ^= 1; // TODO (unsigned char)DAT_80330b20;
+        mode ^= (unsigned char)DAT_80330b20;
 
         unsigned int word = ((unsigned int)9 << 24) | ((unsigned int)mode << 16);
         int ret = 0;
 
         if (m_threadRunningMask != 0)
         {
-            int p = m_threadParams[portIndex].m_portIndex;
+            OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-            OSWaitSemaphore(&m_accessSemaphores[p]);
-
-            if ((int)m_cmdCount[p] < 0x40)
+            unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
+            if ((int)m_cmdCount[queuePort] < 0x40)
             {
-                m_cmdQueueData[p][m_cmdCount[p]] = word;
-                m_cmdCount[p] = m_cmdCount[p] + 1;
+                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
+                queuePort = m_threadParams[portIndex].m_portIndex;
+                m_cmdCount[queuePort] = m_cmdCount[queuePort] + 1;
 
-                OSSignalSemaphore(&m_accessSemaphores[p]);
+                OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
                 ret = 0;
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[p]);
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                 ret = -1;
             }
         }
@@ -6481,7 +6536,8 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
         return 0;
 	}
 
-    unsigned char modeFlag = (controlMode != 0) ? 1 : 0;
+    unsigned char modeFlag =
+        (unsigned char)(((unsigned int)-controlMode >> 24) | ((unsigned int)controlMode >> 24)) >> 7;
     bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
 
     if (isSinglePort)
@@ -6496,21 +6552,23 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 
     if (m_threadRunningMask != 0)
     {
-        const unsigned int port = m_threadParams[portIndex].m_portIndex;
+        unsigned int port = m_threadParams[portIndex].m_portIndex;
 
         OSWaitSemaphore(&m_accessSemaphores[port]);
 
         if ((int)m_cmdCount[port] < 0x40)
         {
             m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
+            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            result = 0;
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[port]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     // If successful, update local mode tracking
@@ -6744,21 +6802,20 @@ int JoyBus::SendResult(int portIndex, int param3, int param4, int param5)
 
     if (m_threadRunningMask != 0)
     {
-        unsigned int port = m_threadParams[portIndex].m_portIndex;
+        OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
-        OSWaitSemaphore(&m_accessSemaphores[port]);
-
-        if (static_cast<int>(m_cmdCount[port]) < 0x40)
+        unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
+        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
         {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            m_cmdCount[port]++;
+            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+            m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
+            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
         }
         else
         {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
             result = -1;
         }
-
-        OSSignalSemaphore(&m_accessSemaphores[port]);
     }
 
     return result;
@@ -6792,16 +6849,16 @@ int JoyBus::SendAddLetter(int portIndex)
 
     if (m_threadRunningMask != 0)
     {
+        OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+
         port = m_threadParams[portIndex].m_portIndex;
-
-        OSWaitSemaphore(m_accessSemaphores + port);
-
         if ((int)m_cmdCount[port] < 0x40)
         {
             m_cmdQueueData[port][ m_cmdCount[port] ] = 0x14010000;
+            port = m_threadParams[portIndex].m_portIndex;
             m_cmdCount[port]++;
 
-            OSSignalSemaphore(m_accessSemaphores + port);
+            OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
             result = 0;
         }
         else
@@ -6930,15 +6987,16 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 			if ((int)m_cmdCount[port] < 0x40)
 			{
 				m_cmdQueueData[port][m_cmdCount[port]] = cmdHi;
+				port = m_threadParams[portIndex].m_portIndex;
 				m_cmdCount[port]++;
+				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;
 			}
 			else
 			{
+				OSSignalSemaphore(&m_accessSemaphores[port]);
 				result = -1;
 			}
-
-			OSSignalSemaphore(&m_accessSemaphores[port]);
 		}
 
 		if (result != 0)
@@ -6962,13 +7020,14 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 			if ((int)m_cmdCount[port] < 0x40)
 			{
 				m_cmdQueueData[port][m_cmdCount[port]] = cmdLo;
+				port = m_threadParams[portIndex].m_portIndex;
 				m_cmdCount[port]++;
+				OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 				result = 0;
 			} else {
+				OSSignalSemaphore(&m_accessSemaphores[port]);
 				result = -1;
 			}
-
-			OSSignalSemaphore(&m_accessSemaphores[port]);
 		}
 	}
 
@@ -7354,17 +7413,15 @@ int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
  */
 int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 {
-	// TODO: restore when GbaQue exists
-    if (playerIndex == 0 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 0) */ && menuId != 0)
+    if (playerIndex == 0 && GbaQue.IsSingleMode(0) && menuId != 0)
     {
         // MenuPcs._2148_2_ = menuId - 1; // TODO: restore when MenuPcs exists
-        // Game.gameWork._5075_1_ = 1; // TODO: restore when Game exists
+        Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
         m_ctrlModeArr[0] = 1;
 
         return 0;
     }
-	// TODO: restore when GbaQue exists
-    else if (playerIndex == 1 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 1) */   && menuId == 0)
+    else if (playerIndex == 1 && GbaQue.IsSingleMode(1) && menuId == 0)
     {
         bool isSingle = GbaQue.IsSingleMode(m_threadParams[1].m_portIndex);
 
@@ -7379,19 +7436,21 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
             OSWaitSemaphore(&m_accessSemaphores[port]);
 
             int result = 0;
-            if (static_cast<int>(m_cmdCount[port]) < 0x40)
+            unsigned int queuePort = m_threadParams[1].m_portIndex;
+            if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
             {
                 const unsigned int cmd = MakeJoyCmd16(0x140F, 0, 0);
 
-                m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-                m_cmdCount[port]++;
+                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+                m_cmdCount[m_threadParams[1].m_portIndex]++;
+                OSSignalSemaphore(&m_accessSemaphores[m_threadParams[1].m_portIndex]);
             }
             else
             {
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                 result = -1;
             }
 
-            OSSignalSemaphore(&m_accessSemaphores[port]);
             return result;
         }
 
@@ -7414,20 +7473,22 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
             int result = 0;
 
-            if (static_cast<int>(m_cmdCount[port]) < 0x40)
+            unsigned int queuePort = m_threadParams[playerIndex].m_portIndex;
+            if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
             {
                 const unsigned short opcode = static_cast<unsigned short>(0x140F);
 				const unsigned int cmd = MakeJoyCmd16(opcode, static_cast<unsigned char>(menuId), 0);
 
-                m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-                m_cmdCount[port]++;
+                m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+                m_cmdCount[m_threadParams[playerIndex].m_portIndex]++;
+                OSSignalSemaphore(&m_accessSemaphores[m_threadParams[playerIndex].m_portIndex]);
             }
             else
             {
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                 result = -1;
             }
 
-            OSSignalSemaphore(&m_accessSemaphores[port]);
             return result;
         }
 

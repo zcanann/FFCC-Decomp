@@ -20,6 +20,60 @@ void chooseMagic();
 void decMagic(int);
 void calcWeightMax();
 
+struct PartyObjFlags {
+    unsigned char commandActive : 1;
+    unsigned char flag40 : 1;
+    unsigned char flag20 : 1;
+    unsigned char flag10 : 1;
+    unsigned char flag08 : 1;
+    signed char flag04 : 1;
+    unsigned char flag02 : 1;
+    unsigned char flag01 : 1;
+};
+
+struct PartyObjOverlay {
+    union {
+        unsigned char partyFlags; // 0x6B8
+        PartyObjFlags flags;
+    };
+    unsigned char _pad6B9[3];
+    int unk6BC;
+    int unk6C0;
+    unsigned char commandFlags;
+    unsigned char _pad6C5[3];
+    int attackSel;
+    int unk6CC;
+    int unk6D0;
+    unsigned short unk6D2;
+    unsigned short _pad6D4;
+    int weaponRef;
+    int weaponItem;
+    union {
+        int pendingWeaponItem;
+        CGBaseObj* carryTarget;
+    };
+    union {
+        CGObject* target;
+        CGBaseObj* secondaryTarget;
+    };
+    union {
+        CGObject* targetOverride;
+        float targetSearchDistance;
+    };
+    union {
+        int unk6EC;
+        float unk6ECFloat;
+        int _legacy6EC;
+        float legacyTargetSearchDistance;
+    };
+    CGObject* carryObject;
+    short commandMode;
+    unsigned short _pad6F6;
+    int bonusCondition;
+};
+
+STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x44);
+
 struct GhostPartyWork {
 	unsigned char _pad0[0x20];
 	int mood;
@@ -146,6 +200,10 @@ public:
     void onDraw();
 
     int GetCID();
+
+    PartyObjOverlay m_partyData; // 0x6B8
 };
+
+STATIC_ASSERT(offsetof(CGPartyObj, m_partyData) == 0x6B8);
 
 #endif

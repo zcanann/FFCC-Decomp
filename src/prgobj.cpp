@@ -130,11 +130,11 @@ int CGPrgObj::GetClassControl(int classControl)
 {
 	switch (classControl) {
 	case 8:
-		return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
+		return static_cast<CGPartyObj*>(this)->isDispTarget();
 	case 9:
-		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
+		return static_cast<CGPartyObj*>(this)->isRideTarget();
 	case 10:
-		return reinterpret_cast<CGCharaObj*>(this)->m_itemId;
+		return static_cast<CGCharaObj*>(this)->m_itemId;
 	default:
 		return 0;
 	}
@@ -165,10 +165,10 @@ void CGPrgObj::ClassControl(int classControl, int value)
 
 	switch (classControl) {
 	case 0:
-		reinterpret_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
+		static_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
 		break;
 	case 1:
-		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
+		static_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
 		if (weaponNodeFlags->m_prg != value) {
@@ -177,7 +177,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		}
 		break;
 	case 3:
-		reinterpret_cast<WeaponNodeFlagBits*>(reinterpret_cast<unsigned char*>(this) + 0x6B8)->m_control3 = value;
+		static_cast<CGPartyObj*>(this)->m_partyData.flags.flag08 = value;
 		break;
 	case 4:
 	{
@@ -196,13 +196,13 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		break;
 	}
 	case 5:
-		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
+		static_cast<CGCharaObj*>(this)->ClearAllSta();
 		break;
 	case 6:
-		reinterpret_cast<CGCharaObj*>(this)->m_itemId = value;
+		static_cast<CGCharaObj*>(this)->m_itemId = value;
 		break;
 	case 7:
-		reinterpret_cast<CGPartyObj*>(this)->setAlive(1, 0);
+		static_cast<CGPartyObj*>(this)->setAlive(1, 0);
 		break;
 	}
 }

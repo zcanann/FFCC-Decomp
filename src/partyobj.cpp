@@ -96,61 +96,9 @@ struct BossGhostPartyCounters {
 
 #define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(CGPartyObj::m_ghostWork))
 
-struct PartyObjFlags {
-	unsigned char commandActive : 1;
-	unsigned char flag40 : 1;
-	unsigned char flag20 : 1;
-	unsigned char flag10 : 1;
-	unsigned char flag08 : 1;
-	signed char flag04 : 1;
-	unsigned char flag02 : 1;
-	unsigned char flag01 : 1;
-};
-
-struct PartyObjOverlay {
-	union {
-		unsigned char partyFlags;
-		PartyObjFlags flags;
-	};
-	unsigned char _pad6B9[3];
-	int unk6BC;
-	int unk6C0;
-	unsigned char commandFlags;
-	unsigned char _pad6C5[3];
-	int attackSel;
-	int unk6CC;
-	int unk6D0;
-	unsigned short unk6D2;
-	unsigned short _pad6D4;
-	int weaponRef;
-	int weaponItem;
-	union {
-		int pendingWeaponItem;
-		CGBaseObj* carryTarget;
-	};
-	union {
-		CGObject* target;
-		CGBaseObj* secondaryTarget;
-	};
-	union {
-		CGObject* targetOverride;
-		float targetSearchDistance;
-	};
-	union {
-		int unk6EC;
-		float unk6ECFloat;
-		int _legacy6EC;
-		float legacyTargetSearchDistance;
-	};
-	CGObject* carryObject;
-	short commandMode;
-	unsigned short _pad6F6;
-	int bonusCondition;
-};
-
 static inline PartyObjOverlay& PartyData(CGPartyObj* self)
 {
-	return *reinterpret_cast<PartyObjOverlay*>(reinterpret_cast<unsigned char*>(self) + 0x6B8);
+	return self->m_partyData;
 }
 
 static inline int& CharaGhostValue(int offset)
@@ -2085,10 +2033,11 @@ void CGPartyObj::putComboParticle()
  */
 void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (doInit != 0) {
-		self[0x6B8] = (self[0x6B8] & 0xBF) | ((targetSide != 0) ? 0x40 : 0x00);
-		self[0x6B8] &= 0xEF;
+		party.partyFlags = (party.partyFlags & 0xBF) | ((targetSide != 0) ? 0x40 : 0x00);
+		party.partyFlags &= 0xEF;
 
 		Vec rayDir = {
 		    sinf(m_rotationY) * FLOAT_80331A98,
@@ -2176,8 +2125,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
  */
 void CGPartyObj::endTargetParticle()
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	self[0x6B8] &= 0xAF;
+	party.partyFlags &= 0xAF;
 	*reinterpret_cast<int*>(self + 0x668) = 0;
 	*reinterpret_cast<int*>(self + 0x660) = 0;
 	*reinterpret_cast<Vec*>(self + 0x678) = m_worldPosition;
@@ -2216,6 +2166,7 @@ int CGPartyObj::isDispTarget()
  */
 int CGPartyObj::isRideTarget()
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	bool hasTarget = false;
 	int result = 0;
@@ -2227,7 +2178,7 @@ int CGPartyObj::isRideTarget()
 	}
 
 	if (hasTarget) {
-		unsigned int flags = self[0x6B8];
+		unsigned int flags = party.partyFlags;
 		if (static_cast<int>((flags << 25) | (flags >> 7)) < 0) {
 			result = 1;
 		}
@@ -2247,12 +2198,13 @@ int CGPartyObj::isRideTarget()
  */
 void CGPartyObj::checkTargetParticle()
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char flags = self[0x6B8];
+	unsigned char flags = party.partyFlags;
 
 	if ((flags & 0x10) != 0) {
 		putTargetParticle((flags & 0x80) ? 1 : 0, 0);
-		self[0x6B8] &= 0xEF;
+		party.partyFlags &= 0xEF;
 	}
 
 	Vec input;
@@ -2298,7 +2250,7 @@ void CGPartyObj::checkTargetParticle()
 	}
 
 	if (input.x == 0.0f && input.z == 0.0f) {
-		self[0x6B8] &= 0xDF;
+		party.partyFlags &= 0xDF;
 	} else {
 		Vec* targetPos = reinterpret_cast<Vec*>(self + 0x66C);
 		Vec* centerPos = reinterpret_cast<Vec*>(self + 0x678);
@@ -2306,7 +2258,7 @@ void CGPartyObj::checkTargetParticle()
 		Vec fromCenter;
 		float maxRange;
 
-		self[0x6B8] |= 0x20;
+		party.partyFlags |= 0x20;
 		PSVECNormalize(&input, &input);
 		PSVECScale(&input, &input, FLOAT_80331ad4);
 
@@ -2582,8 +2534,7 @@ void CGPartyObj::statAlive()
 {
 	setAlive(1, 0);
 	canPlayerGoMenu();
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((self[0x6B8] & 0x20) != 0) {
+	if ((PartyData(this).partyFlags & 0x20) != 0) {
 		checkTargetParticle();
 	}
 
@@ -3060,12 +3011,12 @@ canUse:
  */
 void CGPartyObj::canPlayerGoMenu()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	PartyObjOverlay& party = PartyData(this);
 	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
 	if (m_lastStateId == 0 && (trig & 0x200) != 0) {
-		self[0x6B8] |= 0x10;
+		party.partyFlags |= 0x10;
 	} else if ((m_lastStateId != 0) || ((trig & 0x200) == 0)) {
-		self[0x6B8] &= 0xEF;
+		party.partyFlags &= 0xEF;
 	}
 }
 

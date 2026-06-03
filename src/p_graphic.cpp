@@ -68,12 +68,12 @@ extern const char s_graphic_pad_input_fmt[];
 const char s_debug_pad_port_fmt[] = "%dP";
 const char s_debug_frame_fmt[] = "%d";
 extern "C" const GXColor s_debug_bar_color;
-extern "C" const char s_scenegraph_step_none[];
-extern "C" const char s_scenegraph_step_x8[];
-extern "C" const char s_scenegraph_step_x0[];
-extern "C" const char s_scenegraph_step_x1_8[];
-extern "C" const char s_scenegraph_step_x1_4[];
-extern "C" const char s_scenegraph_step_x1_2[];
+static const char s_scenegraph_step_none[] = "";
+extern "C" const char s_scenegraph_step_x8[] = "x8";
+extern "C" const char s_scenegraph_step_x0[] = "x0";
+extern "C" const char s_scenegraph_step_x1_8[] = "x1/8";
+extern "C" const char s_scenegraph_step_x1_4[] = "x1/4";
+extern "C" const char s_scenegraph_step_x1_2[] = "x1/2";
 static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_none,
     s_scenegraph_step_x8,

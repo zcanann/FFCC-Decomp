@@ -17,9 +17,9 @@ extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 extern const char s_texAnimSeqE1[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 extern "C" const char s_scenegraph_step_none[4] = "";
-extern "C" const char s_scenegraph_step_x8[] = "x8";
-extern "C" const char s_scenegraph_step_x0[] = "x0";
-extern "C" const char s_scenegraph_step_x1_8[] = "x1/8";
+extern "C" const char s_scenegraph_step_x8[];
+extern "C" const char s_scenegraph_step_x0[];
+extern "C" const char s_scenegraph_step_x1_8[];
 
 extern const char s_collection_ptrarray_h_801D7B30[];
 extern const char s_ptrarray_grow_error_801D7B14[];

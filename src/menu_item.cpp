@@ -93,17 +93,6 @@ STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(MenuItemOpenAnim) == 0x40);
 STATIC_ASSERT(sizeof(ItemMenuAnimList) == 0x1008);
 
-static inline ItemMenuAnimList* GetItemOpenAnimList(CMenuPcs* menu)
-{
-    return reinterpret_cast<ItemMenuAnimList*>(menu->itemList);
-}
-
-static inline MenuItemOpenAnim* GetItemOpenAnim(CMenuPcs* menu, int index)
-{
-    return reinterpret_cast<MenuItemOpenAnim*>(
-        reinterpret_cast<unsigned char*>(GetItemOpenAnimList(menu)) + 8 + index * sizeof(MenuItemOpenAnim));
-}
-
 static inline float LoadFloat(const float& value)
 {
     return value;
@@ -719,65 +708,65 @@ void CMenuPcs::ItemInit1()
     ItemMenuAnimList* itemList;
 
     index = 0;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x2E;
     entry->startFrame = 2;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x47;
     entry->startFrame = 7;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x47;
     entry->startFrame = 7;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x2E;
     entry->startFrame = 7;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     progress = LoadFloat(FLOAT_80332e64);
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    entry = GetItemOpenAnim(this, index);
+    entry = &this->itemList->anims[index];
     entry->flags = 2;
     entry->tex = 0x37;
     entry->startFrame = 0;
     entry->duration = 5;
-    itemList = GetItemOpenAnimList(this);
+    itemList = this->itemList;
     count = (unsigned int)itemList->count;
     entry = itemList->anims;
     if (0 < (int)count) {
@@ -851,7 +840,7 @@ void CMenuPcs::ItemInit()
     } while (initCount != 0);
 
     index = 0;
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x2E;
     entry->x = 0x68;
     entry->y = 0x28;
@@ -867,7 +856,7 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 5;
     entry->duration = 5;
 
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x47;
     entry->x = 0x50;
     entry->y = 0xE;
@@ -879,7 +868,7 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 0;
     entry->duration = 5;
 
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->tex = 0x47;
     entry->x = 0x55;
     entry->w = 0x30;
@@ -892,7 +881,7 @@ void CMenuPcs::ItemInit()
     entry->startFrame = 0;
     entry->duration = 5;
 
-    entry = GetItemOpenAnim(this, index++);
+    entry = &this->itemList->anims[index++];
     entry->flags = 2;
     entry->tex = 0x2E;
     entry->x = 0x50;

@@ -3061,17 +3061,22 @@ int CMapMng::GetMapObjIdx(unsigned short id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f950
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
+    CMaterialSet* materialSet = m_materialSet;
     unsigned long index = 0;
 
-    while (index < static_cast<unsigned long>(m_materialSet->GetNumMaterial())) {
-        CMaterial* material = m_materialSet->GetMaterial(index);
-        if ((material != 0) && (materialId == material->GetMaterialId())) {
-            return material;
+    while (index < static_cast<unsigned long>(materialSet->GetNumMaterial())) {
+        if ((materialSet->GetMaterial(index) != 0) &&
+            (materialId == materialSet->GetMaterial(index)->GetMaterialId())) {
+            return materialSet->GetMaterial(index);
         }
         index++;
     }

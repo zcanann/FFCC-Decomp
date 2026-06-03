@@ -16,49 +16,11 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct YmDeformationScreenOffsetData {
-	int unk0;
-	int unk1;
-	int offset;
-};
-
-struct YmDeformationScreenParam {
-	char pad[0xc];
-	YmDeformationScreenOffsetData* offsetData;
-};
-
 struct Vec4d {
 	float x;
 	float y;
 	float z;
 	float w;
-};
-
-struct VYmDeformationScreen {
-	float m_depth;
-	s16 m_angle;
-	u8 m_direction;
-	u8 m_pad;
-	float m_scale;
-	float m_values[5];
-};
-
-struct YmDeformationScreenData {
-	char pad[0xc];
-	int* m_serializedDataOffsets;
-};
-
-struct YmDeformationScreenStep {
-	int m_graphId;
-	int m_dataValIndex;
-	float m_initWOrk;
-	float m_stepValue;
-	float m_arg3;
-	float m_payload0;
-	float m_payload1;
-	float m_payload2;
-	short m_payload3;
-	char m_payloadBytes[0x1a];
 };
 
 struct _pppEnvStYmDeformationScreen {

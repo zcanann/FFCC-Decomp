@@ -5684,18 +5684,18 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
     }
     else if (threadParam->m_subState == 0)
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 267];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 8;
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = GbaQue.GetArtifactData(port, artiBuf);
+        int dataLen = GbaQue.GetArtifactData(threadParam->m_portIndex, artiBuf);
 
         if (dataLen < 0)
         {
@@ -5708,18 +5708,19 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
         }
 
         const int byteLen = dataLen + 1;
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int sendPort = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[sendPort] + 2 + m_txWordIndex[sendPort] * 4);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)
@@ -5801,18 +5802,18 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
     }
     else if (threadParam->m_subState == 0)
     {
-        m_txWordIndex[port] = 0;
+        m_txWordIndex[threadParam->m_portIndex] = 0;
 
         unsigned char payload[1 + 267];
 
         memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, port);
+        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
 
         payload[0] = 9;
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = GbaQue.GetTmpArtifactData(port, artiBuf);
+        int dataLen = GbaQue.GetTmpArtifactData(threadParam->m_portIndex, artiBuf);
 
         if (dataLen < 0)
         {
@@ -5825,18 +5826,19 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
         }
 
         const int byteLen = dataLen + 1;
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[port] + 2));
+        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 
         if (wordCount < 0)
         {
             return wordCount;
         }
 
-        m_txWordCount[port] = wordCount;
+        m_txWordCount[threadParam->m_portIndex] = wordCount;
 
         threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+        unsigned int sendPort = threadParam->m_portIndex;
+        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[sendPort] + 2 + m_txWordIndex[sendPort] * 4);
         unsigned int word = *wordPtr;
 
         if (m_threadRunningMask == 0)

@@ -1914,7 +1914,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 
 	switch (staIndex) {
 		case 0:
-			if (*reinterpret_cast<short*>(script + 0x10) == 0) {
+			if (*reinterpret_cast<short*>(script + 0x40) == 0) {
 				setSta(0, calcSta(0, amount, source));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
@@ -1975,7 +1975,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			next = 0;
 			break;
 		case 8:
-			if (*reinterpret_cast<short*>(script + 0x13) == 0) {
+			if (*reinterpret_cast<short*>(script + 0x4C) == 0) {
 				setSta(8, calcSta(8, amount, source));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
@@ -2001,16 +2001,15 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
 				setSta(0, 0);
 			}
-			if ((GetCID() & 0xAD) != 0xAD || m_scriptHandle[9] == 0 ||
+			if ((GetCID() & 0xAD) != 0xAD ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 8) == 0) {
-				if (sourceObj != 0) {
-					Vec delta;
-					delta.x = sourceObj->m_worldPosition.x - m_worldPosition.x;
-					delta.y = sourceObj->m_worldPosition.y - m_worldPosition.y;
-					delta.z = sourceObj->m_worldPosition.z - m_worldPosition.z;
-					moveVectorH(&delta, 8.0f, 8);
-					m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
-				}
+				CVector sourcePos(sourceObj->m_worldPosition);
+				CVector selfPos(m_worldPosition);
+				CVector deltaVec;
+				PSVECSubtract(selfPos, sourcePos, deltaVec);
+				Vec delta = deltaVec;
+				moveVectorH(&delta, 8.0f, 8);
+				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x19, 0, 0);
 			}
 			break;
@@ -2068,8 +2067,8 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 				setSta(4, 0);
 			}
 			if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
-				*reinterpret_cast<short*>(script + 0x14) == 0 &&
-				*reinterpret_cast<short*>(script + 0x11) == 0) {
+				*reinterpret_cast<short*>(script + 0x50) == 0 &&
+				*reinterpret_cast<short*>(script + 0x44) == 0) {
 				changeStat(0x1A, 0, 0);
 			}
 			break;

@@ -43,7 +43,8 @@ extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;
 extern "C" float FLOAT_8032fe68;
-extern "C" float FLOAT_8032fe70;
+extern "C" float FLOAT_8032FE6C;
+extern "C" float FLOAT_8032FE70;
 extern "C" float FLOAT_8032fe8c;
 extern "C" float FLOAT_8032fe90;
 extern "C" float FLOAT_8032fe94;
@@ -57,9 +58,9 @@ extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
 extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032fe18;
-extern "C" float FLOAT_8032fe74;
-extern "C" float FLOAT_8032fe78;
-extern "C" float FLOAT_8032fe7c;
+extern "C" float FLOAT_8032FE74;
+extern "C" float FLOAT_8032FE78;
+extern "C" float FLOAT_8032FE7C;
 extern "C" double DOUBLE_8032fe80;
 extern "C" {
 extern int ppvSysStopPartF;
@@ -856,8 +857,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorX);
     GXSetChanMatColor((GXChannelID)4, colorX);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x - FLOAT_8032fe70, y, z);
-    GXPosition3f32(x + FLOAT_8032fe70, y, z);
+    GXPosition3f32(x - FLOAT_8032FE70, y, z);
+    GXPosition3f32(x + FLOAT_8032FE70, y, z);
 
     _GXColor colorY;
     colorY.r = 0x80;
@@ -867,8 +868,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorY);
     GXSetChanMatColor((GXChannelID)4, colorY);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y - FLOAT_8032fe70, z);
-    GXPosition3f32(x, y + FLOAT_8032fe70, z);
+    GXPosition3f32(x, y - FLOAT_8032FE70, z);
+    GXPosition3f32(x, y + FLOAT_8032FE70, z);
 
     _GXColor colorZ;
     colorZ.r = 0xff;
@@ -878,8 +879,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorZ);
     GXSetChanMatColor((GXChannelID)4, colorZ);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y, z - FLOAT_8032fe70);
-    GXPosition3f32(x, y, z + FLOAT_8032fe70);
+    GXPosition3f32(x, y, z - FLOAT_8032FE70);
+    GXPosition3f32(x, y, z + FLOAT_8032FE70);
 }
 
 /*
@@ -921,9 +922,9 @@ void CPartMng::pppGet2Dpos()
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
-                        / ((float)((double)(zAtPixel - 0xFFFFFF) / FLOAT_8032fe78) + ppvScreenMatrix0[2][2]);
-            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / FLOAT_8032fe7c)) / ppvScreenMatrix0[0][0]);
-            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / FLOAT_8032fe74)) / ppvScreenMatrix0[1][1]);
+                        / ((float)((double)(zAtPixel - 0xFFFFFF) / FLOAT_8032FE78) + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / FLOAT_8032FE7C)) / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / FLOAT_8032FE74)) / ppvScreenMatrix0[1][1]);
             viewPos.z = -viewPos.z;
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);
@@ -1469,6 +1470,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
     static const int kUsbMapMeshTableOffset = 0x7F4;
     static const int kUsbShapeSlotTableOffset = 0x7F8;
+    static const int kUsbTextTableOffset = 0x7FC;
+    static const int kStreamTextRawOffset = 0x1D8;
     static const int kRecvWriteOffset = 0x23550;
     static const int kRecvBuffOffset = 0x23554;
     static const int kPdtCountOffset = 0x23558;
@@ -1525,6 +1528,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x16C) = packetWords[0x53];
         *reinterpret_cast<int*>(self + 0x170) = packetWords[0x54];
         *reinterpret_cast<int*>(self + kEditDrawModeOffset) = packetWords[0x55];
+        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
 
         if (code == 1) {
             firstMng->m_ownerScale = FLOAT_8032fe18;
@@ -1710,6 +1718,33 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         return;
+    case 8:
+        if (env->m_isEditMode != 0) {
+            return;
+        }
+        {
+            void**& textTable = *reinterpret_cast<void***>(self + kUsbTextTableOffset);
+            if (textTable == 0) {
+                textTable = reinterpret_cast<void**>(
+                    operator new[](0x400, stageLoad, const_cast<char*>(s_partMng_cpp), 0x61F));
+            }
+
+            int slotIndex = static_cast<int>(payloadFloats[0]);
+            void*& textRaw = *reinterpret_cast<void**>(self + kStreamTextRawOffset + slotIndex * 0xC);
+            if (textRaw == 0) {
+                textRaw = operator new[](packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
+            }
+
+            memcpy(textRaw, payload, packetSize - 0x20);
+
+            unsigned char* textBytes = reinterpret_cast<unsigned char*>(textRaw);
+            unsigned short* textEntry = reinterpret_cast<unsigned short*>(
+                reinterpret_cast<unsigned char*>(textTable) + slotIndex * 8);
+            textEntry[0] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 4));
+            textEntry[1] = static_cast<unsigned short>(*reinterpret_cast<int*>(textBytes + 8));
+            *reinterpret_cast<void**>(textEntry + 2) = textBytes + 0xC;
+        }
+        return;
     case 0x0B:
         if (env->m_isEditMode != 0) {
             return;
@@ -1750,15 +1785,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             unsigned char* recvBytes = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(self + kRecvBuffOffset));
             *reinterpret_cast<int*>(recvBytes + 0x2C) = 0;
             *reinterpret_cast<int*>(recvBytes + 0x30) = 0;
-            *reinterpret_cast<float*>(recvBytes + 0x34) = FLOAT_8032fe5c;
-            *reinterpret_cast<float*>(recvBytes + 0x38) = FLOAT_8032fe70;
-            *reinterpret_cast<float*>(recvBytes + 0x3C) = FLOAT_8032fe70;
+            *reinterpret_cast<float*>(recvBytes + 0x34) = FLOAT_8032FE6C;
+            *reinterpret_cast<float*>(recvBytes + 0x38) = FLOAT_8032FE70;
+            *reinterpret_cast<float*>(recvBytes + 0x3C) = FLOAT_8032FE70;
         }
 
         firstMng->m_baseTime = 0;
-        firstMng->m_cullRadiusSq = FLOAT_8032fe5c;
-        firstMng->m_cullRadius = FLOAT_8032fe70;
-        firstMng->m_cullYOffset = FLOAT_8032fe70;
+        firstMng->m_cullRadiusSq = FLOAT_8032FE6C;
+        firstMng->m_cullRadius = FLOAT_8032FE70;
+        firstMng->m_cullYOffset = FLOAT_8032FE70;
         *reinterpret_cast<int*>(self + kEditCountOffset) = 1;
         *reinterpret_cast<int*>(self + kPdtCountOffset) = 1;
         firstMng->m_objHitMask = 0xFFFFFFFF;
@@ -1769,6 +1804,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         firstMng->m_pppResSet = self + 0x23518;
         firstMng->m_nodeIndex = 0;
         firstMng->m_fieldF2 = 1;
+        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
         return;
     case 0x0C:
         if (env->m_isEditMode != 0) {
@@ -1777,11 +1817,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (*reinterpret_cast<int*>(self + kEditCountOffset) == 0) {
             *reinterpret_cast<void**>(self + kRecvWriteOffset) = *reinterpret_cast<void**>(self + kRecvBuffOffset);
         }
-        if (*reinterpret_cast<void**>(self + kRecvWriteOffset) != 0) {
-            memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), payload, packetSize - 0x20);
-            *reinterpret_cast<unsigned char**>(self + kRecvWriteOffset) += 0x60;
-            *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
-        }
+        memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), payload, packetSize - 0x20);
+        *reinterpret_cast<unsigned char**>(self + kRecvWriteOffset) += 0x60;
+        *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
         return;
     case 0x0D: {
         if (env->m_isEditMode != 0) {
@@ -1789,27 +1827,23 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
-        if (0 <= pdtCount && pdtCount < 0x18) {
-            if (pdtSlots[pdtCount].m_pppDataHead != 0) {
-                delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pppDataHead);
-                pdtSlots[pdtCount].m_pppDataHead = 0;
-            }
-            if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-                delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
-                *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
-            }
-
-            pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
-                operator new[](
-                    packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
-            *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-                new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
-            if (pdtSlots[pdtCount].m_pppDataHead != 0) {
-                memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
-                pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
-            }
-            *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
+        if (pdtSlots[pdtCount].m_pppDataHead != 0) {
+            delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pppDataHead);
+            pdtSlots[pdtCount].m_pppDataHead = 0;
         }
+        if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
+            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+            *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
+        }
+
+        pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
+            operator new[](
+                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
+        *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
+            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
+        memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
+        pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
+        *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
         return;
     }
     case 0x0E:
@@ -1874,6 +1908,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
         env->m_envParam = FLOAT_8032fe5c;
+        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
+        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+            *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
         SetFp();
         return;
     case 0x11:

@@ -581,7 +581,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 0x28;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
-	fVar4 = FLOAT_80333040;
+	fVar4 = LoadFloat(FLOAT_80333040);
 	fVar5 = FLOAT_80333080;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
@@ -627,7 +627,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->h = 0x30;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
-	setupEntry->uvScale = FLOAT_80333048;
+	setupEntry->uvScale = LoadFloat(FLOAT_80333048);
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 

@@ -7002,7 +7002,7 @@ int JoyBus::DelItem(int portIndex, unsigned char itemId)
     unsigned int port;
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 

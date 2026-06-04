@@ -1024,36 +1024,37 @@ void CMenuPcs::destroySingleMenu()
 void CMenuPcs::SingMenuInit()
 {
     u8* self = reinterpret_cast<u8*>(this);
+    u8* menu = reinterpret_cast<u8*>(&MenuPcs);
 
     Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
     Graphic.DestroyTempBuffer();
 
     *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
-    m_singleMenuTextureLoadIndex = 0;
-    m_singleMenuTextureLoadState = 0;
+    memset(&m_singleMenuTextureLoadIndex, 0, 8);
     *reinterpret_cast<void**>(self + 0x774) = 0;
 
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
     }
 
     CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
     *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
 
-    handle->Add();
+    CCharaPcs::CHandle** handlePtr = reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
+    (*handlePtr)->Add();
     int modelNo = GetModelNo(
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E4)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E2)));
-    handle->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
-    handle->m_flags |= 0x300141;
-    handle->LoadAnim(s_stand_80332a24, 0, 1, 0, (handle->m_charaNo / 100) * 100, -1, 0);
-    handle->SetAnim(0, -1, -1, -1, 0);
+    (*handlePtr)->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
+    (*handlePtr)->m_flags |= 0x300141;
+    (*handlePtr)->LoadAnim(s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
+    (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp, 0x5DD) u8[0x50];
 
@@ -1067,50 +1068,50 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<float*>(state + 0x3C) = FLOAT_80332934;
     *reinterpret_cast<float*>(state + 0x38) = FLOAT_80332934;
     *reinterpret_cast<float*>(state + 0x34) = FLOAT_80332934;
-    *reinterpret_cast<int*>(state + 0) = 0;
-    *reinterpret_cast<int*>(state + 4) = 0;
-    *reinterpret_cast<s16*>(state + 8) = 0;
-    *reinterpret_cast<s16*>(state + 10) = 0;
-    *reinterpret_cast<s16*>(state + 12) = 0x280;
-    *reinterpret_cast<s16*>(state + 14) = 0x1C0;
-    *reinterpret_cast<float*>(state + 0x10) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x14) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x18) = FLOAT_80332a2c;
-    *reinterpret_cast<int*>(state + 0x40) = 0;
-    *reinterpret_cast<int*>(state + 0x44) = 0;
-    *reinterpret_cast<int*>(state + 0x48) = 0x280;
-    *reinterpret_cast<int*>(state + 0x4C) = 0x1C0;
-    *reinterpret_cast<s16*>(state + 8) = static_cast<s16>(static_cast<int>(
+    **reinterpret_cast<int**>(self + 0x814) = 0;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 4) = 0;
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 8) = 0;
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 10) = 0;
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 12) = 0x280;
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 14) = 0x1C0;
+    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x10) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x14) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x18) = FLOAT_80332a2c;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x40) = 0;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x44) = 0;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x48) = 0x280;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x4C) = 0x1C0;
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 8) = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(DOUBLE_80332a30 + static_cast<double>(FLOAT_803329f4) * DOUBLE_80332968
                 + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec)) - DOUBLE_80332a38) - DOUBLE_80332a30));
-    *reinterpret_cast<s16*>(state + 10) = static_cast<s16>(static_cast<int>(
+    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 10) = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803329f0) * DOUBLE_80332968
                 + static_cast<double>(FLOAT_803329f0))) - DOUBLE_80332a40));
-    *reinterpret_cast<int*>(state + 0x40) = static_cast<int>(static_cast<double>(FLOAT_80332a48)
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x40) = static_cast<int>(static_cast<double>(FLOAT_80332a48)
                 + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec));
-    *reinterpret_cast<int*>(state + 0x44) = static_cast<int>(FLOAT_80332950);
-    *reinterpret_cast<int*>(state + 0x48) = 0x48;
-    *reinterpret_cast<int*>(state + 0x4C) = 0x58;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x44) = static_cast<int>(FLOAT_80332950);
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x48) = 0x48;
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x4C) = 0x58;
 
-    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
 
-    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) u8[sizeof(SingleMenuStateRaw)];
+    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) SingleMenuStateRaw;
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, sizeof(SingleMenuStateRaw));
 
-    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) u8[sizeof(SingleMenuWindowRaw)];
+    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw;
     memset(*reinterpret_cast<void**>(self + 0x848), 0, sizeof(SingleMenuWindowRaw));
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;

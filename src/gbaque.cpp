@@ -3552,6 +3552,60 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 /*
  * --INFO--
+ * PAL Address: 0x800cb818
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void GbaQueue::SetSmithFlg(int channel)
+{
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
+
+	OSWaitSemaphore(semaphore);
+	int mask = 0x10;
+	mask <<= channel;
+	*flags = static_cast<u8>(*flags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 3) != 0) {
+		flags[1] = static_cast<u8>(flags[1] | mask);
+	} else {
+		flags[1] = static_cast<u8>(flags[1] & ~mask);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800cb8c0
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void GbaQueue::SetShopFlg(int channel)
+{
+	OSSemaphore* semaphore = accessSemaphores + channel;
+	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
+
+	OSWaitSemaphore(semaphore);
+	int mask = 1;
+	mask <<= channel;
+	*flags = static_cast<u8>(*flags | mask);
+	OSSignalSemaphore(semaphore);
+
+	if (Joybus.SetMType(channel, 2) != 0) {
+		flags[1] = static_cast<u8>(flags[1] | mask);
+	} else {
+		flags[1] = static_cast<u8>(flags[1] & ~mask);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800CB968
  * PAL Size: 412b
  * EN Address: TODO
@@ -3625,37 +3679,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 
 /*
  * --INFO--
- * PAL Address: 0x800cb8c0
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GbaQueue::SetShopFlg(int channel)
-{
-	OSSemaphore* semaphore = accessSemaphores + channel;
-	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
-
-	OSWaitSemaphore(semaphore);
-	int mask = 1;
-	mask <<= channel;
-	*flags = static_cast<u8>(*flags | mask);
-	OSSignalSemaphore(semaphore);
-
-	if (Joybus.SetMType(channel, 2) != 0) {
-		flags[1] = static_cast<u8>(flags[1] | mask);
-	} else {
-		flags[1] = static_cast<u8>(flags[1] & ~mask);
-	}
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrShopFlg(int channel)
+inline void GbaQueue::ClrShopFlg(int channel)
 {
 	const unsigned char playerMask = static_cast<unsigned char>(1 << channel);
 	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
@@ -3674,37 +3701,10 @@ void GbaQueue::ClrShopFlg(int channel)
 
 /*
  * --INFO--
- * PAL Address: 0x800cb818
- * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GbaQueue::SetSmithFlg(int channel)
-{
-	OSSemaphore* semaphore = accessSemaphores + channel;
-	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
-
-	OSWaitSemaphore(semaphore);
-	int mask = 0x10;
-	mask <<= channel;
-	*flags = static_cast<u8>(*flags | mask);
-	OSSignalSemaphore(semaphore);
-
-	if (Joybus.SetMType(channel, 3) != 0) {
-		flags[1] = static_cast<u8>(flags[1] | mask);
-	} else {
-		flags[1] = static_cast<u8>(flags[1] & ~mask);
-	}
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ClrSmithFlg(int channel)
+inline void GbaQueue::ClrSmithFlg(int channel)
 {
 	const unsigned char shopMask = static_cast<unsigned char>(0x10 << channel);
 	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;

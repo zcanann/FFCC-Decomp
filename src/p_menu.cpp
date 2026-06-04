@@ -791,17 +791,9 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 void CMenuPcs::calc()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    int mode = m_mode;
-
-    if (mode != 1) {
-        if (mode >= 1) {
-            if (mode < 3) {
-                calcBonus();
-            }
-            return;
-        }
-
-        if (mode >= 0) {
+    switch (m_mode) {
+        case 0:
+        {
             int i = 0;
             CMenuPcs* menu = this;
             do {
@@ -818,15 +810,15 @@ void CMenuPcs::calc()
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 0xc);
 
-            int limit = m_battleHud.m_gaugeTarget;
             int current = m_battleHud.m_gaugeValue;
             int value = current - 1;
-            if (value <= limit) {
-                int alt = current + 1;
-                value = limit;
-                if (alt < limit) {
-                    value = alt;
+            int limit = current + (m_battleHud.m_gaugeTarget - current);
+            if (limit >= value) {
+                current++;
+                if (current < limit) {
+                    limit = current;
                 }
+                value = limit;
             }
             m_battleHud.m_gaugeValue = value;
 
@@ -836,11 +828,15 @@ void CMenuPcs::calc()
             m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
 
             calcVillageMenu();
+            break;
         }
-        return;
+        case 1:
+            CalcDiaryMenu();
+            break;
+        case 2:
+            calcBonus();
+            break;
     }
-
-    CalcDiaryMenu();
 }
 
 /*

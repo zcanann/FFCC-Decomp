@@ -2237,7 +2237,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
     firstCmd = m_cmdQueueData[port][0];
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
-    if (static_cast<int>(count) < 1)
+    if (static_cast<int>(count) <= 0)
 	{
         return 0;
 	}

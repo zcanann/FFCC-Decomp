@@ -159,7 +159,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);
 			uvRemainder = FLOAT_803305f8 - uvSplit;
-			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, uvSplit, uvRemainder);
+			setVertexUV(uvs, kPppYmDeformationShpZero, uvSplit, uvSplit, uvRemainder);
 			RenderDeformationShape(object, work, vertices, uvs);
 
 			setVertexPos(vertices, (s8)param_2->m_orientation, size, -split, split, split);

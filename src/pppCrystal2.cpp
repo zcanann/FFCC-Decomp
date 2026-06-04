@@ -205,8 +205,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
 {
     u32 y;
     Crystal2Work* work;
-    u32 x;
     u32 yTile;
+    u32 x;
     Crystal2RefractionMap* textureInfo;
     u32 textureSize;
     float magnitude;

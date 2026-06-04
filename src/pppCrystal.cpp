@@ -241,8 +241,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 {
 	u32 y;
 	CrystalWork* work;
-	u32 x;
 	u32 yTile;
+	u32 x;
 	CrystalRefractionMap* textureInfo;
 	u32 textureSize;
 	float magnitude;

@@ -181,12 +181,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 {
 	Vec escapeDir;
 	CVector baseVec(base);
-	CVector fromVec(from);
-	Vec escapeDirSource;
+	Vec* fromVec = reinterpret_cast<Vec*>(&CVector(from));
+	CVector escapeDirSource;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
-	              reinterpret_cast<Vec*>(&baseVec),
-	              reinterpret_cast<Vec*>(&escapeDirSource));
+	PSVECSubtract(fromVec, reinterpret_cast<Vec*>(&baseVec), reinterpret_cast<Vec*>(&escapeDirSource));
 
 	escapeDir.x = escapeDirSource.x;
 	escapeDir.y = escapeDirSource.y;
@@ -228,12 +226,11 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 				if (forbiddenGroup != otherGroup)
 				{
 					CVector portalDirBase(base);
-					CVector portalDirPos(m_portals[i].m_position);
-					Vec dirToPortalSource;
+					Vec* portalDirPos = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
+					CVector dirToPortalSource;
 					Vec portalVec;
 
-					PSVECSubtract(reinterpret_cast<Vec*>(&portalDirPos),
-					              reinterpret_cast<Vec*>(&portalDirBase),
+					PSVECSubtract(portalDirPos, reinterpret_cast<Vec*>(&portalDirBase),
 					              reinterpret_cast<Vec*>(&dirToPortalSource));
 
 					portalVec.x = dirToPortalSource.x;
@@ -245,11 +242,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					                            reinterpret_cast<Vec*>(&portalVec));
 
 					CVector distBase(base);
-					CVector distPortal(m_portals[i].m_position);
-					Vec distVecSource;
+					Vec* distPortal = reinterpret_cast<Vec*>(&CVector(m_portals[i].m_position));
+					CVector distVecSource;
 
-					PSVECSubtract(reinterpret_cast<Vec*>(&distPortal),
-					              reinterpret_cast<Vec*>(&distBase),
+					PSVECSubtract(distPortal, reinterpret_cast<Vec*>(&distBase),
 					              reinterpret_cast<Vec*>(&distVecSource));
 
 					portalVec.x = distVecSource.x;

@@ -1108,7 +1108,7 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         CRef* item = reinterpret_cast<CRef*>(m_items[i]);
         if (item != 0) {
-            if (--item->refCount == 0) {
+            if (item->DecRef() == 0) {
                 delete item;
             }
             m_items[i] = 0;

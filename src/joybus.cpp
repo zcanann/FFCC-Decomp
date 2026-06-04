@@ -2599,7 +2599,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                 }
             }
 
-            for (unsigned int i = 0; i < 0x20; ++i)
+            for (int i = 0; i < 0x20; ++i)
             {
                 if (i < newCount)
                 {

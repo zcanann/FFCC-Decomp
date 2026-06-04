@@ -5552,91 +5552,94 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
     int result = 0;
     char subState = threadParam->m_subState;
 
-    if (subState == 1)
+    if (subState != 1)
     {
-        port = threadParam->m_portIndex;
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
+        if (subState == 0)
+        {
+            m_txWordIndex[threadParam->m_portIndex] = 0;
 
-        if (m_threadRunningMask == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
+            unsigned char payload[1 + 1 + 258];
+
+            memset(payload, 0, kJoyDataSmallPayloadClearBytes);
+            ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
+
+            payload[0] = 7;
+
+            unsigned char* bonusStr = &payload[1];
+            unsigned char* extraBuf = &payload[2];
+
+            int byteLen;
+            if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
+            {
+                unsigned int bonusPort;
+                if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
+                {
+                    bonusPort = 0;
+                }
+                else
+                {
+                    bonusPort = threadParam->m_portIndex;
+                }
+
+                int bonusIndex = GbaQue.GetBonus(bonusPort);
+                char** bonusTable = Game.m_cFlatDataArr[1].TableStrings(7);
+                strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
+
+                int firstLen = strlen((char*)bonusStr);
+                strcpy((char*)extraBuf + firstLen, bonusTable[bonusIndex * 2 + 1]);
+
+                int secondLen = strlen((char*)extraBuf + firstLen);
+                byteLen = firstLen + secondLen + 3;
+            }
+            else
+            {
+                byteLen = 3;
+                bonusStr[0] = 0;
+                extraBuf[0] = 0;
+            }
+
+            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
+
+            if (wordCount < 0)
+            {
+                return wordCount;
+            }
+
+            m_txWordCount[threadParam->m_portIndex] = wordCount;
+
+            threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
             port = threadParam->m_portIndex;
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
+            unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+            unsigned int word = *wordPtr;
 
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            if (m_threadRunningMask == 0)
+            {
                 result = 0;
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                port = threadParam->m_portIndex;
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
             }
         }
     }
-    else if (subState == 0)
+    else
     {
-        m_txWordIndex[threadParam->m_portIndex] = 0;
-
-        unsigned char payload[1 + 1 + 258];
-
-        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
-        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
-
-        payload[0] = 7;
-
-        unsigned char* bonusStr = &payload[1];
-        unsigned char* extraBuf = &payload[2];
-
-        int byteLen;
-        if (Game.m_gameWork.m_bossArtifactStageIndex < 0xE)
-        {
-            unsigned int bonusPort;
-            if (GbaQue.IsSingleMode(threadParam->m_portIndex) && threadParam->m_portIndex == 1)
-            {
-                bonusPort = 0;
-            }
-            else
-            {
-                bonusPort = threadParam->m_portIndex;
-            }
-
-            int bonusIndex = GbaQue.GetBonus(bonusPort);
-            char** bonusTable = Game.m_cFlatDataArr[1].TableStrings(7);
-            strcpy((char*)bonusStr, bonusTable[bonusIndex * 2]);
-
-            int firstLen = strlen((char*)bonusStr);
-            strcpy((char*)extraBuf + firstLen, bonusTable[bonusIndex * 2 + 1]);
-
-            int secondLen = strlen((char*)extraBuf + firstLen);
-            byteLen = firstLen + secondLen + 3;
-        }
-        else
-        {
-            byteLen = 3;
-            bonusStr[0] = 0;
-            extraBuf[0] = 0;
-        }
-
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
-
-        if (wordCount < 0)
-        {
-            return wordCount;
-        }
-
-        m_txWordCount[threadParam->m_portIndex] = wordCount;
-
-        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
-
         port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;

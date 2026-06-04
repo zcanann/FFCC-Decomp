@@ -191,7 +191,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             model.value[2][2] = ppvMng->m_scale.z * scale;
 
             shapeAngle = state->m_shapeAngle;
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
+            PSMTXRotRad(rotMatrix.value, 'z', 0.01745329238474369f * (float)shapeAngle);
             pppMulMatrix(model, rotMatrix, model);
 
             pppCopyVector(worldPos, state->m_position);
@@ -206,7 +206,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             model.value[2][3] = worldPos.z;
 
             pppSetDrawEnv(
-                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+                0, &model, 0.0f, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
 
             amb.r = state->m_color.m_r;
             amb.g = state->m_color.m_g;
@@ -265,7 +265,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         }
     }
 
-    zero = FLOAT_80330644;
+    zero = 0.0f;
     work->m_emitTimer = work->m_emitTimer + 1;
     work->m_speedDecay = work->m_speedDecay - step->m_speedDecayStep;
     if (work->m_speedDecay < zero) {
@@ -292,13 +292,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         }
 
         angleDelta += step->m_baseAngle;
-        angleScale = FLOAT_80330640 * (float)angleDelta;
-        angleScale = FLOAT_80330650 * angleScale;
-        angleScale = angleScale / FLOAT_80330654;
+        angleScale = (32768.0f * (0.01745329238474369f * (float)angleDelta)) / 3.1415927410125732f;
         angleIdx = (s32)angleScale;
         impulseX = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
         impulseZ = *(float*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
-        zero = FLOAT_80330644;
+        zero = 0.0f;
         work->m_impulse.x = impulseX;
         work->m_impulse.y = zero;
         work->m_impulse.z = impulseZ;
@@ -317,7 +315,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
     distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
-    if (distance != FLOAT_80330644) {
+    if (distance != 0.0f) {
         work->m_prevPositionChanged = 0xff;
     } else {
         work->m_prevPositionChanged = 0;
@@ -429,7 +427,7 @@ static inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma,
     model.value[2][2] = ppvMng->m_scale.z * scale;
 
     shapeAngle = state->m_shapeAngle;
-    PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
+    PSMTXRotRad(rotMatrix.value, 'z', 0.01745329238474369f * (float)shapeAngle);
     pppMulMatrix(model, rotMatrix, model);
 
     pppCopyVector(worldPos, state->m_position);
@@ -444,7 +442,7 @@ static inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma,
     model.value[2][3] = worldPos.z;
 
     pppSetDrawEnv(
-        0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+        0, &model, 0.0f, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
 
     amb.r = state->m_color.m_r;
     amb.g = state->m_color.m_g;
@@ -552,7 +550,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
         state->m_speedDecay = pYmMiasma->m_minSpeed;
     }
 
-    zero = FLOAT_80330644;
+    zero = 0.0f;
     particleData->m_matrix[0][0] = particleData->m_matrix[0][0] + state->m_speedDecay * particleData->m_matrix[1][0];
     particleData->m_matrix[0][1] = particleData->m_matrix[0][1] + pYmMiasma->m_heightJitter;
     particleData->m_matrix[0][2] = particleData->m_matrix[0][2] + state->m_speedDecay * particleData->m_matrix[1][2];
@@ -609,7 +607,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     (void)pppPObject;
 
     randomValue = rand();
-    randomScale = YmMiasmaConst(FLOAT_8033065c) * (float)randomValue;
+    randomScale = (float)randomValue * FLOAT_8033065c;
     shape = static_cast<pppShapeAnimData*>(
         ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();

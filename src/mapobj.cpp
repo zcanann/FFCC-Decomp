@@ -735,6 +735,31 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     }
                 }
                 chunkFile.PopChunk();
+            } else if (chunk.m_version == 5) {
+                spotLight->m_color.r = chunkFile.Get1();
+                spotLight->m_color.g = chunkFile.Get1();
+                spotLight->m_color.b = chunkFile.Get1();
+                spotLight->m_color.a = chunkFile.Get1();
+                spotLight->m_altColor.r = chunkFile.Get1();
+                spotLight->m_altColor.g = chunkFile.Get1();
+                spotLight->m_altColor.b = chunkFile.Get1();
+                spotLight->m_altColor.a = chunkFile.Get1();
+                spotLight->m_baseColor.r = chunkFile.Get1();
+                spotLight->m_baseColor.g = chunkFile.Get1();
+                spotLight->m_baseColor.b = chunkFile.Get1();
+                spotLight->m_baseColor.a = chunkFile.Get1();
+                spotLight->m_radius = chunkFile.GetF4();
+                spotLight->m_nearRange = chunkFile.GetF4();
+                spotLight->m_farRange = chunkFile.GetF4();
+                spotLight->m_intensity = chunkFile.GetF4();
+                chunkFile.GetF4();
+                spotLight->m_falloff = chunkFile.GetF4();
+                unsigned short targetIndex = chunkFile.Get2();
+                spotLight->m_target = MapObjArrayStart() + targetIndex;
+                spotLight->m_colorMode = chunkFile.Get1();
+                spotLight->m_useAltColor = chunkFile.Get1();
+                spotLight->m_angle = chunkFile.GetF4();
+                spotLight->m_unknown2E = chunkFile.Get1();
             }
             m_attribute = spotLightAttr;
         } else if (chunk.m_id == CHUNK_PSTA) {

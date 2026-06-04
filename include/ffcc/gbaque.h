@@ -182,7 +182,10 @@ private:
     unsigned char m_letterFlags;      // 0x2C89
     unsigned char _pad2C8A[0x28];     // 0x2C8A
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
-    unsigned char _pad2D32[0x12];     // 0x2D32
+    unsigned char _pad2D32[0x6];      // 0x2D32
+    unsigned char m_shopFlags;        // 0x2D38
+    unsigned char m_shopModeFlags;    // 0x2D39
+    unsigned char _pad2D3A[0xA];      // 0x2D3A
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55

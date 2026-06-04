@@ -6352,7 +6352,7 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x11;
     cmdBytes[2] = bVar1;
-    int result = 0;
+    unsigned int result = 0;
 
     if (m_threadRunningMask != 0)
     {

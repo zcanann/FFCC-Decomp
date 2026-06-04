@@ -34,6 +34,15 @@ extern "C" const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 extern "C" const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
 extern "C" const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 
+template <>
+void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll();
+template <>
+void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll();
+template <>
+void CPtrArray<_GXTexObj*>::RemoveAll();
+template <>
+void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll();
+
 inline void* operator new(unsigned long, void* ptr)
 {
     return ptr;
@@ -255,6 +264,56 @@ void CFunnyShapePcs::Init()
         positions[i].y = LoadFloat(kFunnyShapeViewportOrigin);
         positions[i].z = LoadFloat(kFunnyShapeNdcMin);
     }
+}
+
+template <>
+void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
+{
+    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
+        _GXTexObj* item = m_items[i];
+        if (item != 0) {
+            delete item;
+            m_items[i] = 0;
+        }
+    }
+
+    RemoveAll();
+}
+
+template <>
+void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
+{
+    for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
+        OSFS_TEXTURE_ST* item = m_items[i];
+        if (item != 0) {
+            delete item;
+            m_items[i] = 0;
+        }
+    }
+
+    RemoveAll();
+}
+
+template <>
+void CPtrArray<_GXTexObj*>::RemoveAll()
+{
+    if (m_items != 0) {
+        delete[] m_items;
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+template <>
+void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
+{
+    if (m_items != 0) {
+        delete[] m_items;
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*

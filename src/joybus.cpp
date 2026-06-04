@@ -6149,63 +6149,66 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
     int result = 0;
     char subState = threadParam->m_subState;
 
-    if (subState == 1)
+    if (subState != 1)
     {
-        port = threadParam->m_portIndex;
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
-        unsigned int word = *wordPtr;
+        if (subState == 0)
+        {
+            m_txWordIndex[threadParam->m_portIndex] = 0;
 
-        if (m_threadRunningMask == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
+            unsigned char payload[0x400];
+            memset(payload, 0, sizeof(payload));
+
+            ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
+
+            payload[0] = 0x0B;
+
+            unsigned char* scouterBuf = &payload[1];
+
+            int dataLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf);
+
+            const int byteLen = dataLen + 1;
+
+            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
+
+            if (wordCount < 0)
+            {
+                return wordCount;
+            }
+
+            m_txWordCount[threadParam->m_portIndex] = wordCount;
+            threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
 
             port = threadParam->m_portIndex;
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
+            unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
+            unsigned int word = *wordPtr;
 
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            if (m_threadRunningMask == 0)
+            {
                 result = 0;
             }
             else
             {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                port = threadParam->m_portIndex;
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
             }
         }
     }
-    else if (subState == 0)
+    else
     {
-        m_txWordIndex[threadParam->m_portIndex] = 0;
-
-        unsigned char payload[0x400];
-        memset(payload, 0, sizeof(payload));
-
-        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
-
-        payload[0] = 0x0B;
-
-        unsigned char* scouterBuf = &payload[1];
-
-        int dataLen = GbaQue.GetScouterInfo(threadParam->m_portIndex, scouterBuf);
-
-        const int byteLen = dataLen + 1;
-
-        int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
-
-        if (wordCount < 0)
-        {
-            return wordCount;
-        }
-
-        m_txWordCount[threadParam->m_portIndex] = wordCount;
-        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
-
         port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + m_txWordIndex[port] * 4 + 2);
         unsigned int word = *wordPtr;

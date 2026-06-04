@@ -2379,7 +2379,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 
 	int listBase = GetCmdListBase(this);
 	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
-	int caravanWork = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (topIdx > 0) {
 		int i = 0;
@@ -2388,7 +2388,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			int idx = i + s_UniteTop[topIdx];
 			int entryBase = GetCmdListBase(this);
 			int entryOffset = idx * 0x40 + 8;
-			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
 
@@ -2416,7 +2416,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 				int idx = j + *top;
 				int entryBase = GetCmdListBase(this);
 				int entryOffset = idx * 0x40 + 8;
-				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
 
@@ -2462,14 +2462,14 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 
 	int listBase = GetCmdListBase(this);
 	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
-	int caravanWork = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (topIdx >= 0) {
 		int finished = 0;
 		for (int i = 0; i < 3; i++) {
 			int idx = i + s_UniteTop[topIdx];
 			int entryOffset = idx * 0x40 + 8;
-			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
 
@@ -2492,7 +2492,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			for (int j = 0; j < 3; j++) {
 				int idx = j + *top;
 				int entryOffset = idx * 0x40 + 8;
-				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
 
@@ -2529,7 +2529,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	const s32 caravanWork = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	const s32 cmd = GetCmdStateBase(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
@@ -2541,10 +2541,10 @@ unsigned int CMenuPcs::CmdOpen1()
 	*reinterpret_cast<f32*>(GetCmdListBase(this) + selected * 0x40 + 0x18) = t;
 
 	s32 chainCount = 1;
-	if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+	if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 		chainCount = 2;
 		*reinterpret_cast<f32*>(GetCmdListBase(this) + (selected + 1) * 0x40 + 0x18) = t;
-		if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+		if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 			chainCount = 3;
 			*reinterpret_cast<f32*>(GetCmdListBase(this) + (selected + 2) * 0x40 + 0x18) = t;
 		}
@@ -2611,7 +2611,7 @@ unsigned int CMenuPcs::CmdOpen1()
 unsigned int CMenuPcs::CmdClose1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s32 caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	s32 cmd = GetCmdStateBase(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
@@ -2625,9 +2625,9 @@ unsigned int CMenuPcs::CmdClose1()
 		const float t = static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(timer));
 		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
 
-		if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+		if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 			*reinterpret_cast<float*>(list + (selected + 1) * 0x20 + 0x0c) = t;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+			if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 				*reinterpret_cast<float*>(list + (selected + 2) * 0x20 + 0x0c) = t;
 			}
 		}
@@ -2664,13 +2664,13 @@ unsigned int CMenuPcs::CmdClose1()
 		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
 		if (done != 0) {
 			s32 ununiteCount = 1;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 				ununiteCount = 2;
-				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+				if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 					ununiteCount = 3;
 				}
 			}
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
+			caravanWork->UnuniteComList(selected, ununiteCount);
 		}
 	} else if (state == 2) {
 		const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
@@ -2699,16 +2699,15 @@ unsigned int CMenuPcs::CmdClose1()
 			ChkUnite(static_cast<int>(selected), combo);
 
 			s32 ununiteCount = 1;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 				ununiteCount = 2;
-				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+				if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 					ununiteCount = 3;
 				}
 			}
 
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
-				combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
+			caravanWork->UnuniteComList(selected, ununiteCount);
+			caravanWork->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
 
 			done = 0;
 			*reinterpret_cast<s16*>(cmd + 0x26) = static_cast<s16>(combo[0][1]);
@@ -2782,7 +2781,7 @@ unsigned int CMenuPcs::CmdClose2()
 	u8* self = reinterpret_cast<u8*>(this);
 	s16* const cmd = GetCmdState(this);
 	s16* const list = GetCmdList(this);
-	const s32 caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	const s32 selected = static_cast<s32>(cmd[0x13]);
 	const s32 modeSel = static_cast<s32>(cmd[0x13 + cmd[0x18]]);
@@ -2794,7 +2793,7 @@ unsigned int CMenuPcs::CmdClose2()
 		cmd[0x11] = 0;
 		if (*reinterpret_cast<s8*>(cmd + 4) < 0) {
 			cmd[0x0A] = 3;
-		} else if (*reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214) == 0) {
+		} else if (caravanWork->m_commandListExtra[selected] == 0) {
 			cmd[0x0A] = 2;
 		} else {
 			cmd[0x0A] = 1;
@@ -2820,23 +2819,23 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 
 			s32 ununiteCount = 1;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+			if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 				ununiteCount = 2;
-				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+				if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 					ununiteCount = 3;
 				}
 			}
 
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
-				combo[comboIdx][1], GetUniteRecipeCount(combo[comboIdx][0]), GetUniteRecipeCmd(combo[comboIdx][0]));
+			caravanWork->UnuniteComList(selected, ununiteCount);
+			caravanWork->UniteComList(
+			    combo[comboIdx][1], GetUniteRecipeCount(combo[comboIdx][0]), GetUniteRecipeCmd(combo[comboIdx][0]));
 			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
 			cmd[0x0A] = 2;
 		}
 		return 0;
 	}
 	case 2:
-		if (*reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214) == 0) {
+		if (caravanWork->m_commandListExtra[selected] == 0) {
 			int combo[2][2];
 			ChkUnite(selected, combo);
 
@@ -2847,7 +2846,7 @@ unsigned int CMenuPcs::CmdClose2()
 				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
 			}
 
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
+			caravanWork->UniteComList(
 				combo[comboIdx][1], GetUniteRecipeCount(combo[comboIdx][0]), GetUniteRecipeCmd(combo[comboIdx][0]));
 			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
 		} else if (UniteOpenAnim(-1) != 0) {

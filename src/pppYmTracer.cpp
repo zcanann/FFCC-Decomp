@@ -192,8 +192,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
     TRACE_POLYGON* poly;
     TracerWork* work;
     f32 fVar3;
-    u8 alpha;
-    u8 decay;
     s32 i;
     TRACE_POLYGON* entriesPtr;
 
@@ -328,13 +326,10 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
     poly = entries;
     for (i = 0; i < (s32)(u32)work->count; i++) {
         if (poly->life > 0) {
-            alpha = poly->alpha;
-            decay = poly->decay;
-            s32 remainingAlpha = (u32)alpha - (u32)decay;
-            if (remainingAlpha <= 0) {
+            if ((s32)((u32)poly->alpha - (u32)poly->decay) <= 0) {
                 poly->alpha = 0;
             } else {
-                poly->alpha = alpha - decay;
+                poly->alpha -= poly->decay;
             }
 
             poly->life--;

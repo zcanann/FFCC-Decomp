@@ -2869,7 +2869,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
     Vec cameraDelta;
     Vec viewPos;
 
-    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
@@ -2892,12 +2892,12 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
                     min.x = partPos.x - mng->m_cullRadius;
                     min.y = partPos.y;
                     min.z = partPos.z - mng->m_cullRadius;
-                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) != 0);
+                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) != 0);
                 }
             }
 
             if (shouldDraw) {
-                PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                 mng->m_sortDepth = viewPos.z;
                 ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
                 ppvMng = reinterpret_cast<_pppMngSt*>(mng);
@@ -2960,7 +2960,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     PppMngStDrawPdtRaw* mng;
     int remaining;
 
-    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
@@ -2997,12 +2997,12 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         min.x = partPos.x - mng->m_cullRadius;
         min.y = partPos.y;
         min.z = partPos.z - mng->m_cullRadius;
-        if (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) == 0) {
+        if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
             return;
         }
     }
 
-    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
     ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
     ppvMng = reinterpret_cast<_pppMngSt*>(mng);

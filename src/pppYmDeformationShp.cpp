@@ -159,10 +159,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 			setVertexPos(vertices, (s8)param_2->m_orientation, -size, -split, -split, split);
 			uvRemainder = FLOAT_803305f8 - uvSplit;
-			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, uvSplit, uvRemainder);
+			setVertexUV(uvs, kPppYmDeformationShpZero, uvSplit, uvSplit, uvRemainder);
 			RenderDeformationShape(object, work, vertices, uvs);
 
-			setVertexPos(vertices, (s8)param_2->m_orientation, split, -split, size, split);
+			setVertexPos(vertices, (s8)param_2->m_orientation, size, -split, split, split);
 			setVertexUV(uvs, FLOAT_803305f8, uvSplit, uvRemainder, uvRemainder);
 			RenderDeformationShape(object, work, vertices, uvs);
 
@@ -171,7 +171,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, FLOAT_803305f8, uvSplit);
 				RenderDeformationShape(object, work, vertices, uvs);
 
-				setVertexPos(vertices, (s8)param_2->m_orientation, split, -size, size, size);
+				setVertexPos(vertices, (s8)param_2->m_orientation, -size, split, size, size);
 				setVertexUV(uvs, kPppYmDeformationShpZero, uvRemainder, FLOAT_803305f8, FLOAT_803305f8);
 				RenderDeformationShape(object, work, vertices, uvs);
 			}

@@ -54,7 +54,7 @@ static inline void ReplaceRef(CTexture*& slot, CTexture* texture)
 
 inline void CMapTexAnim::SetMaterialTextureSlot(CMaterial* material, unsigned long slotIndex, CTexture* texture)
 {
-    ReplaceRef(material->m_textures[slotIndex], texture);
+    ReplaceRef(material->m_textureData.m_textures[slotIndex], texture);
 
     if (slotIndex >= material->m_textureCount) {
         material->m_textureCount = static_cast<unsigned short>(slotIndex + 1);

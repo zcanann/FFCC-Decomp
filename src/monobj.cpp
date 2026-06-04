@@ -1764,12 +1764,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_axis.y = FLOAT_80331A38;
 		hitCylinder.m_axis.z = FLOAT_80331A3C;
 		hitCylinder.m_radius = FLOAT_80331A3C;
-		hitCylinder.m_boundsMin.x = FLOAT_80331A3C;
-		hitCylinder.m_boundsMin.y = FLOAT_80331A38;
-		hitCylinder.m_boundsMin.z = FLOAT_80331A38;
-		hitCylinder.m_boundsMax.x = FLOAT_80331A38;
-		hitCylinder.m_boundsMax.y = FLOAT_80331A38;
-		hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
+		hitCylinder.m_bound.m_min.x = FLOAT_80331A3C;
+		hitCylinder.m_bound.m_min.y = FLOAT_80331A38;
+		hitCylinder.m_bound.m_min.z = FLOAT_80331A38;
+		hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
+		hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
+		hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
 
 		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 		if (hit != 0) {
@@ -1863,12 +1863,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			hitCylinder.m_axis.y = FLOAT_80331A38;
 			hitCylinder.m_axis.z = FLOAT_80331A3C;
 			hitCylinder.m_radius = FLOAT_80331A3C;
-			hitCylinder.m_boundsMin.x = FLOAT_80331A3C;
-			hitCylinder.m_boundsMin.y = FLOAT_80331A38;
-			hitCylinder.m_boundsMin.z = FLOAT_80331A38;
-			hitCylinder.m_boundsMax.x = FLOAT_80331A38;
-			hitCylinder.m_boundsMax.y = FLOAT_80331A38;
-			hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
+			hitCylinder.m_bound.m_min.x = FLOAT_80331A3C;
+			hitCylinder.m_bound.m_min.y = FLOAT_80331A38;
+			hitCylinder.m_bound.m_min.z = FLOAT_80331A38;
+			hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
+			hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
+			hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
 
 			int mapHit = MapMng.CheckHitCylinderNear(
 				&hitCylinder, &targetDelta, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));

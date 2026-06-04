@@ -1161,7 +1161,7 @@ memorycard.cpp:
 	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 	.sdata      start:0x8032E850 end:0x8032E880
-	.sdata2     start:0x80330CD0 end:0x80330CD8
+	.sdata2     start:0x80330CD0 end:0x80330CF0
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8
@@ -1172,6 +1172,7 @@ vector.cpp:
 	extab       start:0x800084E8 end:0x800084F8
 	extabindex  start:0x8000EC44 end:0x8000EC5C
 	.text       start:0x800C4E50 end:0x800C4F04
+	.sdata2     start:0x80330CF0 end:0x80330CF8
 
 color.cpp:
 	.text       start:0x800C4F04 end:0x800C4F50
@@ -1190,7 +1191,7 @@ sound.cpp:
 	.data       start:0x8021056C end:0x80210580
 	.bss        start:0x802F26C8 end:0x802F49AC
 	.sdata      start:0x8032E880 end:0x8032E890
-	.sdata2     start:0x80330CE0 end:0x80330D20
+	.sdata2     start:0x80330CF8 end:0x80330D50
 
 gbaque.cpp:
 	extab       start:0x800086CC end:0x80008A64

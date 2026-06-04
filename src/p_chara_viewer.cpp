@@ -553,8 +553,7 @@ void CCharaPcs::calcViewer()
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        CChara::CModel* model = self->m_viewerModel[i];
-        if (model == 0) {
+        if (self->m_viewerModel[i] == 0) {
             continue;
         }
 
@@ -632,9 +631,12 @@ void CCharaPcs::calcViewer()
             bFirst = 0;
         }
 
-        float rotY = LoadFloat(kCharaViewerZero);
-        if (Pad._452_4_ == 0) {
-            unsigned int padIndex = (~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31) & 4U);
+        float rotY;
+        if (Pad._452_4_ != 0) {
+            rotY = LoadFloat(kCharaViewerZero);
+        } else {
+            unsigned int padIndex = 4;
+            padIndex &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31);
             rotY = Pad.GetPadInputs()[padIndex].substickXF;
         }
         srt.rotY = srt.rotY + rotY;
@@ -642,26 +644,26 @@ void CCharaPcs::calcViewer()
 
         Mtx modelMtx;
         Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
-        model->SetMatrix(modelMtx);
+        self->m_viewerModel[i]->SetMatrix(modelMtx);
 
         CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));
         matrixWatch.Reset();
         matrixWatch.Start();
-        model->CalcMatrix();
+        self->m_viewerModel[i]->CalcMatrix();
         matrixWatch.Stop();
         float matrixTime = matrixWatch.Get();
 
         matrixWatch.Reset();
         matrixWatch.Start();
-        model->CalcSkin();
+        self->m_viewerModel[i]->CalcSkin();
         matrixWatch.Stop();
         float skinTime = matrixWatch.Get();
 
         if (i == 0) {
-            CChara::CAnim* modelAnim = ViewerModelAnim(model);
+            CChara::CAnim* modelAnim = ViewerModelAnim(self->m_viewerModel[i]);
             if (modelAnim != 0) {
                 float animFrames = static_cast<float>(modelAnim->m_frameCount);
-                float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
+                float frame = (float)fmod((double)ViewerModelTime(self->m_viewerModel[i]), (double)(frameAdvance + animFrames));
                 Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
@@ -679,7 +681,7 @@ void CCharaPcs::calcViewer()
                 Graphic.Printf(const_cast<char*>(s_cont_fmt), self->m_viewerAnimLoopIndex);
             }
             Graphic.Printf(const_cast<char*>(s_cpu_profile_fmt), matrixTime + skinTime, matrixTime, skinTime,
-                           ViewerModelNodeCount(model));
+                           ViewerModelNodeCount(self->m_viewerModel[i]));
         }
     }
 }

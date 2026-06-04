@@ -2070,12 +2070,12 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		hitCylinder.m_bottom = startPos;
 		hitCylinder.m_axis = rayDir;
 		hitCylinder.m_radius = radius;
-		hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
-		hitCylinder.m_boundsMin.y = FLOAT_80331a9c;
-		hitCylinder.m_boundsMin.z = FLOAT_80331a9c;
-		hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
-		hitCylinder.m_boundsMax.y = FLOAT_80331aa0;
-		hitCylinder.m_boundsMax.z = FLOAT_80331aa0;
+		hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
+		hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
+		hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
+		hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
+		hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
+		hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
 
 		Vec hitPos = startPos;
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
@@ -2091,12 +2091,12 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_bottom = m_comboCenter;
 		floorCylinder.m_axis = down;
 		floorCylinder.m_radius = FLOAT_80331a78;
-		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
-		floorCylinder.m_boundsMin.y = FLOAT_80331a9c;
-		floorCylinder.m_boundsMin.z = FLOAT_80331a9c;
-		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
-		floorCylinder.m_boundsMax.y = FLOAT_80331aa0;
-		floorCylinder.m_boundsMax.z = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_min.x = FLOAT_80331a9c;
+		floorCylinder.m_bound.m_min.y = FLOAT_80331a9c;
+		floorCylinder.m_bound.m_min.z = FLOAT_80331a9c;
+		floorCylinder.m_bound.m_max.x = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_max.y = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_max.z = FLOAT_80331aa0;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
@@ -2310,10 +2310,10 @@ void CGPartyObj::checkTargetParticle()
 			hitCylinder.m_axis.y = FLOAT_80331aa0;
 			hitCylinder.m_axis.z = FLOAT_80331a9c;
 			hitCylinder.m_radius = FLOAT_80331a9c;
-			hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
-			hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
-			hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
-			hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
+			hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
+			hitCylinder.m_bound.m_min.y = FLOAT_80331aa0;
+			hitCylinder.m_bound.m_min.z = FLOAT_80331aa0;
+			hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
 
 			if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, 0x30) == 0) {
 				break;
@@ -2337,10 +2337,10 @@ void CGPartyObj::checkTargetParticle()
 		floorCylinder.m_axis.y = FLOAT_80331aa0;
 		floorCylinder.m_axis.z = FLOAT_80331a9c;
 		floorCylinder.m_radius = FLOAT_80331a9c;
-		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
-		floorCylinder.m_boundsMin.y = FLOAT_80331aa0;
-		floorCylinder.m_boundsMin.z = FLOAT_80331aa0;
-		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_min.x = FLOAT_80331a9c;
+		floorCylinder.m_bound.m_min.y = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_min.z = FLOAT_80331aa0;
+		floorCylinder.m_bound.m_max.x = FLOAT_80331aa0;
 
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
@@ -2401,10 +2401,10 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_axis.y = FLOAT_80331aa0;
 	hitCylinder.m_axis.z = FLOAT_80331a9c;
 	hitCylinder.m_radius = FLOAT_80331a9c;
-	hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
-	hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
-	hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
-	hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
+	hitCylinder.m_bound.m_min.y = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_min.z = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&moveVec), 0x30) != 0) {
 		CMapObj* hitObj = getMapHitObject();
@@ -4040,10 +4040,10 @@ void CGPartyObj::gpmCol()
 		col.m_axis.y = m_bodyEllipsoidRadius;
 		col.m_axis.z = FLOAT_80331a9c;
 		col.m_radius = FLOAT_80331a9c;
-		col.m_boundsMin.x = FLOAT_80331a9c;
-		col.m_boundsMin.y = FLOAT_80331aa0;
-		col.m_boundsMin.z = FLOAT_80331aa0;
-		col.m_boundsMax.x = FLOAT_80331aa0;
+		col.m_bound.m_min.x = FLOAT_80331a9c;
+		col.m_bound.m_min.y = FLOAT_80331aa0;
+		col.m_bound.m_min.z = FLOAT_80331aa0;
+		col.m_bound.m_max.x = FLOAT_80331aa0;
 
 		if (MapMng.CheckHitCylinderNear(&col, &moveVec, m_attrFlags & ~0x10U) == 0) {
 			sGhostPartyWork.activeTrailCount = i + 1;

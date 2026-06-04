@@ -21,11 +21,7 @@ extern const float kYmBreathHalfCircleDegrees = 180.0f;
 extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 extern const double DOUBLE_80330CA0 = 4503599627370496.0;
 extern const float kYmBreathSpreadScale = 2.0f;
-extern const double kYmBreathHalfChance = 0.5;
-extern "C" const char s_CardGameCode_80330CB8[] = "FFCC";
-extern "C" const char s_CardMakerCode_80330CC0[] = "GDS";
-extern "C" const char s_CardMachineCode_80330CC4[] = "GC";
-extern "C" const char s_CardVersion_80330CC8[] = "1.00";
+extern const float kYmBreathHalfChance = 0.5f;
 
 static inline float LoadFloat(const float& value)
 {

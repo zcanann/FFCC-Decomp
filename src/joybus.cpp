@@ -5055,7 +5055,64 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
     int result = 0;
     char subState = threadParam->m_subState;
 
-    if (subState == 1)
+    if (subState != 1)
+    {
+        if (subState == 0)
+        {
+            unsigned char payload[1 + 75];
+
+            memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
+            ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
+
+            payload[0] = 4;
+
+            unsigned char* favBuf = &payload[1];
+
+            int dataLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf);
+
+            int wordCount = MakeJoyData(
+                (char*)payload,
+                dataLen + 1,
+                (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
+            );
+
+            if (wordCount < 0)
+            {
+                return wordCount;
+            }
+
+            result = 0;
+            m_txWordCount[threadParam->m_portIndex] = wordCount;
+            m_txWordIndex[threadParam->m_portIndex] = 0;
+
+            unsigned int port = threadParam->m_portIndex;
+            unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
+            unsigned int word = *wordPtr;
+
+            if (m_threadRunningMask != 0)
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                port = threadParam->m_portIndex;
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[threadParam->m_portIndex]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
+        }
+    }
+    else
     {
         unsigned int port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
@@ -5084,60 +5141,6 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
                 result = -1;
             }
         }
-    }
-    else if (subState == 0)
-    {
-        unsigned char payload[1 + 75];
-
-        memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
-        ClearJoyDataPacketPayload(this, threadParam->m_portIndex);
-
-        payload[0] = 4;
-
-        unsigned char* favBuf = &payload[1];
-
-        int dataLen = GbaQue.GetFavorite(threadParam->m_portIndex, (char*)favBuf);
-
-        int wordCount = MakeJoyData(
-            (char*)payload,
-            dataLen + 1,
-            (unsigned int*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2)
-        );
-
-        if (wordCount < 0)
-        {
-            return wordCount;
-        }
-
-        result = 0;
-        m_txWordCount[threadParam->m_portIndex] = wordCount;
-        m_txWordIndex[threadParam->m_portIndex] = 0;
-
-        unsigned int port = threadParam->m_portIndex;
-        unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
-        unsigned int word = *wordPtr;
-
-        if (m_threadRunningMask != 0)
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            port = threadParam->m_portIndex;
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[threadParam->m_portIndex]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                result = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-        }
-
-        threadParam->m_subState = (unsigned char)(threadParam->m_subState + 1);
     }
 
     if (result == 0)

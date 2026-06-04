@@ -3038,7 +3038,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
 
-        if (m_threadRunningMask != 0)
+        if (static_cast<signed char>(m_threadRunningMask) != 0)
         {
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

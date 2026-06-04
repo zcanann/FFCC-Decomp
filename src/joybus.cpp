@@ -4448,21 +4448,9 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
             int compatLen = GbaQue.GetCompatibility(threadParam->m_portIndex, compatBuf);
 
-            if (compatLen < 0)
-            {
-                compatLen = 0;
-            }
-            if (compatLen > (int)sizeof(compatBuf))
-            {
-                compatLen = (int)sizeof(compatBuf);
-            }
+            unsigned char* body = &payload[0x93];
 
-            unsigned char* body = &payload[0xA3];
-
-            if (compatLen > 0)
-            {
-                memcpy(body, compatBuf, (unsigned int)compatLen);
-            }
+            memcpy(body, compatBuf, compatLen);
 
             memcpy(body + compatLen, &playerData[playerOffset + 0x18], 8);
 
@@ -4472,7 +4460,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                                      (unsigned int)playerData[playerOffset + 0x24];
             memcpy(body + compatLen + 8, &statWord, sizeof(statWord));
 
-            const int byteLen = compatLen + 0xAF;
+            const int byteLen = compatLen + 0xA3;
 
             int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[threadParam->m_portIndex] + 2));
 

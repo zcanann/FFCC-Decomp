@@ -4541,7 +4541,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
 
     unsigned int hpStatus = GbaQue.GetPlayerHP(threadParam->m_portIndex, (unsigned char*)hpData);
 
-    if (hpStatus == 0)
+    if (((-hpStatus | hpStatus) >> 31) == 0)
 	{
         return 0;
 	}

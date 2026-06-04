@@ -3135,7 +3135,8 @@ void CPartMng::pppDraw()
     Vec cameraDelta;
     Vec viewPos;
 
-    PSMTXInverse(ppvCameraMatrix0, invCamera);
+    m_pppEnvSt.m_debugCounter = 0;
+    PSMTXInverse(ppvCameraMatrix, invCamera);
     cameraPos.x = invCamera[0][3];
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
@@ -3157,12 +3158,12 @@ void CPartMng::pppDraw()
                     min.x = partPos.x - mng->m_cullRadius;
                     min.y = partPos.y;
                     min.z = partPos.z - mng->m_cullRadius;
-                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + mng->m_cullYOffset) != 0);
+                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) != 0);
                 }
             }
 
             if (shouldDraw) {
-                PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                 mng->m_sortDepth = viewPos.z;
 
                 if (mng->m_drawMode == 1) {

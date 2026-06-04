@@ -566,24 +566,30 @@ void CGame::clearWork()
     unkCFlatData0[0] = 0;
     unkCFlatData0[1] = 0;
     unkCFlatData0[2] = 0;
-    unkCFlatData0[3] = 0;
     m_partyObjArr[0] = 0;
-    m_partyObjArr[1] = 0;
-    m_partyObjArr[2] = 0;
-    m_partyObjArr[3] = 0;
     m_scriptFoodBase[0] = 0;
+    m_partyObjArr[1] = 0;
     m_scriptFoodBase[1] = 0;
+    m_partyObjArr[2] = 0;
     m_scriptFoodBase[2] = 0;
+    m_partyObjArr[3] = 0;
     m_scriptFoodBase[3] = 0;
 
     unk_flat3_0xc7d0 = 0;
 
     for (i = 0; i < 4; i++) {
-        for (j = 0; j < 8; j++) {
+        for (j = 0; j < 4; j++) {
             m_scriptWork[i][j][0] = 0;
             m_scriptWork[i + 4][j][0] = 0;
             m_scriptWork[i][j][1] = 0;
             m_scriptWork[i + 4][j][1] = 0;
+        }
+
+        for (j = 0; j < 4; j++) {
+            m_scriptWork[i][j + 4][0] = 0;
+            m_scriptWork[i + 4][j + 4][0] = 0;
+            m_scriptWork[i][j + 4][1] = 0;
+            m_scriptWork[i + 4][j + 4][1] = 0;
         }
     }
 
@@ -603,44 +609,24 @@ void CGame::clearWork()
         _GXColor holderColor;
         Vec holderVec;
 
-        if (mapLightHolderArr->GetSize() != 0) {
+        if (0U < static_cast<unsigned int>(mapLightHolderArr->GetSize())) {
             (*mapLightHolderArr)[0]->GetLightHolder(&holderColor, 0);
         }
 
-        u8* charaColorE8 = reinterpret_cast<u8*>(&CharaPcs) + 0xE8;
-        u8* charaColorF0Base = reinterpret_cast<u8*>(&CharaPcs) + 0xF0;
-        u8* charaVec108Base = reinterpret_cast<u8*>(&CharaPcs) + 0x108;
-
         for (int i = 0; i < 2; i++) {
-            charaColorE8[0] = holderColor.r;
-            charaColorE8[1] = holderColor.g;
-            charaColorE8[2] = holderColor.b;
-            charaColorE8[3] = holderColor.a;
-
-            u8* charaColorF0 = charaColorF0Base;
-            u8* charaVec108 = charaVec108Base;
+            CharaPcs.m_viewerAmbientColor[i] = holderColor;
 
             for (u32 j = 0; j < 3; j++) {
                 if ((j + 1) < static_cast<u32>(mapLightHolderArr->GetSize())) {
                     (*mapLightHolderArr)[j + 1]->GetLightHolder(&holderColor, &holderVec);
                 }
 
-                charaColorF0[0] = holderColor.r;
-                charaColorF0[1] = holderColor.g;
-                charaColorF0[2] = holderColor.b;
-                charaColorF0[3] = holderColor.a;
+                CharaPcs.m_viewerDiffuseColor[i][j] = holderColor;
 
                 if (i == 0) {
-                    *reinterpret_cast<Vec*>(charaVec108) = holderVec;
+                    CharaPcs.m_viewerDiffusePos[j] = holderVec;
                 }
-
-                charaColorF0 += 4;
-                charaVec108 += 0xC;
             }
-
-            charaColorE8 += 4;
-            charaColorF0Base += 0xC;
-            charaVec108Base += 0xC;
         }
     }
 }
@@ -921,7 +907,7 @@ void CGame::loadCfd()
     unkCFlatData0[0] = (unsigned int)m_cFlatDataArr[0].Data(0).m_data;
     unkCFlatData0[1] = (unsigned int)m_cFlatDataArr[0].Data(1).m_data;
     unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].Data(2).m_data;
-    unkCFlatData0[3] = (unsigned int)m_cFlatDataArr[2].Data(0).m_data;
+    m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].Data(0).m_data;
     unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].Data(0).m_data;
     unk_flat3_field_1C_0xc7d8 = (unsigned int)m_cFlatDataArr[3].Data(1).m_data;
     unk_flat3_count_0xc7d4 = m_cFlatDataArr[3].Data(1).m_size / 0x1A;

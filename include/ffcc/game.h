@@ -147,7 +147,8 @@ public:
     CGameWork m_gameWork;                   // 0x08 size 0x13E8
     CCaravanWork m_caravanWorkArr[9];       // 0x13F0 size 0x6DB0
     CMonWork m_monWorkArr[64];              // 0x81A0 size 0x4400
-    unsigned int unkCFlatData0[4];          // 0xC5A0
+    unsigned int unkCFlatData0[3];          // 0xC5A0
+    unsigned int m_romLetterWorkBase;       // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     unsigned int m_scriptFoodBase[4];       // 0xC5C0
     unsigned int m_scriptWork[8][8][2];     // 0xC5D0

@@ -3733,7 +3733,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
             } else {
                 int letterIndex =
-                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.unkCFlatData0[3])) / 0x3E;
+                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / 0x3E;
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
             }
         }
@@ -3995,7 +3995,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xDC: {
-        u8* base = reinterpret_cast<u8*>(Game.unkCFlatData0[3]);
+        u8* base = reinterpret_cast<u8*>(Game.m_romLetterWorkBase);
         runtime->push(
             object, *reinterpret_cast<u16*>(base + *object->m_localBase * 0x3E + object->m_localBase[1] * 2));
         outResult = 0;

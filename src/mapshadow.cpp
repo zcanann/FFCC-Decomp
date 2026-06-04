@@ -17,6 +17,11 @@ extern const float FLOAT_8032FD00 = 0.0f;
 extern const float FLOAT_8032FD04 = 1.0f;
 extern const double DOUBLE_8032FD08 = 4503601774854144.0;
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004c71c
@@ -117,13 +122,13 @@ void CMapShadow::Init()
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
 		double scaleBias = kMapShadowDepthBias;
-		float scaleStep = kMapShadowScaleStep;
+		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
 		double scaleBias = kMapShadowDepthBias;
-		float scaleStep = kMapShadowScaleStep;
+		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}

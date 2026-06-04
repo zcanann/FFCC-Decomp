@@ -6582,7 +6582,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
     {
         mode ^= (unsigned char)DAT_80330b20;
 
-        unsigned int word = ((unsigned int)9 << 24) | ((unsigned int)mode << 16);
+        unsigned int word = MakeJoyCmd16(0x0900, mode, 0);
         int ret = 0;
 
         if (m_threadRunningMask != 0)

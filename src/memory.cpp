@@ -496,57 +496,6 @@ frame_input_done:
 
 /*
  * --INFO--
- * PAL Address: 0x8001EF90
- * PAL Size: 392b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMemory::HeapWalker()
-{
-    System.Printf(const_cast<char*>(sHeapWalkerNewline));
-    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
-    System.Printf(const_cast<char*>(sHeapWalkerTitle));
-    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
-
-    for (int mode = 0; mode < 3; mode++) {
-        if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            CStage* listHead = &m_modes[mode].m_activeList;
-            CStage* stage = listHead->m_next;
-            while (stage != listHead) {
-                stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
-                stage = stage->m_next;
-            }
-
-            System.Printf(const_cast<char*>(sHeapWalkerNewline));
-
-            stage = listHead->m_next;
-            int useTotal = 0;
-            int unuseTotal = 0;
-            do {
-                unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
-                    >> 10;
-                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stageGetSourceName(stage));
-                useTotal += useKB;
-
-                unsigned int unuseKB = static_cast<unsigned int>(
-                    stage->m_next->m_heapTop - stage->m_heapBottom)
-                    >> 10;
-                System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
-                stage = stage->m_next;
-                unuseTotal += unuseKB;
-            } while (stage != listHead);
-
-            System.Printf(
-                const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
-        }
-
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8001EC94
  * PAL Size: 764b
  * EN Address: TODO
@@ -740,6 +689,57 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
         }
     }
     return (CMemory::CStage*)nullptr;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001EF90
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemory::HeapWalker()
+{
+    System.Printf(const_cast<char*>(sHeapWalkerNewline));
+    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
+    System.Printf(const_cast<char*>(sHeapWalkerTitle));
+    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
+
+    for (int mode = 0; mode < 3; mode++) {
+        if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            CStage* listHead = &m_modes[mode].m_activeList;
+            CStage* stage = listHead->m_next;
+            while (stage != listHead) {
+                stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+                stage = stage->m_next;
+            }
+
+            System.Printf(const_cast<char*>(sHeapWalkerNewline));
+
+            stage = listHead->m_next;
+            int useTotal = 0;
+            int unuseTotal = 0;
+            do {
+                unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
+                    >> 10;
+                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stageGetSourceName(stage));
+                useTotal += useKB;
+
+                unsigned int unuseKB = static_cast<unsigned int>(
+                    stage->m_next->m_heapTop - stage->m_heapBottom)
+                    >> 10;
+                System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
+                stage = stage->m_next;
+                unuseTotal += unuseKB;
+            } while (stage != listHead);
+
+            System.Printf(
+                const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
+        }
+
+    }
 }
 
 /*

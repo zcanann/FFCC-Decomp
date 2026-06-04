@@ -193,10 +193,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	escapeDir.z = escapeDirSource.z;
 	reinterpret_cast<CVector*>(&escapeDir)->Normalize();
 
-	double behindBestDist = LoadFloat(kAStarEscapeInitialBestDist);
-	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
-	double aheadBestDist = behindBestDist;
+	CAPos* behindBest = (CAPos*)0;
+	double aheadBestDist = LoadFloat(kAStarEscapeInitialBestDist);
+	double behindBestDist = aheadBestDist;
 	int i = 0;
 
 	do
@@ -258,18 +258,18 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 					float dist = PSVECMag(reinterpret_cast<Vec*>(&portalVec));
 
-					if (dot < LoadFloat(kPolyGroupBaseXZ))
+					if (dot >= LoadFloat(kPolyGroupBaseXZ))
 					{
-						if (behindBestDist < dist)
+						if (aheadBestDist < dist)
 						{
-							behindBest = &m_portals[i];
-							behindBestDist = dist;
+							aheadBest = &m_portals[i];
+							aheadBestDist = dist;
 						}
 					}
-					else if (aheadBestDist < dist)
+					else if (behindBestDist < dist)
 					{
-						aheadBest = &m_portals[i];
-						aheadBestDist = dist;
+						behindBest = &m_portals[i];
+						behindBestDist = dist;
 					}
 				}
 			}

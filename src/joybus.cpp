@@ -4034,7 +4034,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         wordIndex += sent;
 
         // Done with all player-pos words?
-        if (wordIndex >= (unsigned int)(signed char)playerCount)
+        if (wordIndex >= (int)(signed char)playerCount)
         {
             playerCount = 0;
             wordIndex = 0;
@@ -4106,7 +4106,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         wordIndex += sent;
 
-        if (wordIndex >= (unsigned int)(signed char)mobCount)
+        if (wordIndex >= (int)(signed char)mobCount)
         {
             mobCount = 0;
             wordIndex = 0;
@@ -4179,7 +4179,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         wordIndex += sent;
 
-        if (wordIndex >= (unsigned int)(signed char)mobCount)
+        if (wordIndex >= (int)(signed char)mobCount)
         {
             state = 0;
             mobCount = 0;

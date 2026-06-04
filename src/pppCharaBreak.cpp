@@ -485,8 +485,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
                             gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
-                            S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
-                            *dst = *srcPos;
+                            *dst = workPositions[polygon->m_posIndices[i]];
                         }
 
                         if (stepData->m_clipMode == 0) {
@@ -787,8 +786,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                     gUtil.ConvF2IVector(polygonData->m_pos[outVertex], posFloat,
                         ModelData(model)->m_posQuant);
                 } else {
-                    S16Vec* sourcePos = workPositions + posIndex;
-                    polygonData->m_pos[outVertex] = *sourcePos;
+                    polygonData->m_pos[outVertex] = workPositions[posIndex];
                 }
 
                 polygonData->m_posIndices[outVertex] = posIndex;

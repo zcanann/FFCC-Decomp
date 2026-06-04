@@ -32,6 +32,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
+
 struct pppYmBreath {
     _pppPObject m_object;
 };
@@ -968,7 +973,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         flags = params->m_angleFlags;
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (kYmBreathHalfChance < Math.RandF()) {
+            float rand = Math.RandF();
+            if (LoadDouble(kYmBreathHalfChance) < rand) {
                 particle->m_angleRandom *= kCharaAnimNegativeOne;
             }
         } else if ((flags & 2) != 0) {
@@ -1001,7 +1007,8 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelY = rotationAccel;
             particle->m_rotationAccelX = rotationAccel;
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (kYmBreathHalfChance < Math.RandF()) {
+                float rand = Math.RandF();
+                if (LoadDouble(kYmBreathHalfChance) < rand) {
                     particle->m_rotationAccelX *= kCharaAnimNegativeOne;
                     particle->m_rotationAccelY *= kCharaAnimNegativeOne;
                 }
@@ -1013,10 +1020,12 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (kYmBreathHalfChance < Math.RandF()) {
+                float randX = Math.RandF();
+                if (LoadDouble(kYmBreathHalfChance) < randX) {
                     particle->m_rotationAccelX *= kCharaAnimNegativeOne;
                 }
-                if (kYmBreathHalfChance < Math.RandF()) {
+                float randY = Math.RandF();
+                if (LoadDouble(kYmBreathHalfChance) < randY) {
                     particle->m_rotationAccelY *= kCharaAnimNegativeOne;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {

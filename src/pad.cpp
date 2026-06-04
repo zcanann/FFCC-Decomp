@@ -591,7 +591,7 @@ void CPad::Init()
 	int size;
 
 	PADInit();
-	memset(reinterpret_cast<char*>(this) + 4, 0, 0x1A4);
+	memset(m_padInputs, 0, sizeof(m_padInputs));
 	_1a8_4_ = 0;
 	_1ac_4_ = 0;
 	_1b0_4_ = 0;

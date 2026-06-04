@@ -2273,16 +2273,14 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
  */
 CAmemCache::CAmemCache()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-
-    *reinterpret_cast<int*>(bytes + 0x00) = 0;
-    *reinterpret_cast<int*>(bytes + 0x04) = 0;
-    *reinterpret_cast<short*>(bytes + 0x0C) = 0;
-    *reinterpret_cast<int*>(bytes + 0x08) = 0;
-    bytes[0x0E] = 0;
-    *reinterpret_cast<int*>(bytes + 0x10) = 0;
-    bytes[0x1A] = 1;
-    bytes[0x0F] = 0xFF;
+    m_cacheData = 0;
+    m_workData = 0;
+    m_refCount = 0;
+    m_size = 0;
+    m_inUse = 0;
+    m_priority = 0;
+    m_dmaCopy = 1;
+    m_type = 0xFF;
 }
 
 /*

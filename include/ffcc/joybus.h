@@ -29,7 +29,7 @@ struct ThreadParam
 	unsigned int    m_timestamp;         // 0x24
 
 	unsigned char   m_state;             // 0x28
-	unsigned char   m_subState;          // 0x29
+	char            m_subState;          // 0x29
 	unsigned char   m_prevState;         // 0x2A
 	unsigned char   m_altState;          // 0x2B
 

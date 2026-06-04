@@ -3917,7 +3917,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         }
     }
 
-    return result;
+    return result != 0 ? -1 : 0;
 }
 
 /*

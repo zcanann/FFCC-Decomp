@@ -1091,9 +1091,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* par
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
+    setupOffset = param_3->m_serializedDataOffsets[1];
     mana2Work =
         reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_3->m_serializedDataOffsets[2]);
-    setupOffset = param_3->m_serializedDataOffsets[1];
     setup = reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + setupOffset;
     if (gObject == NULL) {
         return;
@@ -1109,7 +1109,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* par
 
     SetMana2ModelCallbacks(model, mana2Work, param_2);
 
-    mana2Work->m_waterAlpha = setup[0xB];
+    MaterialMan.SetManaAlpha(setup[0xB]);
+    mana2Work->m_waterAlpha = MaterialMan.GetManaAlpha();
 
     if (*(s32*)pppMana2 != 0) {
         return;
@@ -1539,7 +1540,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     int type = stepData->m_type;
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;
-    u32* dlEntry = (u32*)(meshData->m_displayLists + dlIndex);
+    CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
     int draw = 0;
 
     if (type == 2) {
@@ -1606,13 +1607,13 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 MaterialMan.SetManaReflectionEnv(mana2->m_meshReflectionVec, mana2->m_baseParaboloidTexObjs, 0x2ACE0F);
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                MaterialMan.SetMaterial(model->m_data->m_materialSet, *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
-                GXCallDisplayList(mana2->m_displayListCopies[dlIndex], *dlEntry);
+                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+                GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
             }
         } else {
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            MaterialMan.SetMaterial(model->m_data->m_materialSet, *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
-            GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
+            MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+            GXCallDisplayList(displayList->m_data, displayList->m_size);
         }
     }
 }

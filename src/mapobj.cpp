@@ -663,6 +663,18 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     }
                 }
                 chunkFile.PopChunk();
+            } else if (chunk.m_version == 1) {
+                pointLight->m_color.r = chunkFile.Get1();
+                pointLight->m_color.g = chunkFile.Get1();
+                pointLight->m_color.b = chunkFile.Get1();
+                pointLight->m_color.a = chunkFile.Get1();
+                pointLight->m_altColor.r = chunkFile.Get1();
+                pointLight->m_altColor.g = chunkFile.Get1();
+                pointLight->m_altColor.b = chunkFile.Get1();
+                pointLight->m_altColor.a = chunkFile.Get1();
+                pointLight->m_radius = chunkFile.GetF4();
+                pointLight->m_intensity = chunkFile.GetF4();
+                pointLight->m_colorMode = chunkFile.Get1();
             }
             m_attribute = pointLightAttr;
         } else if (chunk.m_id == CHUNK_SLIT) {

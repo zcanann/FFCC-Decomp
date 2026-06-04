@@ -318,7 +318,7 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseB == 0)
     {
-        m_fileBaseB = new unsigned int[0x5000];
+        m_fileBaseB = reinterpret_cast<unsigned int*>(new char[0x5000]);
 
         if (m_fileBaseB == 0 && System.m_execParam != 0)
         {

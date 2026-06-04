@@ -1259,12 +1259,14 @@ void CMapObj::Calc()
                 if (mime->m_keyFrame.Get(key0, key1, blend) != 0) {
                     Vec* src0 = reinterpret_cast<Vec*>(mime->m_vertexLists[key0]);
                     Vec* src1 = reinterpret_cast<Vec*>(mime->m_vertexLists[key1]);
+                    Vec* dst = outVerts;
                     for (int i = 0; i < mime->m_vertexCount; i++) {
                         PSVECSubtract(src1, src0, &delta);
                         PSVECScale(&delta, &delta, blend);
-                        PSVECAdd(src0, &delta, &outVerts[i]);
+                        PSVECAdd(src0, &delta, dst);
                         src0++;
                         src1++;
+                        dst++;
                     }
                 } else {
                     float* src = mime->m_vertexLists[key0];

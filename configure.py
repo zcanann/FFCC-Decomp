@@ -744,7 +744,7 @@ config.libs = [
             Object(NonMatching, "pppYmMiasma.cpp", cflags=cflags_game),
             Object(NonMatching, "pppYmMoveCircle.cpp"),
             Object(NonMatching, "pppYmMoveParabola.cpp"),
-            Object(NonMatching, "pppYmTraceMove.cpp"),
+            Object(Matching, "pppYmTraceMove.cpp"),
             Object(NonMatching, "pppYmTracer.cpp"),
             Object(NonMatching, "pppYmTracer2.cpp"),
             Object(NonMatching, "prgobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),

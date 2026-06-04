@@ -7070,7 +7070,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[2] = money >> 24;
 		cmdBytes[3] = money >> 16;
 
-		if (m_threadRunningMask != 0)
+		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
 			unsigned int port = m_threadParams[portIndex].m_portIndex;
 
@@ -7103,7 +7103,7 @@ int JoyBus::SetMoney(int portIndex, unsigned int money)
 		cmdBytes[1] = money >> 8;
 		cmdBytes[2] = money;
 
-		if (m_threadRunningMask != 0)
+		if (static_cast<signed char>(m_threadRunningMask) != 0)
 		{
 			unsigned int port = m_threadParams[portIndex].m_portIndex;
 

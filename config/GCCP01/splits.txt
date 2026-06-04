@@ -1063,6 +1063,7 @@ menu.cpp:
 	.text       start:0x8009B3B4 end:0x8009B4E4
 	.data       start:0x8020F968 end:0x8020F998
 	.sdata      start:0x8032E7D8 end:0x8032E7E8
+	.sdata2     start:0x803308B8 end:0x803308C8
 
 mesmenu.cpp:
 	extab       start:0x80007DA0 end:0x80007E04

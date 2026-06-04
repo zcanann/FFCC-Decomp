@@ -73,7 +73,7 @@ extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
-static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_infoWord1; }
+static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
 static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 

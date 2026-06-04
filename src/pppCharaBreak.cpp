@@ -462,7 +462,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
-            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_infoWord1].m_mtx, meshToWorld);
+            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_nodeIndex].m_mtx, meshToWorld);
         }
 
         for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
@@ -743,7 +743,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_infoWord1].m_mtx, meshMtx);
+        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_nodeIndex].m_mtx, meshMtx);
     }
     workPositions = mesh->m_workPositions;
     u16* stream = (u16*)displayList;

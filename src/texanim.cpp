@@ -16,10 +16,6 @@ extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
 extern const char s_texAnimSeqE1[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
-extern "C" const char s_scenegraph_step_none[4] = "";
-extern "C" const char s_scenegraph_step_x8[3] = "x8";
-extern "C" const char s_scenegraph_step_x0[3] = "x0";
-extern "C" const char s_scenegraph_step_x1_8[5] = "x1/8";
 
 extern const char s_ptrarray_grow_error_801D7B14[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,

@@ -5209,11 +5209,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
  */
 unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
-    cmdBytes[0] = 0x0C;
-    cmdBytes[1] = a;
-    cmdBytes[2] = b;
+    unsigned int cmd = MakeJoyCmd32(0x0C, static_cast<unsigned char>(a), static_cast<unsigned char>(b), 0);
     int result = 0;
 
     if (m_threadRunningMask != 0)

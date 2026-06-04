@@ -419,7 +419,14 @@ void CCharaPcs::calcViewer()
                     System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
-                        ReleaseShared(self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]);
+                        CChara::CAnim* oldAnim = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
+                        if (oldAnim != 0) {
+                            CRef* ref = reinterpret_cast<CRef*>(oldAnim);
+                            if (ref->DecRef() == 0) {
+                                delete ref;
+                            }
+                            self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = 0;
+                        }
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
                         CChara::CAnim* anim =
@@ -477,8 +484,8 @@ void CCharaPcs::calcViewer()
                        USBPcs.m_rootPath);
     }
 
-    unsigned short heldButtons;
-    unsigned short triggerButtons;
+    unsigned int heldButtons;
+    unsigned int triggerButtons;
     bool padDisabled = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
         padDisabled = true;
@@ -573,16 +580,15 @@ void CCharaPcs::calcViewer()
                     animType = -3;
                 }
                 texAnimSet->Change(
-                    self->m_viewerTexAnimName, static_cast<float>((texAnimFrame < 0) ? 0 : texAnimFrame),
+                    self->m_viewerTexAnimName, static_cast<float>((texAnimFrame >= 0) ? texAnimFrame : 0),
                     static_cast<CTexAnimSet::ANIM_TYPE>(animType));
             }
         }
 
-        CChara::CAnim* anim = self->m_viewerAnim[i];
-        if (anim != 0) {
+        if (self->m_viewerAnim[i] != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
                 self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
-                float animFrames = static_cast<float>(anim->m_frameCount);
+                float animFrames = static_cast<float>(self->m_viewerAnim[i]->m_frameCount);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
                     int nextIndex = self->m_viewerAnimLoopIndex + 1;
                     int animCount = self->m_viewerAnimLoadedCount;

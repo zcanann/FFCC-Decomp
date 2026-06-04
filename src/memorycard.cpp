@@ -193,7 +193,7 @@ enum {
 
 static inline CChara* GetCharaGlobal()
 {
-    return &gChara;
+    return &Chara;
 }
 
 static inline CRedSound* GetRedSoundGlobal()

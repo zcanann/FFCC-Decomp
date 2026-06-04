@@ -22,12 +22,6 @@
 extern const f32 kPppLaserZero = 0.0f;
 extern const f32 kPppLaserOne = 1.0f;
 extern const f32 kPppLaserDebugPointScale = 2.0f;
-extern const f32 kPppLaserMaxLengthDisabled;
-extern const f32 kPppLaserAxisScale;
-extern const f32 kPppLaserBoundsMax;
-extern const f32 kPppLaserBoundsMin;
-extern const f32 kPppLaserMaxLengthMargin;
-extern const f32 kPppLaserTau;
 
 extern "C" const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
@@ -82,7 +76,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     work->m_shapeArg2 = 0;
     work->m_shapeArg1 = 0;
 
-    work->m_shapeRotation = Math.RandF(LaserConst(kPppLaserTau));
+    work->m_shapeRotation = Math.RandF(6.2831855f);
     work->m_spawnEnabled = 1;
 
     iVar2 = Game.GetParticleSpecialInfo(ppvMng->m_hitParams, local_24, local_28);
@@ -94,10 +88,10 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
         if (local_24 == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {
-            work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+            work->m_maxLength = -1.0f;
         }
     } else {
-        work->m_maxLength = LaserConst(kPppLaserMaxLengthDisabled);
+        work->m_maxLength = -1.0f;
         ppvMng->m_hitBgFlag = 1;
         pppStopSe(ppvMng, &ppvMng->m_soundEffectData);
     }
@@ -179,7 +173,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     work = GetLaserWork(pppLaser, param_3);
     emptyHistory = 0;
-    f32 maxLengthDisabled = LaserConst(kPppLaserMaxLengthDisabled);
+    f32 maxLengthDisabled = -1.0f;
     if (maxLengthDisabled == work->m_maxLength) {
         return;
     }
@@ -222,7 +216,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 continue;
             }
             s32 frameCount = step->m_laser.m_historyFrameCount + 1;
-            float t = LaserConst(kPppLaserMaxLengthDisabled) / (float)frameCount;
+            float t = -1.0f / (float)frameCount;
             t *= (float)i;
             if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
                 emptyHistory = 1;
@@ -234,14 +228,14 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         pppSubVector(localA, work->m_points[i], work->m_origin);
-        PSVECScale(&localA, &localA, LaserConst(kPppLaserAxisScale));
+        PSVECScale(&localA, &localA, 1.2f);
 
-        cyl.m_boundsMin.z = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMin.y = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMin.x = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMax.z = LaserConst(kPppLaserBoundsMin);
-        cyl.m_boundsMax.y = LaserConst(kPppLaserBoundsMin);
-        cyl.m_boundsMax.x = LaserConst(kPppLaserBoundsMin);
+        cyl.m_boundsMin.z = 10000000000.0f;
+        cyl.m_boundsMin.y = 10000000000.0f;
+        cyl.m_boundsMin.x = 10000000000.0f;
+        cyl.m_boundsMax.z = -10000000000.0f;
+        cyl.m_boundsMax.y = -10000000000.0f;
+        cyl.m_boundsMax.x = -10000000000.0f;
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);
@@ -254,10 +248,10 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
-                if (work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin) < work->m_length) {
+                if (work->m_maxLength - 15.5f < work->m_length) {
                     _pppMngSt* mngSt = ppvMng;
                     s32 partIndex = static_cast<s32>(mngSt - PartMng.m_pppMng);
-                    work->m_length = work->m_maxLength - LaserConst(kPppLaserMaxLengthMargin);
+                    work->m_length = work->m_maxLength - 15.5f;
                     Game.ParticleFrameCallback(
                         partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, pppLaser->m_graphId / 0x1000,
                         work->m_points);
@@ -587,10 +581,3 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         }
     }
 }
-
-extern const f32 kPppLaserMaxLengthDisabled = -1.0f;
-extern const f32 kPppLaserAxisScale = 1.2f;
-extern const f32 kPppLaserBoundsMax = 10000000000.0f;
-extern const f32 kPppLaserBoundsMin = -10000000000.0f;
-extern const f32 kPppLaserMaxLengthMargin = 15.5f;
-extern const f32 kPppLaserTau = 6.2831855f;

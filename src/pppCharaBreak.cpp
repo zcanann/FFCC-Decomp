@@ -169,10 +169,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     CChara::CModel* model;
     CGObject* handle;
     CChara::CMesh* mesh;
-    CharaBreakStep* stepData;
     u32 i;
 
-    stepData = (CharaBreakStep*)step;
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -188,34 +186,34 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     work->m_model = model;
 
     CalcGraphValue(charaBreak,
-                   stepData->m_graphId,
+                   step->m_graphId,
                    work->m_value0,
                    work->m_value1,
                    work->m_value2,
-                   stepData->m_dataValIndex,
-                   stepData->m_graphInit,
-                   stepData->m_graphStep);
+                   step->m_dataValIndex,
+                   step->m_graphInit,
+                   step->m_graphStep);
 
     CalcGraphValue(charaBreak,
-                   stepData->m_graphId,
+                   step->m_graphId,
                    work->m_value3,
                    work->m_value4,
                    work->m_value5,
-                   stepData->m_payloadGraphInit,
-                   stepData->m_payloadGraphStep,
-                   stepData->m_payloadGraphStepStep);
+                   step->m_payloadGraphInit,
+                   step->m_payloadGraphStep,
+                   step->m_payloadGraphStepStep);
 
-    SetCharaBreakModelCallbacks(model, work, stepData);
+    SetCharaBreakModelCallbacks(model, work, step);
 
-    if (stepData->m_graphId == charaBreak->m_graphId) {
+    if (step->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
-        if (zero == stepData->m_direction.x && zero == stepData->m_direction.y &&
-            zero == stepData->m_direction.z) {
-            stepData->m_direction.x = FLOAT_8033204c;
-            stepData->m_direction.y = zero;
-            stepData->m_direction.z = zero;
+        if (zero == step->m_direction.x && zero == step->m_direction.y &&
+            zero == step->m_direction.z) {
+            step->m_direction.x = FLOAT_8033204c;
+            step->m_direction.y = zero;
+            step->m_direction.z = zero;
         } else {
-            PSVECNormalize(&stepData->m_direction, &stepData->m_direction);
+            PSVECNormalize(&step->m_direction, &step->m_direction);
         }
     }
 
@@ -300,7 +298,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
 
                     CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
                                   model, mesh);
-                    InitPolygonParameter((PCharaBreak*)stepData, work, (*dlEntries)->m_polygonData,
+                    InitPolygonParameter((PCharaBreak*)step, work, (*dlEntries)->m_polygonData,
                                          (*dlEntries)->m_polygonCount, model, mesh);
 
                     dlEntries--;
@@ -312,7 +310,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     }
 
     if (ppvIsLoopCalc == 0) {
-        UpdatePolygonData((PCharaBreak*)stepData, work, model);
+        UpdatePolygonData((PCharaBreak*)step, work, model);
     }
     return;
 

@@ -543,7 +543,7 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     m_fileBaseB_dup = 0;
 
-    char path[132];
+    char path[128];
     char tmp[16];
 
     strcpy(path, JoyBusConst::DVD_DIR);

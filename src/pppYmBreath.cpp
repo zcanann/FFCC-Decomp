@@ -21,7 +21,7 @@ extern const float kYmBreathHalfCircleDegrees = 180.0f;
 extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 extern const double DOUBLE_80330CA0 = 4503599627370496.0;
 extern const float kYmBreathSpreadScale = 2.0f;
-extern const float kYmBreathHalfChance = 0.5f;
+extern const double kYmBreathHalfChance = 0.5;
 
 static inline float LoadFloat(const float& value)
 {

@@ -836,8 +836,9 @@ int CCharaPcs::correctLoadAnimAmem()
         return -1;
     }
 
+    int loadAnimCount = LoadAnimArray(this)->GetSize();
     int maxEnd = 0;
-    for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+    for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
         if (loadAnim == 0) {
             continue;
@@ -860,7 +861,7 @@ int CCharaPcs::correctLoadAnimAmem()
         int chunkSize = 0;
         int nextOffset = scanOffset;
 
-        for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        for (int i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
             if (loadAnim == 0) {
                 continue;

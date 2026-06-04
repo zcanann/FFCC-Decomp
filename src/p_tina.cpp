@@ -206,62 +206,149 @@ CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CPartPcs::~CPartPcs()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80053950
- * PAL Size: 16b
+ * PAL Address: 0x80051f38
+ * PAL Size: 64b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::Init()
+void CPartPcs::EndMiruraEvent()
 {
-	CUSBStreamData* usbStream = &m_usbStreamData;
-	usbStream->m_fieldLoadReq = 0;
-	usbStream->m_printFreeOnNext = 0;
+    PartMng.pppReleasePdt(7);
+    m_usbStreamData.m_miruraEventActive = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::Quit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::onScriptChanging(char*)
-{
-	CUSBStreamData* usbStream = &m_usbStreamData;
-	usbStream->m_fieldLoadReq = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005392c
- * PAL Size: 20b
+ * PAL Address: 0x80051f78
+ * PAL Size: 164b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CPartPcs::GetTable(unsigned long index)
+void CPartPcs::StartMiruraEvent()
 {
-	return reinterpret_cast<int>(&CPartPcs::m_table[index]);
+    int loaded;
+    char path[1024];
+    CGame* game = &Game;
+
+    sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
+    loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
+        m_usbStreamData.m_miruraEventActive = 1;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005201c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::EndLocationTitle()
+{
+    PartMng.pppReleasePdt(6);
+    m_usbStreamData.m_blockOnFrame = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005205c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::StartLocationTitle()
+{
+    int loaded;
+    char path[1024];
+    CGame* game = &Game;
+
+    sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
+    loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
+        m_usbStreamData.m_blockOnFrame = 1;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052100
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::ReleasePdt(int pdtSlot)
+{
+    PartMng.pppReleasePdt(pdtSlot);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052128
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CPartPcs::LoadMenuPdt(char* fileName)
+{
+    int pdtSlotIndex;
+    int loaded;
+    CMemory::CStage* stage;
+    char path[0x100];
+
+    sprintf(path, s_dvd__smenu__s_801d7fb0, Game.GetLangString(), fileName);
+
+    if (Game.m_gameWork.m_menuStageMode != 0) {
+        stage = MenuPcs.m_stageF4;
+    } else {
+        stage = MenuPcs.m_menuStage;
+    }
+
+    m_usbStreamData.m_stageLoad = stage;
+    ppvAmemCacheSet.SetRStage(stage);
+
+    PartMng.m_partAMemBase = 0;
+    PartMng.m_partAMemCursor = 0;
+    PartMng.m_partLoadCacheParam = 0;
+    PartMng.m_partChunkIndex = 0;
+    PartMng.m_asyncHandleCount = 0;
+    PartMng.m_partLoadMode = 0;
+
+    pdtSlotIndex = PartMng.pppGetFreeDataMng();
+    if (pdtSlotIndex == -1) {
+        pdtSlotIndex = -1;
+    } else {
+        loaded = PartMng.pppLoadPtx(path, pdtSlotIndex, 0, 0, 0);
+        if (loaded == 0) {
+            PartMng.pppReleasePdt(pdtSlotIndex);
+            pdtSlotIndex = -1;
+        } else {
+            loaded = PartMng.pppLoadPdt(path, pdtSlotIndex, 0, 0, 0);
+            if (loaded == 0) {
+                PartMng.pppReleasePdt(pdtSlotIndex);
+                pdtSlotIndex = -1;
+            } else {
+                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
+            }
+        }
+    }
+
+    m_usbStreamData.m_stageLoad = m_usbStreamData.m_stageDefault;
+    ppvAmemCacheSet.SetRStage(m_usbStreamData.m_stageDefault);
+
+    return pdtSlotIndex;
 }
 
 /*
@@ -269,10 +356,814 @@ int CPartPcs::GetTable(unsigned long index)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned char pppNotAllocAmemCacheRmem(unsigned long)
+int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
-	PartMng.pppDumpMngSt();
-	return 0;
+    int pdtSlotIndex;
+    char path[256];
+
+    if (variant == 0) {
+        sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
+    } else {
+        sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
+    }
+
+    PartMng.m_partAMemBase = 0;
+    PartMng.m_partAMemCursor = 0;
+    PartMng.m_partLoadCacheParam = 0;
+    PartMng.m_partChunkIndex = 0;
+    PartMng.m_asyncHandleCount = 0;
+    PartMng.m_partLoadMode = 0;
+
+    pdtSlotIndex = PartMng.pppGetFreeDataMng();
+    if (pdtSlotIndex == -1) {
+        pdtSlotIndex = -1;
+    } else {
+        if (PartMng.pppLoadPtx(path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
+            PartMng.pppReleasePdt(pdtSlotIndex);
+            pdtSlotIndex = -1;
+        } else {
+            if (PartMng.pppLoadPdt(path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
+                PartMng.pppReleasePdt(pdtSlotIndex);
+                pdtSlotIndex = -1;
+            } else {
+                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
+            }
+        }
+    }
+
+    return pdtSlotIndex;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800523f8
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
+{
+    CPartMng* state = &PartMng;
+
+    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
+    state->m_partLoadCacheParam = loadCacheParam;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
+
+    if (loadCacheParam != 0) {
+        if (mode == 1) {
+            state->m_partLoadMode = 2;
+        } else if (mode == 2) {
+            state->m_partLoadMode = 3;
+            for (int i = 0; i < 0x10; i++) {
+                state->m_partAsyncBusy[i] = 0;
+            }
+        } else {
+            state->m_partLoadMode = 1;
+        }
+    } else {
+        state->m_partLoadMode = 0;
+    }
+
+    LoadFieldPdt0(mapId, floorId);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800524d0
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void LoadFieldPdt0(int mapId, int floorId)
+{
+    int pdtSlot;
+    char path[1024];
+
+    g_MaxHeapSize = 0;
+    g_MaxDataSize = 0;
+
+    if (PartMng.m_partLoadMode != 3) {
+        PartMng.pppReleasePdt(0);
+        PartMng.pppReleasePdt(6);
+        PartMng.pppReleasePdt(7);
+        ppvAmemCacheSet.AmemGetLock();
+        ppvAmemCacheSet.RefCnt0Compare();
+    }
+
+    PartPcs.m_usbStreamData.m_fieldLoadReq = 1;
+
+    sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
+    pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
+    if (pdtSlot != 0) {
+        pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
+        if ((pdtSlot != 0) && (PartMng.m_partLoadMode != 2) && (PartMng.m_partLoadMode != 3)) {
+            int fieldParticleOffset;
+            _pppDataHead* pppDataHead;
+            PPPCREATEPARAM* createParam;
+            int i;
+
+            pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;
+            createParam = PartMng.pppGetDefaultCreateParam();
+            fieldParticleOffset = 0;
+            for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
+                _pppFieldParticleData* fieldParticle = reinterpret_cast<_pppFieldParticleData*>(
+                    reinterpret_cast<unsigned char*>(PartMng.m_pdtSlots[0].m_pppDataHead) + sizeof(_pppDataHead) +
+                    fieldParticleOffset);
+                if (fieldParticle->m_autoCreateMarker != kPppFieldParticleNoAutoCreate) {
+                    PartMng.pppCreate(0, i, createParam, 0);
+                }
+                fieldParticleOffset += sizeof(_pppFieldParticleData);
+            }
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052660
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CPartPcs::IsLoadPartCompleted()
+{
+    for (int i = 0; i < 16; i++) {
+        if (PartMng.m_partAsyncBusy[i] != 0) {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052764
+ * PAL Size: 504b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawAfterViewer()
+{
+	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
+
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+	Graphic.SetFog(1, 0);
+	pppInitDrawEnv(0);
+	PartMng.pppEditPartDrawAfter();
+	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
+	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+	PartMng.pppGet2Dpos();
+	pppClearDrawEnv();
+
+	if (sDebugSpinnerTextPtrInit == 0) {
+		sDebugSpinnerTextPtr = sDebugSpinnerText;
+		sDebugSpinnerTextPtrInit = 1;
+	}
+	if (s_debugSpinnerFrameCounterInit == 0) {
+		s_debugSpinnerFrameCounter = 0;
+		s_debugSpinnerFrameCounterInit = 1;
+	}
+
+	s_debugSpinnerFrameCounter++;
+	Graphic.Printf(
+		stringBase + 0x134, sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
+
+	g_par_calc_prof.ProfEnd();
+	g_par_draw_prof.ProfEnd();
+	Graphic.Printf(
+		stringBase + 0x140,
+		(double)g_par_calc_prof.m_lastTime,
+		(double)g_par_calc_prof.m_maxTime);
+	Graphic.Printf(
+		stringBase + 0x158,
+		(double)g_par_draw_prof.m_lastTime,
+		(double)g_par_draw_prof.m_maxTime);
+	Graphic.Printf(
+		stringBase + 0x170,
+		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
+		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005295c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
+{
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	color.x = pppMngSt->r;
+	color.y = pppMngSt->g;
+	color.z = pppMngSt->b;
+	color.w = pppMngSt->a;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052990
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
+{
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	float one = 1.0f;
+
+	pppMngSt->r = color.x;
+	pppMngSt->g = color.y;
+	pppMngSt->b = color.z;
+	pppMngSt->a = color.w;
+
+	if (one == color.x && one == color.y && one == color.z && one == color.w) {
+		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
+		return;
+	}
+
+	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
+	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
+}
+
+extern "C" {
+const char s_no_name_8032fdcc[] = "no name";
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052a1c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::GetParLocIdx(int index, Vec& location)
+{
+    location.x = PartMng.m_pppMng[index].m_position.x;
+    location.y = PartMng.m_pppMng[index].m_position.y;
+    location.z = PartMng.m_pppMng[index].m_position.z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052a48
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::SetParLocIdx(int index, Vec& location)
+{
+    PartMng.m_pppMng[index].m_position.x = location.x;
+    PartMng.m_pppMng[index].m_position.y = location.y;
+    PartMng.m_pppMng[index].m_position.z = location.z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052a74
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::DrawMenuIdx(int index)
+{
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawIdx(index);
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052b10
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::DrawShoki()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+
+    if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
+        Graphic.SetFog(1, 0);
+        if (Game.m_gameWork.m_gamePaused == 0 &&
+            static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
+            Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+            pppInitDrawEnv(1);
+            PartMng.pppSetRendMatrix();
+            PartMng.pppDrawPrio(8);
+            pppClearDrawEnv();
+            Graphic.SetDrawDoneDebugData(0x7f);
+        }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052bd4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::DrawMenu(int fpNo)
+{
+    if (m_usbStreamData.m_disableShokiDraw == 0) {
+        Graphic.SetFog(1, 0);
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrioPdtFpno(6, 0, static_cast<short>(fpNo));
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052c78
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawAfter()
+{
+    CGame* game = &Game;
+
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppPartDrawAfter();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052d0c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawViewer()
+{
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x31a);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    pppSetProjection();
+    pppInitDrawEnv(0);
+    PartMng.pppEditDraw();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x322);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+    pppClearDrawEnv();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052da4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawShadowViewer()
+{
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x308);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    pppSetProjection();
+    pppInitDrawEnv(0);
+    PartMng.pppEditDrawShadow();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x30f);
+    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
+    pppClearDrawEnv();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052e3c
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::draw()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+    CGame* game = &Game;
+
+    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+    if (game->m_gameWork.m_gamePaused != 0) {
+        ppvDrawMng.DrawOt();
+        Graphic.SetDrawDoneDebugData(0x7f);
+        return;
+    }
+
+    if (usb->m_disableShokiDraw != 0) {
+        ppvDrawMng.DrawOt();
+        Graphic.SetDrawDoneDebugData(0x7f);
+        return;
+    }
+
+    Graphic.SetFog(1, 0);
+    pppInitDrawEnv(0);
+    PartMng.pppSetRendMatrix();
+    PartMng.pppDraw();
+    pppClearDrawEnv();
+    Graphic.SetDrawDoneDebugData(0x7f);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052f1c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawCharaBefore()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+    CGame* game = &Game;
+
+    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrio(4);
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052fb4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::drawShadow()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+    CGame* game = &Game;
+
+    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
+        static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        pppInitDrawEnv(1);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrio(3);
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005304c
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::ClearOt()
+{
+    ppvDrawMng.ClearOt();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80053074
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::calcDead()
+{
+    PartMng.pppPartDead();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005309c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::calcViewer()
+{
+    int packetCode;
+
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
+    PartMng.pppEditBeforeCalc();
+    PartMng.pppEditPartCalc();
+    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
+
+    USBPcs.mccReadData();
+    if (m_usbStreamData.IsUSBStreamDataDone()) {
+        packetCode = m_usbStreamData.m_packetCode;
+        if (packetCode != 0) {
+            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
+        }
+        m_usbStreamData.SetUSBStreamDataDone();
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80053138
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::calc()
+{
+	PartMng.LoadPartNoSyncCalc();
+	if (m_usbStreamData.m_printFreeOnNext != 0) {
+		int freeSize;
+
+		m_usbStreamData.m_printFreeOnNext = 0;
+		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
+		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
+	}
+	ppvAmemCacheSet.CalcPrio();
+	PartMng.pppDumpCacheIdx();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800531c8
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::calcInit()
+{
+	PartMng.pppRefCnt0Up();
+	if ((int)Game.m_currentSceneId == 7) {
+		g_par_calc_prof.ProfStart();
+		g_par_draw_prof.ProfStart();
+	}
+	PartMng.pppPartInit();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005322C
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::destroy()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+
+    USBPcs.IsBigAlloc(0);
+    PartMng.Destroy();
+
+    if (usb->m_stageAmem != 0) {
+        Memory.DestroyStage(usb->m_stageAmem);
+    }
+
+    ppvAmemCacheSet.AssertCache();
+    ppvAmemCacheSet.Destroy();
+
+    Memory.DestroyStage(usb->m_stageDefault);
+
+    if (usb->m_freePtr != 0) {
+        Memory.Free(usb->m_freePtr);
+    }
+
+    if (usb->m_stageExtra != 0) {
+        Memory.DestroyStage(usb->m_stageExtra);
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CPartPcs::createViewer()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
+    CMemory::CStage* stage;
+
+    USBPcs.IsBigAlloc(1);
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
+
+    if ((int)Game.m_currentSceneId == 7) {
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        usb->m_stageAmem = 0;
+    } else {
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
+        usb->m_stageAmem = stage;
+    }
+
+    ppvAmemCacheSet.Init(
+        stringBase + 0x74,
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
+        0x400,
+        pppNotAllocAmemCacheRmem,
+        0,
+        pppAmemDeletePmng,
+        0,
+        pppAmemRefCntError,
+        0);
+
+    ::memset(&PartMng, 0, 0x23FD8);
+    PartMng.Create();
+    m_usbStreamData.CreateBuffer();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80053444
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::createLoad()
+{
+    CPartMng* state = &PartMng;
+    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
+
+    state->m_partAMemBase = 0;
+    state->m_partAMemCursor = 0;
+    state->m_partLoadCacheParam = 0;
+    state->m_partChunkIndex = 0;
+    state->m_asyncHandleCount = 0;
+    state->m_partLoadMode = 0;
+
+    PartMng.pppLoadPtx(stringBase + 0x24C, 1, 1, 0, 0);
+    PartMng.pppLoadPmd(stringBase + 0x24C);
+    PartMng.pppLoadPan(stringBase + 0x24C);
+    PartMng.pppLoadPdt(stringBase + 0x25C, 1, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x2AC, 5, 1, 0, 0);
+    ppvAmemCacheSet.AmemSetLock();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005357c
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::create()
+{
+    CUSBStreamData* usb = &m_usbStreamData;
+    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
+    CMemory::CStage* stage;
+
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
+
+    if ((int)Game.m_currentSceneId == 7) {
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        usb->m_stageAmem = 0;
+    } else {
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
+        usb->m_stageAmem = stage;
+    }
+
+    ppvAmemCacheSet.Init(
+        stringBase + 0x74,
+        PartPcs.m_usbStreamData.m_stageLoad,
+        PartPcs.m_usbStreamData.m_stageAmem,
+        0x400,
+        pppNotAllocAmemCacheRmem,
+        0,
+        pppAmemDeletePmng,
+        0,
+        pppAmemRefCntError,
+        0);
+
+    ::memset(&PartMng, 0, 0x23FD8);
+    PartMng.Create();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+unsigned char pppAmemRefCntError(unsigned long)
+{
+	return 1;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+unsigned char pppAmemDeletePmng(unsigned long)
+{
+	return pppFreeMngStPrioForData();
 }
 
 /*
@@ -374,9 +1265,24 @@ unsigned int pppFreeMngStPrioForData()
  * Address:	TODO
  * Size:	TODO
  */
-unsigned char pppAmemDeletePmng(unsigned long)
+unsigned char pppNotAllocAmemCacheRmem(unsigned long)
 {
-	return pppFreeMngStPrioForData();
+	PartMng.pppDumpMngSt();
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005392c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CPartPcs::GetTable(unsigned long index)
+{
+	return reinterpret_cast<int>(&CPartPcs::m_table[index]);
 }
 
 /*
@@ -384,91 +1290,10 @@ unsigned char pppAmemDeletePmng(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned char pppAmemRefCntError(unsigned long)
+void CPartPcs::onScriptChanging(char*)
 {
-	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005357c
- * PAL Size: 328b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::create()
-{
-    CUSBStreamData* usb = &m_usbStreamData;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-    CMemory::CStage* stage;
-
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
-
-    if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
-    } else {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
-        usb->m_stageAmem = stage;
-    }
-
-    ppvAmemCacheSet.Init(
-        stringBase + 0x74,
-        PartPcs.m_usbStreamData.m_stageLoad,
-        PartPcs.m_usbStreamData.m_stageAmem,
-        0x400,
-        pppNotAllocAmemCacheRmem,
-        0,
-        pppAmemDeletePmng,
-        0,
-        pppAmemRefCntError,
-        0);
-
-    ::memset(&PartMng, 0, 0x23FD8);
-    PartMng.Create();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80053444
- * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::createLoad()
-{
-    CPartMng* state = &PartMng;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-
-    state->m_partAMemBase = 0;
-    state->m_partAMemCursor = 0;
-    state->m_partLoadCacheParam = 0;
-    state->m_partChunkIndex = 0;
-    state->m_asyncHandleCount = 0;
-    state->m_partLoadMode = 0;
-
-    PartMng.pppLoadPtx(stringBase + 0x24C, 1, 1, 0, 0);
-    PartMng.pppLoadPmd(stringBase + 0x24C);
-    PartMng.pppLoadPan(stringBase + 0x24C);
-    PartMng.pppLoadPdt(stringBase + 0x25C, 1, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x2AC, 5, 1, 0, 0);
-    ppvAmemCacheSet.AmemSetLock();
+	CUSBStreamData* usbStream = &m_usbStreamData;
+	usbStream->m_fieldLoadReq = 0;
 }
 
 /*
@@ -476,669 +1301,25 @@ void CPartPcs::createLoad()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::createViewer()
+void CPartPcs::Quit()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-    CMemory::CStage* stage;
-
-    USBPcs.IsBigAlloc(1);
-    usb->m_freePtr = 0;
-    usb->m_stageExtra = 0;
-    usb->m_blockOnFrame = 0;
-    usb->m_miruraEventActive = 0;
-    usb->m_disableShokiDraw = 0;
-
-    if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        usb->m_stageAmem = 0;
-    } else {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
-        usb->m_stageLoad = stage;
-        usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
-        usb->m_stageAmem = stage;
-    }
-
-    ppvAmemCacheSet.Init(
-        stringBase + 0x74,
-        PartPcs.m_usbStreamData.m_stageLoad,
-        PartPcs.m_usbStreamData.m_stageAmem,
-        0x400,
-        pppNotAllocAmemCacheRmem,
-        0,
-        pppAmemDeletePmng,
-        0,
-        pppAmemRefCntError,
-        0);
-
-    ::memset(&PartMng, 0, 0x23FD8);
-    PartMng.Create();
-    m_usbStreamData.CreateBuffer();
+	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8005322C
- * PAL Size: 180b
+ * PAL Address: 0x80053950
+ * PAL Size: 16b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartPcs::destroy()
+void CPartPcs::Init()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
-
-    USBPcs.IsBigAlloc(0);
-    PartMng.Destroy();
-
-    if (usb->m_stageAmem != 0) {
-        Memory.DestroyStage(usb->m_stageAmem);
-    }
-
-    ppvAmemCacheSet.AssertCache();
-    ppvAmemCacheSet.Destroy();
-
-    Memory.DestroyStage(usb->m_stageDefault);
-
-    if (usb->m_freePtr != 0) {
-        Memory.Free(usb->m_freePtr);
-    }
-
-    if (usb->m_stageExtra != 0) {
-        Memory.DestroyStage(usb->m_stageExtra);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800531c8
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::calcInit()
-{
-	PartMng.pppRefCnt0Up();
-	if ((int)Game.m_currentSceneId == 7) {
-		g_par_calc_prof.ProfStart();
-		g_par_draw_prof.ProfStart();
-	}
-	PartMng.pppPartInit();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80053138
- * PAL Size: 144b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::calc()
-{
-	PartMng.LoadPartNoSyncCalc();
-	if (m_usbStreamData.m_printFreeOnNext != 0) {
-		int freeSize;
-
-		m_usbStreamData.m_printFreeOnNext = 0;
-		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
-		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
-	}
-	ppvAmemCacheSet.CalcPrio();
-	PartMng.pppDumpCacheIdx();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005309c
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::calcViewer()
-{
-    int packetCode;
-
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
-    PartMng.pppEditBeforeCalc();
-    PartMng.pppEditPartCalc();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-
-    USBPcs.mccReadData();
-    if (m_usbStreamData.IsUSBStreamDataDone()) {
-        packetCode = m_usbStreamData.m_packetCode;
-        if (packetCode != 0) {
-            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
-        }
-        m_usbStreamData.SetUSBStreamDataDone();
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80053074
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::calcDead()
-{
-    PartMng.pppPartDead();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005304c
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::ClearOt()
-{
-    ppvDrawMng.ClearOt();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052fb4
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawShadow()
-{
-    CUSBStreamData* usb = &m_usbStreamData;
-    CGame* game = &Game;
-
-    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
-        static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
-        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-        pppInitDrawEnv(1);
-        PartMng.pppSetRendMatrix();
-        PartMng.pppDrawPrio(3);
-        pppClearDrawEnv();
-        Graphic.SetDrawDoneDebugData(0x7f);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052f1c
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawCharaBefore()
-{
-    CUSBStreamData* usb = &m_usbStreamData;
-    CGame* game = &Game;
-
-    if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
-        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-        Graphic.SetFog(1, 0);
-        pppInitDrawEnv(0);
-        PartMng.pppSetRendMatrix();
-        PartMng.pppDrawPrio(4);
-        pppClearDrawEnv();
-        Graphic.SetDrawDoneDebugData(0x7f);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052e3c
- * PAL Size: 224b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::draw()
-{
-    CUSBStreamData* usb = &m_usbStreamData;
-    CGame* game = &Game;
-
-    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-    if (game->m_gameWork.m_gamePaused != 0) {
-        ppvDrawMng.DrawOt();
-        Graphic.SetDrawDoneDebugData(0x7f);
-        return;
-    }
-
-    if (usb->m_disableShokiDraw != 0) {
-        ppvDrawMng.DrawOt();
-        Graphic.SetDrawDoneDebugData(0x7f);
-        return;
-    }
-
-    Graphic.SetFog(1, 0);
-    pppInitDrawEnv(0);
-    PartMng.pppSetRendMatrix();
-    PartMng.pppDraw();
-    pppClearDrawEnv();
-    Graphic.SetDrawDoneDebugData(0x7f);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052da4
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawShadowViewer()
-{
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x308);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
-    pppSetProjection();
-    pppInitDrawEnv(0);
-    PartMng.pppEditDrawShadow();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x30f);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
-    pppClearDrawEnv();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052d0c
- * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawViewer()
-{
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x31a);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
-    pppSetProjection();
-    pppInitDrawEnv(0);
-    PartMng.pppEditDraw();
-    reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x322);
-    reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
-    pppClearDrawEnv();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052c78
- * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawAfter()
-{
-    CGame* game = &Game;
-
-    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
-        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-        Graphic.SetFog(1, 0);
-        pppInitDrawEnv(0);
-        PartMng.pppSetRendMatrix();
-        PartMng.pppPartDrawAfter();
-        pppClearDrawEnv();
-        Graphic.SetDrawDoneDebugData(0x7f);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052bd4
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::DrawMenu(int fpNo)
-{
-    if (m_usbStreamData.m_disableShokiDraw == 0) {
-        Graphic.SetFog(1, 0);
-        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-        pppInitDrawEnv(0);
-        PartMng.pppSetRendMatrix();
-        PartMng.pppDrawPrioPdtFpno(6, 0, static_cast<short>(fpNo));
-        PartMng.drawEnd();
-        pppClearDrawEnv();
-        Graphic.SetDrawDoneDebugData(0x7f);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052b10
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::DrawShoki()
-{
-    CUSBStreamData* usb = &m_usbStreamData;
-
-    if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
-        Graphic.SetFog(1, 0);
-        if (Game.m_gameWork.m_gamePaused == 0 &&
-            static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
-            Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-            pppInitDrawEnv(1);
-            PartMng.pppSetRendMatrix();
-            PartMng.pppDrawPrio(8);
-            pppClearDrawEnv();
-            Graphic.SetDrawDoneDebugData(0x7f);
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052a74
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::DrawMenuIdx(int index)
-{
-    if (m_usbStreamData.m_disableShokiDraw == 0) {
-        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-        Graphic.SetFog(1, 0);
-        pppInitDrawEnv(0);
-        PartMng.pppSetRendMatrix();
-        PartMng.pppDrawIdx(index);
-        PartMng.drawEnd();
-        pppClearDrawEnv();
-        Graphic.SetDrawDoneDebugData(0x7f);
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052a48
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::SetParLocIdx(int index, Vec& location)
-{
-    PartMng.m_pppMng[index].m_position.x = location.x;
-    PartMng.m_pppMng[index].m_position.y = location.y;
-    PartMng.m_pppMng[index].m_position.z = location.z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052a1c
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::GetParLocIdx(int index, Vec& location)
-{
-    location.x = PartMng.m_pppMng[index].m_position.x;
-    location.y = PartMng.m_pppMng[index].m_position.y;
-    location.z = PartMng.m_pppMng[index].m_position.z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052764
- * PAL Size: 504b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::drawAfterViewer()
-{
-	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
-	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
-	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
-	Graphic.SetFog(1, 0);
-	pppInitDrawEnv(0);
-	PartMng.pppEditPartDrawAfter();
-	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
-	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
-	PartMng.pppGet2Dpos();
-	pppClearDrawEnv();
-
-	if (sDebugSpinnerTextPtrInit == 0) {
-		sDebugSpinnerTextPtr = sDebugSpinnerText;
-		sDebugSpinnerTextPtrInit = 1;
-	}
-	if (s_debugSpinnerFrameCounterInit == 0) {
-		s_debugSpinnerFrameCounter = 0;
-		s_debugSpinnerFrameCounterInit = 1;
-	}
-
-	s_debugSpinnerFrameCounter++;
-	Graphic.Printf(
-		stringBase + 0x134, sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
-
-	g_par_calc_prof.ProfEnd();
-	g_par_draw_prof.ProfEnd();
-	Graphic.Printf(
-		stringBase + 0x140,
-		(double)g_par_calc_prof.m_lastTime,
-		(double)g_par_calc_prof.m_maxTime);
-	Graphic.Printf(
-		stringBase + 0x158,
-		(double)g_par_draw_prof.m_lastTime,
-		(double)g_par_draw_prof.m_maxTime);
-	Graphic.Printf(
-		stringBase + 0x170,
-		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
-		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052990
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
-{
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float one = 1.0f;
-
-	pppMngSt->r = color.x;
-	pppMngSt->g = color.y;
-	pppMngSt->b = color.z;
-	pppMngSt->a = color.w;
-
-	if (one == color.x && one == color.y && one == color.z && one == color.w) {
-		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
-		return;
-	}
-
-	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
-	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
-}
-
-extern "C" {
-const char s_no_name_8032fdcc[] = "no name";
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005295c
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
-{
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	color.x = pppMngSt->r;
-	color.y = pppMngSt->g;
-	color.z = pppMngSt->b;
-	color.w = pppMngSt->a;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052660
- * PAL Size: 260b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CPartPcs::IsLoadPartCompleted()
-{
-    for (int i = 0; i < 16; i++) {
-        if (PartMng.m_partAsyncBusy[i] != 0) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800524d0
- * PAL Size: 400b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void LoadFieldPdt0(int mapId, int floorId)
-{
-    int pdtSlot;
-    char path[1024];
-
-    g_MaxHeapSize = 0;
-    g_MaxDataSize = 0;
-
-    if (PartMng.m_partLoadMode != 3) {
-        PartMng.pppReleasePdt(0);
-        PartMng.pppReleasePdt(6);
-        PartMng.pppReleasePdt(7);
-        ppvAmemCacheSet.AmemGetLock();
-        ppvAmemCacheSet.RefCnt0Compare();
-    }
-
-    PartPcs.m_usbStreamData.m_fieldLoadReq = 1;
-
-    sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
-    pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
-    if (pdtSlot != 0) {
-        pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
-        if ((pdtSlot != 0) && (PartMng.m_partLoadMode != 2) && (PartMng.m_partLoadMode != 3)) {
-            int fieldParticleOffset;
-            _pppDataHead* pppDataHead;
-            PPPCREATEPARAM* createParam;
-            int i;
-
-            pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;
-            createParam = PartMng.pppGetDefaultCreateParam();
-            fieldParticleOffset = 0;
-            for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                _pppFieldParticleData* fieldParticle = reinterpret_cast<_pppFieldParticleData*>(
-                    reinterpret_cast<unsigned char*>(PartMng.m_pdtSlots[0].m_pppDataHead) + sizeof(_pppDataHead) +
-                    fieldParticleOffset);
-                if (fieldParticle->m_autoCreateMarker != kPppFieldParticleNoAutoCreate) {
-                    PartMng.pppCreate(0, i, createParam, 0);
-                }
-                fieldParticleOffset += sizeof(_pppFieldParticleData);
-            }
-        }
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800523f8
- * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
-{
-    CPartMng* state = &PartMng;
-
-    state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
-    state->m_partLoadCacheParam = loadCacheParam;
-    state->m_partChunkIndex = 0;
-    state->m_asyncHandleCount = 0;
-
-    if (loadCacheParam != 0) {
-        if (mode == 1) {
-            state->m_partLoadMode = 2;
-        } else if (mode == 2) {
-            state->m_partLoadMode = 3;
-            for (int i = 0; i < 0x10; i++) {
-                state->m_partAsyncBusy[i] = 0;
-            }
-        } else {
-            state->m_partLoadMode = 1;
-        }
-    } else {
-        state->m_partLoadMode = 0;
-    }
-
-    LoadFieldPdt0(mapId, floorId);
+	CUSBStreamData* usbStream = &m_usbStreamData;
+	usbStream->m_fieldLoadReq = 0;
+	usbStream->m_printFreeOnNext = 0;
 }
 
 /*
@@ -1146,187 +1327,6 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
  * Address:	TODO
  * Size:	TODO
  */
-int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
+CPartPcs::~CPartPcs()
 {
-    int pdtSlotIndex;
-    char path[256];
-
-    if (variant == 0) {
-        sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
-    } else {
-        sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
-    }
-
-    PartMng.m_partAMemBase = 0;
-    PartMng.m_partAMemCursor = 0;
-    PartMng.m_partLoadCacheParam = 0;
-    PartMng.m_partChunkIndex = 0;
-    PartMng.m_asyncHandleCount = 0;
-    PartMng.m_partLoadMode = 0;
-
-    pdtSlotIndex = PartMng.pppGetFreeDataMng();
-    if (pdtSlotIndex == -1) {
-        pdtSlotIndex = -1;
-    } else {
-        if (PartMng.pppLoadPtx(path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
-            PartMng.pppReleasePdt(pdtSlotIndex);
-            pdtSlotIndex = -1;
-        } else {
-            if (PartMng.pppLoadPdt(path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
-                PartMng.pppReleasePdt(pdtSlotIndex);
-                pdtSlotIndex = -1;
-            } else {
-                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
-            }
-        }
-    }
-
-    return pdtSlotIndex;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052128
- * PAL Size: 392b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CPartPcs::LoadMenuPdt(char* fileName)
-{
-    int pdtSlotIndex;
-    int loaded;
-    CMemory::CStage* stage;
-    char path[0x100];
-
-    sprintf(path, s_dvd__smenu__s_801d7fb0, Game.GetLangString(), fileName);
-
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = MenuPcs.m_stageF4;
-    } else {
-        stage = MenuPcs.m_menuStage;
-    }
-
-    m_usbStreamData.m_stageLoad = stage;
-    ppvAmemCacheSet.SetRStage(stage);
-
-    PartMng.m_partAMemBase = 0;
-    PartMng.m_partAMemCursor = 0;
-    PartMng.m_partLoadCacheParam = 0;
-    PartMng.m_partChunkIndex = 0;
-    PartMng.m_asyncHandleCount = 0;
-    PartMng.m_partLoadMode = 0;
-
-    pdtSlotIndex = PartMng.pppGetFreeDataMng();
-    if (pdtSlotIndex == -1) {
-        pdtSlotIndex = -1;
-    } else {
-        loaded = PartMng.pppLoadPtx(path, pdtSlotIndex, 0, 0, 0);
-        if (loaded == 0) {
-            PartMng.pppReleasePdt(pdtSlotIndex);
-            pdtSlotIndex = -1;
-        } else {
-            loaded = PartMng.pppLoadPdt(path, pdtSlotIndex, 0, 0, 0);
-            if (loaded == 0) {
-                PartMng.pppReleasePdt(pdtSlotIndex);
-                pdtSlotIndex = -1;
-            } else {
-                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
-            }
-        }
-    }
-
-    m_usbStreamData.m_stageLoad = m_usbStreamData.m_stageDefault;
-    ppvAmemCacheSet.SetRStage(m_usbStreamData.m_stageDefault);
-
-    return pdtSlotIndex;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80052100
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::ReleasePdt(int pdtSlot)
-{
-    PartMng.pppReleasePdt(pdtSlot);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005205c
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::StartLocationTitle()
-{
-    int loaded;
-    char path[1024];
-    CGame* game = &Game;
-
-    sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
-    loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
-    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_blockOnFrame = 1;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005201c
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::EndLocationTitle()
-{
-    PartMng.pppReleasePdt(6);
-    m_usbStreamData.m_blockOnFrame = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051f78
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::StartMiruraEvent()
-{
-    int loaded;
-    char path[1024];
-    CGame* game = &Game;
-
-    sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
-    loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
-    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_miruraEventActive = 1;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80051f38
- * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::EndMiruraEvent()
-{
-    PartMng.pppReleasePdt(7);
-    m_usbStreamData.m_miruraEventActive = 0;
 }

@@ -41,6 +41,34 @@ static inline double LoadDouble(const double& value)
 	return value;
 }
 
+static inline void SetMoneyPlaceDigits(signed char* place, int gil)
+{
+	int digitPlace = 10000000;
+	int digitIndex = 0;
+	int digitCount = 8;
+	bool started = false;
+
+	do {
+		if ((!started) && (digitPlace <= gil)) {
+			started = true;
+		}
+		if (((started) || (digitPlace <= gil)) || (digitIndex == 7)) {
+			int digit = gil / digitPlace;
+			if (9 < digit) {
+				digit = 9;
+			}
+			*place = static_cast<signed char>(digit);
+			gil = gil - (gil / digitPlace) * digitPlace;
+		} else {
+			*place = -1;
+		}
+		place++;
+		digitIndex++;
+		digitPlace /= 10;
+		digitCount--;
+	} while (digitCount != 0);
+}
+
 STATIC_ASSERT(offsetof(CMenuPcs, moneyFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, singWindowInfo) == 0x848);
@@ -166,30 +194,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				gil = s_Money;
 
-				int iVar9 = 0;
-				int iVar8 = 10000000;
-				signed char* puVar10 = s_place;
-				int iVar11 = 8;
-				bool started = false;
-				do {
-					if ((!started) && (iVar8 <= (int)gil)) {
-						started = true;
-					}
-					if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
-						int digit = (int)gil / iVar8;
-						if (9 < digit) {
-							digit = 9;
-						}
-						puVar10[8] = static_cast<signed char>(digit);
-						gil = gil - ((int)gil / iVar8) * iVar8;
-					} else {
-						puVar10[8] = -1;
-					}
-					puVar10 = puVar10 + 1;
-					iVar9 = iVar9 + 1;
-					iVar8 /= 10;
-					iVar11 = iVar11 + -1;
-				} while (iVar11 != 0);
+				SetMoneyPlaceDigits(s_place + 8, static_cast<int>(gil));
 			}
 		} else {
 			if ((hold & 4) != 0) {
@@ -200,31 +205,8 @@ int CMenuPcs::MoneyCtrlCur()
 					if (-1 < (int)(s_Money - placeValue)) {
 						gil = s_Money - placeValue;
 					}
-					int iVar9 = 0;
-					int iVar8 = 10000000;
-					signed char* puVar10 = s_place + 8;
-					int iVar11 = 8;
-					bool started = false;
 					s_Money = gil;
-					do {
-						if ((!started) && (iVar8 <= (int)gil)) {
-							started = true;
-						}
-						if (((started) || (iVar8 <= (int)gil)) || (iVar9 == 7)) {
-							int digit = (int)gil / iVar8;
-							if (9 < digit) {
-								digit = 9;
-							}
-							*puVar10 = static_cast<signed char>(digit);
-							gil = gil - ((int)gil / iVar8) * iVar8;
-						} else {
-							*puVar10 = -1;
-						}
-						puVar10 = puVar10 + 1;
-						iVar9 = iVar9 + 1;
-						iVar8 /= 10;
-						iVar11 = iVar11 + -1;
-					} while (iVar11 != 0);
+					SetMoneyPlaceDigits(s_place + 8, static_cast<int>(gil));
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -323,57 +305,8 @@ int CMenuPcs::MoneyCtrlCur()
 					if (*(s16*)(optBase + 0x26) == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
-						int iVar8 = caravanWork->m_gil;
-						int iVar9 = 0;
-						int iVar11 = 10000000;
-						bool started = false;
-						signed char* puVar10 = s_place;
-						int count = 8;
-						do {
-							if ((!started) && (iVar11 <= iVar8)) {
-								started = true;
-							}
-							if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
-								int digit = iVar8 / iVar11;
-								if (9 < digit) {
-									digit = 9;
-								}
-								*puVar10 = static_cast<signed char>(digit);
-								iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
-							} else {
-								*puVar10 = -1;
-							}
-							puVar10 = puVar10 + 1;
-							iVar9 = iVar9 + 1;
-							iVar11 /= 10;
-							count = count + -1;
-						} while (count != 0);
-
-						iVar8 = 0;
-						iVar9 = 0;
-						iVar11 = 10000000;
-						started = false;
-						puVar10 = s_place + 8;
-						count = 8;
-						do {
-							if ((!started) && (iVar11 <= iVar8)) {
-								started = true;
-							}
-							if (((started) || (iVar11 <= iVar8)) || (iVar9 == 7)) {
-								int digit = iVar8 / iVar11;
-								if (9 < digit) {
-									digit = 9;
-								}
-								*puVar10 = static_cast<signed char>(digit);
-								iVar8 = iVar8 - (iVar8 / iVar11) * iVar11;
-							} else {
-								*puVar10 = -1;
-							}
-							puVar10 = puVar10 + 1;
-							iVar9 = iVar9 + 1;
-							iVar11 /= 10;
-							count = count + -1;
-						} while (count != 0);
+						SetMoneyPlaceDigits(s_place, caravanWork->m_gil);
+						SetMoneyPlaceDigits(s_place + 8, 0);
 					}
 					this->singWindowInfo[5] = 2;
 					*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;

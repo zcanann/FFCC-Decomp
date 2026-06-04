@@ -4334,36 +4334,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     const int port = threadParam->m_portIndex;
     int result = 0;
 
-    if (threadParam->m_subState == 1)
-    {
-        unsigned char* base = m_joyDataPacketBuffer[port];
-        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
-        unsigned int word = *wordPtr;
-
-        if (m_threadRunningMask == 0)
-        {
-            result = 0;
-        }
-        else
-        {
-            OSWaitSemaphore(&m_accessSemaphores[port]);
-
-            if ((int)m_cmdCount[port] < 0x40)
-            {
-                m_cmdQueueData[port][m_cmdCount[port]] = word;
-                m_cmdCount[port]++;
-
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[port]);
-                result = -1;
-            }
-        }
-    }
-    else
+    if (threadParam->m_subState != 1)
     {
         if (threadParam->m_subState == 0)
         {
@@ -4501,6 +4472,35 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                     OSSignalSemaphore(&m_accessSemaphores[queuePort]);
                     result = -1;
                 }
+            }
+        }
+    }
+    else
+    {
+        unsigned char* base = m_joyDataPacketBuffer[port];
+        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        unsigned int word = *wordPtr;
+
+        if (m_threadRunningMask == 0)
+        {
+            result = 0;
+        }
+        else
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
             }
         }
     }

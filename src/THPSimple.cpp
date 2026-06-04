@@ -45,6 +45,7 @@ struct THPSimpleControl {
     s32 audioDecodeIndex;          // 0x168
     s32 audioPlayIndex;            // 0x16C
     s32 unk170;                    // 0x170
+    u8 unk174[0x18];               // 0x174
 };
 
 THPSimpleControl SimpleControl;

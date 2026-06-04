@@ -484,30 +484,29 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
  */
 void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
-	CDM* current = menu;
 	CDM* head = menu;
 
 	do {
-		m_currentMenu = current;
-		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
+		m_currentMenu = menu;
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
 		              kDbgMenuViewportNear, kDbgMenuViewportFar);
 
-		switch (current->m_type) {
+		switch (menu->m_type) {
 		case 0:
-			drawWindow(current->m_y, 0, 0, current->m_unk18, current->m_unk1C, current->m_text);
+			drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
 			break;
 		case 1:
-			drawFont(current->m_y, 0, 0, current->m_text);
+			drawFont(menu->m_y, 0, 0, menu->m_text);
 			break;
 		case 2: {
-			drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 
 			const char* stateText;
-			if (current->m_state == 1) {
+			if (menu->m_state == 1) {
 				stateText = sDbgMenuOn;
 			} else {
 				stateText = sDbgMenuUnknown;
-				if (current->m_state == 0) {
+				if (menu->m_state == 0) {
 					stateText = sDbgMenuOff;
 				}
 			}
@@ -516,20 +515,20 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 			break;
 		}
 		case 3:
-			drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 			break;
 		}
 
-		current = current->m_next;
-	} while (current != head);
+		menu = menu->m_next;
+	} while (menu != head);
 
-	current = head;
+	menu = head;
 	do {
-		if (current->m_firstChild != 0) {
-			drawMenu(current->m_firstChild);
+		if (menu->m_firstChild != 0) {
+			drawMenu(menu->m_firstChild);
 		}
-		current = current->m_next;
-	} while (current != head);
+		menu = menu->m_next;
+	} while (menu != head);
 }
 
 /*

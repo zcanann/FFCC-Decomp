@@ -2308,30 +2308,27 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
-	unsigned int curLetterBase = scriptFood;
 	for (int i = 0; i < caravanWork->m_letterCount; i++) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
-		const unsigned int* cur = reinterpret_cast<const unsigned int*>(curLetterBase + 0x3EC);
-		const unsigned int curWord = cur[0];
-		const unsigned short curHalf = *reinterpret_cast<const unsigned short*>(cur);
+		const CCaravanWork::CLetterWork* cur = &caravanWork->m_letters[i];
+		const unsigned int curWord = cur->m_word0;
+		const unsigned short curHalf = cur->HeaderWord();
 		const unsigned int npcId = (curWord >> 9) & 0x1FF;
 		const unsigned int subjectId = (curHalf >> 2) & 0x1FF;
 
-		unsigned int prevLetterBase = scriptFood;
 		for (int j = 0; j < i; j++) {
-			const unsigned int* prev = reinterpret_cast<const unsigned int*>(prevLetterBase + 0x3EC);
-			if (npcId == ((prev[0] >> 9) & 0x1FF)) {
+			const CCaravanWork::CLetterWork* prev = &caravanWork->m_letters[j];
+			if (npcId == ((prev->m_word0 >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
-			if (subjectId == ((*reinterpret_cast<const unsigned short*>(prev) >> 2) & 0x1FF)) {
+			if (subjectId == ((prev->HeaderWord() >> 2) & 0x1FF)) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {
 				break;
 			}
-			prevLetterBase += 0xC;
 		}
 
 		if (matchedNpc != -1) {
@@ -2365,7 +2362,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 		}
 
 		unsigned char flags = 0;
-		const unsigned char curFlags = *reinterpret_cast<const unsigned char*>(cur);
+		const unsigned char curFlags = cur->Flags();
 		if (static_cast<char>(curFlags) < 0) {
 			flags |= 1;
 		}
@@ -2379,8 +2376,8 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			flags |= 8;
 		}
 
-		const unsigned int value = *reinterpret_cast<const unsigned short*>(curLetterBase + 0x3EE) & 0x1FF;
-		const unsigned char valueIsMoney = (curFlags >> 3) & 1;
+		const unsigned int value = cur->AttachmentValue();
+		const unsigned char valueIsMoney = cur->AttachmentIsGil();
 		if (valueIsMoney == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
@@ -2398,7 +2395,6 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
-		curLetterBase += 0xC;
 		entryWrite += 2;
 	}
 
@@ -2460,14 +2456,13 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
     memset(workText, 0, kGbaQueueScratchTextSize);
 
     CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
-    unsigned int scriptFood = Game.m_scriptFoodBase[channel];
-    int entry = scriptFood + letterIndex * 0xC;
-    CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
-    CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
-    CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
-    CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
+    CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+    CMes::m_tempVar[0] = letter->TempVar(0);
+    CMes::m_tempVar[1] = letter->TempVar(1);
+    CMes::m_tempVar[2] = letter->TempVar(2);
+    CMes::m_tempVar[3] = letter->TempVar(3);
 
-    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
+    unsigned short msgIndex = letter->HeaderWord();
     int mesIndex = (msgIndex & 0x7FC) >> 1;
     char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 
@@ -2578,16 +2573,14 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	int letterIndex = valueBytes[2];
-	int letterOffset = letterIndex * 0xC;
-	unsigned char* letter = reinterpret_cast<unsigned char*>(caravanWork) + letterOffset;
-	int hasGil = (letter[0x3EC] >> 3) & 1;
+	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+	int hasGil = letter->AttachmentIsGil();
 	int result;
 
 	if (hasGil == 0) {
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		int item = letter->AttachmentValue();
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
 				if (caravanWork->AddItem(item, 0) == 0) {
@@ -2599,13 +2592,13 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		}
 	}
 	if (hasGil != 0) {
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		int item = letter->AttachmentValue();
 		if (item != 0) {
 			int gil = item * 100;
 			if (caravanWork->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gil);
+				caravanWork->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -2620,10 +2613,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		unsigned char* letterBase = reinterpret_cast<unsigned char*>(*scriptFoodBase);
-		int readFlag = 1;
-		letterBase[letterOffset + 0x3EC] =
-			static_cast<unsigned char>((letterBase[letterOffset + 0x3EC] & 0xBF) | ((readFlag << 6) & 0x40));
+		letter->SetAttachmentClaimed();
 	}
 }
 

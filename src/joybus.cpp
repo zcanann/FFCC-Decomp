@@ -5005,8 +5005,18 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
         crc = (~crc) & 0xFFFF;
 
-        unsigned int cmd1 = (0x16u << 24) | ((unsigned char)(crc & 0xFF) << 16) | ((unsigned char)((crc >> 8) & 0xFF) << 8) | data[0];
-        unsigned int cmd2 = (0x56u << 24) | (data[1] << 16) | (data[2] << 8)  | (data[3]);
+        unsigned int cmds[2] = { 0, 0 };
+        unsigned char* cmdBytes = (unsigned char*)cmds;
+        cmdBytes[0] = 0x16;
+        cmdBytes[1] = (unsigned char)(crc & 0xFF);
+        cmdBytes[2] = (unsigned char)((crc >> 8) & 0xFF);
+        cmdBytes[3] = data[0];
+        cmdBytes[4] = 0x56;
+        cmdBytes[5] = data[1];
+        cmdBytes[6] = data[2];
+        cmdBytes[7] = data[3];
+        unsigned int cmd1 = cmds[0];
+        unsigned int cmd2 = cmds[1];
 
         result = 0;
 

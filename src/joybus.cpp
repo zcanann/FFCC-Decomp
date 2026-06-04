@@ -7327,10 +7327,10 @@ void JoyBus::RestartThread()
 int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
 {
     unsigned char cmdBytes[4];
+    unsigned short param = param_4;
     cmdBytes[0] = 0x1F;
     cmdBytes[1] = static_cast<unsigned char>(param_3);
-    cmdBytes[2] = (unsigned char)param_4;
-    cmdBytes[3] = (unsigned char)((unsigned short)param_4 >> 8);
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
     unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int result = 0;
 

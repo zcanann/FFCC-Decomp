@@ -1839,7 +1839,8 @@ void CMenuPcs::LetterMessDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	int caravanWork = Game.m_scriptFoodBase[0];
+	int caravanBase = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(caravanBase);
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
 	s16* animBase = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
@@ -1888,9 +1889,9 @@ void CMenuPcs::LetterMessDraw()
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
 
-	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
+	u16 msgIndex = *reinterpret_cast<u16*>(caravanBase + s_SelLetter * 0xC + 0x3EC);
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
-	CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
+	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
 	char* curLine = workText;
 	int y = 0x58;
@@ -1919,7 +1920,7 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawInit();
 
-	int letterEntry = caravanWork + s_SelLetter * 0xC;
+	int letterEntry = caravanBase + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterEntry + 0x3EE) & 0x1FF) != 0) {
 		int icon = 0x26 + ((*reinterpret_cast<u8*>(letterEntry + 0x3EC) >> 6) & 1);
 		DrawSingleIcon__8CMenuPcsFiiifif(
@@ -2016,24 +2017,24 @@ int CMenuPcs::LetterCtrlCur()
 		return 0;
 	}
 
-	int caravanWork = Game.m_scriptFoodBase[0];
+	int caravanBase = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(caravanBase);
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	int menuMode = *reinterpret_cast<s16*>(state + 0x30);
 	if (menuMode != 0) {
 		if (menuMode == 1) {
 			if ((press & 0x100) != 0) {
-				int entry = caravanWork + s_SelLetter * 0xC;
+				int entry = caravanBase + s_SelLetter * 0xC;
 				if (((*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) != 0) &&
 				    (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 6) & 1) == 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 1;
 					*reinterpret_cast<u8*>(state + 9) = 5;
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
-						if (*reinterpret_cast<u16*>(caravanWork + 0xB4) + 1 < 0x41) {
+						if (caravanWork->m_inventoryItemCount + 1 < 0x41) {
 							*reinterpret_cast<u8*>(state + 9) |= 2;
 						}
 					} else {
-						int canAdd = reinterpret_cast<CCaravanWork*>(caravanWork)->CanAddGil(
-						    (*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) * 100);
+						int canAdd = caravanWork->CanAddGil((*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) * 100);
 						if (canAdd != 0) {
 							*reinterpret_cast<u8*>(state + 9) |= 2;
 						}
@@ -2090,7 +2091,7 @@ int CMenuPcs::LetterCtrlCur()
 				if ((press & 0x200) == 0) {
 					return 0;
 				}
-				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
+				u8 letterFlags = *reinterpret_cast<u8*>(caravanBase + s_SelLetter * 0xC + 0x3EC);
 				if ((CFlatLetterEventEnabled() == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
@@ -2106,17 +2107,17 @@ int CMenuPcs::LetterCtrlCur()
 			s16 sel = *reinterpret_cast<s16*>(state + 0x28);
 			if ((static_cast<int>(static_cast<signed char>(*reinterpret_cast<char*>(state + 9))) & (1 << (sel + 1))) != 0) {
 				if (sel == 0) {
-					int entry = caravanWork + s_SelLetter * 0xC;
+					int entry = caravanBase + s_SelLetter * 0xC;
 					unsigned int value = *reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF;
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
-						reinterpret_cast<CCaravanWork*>(caravanWork)->AddItem(static_cast<short>(value), 0);
+						caravanWork->AddItem(static_cast<short>(value), 0);
 					} else {
-						reinterpret_cast<CCaravanWork*>(caravanWork)->AddGil(static_cast<int>(value * 100));
+						caravanWork->AddGil(static_cast<int>(value * 100));
 					}
 					*reinterpret_cast<u8*>(entry + 0x3EC) = (*reinterpret_cast<u8*>(entry + 0x3EC) & 0xBF) | 0x40;
 				}
 
-				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
+				u8 letterFlags = *reinterpret_cast<u8*>(caravanBase + s_SelLetter * 0xC + 0x3EC);
 				if ((CFlatLetterEventEnabled() == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
@@ -2179,9 +2180,9 @@ int CMenuPcs::LetterCtrlCur()
 				memset(srcText, 0, kLetterTextScratchSize);
 				memset(workText, 0, kLetterTextScratchSize);
 
-				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
+				u16 msgIndex = *reinterpret_cast<u16*>(caravanBase + s_SelLetter * 0xC + 0x3EC);
 				strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
-				CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
+				CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
 				char* line = workText;
 				int i = 0;
@@ -2280,15 +2281,15 @@ int CMenuPcs::LetterCtrlCur()
 						gilValue = s_AttachItem;
 					}
 				}
-				reinterpret_cast<CCaravanWork*>(caravanWork)->FGLetterReply(
+				caravanWork->FGLetterReply(
 				    static_cast<int>(s_SelLetter),
 				    static_cast<int>(s_ReplyPos),
 				    itemValue,
 				    gilValue);
 				if (s_Attach == 0) {
-					reinterpret_cast<CCaravanWork*>(caravanWork)->DeleteItemIdx(static_cast<int>(s_AttachItemIdx), 0);
+					caravanWork->DeleteItemIdx(static_cast<int>(s_AttachItemIdx), 0);
 				} else {
-					reinterpret_cast<CCaravanWork*>(caravanWork)->AddGil(-gilValue);
+					caravanWork->AddGil(-gilValue);
 				}
 				*reinterpret_cast<u8*>(state + 8) = 1;
 			} else {
@@ -2310,7 +2311,7 @@ int CMenuPcs::LetterCtrlCur()
 		return 0;
 	}
 
-	int letterCount = *reinterpret_cast<int*>(caravanWork + 1000);
+	int letterCount = *reinterpret_cast<int*>(caravanBase + 1000);
 	if ((letterCount == 0) && ((hold & 0xC) != 0)) {
 		Sound.PlaySe(4, 0x40, 0x7F, 0);
 		return 0;
@@ -2370,7 +2371,7 @@ int CMenuPcs::LetterCtrlCur()
 
 	*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 	s_SelLetter = *reinterpret_cast<s16*>(state + 0x34) + *reinterpret_cast<s16*>(state + 0x26);
-	int entry = caravanWork + s_SelLetter * 0xC;
+	int entry = caravanBase + s_SelLetter * 0xC;
 	CMes::m_tempVar[0] = *reinterpret_cast<u16*>(entry + 0x3F0);
 	CMes::m_tempVar[1] = *reinterpret_cast<u16*>(entry + 0x3F2);
 	CMes::m_tempVar[2] = *reinterpret_cast<u16*>(entry + 0x3F4);

@@ -2293,8 +2293,11 @@ CTexScroll::CTexScroll()
 CMaterial::~CMaterial()
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        ReleaseRef(m_textureData.m_textures[i]);
-        m_textureData.m_textures[i] = 0;
+        CTexture* texture = m_textureData.m_textures[i];
+        if (texture != 0) {
+            ReleaseRefNonNull(texture);
+            m_textureData.m_textures[i] = 0;
+        }
     }
 }
 

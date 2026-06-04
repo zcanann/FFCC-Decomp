@@ -763,9 +763,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
  */
 void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
-    Mtx mtx0;
-    Mtx mtx1;
     Mtx mtx2;
+    Mtx mtx1;
+    Mtx mtx0;
     CMapObj* obj = this;
 
     do {

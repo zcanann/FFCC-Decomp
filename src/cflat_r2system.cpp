@@ -21,7 +21,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_gba.h"
-#include "ffcc/p_game.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
@@ -1913,14 +1912,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
                 CameraPcs.SetRefPosition(refPosition);
             } else {
-                *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x38) = refPosition;
+                CharaPcs.m_overlapTargetPos = refPosition;
             }
 
             CVector position(localFloats[3], localFloats[4], localFloats[5]);
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
                 CameraPcs.SetPosition(position);
             } else {
-                *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x2C) = position;
+                CharaPcs.m_overlapEyePos = position;
             }
             CameraPcs.SetFromScript();
         }
@@ -2609,24 +2608,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x32: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
-        *reinterpret_cast<int*>(graphicsPcs + 0x98) = *object->m_localBase;
-        *reinterpret_cast<int*>(graphicsPcs + 0x88) = object->m_localBase[1];
-        *reinterpret_cast<int*>(graphicsPcs + 0x8C) = *reinterpret_cast<int*>(graphicsPcs + 0x88);
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[3];
+        fade.m_invert = *object->m_localBase;
+        fade.m_timer = object->m_localBase[1];
+        fade.m_duration = fade.m_timer;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x33: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
-        *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;
-        *reinterpret_cast<int*>(graphicsPcs + 0x70) = 0;
-        graphicsPcs[0x64] = static_cast<u8>(object->m_localBase[1]);
-        graphicsPcs[0x65] = static_cast<u8>(object->m_localBase[2]);
-        graphicsPcs[0x66] = static_cast<u8>(object->m_localBase[3]);
-        graphicsPcs[0x67] = 0xFF;
-        *reinterpret_cast<int*>(graphicsPcs + 0x5C) = object->m_localBase[4];
-        *reinterpret_cast<int*>(graphicsPcs + 0x60) = *reinterpret_cast<int*>(graphicsPcs + 0x5C);
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[2];
+        fade.m_invert = *object->m_localBase;
+        fade.m_mode = 0;
+        fade.m_colorA.r = static_cast<u8>(object->m_localBase[1]);
+        fade.m_colorA.g = static_cast<u8>(object->m_localBase[2]);
+        fade.m_colorA.b = static_cast<u8>(object->m_localBase[3]);
+        fade.m_colorA.a = 0xFF;
+        fade.m_timer = object->m_localBase[4];
+        fade.m_duration = fade.m_timer;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3503,15 +3502,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x9C: {
         int cameraSlot = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
-        int* cameraFrameCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 4 + cameraSlot * 4);
-        int* cameraTablePtr = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x14 + cameraSlot * 4);
-        if ((*cameraTablePtr == 0) || (cameraFrame < 0) || (*cameraFrameCount <= cameraFrame)) {
+        if ((CharaPcs.m_cameraData[cameraSlot] == 0) || (cameraFrame < 0) ||
+            (CharaPcs.m_cameraFrameCount[cameraSlot] <= cameraFrame)) {
             runtime->push(object, 0);
             outResult = 0;
             return 1;
         }
 
-        int cameraData = *cameraTablePtr + cameraFrame * 0x20;
+        int cameraData = reinterpret_cast<int>(CharaPcs.m_cameraData[cameraSlot]) + cameraFrame * 0x20;
         *reinterpret_cast<int*>(object->m_localBase[2]) = *reinterpret_cast<int*>(cameraData + 0x0);
         *reinterpret_cast<float*>(object->m_localBase[3]) = -*reinterpret_cast<float*>(cameraData + 0x4);
         *reinterpret_cast<float*>(object->m_localBase[4]) = -*reinterpret_cast<float*>(cameraData + 0x8);
@@ -3637,22 +3635,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         runtime->push(object, static_cast<int>(gameWork.m_townName[*object->m_localBase]));
         outResult = 0;
         return 1;
-    case -0xB2:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 64) = 0;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 48) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 52) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 68) = *object->m_localBase;
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
+    case -0xB2: {
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[1];
+        fade.m_invert = 0;
+        fade.m_timer = 1;
+        fade.m_duration = 1;
+        fade.m_mode = *object->m_localBase;
+        fade.m_colorA.r = static_cast<u8>(object->m_localBase[1]);
+        fade.m_colorA.g = static_cast<u8>(object->m_localBase[2]);
+        fade.m_colorA.b = static_cast<u8>(object->m_localBase[3]);
+        fade.m_colorA.a = static_cast<u8>(object->m_localBase[4]);
+        fade.m_colorB.r = static_cast<u8>(object->m_localBase[5]);
+        fade.m_colorB.g = static_cast<u8>(object->m_localBase[6]);
+        fade.m_colorB.b = static_cast<u8>(object->m_localBase[7]);
+        fade.m_colorB.a = static_cast<u8>(object->m_localBase[8]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
+    }
     case -0xB3:
         runtime->push(
             object,
@@ -3695,8 +3695,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0xB9:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 36) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 40) = object->m_localBase[1];
+        CharaPcs.m_overlapEnabled = *object->m_localBase;
+        CharaPcs.m_overlapAlpha = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;

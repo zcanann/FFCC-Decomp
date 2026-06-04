@@ -205,7 +205,8 @@ public:
     void createViewer();
     void destroyViewer();
 
-    u8 _pad004[0x20];                         // 0x004
+    int m_cameraFrameCount[4];                // 0x004
+    void* m_cameraData[4];                    // 0x014
     int m_overlapEnabled;                     // 0x024
     u32 m_overlapAlpha;                       // 0x028
     Vec m_overlapEyePos;                      // 0x02C
@@ -223,7 +224,9 @@ public:
     CMemory::CStage* m_viewerModelStage;      // 0x0CC
     CMemory::CStage* m_viewerTextureStage;    // 0x0D0
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4
-    u8 _pad0D8[0xC];                          // 0x0D8
+    CMemory::CStage* m_weaponTextureStage;    // 0x0D8
+    CMemory::CStage* m_weaponModelStage;      // 0x0DC
+    CMemory::CStage* m_familyModelStage;      // 0x0E0
     int m_charaAllocStage;                    // 0x0E4
     GXColor m_viewerAmbientColor[2];          // 0x0E8
     GXColor m_viewerDiffuseColor[2][3];       // 0x0F0

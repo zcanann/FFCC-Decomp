@@ -3,6 +3,7 @@
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
 #include "ffcc/cflat_data.h"
+#include "ffcc/game.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -16,7 +17,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
-#include "ffcc/p_game.h"
 #include "ffcc/quadobj.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
@@ -1847,7 +1847,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 		File.ReadASync(fileHandle);
 	}
 
-	layer->m_allocStage = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);
+	layer->m_allocStage = CharaPcs.m_charaAllocStage;
 }
 
 /*

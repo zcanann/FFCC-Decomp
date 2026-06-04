@@ -927,7 +927,7 @@ void CMenuPcs::createSingleMenu()
         }
     } else {
         if (m_singleMenuStageActive == 0) {
-            *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xD4);
+            *reinterpret_cast<CMemory::CStage**>(self + 0xF0) = CharaPcs.m_viewerAnimStage;
             m_singleMenuStageActive = 1;
         }
 

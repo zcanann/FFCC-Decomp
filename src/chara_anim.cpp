@@ -1,6 +1,7 @@
 #include "ffcc/chara_anim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -20,47 +21,7 @@ extern const double kCharaAnimSignedDoubleMagic = 4503601774854144.0;
 extern const float kCharaAnimNegativeOne = -1.0f;
 extern const float kCharaAnimFullTurnDegrees = 360.0f;
 
-class CCharaPcs
-{
-private:
-	unsigned char _pad[0x71C];
-
-public:
-	int TryReleaseAnimBank(int);
-};
-
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-	return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
-static inline int& S32At(void* p, unsigned int offset)
-{
-	return *reinterpret_cast<int*>(Ptr(p, offset));
-}
-
-static inline unsigned int& U32At(void* p, unsigned int offset)
-{
-	return *reinterpret_cast<unsigned int*>(Ptr(p, offset));
-}
-
-static inline unsigned short& U16At(void* p, unsigned int offset)
-{
-	return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
-}
-
-static inline unsigned char& U8At(void* p, unsigned int offset)
-{
-	return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
-}
-
-static inline unsigned int FourCC(char a, char b, char c, char d)
-{
-	return (static_cast<unsigned int>(a) << 24) | (static_cast<unsigned int>(b) << 16) |
-	       (static_cast<unsigned int>(c) << 8) | static_cast<unsigned int>(d);
-}
-
 static inline void i2f_5(float* out, register const unsigned short* in)
 {
 	register float value;
@@ -301,11 +262,11 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 					Memory.CopyToAMemorySync(
 					    m_bank,
-					    reinterpret_cast<void*>(Chara.m_animBankAddress + S32At(Chara.m_animAmemBase, 8)),
+					    reinterpret_cast<void*>(Chara.GetAmemBaseAddress() + Chara.AmemAnimSize()),
 					    m_bankSize);
 
-					m_bankAddress = Chara.m_animBankAddress;
-					Chara.m_animBankAddress += m_bankSize;
+					m_bankAddress = Chara.AmemAnimSize();
+					Chara.AmemAnimSize() += m_bankSize;
 					if (m_bank != 0) {
 						delete static_cast<unsigned char*>(m_bank);
 						m_bank = 0;
@@ -385,7 +346,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 
 		Memory.SetGroup(anim->m_bank, 1);
 		Memory.CopyFromAMemorySync(anim->m_bank,
-		                           reinterpret_cast<void*>(anim->m_bankAddress + S32At(Chara.m_animAmemBase, 8)),
+		                           reinterpret_cast<void*>(anim->m_bankAddress + Chara.GetAmemBaseAddress()),
 		                           anim->m_bankSize);
 	}
 

@@ -315,7 +315,7 @@ void CDbgMenuPcs::calc()
 			if ((m_selectedMenu->m_flags & 1) != 0) {
 				break;
 			}
-		} while (m_selectedMenu != start);
+		} while (start != m_selectedMenu);
 		m_selectedMenu->m_statusBits.m_selected = 1;
 	}
 
@@ -333,7 +333,7 @@ void CDbgMenuPcs::calc()
 			if ((m_selectedMenu->m_flags & 1) != 0) {
 				break;
 			}
-		} while (m_selectedMenu != start);
+		} while (start != m_selectedMenu);
 		m_selectedMenu->m_statusBits.m_selected = 1;
 	}
 

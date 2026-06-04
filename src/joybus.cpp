@@ -2616,8 +2616,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
         }
     }
 
-    unsigned int recvBit = (recvResult == 2) ? 1u : 0u;
-    unsigned int sendBit = (sendResult != 0) ? 2u : 0u;
+    unsigned int recvBit = static_cast<unsigned int>(__cntlzw(2 - recvResult)) >> 5;
+    unsigned int sendBit = ((-sendResult | sendResult) >> 31) & 2u;
 
     return static_cast<int>(recvBit | sendBit);
 }

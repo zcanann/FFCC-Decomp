@@ -562,24 +562,16 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 if (mimeChunk.m_id == CHUNK_KEY) {
-                    if (mime != 0) {
-                        mime->m_keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                    }
+                    mime->m_keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
-                    if (mime != 0) {
-                        mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                    }
+                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
-                    if (mime != 0) {
-                        mime->m_keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
-                    }
+                    mime->m_keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
-                    if (mime != 0) {
-                        mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
-                        mime->m_vertexLists = reinterpret_cast<float**>(
-                            operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                           MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x348));
-                    }
+                    mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
+                    mime->m_vertexLists = reinterpret_cast<float**>(
+                        operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
+                                       MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x348));
 
                     chunkFile.PushChunk();
                     CChunkFile::CChunk vtxChunk;
@@ -589,13 +581,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                             float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x353));
-                            if ((mime != 0) && (mime->m_vertexLists != 0)) {
-                                mime->m_vertexLists[vtxTableIndex] = vtx;
-                            }
+                            mime->m_vertexLists[vtxTableIndex] = vtx;
                             vtxTableIndex++;
-                            if (mime != 0) {
-                                mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
-                            }
+                            mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (unsigned int i = 0; i < vtxChunk.m_arg0; i++) {
                                 vtx[0] = chunkFile.GetF4();
@@ -755,9 +743,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             CMapObjAtrPlaySta* playSta =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x39B) CMapObjAtrPlaySta();
-            if (playSta != 0) {
-                playSta->m_playStaNo = chunkFile.Get1();
-            }
+            playSta->m_playStaNo = chunkFile.Get1();
             m_attribute = playSta;
         }
     }

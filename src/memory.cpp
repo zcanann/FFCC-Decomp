@@ -2103,10 +2103,10 @@ void CAmemCacheSet::CacheClear()
         CAmemCache& entry = cacheEntryAt(this, i);
 
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
-            int data = reinterpret_cast<int>(entry.m_cacheData);
+            void* data = entry.m_cacheData;
             if (data != 0) {
                 if (data != 0) {
-                    freeAmemCacheBlock(static_cast<unsigned long>(data));
+                    freeAmemCacheBlock(reinterpret_cast<unsigned long>(data));
                 }
                 entry.m_cacheData = 0;
             }

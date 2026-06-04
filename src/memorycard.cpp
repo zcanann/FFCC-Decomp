@@ -24,10 +24,10 @@ public:
     static char* MCDAT_VERSION;
 };
 
-extern const char s_CardGameCode_80330CD0[] = "FFCC";
-extern const char s_CardMakerCode_80330CD8[] = "GDS";
-extern const char s_CardMachineCode_80330CDC[] = "GC";
-extern const char s_CardVersion_80330CE0[] = "1.00";
+const char s_CardGameCode_80330CD0[] = "FFCC";
+const char s_CardMakerCode_80330CD8[] = "GDS";
+const char s_CardMachineCode_80330CDC[] = "GC";
+const char s_CardVersion_80330CE0[] = "1.00";
 
 static const char s_dvd_gba_801DA9C0[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801DA9CC[] = "ffcc_cli.bin";
@@ -45,7 +45,7 @@ char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CE0);
 
 CMemoryCardMan MemoryCardMan;
 
-extern const char sMcOdekakeReturn[] = "\202\250\213A\202\350";
+const char sMcOdekakeReturn[] = "\202\250\213A\202\350";
 // CRC32 lookup table
 static const unsigned int s_CrcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
@@ -1525,8 +1525,6 @@ void CMemoryCardMan::MakeSaveData()
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = reinterpret_cast<u8*>(&Game);
-    u8* gameWork = game + 0x08;
 
     const u64 now = OSGetTime();
     memcpy(save + 0x8AD0, &now, sizeof(now));
@@ -1540,43 +1538,39 @@ void CMemoryCardMan::MakeSaveData()
     save[0x11] = static_cast<u8>(Math.Rand(0xFF));
     save[0x12] = 0;
 
-    int wm = Game.m_gameWork.m_wmBackupParams[0];
-    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    int wm0 = Game.m_gameWork.m_wmBackupParams[0];
+    int wm1 = Game.m_gameWork.m_wmBackupParams[1];
+    int wm2 = Game.m_gameWork.m_wmBackupParams[2];
+    int wm3 = Game.m_gameWork.m_wmBackupParams[3];
+    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]].m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (Game.m_caravanWorkArr[wm0].m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    wm = Game.m_gameWork.m_wmBackupParams[1];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]].m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (Game.m_caravanWorkArr[wm1].m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    wm = Game.m_gameWork.m_wmBackupParams[2];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]].m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (Game.m_caravanWorkArr[wm2].m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    wm = Game.m_gameWork.m_wmBackupParams[3];
-    wmWork = &Game.m_caravanWorkArr[wm];
-    if (wmWork->m_shopState == 0)
+    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]].m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
-    if (wmWork->m_shopBusyFlag != 0)
+    if (Game.m_caravanWorkArr[wm3].m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
@@ -1585,22 +1579,22 @@ void CMemoryCardMan::MakeSaveData()
     save[0x21] = Game.m_gameWork.m_scriptSysVal1;
     save[0x22] = Game.m_gameWork.m_scriptSysVal2;
     save[0x23] = Game.m_gameWork.m_scriptSysVal3;
-    *reinterpret_cast<int*>(save + 0x24) = *reinterpret_cast<int*>(gameWork + 0x0C);
-    *reinterpret_cast<int*>(save + 0x28) = *reinterpret_cast<int*>(gameWork + 0x10);
-    *reinterpret_cast<int*>(save + 0x2C) = *reinterpret_cast<int*>(gameWork + 0x14);
-    memcpy(save + 0x30, gameWork + 0x18, 0x10);
-    memcpy(save + 0x40, gameWork + 0x28, 0x3C);
-    memcpy(save + 0x7C, gameWork + 0x64, 0x3C);
-    *reinterpret_cast<int*>(save + 0xB8) = *reinterpret_cast<int*>(gameWork + 0x10B4);
-    memcpy(save + 0xC0, gameWork + 0xA0, 0x1000);
-    memcpy(save + 0x10C0, gameWork + 0x10A0, 0x10);
+    *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
+    *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
+    *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
+    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
+    memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
+    memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
+    *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;
+    memcpy(save + 0xC0, Game.m_gameWork.m_linkTable, 0x1000);
+    memcpy(save + 0x10C0, Game.m_gameWork.m_townName, 0x10);
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    *reinterpret_cast<u32*>(save + 0x13D0) = *reinterpret_cast<u32*>(gameWork + 0x13E0);
-    *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
-    *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
-    save[0x13DC] = gameWork[0x13D6];
+    *reinterpret_cast<u32*>(save + 0x13D0) = Game.m_gameWork.m_mcSerial0;
+    *reinterpret_cast<u32*>(save + 0x13D4) = Game.m_gameWork.m_mcSerial1;
+    *reinterpret_cast<u32*>(save + 0x13D8) = Game.m_gameWork.m_mcRandom;
+    save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
     save[0x13DD] = Game.m_gameWork.m_bgmVolume;
     save[0x13DE] = Game.m_gameWork.m_seVolume;
     save[0x13DE] = Game.m_gameWork.m_seVolume;

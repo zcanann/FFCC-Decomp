@@ -216,6 +216,11 @@ static inline int ShopMenuCaravan(CShopMenu* shopMenu)
     return ShopMenuInt(shopMenu, 0x20);
 }
 
+static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
+{
+    return reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(shopMenu));
+}
+
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
 {
     return static_cast<float>(static_cast<int>((464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f + 80.0f));
@@ -224,8 +229,9 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 {
     int listType = ShopMenuInt(shopMenu, 0x14);
+    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     if (listType == 0) {
-        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + 0xBE4);
+        return caravanWork->m_shopListCount;
     }
     if (listType == 1) {
         return 0x40;
@@ -239,18 +245,19 @@ static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 {
     int listType = ShopMenuInt(shopMenu, 0x14);
+    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     if (listType == 0) {
-        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (index * 2 + 0xBE6));
+        return caravanWork->m_shopList[index];
     }
     if (listType == 1) {
-        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (index * 2 + 0xB6));
+        return caravanWork->m_inventoryItems[index];
     }
     if (listType == 2) {
         int mapped = ShopMenuInt(shopMenu, 0x50 + index * 4);
         if (mapped == -1) {
             return -1;
         }
-        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (mapped * 2 + 0xB6));
+        return caravanWork->m_inventoryItems[mapped];
     }
     return -1;
 }
@@ -266,8 +273,8 @@ static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
         return 0;
     }
 
-    int caravan = ShopMenuCaravan(shopMenu);
-    int gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
+    int gilValue = caravanWork->m_shopParam *
                    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
     gilValue = gilValue / 100 + (gilValue >> 0x1F);
     return gilValue - (gilValue >> 0x1F);
@@ -279,7 +286,8 @@ static int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
         return 0;
     }
 
-    int gil = *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + 0xBE2) * baseGil;
+    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
+    int gil = caravanWork->m_shopParam * baseGil;
     gil = gil / 100 + (gil >> 0x1F);
     return gil - (gil >> 0x1F);
 }
@@ -305,7 +313,7 @@ static int CalcShopMenuTradeGil(CShopMenu* shopMenu, int itemNo)
     return gilValue;
 }
 
-static int CountShopMenuOwnedItems(int caravan, int itemNo)
+static int CountShopMenuOwnedItems(CCaravanWork* caravanWork, int itemNo)
 {
     if (itemNo < 1) {
         return 0;
@@ -313,7 +321,7 @@ static int CountShopMenuOwnedItems(int caravan, int itemNo)
 
     int count = 0;
     for (int i = 0; i < 0x40; i++) {
-        if (*reinterpret_cast<short*>(caravan + i * 2 + 0xB6) == itemNo) {
+        if (caravanWork->m_inventoryItems[i] == itemNo) {
             ++count;
         }
     }
@@ -333,8 +341,7 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 
     if (listType == 2) {
         unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-        int caravan = ShopMenuCaravan(shopMenu);
-        return (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) != 0;
+        return (ShopMenuCaravanWork(shopMenu)->m_shopArgs[(itemNo - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0;
     }
 
     if (MenuPcs.EquipChk(index) != 0) {
@@ -730,7 +737,7 @@ int CShopMenu::CheckSell(int index)
  */
 int CShopMenu::getItemHaveCnt(int itemNo)
 {
-    return CountShopMenuOwnedItems(ShopMenuCaravan(this), itemNo);
+    return CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo);
 }
 
 static long* GetShopMenuShapeAnimData(int shapeNo)
@@ -1137,7 +1144,7 @@ void CShopMenu::DrawItemInfo0()
             canTrade = true;
         } else if (listType == 2) {
             canTrade = true;
-            if ((*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191U) >> 5) * 4 + 0xC08) &
+            if ((reinterpret_cast<CCaravanWork*>(caravan)->m_shopArgs[(itemNo - 0x191U) >> 5] &
                 (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
                 canTrade = false;
             }
@@ -1284,7 +1291,7 @@ void CShopMenu::DrawBuySellInfo()
                 canTrade = true;
             } else if (listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
+                canTrade = (reinterpret_cast<CCaravanWork*>(caravan)->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
             } else if ((listType == 1) && MenuPcs.EquipChk(selected) == 0 && itemNo >= 0x9F) {
                 canTrade = true;
@@ -1418,7 +1425,7 @@ void CShopMenu::DrawItemList()
                     canTrade = true;
                 } else if (listType == 2) {
                     unsigned int bit = static_cast<unsigned int>(tradeItemNo - 0x191);
-                    if ((*reinterpret_cast<unsigned int*>(ShopMenuCaravan(this) + ((tradeItemNo - 0x191) >> 5) * 4 + 0xC08) &
+                    if ((ShopMenuCaravanWork(this)->m_shopArgs[(tradeItemNo - 0x191) >> 5] &
                          (1U << (bit & 0x1F))) != 0) {
                         canTrade = true;
                     }
@@ -2196,7 +2203,7 @@ void CShopMenu::SelectMake()
 
         canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
         if (canSelect != 0) {
-            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravan(this), itemNo));
+            unsigned int total = static_cast<unsigned int>(CountShopMenuOwnedItems(ShopMenuCaravanWork(this), itemNo));
             canSelect = (total >= static_cast<unsigned int>(material[3])) ? 1U : 0U;
         }
     }
@@ -2306,8 +2313,7 @@ void CShopMenu::SelectYesNo()
                 canTrade = true;
             } else if (listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemId - 0x191);
-                int caravan = ShopMenuCaravan(this);
-                canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemId - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) != 0;
+                canTrade = (ShopMenuCaravanWork(this)->m_shopArgs[(itemId - 0x191) >> 5] & (1U << (bit & 0x1F))) != 0;
             } else if (MenuPcs.EquipChk(itemIndex) == 0) {
                 canTrade = itemId >= 0x9F;
             }
@@ -2520,8 +2526,7 @@ void CShopMenu::SelectItemIdx()
             } else if (listType == 2) {
                 if ((itemIndex != -1) && (itemNo >= 1)) {
                     unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                    int caravan = ShopMenuCaravan(this);
-                    canSelect = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
+                    canSelect = (ShopMenuCaravanWork(this)->m_shopArgs[(itemNo - 0x191) >> 5] &
                                  (1U << (bit & 0x1F))) != 0;
                 }
                 if (canSelect) {

@@ -199,10 +199,7 @@ public:
     short m_shopList[16];                       // 0x0BE6
     unsigned char m_shopExtraState;             // 0x0C06
     unsigned char m_shopExtraFlags;             // 0x0C07
-    int m_shopArg0;                             // 0x0C08
-    int m_shopArg1;                             // 0x0C0C
-    int m_shopArg2;                             // 0x0C10
-    int m_shopArg3;                             // 0x0C14
+    int m_shopArgs[4];                         // 0x0C08
     unsigned short m_baseStrength;              // 0x0C18
     unsigned short m_baseMagic;                 // 0x0C1A
     unsigned short m_baseDefense;               // 0x0C1C

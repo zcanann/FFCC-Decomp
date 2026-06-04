@@ -3454,10 +3454,8 @@ u8 CMenuPcs::GetItemIcon(int index)
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
-    int script = Game.m_scriptFoodBase[0];
-
     if (useRawItemId == 0) {
-        itemId = static_cast<int>(*reinterpret_cast<s16*>(script + itemId * 2 + 0xB6));
+        itemId = static_cast<int>(SingleCaravanWork()->m_inventoryItems[itemId]);
     }
 
     if (itemId <= 0) {

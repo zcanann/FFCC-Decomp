@@ -1564,19 +1564,19 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
 		m_shopList[14] = 0;
 		m_shopList[15] = 0;
 		break;
-	case 1: {
-		short idx = m_shopListCount;
-		m_shopListCount = idx + 1;
-		m_shopList[idx] = (short)param3;
-		break;
-	}
-	case 2:
-		m_shopArg0 = param3;
-		m_shopArg1 = param4;
-		m_shopArg2 = param5;
-		m_shopArg3 = param6;
-		m_shopRequestFlags = (unsigned char)(flags & 1);
-		break;
+		case 1: {
+			short idx = m_shopListCount;
+			m_shopListCount = idx + 1;
+			m_shopList[idx] = (short)param3;
+			break;
+		}
+		case 2:
+			m_shopArgs[0] = param3;
+			m_shopArgs[1] = param4;
+			m_shopArgs[2] = param5;
+			m_shopArgs[3] = param6;
+			m_shopRequestFlags = (unsigned char)(flags & 1);
+			break;
 	case 3:
 		m_shopParam = (short)param3;
 		break;

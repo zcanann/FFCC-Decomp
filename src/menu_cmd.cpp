@@ -1056,6 +1056,7 @@ void CMenuPcs::CmdDraw()
 	s16* cmdState = GetCmdState(this);
 	s16* drawList = GetCmdList(this);
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(caravanWork);
 	s32 caravanIter = caravanWork;
 	s16* entry = drawList + 4;
 	const s16 cmdMode = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x30);
@@ -1082,7 +1083,7 @@ void CMenuPcs::CmdDraw()
 				    (*reinterpret_cast<s16*>(caravanIter + 0x204) == -1)) {
 					t += h;
 				}
-				if ((animState == 1) && (i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots) &&
+				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
 				    (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
 					t = FLOAT_80332b10;
 					y -= FLOAT_80332ad0;
@@ -1113,7 +1114,7 @@ void CMenuPcs::CmdDraw()
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
-	for (i = 0; i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots; i++) {
+	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
 		if ((i > 7) || (*reinterpret_cast<s16*>(caravanIter + 0x214) == 0)) {
 			float alpha = *reinterpret_cast<float*>(entry + 8);
 			if (cmdMode == 3) {
@@ -1137,7 +1138,7 @@ void CMenuPcs::CmdDraw()
 					entry += 0x20;
 					continue;
 				}
-				const s16 skillId = *reinterpret_cast<s16*>(caravanWork + cmdId * 2 + 0xB6);
+				const s16 skillId = caravan->m_inventoryItems[cmdId];
 				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 				text = flatText[skillId * 5 + 4];
 				if ((cmdMode == 0) && (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
@@ -1162,10 +1163,10 @@ void CMenuPcs::CmdDraw()
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
-	for (i = 0; i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots; i++) {
+	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
 		if ((i > 1) && (*reinterpret_cast<s16*>(caravanIter + 0x204) >= 0)) {
 			DrawSingleIcon(
-			    *reinterpret_cast<s16*>(caravanWork + *reinterpret_cast<s16*>(caravanIter + 0x204) * 2 + 0xB6),
+			    caravan->m_inventoryItems[*reinterpret_cast<s16*>(caravanIter + 0x204)],
 			    entry[0] + entry[2] - 0x10, entry[1] - 2, *reinterpret_cast<float*>(entry + 8), 0, 0.0f);
 		}
 		caravanIter += 2;
@@ -2123,10 +2124,11 @@ void CMenuPcs::CmdDismantle(int selected)
 void CMenuPcs::DrawUniteList()
 {
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(caravanWork);
 	s16* const list = GetCmdList(this);
 	s16* const cmd = GetCmdState(this);
 	s16 selected = cmd[0x26 / 2];
-	const s16 foodCount = reinterpret_cast<const CCaravanWork*>(caravanWork)->m_numCmdListSlots;
+	const s16 foodCount = caravan->m_numCmdListSlots;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2221,7 +2223,7 @@ void CMenuPcs::DrawUniteList()
 			if (itemIdx < 0) {
 				continue;
 			}
-			const s16 skillId = *reinterpret_cast<const s16*>(caravanWork + itemIdx * 2 + 0xB6);
+			const s16 skillId = caravan->m_inventoryItems[itemIdx];
 			char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 			text = flatText[skillId * 5 + 4];
 		}

@@ -3973,28 +3973,32 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	unsigned int* scriptFood = Game.m_scriptFoodBase + channel;
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	const unsigned int flatBase = Game.unkCFlatData0[2];
 
 	char smithCount = 0;
 	char baseIndex = 0;
-	int itemOffset = 0;
-	for (int i = 0; i < 0x10; i++, itemOffset += 8) {
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xB6) >= 401) {
+	int itemIndex = 0;
+	for (int i = 0; i < 0x10; i++) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xB8) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xBA) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xBC) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
 	}
 
@@ -4009,7 +4013,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	totalSize += 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = *reinterpret_cast<short*>(*scriptFood + i * 2 + 0xB6);
+		const int itemId = caravanWork->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
@@ -4017,7 +4021,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 			const int itemBase = flatBase + itemId * 0x48;
 			int price = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
-				static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(*scriptFood + 0xBE2)) / 100.0f));
+				static_cast<float>(static_cast<float>(caravanWork->m_shopParam) / 100.0f));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
@@ -4073,7 +4077,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(*scriptFood + i * 4 + 0xC08), 0);
+		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&caravanWork->m_shopArgs[i]), 0);
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;

@@ -6387,7 +6387,11 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
     unsigned char value = GbaQue.GetMemorys(port);
-    unsigned int cmd = (0x14u << 24) | (0x13u << 16) | (value << 8);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x13;
+    cmdBytes[2] = value;
 
     if (m_threadRunningMask == 0)
 	{

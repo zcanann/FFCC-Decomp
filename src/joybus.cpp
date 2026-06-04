@@ -7425,18 +7425,18 @@ int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
     int result = 0;
 
     port = m_threadParams[portIndex].m_portIndex;
-    if ((int)m_cmdCount[port] < 0x40)
+    if ((int)m_cmdCount[port] >= 0x40)
+    {
+        OSSignalSemaphore(m_accessSemaphores + port);
+        result = -1;
+    }
+    else
     {
         m_cmdQueueData[port][m_cmdCount[port]] = cmd;
         port = m_threadParams[portIndex].m_portIndex;
         m_cmdCount[port]++;
         OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
         result = 0;
-    }
-    else
-    {
-        OSSignalSemaphore(m_accessSemaphores + port);
-        result = -1;
     }
 
     return result;

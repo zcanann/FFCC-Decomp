@@ -61,27 +61,23 @@ extern const char sDbgMenuOn[] = "ON";
 extern const char sDbgMenuOff[] = "OFF";
 extern const char sDbgMenuUnknown[] = "?";
 
-static CProcessTableCallback m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-static CProcessTableCallback m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-static CProcessTableCallback m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-static CProcessTableCallback m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 CProcessTable CDbgMenuPcs::m_table = {
     const_cast<char*>(sCDbgMenuPcs),
     {
-        m_table_desc0.m_thisOffset,
-        m_table_desc0.m_virtualOffset,
-        m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset,
-        m_table_desc1.m_virtualOffset,
-        m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset,
-        m_table_desc2.m_virtualOffset,
-        m_table_desc2.m_function,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0x11,
         0,
-        m_table_desc3.m_thisOffset,
-        m_table_desc3.m_virtualOffset,
-        m_table_desc3.m_function,
+        0,
+        0,
+        0,
         0x4A,
         1,
     },
@@ -181,6 +177,17 @@ void CDbgMenuPcs::destroy()
 
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
+	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+	static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+	static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+	static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+
+	CProcessTable* table = &m_table;
+
+	table->m_fields.m_create = desc0;
+	table->m_fields.m_destroy = desc1;
+	table->m_fields.m_entries[0].m_callback = desc2;
+	table->m_fields.m_entries[1].m_callback = desc3;
 }
 
 /*

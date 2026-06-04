@@ -6393,7 +6393,7 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
     cmdBytes[1] = 0x13;
     cmdBytes[2] = value;
 
-    if (m_threadRunningMask == 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
 	{
         return 0;
 	}

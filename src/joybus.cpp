@@ -2544,7 +2544,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             unsigned int newCount = 0;
 
-            for (unsigned int i = 0; i < m_cmdCount[port]; ++i)
+            for (int i = 0; i < (int)m_cmdCount[port]; ++i)
             {
                 unsigned int cmd = m_cmdQueueData[port][i];
                 unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;

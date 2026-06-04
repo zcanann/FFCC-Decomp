@@ -3,6 +3,7 @@
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/linkage.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_menu.h"
@@ -521,7 +522,7 @@ void CMesMenu::onDraw()
     }
 
     if (menuIndex < 4) {
-        unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+        CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[menuIndex]);
         if (scriptFood == 0) {
             return;
         }
@@ -617,18 +618,19 @@ void CMesMenu::onDraw()
                 (float)(((menuIndex & 1) != 0) ? 56 : 0), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
 
             font->SetScale(FLOAT_8033094C);
-            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood + 0x3CA));
+            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->unk_0x3ca_0x3dd));
             font->DrawInit();
             font->SetTlut(0xF);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             font->SetColor(colorStorage.color);
             font->SetPosX(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950));
             font->SetPosY(frameY + FLOAT_8033096C);
-            font->Draw(reinterpret_cast<char*>(scriptFood + 0x3CA));
+            font->Draw(reinterpret_cast<char*>(scriptFood->unk_0x3ca_0x3dd));
             MenuPcs.DrawInit();
 
             {
-                unsigned int heartFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+                CCaravanWork* heartFood =
+                    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)]);
                 if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
                     MenuPcs.SetColor(colorStorage);
@@ -644,7 +646,7 @@ void CMesMenu::onDraw()
                     int heartValueOffset = 0;
                     int heartTimerOffset = (int)this;
 
-                    for (int heartIndex = 0; heartIndex < (int)((unsigned int)*(unsigned short*)(heartFood + 0x1A) >> 1);
+                    for (int heartIndex = 0; heartIndex < (int)((unsigned int)heartFood->m_maxHp >> 1);
                          heartIndex++) {
                         int heartValue = *(int*)((char*)this + 0x3DA8) - heartValueOffset;
                         float heartTimer = (float)*(unsigned int*)(heartTimerOffset + 0x3DB0);
@@ -677,7 +679,7 @@ void CMesMenu::onDraw()
                                 fillAmount = heartValue;
                             }
 
-                            float u = (float)((*(unsigned short*)(heartFood + 0x42) != 0) * 0x18);
+                            float u = (float)((heartFood->m_statusTimers[5] != 0) * 0x18);
                             float v = (float)((0x0C - fillAmount) * 0x18);
                             MenuPcs.DrawRect(
                                 3, heartX, heartY, FLOAT_803308dc, FLOAT_803308dc, u, v, heartPulse, heartPulse,
@@ -692,7 +694,7 @@ void CMesMenu::onDraw()
             }
 
             unsigned int foodTimer = *(unsigned int*)((char*)this + 0x3DF0);
-            unsigned int foodAmount = (unsigned int)*(unsigned short*)(scriptFood + 0x14);
+            unsigned int foodAmount = (unsigned int)scriptFood->m_id;
             int foodTier = (int)foodAmount - 100;
             foodTier = foodTier / 100 + (foodTier >> 31);
             unsigned int foodIcon = (foodAmount % 100) + (foodTier - (foodTier >> 31)) * 4;
@@ -702,7 +704,7 @@ void CMesMenu::onDraw()
             MenuPcs.SetColor(colorStorage);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
             MenuPcs.m_textures[0x18]->SetExternalTlut(
-                (*(short*)(scriptFood + 0x1C) == 0) ? MenuPcs.m_externalFontTlut : nullptr, 1);
+                (scriptFood->m_hp == 0) ? MenuPcs.m_externalFontTlut : nullptr, 1);
             MenuPcs.DrawRect(
                 ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (float)(((menuIndex & 1) != 0) ? 75 : 5),
                 frameY + shakeY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
@@ -863,9 +865,9 @@ void CMesMenu::onCalc()
     }
 
     if (m_menuIndex < 4) {
-        unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+        CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
         if (scriptFood != 0) {
-            unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
+            unsigned int foodCount = (unsigned int)scriptFood->m_hp;
             int targetValue = (int)(foodCount * 6);
             if (*(int*)((char*)this + 0x3DAC) < targetValue) {
                 *(int*)((char*)this + 0x3DAC) += targetValue - *(int*)((char*)this + 0x3DAC);

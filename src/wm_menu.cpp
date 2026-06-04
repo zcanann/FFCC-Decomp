@@ -8964,7 +8964,7 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 		charaKind = 0;
 		modelNo = tribe * 200 + 100;
 		if (isFemale != 0) {
-			modelNo = tribe * 200 + 200;
+			modelNo += 100;
 		}
 		modelNo += job;
 		modelData[0xC] = 1;

@@ -3289,17 +3289,17 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
         unsigned int queuePort = threadParam->m_portIndex;
-        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
+        if (static_cast<int>(m_cmdCount[queuePort]) >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+            result = 0xFFFFFFFF;
+        }
+        else
         {
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = 0x10000000;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = 0xFFFFFFFF;
         }
     }
 

@@ -23,6 +23,36 @@ STATIC_ASSERT(offsetof(LocationTitleColorBlock, m_color) == 0x08);
 
 extern "C" const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
 
+struct LOCATION_POLYGON {
+    Vec m_pos;
+    GXColor m_color;
+    float m_frame;
+    s16 m_shapeUnk;
+    s16 m_shapeA;
+    s16 m_shapeB;
+    s16 m_pad;
+};
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: UNUSED
+ * EN Size: 260b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
+{
+    pppCopyVector(dst->m_pos, src->m_pos);
+    memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));
+    dst->m_frame = src->m_frame;
+    dst->m_shapeUnk = src->m_shapeUnk;
+    dst->m_shapeA = src->m_shapeA;
+    dst->m_shapeB = src->m_shapeB;
+    dst->m_pad = src->m_pad;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d8c1c

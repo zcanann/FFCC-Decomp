@@ -5,13 +5,12 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pppChangeTexCommon.h"
+#include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 extern "C" {
 extern const float kPppChangeTexInit[2];
-extern int ppvUserStopPartF;
-extern unsigned char ppvIsLoopCalc;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"

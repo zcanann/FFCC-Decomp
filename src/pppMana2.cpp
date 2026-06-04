@@ -501,10 +501,8 @@ static int UpdateWaterMesh(VMana2* mana2)
     do {
         currentScale = FLOAT_80331898;
         neighborScale = FLOAT_803318a4;
-        int col = 1;
-        int batch = 3;
-        do {
-            int index = rowBase + col;
+        int index = rowBase + 1;
+        for (int col = 1; col < 0x10; col += 5, index += 5) {
             int above0 = index - 0x11;
             int below0 = index + 0x11;
 
@@ -544,9 +542,7 @@ static int UpdateWaterMesh(VMana2* mana2)
                                    neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
                                                     waterHeightA[index4 - 1] + waterHeightA[index4 + 1]) -
                                    waterHeightB[index4];
-            col += 5;
-            batch--;
-        } while (batch != 0);
+        }
         row++;
         rowBase += 0x11;
     } while (row < 0x10);

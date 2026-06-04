@@ -877,6 +877,40 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
+{
+    (void)pObject;
+    switch (params->m_spawnMode) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
+        PSMTXIdentity(out.value);
+        out.value[0][0] = ppvMng->m_scale.x;
+        out.value[1][1] = ppvMng->m_scale.y;
+        out.value[2][2] = ppvMng->m_scale.z;
+        out.value[0][3] = ppvMng->m_position.x;
+        out.value[1][3] = ppvMng->m_position.y;
+        out.value[2][3] = ppvMng->m_position.z;
+        break;
+    case 8:
+        PSMTXIdentity(out.value);
+        out.value[0][3] = work->m_currentPosition.x;
+        out.value[1][3] = work->m_currentPosition.y;
+        out.value[2][3] = work->m_currentPosition.z;
+        break;
+    default:
+        PSMTXCopy(ppvMng->m_matrix.value, out.value);
+        break;
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8008521c
  * PAL Size: 2076b
  * EN Address: TODO
@@ -975,40 +1009,6 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
         pppSetBlendMode(params->m_blendMode);
         pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
         pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
-    }
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* params, VRyjMegaBirthModel* work)
-{
-    (void)pObject;
-    switch (params->m_spawnMode) {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 9:
-        PSMTXIdentity(out.value);
-        out.value[0][0] = ppvMng->m_scale.x;
-        out.value[1][1] = ppvMng->m_scale.y;
-        out.value[2][2] = ppvMng->m_scale.z;
-        out.value[0][3] = ppvMng->m_position.x;
-        out.value[1][3] = ppvMng->m_position.y;
-        out.value[2][3] = ppvMng->m_position.z;
-        break;
-    case 8:
-        PSMTXIdentity(out.value);
-        out.value[0][3] = work->m_currentPosition.x;
-        out.value[1][3] = work->m_currentPosition.y;
-        out.value[2][3] = work->m_currentPosition.z;
-        break;
-    default:
-        PSMTXCopy(ppvMng->m_matrix.value, out.value);
-        break;
     }
 }
 

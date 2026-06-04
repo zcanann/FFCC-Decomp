@@ -58,6 +58,67 @@ static inline float DeformationMdlZero()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void SetUpIndWarp(VYmDeformationMdl* work)
+{
+    Mtx rotMtx;
+    float indMtx[2][3];
+
+    GXSetNumIndStages(1);
+    GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
+    GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
+    GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+
+    if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
+        work->m_angle = 1;
+    }
+
+    PSMTXRotRad(rotMtx, 'z', kYmDeformationMdlDegToRad * (float)work->m_angle);
+    indMtx[0][0] = rotMtx[0][0] * work->m_scale;
+    indMtx[0][1] = rotMtx[0][1] * work->m_scale;
+    indMtx[0][2] = DeformationMdlZero();
+    indMtx[1][0] = rotMtx[1][0] * work->m_scale;
+    indMtx[1][1] = rotMtx[1][1] * work->m_scale;
+    indMtx[1][2] = DeformationMdlZero();
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void DisableIndWarp()
+{
+    Mtx rotMtx;
+    float indMtx[2][3];
+
+    GXSetTevDirect((GXTevStageID)1);
+    GXSetNumIndStages(0);
+    GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+
+    PSMTXRotRad(rotMtx, 'z', DeformationMdlZero());
+    indMtx[0][0] = DeformationMdlZero();
+    indMtx[0][1] = DeformationMdlZero();
+    indMtx[0][2] = DeformationMdlZero();
+    indMtx[1][0] = DeformationMdlZero();
+    indMtx[1][1] = DeformationMdlZero();
+    indMtx[1][2] = DeformationMdlZero();
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800d19f0
  * PAL Size: 1384b
  * EN Address: TODO
@@ -99,10 +160,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     pppSetBlendMode(0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    int zEnable = (param_2->m_disableZ == 0) ? 1 : 0;
+    u8 zEnable = param_2->m_disableZ == 0;
     pppSetDrawEnv(
         &colorInfo->m_color, &pppYmDeformationMdl->m_object.m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
-        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode, static_cast<unsigned char>(zEnable), 1, 0);
+        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode, zEnable, 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);

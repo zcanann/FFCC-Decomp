@@ -16959,6 +16959,7 @@ DOUBLE_803331D0 = .sdata2:0x803331D0; // type:object size:0x8 align:8 data:doubl
 @188 = .sdata2:0x803331E0; // type:object size:0x4 scope:local align:4 data:float
 @189 = .sdata2:0x803331E4; // type:object size:0x4 scope:local align:4 data:float
 @190 = .sdata2:0x803331E8; // type:object size:0x4 scope:local align:4 data:float
+kConstrainCameraDir2Zero = .sdata2:0x803331EC; // type:object size:0x4 align:4 data:float
 lbl_803331F0 = .sdata2:0x803331F0; // type:object size:0x7 data:string
 lbl_803331F8 = .sdata2:0x803331F8; // type:object size:0x8 data:string
 lbl_80333200 = .sdata2:0x80333200; // type:object size:0x8 data:string

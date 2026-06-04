@@ -13856,6 +13856,7 @@ sDebugSpinnerTextPtr = .sbss:0x8032ED40; // type:object size:0x4 data:4byte
 sDebugSpinnerTextPtrInit = .sbss:0x8032ED44; // type:object size:0x1 data:byte
 s_debugSpinnerFrameCounter = .sbss:0x8032ED48; // type:object size:0x4 data:4byte
 s_debugSpinnerFrameCounterInit = .sbss:0x8032ED4C; // type:object size:0x1 data:byte
+g_IsCheckDrawDone = .sbss:0x8032ED4D; // type:object size:0x1 data:byte
 ppvMng = .sbss:0x8032ED50; // type:object size:0x4 data:4byte
 ppvEnv = .sbss:0x8032ED54; // type:object size:0x4 data:4byte
 ppvScreenMatrixXbuff = .sbss:0x8032ED58; // type:object size:0x4 align:4 data:float

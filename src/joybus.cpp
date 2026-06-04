@@ -6100,24 +6100,26 @@ int JoyBus::SendRaderType(ThreadParam* threadParam)
     cmdBytes[1] = 0x0D;
     cmdBytes[2] = GbaQue.GetRadarType(threadParam->m_portIndex);
 
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
     int result = 0;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int queuePort = threadParam->m_portIndex;
-        if ((int)m_cmdCount[queuePort] < 0x40)
-        {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
-        }
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    }
+    else
+    {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+        result = -1;
     }
 
     return result;
@@ -6136,24 +6138,26 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
     cmdBytes[1] = 0x0E;
     cmdBytes[2] = GbaQue.GetRadarMode(threadParam->m_portIndex);
 
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
     int result = 0;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int queuePort = threadParam->m_portIndex;
-        if ((int)m_cmdCount[queuePort] < 0x40)
-        {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
-        }
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    }
+    else
+    {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+        result = -1;
     }
 
     return result;

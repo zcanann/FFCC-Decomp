@@ -836,17 +836,11 @@ int CCharaPcs::correctLoadAnimAmem()
         return -1;
     }
 
+    int loadAnimCount = LoadAnimArray(this)->GetSize();
     int maxEnd = 0;
-    for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+    for (int i = 0; i < loadAnimCount; i++) {
         unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-        if (loadAnim == 0) {
-            continue;
-        }
-
         unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
-        if (anim == 0) {
-            continue;
-        }
 
         const int animEnd = *reinterpret_cast<int*>(anim + 0x28) + *reinterpret_cast<int*>(anim + 0x1C);
         if (maxEnd < animEnd) {
@@ -860,16 +854,9 @@ int CCharaPcs::correctLoadAnimAmem()
         int chunkSize = 0;
         int nextOffset = scanOffset;
 
-        for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+        for (int i = 0; i < loadAnimCount; i++) {
             unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-            if (loadAnim == 0) {
-                continue;
-            }
-
             unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
-            if (anim == 0) {
-                continue;
-            }
 
             const unsigned int animOffset = *reinterpret_cast<unsigned int*>(anim + 0x28);
             const int animSize = *reinterpret_cast<int*>(anim + 0x1C);

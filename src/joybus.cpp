@@ -3422,7 +3422,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         return diffMask - 1;
     }
 
-    if (seq == sendType)
+    if ((int)seq == (int)static_cast<char>(sendType))
     {
         step = 0;
         phase = 1;

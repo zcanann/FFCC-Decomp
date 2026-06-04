@@ -3714,7 +3714,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
                 OSWaitSemaphore(&m_accessSemaphores[port]);
 
-                if ((int)m_cmdCount[port] < 0x40)
+                if ((int)m_cmdCount[port] >= 0x40)
                 {
                     m_cmdQueueData[port][m_cmdCount[port]] = word;
                     m_cmdCount[port]++;

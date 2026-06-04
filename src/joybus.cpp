@@ -3410,7 +3410,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
         }
 
         const int typeVal = static_cast<char>(sendType);
-        const int respVal = static_cast<char>(seq);
+        const int respVal = seq;
 
         if (result != 0)
         {

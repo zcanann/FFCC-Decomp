@@ -549,7 +549,7 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     strcpy(path, JoyBusConst::DVD_DIR);
     sprintf(tmp, const_cast<char*>(s_map_filename_fmt), stageId, mapId);
-    strcat(path, tmp, 132UL);
+    strcat(path, tmp);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 

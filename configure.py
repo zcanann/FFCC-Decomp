@@ -604,7 +604,7 @@ config.libs = [
             Object(NonMatching, "pppColum.cpp"),
             Object(NonMatching, "pppConformBGNormal.cpp"),
             Object(NonMatching, "pppConstrainCameraDir.cpp", cflags=cflags_game),
-            Object(NonMatching, "pppConstrainCameraDir2.cpp", cflags=cflags_game),
+            Object(NonMatching, "pppConstrainCameraDir2.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppConstrainCameraForLoc.cpp"),
             Object(NonMatching, "pppCorona.cpp"),
             Object(NonMatching, "pppCrystal.cpp"),

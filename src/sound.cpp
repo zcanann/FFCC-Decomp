@@ -32,6 +32,7 @@ extern const float FLOAT_80330d00 = 100.0f;
 extern const double DOUBLE_80330d08 = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
 extern const double DOUBLE_80330d18 = 0.5;
+extern const float kVectorFive;
 extern const char s_soundNoFreeWaveWarn_801DB0BC[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
@@ -233,7 +234,7 @@ void CLine<10>::Draw()
     GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
     for (u32 i = 0; i < pointCount; i++) {
         float x = points[i].x;
-        float y = FLOAT_80330cf4 + points[i].y;
+        float y = kVectorFive + points[i].y;
         float z = points[i].z;
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
@@ -252,7 +253,7 @@ void CLine<10>::Draw()
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
         {
-            float raisedY = FLOAT_80330cf4 + points[i].y;
+            float raisedY = kVectorFive + points[i].y;
             float raisedZ = points[i].z;
             float raisedX = points[i].x;
             GXWGFifo.f32 = raisedX;

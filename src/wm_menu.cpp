@@ -87,6 +87,14 @@ extern "C" char* lbl_80210750[];
 extern "C" char* lbl_80210B74[];
 extern "C" CMenuPcs::CTmp lbl_80210B98[];
 
+inline CGBaseObj::CGBaseObj()
+{
+}
+
+inline CGObject::CGObject()
+{
+}
+
 float FLOAT_8032ee18;
 int DAT_8032ee1c;
 unsigned char DAT_8032ee20;

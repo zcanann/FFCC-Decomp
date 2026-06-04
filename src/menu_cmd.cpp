@@ -286,7 +286,7 @@ void CMenuPcs::CmdInit()
 	float fVar3 = FLOAT_80332ab0;
 	float fVar4 = FLOAT_80332ad0;
 	do {
-		if (iVar5 < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) {
+		if (iVar5 < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots) {
 			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0x2D;
 		} else {
 			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0xFFFFFFFF;
@@ -332,7 +332,7 @@ void CMenuPcs::CmdInit0()
 		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
 	}
 
-	const u32 count = static_cast<u32>(*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + 0xBAA));
+	const u32 count = static_cast<u32>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->m_numCmdListSlots);
 	if (count == 0) {
 		return;
 	}
@@ -864,7 +864,7 @@ void CMenuPcs::CmdCtrl()
 		}
 
 		s32 next = selected + 1;
-		s32 limit = static_cast<s32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+		s32 limit = static_cast<s32>(reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots);
 		for (; next < limit; ++next) {
 			if (*reinterpret_cast<s16*>(caravanWork + next * 2 + 0x214) >= 0) {
 				break;
@@ -912,7 +912,7 @@ void CMenuPcs::CmdCtrl()
 		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
 	}
 
-	u32 count = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+	u32 count = static_cast<u32>(reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots);
 	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
 		*reinterpret_cast<s32*>(list + i * 0x20 + 0x14) = idx;
 		*reinterpret_cast<s32*>(list + i * 0x20 + 0x16) = 3;
@@ -1082,7 +1082,7 @@ void CMenuPcs::CmdDraw()
 				    (*reinterpret_cast<s16*>(caravanIter + 0x204) == -1)) {
 					t += h;
 				}
-				if ((animState == 1) && (i < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) &&
+				if ((animState == 1) && (i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots) &&
 				    (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
 					t = FLOAT_80332b10;
 					y -= FLOAT_80332ad0;
@@ -1113,7 +1113,7 @@ void CMenuPcs::CmdDraw()
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
-	for (i = 0; i < *reinterpret_cast<s16*>(caravanWork + 0xBAA); i++) {
+	for (i = 0; i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots; i++) {
 		if ((i > 7) || (*reinterpret_cast<s16*>(caravanIter + 0x214) == 0)) {
 			float alpha = *reinterpret_cast<float*>(entry + 8);
 			if (cmdMode == 3) {
@@ -1162,7 +1162,7 @@ void CMenuPcs::CmdDraw()
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
-	for (i = 0; i < *reinterpret_cast<s16*>(caravanWork + 0xBAA); i++) {
+	for (i = 0; i < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots; i++) {
 		if ((i > 1) && (*reinterpret_cast<s16*>(caravanIter + 0x204) >= 0)) {
 			DrawSingleIcon(
 			    *reinterpret_cast<s16*>(caravanWork + *reinterpret_cast<s16*>(caravanIter + 0x204) * 2 + 0xB6),
@@ -1382,7 +1382,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	int mode = menuState[0x18];
 
 	if (mode == 0) {
-		s16 cmdCount = *reinterpret_cast<s16*>(caravanWork + 0xBAA);
+		s16 cmdCount = reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots;
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
@@ -1612,9 +1612,9 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 
 			int next = selected + 1;
-			remaining = *reinterpret_cast<s16*>(caravanWork + 0xBAA) - next;
+			remaining = reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots - next;
 			check = caravanWork + next * 2;
-			if (next < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) {
+			if (next < reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots) {
 				do {
 					if (*reinterpret_cast<s16*>(check + 0x214) >= 0) {
 						break;
@@ -1944,7 +1944,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	int index = 2;
 	for (int slot = 2; slot < 8; slot++, index++) {
-		if (*reinterpret_cast<s16*>(caravanWork + 0xbaa) <= slot) {
+		if (reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots <= slot) {
 			break;
 		}
 		const s16 itemRef = *reinterpret_cast<s16*>(caravanWork + slot * 2 + 0x204);
@@ -2126,7 +2126,7 @@ void CMenuPcs::DrawUniteList()
 	s16* const list = GetCmdList(this);
 	s16* const cmd = GetCmdState(this);
 	s16 selected = cmd[0x26 / 2];
-	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
+	const s16 foodCount = reinterpret_cast<const CCaravanWork*>(caravanWork)->m_numCmdListSlots;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2750,7 +2750,7 @@ void CMenuPcs::CmdOpen2()
 	}
 
 	s32 next = selected + 1;
-	const s32 limit = static_cast<s32>(*reinterpret_cast<s16*>(caravanWork + 0xBAA));
+	const s32 limit = static_cast<s32>(reinterpret_cast<CCaravanWork*>(caravanWork)->m_numCmdListSlots);
 	for (; next < limit; ++next) {
 		if (*reinterpret_cast<s16*>(caravanWork + next * 2 + 0x214) >= 0) {
 			break;

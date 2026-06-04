@@ -200,7 +200,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             }
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);
-            if (p0Data->m_color.m_bytes[3] != 0) {
+            if (p0Data->m_color.m_gxColor.a != 0) {
                 colorValue = drawColor;
             } else {
                 colorValue = p0Data->m_color.m_rawColor;
@@ -209,7 +209,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             GXTexCoord2f32(uvMin.x + (f32)x * uStep, uvMin.y + v1);
 
             GXPosition3f32(vtx1.x, vtx1.y, vtx1.z);
-            if (p1Data->m_color.m_bytes[3] != 0) {
+            if (p1Data->m_color.m_gxColor.a != 0) {
                 colorValue = drawColor;
             } else {
                 colorValue = p1Data->m_color.m_rawColor;
@@ -218,7 +218,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             GXTexCoord2f32(uvMin.x + (f32)x * uStep, uvMin.y + v0);
 
             GXPosition3f32(vtx2.x, vtx2.y, vtx2.z);
-            if (p2Data->m_color.m_bytes[3] != 0) {
+            if (p2Data->m_color.m_gxColor.a != 0) {
                 colorValue = drawColor;
             } else {
                 colorValue = p2Data->m_color.m_rawColor;
@@ -227,7 +227,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             GXTexCoord2f32(uvMin.x + (f32)(x + 1) * uStep, uvMin.y + v0);
 
             GXPosition3f32(vtx3.x, vtx3.y, vtx3.z);
-            if (p3Data->m_color.m_bytes[3] != 0) {
+            if (p3Data->m_color.m_gxColor.a != 0) {
                 colorValue = drawColor;
             } else {
                 colorValue = p3Data->m_color.m_rawColor;

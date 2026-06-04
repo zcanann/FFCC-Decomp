@@ -6454,24 +6454,27 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
     cmdBytes[0] = 0x14;
     cmdBytes[1] = 0x12;
     cmdBytes[2] = cmdNum;
+
+    if (m_threadRunningMask == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int queuePort = threadParam->m_portIndex;
-        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
-        {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
-        }
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    }
+    else
+    {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+        result = -1;
     }
 
     return result;

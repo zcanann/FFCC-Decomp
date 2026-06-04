@@ -3121,26 +3121,27 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
  */
 int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
-    int result = 0;
-
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
     {
-        OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
+        return 0;
+    }
 
-        unsigned int port = threadParam->m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
-        {
-            m_cmdQueueData[port][m_cmdCount[port]] = command;
-            m_cmdCount[threadParam->m_portIndex]++;
+    OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
 
-            OSSignalSemaphore(m_accessSemaphores + threadParam->m_portIndex);
-            result = 0;
-        }
-        else
-        {
-            OSSignalSemaphore(m_accessSemaphores + port);
-            result = -1;
-        }
+    int result = 0;
+    unsigned int port = threadParam->m_portIndex;
+    if ((int)m_cmdCount[port] < 0x40)
+    {
+        m_cmdQueueData[port][m_cmdCount[port]] = command;
+        m_cmdCount[threadParam->m_portIndex]++;
+
+        OSSignalSemaphore(m_accessSemaphores + threadParam->m_portIndex);
+        result = 0;
+    }
+    else
+    {
+        OSSignalSemaphore(m_accessSemaphores + port);
+        result = -1;
     }
 
     return result;

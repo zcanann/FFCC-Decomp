@@ -343,8 +343,8 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
 	ChangeTexDisplayListCopy* displayListPtr;
-	unsigned int drawTevBits;
-	unsigned int fullTevBits;
+	int drawTevBits;
+	int fullTevBits;
 	GXColor** meshColorArrays;
 	GXColor* meshColorArray;
 	ChangeTexMeshData* meshData;
@@ -408,9 +408,8 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	CTexture* texture = state->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
-		unsigned int drawTevBits = 0xACE0F;
-		unsigned int fullTevBits = drawTevBits;
-		fullTevBits |= 0x1000;
+		int drawTevBits = 0xADE0F;
+		int fullTevBits = drawTevBits;
 		MaterialMan.SetChangeTexReflectionState(
 		    &texture->m_texObj, drawTevBits, fullTevBits);
 	}

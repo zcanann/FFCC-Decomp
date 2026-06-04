@@ -2242,7 +2242,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
         return 0;
 	}
 
-    char isSingle = GbaQue.IsSingleMode(port);
+    bool isSingle = GbaQue.IsSingleMode(port);
 
     if (isSingle == 0 || port == 1)
     {

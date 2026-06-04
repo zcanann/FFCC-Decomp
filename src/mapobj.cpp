@@ -1349,7 +1349,6 @@ void CMapObj::Draw(unsigned char priority)
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, m_lightSetIndex);
 
     _GXColor mapColor;
-    _GXColor lightColor;
 
     MaterialMan.SetDefaultDrawEnv(0xACE0F);
 
@@ -1385,7 +1384,7 @@ void CMapObj::Draw(unsigned char priority)
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
-    lightColor = s_mapObjLightColor;
+    _GXColor lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, m_cameraSemiTransActive, m_cameraSemiTransNear,
                               m_cameraSemiTransFar, m_cameraSemiTransFadeRange,
                               static_cast<unsigned char>(m_cameraSemiTransAlpha >> 7));

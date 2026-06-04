@@ -318,7 +318,7 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseB == 0)
     {
-        m_fileBaseB = new unsigned int[0x5000];
+        m_fileBaseB = reinterpret_cast<unsigned int*>(new char[0x5000]);
 
         if (m_fileBaseB == 0 && System.m_execParam != 0)
         {
@@ -3917,7 +3917,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         }
     }
 
-    return result;
+    return result != 0 ? -1 : 0;
 }
 
 /*
@@ -3942,7 +3942,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
     cmdBytes[3] = stageMinor[3];
     unsigned int queueCmd = cmd;
 
-    int result = 0;
+    unsigned int result = 0;
 
     if (m_threadRunningMask != 0)
     {
@@ -3952,7 +3952,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
         if ((int)m_cmdCount[port] >= 0x40)
         {
             OSSignalSemaphore(&m_accessSemaphores[port]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
         else
         {
@@ -3962,7 +3962,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
         }
     }
 
-    return result;
+    return result != 0 ? -1 : 0;
 }
 
 /*
@@ -6582,7 +6582,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
     {
         mode ^= (unsigned char)DAT_80330b20;
 
-        unsigned int word = ((unsigned int)9 << 24) | ((unsigned int)mode << 16);
+        unsigned int word = MakeJoyCmd16(0x0900, mode, 0);
         int ret = 0;
 
         if (m_threadRunningMask != 0)

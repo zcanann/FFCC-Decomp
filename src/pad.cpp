@@ -52,14 +52,14 @@ typedef char ReplayBuffer_size_check[(sizeof(ReplayBuffer) == 0x69780C) ? 1 : -1
 
 /*
  * --INFO--
- * PAL Address: 0x800220CC
+ * PAL Address: UNUSED
  * PAL Size: 156b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPad::SaveReplayData()
+inline void CPad::SaveReplayData()
 {
     ReplayBuffer* replay = reinterpret_cast<ReplayBuffer*>(_1b0_4_);
 

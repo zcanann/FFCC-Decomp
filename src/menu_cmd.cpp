@@ -11,42 +11,42 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" const char s_EmptySkillName_80332A50[];
-
-
-extern "C" const double DOUBLE_80332a58;
-extern "C" const double DOUBLE_80332a60;
-extern "C" const double DOUBLE_80332a68;
-extern "C" const double DOUBLE_80332a78;
-extern "C" const double DOUBLE_80332a80;
-extern "C" const double DOUBLE_80332a90;
-extern "C" const double DOUBLE_80332a98;
-extern "C" const double DOUBLE_80332aa0;
-extern "C" const double DOUBLE_80332aa8;
-extern "C" const double DOUBLE_80332ab8;
-extern "C" const double DOUBLE_80332ac0;
-extern "C" const float FLOAT_80332ad0;
-extern "C" const float FLOAT_80332AD4;
-extern "C" const float FLOAT_80332ac8;
-extern "C" const float FLOAT_80332a70;
-extern "C" const float FLOAT_80332ab0;
-extern "C" const float FLOAT_80332a88;
-extern "C" const float FLOAT_80332b38;
-extern "C" const float FLOAT_80332b3c;
-extern "C" const float FLOAT_80332acc;
-extern "C" const float FLOAT_80332ad8;
-extern "C" const float FLOAT_80332ae8;
-extern "C" const float FLOAT_80332AEC;
-extern "C" const float FLOAT_80332AF0;
-extern "C" const float FLOAT_80332b08;
-extern "C" const float FLOAT_80332b10;
-extern "C" const float FLOAT_80332b14;
-extern "C" const float FLOAT_80332b18;
-extern "C" const float FLOAT_80332b28;
-extern "C" const double DOUBLE_80332AE0;
-extern "C" const double DOUBLE_80332af8;
-extern "C" const double DOUBLE_80332B00;
-extern "C" const double DOUBLE_80332b20;
+extern "C" const char s_EmptySkillName_80332A50[8] = "";
+extern "C" const double DOUBLE_80332a58 = 1.0;
+extern "C" const double DOUBLE_80332a60 = 0.5;
+extern "C" const double DOUBLE_80332a68 = 0.1;
+extern "C" const float FLOAT_80332a70 = 1.0f;
+extern "C" const double DOUBLE_80332a78 = 5.0;
+extern "C" const double DOUBLE_80332a80 = 4503601774854144.0;
+extern "C" const float FLOAT_80332a88 = 0.5f;
+extern "C" const double DOUBLE_80332a90 = 0.2;
+extern "C" const double DOUBLE_80332a98 = 24.0;
+extern "C" const double DOUBLE_80332aa0 = 1.5;
+extern "C" const double DOUBLE_80332aa8 = 3.0;
+extern "C" const float FLOAT_80332ab0 = 0.0f;
+extern "C" const double DOUBLE_80332ab8 = 12.8;
+extern "C" const double DOUBLE_80332ac0 = 64.0;
+extern "C" const float FLOAT_80332ac8 = 64.0f;
+extern "C" const float FLOAT_80332acc = 255.0f;
+extern "C" const float FLOAT_80332ad0 = 8.0f;
+extern "C" const float FLOAT_80332AD4 = 40.0f;
+extern "C" const float FLOAT_80332ad8 = 0.9f;
+extern "C" const double DOUBLE_80332AE0 = 0.015625;
+extern "C" const float FLOAT_80332ae8 = 4.0f;
+extern "C" const float FLOAT_80332AEC = 208.0f;
+extern "C" const float FLOAT_80332AF0 = 2.0f;
+extern "C" const double DOUBLE_80332af8 = 19.8;
+extern "C" const double DOUBLE_80332B00 = 2.0;
+extern "C" const float FLOAT_80332b08 = 320.0f;
+extern "C" const float FLOAT_80332B0C = 3.0f;
+extern "C" const float FLOAT_80332b10 = 72.0f;
+extern "C" const float FLOAT_80332b14 = 12.0f;
+extern "C" const float FLOAT_80332b18 = 24.0f;
+extern "C" const double DOUBLE_80332b20 = 16.0;
+extern "C" const float FLOAT_80332b28 = 352.0f;
+extern "C" const double DOUBLE_80332B30 = 0.0;
+extern "C" const float FLOAT_80332b38 = 128.0f;
+extern "C" const float FLOAT_80332b3c = 0.75f;
 s32 s_unitePanelCount;
 s32 s_UniteTop[3];
 

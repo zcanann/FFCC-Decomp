@@ -33,7 +33,15 @@ public:
     void BindMcObj(int);
     unsigned int BindEffect(int, int, int);
 
-    char pad_00[0x8E];
+    char pad_00[0x70];
+    int m_manaWaterTimerA;            // 0x70
+    char pad_74[0x80 - 0x74];
+    unsigned char m_effectTimer;      // 0x80
+    char pad_81[0x84 - 0x81];
+    int m_crystalElem;                // 0x84
+    short m_crystalPart;              // 0x88
+    short m_crystalAttr;              // 0x8A
+    char pad_8C[0x8E - 0x8C];
     signed char m_optionIndex;          // 0x8E
     signed char m_gameInitMode;         // 0x8F
     signed char m_stereoMode;           // 0x90
@@ -61,7 +69,10 @@ public:
     CFont* menuFont;
     char pad_FC[0x82C - 0xFC];
     ArtiState* m_artiState;             // 0x82C
-    char pad_830[0x864 - 0x830];
+    char pad_830[0x838 - 0x830];
+    unsigned char* m_effectEntries;     // 0x838
+    unsigned char* m_effectWork;        // 0x840
+    char pad_844[0x864 - 0x844];
     unsigned short m_battleStateFlag;   // 0x864
 };
 

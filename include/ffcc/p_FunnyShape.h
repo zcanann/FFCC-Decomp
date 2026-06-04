@@ -3,24 +3,13 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/FunnyShape.h"
+#include "ffcc/USBStreamData.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ptrarray_decl.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 
 struct _GXTexObj;
-
-struct CUSBStreamDataStorage
-{
-    CUSBStreamDataStorage();
-    ~CUSBStreamDataStorage();
-
-    u8* m_data;          // 0x00
-    int m_headerReady;   // 0x04
-    int m_dataReady;     // 0x08
-    u32 m_sizeBytes;     // 0x0C
-    u32 m_packetCode;    // 0x10
-};
 
 class CFunnyShapePcs : public CProcess
 {
@@ -48,7 +37,7 @@ public:
 
     CMemory::CStage* m_viewerStage;        // 0x04
     u8 m_viewerState[0x34];                // 0x08
-    CUSBStreamDataStorage m_usbStreamDataStorage; // 0x3C
+    CUSBStreamData m_usbStreamData;        // 0x3C
     CFunnyShape m_funnyShape;              // 0x50
     FS_DISPLAY_STATUS m_displayPending;    // 0x6178
     u32 m_displayTextureEnabled;           // 0x61B8

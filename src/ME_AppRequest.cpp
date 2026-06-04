@@ -24,7 +24,7 @@ static inline CMemory::CStage* MaterialEditorStage()
  */
 RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
 {
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStream.m_stageLoad)));
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStreamState.m_stageLoad)));
 }
 
 /*
@@ -38,7 +38,7 @@ RSDLISTITEM* CMaterialEditorPcs::GetRsdItem()
  */
 inline RSDITEM* CMaterialEditorPcs::GetReadRsd()
 {
-    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStream.m_stageLoad)))->rsdItem;
+    return reinterpret_cast<RSDLISTITEM*>(m_zlist1.GetDataIdx(reinterpret_cast<int>(m_usbStreamState.m_stageLoad)))->rsdItem;
 }
 
 /*

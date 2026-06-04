@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/ptrarray.h"
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
@@ -25,6 +26,19 @@ public:
 private:
     unsigned int m_data;
 };
+
+/*
+ * --INFO--
+ * PAL Address: 0x80036254
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRelProfile::~CRelProfile()
+{
+}
 
 CProcessTableCallback CMapPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
 CProcessTableCallback CMapPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
@@ -176,19 +190,6 @@ struct PMapBound
     Vec m_min;
     Vec m_max;
 };
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80036254
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CRelProfile::~CRelProfile()
-{
 }
 
 /*

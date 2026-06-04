@@ -2280,7 +2280,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     threadParam->m_gbaStatus = gbaResult;
 
-    if (gbaResult != 0)
+    if (threadParam->m_gbaStatus != 0)
 	{
         return -1;
 	}

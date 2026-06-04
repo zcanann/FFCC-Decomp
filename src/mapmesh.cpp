@@ -24,9 +24,24 @@ static inline void AddMeshDataBase(void*& ptr, void* base)
     ptr = reinterpret_cast<void*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
 }
 
+static inline void AddMeshDataBase(Vec*& ptr, void* base)
+{
+    ptr = reinterpret_cast<Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
+}
+
+static inline void AddMeshDataBase(S16Vec*& ptr, void* base)
+{
+    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
+}
+
 static inline void AddMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
     ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
+}
+
+static inline void AddMeshDataBase(GXColor*& ptr, void* base)
+{
+    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<unsigned int>(ptr) + reinterpret_cast<unsigned int>(base));
 }
 
 static inline void AddMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
@@ -39,9 +54,24 @@ static inline void SubMeshDataBase(void*& ptr, void* base)
     ptr = reinterpret_cast<void*>(static_cast<u8*>(ptr) - static_cast<u8*>(base));
 }
 
+static inline void SubMeshDataBase(Vec*& ptr, void* base)
+{
+    ptr = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
+}
+
+static inline void SubMeshDataBase(S16Vec*& ptr, void* base)
+{
+    ptr = reinterpret_cast<S16Vec*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
+}
+
 static inline void SubMeshDataBase(CMapMeshUvPair*& ptr, void* base)
 {
     ptr = reinterpret_cast<CMapMeshUvPair*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
+}
+
+static inline void SubMeshDataBase(GXColor*& ptr, void* base)
+{
+    ptr = reinterpret_cast<GXColor*>(reinterpret_cast<u8*>(ptr) - static_cast<u8*>(base));
 }
 
 static inline void SubMeshDataBase(CMapMeshDrawEntry*& ptr, void* base)
@@ -147,13 +177,11 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
  */
 CTexture* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
-    unsigned int* drawEntry;
-
     if (m_displayListCount != 0) {
-        drawEntry = reinterpret_cast<unsigned int*>(m_drawEntries);
-        if (*drawEntry != 0) {
-            textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
-            CMaterial* material = materialSet->GetMaterial(*reinterpret_cast<unsigned short*>(drawEntry + 2));
+        CMapMeshDrawEntry* drawEntry = m_drawEntries;
+        if (drawEntry->m_size != 0) {
+            textureIndex = static_cast<unsigned int>(drawEntry->m_materialIdx);
+            CMaterial* material = materialSet->GetMaterial(drawEntry->m_materialIdx);
             return material->GetTexture(0);
         }
     }
@@ -361,7 +389,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            m_vertices = cursor;
+            m_vertices = reinterpret_cast<Vec*>(cursor);
             cursor += chunk.m_size;
             m_bound.m_min.z = FLOAT_8032F930;
             m_bound.m_min.y = FLOAT_8032F930;
@@ -371,60 +399,51 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_bound.m_max.x = FLOAT_8032F934;
 
             int vertexIndex = 0;
-            offset = 0;
             for (; vertexIndex < static_cast<int>(m_vertexCount); vertexIndex++) {
                 float value = reader.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset) = value;
+                m_vertices[vertexIndex].x = value;
                 value = reader.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset + 4) = value;
+                m_vertices[vertexIndex].y = value;
                 value = reader.GetF4();
-                *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset + 8) = value;
+                m_vertices[vertexIndex].z = value;
 
-                float* vert = reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset);
-                m_bound.m_min.x = (m_bound.m_min.x < vert[0]) ? m_bound.m_min.x : vert[0];
-                m_bound.m_min.y = (m_bound.m_min.y < vert[1]) ? m_bound.m_min.y : vert[1];
-                m_bound.m_min.z = (m_bound.m_min.z < vert[2]) ? m_bound.m_min.z : vert[2];
-                m_bound.m_max.x = (m_bound.m_max.x > vert[0]) ? m_bound.m_max.x : vert[0];
-                m_bound.m_max.y = (m_bound.m_max.y > vert[1]) ? m_bound.m_max.y : vert[1];
-                m_bound.m_max.z = (m_bound.m_max.z > vert[2]) ? m_bound.m_max.z : vert[2];
-
-                offset += 0xC;
+                Vec* vert = &m_vertices[vertexIndex];
+                m_bound.m_min.x = (m_bound.m_min.x < vert->x) ? m_bound.m_min.x : vert->x;
+                m_bound.m_min.y = (m_bound.m_min.y < vert->y) ? m_bound.m_min.y : vert->y;
+                m_bound.m_min.z = (m_bound.m_min.z < vert->z) ? m_bound.m_min.z : vert->z;
+                m_bound.m_max.x = (m_bound.m_max.x > vert->x) ? m_bound.m_max.x : vert->x;
+                m_bound.m_max.y = (m_bound.m_max.y > vert->y) ? m_bound.m_max.y : vert->y;
+                m_bound.m_max.z = (m_bound.m_max.z > vert->z) ? m_bound.m_max.z : vert->z;
             }
             break;
         case 0x4E4F524D:
             m_normalCount = static_cast<unsigned short>(chunk.m_size / 6);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            m_normals = cursor;
+            m_normals = reinterpret_cast<S16Vec*>(cursor);
             cursor += chunk.m_size;
 
-            for (int i = 0, offset = 0; i < static_cast<int>(m_normalCount); i++, offset += 6) {
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset) = reader.Get2();
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 2) =
-                    reader.Get2();
-                *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_normals) + offset + 4) =
-                    reader.Get2();
+            for (int i = 0; i < static_cast<int>(m_normalCount); i++) {
+                m_normals[i].x = reader.Get2();
+                m_normals[i].y = reader.Get2();
+                m_normals[i].z = reader.Get2();
             }
             break;
         case 0x434F4C52:
             m_colorCount = static_cast<unsigned short>(chunk.m_size >> 2);
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-            m_colors = cursor;
+            m_colors = reinterpret_cast<GXColor*>(cursor);
             cursor += chunk.m_size;
 
-            for (int i = 0, offset = 0; i < static_cast<int>(m_colorCount); i++) {
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) = reader.Get1();
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) =
-                    reader.Get1();
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) =
-                    reader.Get1();
-                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 3) =
-                    reader.Get1();
+            for (int i = 0; i < static_cast<int>(m_colorCount); i++) {
+                m_colors[i].r = reader.Get1();
+                m_colors[i].g = reader.Get1();
+                m_colors[i].b = reader.Get1();
+                m_colors[i].a = reader.Get1();
                 if (halfColor != 0) {
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset) >>= 1;
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 1) >>= 1;
-                    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_colors) + offset + 2) >>= 1;
+                    m_colors[i].r >>= 1;
+                    m_colors[i].g >>= 1;
+                    m_colors[i].b >>= 1;
                 }
-                offset += 4;
             }
             break;
         case 0x55562020:
@@ -451,11 +470,9 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_drawEntries = reinterpret_cast<CMapMeshDrawEntry*>(cursor);
 
             cursor += static_cast<unsigned int>(m_displayListCount) * 0x10U;
-            offset = 0;
             for (int i = 0; i < static_cast<int>(m_displayListCount); i++) {
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset) = 0;
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset + 4) = 0;
-                offset += 0x10;
+                m_drawEntries[i].m_size = 0;
+                m_drawEntries[i].m_displayList = 0;
             }
 
             dlIndex = 0;

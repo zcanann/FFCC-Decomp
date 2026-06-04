@@ -4,6 +4,7 @@
 #include "ffcc/mapocttree.h"
 #include "ffcc/memory.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 class CChunkFile;
@@ -66,11 +67,11 @@ public:
     CMapMeshBound m_bound;             // 0x0C
     void* m_meshData;                  // 0x24
     void* m_displayListData;           // 0x28
-    void* m_vertices;                  // 0x2C
-    void* m_normals;                   // 0x30
+    Vec* m_vertices;                   // 0x2C
+    S16Vec* m_normals;                 // 0x30
     void* m_nbt;                       // 0x34
     CMapMeshUvPair* m_uvPairs;         // 0x38
-    void* m_colors;                    // 0x3C
+    GXColor* m_colors;                 // 0x3C
     CMapMeshDrawEntry* m_drawEntries;  // 0x40
 };
 

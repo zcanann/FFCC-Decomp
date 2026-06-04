@@ -2078,13 +2078,21 @@ void JoyBus::SetPadData(ThreadParam* threadParam, unsigned char* data)
 
     unsigned char state = threadParam->m_state;
 
-    if (state == 0x05 || state == '!' || state == '"' || state == '#' || state == '$' || m_stageId == '!')
+    if ((((state != 0x05) && (state != '!')) && (state != '"')) &&
+        ((state != '#' && (state != '$'))))
     {
-        if (b1 & 0x04)
+        if (m_stageId != '!')
         {
-            flags |= 0x0010;
+            goto skipStartFlag;
         }
     }
+
+    if (b1 & 0x04)
+    {
+        flags |= 0x0010;
+    }
+
+skipStartFlag:
 
     unsigned char b2 = data[2];
 

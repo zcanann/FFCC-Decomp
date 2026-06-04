@@ -51,9 +51,9 @@ CProcessTableCallback CMapPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast
 CProcessTableCallback CMapPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
 CProcessTableCallback CMapPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
-extern const char s_CMapPcs_GAME_801D76E0[];
-extern const char s_CMapPcs_VIEWER_801D76F0[];
-extern const char s_CMapPcs_PART_801D7700[];
+extern "C" const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs(GAME)";
+extern "C" const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs(VIEWER)";
+extern "C" const char s_CMapPcs_PART_801D7700[] = "CMapPcs(PART)";
 
 CProcessTable CMapPcs::m_table[3] = {
     {
@@ -115,9 +115,15 @@ extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-extern const char s_p_map_cpp[];
-extern const char s_map_load_ok_fmt[];
-extern const char s_dvd_map_stage_map_fmt[];
+extern "C" const char s_p_map_cpp[] = "p_map.cpp";
+extern "C" const char s_map_load_ok_fmt[] =
+    "\n\n=============================================================\n"
+    "                   LoadMap [%s] OK\n"
+    "                   m_mapobj_n = %d\n"
+    "                   m_octtree_n = %d\n"
+    "                   memFree=%d Kbyte\n"
+    "=============================================================\n\n\n";
+extern "C" const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
 namespace {

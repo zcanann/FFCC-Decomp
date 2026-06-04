@@ -4926,7 +4926,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 {
     const int port = threadParam->m_portIndex;
-    unsigned char modeByte = static_cast<unsigned char>(controlMode);
+    int modeByte = controlMode;
     bool isSingle = GbaQue.IsSingleMode(port);
 
     // If single-player, force modeByte = 0

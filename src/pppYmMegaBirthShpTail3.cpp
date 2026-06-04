@@ -9,16 +9,17 @@ extern const float kPppYmMegaBirthShpTail3Zero;
 extern const float FLOAT_803305A0;
 extern const float FLOAT_803305A8;
 extern const float FLOAT_803305AC;
-extern const float FLOAT_803305B0;
-extern const float FLOAT_803305C8;
-extern const float FLOAT_803305CC;
-extern const float FLOAT_803305D0;
-extern const float FLOAT_803305D4;
-extern const double DOUBLE_803305D8;
 }
 #include "dolphin/mtx.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
+
+static const float FLOAT_803305B0 = 127.0f;
+static const float FLOAT_803305C8 = 2.0f;
+static const float FLOAT_803305CC = 180.0f;
+static const float FLOAT_803305D0 = 0.7f;
+static const float FLOAT_803305D4 = 0.5f;
+static const double DOUBLE_803305D8 = 1.0;
 
 static pppFMATRIX g_matUnit3;
 

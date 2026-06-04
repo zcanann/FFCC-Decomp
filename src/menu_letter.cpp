@@ -69,7 +69,7 @@ static unsigned char s_OpenClose = 0;
 static unsigned char s_ReplyMax = 0;
 static unsigned char s_ReplyPos = 0;
 static signed char s_Attach = 0;
-static unsigned char s_AttachItemIdx = 0;
+static signed char s_AttachItemIdx = 0;
 static int s_AttachItem = 0;
 static int s_AttachMode = 0;
 static int s_BackUpCur[2];
@@ -2555,7 +2555,7 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 	unsigned int caravanWork = Game.m_scriptFoodBase[0];
 
 	if (s_Attach == 0) {
-		s_AttachItemIdx = static_cast<unsigned char>(itemIndex);
+		s_AttachItemIdx = static_cast<signed char>(itemIndex);
 		caravanWork += itemIndex * 2;
 		s_AttachItem = *reinterpret_cast<short*>(caravanWork + 0xB6);
 	} else {

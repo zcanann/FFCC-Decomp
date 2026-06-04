@@ -23,7 +23,7 @@ extern const float FLOAT_80330e4c = 0.0f;
 extern const char s_ymManaRuin2Name[] = "ruin_2";
 extern const float FLOAT_80330e58;
 static const float LOCAL_FLOAT_80330e58 = 1.0f;
-extern const float FLOAT_80330e5c = 0.5f;
+extern const float FLOAT_80330e5c;
 
 extern const float FLOAT_80330e60 = 2.0f;
 extern const float FLOAT_80330e64 = 0.015625f;

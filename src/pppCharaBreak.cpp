@@ -737,7 +737,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_infoWord1].m_mtx, meshMtx);
+        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_nodeIndex].m_mtx, meshMtx);
     }
     workPositions = mesh->m_workPositions;
     u16* stream = (u16*)displayList;

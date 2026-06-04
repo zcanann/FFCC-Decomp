@@ -224,7 +224,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     segBaseX = work->m_posHistory[curIndex].x;
     segBaseY = work->m_posHistory[curIndex].y;
     segBaseZ = work->m_posHistory[curIndex].z;
-    if (curIndex == lastIndex) {
+    if (nextIndex == work->m_count) {
         nextIndex = 0;
     }
     nextBaseX = work->m_posHistory[nextIndex].x;

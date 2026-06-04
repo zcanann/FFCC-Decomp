@@ -40,6 +40,7 @@ public:
     static CProcessTable m_table[2];
 
     CUSBStreamData m_usbStreamData; // 0x04
+    CUSBStreamDataState m_usbStreamState; // 0x18
 
     CPartPcs();
     ~CPartPcs();

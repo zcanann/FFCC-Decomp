@@ -271,7 +271,7 @@ void CDbgMenuPcs::calc()
 		case 0x72:
 			m_dbgFlags ^= 0x800;
 			flags = (unsigned int)__cntlzw(m_dbgFlags & 0x800);
-			PartPcs.m_usbStreamData.m_disableShokiDraw = (unsigned char)(flags >> 5);
+			PartPcs.m_usbStreamState.m_disableShokiDraw = (unsigned char)(flags >> 5);
 			break;
 		case 0x73:
 			m_dbgFlags ^= 0x1000;

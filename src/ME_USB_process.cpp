@@ -109,6 +109,7 @@ static inline f32 S32ToFloat(s32 value)
 void CMaterialEditorPcs::SetUSBData()
 {
     CUSBStreamData& usb = m_usbStream;
+    CUSBStreamDataState& usbState = m_usbStreamState;
 
     switch (usb.m_packetCode) {
     case 0x21:
@@ -119,10 +120,10 @@ void CMaterialEditorPcs::SetUSBData()
         m_displayTextureEnabled = 0;
         break;
     case 3:
-        usb.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
+        usbState.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
         break;
     case 4:
-        usb.m_stageDefault = 0;
+        usbState.m_stageDefault = 0;
         break;
     case 0x40:
         ResetRsdList(&m_zlist1);
@@ -223,9 +224,9 @@ void CMaterialEditorPcs::SetUSBData()
         break;
     }
     case 0x42:
-        memcpy(&usb.m_stageLoad, usb.m_data, 4);
-        usb.m_stageLoad = reinterpret_cast<CMemory::CStage*>(LoadSwap32(reinterpret_cast<u32>(usb.m_stageLoad)));
-        DCStoreRange(&usb.m_stageLoad, 4);
+        memcpy(&usbState.m_stageLoad, usb.m_data, 4);
+        usbState.m_stageLoad = reinterpret_cast<CMemory::CStage*>(LoadSwap32(reinterpret_cast<u32>(usbState.m_stageLoad)));
+        DCStoreRange(&usbState.m_stageLoad, 4);
         SetRsdIndex();
         break;
     case 0x43:

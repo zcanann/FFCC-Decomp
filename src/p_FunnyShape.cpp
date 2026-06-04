@@ -47,7 +47,7 @@ struct CFunnyShapeViewerState {
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>(&self->m_usbStreamDataStorage);
+    return &self->m_usbStreamData;
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)

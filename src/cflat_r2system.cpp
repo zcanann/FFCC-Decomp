@@ -40,9 +40,9 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-static inline CUSBStreamData* UsbStream(CPartPcs* self)
+static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 {
-    return &self->m_usbStreamData;
+    return &self->m_usbStreamState;
 }
 
 extern float FLOAT_80330B30;

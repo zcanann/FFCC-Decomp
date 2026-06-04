@@ -7441,26 +7441,29 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
     cmdBytes[1] = 0x0C;
     cmdBytes[2] = itemId;
     unsigned int port;
+
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+
     unsigned int result = 0;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    port = m_threadParams[portIndex].m_portIndex;
+    if ((int)m_cmdCount[port] < 0x40)
     {
-        OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
-
+        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
         port = m_threadParams[portIndex].m_portIndex;
-        if ((int)m_cmdCount[port] < 0x40)
-        {
-            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-            port = m_threadParams[portIndex].m_portIndex;
-            m_cmdCount[port]++;
-            OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
-            result = 0;
-        }
-        else
-        {
-            OSSignalSemaphore(m_accessSemaphores + port);
-            result = 0xFFFFFFFF;
-        }
+        m_cmdCount[port]++;
+        OSSignalSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
+        result = 0;
+    }
+    else
+    {
+        OSSignalSemaphore(m_accessSemaphores + port);
+        result = 0xFFFFFFFF;
     }
 
     return result;

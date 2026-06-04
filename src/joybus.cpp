@@ -3854,7 +3854,11 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     GbaQue.GetMBasePos(port, &posX, &posY);
 
-    unsigned int cmdX = (0x0Fu << 24) | (0x00u << 16) | ((unsigned char)(posX & 0xFF) << 8) | ((unsigned char)((posX >> 8) & 0xFF));
+    unsigned int cmdX = 0;
+    unsigned char* cmdXBytes = reinterpret_cast<unsigned char*>(&cmdX);
+    unsigned short xValue = posX;
+    cmdXBytes[0] = 0x0F;
+    *reinterpret_cast<unsigned short*>(cmdXBytes + 2) = __lhbrx(&xValue, 0);
     int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
@@ -3880,7 +3884,11 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         return -1;
 	}
 
-    unsigned int cmdY = (0x4Fu << 24) | (0x00u << 16) | ((unsigned char)(posY & 0xFF) << 8) | ((unsigned char)((posY >> 8) & 0xFF));
+    unsigned int cmdY = 0;
+    unsigned char* cmdYBytes = reinterpret_cast<unsigned char*>(&cmdY);
+    unsigned short yValue = posY;
+    cmdYBytes[0] = 0x4F;
+    *reinterpret_cast<unsigned short*>(cmdYBytes + 2) = __lhbrx(&yValue, 0);
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
     {

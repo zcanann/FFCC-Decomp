@@ -2504,12 +2504,12 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
 void CMenuPcs::DrawSingWin(short mode)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    s16* win = *reinterpret_cast<s16**>(self + 0x848);
 
-    if (mode >= 0 && win[5] != mode) {
-        win[5] = mode;
+    if (mode >= 0 && (*reinterpret_cast<s16**>(self + 0x848))[5] != mode) {
+        (*reinterpret_cast<s16**>(self + 0x848))[5] = mode;
     }
 
+    s16* win = *reinterpret_cast<s16**>(self + 0x848);
     if (win[5] == 3) {
         return;
     }

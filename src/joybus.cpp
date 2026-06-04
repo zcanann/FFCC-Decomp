@@ -3044,7 +3044,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
             unsigned int qPort = threadParam->m_portIndex;
-            if ((int)m_cmdCount[qPort] < 0x40)
+            if ((int)m_cmdCount[qPort] >= 0x40)
             {
                 m_cmdQueueData[qPort][m_cmdCount[qPort]] = cmdStage;
                 m_cmdCount[threadParam->m_portIndex]++;

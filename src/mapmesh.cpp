@@ -527,8 +527,10 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
  */
 void CMapMesh::Off2Ptr()
 {
-    int offset = 0;
+    int offset;
     CMapMeshDrawEntry* entry;
+    int i = 0;
+    offset = 0;
 
     AddMeshDataBase(m_vertices, m_meshData);
     AddMeshDataBase(m_normals, m_meshData);
@@ -537,7 +539,7 @@ void CMapMesh::Off2Ptr()
     AddMeshDataBase(m_colors, m_meshData);
     AddMeshDataBase(m_drawEntries, m_meshData);
 
-    for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(m_displayListCount)); i++) {
+    for (; i < static_cast<int>(static_cast<unsigned short>(m_displayListCount)); i++) {
         entry = reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + offset);
         offset += sizeof(CMapMeshDrawEntry);
         entry->m_displayList = static_cast<u8*>(m_meshData) + entry->m_displayListOffset;

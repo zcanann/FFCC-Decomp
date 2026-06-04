@@ -312,13 +312,16 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
 	CFont* font = menuFont;
 	float width;
+	const float& scaleY = kOptionAnimMax;
+	const float& halfWidth = kMenuCenteringHalfWidth;
+	const float& offset = kMenuCenteringOffset;
 
 	font->SetShadow(1);
 	font->SetMargin(margin);
 	font->SetScaleX(scale);
-	font->SetScaleY(kOptionAnimMax);
+	font->SetScaleY(scaleY);
 	width = font->GetWidth(text);
-	return -(width * kMenuCenteringHalfWidth - kMenuCenteringOffset);
+	return offset - width * halfWidth;
 }
 
 /*
@@ -328,8 +331,10 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
  */
 float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
+    const float& halfWidth = kMenuCenteringHalfWidth;
+    const float& offset = kMenuCenteringOffset;
     float width = font->GetWidth(text);
-    return -(width * kMenuCenteringHalfWidth - kMenuCenteringOffset);
+    return offset - width * halfWidth;
 }
 
 /*

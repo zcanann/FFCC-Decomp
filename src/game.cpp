@@ -1245,7 +1245,7 @@ void CGame::Draw()
  */
 int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-    static s16 s_top[] = {0, 4, 8};
+    static s16 s_top[] = {0, 2, 4, 0};
 
     int stage =
         Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];

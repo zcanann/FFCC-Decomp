@@ -6740,7 +6740,7 @@ int JoyBus::IsInitSend(int portIndex)
         }
         else if (state == 2)
         {
-            result = (tp.m_flags[0] ? 0 : 1);
+            result = (tp.m_flags[0] ? 1 : 0);
         }
         else
         {

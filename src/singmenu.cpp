@@ -2633,17 +2633,22 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     CColor color(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(color.color);
 
-    int lineCount = s_DynamicMess[0];
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
-    if (useDynamic == 0) {
+    int lineCount;
+    if (useDynamic != 0) {
+        lineCount = s_DynamicMess[0];
+    } else {
         lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        short textId = staticMessage.textIds[i];
-        int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
+        const char* text = dynamicText;
+        if (useDynamic == 0) {
+            text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        }
+        int textWidth = font->GetWidth(text);
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }
@@ -2664,8 +2669,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     for (int i = 0; i < lineCount; i++) {
         font->SetTlut(((activeMask & (1 << i)) != 0) + 8);
 
-        short textId = staticMessage.textIds[i];
-        const char* text = GetSingWinMessage(textId, dynamicText, useDynamic);
+        const char* text = dynamicText;
+        if (useDynamic == 0) {
+            text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        }
         if (strlen(text) != 0) {
             char lineBuffer[128];
             strcpy(lineBuffer, text);
@@ -2697,17 +2704,22 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    int lineCount = s_DynamicMess[0];
     const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
-    if (useDynamic == 0) {
+    int lineCount;
+    if (useDynamic != 0) {
+        lineCount = s_DynamicMess[0];
+    } else {
         lineCount = staticMessage.lineCount;
     }
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;
     for (int i = 0; i < lineCount; i++) {
-        short textId = staticMessage.textIds[i];
-        int textWidth = font->GetWidth(GetSingWinMessage(textId, dynamicText, useDynamic));
+        const char* text = dynamicText;
+        if (useDynamic == 0) {
+            text = GetSingWinMessage(staticMessage.textIds[i], dynamicText, 0);
+        }
+        int textWidth = font->GetWidth(text);
         if (maxWidth < textWidth) {
             maxWidth = textWidth;
         }

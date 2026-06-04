@@ -157,7 +157,7 @@ static inline void freeStageBlock(void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
         }
 
-        block->m_flags = static_cast<unsigned char>(block->m_flags & 0xfb);
+        block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
 
         if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
             block->m_size =
@@ -1521,7 +1521,7 @@ static inline void freeAmemCacheBlock(unsigned long ptr)
         System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
     }
 
-    block[2] = static_cast<unsigned char>(block[2] & 0xfb);
+    block[2] = static_cast<unsigned char>(block[2] & ~kMemoryBlockUsedFlag);
 
     int blockPrev = *reinterpret_cast<int*>(block + 8);
     if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {

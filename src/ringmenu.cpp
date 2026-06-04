@@ -380,7 +380,7 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
 	float gbaAnim = static_cast<float>(
-	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
+	    sin(static_cast<double>((FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / FLOAT_80330a10)));
 	if (m_gbaConnectedFlag == 1) {
 		gbaAnim = FLOAT_803309cc - gbaAnim;
 	}

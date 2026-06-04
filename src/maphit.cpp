@@ -448,17 +448,17 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     bool boundsOverlap = false;
     bool partialOverlap = false;
     bool axisOverlap;
-    if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_boundsMin.x) {
-        axisOverlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
+    if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_bound.m_min.x) {
+        axisOverlap = g_hit_cyl.m_bound.m_min.x <= g_hit_lpface->m_boundsMax.x;
     } else {
-        axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
+        axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_bound.m_max.x;
     }
 
     if (axisOverlap) {
-        if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_boundsMin.y) {
-            axisOverlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
+        if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_bound.m_min.y) {
+            axisOverlap = g_hit_cyl.m_bound.m_min.y <= g_hit_lpface->m_boundsMax.y;
         } else {
-            axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
+            axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_bound.m_max.y;
         }
 
         if (axisOverlap) {
@@ -467,10 +467,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     if (partialOverlap) {
-        if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_boundsMin.z) {
-            axisOverlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
+        if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_bound.m_min.z) {
+            axisOverlap = g_hit_cyl.m_bound.m_min.z <= g_hit_lpface->m_boundsMax.z;
         } else {
-            axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
+            axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_bound.m_max.z;
         }
 
         if (axisOverlap) {

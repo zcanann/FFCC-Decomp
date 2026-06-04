@@ -1049,7 +1049,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	}
 
-	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[3]);
+	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.m_romLetterWorkBase);
 	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter += 0x3E) {
 		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
 

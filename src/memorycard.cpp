@@ -24,10 +24,10 @@ public:
     static char* MCDAT_VERSION;
 };
 
-extern const char s_CardGameCode_80330CB8[];
-extern const char s_CardMakerCode_80330CC0[];
-extern const char s_CardMachineCode_80330CC4[];
-extern const char s_CardVersion_80330CC8[];
+extern const char s_CardGameCode_80330CD0[] = "FFCC";
+extern const char s_CardMakerCode_80330CD8[] = "GDS";
+extern const char s_CardMachineCode_80330CDC[] = "GC";
+extern const char s_CardVersion_80330CE0[] = "1.00";
 
 static const char s_dvd_gba_801DA9C0[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801DA9CC[] = "ffcc_cli.bin";
@@ -36,16 +36,16 @@ static const char s_icon_dat_801DA9E8[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
 
 char* CardConst::MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
-char* CardConst::MC_FNAME = const_cast<char*>(s_CardGameCode_80330CB8);
+char* CardConst::MC_FNAME = const_cast<char*>(s_CardGameCode_80330CD0);
 char* CardConst::MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
-char* CardConst::MCDAT_MAKER = const_cast<char*>(s_CardMakerCode_80330CC0);
-char* CardConst::MCDAT_TITLE = const_cast<char*>(s_CardGameCode_80330CB8);
-char* CardConst::MCDAT_MACHINE = const_cast<char*>(s_CardMachineCode_80330CC4);
-char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CC8);
+char* CardConst::MCDAT_MAKER = const_cast<char*>(s_CardMakerCode_80330CD8);
+char* CardConst::MCDAT_TITLE = const_cast<char*>(s_CardGameCode_80330CD0);
+char* CardConst::MCDAT_MACHINE = const_cast<char*>(s_CardMachineCode_80330CDC);
+char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CE0);
 
 CMemoryCardMan MemoryCardMan;
 
-extern const char sMcOdekakeReturn[8] = "\202\250\213A\202\350";
+extern const char sMcOdekakeReturn[] = "\202\250\213A\202\350";
 // CRC32 lookup table
 static const unsigned int s_CrcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,

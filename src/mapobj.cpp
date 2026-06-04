@@ -402,39 +402,60 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     int objIndex = this - MapObjArrayStart();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
-        if (chunk.m_id == CHUNK_BOBJ) {
+        switch (chunk.m_id) {
+        case CHUNK_BOBJ: {
             m_bumpObjId = chunkFile.Get2();
-        } else if (chunk.m_id == CHUNK_GBID) {
+            break;
+        }
+        case CHUNK_GBID: {
             m_groupId = chunkFile.Get2();
-        } else if (chunk.m_id == CHUNK_EFID) {
+            break;
+        }
+        case CHUNK_EFID: {
             m_effectId = chunkFile.Get2();
-        } else if (chunk.m_id == CHUNK_FSDW) {
+            break;
+        }
+        case CHUNK_FSDW: {
             CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
-        } else if (chunk.m_id == CHUNK_ID) {
+            break;
+        }
+        case CHUNK_ID: {
             m_objId = chunkFile.Get2();
-        } else if (chunk.m_id == CHUNK_MSID) {
+            break;
+        }
+        case CHUNK_MSID: {
             m_meshId = static_cast<unsigned short>(chunkFile.Get4());
-        } else if (chunk.m_id == CHUNK_PRIO) {
+            break;
+        }
+        case CHUNK_PRIO: {
             unsigned char priority = chunkFile.Get1();
             m_drawPriority = priority;
             m_baseDrawPriority = priority;
-        } else if (chunk.m_id == CHUNK_AMBI) {
+            break;
+        }
+        case CHUNK_AMBI: {
             m_ambientColor.r = chunkFile.Get1();
             m_ambientColor.g = chunkFile.Get1();
             m_ambientColor.b = chunkFile.Get1();
             m_ambientColor.a = chunkFile.Get1();
             m_useAmbientColor = 1;
-        } else if (chunk.m_id == CHUNK_GEOM) {
+            break;
+        }
+        case CHUNK_GEOM: {
             m_zBufferOffset = chunkFile.GetF4();
             m_bumpTexMatrixMode = chunkFile.Get1();
             m_disableZWrite = chunkFile.Get1();
-        } else if (chunk.m_id == CHUNK_LTST) {
+            break;
+        }
+        case CHUNK_LTST: {
             if (chunk.m_version == 1) {
                 m_lightSetIndex = static_cast<int>(chunkFile.Get4());
             } else if (chunkFile.Get1() == 0) {
                 m_lightSetIndex = 0;
             }
-        } else if (chunk.m_id == CHUNK_SDST) {
+            break;
+        }
+        case CHUNK_SDST: {
             if (chunk.m_version == 2) {
                 m_enableFullScreenShadow = chunkFile.Get1();
                 chunkFile.Get1();
@@ -452,7 +473,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_enableFullScreenShadow = chunkFile.Get1();
                 m_shadowTarget = -1;
             }
-        } else if (chunk.m_id == CHUNK_PIDX) {
+            break;
+        }
+        case CHUNK_PIDX: {
             short parentIdx = static_cast<short>(chunkFile.Get2());
             short meshOrHitIdx = static_cast<short>(chunkFile.Get2());
 
@@ -492,11 +515,15 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
             }
-        } else if (chunk.m_id == CHUNK_TRNS) {
+            break;
+        }
+        case CHUNK_TRNS: {
             m_transRateX = chunkFile.GetF4();
             m_transRateY = chunkFile.GetF4();
             m_transRateZ = chunkFile.GetF4();
-        } else if (chunk.m_id == CHUNK_TFRM) {
+            break;
+        }
+        case CHUNK_TFRM: {
             m_localTranslateX = chunkFile.GetF4();
             m_localTranslateY = chunkFile.GetF4();
             m_localTranslateZ = chunkFile.GetF4();
@@ -522,7 +549,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
             m_localMtxDirty = 1;
             m_calcMtxPending = 1;
-        } else if (chunk.m_id == CHUNK_ANIM) {
+            break;
+        }
+        case CHUNK_ANIM: {
             CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
                 operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
             if (animRun != 0) {
@@ -539,7 +568,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 }
                 MapMng.GetMapAnimRunArray().Add(animRun);
             }
-        } else if (chunk.m_id == CHUNK_MIME) {
+            break;
+        }
+        case CHUNK_MIME: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
@@ -598,7 +629,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             chunkFile.PopChunk();
             m_attribute = mimeAttr;
-        } else if (chunk.m_id == CHUNK_PLIT) {
+            break;
+        }
+        case CHUNK_PLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
@@ -671,7 +704,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 pointLight->m_colorMode = chunkFile.Get1();
             }
             m_attribute = pointLightAttr;
-        } else if (chunk.m_id == CHUNK_SLIT) {
+            break;
+        }
+        case CHUNK_SLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
@@ -774,7 +809,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_unknown2E = chunkFile.Get1();
             }
             m_attribute = spotLightAttr;
-        } else if (chunk.m_id == CHUNK_PSTA) {
+            break;
+        }
+        case CHUNK_PSTA: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
@@ -782,6 +819,8 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x39B) CMapObjAtrPlaySta();
             playSta->m_playStaNo = chunkFile.Get1();
             m_attribute = playSta;
+            break;
+        }
         }
     }
     chunkFile.PopChunk();

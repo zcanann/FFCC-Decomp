@@ -1406,7 +1406,7 @@ void GbaQueue::LoadPlayerStat()
 	memset(localNames, 0, sizeof(localNames));
 
 	for (i = 0; i < 8; i++) {
-		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].unk_0x3ca_0x3dd, 0x10);
+		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
 	outOfShoukiMask = 0;
@@ -3133,7 +3133,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 			if ((i != localInfo.m_playerSlot) && (caravanWork->m_shopState != 0) &&
 			    (caravanWork->m_caravanLocalFlags == '\0') &&
-			    (strcmp(reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd), localInfo.m_name) == 0)) {
+			    (strcmp(reinterpret_cast<char*>(caravanWork->m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}

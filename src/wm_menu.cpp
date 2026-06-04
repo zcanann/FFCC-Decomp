@@ -7702,8 +7702,8 @@ void CMenuPcs::CalcCharaSelect()
 				caravanWork.unk_0x3a8 =
 				    (static_cast<unsigned int>(info.m_birthMonth) << 8) | static_cast<unsigned int>(info.m_birthDay);
 				caravanWork.unk_0x3ac = static_cast<int>(info.m_jobType);
-				memset(caravanWork.unk_0x3ca_0x3dd, 0, 0x11);
-				strcpy(reinterpret_cast<char*>(caravanWork.unk_0x3ca_0x3dd), info.m_name);
+				memset(caravanWork.m_name, 0, 0x11);
+				strcpy(reinterpret_cast<char*>(caravanWork.m_name), info.m_name);
 				caravanWork.m_tribeId = static_cast<unsigned short>(info.m_charaType & 3);
 				caravanWork.m_appearanceVariant = static_cast<unsigned short>(appearance);
 				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
@@ -8023,7 +8023,7 @@ void CMenuPcs::DrawCharaName()
 		for (int col = 0; col < 4; col++) {
 			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
-				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
+				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
 				float scale = FLOAT_803313e8;
 				float xOffset = -(static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678));
 				const float width = font->GetWidth(text);
@@ -8066,7 +8066,7 @@ void CMenuPcs::DrawCharaName()
 				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
 				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
 			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
+				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
 				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
 			} else if ((pendingMask & (1u << slot)) == 0) {
 				text = emptyText[0];

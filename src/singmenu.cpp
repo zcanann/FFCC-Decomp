@@ -1643,7 +1643,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->SetColor(fontColor);
     font->DrawInit();
 
-    char* charaName = reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0x3CA);
+    CCaravanWork* caravanWork = SingleCaravanWork();
+    char* charaName = reinterpret_cast<char*>(caravanWork->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
     float titleX = FLOAT_803329d4 + (FLOAT_803329d8 - titleWidth) * static_cast<float>(DOUBLE_80332968);
     font->SetTlut(0x12);
@@ -1699,13 +1700,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         unsigned short stat;
         if (i == 0) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x1E);
+            stat = caravanWork->m_strength;
         } else if (i == 1) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x22);
+            stat = caravanWork->m_defense;
         } else if (i == 2) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x20);
+            stat = caravanWork->m_magic;
         } else {
-            stat = SingleCaravanWork()->m_progressValue;
+            stat = caravanWork->m_progressValue;
         }
 
         char valueText[36];

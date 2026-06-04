@@ -3628,14 +3628,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -0xAE:
         strcpy(
-            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd),
+            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].m_name),
             strBlob + strOffs[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0xAF:
         runtime->push(
-            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));
+            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
         outResult = 0;
         return 1;
     case -0xB0:

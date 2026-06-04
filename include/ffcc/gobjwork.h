@@ -156,7 +156,7 @@ public:
     int m_joybusCaravanId;                      // 0x03B4
     unsigned short m_letterMeta[8];             // 0x03B8
     unsigned short unk_0x3c8;                   // 0x03C8
-    unsigned char unk_0x3ca_0x3dd[20];          // 0x03CA
+    unsigned char m_name[20];                   // 0x03CA
     unsigned short m_progressValue;             // 0x03DE
     unsigned short m_tribeId;                   // 0x03E0
     unsigned short m_genderFlag;                // 0x03E2

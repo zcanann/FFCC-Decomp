@@ -162,7 +162,7 @@ CCaravanWork::CCaravanWork()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)unk_0x3ca_0x3dd, const_cast<char*>(s_UnnamedItem_801D9FF0));
+	sprintf((char*)m_name, const_cast<char*>(s_UnnamedItem_801D9FF0));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -248,7 +248,7 @@ void CCaravanWork::LoadInit()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)unk_0x3ca_0x3dd, const_cast<char*>(s_UnnamedItem_801D9FF0));
+	sprintf((char*)m_name, const_cast<char*>(s_UnnamedItem_801D9FF0));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;

@@ -796,8 +796,8 @@ void CMenuPcs::CalcSingCMake()
                             caravanWork->m_shopState = 1;
                             caravanWork->unk_0x3a8 = 0x101;
                             caravanWork->unk_0x3ac = static_cast<int>(s_CmakeInfo.m_job);
-                            memset(caravanWork->unk_0x3ca_0x3dd, 0, 0x11);
-                            strcpy(reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd), s_CmakeInfo.m_name);
+                            memset(caravanWork->m_name, 0, 0x11);
+                            strcpy(reinterpret_cast<char*>(caravanWork->m_name), s_CmakeInfo.m_name);
                             caravanWork->m_tribeId = static_cast<unsigned short>(s_CmakeInfo.m_tribe);
                             caravanWork->m_appearanceVariant = static_cast<unsigned short>(s_CmakeInfo.m_hair);
                             caravanWork->m_genderFlag = static_cast<unsigned short>(s_CmakeInfo.m_gender);

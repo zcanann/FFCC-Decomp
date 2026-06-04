@@ -1384,7 +1384,7 @@ void CMemoryCardMan::SetLoadData()
         }
         caravanWork->m_joybusCaravanId = *reinterpret_cast<int*>(src + 0xE8);
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
-        memcpy(caravanWork->unk_0x3ca_0x3dd, src + 0xF0, 0x10);
+        memcpy(caravanWork->m_name, src + 0xF0, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
         for (int i = 0; i < 100; i++)
         {
@@ -1650,7 +1650,7 @@ void CMemoryCardMan::MakeSaveData()
         }
         *reinterpret_cast<u32*>(dst + 0xE8) = caravanWork->m_joybusCaravanId;
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
-        memcpy(dst + 0xF0, caravanWork->unk_0x3ca_0x3dd, 0x10);
+        memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
         for (int i = 0; i < 100; i++)
         {

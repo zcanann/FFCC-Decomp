@@ -71,8 +71,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     serializedDataOffsets = param_3->m_serializedDataOffsets;
     colorOffset = serializedDataOffsets[1];
-    colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
     work = reinterpret_cast<RainWork*>(pppRain->m_object.m_workArea + serializedDataOffsets[2]);
+    colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,

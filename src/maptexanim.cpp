@@ -18,7 +18,7 @@ extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
 };
 extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
 }
-extern "C" const float FLOAT_8032fd38;
+extern "C" const float FLOAT_8032fd38 = 256.0f;
 extern "C" const float FLOAT_8032fd48 = 1.0f;
 extern "C" const float FLOAT_8032fd4c = 0.0f;
 extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };

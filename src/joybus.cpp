@@ -2500,7 +2500,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                         const unsigned int tPort = m_threadParams[port].m_portIndex;
                         OSWaitSemaphore(&m_accessSemaphores[tPort]);
 
-                        if (static_cast<int>(m_cmdCount[tPort]) < 0x40)
+                        if (static_cast<int>(m_cmdCount[tPort]) >= 0x40)
                         {
                             m_cmdQueueData[tPort][m_cmdCount[tPort]] = 0x07150000;
                             m_cmdCount[tPort]++;

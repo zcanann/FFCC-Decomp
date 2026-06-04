@@ -539,8 +539,10 @@ void CGMonObj::changeStatFuncArmstrong(int stat)
 void CGMonObj::cancelStatFuncArmstrong()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	if (prgObj->m_lastStateId == 100) {
+	switch (prgObj->m_lastStateId) {
+	case 100:
 		enableDamageCol(1);
+		break;
 	}
 }
 
@@ -2022,15 +2024,20 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
-	if (scriptKind == 0x87) {
-		if (stat == 0x67) {
+	switch (scriptKind) {
+	case 0x87:
+		switch (stat) {
+		case 0x67: {
 			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74);
 			if (meteoC->m_actionBranch == 1) {
 				setActionParam(-13);
 			} else {
 				setActionParam(-14);
 			}
+			break;
 		}
+		}
+		break;
 	}
 }
 

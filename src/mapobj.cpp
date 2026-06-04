@@ -1204,6 +1204,32 @@ void CMapObj::SetLink()
     m_child = head0;
 }
 
+static inline void calcRunningColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
+{
+    float blend;
+    int key0;
+    int key1;
+    if (keyFrame->Get(key0, key1, blend) != 0) {
+        int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
+        _GXColor c0 = colors[key0];
+        _GXColor c1 = colors[key1];
+
+        c0.r = static_cast<unsigned char>(
+            c0.r + ((blendRate * (static_cast<int>(c1.r) - static_cast<int>(c0.r))) >> 8));
+        c0.g = static_cast<unsigned char>(
+            c0.g + ((blendRate * (static_cast<int>(c1.g) - static_cast<int>(c0.g))) >> 8));
+        c0.b = static_cast<unsigned char>(
+            c0.b + ((blendRate * (static_cast<int>(c1.b) - static_cast<int>(c0.b))) >> 8));
+        c0.a = static_cast<unsigned char>(
+            c0.a + ((blendRate * (static_cast<int>(c1.a) - static_cast<int>(c0.a))) >> 8));
+        out = c0;
+    } else {
+        out = colors[key0];
+    }
+
+    keyFrame->Calc();
+}
+
 static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
     if (keyFrame->IsRun() == 0) {
@@ -1336,9 +1362,11 @@ void CMapObj::Calc()
         case CMapObjAtr::POINT_LIGHT: {
             CMapObjAtrPointLight* pointLight = reinterpret_cast<CMapObjAtrPointLight*>(attr);
 
-            calcColorKeyFrame(&pointLight->m_colorKeyFrame, pointLight->m_color, pointLight->m_colors);
-            if (pointLight->m_useAltColor != 0) {
-                pointLight->m_altColor = pointLight->m_color;
+            if (pointLight->m_colorKeyFrame.IsRun() != 0) {
+                calcRunningColorKeyFrame(&pointLight->m_colorKeyFrame, pointLight->m_color, pointLight->m_colors);
+                if (pointLight->m_useAltColor != 0) {
+                    pointLight->m_altColor = pointLight->m_color;
+                }
             }
 
             calcColorKeyFrame(&pointLight->m_altColorKeyFrame, pointLight->m_color, pointLight->m_colors);
@@ -1347,9 +1375,11 @@ void CMapObj::Calc()
         case CMapObjAtr::SPOT_LIGHT: {
             CMapObjAtrSpotLight* spotLight = reinterpret_cast<CMapObjAtrSpotLight*>(attr);
 
-            calcColorKeyFrame(&spotLight->m_colorKeyFrame, spotLight->m_color, spotLight->m_colors);
-            if (spotLight->m_unknown2F != 0) {
-                spotLight->m_altColor = spotLight->m_color;
+            if (spotLight->m_colorKeyFrame.IsRun() != 0) {
+                calcRunningColorKeyFrame(&spotLight->m_colorKeyFrame, spotLight->m_color, spotLight->m_colors);
+                if (spotLight->m_unknown2F != 0) {
+                    spotLight->m_altColor = spotLight->m_color;
+                }
             }
 
             calcColorKeyFrame(&spotLight->m_altColorKeyFrame, spotLight->m_color, spotLight->m_colors);

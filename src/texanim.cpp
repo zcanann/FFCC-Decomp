@@ -133,7 +133,6 @@ CTexAnimSeq::~CTexAnimSeq()
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
 CTexAnim::CRefData::~CRefData()
 {
     CRef* material = reinterpret_cast<CRef*>(m_material);
@@ -145,7 +144,6 @@ CTexAnim::CRefData::~CRefData()
     }
     m_texAnimSeqs.ReleaseAndRemoveAll();
 }
-#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -806,6 +804,7 @@ void CPtrArray<CTexAnimSeq*>::RemoveAll()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline reset
 template <>
 void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
 {
@@ -826,6 +825,7 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline on
 
 /*
  * --INFO--
@@ -1016,6 +1016,7 @@ void CPtrArray<CTexAnim*>::RemoveAll()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline reset
 template <>
 void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
 {
@@ -1036,6 +1037,7 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline on
 
 /*
  * --INFO--

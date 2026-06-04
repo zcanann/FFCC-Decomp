@@ -23,7 +23,7 @@ inline CUSBPcs::CUSBPcs()
     table->m_fields.m_entries[0].m_callback = desc2;
 }
 
-CSmallProcessTable CUSBPcs::m_table = {
+CProcessTable CUSBPcs::m_table = {
     const_cast<char*>(sUsbPcsClassName),
     {
         0,

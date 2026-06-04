@@ -4,8 +4,8 @@
 #include "ffcc/textureman.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-extern const float kUtilZero;
-extern const float kUtilOne;
+extern const float kUtilZero = 0.0f;
+extern const float kUtilOne = 1.0f;
 extern const float kUtilOrthoBottom;
 extern const float kUtilOrthoRight;
 extern const float kUtilQuadDepth;

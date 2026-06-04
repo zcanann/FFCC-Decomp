@@ -58,50 +58,71 @@ extern "C" const char s_CMapPcs_PART_801D7700[] = "CMapPcs(PART)";
 CProcessTable CMapPcs::m_table[3] = {
     {
         const_cast<char*>(s_CMapPcs_GAME_801D76E0),
-        CMapPcs::m_table_desc0.m_thisOffset,  CMapPcs::m_table_desc0.m_virtualOffset,  CMapPcs::m_table_desc0.m_function,
-        CMapPcs::m_table_desc1.m_thisOffset,  CMapPcs::m_table_desc1.m_virtualOffset,  CMapPcs::m_table_desc1.m_function,
-        CMapPcs::m_table_desc2.m_thisOffset,  CMapPcs::m_table_desc2.m_virtualOffset,  CMapPcs::m_table_desc2.m_function,
-        0x14,                        0,                           CMapPcs::m_table_desc3.m_thisOffset,
-        CMapPcs::m_table_desc3.m_virtualOffset,  CMapPcs::m_table_desc3.m_function,  0x1E,
-        0,                           CMapPcs::m_table_desc4.m_thisOffset,  CMapPcs::m_table_desc4.m_virtualOffset,
-        CMapPcs::m_table_desc4.m_function,  0x2F,                        1,
-        CMapPcs::m_table_desc5.m_thisOffset,  CMapPcs::m_table_desc5.m_virtualOffset,  CMapPcs::m_table_desc5.m_function,
-        0x35,                        1,                           CMapPcs::m_table_desc6.m_thisOffset,
-        CMapPcs::m_table_desc6.m_virtualOffset,  CMapPcs::m_table_desc6.m_function,  0x37,
-        1,                           CMapPcs::m_table_desc7.m_thisOffset,  CMapPcs::m_table_desc7.m_virtualOffset,
-        CMapPcs::m_table_desc7.m_function,  0x3F,                        1,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        0x14,                        0,                           0, 0, 0,  0x1E,
+        0,                           0, 0, 0,  0x2F,                        1,
+        0, 0, 0,
+        0x35,                        1,                           0, 0, 0,  0x37,
+        1,                           0, 0, 0,  0x3F,                        1,
     },
     {
         const_cast<char*>(s_CMapPcs_VIEWER_801D76F0),
-        CMapPcs::m_table_desc8.m_thisOffset,  CMapPcs::m_table_desc8.m_virtualOffset,  CMapPcs::m_table_desc8.m_function,
-        CMapPcs::m_table_desc9.m_thisOffset,  CMapPcs::m_table_desc9.m_virtualOffset,  CMapPcs::m_table_desc9.m_function,
-        CMapPcs::m_table_desc10.m_thisOffset, CMapPcs::m_table_desc10.m_virtualOffset, CMapPcs::m_table_desc10.m_function,
-        0x14,                        0,                           CMapPcs::m_table_desc11.m_thisOffset,
-        CMapPcs::m_table_desc11.m_virtualOffset, CMapPcs::m_table_desc11.m_function, 0x1E,
-        0,                           CMapPcs::m_table_desc12.m_thisOffset, CMapPcs::m_table_desc12.m_virtualOffset,
-        CMapPcs::m_table_desc12.m_function, 0x2F,                        1,
-        CMapPcs::m_table_desc13.m_thisOffset, CMapPcs::m_table_desc13.m_virtualOffset, CMapPcs::m_table_desc13.m_function,
-        0x35,                        1,                           CMapPcs::m_table_desc14.m_thisOffset,
-        CMapPcs::m_table_desc14.m_virtualOffset, CMapPcs::m_table_desc14.m_function, 0x37,
-        1,                           CMapPcs::m_table_desc15.m_thisOffset, CMapPcs::m_table_desc15.m_virtualOffset,
-        CMapPcs::m_table_desc15.m_function, 0x3F,                        1,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        0x14,                        0,                           0, 0, 0, 0x1E,
+        0,                           0, 0, 0, 0x2F,                        1,
+        0, 0, 0,
+        0x35,                        1,                           0, 0, 0, 0x37,
+        1,                           0, 0, 0, 0x3F,                        1,
     },
     {
         const_cast<char*>(s_CMapPcs_PART_801D7700),
-        CMapPcs::m_table_desc16.m_thisOffset, CMapPcs::m_table_desc16.m_virtualOffset, CMapPcs::m_table_desc16.m_function,
-        CMapPcs::m_table_desc17.m_thisOffset, CMapPcs::m_table_desc17.m_virtualOffset, CMapPcs::m_table_desc17.m_function,
-        CMapPcs::m_table_desc18.m_thisOffset, CMapPcs::m_table_desc18.m_virtualOffset, CMapPcs::m_table_desc18.m_function,
-        0x14,                        0,                           CMapPcs::m_table_desc19.m_thisOffset,
-        CMapPcs::m_table_desc19.m_virtualOffset, CMapPcs::m_table_desc19.m_function, 0x1E,
-        0,                           CMapPcs::m_table_desc20.m_thisOffset, CMapPcs::m_table_desc20.m_virtualOffset,
-        CMapPcs::m_table_desc20.m_function, 0x2F,                        1,
-        CMapPcs::m_table_desc21.m_thisOffset, CMapPcs::m_table_desc21.m_virtualOffset, CMapPcs::m_table_desc21.m_function,
-        0x35,                        1,                           CMapPcs::m_table_desc22.m_thisOffset,
-        CMapPcs::m_table_desc22.m_virtualOffset, CMapPcs::m_table_desc22.m_function, 0x37,
-        1,                           CMapPcs::m_table_desc23.m_thisOffset, CMapPcs::m_table_desc23.m_virtualOffset,
-        CMapPcs::m_table_desc23.m_function, 0x3F,                        1,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        0x14,                        0,                           0, 0, 0, 0x1E,
+        0,                           0, 0, 0, 0x2F,                        1,
+        0, 0, 0,
+        0x35,                        1,                           0, 0, 0, 0x37,
+        1,                           0, 0, 0, 0x3F,                        1,
     },
 };
+
+#pragma inline_max_size(10000)
+inline CMapPcs::CMapPcs()
+{
+    CProcessTable* table = reinterpret_cast<CProcessTable*>(m_table);
+
+    table[0].m_fields.m_create = m_table_desc0;
+    table[0].m_fields.m_destroy = m_table_desc1;
+    table[0].m_fields.m_entries[0].m_callback = m_table_desc2;
+    table[0].m_fields.m_entries[1].m_callback = m_table_desc3;
+    table[0].m_fields.m_entries[2].m_callback = m_table_desc4;
+    table[0].m_fields.m_entries[3].m_callback = m_table_desc5;
+    table[0].m_fields.m_entries[4].m_callback = m_table_desc6;
+    table[0].m_fields.m_entries[5].m_callback = m_table_desc7;
+
+    table[1].m_fields.m_create = m_table_desc8;
+    table[1].m_fields.m_destroy = m_table_desc9;
+    table[1].m_fields.m_entries[0].m_callback = m_table_desc10;
+    table[1].m_fields.m_entries[1].m_callback = m_table_desc11;
+    table[1].m_fields.m_entries[2].m_callback = m_table_desc12;
+    table[1].m_fields.m_entries[3].m_callback = m_table_desc13;
+    table[1].m_fields.m_entries[4].m_callback = m_table_desc14;
+    table[1].m_fields.m_entries[5].m_callback = m_table_desc15;
+
+    table[2].m_fields.m_create = m_table_desc16;
+    table[2].m_fields.m_destroy = m_table_desc17;
+    table[2].m_fields.m_entries[0].m_callback = m_table_desc18;
+    table[2].m_fields.m_entries[1].m_callback = m_table_desc19;
+    table[2].m_fields.m_entries[2].m_callback = m_table_desc20;
+    table[2].m_fields.m_entries[3].m_callback = m_table_desc21;
+    table[2].m_fields.m_entries[4].m_callback = m_table_desc22;
+    table[2].m_fields.m_entries[5].m_callback = m_table_desc23;
+}
 
 CMapPcs MapPcs;
 extern unsigned int s_loadedStageNo__7CMapPcs;

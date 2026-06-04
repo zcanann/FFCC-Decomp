@@ -54,6 +54,8 @@ CProcessTableCallback CMapPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast
 extern "C" const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs(GAME)";
 extern "C" const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs(VIEWER)";
 extern "C" const char s_CMapPcs_PART_801D7700[] = "CMapPcs(PART)";
+extern const char s_CManager_801D7710[] = "CManager";
+extern const char s_CProcess_801D771C[] = "CProcess";
 
 CProcessTable CMapPcs::m_table[3] = {
     {

@@ -285,12 +285,11 @@ void JoyBus::CreateInit()
     char path[140];
     strcpy(path, JoyBusConst::DVD_DIR);
 
-    // MWCC PPC requires 3-arg strcat
-    strcat(path, JoyBusConst::OBJ_FILE, 131UL);
+    strcat(path, JoyBusConst::OBJ_FILE);
 
     CFile::CHandle* file = File.Open(path, 0, CFile::PRI_LOW);
 
-    if (!file && System.m_execParam > 1)
+    if (!file && (unsigned int)System.m_execParam >= 2)
     {
         System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
     }
@@ -439,7 +438,7 @@ int JoyBus::LoadBin()
 
         if (file == 0)
         {
-            if ((unsigned int)System.m_execParam > 1)
+            if ((unsigned int)System.m_execParam >= 2)
             {
                 System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
             }
@@ -549,13 +548,13 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     strcpy(path, JoyBusConst::DVD_DIR);
     sprintf(tmp, const_cast<char*>(s_map_filename_fmt), stageId, mapId);
-    strcat(path, tmp, 132UL);
+    strcat(path, tmp);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 
     if (fileHandle == 0)
     {
-        if ((unsigned int)System.m_execParam > 1)
+        if ((unsigned int)System.m_execParam >= 2)
         {
             System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
         }

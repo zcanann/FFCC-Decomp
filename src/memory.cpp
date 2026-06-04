@@ -138,9 +138,44 @@ static inline CMemory::CStage::CBlock* stageBlockAt(unsigned long address)
     return reinterpret_cast<CMemory::CStage::CBlock*>(address);
 }
 
+static inline CMemory::CStage::CBlock* blockFromPayload(void* payload)
+{
+    return reinterpret_cast<CMemory::CStage::CBlock*>(reinterpret_cast<unsigned char*>(payload) - sizeof(CMemory::CStage::CBlock));
+}
+
 static inline void* payloadFromBlock(CMemory::CStage::CBlock* block)
 {
     return reinterpret_cast<void*>(reinterpret_cast<unsigned char*>(block) + sizeof(CMemory::CStage::CBlock));
+}
+
+static inline void freeStageBlock(void* ptr)
+{
+    if (ptr != (void*)nullptr) {
+        CMemory::CStage::CBlock* block = blockFromPayload(ptr);
+        if ((block->m_magicStart != kMemoryBlockStartMagic) ||
+            (block->m_magicEnd != kMemoryBlockEndMagic)) {
+            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
+        }
+
+        block->m_flags = static_cast<unsigned char>(block->m_flags & 0xfb);
+
+        if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
+            block->m_size =
+                block->m_size + sizeof(CMemory::CStage::CBlock) + block->m_next->m_size;
+            block->m_next->m_next->m_prev = block;
+            block->m_next = block->m_next->m_next;
+        }
+
+        CMemory::CStage::CBlock* prevBlock = block->m_prev;
+        if ((prevBlock->m_flags & kMemoryBlockUsedFlag) == 0) {
+            prevBlock->m_size =
+                prevBlock->m_size + sizeof(CMemory::CStage::CBlock) + block->m_size;
+            block->m_prev->m_next = block->m_next;
+            block->m_next->m_prev = block->m_prev;
+        }
+
+        block->m_stage->m_allocCount -= 1;
+    }
 }
 
 static inline CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
@@ -254,37 +289,7 @@ void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int
  */
 void operator delete(void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*
@@ -298,37 +303,7 @@ void operator delete(void* ptr)
  */
 void operator delete[](void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*
@@ -823,37 +798,7 @@ void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, 
  */
 void CMemory::Free(void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*

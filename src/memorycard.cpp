@@ -1595,9 +1595,9 @@ void CMemoryCardMan::MakeSaveData()
     *reinterpret_cast<u32*>(save + 0x13D4) = Game.m_gameWork.m_mcSerial1;
     *reinterpret_cast<u32*>(save + 0x13D8) = Game.m_gameWork.m_mcRandom;
     save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
-    save[0x13DD] = Game.m_gameWork.m_bgmVolume;
-    save[0x13DE] = Game.m_gameWork.m_seVolume;
-    save[0x13DE] = Game.m_gameWork.m_seVolume;
+    save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
+    save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
+    save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
     save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode()) >> 5)) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
     save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);

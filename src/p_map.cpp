@@ -104,8 +104,7 @@ CProcessTable CMapPcs::m_table[3] = {
 };
 
 CMapPcs MapPcs;
-unsigned int s_loadedStageNo__7CMapPcs;
-unsigned int s_loadedMapNo__7CMapPcs;
+extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
 CRelProfile g_hit_prof;
@@ -127,6 +126,11 @@ extern "C" const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
 namespace {
+static inline unsigned int& LoadedStageNo()
+{
+    return *reinterpret_cast<unsigned int*>(&g_MapHitDrawMode);
+}
+
 struct PMapBound
 {
     PMapBound()
@@ -249,12 +253,12 @@ void CMapPcs::createViewer()
  */
 void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSize, unsigned char mode)
 {
-    unsigned int prevStageNo = s_loadedStageNo__7CMapPcs;
+    unsigned int prevStageNo = LoadedStageNo();
     unsigned int prevMapNo = s_loadedMapNo__7CMapPcs;
     Vec cameraPos;
     char mapPath[0x104];
 
-    s_loadedStageNo__7CMapPcs = stageNo;
+    LoadedStageNo() = stageNo;
     s_loadedMapNo__7CMapPcs = mapNo;
     sprintf(mapPath, s_dvd_map_stage_map_fmt, stageNo, mapNo);
 
@@ -333,7 +337,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     }
 
     if (mode == 2) {
-        s_loadedStageNo__7CMapPcs = prevStageNo;
+        LoadedStageNo() = prevStageNo;
         s_loadedMapNo__7CMapPcs = prevMapNo;
     }
 }

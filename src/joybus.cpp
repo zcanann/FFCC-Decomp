@@ -3170,7 +3170,7 @@ int JoyBus::SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd)
 
     *outCmd = cmd;
 
-    unsigned int result = 0;
+    int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)
     {

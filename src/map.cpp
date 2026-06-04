@@ -2578,14 +2578,14 @@ void setDbgLight(int, Vec&, _GXColor&)
  */
 void CMapMng::DrawBefore()
 {
-    const short mapObjCount = m_mapObjCount;
+    const int mapObjCount = m_mapObjCount;
     if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
         return;
     }
 
     GXSetColorUpdate(1);
     GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_BACK);
+    GXSetCullMode(GX_CULL_FRONT);
     GXSetZMode(1, GX_LEQUAL, 1);
     LightPcs.SetNumDiffuse(0);
 
@@ -2616,24 +2616,28 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
+    if (m_mapReadReady == 0) {
+        return;
+    }
+
+    const int mapObjCount = m_mapObjCount;
+    if (mapObjCount == 0) {
         return;
     }
 
     GXSetColorUpdate(1);
     GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_BACK);
+    GXSetCullMode(GX_CULL_FRONT);
     GXSetZMode(1, GX_LEQUAL, 1);
     LightPcs.SetNumDiffuse(0);
 
     Mtx44 projection;
     PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
-    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+    GXSetProjection(projection, GX_PERSPECTIVE);
     m_underWaterTexPending = 1;
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        const short octTreeCount = m_octTreeCount;
+        const int octTreeCount = m_octTreeCount;
 
         COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < octTreeCount; i++) {
@@ -2651,7 +2655,7 @@ void CMapMng::Draw()
 
         GXSetColorUpdate(1);
         GXSetAlphaUpdate(0);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
@@ -2682,7 +2686,7 @@ void CMapMng::Draw()
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZCompLoc(0);
         GXSetZMode(1, GX_LEQUAL, 1);
-        GXSetCullMode(GX_CULL_BACK);
+        GXSetCullMode(GX_CULL_FRONT);
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -2742,11 +2746,11 @@ void CMapMng::DrawAfter()
 
     Mtx44 projection;
     PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
-    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+    GXSetProjection(projection, GX_PERSPECTIVE);
 
     GXSetColorUpdate(1);
     GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_BACK);
+    GXSetCullMode(GX_CULL_FRONT);
     GXSetZMode(1, GX_LEQUAL, 1);
     LightPcs.SetNumDiffuse(0);
 

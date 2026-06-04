@@ -7556,18 +7556,18 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 
             int result = 0;
             unsigned int queuePort = m_threadParams[1].m_portIndex;
-            if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
+            if (static_cast<int>(m_cmdCount[queuePort]) >= 0x40)
+            {
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                result = -1;
+            }
+            else
             {
                 const unsigned int cmd = MakeJoyCmd16(0x140F, 0, 0);
 
                 m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
                 m_cmdCount[m_threadParams[1].m_portIndex]++;
                 OSSignalSemaphore(&m_accessSemaphores[m_threadParams[1].m_portIndex]);
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-                result = -1;
             }
 
             return result;
@@ -7593,7 +7593,12 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
             int result = 0;
 
             unsigned int queuePort = m_threadParams[playerIndex].m_portIndex;
-            if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
+            if (static_cast<int>(m_cmdCount[queuePort]) >= 0x40)
+            {
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                result = -1;
+            }
+            else
             {
                 const unsigned short opcode = static_cast<unsigned short>(0x140F);
 				const unsigned int cmd = MakeJoyCmd16(opcode, static_cast<unsigned char>(menuId), 0);
@@ -7601,11 +7606,6 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
                 m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
                 m_cmdCount[m_threadParams[playerIndex].m_portIndex]++;
                 OSSignalSemaphore(&m_accessSemaphores[m_threadParams[playerIndex].m_portIndex]);
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-                result = -1;
             }
 
             return result;

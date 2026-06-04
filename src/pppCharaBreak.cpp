@@ -40,11 +40,6 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
-static inline int LoadInt(const int& value)
-{
-    return value;
-}
-
 typedef CharaBreakUnkB CharaBreakStep;
 
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
@@ -457,15 +452,14 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
         s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
-        CharaBreakMeshData* meshData = MeshData(mesh);
         S16Vec* workPositions = mesh->m_workPositions;
 
-        if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
+        if (MeshData(mesh)->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
-            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_nodeIndex].m_mtx, meshToWorld);
+            PSMTXConcat(model->m_matrix, model->m_nodes[MeshData(mesh)->m_nodeIndex].m_mtx, meshToWorld);
         }
 
-        for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
+        for (int dl = MeshData(mesh)->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
                 reinterpret_cast<CharaBreakDisplayListPair**>(
                     reinterpret_cast<void**>(workData->m_meshBuffers)[meshIndex]);
@@ -477,9 +471,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                 if (polygon->m_enabled == 0) {
                     int flags[3];
-                    flags[0] = LoadInt(kCharaBreakInitialVertexFlag0);
-                    flags[1] = LoadInt(kCharaBreakInitialVertexFlag1);
-                    flags[2] = LoadInt(kCharaBreakInitialVertexFlag2);
+                    flags[0] = kCharaBreakInitialVertexFlag0;
+                    flags[1] = kCharaBreakInitialVertexFlag1;
+                    flags[2] = kCharaBreakInitialVertexFlag2;
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];

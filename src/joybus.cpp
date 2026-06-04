@@ -6336,24 +6336,27 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
 
     unsigned char itemId = GbaQue.GetItemUse(port);
     unsigned int cmd = MakeJoyCmd16(0x1410, itemId);
+
+    if (m_threadRunningMask == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int queuePort = threadParam->m_portIndex;
-        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
-        {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
-        }
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    }
+    else
+    {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+        result = -1;
     }
 
     return result;

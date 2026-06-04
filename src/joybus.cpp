@@ -6084,7 +6084,7 @@ int JoyBus::SendRaderType(ThreadParam* threadParam)
 
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
@@ -6120,7 +6120,7 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
 
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

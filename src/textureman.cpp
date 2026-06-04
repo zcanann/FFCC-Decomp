@@ -592,11 +592,9 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                                   GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
                 }
             } else {
-                int lodDiff = 1 - m_maxLod;
-                u32 mipmap = static_cast<u32>(lodDiff) >> 31;
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
+                             static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
             }
 
             if (1 < m_maxLod) {
@@ -760,11 +758,9 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                           GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         }
     } else {
-        int lodDiff = 1 - m_maxLod;
-        u32 mipmap = static_cast<u32>(lodDiff) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
+                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {
@@ -798,11 +794,9 @@ void CTexture::InitTexObj()
                           GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         }
     } else {
-        int lodDiff = 1 - m_maxLod;
-        u32 mipmap = static_cast<u32>(lodDiff) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
+                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {

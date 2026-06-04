@@ -3122,7 +3122,7 @@ int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(m_accessSemaphores + threadParam->m_portIndex);
 
@@ -3880,7 +3880,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
 
     unsigned int cmdY = (0x4Fu << 24) | (0x00u << 16) | ((unsigned char)(posY & 0xFF) << 8) | ((unsigned char)((posY >> 8) & 0xFF));
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

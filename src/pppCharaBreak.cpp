@@ -87,7 +87,7 @@ static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
 
 static inline CharaBreakDisplayListPair*** MeshDisplayListPairs(CharaBreakWork* work)
 {
-    return reinterpret_cast<CharaBreakDisplayListPair***>(work->m_meshBuffers);
+    return work->m_meshBuffers;
 }
 
 static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
@@ -224,14 +224,15 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
         work->m_meshBuffers =
-            pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
-                            ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3D0);
+            static_cast<CharaBreakDisplayListPair***>(
+                pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
+                                ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3D0));
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
 
         for (i = 0; i < ModelData(model)->m_meshCount; i++) {
-            ((u32*)work->m_meshBuffers)[i] = 0;
+            work->m_meshBuffers[i] = 0;
         }
 
         for (i = 0; i < ModelData(model)->m_meshCount; i++) {
@@ -245,17 +246,17 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
                 }
             }
 
-            ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
+            work->m_meshBuffers[i] = static_cast<CharaBreakDisplayListPair**>(pppMemFree__FPv(
                 MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9);
-            u32 meshBuffer = ((u32*)work->m_meshBuffers)[i];
+                const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9));
+            CharaBreakDisplayListPair** meshBuffer = work->m_meshBuffers[i];
             if (meshBuffer == 0) {
                 goto fail;
             }
 
             {
                 int displayListCount = MeshData(mesh)->m_displayListCount;
-                int* dlEntries = (int*)meshBuffer;
+                CharaBreakDisplayListPair** dlEntries = meshBuffer;
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
                 }
@@ -266,7 +267,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtr
                 CharaBreakDisplayList* displayList = MeshData(mesh)->m_displayLists;
                 int dl = displayListCount - 1;
                 CharaBreakDisplayListPair** dlEntries =
-                    (CharaBreakDisplayListPair**)(meshBuffer + (dl << 2));
+                    meshBuffer + dl;
                 for (; dl >= 0; dl--, displayList++) {
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
                         0x10, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3FC);
@@ -461,8 +462,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
         for (int dl = MeshData(mesh)->m_displayListCount - 1; dl >= 0; dl--) {
             CharaBreakDisplayListPair** displayListPairs =
-                reinterpret_cast<CharaBreakDisplayListPair**>(
-                    reinterpret_cast<void**>(workData->m_meshBuffers)[meshIndex]);
+                workData->m_meshBuffers[meshIndex];
             CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
             POLYGON_DATA* polygon = displayListPair->m_polygonData;
 
@@ -855,9 +855,9 @@ static void CharaBreak_AfterDrawMeshCallback(
 
         for (; materialIndex >= 0; materialIndex--, materialData++) {
             CharaBreakDisplayListPair** meshTable =
-                reinterpret_cast<CharaBreakDisplayListPair**>(workData->m_meshBuffers) + meshIndex;
+                workData->m_meshBuffers[meshIndex];
             CharaBreakDisplayListPair** displayListEntry =
-                reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(*meshTable) + materialOffset);
+                reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(meshTable) + materialOffset);
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             MaterialMan.SetMaterial(

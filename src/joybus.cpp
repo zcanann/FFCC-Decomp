@@ -6993,7 +6993,12 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
  */
 int JoyBus::DelItem(int portIndex, unsigned char itemId)
 {
-    unsigned int cmd = ((0x17u << 16) | (itemId << 8) | 0xFF) & 0xFF3FFFFF;
+    unsigned short tail = 0xFFFF;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x17;
+    cmdBytes[1] = itemId & 0x3F;
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&tail, 0);
     unsigned int port;
     int result = 0;
 

@@ -25,6 +25,13 @@ struct CMapCylinderProbeView
 };
 typedef char CMapCylinderProbeView_size_check[(sizeof(CMapCylinderProbeView) == 0x34) ? 1 : -1];
 
+struct CMapCylinderBound
+{
+    Vec m_min; // 0x00
+    Vec m_max; // 0x0c
+};
+typedef char CMapCylinderBound_size_check[(sizeof(CMapCylinderBound) == 0x18) ? 1 : -1];
+
 class CMapCylinder
 {
 public:
@@ -32,27 +39,27 @@ public:
     {
         float min = kMapHitBoundsMinInit;
 
-        m_boundsMin.z = min;
-        m_boundsMin.y = min;
-        m_boundsMin.x = min;
+        m_bound.m_min.z = min;
+        m_bound.m_min.y = min;
+        m_bound.m_min.x = min;
 
-        m_boundsMax.z = kMapHitBoundsMaxInit;
-        m_boundsMax.y = kMapHitBoundsMaxInit;
-        m_boundsMax.x = kMapHitBoundsMaxInit;
+        m_bound.m_max.z = kMapHitBoundsMaxInit;
+        m_bound.m_max.y = kMapHitBoundsMaxInit;
+        m_bound.m_max.x = kMapHitBoundsMaxInit;
     }
 
     CMapCylinder(float min, float max)
     {
-        m_boundsMin.z = min;
-        m_boundsMin.y = min;
-        m_boundsMin.x = min;
+        m_bound.m_min.z = min;
+        m_bound.m_min.y = min;
+        m_bound.m_min.x = min;
 
-        m_boundsMax.z = max;
-        m_boundsMax.y = max;
-        m_boundsMax.x = max;
+        m_bound.m_max.z = max;
+        m_bound.m_max.y = max;
+        m_bound.m_max.x = max;
     }
 
-    CBound* GetBound() { return reinterpret_cast<CBound*>(&m_boundsMin); }
+    CBound* GetBound() { return reinterpret_cast<CBound*>(&m_bound); }
     CMapCylinderProbeView& Probe() { return *reinterpret_cast<CMapCylinderProbeView*>(&m_top); }
     const CMapCylinderProbeView& Probe() const { return *reinterpret_cast<const CMapCylinderProbeView*>(&m_top); }
 
@@ -60,8 +67,7 @@ public:
     Vec m_top;       // 0x0c
     Vec m_axis;      // 0x18
     float m_radius;  // 0x24
-    Vec m_boundsMin; // 0x28
-    Vec m_boundsMax; // 0x34
+    CMapCylinderBound m_bound; // 0x28
 };
 typedef char CMapCylinder_size_check[(sizeof(CMapCylinder) == 0x40) ? 1 : -1];
 

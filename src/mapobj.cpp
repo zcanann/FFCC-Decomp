@@ -1585,49 +1585,49 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         float margin = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_boundsMin.x = localCylinder.m_bottom.x - margin;
-            localCylinder.m_boundsMax.x = localCylinder.m_top.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - margin;
+            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + margin;
         } else {
-            localCylinder.m_boundsMin.x = localCylinder.m_top.x - margin;
-            localCylinder.m_boundsMax.x = localCylinder.m_bottom.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - margin;
+            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + margin;
         }
 
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_boundsMin.y = localCylinder.m_bottom.y - margin;
-            localCylinder.m_boundsMax.y = localCylinder.m_top.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - margin;
+            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + margin;
         } else {
-            localCylinder.m_boundsMin.y = localCylinder.m_top.y - margin;
-            localCylinder.m_boundsMax.y = localCylinder.m_bottom.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - margin;
+            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + margin;
         }
 
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_boundsMin.z = localCylinder.m_bottom.z - margin;
-            localCylinder.m_boundsMax.z = localCylinder.m_top.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - margin;
+            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + margin;
         } else {
-            localCylinder.m_boundsMin.z = localCylinder.m_top.z - margin;
-            localCylinder.m_boundsMax.z = localCylinder.m_bottom.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - margin;
+            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
-        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_boundsMin.x
-            ? localCylinder.m_boundsMin.x <= mapHit->m_positionMax.x
-            : mapHit->m_positionMin.x <= localCylinder.m_boundsMax.x;
+        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
+            ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
+            : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
 
         if (xOverlap) {
-            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_boundsMin.y
-                ? localCylinder.m_boundsMin.y <= mapHit->m_positionMax.y
-                : mapHit->m_positionMin.y <= localCylinder.m_boundsMax.y;
+            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
+                ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
+                : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
             if (yOverlap) {
                 xyOverlap = true;
             }
         }
 
         if (xyOverlap) {
-            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_boundsMin.z
-                ? localCylinder.m_boundsMin.z <= mapHit->m_positionMax.z
-                : mapHit->m_positionMin.z <= localCylinder.m_boundsMax.z;
+            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
+                ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
+                : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
 
             if (zOverlap) {
                 hitBounds = true;
@@ -1670,49 +1670,49 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         float margin = kMapObjZero + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_boundsMin.x = localCylinder.m_bottom.x - margin;
-            localCylinder.m_boundsMax.x = localCylinder.m_top.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - margin;
+            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + margin;
         } else {
-            localCylinder.m_boundsMin.x = localCylinder.m_top.x - margin;
-            localCylinder.m_boundsMax.x = localCylinder.m_bottom.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - margin;
+            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + margin;
         }
 
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_boundsMin.y = localCylinder.m_bottom.y - margin;
-            localCylinder.m_boundsMax.y = localCylinder.m_top.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - margin;
+            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + margin;
         } else {
-            localCylinder.m_boundsMin.y = localCylinder.m_top.y - margin;
-            localCylinder.m_boundsMax.y = localCylinder.m_bottom.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - margin;
+            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + margin;
         }
 
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_boundsMin.z = localCylinder.m_bottom.z - margin;
-            localCylinder.m_boundsMax.z = localCylinder.m_top.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - margin;
+            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + margin;
         } else {
-            localCylinder.m_boundsMin.z = localCylinder.m_top.z - margin;
-            localCylinder.m_boundsMax.z = localCylinder.m_bottom.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - margin;
+            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
-        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_boundsMin.x
-            ? localCylinder.m_boundsMin.x <= mapHit->m_positionMax.x
-            : mapHit->m_positionMin.x <= localCylinder.m_boundsMax.x;
+        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
+            ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
+            : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
 
         if (xOverlap) {
-            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_boundsMin.y
-                ? localCylinder.m_boundsMin.y <= mapHit->m_positionMax.y
-                : mapHit->m_positionMin.y <= localCylinder.m_boundsMax.y;
+            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
+                ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
+                : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
             if (yOverlap) {
                 xyOverlap = true;
             }
         }
 
         if (xyOverlap) {
-            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_boundsMin.z
-                ? localCylinder.m_boundsMin.z <= mapHit->m_positionMax.z
-                : mapHit->m_positionMin.z <= localCylinder.m_boundsMax.z;
+            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
+                ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
+                : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
 
             if (zOverlap) {
                 hitBounds = true;

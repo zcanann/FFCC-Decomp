@@ -2945,21 +2945,59 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
  */
 void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
-    CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
-
     switch (channelIndex) {
     case 0:
-        mapIdGrp->m_primaryColor = color;
+    {
+        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
+        u8 r = color.r;
+        u8 g = color.g;
+        u8 b = color.b;
+        u8 a = color.a;
+        mapIdGrp->m_primaryColor.r = r;
+        mapIdGrp->m_primaryColor.g = g;
+        mapIdGrp->m_primaryColor.b = b;
+        mapIdGrp->m_primaryColor.a = a;
         return;
+    }
     case 1:
-        mapIdGrp->m_secondaryColor = color;
+    {
+        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
+        u8 r = color.r;
+        u8 g = color.g;
+        u8 b = color.b;
+        u8 a = color.a;
+        mapIdGrp->m_secondaryColor.r = r;
+        mapIdGrp->m_secondaryColor.g = g;
+        mapIdGrp->m_secondaryColor.b = b;
+        mapIdGrp->m_secondaryColor.a = a;
         return;
+    }
     case 2:
-        mapIdGrp->m_tertiaryColor = color;
+    {
+        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
+        u8 r = color.r;
+        u8 g = color.g;
+        u8 b = color.b;
+        u8 a = color.a;
+        mapIdGrp->m_tertiaryColor.r = r;
+        mapIdGrp->m_tertiaryColor.g = g;
+        mapIdGrp->m_tertiaryColor.b = b;
+        mapIdGrp->m_tertiaryColor.a = a;
         return;
+    }
     case 3:
-        mapIdGrp->m_quaternaryColor = color;
+    {
+        CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
+        u8 r = color.r;
+        u8 g = color.g;
+        u8 b = color.b;
+        u8 a = color.a;
+        mapIdGrp->m_quaternaryColor.r = r;
+        mapIdGrp->m_quaternaryColor.g = g;
+        mapIdGrp->m_quaternaryColor.b = b;
+        mapIdGrp->m_quaternaryColor.a = a;
         return;
+    }
     }
 }
 

@@ -318,7 +318,7 @@ float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 	font->SetScaleX(scale);
 	font->SetScaleY(kOptionAnimMax);
 	width = font->GetWidth(text);
-	return kMenuCenteringOffset - width * kMenuCenteringHalfWidth;
+	return -(width * kMenuCenteringHalfWidth - kMenuCenteringOffset);
 }
 
 /*

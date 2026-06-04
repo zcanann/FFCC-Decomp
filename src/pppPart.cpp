@@ -1507,8 +1507,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 			if (ppvAmemCacheSet.IsEnable(mapMesh->m_cacheId) == 0)
 			{
 				mapMesh->Ptr2Off();
-				*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
-				    ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5);
+				mapMesh->m_meshData =
+				    reinterpret_cast<void*>(ppvAmemCacheSet.GetData(mapMesh->m_cacheId, (char*)s_pppPart_cpp, 0x4E5));
 				mapMesh->Off2Ptr();
 			}
 
@@ -2317,17 +2317,17 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 
 	if (positions == 0)
 	{
-		GXSetArray((GXAttr)9, *(void**)((u8*)model + 0x2C), 0xC);
+		GXSetArray((GXAttr)9, model->m_vertices, 0xC);
 	}
 	else
 	{
 		GXSetArray((GXAttr)9, positions, 0xC);
 	}
 
-	GXSetArray((GXAttr)0xB, *(void**)((u8*)model + 0x3C), 4);
-	GXSetArray((GXAttr)0xD, *(void**)((u8*)model + 0x38), 4);
-	GXSetArray((GXAttr)0xE, *(void**)((u8*)model + 0x38), 4);
-	MaterialMan.SetGeometryArraySource(*(void**)((u8*)model + 0x30));
+	GXSetArray((GXAttr)0xB, model->m_colors, 4);
+	GXSetArray((GXAttr)0xD, model->m_uvPairs, 4);
+	GXSetArray((GXAttr)0xE, model->m_uvPairs, 4);
+	MaterialMan.SetGeometryArraySource(model->m_normals);
 
 	if (usePartMaterial == 0)
 	{

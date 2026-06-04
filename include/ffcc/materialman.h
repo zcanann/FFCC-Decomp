@@ -421,17 +421,17 @@ public:
     }
     CTexture* GetFurPickTexture()
     {
-        return m_textures[1];
+        return m_textureData.m_textures[1];
     }
     CTexture* GetFurTexture(int index)
     {
-        return m_textures[index + 2];
+        return m_textureData.m_textures[index + 2];
     }
     void SetTag(int);
     void AddTextureIdx(int, int);
     void SetMaterialColor(unsigned int rgba)
     {
-        GXColor& color = m_textureColorView.m_materialColor;
+        GXColor& color = m_textureData.m_textureColorView.m_materialColor;
         color.r = static_cast<unsigned char>((rgba >> 24) & 0xFF);
         color.g = static_cast<unsigned char>((rgba >> 16) & 0xFF);
         color.b = static_cast<unsigned char>((rgba >> 8) & 0xFF);
@@ -443,11 +443,11 @@ public:
     }
     CTexture* GetTexture(int index)
     {
-        return m_textures[index];
+        return m_textureData.m_textures[index];
     }
     CTexScroll* GetTexScroll(int index)
     {
-        return &m_texScroll[index];
+        return &m_textureData.m_texScroll[index];
     }
 
 private:
@@ -471,11 +471,13 @@ private:
         CTexture* m_texture2;             // 0x044
         GXColor m_materialColor;          // 0x048
     };
-    union {
-        CTexture* m_textures[4];          // 0x03C
-        TextureColorView m_textureColorView;
-    };
-    CTexScroll m_texScroll[4];            // 0x04C
+    struct {
+        union {
+            CTexture* m_textures[4];      // 0x03C
+            TextureColorView m_textureColorView;
+        };
+        CTexScroll m_texScroll[4];        // 0x04C
+    } m_textureData;
     int m_pdtSlotIndex;                   // 0x09C
     unsigned char m_blendMode;            // 0x0A0
     unsigned char m_fogEnable;            // 0x0A1

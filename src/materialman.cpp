@@ -1721,12 +1721,12 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
         int texMapCur = m_texMapIdCur;
         m_texMapIdCur = texMapCur + 1;
-        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[0]);
+        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textureData.m_textures[0]);
 
         if (useShadowBit32 != 0) {
             texMapCur = m_texMapIdCur;
             m_texMapIdCur = texMapCur + 1;
-            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textures[1]);
+            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textureData.m_textures[1]);
             m_shadowKColorIds[materialNum] = material->m_shadowKColorId;
             m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
             m_shadowTextureCount = m_shadowTextureCount + 1;
@@ -2293,8 +2293,8 @@ CTexScroll::CTexScroll()
 CMaterial::~CMaterial()
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        ReleaseRef(m_textures[i]);
-        m_textures[i] = 0;
+        ReleaseRef(m_textureData.m_textures[i]);
+        m_textureData.m_textures[i] = 0;
     }
 }
 
@@ -2315,10 +2315,10 @@ CMaterial::CMaterial()
     m_fogEnable = 1;
     m_materialType = 0;
     m_shadowKColorId = 0;
-    m_textures[0] = 0;
-    m_textures[1] = 0;
-    m_textures[2] = 0;
-    m_textures[3] = 0;
+    m_textureData.m_textures[0] = 0;
+    m_textureData.m_textures[1] = 0;
+    m_textureData.m_textures[2] = 0;
+    m_textureData.m_textures[3] = 0;
     m_texShiftU = 0;
     m_texShiftV = 0;
     m_unk36 = 0;
@@ -2674,8 +2674,8 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                 material->m_tevBit |= 1;
             } else {
                 for (int i = 0; i < numTexture; i++) {
-                    ReleaseRef(material->m_textures[i]);
-                    material->m_textures[i] = 0;
+                    ReleaseRef(material->m_textureData.m_textures[i]);
+                    material->m_textureData.m_textures[i] = 0;
 
                     if (textureSet != 0) {
                         CTexture* texture = 0;
@@ -2687,7 +2687,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                             }
                         }
 
-                        material->m_textures[i] = texture;
+                        material->m_textureData.m_textures[i] = texture;
                         if (texture != 0) {
                             texture->AddRef();
 
@@ -2708,10 +2708,10 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 
                 if ((material->m_materialType != 0) &&
                     (numTexture > 1) &&
-                    (material->m_textures[0] != 0) &&
-                    (material->m_textures[1] != 0)) {
-                    CTexture* texture0 = material->m_textures[0];
-                    CTexture* texture1 = material->m_textures[1];
+                    (material->m_textureData.m_textures[0] != 0) &&
+                    (material->m_textureData.m_textures[1] != 0)) {
+                    CTexture* texture0 = material->m_textureData.m_textures[0];
+                    CTexture* texture1 = material->m_textureData.m_textures[1];
 
                     unsigned int scaleU =
                         texture0->m_width / texture1->m_width;
@@ -2825,14 +2825,14 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
         CMaterial* material = m_materials[index];
         if ((material != 0) && (material->m_pdtSlotIndex == pdtSlotIndex)) {
             for (int i = 0; i < static_cast<int>(material->m_textureCount); i++) {
-                CTexture* object = material->m_textures[i];
+                CTexture* object = material->m_textureData.m_textures[i];
                 if (object != 0) {
                     ReleaseRefNonNull(object);
-                    material->m_textures[i] = 0;
+                    material->m_textureData.m_textures[i] = 0;
                 }
 
                 textureSet->ReleaseTextureIdx(static_cast<int>(material->m_textureIndices[i]), amemCacheSet);
-                material->m_textures[i] = 0;
+                material->m_textureData.m_textures[i] = 0;
             }
 
             if (material != 0) {
@@ -2924,7 +2924,7 @@ CMaterialSet::CMaterialSet()
 void CMaterial::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textures[i];
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
         }
@@ -2939,7 +2939,7 @@ void CMaterial::CacheDumpTexture(CAmemCacheSet* amemCacheSet)
 void CMaterial::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textures[i];
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheRefCnt0UpTexture(amemCacheSet);
         }
@@ -2954,7 +2954,7 @@ void CMaterial::CacheRefCnt0UpTexture(CAmemCacheSet* amemCacheSet)
 void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textures[i];
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheUnLoadTexture(amemCacheSet);
         }
@@ -2969,7 +2969,7 @@ void CMaterial::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 void CMaterial::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
-        CTexture* texture = m_textures[i];
+        CTexture* texture = m_textureData.m_textures[i];
         if (texture != 0) {
             texture->CacheLoadTexture(amemCacheSet);
         }
@@ -3071,7 +3071,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
             for (int slot = 0; slot < static_cast<int>(material->m_textureCount); slot++) {
-                if (material->m_textures[slot]->CheckName(textureName)) {
+                if (material->m_textureData.m_textures[slot]->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }
@@ -3179,7 +3179,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
     int textureCount = static_cast<int>(m_textureCount);
     CTexScroll* scroll = GetTexScroll(0);
-    CTexture** textureSlot = m_textures;
+    CTexture** textureSlot = m_textureData.m_textures;
     int i = 0;
 
     bool hasDualScroll = false;

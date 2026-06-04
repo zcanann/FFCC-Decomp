@@ -200,7 +200,7 @@ void CCharaPcs::drawViewer()
     Mtx cameraMtx;
 
     if ((self->m_viewerBackTextureSet != 0) &&
-        (static_cast<unsigned int>(self->m_viewerBackTextureSet->m_textureArray.GetSize()) != 0)) {
+        (static_cast<unsigned int>(self->m_viewerBackTextureSet->GetNumTexture()) != 0)) {
         C_MTXOrtho(projMtx, LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoRight),
                    LoadFloat(kCharaViewerZero), LoadFloat(kCharaViewerBackOrthoBottom), LoadFloat(kCharaViewerZero),
                    LoadFloat(kCharaViewerGridMax));
@@ -217,10 +217,10 @@ void CCharaPcs::drawViewer()
         PSMTXIdentity(backCameraMtx);
         GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
-        CTexture* texture = self->m_viewerBackTextureSet->m_textureArray[0];
+        CTexture* texture = self->m_viewerBackTextureSet->GetTexture(0);
         TextureMan.SetTexture(GX_TEXMAP0, texture);
-        int width = texture->m_width;
-        int height = texture->m_height;
+        unsigned int width = texture->m_width;
+        unsigned int height = texture->m_height;
         PSMTXScale(texMtx, LoadFloat(kCharaViewerUnitStep) / static_cast<float>(width),
                    LoadFloat(kCharaViewerUnitStep) / static_cast<float>(height),
                    LoadFloat(kCharaViewerUnitStep));
@@ -429,7 +429,7 @@ void CCharaPcs::calcViewer()
                                                                                       self->m_viewerAnimStage);
                         File.Close(fileHandle);
                         if (self->m_viewerAnimLoadedCount == 0) {
-                            self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
+                            self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoadedCount];
                             reinterpret_cast<CRef*>(self->m_viewerAnim[0])->AddRef();
                         }
                         self->m_viewerAnimLoadedCount = self->m_viewerAnimLoadedCount + 1;
@@ -486,7 +486,8 @@ void CCharaPcs::calcViewer()
     if (padDisabled) {
         heldButtons = 0;
     } else {
-        int padIndex = __cntlzw((unsigned int)Pad._448_4_) >> 5;
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         heldButtons = Pad.GetPadInputs()[padIndex].button[0];
     }
     padDisabled = false;
@@ -496,7 +497,8 @@ void CCharaPcs::calcViewer()
     if (padDisabled) {
         triggerButtons = 0;
     } else {
-        int padIndex = __cntlzw((unsigned int)Pad._448_4_) >> 5;
+        int padIndex = 0;
+        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         triggerButtons = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
 
@@ -527,15 +529,17 @@ void CCharaPcs::calcViewer()
 
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
-        float offsetA = LoadFloat(kCharaViewerZero);
+        frameAdvance = LoadFloat(kCharaViewerZero);
+        float offsetA = frameAdvance;
         if ((triggerButtons & 0x100) != 0) {
             offsetA = LoadFloat(kCharaViewerUnitStep);
         }
+        frameAdvance += offsetA;
         float offsetB = LoadFloat(kCharaViewerZero);
         if ((triggerButtons & 0x200) != 0) {
             offsetB = LoadFloat(kCharaViewerFineStep);
         }
-        frameAdvance = LoadFloat(kCharaViewerZero) + offsetA + offsetB;
+        frameAdvance += offsetB;
     } else {
         float deltaY = LoadFloat(kCharaViewerUnitStep);
         if ((heldButtons & 0x200) != 0) {
@@ -590,13 +594,14 @@ void CCharaPcs::calcViewer()
                     reinterpret_cast<CRef*>(self->m_viewerAnim[0])->AddRef();
                 }
             } else if ((i == 0) && (self->m_viewerIFrameEnabled != 0)) {
-                float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
                 if (self->m_viewerSavedAnimState == 0) {
+                    float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
                     if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
                         self->m_viewerSavedAnimState = 1;
                         self->m_viewerModel[i]->AttachAnim(self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
+                    float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
                     if (animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
                         self->m_viewerSavedAnimState = 0;
                         self->m_viewerModel[i]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);

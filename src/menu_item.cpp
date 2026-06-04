@@ -508,6 +508,14 @@ void CMenuPcs::ItemDraw()
         float cursorY;
 
         if (mode == 0) {
+            cursorEntry = reinterpret_cast<s16*>(itemList->anims);
+            int cursorCount = itemList->count;
+            for (int i = 0; i < cursorCount; i++, cursorEntry += 0x20) {
+                if (*(int*)(cursorEntry + 0xE) == 0x37) {
+                    break;
+                }
+            }
+
             cursorEntry += itemState->selectedIndex * 0x20;
             cursorX = (float)(cursorEntry[0] - 0x14);
             cursorY = (float)((float)(cursorEntry[3] - 0x20) * (float)LoadDouble(DOUBLE_80332e78) + (float)cursorEntry[1]);

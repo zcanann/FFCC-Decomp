@@ -1,4 +1,5 @@
 #include "ffcc/ptrarray.h"
+#define FFCC_PARTMNG_NO_INLINE_PPPCREATEPARAM
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
 #include "ffcc/line_constants.h"

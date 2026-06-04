@@ -85,6 +85,37 @@ struct PPPCREATEPARAM
     int m_hitObjectIds[8];            // 0x4c
 }; // Size 0x6c
 
+#ifndef FFCC_PARTMNG_NO_INLINE_PPPCREATEPARAM
+extern "C" float FLOAT_8032fe18;
+
+inline PPPCREATEPARAM::PPPCREATEPARAM()
+{
+    m_soundEffectParams.m_soundEffectHandle = -1;
+    m_soundEffectParams.m_soundEffectSlot = -1;
+    m_soundEffectParams.m_soundEffectStopFlag = 0;
+    m_soundEffectParams.m_soundEffectKind = 1;
+    m_soundEffectParams.m_soundEffectStartFrame = 0;
+    m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    m_hitParamA = 0;
+    m_hitParamB = 0;
+    m_hitObjectCount = 0;
+    m_hitFlags = 0;
+    m_positionOffsetPtr = 0;
+    m_rotationPtr = 0;
+    m_scalePtr = 0;
+    m_extraPositionPtr = 0;
+    m_paramA = 0;
+    m_paramB = 0;
+    m_lookTargetPtr = 0;
+    m_objectHitMask = 0;
+    m_cylinderAttribute = 0;
+    m_paramC = FLOAT_8032fe18;
+    m_paramD = FLOAT_8032fe18;
+    *reinterpret_cast<unsigned char*>(&m_owner) = 0;
+}
+#endif
+
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern PPPCREATEPARAM g_dcp;

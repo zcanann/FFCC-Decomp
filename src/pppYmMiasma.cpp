@@ -183,6 +183,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             GXColor amb;
             float scale;
             s16 shapeAngle;
+            const float& degToRad = FLOAT_80330640;
 
             pppUnitMatrix(model);
             scale = state->m_speed;
@@ -191,7 +192,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             model.value[2][2] = ppvMng->m_scale.z * scale;
 
             shapeAngle = state->m_shapeAngle;
-            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
+            PSMTXRotRad(rotMatrix.value, 'z', degToRad * (float)shapeAngle);
             pppMulMatrix(model, rotMatrix, model);
 
             pppCopyVector(worldPos, state->m_position);

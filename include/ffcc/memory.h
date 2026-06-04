@@ -19,7 +19,17 @@ public:
     public:
         struct CBlock
         {
-            u8 m_bytes[0x40];
+            unsigned short m_magicStart;
+            unsigned char m_flags;
+            unsigned char m_level;
+            CBlock* m_prev;
+            CBlock* m_next;
+            CStage* m_stage;
+            int m_size;
+            unsigned long m_defaultParam;
+            unsigned short m_line;
+            char m_source[0x24];
+            unsigned short m_magicEnd;
         };
 
         CStage* m_prev;

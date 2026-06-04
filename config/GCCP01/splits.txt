@@ -193,6 +193,7 @@ map.cpp:
 	.data       start:0x801E8960 end:0x801E89B4
 	.bss        start:0x80245758 end:0x802685E0
 	.sdata      start:0x8032E4D0 end:0x8032E508
+	.sbss       start:0x8032ECC0 end:0x8032ECC8
 	.sdata2     start:0x8032F984 end:0x8032FA00
 
 p_map.cpp:
@@ -204,7 +205,7 @@ p_map.cpp:
 	.data       start:0x801E89B8 end:0x801E9030
 	.bss        start:0x802685E0 end:0x8026878C
 	.sdata      start:0x8032E508 end:0x8032E520
-	.sbss       start:0x8032ECC0 end:0x8032ECD9
+	.sbss       start:0x8032ECC8 end:0x8032ECD9
 
 p_camera.cpp:
 	extab       start:0x80006374 end:0x80006414

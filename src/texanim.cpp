@@ -579,12 +579,10 @@ inline void CTexAnimSeq::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         case 'INFO': {
             m_totalFrames = chunkFile.Get4();
             chunkFile.Get4();
-            char b7 = (char)chunkFile.Get4();
-            m_flags = (unsigned char)(((int)b7 << 7) | (m_flags & 0x7F));
-            char b6 = (char)chunkFile.Get4();
-            m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (m_flags & 0xBF));
+            m_flagBits.m_interp = (char)chunkFile.Get4();
+            m_flagBits.m_chin = (char)chunkFile.Get4();
             unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(m_name, s_texAnimSeqE1));
-            m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (m_flags & 0xDF));
+            m_flagBits.m_e1 = (char)(eq >> 5);
             continue;
         }
         case 'KEY ':

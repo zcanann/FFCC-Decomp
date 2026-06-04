@@ -180,12 +180,11 @@ void CGItemObj::ItemJump(int state, float jump)
 
 		if ((object->m_objectFlags & 0x10) == 0) {
 			unsigned int mapMask = object->m_bgHitMask;
+			Vec bottom = object->m_worldPosition;
 			Vec move;
 			CItemJumpCylinder cylinder;
 
-			cylinder.m_bottom.x = object->m_worldPosition.x;
-			cylinder.m_bottom.z = object->m_worldPosition.z;
-			cylinder.m_bottom.y = object->m_worldPosition.y + FLOAT_80331b1c;
+			bottom.y += FLOAT_80331b1c;
 			move.x = FLOAT_80331b20;
 			move.z = FLOAT_80331b20;
 			move.y = FLOAT_80331b24;
@@ -195,9 +194,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_boundsMax.z = FLOAT_80331b2c;
 			cylinder.m_boundsMax.y = FLOAT_80331b2c;
 			cylinder.m_boundsMax.x = FLOAT_80331b2c;
-			cylinder.m_top.x = FLOAT_80331b20;
-			cylinder.m_top.y = FLOAT_80331b20;
-			cylinder.m_top.z = FLOAT_80331b20;
+			cylinder.m_bottom = bottom;
 			cylinder.m_axis.x = FLOAT_80331b20;
 			cylinder.m_axis.y = FLOAT_80331b24;
 			cylinder.m_axis.z = FLOAT_80331b20;
@@ -1004,7 +1001,7 @@ void CGItemObj::onFrameStat()
 	case 0xE:
 		if (m_stateFrame == 0) {
 			prgObj->m_bgColMask = 0;
-			prgObj->m_weaponNodeFlags &= 0xFFEF;
+			*reinterpret_cast<unsigned char*>(&prgObj->m_weaponNodeFlags) &= 0xEF;
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;

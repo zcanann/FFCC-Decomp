@@ -49,6 +49,27 @@ struct MenuEquipMembers {
 	s16* m_equipList;
 };
 
+struct EquipMenuState {
+	unsigned char pad_00[0x0B];
+	u8 initialized;
+	unsigned char pad_0C;
+	u8 closeRequested;
+	unsigned char pad_0E[2];
+	s16 listState;
+	s16 step;
+	unsigned char pad_14[0x0A];
+	s16 cursorMove;
+	unsigned char pad_20[2];
+	s16 frame;
+	unsigned char pad_24[2];
+	s16 selectedIndex;
+	s16 subSelectedIndex;
+	unsigned char pad_2A[6];
+	s16 mode;
+	s16 prevMode;
+	s16 scroll;
+};
+
 struct EquipListStorage {
 	s16 count;
 	s16 selected;
@@ -59,6 +80,17 @@ struct EquipListStorage {
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipFont) == 0x108);
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipList) == 0x850);
+STATIC_ASSERT(offsetof(EquipMenuState, initialized) == 0x0B);
+STATIC_ASSERT(offsetof(EquipMenuState, closeRequested) == 0x0D);
+STATIC_ASSERT(offsetof(EquipMenuState, listState) == 0x10);
+STATIC_ASSERT(offsetof(EquipMenuState, step) == 0x12);
+STATIC_ASSERT(offsetof(EquipMenuState, cursorMove) == 0x1E);
+STATIC_ASSERT(offsetof(EquipMenuState, frame) == 0x22);
+STATIC_ASSERT(offsetof(EquipMenuState, selectedIndex) == 0x26);
+STATIC_ASSERT(offsetof(EquipMenuState, subSelectedIndex) == 0x28);
+STATIC_ASSERT(offsetof(EquipMenuState, mode) == 0x30);
+STATIC_ASSERT(offsetof(EquipMenuState, prevMode) == 0x32);
+STATIC_ASSERT(offsetof(EquipMenuState, scroll) == 0x34);
 STATIC_ASSERT(offsetof(EquipListStorage, entries) == 8);
 STATIC_ASSERT(sizeof(EquipListStorage) == 0x1008);
 
@@ -70,6 +102,11 @@ static inline MenuEquipMembers& GetMenuEquipMembers(CMenuPcs* menu)
 static inline s16* GetEquipState(CMenuPcs* menu)
 {
 	return GetMenuEquipMembers(menu).m_equipState;
+}
+
+static inline EquipMenuState* GetEquipMenuState(CMenuPcs* menu)
+{
+	return reinterpret_cast<EquipMenuState*>(GetEquipState(menu));
 }
 
 static inline s16* GetEquipList(CMenuPcs* menu)
@@ -113,7 +150,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	int entryCount = entries[0];
 	s16* itemEntries = entries + 1;
-	int equipIndex = GetEquipState(this)[0x13];
+	int equipIndex = GetEquipMenuState(this)->selectedIndex;
 
 	if ((index < 0) || (index >= entryCount)) {
 		return 0;
@@ -308,53 +345,53 @@ int CMenuPcs::EquipCtrlCur()
 		return 0;
 	}
 
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-	int mode = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x30));
+	EquipMenuState* menuState = GetEquipMenuState(this);
+	int mode = static_cast<int>(menuState->mode);
 
 	if (mode == 0) {
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (*reinterpret_cast<s16*>(menuState + 0x26) < 3) {
-					*reinterpret_cast<s16*>(menuState + 0x26) = *reinterpret_cast<s16*>(menuState + 0x26) + 1;
+				if (menuState->selectedIndex < 3) {
+					menuState->selectedIndex = menuState->selectedIndex + 1;
 				} else {
-					*reinterpret_cast<s16*>(menuState + 0x26) = 0;
+					menuState->selectedIndex = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else {
-			if (*reinterpret_cast<s16*>(menuState + 0x26) == 0) {
-				*reinterpret_cast<s16*>(menuState + 0x26) = 3;
+			if (menuState->selectedIndex == 0) {
+				menuState->selectedIndex = 3;
 			} else {
-				*reinterpret_cast<s16*>(menuState + 0x26) = *reinterpret_cast<s16*>(menuState + 0x26) - 1;
+				menuState->selectedIndex = menuState->selectedIndex - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 
 		if ((hold & 0xc) == 0) {
 			if ((press & 0x20) != 0) {
-				*reinterpret_cast<s16*>(menuState + 0x1e) = 1;
+				menuState->cursorMove = 1;
 				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 				return 1;
 			}
 
 			if ((press & 0x40) != 0) {
-				*reinterpret_cast<s16*>(menuState + 0x1e) = -1;
+				menuState->cursorMove = -1;
 				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 				return 1;
 			}
 
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					*reinterpret_cast<u8*>(menuState + 0xd) = 1;
+					menuState->closeRequested = 1;
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 					return 1;
 				}
 			} else if (caravanWork->CanPlayerPutItem() == 0) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
-				*reinterpret_cast<s16*>(menuState + 0x30) = 1;
-				*reinterpret_cast<s16*>(menuState + 0x12) = 0;
-				*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+				menuState->mode = 1;
+				menuState->step = 0;
+				menuState->frame = 0;
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
 			}
 		}
@@ -363,14 +400,14 @@ int CMenuPcs::EquipCtrlCur()
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				int base = menuState + mode * 2;
-				s16 selected = *reinterpret_cast<s16*>(base + 0x26);
+				s16* modeSelected = reinterpret_cast<s16*>(reinterpret_cast<char*>(menuState) + mode * 2 + 0x26);
+				s16 selected = *modeSelected;
 
 				if (selected < 7) {
-					*reinterpret_cast<s16*>(base + 0x26) = selected + 1;
-				} else if (static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) + static_cast<int>(selected) <
+					*modeSelected = selected + 1;
+				} else if (static_cast<int>(menuState->scroll) + static_cast<int>(selected) <
 				           letterBuffer[0] - 1) {
-					*reinterpret_cast<s16*>(menuState + 0x34) = *reinterpret_cast<s16*>(menuState + 0x34) + 1;
+					menuState->scroll = menuState->scroll + 1;
 					Sound.PlaySe(1, 0x40, 0x7f, 0);
 				} else {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -379,18 +416,18 @@ int CMenuPcs::EquipCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else {
-			int base = menuState + mode * 2;
-			s16 selected = *reinterpret_cast<s16*>(base + 0x26);
+			s16* modeSelected = reinterpret_cast<s16*>(reinterpret_cast<char*>(menuState) + mode * 2 + 0x26);
+			s16 selected = *modeSelected;
 
 			if (selected == 0) {
-				if (*reinterpret_cast<s16*>(menuState + 0x34) == 0) {
+				if (menuState->scroll == 0) {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
 				} else {
-					*reinterpret_cast<s16*>(menuState + 0x34) = *reinterpret_cast<s16*>(menuState + 0x34) - 1;
+					menuState->scroll = menuState->scroll - 1;
 					Sound.PlaySe(1, 0x40, 0x7f, 0);
 				}
 			} else {
-				*reinterpret_cast<s16*>(base + 0x26) = selected - 1;
+				*modeSelected = selected - 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		}
@@ -398,16 +435,16 @@ int CMenuPcs::EquipCtrlCur()
 		if ((hold & 0xc) == 0) {
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
-					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+					menuState->step = menuState->step + 1;
+					menuState->frame = 0;
 					CmdInit2();
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 				}
 			} else {
-				int index = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) +
-				            static_cast<int>(*reinterpret_cast<s16*>(menuState + mode * 2 + 0x26));
+				int index = static_cast<int>(menuState->scroll) +
+				            static_cast<int>(*reinterpret_cast<s16*>(reinterpret_cast<char*>(menuState) + mode * 2 + 0x26));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-				int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x26));
+				int equipIndex = static_cast<int>(menuState->selectedIndex);
 				unsigned int valid = ChkEquipActive(index);
 
 				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk(entries[index]) != 0))) {
@@ -421,8 +458,8 @@ int CMenuPcs::EquipCtrlCur()
 					}
 					caravanWork->ChgEquipPos(equipIndex, item);
 					caravanWork->CalcStatus();
-					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
-					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+					menuState->step = menuState->step + 1;
+					menuState->frame = 0;
 					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}

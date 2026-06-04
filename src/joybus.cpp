@@ -4333,7 +4333,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-    int result = 0;
+    unsigned int result = 0;
 
     if (threadParam->m_subState != 1)
     {

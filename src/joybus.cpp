@@ -6423,7 +6423,11 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
     unsigned char cmdNum = GbaQue.GetCmdNum(port);
-    unsigned int cmd = (0x14u << 24) | (0x12u << 16) | (static_cast<unsigned int>(cmdNum) << 8);
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x12;
+    cmdBytes[2] = cmdNum;
     int result = 0;
 
     if (m_threadRunningMask != 0)

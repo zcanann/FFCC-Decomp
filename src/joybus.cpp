@@ -6491,7 +6491,10 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
  */
 int JoyBus::SendStartBonus(ThreadParam* threadParam)
 {
-    unsigned int cmd = 0x14140000;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
+    cmdBytes[0] = 0x14;
+    cmdBytes[1] = 0x14;
     unsigned int result = 0;
 
     if (static_cast<signed char>(m_threadRunningMask) != 0)

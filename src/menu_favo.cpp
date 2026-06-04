@@ -24,7 +24,6 @@ extern "C" const double DOUBLE_80333060 = 0.5;
 extern "C" const char s_FavoRankFormat_80333068[] = "%d";
 extern "C" const float FLOAT_8033306C = 4.0f;
 extern "C" const float FLOAT_80333070 = 0.9f;
-extern "C" const double DOUBLE_80333078 = 4503601774854144.0;
 extern "C" const float FLOAT_80333080;
 extern "C" const float FLOAT_80333084;
 
@@ -561,14 +560,14 @@ void CMenuPcs::FavoInit()
 	FavoEntry* entry = favoList->entries;
 	iVar16 = 8;
 	do {
-		entry[0].uvScale = FLOAT_80333048;
-		entry[1].uvScale = FLOAT_80333048;
-		entry[2].uvScale = FLOAT_80333048;
-		entry[3].uvScale = FLOAT_80333048;
-		entry[4].uvScale = FLOAT_80333048;
-		entry[5].uvScale = FLOAT_80333048;
-		entry[6].uvScale = FLOAT_80333048;
-		entry[7].uvScale = FLOAT_80333048;
+		entry[0].uvScale = LoadFloat(FLOAT_80333048);
+		entry[1].uvScale = LoadFloat(FLOAT_80333048);
+		entry[2].uvScale = LoadFloat(FLOAT_80333048);
+		entry[3].uvScale = LoadFloat(FLOAT_80333048);
+		entry[4].uvScale = LoadFloat(FLOAT_80333048);
+		entry[5].uvScale = LoadFloat(FLOAT_80333048);
+		entry[6].uvScale = LoadFloat(FLOAT_80333048);
+		entry[7].uvScale = LoadFloat(FLOAT_80333048);
 		entry += 8;
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
@@ -582,7 +581,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 0x28;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
-	fVar4 = FLOAT_80333040;
+	fVar4 = LoadFloat(FLOAT_80333040);
 	fVar5 = FLOAT_80333080;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
@@ -628,7 +627,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->h = 0x30;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
-	setupEntry->uvScale = FLOAT_80333048;
+	setupEntry->uvScale = LoadFloat(FLOAT_80333048);
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 

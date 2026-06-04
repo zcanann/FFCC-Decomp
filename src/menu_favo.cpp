@@ -24,7 +24,6 @@ extern "C" const double DOUBLE_80333060 = 0.5;
 extern "C" const char s_FavoRankFormat_80333068[] = "%d";
 extern "C" const float FLOAT_8033306C = 4.0f;
 extern "C" const float FLOAT_80333070 = 0.9f;
-extern "C" const double DOUBLE_80333078 = 4503601774854144.0;
 extern "C" const float FLOAT_80333080;
 extern "C" const float FLOAT_80333084;
 
@@ -561,14 +560,14 @@ void CMenuPcs::FavoInit()
 	FavoEntry* entry = favoList->entries;
 	iVar16 = 8;
 	do {
-		entry[0].uvScale = FLOAT_80333048;
-		entry[1].uvScale = FLOAT_80333048;
-		entry[2].uvScale = FLOAT_80333048;
-		entry[3].uvScale = FLOAT_80333048;
-		entry[4].uvScale = FLOAT_80333048;
-		entry[5].uvScale = FLOAT_80333048;
-		entry[6].uvScale = FLOAT_80333048;
-		entry[7].uvScale = FLOAT_80333048;
+		entry[0].uvScale = LoadFloat(FLOAT_80333048);
+		entry[1].uvScale = LoadFloat(FLOAT_80333048);
+		entry[2].uvScale = LoadFloat(FLOAT_80333048);
+		entry[3].uvScale = LoadFloat(FLOAT_80333048);
+		entry[4].uvScale = LoadFloat(FLOAT_80333048);
+		entry[5].uvScale = LoadFloat(FLOAT_80333048);
+		entry[6].uvScale = LoadFloat(FLOAT_80333048);
+		entry[7].uvScale = LoadFloat(FLOAT_80333048);
 		entry += 8;
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);

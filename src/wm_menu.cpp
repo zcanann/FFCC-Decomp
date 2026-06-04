@@ -8814,7 +8814,7 @@ void CMenuPcs::ChgAllModel()
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
 		}
@@ -8826,7 +8826,7 @@ void CMenuPcs::ChgAllModel()
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			modelData[0xC] = 1;
 			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
@@ -8881,7 +8881,7 @@ void CMenuPcs::ChgAllModel2()
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			modelData[0xC] = 1;
 			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
@@ -8956,7 +8956,8 @@ void CMenuPcs::SetMakeChara(int slot)
 void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]) + slot * 0x34;
+	unsigned char* modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	modelData += slot * 0x34;
 	int modelNo;
 	int charaKind;
 
@@ -8964,7 +8965,7 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 		charaKind = 0;
 		modelNo = tribe * 200 + 100;
 		if (isFemale != 0) {
-			modelNo = tribe * 200 + 200;
+			modelNo += 100;
 		}
 		modelNo += job;
 		modelData[0xC] = 1;

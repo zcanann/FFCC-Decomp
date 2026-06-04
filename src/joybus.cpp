@@ -6588,7 +6588,12 @@ int JoyBus::ChgCtrlMode(int portIndex)
             OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
             unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
-            if ((int)m_cmdCount[queuePort] < 0x40)
+            if ((int)m_cmdCount[queuePort] >= 0x40)
+            {
+                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+                ret = -1;
+            }
+            else
             {
                 m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = word;
                 queuePort = m_threadParams[portIndex].m_portIndex;
@@ -6596,11 +6601,6 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
                 OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
                 ret = 0;
-            }
-            else
-            {
-                OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-                ret = -1;
             }
         }
 

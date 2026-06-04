@@ -252,9 +252,9 @@ extern const float kOptionColumnAnimStep;
 extern const float kOptionVolumeScale;
 
 namespace {
-static inline int* GetMenuHelpMsgTable()
+static inline char** GetMenuHelpMsgTable()
 {
-	return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(6));
+	return reinterpret_cast<char**>(Game.m_cFlatDataArr[1].TableStrings(6));
 }
 
 static inline CRedSound* GetRedSoundGlobal()
@@ -389,7 +389,6 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const menuPcsGlobal = reinterpret_cast<unsigned char*>(&MenuPcs);
 	u32 foodBase = Game.m_scriptFoodBase[0];
 	u32 lineBaseY[4];
 	const u32* lineBaseData = reinterpret_cast<const u32*>(lbl_801E3058 + 0x678);
@@ -419,9 +418,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		firstLine = msgNo * 3 + 0x1F5;
 	}
 
-	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
+	CMemory::CStage* stage = MenuPcs.m_menuStage;
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
+		stage = MenuPcs.m_stageF4;
 	}
 
 	char* temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x8C) char[0x200];
@@ -429,11 +428,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x8E);
 	}
 	for (int line = firstLine; line < firstLine + 3; line++) {
-		int msgId = GetMenuHelpMsgTable()[line];
+		char* msg = GetMenuHelpMsgTable()[line];
 		memset(temp, 0, 0x200);
-		CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
+		CMes::MakeAgbString(temp, msg, 0, 1);
 		if (strlen(temp) != 0) {
-			int width = static_cast<int>(CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 0, 0, 0));
+			int width = static_cast<int>(CMes::drawTagString(font, msg, 0, 0, 0));
 			if (width < maxWidth) {
 				width = maxWidth;
 			}
@@ -492,10 +491,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 
 		for (int i = 0; i < 3; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstLine + i];
+			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
+			CMes::drawTagString(font, msg, 1, 0, 0);
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
@@ -628,9 +627,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else {
 		int lineCount = 3;
 		int firstNonEmptyLine = firstLine;
-		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
+		stage = MenuPcs.m_menuStage;
 		if (Game.m_gameWork.m_menuStageMode != 0) {
-			stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
+			stage = MenuPcs.m_stageF4;
 		}
 
 		temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x23D) char[0x200];
@@ -638,9 +637,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
 		}
 		for (int i = 0; i < 3; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstLine + i];
+			char* msg = GetMenuHelpMsgTable()[firstLine + i];
 			memset(temp, 0, 0x200);
-			CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
+			CMes::MakeAgbString(temp, msg, 0, 1);
 			if (strlen(temp) == 0) {
 				lineCount--;
 				if (firstNonEmptyLine == firstLine + i) {
@@ -660,10 +659,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 
 		for (int i = 0; i < lineCount; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
+			char* msg = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
-			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
+			CMes::drawTagString(font, msg, 1, 0, 0);
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 	}
@@ -804,7 +803,6 @@ void CMenuPcs::GetOptionData()
  */
 void CMenuPcs::CalcOptionMenu()
 {
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	unsigned short press = static_cast<unsigned short>(GetMenuPress());
 	int optionChanged = 0;
 
@@ -837,7 +835,7 @@ void CMenuPcs::CalcOptionMenu()
 			return;
 		}
 
-		*reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x20) = 1;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_artiState) + 0x20) = 1;
 		m_optionIndex = 0;
 		m_optionMenuState = 0;
 		m_optionOpenAnim = kOptionAnimMin;

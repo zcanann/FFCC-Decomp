@@ -298,7 +298,7 @@ p_light.cpp:
 	.bss        start:0x80268F88 end:0x8026D338
 	.sdata      start:0x8032E620 end:0x8032E63C
 	.sbss       start:0x8032ED10 end:0x8032ED18
-	.sdata2     start:0x8032FC68 end:0x8032FC88
+	.sdata2     start:0x8032FC08 end:0x8032FC98
 
 mapanim.cpp:
 	extab       start:0x800069C8 end:0x80006A44

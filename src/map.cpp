@@ -129,16 +129,10 @@ CMapTexAnimSet::CMapTexAnimSet()
  */
 CMapTexAnimSet::~CMapTexAnimSet()
 {
-    struct RefCounted {
-        void* vtable;
-        int refCount;
-    };
-
     for (int i = 0; i < m_count; i++) {
         CMapTexAnim* entry = m_anims[i];
         if (entry != 0) {
-            RefCounted* ref = reinterpret_cast<RefCounted*>(entry);
-            if (--ref->refCount == 0) {
+            if (entry->DecRef() == 0) {
                 delete entry;
             }
             m_anims[i] = 0;

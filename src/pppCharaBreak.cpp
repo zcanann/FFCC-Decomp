@@ -335,15 +335,18 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
     Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);
 
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
+    CharaBreakDisplayListPair*** perMeshBuffers;
+    CChara::CMesh* mesh;
+    CharaBreakDisplayListPair*** meshBufferSlot;
     CChara::CModel* model = work->m_model;
 
     ClearCharaBreakModelCallbacks(model);
 
-    CharaBreakDisplayListPair*** meshBufferSlot = MeshDisplayListPairs(work);
-    CharaBreakDisplayListPair*** perMeshBuffers = meshBufferSlot;
-    CChara::CMesh* mesh = model->m_meshes;
+    perMeshBuffers = MeshDisplayListPairs(work);
+    meshBufferSlot = perMeshBuffers;
+    mesh = model->m_meshes;
 
-    if (meshBufferSlot != NULL) {
+    if (perMeshBuffers != NULL) {
         u32 meshIndex = 0;
         while (meshIndex < ModelData(model)->m_meshCount) {
             CharaBreakDisplayListPair** dlEntryBase = *meshBufferSlot;

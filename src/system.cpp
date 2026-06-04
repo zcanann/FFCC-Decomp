@@ -86,7 +86,6 @@ extern const char s_compilerMapLoaded[] =
     "\251\202\347\223\307\202\335\215\236\202\335\202\334\202\265\202\275"
     "\201\102\012";
 extern const char s_systemTemplateDebug[28] = "systemTemplateDebug\n";
-extern const char s_CManager_801D6F90[] = "CManager";
 extern const char s_systemStopwatchName[8];
 
 /*

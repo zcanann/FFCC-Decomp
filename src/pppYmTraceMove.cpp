@@ -43,9 +43,10 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		return;
 	}
 
+	s32 workOffset = *param_3->m_serializedDataOffsets;
 	_pppMngSt* pppMngSt = ppvMng;
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
 	CGObject* lookTarget = pppMngSt->m_lookTarget;
+	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + workOffset);
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;

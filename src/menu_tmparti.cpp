@@ -448,7 +448,7 @@ void CMenuPcs::TmpArtiCtrl()
 
 		uVar5 = (unsigned int)*(short *)(uVar4 + 0xbaa);
 		iVar7 = 0;
-		TmpArtiEntry* setupEntry = &this->m_tmpArtiList->entries[uVar5 - 1];
+		TmpArtiEntry* setupEntry = GetTmpArtiEntries(this) + (uVar5 - 1);
 		if (-1 < (int)(uVar5 - 1)) {
 			uVar9 = uVar5 >> 3;
 			if (uVar9 != 0) {

@@ -285,12 +285,11 @@ void JoyBus::CreateInit()
     char path[140];
     strcpy(path, JoyBusConst::DVD_DIR);
 
-    // MWCC PPC requires 3-arg strcat
-    strcat(path, JoyBusConst::OBJ_FILE, 131UL);
+    strcat(path, JoyBusConst::OBJ_FILE);
 
     CFile::CHandle* file = File.Open(path, 0, CFile::PRI_LOW);
 
-    if (!file && System.m_execParam > 1)
+    if (!file && (unsigned int)System.m_execParam >= 2)
     {
         System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
     }
@@ -439,7 +438,7 @@ int JoyBus::LoadBin()
 
         if (file == 0)
         {
-            if ((unsigned int)System.m_execParam > 1)
+            if ((unsigned int)System.m_execParam >= 2)
             {
                 System.Printf(const_cast<char*>(s_not_found_error_fmt), (char*)this);
             }
@@ -549,13 +548,13 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     strcpy(path, JoyBusConst::DVD_DIR);
     sprintf(tmp, const_cast<char*>(s_map_filename_fmt), stageId, mapId);
-    strcat(path, tmp, 132UL);
+    strcat(path, tmp);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 
     if (fileHandle == 0)
     {
-        if ((unsigned int)System.m_execParam > 1)
+        if ((unsigned int)System.m_execParam >= 2)
         {
             System.Printf(const_cast<char*>(s_not_found_error_fmt), path);
         }
@@ -6974,8 +6973,12 @@ int JoyBus::SendAddLetter(int portIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b014c
+ * PAL Size: 256b
+ * EN Address: 0x800c4cd8
+ * EN Size: 172b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
 {
@@ -6987,10 +6990,14 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&amountBytes, 0);
     unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
-    unsigned int result = 0;
+    unsigned int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
-	{
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
+    {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 
         port = m_threadParams[portIndex].m_portIndex;
@@ -7014,21 +7021,29 @@ int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b0048
+ * PAL Size: 260b
+ * EN Address: 0x800c4d84
+ * EN Size: 60b
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::DelItem(int portIndex, unsigned char itemId)
 {
-    unsigned short tail = 0xFFFF;
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = (unsigned char*)&cmd;
+    unsigned char cmdBytes[4];
+    short tail = -1;
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId & 0x3F;
-    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&tail, 0);
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(reinterpret_cast<unsigned short*>(&tail), 0);
+    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
-    int result = 0;
+    int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 
@@ -7368,10 +7383,10 @@ void JoyBus::RestartThread()
 
 /*
  * --INFO--
- * PAL Address: 0x800a6620
+ * PAL Address: 0x800af830
  * PAL Size: 260b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x800c50f8
+ * EN Size: 160b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -7383,9 +7398,13 @@ int JoyBus::SetCmdLst(int portIndex, int param_3, short param_4)
     cmdBytes[1] = static_cast<unsigned char>(param_3);
     *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&param, 0);
     unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
-    unsigned int result = 0;
+    unsigned int result;
 
-    if (static_cast<signed char>(m_threadRunningMask) != 0)
+    if (static_cast<signed char>(m_threadRunningMask) == 0)
+    {
+        result = 0;
+    }
+    else
     {
         OSWaitSemaphore(m_accessSemaphores + m_threadParams[portIndex].m_portIndex);
 

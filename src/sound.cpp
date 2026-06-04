@@ -20,7 +20,7 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern const char s_CSound_80330ce0[] = "CSound";
+extern const char s_CSound_80330cf8[] = "CSound";
 extern const char sSoundManagerClassName[] = "CManager";
 extern const float FLOAT_80330ce8 = 127.0f;
 extern const float kLineSegmentMinT = 0.0f;
@@ -338,7 +338,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
+    m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330cf8), 0);
 
     m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2E) u8[0x80000];
     m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2F) u8[0x20000];

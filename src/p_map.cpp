@@ -104,6 +104,7 @@ CProcessTable CMapPcs::m_table[3] = {
 };
 
 CMapPcs MapPcs;
+extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;

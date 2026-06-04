@@ -2288,7 +2288,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
 
-    for (unsigned int i = 1; i < m_cmdCount[port]; ++i)
+    for (int i = 1; i < (int)m_cmdCount[port]; ++i)
 	{
         m_cmdQueueData[port][i - 1] = m_cmdQueueData[port][i];
 	}

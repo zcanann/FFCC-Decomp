@@ -355,9 +355,9 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     self[0x6494] = 0;
 
     *reinterpret_cast<void**>(self + 0x1354) =
-        new (PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) u8[0x40000];
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) u8[0x40000];
     *reinterpret_cast<void**>(self + 0x135C) =
-        new (PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) u8[0x40000];
+        new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) u8[0x40000];
 
     *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x1354) + 200) =

@@ -17,8 +17,8 @@ struct DisplayTail {
     u8 m_bytes[0xB];
 };
 
-static inline CUSBStreamDataStorage* UsbStream(CFunnyShapePcs* self) {
-    return &self->m_usbStreamDataStorage;
+static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self) {
+    return &self->m_usbStreamData;
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
@@ -66,7 +66,7 @@ static inline u16 LoadSwapU16(u16 value) {
  */
 void CFunnyShapePcs::SetUSBData()
 {
-    CUSBStreamDataStorage* usb = UsbStream(this);
+    CUSBStreamData* usb = UsbStream(this);
 
     switch (usb->m_packetCode) {
     case 4:
@@ -359,7 +359,7 @@ void CFunnyShapePcs::SetUSBData()
  */
 inline void CFunnyShapePcs::USBDataCallback(CUSBPcs::CDataHeader* header)
 {
-    CUSBStreamDataStorage* usb = UsbStream(this);
+    CUSBStreamData* usb = UsbStream(this);
 
     usb->m_dataReady = 1;
     usb->m_headerReady = header->m_packetSize != 0;

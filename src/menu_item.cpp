@@ -846,7 +846,7 @@ void CMenuPcs::ItemInit()
     entry->y = 0x28;
     entry->w = 0x78;
     entry->h = 0x108;
-    float titleAlpha = FLOAT_80332EA8;
+    float titleAlpha = LoadFloat(FLOAT_80332EA8);
     float titleScale = FLOAT_80332EAC;
     float zero = FLOAT_80332e60;
     entry->u = titleAlpha;

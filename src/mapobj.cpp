@@ -1401,7 +1401,7 @@ void CMapObj::Draw(unsigned char priority)
     }
 
     if (m_colorAlphaRate != 0xFF) {
-        unsigned int alphaRate = m_colorAlphaRate;
+        unsigned char alphaRate = m_colorAlphaRate;
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);

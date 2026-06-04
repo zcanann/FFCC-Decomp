@@ -3794,13 +3794,13 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     }
     else
     {
-        unsigned char* p = dataPtr;
+        unsigned char* p = dataBase;
 
         unsigned char b0 = *p++;
         unsigned char b1 = *p++;
         unsigned char b2 = *p++;
 
-        dataPtr = p;
+        dataBase = p;
 
         unsigned int word =
             (static_cast<unsigned int>(0x8B) << 24) |

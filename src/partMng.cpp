@@ -19,6 +19,7 @@
 #include "ffcc/USBStreamData.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppfunctbl.h"
+#include "ffcc/ppp_linkage.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
 extern "C" {
@@ -65,7 +66,6 @@ extern "C" double DOUBLE_8032fe80;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
-extern int ppvUserStopPartF;
 unsigned char gPppDefaultValueBuffer[0x40] = {0};
 int gPppHeapUseRateWords[3] = {0, 0, 0};
 unsigned char gPppInConstructor = 0;

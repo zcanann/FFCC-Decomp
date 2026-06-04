@@ -14,23 +14,26 @@
 #include <math.h>
 #include <string.h>
 
-extern const _GXColor kBumpLightMapColor;
-extern const _GXColor kLightDefaultMaterialColor;
-extern float FLOAT_8032fc10;
-extern float FLOAT_8032fc14;
-extern float FLOAT_8032fc18;
-extern float FLOAT_8032fc1c;
-extern float FLOAT_8032fc20;
-extern float FLOAT_8032fc24;
-extern float FLOAT_8032fc28;
-extern float FLOAT_8032fc2c;
-extern float FLOAT_8032fc30;
-extern float FLOAT_8032fc34;
-extern float FLOAT_8032fc38;
-extern float FLOAT_8032fc3c;
-extern float FLOAT_8032fc40;
-extern float FLOAT_8032fc44;
-extern float FLOAT_8032fc60;
+extern const _GXColor kLightDefaultMaterialColor = {0xFF, 0xFF, 0xFF, 0xFF};
+extern const _GXColor kBumpLightMapColor = {0x88, 0x88, 0x88, 0xFF};
+extern const float FLOAT_8032fc10 = 100000000.0f;
+extern const float FLOAT_8032fc14 = 0.0f;
+extern const float FLOAT_8032fc18 = 0.5f;
+extern const float FLOAT_8032fc1c = 1.0f;
+extern const float FLOAT_8032fc20 = 0.4f;
+extern const float FLOAT_8032fc24 = 0.005f;
+extern const float FLOAT_8032fc28 = 64.0f;
+extern const float FLOAT_8032fc2c = -1.0f;
+extern const float FLOAT_8032fc30 = 15.0f;
+extern const float FLOAT_8032fc34 = -4.0f;
+extern const float FLOAT_8032fc38 = 8.0f;
+extern const float FLOAT_8032fc3c = 2.0f;
+extern const float FLOAT_8032fc40 = 0.03125f;
+extern const float FLOAT_8032fc44 = 0.8f;
+extern const double DOUBLE_8032fc48 = 0.5;
+extern const double DOUBLE_8032fc50 = 3.0;
+extern const double DOUBLE_8032fc58 = 0.0;
+extern const float FLOAT_8032fc60 = -2.0f;
 extern const double DOUBLE_8032fc68 = 4503599627370496.0;
 extern const float FLOAT_8032fc70 = 100000.0f;
 extern const float FLOAT_8032fc74 = 360.0f;
@@ -38,10 +41,10 @@ extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
 extern const float FLOAT_8032fc7c = 255.0f;
 extern const float FLOAT_8032fc80 = 999999986991104.0f;
 extern const float FLOAT_8032fc84 = 0.125f;
-extern const float FLOAT_8032fc90;
-extern float FLOAT_8032fc88;
-extern float FLOAT_8032fc8c;
-extern float FLOAT_8032fc94;
+extern const float FLOAT_8032fc88 = -0.125f;
+extern const float FLOAT_8032fc8c = -0.015625f;
+extern const float FLOAT_8032fc90 = 0.1f;
+extern const float FLOAT_8032fc94 = 57.29578f;
 float FLOAT_8032ed10;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }

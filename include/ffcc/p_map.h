@@ -40,7 +40,7 @@ public:
     static CProcessTableCallback m_table_desc23;
     static CProcessTable m_table[3];
 
-    CMapPcs() {}
+    CMapPcs();
 
     void Init();
     void Quit();

@@ -5212,18 +5212,18 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 
         unsigned int p = threadParam->m_portIndex;
 
-        if ((int)m_cmdCount[p] < 0x40)
+        if ((int)m_cmdCount[p] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[p]);
+            result = -1;
+        }
+        else
         {
             m_cmdQueueData[p][m_cmdCount[p]] = cmd;
             m_cmdCount[threadParam->m_portIndex]++;
 
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[p]);
-            result = -1;
         }
     }
 

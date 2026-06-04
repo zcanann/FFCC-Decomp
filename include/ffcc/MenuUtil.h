@@ -1,9 +1,12 @@
 #ifndef _FFCC_MENU_UTIL_H_
 #define _FFCC_MENU_UTIL_H_
 
+#include "ffcc/memory.h"
+
 #include <dolphin/gx.h>
 
 class CFont;
+struct ArtiState;
 
 class CMenuPcs
 {
@@ -51,8 +54,15 @@ public:
     int m_specialModeEdit;              // 0xB0
     signed char m_specialModeCursor;    // 0xB4
     signed char m_specialModeFlags[4];  // 0xB5
-    char pad_B9[0xF8 - 0xB9];
+    char pad_B9[0xEC - 0xB9];
+    CMemory::CStage* m_menuStage;       // 0xEC
+    CMemory::CStage* m_stageF0;         // 0xF0
+    CMemory::CStage* m_stageF4;         // 0xF4
     CFont* menuFont;
+    char pad_FC[0x82C - 0xFC];
+    ArtiState* m_artiState;             // 0x82C
+    char pad_830[0x864 - 0x830];
+    unsigned short m_battleStateFlag;   // 0x864
 };
 
 extern CMenuPcs MenuPcs;

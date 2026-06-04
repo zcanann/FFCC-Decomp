@@ -19,31 +19,31 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+CProcessTableCallback CGraphicPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawWait__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawFlip__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBegin__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCopy__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawEnd__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(preDrawEnvInit__11CGraphicPcsFv)};
+CProcessTableCallback CGraphicPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(stdDrawEnvInit__11CGraphicPcsFv)};
+
 inline CGraphicPcs::CGraphicPcs()
 {
-    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
-    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
-    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};
-    static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawWait__11CGraphicPcsFv)};
-    static CProcessTableCallback desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawFlip__11CGraphicPcsFv)};
-    static CProcessTableCallback desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBegin__11CGraphicPcsFv)};
-    static CProcessTableCallback desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCopy__11CGraphicPcsFv)};
-    static CProcessTableCallback desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawEnd__11CGraphicPcsFv)};
-    static CProcessTableCallback desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(preDrawEnvInit__11CGraphicPcsFv)};
-    static CProcessTableCallback desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(stdDrawEnvInit__11CGraphicPcsFv)};
-
     CProcessTable* table = &m_table;
 
-    table->m_fields.m_create = desc0;
-    table->m_fields.m_destroy = desc1;
-    table->m_fields.m_entries[0].m_callback = desc2;
-    table->m_fields.m_entries[1].m_callback = desc3;
-    table->m_fields.m_entries[2].m_callback = desc4;
-    table->m_fields.m_entries[3].m_callback = desc5;
-    table->m_fields.m_entries[4].m_callback = desc6;
-    table->m_fields.m_entries[5].m_callback = desc7;
-    table->m_fields.m_entries[6].m_callback = desc8;
-    table->m_fields.m_entries[7].m_callback = desc9;
+    table->m_fields.m_create = m_table_desc0;
+    table->m_fields.m_destroy = m_table_desc1;
+    table->m_fields.m_entries[0].m_callback = m_table_desc2;
+    table->m_fields.m_entries[1].m_callback = m_table_desc3;
+    table->m_fields.m_entries[2].m_callback = m_table_desc4;
+    table->m_fields.m_entries[3].m_callback = m_table_desc5;
+    table->m_fields.m_entries[4].m_callback = m_table_desc6;
+    table->m_fields.m_entries[5].m_callback = m_table_desc7;
+    table->m_fields.m_entries[6].m_callback = m_table_desc8;
+    table->m_fields.m_entries[7].m_callback = m_table_desc9;
 }
 
 CGraphicPcs GraphicPcs;

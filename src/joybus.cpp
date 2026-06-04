@@ -6898,16 +6898,16 @@ int JoyBus::SendResult(int portIndex, int param3, int param4, int param5)
         OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
 
         unsigned int queuePort = m_threadParams[portIndex].m_portIndex;
-        if (static_cast<int>(m_cmdCount[queuePort]) < 0x40)
+        if (static_cast<int>(m_cmdCount[queuePort]) >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+            result = -1;
+        }
+        else
         {
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
             m_cmdCount[m_threadParams[portIndex].m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
         }
     }
 

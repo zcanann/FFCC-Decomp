@@ -731,7 +731,7 @@ void CGame::CheckScriptChange()
     m_newGameFlag = 0;
     Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x205);
 
-    if ((u32)System.m_execParam > 2) {
+    if (static_cast<u32>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ScriptWillChangeMsg_801D619C));
     }
 
@@ -743,7 +743,7 @@ void CGame::CheckScriptChange()
             loadCfd();
             m_cfdLoadedFlag = 1;
 
-            if ((u32)System.m_execParam > 2) {
+            if (static_cast<u32>(System.m_execParam) >= 3U) {
                 System.Printf(const_cast<char*>(s_ScriptResidentLoadedMsg_801D61B8));
             }
         }
@@ -754,7 +754,7 @@ void CGame::CheckScriptChange()
             PartPcs.createLoad();
             m_assetsLoadedFlag = 1;
 
-            if ((u32)System.m_execParam > 2) {
+            if (static_cast<u32>(System.m_execParam) >= 3U) {
                 System.Printf(const_cast<char*>(sCoreResidentLoadedMsg));
             }
         }
@@ -783,7 +783,7 @@ void CGame::CheckScriptChange()
 
     System.ScriptChanged(m_nextScript.m_name, scriptResult);
 
-    if ((u32)System.m_execParam > 2) {
+    if (static_cast<u32>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ScriptChangedMsg_801D6234));
     }
 }

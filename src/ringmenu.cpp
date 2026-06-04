@@ -150,7 +150,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
@@ -208,8 +208,8 @@ void CRingMenu::DrawIcon()
 		iconRow = 1;
 		iconCol = 0x65;
 	} else {
-		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
-		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
+		iconRow = caravanWork->m_joybusCaravanId;
+		int foodProgress = static_cast<int>(caravanWork->m_id);
 		int progress = foodProgress - 100;
 		int q = progress / 100 + (progress >> 31);
 		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
@@ -229,7 +229,7 @@ void CRingMenu::DrawIcon()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
-	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
+	if (caravanWork->m_hp != 0) {
 		tlut = 0;
 	}
 	MenuPcs.m_textures[0x18]->SetExternalTlut(tlut, 1);

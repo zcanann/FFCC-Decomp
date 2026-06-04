@@ -602,7 +602,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Vec4d clipOutput;
     Vec screenOffset;
     Vec cameraOffset;
-    Vec basis = { 0.0f, 1.0f, 0.0f };
+    Vec basis = kScreenBreakCameraUpVector;
     Vec gravityAdd;
     Vec axis;
     Quaternion meshQuat;

@@ -60,6 +60,31 @@ public:
     {
     public:
         void operator=(const CLetterWork&);
+
+        unsigned char Flags() const { return static_cast<unsigned char>(m_word0 >> 24); }
+        void SetFlags(unsigned char flags)
+        {
+            m_word0 = (m_word0 & 0x00FFFFFF) | (static_cast<unsigned int>(flags) << 24);
+        }
+        bool IsOpened() const { return static_cast<signed char>(Flags()) < 0; }
+        void SetOpened() { SetFlags(Flags() | 0x80); }
+        bool IsAttachmentClaimed() const { return (Flags() & 0x40) != 0; }
+        void SetAttachmentClaimed() { SetFlags((Flags() & 0xBF) | 0x40); }
+        bool IsReplySent() const { return (Flags() & 0x20) != 0; }
+        bool HasReply() const { return (Flags() & 0x10) != 0; }
+        bool AttachmentIsGil() const { return (Flags() & 8) != 0; }
+        unsigned short HeaderWord() const { return static_cast<unsigned short>(m_word0 >> 16); }
+        unsigned short AttachmentWord() const { return static_cast<unsigned short>(m_word0); }
+        unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
+        unsigned short TempVar(int index) const
+        {
+            unsigned int word = (index < 2) ? m_word1 : m_word2;
+            return (index & 1) ? static_cast<unsigned short>(word) : static_cast<unsigned short>(word >> 16);
+        }
+
+        unsigned int m_word0;
+        unsigned int m_word1;
+        unsigned int m_word2;
     };
 
     CCaravanWork();
@@ -163,8 +188,7 @@ public:
     unsigned short m_appearanceVariant;         // 0x03E4
     unsigned short unk_0x3e6;                   // 0x03E6
     int m_letterCount;                          // 0x03E8
-    unsigned char m_letter0[12];                // 0x03EC
-    unsigned char m_letterSlots[1188];          // 0x03F8
+    CLetterWork m_letters[100];                 // 0x03EC
     unsigned int m_evtState0;                   // 0x089C
     unsigned int m_evtState1;                   // 0x08A0
     unsigned short m_evtWorkArr[128];           // 0x08A4
@@ -212,5 +236,6 @@ public:
 }; // Size 0xC30
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
+STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 
 #endif // _FFCC_GOBJWORK_H_

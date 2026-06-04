@@ -1388,7 +1388,7 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
         for (int i = 0; i < 100; i++)
         {
-            u8* dstLetter = caravanWork->m_letter0 + i * 0x0C;
+            u8* dstLetter = reinterpret_cast<u8*>(&caravanWork->m_letters[i]);
             u8* srcLetter = src + 0x104 + i * 0x0C;
 
             dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
@@ -1655,7 +1655,7 @@ void CMemoryCardMan::MakeSaveData()
         for (int i = 0; i < 100; i++)
         {
             u8* dstLetter = dst + 0x104 + i * 0x0C;
-            u8* srcLetter = caravanWork->m_letter0 + i * 0x0C;
+            u8* srcLetter = reinterpret_cast<u8*>(&caravanWork->m_letters[i]);
 
             dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
             *reinterpret_cast<u16*>(dstLetter) =

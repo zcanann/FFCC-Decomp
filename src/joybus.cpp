@@ -6473,11 +6473,7 @@ int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
     unsigned char cmdNum = GbaQue.GetCmdNum(port);
-    unsigned int cmd = 0;
-    unsigned char* cmdBytes = (unsigned char*)&cmd;
-    cmdBytes[0] = 0x14;
-    cmdBytes[1] = 0x12;
-    cmdBytes[2] = cmdNum;
+    unsigned int cmd = MakeJoyCmd16(0x1412, cmdNum, 0);
 
     if (m_threadRunningMask == 0)
     {

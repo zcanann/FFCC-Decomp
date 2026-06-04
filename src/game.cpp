@@ -151,7 +151,7 @@ static s8 sMapObjRotationInitialized;
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGBaseObj::GetCID()
+inline int CGBaseObj::GetCID()
 {
     return 1;
 }

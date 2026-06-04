@@ -457,8 +457,7 @@ void CAStar::drawAStar()
 				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
 				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
 				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
-				CColor color(r, g, b, 0xFF);
-				MapMng.SetIdGrpColor(group, 0, color.color);
+				MapMng.SetIdGrpColor(group, 0, CColor(r, g, b, 0xFF).color);
 				++group;
 			} while (group < 64);
 		}
@@ -498,7 +497,7 @@ void CAStar::drawAStar()
 
 				do
 				{
-					unsigned char groupId = *group;
+					int groupId = *group;
 
 					if (groupId != 0)
 					{

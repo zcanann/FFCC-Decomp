@@ -1074,11 +1074,11 @@ void CMemory::CStage::free(void*)
 int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
     int mode = stageGetAllocationMode(this);
-    int node;
+    CBlock* node;
     if (mode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
     if (flag == -1) {
@@ -1098,7 +1098,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
         int top = m_heapTop;
 
         for (int i = 0; i <= m_blockCount; i++) {
-            int blockTail = (i == m_blockCount) ? m_heapBottom : *reinterpret_cast<int*>(node + 4);
+            int blockTail = (i == m_blockCount) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
             int size = blockTail - top;
             if (size != 0) {
                 if ((flag & 1) != 0) {
@@ -1112,13 +1112,12 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             }
 
             if (i < m_blockCount) {
-                int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+                int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 if ((flag & 2) != 0) {
                     System.Printf(
                         const_cast<char*>(sHeapWalkerEntryFmt), usedCount, sHeapWalkerUsed,
-                        *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
-                        *reinterpret_cast<int*>(node + 4), 0, 0, reinterpret_cast<char*>(node + 0x1A),
-                        *reinterpret_cast<unsigned short*>(node + 0x18));
+                        node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
+                        node->m_line);
                 }
                 freeSize += used;
                 totalSize += used;
@@ -1126,23 +1125,23 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 usedCount++;
             }
 
-            node += 0x40;
+            node++;
         }
     } else {
-        while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-            unsigned char nodeFlags = *reinterpret_cast<unsigned char*>(node + 2);
-            int nodeGroup = *reinterpret_cast<int*>(node + 0x14);
+        while ((node->m_flags & 2) == 0) {
+            unsigned char nodeFlags = node->m_flags;
+            int nodeGroup = node->m_defaultParam;
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 bool isUsed = (nodeFlags & 4) != 0;
                 if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
                     const char* kind = isUsed ? sHeapWalkerUsed : sHeapWalkerFree;
-                    unsigned char level = isUsed ? *reinterpret_cast<unsigned char*>(node + 3) : 0;
-                    const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : sEmptyAllocSourceName;
-                    unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
+                    unsigned char level = isUsed ? node->m_level : 0;
+                    const char* source = isUsed ? node->m_source : sEmptyAllocSourceName;
+                    unsigned short line = isUsed ? node->m_line : 0;
                     int index = isUsed ? usedCount : freeCount;
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, *reinterpret_cast<int*>(node + 0x10),
-                        totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), *reinterpret_cast<int*>(node + 8),
+                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, node->m_size,
+                        totalSize, payloadFromBlock(node), node->m_prev, node->m_next,
                         source, line);
                 }
             }
@@ -1150,15 +1149,15 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 if ((nodeFlags & 4) == 0) {
                     freeCount++;
-                    usedSize += *reinterpret_cast<int*>(node + 0x10);
+                    usedSize += node->m_size;
                 } else {
                     usedCount++;
-                    freeSize += *reinterpret_cast<int*>(node + 0x10);
+                    freeSize += node->m_size;
                 }
             }
 
-            totalSize += *reinterpret_cast<int*>(node + 8) - node;
-            node = *reinterpret_cast<int*>(node + 8);
+            totalSize += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
+            node = node->m_next;
         }
     }
 
@@ -1200,32 +1199,32 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[14] = sHeapBarColors[14];
     colors[15] = sHeapBarColors[15];
 
-    int prevNode;
-    int node;
+    CBlock* prevNode;
+    CBlock* node;
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
-    prevNode = *reinterpret_cast<int*>(node + 4);
+    prevNode = node->m_prev;
     unsigned char heapBar[0x17D];
     memset(heapBar, 0xFF, 0x17D);
 
     int heapTop = m_heapTop;
     int heapSpan = (m_heapBottom - 0x40) - heapTop;
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        int curNode = node;
-        unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
+    while ((node->m_flags & 2) == 0) {
+        CBlock* curNode = node;
+        unsigned char flags = curNode->m_flags;
         bool isUsed = false;
         if (((flags & 4) != 0) && ((flags & 3) == 0)) {
             isUsed = true;
         }
 
         if (isUsed) {
-            int fillEnd = ((*reinterpret_cast<int*>(curNode + 8) - heapTop) * 0x17C) / heapSpan;
-            int fillStart = (((curNode + 0x40) - heapTop) * 0x17C) / heapSpan;
+            int fillEnd = ((reinterpret_cast<int>(curNode->m_next) - heapTop) * 0x17C) / heapSpan;
+            int fillStart = ((reinterpret_cast<int>(payloadFromBlock(curNode)) - heapTop) * 0x17C) / heapSpan;
             unsigned char* dst = heapBar + fillStart;
             unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1) - static_cast<unsigned int>(fillStart);
 
@@ -1233,14 +1232,14 @@ void CMemory::CStage::drawHeapBar(int y)
                 unsigned int loop = fillCount >> 3;
                 if (loop != 0) {
                     do {
-                        dst[0] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[1] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[2] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[3] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[4] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[5] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[6] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[7] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[0] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[1] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[2] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[3] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[4] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[5] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[6] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[7] = static_cast<unsigned char>(curNode->m_flags >> 4);
                         dst += 8;
                         loop--;
                     } while (loop != 0);
@@ -1252,7 +1251,7 @@ void CMemory::CStage::drawHeapBar(int y)
                 }
 
                 do {
-                    *dst = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                    *dst = static_cast<unsigned char>(curNode->m_flags >> 4);
                     dst++;
                     fillCount--;
                 } while (fillCount != 0);
@@ -1260,9 +1259,10 @@ void CMemory::CStage::drawHeapBar(int y)
         }
 
 checkHeapNode:
-        if ((static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 0x10)) !=
-             static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40))) ||
-            (static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 4)) != static_cast<unsigned int>(prevNode))) {
+        if ((static_cast<unsigned int>(curNode->m_size) !=
+             static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_next) - reinterpret_cast<int>(payloadFromBlock(curNode)))) ||
+            (static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_prev)) !=
+             static_cast<unsigned int>(reinterpret_cast<int>(prevNode)))) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
@@ -1270,7 +1270,7 @@ checkHeapNode:
         }
 
         prevNode = curNode;
-        node = *reinterpret_cast<int*>(curNode + 8);
+        node = curNode->m_next;
     }
 
     int drawColor = heapBar[0];
@@ -1336,17 +1336,19 @@ checkHeapNode:
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    CBlock* node = (stageGetAllocationMode(this) == 2) ?
+        stageBlockAt(stageGetHeapHead(this)) :
+        stageBlockAt(stageGetHeapHead(this))->m_next;
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
-    int prev = *reinterpret_cast<int*>(node + 4);
+    CBlock* prev = node->m_prev;
     int heapTop = m_heapTop;
     char line[264];
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            int blockStart = (node + 0x40) - heapTop;
-            int blockEnd = *reinterpret_cast<int*>(node + 8) - heapTop;
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
+            int blockStart = reinterpret_cast<int>(payloadFromBlock(node)) - heapTop;
+            int blockEnd = reinterpret_cast<int>(node->m_next) - heapTop;
             int blockSize = blockEnd - blockStart;
             totalUnuse += blockSize;
             if (static_cast<int>(maxUnuse) < blockSize) {
@@ -1354,8 +1356,8 @@ void CMemory::CStage::drawHeapTitle(int y)
             }
         }
 
-        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
-            (*reinterpret_cast<int*>(node + 4) != prev)) {
+        if ((node->m_size != reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(payloadFromBlock(node))) ||
+            (node->m_prev != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
@@ -1363,7 +1365,7 @@ void CMemory::CStage::drawHeapTitle(int y)
         }
 
         prev = node;
-        node = *reinterpret_cast<int*>(node + 8);
+        node = node->m_next;
     }
 
     int srcLen = strlen(m_allocationSourceStr);
@@ -1388,19 +1390,19 @@ void CMemory::CStage::drawHeapTitle(int y)
  */
 int CMemory::CStage::GetHeapUnuse()
 {
-    int node;
+    CBlock* node;
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
     int total = 0;
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            total += *reinterpret_cast<int*>(node + 0x10);
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
+            total += node->m_size;
         }
-        node = *reinterpret_cast<int*>(node + 8);
+        node = node->m_next;
     }
 
     return total;
@@ -2209,12 +2211,12 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     int blockTail;
     int i;
     int top;
-    int node;
+    CBlock* node;
 
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
     heapTotal = 0;
@@ -2224,11 +2226,11 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     if (m_allocationMode == 2) {
         top = m_heapTop;
 
-        for (i = 0; i <= m_blockCount; i++, node += 0x40) {
+        for (i = 0; i <= m_blockCount; i++, node++) {
             if (m_blockCount == i) {
                 blockTail = m_heapBottom;
             } else {
-                blockTail = *reinterpret_cast<int*>(node + 4);
+                blockTail = reinterpret_cast<int>(node->m_prev);
             }
 
             freeSize = blockTail - top;
@@ -2238,7 +2240,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
             }
 
             if (i < m_blockCount) {
-                usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+                usedSize = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 heapUse += usedSize;
                 top = blockTail + usedSize;
                 heapTotal += usedSize;
@@ -2248,15 +2250,15 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
         return;
     }
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) != 0) {
-            heapUse += *reinterpret_cast<int*>(node + 0x10);
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) != 0) {
+            heapUse += node->m_size;
         } else {
-            heapUnuse += *reinterpret_cast<int*>(node + 0x10);
+            heapUnuse += node->m_size;
         }
 
-        heapTotal += *reinterpret_cast<int*>(node + 8) - node;
-        node = *reinterpret_cast<int*>(node + 8);
+        heapTotal += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
+        node = node->m_next;
     }
 }
 

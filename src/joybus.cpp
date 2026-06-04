@@ -6295,24 +6295,26 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
     unsigned short opcode = 0x140F;
     unsigned int cmd = MakeJoyCmd16(opcode, menuId, 0);
 
+    if (m_threadRunningMask == 0)
+    {
+        return 0;
+    }
+
+    OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    unsigned int queuePort = threadParam->m_portIndex;
+    if ((int)m_cmdCount[queuePort] < 0x40)
     {
-        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-
-        unsigned int queuePort = threadParam->m_portIndex;
-        if ((int)m_cmdCount[queuePort] < 0x40)
-        {
-            m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
-            m_cmdCount[threadParam->m_portIndex]++;
-            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
-        }
+        m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmd;
+        m_cmdCount[threadParam->m_portIndex]++;
+        OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+    }
+    else
+    {
+        OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+        result = -1;
     }
 
     return result;

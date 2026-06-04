@@ -3855,7 +3855,7 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
     unsigned int cmdX = (0x0Fu << 24) | (0x00u << 16) | ((unsigned char)(posX & 0xFF) << 8) | ((unsigned char)((posX >> 8) & 0xFF));
     int result = 0;
 
-    if (m_threadRunningMask != 0)
+    if (static_cast<signed char>(m_threadRunningMask) != 0)
     {
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 

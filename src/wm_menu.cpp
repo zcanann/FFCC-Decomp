@@ -8960,11 +8960,7 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 	int modelNo;
 	int charaKind;
 
-	if (tribe < 0) {
-		charaKind = 3;
-		modelData[0xC] = 0;
-		modelNo = 0x43;
-	} else {
+	if (tribe >= 0) {
 		charaKind = 0;
 		modelNo = tribe * 200 + 100;
 		if (isFemale != 0) {
@@ -8972,6 +8968,10 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 		}
 		modelNo += job;
 		modelData[0xC] = 1;
+	} else {
+		charaKind = 3;
+		modelData[0xC] = 0;
+		modelNo = 0x43;
 	}
 
 	GetWmCharaHandles(this)[slot]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);

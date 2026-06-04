@@ -6936,11 +6936,12 @@ int JoyBus::SendAddLetter(int portIndex)
 int JoyBus::SetItem(int portIndex, unsigned char itemId, short amount)
 {
     unsigned char cmdBytes[4];
+    itemId &= 0x3F;
     cmdBytes[0] = 0x17;
     cmdBytes[1] = itemId;
     cmdBytes[2] = (unsigned char)amount;
     cmdBytes[3] = (unsigned char)((unsigned short)amount >> 8);
-    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes) & 0xFF3FFFFF;
+    unsigned int cmd = *reinterpret_cast<unsigned int*>(cmdBytes);
     unsigned int port;
     unsigned int result = 0;
 

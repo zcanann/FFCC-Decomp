@@ -2413,49 +2413,20 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    int script = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
 
-    if (*reinterpret_cast<s16*>(script + 0xbaa) > 2) {
-        if (*reinterpret_cast<s16*>(script + 0x208) >= 0 && *reinterpret_cast<s16*>(script + 0x208) == itemNo) {
+    for (int i = 2; i < caravanWork->m_numCmdListSlots && i < 8; i++) {
+        const short commandItem = caravanWork->m_commandListInventorySlotRef[i];
+        if (commandItem >= 0 && commandItem == itemNo) {
             return 1;
         }
-        if (*reinterpret_cast<s16*>(script + 0xbaa) > 3) {
-            if (*reinterpret_cast<s16*>(script + 0x20a) >= 0 && *reinterpret_cast<s16*>(script + 0x20a) == itemNo) {
-                return 1;
-            }
-            if (*reinterpret_cast<s16*>(script + 0xbaa) > 4) {
-                if (*reinterpret_cast<s16*>(script + 0x20c) >= 0 && *reinterpret_cast<s16*>(script + 0x20c) == itemNo) {
-                    return 1;
-                }
-                if (*reinterpret_cast<s16*>(script + 0xbaa) > 5) {
-                    if (*reinterpret_cast<s16*>(script + 0x20e) >= 0 && *reinterpret_cast<s16*>(script + 0x20e) == itemNo) {
-                        return 1;
-                    }
-                    if (*reinterpret_cast<s16*>(script + 0xbaa) > 6) {
-                        if (*reinterpret_cast<s16*>(script + 0x210) >= 0 && *reinterpret_cast<s16*>(script + 0x210) == itemNo) {
-                            return 1;
-                        }
-                        if (*reinterpret_cast<s16*>(script + 0xbaa) > 7 && *reinterpret_cast<s16*>(script + 0x212) >= 0 &&
-                            *reinterpret_cast<s16*>(script + 0x212) == itemNo) {
-                            return 1;
-                        }
-                    }
-                }
-            }
-        }
     }
 
-    if (*reinterpret_cast<s16*>(script + 0xac) >= 0 && *reinterpret_cast<s16*>(script + 0xac) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xae) >= 0 && *reinterpret_cast<s16*>(script + 0xae) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xb0) >= 0 && *reinterpret_cast<s16*>(script + 0xb0) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xb2) >= 0 && *reinterpret_cast<s16*>(script + 0xb2) == itemNo) {
-        return 1;
+    for (int i = 0; i < 4; i++) {
+        const short equipment = caravanWork->m_equipment[i];
+        if (equipment >= 0 && equipment == itemNo) {
+            return 1;
+        }
     }
 
     return 0;
@@ -2948,19 +2919,19 @@ int CMenuPcs::GetEquipType(int itemNo)
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    int script = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
 
     GetItemType(itemNo, 1);
-    u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
+    u16 race = caravanWork->m_tribeId;
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
     int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
     if (smithItem != 0) {
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
-        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(script + 0x3E0) & 3);
+        unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
         unsigned int genderMask = 0x10;
-        if (*reinterpret_cast<s16*>(script + 0x3E2) != 0) {
+        if (caravanWork->m_genderFlag != 0) {
             genderMask = 0x20;
         }
 
@@ -3248,7 +3219,7 @@ void CMenuPcs::CalcSingLife()
  */
 void CMenuPcs::DrawSingLife()
 {
-    unsigned int scriptFood = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
     if (lifeTimer < 0) {
         return;
@@ -3273,7 +3244,7 @@ void CMenuPcs::DrawSingLife()
         y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
     }
 
-    int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
+    int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp >> 1);
     float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
     reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
         ->DrawHeart(x, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);

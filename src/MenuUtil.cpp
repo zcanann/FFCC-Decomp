@@ -1,6 +1,7 @@
 #include "ffcc/MenuUtil.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/memory.h"
 #include "ffcc/mes.h"
 #include "ffcc/pad.h"
@@ -394,7 +395,7 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor color, int tlut, float margin, float scale)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	u32 foodBase = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
 	const u32* lineBaseData = reinterpret_cast<const u32*>(lbl_801E3058 + 0x678);
 	lineBaseY[0] = lineBaseData[0];
@@ -580,10 +581,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						currentItem = 3;
 					}
 
-					currentItem = *reinterpret_cast<short*>(
-					    foodBase +
-					    static_cast<int>(*reinterpret_cast<short*>(foodBase + currentItem * 2 + 0xAC)) * 2 +
-					    0xB6);
+					int equipmentSlot = caravanWork->m_equipment[currentItem];
+					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
 					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
 					                                              static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34)))) != 0) {

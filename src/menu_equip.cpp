@@ -349,7 +349,7 @@ int CMenuPcs::EquipCtrlCur()
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 					return 1;
 				}
-			} else if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() == 0) {
+			} else if (caravanWork->CanPlayerPutItem() == 0) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				*reinterpret_cast<s16*>(menuState + 0x30) = 1;
@@ -407,26 +407,8 @@ int CMenuPcs::EquipCtrlCur()
 				int index = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) +
 				            static_cast<int>(*reinterpret_cast<s16*>(menuState + mode * 2 + 0x26));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-				CCaravanWork* activeCaravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-				s16* activeEntries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 				int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x26));
-				unsigned int valid;
-
-				if ((index < 0) || (activeEntries[0] <= index)) {
-					valid = 0;
-				} else if (index == 0) {
-					if (equipIndex < 3) {
-						valid = 0;
-					} else {
-						valid = (unsigned int)(int)activeCaravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
-					}
-				} else {
-					int item = activeCaravanWork->m_inventoryItems[activeEntries[index]];
-					valid = ChkEquipPossible(item);
-					if (((valid & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
-						valid = 0;
-					}
-				}
+				unsigned int valid = ChkEquipActive(index);
 
 				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk(entries[index]) != 0))) {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -437,8 +419,8 @@ int CMenuPcs::EquipCtrlCur()
 					} else {
 						item = entries[index];
 					}
-					reinterpret_cast<CCaravanWork*>(caravanWork)->ChgEquipPos(equipIndex, item);
-					reinterpret_cast<CCaravanWork*>(caravanWork)->CalcStatus();
+					caravanWork->ChgEquipPos(equipIndex, item);
+					caravanWork->CalcStatus();
 					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
 					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
 					CmdInit2();
@@ -802,7 +784,7 @@ int CMenuPcs::EquipClose()
 void CMenuPcs::EquipCtrl()
 {
 	int mode;
-	u32 caravanWork;
+	CCaravanWork* caravanWork;
 	float scale;
 	int state;
 	int menuState;
@@ -835,7 +817,7 @@ void CMenuPcs::EquipCtrl()
 	}
 
 	scale = FLOAT_80332ee0;
-	caravanWork = Game.m_scriptFoodBase[0];
+	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	if (state != 0) {
 		item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 		for (index = 0; index < **reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850); index++) {
@@ -844,7 +826,7 @@ void CMenuPcs::EquipCtrl()
 			item += 0x40;
 		}
 
-		equipCount = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
 		index = 0;
 		offset = (equipCount - 1) * 0x40;
 		if (-1 < static_cast<int>(equipCount - 1)) {

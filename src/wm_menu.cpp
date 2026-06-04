@@ -8814,7 +8814,7 @@ void CMenuPcs::ChgAllModel()
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
 		}
@@ -8826,7 +8826,7 @@ void CMenuPcs::ChgAllModel()
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			modelData[0xC] = 1;
 			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
@@ -8881,7 +8881,7 @@ void CMenuPcs::ChgAllModel2()
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
-				modelId = race * 200 + 200;
+				modelId += 100;
 			}
 			modelData[0xC] = 1;
 			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);

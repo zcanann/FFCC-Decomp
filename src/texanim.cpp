@@ -224,19 +224,19 @@ void CTexAnimSet::SetTexGen()
             float y = texAnim->m_texGen.y;
             int index = texAnim->m_refData->m_texSrtIndex;
             float x = texAnim->m_texGen.x;
-            material->m_texScroll[index].m_u0 = x;
-            material->m_texScroll[index].m_v0 = y;
-            material->m_texScroll[index].m_u1 = zero;
-            material->m_texScroll[index].m_v1 = zero;
-            if (zero == material->m_texScroll[index].m_u1) {
-                material->m_texScroll[index].m_type0 = 0;
+            material->m_textureData.m_texScroll[index].m_u0 = x;
+            material->m_textureData.m_texScroll[index].m_v0 = y;
+            material->m_textureData.m_texScroll[index].m_u1 = zero;
+            material->m_textureData.m_texScroll[index].m_v1 = zero;
+            if (zero == material->m_textureData.m_texScroll[index].m_u1) {
+                material->m_textureData.m_texScroll[index].m_type0 = 0;
             } else {
-                material->m_texScroll[index].m_type0 = 1;
+                material->m_textureData.m_texScroll[index].m_type0 = 1;
             }
-            if (zero == material->m_texScroll[index].m_v1) {
-                material->m_texScroll[index].m_type1 = 0;
+            if (zero == material->m_textureData.m_texScroll[index].m_v1) {
+                material->m_textureData.m_texScroll[index].m_type1 = 0;
             } else {
-                material->m_texScroll[index].m_type1 = 1;
+                material->m_textureData.m_texScroll[index].m_type1 = 1;
             }
         }
     }

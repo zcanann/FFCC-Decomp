@@ -181,6 +181,24 @@ static inline int ClampIndex(int index, int maxIndex)
     return index;
 }
 
+struct CFlatPathPoint
+{
+    float m_distance;
+    Vec m_position;
+};
+
+struct CFlatPathCache
+{
+    int m_pointCount;
+    float m_totalDistance;
+    CFlatPathPoint m_points[0x40];
+};
+
+static inline CFlatPathCache* PathCache(CFlatRuntime2* self)
+{
+    return reinterpret_cast<CFlatPathCache*>(reinterpret_cast<u8*>(self) + 0x17D4);
+}
+
 static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
 {
     out.x = a.x + (b.x - a.x) * t;
@@ -2173,26 +2191,26 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x19: {
-        int* pointCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
-        float* totalDistance = reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
-        if (*pointCount < 0x40) {
+        CFlatPathCache* pathCache = PathCache(this);
+        if (pathCache->m_pointCount < 0x40) {
             if (*object->m_localBase != 0) {
-                *pointCount = 0;
-                *totalDistance = 0.0f;
+                pathCache->m_pointCount = 0;
+                pathCache->m_totalDistance = 0.0f;
             }
 
-            Vec* point = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + *pointCount * 0x10);
+            CFlatPathPoint* pathPoint = &pathCache->m_points[pathCache->m_pointCount];
+            Vec* point = &pathPoint->m_position;
             *reinterpret_cast<unsigned int*>(&point->x) = object->m_localBase[1];
             *reinterpret_cast<unsigned int*>(&point->y) = object->m_localBase[2];
             *reinterpret_cast<unsigned int*>(&point->z) = object->m_localBase[3];
 
-            if (*pointCount != 0) {
-                Vec* previous = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (*pointCount - 1) * 0x10);
-                *totalDistance += PSVECDistance(point, previous);
+            if (pathCache->m_pointCount != 0) {
+                Vec* previous = &pathCache->m_points[pathCache->m_pointCount - 1].m_position;
+                pathCache->m_totalDistance += PSVECDistance(point, previous);
             }
 
-            *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + *pointCount * 0x10) = *totalDistance;
-            *pointCount = *pointCount + 1;
+            pathPoint->m_distance = pathCache->m_totalDistance;
+            pathCache->m_pointCount = pathCache->m_pointCount + 1;
         }
         runtime->push(object, 0);
         outResult = 0;
@@ -2200,7 +2218,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x1A: {
         const unsigned int mode = *object->m_localBase;
-        const int pointCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        CFlatPathCache* pathCache = PathCache(this);
+        const int pointCount = pathCache->m_pointCount;
         Vec result = {0.0f, 0.0f, 0.0f};
 
         if (pointCount > 0 && object->m_localBase[2] != 0) {
@@ -2223,23 +2242,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             }
 
             if ((mode & 4) == 0) {
-                const float totalDistance = *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+                const float totalDistance = pathCache->m_totalDistance;
                 const float pathDistance = totalDistance * t;
 
-                result = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0);
+                result = pathCache->m_points[0].m_position;
                 for (int i = 0; i + 1 < pointCount; i++) {
-                    const float startDistance =
-                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + i * 0x10);
-                    const float endDistance =
-                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + (i + 1) * 0x10);
+                    const float startDistance = pathCache->m_points[i].m_distance;
+                    const float endDistance = pathCache->m_points[i + 1].m_distance;
                     if (startDistance <= pathDistance && pathDistance <= endDistance) {
                         float segmentT = 0.0f;
                         if (endDistance != startDistance) {
                             segmentT = (pathDistance - startDistance) / (endDistance - startDistance);
                         }
-                        const Vec& startPoint = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + i * 0x10);
-                        const Vec& endPoint =
-                            *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (i + 1) * 0x10);
+                        const Vec& startPoint = pathCache->m_points[i].m_position;
+                        const Vec& endPoint = pathCache->m_points[i + 1].m_position;
                         VECLerp(const_cast<Vec*>(&startPoint), const_cast<Vec*>(&endPoint), &result, segmentT);
                         break;
                     }
@@ -2255,14 +2271,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     segmentT = 0.0f;
                 }
 
-                const Vec& p0 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex - 1, maxIndex) * 0x10);
-                const Vec& p1 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex, maxIndex) * 0x10);
-                const Vec& p2 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 1, maxIndex) * 0x10);
-                const Vec& p3 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 2, maxIndex) * 0x10);
+                const Vec& p0 = pathCache->m_points[ClampIndex(baseIndex - 1, maxIndex)].m_position;
+                const Vec& p1 = pathCache->m_points[ClampIndex(baseIndex, maxIndex)].m_position;
+                const Vec& p2 = pathCache->m_points[ClampIndex(baseIndex + 1, maxIndex)].m_position;
+                const Vec& p3 = pathCache->m_points[ClampIndex(baseIndex + 2, maxIndex)].m_position;
                 CatmullRomVec(result, p0, p1, p2, p3, segmentT);
             }
         }

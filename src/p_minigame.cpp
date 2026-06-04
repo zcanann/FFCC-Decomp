@@ -1,9 +1,9 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/joybus.h"
 #include "ffcc/file.h"
+#include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
-#include "ffcc/p_game.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/cflat_runtime2.h"
 

@@ -618,14 +618,14 @@ void CMesMenu::onDraw()
                 (float)(((menuIndex & 1) != 0) ? 56 : 0), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
 
             font->SetScale(FLOAT_8033094C);
-            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->unk_0x3ca_0x3dd));
+            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood->m_name));
             font->DrawInit();
             font->SetTlut(0xF);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             font->SetColor(colorStorage.color);
             font->SetPosX(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950));
             font->SetPosY(frameY + FLOAT_8033096C);
-            font->Draw(reinterpret_cast<char*>(scriptFood->unk_0x3ca_0x3dd));
+            font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
             MenuPcs.DrawInit();
 
             {

@@ -1,5 +1,6 @@
 #include "ffcc/memory.h"
 #include "ffcc/chara.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
@@ -90,6 +91,25 @@ extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
 int s_RefCnt0Compare;
 
+STATIC_ASSERT(sizeof(CMemory::CStage) == 0x12C);
+STATIC_ASSERT(sizeof(CMemory::CStage::CBlock) == 0x40);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_flags) == 0x02);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_level) == 0x03);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_prev) == 0x04);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_next) == 0x08);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_stage) == 0x0C);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_size) == 0x10);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_defaultParam) == 0x14);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_line) == 0x18);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_source) == 0x1A);
+STATIC_ASSERT(offsetof(CMemory::CStage::CBlock, m_magicEnd) == 0x3E);
+STATIC_ASSERT(sizeof(CMemory::CMode) == 0x27D8);
+STATIC_ASSERT(sizeof(CMemory) == 0x77A0);
+
+static const unsigned short kMemoryBlockStartMagic = 0x4B41;
+static const unsigned short kMemoryBlockEndMagic = 0x4D49;
+static const unsigned char kMemoryBlockUsedFlag = 0x04;
+
 static const int kStagePoolFullMsgOffset = 0xC0;
 static const int kStageAllocFailedMsgOffset = 0xF4;
 static const int kStageDestroyingMsgOffset = 0x28;
@@ -111,6 +131,51 @@ static inline void stageSetHeapHead(CMemory::CStage* stage, int value)
 static inline char* stageGetSourceName(CMemory::CStage* stage)
 {
     return stage->m_allocationSourceStr;
+}
+
+static inline CMemory::CStage::CBlock* stageBlockAt(unsigned long address)
+{
+    return reinterpret_cast<CMemory::CStage::CBlock*>(address);
+}
+
+static inline CMemory::CStage::CBlock* blockFromPayload(void* payload)
+{
+    return reinterpret_cast<CMemory::CStage::CBlock*>(reinterpret_cast<unsigned char*>(payload) - sizeof(CMemory::CStage::CBlock));
+}
+
+static inline void* payloadFromBlock(CMemory::CStage::CBlock* block)
+{
+    return reinterpret_cast<void*>(reinterpret_cast<unsigned char*>(block) + sizeof(CMemory::CStage::CBlock));
+}
+
+static inline void freeStageBlock(void* ptr)
+{
+    if (ptr != (void*)nullptr) {
+        CMemory::CStage::CBlock* block = blockFromPayload(ptr);
+        if ((block->m_magicStart != kMemoryBlockStartMagic) ||
+            (block->m_magicEnd != kMemoryBlockEndMagic)) {
+            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
+        }
+
+        block->m_flags = static_cast<unsigned char>(block->m_flags & 0xfb);
+
+        if ((block->m_next->m_flags & kMemoryBlockUsedFlag) == 0) {
+            block->m_size =
+                block->m_size + sizeof(CMemory::CStage::CBlock) + block->m_next->m_size;
+            block->m_next->m_next->m_prev = block;
+            block->m_next = block->m_next->m_next;
+        }
+
+        CMemory::CStage::CBlock* prevBlock = block->m_prev;
+        if ((prevBlock->m_flags & kMemoryBlockUsedFlag) == 0) {
+            prevBlock->m_size =
+                prevBlock->m_size + sizeof(CMemory::CStage::CBlock) + block->m_size;
+            block->m_prev->m_next = block->m_next;
+            block->m_next->m_prev = block->m_prev;
+        }
+
+        block->m_stage->m_allocCount -= 1;
+    }
 }
 
 static inline CAmemCache& cacheEntryAt(CAmemCacheSet* cacheSet, int index)
@@ -140,13 +205,12 @@ static inline CRedSound* RedSound(CSound* sound)
 
 static inline bool stageHasUnfreedBlocks(CMemory::CStage* stage)
 {
-    int heapHead = stageGetHeapHead(stage);
-    int node = *reinterpret_cast<int*>(heapHead + 8);
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) != 0) {
+    CMemory::CStage::CBlock* node = stageBlockAt(stageGetHeapHead(stage))->m_next;
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) != 0) {
             return true;
         }
-        node = *reinterpret_cast<int*>(node + 8);
+        node = node->m_next;
     }
     return false;
 }
@@ -164,14 +228,13 @@ static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
 
 static inline void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
 {
-    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
     int mode = stageGetAllocationMode(stage);
-    int modeListBase = reinterpret_cast<int>(memory) + mode * 0x27D8 + 4;
+    CMemory::CMode& modeData = memory->Mode(mode);
 
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
-    **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
-    *reinterpret_cast<int*>(stageBytes + 4) = *reinterpret_cast<int*>(modeListBase + 0x130);
-    *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
+    stage->m_prev->m_next = stage->m_next;
+    stage->m_next->m_prev = stage->m_prev;
+    stage->m_next = modeData.m_freeList.m_next;
+    modeData.m_freeList.m_next = stage;
 }
 
 static inline void stageDestroyInternal(CMemory::CStage* stage)
@@ -226,37 +289,7 @@ void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int
  */
 void operator delete(void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*
@@ -270,37 +303,7 @@ void operator delete(void* ptr)
  */
 void operator delete[](void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*
@@ -362,61 +365,57 @@ void CMemory::Init()
     int arenaLo = reinterpret_cast<int>(OSGetArenaLo());
     OSInitAlloc(OSGetArenaLo(), reinterpret_cast<void*>(arenaLo + 0x14000), 1);
 
-    unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4;
     m_heapWalkerLevel = 0;
     m_heapWalkerVisible = 0;
     m_defaultGroup = 0;
 
     for (int pass = 0; pass < 3; pass++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            CMode& modeData = m_modes[pass];
             if ((pass == 0) || (pass == 1)) {
                 unsigned int arenaHi = reinterpret_cast<unsigned int>(OSGetArenaHi());
                 if (pass == 0) {
-                    *reinterpret_cast<unsigned int*>(modeBase + 8) = 0x81780000;
+                    modeData.m_activeList.m_heapTop = 0x81780000;
                     unsigned int lo = reinterpret_cast<unsigned int>(OSGetArenaLo());
-                    *reinterpret_cast<unsigned int*>(modeBase + 0xC) = (lo + 0x1403F) & ~0x3FU;
+                    modeData.m_activeList.m_heapBottom = (lo + 0x1403F) & ~0x3FU;
                 } else {
-                    *reinterpret_cast<unsigned int*>(modeBase + 8) = arenaHi & ~0x3FU;
-                    *reinterpret_cast<unsigned int*>(modeBase + 0xC) = 0x81800000;
+                    modeData.m_activeList.m_heapTop = arenaHi & ~0x3FU;
+                    modeData.m_activeList.m_heapBottom = 0x81800000;
                 }
 
-                int top = *reinterpret_cast<int*>(modeBase + 8);
-                int bottom = *reinterpret_cast<int*>(modeBase + 0xC);
+                int top = modeData.m_activeList.m_heapTop;
+                int bottom = modeData.m_activeList.m_heapBottom;
                 if (0 < (top - bottom)) {
                     memset(reinterpret_cast<void*>(bottom), 0xAB, top - bottom);
                 }
             } else {
-                *reinterpret_cast<int*>(modeBase + 8) = 0x7FC000;
-                *reinterpret_cast<int*>(modeBase + 0xC) = 0x4000;
+                modeData.m_activeList.m_heapTop = 0x7FC000;
+                modeData.m_activeList.m_heapBottom = 0x4000;
             }
 
-            *reinterpret_cast<unsigned char**>(modeBase) = modeBase;
-            *reinterpret_cast<unsigned char**>(modeBase + 4) = modeBase;
-            *reinterpret_cast<unsigned char**>(modeBase + 0x130) = modeBase + 600;
+            modeData.m_activeList.m_prev = &modeData.m_activeList;
+            modeData.m_activeList.m_next = &modeData.m_activeList;
+            modeData.m_freeList.m_next = &modeData.m_stagePool[0];
 
-            CStage* stageBase = reinterpret_cast<CStage*>(modeBase + 0x258);
             for (int index = 0; index < 32; index++) {
-                unsigned char* next;
+                CStage* next;
 
                 if (index == 0x1F) {
-                    next = modeBase + 300;
+                    next = &modeData.m_freeList;
                 } else {
-                    next = modeBase + (index + 1) * 300 + 600;
+                    next = &modeData.m_stagePool[index + 1];
                 }
 
-                stageBase->m_next = reinterpret_cast<CStage*>(next);
-                stageBase++;
+                modeData.m_stagePool[index].m_next = next;
             }
         }
-
-        modeBase += 0x27D8;
     }
 
     CStage* stage = CreateStage(0x2000, sCurrentMemoryStageName, 0);
-    *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C) = stage;
+    m_currentMemoryStage = stage;
 
     stage = CreateStage(0x4000, sMainMemoryStageName, 0);
-    *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790) = stage;
+    m_mainMemoryStage = stage;
 }
 
 /*
@@ -430,20 +429,19 @@ void CMemory::Init()
  */
 void CMemory::Quit()
 {
-    CStage* activeStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790);
+    CStage* activeStage = m_mainMemoryStage;
     stageDestroyInternal(activeStage);
     stageMoveToPoolList(this, activeStage);
 
     for (int pass = 0; pass < 3; pass++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            unsigned char* listHeadBytes = reinterpret_cast<unsigned char*>(this) + 4 + pass * 0x27D8;
-            CStage* listHead = reinterpret_cast<CStage*>(listHeadBytes);
-            CStage* stage = *reinterpret_cast<CStage**>(listHeadBytes + 4);
+            CStage* listHead = &m_modes[pass].m_activeList;
+            CStage* stage = listHead->m_next;
 
             while (stage != listHead) {
-                CStage* next = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                CStage* next = stage->m_next;
                 if ((pass != 0) ||
-                    (stage != *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C))) {
+                    (stage != m_currentMemoryStage)) {
                     System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stageGetSourceName(stage));
                     stageDestroyInternal(stage);
                     stageMoveToPoolList(this, stage);
@@ -453,7 +451,7 @@ void CMemory::Quit()
         }
     }
 
-    CStage* rootStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C);
+    CStage* rootStage = m_currentMemoryStage;
     stageDestroyInternal(rootStage);
     stageMoveToPoolList(this, rootStage);
 }
@@ -512,34 +510,31 @@ void CMemory::HeapWalker()
     System.Printf(const_cast<char*>(sHeapWalkerTitle));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
 
-    CStage* listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
     for (int mode = 0; mode < 3; mode++) {
         if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            CStage* stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
+            CStage* listHead = &m_modes[mode].m_activeList;
+            CStage* stage = listHead->m_next;
             while (stage != listHead) {
                 stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
-                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                stage = stage->m_next;
             }
 
             System.Printf(const_cast<char*>(sHeapWalkerNewline));
 
-            stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
+            stage = listHead->m_next;
             int useTotal = 0;
             int unuseTotal = 0;
             do {
-                unsigned int useKB = static_cast<unsigned int>(
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8))
+                unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
                     >> 10;
                 System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stageGetSourceName(stage));
                 useTotal += useKB;
 
                 unsigned int unuseKB = static_cast<unsigned int>(
-                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC))
+                    stage->m_next->m_heapTop - stage->m_heapBottom)
                     >> 10;
                 System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
-                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                stage = stage->m_next;
                 unuseTotal += unuseKB;
             } while (stage != listHead);
 
@@ -547,7 +542,6 @@ void CMemory::HeapWalker()
                 const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
         }
 
-        listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(listHead) + 0x27D8);
     }
 }
 
@@ -600,41 +594,30 @@ void CMemory::Draw()
             Graphic.InitDebugString();
         }
 
-        unsigned char* listHead = reinterpret_cast<unsigned char*>(this) + 4;
         int y = 0x20;
         int useTotalKB = 0;
         int unuseTotalKB = 0;
 
         for (int mode = 0; mode < 3; mode++) {
             if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
-                CMemory::CStage* head = reinterpret_cast<CMemory::CStage*>(listHead);
-                CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(listHead + 4);
+                CMemory::CStage* head = &m_modes[mode].m_activeList;
+                CMemory::CStage* stage = head->m_next;
                 while (stage != head) {
                     if (pass == 0) {
                         stage->drawHeapBar(y);
                     } else {
                         stage->drawHeapTitle(y);
                         if (mode == 0) {
-                            useTotalKB +=
-                                static_cast<unsigned int>(
-                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
-                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8)) >>
-                                10;
+                            useTotalKB += static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop) >> 10;
                             unuseTotalKB +=
-                                static_cast<unsigned int>(
-                                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) +
-                                                                                  4) +
-                                                           8) -
-                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
+                                static_cast<unsigned int>(stage->m_next->m_heapTop - stage->m_heapBottom) >>
                                 10;
                         }
                     }
                     y += 0xC;
-                    stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                    stage = stage->m_next;
                 }
             }
-
-            listHead += 0x27D8;
         }
 
         if (pass == 1) {
@@ -677,90 +660,80 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 {
     if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
         unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
-        unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4 + mode * 0x27D8;
-        CStage* stage = *reinterpret_cast<CStage**>(modeBase + 0x130);
-        unsigned char* list = modeBase;
+        CMode& modeData = m_modes[mode];
+        CStage* stage = modeData.m_freeList.m_next;
+        CStage* list = &modeData.m_activeList;
 
-        if (stage == reinterpret_cast<CStage*>(modeBase + 300)) {
+        if (stage == &modeData.m_freeList) {
             System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStagePoolFullMsgOffset));
         } else {
             do {
-                unsigned char* next = *reinterpret_cast<unsigned char**>(list + 4);
-                if (static_cast<unsigned int>(*reinterpret_cast<int*>(list + 0xC)) + alignedSize <=
-                    *reinterpret_cast<unsigned int*>(next + 8)) {
-                    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
+                CStage* next = list->m_next;
+                if (static_cast<unsigned int>(list->m_heapBottom) + alignedSize <=
+                    static_cast<unsigned int>(next->m_heapTop)) {
 
-                    *reinterpret_cast<CStage**>(modeBase + 0x130) =
-                        *reinterpret_cast<CStage**>(stageBytes + 4);
-                    *reinterpret_cast<unsigned char**>(stageBytes) = list;
-                    *reinterpret_cast<unsigned char**>(stageBytes + 4) =
-                        *reinterpret_cast<unsigned char**>(list + 4);
-                    *reinterpret_cast<CStage**>(*reinterpret_cast<unsigned char**>(list + 4)) = stage;
-                    *reinterpret_cast<CStage**>(list + 4) = stage;
+                    modeData.m_freeList.m_next = stage->m_next;
+                    stage->m_prev = list;
+                    stage->m_next = list->m_next;
+                    list->m_next->m_prev = stage;
+                    list->m_next = stage;
 
-                    *reinterpret_cast<int*>(stageBytes + 8) = *reinterpret_cast<int*>(list + 0xC);
-                    *reinterpret_cast<unsigned int*>(stageBytes + 0xC) =
-                        *reinterpret_cast<unsigned int*>(stageBytes + 8) + alignedSize;
+                    stage->m_heapTop = list->m_heapBottom;
+                    stage->m_heapBottom = stage->m_heapTop + alignedSize;
 
                     if (source == (char*)nullptr) {
                         source = const_cast<char*>(sEmptyAllocSourceName);
                     }
-                    strcpy(reinterpret_cast<char*>(stageBytes + 0x10), source);
+                    strcpy(stage->m_allocationSourceStr, source);
                     stage->m_allocationMode = mode;
 
                     if (mode != 2) {
                         unsigned char* fill = reinterpret_cast<unsigned char*>(
-                            *reinterpret_cast<int*>(stageBytes + 8));
+                            stage->m_heapTop);
                         while (fill < reinterpret_cast<unsigned char*>(
-                                          *reinterpret_cast<int*>(stageBytes + 0xC))) {
+                                          stage->m_heapBottom)) {
                             *fill = 0xCD;
                             fill++;
                         }
 
-                        *reinterpret_cast<int*>(stageBytes + 0x110) =
-                            *reinterpret_cast<int*>(stageBytes + 8);
-                        *reinterpret_cast<int*>(stageBytes + 0x114) =
-                            *reinterpret_cast<int*>(stageBytes + 0xC) - 0x40;
+                        stage->m_heapHead = stage->m_heapTop;
+                        stage->m_heapTail = stage->m_heapBottom - 0x40;
 
-                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 2) = 5;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 4) = 0;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 8) =
-                            *reinterpret_cast<int*>(stageBytes + 0x110) + 0x40;
+                        CStage::CBlock* headBlock = stageBlockAt(stage->m_heapHead);
+                        CStage::CBlock* firstBlock = headBlock + 1;
+                        CStage::CBlock* tailBlock = stageBlockAt(stage->m_heapTail);
 
-                        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x40) =
-                            0x4B41;
-                        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x7E) =
-                            0x4D49;
-                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x42) = 0;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x50) =
-                            *reinterpret_cast<int*>(stageBytes + 0x114) -
-                            (*reinterpret_cast<int*>(stageBytes + 0x110) + 0x80);
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x44) =
-                            *reinterpret_cast<int*>(stageBytes + 0x110);
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x48) =
-                            *reinterpret_cast<int*>(stageBytes + 0x114);
+                        headBlock->m_flags = 5;
+                        headBlock->m_prev = 0;
+                        headBlock->m_next = firstBlock;
 
-                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 2) = 6;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 4) =
-                            *reinterpret_cast<int*>(stageBytes + 0x110) + 0x40;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 8) = 0;
-                        *reinterpret_cast<int*>(stageBytes + 0x124) = 0;
+                        firstBlock->m_magicStart = kMemoryBlockStartMagic;
+                        firstBlock->m_magicEnd = kMemoryBlockEndMagic;
+                        firstBlock->m_flags = 0;
+                        firstBlock->m_size = stage->m_heapTail - reinterpret_cast<unsigned long>(firstBlock + 1);
+                        firstBlock->m_prev = headBlock;
+                        firstBlock->m_next = tailBlock;
+
+                        tailBlock->m_flags = 6;
+                        tailBlock->m_prev = firstBlock;
+                        tailBlock->m_next = 0;
+                        stage->m_allocCount = 0;
                     }
 
                     if (mode == 2) {
-                        CStage* backingStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790);
+                        CStage* backingStage = m_mainMemoryStage;
                         void* blockPool =
                             backingStage->alloc(sizeof(CStage::CBlock) * 0x20 + 0x10, const_cast<char*>(s_memory_cpp), 0x228, 0);
-                        *reinterpret_cast<CStage::CBlock**>(stageBytes + 0x110) =
-                            static_cast<CStage::CBlock*>(__construct_new_array(blockPool, 0, 0, sizeof(CStage::CBlock), 0x20));
-                        *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
+                        stage->m_heapHead = reinterpret_cast<unsigned long>(
+                            static_cast<CStage::CBlock*>(__construct_new_array(blockPool, 0, 0, sizeof(CStage::CBlock), 0x20)));
+                        stage->m_blockCount = 0;
                     }
 
                     stage->m_defaultParam = static_cast<unsigned int>(-1);
                     return stage;
                 }
                 list = next;
-            } while (list != modeBase);
+            } while (list != &modeData.m_activeList);
 
             System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStageAllocFailedMsgOffset));
             HeapWalker();
@@ -781,7 +754,6 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
     int mode = stageGetAllocationMode(stage);
-    unsigned char* modeListBase = reinterpret_cast<unsigned char*>(this) + 4 + mode * 0x27D8;
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
@@ -798,13 +770,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
         }
     }
 
-    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
-    int modeListNode = *reinterpret_cast<int*>(modeListBase + 0x130);
-
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
-    **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
-    *reinterpret_cast<int*>(stageBytes + 4) = modeListNode;
-    *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
+    stageMoveToPoolList(this, stage);
 }
 
 /*
@@ -832,37 +798,7 @@ void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, 
  */
 void CMemory::Free(void* ptr)
 {
-    if (ptr != (void*)nullptr) {
-        int mem = reinterpret_cast<int>(ptr);
-        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
-            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-        }
-
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
-            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
-
-        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
-                mem - 0x40;
-            *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
-        }
-
-        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
-                *reinterpret_cast<int*>(mem - 0x30);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
-        }
-
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
-    }
+    freeStageBlock(ptr);
 }
 
 /*
@@ -1017,48 +953,45 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
     for (int pass = 0; pass < 2; pass++) {
         if (pass != 0) {
-            for (int node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
-                 (*reinterpret_cast<unsigned char*>(node + 2) & 3) == 0;
-                 node = *reinterpret_cast<int*>(node + 8)) {
-                if (((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) &&
-                    (allocSize <= static_cast<unsigned int>(*reinterpret_cast<int*>(node + 0x10)))) {
-                    if (allocSize < static_cast<unsigned int>(*reinterpret_cast<int*>(node + 0x10) - 0x40)) {
-                        int split = node + allocSize;
-                        *reinterpret_cast<unsigned char*>(split + 2) = 0;
-                        *reinterpret_cast<int*>(split + 0x10) =
-                            (*reinterpret_cast<int*>(node + 0x10) - static_cast<int>(allocSize)) - 0x40;
-                        *reinterpret_cast<int*>(node + 0x10) = allocSize;
-                        *reinterpret_cast<unsigned short*>(split + 0x00) = 0x4B41;
-                        *reinterpret_cast<unsigned short*>(split + 0x3E) = 0x4D49;
-                        *reinterpret_cast<int*>(split + 0x04) = node;
-                        *reinterpret_cast<int*>(split + 0x08) = *reinterpret_cast<int*>(node + 0x08);
-                        *reinterpret_cast<int*>(node + 0x08) = split + 0x40;
-                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(split + 0x08) + 0x04) = split + 0x40;
+            for (CBlock* node = stageBlockAt(stageGetHeapHead(this))->m_next;
+                 (node->m_flags & 3) == 0;
+                 node = node->m_next) {
+                if (((node->m_flags & kMemoryBlockUsedFlag) == 0) &&
+                    (allocSize <= static_cast<unsigned int>(node->m_size))) {
+                    if (allocSize < static_cast<unsigned int>(node->m_size - 0x40)) {
+                        CBlock* split = stageBlockAt(reinterpret_cast<unsigned long>(node) + allocSize);
+                        split->m_flags = 0;
+                        split->m_size = (node->m_size - static_cast<int>(allocSize)) - 0x40;
+                        node->m_size = allocSize;
+                        split->m_magicStart = kMemoryBlockStartMagic;
+                        split->m_magicEnd = kMemoryBlockEndMagic;
+                        split->m_prev = node;
+                        split->m_next = node->m_next;
+                        node->m_next = split + 1;
+                        split->m_next->m_prev = split + 1;
                     }
 
-                    *reinterpret_cast<unsigned short*>(node + 0x18) = static_cast<unsigned short>(line);
-                    *reinterpret_cast<unsigned char*>(node + 3) =
-                        static_cast<unsigned char>(Memory.GetHeapWalkerLevel());
-                    memset(reinterpret_cast<void*>(node + 0x1A), 0, 0x24);
+                    node->m_line = static_cast<unsigned short>(line);
+                    node->m_level = static_cast<unsigned char>(Memory.GetHeapWalkerLevel());
+                    memset(node->m_source, 0, sizeof(node->m_source));
 
                     if (source == (char*)nullptr) {
                         source = const_cast<char*>(sEmptyAllocSourceName);
                     }
-                    strncpy(reinterpret_cast<char*>(node + 0x1A), source, 0x23);
+                    strncpy(node->m_source, source, sizeof(node->m_source) - 1);
 
-                    allocated = node + 0x40;
-                    *reinterpret_cast<unsigned char*>(node + 2) = 4;
-                    *reinterpret_cast<unsigned char*>(node + 2) =
-                        (*reinterpret_cast<unsigned char*>(node + 2) & 0x0F) |
+                    allocated = reinterpret_cast<int>(payloadFromBlock(node));
+                    node->m_flags = kMemoryBlockUsedFlag;
+                    node->m_flags =
+                        (node->m_flags & 0x0F) |
                         static_cast<unsigned char>(Memory.GetDefaultGroup() << 4);
-                    *reinterpret_cast<unsigned long*>(node + 0x14) =
-                        m_defaultParam;
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124) += 1;
-                    *reinterpret_cast<CStage**>(node + 0x0C) = this;
+                    node->m_defaultParam = m_defaultParam;
+                    m_allocCount += 1;
+                    node->m_stage = this;
                     break;
                 }
 
-                if ((*reinterpret_cast<int*>(node + 8) == 0) || (*reinterpret_cast<int*>(node + 4) == 0)) {
+                if ((node->m_next == 0) || (node->m_prev == 0)) {
                     heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
                 }
             }
@@ -1092,8 +1025,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
  */
 void CMemory::CStage::setDefaultParam(unsigned long defaultParam)
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x128) =
-        defaultParam;
+    m_defaultParam = defaultParam;
 }
 
 /*
@@ -1107,8 +1039,7 @@ void CMemory::CStage::setDefaultParam(unsigned long defaultParam)
  */
 void CMemory::CStage::resDefaultParam()
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x128) =
-        static_cast<unsigned long>(-1);
+    m_defaultParam = static_cast<unsigned long>(-1);
 }
 
 /*
@@ -1143,11 +1074,11 @@ void CMemory::CStage::free(void*)
 int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
     int mode = stageGetAllocationMode(this);
-    int node;
+    CBlock* node;
     if (mode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
     if (flag == -1) {
@@ -1167,7 +1098,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
         int top = m_heapTop;
 
         for (int i = 0; i <= m_blockCount; i++) {
-            int blockTail = (i == m_blockCount) ? m_heapBottom : *reinterpret_cast<int*>(node + 4);
+            int blockTail = (i == m_blockCount) ? m_heapBottom : reinterpret_cast<int>(node->m_prev);
             int size = blockTail - top;
             if (size != 0) {
                 if ((flag & 1) != 0) {
@@ -1181,13 +1112,12 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             }
 
             if (i < m_blockCount) {
-                int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+                int used = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 if ((flag & 2) != 0) {
                     System.Printf(
                         const_cast<char*>(sHeapWalkerEntryFmt), usedCount, sHeapWalkerUsed,
-                        *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
-                        *reinterpret_cast<int*>(node + 4), 0, 0, reinterpret_cast<char*>(node + 0x1A),
-                        *reinterpret_cast<unsigned short*>(node + 0x18));
+                        node->m_level, used, totalSize, node->m_prev, 0, 0, node->m_source,
+                        node->m_line);
                 }
                 freeSize += used;
                 totalSize += used;
@@ -1195,23 +1125,23 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 usedCount++;
             }
 
-            node += 0x40;
+            node++;
         }
     } else {
-        while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-            unsigned char nodeFlags = *reinterpret_cast<unsigned char*>(node + 2);
-            int nodeGroup = *reinterpret_cast<int*>(node + 0x14);
+        while ((node->m_flags & 2) == 0) {
+            unsigned char nodeFlags = node->m_flags;
+            int nodeGroup = node->m_defaultParam;
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 bool isUsed = (nodeFlags & 4) != 0;
                 if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
                     const char* kind = isUsed ? sHeapWalkerUsed : sHeapWalkerFree;
-                    unsigned char level = isUsed ? *reinterpret_cast<unsigned char*>(node + 3) : 0;
-                    const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : sEmptyAllocSourceName;
-                    unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
+                    unsigned char level = isUsed ? node->m_level : 0;
+                    const char* source = isUsed ? node->m_source : sEmptyAllocSourceName;
+                    unsigned short line = isUsed ? node->m_line : 0;
                     int index = isUsed ? usedCount : freeCount;
                     System.Printf(
-                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, *reinterpret_cast<int*>(node + 0x10),
-                        totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), *reinterpret_cast<int*>(node + 8),
+                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, node->m_size,
+                        totalSize, payloadFromBlock(node), node->m_prev, node->m_next,
                         source, line);
                 }
             }
@@ -1219,15 +1149,15 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
                 if ((nodeFlags & 4) == 0) {
                     freeCount++;
-                    usedSize += *reinterpret_cast<int*>(node + 0x10);
+                    usedSize += node->m_size;
                 } else {
                     usedCount++;
-                    freeSize += *reinterpret_cast<int*>(node + 0x10);
+                    freeSize += node->m_size;
                 }
             }
 
-            totalSize += *reinterpret_cast<int*>(node + 8) - node;
-            node = *reinterpret_cast<int*>(node + 8);
+            totalSize += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
+            node = node->m_next;
         }
     }
 
@@ -1269,32 +1199,32 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[14] = sHeapBarColors[14];
     colors[15] = sHeapBarColors[15];
 
-    int prevNode;
-    int node;
+    CBlock* prevNode;
+    CBlock* node;
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
-    prevNode = *reinterpret_cast<int*>(node + 4);
+    prevNode = node->m_prev;
     unsigned char heapBar[0x17D];
     memset(heapBar, 0xFF, 0x17D);
 
-    int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
-    int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
+    int heapTop = m_heapTop;
+    int heapSpan = (m_heapBottom - 0x40) - heapTop;
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        int curNode = node;
-        unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
+    while ((node->m_flags & 2) == 0) {
+        CBlock* curNode = node;
+        unsigned char flags = curNode->m_flags;
         bool isUsed = false;
         if (((flags & 4) != 0) && ((flags & 3) == 0)) {
             isUsed = true;
         }
 
         if (isUsed) {
-            int fillEnd = ((*reinterpret_cast<int*>(curNode + 8) - heapTop) * 0x17C) / heapSpan;
-            int fillStart = (((curNode + 0x40) - heapTop) * 0x17C) / heapSpan;
+            int fillEnd = ((reinterpret_cast<int>(curNode->m_next) - heapTop) * 0x17C) / heapSpan;
+            int fillStart = ((reinterpret_cast<int>(payloadFromBlock(curNode)) - heapTop) * 0x17C) / heapSpan;
             unsigned char* dst = heapBar + fillStart;
             unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1) - static_cast<unsigned int>(fillStart);
 
@@ -1302,14 +1232,14 @@ void CMemory::CStage::drawHeapBar(int y)
                 unsigned int loop = fillCount >> 3;
                 if (loop != 0) {
                     do {
-                        dst[0] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[1] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[2] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[3] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[4] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[5] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[6] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[7] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[0] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[1] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[2] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[3] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[4] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[5] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[6] = static_cast<unsigned char>(curNode->m_flags >> 4);
+                        dst[7] = static_cast<unsigned char>(curNode->m_flags >> 4);
                         dst += 8;
                         loop--;
                     } while (loop != 0);
@@ -1321,7 +1251,7 @@ void CMemory::CStage::drawHeapBar(int y)
                 }
 
                 do {
-                    *dst = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                    *dst = static_cast<unsigned char>(curNode->m_flags >> 4);
                     dst++;
                     fillCount--;
                 } while (fillCount != 0);
@@ -1329,9 +1259,10 @@ void CMemory::CStage::drawHeapBar(int y)
         }
 
 checkHeapNode:
-        if ((static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 0x10)) !=
-             static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40))) ||
-            (static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 4)) != static_cast<unsigned int>(prevNode))) {
+        if ((static_cast<unsigned int>(curNode->m_size) !=
+             static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_next) - reinterpret_cast<int>(payloadFromBlock(curNode)))) ||
+            (static_cast<unsigned int>(reinterpret_cast<int>(curNode->m_prev)) !=
+             static_cast<unsigned int>(reinterpret_cast<int>(prevNode)))) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
@@ -1339,7 +1270,7 @@ checkHeapNode:
         }
 
         prevNode = curNode;
-        node = *reinterpret_cast<int*>(curNode + 8);
+        node = curNode->m_next;
     }
 
     int drawColor = heapBar[0];
@@ -1405,17 +1336,19 @@ checkHeapNode:
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    CBlock* node = (stageGetAllocationMode(this) == 2) ?
+        stageBlockAt(stageGetHeapHead(this)) :
+        stageBlockAt(stageGetHeapHead(this))->m_next;
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
-    int prev = *reinterpret_cast<int*>(node + 4);
-    int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
+    CBlock* prev = node->m_prev;
+    int heapTop = m_heapTop;
     char line[264];
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            int blockStart = (node + 0x40) - heapTop;
-            int blockEnd = *reinterpret_cast<int*>(node + 8) - heapTop;
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
+            int blockStart = reinterpret_cast<int>(payloadFromBlock(node)) - heapTop;
+            int blockEnd = reinterpret_cast<int>(node->m_next) - heapTop;
             int blockSize = blockEnd - blockStart;
             totalUnuse += blockSize;
             if (static_cast<int>(maxUnuse) < blockSize) {
@@ -1423,8 +1356,8 @@ void CMemory::CStage::drawHeapTitle(int y)
             }
         }
 
-        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
-            (*reinterpret_cast<int*>(node + 4) != prev)) {
+        if ((node->m_size != reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(payloadFromBlock(node))) ||
+            (node->m_prev != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
@@ -1432,16 +1365,16 @@ void CMemory::CStage::drawHeapTitle(int y)
         }
 
         prev = node;
-        node = *reinterpret_cast<int*>(node + 8);
+        node = node->m_next;
     }
 
-    int srcLen = strlen(reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10));
+    int srcLen = strlen(m_allocationSourceStr);
     int sourceOffset = srcLen - 12;
     sourceOffset &= ~(sourceOffset >> 31);
-    strcpy(line, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + sourceOffset + 0x10));
+    strcpy(line, m_allocationSourceStr + sourceOffset);
     Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
-    sprintf(line, s_drawHeapTitleFmt, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
+    sprintf(line, s_drawHeapTitleFmt, m_allocCount,
             static_cast<int>(totalUnuse) / 1024, static_cast<int>(maxUnuse) / 1024);
     Graphic.DrawDebugStringDirect(0x208, y, line, 8);
 }
@@ -1457,19 +1390,19 @@ void CMemory::CStage::drawHeapTitle(int y)
  */
 int CMemory::CStage::GetHeapUnuse()
 {
-    int node;
+    CBlock* node;
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
     int total = 0;
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            total += *reinterpret_cast<int*>(node + 0x10);
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) == 0) {
+            total += node->m_size;
         }
-        node = *reinterpret_cast<int*>(node + 8);
+        node = node->m_next;
     }
 
     return total;
@@ -2278,12 +2211,12 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     int blockTail;
     int i;
     int top;
-    int node;
+    CBlock* node;
 
     if (m_allocationMode == 2) {
-        node = stageGetHeapHead(this);
+        node = stageBlockAt(stageGetHeapHead(this));
     } else {
-        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+        node = stageBlockAt(stageGetHeapHead(this))->m_next;
     }
 
     heapTotal = 0;
@@ -2291,13 +2224,13 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     heapUnuse = 0;
 
     if (m_allocationMode == 2) {
-        top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
+        top = m_heapTop;
 
-        for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++, node += 0x40) {
-            if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120) == i) {
-                blockTail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x0C);
+        for (i = 0; i <= m_blockCount; i++, node++) {
+            if (m_blockCount == i) {
+                blockTail = m_heapBottom;
             } else {
-                blockTail = *reinterpret_cast<int*>(node + 4);
+                blockTail = reinterpret_cast<int>(node->m_prev);
             }
 
             freeSize = blockTail - top;
@@ -2306,8 +2239,8 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
                 heapTotal += freeSize;
             }
 
-            if (i < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120)) {
-                usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+            if (i < m_blockCount) {
+                usedSize = reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node->m_prev);
                 heapUse += usedSize;
                 top = blockTail + usedSize;
                 heapTotal += usedSize;
@@ -2317,15 +2250,15 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
         return;
     }
 
-    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
-        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) != 0) {
-            heapUse += *reinterpret_cast<int*>(node + 0x10);
+    while ((node->m_flags & 2) == 0) {
+        if ((node->m_flags & kMemoryBlockUsedFlag) != 0) {
+            heapUse += node->m_size;
         } else {
-            heapUnuse += *reinterpret_cast<int*>(node + 0x10);
+            heapUnuse += node->m_size;
         }
 
-        heapTotal += *reinterpret_cast<int*>(node + 8) - node;
-        node = *reinterpret_cast<int*>(node + 8);
+        heapTotal += reinterpret_cast<int>(node->m_next) - reinterpret_cast<int>(node);
+        node = node->m_next;
     }
 }
 
@@ -2340,16 +2273,14 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
  */
 CAmemCache::CAmemCache()
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-
-    *reinterpret_cast<int*>(bytes + 0x00) = 0;
-    *reinterpret_cast<int*>(bytes + 0x04) = 0;
-    *reinterpret_cast<short*>(bytes + 0x0C) = 0;
-    *reinterpret_cast<int*>(bytes + 0x08) = 0;
-    bytes[0x0E] = 0;
-    *reinterpret_cast<int*>(bytes + 0x10) = 0;
-    bytes[0x1A] = 1;
-    bytes[0x0F] = 0xFF;
+    m_cacheData = 0;
+    m_workData = 0;
+    m_refCount = 0;
+    m_size = 0;
+    m_inUse = 0;
+    m_priority = 0;
+    m_dmaCopy = 1;
+    m_type = 0xFF;
 }
 
 /*

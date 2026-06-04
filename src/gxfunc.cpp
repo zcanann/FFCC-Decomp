@@ -213,13 +213,12 @@ void _GXSetBlendMode(_GXBlendMode mode, _GXBlendFactor srcFactor, _GXBlendFactor
  */
 void _GXSetTevSwapModeTable(_GXTevSwapSel table, _GXTevColorChan red, _GXTevColorChan green, _GXTevColorChan blue, _GXTevColorChan alpha)
 {
-	int tableOff = table * 0x10;
-	int* entry = (int*)((char*)s_GXSetTevSwapModeTable_Reg + tableOff);
-	if (entry[0] != red || entry[1] != green || entry[2] != blue || entry[3] != alpha) {
-		entry[0] = red;
-		entry[1] = green;
-		entry[2] = blue;
-		entry[3] = alpha;
+	GXTevSwapModeTableReg* entry = &s_GXSetTevSwapModeTable_Reg[table];
+	if (entry->red != red || entry->green != green || entry->blue != blue || entry->alpha != alpha) {
+		entry->red = red;
+		entry->green = green;
+		entry->blue = blue;
+		entry->alpha = alpha;
 		GXSetTevSwapModeTable(table, red, green, blue, alpha);
 	}
 }
@@ -235,12 +234,11 @@ void _GXSetTevSwapModeTable(_GXTevSwapSel table, _GXTevColorChan red, _GXTevColo
  */
 void _GXSetTevSwapMode(_GXTevStageID stage, _GXTevSwapSel rasSel, _GXTevSwapSel texSel)
 {
-	int stageOff = stage * 8;
-	int* entry = (int*)((char*)s_GXSetTevSwapMode_Reg + stageOff);
+	GXTevSwapModeReg* entry = &s_GXSetTevSwapMode_Reg[stage];
 
-	if (entry[0] != rasSel || entry[1] != texSel) {
-		entry[0] = rasSel;
-		entry[1] = texSel;
+	if (entry->rasSel != rasSel || entry->texSel != texSel) {
+		entry->rasSel = rasSel;
+		entry->texSel = texSel;
 		GXSetTevSwapMode(stage, rasSel, texSel);
 	}
 }
@@ -273,13 +271,12 @@ inline void _GXSetNumTevStages(unsigned char nStages)
  */
 void _GXSetTevOrder(_GXTevStageID stage, _GXTexCoordID coord, _GXTexMapID map, _GXChannelID channel)
 {
-	int stageOff = stage * 0xC;
-	int* entry = (int*)((char*)s_GXSetTevOrder_Reg + stageOff);
+	GXTevOrderReg* entry = &s_GXSetTevOrder_Reg[stage];
 
-	if (entry[0] != coord || entry[1] != map || entry[2] != channel) {
-		entry[0] = coord;
-		entry[1] = map;
-		entry[2] = channel;
+	if (entry->coord != coord || entry->map != map || entry->channel != channel) {
+		entry->coord = coord;
+		entry->map = map;
+		entry->channel = channel;
 		GXSetTevOrder(stage, coord, map, channel);
 	}
 }
@@ -363,14 +360,13 @@ void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevS
  */
 void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _GXTevAlphaArg c, _GXTevAlphaArg d)
 {
-	int stageOff = stage * 0x10;
-	int* entry = (int*)((char*)s_GXSetTevAlphaIn_Reg + stageOff);
+	GXTevAlphaInReg* entry = &s_GXSetTevAlphaIn_Reg[stage];
 
-	if (entry[0] != a || entry[1] != b || entry[2] != c || entry[3] != d) {
-		entry[0] = a;
-		entry[1] = b;
-		entry[2] = c;
-		entry[3] = d;
+	if (entry->a != a || entry->b != b || entry->c != c || entry->d != d) {
+		entry->a = a;
+		entry->b = b;
+		entry->c = c;
+		entry->d = d;
 		GXSetTevAlphaIn(stage, a, b, c, d);
 	}
 }
@@ -386,14 +382,13 @@ void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _
  */
 void _GXSetTevColorIn(_GXTevStageID stage, _GXTevColorArg a, _GXTevColorArg b, _GXTevColorArg c, _GXTevColorArg d)
 {
-	int stageOff = stage * 0x10;
-	int* entry = (int*)((char*)s_GXSetTevColorIn_Reg + stageOff);
+	GXTevColorInReg* entry = &s_GXSetTevColorIn_Reg[stage];
 
-	if (entry[0] != a || entry[1] != b || entry[2] != c || entry[3] != d) {
-		entry[0] = a;
-		entry[1] = b;
-		entry[2] = c;
-		entry[3] = d;
+	if (entry->a != a || entry->b != b || entry->c != c || entry->d != d) {
+		entry->a = a;
+		entry->b = b;
+		entry->c = c;
+		entry->d = d;
 		GXSetTevColorIn(stage, a, b, c, d);
 	}
 }

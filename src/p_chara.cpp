@@ -211,6 +211,21 @@ STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x30);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
+STATIC_ASSERT(offsetof(CCharaPcs, m_cameraFrameCount) == 0x04);
+STATIC_ASSERT(offsetof(CCharaPcs, m_cameraData) == 0x14);
+STATIC_ASSERT(offsetof(CCharaPcs, m_overlapEyePos) == 0x2C);
+STATIC_ASSERT(offsetof(CCharaPcs, m_overlapTargetPos) == 0x38);
+STATIC_ASSERT(offsetof(CCharaPcs, m_handleList) == 0x4C);
+STATIC_ASSERT(offsetof(CCharaPcs, m_stage) == 0xC0);
+STATIC_ASSERT(offsetof(CCharaPcs, m_amemStage) == 0xC4);
+STATIC_ASSERT(offsetof(CCharaPcs, m_amemWorkStage) == 0xC8);
+STATIC_ASSERT(offsetof(CCharaPcs, m_viewerModelStage) == 0xCC);
+STATIC_ASSERT(offsetof(CCharaPcs, m_viewerTextureStage) == 0xD0);
+STATIC_ASSERT(offsetof(CCharaPcs, m_viewerAnimStage) == 0xD4);
+STATIC_ASSERT(offsetof(CCharaPcs, m_weaponTextureStage) == 0xD8);
+STATIC_ASSERT(offsetof(CCharaPcs, m_weaponModelStage) == 0xDC);
+STATIC_ASSERT(offsetof(CCharaPcs, m_familyModelStage) == 0xE0);
+STATIC_ASSERT(offsetof(CCharaPcs, m_charaAllocStage) == 0xE4);
 
 #pragma dont_inline reset
 
@@ -238,26 +253,6 @@ static inline CPtrArray<CCharaPcs::CLoadTexture*>* LoadTextureArray(CCharaPcs* s
 static inline CPtrArray<CCharaPcs::CLoadPdt*>* LoadPdtArray(CCharaPcs* self)
 {
     return &self->m_loadPdts;
-}
-
-static inline CMemory::CStage*& StageAt(CCharaPcs* self, unsigned int offset)
-{
-    return *reinterpret_cast<CMemory::CStage**>(Ptr(self, offset));
-}
-
-static inline int& CameraCountAt(CCharaPcs* self, int index)
-{
-    return *reinterpret_cast<int*>(Ptr(self, 0x04 + index * 4));
-}
-
-static inline void*& CameraDataAt(CCharaPcs* self, int index)
-{
-    return *reinterpret_cast<void**>(Ptr(self, 0x14 + index * 4));
-}
-
-static inline CCharaPcs::CHandle*& HandleListHead(CCharaPcs* self)
-{
-    return self->m_handleList;
 }
 
 static inline u32& FreeMergeMask(CCharaPcs* self)
@@ -302,7 +297,7 @@ static inline void SetupBaseCharaLights(CCharaPcs* self)
 
 static inline void* StageBase(CMemory::CStage* stage)
 {
-    return *reinterpret_cast<void**>(Ptr(stage, 8));
+    return reinterpret_cast<void*>(stage->m_heapTop);
 }
 
 static inline CMemory::CStage* SelectLoadStage(CCharaPcs* self, CMemory::CStage* fallback)
@@ -366,12 +361,12 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     File.Read(fileHandle);
     File.SyncCompleted(fileHandle);
 
-    CChara::CAnim* anim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
+    CChara::CAnim* anim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
     if (anim != 0) {
-        anim->Create(File.m_readBuffer, StageAt(self, 0xD4));
+        anim->Create(File.m_readBuffer, self->m_viewerAnimStage);
     }
 
-    CCharaPcs::CLoadAnim* loadAnim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
+    CCharaPcs::CLoadAnim* loadAnim = new (self->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
     if (loadAnim != 0) {
         loadAnim->m_keyTag = reinterpret_cast<void*>(charaKind);
         loadAnim->m_keyId = charaNo;
@@ -426,13 +421,17 @@ static inline void BuildCharaBasePath(int charaKind, unsigned long charaNo, char
 
 static inline CMemory::CStage* HandleModelStage(int charaKind, int specialModelStage)
 {
-    const unsigned int offset = specialModelStage != 0 ? (charaKind == 3 ? 0xE0U : 0xDCU) : 0xCCU;
-    return SelectLoadStage(&CharaPcs, StageAt(&CharaPcs, offset));
+    CMemory::CStage* stage = CharaPcs.m_viewerModelStage;
+    if (specialModelStage != 0) {
+        stage = charaKind == 3 ? CharaPcs.m_familyModelStage : CharaPcs.m_weaponModelStage;
+    }
+    return SelectLoadStage(&CharaPcs, stage);
 }
 
 static inline CMemory::CStage* HandleTextureStage(int charaKind)
 {
-    return SelectLoadStage(&CharaPcs, StageAt(&CharaPcs, charaKind == 4 ? 0xD8U : 0xD0U));
+    CMemory::CStage* stage = charaKind == 4 ? CharaPcs.m_weaponTextureStage : CharaPcs.m_viewerTextureStage;
+    return SelectLoadStage(&CharaPcs, stage);
 }
 
 static inline Mtx* ModelLocalMtx(CChara::CModel* model)
@@ -481,7 +480,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
     case 3:
         return PartMng.m_pppEnvSt.m_stagePtr;
     case 4:
-        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&CharaPcs) + 0xd4);
+        return CharaPcs.m_viewerAnimStage;
     default:
         return stage;
     }
@@ -628,16 +627,17 @@ void CCharaPcs::create()
 {
     FreeMergeMask(this) = 0;
 
-    StageAt(this, 0xCC) = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
-    StageAt(this, 0xD0) = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
-    StageAt(this, 0xD8) = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
-    StageAt(this, 0xDC) = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
-    StageAt(this, 0xE0) = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
-    StageAt(this, 0xD4) =
-        Memory.CreateStage((s32)CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
+    m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
+    m_viewerTextureStage = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
+    m_weaponTextureStage = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
+    m_weaponModelStage = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
+    m_familyModelStage = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
+    m_viewerAnimStage =
+        Memory.CreateStage(static_cast<s32>(CurrentSceneId()) == 4 ? 0x190000UL : 0x1E0000UL,
+                           const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
-        Memory._Alloc(0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
+        Memory._Alloc(0x194, CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
     if (sentinel != 0) {
         sentinel->m_previous = 0;
         sentinel->m_next = 0;
@@ -663,13 +663,13 @@ void CCharaPcs::create()
         sentinel->m_drawListFlags = static_cast<unsigned char>(__rlwimi(sentinel->m_drawListFlags, 1, 7, 24, 24));
     }
 
-    HandleListHead(this) = sentinel;
-    HandleListHead(this)->m_previous = HandleListHead(this);
-    HandleListHead(this)->m_next = HandleListHead(this);
+    m_handleList = sentinel;
+    m_handleList->m_previous = m_handleList;
+    m_handleList->m_next = m_handleList;
 
     for (int i = 0; i < 4; i++) {
-        CameraCountAt(this, i) = 0;
-        CameraDataAt(this, i) = 0;
+        m_cameraFrameCount[i] = 0;
+        m_cameraData[i] = 0;
     }
 
     CLightPcs::CBumpLight bumpLight;
@@ -733,12 +733,12 @@ void CCharaPcs::destroy()
         m_handleList = 0;
     }
 
-    Memory.DestroyStage(StageAt(this, 0xCC));
-    Memory.DestroyStage(StageAt(this, 0xD0));
-    Memory.DestroyStage(StageAt(this, 0xD8));
-    Memory.DestroyStage(StageAt(this, 0xDC));
-    Memory.DestroyStage(StageAt(this, 0xE0));
-    Memory.DestroyStage(StageAt(this, 0xD4));
+    Memory.DestroyStage(m_viewerModelStage);
+    Memory.DestroyStage(m_viewerTextureStage);
+    Memory.DestroyStage(m_weaponTextureStage);
+    Memory.DestroyStage(m_weaponModelStage);
+    Memory.DestroyStage(m_familyModelStage);
+    Memory.DestroyStage(m_viewerAnimStage);
     Chara.Destroy();
 }
 
@@ -756,24 +756,24 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     const int resetMode = static_cast<int>(mode);
 
     for (int i = LoadAnimArray(this)->GetSize() - 1; i >= 0; i--) {
-        unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-        unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
-        if (*reinterpret_cast<void**>(anim + 0x20) != 0) {
-            operator delete(*reinterpret_cast<void**>(anim + 0x20));
-            *reinterpret_cast<void**>(anim + 0x20) = 0;
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        CChara::CAnim* anim = loadAnim->m_anim;
+        if (anim->m_bank != 0) {
+            operator delete(anim->m_bank);
+            anim->m_bank = 0;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        CameraCountAt(this, i) = 0;
-        if (CameraDataAt(this, i) != 0) {
-            delete[] static_cast<u8*>(CameraDataAt(this, i));
-            CameraDataAt(this, i) = 0;
+        m_cameraFrameCount[i] = 0;
+        if (m_cameraData[i] != 0) {
+            delete[] static_cast<u8*>(m_cameraData[i]);
+            m_cameraData[i] = 0;
         }
     }
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         CHandle* next = handle->m_next;
         delete handle;
         handle = next;
@@ -831,7 +831,7 @@ complete:
 int CCharaPcs::correctLoadAnimAmem()
 {
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
-        Memory._Alloc(0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
+        Memory._Alloc(0x80000, m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x162, 1));
     if (tempBuffer == 0) {
         return -1;
     }
@@ -839,10 +839,17 @@ int CCharaPcs::correctLoadAnimAmem()
     int loadAnimCount = LoadAnimArray(this)->GetSize();
     int maxEnd = 0;
     for (int i = 0; i < loadAnimCount; i++) {
-        unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-        unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
+        CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+        if (loadAnim == 0) {
+            continue;
+        }
 
-        const int animEnd = *reinterpret_cast<int*>(anim + 0x28) + *reinterpret_cast<int*>(anim + 0x1C);
+        CChara::CAnim* anim = loadAnim->m_anim;
+        if (anim == 0) {
+            continue;
+        }
+
+        const int animEnd = anim->m_bankAddress + static_cast<int>(anim->m_bankSize);
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }
@@ -855,11 +862,18 @@ int CCharaPcs::correctLoadAnimAmem()
         int nextOffset = scanOffset;
 
         for (int i = 0; i < loadAnimCount; i++) {
-            unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
-            unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
+            CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+            if (loadAnim == 0) {
+                continue;
+            }
 
-            const unsigned int animOffset = *reinterpret_cast<unsigned int*>(anim + 0x28);
-            const int animSize = *reinterpret_cast<int*>(anim + 0x1C);
+            CChara::CAnim* anim = loadAnim->m_anim;
+            if (anim == 0) {
+                continue;
+            }
+
+            const unsigned int animOffset = static_cast<unsigned int>(anim->m_bankAddress);
+            const int animSize = static_cast<int>(anim->m_bankSize);
             const unsigned int animEnd = animOffset + static_cast<unsigned int>(animSize);
             if (animOffset < static_cast<unsigned int>(scanOffset) || animEnd >= static_cast<unsigned int>(scanOffset + 0x80000)) {
                 continue;
@@ -871,16 +885,16 @@ int CCharaPcs::correctLoadAnimAmem()
 
             Memory.CopyFromAMemorySync(
                 tempBuffer + chunkSize,
-                reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + static_cast<int>(animOffset)),
+                reinterpret_cast<void*>(m_amemStage->m_heapTop + static_cast<int>(animOffset)),
                 static_cast<unsigned long>(animSize));
 
-            *reinterpret_cast<int*>(anim + 0x28) = compactedSize + chunkSize;
+            anim->m_bankAddress = compactedSize + chunkSize;
             chunkSize += animSize;
         }
 
         if (chunkSize != 0) {
             Memory.CopyToAMemorySync(
-                tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
+                tempBuffer, reinterpret_cast<void*>(m_amemStage->m_heapTop + compactedSize),
                 static_cast<unsigned long>(chunkSize));
         }
 
@@ -903,8 +917,6 @@ int CCharaPcs::correctLoadAnimAmem()
  */
 void CCharaPcs::onScriptChanging(char*)
 {
-    unsigned char* fadeColor = reinterpret_cast<unsigned char*>(this);
-
     for (int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
@@ -916,11 +928,10 @@ void CCharaPcs::onScriptChanging(char*)
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
-        fadeColor[0x12C] = shadeCopy.color.r;
-        fadeColor[0x12D] = shadeCopy.color.g;
-        fadeColor[0x12E] = shadeCopy.color.b;
-        fadeColor[0x12F] = shadeCopy.color.a;
-        fadeColor += 4;
+        m_viewerChoiceColor[i].color.r = shadeCopy.color.r;
+        m_viewerChoiceColor[i].color.g = shadeCopy.color.g;
+        m_viewerChoiceColor[i].color.b = shadeCopy.color.b;
+        m_viewerChoiceColor[i].color.a = shadeCopy.color.a;
     }
 
     m_overlapEnabled = 0;
@@ -1146,9 +1157,9 @@ int CCharaPcs::GetNumTexShadow()
 void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, Vec* worldPositions, float (*shadowMatrices)[3][4])
 {
     int shadowIndex = 0;
-    CHandle* handle = HandleListHead(this)->m_next;
+    CHandle* handle = m_handleList->m_next;
 
-    while (handle != HandleListHead(this)) {
+    while (handle != m_handleList) {
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;
@@ -1185,12 +1196,12 @@ void CCharaPcs::draw()
 {
     SetupBaseCharaLights(this);
 
-    if (HandleListHead(this) == 0) {
+    if (m_handleList == 0) {
         return;
     }
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
@@ -1208,12 +1219,12 @@ void CCharaPcs::drawBefore()
     CameraPcs.SetStdProjectionMatrix();
     SetupBaseCharaLights(this);
 
-    if (HandleListHead(this) == 0) {
+    if (m_handleList == 0) {
         return;
     }
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
@@ -1258,8 +1269,8 @@ void CCharaPcs::drawMakeTexShadow()
     m_texShadowTextureOffset = texSize * texSize * 4;
     C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);
         }
@@ -1294,12 +1305,12 @@ void CCharaPcs::drawShadow()
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
-    if (HandleListHead(this) == 0) {
+    if (m_handleList == 0) {
         return;
     }
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(1, 1);
         }
@@ -1314,13 +1325,14 @@ void CCharaPcs::drawShadow()
  */
 CTextureSet* CCharaPcs::createTextureSet(void* textureData, int useWeaponStage)
 {
-    CTextureSet* textureSet = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+    CTextureSet* textureSet = new (m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
     if (textureSet != 0) {
         textureSet = textureSet;
     }
 
     if (textureSet != 0) {
-        textureSet->Create(textureData, SelectLoadStage(this, StageAt(this, useWeaponStage != 0 ? 0xD8 : 0xD0)), 0, 0, 0, 0);
+        CMemory::CStage* textureStage = useWeaponStage != 0 ? m_weaponTextureStage : m_viewerTextureStage;
+        textureSet->Create(textureData, SelectLoadStage(this, textureStage), 0, 0, 0, 0);
     }
 
     return textureSet;
@@ -1541,9 +1553,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     char path[0x104];
     CChunkFile::CChunk chunk;
 
-    int* cameraCounts = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x04);
-    void** cameraData = reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x14);
-    void*& cameraBuffer = cameraData[index];
+    void*& cameraBuffer = m_cameraData[index];
 
     if (cameraBuffer != 0) {
         delete[] static_cast<u8*>(cameraBuffer);
@@ -1565,13 +1575,13 @@ void CCharaPcs::LoadCam(int index, char* fileName)
             continue;
         }
 
-        cameraCounts[index] = static_cast<int>(chunk.m_arg0);
+        m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xD4);
-        cameraBuffer = new (stage, s_p_chara_cpp, 0x4D4) u8[static_cast<unsigned long>(cameraCounts[index] << 5)];
+        cameraBuffer =
+            new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4) u8[static_cast<unsigned long>(m_cameraFrameCount[index] << 5)];
 
         float* values = reinterpret_cast<float*>(cameraBuffer);
-        for (int i = 0; i < cameraCounts[index] * 8; i++) {
+        for (int i = 0; i < m_cameraFrameCount[index] * 8; i++) {
             values[i] = chunkFile.GetF4();
         }
     }
@@ -1706,7 +1716,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadModel == 0) {
-                            loadModel = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+                            loadModel = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                             if (loadModel != 0) {
                                 loadModel->m_keyTag = keyTag;
                                 loadModel->m_keyId = keyId;
@@ -1720,16 +1730,16 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                                 if (streamToAmem == 0) {
                                     loadModel->m_model =
-                                        new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
                                     if (loadModel->m_model != 0) {
-                                        loadModel->m_model->Create(rawData, SelectLoadStage(pcs, StageAt(pcs, 0xCC)));
+                                        loadModel->m_model->Create(rawData, SelectLoadStage(pcs, pcs->m_viewerModelStage));
                                     }
                                 } else {
                                     loadModel->m_streamMode = 1;
                                     loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadModel->m_streamSize = rawSize;
                                     Memory.CopyToAMemorySync(
-                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1738,7 +1748,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                         if (hasDynamics != 0 && loadModel != 0 && loadModel->m_model != 0 && chunkFile.GetNextChunk(chunk)) {
                             loadModel->m_model->CreateDynamics(
-                                chunkFile.GetAddress(), SelectLoadStage(pcs, StageAt(pcs, 0xCC)));
+                                chunkFile.GetAddress(), SelectLoadStage(pcs, pcs->m_viewerModelStage));
                         }
                     } else if (dataType == 1) {
                         CLoadTexture* loadTexture = 0;
@@ -1751,7 +1761,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadTexture == 0) {
-                            loadTexture = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+                            loadTexture = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                             if (loadTexture != 0) {
                                 loadTexture->m_keyTag = keyTag;
                                 loadTexture->m_keyId = keyId;
@@ -1766,20 +1776,20 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                                 if (streamToAmem == 0) {
                                     loadTexture->m_textureSet =
-                                        new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+                                        new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
                                     if (loadTexture->m_textureSet != 0) {
+                                        CMemory::CStage* textureStage =
+                                            variantTag == reinterpret_cast<void*>(4) ? pcs->m_weaponTextureStage
+                                                                                    : pcs->m_viewerTextureStage;
                                         loadTexture->m_textureSet->Create(
-                                            rawData,
-                                            SelectLoadStage(
-                                                pcs, StageAt(pcs, variantTag == reinterpret_cast<void*>(4) ? 0xD8 : 0xD0)),
-                                            0, 0, 0, 0);
+                                            rawData, SelectLoadStage(pcs, textureStage), 0, 0, 0, 0);
                                     }
                                 } else {
                                     loadTexture->m_streamMode = 1;
                                     loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadTexture->m_streamSize = rawSize;
                                     Memory.CopyToAMemorySync(
-                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(m_amemWorkStage)) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1798,12 +1808,12 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                         if (loadAnim == 0) {
                             CChara::CAnim* anim =
-                                new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
+                                new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                             if (anim != 0) {
-                                anim->Create(rawData, StageAt(pcs, 0xD4));
+                                anim->Create(rawData, pcs->m_viewerAnimStage);
                             }
 
-                            loadAnim = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
+                            loadAnim = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
                             if (loadAnim != 0) {
                                 loadAnim->m_keyTag = keyTag;
                                 loadAnim->m_keyId = keyId;
@@ -1829,7 +1839,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadPdt == 0 && chunkFile.GetNextChunk(chunk)) {
-                            loadPdt = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
+                            loadPdt = new (pcs->m_stage, const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
                             if (loadPdt != 0) {
                                 loadPdt->m_keyTag = keyTag;
                                 loadPdt->m_keyId = keyId;
@@ -1969,8 +1979,8 @@ void CCharaPcs::drawOverlap()
 
     SetupBaseCharaLights(this);
 
-    CHandle* handle = HandleListHead(this)->m_next;
-    while (handle != HandleListHead(this)) {
+    CHandle* handle = m_handleList->m_next;
+    while (handle != m_handleList) {
         if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
@@ -2050,7 +2060,7 @@ void CCharaPcs::drawOverlap()
  */
 void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return Memory._Alloc(size, StageAt(&CharaPcs, 0xC0), file, line, 0);
+    return Memory._Alloc(size, CharaPcs.m_stage, file, line, 0);
 }
 
 /*
@@ -2155,8 +2165,7 @@ void CCharaPcs::CHandle::Add()
         return;
     }
 
-    CCharaPcs::CHandle* head =
-        (*reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(&CharaPcs) + 0x4C))->m_previous;
+    CCharaPcs::CHandle* head = CharaPcs.m_handleList->m_previous;
 
     m_previous = head;
     m_next = head->m_next;
@@ -2211,14 +2220,14 @@ void CCharaPcs::CHandle::ChangeTexture(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        loadTexture = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+        loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
         if (loadTexture != 0) {
             loadTexture->m_keyTag = reinterpret_cast<void*>(charaKind);
             loadTexture->m_keyId = static_cast<int>(charaNo);
             loadTexture->m_mergeFileId = mergeFileId;
             loadTexture->m_mergeFlags = mergeFlags;
             loadTexture->m_variantTag = reinterpret_cast<void*>(textureVariant);
-            loadTexture->m_textureSet = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+            loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
             loadTexture->m_streamMode = 0;
             loadTexture->m_streamOffset = 0;
             loadTexture->m_streamSize = 0;
@@ -2233,10 +2242,10 @@ void CCharaPcs::CHandle::ChangeTexture(
         File.LockBuffer();
         Memory.CopyFromAMemorySync(
             File.m_readBuffer,
-            reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
+            reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
                 reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
             static_cast<unsigned long>(loadTexture->m_streamSize));
-        loadTexture->m_textureSet = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+        loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
         if (loadTexture->m_textureSet != 0) {
             loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(charaKind), 0, 0, 0, 0);
         }
@@ -2304,14 +2313,14 @@ void CCharaPcs::CHandle::LoadModel(
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        loadModel = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+        loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
         if (loadModel != 0) {
             loadModel->m_keyTag = reinterpret_cast<void*>(charaKind);
             loadModel->m_keyId = static_cast<int>(charaNo);
             loadModel->m_mergeFileId = mergeFileId;
             loadModel->m_mergeFlags = mergeFlags;
             loadModel->m_model =
-                new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+                new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
             loadModel->m_streamMode = 0;
             loadModel->m_streamOffset = 0;
             loadModel->m_streamSize = 0;
@@ -2346,11 +2355,11 @@ void CCharaPcs::CHandle::LoadModel(
                 File.LockBuffer();
                 Memory.CopyFromAMemorySync(
                     File.m_readBuffer,
-                    reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
+                    reinterpret_cast<unsigned char*>(StageBase(CharaPcs.m_amemWorkStage)) +
                         reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
                     static_cast<unsigned long>(loadModel->m_streamSize));
                 loadModel->m_model =
-                    new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
+                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
                 if (loadModel->m_model != 0) {
                     loadModel->m_model->Create(File.m_readBuffer, HandleModelStage(charaKind, specialModelStage));
                 }
@@ -2386,7 +2395,7 @@ void CCharaPcs::CHandle::LoadModel(
         }
 
         if (loadPdt == 0) {
-            loadPdt = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
+            loadPdt = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x868) CLoadPdt;
             if (loadPdt != 0) {
                 loadPdt->m_keyTag = reinterpret_cast<void*>(1);
                 loadPdt->m_keyId = static_cast<int>(charaNo);
@@ -2886,14 +2895,14 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     }
 
     if (m_asyncState == 2) {
-        CLoadModel* loadModel = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+        CLoadModel* loadModel = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
         loadModel->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
         loadModel->m_keyId = m_asyncCharaNo;
         loadModel->m_mergeFileId = -1;
         loadModel->m_mergeFlags = 0;
         LoadModelArray(&CharaPcs)->Add(loadModel);
         loadModel->m_model =
-            new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
+            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
         loadModel->m_streamMode = 0;
         loadModel->m_streamOffset = 0;
         loadModel->m_streamSize = 0;
@@ -2907,14 +2916,14 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     } else if (m_asyncState == 4) {
         m_model->CreateDynamics(File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
     } else {
-        CLoadTexture* loadTexture = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+        CLoadTexture* loadTexture = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
         loadTexture->m_keyTag = reinterpret_cast<void*>(m_asyncCharaKind);
         loadTexture->m_keyId = m_asyncCharaNo;
         loadTexture->m_mergeFileId = -1;
         loadTexture->m_mergeFlags = 0;
         loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
         LoadTextureArray(&CharaPcs)->Add(loadTexture);
-        loadTexture->m_textureSet = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+        loadTexture->m_textureSet = new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
         loadTexture->m_streamMode = 0;
         loadTexture->m_streamOffset = 0;
         loadTexture->m_streamSize = 0;

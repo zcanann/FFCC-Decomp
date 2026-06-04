@@ -745,7 +745,7 @@ void CCharaPcs::createViewer()
 
     memset(&self->m_viewerModelStage, 0,
            sizeof(self->m_viewerModelStage) + sizeof(self->m_viewerTextureStage) + sizeof(self->m_viewerAnimStage) +
-               sizeof(self->_pad0D8));
+               sizeof(self->m_weaponTextureStage) + sizeof(self->m_weaponModelStage) + sizeof(self->m_familyModelStage));
     self->m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
     self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
     self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);

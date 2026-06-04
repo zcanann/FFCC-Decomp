@@ -1406,7 +1406,7 @@ void GbaQueue::LoadPlayerStat()
 	memset(localNames, 0, sizeof(localNames));
 
 	for (i = 0; i < 8; i++) {
-		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].unk_0x3ca_0x3dd, 0x10);
+		memcpy(localNames + (i * 0x10), Game.m_caravanWorkArr[i].m_name, 0x10);
 	}
 
 	outOfShoukiMask = 0;
@@ -2308,30 +2308,27 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(5);
 	char tempName[kGbaQueueLetterTempNameBytes];
 
-	unsigned int curLetterBase = scriptFood;
 	for (int i = 0; i < caravanWork->m_letterCount; i++) {
 		int matchedSubject = -1;
 		int matchedNpc = -1;
 
-		const unsigned int* cur = reinterpret_cast<const unsigned int*>(curLetterBase + 0x3EC);
-		const unsigned int curWord = cur[0];
-		const unsigned short curHalf = *reinterpret_cast<const unsigned short*>(cur);
+		const CCaravanWork::CLetterWork* cur = &caravanWork->m_letters[i];
+		const unsigned int curWord = cur->m_word0;
+		const unsigned short curHalf = cur->HeaderWord();
 		const unsigned int npcId = (curWord >> 9) & 0x1FF;
 		const unsigned int subjectId = (curHalf >> 2) & 0x1FF;
 
-		unsigned int prevLetterBase = scriptFood;
 		for (int j = 0; j < i; j++) {
-			const unsigned int* prev = reinterpret_cast<const unsigned int*>(prevLetterBase + 0x3EC);
-			if (npcId == ((prev[0] >> 9) & 0x1FF)) {
+			const CCaravanWork::CLetterWork* prev = &caravanWork->m_letters[j];
+			if (npcId == ((prev->m_word0 >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
-			if (subjectId == ((*reinterpret_cast<const unsigned short*>(prev) >> 2) & 0x1FF)) {
+			if (subjectId == ((prev->HeaderWord() >> 2) & 0x1FF)) {
 				matchedSubject = j;
 			}
 			if (matchedSubject != -1 && matchedNpc != -1) {
 				break;
 			}
-			prevLetterBase += 0xC;
 		}
 
 		if (matchedNpc != -1) {
@@ -2365,7 +2362,7 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 		}
 
 		unsigned char flags = 0;
-		const unsigned char curFlags = *reinterpret_cast<const unsigned char*>(cur);
+		const unsigned char curFlags = cur->Flags();
 		if (static_cast<char>(curFlags) < 0) {
 			flags |= 1;
 		}
@@ -2379,8 +2376,8 @@ System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_
 			flags |= 8;
 		}
 
-		const unsigned int value = *reinterpret_cast<const unsigned short*>(curLetterBase + 0x3EE) & 0x1FF;
-		const unsigned char valueIsMoney = (curFlags >> 3) & 1;
+		const unsigned int value = cur->AttachmentValue();
+		const unsigned char valueIsMoney = cur->AttachmentIsGil();
 		if (valueIsMoney == 0) {
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
@@ -2398,7 +2395,6 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
-		curLetterBase += 0xC;
 		entryWrite += 2;
 	}
 
@@ -2459,26 +2455,26 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
     }
     memset(workText, 0, kGbaQueueScratchTextSize);
 
-    unsigned int scriptFood = Game.m_scriptFoodBase[channel];
-    int entry = scriptFood + letterIndex * 0xC;
-    CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(entry + 0x3F0);
-    CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(entry + 0x3F2);
-    CMes::m_tempVar[2] = *reinterpret_cast<unsigned short*>(entry + 0x3F4);
-    CMes::m_tempVar[3] = *reinterpret_cast<unsigned short*>(entry + 0x3F6);
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
+    CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+    CMes::m_tempVar[0] = letter->TempVar(0);
+    CMes::m_tempVar[1] = letter->TempVar(1);
+    CMes::m_tempVar[2] = letter->TempVar(2);
+    CMes::m_tempVar[3] = letter->TempVar(3);
 
-    unsigned short msgIndex = *reinterpret_cast<unsigned short*>(entry + 0x3EC);
+    unsigned short msgIndex = letter->HeaderWord();
     int mesIndex = (msgIndex & 0x7FC) >> 1;
     char** mesPtr = reinterpret_cast<char**>(Game.m_cFlatDataArr[1].Data(3).m_data);
 
     strcpy(srcText, mesPtr[mesIndex]);
-    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, kGbaQueueScratchTextSize);
     memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, mesPtr[mesIndex + 1]);
-    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;
@@ -2577,16 +2573,14 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 {
 	unsigned int stackValue = value;
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&stackValue);
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase + channel;
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	int letterIndex = valueBytes[2];
-	int letterOffset = letterIndex * 0xC;
-	unsigned char* letter = reinterpret_cast<unsigned char*>(caravanWork) + letterOffset;
-	int hasGil = (letter[0x3EC] >> 3) & 1;
+	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
+	int hasGil = letter->AttachmentIsGil();
 	int result;
 
 	if (hasGil == 0) {
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		int item = letter->AttachmentValue();
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
 				if (caravanWork->AddItem(item, 0) == 0) {
@@ -2598,13 +2592,13 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		}
 	}
 	if (hasGil != 0) {
-		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
+		int item = letter->AttachmentValue();
 		if (item != 0) {
 			int gil = item * 100;
 			if (caravanWork->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gil);
+				caravanWork->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -2619,10 +2613,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 	} while (i < 10);
 
 	if ((result == 0) && (i < 10)) {
-		unsigned char* letterBase = reinterpret_cast<unsigned char*>(*scriptFoodBase);
-		int readFlag = 1;
-		letterBase[letterOffset + 0x3EC] =
-			static_cast<unsigned char>((letterBase[letterOffset + 0x3EC] & 0xBF) | ((readFlag << 6) & 0x40));
+		letter->SetAttachmentClaimed();
 	}
 }
 
@@ -3133,7 +3124,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
 			if ((i != localInfo.m_playerSlot) && (caravanWork->m_shopState != 0) &&
 			    (caravanWork->m_caravanLocalFlags == '\0') &&
-			    (strcmp(reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd), localInfo.m_name) == 0)) {
+			    (strcmp(reinterpret_cast<char*>(caravanWork->m_name), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}
@@ -3780,18 +3771,16 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	const unsigned int flatBase = Game.unkCFlatData0[2];
-	const unsigned int itemCount =
-		static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(scriptFood + 0xBE4));
+	const unsigned int itemCount = static_cast<unsigned short>(caravanWork->m_shopListCount);
 
 	int totalSize = 4;
 	outData[0] = static_cast<char>(itemCount);
 	char* writePtr = outData + 4;
 
 	for (unsigned int i = 0; i < itemCount; i++) {
-		const unsigned short itemId =
-			static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(scriptFood + i * 2 + 0xBE6));
+		const unsigned short itemId = static_cast<unsigned short>(caravanWork->m_shopList[i]);
 		const unsigned short swapped = SwapU16(itemId);
 		memcpy(writePtr, &swapped, 2);
 		writePtr += 2;
@@ -3804,10 +3793,10 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 
 	const double userRate = static_cast<double>(
-		static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f));
+		static_cast<float>(static_cast<float>(caravanWork->m_shopParam) / 100.0f));
 
 	for (unsigned int i = 0; i < itemCount; i++) {
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
+		const int itemId = caravanWork->m_shopList[i];
 		int itemPrice = static_cast<unsigned short>(
 			*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
 		itemPrice = static_cast<int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
@@ -3826,7 +3815,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
+		const int itemId = caravanWork->m_shopList[i];
 		strcpy(itemNameScratch, itemNameTable[itemId]);
 		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
@@ -3877,12 +3866,12 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	const unsigned int flatBase = Game.unkCFlatData0[2];
 	int totalSize = 0;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		const int itemId = caravanWork->m_inventoryItems[i];
 		unsigned short sellInfo[4];
 		if ((itemId < 1) || (itemId > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
@@ -3899,9 +3888,9 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 
 	const double userRate = static_cast<double>(static_cast<float>(
-		static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f * 0.3f));
+		static_cast<float>(caravanWork->m_shopParam) / 100.0f * 0.3f));
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		const int itemId = caravanWork->m_inventoryItems[i];
 		unsigned int packedPrice;
 		if (itemId > 0) {
 			int itemPrice = static_cast<unsigned short>(
@@ -3925,7 +3914,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
-		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		const int itemId = caravanWork->m_inventoryItems[i];
 		if (itemId < 1) {
 			outData[0] = 0;
 			outData += 1;
@@ -3974,28 +3963,32 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 	memset(smithIndices, 0xFF, 0x40);
 
-	unsigned int* scriptFood = Game.m_scriptFoodBase + channel;
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[channel]);
 	const unsigned int flatBase = Game.unkCFlatData0[2];
 
 	char smithCount = 0;
 	char baseIndex = 0;
-	int itemOffset = 0;
-	for (int i = 0; i < 0x10; i++, itemOffset += 8) {
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xB6) >= 401) {
+	int itemIndex = 0;
+	for (int i = 0; i < 0x10; i++) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xB8) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xBA) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
-		if (*reinterpret_cast<short*>(*scriptFood + itemOffset + 0xBC) >= 401) {
+		if (caravanWork->m_inventoryItems[itemIndex] >= 401) {
 			smithIndices[smithCount++] = baseIndex;
 		}
+		itemIndex++;
 		baseIndex++;
 	}
 
@@ -4010,7 +4003,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	totalSize += 1;
 
 	for (int i = 0; i < 0x40; i++) {
-		const int itemId = *reinterpret_cast<short*>(*scriptFood + i * 2 + 0xB6);
+		const int itemId = caravanWork->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
 			memset(itemBuf, 0, sizeof(itemBuf));
@@ -4018,7 +4011,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 			const int itemBase = flatBase + itemId * 0x48;
 			int price = static_cast<int>(
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
-				static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(*scriptFood + 0xBE2)) / 100.0f));
+				static_cast<float>(static_cast<float>(caravanWork->m_shopParam) / 100.0f));
 
 			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
@@ -4074,7 +4067,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	}
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(*scriptFood + i * 4 + 0xC08), 0);
+		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(&caravanWork->m_shopArgs[i]), 0);
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;

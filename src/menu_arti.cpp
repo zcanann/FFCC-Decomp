@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -239,7 +240,7 @@ void CMenuPcs::ArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	u32 scriptFood = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	short state = *(short*)(GetArtiStateBase(this) + 0x10);
 	short* entry = (short*)(GetArtiListBase(this) + 8);
 	int drawIndex = 0;
@@ -299,7 +300,7 @@ void CMenuPcs::ArtiDraw()
 			} else {
 				float itemAlpha = *(float*)(entry + 8);
 				if (tex == 0x37) {
-					short itemCount = *(short*)(scriptFood + (drawIndex + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
+					short itemCount = caravanWork->m_artifacts[drawIndex + *(short*)(GetArtiStateBase(this) + 0x34)];
 					if (itemCount < 1) {
 						tex = 0x34;
 						itemAlpha = (float)(DOUBLE_80332fb8 * (double)itemAlpha);
@@ -347,7 +348,7 @@ void CMenuPcs::ArtiDraw()
 		listFont->SetColor(color.color);
 
 		int menuIndex = i + *(short*)(GetArtiStateBase(this) + 0x34);
-		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
+		short itemCount = caravanWork->m_artifacts[menuIndex];
 		const char* text;
 		if (itemCount < 1) {
 			text = GetMenuStr(0x14);
@@ -372,7 +373,7 @@ void CMenuPcs::ArtiDraw()
 
 	short* iconEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		short itemCount = *(short*)(scriptFood + (i + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
+		short itemCount = caravanWork->m_artifacts[i + *(short*)(GetArtiStateBase(this) + 0x34)];
 		if (itemCount > 0) {
 			int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332fac);
 			int iconX = (int)((float)(iconEntry[0] + iconEntry[2] - 0x10));

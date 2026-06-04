@@ -9,7 +9,7 @@
 #include "ffcc/monobj.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/partMng.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"

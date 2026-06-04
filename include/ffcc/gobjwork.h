@@ -60,6 +60,31 @@ public:
     {
     public:
         void operator=(const CLetterWork&);
+
+        unsigned char Flags() const { return static_cast<unsigned char>(m_word0 >> 24); }
+        void SetFlags(unsigned char flags)
+        {
+            m_word0 = (m_word0 & 0x00FFFFFF) | (static_cast<unsigned int>(flags) << 24);
+        }
+        bool IsOpened() const { return static_cast<signed char>(Flags()) < 0; }
+        void SetOpened() { SetFlags(Flags() | 0x80); }
+        bool IsAttachmentClaimed() const { return (Flags() & 0x40) != 0; }
+        void SetAttachmentClaimed() { SetFlags((Flags() & 0xBF) | 0x40); }
+        bool IsReplySent() const { return (Flags() & 0x20) != 0; }
+        bool HasReply() const { return (Flags() & 0x10) != 0; }
+        bool AttachmentIsGil() const { return (Flags() & 8) != 0; }
+        unsigned short HeaderWord() const { return static_cast<unsigned short>(m_word0 >> 16); }
+        unsigned short AttachmentWord() const { return static_cast<unsigned short>(m_word0); }
+        unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
+        unsigned short TempVar(int index) const
+        {
+            unsigned int word = (index < 2) ? m_word1 : m_word2;
+            return (index & 1) ? static_cast<unsigned short>(word) : static_cast<unsigned short>(word >> 16);
+        }
+
+        unsigned int m_word0;
+        unsigned int m_word1;
+        unsigned int m_word2;
     };
 
     CCaravanWork();
@@ -156,15 +181,14 @@ public:
     int m_joybusCaravanId;                      // 0x03B4
     unsigned short m_letterMeta[8];             // 0x03B8
     unsigned short unk_0x3c8;                   // 0x03C8
-    unsigned char unk_0x3ca_0x3dd[20];          // 0x03CA
+    unsigned char m_name[20];                   // 0x03CA
     unsigned short m_progressValue;             // 0x03DE
     unsigned short m_tribeId;                   // 0x03E0
     unsigned short m_genderFlag;                // 0x03E2
     unsigned short m_appearanceVariant;         // 0x03E4
     unsigned short unk_0x3e6;                   // 0x03E6
     int m_letterCount;                          // 0x03E8
-    unsigned char m_letter0[12];                // 0x03EC
-    unsigned char m_letterSlots[1188];          // 0x03F8
+    CLetterWork m_letters[100];                 // 0x03EC
     unsigned int m_evtState0;                   // 0x089C
     unsigned int m_evtState1;                   // 0x08A0
     unsigned short m_evtWorkArr[128];           // 0x08A4
@@ -199,10 +223,7 @@ public:
     short m_shopList[16];                       // 0x0BE6
     unsigned char m_shopExtraState;             // 0x0C06
     unsigned char m_shopExtraFlags;             // 0x0C07
-    int m_shopArg0;                             // 0x0C08
-    int m_shopArg1;                             // 0x0C0C
-    int m_shopArg2;                             // 0x0C10
-    int m_shopArg3;                             // 0x0C14
+    int m_shopArgs[4];                         // 0x0C08
     unsigned short m_baseStrength;              // 0x0C18
     unsigned short m_baseMagic;                 // 0x0C1A
     unsigned short m_baseDefense;               // 0x0C1C
@@ -215,5 +236,6 @@ public:
 }; // Size 0xC30
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
+STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 
 #endif // _FFCC_GOBJWORK_H_

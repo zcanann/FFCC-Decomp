@@ -1,6 +1,7 @@
 #include "ffcc/menu_tmparti.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
@@ -245,9 +246,8 @@ void CMenuPcs::TmpArtiDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[0];
+	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	TmpArtiEntry* entry = GetTmpArtiEntries(this);
-	unsigned int foodPtr = scriptFood;
 
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
 		int tex = entry->tex;
@@ -260,7 +260,7 @@ void CMenuPcs::TmpArtiDraw()
 			float s = entry->s;
 			float t = entry->t;
 
-			if (*(short*)(foodPtr + 0x1F6) < 0) {
+			if (caravanWork->m_treasures[i] < 0) {
 				tex = 0x34;
 				alpha = (float)(DOUBLE_80332f20 * (double)alpha);
 			}
@@ -277,20 +277,17 @@ void CMenuPcs::TmpArtiDraw()
 			float z = entry->z;
 			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
-		foodPtr += 2;
 		entry++;
 	}
 
 	entry = GetTmpArtiEntries(this);
-	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
-		short icon = *(short*)(foodPtr + 0x1F6);
+		short icon = caravanWork->m_treasures[i];
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
 			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - FLOAT_80332f30);
 			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, FLOAT_80332f2c);
 		}
-		foodPtr += 2;
 		entry++;
 	}
 
@@ -301,14 +298,13 @@ void CMenuPcs::TmpArtiDraw()
 	font->DrawInit();
 
 	entry = GetTmpArtiEntries(this);
-	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
-		if (*(short*)(foodPtr + 0x1F6) >= 0) {
+		if (caravanWork->m_treasures[i] >= 0) {
 			float alpha = entry->alpha;
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
 			font->SetColor(textColor.color);
 
-			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[*(short*)(foodPtr + 0x1F6) * 5 + 4];
+			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_treasures[i] * 5 + 4];
 			float width = font->GetWidth(text);
 			float posX = (float)((((float)entry->width - width) * DOUBLE_80332f20) + (float)entry->x);
 			float posY = (float)(entry->y + 11);
@@ -318,7 +314,6 @@ void CMenuPcs::TmpArtiDraw()
 			font->Draw(text);
 		}
 		entry++;
-		foodPtr += 2;
 	}
 
 	DrawInit();
@@ -437,7 +432,7 @@ void CMenuPcs::TmpArtiCtrl()
 
 	if (hasInput) {
 		float fVar2 = FLOAT_80332f30;
-		unsigned int uVar4 = Game.m_scriptFoodBase[0];
+		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
 		for (iVar7 = 0; iVar7 < this->m_tmpArtiList->count; iVar7 = iVar7 + 1) {
@@ -446,7 +441,7 @@ void CMenuPcs::TmpArtiCtrl()
 			entry++;
 		}
 
-		uVar5 = (unsigned int)*(short *)(uVar4 + 0xbaa);
+		uVar5 = static_cast<unsigned int>(caravanWork->m_numCmdListSlots);
 		iVar7 = 0;
 		TmpArtiEntry* setupEntry = GetTmpArtiEntries(this) + (uVar5 - 1);
 		if (-1 < (int)(uVar5 - 1)) {

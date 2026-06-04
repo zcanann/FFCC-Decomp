@@ -19,7 +19,17 @@ public:
     public:
         struct CBlock
         {
-            u8 m_bytes[0x40];
+            unsigned short m_magicStart;
+            unsigned char m_flags;
+            unsigned char m_level;
+            CBlock* m_prev;
+            CBlock* m_next;
+            CStage* m_stage;
+            int m_size;
+            unsigned long m_defaultParam;
+            unsigned short m_line;
+            char m_source[0x24];
+            unsigned short m_magicEnd;
         };
 
         CStage* m_prev;
@@ -53,6 +63,15 @@ public:
         void GetTop();
     };
 
+    struct CMode
+    {
+        CStage m_activeList;
+        CStage m_freeList;
+        CStage m_stagePool[32];
+    };
+
+    CMode& Mode(int index) { return m_modes[index]; }
+
     void Init();
     void Quit();
     void Frame();
@@ -77,8 +96,9 @@ public:
     int& DefaultGroup() { return m_defaultGroup; }
 
 private:
-    // Backing storage for the recovered CMemory instance; methods access fields via known offsets.
-    u8 m_storage[0x7790];                    // 0x0004
+    CMode m_modes[3];                        // 0x0004
+    CStage* m_currentMemoryStage;            // 0x778C
+    CStage* m_mainMemoryStage;               // 0x7790
     int m_heapWalkerLevel;                   // 0x7794
     int m_heapWalkerVisible;                 // 0x7798
     int m_defaultGroup;                      // 0x779C

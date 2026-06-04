@@ -85,6 +85,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 
+static inline CCaravanWork* SingleCaravanWork()
+{
+    return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+}
+
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -927,7 +932,7 @@ void CMenuPcs::createSingleMenu()
         }
     } else {
         if (m_singleMenuStageActive == 0) {
-            *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xD4);
+            *reinterpret_cast<CMemory::CStage**>(self + 0xF0) = CharaPcs.m_viewerAnimStage;
             m_singleMenuStageActive = 1;
         }
 
@@ -1043,10 +1048,11 @@ void CMenuPcs::SingMenuInit()
 
     CCharaPcs::CHandle** handlePtr = reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
     (*handlePtr)->Add();
+    CCaravanWork* caravanWork = SingleCaravanWork();
     int modelNo = GetModelNo(
-        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0)),
-        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E4)),
-        static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E2)));
+        static_cast<int>(caravanWork->m_tribeId),
+        static_cast<int>(caravanWork->m_appearanceVariant),
+        static_cast<int>(caravanWork->m_genderFlag));
     (*handlePtr)->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
     (*handlePtr)->m_flags |= 0x300141;
     (*handlePtr)->LoadAnim(s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
@@ -1168,7 +1174,7 @@ void CMenuPcs::drawSingleMenu()
         gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332A20);
         DrawInit();
 
-        u8 menuType = *reinterpret_cast<u8*>(Game.m_scriptFoodBase[0] + 0xBE0);
+        u8 menuType = SingleCaravanWork()->m_shopRequestState;
         if (menuType == 1) {
             if (*reinterpret_cast<void**>(self + 0x878) != 0) {
                 reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
@@ -1362,7 +1368,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    gSingMenuHasScriptFoodBase = static_cast<int>(*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) != 0);
+    gSingMenuHasScriptFoodBase = static_cast<int>(SingleCaravanWork()->m_shopRequestState != 0);
     if (Game.m_gameWork.m_menuStageMode == 0) {
         if (m_singleMenuStageActive == 0) {
             return;
@@ -1384,7 +1390,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
         SingMenuInit();
     }
 
-    if (*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) == 0) {
+    if (SingleCaravanWork()->m_shopRequestState == 0) {
         int loadIndex = m_singleMenuTextureLoadIndex;
         if (loadIndex < 2) {
             if (m_singleMenuTextureLoadState == 0) {
@@ -1450,7 +1456,7 @@ post_texture_load:
         *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = 0;
     }
 
-    char menuKind = *reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0);
+    char menuKind = SingleCaravanWork()->m_shopRequestState;
     if (menuKind == 1) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
             CreateShopMenu();
@@ -1496,7 +1502,7 @@ void CMenuPcs::SingCalcChara(float frameStep)
         model->AddFrame(frameStep);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1598,7 +1604,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     GXSetChanMatColor(GX_COLOR0A0, color);
     SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 
-    unsigned short charaNo = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short charaNo = SingleCaravanWork()->m_tribeId;
     float iconStep = FLOAT_803329e8;
     float texU = static_cast<float>(charaNo & 1) * iconStep;
     float texV = static_cast<float>(charaNo >> 1) * iconStep;
@@ -1637,7 +1643,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
     font->SetColor(fontColor);
     font->DrawInit();
 
-    char* charaName = reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0x3CA);
+    CCaravanWork* caravanWork = SingleCaravanWork();
+    char* charaName = reinterpret_cast<char*>(caravanWork->m_name);
     float titleWidth = static_cast<float>(font->GetWidth(charaName));
     float titleX = FLOAT_803329d4 + (FLOAT_803329d8 - titleWidth) * static_cast<float>(DOUBLE_80332968);
     font->SetTlut(0x12);
@@ -1693,13 +1700,13 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
         unsigned short stat;
         if (i == 0) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x1E);
+            stat = caravanWork->m_strength;
         } else if (i == 1) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x22);
+            stat = caravanWork->m_defense;
         } else if (i == 2) {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x20);
+            stat = caravanWork->m_magic;
         } else {
-            stat = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3DE);
+            stat = caravanWork->m_progressValue;
         }
 
         char valueText[36];
@@ -1818,7 +1825,7 @@ void CMenuPcs::SingleCalcFadeIn()
         model->AddFrame(FLOAT_80332934);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1924,7 +1931,7 @@ void CMenuPcs::SingleCalcFadeOut()
         model->AddFrame(FLOAT_80332934);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -1996,7 +2003,7 @@ void CMenuPcs::SingleCalcCtrl()
         model->AddFrame(FLOAT_80332934);
     }
 
-    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
+    unsigned short modelScaleIndex = SingleCaravanWork()->m_tribeId;
     float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
@@ -2406,49 +2413,20 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
  */
 int CMenuPcs::EquipChk(int itemNo)
 {
-    int script = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
 
-    if (*reinterpret_cast<s16*>(script + 0xbaa) > 2) {
-        if (*reinterpret_cast<s16*>(script + 0x208) >= 0 && *reinterpret_cast<s16*>(script + 0x208) == itemNo) {
+    for (int i = 2; i < caravanWork->m_numCmdListSlots && i < 8; i++) {
+        const short commandItem = caravanWork->m_commandListInventorySlotRef[i];
+        if (commandItem >= 0 && commandItem == itemNo) {
             return 1;
         }
-        if (*reinterpret_cast<s16*>(script + 0xbaa) > 3) {
-            if (*reinterpret_cast<s16*>(script + 0x20a) >= 0 && *reinterpret_cast<s16*>(script + 0x20a) == itemNo) {
-                return 1;
-            }
-            if (*reinterpret_cast<s16*>(script + 0xbaa) > 4) {
-                if (*reinterpret_cast<s16*>(script + 0x20c) >= 0 && *reinterpret_cast<s16*>(script + 0x20c) == itemNo) {
-                    return 1;
-                }
-                if (*reinterpret_cast<s16*>(script + 0xbaa) > 5) {
-                    if (*reinterpret_cast<s16*>(script + 0x20e) >= 0 && *reinterpret_cast<s16*>(script + 0x20e) == itemNo) {
-                        return 1;
-                    }
-                    if (*reinterpret_cast<s16*>(script + 0xbaa) > 6) {
-                        if (*reinterpret_cast<s16*>(script + 0x210) >= 0 && *reinterpret_cast<s16*>(script + 0x210) == itemNo) {
-                            return 1;
-                        }
-                        if (*reinterpret_cast<s16*>(script + 0xbaa) > 7 && *reinterpret_cast<s16*>(script + 0x212) >= 0 &&
-                            *reinterpret_cast<s16*>(script + 0x212) == itemNo) {
-                            return 1;
-                        }
-                    }
-                }
-            }
-        }
     }
 
-    if (*reinterpret_cast<s16*>(script + 0xac) >= 0 && *reinterpret_cast<s16*>(script + 0xac) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xae) >= 0 && *reinterpret_cast<s16*>(script + 0xae) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xb0) >= 0 && *reinterpret_cast<s16*>(script + 0xb0) == itemNo) {
-        return 1;
-    }
-    if (*reinterpret_cast<s16*>(script + 0xb2) >= 0 && *reinterpret_cast<s16*>(script + 0xb2) == itemNo) {
-        return 1;
+    for (int i = 0; i < 4; i++) {
+        const short equipment = caravanWork->m_equipment[i];
+        if (equipment >= 0 && equipment == itemNo) {
+            return 1;
+        }
     }
 
     return 0;
@@ -2874,10 +2852,10 @@ int CMenuPcs::SingWinMessHeight()
 int CMenuPcs::ChkEquipPossible(int itemNo)
 {
     u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
-    unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0) & 3);
+    unsigned int raceMask = 1 << (SingleCaravanWork()->m_tribeId & 3);
     unsigned int genderMask = 0x10;
 
-    if (*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + 0x3E2) != 0) {
+    if (SingleCaravanWork()->m_genderFlag != 0) {
         genderMask = 0x20;
     }
 
@@ -2941,19 +2919,19 @@ int CMenuPcs::GetEquipType(int itemNo)
  */
 int CMenuPcs::GetSmithItem(int itemNo)
 {
-    int script = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
 
     GetItemType(itemNo, 1);
-    u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
+    u16 race = caravanWork->m_tribeId;
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
 
     int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
     if (smithItem != 0) {
         u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + smithItem * 0x48 + 4);
-        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(script + 0x3E0) & 3);
+        unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
         unsigned int genderMask = 0x10;
-        if (*reinterpret_cast<s16*>(script + 0x3E2) != 0) {
+        if (caravanWork->m_genderFlag != 0) {
             genderMask = 0x20;
         }
 
@@ -3241,7 +3219,7 @@ void CMenuPcs::CalcSingLife()
  */
 void CMenuPcs::DrawSingLife()
 {
-    unsigned int scriptFood = Game.m_scriptFoodBase[0];
+    const CCaravanWork* const caravanWork = SingleCaravanWork();
     int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
     if (lifeTimer < 0) {
         return;
@@ -3266,7 +3244,7 @@ void CMenuPcs::DrawSingLife()
         y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
     }
 
-    int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
+    int halfHearts = static_cast<unsigned int>(caravanWork->m_maxHp >> 1);
     float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
     reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
         ->DrawHeart(x, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
@@ -3447,10 +3425,8 @@ u8 CMenuPcs::GetItemIcon(int index)
  */
 int CMenuPcs::GetItemType(int itemId, int useRawItemId)
 {
-    int script = Game.m_scriptFoodBase[0];
-
     if (useRawItemId == 0) {
-        itemId = static_cast<int>(*reinterpret_cast<s16*>(script + itemId * 2 + 0xB6));
+        itemId = static_cast<int>(SingleCaravanWork()->m_inventoryItems[itemId]);
     }
 
     if (itemId <= 0) {

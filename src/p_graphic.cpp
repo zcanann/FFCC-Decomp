@@ -84,15 +84,15 @@ extern const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 extern const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
 extern const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
 extern const char s_p_graphic_cpp[] = "p_graphic.cpp";
-const char s_debug_pad_port_fmt[] = "%dP";
-const char s_debug_frame_fmt[] = "%d";
 extern "C" const GXColor s_debug_bar_color;
-static const char s_scenegraph_step_none[] = "";
-extern "C" const char s_scenegraph_step_x8[] = "x8";
-extern "C" const char s_scenegraph_step_x0[] = "x0";
-extern "C" const char s_scenegraph_step_x1_8[] = "x1/8";
-extern "C" const char s_scenegraph_step_x1_4[] = "x1/4";
-extern "C" const char s_scenegraph_step_x1_2[] = "x1/2";
+extern "C" const char s_debug_pad_port_fmt[4];
+extern "C" const char s_debug_frame_fmt[3];
+extern "C" const char s_scenegraph_step_none[4];
+extern "C" const char s_scenegraph_step_x8[3];
+extern "C" const char s_scenegraph_step_x0[3];
+extern "C" const char s_scenegraph_step_x1_8[5];
+extern "C" const char s_scenegraph_step_x1_4[5];
+extern "C" const char s_scenegraph_step_x1_2[5];
 static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_none,
     s_scenegraph_step_x8,
@@ -101,6 +101,15 @@ static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_x1_4,
     s_scenegraph_step_x1_2,
 };
+
+STATIC_ASSERT(offsetof(CGraphicPcs, m_screenFade) == 0x04);
+STATIC_ASSERT(sizeof(CGraphicPcs::ScreenFadeSlot) == 0x2C);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_timer) == 0x00);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_duration) == 0x04);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_colorA) == 0x08);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_colorB) == 0x0C);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_invert) == 0x10);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_mode) == 0x14);
 
 /*
  * --INFO--
@@ -467,6 +476,56 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
         GXPosition3f32(ringPoints[i][2], ringPoints[i][3], z);
         GXColor1u32(outerColorWord);
         GXTexCoord2u16(0, 0);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphicPcs::drawSFRect(float x0, float y0, float x1, float y1, _GXColor topColor, _GXColor bottomColor)
+{
+    const u32 topColorWord = *(u32*)&topColor;
+    const u32 bottomColorWord = *(u32*)&bottomColor;
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(x0, y0, 0.0f);
+    GXColor1u32(topColorWord);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(x1, y0, 0.0f);
+    GXColor1u32(topColorWord);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(x1, y1, 0.0f);
+    GXColor1u32(bottomColorWord);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(x0, y1, 0.0f);
+    GXColor1u32(bottomColorWord);
+    GXTexCoord2u16(0, 2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphicPcs::calcScreenFade()
+{
+    for (int i = 0; i < 4; i++) {
+        if (m_screenFade[i].m_timer > 0 && i != 1) {
+            m_screenFade[i].m_timer--;
+            if (m_screenFade[i].m_timer == 0) {
+                m_screenFade[i].m_targetObj = 0;
+            }
+        }
     }
 }
 

@@ -1253,7 +1253,8 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
  */
 int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 {
-    u16 level = reinterpret_cast<u16*>(m_scriptFoodBase[playerIndex] + 0x3B8)[foodIndex];
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
+    u16 level = caravanWork->m_letterMeta[foodIndex];
     return level;
 }
 
@@ -1310,8 +1311,8 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    char* objWork = (char*)reinterpret_cast<CGObject*>(baseObj)->m_scriptHandle;
-    specialInfo = *reinterpret_cast<int*>(objWork + 0x3B4);
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(reinterpret_cast<CGObject*>(baseObj)->m_scriptHandle);
+    specialInfo = caravanWork->m_joybusCaravanId;
     return 1;
 }
 

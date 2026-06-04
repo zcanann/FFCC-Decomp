@@ -21,7 +21,6 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_gba.h"
-#include "ffcc/p_game.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
@@ -180,6 +179,24 @@ static inline int ClampIndex(int index, int maxIndex)
         return maxIndex;
     }
     return index;
+}
+
+struct CFlatPathPoint
+{
+    float m_distance;
+    Vec m_position;
+};
+
+struct CFlatPathCache
+{
+    int m_pointCount;
+    float m_totalDistance;
+    CFlatPathPoint m_points[0x40];
+};
+
+static inline CFlatPathCache* PathCache(CFlatRuntime2* self)
+{
+    return reinterpret_cast<CFlatPathCache*>(reinterpret_cast<u8*>(self) + 0x17D4);
 }
 
 static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
@@ -1913,14 +1930,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
                 CameraPcs.SetRefPosition(refPosition);
             } else {
-                *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x38) = refPosition;
+                CharaPcs.m_overlapTargetPos = refPosition;
             }
 
             CVector position(localFloats[3], localFloats[4], localFloats[5]);
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
                 CameraPcs.SetPosition(position);
             } else {
-                *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x2C) = position;
+                CharaPcs.m_overlapEyePos = position;
             }
             CameraPcs.SetFromScript();
         }
@@ -2174,26 +2191,26 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x19: {
-        int* pointCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
-        float* totalDistance = reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
-        if (*pointCount < 0x40) {
+        CFlatPathCache* pathCache = PathCache(this);
+        if (pathCache->m_pointCount < 0x40) {
             if (*object->m_localBase != 0) {
-                *pointCount = 0;
-                *totalDistance = 0.0f;
+                pathCache->m_pointCount = 0;
+                pathCache->m_totalDistance = 0.0f;
             }
 
-            Vec* point = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + *pointCount * 0x10);
+            CFlatPathPoint* pathPoint = &pathCache->m_points[pathCache->m_pointCount];
+            Vec* point = &pathPoint->m_position;
             *reinterpret_cast<unsigned int*>(&point->x) = object->m_localBase[1];
             *reinterpret_cast<unsigned int*>(&point->y) = object->m_localBase[2];
             *reinterpret_cast<unsigned int*>(&point->z) = object->m_localBase[3];
 
-            if (*pointCount != 0) {
-                Vec* previous = reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (*pointCount - 1) * 0x10);
-                *totalDistance += PSVECDistance(point, previous);
+            if (pathCache->m_pointCount != 0) {
+                Vec* previous = &pathCache->m_points[pathCache->m_pointCount - 1].m_position;
+                pathCache->m_totalDistance += PSVECDistance(point, previous);
             }
 
-            *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + *pointCount * 0x10) = *totalDistance;
-            *pointCount = *pointCount + 1;
+            pathPoint->m_distance = pathCache->m_totalDistance;
+            pathCache->m_pointCount = pathCache->m_pointCount + 1;
         }
         runtime->push(object, 0);
         outResult = 0;
@@ -2201,7 +2218,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x1A: {
         const unsigned int mode = *object->m_localBase;
-        const int pointCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x17D4);
+        CFlatPathCache* pathCache = PathCache(this);
+        const int pointCount = pathCache->m_pointCount;
         Vec result = {0.0f, 0.0f, 0.0f};
 
         if (pointCount > 0 && object->m_localBase[2] != 0) {
@@ -2224,23 +2242,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             }
 
             if ((mode & 4) == 0) {
-                const float totalDistance = *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17D8);
+                const float totalDistance = pathCache->m_totalDistance;
                 const float pathDistance = totalDistance * t;
 
-                result = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0);
+                result = pathCache->m_points[0].m_position;
                 for (int i = 0; i + 1 < pointCount; i++) {
-                    const float startDistance =
-                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + i * 0x10);
-                    const float endDistance =
-                        *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x17DC + (i + 1) * 0x10);
+                    const float startDistance = pathCache->m_points[i].m_distance;
+                    const float endDistance = pathCache->m_points[i + 1].m_distance;
                     if (startDistance <= pathDistance && pathDistance <= endDistance) {
                         float segmentT = 0.0f;
                         if (endDistance != startDistance) {
                             segmentT = (pathDistance - startDistance) / (endDistance - startDistance);
                         }
-                        const Vec& startPoint = *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + i * 0x10);
-                        const Vec& endPoint =
-                            *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + (i + 1) * 0x10);
+                        const Vec& startPoint = pathCache->m_points[i].m_position;
+                        const Vec& endPoint = pathCache->m_points[i + 1].m_position;
                         VECLerp(const_cast<Vec*>(&startPoint), const_cast<Vec*>(&endPoint), &result, segmentT);
                         break;
                     }
@@ -2256,14 +2271,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     segmentT = 0.0f;
                 }
 
-                const Vec& p0 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex - 1, maxIndex) * 0x10);
-                const Vec& p1 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex, maxIndex) * 0x10);
-                const Vec& p2 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 1, maxIndex) * 0x10);
-                const Vec& p3 =
-                    *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x17E0 + ClampIndex(baseIndex + 2, maxIndex) * 0x10);
+                const Vec& p0 = pathCache->m_points[ClampIndex(baseIndex - 1, maxIndex)].m_position;
+                const Vec& p1 = pathCache->m_points[ClampIndex(baseIndex, maxIndex)].m_position;
+                const Vec& p2 = pathCache->m_points[ClampIndex(baseIndex + 1, maxIndex)].m_position;
+                const Vec& p3 = pathCache->m_points[ClampIndex(baseIndex + 2, maxIndex)].m_position;
                 CatmullRomVec(result, p0, p1, p2, p3, segmentT);
             }
         }
@@ -2609,24 +2620,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x32: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
-        *reinterpret_cast<int*>(graphicsPcs + 0x98) = *object->m_localBase;
-        *reinterpret_cast<int*>(graphicsPcs + 0x88) = object->m_localBase[1];
-        *reinterpret_cast<int*>(graphicsPcs + 0x8C) = *reinterpret_cast<int*>(graphicsPcs + 0x88);
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[3];
+        fade.m_invert = *object->m_localBase;
+        fade.m_timer = object->m_localBase[1];
+        fade.m_duration = fade.m_timer;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x33: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
-        *reinterpret_cast<int*>(graphicsPcs + 0x6C) = *object->m_localBase;
-        *reinterpret_cast<int*>(graphicsPcs + 0x70) = 0;
-        graphicsPcs[0x64] = static_cast<u8>(object->m_localBase[1]);
-        graphicsPcs[0x65] = static_cast<u8>(object->m_localBase[2]);
-        graphicsPcs[0x66] = static_cast<u8>(object->m_localBase[3]);
-        graphicsPcs[0x67] = 0xFF;
-        *reinterpret_cast<int*>(graphicsPcs + 0x5C) = object->m_localBase[4];
-        *reinterpret_cast<int*>(graphicsPcs + 0x60) = *reinterpret_cast<int*>(graphicsPcs + 0x5C);
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[2];
+        fade.m_invert = *object->m_localBase;
+        fade.m_mode = 0;
+        fade.m_colorA.r = static_cast<u8>(object->m_localBase[1]);
+        fade.m_colorA.g = static_cast<u8>(object->m_localBase[2]);
+        fade.m_colorA.b = static_cast<u8>(object->m_localBase[3]);
+        fade.m_colorA.a = 0xFF;
+        fade.m_timer = object->m_localBase[4];
+        fade.m_duration = fade.m_timer;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3503,15 +3514,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x9C: {
         int cameraSlot = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
-        int* cameraFrameCount = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 4 + cameraSlot * 4);
-        int* cameraTablePtr = reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x14 + cameraSlot * 4);
-        if ((*cameraTablePtr == 0) || (cameraFrame < 0) || (*cameraFrameCount <= cameraFrame)) {
+        if ((CharaPcs.m_cameraData[cameraSlot] == 0) || (cameraFrame < 0) ||
+            (CharaPcs.m_cameraFrameCount[cameraSlot] <= cameraFrame)) {
             runtime->push(object, 0);
             outResult = 0;
             return 1;
         }
 
-        int cameraData = *cameraTablePtr + cameraFrame * 0x20;
+        int cameraData = reinterpret_cast<int>(CharaPcs.m_cameraData[cameraSlot]) + cameraFrame * 0x20;
         *reinterpret_cast<int*>(object->m_localBase[2]) = *reinterpret_cast<int*>(cameraData + 0x0);
         *reinterpret_cast<float*>(object->m_localBase[3]) = -*reinterpret_cast<float*>(cameraData + 0x4);
         *reinterpret_cast<float*>(object->m_localBase[4]) = -*reinterpret_cast<float*>(cameraData + 0x8);
@@ -3618,14 +3628,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -0xAE:
         strcpy(
-            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd),
+            reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].m_name),
             strBlob + strOffs[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0xAF:
         runtime->push(
-            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ca_0x3dd[object->m_localBase[1]]));
+            object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
         outResult = 0;
         return 1;
     case -0xB0:
@@ -3637,22 +3647,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         runtime->push(object, static_cast<int>(gameWork.m_townName[*object->m_localBase]));
         outResult = 0;
         return 1;
-    case -0xB2:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 64) = 0;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 48) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 52) = 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&GraphicPcs) + 68) = *object->m_localBase;
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 56) = static_cast<u8>(object->m_localBase[1]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 57) = static_cast<u8>(object->m_localBase[2]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 58) = static_cast<u8>(object->m_localBase[3]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 59) = static_cast<u8>(object->m_localBase[4]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 60) = static_cast<u8>(object->m_localBase[5]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 61) = static_cast<u8>(object->m_localBase[6]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 62) = static_cast<u8>(object->m_localBase[7]);
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(&GraphicPcs) + 63) = static_cast<u8>(object->m_localBase[8]);
+    case -0xB2: {
+        CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[1];
+        fade.m_invert = 0;
+        fade.m_timer = 1;
+        fade.m_duration = 1;
+        fade.m_mode = *object->m_localBase;
+        fade.m_colorA.r = static_cast<u8>(object->m_localBase[1]);
+        fade.m_colorA.g = static_cast<u8>(object->m_localBase[2]);
+        fade.m_colorA.b = static_cast<u8>(object->m_localBase[3]);
+        fade.m_colorA.a = static_cast<u8>(object->m_localBase[4]);
+        fade.m_colorB.r = static_cast<u8>(object->m_localBase[5]);
+        fade.m_colorB.g = static_cast<u8>(object->m_localBase[6]);
+        fade.m_colorB.b = static_cast<u8>(object->m_localBase[7]);
+        fade.m_colorB.a = static_cast<u8>(object->m_localBase[8]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
+    }
     case -0xB3:
         runtime->push(
             object,
@@ -3695,8 +3707,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0xB9:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 36) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 40) = object->m_localBase[1];
+        CharaPcs.m_overlapEnabled = *object->m_localBase;
+        CharaPcs.m_overlapAlpha = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;

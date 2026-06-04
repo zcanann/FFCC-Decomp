@@ -355,10 +355,12 @@ public:
 	void gqrInit(unsigned long, unsigned long, unsigned long);
     void SetAmemStage(CMemory::CStage* stage) { m_amemStage = stage; }
     CMemory::CStage* GetMemoryStage() { return m_amemStage; }
+    u32 GetAmemBaseAddress() const { return m_amemStage->m_heapTop; }
     u32& AmemSize() { return m_amemSize; }
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
     u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
+    u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemAnimSize() const { return m_amemAnimSize; }
     void ResetAmem(int) { m_amemSize = 0; }
     void TimeMogFur();

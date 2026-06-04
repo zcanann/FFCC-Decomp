@@ -41,24 +41,8 @@ enum GraphicCppStringOffset {
     kGraphicCppDrawDoneFmt = 0xF4,
 };
 
-static inline void*& PtrAt(CGraphic* self, u32 offset) {
-    return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
-}
-
 static inline float LoadFloat(const float& value) {
     return value;
-}
-
-static inline u16 U16At(void* p, u32 offset) {
-    return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(p) + offset);
-}
-
-static inline int& S32At(CGraphic* self, u32 offset) {
-    return *reinterpret_cast<int*>(reinterpret_cast<u8*>(self) + offset);
-}
-
-static inline u8& U8At(CGraphic* self, u32 offset) {
-    return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(self) + offset);
 }
 
 static inline float CameraNearZ()
@@ -1096,9 +1080,7 @@ void CGraphic::makeSphere()
     vertices[vertexCount * 3 + 1] = kGraphicZeroF;
     vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
-    m_sphereDisplayList =
-        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(sGraphicSourceStrings), 0x41A)
-        u8[m_sphereDisplayListSize];
+    m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), 0x41A) u8[m_sphereDisplayListSize];
 
     DCInvalidateRange(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);

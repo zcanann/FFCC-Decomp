@@ -3037,6 +3037,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         GbaQue.GetStageNo(port, &stageMajor, &stageMinor);
 
         unsigned int cmdStage = MakeJoyCmd32(0x0E, 1, ((unsigned char*)&stageMajor)[3], ((unsigned char*)&stageMinor)[3]);
+        unsigned int stageResult = 0;
 
         if (static_cast<signed char>(m_threadRunningMask) != 0)
         {
@@ -3049,16 +3050,16 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 m_cmdCount[threadParam->m_portIndex]++;
 
                 OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-                err = 0;
+                stageResult = 0;
             }
             else
             {
                 OSSignalSemaphore(&m_accessSemaphores[qPort]);
-                err = -1;
+                stageResult = 0xFFFFFFFF;
             }
         }
 
-        if (err < 0)
+        if (((-stageResult | stageResult) >> 31) != 0)
         {
             result = 1;
             break;

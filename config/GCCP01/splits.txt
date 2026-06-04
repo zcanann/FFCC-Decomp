@@ -949,6 +949,7 @@ pppYmMegaBirthShpTail3.cpp:
 	.rodata     start:0x801D9C88 end:0x801D9CA3
 	.data       start:0x801FD448 end:0x801FD470
 	.bss        start:0x802EA140 end:0x802EA170
+	.sdata2     start:0x803305B0 end:0x803305F0
 
 pppKeLns.cpp:
 	extab       start:0x80007AE0 end:0x80007AE8

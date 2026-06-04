@@ -3942,7 +3942,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
     cmdBytes[3] = stageMinor[3];
     unsigned int queueCmd = cmd;
 
-    int result = 0;
+    unsigned int result = 0;
 
     if (m_threadRunningMask != 0)
     {
@@ -3952,7 +3952,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
         if ((int)m_cmdCount[port] >= 0x40)
         {
             OSSignalSemaphore(&m_accessSemaphores[port]);
-            result = -1;
+            result = 0xFFFFFFFF;
         }
         else
         {
@@ -3962,7 +3962,7 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
         }
     }
 
-    return result;
+    return result != 0 ? -1 : 0;
 }
 
 /*

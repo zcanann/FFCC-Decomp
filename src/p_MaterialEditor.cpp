@@ -299,6 +299,9 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     if ((textureHeader[1] == 4) || (textureHeader[1] == 8)) {
+                        GXSetNumTevStages(3);
+                        GXSetNumTexGens(1);
+
                         GXColor red;
                         GXColor blue;
                         red.r = 0xff;
@@ -310,8 +313,6 @@ void CMaterialEditorPcs::drawViewer()
                         blue.b = 0xff;
                         blue.a = 0xff;
 
-                        GXSetNumTevStages(3);
-                        GXSetNumTexGens(1);
                         GXSetTevColor(GX_TEVREG2, red);
                         GXSetTevColor(GX_TEVPREV, blue);
                         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

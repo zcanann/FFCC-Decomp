@@ -138,15 +138,6 @@ static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
-static inline void DestroyTexScrollKeyFrame(CMapKeyFrame* keyFrame)
-{
-    if (keyFrame == 0) {
-        return;
-    }
-
-    delete keyFrame;
-}
-
 static void ReleaseRefNonNull(CRef* object)
 {
     if (object->DecRef() == 0) {
@@ -2256,7 +2247,7 @@ CTexScroll::~CTexScroll()
     if (m_type0 == 2) {
         CMapKeyFrame* keyFrame = m_uKeyFrame;
         if (keyFrame != 0) {
-            DestroyTexScrollKeyFrame(keyFrame);
+            delete keyFrame;
             m_uKeyFrame = 0;
         }
     }
@@ -2264,7 +2255,7 @@ CTexScroll::~CTexScroll()
     if (m_type1 == 2) {
         CMapKeyFrame* keyFrame = m_vKeyFrame;
         if (keyFrame != 0) {
-            DestroyTexScrollKeyFrame(keyFrame);
+            delete keyFrame;
             m_vKeyFrame = 0;
         }
     }

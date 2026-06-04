@@ -1093,22 +1093,8 @@ void CShopMenu::DrawItemInfo0()
     }
 
     int listType = ShopMenuInt(this, 0x14);
-    int caravan = ShopMenuCaravan(this);
-    int itemNo;
-    if (listType == 0) {
-        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (itemIndex * 2 + 0xBE6)));
-    } else if (listType == 1) {
-        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (itemIndex * 2 + 0xB6)));
-    } else if (listType == 2) {
-        int smithIndex = ShopMenuInt(this, 0x50 + itemIndex * 4);
-        if (smithIndex == -1) {
-            itemNo = -1;
-        } else {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (smithIndex * 2 + 0xB6)));
-        }
-    } else {
-        itemNo = -1;
-    }
+    const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
+    int itemNo = ResolveShopMenuItemNo(this, itemIndex);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -1144,8 +1130,8 @@ void CShopMenu::DrawItemInfo0()
             canTrade = true;
         } else if (listType == 2) {
             canTrade = true;
-            if ((reinterpret_cast<CCaravanWork*>(caravan)->m_shopArgs[(itemNo - 0x191U) >> 5] &
-                (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
+            if ((caravanWork->m_shopArgs[(itemNo - 0x191U) >> 5] &
+                 (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
                 canTrade = false;
             }
         } else if (listType == 1) {
@@ -1167,7 +1153,7 @@ void CShopMenu::DrawItemInfo0()
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
-                totalGil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                totalGil = static_cast<int>(caravanWork->m_shopParam) *
                            static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
                 totalGil = totalGil / 100 + (totalGil >> 31);
                 totalGil = totalGil - (totalGil >> 31);
@@ -1176,7 +1162,7 @@ void CShopMenu::DrawItemInfo0()
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
-                int gil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                int gil = static_cast<int>(caravanWork->m_shopParam) *
                           static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
                 gil = gil / 100 + (gil >> 31);
                 totalGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 31)));
@@ -1272,26 +1258,15 @@ void CShopMenu::DrawBuySellInfo()
     int itemNo = -1;
     bool canTrade = false;
     if (selected != -1) {
-        int caravan = ShopMenuCaravan(this);
-        if (listType == 0) {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (selected * 2 + 0xBE6)));
-        } else if (listType == 1) {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (selected * 2 + 0xB6)));
-        } else if (listType == 2) {
-            int smithIndex = ShopMenuInt(this, 0x50 + selected * 4);
-            if (smithIndex == -1) {
-                itemNo = -1;
-            } else {
-                itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (smithIndex * 2 + 0xB6)));
-            }
-        }
+        const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
+        itemNo = ResolveShopMenuItemNo(this, selected);
 
         if (itemNo > 0) {
             if (listType == 0) {
                 canTrade = true;
             } else if (listType == 2) {
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                canTrade = (reinterpret_cast<CCaravanWork*>(caravan)->m_shopArgs[(itemNo - 0x191) >> 5] &
+                canTrade = (caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
             } else if ((listType == 1) && MenuPcs.EquipChk(selected) == 0 && itemNo >= 0x9F) {
                 canTrade = true;
@@ -1304,8 +1279,8 @@ void CShopMenu::DrawBuySellInfo()
         if (listType == 0) {
             int gil = 0;
             if (itemNo >= 1) {
-                int caravan = ShopMenuCaravan(this);
-                gil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
+                gil = static_cast<int>(caravanWork->m_shopParam) *
                       static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
                 gil = gil / 100 + (gil >> 0x1F);
                 gil = gil - (gil >> 0x1F);
@@ -1314,8 +1289,8 @@ void CShopMenu::DrawBuySellInfo()
         } else if (listType == 1) {
             int sellGil = 0;
             if (itemNo >= 1) {
-                int caravan = ShopMenuCaravan(this);
-                sellGil = static_cast<int>(*reinterpret_cast<short*>(caravan + 0xBE2)) *
+                const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
+                sellGil = static_cast<int>(caravanWork->m_shopParam) *
                           static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 0x20));
                 sellGil = sellGil / 100 + (sellGil >> 0x1F);
                 sellGil = sellGil - (sellGil >> 0x1F);
@@ -1363,7 +1338,6 @@ void CShopMenu::DrawItemList()
 {
     int y = 0x4C;
     int itemIndex = ShopMenuInt(this, 0x24);
-    int itemOffset = itemIndex << 1;
     int selectableFrame = 10;
     if (ShopMenuInt(this, 0x14) == 2) {
         selectableFrame = 0xF;
@@ -1371,54 +1345,17 @@ void CShopMenu::DrawItemList()
 
     for (int row = 0; row < ShopMenuInt(this, 0x2C); ++row) {
         int listType = ShopMenuInt(this, 0x14);
-        int itemCount;
-        if (listType == 0) {
-            itemCount = *reinterpret_cast<short*>(ShopMenuCaravan(this) + 0xBE4);
-        } else if (listType == 1) {
-            itemCount = 0x40;
-        } else if (listType == 2) {
-            itemCount = ShopMenuInt(this, 0x4C);
-        } else {
-            itemCount = -1;
-        }
+        int itemCount = ResolveShopMenuItemCount(this);
 
         if (itemCount <= itemIndex) {
             break;
         }
 
-        int itemNo;
-        if (listType == 0) {
-            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
-        } else if (listType == 1) {
-            itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
-        } else if (listType == 2) {
-            int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
-            if (mapped == -1) {
-                itemNo = -1;
-            } else {
-                itemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
-            }
-        } else {
-            itemNo = -1;
-        }
+        int itemNo = ResolveShopMenuItemNo(this, itemIndex);
 
         bool canTrade = false;
         if (itemIndex != -1) {
-            int tradeItemNo;
-            if (listType == 0) {
-                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xBE6);
-            } else if (listType == 1) {
-                tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + itemOffset + 0xB6);
-            } else if (listType == 2) {
-                int mapped = ShopMenuInt(this, 0x50 + itemIndex * 4);
-                if (mapped == -1) {
-                    tradeItemNo = -1;
-                } else {
-                    tradeItemNo = *reinterpret_cast<short*>(ShopMenuCaravan(this) + mapped * 2 + 0xB6);
-                }
-            } else {
-                tradeItemNo = -1;
-            }
+            int tradeItemNo = ResolveShopMenuItemNo(this, itemIndex);
 
             if (tradeItemNo > 0) {
                 if (listType == 0) {
@@ -1472,7 +1409,6 @@ void CShopMenu::DrawItemList()
                 MenuPcsVoid(), itemNo, frameX + 0x54, y - 0x18, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
         }
 
-        itemOffset += 2;
         ++itemIndex;
         y += 0x1C;
     }
@@ -1867,31 +1803,14 @@ void CShopMenu::DrawMake()
     int resultItem = ShopMenuInt(this, 0x150);
     int listType = ShopMenuInt(this, 0x14);
     int selectedIndex = ShopMenuInt(this, 0x28);
-    int caravan = ShopMenuCaravan(this);
-    int selectedItem;
-    if (listType == 0) {
-        selectedItem = *reinterpret_cast<short*>(caravan + (selectedIndex * 2 + 0xBE6));
-    } else if (listType == 1) {
-        selectedItem = *reinterpret_cast<short*>(caravan + (selectedIndex * 2 + 0xB6));
-    } else if (listType == 2) {
-        int mappedIndex = ShopMenuInt(this, 0x50 + selectedIndex * 4);
-        if (mappedIndex == -1) {
-            selectedItem = -1;
-        } else {
-            selectedItem = *reinterpret_cast<short*>(caravan + (mappedIndex * 2 + 0xB6));
-        }
-    } else {
-        selectedItem = -1;
-    }
+    CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
+    int selectedItem = ResolveShopMenuItemNo(this, selectedIndex);
 
     int makeGil = 0;
     if (selectedItem > 0) {
-        makeGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
-                  *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selectedItem * 0x48 + 0x24);
-        makeGil = makeGil / 100 + (makeGil >> 0x1F);
-        makeGil = makeGil - (makeGil >> 0x1F);
+        makeGil = CalcShopMenuMakeGil(this, selectedItem);
     }
-    int currentMoney = *reinterpret_cast<int*>(caravan + 0x200);
+    int currentMoney = caravanWork->m_gil;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
@@ -2026,7 +1945,7 @@ void CShopMenu::DrawMake()
 
         int ownedCount = 0;
         for (int slot = 0; slot < 0x40; slot++) {
-            if (*reinterpret_cast<short*>(caravan + slot * 2 + 0xB6) == materialItem) {
+            if (caravanWork->m_inventoryItems[slot] == materialItem) {
                 ++ownedCount;
             }
         }

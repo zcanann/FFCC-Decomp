@@ -4546,7 +4546,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
         return 0;
 	}
 
-    hpData[0] |= 0x00800000;
+    ((unsigned char*)hpData)[1] |= 0x80;
 
     unsigned int cmd = hpData[0];
     int result = 0;

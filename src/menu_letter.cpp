@@ -364,7 +364,7 @@ void CMenuPcs::LetterInit3()
 
 	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
-	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
+	CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
 
 	s_ReplyMax = 0;
 	char* curLine = workText;
@@ -1389,7 +1389,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
 			caravanWork + s_SelLetter * 0xC + 0x3EC);
 		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
-		CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
+		CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
 
 		s_ReplyMax = 0;
 		char* curLine = workText;
@@ -1890,7 +1890,7 @@ void CMenuPcs::LetterMessDraw()
 
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
-	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
+	CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
 
 	char* curLine = workText;
 	int y = 0x58;
@@ -2181,7 +2181,7 @@ int CMenuPcs::LetterCtrlCur()
 
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
-				CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
+				CMes::MakeAgbString(workText, srcText, reinterpret_cast<CCaravanWork*>(caravanWork)->m_genderFlag, 0);
 
 				char* line = workText;
 				int i = 0;
@@ -2552,12 +2552,11 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
  */
 void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
-	unsigned int caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (s_Attach == 0) {
 		s_AttachItemIdx = static_cast<signed char>(itemIndex);
-		caravanWork += itemIndex * 2;
-		s_AttachItem = *reinterpret_cast<short*>(caravanWork + 0xB6);
+		s_AttachItem = caravanWork->m_inventoryItems[itemIndex];
 	} else {
 		s_AttachItem = itemIndex;
 	}

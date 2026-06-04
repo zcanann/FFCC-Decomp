@@ -700,6 +700,7 @@ void CalcReflectionVector2(
     Mtx nodeRotMtx;
     Mtx cameraMtx;
     Mtx cameraModelMtx;
+    float (*nodeMatrix)[4];
     u16* dl = (u16*)displayList;
     u16* dlEnd;
 
@@ -708,16 +709,17 @@ void CalcReflectionVector2(
     cameraPos.z = CameraWorldZ();
 
     PSMTXCopy(matrix, nodeMtx);
-    nodeOffset.x = node->m_mtx[0][3];
-    nodeOffset.y = node->m_mtx[1][3];
-    nodeOffset.z = node->m_mtx[2][3];
+    nodeMatrix = node->m_mtx;
+    nodeOffset.x = nodeMatrix[0][3];
+    nodeOffset.y = nodeMatrix[1][3];
+    nodeOffset.z = nodeMatrix[2][3];
 
     matrixPos.x = nodeMtx[0][3];
     matrixPos.y = nodeMtx[1][3];
     matrixPos.z = nodeMtx[2][3];
     PSVECAdd(&nodeOffset, &matrixPos, &worldPos);
 
-    PSMTXCopy(node->m_mtx, matrix);
+    PSMTXCopy(nodeMatrix, matrix);
     matrix[0][3] = worldPos.x;
     matrix[1][3] = worldPos.y;
     matrix[2][3] = worldPos.z;
@@ -730,7 +732,7 @@ void CalcReflectionVector2(
     PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
 
-    const double half = (double)LoadFloat(FLOAT_803318a4);
+    const float half = LoadFloat(FLOAT_803318a4);
 
     dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
@@ -795,46 +797,58 @@ void CalcReflectionVector2(
                 invAxis = LoadFloat(FLOAT_803318b8) * reflected.x;
                 if (outVec->x >= LoadFloat(FLOAT_80331898)) {
                     clr[0] = (u8)(clr[0] + 0x7F);
-                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.x = half - reflected.z / invAxis;
+                    uv.y = half - reflected.y / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x + LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
                 } else {
                     clr[0] = (u8)(clr[0] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318c0));
-                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.x = half - reflected.z / invAxis;
+                    uv.y = half + reflected.y / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x + LoadFloat(FLOAT_803318c0);
+                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
                 }
                 break;
             case 1:
                 invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
                 if (outVec->y >= LoadFloat(FLOAT_80331898)) {
                     clr[1] = (u8)(clr[1] + 0x7F);
-                    uv.y = (float)((half + (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.x =
-                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                    uv.x = half + reflected.x / invAxis;
+                    uv.y = half + reflected.z / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x + half;
                 } else {
                     clr[1] = (u8)(clr[1] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                    uv.y =
-                        (float)((double)((float)(half + (double)(reflected.z / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                    uv.x = half - reflected.x / invAxis;
+                    uv.y = half + reflected.z / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x + LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y + half;
                 }
                 break;
             case 2:
                 invAxis = LoadFloat(FLOAT_803318b8) * reflected.z;
                 if (outVec->z >= LoadFloat(FLOAT_80331898)) {
                     clr[2] = (u8)(clr[2] + 0x7F);
-                    uv.x = (float)((half + (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.x = half + reflected.x / invAxis;
+                    uv.y = half - reflected.y / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
                 } else {
                     clr[2] = (u8)(clr[2] - 0x7F);
-                    uv.x =
-                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.x = half + reflected.x / invAxis;
+                    uv.y = half + reflected.y / invAxis;
+                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x + half;
+                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
                 }
                 break;
             }

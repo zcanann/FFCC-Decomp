@@ -3965,7 +3965,7 @@ void JoyBus::InitPpos()
  */
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
-    int result = 0;
+    unsigned int result = 0;
     const int port = threadParam->m_portIndex;
     unsigned char& state = threadParam->m_pposCounter;
     unsigned char& playerCount = m_cmdBuffer[port];

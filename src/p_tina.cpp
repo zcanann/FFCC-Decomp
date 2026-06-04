@@ -193,6 +193,7 @@ const char* sDebugSpinnerTextPtr;
 signed char sDebugSpinnerTextPtrInit;
 int s_debugSpinnerFrameCounter;
 signed char s_debugSpinnerFrameCounterInit;
+unsigned char g_IsCheckDrawDone;
 signed char s_debugSpinnerFrameCounterPad0;
 signed char s_debugSpinnerFrameCounterPad1;
 signed char s_debugSpinnerFrameCounterPad2;

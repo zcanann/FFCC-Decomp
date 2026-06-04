@@ -11,12 +11,10 @@
 
 typedef struct DdhRecvCB {
     CircleBuffer cb;
-    u32 reserved;
 } DdhRecvCB;
 
 typedef struct DdhInitFlag {
     BOOL value;
-    u32 reserved;
 } DdhInitFlag;
 
 /* 80450030-80450050 07CD50 001C+04 3/3 0/0 0/0 .bss             gRecvCB */

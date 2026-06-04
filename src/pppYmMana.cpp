@@ -371,38 +371,41 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
  */
 void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
-    VYmMana* mana = static_cast<VYmMana*>(work);
-    pppYmManaUnkB* stepData = static_cast<pppYmManaUnkB*>(step);
-    u8 type = stepData->m_type;
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
     CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
-    bool draw = false;
+    VYmMana* mana = static_cast<VYmMana*>(work);
+    pppYmManaUnkB* stepData = static_cast<pppYmManaUnkB*>(step);
+    int type = stepData->m_type;
+    CGObject* object = mana->m_object;
+    int draw = 0;
 
-    if (type == 2) {
-        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj3) == 0) {
-            draw = true;
-        }
-    } else if (type < 2) {
-        if (type == 0) {
-            if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
-                draw = true;
+    if (type != 2) {
+        if (type < 2) {
+            if (type == 0) {
+                if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0) {
+                    draw = 1;
+                }
+            } else if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
+                draw = 1;
             }
-        } else if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj5) == 0) {
-            draw = true;
+        } else if (type < 4 && (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0)) {
+            draw = 1;
         }
-    } else if (type < 4 && (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj1) == 0)) {
-        draw = true;
+    } else {
+        if (strcmp(mesh->m_name, s_ymManaShapeObj) == 0 || strcmp(mesh->m_name, s_ymManaShapeObj3) == 0) {
+            draw = 1;
+        }
     }
 
     int waterCmp = strcmp(mesh->m_name, s_ymManaShapeObj4);
-    if ((waterCmp == 0 && type == 1) || (strcmp(mesh->m_name, s_ymManaShapeObj2) == 0 && type == 2)) {
+    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(mesh->m_name, s_ymManaShapeObj2) == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
         Mtx rotXMtx;
         Mtx rotZMtx;
         Mtx offsetMtx;
         Mtx worldMtx;
 
-        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+        PSMTXCopy(CameraMatrix(), cameraMtx);
         PSMTXCopy(mtx, mana->m_waterMtx);
         GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
         GXSetCullMode(GX_CULL_NONE);
@@ -448,7 +451,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = FLOAT_80330ec0 * mana->m_object->m_lookAtTimer;
+        float alphaScale = FLOAT_80330ec0 * object->m_lookAtTimer;
         int alpha = (int)alphaScale;
         mana->m_baseColor.r = 0xFF;
         mana->m_baseColor.g = 0xFF;
@@ -1264,18 +1267,24 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     do {
         quadIndex = rowBase;
         for (pairCount = 0; pairCount < 8; pairCount++) {
+            int nextIndex = quadIndex + 1;
+            int lowerIndex = quadIndex + 0x11;
+            int lowerNextIndex = quadIndex + 0x12;
+            int nextNextIndex = quadIndex + 2;
+            int lowerNextNextIndex = quadIndex + 0x13;
+
             indicesOut[indexOffset++] = quadIndex;
-            indicesOut[indexOffset++] = quadIndex + 1;
-            indicesOut[indexOffset++] = quadIndex + 0x12;
-            indicesOut[indexOffset++] = quadIndex + 0x12;
-            indicesOut[indexOffset++] = quadIndex + 0x11;
+            indicesOut[indexOffset++] = nextIndex;
+            indicesOut[indexOffset++] = lowerNextIndex;
+            indicesOut[indexOffset++] = lowerNextIndex;
+            indicesOut[indexOffset++] = lowerIndex;
             indicesOut[indexOffset++] = quadIndex;
-            indicesOut[indexOffset++] = quadIndex + 1;
-            indicesOut[indexOffset++] = quadIndex + 2;
-            indicesOut[indexOffset++] = quadIndex + 0x13;
-            indicesOut[indexOffset++] = quadIndex + 0x13;
-            indicesOut[indexOffset++] = quadIndex + 0x12;
-            indicesOut[indexOffset++] = quadIndex + 1;
+            indicesOut[indexOffset++] = nextIndex;
+            indicesOut[indexOffset++] = nextNextIndex;
+            indicesOut[indexOffset++] = lowerNextNextIndex;
+            indicesOut[indexOffset++] = lowerNextNextIndex;
+            indicesOut[indexOffset++] = lowerNextIndex;
+            indicesOut[indexOffset++] = nextIndex;
             quadIndex = quadIndex + 2;
         }
         rowCount = rowCount + 1;
@@ -1721,7 +1730,6 @@ void CalcReflectionVector2(
     Mtx normalMtx;
     Mtx rotateMtx;
     u16* dl = (u16*)displayList;
-    u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     const float zero = FLOAT_80330e4c;
     const float denomBias = LOCAL_FLOAT_80330e58;
     const float half = FLOAT_80330e5c;
@@ -1756,6 +1764,7 @@ void CalcReflectionVector2(
     normalMtx[1][3] = FLOAT_80330e4c;
     normalMtx[2][3] = FLOAT_80330e4c;
 
+    u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
         u8 drawFmt = *(u8*)dl;
         u16 itemCount = *(u16*)((u8*)dl + 1);

@@ -60,41 +60,41 @@ extern "C" const float kOptionOpenAnimStep = 0.04f;
 extern "C" const float kOptionColumnAnimStep = 0.2f;
 extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
-extern float FLOAT_80333548;
-extern float FLOAT_80333550;
-extern float FLOAT_80333554;
-extern float FLOAT_8033355C;
-extern float FLOAT_80333560;
-extern float FLOAT_80333564;
-extern float FLOAT_80333568;
-extern float FLOAT_80333570;
-extern float FLOAT_80333574;
-extern float FLOAT_80333578;
-extern float FLOAT_8033357c;
-extern float FLOAT_80333580;
-extern float FLOAT_80333584;
-extern float FLOAT_80333588;
-extern float FLOAT_80333590;
-extern float FLOAT_80333594;
-extern float FLOAT_8033359C;
-extern float FLOAT_803335a0;
-extern float FLOAT_803335A4;
-extern float FLOAT_803335A8;
-extern float FLOAT_803335AC;
-extern float FLOAT_803335B0;
-extern float FLOAT_803335B4;
-extern const double DOUBLE_803335B8;
-extern const double DOUBLE_803335C0;
-extern const double DOUBLE_803335C8;
-extern const double DOUBLE_803335D0;
-extern const double DOUBLE_803335D8;
-extern float FLOAT_803335E0;
-extern const double DOUBLE_803335E8;
-extern const double DOUBLE_803335F0;
-extern float FLOAT_803335F8;
-extern float FLOAT_803335FC;
-extern float FLOAT_80333600;
-extern float FLOAT_80333604;
+extern const float FLOAT_80333548 = 0.88f;
+extern const float FLOAT_80333550 = 255.0f;
+extern const float FLOAT_80333554 = 224.0f;
+extern const float FLOAT_8033355C = 14.0f;
+extern const float FLOAT_80333560 = 640.0f;
+extern const float FLOAT_80333564 = 336.0f;
+extern const float FLOAT_80333568 = 88.0f;
+extern const float FLOAT_80333570 = 32.0f;
+extern const float FLOAT_80333574 = 64.0f;
+extern const float FLOAT_80333578 = 0.8f;
+extern const float FLOAT_8033357C = 56.0f;
+extern const float FLOAT_80333580 = -4.0f;
+extern const float FLOAT_80333584 = 384.0f;
+extern const float FLOAT_80333588 = 40.0f;
+extern const float FLOAT_80333590 = 387.0f;
+extern const float FLOAT_80333594 = 0.017453292f;
+extern const float FLOAT_8033359C = 11.25f;
+extern const float FLOAT_803335A0 = 2.0f;
+extern const float FLOAT_803335A4 = 185.0f;
+extern const float FLOAT_803335A8 = 472.0f;
+extern const float FLOAT_803335AC = 96.0f;
+extern const float FLOAT_803335B0 = 120.0f;
+extern const float FLOAT_803335B4 = 48.0f;
+extern const double DOUBLE_803335B8 = 0.8;
+extern const double DOUBLE_803335C0 = 1.0;
+extern const double DOUBLE_803335C8 = 368.0;
+extern const double DOUBLE_803335D0 = 0.5;
+extern const double DOUBLE_803335D8 = 464.0;
+extern const float FLOAT_803335E0 = 112.0f;
+extern const double DOUBLE_803335E8 = 360.0;
+extern const double DOUBLE_803335F0 = 472.0;
+extern const float FLOAT_803335F8 = 348.0f;
+extern const float FLOAT_803335FC = 192.0f;
+extern const float FLOAT_80333600 = 556.0f;
+extern const float FLOAT_80333604 = 184.0f;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -241,12 +241,12 @@ extern "C" char* g_strMenuUtilMes[] = {
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
 #define PTR_s_Defence__80215a4c (g_strMenuUtilMes + 1)
 
-// Constants defined externally, placed in .sdata2 by the linker.
-extern const float kMenuCenteringHalfWidth;
-extern const float kOptionAnimMin;
-extern const float kOptionAnimMax;
-extern const float kMenuCenteringOffset;
-extern const float kOptionRowAnimStep;
+// Constants placed in .sdata2 by the linker.
+extern const float kMenuCenteringHalfWidth = 0.5f;
+extern const float kOptionAnimMin = 0.0f;
+extern const float kOptionAnimMax = 1.0f;
+extern const float kMenuCenteringOffset = 320.0f;
+extern const float kOptionRowAnimStep = 0.125f;
 extern const float kOptionOpenAnimStep;
 extern const float kOptionColumnAnimStep;
 extern const float kOptionVolumeScale;
@@ -406,7 +406,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	char itemName[260];
 	char scratch[0x100];
 
-	font->SetMargin(FLOAT_803335a0);
+	font->SetMargin(FLOAT_803335A0);
 	font->SetShadow(1);
 	font->SetScale(margin);
 	font->DrawInit();
@@ -483,7 +483,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
 		if (drawPrefix != 0) {
-			font->SetPosX(FLOAT_8033357c);
+			font->SetPosX(FLOAT_8033357C);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -514,7 +514,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		strcpy(scratch, sMenuUtilEmptyText);
 	}
 
-	font->SetPosX(FLOAT_8033357c);
+	font->SetPosX(FLOAT_8033357C);
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
@@ -523,7 +523,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
 				font->SetTlut(4);
 				font->Draw(scratch);
-				int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
+				int valueX = static_cast<int>(FLOAT_8033357C + (FLOAT_803335A0 + font->GetWidth(scratch)));
 				font->SetPosX(static_cast<float>(valueX));
 				font->SetTlut(9);
 
@@ -548,7 +548,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcat(scratch, sMenuUtilSpaceText);
 			font->Draw(scratch);
 
-			int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
+			int valueX = static_cast<int>(FLOAT_8033357C + (FLOAT_803335A0 + font->GetWidth(scratch)));
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(valueX));
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
@@ -591,7 +591,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						}
 
 						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-						int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335a0 + font->GetWidth(scratch)));
+						int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335A0 + font->GetWidth(scratch)));
 						font->SetPosX(static_cast<float>(deltaX));
 						if (delta >= 0) {
 							font->SetTlut(9);
@@ -651,7 +651,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		int y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
-			font->SetPosX(FLOAT_8033357c);
+			font->SetPosX(FLOAT_8033357C);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -1151,7 +1151,7 @@ void CMenuPcs::DrawOptionMenu()
 		uv0.y = kOptionAnimMin;
 		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
 		uv1.y = kOptionAnimMax;
-		gUtil.RenderTextureQuad(FLOAT_8033357c, static_cast<float>(rowY),
+		gUtil.RenderTextureQuad(FLOAT_8033357C, static_cast<float>(rowY),
 		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, GetMenuTexture(this, 0xC0), &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1181,7 +1181,7 @@ void CMenuPcs::DrawOptionMenu()
 	int rowAnimStep = static_cast<int>(m_optionRowAnim / kOptionRowAnimStep);
 	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionRowAnim));
 	float rowAngle = static_cast<float>(rowAnimStep) * FLOAT_8033359C;
-	float rowSin = static_cast<float>(sin(static_cast<double>(FLOAT_80333594 * FLOAT_803335a0 * rowAngle)));
+	float rowSin = static_cast<float>(sin(static_cast<double>(FLOAT_80333594 * FLOAT_803335A0 * rowAngle)));
 	float rowCos = static_cast<float>(cos(static_cast<double>(FLOAT_80333594 * rowAngle)));
 
 	if (m_optionIndex == 2) {
@@ -1285,8 +1285,8 @@ void CMenuPcs::DrawOptionMenu()
 		                           DOUBLE_803335B8 : DOUBLE_803335C0;
 		float firstScale = static_cast<float>(optionScale);
 		float secondScale = static_cast<float>(optionScale);
-		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335a0;
-		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335a0 : FLOAT_803335A4;
+		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335A0;
+		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335A0 : FLOAT_803335A4;
 		int firstTlut = secondValue ? 6 : 0x17;
 		int secondTlut = secondValue ? 0x17 : 6;
 

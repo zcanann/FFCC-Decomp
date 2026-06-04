@@ -64,7 +64,15 @@ private:
     char m_name[0x100];
     unsigned int m_totalFrames;
     int m_keyCount;
-    unsigned char m_flags;
+    union {
+        unsigned char m_flags;
+        struct {
+            signed char m_interp : 1;
+            signed char m_chin : 1;
+            signed char m_e1 : 1;
+            signed char m_flagsRest : 5;
+        } m_flagBits;
+    };
     unsigned char m_pad111[3];
     CTexAnimKey* m_keys;
 };

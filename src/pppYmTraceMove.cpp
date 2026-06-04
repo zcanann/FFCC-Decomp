@@ -8,11 +8,6 @@ extern const float kPppYmTraceMoveOne;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, pppYmTraceMoveCtrl* ctrl)
-{
-	return reinterpret_cast<pppYmTraceMoveWork*>(traceMove->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
-}
-
 static inline Vec* GetYmTraceMovePreviousPosition(_pppMngSt* pppMngSt)
 {
 	return &pppMngSt->UserPosition();
@@ -120,7 +115,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2)
 {
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_2);
+	pppYmTraceMoveWork* work =
+	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_2->m_serializedDataOffsets);
 	_pppMngSt* pppMngSt = ppvMng;
 	f32 zero;
 

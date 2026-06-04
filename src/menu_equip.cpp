@@ -279,7 +279,7 @@ int CMenuPcs::EquipCtrlCur()
 	bool blocked = false;
 	unsigned int press;
 	unsigned int hold;
-	u32 caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
@@ -465,7 +465,7 @@ void CMenuPcs::EquipDraw()
 	int menuState = GetEquipStateBase(this);
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int listState = (int)*(s16*)(menuState + 0x10);
-	u32 caravanWork = Game.m_scriptFoodBase[0];
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	s16* menuData = GetEquipList(this);
 	s16* item = menuData + 4;
 	int helpItem = -1;
@@ -501,10 +501,10 @@ void CMenuPcs::EquipDraw()
 
 	item = menuData + 4;
 	for (int i = 0; i < 4; i++) {
-		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
+		if (caravanWork->m_equipment[i] >= 0) {
 			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
-			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
+			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			DrawSingleIcon(itemIdx, iconX, iconY, *(float*)(item + 8), 0, FLOAT_80332ee0);
 		}
 		item += 0x20;
@@ -518,11 +518,11 @@ void CMenuPcs::EquipDraw()
 
 	item = menuData + 4;
 	for (int i = 0; i < 4; i++) {
-		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
+		if (caravanWork->m_equipment[i] >= 0) {
 			u8 alpha = (u8)(FLOAT_80332ee4 * *(float*)(item + 8));
 			CColor color(0xff, 0xff, 0xff, alpha);
 			font->SetColor(color.color);
-			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
+			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			const char* str = GetAttrStr(itemIdx);
 			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
 				helpItem = itemIdx;
@@ -657,7 +657,7 @@ void CMenuPcs::EquipDraw()
 			if (idx == 0) {
 				str = GetMenuStr(0xb);
 			} else if (letter[idx] >= 0) {
-				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
+				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				str = GetAttrStr(itemIdx);
 				if (idx == (int)*(s16*)(menuState + 0x28) + (int)*(s16*)(menuState + 0x34)) {
 					helpItem = itemIdx;
@@ -681,7 +681,7 @@ void CMenuPcs::EquipDraw()
 			if ((idx > 0) && (letter[idx] >= 0)) {
 				int iconY = (int)((float)(iconItem[1] + 6) - FLOAT_80332ee0);
 				int iconX = (int)(float)(iconItem[0] + iconItem[2] - 0x10);
-				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
+				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				DrawSingleIcon(itemIdx, iconX, iconY, *(float*)(listStart + 8), 0, FLOAT_80332ee0);
 			}
 			iconItem += 0x20;

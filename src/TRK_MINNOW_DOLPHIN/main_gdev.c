@@ -11,12 +11,10 @@
 
 typedef struct GdevRecvCB {
     CircleBuffer cb;
-    u32 reserved;
 } GdevRecvCB;
 
 typedef struct GdevInitFlag {
     BOOL value;
-    u32 reserved;
 } GdevInitFlag;
 
 static GdevRecvCB gRecvCB ATTRIBUTE_ALIGN(8);

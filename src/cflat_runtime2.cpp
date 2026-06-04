@@ -434,7 +434,7 @@ static inline u32 SwapF32(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGBaseObj::InitFinished()
+inline void CGBaseObj::InitFinished()
 {
 }
 

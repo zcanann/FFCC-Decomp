@@ -212,7 +212,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = 4U;
-		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padOffset &= (Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 
@@ -306,7 +306,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = 4U;
-		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padOffset &= (Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 4) != 0) {
@@ -325,7 +325,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = 4U;
-		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padOffset &= (Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 8) != 0) {
@@ -348,7 +348,7 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	} else {
 		padOffset = 4U;
-		padOffset &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f);
+		padOffset &= (Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 0x200) != 0) {

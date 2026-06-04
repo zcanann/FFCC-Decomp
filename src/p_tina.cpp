@@ -1083,9 +1083,9 @@ void LoadFieldPdt0(int mapId, int floorId)
     if (pdtSlot != 0) {
         pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
         if ((pdtSlot != 0) && (PartMng.m_partLoadMode != 2) && (PartMng.m_partLoadMode != 3)) {
+            int fieldParticleOffset;
             _pppDataHead* pppDataHead;
             PPPCREATEPARAM* createParam;
-            int fieldParticleOffset;
             int i;
 
             pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;

@@ -6,6 +6,7 @@
 
 struct PCharaBreak;
 struct CharaBreakUnkB;
+struct CharaBreakDisplayListPair;
 
 typedef _pppPObject pppCharaBreak;
 
@@ -52,7 +53,7 @@ struct VCharaBreak {
     f32 m_value3;
     f32 m_value4;
     f32 m_value5;
-    void* m_meshBuffers;
+    CharaBreakDisplayListPair*** m_meshBuffers;
     Vec m_bboxMin;
     u8 _pad2C[0x4];
     Vec m_bboxMax;

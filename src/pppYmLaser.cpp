@@ -164,7 +164,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		           step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = YmLaserConst(FLOAT_80330DC4) / (float)count;
+		uvStep = YmLaserConst(FLOAT_80330DC4) / (float)(s32)count;
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);

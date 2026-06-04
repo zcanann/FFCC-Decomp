@@ -3866,16 +3866,16 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
         unsigned int queuePort = threadParam->m_portIndex;
-        if ((int)m_cmdCount[queuePort] < 0x40)
+        if ((int)m_cmdCount[queuePort] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+            result = -1;
+        }
+        else
         {
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdX;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
         }
     }
 
@@ -3895,17 +3895,17 @@ int JoyBus::SendMBase(ThreadParam* threadParam)
         OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
 
         unsigned int queuePort = threadParam->m_portIndex;
-        if ((int)m_cmdCount[queuePort] < 0x40)
+        if ((int)m_cmdCount[queuePort] >= 0x40)
+        {
+            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
+            result = -1;
+        }
+        else
         {
             m_cmdQueueData[queuePort][m_cmdCount[queuePort]] = cmdY;
             m_cmdCount[threadParam->m_portIndex]++;
             OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
             result = 0;
-        }
-        else
-        {
-            OSSignalSemaphore(&m_accessSemaphores[queuePort]);
-            result = -1;
         }
     }
 

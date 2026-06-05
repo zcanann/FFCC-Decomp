@@ -9,13 +9,6 @@ extern "C" {
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
-struct pppYmCheckBGHeightUnkC {
-    float m_unk0x0;
-    float m_unk0x4;
-    float m_unk0x8;
-    float m_unk0xC;
-};
-
 static inline Vec* CheckBGHeightPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -50,8 +43,8 @@ typedef char CheckBGHeightCylinder_size_check[(sizeof(CheckBGHeightCylinder) == 
  * JP Address: TODO
  * JP Size: TODO
  */
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
-    struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
+pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
+    pppYmCheckBGHeight* object, pppYmCheckBGHeightStep* param_2)
 {
     _pppMngSt* pppMngSt;
     Vec direction;
@@ -81,7 +74,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         float finalY = nextY;
         bottomX = ppvMng->m_matrix.value[0][3];
         bottomZ = ppvMng->m_matrix.value[2][3];
-        bottomY += param_2->m_unk0x4;
+        bottomY += param_2->m_probeStartOffset;
         cylinder.m_boundsMin.z = scale;
         cylinder.m_boundsMin.y = scale;
         cylinder.m_boundsMin.x = scale;
@@ -98,10 +91,10 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), &direction, (unsigned long)-1) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
-            if ((nextY - param_2->m_unk0xC) > hitPos.y) {
+            if ((nextY - param_2->m_fallLimit) > hitPos.y) {
                 finalY = nextY;
             } else {
-                finalY = hitPos.y + param_2->m_unk0x8;
+                finalY = hitPos.y + param_2->m_hitHeightOffset;
             }
         } else {
             finalY = nextY;
@@ -116,10 +109,10 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;
         ppvMng->m_matrix.value[2][3] = pppMngSt->m_position.z;
 
-        pppYmCheckBGHeight = (struct pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        object = (pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 
-    return pppYmCheckBGHeight;
+    return object;
 }
 
 /*
@@ -131,7 +124,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmCheckBGHeight(struct pppYmCheckBGHeight*, struct pppYmCheckBGHeightUnkC*)
+void pppConstructYmCheckBGHeight(pppYmCheckBGHeight*, _pppCtrlTable*)
 {
 	return;
 }

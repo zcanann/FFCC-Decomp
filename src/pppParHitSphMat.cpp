@@ -10,6 +10,13 @@ extern const float kPppParHitSphMatZero[2];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+struct pppParHitSphMatStep {
+    int m_unused0;
+    float m_height;
+    float m_radiusScale;
+    unsigned char m_useWorkPosition;
+};
+
 static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();

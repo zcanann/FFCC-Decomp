@@ -3,13 +3,7 @@
 
 struct _pppCtrlTable;
 struct _pppPObject;
-
-struct pppParHitSphMatStep {
-    int m_unused0;
-    float m_height;
-    float m_radiusScale;
-    unsigned char m_useWorkPosition;
-};
+struct pppParHitSphMatStep;
 
 #ifdef __cplusplus
 extern "C" {

@@ -2949,7 +2949,7 @@ void CMapMng::DrawAfter()
  */
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 
@@ -3004,7 +3004,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 {
     int hit = 0;
 
-    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 

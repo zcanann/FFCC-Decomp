@@ -3,22 +3,7 @@
 
 #include "ffcc/partMng.h"
 
-#include <dolphin/gx.h>
 #include <dolphin/types.h>
-
-struct CrystalRefractionMap {
-    u8* m_imageData;
-    GXTexFmt m_format;
-    u32 m_width;
-    u32 m_height;
-    u32 m_imageCount;
-    u32 m_bufferSize;
-};
-
-struct CrystalWork {
-    CrystalRefractionMap* m_refractionMap;
-    GXTexObj* m_refractionTexObj;
-};
 
 struct pppCrystal {
     _pppPObject m_object; // 0x0

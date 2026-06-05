@@ -55,6 +55,11 @@ struct HSD_ImageBuffer {
     u32 m_bufferSize;
 };
 
+struct CrystalWork {
+    HSD_ImageBuffer* m_refractionMap;
+    GXTexObj* m_refractionTexObj;
+};
+
 inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
 
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
@@ -243,7 +248,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	CrystalWork* work;
 	u32 yTile;
 	u32 x;
-	CrystalRefractionMap* textureInfo;
+	HSD_ImageBuffer* textureInfo;
 	u32 textureSize;
 	float magnitude;
 	float stepX;
@@ -282,8 +287,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	}
 
 	if ((param_2->m_crystal.m_refractionMode == 1) && (work->m_refractionMap == 0)) {
-		work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc(
-			sizeof(CrystalRefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xA7);
+		work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
+			sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xA7);
 
 		textureInfo = work->m_refractionMap;
 		textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);

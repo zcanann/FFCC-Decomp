@@ -1575,10 +1575,7 @@ void CMemoryCardMan::MakeSaveData()
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
 
-    save[0x20] = Game.m_gameWork.m_scriptSysVal0;
-    save[0x21] = Game.m_gameWork.m_scriptSysVal1;
-    save[0x22] = Game.m_gameWork.m_scriptSysVal2;
-    save[0x23] = Game.m_gameWork.m_scriptSysVal3;
+    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0);
     *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
     *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
     *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
@@ -1591,8 +1588,9 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
-    *reinterpret_cast<u32*>(save + 0x13D0) = Game.m_gameWork.m_mcSerial0;
+    u32 mcSerial0 = Game.m_gameWork.m_mcSerial0;
     *reinterpret_cast<u32*>(save + 0x13D4) = Game.m_gameWork.m_mcSerial1;
+    *reinterpret_cast<u32*>(save + 0x13D0) = mcSerial0;
     *reinterpret_cast<u32*>(save + 0x13D8) = Game.m_gameWork.m_mcRandom;
     save[0x13DC] = Game.m_gameWork.m_mcHasSerial;
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());

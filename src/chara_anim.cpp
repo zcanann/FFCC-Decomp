@@ -292,11 +292,12 @@ inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
 			strcpy(m_name, chunkFile.GetString());
 			break;
 		case 0x44415441: {
+			int type;
+			int mode;
 			int i = 0;
 			int shift = 0;
 			do {
-				int type = chunkFile.Get4();
-				int mode;
+				type = chunkFile.Get4();
 
 				if (type == 0) {
 					mode = 0;

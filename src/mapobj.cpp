@@ -333,10 +333,8 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
     m_type = CMapObjAtr::MIME;
-    m_vertexListCount = 0;
     m_vertexLists = 0;
-    m_vertexCount = 0;
-    new (&m_keyFrame) CMapKeyFrame;
+    InitMapObjAtrColorKeyFrame(m_keyFrame);
 }
 
 /*
@@ -573,17 +571,6 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CMapObjAtrMime* mimeAttr =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
-
-            if (mime != 0) {
-                mime->m_type = CMapObjAtr::MIME;
-                mime->m_vertexLists = 0;
-                mime->m_vertexCount = 0;
-                *reinterpret_cast<int*>(&mime->m_keyFrame.m_mode) = 0;
-                *reinterpret_cast<int*>(&mime->m_keyFrame.m_isRun) = 0;
-                mime->m_keyFrame.m_loop = 1;
-                mime->m_vertexListCount = 0;
-                mime->m_keyFrame.m_currentFrame = 0;
-            }
 
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;

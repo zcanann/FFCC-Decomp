@@ -1753,7 +1753,7 @@ int CMapMng::ReadMtx(char* mapName)
     int loadIndex = 0;
     int append = 0;
 
-    m_mapReadReady = 1;
+    MapMng.m_mapReadReady = 1;
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = m_stage;
@@ -1883,7 +1883,7 @@ int CMapMng::ReadMpl(char* mapName)
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
 
-    m_mapReadReady = 1;
+    MapMng.m_mapReadReady = 1;
 
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);

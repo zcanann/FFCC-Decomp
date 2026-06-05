@@ -2320,7 +2320,6 @@ int CMapMng::ReadMid(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    void* filePtr = File.m_readBuffer;
 
     sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     bool ok = true;
@@ -2329,6 +2328,7 @@ int CMapMng::ReadMid(char* mapName)
         System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
     }
 
+    void* filePtr = File.m_readBuffer;
     if (asyncLoadState.m_mapReadMode == 1) {
         int& readIndex = asyncLoadState.m_asyncReadIndex;
         const int size = asyncLoadState.m_fileSizes[readIndex];

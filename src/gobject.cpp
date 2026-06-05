@@ -211,17 +211,6 @@ static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
  * Address:	TODO
  * Size:	TODO
  */
-void VECNormalizeZero(Vec*, Vec*)
-{
-	// TODO
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGBaseObj::onFrame()
 {
 	// TODO
@@ -3136,10 +3125,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
     m_worldPosition = *position;
 
-    if ((static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1B)
-             | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 5))
-            < 0)
-        && (Game.m_currentMapId != 0x21)) {
+    if (((*reinterpret_cast<u8*>(&m_weaponNodeFlags) & 0x10) != 0) && (Game.m_currentMapId != 0x21)) {
         {
             GObjectMapCylinder bodyCylinder;
             bodyCylinder.m_bottom = m_worldPosition;

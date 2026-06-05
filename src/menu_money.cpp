@@ -40,8 +40,26 @@ static inline double LoadDouble(const double& value)
 	return value;
 }
 
-static inline void SetMoneyPlaceDigits(signed char* place, int gil)
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CMenuPcs::MoneySetPlace(int row)
 {
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	int gil;
+	if (row == 0) {
+		gil = caravanWork->m_gil;
+	} else {
+		gil = s_Money;
+	}
+
+	signed char* place = s_place + row * 8;
 	int digitPlace = 10000000;
 	int digitIndex = 0;
 	int digitCount = 8;
@@ -122,7 +140,7 @@ int CMenuPcs::MoneyCtrlCur()
 	if (blocked) {
 		press = 0;
 	} else {
-		int padIndex = blocked;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
 		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
@@ -134,7 +152,7 @@ int CMenuPcs::MoneyCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		int padIndex = blocked;
+		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
 		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
@@ -164,21 +182,9 @@ int CMenuPcs::MoneyCtrlCur()
 	if (mode == 0) {
 		unsigned int cursor = *(s16*)(optBase + 0x26);
 		unsigned int placeValue = 1;
-		if ((int)cursor > 0) {
-			unsigned int chunks = cursor >> 3;
-			if (chunks != 0) {
-				do {
-					placeValue *= 100000000;
-					chunks--;
-				} while (chunks != 0);
-				cursor &= 7;
-			}
-			if (cursor != 0) {
-				do {
-					placeValue *= 10;
-					cursor--;
-				} while (cursor != 0);
-			}
+		while (cursor != 0) {
+			placeValue *= 10;
+			cursor--;
 		}
 
 		if ((hold & 8) != 0) {
@@ -193,7 +199,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 				gil = s_Money;
 
-				SetMoneyPlaceDigits(s_place + 8, static_cast<int>(gil));
+				MoneySetPlace(1);
 			}
 		} else {
 			if ((hold & 4) != 0) {
@@ -205,7 +211,7 @@ int CMenuPcs::MoneyCtrlCur()
 						gil = s_Money - placeValue;
 					}
 					s_Money = gil;
-					SetMoneyPlaceDigits(s_place + 8, static_cast<int>(gil));
+					MoneySetPlace(1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -304,8 +310,8 @@ int CMenuPcs::MoneyCtrlCur()
 					if (*(s16*)(optBase + 0x26) == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
-						SetMoneyPlaceDigits(s_place, caravanWork->m_gil);
-						SetMoneyPlaceDigits(s_place + 8, 0);
+						MoneySetPlace(0);
+						MoneySetPlace(1);
 					}
 					this->singWindowInfo[5] = 2;
 					*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
@@ -436,9 +442,7 @@ void CMenuPcs::MoneyDraw()
 		float cursorY = (float)(singWindow[1] + 0x20);
 		cursorY += (float)(this->moneyState->subMenuIndex * SingWinMessHeight());
 
-		int frame = (int)System.m_frameCounter;
-		int frameSign = frame >> 31;
-		int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
+		int anim = (int)System.m_frameCounter % 8;
 		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
 	}
 }
@@ -588,43 +592,11 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
 
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 		s_Money = 0;
-		signed char* place = s_place;
 		int row = 0;
 		do {
-			int digitPlace = 10000000;
-			int gil;
-			if (row == 0) {
-				gil = caravanWork->m_gil;
-			} else {
-				gil = 0;
-			}
-			int digitIndex = 0;
-			int digitCount = 8;
-			int started = 0;
-			signed char* digit = place;
-			do {
-				if ((!started) && (gil >= digitPlace)) {
-					started = 1;
-				}
-				if (((started) || (gil >= digitPlace)) || (digitIndex == 7)) {
-					int value = gil / digitPlace;
-					if (9 < value) {
-						value = 9;
-					}
-					*digit = static_cast<signed char>(value);
-					gil = gil - (gil / digitPlace) * digitPlace;
-				} else {
-					*digit = -1;
-				}
-				digit = digit + 1;
-				digitIndex = digitIndex + 1;
-				digitPlace /= 10;
-				digitCount = digitCount + -1;
-			} while (digitCount != 0);
+			MoneySetPlace(row);
 			row = row + 1;
-			place = place + 8;
 		} while (row < 2);
 
 		this->moneyState->selectedIndex = 0;

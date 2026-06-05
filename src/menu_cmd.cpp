@@ -11,7 +11,7 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" const char s_EmptySkillName_80332A50[8] = "";
+static const char s_EmptySkillName_80332A50[] = "";
 extern "C" const double DOUBLE_80332a58 = 1.0;
 extern "C" const double DOUBLE_80332a60 = 0.5;
 extern "C" const double DOUBLE_80332a68 = 0.1;
@@ -83,21 +83,21 @@ extern "C" const s16 s_uniteRecipePatterns[] = {
     static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
 };
 
-extern "C" const char s_Flamestrike_801DEA6C[] = "Flamestrike";
-extern "C" const char s_Icestrike_801DEA78[] = "Icestrike";
-extern "C" const char s_Thunderstrike_801DEA84[] = "Thunderstrike";
-extern "C" const char s_Feuer_Hieb_801DEA94[] = "Feuer-Hieb";
-extern "C" const char s_Eis_Hieb_801DEAA0[] = "Eis-Hieb";
-extern "C" const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
-extern "C" const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
-extern "C" const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
-extern "C" const char s_Colpo_Thunder_801DEAD4[] = "Colpo Thunder";
-extern "C" const char s_Pyro_Frappe_801DEAE4[] = "Pyro-Frappe";
-extern "C" const char s_Cryo_Frappe_801DEAF0[] = "Cryo-Frappe";
-extern "C" const char s_Rheo_Frappe_801DEAFC[] = "Rh\351o-Frappe";
-extern "C" const char s_Efecto_Fuego_801DEB08[] = "Efecto Fuego";
-extern "C" const char s_Efecto_Hielo_801DEB18[] = "Efecto Hielo";
-extern "C" const char s_Efecto_Electro_801DEB28[] = "Efecto Electro";
+static const char s_Flamestrike_801DEA6C[] = "Flamestrike";
+static const char s_Icestrike_801DEA78[] = "Icestrike";
+static const char s_Thunderstrike_801DEA84[] = "Thunderstrike";
+static const char s_Feuer_Hieb_801DEA94[] = "Feuer-Hieb";
+static const char s_Eis_Hieb_801DEAA0[] = "Eis-Hieb";
+static const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
+static const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
+static const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
+static const char s_Colpo_Thunder_801DEAD4[] = "Colpo Thunder";
+static const char s_Pyro_Frappe_801DEAE4[] = "Pyro-Frappe";
+static const char s_Cryo_Frappe_801DEAF0[] = "Cryo-Frappe";
+static const char s_Rheo_Frappe_801DEAFC[] = "Rh\351o-Frappe";
+static const char s_Efecto_Fuego_801DEB08[] = "Efecto Fuego";
+static const char s_Efecto_Hielo_801DEB18[] = "Efecto Hielo";
+static const char s_Efecto_Electro_801DEB28[] = "Efecto Electro";
 
 extern "C" const char* s_SkillStr_us[];
 extern "C" const char* s_SkillStr_ge[];

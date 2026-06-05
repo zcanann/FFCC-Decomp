@@ -425,7 +425,7 @@ void CMapPcs::CalcHitPosition(Vec* hitPosition)
  */
 int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
-    CMapCylinder cylinder;
+    CMapCylinder cylinder(kMapHitBoundsMinInit, kMapHitBoundsMaxInit);
 
     cylinder.m_bottom = *cylinderBottom;
     cylinder.m_axis = *direction;
@@ -1815,14 +1815,12 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
 int CLine<64>::IsInner(Vec* position, float margin)
 {
-    if (pointCount == 0) {
-        return 0;
-    }
-
-    if ((min.x - margin) <= position->x && (min.y - margin) <= position->y &&
-        (min.z - margin) <= position->z && (max.x + margin) >= position->x &&
-        (max.y + margin) >= position->y && (max.z + margin) >= position->z) {
-        return 1;
+    if (pointCount != 0) {
+        if ((min.x - margin) <= position->x && (min.y - margin) <= position->y &&
+            (min.z - margin) <= position->z && (max.x + margin) >= position->x &&
+            (max.y + margin) >= position->y && (max.z + margin) >= position->z) {
+            return 1;
+        }
     }
 
     return 0;

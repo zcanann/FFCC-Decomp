@@ -85,6 +85,7 @@ public:
     bool MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
+    inline void MoneySetPlace(int);
     char* GetMenuStr(int);
     int SingGetLetterAttachflg();
     void LetterSetAttachItem(unsigned int, int);

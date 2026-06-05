@@ -14,37 +14,37 @@
 #include <math.h>
 #include <string.h>
 
-extern const _GXColor kLightDefaultMaterialColor = {0xFF, 0xFF, 0xFF, 0xFF};
-extern const _GXColor kBumpLightMapColor = {0x88, 0x88, 0x88, 0xFF};
-extern const float FLOAT_8032fc10 = 100000000.0f;
-extern const float FLOAT_8032fc14 = 0.0f;
-extern const float FLOAT_8032fc18 = 0.5f;
-extern const float FLOAT_8032fc1c = 1.0f;
-extern const float FLOAT_8032fc20 = 0.4f;
-extern const float FLOAT_8032fc24 = 0.005f;
-extern const float FLOAT_8032fc28 = 64.0f;
-extern const float FLOAT_8032fc2c = -1.0f;
-extern const float FLOAT_8032fc30 = 15.0f;
-extern const float FLOAT_8032fc34 = -4.0f;
-extern const float FLOAT_8032fc38 = 8.0f;
-extern const float FLOAT_8032fc3c = 2.0f;
-extern const float FLOAT_8032fc40 = 0.03125f;
-extern const float FLOAT_8032fc44 = 0.8f;
-extern const double DOUBLE_8032fc48 = 0.5;
-extern const double DOUBLE_8032fc50 = 3.0;
-extern const double DOUBLE_8032fc58 = 0.0;
-extern const float FLOAT_8032fc60 = -2.0f;
-extern const double DOUBLE_8032fc68 = 4503599627370496.0;
-extern const float FLOAT_8032fc70 = 100000.0f;
-extern const float FLOAT_8032fc74 = 360.0f;
-extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
-extern const float FLOAT_8032fc7c = 255.0f;
-extern const float FLOAT_8032fc80 = 999999986991104.0f;
-extern const float FLOAT_8032fc84 = 0.125f;
-extern const float FLOAT_8032fc88 = -0.125f;
-extern const float FLOAT_8032fc8c = -0.015625f;
-extern const float FLOAT_8032fc90 = 0.1f;
-extern const float FLOAT_8032fc94 = 57.29578f;
+extern const _GXColor kLightDefaultMaterialColor;
+extern const _GXColor kBumpLightMapColor;
+extern const float FLOAT_8032fc10;
+extern const float FLOAT_8032fc14;
+extern const float FLOAT_8032fc18;
+extern const float FLOAT_8032fc1c;
+extern const float FLOAT_8032fc20;
+extern const float FLOAT_8032fc24;
+extern const float FLOAT_8032fc28;
+extern const float FLOAT_8032fc2c;
+extern const float FLOAT_8032fc30;
+extern const float FLOAT_8032fc34;
+extern const float FLOAT_8032fc38;
+extern const float FLOAT_8032fc3c;
+extern const float FLOAT_8032fc40;
+extern const float FLOAT_8032fc44;
+extern const double DOUBLE_8032fc48;
+extern const double DOUBLE_8032fc50;
+extern const double DOUBLE_8032fc58;
+extern const float FLOAT_8032fc60;
+extern const double DOUBLE_8032fc68;
+extern const float FLOAT_8032fc70;
+extern const float FLOAT_8032fc74;
+extern const float FLOAT_8032fc78;
+extern const float FLOAT_8032fc7c;
+extern const float FLOAT_8032fc80;
+extern const float FLOAT_8032fc84;
+extern const float FLOAT_8032fc88;
+extern const float FLOAT_8032fc8c;
+extern const float FLOAT_8032fc90;
+extern const float FLOAT_8032fc94;
 float FLOAT_8032ed10;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
@@ -409,16 +409,7 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs::TARGET target,
                                           CMemory::CStage* stage, int count)
 {
-    float minFalloff = FLOAT_8032fc10;
-    CBumpLight* bumpLight = 0;
-    CBumpLight* bumpLights = &m_bumpLights[target * 8];
-
-    for (int i = 0; i < 8; i++) {
-        if (!bumpLights[i].m_hasTexture) {
-            bumpLight = &bumpLights[i];
-            break;
-        }
-    }
+    CBumpLight* bumpLight = GetFreeBumpLight(target);
 
     if (bumpLight == 0) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -427,33 +418,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
         return 0;
     }
 
-    *static_cast<CLight*>(bumpLight) = *srcLight;
-
-    if (minFalloff <= bumpLight->m_attenFalloff) {
-        bumpLight->m_attenFalloff = bumpLight->m_attenRadius;
-    }
-
-    bumpLight->m_unkAC = bumpLight->m_attenRadius * bumpLight->m_attenRadius;
-    bumpLight->m_range = bumpLight->m_attenRadius;
-    if (bumpLight->m_range < FLOAT_8032fc14) {
-        bumpLight->m_range = -bumpLight->m_range;
-    }
-    bumpLight->m_range = bumpLight->m_range * FLOAT_8032fc18 * bumpLight->m_radius;
-
-    bumpLight->m_targetEnable[3] = 1;
-    bumpLight->m_targetEnable[2] = 1;
-    bumpLight->m_targetEnable[1] = 1;
-    bumpLight->m_targetEnable[0] = 1;
-
-    if (*(u32*)&bumpLight->m_targetColor[0] == 0) {
-        bumpLight->m_targetEnable[0] = 0;
-    }
-    if (*(u32*)&bumpLight->m_targetColor[1] == 0) {
-        bumpLight->m_targetEnable[1] = 0;
-    }
-    if (*(u32*)&bumpLight->m_targetColor[2] == 0) {
-        bumpLight->m_targetEnable[2] = 0;
-    }
+    bumpLight->Set(srcLight);
 
     bumpLight->m_target = target;
     bumpLight->m_hasTexture = 1;
@@ -1391,3 +1356,35 @@ CLightPcs::CLight::CLight()
     *(u32*)&m_targetColor[2] = 0;
     *(u32*)&m_targetColor[3] = 0;
 }
+
+extern const _GXColor kLightDefaultMaterialColor = {0xFF, 0xFF, 0xFF, 0xFF};
+extern const _GXColor kBumpLightMapColor = {0x88, 0x88, 0x88, 0xFF};
+extern const float FLOAT_8032fc10 = 100000000.0f;
+extern const float FLOAT_8032fc14 = 0.0f;
+extern const float FLOAT_8032fc18 = 0.5f;
+extern const float FLOAT_8032fc1c = 1.0f;
+extern const float FLOAT_8032fc20 = 0.4f;
+extern const float FLOAT_8032fc24 = 0.005f;
+extern const float FLOAT_8032fc28 = 64.0f;
+extern const float FLOAT_8032fc2c = -1.0f;
+extern const float FLOAT_8032fc30 = 15.0f;
+extern const float FLOAT_8032fc34 = -4.0f;
+extern const float FLOAT_8032fc38 = 8.0f;
+extern const float FLOAT_8032fc3c = 2.0f;
+extern const float FLOAT_8032fc40 = 0.03125f;
+extern const float FLOAT_8032fc44 = 0.8f;
+extern const double DOUBLE_8032fc48 = 0.5;
+extern const double DOUBLE_8032fc50 = 3.0;
+extern const double DOUBLE_8032fc58 = 0.0;
+extern const float FLOAT_8032fc60 = -2.0f;
+extern const double DOUBLE_8032fc68 = 4503599627370496.0;
+extern const float FLOAT_8032fc70 = 100000.0f;
+extern const float FLOAT_8032fc74 = 360.0f;
+extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
+extern const float FLOAT_8032fc7c = 255.0f;
+extern const float FLOAT_8032fc80 = 999999986991104.0f;
+extern const float FLOAT_8032fc84 = 0.125f;
+extern const float FLOAT_8032fc88 = -0.125f;
+extern const float FLOAT_8032fc8c = -0.015625f;
+extern const float FLOAT_8032fc90 = 0.1f;
+extern const float FLOAT_8032fc94 = 57.29578f;

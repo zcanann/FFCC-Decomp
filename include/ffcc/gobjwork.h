@@ -241,4 +241,7 @@ public:
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 
+CMonWork* SAFE_CAST_MON_WORK(CGObjWork*);
+CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork*);
+
 #endif // _FFCC_GOBJWORK_H_

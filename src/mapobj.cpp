@@ -580,11 +580,11 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 if (mimeChunk.m_id == CHUNK_KEY) {
-                    mime->m_keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
-                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    mime->m_keyFrame.ReadJun(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
-                    mime->m_keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
@@ -657,22 +657,22 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         pointLight->m_altColor = pointLight->m_altColors[0];
                     } else switch (chunk.m_id) {
                     case CHUNK_CFRM:
-                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CJUN:
-                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CKEY:
-                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MFRM:
-                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MJUN:
-                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MKEY:
-                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -749,22 +749,22 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         spotLight->m_altColor = spotLight->m_altColors[0];
                     } else switch (chunk.m_id) {
                     case CHUNK_CFRM:
-                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CJUN:
-                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CKEY:
-                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MFRM:
-                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MJUN:
-                        spotLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MKEY:
-                        spotLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }

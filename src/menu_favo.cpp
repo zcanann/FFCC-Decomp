@@ -14,16 +14,16 @@ FoodRank s_rank[8];
 
 extern "C" const float FLOAT_80333038 = 0.75f;
 extern "C" const float FLOAT_8033303C = 72.0f;
-extern "C" const float FLOAT_80333040 = 0.0f;
-extern "C" const float FLOAT_80333044 = 32.0f;
-extern "C" const float FLOAT_80333048 = 1.0f;
-extern "C" const double DOUBLE_80333050 = 1.0;
-extern "C" const float FLOAT_80333058 = 255.0f;
-extern "C" const float FLOAT_8033305C = 24.0f;
-extern "C" const double DOUBLE_80333060 = 0.5;
-extern "C" const char s_FavoRankFormat_80333068[] = "%d";
-extern "C" const float FLOAT_8033306C = 4.0f;
-extern "C" const float FLOAT_80333070 = 0.9f;
+static const float FLOAT_80333040 = 0.0f;
+static const float FLOAT_80333044 = 32.0f;
+static const float FLOAT_80333048 = 1.0f;
+static const double DOUBLE_80333050 = 1.0;
+static const float FLOAT_80333058 = 255.0f;
+static const float FLOAT_8033305C = 24.0f;
+static const double DOUBLE_80333060 = 0.5;
+static const char s_FavoRankFormat_80333068[] = "%d";
+static const float FLOAT_8033306C = 4.0f;
+static const float FLOAT_80333070 = 0.9f;
 extern "C" const float FLOAT_80333080;
 extern "C" const float FLOAT_80333084;
 

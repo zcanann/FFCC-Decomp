@@ -9,17 +9,14 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_light.h"
 #include "ffcc/system.h"
-extern "C" {
-extern const float kMapOctTreeDefaultOffsetZ;
-}
 
-// Linkage definitions from config/GCCP01/symbols.txt.
-extern const float kMapObjBoundMinInit = 10000000000.0f;
-extern const float kMapObjBoundMaxInit = -10000000000.0f;
-extern const float kMapObjZero = 1.0f;
+static const float kMapOctTreeBoundMinInit = 10000000000.0f;
+static const float kMapOctTreeBoundMaxInit = -10000000000.0f;
+static const float kMapOctTreeRadiusPad = 1.0f;
+static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 
-static CBound s_bound(kMapObjBoundMinInit, kMapObjBoundMaxInit);
-static CMapCylinder s_cyl(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+static CBound s_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
+static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static Vec s_mvec;
 static int s_light_no = 0;
 static unsigned long s_shadow_no = 0;
@@ -591,8 +588,8 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	} else {
 		Vec localCorner;
 		Vec viewPos;
-		float maxDepth = kMapObjBoundMinInit;
-		float minDepth = kMapObjBoundMaxInit;
+		float maxDepth = kMapOctTreeBoundMinInit;
+		float minDepth = kMapOctTreeBoundMaxInit;
 
 		andMask = 0xF;
 		orMask = 0;
@@ -1838,7 +1835,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
 			s_cyl.m_radius = cylinder->m_radius;
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
 				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
 				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
@@ -1847,7 +1844,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
 			}
 
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
 				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
 				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
@@ -1856,7 +1853,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
 			}
 
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
 				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
 				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
@@ -2061,7 +2058,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
 			s_cyl.m_radius = cylinder->m_radius;
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
 				s_cyl.m_bound.m_min.x = s_cyl.m_bottom.x - radiusPad;
 				s_cyl.m_bound.m_max.x = s_cyl.m_top.x + radiusPad;
@@ -2070,7 +2067,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 				s_cyl.m_bound.m_max.x = s_cyl.m_bottom.x + radiusPad;
 			}
 
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
 				s_cyl.m_bound.m_min.y = s_cyl.m_bottom.y - radiusPad;
 				s_cyl.m_bound.m_max.y = s_cyl.m_top.y + radiusPad;
@@ -2079,7 +2076,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 				s_cyl.m_bound.m_max.y = s_cyl.m_bottom.y + radiusPad;
 			}
 
-			radiusPad = kMapObjZero + s_cyl.m_radius;
+			radiusPad = kMapOctTreeRadiusPad + s_cyl.m_radius;
 			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
 				s_cyl.m_bound.m_min.z = s_cyl.m_bottom.z - radiusPad;
 				s_cyl.m_bound.m_max.z = s_cyl.m_top.z + radiusPad;
@@ -2194,8 +2191,8 @@ int CBound::CheckCross(CBound& other)
  */
 COctNode::COctNode()
 {
-	float min = kMapObjBoundMinInit;
-	float max = kMapObjBoundMaxInit;
+	float min = kMapOctTreeBoundMinInit;
+	float max = kMapOctTreeBoundMaxInit;
 	float* bounds = (float*)this;
 
 	bounds[2] = min;

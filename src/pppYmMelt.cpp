@@ -15,11 +15,13 @@
 extern "C" {
 extern const float kPppYmMeltZero;
 extern const float FLOAT_80330af4;
-extern const float FLOAT_80330b08 = 0.5f;
-extern const float FLOAT_80330b0c = 0.017453292f;
-extern const float FLOAT_80330b10 = -2000.0f;
-extern const float FLOAT_80330b14 = 10000000000.0f;
-extern const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
+}
+static const float FLOAT_80330b08 = 0.5f;
+static const float FLOAT_80330b0c = 0.017453292f;
+static const float FLOAT_80330b10 = -2000.0f;
+static const float FLOAT_80330b14 = 10000000000.0f;
+static const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
+extern "C" {
 extern const u32 DAT_80330b20 = 0x00000001;
 extern const u32 DAT_80330b24 = 0x00000010;
 extern const u32 DAT_80330B28[2] = {0x0000003f, 0x00000000};
@@ -313,7 +315,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
+static const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {

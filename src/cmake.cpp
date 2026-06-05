@@ -93,9 +93,7 @@ static const double DOUBLE_803333b8 = 20.0;
 static const double DOUBLE_803333c0 = 8.0;
 extern "C" int gCmakePreviousStep;
 extern "C" char s_menuSubfontPathFmt[];
-extern "C" {
-extern "C" const char s_cmake_cpp[] = "cmake.cpp";
-}
+static const char s_cmake_cpp[] = "cmake.cpp";
 
 struct CmakeInfo {
     char m_name[0x12];

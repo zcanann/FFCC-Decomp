@@ -3131,16 +3131,15 @@ void CMenuPcs::CalcTitleMenu()
 				*reinterpret_cast<float*>(param + 0x24) = FLOAT_803313e8;
 				*reinterpret_cast<float*>(param + 0x28) = FLOAT_803313e8;
 				param[0x2C] = 0;
-				int titleWork = *reinterpret_cast<int*>(bytes + 0x840);
-				*reinterpret_cast<int*>(titleWork + 0x763C) = 0x1F;
-				CGBaseObj* titleObject = reinterpret_cast<CGBaseObj*>(titleWork + 0x7648);
-				*reinterpret_cast<int*>(titleWork + 0x7644) = 0x17;
+				EffectInfo* titleEffect = &m_effectWork[23];
+				titleEffect->m_effectNo = 0x1F;
+				CGObject* titleObject = &titleEffect->m_object;
+				titleEffect->m_slotNo = 0x17;
 				titleObject->Create();
-				*reinterpret_cast<int*>(titleWork + 0x7740) = *reinterpret_cast<int*>(bytes + 0x7D0);
-				*reinterpret_cast<CGBaseObj**>(param + 0x14) = titleObject;
-				*reinterpret_cast<CGBaseObj**>(param + 0x18) = titleObject;
-				*reinterpret_cast<int*>(titleWork + 0x7640) =
-				    PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
+				titleObject->m_charaModelHandle = *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7D0);
+				*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
+				*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
+				titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
 				CFlatRuntime::CStack flatArgs[3];
 				flatArgs[0].m_word = 9;
 				flatArgs[1].m_word = 0;
@@ -3184,16 +3183,15 @@ void CMenuPcs::CalcTitleMenu()
 			*reinterpret_cast<float*>(param + 0x24) = FLOAT_803313e8;
 			*reinterpret_cast<float*>(param + 0x28) = FLOAT_803313e8;
 			param[0x2C] = 0;
-			int titleWork = *reinterpret_cast<int*>(bytes + 0x840);
-			*reinterpret_cast<int*>(titleWork + 0x763C) = 0x1F;
-			CGBaseObj* titleObject = reinterpret_cast<CGBaseObj*>(titleWork + 0x7648);
-			*reinterpret_cast<int*>(titleWork + 0x7644) = 0x17;
+			EffectInfo* titleEffect = &m_effectWork[23];
+			titleEffect->m_effectNo = 0x1F;
+			CGObject* titleObject = &titleEffect->m_object;
+			titleEffect->m_slotNo = 0x17;
 			titleObject->Create();
-			*reinterpret_cast<int*>(titleWork + 0x7740) = *reinterpret_cast<int*>(bytes + 0x7D0);
-			*reinterpret_cast<CGBaseObj**>(param + 0x14) = titleObject;
-			*reinterpret_cast<CGBaseObj**>(param + 0x18) = titleObject;
-			*reinterpret_cast<int*>(titleWork + 0x7640) =
-			    PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
+			titleObject->m_charaModelHandle = *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7D0);
+			*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
+			*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
+			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
 			bytes[0x858] = 1;
 		}
 
@@ -4900,7 +4898,7 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
 		              FLOAT_803313dc, FLOAT_803313e8);
 
-		PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
@@ -5094,7 +5092,7 @@ void CMenuPcs::DrawTitleMenu()
 		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 		state = *reinterpret_cast<short*>(worldState + 0x10);
 		if (state == 3 && *reinterpret_cast<short*>(worldState + 0x22) > 9) {
-			PartMng.pppDeletePart(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) == 0) {
 				DAT_8032e8ac = 0;
 			} else {
@@ -7135,9 +7133,7 @@ void CMenuPcs::CalcChara()
 					loc.x = s_RingOrgPos.x;
 					loc.y = static_cast<float>((double)s_RingOrgPos.y + DOUBLE_80331420 + (double)offset);
 					loc.z = s_RingOrgPos.z;
-					PartPcs.SetParLocIdx(*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] +
-					                                              player * 0x524 + 0xA484),
-					                     loc);
+					PartPcs.SetParLocIdx(m_effectWork[player + 32].m_partNo, loc);
 					offset = static_cast<float>((double)offset - (double)FLOAT_8033169C);
 				}
 			}
@@ -7464,7 +7460,7 @@ void CMenuPcs::DrawChara()
 		if (worldState[8] == 2 && selectedMask != 0) {
 			for (int chan = 3; chan >= 0; chan--) {
 				if ((selectedMask & (1u << chan)) != 0) {
-					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0xA484 + chan * 0x524));
+					PartPcs.DrawMenuIdx(m_effectWork[chan + 32].m_partNo);
 				}
 			}
 		}

@@ -116,7 +116,7 @@ void CPad::Frame()
 		CPad::Gba* gba = &local_98[uVar17];
 		iVar6 = SIProbe(uVar17);
 		int padIndex = uVar17;
-		gba->connected = (0x40000 - iVar6) == 0;
+		gba->connected = static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(0x40000 - iVar6)) >> 5);
 		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
 		gba->noController = gba->connected && (gba->ctrlMode == 0);
 		gba->button = 0;

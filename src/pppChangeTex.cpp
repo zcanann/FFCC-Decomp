@@ -53,7 +53,7 @@ STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 extern const float kPppChangeTexCachedValueInit = -10000.0f;
 extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float kPppChangeTexAlphaScale = 255.0f;
-extern "C" const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
+static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
 static inline float LoadFloat(const float& value)
 {

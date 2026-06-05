@@ -1497,7 +1497,8 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
         mapObj++;
 
 search:
-        unsigned int stride = sizeof(CMapObj);
+        unsigned int stride =
+            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
         CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
@@ -1547,7 +1548,8 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
         mapObj++;
 
 search:
-        unsigned int stride = sizeof(CMapObj);
+        unsigned int stride =
+            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
         CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /

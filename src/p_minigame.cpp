@@ -28,7 +28,11 @@ void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 CProcessTableCallback CMiniGamePcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
-extern const char s_CMiniGamePcs_GAME_801DD098[];
+extern const char s_miniGameGbaAssets[] = "dvd/gba/\0\0\0ffcc_cli.bin\0\0\0objdat.spt";
+extern const char s_CMiniGamePcs_GAME_801DD098[] = "CMiniGamePcs(GAME)";
+extern const char s_CMiniGamePcs_801DD0AC[] = "CMiniGamePcs";
+extern const char s_CManager_801DD0BC[] = "CManager";
+extern const char s_CProcess_801DD0C8[] = "CProcess";
 CProcessTable CMiniGamePcs::m_table = {
     const_cast<char*>(s_CMiniGamePcs_GAME_801DD098),
     {

@@ -275,9 +275,9 @@ static inline u32 CurrentSceneId()
     return Game.m_currentSceneId;
 }
 
-static inline u32& CharaAmemSize()
+static inline u32& CharaAmemAnimSize()
 {
-    return Chara.AmemSize();
+    return Chara.AmemAnimSize();
 }
 
 static inline void SetupBaseCharaLights(CCharaPcs* self)
@@ -602,7 +602,7 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    CharaAmemSize() = 0;
+    Chara.SetAmemStage(0);
     Memory.DestroyStage(m_amemWorkStage);
     Memory.DestroyStage(m_amemStage);
     Memory.DestroyStage(m_stage);
@@ -802,7 +802,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             LoadPdtArray(this)->ReleaseAndRemoveAll();
             int charaAmemSize = correctLoadAnimAmem();
             if (charaAmemSize >= 0) {
-                CharaAmemSize() = static_cast<unsigned int>(charaAmemSize);
+                CharaAmemAnimSize() = static_cast<unsigned int>(charaAmemSize);
                 goto complete;
             }
 
@@ -816,7 +816,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     LoadAnimArray(this)->ReleaseAndRemoveAll();
     LoadTextureArray(this)->ReleaseAndRemoveAll();
     LoadPdtArray(this)->ReleaseAndRemoveAll();
-    CharaAmemSize() = 0;
+    CharaAmemAnimSize() = 0;
 
 complete:
     gCharaPartWorkPtr[0x6B] = 0xFF;

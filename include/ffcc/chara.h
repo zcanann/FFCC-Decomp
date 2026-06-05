@@ -354,15 +354,15 @@ public:
 	void FlipDBuffer();
 	void gqrInit(unsigned long, unsigned long, unsigned long);
     void SetAmemStage(CMemory::CStage* stage) { m_amemStage = stage; }
-    CMemory::CStage* GetMemoryStage() { return m_amemStage; }
+    CMemory::CStage* GetMemoryStage() { return m_memoryStage; }
     u32 GetAmemBaseAddress() const { return m_amemStage->m_heapTop; }
-    u32& AmemSize() { return m_amemSize; }
+    u32& AmemSize() { return m_amemAnimSize; }
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
     u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemAnimSize() const { return m_amemAnimSize; }
-    void ResetAmem(int) { m_amemSize = 0; }
+    void ResetAmem(int) { m_amemAnimSize = 0; }
     void TimeMogFur();
     void CalcMogScore();
     void ChangeMogMode(int);
@@ -405,8 +405,8 @@ private:
     };
 
     CSharedState m_sharedState;               // 0x004
-    CMemory::CStage* m_amemStage;             // 0x2058
-    u32 m_amemSize;                           // 0x205C
+    CMemory::CStage* m_memoryStage;           // 0x2058
+    CMemory::CStage* m_amemStage;             // 0x205C
     int m_drawBufferIndex;                    // 0x2060
     CDrawBuffer m_drawBuffers[2];             // 0x2064
     u32 m_amemAnimSize;                       // 0x2074

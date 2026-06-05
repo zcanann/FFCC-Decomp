@@ -628,10 +628,10 @@ inline void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[
  */
 void CChara::Init()
 {
-	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
-	m_amemSize = 0;
-	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
-	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];
+	m_memoryStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
+	m_amemStage = 0;
+	m_drawBuffers[0].m_base = new (m_memoryStage, const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
+	m_drawBuffers[1].m_base = new (m_memoryStage, const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];
 	m_drawBufferIndex = 1;
 	m_drawBufferIndex = 1 - m_drawBufferIndex;
 	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;
@@ -657,7 +657,7 @@ void CChara::Quit()
 		delete[] m_drawBuffers[1].m_base;
 		m_drawBuffers[1].m_base = 0;
 	}
-	Memory.DestroyStage(m_amemStage);
+	Memory.DestroyStage(m_memoryStage);
 }
 
 /*

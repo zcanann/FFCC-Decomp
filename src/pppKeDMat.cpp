@@ -11,7 +11,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeDMatDraw(_pppPObject* pObject, void*, _pppCtrlTable* ctrlTable)
+void pppKeDMatDraw(_pppPObject* pObject, pppNoStep*, _pppCtrlTable* ctrlTable)
 {
     int targetOffset = ctrlTable->m_serializedDataOffsets[1];
     pppFMATRIX* targetMatrix = (pppFMATRIX*)(pObject->m_workArea + targetOffset);

@@ -11,7 +11,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppWDrawMatrixFront(struct _pppPObject* object, void*, struct _pppCtrlTable*)
+void pppWDrawMatrixFront(struct _pppPObject* object, pppNoStep*, struct _pppCtrlTable*)
 {
     Vec localPos;
 

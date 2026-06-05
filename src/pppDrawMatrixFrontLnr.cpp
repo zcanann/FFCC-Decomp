@@ -12,7 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixFrontLnr(_pppPObject* object, void*, _pppCtrlTable*)
+void pppDrawMatrixFrontLnr(_pppPObject* object, pppNoStep*, _pppCtrlTable*)
 {
     Vec local_18;
     _pppMngSt* mng = (_pppMngSt*)ppvMng;

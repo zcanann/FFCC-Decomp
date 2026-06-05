@@ -12,7 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
+void pppDrawMatrixWood(_pppPObject* object, pppNoStep*, _pppCtrlTable*) {
     PSMTXScaleApply(
         object->m_localMatrix.value,
         object->m_drawMatrix.value,

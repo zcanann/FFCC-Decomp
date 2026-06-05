@@ -11,7 +11,7 @@ const float kPppKeLnsZero = 0.0f;
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsFlsDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppKeLnsFlsDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;
@@ -36,7 +36,7 @@ void pppKeLnsFlsCon(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsLpDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppKeLnsLpDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;

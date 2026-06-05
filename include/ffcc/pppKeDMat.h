@@ -3,12 +3,13 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
+struct pppNoStep;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppKeDMatDraw(_pppPObject* pObject, void* data, _pppCtrlTable* ctrlTable);
+void pppKeDMatDraw(_pppPObject* pObject, pppNoStep* data, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

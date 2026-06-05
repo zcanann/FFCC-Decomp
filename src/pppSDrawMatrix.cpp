@@ -15,7 +15,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
+void pppSDrawMatrix(_pppPObject* object, pppNoStep*, _pppCtrlTable*)
 {
 	PSMTXConcat(ppvCameraMatrix,
 	           object->m_localMatrix.value,

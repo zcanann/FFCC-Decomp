@@ -13,7 +13,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;

@@ -2029,7 +2029,6 @@ int CMapMng::ReadOtm(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    CFile::CHandle* fileHandle = 0;
     void* filePtr = File.m_readBuffer;
 
     m_mapReadReady = 1;
@@ -2049,7 +2048,7 @@ int CMapMng::ReadOtm(char* mapName)
         CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (asyncLoadState.m_mapReadMode == 3) {

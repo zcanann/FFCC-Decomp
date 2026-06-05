@@ -797,6 +797,11 @@ pppVtMime.cpp:
 	.sdata2     start:0x803300F0 end:0x803300F4
 	.rodata     start:0x801D8520 end:0x801D8530
 
+pppfunctbl.cpp:
+	.rodata     start:0x801D8530 end:0x801D8EE1
+	.data       start:0x801EAE98 end:0x801EC9EC
+	.sdata2     start:0x803300F8 end:0x80330108
+
 pppDrawMatrix.cpp:
 	extab       start:0x800071E8 end:0x800071F0
 	extabindex  start:0x8000D18C end:0x8000D198
@@ -827,7 +832,7 @@ cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310
 	extabindex  start:0x8000D21C end:0x8000D2F4
 	.text       start:0x80065CAC end:0x80069B08
-	.rodata     start:0x801D8EF8 end:0x801D8F10
+	.rodata     start:0x801D8EE8 end:0x801D8F10
 	.data       start:0x801FC9F0 end:0x801FCC08
 	.sdata      start:0x8032E6C0 end:0x8032E6C8
 

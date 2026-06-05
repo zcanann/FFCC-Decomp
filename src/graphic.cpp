@@ -529,7 +529,7 @@ void CGraphic::Thread()
                         System.Printf(debugFmtBase + kGraphicCppPartCharaDoneFmt, m_drawDoneFile, m_drawDoneLine);
                     } else {
                         System.Printf(debugFmtBase + kGraphicCppPartDoneFmt, m_drawDoneFile, m_drawDoneLine,
-                                      s_pppSysProgTable[drawSyncPart].m_pppName);
+                                      pppSysProgTbl[drawSyncPart].m_pppName);
                     }
                 }
 

@@ -3,8 +3,12 @@
 
 #include "ffcc/partMng.h"
 
-extern pppProg s_pppSysProgTable[];
-pppProg* pppGetSysProgTable();
+extern pppProg pppSysProgTbl[];
+
+inline pppProg* pppGetSysProgTable()
+{
+    return pppSysProgTbl;
+}
 
 #ifdef FFCC_PPPFUNCTBL_IMPLEMENTATION
 #include "ffcc/LocationTitle2.h"
@@ -160,12 +164,7 @@ pppProg* pppGetSysProgTable();
 #define PPP_CONSTRUCT(fn) ((pppProgAnyCallback)(pppProgConstructCallback)(fn))
 #define PPP_DESTRUCT(fn) ((pppProgAnyCallback)(pppProgDestructCallback)(fn))
 
-struct _pppSysProgTbl
-{
-    pppProg* m_progs;
-};
-
-pppProg s_pppSysProgTable[159] = {
+pppProg pppSysProgTbl[159] = {
     {
         (char*)"pppDummyFunc",
         0,
@@ -1857,7 +1856,7 @@ pppProg s_pppSysProgTable[159] = {
         { 0, 0, 0 },
         PPP_FN(pppConstructConstrainCameraForLoc),
         PPP_FN(pppConstruct2ConstrainCameraForLoc),
-        PPP_FN(pppConstruct3ConstrainCameraForLoc),
+        0,
         PPP_FN(pppDestructConstrainCameraForLoc)
     },
     {
@@ -1916,15 +1915,6 @@ pppProg s_pppSysProgTable[159] = {
         PPP_FN(pppDestructLaser)
     },
 };
-
-static _pppSysProgTbl pppSysProgTbl = {
-    s_pppSysProgTable,
-};
-
-pppProg* pppGetSysProgTable()
-{
-    return pppSysProgTbl.m_progs;
-}
 #endif // FFCC_PPPFUNCTBL_IMPLEMENTATION
 
 #endif // _FFCC_FUNCTBL_H_

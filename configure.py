@@ -726,6 +726,7 @@ config.libs = [
             Object(NonMatching, "pppVertexApMtx.cpp"),
             Object(Matching, "pppVertexAttend.cpp"),
             Object(Matching, "pppVtMime.cpp"),
+            Object(Matching, "pppfunctbl.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(Matching, "pppWDrawMatrix.cpp"),
             Object(Matching, "pppWDrawMatrixFront.cpp"),
             Object(Matching, "pppWDrawMatrixFrontLoop.cpp"),

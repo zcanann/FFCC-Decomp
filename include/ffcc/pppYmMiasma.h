@@ -6,7 +6,9 @@
 
 struct _pppCtrlTable;
 struct _pppPObject;
+#ifndef FFCC_HAS_DEFAULT_PARTICLE_DATA_TYPE
 struct PARTICLE_DATA;
+#endif
 
 typedef _pppPObject pppYmMiasma;
 

@@ -42,9 +42,9 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, voi
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
-                                      pppConstrainCameraForLocParams* params,
-                                      _pppCtrlTable* data)
+void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                   pppConstrainCameraForLocParams* params,
+                                   _pppCtrlTable* data)
 {
 	pppConstrainCameraForLocWork* value;
 	CChara::CModel* model;
@@ -67,7 +67,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  * PAL Address: 0x80167E70
  * PAL Size: 48b
  */
-void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
+void pppDestructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
 	CGObject* obj = ppvMng->m_owner;
 	CChara::CModel* model = GetModelPtr(obj);
@@ -102,7 +102,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
+void pppConstructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
     float fVar1 = kPppConstrainCameraForLocZero;
     pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
@@ -193,14 +193,4 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, voi
     work->m_worldBaseMtx[1][3] = local_a4.y;
     work->m_worldBaseMtx[2][3] = local_a4.z;
     return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- */
-void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*, _pppCtrlTable*)
-{
-	// TODO - frame processing function
 }

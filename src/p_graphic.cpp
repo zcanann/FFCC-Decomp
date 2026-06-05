@@ -149,6 +149,9 @@ STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_colorA) == 0x08);
 STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_colorB) == 0x0C);
 STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_invert) == 0x10);
 STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_mode) == 0x14);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_targetYOffs) == 0x1C);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_phase) == 0x20);
+STATIC_ASSERT(offsetof(CGraphicPcs::ScreenFadeSlot, m_stretch) == 0x24);
 
 /*
  * --INFO--

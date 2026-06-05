@@ -160,7 +160,7 @@ public:
     unsigned int m_bossArtifactBase;        // 0xC7E4
     unsigned int m_currentMapId;            // 0xC7E8
     unsigned int m_currentMapVariantId;     // 0xC7EC
-    unsigned int m_currentSceneId;          // 0xC7F0
+    int m_currentSceneId;                   // 0xC7F0
     char m_currentScriptName[256];          // 0xC7F4
     char m_startScriptName[256];            // 0xC8F4
     float m_partyMinX;                      // 0xC9F4

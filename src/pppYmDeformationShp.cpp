@@ -468,7 +468,7 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
-	const float& value = kPppYmDeformationShpZero;
+	const float value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
 	state->m_values[1] = value;
@@ -490,7 +490,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _p
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
-	const float& value = kPppYmDeformationShpZero;
+	const float value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
 	state->m_backBuffer = 0;

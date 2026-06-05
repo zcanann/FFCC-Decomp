@@ -579,9 +579,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CChunkFile::CChunk mimeChunk;
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 if (mimeChunk.m_id == CHUNK_KEY) {
-                    mime->m_keyFrame.ReadKey(chunkFile, mimeChunk.m_arg0);
+                    mime->m_keyFrame.ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
-                    mime->m_keyFrame.ReadJun(chunkFile, mimeChunk.m_arg0);
+                    mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
                     mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {

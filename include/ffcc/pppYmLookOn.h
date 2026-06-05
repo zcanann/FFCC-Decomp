@@ -2,15 +2,17 @@
 #define _PPP_YMLOOKON_H_
 
 struct _pppCtrlTable;
-struct pppYmLookOn;
+struct _pppPObject;
 struct pppYmLookOnStep;
+
+typedef _pppPObject pppYmLookOn;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct _pppCtrlTable* param_2);
-void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct _pppCtrlTable* param_3);
+void pppConstructYmLookOn(pppYmLookOn* pppYmLookOn, struct _pppCtrlTable* param_2);
+void pppFrameYmLookOn(pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

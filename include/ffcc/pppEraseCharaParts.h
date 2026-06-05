@@ -2,8 +2,10 @@
 #define _PPP_ERASECHARAPARTS_H_
 
 struct _pppCtrlTable;
-struct pppEraseCharaParts;
+struct _pppPObject;
 struct pppEraseCharaPartsUnkB;
+
+typedef _pppPObject pppEraseCharaParts;
 
 #ifdef __cplusplus
 extern "C" {

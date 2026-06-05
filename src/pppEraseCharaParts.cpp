@@ -11,10 +11,6 @@ typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
 typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
 typedef CChara::CMesh EraseCharaPartsMesh;
 
-struct pppEraseCharaParts {
-    _pppPObject m_object;
-};
-
 struct pppEraseCharaPartsUnkB {
     u8 m_unk0[4];
     s8 m_meshIndex;
@@ -24,7 +20,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int,
 
 static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s32 offset)
 {
-    return eraseCharaParts->m_object.m_workArea + offset;
+    return eraseCharaParts->m_workArea + offset;
 }
 
 /*

@@ -88,10 +88,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
             u8 trailNextIndex = (u8)(trailReadIndex + 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_80330564;
-            float stepDivisor = (float)((s32)frameCountRaw - 1);
-            if (stepDivisor == kPppYmMegaBirthShpTail2Zero) {
-                stepDivisor = LoadFloat(FLOAT_80330568);
-            }
+            const float stepDivisor = (float)((s32)frameCountRaw - 1);
             float drawScale = *(float*)(payload + 0x5c);
             const float drawScaleStep =
                 (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
@@ -99,14 +96,16 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeG = (float)payload[0x65];
             float fadeB = (float)payload[0x66];
             float fadeA = (float)payload[0x67] * alphaScale;
-            const float fadeRStep =
-                (fadeR - (float)payload[0x68]) / stepDivisor;
-            const float fadeGStep =
-                (fadeG - (float)payload[0x69]) / stepDivisor;
-            const float fadeBStep =
-                (fadeB - (float)payload[0x6A]) / stepDivisor;
-            const float fadeAStep =
-                (fadeA - (float)payload[0x6B] * alphaScale) / stepDivisor;
+            float fadeRStep = LoadFloat(FLOAT_80330568);
+            float fadeGStep = LoadFloat(FLOAT_80330568);
+            float fadeBStep = LoadFloat(FLOAT_80330568);
+            float fadeAStep = LoadFloat(FLOAT_80330568);
+            if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
+                fadeRStep = (fadeR - (float)payload[0x68]) / stepDivisor;
+                fadeGStep = (fadeG - (float)payload[0x69]) / stepDivisor;
+                fadeBStep = (fadeB - (float)payload[0x6A]) / stepDivisor;
+                fadeAStep = (fadeA - (float)payload[0x6B] * alphaScale) / stepDivisor;
+            }
             const float spacing = *(float*)(payload + 0x6C);
             Vec* history = (Vec*)(particle + 0x40);
             Vec segVec;

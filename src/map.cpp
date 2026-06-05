@@ -2472,15 +2472,13 @@ void CMapMng::Calc()
 {
     m_calcCount += 1;
 
-    const int mapObjCount = m_mapObjCount;
-    if (mapObjCount == 0) {
+    if (m_mapObjCount == 0) {
         return;
     }
 
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
-    const int mapAnimRunCount = mapAnimRunArray->GetSize();
+    const int mapAnimRunCount = GetMapAnimRunArray().GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
+        CMapAnimRun* mapAnimRun = GetMapAnimRunArray()[i];
         mapAnimRun->Calc(m_mapAnimFrame);
     }
 
@@ -2501,14 +2499,12 @@ void CMapMng::Calc()
 
     SetLightSource();
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
-    const int mapShadowCount = mapShadowArray->GetSize();
-    for (int i = 0; i < mapShadowCount; i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* mapShadow = GetMapShadowArray()[i];
         mapShadow->Calc();
     }
 
-    for (int i = 0; i < mapObjCount; i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         GetMapObjArray()[i].Calc();
     }
 
@@ -2520,22 +2516,21 @@ void CMapMng::Calc()
     CMaterialSet* materialSet = m_materialSet;
     materialSet->Calc();
 
-    const int octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
     }
 
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
     }
 
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         GetOctTreeArray()[i].SetDrawFlag();
     }
 
-    for (int i = 0; i < mapObjCount; i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         GetMapObjArray()[i].SetDrawFlag();
     }
 }

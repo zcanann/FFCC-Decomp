@@ -5,8 +5,6 @@
 
 #include <dolphin/types.h>
 
-struct PYmTracer2;
-
 struct pppYmTracer2UnkB {
     s32 m_graphId;
     s32 m_dataValIndex;

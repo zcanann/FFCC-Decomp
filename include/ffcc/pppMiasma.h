@@ -1,47 +1,13 @@
 #ifndef _PPP_MIASMA_H_
 #define _PPP_MIASMA_H_
 
-#include "ffcc/partMng.h"
+struct _pppCtrlTable;
+struct _pppPObject;
 
-typedef struct {
-    _pppPObject m_object;
-} pppMiasma;
+typedef _pppPObject pppMiasma;
 
-typedef struct {
-    s32 m_graphId;
-    u8 m_pad_0x4[0x14];
-    s16 m_addPosX;
-    s16 m_addPosY;
-    s16 m_addPosZ;
-    s16 m_addPosW;
-    s16 m_addVelX;
-    s16 m_addVelY;
-    s16 m_addVelZ;
-    s16 m_addVelW;
-    s16 m_addAccX;
-    s16 m_addAccY;
-    s16 m_addAccZ;
-    s16 m_addAccW;
-} pppMiasmaFrameStep;
-
-typedef struct {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_initWOrk;
-    u8 m_pad_0x09[3];
-    float m_stepValue;
-    u8 m_arg3;
-    u8 m_pad_0x11[3];
-    union {
-        u8 m_payload[0x1f];
-        struct Payload {
-            u8 m_pad00[0x1C];
-            u8 m_alphaOpScale;
-            u8 m_useSecondaryMask;
-            u8 m_alphaScale;
-        } m_miasma;
-    };
-} pppMiasmaRenderStep;
+struct pppMiasmaFrameStep;
+struct pppMiasmaRenderStep;
 
 #ifdef __cplusplus
 extern "C" {

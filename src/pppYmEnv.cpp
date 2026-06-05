@@ -43,13 +43,6 @@ struct _pppEnvStYmEnv {
     CMapMesh** m_mapMeshPtr;
 };
 
-struct GraphValueState {
-    float value;
-    float velocity;
-    float acceleration;
-    s32 graphId;
-};
-
 struct YmEnvPackedXAxisIds {
     u32 m_word;
     u16 m_tail;
@@ -537,12 +530,10 @@ CTexture* GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velocity, float& acceleration, float addValue,
                     float& velocityAdd, float& accelerationAdd)
 {
-    GraphValueState* state = (GraphValueState*)object;
-
     velocity += acceleration;
     value += velocity;
 
-    if (graphId == state->graphId) {
+    if (graphId == object->m_graphId) {
         value += addValue;
         velocity += velocityAdd;
         acceleration += accelerationAdd;

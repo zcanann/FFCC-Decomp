@@ -1,5 +1,12 @@
 #include "ffcc/p_sample.h"
 
+extern "C" {
+void create__10CSamplePcsFv(CSamplePcs*);
+void destroy__10CSamplePcsFv(CSamplePcs*);
+void func0__10CSamplePcsFv(CSamplePcs*);
+void func1__10CSamplePcsFv(CSamplePcs*);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8001FEB0

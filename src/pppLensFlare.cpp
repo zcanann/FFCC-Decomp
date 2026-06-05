@@ -38,12 +38,12 @@ LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
 
 static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<LensFlareWork*>(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 }
 
 static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<_pppColorWork*>(obj->m_object.m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+	return reinterpret_cast<_pppColorWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
 }
 
 extern const double kPppLensFlareZeroD = 0.0;
@@ -79,9 +79,9 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 
 			PSMTXIdentity(local_54);
 			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = (ppvMng->m_scale.x * obj->m_object.m_drawMatrix.value[0][0]) * scale;
-			local_54[1][1] = (ppvMng->m_scale.y * obj->m_object.m_drawMatrix.value[1][1]) * scale;
-			local_54[2][2] = (ppvMng->m_scale.z * obj->m_object.m_drawMatrix.value[2][2]) * scale;
+			local_54[0][0] = (ppvMng->m_scale.x * obj->m_drawMatrix.value[0][0]) * scale;
+			local_54[1][1] = (ppvMng->m_scale.y * obj->m_drawMatrix.value[1][1]) * scale;
+			local_54[2][2] = (ppvMng->m_scale.z * obj->m_drawMatrix.value[2][2]) * scale;
 
 			local_60.x = ppvMng->m_matrix.value[0][3];
 			local_60.y = ppvMng->m_matrix.value[1][3];

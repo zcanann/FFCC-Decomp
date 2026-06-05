@@ -63,7 +63,7 @@ public:
     void SingleCalcCtrl();
     void SingleDrawCtrl();
     void CmdOpen();
-    void CmdCtrl();
+    int CmdCtrl();
     int CmdClose();
     bool ItemOpen();
     int ItemCtrl();

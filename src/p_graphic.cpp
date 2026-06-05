@@ -170,7 +170,7 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
-    C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    C_MTXOrtho(orthoMtx, FLOAT_8032fb78, FLOAT_8032FB7C, FLOAT_8032fb78, FLOAT_8032FB80, FLOAT_8032fb78, FLOAT_8032FB84);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -228,7 +228,7 @@ void CGraphicPcs::drawScreenFade()
         if (invert != 0) {
             t = 1.0f - t;
         }
-        const float fadeWave = (float)sin((double)(3.1415927f * t));
+        const float fadeWave = (float)sin((double)(FLOAT_8032FB8C * t));
         const u8 fadeAlpha = (u8)(255.0f * fadeWave);
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
@@ -305,7 +305,7 @@ void CGraphicPcs::drawScreenFade()
                     PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
                     float sx = pos.x * 320.0f + 320.0f;
-                    float sy = -(pos.y * 240.0f - 240.0f);
+                    float sy = -(pos.y * FLOAT_8032FBA0 - FLOAT_8032FBA0);
                     if (sx < 0.0f) {
                         sx = 0.0f;
                     } else if (sx > 640.0f) {
@@ -313,8 +313,8 @@ void CGraphicPcs::drawScreenFade()
                     }
                     if (sy < 0.0f) {
                         sy = 0.0f;
-                    } else if (sy > 480.0f) {
-                        sy = 480.0f;
+                    } else if (sy > FLOAT_8032FB7C) {
+                        sy = FLOAT_8032FB7C;
                     }
 
                     const int radius = (int)(640.0f * (1.0f - fadeWave));
@@ -331,10 +331,10 @@ void CGraphicPcs::drawScreenFade()
             GXPosition3f32(640.0f, 0.0f, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(640.0f, 480.0f, 0.0f);
+            GXPosition3f32(640.0f, 448.0f, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(0.0f, 480.0f, 0.0f);
+            GXPosition3f32(0.0f, 448.0f, 0.0f);
             GXColor1u32(*(u32*)&baseColor);
             GXTexCoord2u16(0, 2);
             continue;
@@ -353,11 +353,11 @@ void CGraphicPcs::drawScreenFade()
                 const float amp = slotData->m_amplitude * (1.0f - t);
                 const float size = amp + 1.0f;
                 const float offX = stretch * (320.0f * amp) * (float)sin((double)phase);
-                const float offY = stretch * (240.0f * amp) * (float)cos((double)phase);
+                const float offY = stretch * (FLOAT_8032FBA0 * amp) * (float)cos((double)phase);
                 const float cx = 320.0f + offX;
-                const float cy = 240.0f + offY;
+                const float cy = FLOAT_8032FBA0 + offY;
                 const float w = 320.0f * size;
-                const float h = 240.0f * size;
+                const float h = FLOAT_8032FBA0 * size;
 
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 GXPosition3f32(cx - w, cy - h, 0.0f);
@@ -438,10 +438,10 @@ void CGraphicPcs::drawScreenFade()
         GXPosition3f32(640.0f, 0.0f, 0.0f);
         GXColor1u32(*(u32*)&baseColor);
         GXTexCoord2u16(2, 0);
-        GXPosition3f32(640.0f, 480.0f, 0.0f);
+        GXPosition3f32(640.0f, 448.0f, 0.0f);
         GXColor1u32(*(u32*)&baseColor2);
         GXTexCoord2u16(2, 2);
-        GXPosition3f32(0.0f, 480.0f, 0.0f);
+        GXPosition3f32(0.0f, 448.0f, 0.0f);
         GXColor1u32(*(u32*)&baseColor2);
         GXTexCoord2u16(0, 2);
     }
@@ -677,7 +677,7 @@ void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
     Mtx identity;
-    C_MTXOrtho(ortho, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    C_MTXOrtho(ortho, FLOAT_8032fb78, FLOAT_8032FB7C, FLOAT_8032fb78, FLOAT_8032FB80, FLOAT_8032fb78, FLOAT_8032FB84);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
     _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
@@ -716,23 +716,23 @@ void CGraphicPcs::drawBar()
 
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 448.0f, 0.0f);
+    GXPosition3f32(16.0f, 440.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(0, 0);
-    GXPosition3f32(640.0f, 448.0f, 0.0f);
+    GXPosition3f32(336.0f, 440.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(2, 0);
-    GXPosition3f32(640.0f, 480.0f, 0.0f);
+    GXPosition3f32(336.0f, 441.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(2, 2);
-    GXPosition3f32(0.0f, 480.0f, 0.0f);
+    GXPosition3f32(16.0f, 441.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&backColor));
     GXTexCoord2u16(0, 2);
 
     CSystem::COrder* order = System.GetFirstOrder();
     const int orderCount = System.m_orderCount;
     const int lastOrder = orderCount - 1;
-    float x = 0.0f;
+    float x = 16.0f;
     int hue = 0;
     u32 y = 0x10;
     for (int i = 0; i < orderCount; i++) {
@@ -740,8 +740,8 @@ void CGraphicPcs::drawBar()
         const float width = (100.0f * order->m_lastTime) / 16.666666f;
 
         if (order->m_priority == 0x26) {
-            const float y0 = drawText ? static_cast<float>(y) : 448.0f;
-            const float y1 = drawText ? static_cast<float>(y + 8) : 456.0f;
+            const float y0 = drawText ? static_cast<float>(y) : 436.0f;
+            const float y1 = drawText ? static_cast<float>(y + 8) : 440.0f;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, 0.0f);
@@ -758,8 +758,8 @@ void CGraphicPcs::drawBar()
             GXTexCoord2u16(0, 2);
             x += width;
         } else if (order->m_priority != 0x27) {
-            const float y0 = drawText ? static_cast<float>(y) : 464.0f;
-            const float y1 = drawText ? static_cast<float>(y + 8) : 448.0f;
+            const float y0 = drawText ? static_cast<float>(y) : 432.0f;
+            const float y1 = drawText ? static_cast<float>(y + 8) : 436.0f;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, 0.0f);
@@ -782,16 +782,16 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : 448.0f, 0.0f);
+            GXPosition3f32(x, drawText ? static_cast<float>(y) : 436.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y) : 448.0f, 0.0f);
+            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y) : 436.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y + 8) : 456.0f, 0.0f);
+            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y + 8) : 440.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, drawText ? static_cast<float>(y + 8) : 456.0f, 0.0f);
+            GXPosition3f32(x, drawText ? static_cast<float>(y + 8) : 440.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 2);
         }
@@ -803,31 +803,31 @@ void CGraphicPcs::drawBar()
 
     CColor frameColor = (Graphic.IsFrameRateOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(0.0f, 468.0f, 0.0f);
+    GXPosition3f32(16.0f, 420.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(0, 0);
-    GXPosition3f32(32.0f, 468.0f, 0.0f);
+    GXPosition3f32(32.0f, 420.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(2, 0);
-    GXPosition3f32(32.0f, 472.0f, 0.0f);
+    GXPosition3f32(32.0f, 424.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(2, 2);
-    GXPosition3f32(0.0f, 472.0f, 0.0f);
+    GXPosition3f32(16.0f, 424.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&frameColor.color));
     GXTexCoord2u16(0, 2);
 
     CColor fifoColor = (Graphic.IsFifoOver() == 0) ? CColor(0, 0xFF, 0, 0xFF) : CColor(0xFF, 0, 0, 0xFF);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(40.0f, 468.0f, 0.0f);
+    GXPosition3f32(40.0f, 420.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(0, 0);
-    GXPosition3f32(48.0f, 468.0f, 0.0f);
+    GXPosition3f32(56.0f, 420.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(2, 0);
-    GXPosition3f32(48.0f, 472.0f, 0.0f);
+    GXPosition3f32(56.0f, 424.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(2, 2);
-    GXPosition3f32(40.0f, 472.0f, 0.0f);
+    GXPosition3f32(40.0f, 424.0f, 0.0f);
     GXColor1u32(*reinterpret_cast<u32*>(&fifoColor.color));
     GXTexCoord2u16(0, 2);
 

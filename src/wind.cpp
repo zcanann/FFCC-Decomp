@@ -635,9 +635,9 @@ void CWind::Frame()
                 obj->targetPower = f2 * obj->basePower + obj->targetPower;
                 f0 = obj->targetPower;
                 f1 = kWindZero;
-                if (!(f0 < f1)) {
+                if (f0 >= f1) {
                     f1 = obj->basePower;
-                    if (!(f1 < f0)) {
+                    if (f1 >= f0) {
                         f1 = f0;
                     }
                 }
@@ -656,7 +656,7 @@ void CWind::Frame()
                 obj->targetDir = f2 * obj->baseDir + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
-                if (!(f0 < f1)) {
+                if (f0 >= f1) {
                     f2 = kWindDirMaxOffset + f1;
                     f1 = f0;
                     if (f2 < f0) {

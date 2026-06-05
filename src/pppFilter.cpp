@@ -19,11 +19,6 @@ struct _pppFilterSerializedData {
     _GXColor m_color;
 };
 
-struct pppFilterUnkB {
-    unsigned int m_unk0;
-    int m_dataValIndex;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8015a788

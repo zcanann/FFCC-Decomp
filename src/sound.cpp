@@ -1279,24 +1279,23 @@ void CSound::LoadSe(void* seData)
  */
 void CSound::LoadWave(int waveId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
     if (waveId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(waveId) == -1) {
+        if (m_redSound.ReentryWaveData(waveId) == -1) {
             if (waveId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-            } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(waveId) == -1) {
+            } else if (m_redSound.ReentryWaveData(waveId) == -1) {
                 if (waveFile != 0) {
                     File.Close(waveFile);
                     waveFile = 0;
                     System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
                 }
 
-                reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
+                m_redSound.SetWaveData(-1, nullptr, 0);
 
                 char wavePath[260];
                 sprintf(wavePath, s_soundWavePathFmt, waveId);
@@ -1332,18 +1331,17 @@ void CSound::LoadWave(int waveId)
  */
 void CSound::LoadWave(void* waveData)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
+    if (m_redSound.ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, waveData, -1);
+        m_redSound.SetWaveData(-1, nullptr, 0);
+        m_redSound.SetWaveData(-1, waveData, -1);
     }
 }
 
@@ -1376,19 +1374,18 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     if (clearMode != 0) {
-        reinterpret_cast<CRedSound*>(self + 8)->SeStop(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearSeSepData(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearWaveData(-3);
+        m_redSound.SeStop(-1);
+        m_redSound.ClearSeSepData(-1);
+        m_redSound.ClearWaveData(-3);
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->SeStopMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1],
-                                                         sound.m_noFreeSeGroups[2], sound.m_noFreeSeGroups[3]);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearSeSepDataMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1],
-                                                                 sound.m_noFreeSeGroups[2], sound.m_noFreeSeGroups[3]);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearWaveDataM(sound.m_noFreeWaves[0], sound.m_noFreeWaves[1],
-                                                               sound.m_noFreeWaves[2], sound.m_noFreeWaves[3]);
+        m_redSound.SeStopMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
+                            sound.m_noFreeSeGroups[3]);
+        m_redSound.ClearSeSepDataMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
+                                    sound.m_noFreeSeGroups[3]);
+        m_redSound.ClearWaveDataM(sound.m_noFreeWaves[0], sound.m_noFreeWaves[1], sound.m_noFreeWaves[2],
+                                  sound.m_noFreeWaves[3]);
     }
 
     sound.m_seCount = 10000000;
@@ -2198,9 +2195,8 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
  */
 void CSound::SetReverb(int reverb, int depth)
 {
-    u8* soundObj = reinterpret_cast<u8*>(this);
-    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverb(1, reverb);
-    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverbDepth(1, depth, 0xF);
+    m_redSound.SetReverb(1, reverb);
+    m_redSound.SetReverbDepth(1, depth, 0xF);
 }
 
 /*

@@ -120,18 +120,11 @@ extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern PPPCREATEPARAM g_dcp;
 
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
-typedef Mtx PARTICLE_WMAT;  // Size 0x30
-#endif
-
 struct _PARTICLE_COLOR
 {
     float m_color[4];            // 0x0
     float m_colorFrameDeltas[4]; // 0x10
 };
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
-typedef _PARTICLE_COLOR PARTICLE_COLOR;
-#endif
 
 struct _PARTICLE_DATA
 {

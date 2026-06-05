@@ -3,14 +3,12 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
-#undef PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathParticle.h"
 #include "ffcc/pppShape.h"
 

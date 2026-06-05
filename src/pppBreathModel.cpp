@@ -6,9 +6,7 @@
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
 #include "ffcc/ppp_linkage.h"
-#define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppPart.h"
-#undef PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathParticle.h"
 #include <string.h>
 

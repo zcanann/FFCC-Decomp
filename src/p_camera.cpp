@@ -17,6 +17,7 @@
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
+#include "ffcc/vector.h"
 
 #include <math.h>
 #include <string.h>
@@ -310,6 +311,11 @@ STATIC_ASSERT(sizeof(CCameraPcs) == 0x4C4);
 static inline void CopyCameraState(CCameraPcs::CameraState& dst, const CCameraPcs::CameraState& src)
 {
     dst = src;
+}
+
+static inline Vec* AsVec(CVector& vec)
+{
+    return reinterpret_cast<Vec*>(&vec);
 }
 
 }
@@ -1023,7 +1029,6 @@ void CCameraPcs::calcChara()
     Mtx mtxB;
     Mtx mtxInv;
     float stick;
-    Vec eyeDir;
     Vec scaledDir;
     Vec targetPos;
 
@@ -1094,9 +1099,19 @@ void CCameraPcs::calcChara()
     m_targetY = m_viewer.m_position.y;
     m_targetZ = m_viewer.m_position.z;
 
-    eyeDir = DirectionVec();
-    PSVECScale(&eyeDir, &scaledDir, FLOAT_8032fa88);
-    PSVECAdd(&TargetVec(), &scaledDir, &targetPos);
+    CVector eyeDir(DirectionVec());
+    CVector scaledVec;
+    PSVECScale(AsVec(eyeDir), AsVec(scaledVec), FLOAT_8032fa88);
+    scaledDir.x = scaledVec.x;
+    scaledDir.y = scaledVec.y;
+    scaledDir.z = scaledVec.z;
+
+    CVector targetBase(TargetVec());
+    CVector targetVec;
+    PSVECAdd(AsVec(targetBase), &scaledDir, AsVec(targetVec));
+    targetPos.x = targetVec.x;
+    targetPos.y = targetVec.y;
+    targetPos.z = targetVec.z;
 
     m_positionX = targetPos.x;
     m_positionY = targetPos.y;
@@ -1369,7 +1384,8 @@ void CCameraPcs::createFullShadow()
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
                  GX_CLAMP, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[1], GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f,
+    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[1], GX_NEAR, GX_NEAR,
+                    FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 

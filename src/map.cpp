@@ -427,10 +427,12 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnim*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -464,10 +466,12 @@ void CPtrArray<CMapAnim*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -524,10 +528,12 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnimKeyDt*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -539,10 +545,12 @@ int CPtrArray<CMapAnimKeyDt*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -851,10 +859,12 @@ CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
  * Size:	TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnimRun*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -888,10 +898,12 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -935,10 +947,12 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapShadow*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -972,10 +986,12 @@ void CPtrArray<CMapShadow*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1431,20 +1447,23 @@ void CMapMng::Destroy()
 void CMapMng::MapFileRead(char*, unsigned long&)
 {
     for (int i = 0; i < 0x10; i++) {
-        void** handleSlot = &m_asyncLoadState.m_asyncHandles[i];
-        if (*handleSlot != 0 && File.IsCompleted(reinterpret_cast<CFile::CHandle*>(*handleSlot))) {
+        if (m_asyncLoadState.m_asyncHandles[i] != 0) {
+            int completed = File.IsCompleted(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
             void* readBuffer = File.m_readBuffer;
-            int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(*handleSlot));
-            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            if (completed != 0) {
+                int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+                void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
-            Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
-            m_asyncLoadState.m_fileSizes[i] = len;
-            m_asyncLoadState.m_fileChecksums[i] = CheckSum(readBuffer, len);
-            m_asyncLoadState.m_asyncReadIndex++;
-            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
+                Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
+                m_asyncLoadState.m_fileSizes[i] = len;
+                m_asyncLoadState.m_fileChecksums[i] = CheckSum(readBuffer, len);
+                m_asyncLoadState.m_asyncReadIndex++;
+                m_asyncLoadState.m_mapLoadCursor =
+                    reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
 
-            File.Close(reinterpret_cast<CFile::CHandle*>(*handleSlot));
-            *handleSlot = 0;
+                File.Close(reinterpret_cast<CFile::CHandle*>(m_asyncLoadState.m_asyncHandles[i]));
+                m_asyncLoadState.m_asyncHandles[i] = 0;
+            }
         }
     }
 }
@@ -1646,8 +1665,8 @@ void CMapMng::SetLightSource()
                 light.m_attenRadius = pointAttr->m_radius;
                 light.m_range = pointAttr->m_intensity;
                 light.m_attenFalloff = 1.0f;
-                light.m_targetColor[0] = pointAttr->m_color;
-                light.m_targetColor[1] = pointAttr->m_altColor;
+                light.m_targetColor[0] = pointAttr->m_altColor;
+                light.m_targetColor[1] = pointAttr->m_color;
                 *(u32*)light.m_targetEnable = 0;
                 light.m_spotFn = pointAttr->m_colorMode;
                 light.m_unk4D = 4;
@@ -1700,8 +1719,8 @@ void CMapMng::SetLightSource()
                     light.m_range = spotAttr->m_nearRange;
                     light.m_attenFalloff = spotAttr->m_farRange;
 
-                    light.m_targetColor[0] = spotAttr->m_color;
-                    light.m_targetColor[1] = spotAttr->m_altColor;
+                    light.m_targetColor[0] = spotAttr->m_altColor;
+                    light.m_targetColor[1] = spotAttr->m_color;
 
                     light.m_spotFn = spotAttr->m_colorMode;
                     light.m_unk4D = (spotAttr->m_useAltColor == 0) ? 4 : 2;
@@ -1751,7 +1770,6 @@ int CMapMng::ReadMtx(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    int loadIndex = 0;
     int append = 0;
 
     MapMng.m_mapReadReady = 1;
@@ -1762,10 +1780,11 @@ int CMapMng::ReadMtx(char* mapName)
         m_textureSet = textureSet;
     }
 
+    int loadIndex = 0;
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
-        bool exists = false;
+        bool exists;
         if (asyncLoadState.m_mapReadMode == 1) {
             exists = true;
         } else {
@@ -1773,10 +1792,15 @@ int CMapMng::ReadMtx(char* mapName)
             if (openProbe != 0) {
                 File.Close(openProbe);
                 exists = true;
+            } else {
+                exists = false;
             }
         }
         if (!exists) {
-            if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 2) {
+                return 1;
+            }
+            if (asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {
@@ -1889,7 +1913,7 @@ int CMapMng::ReadMpl(char* mapName)
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
-        bool canRead = false;
+        bool canRead;
         if (asyncLoadState.m_mapReadMode == 1) {
             canRead = true;
         } else {
@@ -1897,6 +1921,8 @@ int CMapMng::ReadMpl(char* mapName)
             if (existsHandle != 0) {
                 File.Close(existsHandle);
                 canRead = true;
+            } else {
+                canRead = false;
             }
         }
 
@@ -2025,7 +2051,6 @@ int CMapMng::ReadOtm(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    CFile::CHandle* fileHandle = 0;
     void* filePtr = File.m_readBuffer;
 
     m_mapReadReady = 1;
@@ -2042,10 +2067,10 @@ int CMapMng::ReadOtm(char* mapName)
 
         Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
         asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
-        CheckSum(File.m_readBuffer, size);
+        CheckSum(filePtr, size);
         readIndex += 1;
     } else {
-        fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
+        CFile::CHandle* fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
             if (asyncLoadState.m_mapReadMode == 3) {
@@ -2317,7 +2342,6 @@ int CMapMng::ReadMid(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
-    void* filePtr = File.m_readBuffer;
 
     sprintf(g_StrTmp, const_cast<char*>(s_mapMidPathFmt), mapName);
     bool ok = true;
@@ -2326,6 +2350,7 @@ int CMapMng::ReadMid(char* mapName)
         System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
     }
 
+    void* filePtr = File.m_readBuffer;
     if (asyncLoadState.m_mapReadMode == 1) {
         int& readIndex = asyncLoadState.m_asyncReadIndex;
         const int size = asyncLoadState.m_fileSizes[readIndex];
@@ -2515,7 +2540,7 @@ void CMapMng::Calc()
     }
 
     const int mapAnimRunCount = GetMapAnimRunArray().GetSize();
-    for (int i = 0; i < mapAnimRunCount; i++) {
+    for (unsigned int i = 0; static_cast<int>(i) < mapAnimRunCount; i++) {
         CMapAnimRun* mapAnimRun = GetMapAnimRunArray()[i];
         mapAnimRun->Calc(m_mapAnimFrame);
     }
@@ -2611,26 +2636,22 @@ void setDbgLight(int, Vec&, _GXColor&)
  */
 void CMapMng::DrawBefore()
 {
-    const int mapObjCount = m_mapObjCount;
-    if ((mapObjCount != 0) && (m_mapReadReady != 0)) {
+    if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
         GXSetColorUpdate(1);
         GXSetAlphaUpdate(0);
         GXSetCullMode(GX_CULL_FRONT);
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if ((gMapHitDrawMode.m_byte & 8) == 0) {
-            CMapObj* mapObj = MapMng.GetMapObjArray();
-            for (int i = 0; i < mapObjCount; i++) {
+        if ((s_bitMask.m_byte & 8) == 0) {
+            for (int i = 0; i < m_mapObjCount; i++) {
+                CMapObj* mapObj = MapMng.GetMapObj(i);
                 mapObj->Draw(0xFE);
-                mapObj++;
             }
 
-            const short octTreeCount = m_octTreeCount;
-            COctTree* octTree = GetOctTreeArray();
-            for (int i = 0; i < octTreeCount; i++) {
+            for (int i = 0; i < m_octTreeCount; i++) {
+                COctTree* octTree = GetOctTreeArray() + i;
                 octTree->Draw(0xFF);
-                octTree++;
             }
         }
     }
@@ -2647,12 +2668,7 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    if (m_mapReadReady == 0) {
-        return;
-    }
-
-    const int mapObjCount = m_mapObjCount;
-    if (mapObjCount == 0) {
+    if ((m_mapReadReady == 0) || (m_mapObjCount == 0)) {
         return;
     }
 
@@ -2668,16 +2684,14 @@ void CMapMng::Draw()
     m_underWaterTexPending = 1;
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        const int octTreeCount = m_octTreeCount;
-
         COctTree* octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
+        for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(0);
             octTree++;
         }
 
         CMapObj* mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->Draw(0x40);
             mapObj++;
         }
@@ -2691,13 +2705,13 @@ void CMapMng::Draw()
         LightPcs.SetNumDiffuse(0);
 
         mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->Draw(0);
             mapObj++;
         }
 
         octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
+        for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(1);
             octTree++;
         }
@@ -2835,7 +2849,7 @@ void CMapMng::Draw()
                     startIndex += batchCount;
 
                     octTree = GetOctTreeArray();
-                    for (int i = 0; i < octTreeCount; i++) {
+                    for (int i = 0; i < m_octTreeCount; i++) {
                         octTree->DrawCharaShadow(0);
                         octTree++;
                     }
@@ -2846,11 +2860,103 @@ void CMapMng::Draw()
 
     if ((gMapHitDrawMode.m_byte & 8) != 0) {
         _GXColor clearColor;
-        clearColor.r = 0xFF;
-        clearColor.g = 0xFF;
-        clearColor.b = 0xFF;
+        clearColor.r = 0;
+        clearColor.g = 0;
+        clearColor.b = 0;
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
+    }
+
+    if ((gMapHitDrawMode.m_byte & 1) != 0) {
+        _GXColor lightColor;
+        *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
+
+        Vec lightDir0;
+        lightDir0.x = 1.0f;
+        lightDir0.y = 1.0f;
+        lightDir0.z = 1.0f;
+
+        Mtx cameraMtx0;
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
+
+        Vec lightPos0;
+        lightPos0.x = kMapLargeDistance * -lightDir0.x;
+        lightPos0.y = kMapLargeDistance * -lightDir0.y;
+        lightPos0.z = kMapLargeDistance * -lightDir0.z;
+
+        GXLightObj lightObj0;
+        GXInitLightColor(&lightObj0, lightColor);
+        PSMTXMultVec(cameraMtx0, &lightPos0, &lightPos0);
+        GXInitLightPos(&lightObj0, lightPos0.x, lightPos0.y, lightPos0.z);
+        PSMTXMultVecSR(cameraMtx0, &lightDir0, &lightDir0);
+        GXInitLightDir(&lightObj0, lightDir0.x, lightDir0.y, lightDir0.z);
+        GXInitLightSpot(&lightObj0, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
+
+        Vec lightDir1;
+        lightDir1.x = -1.0f;
+        lightDir1.y = 1.0f;
+        lightDir1.z = -1.0f;
+
+        Mtx cameraMtx1;
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);
+
+        Vec lightPos1;
+        lightPos1.x = kMapLargeDistance * -lightDir1.x;
+        lightPos1.y = kMapLargeDistance * -lightDir1.y;
+        lightPos1.z = kMapLargeDistance * -lightDir1.z;
+
+        GXLightObj lightObj1;
+        GXInitLightColor(&lightObj1, lightColor);
+        PSMTXMultVec(cameraMtx1, &lightPos1, &lightPos1);
+        GXInitLightPos(&lightObj1, lightPos1.x, lightPos1.y, lightPos1.z);
+        PSMTXMultVecSR(cameraMtx1, &lightDir1, &lightDir1);
+        GXInitLightDir(&lightObj1, lightDir1.x, lightDir1.y, lightDir1.z);
+        GXInitLightSpot(&lightObj1, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj1, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj1, GX_LIGHT1);
+
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),
+                      GX_DF_CLAMP, GX_AF_SPEC);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+
+        _GXColor materialColor;
+        *reinterpret_cast<u32*>(&materialColor) = 0xFFFFFFFF;
+        GXSetChanMatColor(GX_COLOR0A0, materialColor);
+
+        _GXColor ambientColor;
+        *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
+        GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
+
+        if ((gMapHitDrawMode.m_byte & 2) == 0) {
+            _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_COPY);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            GXSetCullMode(GX_CULL_FRONT);
+        } else {
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(0, GX_ALWAYS, 0);
+            GXSetCullMode(GX_CULL_FRONT);
+        }
+
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, 0, GX_PTIDENTITY);
+        GXSetNumTevStages(1);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+        CMapObj* mapObj = MapMng.GetMapObjArray();
+        for (int i = 0; i < m_mapObjCount; i++) {
+            mapObj->DrawHit();
+            mapObj++;
+        }
+
+        CameraPcs.SetOffsetZBuff(kMapZero);
     }
 
     if ((gMapHitDrawMode.m_byte & 4) != 0) {
@@ -2866,22 +2972,22 @@ void CMapMng::Draw()
         GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
         GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         _GXColor wireColor;
-        wireColor.r = 0x80;
-        wireColor.g = 0x80;
-        wireColor.b = 0x80;
+        wireColor.r = 0xFF;
+        wireColor.g = 0xFF;
+        wireColor.b = 0xFF;
         wireColor.a = 0x80;
         GXSetChanMatColor(GX_COLOR0A0, wireColor);
 
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
         CMapObj* mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->DrawHitWire();
             mapObj++;
         }
 
         mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->DrawHitNormal();
             mapObj++;
         }
@@ -2922,17 +3028,15 @@ void CMapMng::DrawAfter()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if (gMapHitDrawMode.m_byte == 0) {
-            COctTree* octTree = GetOctTreeArray();
+        if (static_cast<signed char>(s_bitMask.m_byte) == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
+                COctTree* octTree = GetOctTreeArray() + i;
                 octTree->Draw(2);
-                octTree++;
             }
 
-            CMapObj* mapObj = MapMng.GetMapObjArray();
             for (int i = 0; i < m_mapObjCount; i++) {
+                CMapObj* mapObj = MapMng.GetMapObj(i);
                 mapObj->Draw(2);
-                mapObj++;
             }
         }
     }
@@ -2949,7 +3053,7 @@ void CMapMng::DrawAfter()
  */
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 
@@ -3002,9 +3106,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
  */
 int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    int hit = 0;
-
-    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->z) && (kMapZero == move->y)) {
         return 0;
     }
 
@@ -3025,6 +3127,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
     g_hit_edge_idx_min = -2;
     g_hit_t_min = kMapHitTInitial;
+    int hit = 0;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3121,11 +3224,10 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     case 0:
     {
         CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
-        u8 r = color.r;
         u8 g = color.g;
         u8 b = color.b;
+        mapIdGrp->m_primaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_primaryColor.r = r;
         mapIdGrp->m_primaryColor.g = g;
         mapIdGrp->m_primaryColor.b = b;
         mapIdGrp->m_primaryColor.a = a;
@@ -3134,11 +3236,10 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     case 1:
     {
         CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
-        u8 r = color.r;
         u8 g = color.g;
         u8 b = color.b;
+        mapIdGrp->m_secondaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_secondaryColor.r = r;
         mapIdGrp->m_secondaryColor.g = g;
         mapIdGrp->m_secondaryColor.b = b;
         mapIdGrp->m_secondaryColor.a = a;
@@ -3147,11 +3248,10 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     case 2:
     {
         CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
-        u8 r = color.r;
         u8 g = color.g;
         u8 b = color.b;
+        mapIdGrp->m_tertiaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_tertiaryColor.r = r;
         mapIdGrp->m_tertiaryColor.g = g;
         mapIdGrp->m_tertiaryColor.b = b;
         mapIdGrp->m_tertiaryColor.a = a;
@@ -3160,11 +3260,10 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
     case 3:
     {
         CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
-        u8 r = color.r;
         u8 g = color.g;
         u8 b = color.b;
+        mapIdGrp->m_quaternaryColor.r = color.r;
         u8 a = color.a;
-        mapIdGrp->m_quaternaryColor.r = r;
         mapIdGrp->m_quaternaryColor.g = g;
         mapIdGrp->m_quaternaryColor.b = b;
         mapIdGrp->m_quaternaryColor.a = a;

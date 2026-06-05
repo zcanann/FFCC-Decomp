@@ -27,7 +27,7 @@ file.cpp:
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
 	.sdata      start:0x8032E3C0 end:0x8032E3D0
-	.sdata2     start:0x8032F600 end:0x8032F638
+	.sdata2     start:0x8032F600 end:0x8032F630
 
 strcase.c:
 	.text       start:0x80013D70 end:0x80013E70
@@ -41,7 +41,7 @@ game.cpp:
 	.bss        start:0x8021EEB4 end:0x80230E48
 	.sdata      start:0x8032E3D0 end:0x8032E3E8
 	.sbss       start:0x8032EC40 end:0x8032EC45
-	.sdata2     start:0x8032F660 end:0x8032F6A0
+	.sdata2     start:0x8032F630 end:0x8032F6A0
 
 graphic.cpp:
 	extab       start:0x800057E0 end:0x80005920
@@ -1288,6 +1288,7 @@ pppYmMana.cpp:
 	extabindex  start:0x8000F574 end:0x8000F628
 	.text       start:0x800D4C7C end:0x800D8710
 	.rodata     start:0x801DB4D8 end:0x801DB4E8
+	.sdata2     start:0x80330E60 end:0x80330EC8
 
 p_sound.cpp:
 	extab       start:0x80008B94 end:0x80008BBC
@@ -1612,7 +1613,7 @@ monobj_boss.cpp:
 	extabindex  start:0x80010918 end:0x80010C18
 	.text       start:0x8012E5DC end:0x80133108
 	.data       start:0x802127C0 end:0x80212820
-	.sdata2     start:0x80331CF8 end:0x80331D10
+	.sdata2     start:0x80331CF8 end:0x80331DDC
 
 bonus_menu.cpp:
 	extab       start:0x80009A34 end:0x80009AC4
@@ -1622,7 +1623,7 @@ bonus_menu.cpp:
 	.data       start:0x80212820 end:0x802129B0
 	.sdata      start:0x8032EA68 end:0x8032EA78
 	.sbss       start:0x8032EEA8 end:0x8032EEB8
-	.sdata2     start:0x80331D10 end:0x80331FC0
+	.sdata2     start:0x80331DE0 end:0x80331FC0
 
 pppScreenBlur.cpp:
 	extab       start:0x80009AC4 end:0x80009ADC

@@ -182,6 +182,132 @@ static inline unsigned int LoadU32(u8* base, int offset)
 
 /*
  * --INFO--
+ * PAL Address: 0x800C7FE8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void VECNormalizeZero(Vec* src, Vec* dst)
+{
+	float magnitude = PSVECMag(src);
+	if (magnitude == 0.0f) {
+		dst->x = 0.0f;
+		dst->y = 0.0f;
+		dst->z = 0.0f;
+	} else {
+		PSVECScale(src, dst, 1.0f / magnitude);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C8050
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CPad::IsGba(long padNo)
+{
+	if (padNo < 0 || padNo >= 4) {
+		return 0;
+	}
+	return m_padInputs[padNo].gbaMode != 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C80B0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMonWork* SAFE_CAST_MON_WORK(CGObjWork* work)
+{
+	if (work == 0 || work->m_objType != 1) {
+		return 0;
+	}
+	return static_cast<CMonWork*>(work);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C812C
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork* work)
+{
+	if (work == 0 || work->m_objType != 0) {
+		return 0;
+	}
+	return static_cast<CCaravanWork*>(work);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C81A8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::SetDamageColMask(int index, int mask)
+{
+	if (index < 0) {
+		for (int i = 0; i < 8; ++i) {
+			m_damageColliders[i].m_hitMask = mask;
+		}
+	} else if (index < 8) {
+		m_damageColliders[index].m_hitMask = mask;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C81E4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::SetAttackColMask(int index, int mask)
+{
+	if (index < 0) {
+		for (int i = 0; i < 8; ++i) {
+			m_attackColliders[i].m_hitMask = mask;
+		}
+	} else if (index < 8) {
+		m_attackColliders[index].m_hitMask = mask;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800C8220
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGObject::IsFall(int, int)
+{
+	return (m_stateFlags0 & 0x80) != 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800BA2FC
  * PAL Size: 3800b
  * EN Address: TODO

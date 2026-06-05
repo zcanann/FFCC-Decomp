@@ -102,7 +102,7 @@ static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 	object->m_particleId = particleId;
 }
 
-static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
+static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
 	CFlatRuntime::CObject* const root =
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x8CC);

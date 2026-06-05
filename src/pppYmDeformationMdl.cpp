@@ -16,26 +16,6 @@
 
 STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
 
-struct pppYmDeformationMdlUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    f32 m_scaleValueAdd;
-    f32 m_scaleVelocityAdd;
-    f32 m_scaleAccelerationAdd;
-    f32 m_angleValueAdd;
-    f32 m_angleVelocityAdd;
-    f32 m_angleAccelerationAdd;
-    s16 m_angleLimit;
-    u8 m_pad22[2];
-    f32 m_envDepth;
-    u8 m_blendMode;
-    u8 m_cullMode;
-    u8 m_fogIndex;
-    u8 m_lightTarget;
-    u8 m_disableZ;
-    u8 m_pad2D[0xF];
-};
-
 struct YmDeformationMdlColorInfo {
     u32 m_unk0;
     u32 m_unk4;
@@ -161,7 +141,7 @@ inline void DisableIndWarp()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
 {
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2);
     YmDeformationMdlColorInfo* colorInfo;
@@ -307,7 +287,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
 {
     YmDeformationMdlState* state;
 

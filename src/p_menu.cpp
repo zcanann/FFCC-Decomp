@@ -1661,15 +1661,14 @@ void CMenuPcs::createBattle()
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x18) = i;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x1C) = i;
+        m_battleMesMenus[i]->SetBattleIndex(i);
         m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
         CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleRingMenus[i]) + 8) = i;
+        m_battleRingMenus[i]->m_menuIndex = i;
         m_battleRingMenus[i]->Create();
     }
 

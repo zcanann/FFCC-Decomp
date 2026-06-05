@@ -30,6 +30,7 @@ public:
     void GET_2(char**);
     void GET_1(char**);
     int GetWait();
+    void SetPlayerIndex(int index) { m_playerIndex = index; }
     void Calc();
     void Draw();
     void SetPosition(float, float);
@@ -41,7 +42,7 @@ public:
     static int m_tempVar[0x14];
 
 private:
-    int mUnknown0;
+    int m_playerIndex;
     char* mText;
     int mCounter;
     int mFlags;

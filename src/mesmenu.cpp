@@ -629,7 +629,7 @@ void CMesMenu::onDraw()
 
             {
                 CCaravanWork* heartFood =
-                    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)]);
+                    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
                 if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
                     MenuPcs.SetColor(colorStorage);

@@ -1027,10 +1027,7 @@ static void OpenMogHintMessage(int messageId)
 		return;
 	}
 
-	const bool isBusy = (*(reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mesMenu) + 8)) != 0) &&
-	                    (*(reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mesMenu) + 0x0C)) < 2) &&
-	                    (reinterpret_cast<CMes*>(reinterpret_cast<unsigned char*>(mesMenu) + 0x1C)->GetWait() != 4);
-	if (isBusy) {
+	if (mesMenu->IsActiveMessage()) {
 		return;
 	}
 

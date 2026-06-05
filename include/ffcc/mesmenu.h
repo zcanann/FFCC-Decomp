@@ -23,6 +23,12 @@ public:
     void Open(char*, int, int, int, int, int, int);
     void CloseRequest(int);
     void SetPos(float, float);
+    void SetBattleIndex(int index)
+    {
+        m_menuIndex = index;
+        m_mes.SetPlayerIndex(index);
+    }
+    int IsActiveMessage() { return (m_active != 0) && (m_state <= 1) && (m_mes.GetWait() != 4); }
 
 private:
     int m_active;              // 0x0008

@@ -1102,8 +1102,7 @@ void CGraphicPcs::ReqScreenCapture()
 extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 {
     unsigned char result = 0;
-    if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) <= 1 &&
-        reinterpret_cast<CMes*>(reinterpret_cast<char*>(mesMenu) + 0x1C)->GetWait() != 4) {
+    if (reinterpret_cast<CMesMenu*>(mesMenu)->IsActiveMessage()) {
         result = 1;
     }
 

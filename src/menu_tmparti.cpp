@@ -443,11 +443,13 @@ int CMenuPcs::TmpArtiCtrl()
 
 		uVar5 = static_cast<unsigned int>(caravanWork->m_numCmdListSlots);
 		iVar7 = 0;
-		TmpArtiEntry* setupEntry = GetTmpArtiEntries(this) + (uVar5 - 1);
+		TmpArtiEntry* entries = GetTmpArtiEntries(this);
+		int setupIndex = uVar5 - 1;
 		if (-1 < (int)(uVar5 - 1)) {
 			uVar9 = uVar5 >> 3;
 			if (uVar9 != 0) {
 				do {
+					TmpArtiEntry* setupEntry = entries + setupIndex;
 					setupEntry[0].startFrame = iVar7++;
 					setupEntry[0].duration = 3;
 					setupEntry[-1].startFrame = iVar7++;
@@ -464,7 +466,7 @@ int CMenuPcs::TmpArtiCtrl()
 					setupEntry[-6].duration = 3;
 					setupEntry[-7].startFrame = iVar7++;
 					setupEntry[-7].duration = 3;
-					setupEntry -= 8;
+					setupIndex -= 8;
 					uVar9 = uVar9 - 1;
 				} while (uVar9 != 0);
 				uVar5 = uVar5 & 7;
@@ -473,10 +475,10 @@ int CMenuPcs::TmpArtiCtrl()
 				}
 			}
 			do {
-				setupEntry->startFrame = iVar7;
+				entries[setupIndex].startFrame = iVar7;
 				iVar7 = iVar7 + 1;
-				setupEntry->duration = 3;
-				setupEntry--;
+				entries[setupIndex].duration = 3;
+				setupIndex--;
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
 		}

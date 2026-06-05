@@ -1,4 +1,5 @@
 #include "ffcc/pppYmTraceMove.h"
+#include "global.h"
 #include "ffcc/gobject.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
@@ -16,6 +17,17 @@ struct pppYmTraceMoveWork {
     f32 m_velocity;
     f32 m_acceleration;
 };
+
+struct YmTraceMoveDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(YmTraceMoveDataOffsets, m_workOffset) == 0x0);
+
+static inline YmTraceMoveDataOffsets* GetYmTraceMoveDataOffsets(_pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<YmTraceMoveDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline Vec* GetYmTraceMovePreviousPosition(_pppMngSt* pppMngSt)
 {
@@ -47,7 +59,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		return;
 	}
 
-	s32 workOffset = *param_3->m_serializedDataOffsets;
+	s32 workOffset = GetYmTraceMoveDataOffsets(param_3)->m_workOffset;
 	_pppMngSt* pppMngSt = ppvMng;
 	CGObject* lookTarget = pppMngSt->m_lookTarget;
 	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + workOffset);
@@ -125,7 +137,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* param_2)
 {
 	pppYmTraceMoveWork* work =
-	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + *param_2->m_serializedDataOffsets);
+	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea +
+	                                          GetYmTraceMoveDataOffsets(param_2)->m_workOffset);
 	_pppMngSt* pppMngSt = ppvMng;
 	f32 zero;
 

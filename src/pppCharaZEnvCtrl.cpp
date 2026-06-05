@@ -1,9 +1,21 @@
 #include "ffcc/pppCharaZEnvCtrl.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 #include "dolphin/gx/GXPixel.h"
 
 void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+
+struct CharaZEnvCtrlDataOffsets {
+	s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(CharaZEnvCtrlDataOffsets, m_workOffset) == 0x0);
+
+static inline CharaZEnvCtrlDataOffsets* GetCharaZEnvCtrlDataOffsets(_pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<CharaZEnvCtrlDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -20,7 +32,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlS
 		return;
 	}
 
-	int dataOffset = *param_3->m_serializedDataOffsets;
+	int dataOffset = GetCharaZEnvCtrlDataOffsets(param_3)->m_workOffset;
 	void* work = pppCharaZEnvCtrl->m_workArea + dataOffset;
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);

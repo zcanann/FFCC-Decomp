@@ -1,4 +1,5 @@
 #include "ffcc/ptrarray.h"
+#include "global.h"
 #include "ffcc/pppConformBGNormal.h"
 #include "types.h"
 #include "ffcc/game.h"
@@ -40,6 +41,17 @@ struct ConformBgNormalCylinder {
     Vec m_boundsMin;
     Vec m_boundsMax;
 };
+
+struct ConformBgNormalDataOffsets {
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(ConformBgNormalDataOffsets, m_stateOffset) == 0x0);
+
+static inline ConformBgNormalDataOffsets* GetConformBgNormalDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<ConformBgNormalDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
 {
@@ -100,7 +112,7 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
     matrixX = pppMngSt->m_matrix.value[0][3];
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
-    dataOffset = *param3->m_serializedDataOffsets;
+    dataOffset = GetConformBgNormalDataOffsets(param3)->m_stateOffset;
     state = (ConformBgNormalState*)(pppConformBGNormal->m_workArea + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {

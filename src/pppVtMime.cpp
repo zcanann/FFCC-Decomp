@@ -1,4 +1,5 @@
 #include "ffcc/pppVtMime.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -33,12 +34,23 @@ struct VtMimeEnv
     void** sourceTable;
 };
 
+struct VtMimeDataOffsets {
+    s32 stateOffset;
+};
+
+STATIC_ASSERT(offsetof(VtMimeDataOffsets, stateOffset) == 0x0);
+
 static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 static const float kVtMimeZero = 0.0f;
 
+static inline VtMimeDataOffsets* GetVtMimeDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VtMimeDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline VtMimeState* GetVtMimeState(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<VtMimeState*>(object->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<VtMimeState*>(object->m_workArea + GetVtMimeDataOffsets(ctrl)->stateOffset);
 }
 
 static inline VtMimeState* GetVtMimeState(_pppPObjLink* object, _pppCtrlTable* ctrl)

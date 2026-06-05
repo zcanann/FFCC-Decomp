@@ -569,7 +569,9 @@ void CPartPcs::drawAfterViewer()
  */
 void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 {
-	_pppMngSt& pppMngSt = PartMng.m_pppMng[index];
+	_pppMngSt* pppMngStArray = PartMng.m_pppMng;
+	_pppMngSt& pppMngSt = pppMngStArray[index];
+
 	color.x = pppMngSt.m_userFloat0;
 	color.y = pppMngSt.m_userFloat1;
 	color.z = pppMngSt.m_scaleFactor;

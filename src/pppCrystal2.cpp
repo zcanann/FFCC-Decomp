@@ -56,12 +56,12 @@ union Crystal2FloatBits {
     u32 bits;
 };
 
-extern const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
-extern const Crystal2TexMtx s_crystal2TexMtxBase = {
+static const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-extern const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
+static const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";
 
 static inline int Crystal2FpClassify(float value)
 {

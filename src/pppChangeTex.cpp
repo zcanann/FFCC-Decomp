@@ -420,9 +420,8 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	CTexture* texture = work->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
-		unsigned int drawTevBits = 0xADE0F;
 		MaterialMan.SetChangeTexReflectionState(
-		    &texture->m_texObj, drawTevBits, drawTevBits | 0x1000);
+		    &texture->m_texObj, 0xACE0F, 0xADE0F);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

@@ -31,10 +31,10 @@ unsigned long octtree_draw_node_ct = 0;
 extern unsigned long g_pStage;
 extern unsigned long s_insertShadowNo;
 
-extern "C" const char sMapOctTreeNodeMeshTypeFmt[] =
+static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
     "===============================================\n\n";
-extern "C" const char s_mapocttree_cpp[] = "mapocttree.cpp";
+static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
 static inline unsigned char* Ptr(void* ptr, unsigned int offset)

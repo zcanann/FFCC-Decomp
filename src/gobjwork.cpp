@@ -410,22 +410,23 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 		m_letters[i].m_words.m_word2 = m_letters[i - 1].m_words.m_word2;
 	}
 
-	CCaravanWork::CLetterWork* letter = &m_letters[0];
-	memset(letter, 0, sizeof(*letter));
-	letter->m_half.m_header = static_cast<unsigned short>(letterType << 2);
-	letter->m_words.m_word0 = (letter->m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	if (hasMoneyFlag != 0) {
-		letter->SetFlags(letter->Flags() | 8);
+	memset(&m_letters[0], 0, sizeof(m_letters[0]));
+	m_letters[0].m_half.m_header =
+		(m_letters[0].m_half.m_header & 0xF803) | static_cast<unsigned short>(letterType << 2);
+	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
+	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
+	if (m_letters[0].AttachmentIsGil()) {
 		moneyValue /= 100;
 	}
-	letter->m_half.m_attachment = (letter->m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
-	if (hasReplyFlag != 0) {
-		letter->SetFlags(letter->Flags() | 0x10);
-	}
-	letter->m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
-	letter->m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
-	letter->m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
-	letter->m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
+	m_letters[0].m_half.m_attachment = (m_letters[0].m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
+	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x80);
+	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x40);
+	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x20);
+	m_letters[0].SetFlags((m_letters[0].Flags() & ~0x10) | ((hasReplyFlag << 4) & 0x10));
+	m_letters[0].m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
+	m_letters[0].m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
+	m_letters[0].m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
+	m_letters[0].m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
 	int nextCount = m_letterCount + 1;
 	int letterCount = 100;
@@ -1468,13 +1469,28 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param5, int param6, int, int flags)
+int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param5, int param6, int flags, int)
 {
 	switch (requestType) {
 	case 0:
 		m_shopListCount = 0;
 		m_shopRequestState = 0;
-		memset(m_shopList, 0, sizeof(m_shopList));
+		m_shopList[0] = 0;
+		m_shopList[1] = 0;
+		m_shopList[2] = 0;
+		m_shopList[3] = 0;
+		m_shopList[4] = 0;
+		m_shopList[5] = 0;
+		m_shopList[6] = 0;
+		m_shopList[7] = 0;
+		m_shopList[8] = 0;
+		m_shopList[9] = 0;
+		m_shopList[10] = 0;
+		m_shopList[11] = 0;
+		m_shopList[12] = 0;
+		m_shopList[13] = 0;
+		m_shopList[14] = 0;
+		m_shopList[15] = 0;
 		break;
 		case 1: {
 			short idx = m_shopListCount;
@@ -1494,18 +1510,18 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
 		break;
 	case 4:
 		m_shopRequestState = 1;
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			GbaQue.SetShopFlg(m_joybusCaravanId);
-		} else {
+		if (Game.m_gameWork.m_menuStageMode != 0) {
 			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		} else {
+			GbaQue.SetShopFlg(m_joybusCaravanId);
 		}
 		break;
 	case 5:
 		m_shopRequestState = 2;
-		if (Game.m_gameWork.m_menuStageMode == 0) {
-			GbaQue.SetSmithFlg(m_joybusCaravanId);
-		} else {
+		if (Game.m_gameWork.m_menuStageMode != 0) {
 			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		} else {
+			GbaQue.SetSmithFlg(m_joybusCaravanId);
 		}
 		break;
 	default:

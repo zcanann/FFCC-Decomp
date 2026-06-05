@@ -10357,27 +10357,27 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 		cameraSlot = slot;
 	}
 
-	unsigned char* effect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] + slot * 0x524);
+	EffectInfo* effect = &m_effectWork[slot];
 	if (slot == 5 && effectNo < 0x13) {
-		effect += 0x524;
+		effect++;
 	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
-		effect += 0x1490;
+		effect += 4;
 	}
 
-	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
-	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
-	reinterpret_cast<CGBaseObj*>(effect + 0xC)->Create();
-	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
+	effect->m_effectNo = effectNo;
+	effect->m_slotNo = slot;
+	effect->m_object.Create();
+	effect->m_object.m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
 
-	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;
-	*reinterpret_cast<void**>(createParam + 0x70) = effect + 0xC;
+	*reinterpret_cast<void**>(createParam + 0x74) = &effect->m_object;
+	*reinterpret_cast<void**>(createParam + 0x70) = &effect->m_object;
 	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
 	*reinterpret_cast<float*>(createParam + 0x60) = FLOAT_803313e8;
 	createParam[0x5C] = 0;
 
 	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
 	const unsigned int partId = PartMng.pppCreate(group, effectNo, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
-	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
+	effect->m_partNo = partId;
 	return partId;
 }
 
@@ -10977,24 +10977,23 @@ float CMenuPcs::GetMaxAnimWait()
 void CMenuPcs::BindMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const effectBase = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0]);
 	unsigned int* charaState = reinterpret_cast<unsigned int*>(bytes + 0x838);
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int* const effectA = reinterpret_cast<unsigned int*>(effectBase + (i + 0x11) * 0x524);
-		if (static_cast<int>(effectA[1]) >= 0) {
-			PartMng.pppDeletePart(static_cast<int>(effectA[1]));
-			effectA[1] = 0xFFFFFFFF;
-			effectA[2] = 0xFFFFFFFF;
-			effectA[0] = 0xFFFFFFFF;
+		EffectInfo* const effectA = &m_effectWork[i + 0x11];
+		if (effectA->m_partNo >= 0) {
+			PartMng.pppDeletePart(effectA->m_partNo);
+			effectA->m_partNo = -1;
+			effectA->m_slotNo = -1;
+			effectA->m_effectNo = -1;
 		}
 
-		unsigned int* const effectB = reinterpret_cast<unsigned int*>(effectBase + (i + 0x12) * 0x524);
-		if (static_cast<int>(effectB[1]) >= 0) {
-			PartMng.pppDeletePart(static_cast<int>(effectB[1]));
-			effectB[1] = 0xFFFFFFFF;
-			effectB[2] = 0xFFFFFFFF;
-			effectB[0] = 0xFFFFFFFF;
+		EffectInfo* const effectB = &m_effectWork[i + 0x12];
+		if (effectB->m_partNo >= 0) {
+			PartMng.pppDeletePart(effectB->m_partNo);
+			effectB->m_partNo = -1;
+			effectB->m_slotNo = -1;
+			effectB->m_effectNo = -1;
 		}
 	}
 
@@ -11029,22 +11028,22 @@ void CMenuPcs::BindMcObj()
 			createParam[0x2C] = 0;
 
 			const unsigned int effectNo = static_cast<unsigned int>(modelNo + 0x16);
-			unsigned int* effect = reinterpret_cast<unsigned int*>(effectBase + slot * 0x524);
+			EffectInfo* effect = &m_effectWork[slot];
 			if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
-				effect += 0x149;
+				effect++;
 			} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
-				effect += 0x524;
+				effect += 4;
 			}
 
-			effect[0] = effectNo;
-			CGBaseObj* const baseObj = reinterpret_cast<CGBaseObj*>(effect + 3);
-			effect[2] = static_cast<unsigned int>(slot);
-			baseObj->Create();
-			effect[0x41] = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + i * 4);
-			*reinterpret_cast<void**>(createParam + 0x74) = baseObj;
-			*reinterpret_cast<void**>(createParam + 0x70) = baseObj;
+			effect->m_effectNo = effectNo;
+			CGObject* const object = &effect->m_object;
+			effect->m_slotNo = slot;
+			object->Create();
+			object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[i];
+			*reinterpret_cast<void**>(createParam + 0x74) = object;
+			*reinterpret_cast<void**>(createParam + 0x70) = object;
 			const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
-			effect[1] = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+			effect->m_partNo = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 		}
 
 		const unsigned int flags = charaState[i * 0x12 + 0xA];
@@ -11087,22 +11086,22 @@ void CMenuPcs::BindMcObj()
 		createParam[0x2C] = 0;
 
 		const unsigned int effectNo = static_cast<unsigned int>(weaponModel + 0x1A);
-		unsigned int* effect = reinterpret_cast<unsigned int*>(effectBase + slot * 0x524);
+		EffectInfo* effect = &m_effectWork[slot];
 		if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
-			effect += 0x149;
+			effect++;
 		} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
-			effect += 0x524;
+			effect += 4;
 		}
 
-		effect[0] = effectNo;
-		CGBaseObj* const baseObj = reinterpret_cast<CGBaseObj*>(effect + 3);
-		effect[2] = static_cast<unsigned int>(slot);
-		baseObj->Create();
-		effect[0x41] = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + i * 4);
-		*reinterpret_cast<void**>(createParam + 0x74) = baseObj;
-		*reinterpret_cast<void**>(createParam + 0x70) = baseObj;
+		effect->m_effectNo = effectNo;
+		CGObject* const object = &effect->m_object;
+		effect->m_slotNo = slot;
+		object->Create();
+		object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[i];
+		*reinterpret_cast<void**>(createParam + 0x74) = object;
+		*reinterpret_cast<void**>(createParam + 0x70) = object;
 		const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
-		effect[1] = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+		effect->m_partNo = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 	}
 }
 

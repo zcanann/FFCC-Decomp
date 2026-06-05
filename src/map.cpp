@@ -2611,28 +2611,26 @@ void setDbgLight(int, Vec&, _GXColor&)
 void CMapMng::DrawBefore()
 {
     const int mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
-        return;
-    }
+    if ((mapObjCount != 0) && (m_mapReadReady != 0)) {
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
 
-    GXSetColorUpdate(1);
-    GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_FRONT);
-    GXSetZMode(1, GX_LEQUAL, 1);
-    LightPcs.SetNumDiffuse(0);
+        if ((gMapHitDrawMode.m_byte & 8) == 0) {
+            CMapObj* mapObj = MapMng.GetMapObjArray();
+            for (int i = 0; i < mapObjCount; i++) {
+                mapObj->Draw(0xFE);
+                mapObj++;
+            }
 
-    if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        CMapObj* mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
-            mapObj->Draw(0xFE);
-            mapObj++;
-        }
-
-        const short octTreeCount = m_octTreeCount;
-        COctTree* octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
-            octTree->Draw(0xFF);
-            octTree++;
+            const short octTreeCount = m_octTreeCount;
+            COctTree* octTree = GetOctTreeArray();
+            for (int i = 0; i < octTreeCount; i++) {
+                octTree->Draw(0xFF);
+                octTree++;
+            }
         }
     }
 }

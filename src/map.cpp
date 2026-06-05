@@ -1748,7 +1748,16 @@ int CMapMng::ReadMtx(char* mapName)
             }
         }
         if (!exists) {
-            break;
+            if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+                return 1;
+            }
+            if (loadIndex == 0) {
+                if (System.m_execParam != 0) {
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                }
+                return 0;
+            }
+            return 1;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) > 2) {
@@ -1827,17 +1836,6 @@ int CMapMng::ReadMtx(char* mapName)
         }
 
         loadIndex += 1;
-    }
-
-    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
-        return 1;
-    }
-
-    if (loadIndex == 0) {
-        if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
-        }
-        return 0;
     }
 
     return 1;

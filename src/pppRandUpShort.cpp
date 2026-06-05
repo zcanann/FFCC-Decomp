@@ -1,10 +1,22 @@
 #include "ffcc/pppRandUpShort.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandUpShortDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandUpShortDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandUpShortDataOffsets* GetRandUpShortDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandUpShortDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -33,13 +45,13 @@ void pppRandUpShort(_pppPObject* basePtr, RandUpShortParam* in, _pppCtrlTable* c
             value = mixed * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpShortDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpShortDataOffsets(ctrl)->m_valueOffset);
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);

@@ -2,6 +2,25 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
+extern "C" {
+void create__10CSystemPcsFv(CSystemPcs*);
+void destroy__10CSystemPcsFv(CSystemPcs*);
+void calc__10CSystemPcsFv(CSystemPcs*);
+}
+
+inline CSystemPcs::CSystemPcs()
+{
+    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
+    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
+    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
+
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = desc0;
+    table->m_fields.m_destroy = desc1;
+    table->m_fields.m_entries[0].m_callback = desc2;
+}
+
 CSystemPcs SystemPcs;
 CProcessTable CSystemPcs::m_table = {
     "CSystemPcs",

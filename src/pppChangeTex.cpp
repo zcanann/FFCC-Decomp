@@ -17,6 +17,23 @@ extern const float kPppChangeTexInit[2];
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 
+struct ChangeTexWork {
+    float m_value0;
+    float m_value1;
+    float m_value2;
+    GXColor** m_meshColorArrays;
+    ChangeTexDisplayListCopy*** m_displayListArrays;
+    int _pad14;
+    CGObject* m_charaObj;
+    CTexture* m_texture;
+    int _pad20;
+    void* m_context;
+    Vec m_bboxMin;
+    int _pad34;
+    Vec m_bboxMax;
+    float m_cachedValue;
+};
+
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);

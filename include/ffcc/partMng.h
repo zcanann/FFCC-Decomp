@@ -86,7 +86,7 @@ struct PPPCREATEPARAM
 }; // Size 0x6c
 
 #ifndef FFCC_PARTMNG_NO_INLINE_PPPCREATEPARAM
-extern "C" float FLOAT_8032fe18;
+extern "C" const float FLOAT_8032fe18;
 
 inline PPPCREATEPARAM::PPPCREATEPARAM()
 {

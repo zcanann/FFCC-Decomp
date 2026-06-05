@@ -7,6 +7,25 @@ extern const char s_CMcPcs_80331B10[];
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
 
+extern "C" {
+void create__6CMcPcsFv(CMcPcs*);
+void destroy__6CMcPcsFv(CMcPcs*);
+void calc__6CMcPcsFv(CMcPcs*);
+}
+
+inline CMcPcs::CMcPcs()
+{
+    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__6CMcPcsFv)};
+    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__6CMcPcsFv)};
+    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__6CMcPcsFv)};
+
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = desc0;
+    table->m_fields.m_destroy = desc1;
+    table->m_fields.m_entries[0].m_callback = desc2;
+}
+
 CProcessTable CMcPcs::m_table = {
     const_cast<char*>(s_CMcPcs_80331B10),
     {

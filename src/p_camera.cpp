@@ -85,6 +85,34 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
+extern "C" {
+void create__10CCameraPcsFv(CCameraPcs*);
+void destroy__10CCameraPcsFv(CCameraPcs*);
+void calc__10CCameraPcsFv(CCameraPcs*);
+void draw__10CCameraPcsFv(CCameraPcs*);
+void createChara__10CCameraPcsFv(CCameraPcs*);
+void destroyChara__10CCameraPcsFv(CCameraPcs*);
+void calcChara__10CCameraPcsFv(CCameraPcs*);
+void createMap__10CCameraPcsFv(CCameraPcs*);
+void destroyMap__10CCameraPcsFv(CCameraPcs*);
+void calcMap__10CCameraPcsFv(CCameraPcs*);
+void createMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+void destroyMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+void calcMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+void createFunnyShape__10CCameraPcsFv(CCameraPcs*);
+void destroyFunnyShape__10CCameraPcsFv(CCameraPcs*);
+void calcFunnyShape__10CCameraPcsFv(CCameraPcs*);
+void createPart__10CCameraPcsFv(CCameraPcs*);
+void destroyPart__10CCameraPcsFv(CCameraPcs*);
+void calcPart__10CCameraPcsFv(CCameraPcs*);
+void createFullShadow__10CCameraPcsFv(CCameraPcs*);
+void destroyFullShadow__10CCameraPcsFv(CCameraPcs*);
+void drawShadowBegin__10CCameraPcsFv(CCameraPcs*);
+void drawShadowEnd__10CCameraPcsFv(CCameraPcs*);
+void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
+void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
+}
+
 CProcessTableCallback CCameraPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
 CProcessTableCallback CCameraPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
 CProcessTableCallback CCameraPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};

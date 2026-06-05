@@ -2,6 +2,28 @@
 #include "ffcc/linkage.h"
 #include "ffcc/sound.h"
 
+extern "C" {
+void create__9CSoundPcsFv(CSoundPcs*);
+void destroy__9CSoundPcsFv(CSoundPcs*);
+void calc__9CSoundPcsFv(CSoundPcs*);
+void draw__9CSoundPcsFv(CSoundPcs*);
+}
+
+inline CSoundPcs::CSoundPcs()
+{
+    static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
+    static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
+    static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)};
+    static CProcessTableCallback desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)};
+
+    CProcessTable* table = &m_table;
+
+    table->m_fields.m_create = desc0;
+    table->m_fields.m_destroy = desc1;
+    table->m_fields.m_entries[0].m_callback = desc2;
+    table->m_fields.m_entries[1].m_callback = desc3;
+}
+
 CProcessTable CSoundPcs::m_table = {
     "CSoundPcs",
     {

@@ -42,10 +42,15 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
-extern "C" double DOUBLE_8032fdf0;
-extern "C" double DOUBLE_8032fe00;
-extern "C" float FLOAT_8032fdf8;
-extern "C" unsigned int gPppFixedWhite;
+extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
+extern "C" const float FLOAT_8032fddc = 0.0f;
+extern "C" const float FLOAT_8032fde0 = 10000000000.0f;
+extern "C" const float FLOAT_8032fde4 = -10000000000.0f;
+extern "C" const float FLOAT_8032FDE8 = -1000000000000.0f;
+extern "C" const double DOUBLE_8032fdf0 = 0.0;
+extern "C" const float FLOAT_8032fdf8 = 5000.0f;
+extern "C" const float FLOAT_8032fdfc = 1.0f;
+extern "C" const double DOUBLE_8032fe00 = 1.0;
 
 _pppMngSt* ppvMng;
 _pppEnvSt* ppvEnv;
@@ -90,11 +95,6 @@ CAmemCacheSet ppvAmemCacheSet;
 extern "C" const char s_pppPart_cpp[];
 extern "C" const char s_ERROR_prog_NULL[];
 extern "C" const char s_CPartPcs_heap_801D821C[];
-extern "C" const float FLOAT_8032fddc;
-extern "C" const float FLOAT_8032fdfc;
-extern "C" float FLOAT_8032fde0;
-extern "C" float FLOAT_8032fde4;
-extern "C" float FLOAT_8032FDE8;
 
 /*
  * --INFO--

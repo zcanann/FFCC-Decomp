@@ -45,6 +45,7 @@ struct VtMimeEnv
 };
 
 extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
+extern "C" const float kPppVtMimeZero = 0.0f;
 
 static inline VtMimeState* GetVtMimeState(_pppPObject* object, _pppCtrlTable* ctrl)
 {
@@ -88,7 +89,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kPppVtMimeZero[0];
+    float zero = kPppVtMimeZero;
 
     state->accel = zero;
     state->velocity = zero;
@@ -107,7 +108,7 @@ void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl)
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    float zero = kPppVtMimeZero[0];
+    float zero = kPppVtMimeZero;
 
     state->accel = zero;
     state->velocity = zero;

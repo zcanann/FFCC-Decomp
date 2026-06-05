@@ -3,12 +3,7 @@
 
 #include "ffcc/partMng.h"
 
-#include <dolphin/gx/GXStruct.h>
-
-struct pppFilterUnkB {
-    unsigned int m_unk0;
-    unsigned int m_dataValIndex;
-};
+struct pppFilterUnkB;
 
 #ifdef __cplusplus
 extern "C" {

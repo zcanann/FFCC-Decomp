@@ -5,8 +5,8 @@
 #include "ffcc/ppp_linkage.h"
 
 extern "C" {
-extern f32 FLOAT_80330548;
-extern f32 FLOAT_8033054c;
+const f32 FLOAT_80330548 = -1.0f;
+const f32 FLOAT_8033054c = 0.0f;
 extern const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
 extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
     (char)0x83, (char)0x52, (char)0x83, (char)0x93, (char)0x83,
@@ -15,6 +15,20 @@ extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
     '\0',
 };
 }
+
+struct pppYmDrawMdlTexAnmWork {
+    u32 m_frame;
+    u32 m_wait;
+    u32 m_tilesU;
+    u32 m_tilesV;
+    f32 m_perU;
+    f32 m_perV;
+};
+
+struct pppYmDrawMdlTexAnmColorBlock {
+    u8 _pad0[8];
+    pppCVECTOR m_color;
+};
 
 static inline CMapMesh** GetMapMeshTable()
 {

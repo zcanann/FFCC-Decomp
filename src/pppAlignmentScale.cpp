@@ -10,6 +10,13 @@ extern const float FLOAT_80331924;
 extern const float FLOAT_80331928 = 640.0f;
 extern const float FLOAT_8033192c = 224.0f;
 
+struct pppAlignmentScaleData
+{
+    float m_unk0x0;
+    float m_unk0x4;
+    float m_unk0x8;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80109810

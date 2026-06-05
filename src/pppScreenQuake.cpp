@@ -6,7 +6,27 @@ extern "C" {
 extern const float kPppScreenQuakeZero[2];
 }
 
-static inline float* GetScreenQuakeWork(pppScreenQuake* quake, pppScreenQuakeCtrl* ctrl)
+struct pppScreenQuake {
+    _pppPObject m_object;
+};
+
+struct pppScreenQuakeStep {
+    int m_graphId;
+    float m_dataValIndex;
+    float m_initWOrk;
+    float m_stepValue;
+    float m_arg3;
+    float m_initWOrk2;
+    float m_stepValue2;
+    float m_arg4;
+    float m_initWOrk3;
+    float m_stepValue3;
+    float m_quakeParam0;
+    float m_quakeParam1;
+    float m_quakeParam2;
+};
+
+static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<float*>(quake->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
@@ -20,7 +40,7 @@ static inline float* GetScreenQuakeWork(pppScreenQuake* quake, pppScreenQuakeCtr
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, pppScreenQuakeCtrl*)
+void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, _pppCtrlTable*)
 {
 }
 
@@ -33,7 +53,7 @@ void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, pppScreenQuakeCt
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, pppScreenQuakeCtrl *param3)
+void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, _pppCtrlTable *param3)
 {
     if (ppvUserStopPartF == 0) {
         float *value = GetScreenQuakeWork(quake, param3);
@@ -66,7 +86,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, pppS
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeCtrl*)
+void pppDesScreenQuake(pppScreenQuake*, _pppCtrlTable*)
 {
     float val = kPppScreenQuakeZero[0];
 
@@ -93,7 +113,7 @@ void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeCtrl*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2)
+void pppCon2ScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
     float val = kPppScreenQuakeZero[0];
     float *data = GetScreenQuakeWork(quake, param2);
@@ -118,7 +138,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2)
+void pppConScreenQuake(pppScreenQuake *quake, _pppCtrlTable *param2)
 {
     float val = kPppScreenQuakeZero[0];
     float *data = GetScreenQuakeWork(quake, param2);

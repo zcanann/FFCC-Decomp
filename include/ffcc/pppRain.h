@@ -8,8 +8,6 @@ struct pppRain {
     _pppPObject m_object;
 };
 
-struct VRain;
-
 struct PRain {
     s32 m_graphId;
     u16 m_dataValIndex;
@@ -46,25 +44,6 @@ struct PRain {
 struct RAIN_DATA {
     u8 padding[0xc];
     s32* m_serializedDataOffsets;
-};
-
-struct RainDrop {
-    f32 posX;
-    f32 posY;
-    f32 posZ;
-    f32 dirX;
-    f32 dirY;
-    f32 dirZ;
-    f32 length;
-    s16 life;
-    s16 pad;
-};
-
-struct RainWork {
-    RainDrop* drops;
-    f32 moveY;
-    f32 accelY;
-    f32 accelZ;
 };
 
 #ifdef __cplusplus

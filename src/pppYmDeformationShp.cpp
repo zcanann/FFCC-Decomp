@@ -9,9 +9,9 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 extern "C" {
-extern const float FLOAT_803305f0;
-extern const float kPppYmDeformationShpZero;
-extern const float FLOAT_803305f8;
+const float FLOAT_803305f0 = 0.017453292f;
+const float kPppYmDeformationShpZero = 0.0f;
+const float FLOAT_803305f8 = 1.0f;
 }
 #include "ffcc/util.h"
 
@@ -29,6 +29,25 @@ struct Vec4d {
 	float z;
 	float w;
 };
+
+struct YmDeformationShpColorInfo {
+	u32 m_unk0;
+	u32 m_unk4;
+	pppCVECTOR m_color;
+};
+
+struct VYmDeformationShp {
+	GXTexObj* m_backBuffer;
+	int m_pad0;
+	int m_pad1;
+	s16 m_angle;
+	u8 m_direction;
+	u8 m_pad2;
+	float m_scale;
+	float m_values[5];
+};
+
+int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 struct _pppEnvStYmDeformationShp {
 	void* m_stagePtr;
@@ -497,7 +516,3 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pp
 	state->m_values[3] = value;
 	state->m_values[2] = value;
 }
-
-extern const float FLOAT_80330634 = 0.0f;
-extern const float FLOAT_80330638 = 0.0f;
-extern const float FLOAT_8033063c = 0.0f;

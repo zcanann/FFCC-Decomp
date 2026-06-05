@@ -3,9 +3,9 @@
 
 extern float ppvSinTbl[];
 
-extern float gPppPointRApRandomAngleRange;
-extern float gPppPointRApRandomAngleBias;
-extern const float gPppPointRApSpinScale[2];
+extern const float gPppPointRApRandomAngleRange;
+extern const float gPppPointRApRandomAngleBias;
+extern const float gPppPointRApSpinScale;
 
 extern const float gPppScaleLoopAutoZero;
 
@@ -32,11 +32,11 @@ extern const float kPppGetRotMatrixZOne;
 extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
 extern const float kPppChangeTexInit[2];
-extern const float kPppKeLnsZero[2];
-extern const float kPppMoveZero[2];
+extern const float kPppKeLnsZero;
+extern const float kPppMoveZero;
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;
-extern const float kPppVtMimeZero[2];
+extern const float kPppVtMimeZero;
 
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;

@@ -23,21 +23,61 @@ struct Vec4d {
 	float w;
 };
 
+struct YmDeformationScreenOffsetData {
+	int unk0;
+	int unk1;
+	int offset;
+};
+
+struct YmDeformationScreenParam {
+	char pad[0xc];
+	YmDeformationScreenOffsetData* offsetData;
+};
+
+struct VYmDeformationScreen {
+	float m_depth;
+	s16 m_angle;
+	u8 m_direction;
+	u8 m_pad;
+	float m_scale;
+	float m_values[5];
+};
+
+struct YmDeformationScreenData {
+	char pad[0xc];
+	int* m_serializedDataOffsets;
+};
+
+struct YmDeformationScreenStep {
+	int m_graphId;
+	int m_dataValIndex;
+	float m_initWOrk;
+	float m_stepValue;
+	float m_arg3;
+	float m_payload0;
+	float m_payload1;
+	float m_payload2;
+	short m_payload3;
+	char m_payloadBytes[0x1a];
+};
+
 struct _pppEnvStYmDeformationScreen {
 	void* m_stagePtr;
 	CMaterialSet* m_materialSetPtr;
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern const float kYmDeformationScreenZero;
-extern const float kYmDeformationScreenOrthoScaleX;
-extern const float kYmDeformationScreenOrthoScaleY;
-extern const float kYmDeformationScreenOne;
-extern const float kYmDeformationScreenOrthoOffsetX;
-extern const float kYmDeformationScreenAngleToRad;
-extern const float kYmDeformationScreenQuadRight;
-extern const float kYmDeformationScreenQuadMiddleY;
-extern const float kYmDeformationScreenQuadBottom;
+extern "C" {
+extern const float kYmDeformationScreenZero = 0.0f;
+extern const float kYmDeformationScreenOrthoScaleX = 0.003125f;
+extern const float kYmDeformationScreenOrthoScaleY = -0.004464f;
+extern const float kYmDeformationScreenOne = 1.0f;
+extern const float kYmDeformationScreenOrthoOffsetX = -1.0f;
+extern const float kYmDeformationScreenAngleToRad = 0.017453292f;
+extern const float kYmDeformationScreenQuadRight = 640.0f;
+extern const float kYmDeformationScreenQuadMiddleY = 224.0f;
+extern const float kYmDeformationScreenQuadBottom = 448.0f;
+}
 
 /*
  * --INFO--

@@ -150,6 +150,9 @@ struct YmMiasmaFrameStep : PYmMiasma {
     float m_speedDecayStep;
 };
 
+void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
+void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
+
 template <typename T>
 static inline T* PppWorkArea(_pppPObject* object, _pppCtrlTable* ctrl, int index)
 {

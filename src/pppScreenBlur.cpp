@@ -5,6 +5,15 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
+struct pppScreenBlurUnkB {
+    u32 m_dataValIndex;
+    u8 m_blurR;
+    u8 m_blurG;
+    u8 m_blurB;
+    u8 m_pad7;
+    s16 m_initWOrk;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80155504

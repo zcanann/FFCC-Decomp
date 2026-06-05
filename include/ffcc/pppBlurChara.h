@@ -4,10 +4,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/pppPart.h"
 
-#include <dolphin/gx.h>
 #include <dolphin/types.h>
-
-class CGObject;
 
 struct pppBlurChara {
     _pppPObject m_object;
@@ -26,24 +23,6 @@ struct pppBlurCharaUnkB {
     u8 _pad18;
     u8 m_alpha;
     u8 _pad1A[2];
-};
-
-struct pppBlurCharaWork {
-    void* m_captureBuffer;
-    CGObject* m_ownerObj;
-    GXTexObj* m_smallTexObj;
-    float m_savedModelField;
-};
-
-struct BlurCharaColorData {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
-struct BlurCharaTexData {
-    u8 _pad0[4];
-    CGObject* m_objPosBase;
-    GXTexObj* m_texObj;
 };
 
 void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);

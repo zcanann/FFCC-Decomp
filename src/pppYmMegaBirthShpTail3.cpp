@@ -5,14 +5,64 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern const float kPppYmMegaBirthShpTail3Zero;
-extern const float FLOAT_803305A0;
-extern const float FLOAT_803305A8;
-extern const float FLOAT_803305AC;
+const float FLOAT_803305A0 = 16384.0f;
+const float kPppYmMegaBirthShpTail3Zero = 0.0f;
+const float FLOAT_803305A8 = 0.017453292f;
+const float FLOAT_803305AC = 0.00787f;
 }
 #include "dolphin/mtx.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
+
+struct pppYmMegaBirthShpTail3
+{
+    _pppPObjLink m_link;
+    s32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX field_0x40;
+    char field_0x70[0x4c];
+    unsigned int field_0xbc;
+    unsigned int field_0xc0;
+    unsigned int field_0xc4;
+    unsigned int field_0xc8;
+    char m_data[0x500];
+};
+
+struct VYmMegaBirthShpTail3
+{
+    pppFMATRIX m_emitterMatrix;
+    Vec m_tailScaleDirection;
+    _PARTICLE_DATA* m_particles;
+    _PARTICLE_WMAT* m_wmats;
+    _PARTICLE_COLOR* m_colors;
+    unsigned int m_maxParticles;
+    unsigned short m_lifeLimit;
+    unsigned short m_pathIndex;
+};
+
+struct PYmMegaBirthShpTail3
+{
+    Mtx m_matrix;
+    Vec m_directionTail;
+    float m_colorDeltaAdd[4];
+    float m_sizeStart;
+    float m_sizeVal;
+    float m_speedRandRange;
+    float field_0x58;
+    Vec m_speedScale;
+    unsigned char m_randType;
+    unsigned char m_enableParticleColor;
+    unsigned char m_pad0x6a[0x6C - 0x6A];
+    short m_pathIndex;
+    unsigned char m_pad0x6e[0xB9 - 0x6E];
+    unsigned char m_wmatCopyMode;
+};
+
+struct pppYmMegaBirthShpTail3UnkC
+{
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
+};
 
 static const float FLOAT_803305B0 = 127.0f;
 static const float FLOAT_803305C8 = 2.0f;
@@ -24,6 +74,10 @@ static const double DOUBLE_803305D8 = 1.0;
 static pppFMATRIX g_matUnit3;
 
 extern "C" const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
+
+void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
+
 /*
  * --INFO--
  * PAL Address: 8008ca98

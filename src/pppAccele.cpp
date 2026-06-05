@@ -2,9 +2,16 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
-extern const float kPppAcceleZero;
+const float kPppAcceleZero = 0.0f;
 }
 
+struct pppAcceleUnkB {
+    int m_graphId;          // 0x00
+    int m_field_04;         // 0x04
+    float m_initWOrk;       // 0x08
+    float m_stepValue;      // 0x0C
+    float m_arg3;           // 0x10
+};
 
 /*
  * --INFO--

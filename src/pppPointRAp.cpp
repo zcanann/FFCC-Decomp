@@ -6,6 +6,9 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
+extern "C" const float gPppPointRApRandomAngleRange = 32768.0f;
+extern "C" const float gPppPointRApRandomAngleBias = 16384.0f;
+extern "C" const float gPppPointRApSpinScale = 2.0f;
 
 struct pppPointRApStep {
     u32 m_unknown0;
@@ -67,7 +70,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         yOff = scaleA * pppSinFromTable(angleA);
         float spinRand = Math.RandF();
         float spinAngle = gPppPointRApRandomAngleRange * spinRand;
-        s32 angleB = (s32)(gPppPointRApSpinScale[0] * spinAngle);
+        s32 angleB = (s32)(gPppPointRApSpinScale * spinAngle);
         u32 childPosOffset = payload->m_childPosOffset;
         u32 childVelocityOffset = payload->m_childVelocityOffset;
         float xOff = planarOff * pppSinFromTable(angleB);

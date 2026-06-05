@@ -2,6 +2,13 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
+struct pppAngAcceleUnkB {
+    int m_graphId; // 0x00
+    int m_field_04;
+    int m_x;
+    int m_y;
+    int m_z;
+};
 
 /*
  * --INFO--

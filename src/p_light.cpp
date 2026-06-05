@@ -61,6 +61,14 @@ extern const char sLightProcessClassName[] = "CProcess";
 extern "C" const char sLightTextureFullMsg[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
+extern "C" {
+void create__9CLightPcsFv(CLightPcs*);
+void destroy__9CLightPcsFv(CLightPcs*);
+void calc__9CLightPcsFv(CLightPcs*);
+void draw__9CLightPcsFv(CLightPcs*);
+void MakeLightMap__9CLightPcsFv(CLightPcs*);
+}
+
 CLightPcs LightPcs;
 
 CProcessTableCallback CLightPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};

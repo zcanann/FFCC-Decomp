@@ -61,6 +61,13 @@ extern const char sDbgMenuOn[] = "ON";
 extern const char sDbgMenuOff[] = "OFF";
 extern const char sDbgMenuUnknown[] = "?";
 
+extern "C" {
+void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
+void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
+void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
+void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
+}
+
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
 	static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};

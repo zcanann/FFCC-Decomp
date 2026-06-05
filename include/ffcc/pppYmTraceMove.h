@@ -9,15 +9,6 @@ struct pppYmTraceMove {
     _pppPObject m_object;
 };
 
-struct pppYmTraceMoveWork {
-    Vec m_direction;
-    u32 _pad0C;
-    Vec m_previousDirection;
-    f32 m_distance;
-    f32 m_velocity;
-    f32 m_acceleration;
-};
-
 struct pppYmTraceMoveStep {
     s32 m_graphId;
     f32 m_dataValIndex;

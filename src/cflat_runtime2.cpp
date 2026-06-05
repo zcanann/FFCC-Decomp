@@ -8,6 +8,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
+#include "ffcc/line.h"
 #include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
@@ -134,62 +135,45 @@ static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime
 	return 0;
 }
 
-template <int count>
-class CLine;
-
-template <>
-class CLine<64>
-{
-public:
-	CLine();
-	void Draw();
-
-private:
-	u8 m_0x00[0x18];
-	u32 m_numPoints;
-	u8 m_0x1C[0x14];
-	Vec m_points[64];
-};
-
 CLine<64>::CLine()
 {
-	m_numPoints = 0;
+	pointCount = 0;
 }
 
 void CLine<64>::Draw()
 {
-	if (m_numPoints == 0) {
+	if (pointCount == 0) {
 		return;
 	}
 
-	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	u32 i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 
 	const float yOffset = 1.0f;
-	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = yOffset + m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = yOffset + points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 
-	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((m_numPoints & 0x7FFF) << 1));
+	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
 	i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = yOffset + m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = points[i].y;
+		GXWGFifo.f32 = points[i].z;
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = yOffset + points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 }
@@ -206,11 +190,6 @@ static inline u8* PadRaw()
 static inline u8* MenuPcsRaw()
 {
 	return reinterpret_cast<u8*>(&MenuPcs);
-}
-
-static inline u8* GraphicPcsRaw()
-{
-	return reinterpret_cast<u8*>(&GraphicPcs);
 }
 
 static inline u8* CameraPcsRaw()
@@ -1414,7 +1393,7 @@ void CFlatRuntime2::Calc()
 		saveData[4] = SwapF32(CameraPcs.m_targetY);
 		saveData[5] = SwapF32(CameraPcs.m_targetZ);
 		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((FLOAT_80330138 * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / FLOAT_8033013C);
+		saveData[7] = SwapF32((FLOAT_80330138 * CameraPcs.m_zRotate) / FLOAT_8033013C);
 
 		u32 lastX = 0;
 		u32 lastY = 0;
@@ -2459,7 +2438,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x17:
-	*reinterpret_cast<unsigned int*>(PadRaw() + 0x1C8) = static_cast<unsigned int>(controlValue);
+	Pad._1c8_4_ = static_cast<int>(controlValue);
 		break;
 
 	case 0x18:
@@ -2626,9 +2605,9 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
-	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
-	*reinterpret_cast<u32*>(GraphicPcsRaw() + 0x44) = 0;
-	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;
+	Pad._1c8_4_ = 1;
+	GraphicPcs.m_screenFade[1].m_mode = 0;
+	CameraPcs.m_shadowAuto = 1;
 	AStar.reset();
 }
 

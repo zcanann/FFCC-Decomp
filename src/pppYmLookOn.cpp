@@ -5,7 +5,16 @@
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
-static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* ctrl)
+struct pppYmLookOn {
+    _pppPObject m_object;
+};
+
+struct pppYmLookOnStep {
+    int m_graphId;
+    float m_dataValIndex;
+};
+
+static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<CGObject**>(lookOn->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
@@ -19,7 +28,7 @@ static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* c
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct pppYmLookOnCtrl* param_3)
+void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct _pppCtrlTable* param_3)
 {
     struct _pppMngSt* pppMngSt;
     CGObject* owner;
@@ -95,7 +104,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnCtrl* param_2)
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct _pppCtrlTable* param_2)
 {
     *GetYmLookOnWork(pppYmLookOn, param_2) = 0;
 }

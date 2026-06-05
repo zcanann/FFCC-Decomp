@@ -29,7 +29,6 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
     u32 offset = static_cast<u32>(ctrlTable->m_serializedDataOffsets[1]);
     PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offset);
     
-    // Initialize to zero (store order: z, y, x to match assembly)
     f32 zero = kPppMoveZero;
     moveObj->z = zero;
     moveObj->y = zero;

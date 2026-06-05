@@ -25,10 +25,10 @@ struct PppAngMoveOffsets {
 void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
 {
     int offset = ctrlTable->m_serializedDataOffsets[1];
-    int* ptr = (int*)(dest->m_workArea + offset);
-    ptr[2] = 0;
-    ptr[1] = 0;
-    ptr[0] = 0;
+    PppAngMoveObj* work = (PppAngMoveObj*)(dest->m_workArea + offset);
+    work->z = 0;
+    work->y = 0;
+    work->x = 0;
 }
 
 /*

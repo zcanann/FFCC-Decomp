@@ -1315,36 +1315,32 @@ void CMapMng::DestroyMap()
 
     CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
-        CMapAnim* mapAnim = (*mapAnimArray)[i];
-        if (mapAnim != 0) {
-            delete mapAnim;
+        if ((*mapAnimArray)[i] != 0) {
+            delete (*mapAnimArray)[i];
         }
     }
     mapAnimArray->RemoveAll();
 
     CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &GetMapAnimKeyDtArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
-        CMapAnimKeyDt* mapAnimKeyDt = (*mapAnimKeyDtArray)[i];
-        if (mapAnimKeyDt != 0) {
-            delete mapAnimKeyDt;
+        if ((*mapAnimKeyDtArray)[i] != 0) {
+            delete (*mapAnimKeyDtArray)[i];
         }
     }
     mapAnimKeyDtArray->RemoveAll();
 
     CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
-        if (mapAnimRun != 0) {
-            operator delete(mapAnimRun);
+        if ((*mapAnimRunArray)[i] != 0) {
+            operator delete((*mapAnimRunArray)[i]);
         }
     }
     mapAnimRunArray->RemoveAll();
 
     CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
-        if (mapShadow != 0) {
-            operator delete(mapShadow);
+        if ((*mapShadowArray)[i] != 0) {
+            operator delete((*mapShadowArray)[i]);
         }
     }
     mapShadowArray->RemoveAll();
@@ -1353,9 +1349,8 @@ void CMapMng::DestroyMap()
         CPtrArray<CMapLightHolder*>* mapLightHolderArray = &GetMapLightHolderArray(i);
 
         for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
-            CMapLightHolder* holder = (*mapLightHolderArray)[j];
-            if (holder != 0) {
-                operator delete(holder);
+            if ((*mapLightHolderArray)[j] != 0) {
+                operator delete((*mapLightHolderArray)[j]);
             }
         }
         mapLightHolderArray->RemoveAll();

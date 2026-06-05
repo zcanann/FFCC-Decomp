@@ -17,6 +17,22 @@
 STATIC_ASSERT(offsetof(pppYmDeformationMdl, m_object) == 0);
 STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
 
+struct YmDeformationMdlColorInfo {
+    u32 m_unk0;
+    u32 m_unk4;
+    pppCVECTOR m_color;
+};
+
+struct VYmDeformationMdl {
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad;
+    float m_scale;
+    float m_values[5];
+};
+
+typedef VYmDeformationMdl YmDeformationMdlState;
+
 struct _pppEnvStYmDeformationMdl {
     void* m_stagePtr;
     CMaterialSet* m_materialSetPtr;

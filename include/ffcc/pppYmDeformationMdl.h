@@ -5,22 +5,6 @@
 
 #include <dolphin/types.h>
 
-struct YmDeformationMdlColorInfo {
-    u32 m_unk0;
-    u32 m_unk4;
-    pppCVECTOR m_color;
-};
-
-struct VYmDeformationMdl {
-    s16 m_angle;
-    u8 m_direction;
-    u8 m_pad;
-    float m_scale;
-    float m_values[5];
-};
-
-typedef VYmDeformationMdl YmDeformationMdlState;
-
 struct pppYmDeformationMdlUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -44,8 +28,6 @@ struct pppYmDeformationMdlUnkB {
 struct pppYmDeformationMdl {
     _pppPObject m_object;
 };
-
-void SetUpIndWarp(VYmDeformationMdl*);
 
 #ifdef __cplusplus
 extern "C" {

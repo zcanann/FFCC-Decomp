@@ -7,7 +7,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
-#include "ffcc/RedSound/RedSound.h"
 #include "ffcc/fontman.h"
 #include "ffcc/strcase.h"
 #include "ffcc/util.h"
@@ -251,11 +250,6 @@ namespace {
 static inline char** GetMenuHelpMsgTable()
 {
 	return reinterpret_cast<char**>(Game.m_cFlatDataArr[1].TableStrings(6));
-}
-
-static inline CRedSound* GetRedSoundGlobal()
-{
-	return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(&Sound) + 8);
 }
 
 static inline CTexture* GetMenuTexture(CMenuPcs* menu, int offset)
@@ -760,7 +754,7 @@ void CMenuPcs::GetOptionData()
 	gameInitMode =
 	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
 
-	unsigned int soundMode = GetRedSoundGlobal()->GetSoundMode();
+	unsigned int soundMode = Sound.GetSoundMode();
 	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
 	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
 

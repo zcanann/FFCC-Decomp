@@ -12,7 +12,13 @@ public:
 	CColor(_GXColor& other);
 	operator _GXColor();
 	operator _GXColor*();
-	void Identity();
+	void Identity()
+	{
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = 0xFF;
+	}
 
 	GXColor color;
 };
@@ -21,7 +27,13 @@ class CColor3
 {
 public:
 	CColor3();
-	CColor3(unsigned char r, unsigned char g, unsigned char b);
+	CColor3(unsigned char r, unsigned char g, unsigned char b)
+	{
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = 0xFF;
+	}
 	CColor3(CColor3& other);
 	CColor3(_GXColor& other);
 

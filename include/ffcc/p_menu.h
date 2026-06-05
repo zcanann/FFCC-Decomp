@@ -82,6 +82,14 @@ public:
 
         EffectInfo();
     };
+    struct EffectEntry
+    {
+        unsigned char m_pad00[0x0C];
+        int m_iconType;
+        unsigned char m_pad10[0x28 - 0x10];
+        unsigned int m_flags;
+        unsigned char m_pad2C[0x48 - 0x2C];
+    };
     enum MENUMODE
 	{
 		TODOA,
@@ -423,7 +431,7 @@ public:
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
-        unsigned char* m_effectEntries;
+        EffectEntry* m_effectEntries;
         unsigned char* m_wmCharaState;
     };
     void* m_pad83C;
@@ -448,6 +456,7 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
+STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 

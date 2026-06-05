@@ -1465,16 +1465,16 @@ void CMenuPcs::BindMcObj(int slotNo)
 		}
 	}
 
-	for (int slot = 0, entryOffset = 0; slot < 4; slot++, entryOffset += 0x48) {
+	for (int slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
-			unsigned char* entry = m_effectEntries + entryOffset;
-			int iconType = *reinterpret_cast<int*>(entry + 0xC);
+			EffectEntry* entry = &m_effectEntries[slot];
+			int iconType = entry->m_iconType;
 
 			if (iconType != 0) {
 				BindEffect(slot + 0x11, iconType + 0x16, -1);
 			}
 
-			unsigned int flags = *reinterpret_cast<unsigned int*>(entry + 0x28);
+			unsigned int flags = entry->m_flags;
 
 			if ((flags & 1) != 0) {
 				iconType = 0;

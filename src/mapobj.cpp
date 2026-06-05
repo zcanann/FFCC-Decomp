@@ -332,9 +332,9 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
+    InitMapObjAtrColorKeyFrame(m_keyFrame);
     m_type = CMapObjAtr::MIME;
     m_vertexLists = 0;
-    InitMapObjAtrColorKeyFrame(m_keyFrame);
 }
 
 /*

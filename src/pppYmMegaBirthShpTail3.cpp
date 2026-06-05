@@ -5,10 +5,10 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern const float kPppYmMegaBirthShpTail3Zero;
-extern const float FLOAT_803305A0;
-extern const float FLOAT_803305A8;
-extern const float FLOAT_803305AC;
+const float FLOAT_803305A0 = 16384.0f;
+const float kPppYmMegaBirthShpTail3Zero = 0.0f;
+const float FLOAT_803305A8 = 0.017453292f;
+const float FLOAT_803305AC = 0.00787f;
 }
 #include "dolphin/mtx.h"
 #include <string.h>

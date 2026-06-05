@@ -32,7 +32,7 @@ extern const float kPppGetRotMatrixZOne;
 extern const float kPppAcceleZero;
 extern float kPppBreathModelZero;
 extern const float kPppChangeTexInit[2];
-extern const float kPppKeLnsZero[2];
+extern const float kPppKeLnsZero;
 extern const float kPppMoveZero;
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;

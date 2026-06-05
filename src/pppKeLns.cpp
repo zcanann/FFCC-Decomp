@@ -3,7 +3,7 @@
 #include "ffcc/partMng.h"
 #include "dolphin/types.h"
 extern "C" {
-extern const float kPppKeLnsZero[2];
+const float kPppKeLnsZero = 0.0f;
 }
 
 /*
@@ -59,7 +59,7 @@ void pppKeLnsLpCon2(void* pObject, void* pPart)
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)pPart;
 	u32 offset = ctrlTable->m_serializedDataOffsets[0];
 	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + offset);
-	f32 zero = kPppKeLnsZero[0];
+	f32 zero = kPppKeLnsZero;
 
 	keLnsLp->m_work8C = zero;
 	keLnsLp->m_work98 = zero;
@@ -82,7 +82,7 @@ void pppKeLnsLpCon(void* pObject, void* pPart)
 	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + offset);
 
 	KeLnsLp_Init(keLnsLp);
-	f32 zero = kPppKeLnsZero[0];
+	f32 zero = kPppKeLnsZero;
 	keLnsLp->m_work8C = zero;
 	keLnsLp->m_work98 = zero;
 }

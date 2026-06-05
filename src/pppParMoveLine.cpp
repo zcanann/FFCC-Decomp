@@ -4,7 +4,9 @@
 
 #include <dolphin/mtx.h>
 
-extern const float FLOAT_80330638;
+extern "C" {
+const float FLOAT_80330638 = 0.0f;
+}
 
 struct ParMoveLineParams {
     u8 m_pad0[4];

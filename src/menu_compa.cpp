@@ -10,23 +10,23 @@
 
 typedef unsigned char u8;
 
-extern "C" const float FLOAT_80332FF8 = 0.0f;
-extern "C" const float FLOAT_80332FFC = 24.0f;
-extern "C" const float FLOAT_80333000 = 1.0f;
-extern "C" const double DOUBLE_80333008 = 1.0;
-extern "C" const float FLOAT_80333010 = 255.0f;
-extern "C" const float FLOAT_80333014 = 328.0f;
-extern "C" const float FLOAT_80333018 = 40.0f;
-extern "C" const float FLOAT_8033301C = 0.8f;
-extern "C" const float FLOAT_80333020 = 4.0f;
-extern "C" const float FLOAT_80333024 = 1.2f;
-extern "C" const float FLOAT_80333028 = 2.0f;
-extern "C" const double DOUBLE_80333030 = 4503601774854144.0;
+static const float FLOAT_80332FF8 = 0.0f;
+static const float FLOAT_80332FFC = 24.0f;
+static const float FLOAT_80333000 = 1.0f;
+static const double DOUBLE_80333008 = 1.0;
+static const float FLOAT_80333010 = 255.0f;
+static const float FLOAT_80333014 = 328.0f;
+static const float FLOAT_80333018 = 40.0f;
+static const float FLOAT_8033301C = 0.8f;
+static const float FLOAT_80333020 = 4.0f;
+static const float FLOAT_80333024 = 1.2f;
+static const float FLOAT_80333028 = 2.0f;
+static const double DOUBLE_80333030 = 4503601774854144.0;
 extern "C" const float FLOAT_80333038;
 extern "C" const float FLOAT_8033303C;
 
-extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
-extern "C" const char s_menu_compa_cpp[] = "menu_compa.cpp";
+static const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
+static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 extern "C" const char s_MenuOptionMonoUpper_803334A8[];
 extern "C" const char s_MenuOptionNormalIt_803334B0[];

@@ -868,11 +868,13 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
  */
 void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
-    int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
-                                           static_cast<int>(size), 0, 0);
+    int dmaId;
+    CRedSound* redSound = RedSound(&Sound);
+    dmaId = redSound->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                               static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
-    while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
+    while (redSound->DMACheck(dmaId) != 0) {
         watch.Stop();
         watch.Get();
         watch.Start();

@@ -17,44 +17,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct YmDeformationScreenOffsetData {
-	int unk0;
-	int unk1;
-	int offset;
-};
-
-struct YmDeformationScreenParam {
-	char pad[0xc];
-	YmDeformationScreenOffsetData* offsetData;
-};
-
-struct VYmDeformationScreen {
-	float m_depth;
-	s16 m_angle;
-	u8 m_direction;
-	u8 m_pad;
-	float m_scale;
-	float m_values[5];
-};
-
-struct YmDeformationScreenData {
-	char pad[0xc];
-	int* m_serializedDataOffsets;
-};
-
-struct YmDeformationScreenStep {
-	int m_graphId;
-	int m_dataValIndex;
-	float m_initWOrk;
-	float m_stepValue;
-	float m_arg3;
-	float m_payload0;
-	float m_payload1;
-	float m_payload2;
-	short m_payload3;
-	char m_payloadBytes[0x1a];
-};
-
 struct _pppEnvStYmDeformationScreen {
 	void* m_stagePtr;
 	CMaterialSet* m_materialSetPtr;
@@ -82,12 +44,10 @@ extern const float kYmDeformationScreenQuadBottom = 448.0f;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
+void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
-	YmDeformationScreenStep* step = (YmDeformationScreenStep*)param2;
 	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(param1->m_workArea +
-								((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
+		(VYmDeformationScreen*)(param1->m_workArea + param3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
 	Mtx identity;
@@ -250,7 +210,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, void* param3)
+void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
 	Vec4d outVec;
 	Vec4d inVec;
@@ -260,11 +220,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	float cameraX;
 	float cameraY;
 	float cameraZ;
-	YmDeformationScreenStep* step;
 
 	if (ppvUserStopPartF == 0) {
-		step = (YmDeformationScreenStep*)param2;
-		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
+		serializedDataOffsets = param3->m_serializedDataOffsets;
 		work = (VYmDeformationScreen*)(param1->m_workArea + serializedDataOffsets[2]);
 
 		CalcGraphValue(
@@ -329,7 +287,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
+void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
 {
 	return;
 }
@@ -343,11 +301,11 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
+void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
 	float zero = kYmDeformationScreenZero;
 	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(obj->m_workArea + ((YmDeformationScreenParam*)param2)->offsetData->offset);
+		(VYmDeformationScreen*)(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
 	work->m_values[1] = zero;
 	work->m_values[0] = zero;
@@ -366,13 +324,12 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
+void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
-	YmDeformationScreenOffsetData* offsetData = ((YmDeformationScreenParam*)param2)->offsetData;
 	short angle = 0;
 	char direction = 1;
 	float zero = kYmDeformationScreenZero;
-	VYmDeformationScreen* work = (VYmDeformationScreen*)(obj->m_workArea + offsetData->offset);
+	VYmDeformationScreen* work = (VYmDeformationScreen*)(obj->m_workArea + param2->m_serializedDataOffsets[2]);
 
 	work->m_angle = angle;
 	work->m_direction = direction;

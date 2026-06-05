@@ -75,7 +75,9 @@ public:
     };
     struct EffectInfo
     {
-        unsigned char m_pad[0xC];
+        int m_effectNo;
+        int m_partNo;
+        int m_slotNo;
         CGObject m_object;
 
         EffectInfo();

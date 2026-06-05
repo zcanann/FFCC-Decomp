@@ -549,9 +549,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 			font->Draw(scratch);
 
-			if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
-			    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
-				int menuState = *reinterpret_cast<int*>(self + 0x82C);
+			if ((m_battleStateFlag == 2) &&
+			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_artiState) + 0x30) == 1)) {
+				int menuState = reinterpret_cast<int>(m_artiState);
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {
@@ -723,15 +723,14 @@ void CMenuPcs::SetCrystalCageAttr()
  */
 void CMenuPcs::SetManaWaterEffect()
 {
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	int partNo = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x840) + 0x19B8);
+	int partNo = m_effectWork[5].m_partNo;
 
 	if (partNo != -1) {
 		PartMng.pppDeletePart(partNo);
 	}
 
 	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
-	*reinterpret_cast<int*>(self + 0x70) = Game.m_gameWork.m_timerA;
+	m_manaWaterTimerA = Game.m_gameWork.m_timerA;
 }
 
 /*
@@ -745,11 +744,10 @@ void CMenuPcs::SetManaWaterEffect()
  */
 void CMenuPcs::GetOptionData()
 {
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	signed char& gameInitMode = *reinterpret_cast<signed char*>(self + 0x8F);
-	signed char& stereoMode = *reinterpret_cast<signed char*>(self + 0x90);
-	signed char& bgmVolume = *reinterpret_cast<signed char*>(self + 0x91);
-	signed char& seVolume = *reinterpret_cast<signed char*>(self + 0x92);
+	signed char& gameInitMode = m_gameInitMode;
+	signed char& stereoMode = m_stereoMode;
+	signed char& bgmVolume = m_bgmVolume;
+	signed char& seVolume = m_seVolume;
 
 	gameInitMode =
 	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
@@ -1444,33 +1442,32 @@ void CMenuPcs::DrawOptionMenu()
  */
 void CMenuPcs::BindMcObj(int slotNo)
 {
-	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	int* obj;
+	EffectInfo* obj;
 
 	for (int slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
-			obj = reinterpret_cast<int*>(
-				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
+			obj = &m_effectWork[slot + 0x11];
 
-			if (obj[1] >= 0) {
-				PartMng.pppDeletePart(obj[1]);
-				obj[1] = -1;
-				obj[2] = -1;
-				obj[0] = -1;
+			if (obj->m_partNo >= 0) {
+				PartMng.pppDeletePart(obj->m_partNo);
+				obj->m_partNo = -1;
+				obj->m_slotNo = -1;
+				obj->m_effectNo = -1;
 			}
 
-			if (obj[0x525] >= 0) {
-				PartMng.pppDeletePart(obj[0x525]);
-				obj[0x525] = -1;
-				obj[0x526] = -1;
-				obj[0x524] = -1;
+			obj += 4;
+			if (obj->m_partNo >= 0) {
+				PartMng.pppDeletePart(obj->m_partNo);
+				obj->m_partNo = -1;
+				obj->m_slotNo = -1;
+				obj->m_effectNo = -1;
 			}
 		}
 	}
 
 	for (int slot = 0, entryOffset = 0; slot < 4; slot++, entryOffset += 0x48) {
 		if (slotNo == slot) {
-			unsigned char* entry = *reinterpret_cast<unsigned char**>(self + 0x838) + entryOffset;
+			unsigned char* entry = m_effectEntries + entryOffset;
 			int iconType = *reinterpret_cast<int*>(entry + 0xC);
 
 			if (iconType != 0) {

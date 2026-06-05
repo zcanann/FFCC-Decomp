@@ -1,6 +1,7 @@
 #ifndef _FFCC_MENU_UTIL_H_
 #define _FFCC_MENU_UTIL_H_
 
+#include "ffcc/gobject.h"
 #include "ffcc/memory.h"
 
 #include <dolphin/gx.h>
@@ -32,6 +33,14 @@ public:
     void DrawOptionMenu();
     void BindMcObj(int);
     unsigned int BindEffect(int, int, int);
+
+    struct EffectInfo
+    {
+        int m_effectNo;
+        int m_partNo;
+        int m_slotNo;
+        CGObject m_object;
+    };
 
     char pad_00[0x70];
     int m_manaWaterTimerA;            // 0x70
@@ -71,7 +80,7 @@ public:
     ArtiState* m_artiState;             // 0x82C
     char pad_830[0x838 - 0x830];
     unsigned char* m_effectEntries;     // 0x838
-    unsigned char* m_effectWork;        // 0x840
+    EffectInfo* m_effectWork;           // 0x840
     char pad_844[0x864 - 0x844];
     unsigned short m_battleStateFlag;   // 0x864
 };

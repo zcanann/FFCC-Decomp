@@ -1186,7 +1186,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 void CMapMng::Create()
 {
     m_calcCount = 0;
-    m_unknown10 = 0;
+    m_shadowKeyInfoCount = 0;
     m_mapMeshCount = 0;
     m_mapObjCount = 0;
     m_octTreeCount = 0;

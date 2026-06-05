@@ -5,15 +5,6 @@
 
 struct pppKeShpTailUnkB;
 
-struct KeShpTailWork {
-    u8 m_count;
-    u8 m_head;
-    u16 m_field2;
-    u16 m_field4;
-    u16 m_field6;
-    Vec m_posHistory[31];
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

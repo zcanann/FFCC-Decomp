@@ -14,10 +14,25 @@ struct KeShpTailWork {
     Vec m_posHistory[31];
 };
 
+struct KeShpTailDataOffsets {
+    s32 m_workOffset;
+};
+
 STATIC_ASSERT(sizeof(KeShpTailWork) == 0x17C);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_count) == 0x00);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_head) == 0x01);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
+STATIC_ASSERT(offsetof(KeShpTailDataOffsets, m_workOffset) == 0x0);
+
+static inline KeShpTailDataOffsets* GetKeShpTailDataOffsets(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<KeShpTailDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
+static inline KeShpTailWork* GetKeShpTailWork(_pppPObject* obj, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<KeShpTailWork*>(obj->m_workArea + GetKeShpTailDataOffsets(ctrlTable)->m_workOffset);
+}
 
 /*
  * --INFO--
@@ -48,7 +63,7 @@ void pppKeShpTailDraw(_pppPObject* obj, pppKeShpTailStep* stepData, _pppCtrlTabl
  */
 void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	KeShpTailWork* work = (KeShpTailWork*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[0]);
+	KeShpTailWork* work = GetKeShpTailWork(obj, ctrlTable);
 	work->m_field2 = 0;
 	work->m_field4 = 0;
 	work->m_field6 = 0;
@@ -72,7 +87,7 @@ void pppKeShpTail(_pppPObject* obj, pppKeShpTailStep*, _pppCtrlTable* offsets)
 		return;
 	}
 
-	work = (KeShpTailWork*)(obj->m_workArea + offsets->m_serializedDataOffsets[0]);
+	work = GetKeShpTailWork(obj, offsets);
 	if (obj->m_graphId == 0) {
 		Vec local_14 ATTRIBUTE_ALIGN(8);
 		Vec local_20;

@@ -30,14 +30,28 @@ struct KeShpTail2XAlphaWork {
 };
 STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
 
+struct KeShpTail2XDataOffsets {
+    s32 m_workOffset;
+    s32 m_alphaWorkOffset;
+};
+
+STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_workOffset) == 0x0);
+STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_alphaWorkOffset) == 0x4);
+
+static inline KeShpTail2XDataOffsets* GetKeShpTail2XDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<KeShpTail2XDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline KeShpTail2XWork* GetKeShpTail2XWork(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0]);
+    return reinterpret_cast<KeShpTail2XWork*>(obj->m_workArea + GetKeShpTail2XDataOffsets(ctrl)->m_workOffset);
 }
 
 static inline KeShpTail2XAlphaWork* GetKeShpTail2XAlphaWork(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<KeShpTail2XAlphaWork*>(obj->m_workArea + ctrl->m_serializedDataOffsets[1]);
+    return reinterpret_cast<KeShpTail2XAlphaWork*>(
+        obj->m_workArea + GetKeShpTail2XDataOffsets(ctrl)->m_alphaWorkOffset);
 }
 
 /*

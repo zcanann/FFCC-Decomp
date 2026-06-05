@@ -6,14 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-
-struct SRandHCVParams {
-    s32 targetId;
-    s32 sourceOffset;
-    s16 delta[4];
-    u8 useNormalDistribution;
-};
-
 static inline float randf(unsigned char flag)
 {
     float value = Math.RandF();

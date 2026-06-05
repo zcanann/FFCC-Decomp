@@ -1,3 +1,5 @@
+#define FFCC_MAPKEYFRAME_NO_DESTRUCTOR
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/maptexanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/map.h"
@@ -278,6 +280,9 @@ CMapTexAnim::~CMapTexAnim()
 {
     delete m_frameTable;
     m_frameTable = 0;
+    if (&m_keyFrame != 0) {
+        m_keyFrame.Destroy();
+    }
 }
 
 extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };

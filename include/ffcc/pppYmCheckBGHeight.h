@@ -1,16 +1,8 @@
 #ifndef _PPP_YMCHECKBGHEIGHT_H_
 #define _PPP_YMCHECKBGHEIGHT_H_
 
-#include <dolphin/types.h>
-
 struct pppYmCheckBGHeight;
-
-struct pppYmCheckBGHeightUnkC {
-    float m_unk0x0;
-    float m_unk0x4;
-    float m_unk0x8;
-    float m_unk0xC;
-};
+struct pppYmCheckBGHeightUnkC;
 
 #ifdef __cplusplus
 extern "C" {

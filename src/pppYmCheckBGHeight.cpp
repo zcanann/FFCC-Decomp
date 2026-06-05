@@ -9,6 +9,13 @@ extern "C" {
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
+struct pppYmCheckBGHeightUnkC {
+    float m_unk0x0;
+    float m_unk0x4;
+    float m_unk0x8;
+    float m_unk0xC;
+};
+
 static inline Vec* CheckBGHeightPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();

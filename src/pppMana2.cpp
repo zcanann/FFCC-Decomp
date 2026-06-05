@@ -34,8 +34,8 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId1) == 0x28);
 STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x30);
 STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
-extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
-extern "C" const char s_pppMana2_cpp[] = "pppMana2.cpp";
+static const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
+static const char s_pppMana2_cpp[] = "pppMana2.cpp";
 extern const float FLOAT_80331898 = 0.0f;
 extern const float FLOAT_8033189c = -1.0f;
 extern const float FLOAT_803318a0 = 1.0f;

@@ -69,7 +69,7 @@ static inline Mtx44& CameraScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
-extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
+static const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);

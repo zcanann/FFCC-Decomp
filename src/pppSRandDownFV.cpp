@@ -1,10 +1,22 @@
 #include "ffcc/pppSRandDownFV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct SRandDownFVDataOffsets {
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(SRandDownFVDataOffsets, m_stateOffset) == 0x0);
+
+static inline SRandDownFVDataOffsets* GetSRandDownFVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<SRandDownFVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline float randf(unsigned char flag)
 {
@@ -41,7 +53,7 @@ void pppSRandDownFV(_pppPObject* basePtr, SRandDownFVParams* in, _pppCtrlTable* 
     f32* randVec;
     s32 currentIndex = basePtr->m_graphId;
     if (currentIndex == 0) {
-        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        randVec = (f32*)(basePtr->m_workArea + GetSRandDownFVDataOffsets(ctrl)->m_stateOffset);
         randVec[0] = randf(in->useNormalDistribution);
         randVec[1] = randf(in->useNormalDistribution);
         randVec[2] = randf(in->useNormalDistribution);
@@ -49,7 +61,7 @@ void pppSRandDownFV(_pppPObject* basePtr, SRandDownFVParams* in, _pppCtrlTable* 
         if (in->targetId != currentIndex) {
             return;
         }
-        randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        randVec = (f32*)(basePtr->m_workArea + GetSRandDownFVDataOffsets(ctrl)->m_stateOffset);
     }
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);

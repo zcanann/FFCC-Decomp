@@ -2912,31 +2912,29 @@ void GXSetTexCoordGen(void)
  */
 void CMapMng::DrawAfter()
 {
-    if ((m_mapObjCount == 0) || (m_mapReadReady == 0)) {
-        return;
-    }
+    if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
+        Mtx44 projection;
+        PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+        GXSetProjection(projection, GX_PERSPECTIVE);
 
-    Mtx44 projection;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
-    GXSetProjection(projection, GX_PERSPECTIVE);
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
 
-    GXSetColorUpdate(1);
-    GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_FRONT);
-    GXSetZMode(1, GX_LEQUAL, 1);
-    LightPcs.SetNumDiffuse(0);
+        if (gMapHitDrawMode.m_byte == 0) {
+            COctTree* octTree = GetOctTreeArray();
+            for (int i = 0; i < m_octTreeCount; i++) {
+                octTree->Draw(2);
+                octTree++;
+            }
 
-    if (gMapHitDrawMode.m_byte == 0) {
-        COctTree* octTree = GetOctTreeArray();
-        for (int i = 0; i < m_octTreeCount; i++) {
-            octTree->Draw(2);
-            octTree++;
-        }
-
-        CMapObj* mapObj = GetMapObjArray();
-        for (int i = 0; i < m_mapObjCount; i++) {
-            mapObj->Draw(2);
-            mapObj++;
+            CMapObj* mapObj = GetMapObjArray();
+            for (int i = 0; i < m_mapObjCount; i++) {
+                mapObj->Draw(2);
+                mapObj++;
+            }
         }
     }
 }

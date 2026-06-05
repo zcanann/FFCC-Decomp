@@ -50,25 +50,6 @@ struct VScreenBreak {
     GXColor m_color;
 };
 
-struct PScreenBreak {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_initWOrk;
-    u8 _pad9[3];
-    float m_stepValue;
-    float m_arg3;
-    float m_graphPayload;
-    float m_gravityScale;
-    u8 m_pad1C[4];
-    Vec m_gravityDir;
-    u8 m_pad2C[4];
-    float m_gravityAmount;
-    u8 m_angleRand;
-    u8 m_pad35[3];
-    float m_speedBase;
-    float m_speedRand;
-};
-
 struct ScreenBreakColorData {
     u8 m_pad0[8];
     GXColor m_color;

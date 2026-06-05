@@ -137,7 +137,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             model.value[2][3] = worldPos.z;
 
             pppSetDrawEnv(
-                0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+                0, &model, YmMiasmaConst(FLOAT_80330644), step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
 
             amb.r = state->m_color.m_r;
             amb.g = state->m_color.m_g;
@@ -223,11 +223,12 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         }
 
         angleDelta += step->m_baseAngle;
-        angleScale = (FLOAT_80330650 * (FLOAT_80330640 * (float)angleDelta)) / FLOAT_80330654;
+        angleScale = (YmMiasmaConst(FLOAT_80330650) * (YmMiasmaConst(FLOAT_80330640) * (float)angleDelta)) /
+                     YmMiasmaConst(FLOAT_80330654);
         angleIdx = (s32)angleScale;
         impulseX = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
         impulseZ = *(float*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
-        zero = FLOAT_80330644;
+        zero = YmMiasmaConst(FLOAT_80330644);
         work->m_impulse.x = impulseX;
         work->m_impulse.y = zero;
         work->m_impulse.z = impulseZ;
@@ -246,7 +247,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
     distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
-    if (distance != FLOAT_80330644) {
+    if (distance != YmMiasmaConst(FLOAT_80330644)) {
         work->m_prevPositionChanged = 0xff;
     } else {
         work->m_prevPositionChanged = 0;

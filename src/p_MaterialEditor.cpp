@@ -59,10 +59,10 @@ CProcessTable CMaterialEditorPcs::m_table = {
     },
 };
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
-extern "C" const double DOUBLE_8032FCD0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
-extern "C" const float FLOAT_8032FCD8;
-extern "C" float FLOAT_8032FCDC;
+extern "C" const double DOUBLE_8032FCD0 = 4503601774854144.0;
+extern "C" const float FLOAT_8032FCD8 = 0.0f;
+extern "C" const float FLOAT_8032FCDC = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {

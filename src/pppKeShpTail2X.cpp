@@ -15,34 +15,6 @@ const float FLOAT_80330508 = 0.5f;
 
 STATIC_ASSERT(offsetof(struct pppKeShpTail2X, m_object.m_workArea) == 0x80);
 
-struct KeShpTail2XStep {
-    u8 _pad0[4];
-    s32 m_dataValIndex;
-    s32 m_frameStep;
-    float m_scaleStart;
-    float m_scaleEnd;
-    u8 m_colorStartR;
-    u8 m_colorStartG;
-    u8 m_colorStartB;
-    u8 m_colorStartA;
-    u8 m_colorEndR;
-    u8 m_colorEndG;
-    u8 m_colorEndB;
-    u8 m_colorEndA;
-    float m_stepDistance;
-    u16 m_drawCount;
-    u8 m_drawFirst;
-    u8 m_drawA;
-    u8 m_drawB;
-    u8 m_useEnvDepth;
-    u8 m_worldSpaceMode;
-    u8 _pad27;
-    u8 m_zDisable;
-    u8 m_blendMode;
-    u8 _pad2A[2];
-    float m_envDepth;
-};
-
 struct KeShpTail2XWork {
     u8 m_count;
     u8 m_head;
@@ -119,9 +91,8 @@ void pppKeShpTail2XCon(_pppPObject* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pppCtrlTable* param_3)
+void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* param_3)
 {
-    KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XWork* work;
     pppShapeSt* shape;
     long* shapeEntry;
@@ -355,9 +326,8 @@ move_next_segment:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pppCtrlTable* param_3)
+void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _pppCtrlTable* param_3)
 {
-    KeShpTail2XStep* step;
     KeShpTail2XWork* work;
     pppFMATRIX outMatrix;
     Vec historyPos ATTRIBUTE_ALIGN(8);
@@ -368,7 +338,6 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
         return;
     }
 
-    step = (KeShpTail2XStep*)param_2;
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
 
     if (obj->m_object.m_graphId == 0) {

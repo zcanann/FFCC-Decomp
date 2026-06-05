@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppLensFlare.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppColum.h"
@@ -9,11 +10,6 @@
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
 #include "PowerPC_EABI_Support/Runtime/runtime.h"
-#include <stddef.h>
-
-#define LENS_FLARE_STATIC_ASSERT_JOIN_1(a, b) a##b
-#define LENS_FLARE_STATIC_ASSERT_JOIN(a, b) LENS_FLARE_STATIC_ASSERT_JOIN_1(a, b)
-#define LENS_FLARE_STATIC_ASSERT(expr) typedef char LENS_FLARE_STATIC_ASSERT_JOIN(lens_flare_static_assert_, __LINE__)[(expr) ? 1 : -1]
 
 struct LensFlareWork {
 	u8 _pad00[0x10];
@@ -30,20 +26,33 @@ struct LensFlareWork {
 	f32 m_dot;
 };
 
-LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_projectedX) == 0x10);
-LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
-LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
-LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
-LENS_FLARE_STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
+struct LensFlareDataOffsets {
+	s32 _unused0;
+	s32 m_colorWorkOffset;
+	s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(LensFlareWork, m_projectedX) == 0x10);
+STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
+STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
+STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
+STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
+STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_colorWorkOffset) == 0x4);
+STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_workOffset) == 0x8);
+
+static inline LensFlareDataOffsets* GetLensFlareDataOffsets(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<LensFlareDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 static inline LensFlareWork* GetLensFlareWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+	return reinterpret_cast<LensFlareWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_workOffset);
 }
 
 static inline _pppColorWork* GetLensFlareColorWork(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	return reinterpret_cast<_pppColorWork*>(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+	return reinterpret_cast<_pppColorWork*>(obj->m_workArea + GetLensFlareDataOffsets(ctrlTable)->m_colorWorkOffset);
 }
 
 extern const double kPppLensFlareZeroD = 0.0;

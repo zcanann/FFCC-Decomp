@@ -65,6 +65,11 @@ STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);
 
+static inline YmTracerDataOffsets* GetYmTracerDataOffsets(pppYmTracerCtrl* ctrl)
+{
+    return reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
     pppCopyVector(dst->from, src->from);
@@ -79,8 +84,7 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 
 static inline TracerWork* GetYmTracerWork(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    return reinterpret_cast<TracerWork*>(
-        tracer->m_workArea + reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets)->m_workOffset);
+    return reinterpret_cast<TracerWork*>(tracer->m_workArea + GetYmTracerDataOffsets(ctrl)->m_workOffset);
 }
 
 static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
@@ -118,7 +122,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
 
     dataValIndex = param_2->m_dataValIndex;
     work = GetYmTracerWork(pppYmTracer, param_3);
-    colorOffset = reinterpret_cast<YmTracerDataOffsets*>(param_3->m_serializedDataOffsets)->m_colorOffset;
+    colorOffset = GetYmTracerDataOffsets(param_3)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
     colorData = reinterpret_cast<TracerColorBlock*>(pppYmTracer->m_workArea + colorOffset);

@@ -50,8 +50,8 @@ public:
 
     CMapCylinder(float min, float max)
     {
-        float maxBound = max;
         float minBound = min;
+        float maxBound = max;
 
         m_bound.m_min.z = minBound;
         m_bound.m_min.y = minBound;

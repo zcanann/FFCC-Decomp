@@ -14,21 +14,20 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-static const float FLOAT_80330640 = 0.01745329238474369f;
-static const float FLOAT_80330644 = 0.0f;
-static const double DOUBLE_80330648 = 4503601774854144.0;
-static const float FLOAT_80330650 = 32768.0f;
-static const float FLOAT_80330654 = 3.1415927410125732f;
-static const float FLOAT_80330658 = 1.0f;
-static const float FLOAT_8033065c = 0.00003051850947599719f;
-static const float FLOAT_80330660 = 2.0f;
-static const float FLOAT_80330664 = 16384.0f;
-static const float FLOAT_80330668 = -1.0f;
+#define FLOAT_80330640 0.01745329238474369f
+#define FLOAT_80330644 0.0f
+#define FLOAT_80330650 32768.0f
+#define FLOAT_80330654 3.1415927410125732f
+#define FLOAT_80330658 1.0f
+#define FLOAT_8033065c 0.00003051850947599719f
+#define FLOAT_80330660 2.0f
+#define FLOAT_80330664 16384.0f
+#define FLOAT_80330668 -1.0f
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
-static inline float YmMiasmaConst(const float& value)
+static inline float YmMiasmaConst(float value)
 {
-    return *reinterpret_cast<const float*>(&value);
+    return value;
 }
 
 struct PARTICLE_DATA {
@@ -113,7 +112,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             GXColor amb;
             float scale;
             s16 shapeAngle;
-            const float& degToRad = FLOAT_80330640;
+            float degToRad = FLOAT_80330640;
 
             pppUnitMatrix(model);
             scale = state->m_speed;
@@ -305,8 +304,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(pppYmMiasma_, param_2, 2);
-    const float& fVar2 = FLOAT_80330644;
-    const float& fVar1 = FLOAT_80330658;
+    float fVar2 = FLOAT_80330644;
+    float fVar1 = FLOAT_80330658;
 
     work->m_particles = 0;
     work->m_radius = fVar2;

@@ -1,15 +1,9 @@
 #ifndef _PPP_YMCHANGETEX_H_
 #define _PPP_YMCHANGETEX_H_
 
-#include "ffcc/chara.h"
-#include "ffcc/pppChangeTexCommon.h"
 #include "ffcc/pppPart.h"
 
-#include <dolphin/gx.h>
 #include <dolphin/types.h>
-
-class CGObject;
-class CTexture;
 
 struct pppYmChangeTex {
     _pppPObject m_object;
@@ -29,19 +23,6 @@ struct pppYmChangeTexStep {
         } m_changeTex;
     };
     u8 _pad1[1];
-};
-
-struct pppYmChangeTexState {
-    float m_value0;
-    float m_value1;
-    float m_value2;
-    GXColor** m_meshColorArrays;
-    ChangeTexDisplayListCopy*** m_displayListArrays;
-    int _pad14;
-    CGObject* m_charaObj;
-    CTexture* m_texture;
-    int _pad20;
-    void* m_context;
 };
 
 #ifdef __cplusplus

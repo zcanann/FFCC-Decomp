@@ -10,6 +10,7 @@
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <string.h>
+#include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
@@ -18,6 +19,19 @@ extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;
 extern const float kPppYmChangeTexInitZero = 0.0f;
+
+struct pppYmChangeTexState {
+    float m_value0;
+    float m_value1;
+    float m_value2;
+    GXColor** m_meshColorArrays;
+    ChangeTexDisplayListCopy*** m_displayListArrays;
+    int _pad14;
+    CGObject* m_charaObj;
+    CTexture* m_texture;
+    int _pad20;
+    void* m_context;
+};
 
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);

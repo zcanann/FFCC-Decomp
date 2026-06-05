@@ -10,17 +10,6 @@ extern "C" const float gPppPointRApRandomAngleRange = 32768.0f;
 extern "C" const float gPppPointRApRandomAngleBias = 16384.0f;
 extern "C" const float gPppPointRApSpinScale = 2.0f;
 
-struct pppPointRApStep {
-    u32 m_unknown0;
-    float m_radius;
-    float m_speedScale;
-    u32 m_createProgramIndex;
-    u32 m_childPosOffset;
-    u32 m_unused14;
-    u32 m_childVelocityOffset;
-    u8 m_cooldown;
-};
-
 struct pppPointRApOffsets {
     u32 m_srcOffset;
     u32 m_stateOffset;
@@ -35,9 +24,8 @@ struct pppPointRApOffsets {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
+void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctrlTable)
 {
-    pppPointRApStep* payload = (pppPointRApStep*)step;
     pppPointRApOffsets* ctrlData = (pppPointRApOffsets*)ctrlTable->m_serializedDataOffsets;
     u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
 
@@ -46,7 +34,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     }
 
     if (state[1] == 0) {
-        u32 createId = payload->m_createProgramIndex;
+        u32 createId = step->m_createProgramIndex;
         Vec* srcPos = (Vec*)(pObject->m_workArea + ctrlData->m_srcOffset);
 
         if ((createId + 0x10000) == 0xFFFF) {
@@ -64,15 +52,15 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         s32 angleA = (s32)(gPppPointRApRandomAngleRange * Math.RandF() - gPppPointRApRandomAngleBias);
-        float scaleA = payload->m_radius;
+        float scaleA = step->m_radius;
         float yOff;
         float planarOff = scaleA * pppCosFromTable(angleA);
         yOff = scaleA * pppSinFromTable(angleA);
         float spinRand = Math.RandF();
         float spinAngle = gPppPointRApRandomAngleRange * spinRand;
         s32 angleB = (s32)(gPppPointRApSpinScale * spinAngle);
-        u32 childPosOffset = payload->m_childPosOffset;
-        u32 childVelocityOffset = payload->m_childVelocityOffset;
+        u32 childPosOffset = step->m_childPosOffset;
+        u32 childVelocityOffset = step->m_childVelocityOffset;
         float xOff = planarOff * pppSinFromTable(angleB);
         planarOff *= pppCosFromTable(angleB);
         Vec* dstPos = (Vec*)(obj->m_workArea + childPosOffset);
@@ -82,11 +70,11 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         dstPos->y = srcPos->y + yOff;
         dstPos->z = srcPos->z + planarOff;
 
-        dstVel->x = xOff * payload->m_speedScale;
-        dstVel->y = yOff * payload->m_speedScale;
-        dstVel->z = planarOff * payload->m_speedScale;
+        dstVel->x = xOff * step->m_speedScale;
+        dstVel->y = yOff * step->m_speedScale;
+        dstVel->z = planarOff * step->m_speedScale;
 
-        state[1] = payload->m_cooldown;
+        state[1] = step->m_cooldown;
     }
 
     state[1]--;

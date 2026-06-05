@@ -166,7 +166,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
         PSVECNormalize(&param_2->m_gravityDir, &param_2->m_gravityDir);
     }
 
-    const float& two = FLOAT_80331cc0;
+    const float two = FLOAT_80331cc0;
     float sx = two * value->m_extent.x;
     float sy = two * value->m_extent.y;
     ScreenBreakPiece* piece = value->m_pieces;
@@ -275,7 +275,7 @@ void pppCon2ScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     VScreenBreak* value = GetScreenBreakValue(screenBreak, dataOffset);
-    const float& f = FLOAT_80331cc4;
+    const float f = FLOAT_80331cc4;
     value->m_graphValue2 = f;
     value->m_graphValue1 = f;
     value->m_graphValue0 = f;
@@ -299,7 +299,7 @@ void pppConScreenBreak(pppScreenBreak* screenBreak, _pppCtrlTable* param_2)
     CChara::CModel* model = GetCharaModelPtr(handle);
     gObject->m_displayFlags |= 0x40;
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
-    const float& f = FLOAT_80331cc4;
+    const float f = FLOAT_80331cc4;
     model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
     model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
     model->SetBeforeCalcMatrixCallback(SB_BeforeCalcMatrixCallback);
@@ -571,10 +571,10 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     CCameraPcs* camera = &CameraPcs;
-    const float& zero = FLOAT_80331cc4;
-    const float& one = FLOAT_80331cd0;
-    const float& attnA = FLOAT_80331cec;
-    const float& attnB = FLOAT_80331cf0;
+    const float zero = FLOAT_80331cc4;
+    const float one = FLOAT_80331cd0;
+    const float attnA = FLOAT_80331cec;
+    const float attnB = FLOAT_80331cf0;
 
     lightDir.x = camera->m_directionX - (FLOAT_80331ce8 + camera->m_positionX);
     lightDir.y = camera->m_directionY - (FLOAT_80331ce8 + camera->m_positionY);

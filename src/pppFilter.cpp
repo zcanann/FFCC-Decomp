@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppFilter.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/textureman.h"
@@ -19,6 +20,18 @@ struct _pppFilterSerializedData {
     _GXColor m_color;
 };
 
+struct pppFilterDataOffsets
+{
+    s32 m_serializedDataOffset;
+};
+
+STATIC_ASSERT(offsetof(pppFilterDataOffsets, m_serializedDataOffset) == 0x0);
+
+static inline pppFilterDataOffsets* GetFilterDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppFilterDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8015a788
@@ -30,8 +43,7 @@ struct _pppFilterSerializedData {
  */
 void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* param_2, _pppCtrlTable* param_3)
 {
-    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    int serializedOffset = *serializedDataOffsets;
+    int serializedOffset = GetFilterDataOffsets(param_3)->m_serializedDataOffset;
     _pppFilterSerializedData* serializedData =
         (_pppFilterSerializedData*)(pppFilterObj->m_workArea + serializedOffset);
 

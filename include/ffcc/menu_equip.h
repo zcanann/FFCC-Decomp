@@ -1,47 +1,58 @@
 #ifndef _FFCC_MENU_EQUIP_H_
 #define _FFCC_MENU_EQUIP_H_
 
-class CMenuPcs
+#include "ffcc/p_menu.h"
+
+struct EquipMenuState
 {
-public:
-    enum FMT
-    {
-        TODO_FMT
-    };
-
-    enum TEX
-    {
-        TODO_TEX
-    };
-
-    void SetAttrFmt(FMT);
-    void SetTexture(TEX);
-    void DrawInit();
-    void DrawSingleIcon(int, int, int, float, int, float);
-    double CalcListPos(int, int, int);
-    void DrawListPosMark(float, float, float);
-    void DrawCursor(int, int, float);
-    void DrawEquipMark(int, int, float);
-
-    void EquipInit1();
-    int EquipOpen();
-    void EquipCtrl();
-    int EquipClose();
-    void EquipDraw();
-    int EquipCtrlCur();
-    bool EquipOpen0();
-    bool EquipClose0();
-    int ChkEquipActive(int);
-    int GetItemType(int, int);
-    int ChkEquipPossible(int);
-    int GetEquipType(int);
-    int EquipChk(int);
-    void CmdInit1();
-    void CmdInit2();
-    char* GetMenuStr(int);
-    char* GetAttrStr(int);
+    unsigned char pad_00[0x0B];
+    unsigned char initialized;
+    unsigned char pad_0C;
+    unsigned char closeRequested;
+    unsigned char pad_0E[2];
+    short listState;
+    short step;
+    unsigned char pad_14[0x0A];
+    short cursorMove;
+    unsigned char pad_20[2];
+    short frame;
+    unsigned char pad_24[2];
+    short selectedIndex;
+    short subSelectedIndex;
+    unsigned char pad_2A[6];
+    short mode;
+    short prevMode;
+    short scroll;
 };
 
-extern CMenuPcs MenuPcs;
+struct EquipOpenAnim
+{
+    short x;
+    short y;
+    short w;
+    short h;
+    float u;
+    float v;
+    float alpha;
+    float scale;
+    int unk;
+    int tex;
+    int step;
+    int startFrame;
+    int duration;
+    unsigned int flags;
+    float dx;
+    float dy;
+    float targetX;
+    float targetY;
+};
+
+struct EquipOpenAnimList
+{
+    short count;
+    short listEnd;
+    unsigned char pad_04[4];
+    EquipOpenAnim entries[64];
+};
 
 #endif // _FFCC_MENU_EQUIP_H_

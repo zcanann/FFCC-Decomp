@@ -20,6 +20,8 @@ class CRingMenu;
 class CMesMenu;
 struct ArtiState;
 struct ArtiOpenAnimList;
+struct EquipMenuState;
+struct EquipOpenAnimList;
 
 struct McListInfo
 {
@@ -151,6 +153,7 @@ public:
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
+    void DrawEquipMark(int, int, float);
     char* GetMenuStr(int);
 
     void LoadExtraFont(int, char*);
@@ -293,6 +296,21 @@ public:
     int ArtiClose();
     void ArtiDraw();
     int ArtiCtrlCur();
+    void EquipInit1();
+    int EquipOpen();
+    void EquipCtrl();
+    int EquipClose();
+    void EquipDraw();
+    int EquipCtrlCur();
+    bool EquipOpen0();
+    bool EquipClose0();
+    int ChkEquipActive(int);
+    int ChkEquipPossible(int);
+    int GetEquipType(int);
+    int EquipChk(int);
+    void CmdInit1();
+    void CmdInit2();
+    char* GetAttrStr(int);
     void SetParty();
     void SetCMakeEnd(int);
     void ClrCMakeFlg(int);
@@ -397,9 +415,15 @@ public:
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
     unsigned char m_pad744[0x82C - 0x744];
-    ArtiState* m_artiState;
+    union {
+        ArtiState* m_artiState;
+        EquipMenuState* m_equipState;
+    };
     unsigned char m_pad830[0x850 - 0x830];
-    ArtiOpenAnimList* m_artiList;
+    union {
+        ArtiOpenAnimList* m_artiList;
+        EquipOpenAnimList* m_equipList;
+    };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
     unsigned char m_singleMenuInitialized;

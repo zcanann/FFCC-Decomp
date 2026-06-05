@@ -6,15 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-
-typedef struct RandCVParams {
-    s32 index;
-    s32 colorOffset;
-    s8 delta[4];
-    u8 flag;
-    u8 pad[3];
-} RandCVParams;
-
 static inline char randchar(char value, float scale)
 {
     return (char)((f32)value * scale - (f32)value);

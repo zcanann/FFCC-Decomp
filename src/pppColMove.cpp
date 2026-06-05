@@ -2,20 +2,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-
-typedef struct {
-    short x;
-    short y;
-    short z;
-    short w;
-} pppColMoveVec4S;
-
-typedef struct {
-    int id;
-    int pad;
-    pppColMoveVec4S move;
-} pppColMoveInput;
-
 /*
  * --INFO--
  * PAL Address: 0x80065000

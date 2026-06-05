@@ -2,8 +2,8 @@
 #define _FFCC_PPP_TEXANIM_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/ptrarray_decl.h"
 #include "ffcc/ref.h"
-#include "ffcc/ptrarray.h"
 
 #include <dolphin/mtx.h>
 

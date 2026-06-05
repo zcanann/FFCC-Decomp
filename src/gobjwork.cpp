@@ -28,6 +28,15 @@ struct ShoukiByteFlags {
 	int middle : 1;
 };
 
+struct LetterFlags {
+	unsigned char opened : 1;
+	unsigned char flag6 : 1;
+	unsigned char replySent : 1;
+	unsigned char hasReply : 1;
+	unsigned char hasMoney : 1;
+	unsigned char low : 3;
+};
+
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * kGObjWorkStatusScaleStep) +
@@ -423,18 +432,10 @@ int CCaravanWork::IsOutOfShouki()
 void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int hasMoneyFlag, int hasReplyFlag,
 							 int itemA, int itemB, int itemC, int itemD)
 {
-	struct LetterFlags
-	{
-		unsigned char opened : 1;
-		unsigned char flag6 : 1;
-		unsigned char flag5 : 1;
-		unsigned char hasReply : 1;
-		unsigned char hasMoney : 1;
-		unsigned char low : 3;
-	};
-
 	for (int i = 98; i >= 0; i--) {
-		m_letters[i + 1] = m_letters[i];
+		m_letters[i + 1].m_word0 = m_letters[i].m_word0;
+		m_letters[i + 1].m_word1 = m_letters[i].m_word1;
+		m_letters[i + 1].m_word2 = m_letters[i].m_word2;
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
@@ -451,7 +452,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
 	letterFlags->opened = 0;
 	letterFlags->flag6 = 0;
-	letterFlags->flag5 = 0;
+	letterFlags->replySent = 0;
 	letterFlags->hasReply = hasReplyFlag;
 	letterWords16[2] = (unsigned short)itemA;
 	letterWords16[3] = (unsigned short)itemB;
@@ -470,18 +471,6 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork& other)
-{
-	m_word0 = other.m_word0;
-	m_word1 = other.m_word1;
-	m_word2 = other.m_word2;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800a23d8
  * PAL Size: 316b
  * EN Address: TODO
@@ -494,30 +483,34 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	CCaravanWork* self = this;
 	CFlatRuntime::CStack stack[2];
 	CLetterWork* letter = &self->m_letters[letterIdx];
+	unsigned char* letterBytes = reinterpret_cast<unsigned char*>(letter);
+	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letter);
+	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letter);
+	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letter);
 
-	stack[0].m_word = (letter->HeaderWord() >> 2) & 0x1FF;
-	stack[1].m_word = (letter->m_word0 >> 9) & 0x1FF;
+	stack[0].m_word = (letterWords16[0] >> 2) & 0x1FF;
+	stack[1].m_word = (letterWords32[0] >> 9) & 0x1FF;
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = letter->TempVar(0);
-	CMes::m_tempVar[1] = letter->TempVar(1);
-	CMes::m_tempVar[2] = letter->TempVar(2);
-	CMes::m_tempVar[3] = letter->TempVar(3);
-	CMes::m_tempVar[4] = (letter->HeaderWord() >> 2) & 0x1FF;
-	CMes::m_tempVar[5] = (letter->m_word0 >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = letterWords16[2];
+	CMes::m_tempVar[1] = letterWords16[3];
+	CMes::m_tempVar[2] = letterWords16[4];
+	CMes::m_tempVar[3] = letterWords16[5];
+	CMes::m_tempVar[4] = (letterWords16[0] >> 2) & 0x1FF;
+	CMes::m_tempVar[5] = (letterWords32[0] >> 9) & 0x1FF;
 
 	int money;
-	if (letter->AttachmentIsGil()) {
+	if (((letterBytes[0] >> 3) & 1) != 0) {
 		money = 0;
 	} else {
-		money = letter->AttachmentValue();
+		money = letterWords16[1] & 0x1FF;
 	}
 	CMes::m_tempVar[6] = money;
 
 	int gil;
-	if (letter->AttachmentIsGil()) {
-		gil = letter->AttachmentValue() * 100;
+	if (((letterBytes[0] >> 3) & 1) != 0) {
+		gil = (letterWords16[1] & 0x1FF) * 100;
 	} else {
 		gil = 0;
 	}
@@ -525,7 +518,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = self->m_saveSlot;
 
-	letter->SetOpened();
+	letterFlags->opened = 1;
 }
 
 /*
@@ -541,9 +534,12 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 {
 	CFlatRuntime::CStack stack[5];
 	CLetterWork* letter = &m_letters[letterIdx];
+	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letter);
+	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letter);
+	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letter);
 
-	stack[0].m_word = (letter->HeaderWord() >> 2) & 0x1FF;
-	stack[1].m_word = (letter->m_word0 >> 9) & 0x1FF;
+	stack[0].m_word = (letterWords16[0] >> 2) & 0x1FF;
+	stack[1].m_word = (letterWords32[0] >> 9) & 0x1FF;
 	stack[2].m_word = param3;
 	stack[3].m_word = param4;
 	stack[4].m_word = param5;
@@ -551,7 +547,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	letter->SetFlags(letter->Flags() | 0x20);
+	letterFlags->replySent = 1;
 }
 
 /*

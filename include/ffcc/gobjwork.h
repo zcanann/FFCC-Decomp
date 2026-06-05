@@ -59,8 +59,6 @@ public:
     class CLetterWork
     {
     public:
-        void operator=(const CLetterWork&);
-
         unsigned char Flags() const { return static_cast<unsigned char>(m_word0 >> 24); }
         void SetFlags(unsigned char flags)
         {

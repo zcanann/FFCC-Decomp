@@ -240,19 +240,20 @@ static void CalculateNormal(VMana2* mana2)
     Vec edgeA;
     Vec edgeB;
     Vec faceNormal;
+    s32 i;
 
     positions = mana2->m_positions;
     normals = mana2->m_normals;
     indices = mana2->m_indices;
 
-    float zero = FLOAT_80331898;
-    for (s32 i = 0; i < 0x121; i++) {
+    float zero = 0.0f;
+    for (i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;
         normals[i].x = zero;
     }
 
-    s32 i = 0;
+    i = 0;
     s32 indicesOffset = i;
     for (; i < 0x200; i++) {
         u16 i0 = indices[indicesOffset++];

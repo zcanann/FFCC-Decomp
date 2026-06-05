@@ -2668,7 +2668,7 @@ void GbaQueue::LoadMapObj()
 	GbaQueue* semaphoreIter;
 	int i;
 
-	if (*reinterpret_cast<unsigned int*>(obj + 0x2AF8) == 0) {
+	if (*reinterpret_cast<int*>(obj + 0x2AF8) == 0) {
 		i = 0;
 		semaphoreIter = this;
 		do {
@@ -2693,40 +2693,46 @@ void GbaQueue::LoadMapObj()
 		memset(mapObjWork, 0, sizeof(mapObjWork));
 
 		char* mapObjBase = reinterpret_cast<char*>(&CFlat) + 0x134C;
-		for (i = 0; i < 0x20; i++) {
+		i = 0;
+		do {
 			char objType = mapObjBase[0];
 			if (objType != -1) {
 				unsigned int count = mapObjWork[0];
-				if (objType < 0x19) {
+				if (objType >= 0x19) {
+					if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+						System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
+					}
+				} else {
 					float x = *reinterpret_cast<float*>(mapObjBase + 4);
+					const float scale = kGbaQueueMapCoordScale;
+					unsigned int mask = 1U << count;
+					unsigned int clearMask = ~mask;
 					float y = *reinterpret_cast<float*>(mapObjBase + 8);
 					float z = *reinterpret_cast<float*>(mapObjBase + 0xC);
 					float r = *reinterpret_cast<float*>(mapObjBase + 0x10);
+					int drawFlag = static_cast<int>(mapObjBase[1]);
 					unsigned int entryBase = count * 0xC;
 
 					mapObjWork[8 + entryBase] = static_cast<unsigned char>(objType);
 					*reinterpret_cast<short*>(mapObjWork + 0xC + entryBase) =
-						static_cast<short>((int)(x / kGbaQueueMapCoordScale));
+						static_cast<short>((int)(x / scale));
 					*reinterpret_cast<short*>(mapObjWork + 0xE + entryBase) =
-						static_cast<short>((int)(y / kGbaQueueMapCoordScale));
+						static_cast<short>((int)(y / scale));
 					*reinterpret_cast<short*>(mapObjWork + 0x10 + entryBase) =
-						static_cast<short>((int)(z / kGbaQueueMapCoordScale));
+						static_cast<short>((int)(z / scale));
 					*reinterpret_cast<short*>(mapObjWork + 0x12 + entryBase) =
-						static_cast<short>((int)(r / kGbaQueueMapCoordScale));
+						static_cast<short>((int)(r / scale));
 
-					unsigned int mask = 1U << count;
 					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
-					int drawFlag = static_cast<int>(mapObjBase[1]);
-					drawMask = (drawMask & ~mask) | (mask & ((-drawFlag | drawFlag) >> 31));
+					drawMask = (drawMask & clearMask) | (mask & ((-drawFlag | drawFlag) >> 31));
 					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
 					mapObjWork[0] = static_cast<unsigned char>(count + 1);
-				} else if (System.m_execParam > 1) {
-System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
 				}
 			}
 
+			i++;
 			mapObjBase += 0x14;
-		}
+		} while (i < 0x20);
 
 		i = 0;
 		semaphoreIter = this;

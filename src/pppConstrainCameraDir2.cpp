@@ -97,3 +97,5 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
         }
     }
 }
+
+extern const float kPppConstrainCameraDir2Sdata2Pad = 0.0f;

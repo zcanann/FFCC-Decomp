@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppYmTracer.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/mapmesh.h"
@@ -45,10 +46,24 @@ struct TracerWork {
     u16 _pad2e;
 };
 
+struct TracerColorBlock {
+    u8 pad[8];
+    pppCVECTOR color;
+};
+
+struct YmTracerDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
 union PackedColor {
     u32 value;
     u8 bytes[4];
 };
+
+STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
+STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
+STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);
 
 static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
@@ -64,7 +79,8 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 
 static inline TracerWork* GetYmTracerWork(pppYmTracer* tracer, pppYmTracerCtrl* ctrl)
 {
-    return reinterpret_cast<TracerWork*>(tracer->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<TracerWork*>(
+        tracer->m_workArea + reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets)->m_workOffset);
 }
 
 static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
@@ -87,7 +103,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
 {
     TracerWork* work;
     CMapMesh* mapMesh;
-    u8* colorData;
+    TracerColorBlock* colorData;
     TRACE_POLYGON* poly;
     CTexture* texture;
     s32 i;
@@ -102,15 +118,15 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
 
     dataValIndex = param_2->m_dataValIndex;
     work = GetYmTracerWork(pppYmTracer, param_3);
-    colorOffset = param_3->m_serializedDataOffsets[1];
+    colorOffset = reinterpret_cast<YmTracerDataOffsets*>(param_3->m_serializedDataOffsets)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
-    colorData = pppYmTracer->m_workArea + colorOffset;
+    colorData = reinterpret_cast<TracerColorBlock*>(pppYmTracer->m_workArea + colorOffset);
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv(
-            reinterpret_cast<pppCVECTOR*>(colorData + 8), reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
+            &colorData->color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
             FLOAT_803306e8,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);

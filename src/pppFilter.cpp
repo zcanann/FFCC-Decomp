@@ -19,6 +19,11 @@ struct _pppFilterSerializedData {
     _GXColor m_color;
 };
 
+struct pppFilterUnkB {
+    unsigned int m_unk0;
+    int m_dataValIndex;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8015a788
@@ -30,18 +35,12 @@ struct _pppFilterSerializedData {
  */
 void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTable* param_3)
 {
-    struct FilterStep {
-        unsigned int unk0;
-        int dataValIndex;
-    };
-
-    FilterStep* step = (FilterStep*)param_2;
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     int serializedOffset = *serializedDataOffsets;
     _pppFilterSerializedData* serializedData =
         (_pppFilterSerializedData*)(pppFilterObj->m_workArea + serializedOffset);
 
-    if (step->dataValIndex == 0xFFFF) {
+    if (param_2->m_dataValIndex == 0xFFFF) {
         gUtil.RenderColorQuad(
             kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY[0],
             serializedData->m_color);
@@ -49,7 +48,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrl
     }
 
     int textureIndex = 0;
-    CTexture* textureInfo = (CTexture*)ppvEnv->m_mapMeshPtr[step->dataValIndex]->GetTexture(
+    CTexture* textureInfo = (CTexture*)ppvEnv->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(
         ppvEnv->m_materialSetPtr, textureIndex);
     gUtil.RenderTextureQuad(
         kPppFilterScreenMin, kPppFilterScreenMin, kPppFilterScreenMaxX, kPppFilterScreenMaxY[0], &textureInfo->m_texObj,

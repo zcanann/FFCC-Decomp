@@ -96,6 +96,11 @@ static inline double U32ToDouble(unsigned int value)
     return conv.d - DOUBLE_8032fc68;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -317,7 +322,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 void CLightPcs::calc()
 {
     m_sceneLightCount = 0;
-    FLOAT_8032ed10 = FLOAT_8032ed10 + FLOAT_8032fc90;
+    FLOAT_8032ed10 = FLOAT_8032ed10 + LoadFloat(FLOAT_8032fc90);
 }
 
 /*
@@ -1335,6 +1340,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 CLightPcs::CBumpLight::CBumpLight()
     : CLight()
 {
+    m_radius = LoadFloat(FLOAT_8032fc1c);
     m_hasTexture = 0;
 }
 
@@ -1363,11 +1369,11 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    float radius = FLOAT_8032fc1c;
-    float f2 = FLOAT_8032fc14;
+    float radius = LoadFloat(FLOAT_8032fc1c);
+    float f2 = LoadFloat(FLOAT_8032fc14);
 
     m_radius = radius;
-    float f1 = FLOAT_8032fc10;
+    float f1 = LoadFloat(FLOAT_8032fc10);
     m_offsetZ = f2;
     m_offsetX = f2;
     m_attenFalloff = f1;

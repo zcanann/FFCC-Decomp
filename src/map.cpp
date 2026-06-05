@@ -2542,7 +2542,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        GetMapObjArray()[i].Calc();
+        MapMng.GetMapObjArray()[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -2568,7 +2568,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        GetMapObjArray()[i].SetDrawFlag();
+        MapMng.GetMapObjArray()[i].SetDrawFlag();
     }
 }
 

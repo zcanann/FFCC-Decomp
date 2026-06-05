@@ -3,11 +3,6 @@
 
 #include "ffcc/partMng.h"
 
-// pppCVector structure
-typedef struct pppCVector {
-    u8 m_rgba[4];
-} pppCVector;
-
 struct pppColum {
     _pppPObject m_object;
 };
@@ -44,30 +39,6 @@ struct pppColumUnkB {
             u8 m_pad01[0x18];
         } m_lensFlare;
     };
-};
-
-struct pppColumValue {
-    float m_scaleStep;
-    float m_positionScale;
-    u8 m_colorR;
-    u8 m_colorG;
-    u8 m_colorB;
-    u8 _padB;
-};
-
-struct pppColumFrameWork {
-    s16 m_shapeA;
-    s16 m_shapeB;
-    s16 m_shapeC;
-    s16 _pad6;
-    pppColumValue* m_values;
-};
-
-struct pppColumPositionWork {
-    u8 _pad0[0x10];
-    Vec m_position;
-    u8 _pad1[0x16];
-    u8 m_alpha;
 };
 
 #ifdef __cplusplus

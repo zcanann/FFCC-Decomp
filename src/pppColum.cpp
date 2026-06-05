@@ -24,6 +24,30 @@ union ColumFloatBits {
 #define COLUM_STATIC_ASSERT_JOIN(a, b) COLUM_STATIC_ASSERT_JOIN_1(a, b)
 #define COLUM_STATIC_ASSERT(expr) typedef char COLUM_STATIC_ASSERT_JOIN(colum_static_assert_, __LINE__)[(expr) ? 1 : -1]
 
+struct pppColumValue {
+    float m_scaleStep;
+    float m_positionScale;
+    u8 m_colorR;
+    u8 m_colorG;
+    u8 m_colorB;
+    u8 _padB;
+};
+
+struct pppColumFrameWork {
+    s16 m_shapeA;
+    s16 m_shapeB;
+    s16 m_shapeC;
+    s16 _pad6;
+    pppColumValue* m_values;
+};
+
+struct pppColumPositionWork {
+    u8 _pad0[0x10];
+    Vec m_position;
+    u8 _pad1[0x16];
+    u8 m_alpha;
+};
+
 COLUM_STATIC_ASSERT(sizeof(pppColumValue) == 0x0C);
 COLUM_STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
 COLUM_STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);

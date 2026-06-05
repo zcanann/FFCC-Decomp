@@ -322,7 +322,7 @@ p_MaterialEditor.cpp:
 	.bss        start:0x8026D338 end:0x8026D724
 	.sdata      start:0x8032E648 end:0x8032E660
 	.sbss       start:0x8032ED18 end:0x8032ED28
-	.sdata2     start:0x8032FCA8 end:0x8032FCD0
+	.sdata2     start:0x8032FCA8 end:0x8032FCF0
 
 mapshadow.cpp:
 	extab       start:0x80006AAC end:0x80006AC4

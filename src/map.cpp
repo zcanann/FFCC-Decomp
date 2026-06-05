@@ -2519,7 +2519,7 @@ void CMapMng::Calc()
     }
 
     const int mapAnimRunCount = GetMapAnimRunArray().GetSize();
-    for (int i = 0; i < mapAnimRunCount; i++) {
+    for (unsigned int i = 0; static_cast<int>(i) < mapAnimRunCount; i++) {
         CMapAnimRun* mapAnimRun = GetMapAnimRunArray()[i];
         mapAnimRun->Calc(m_mapAnimFrame);
     }

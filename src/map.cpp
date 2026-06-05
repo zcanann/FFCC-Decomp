@@ -2854,6 +2854,102 @@ void CMapMng::Draw()
         GXSetCopyClear(clearColor, 0x00FFFFFF);
     }
 
+    if ((gMapHitDrawMode.m_byte & 1) != 0) {
+        _GXColor lightColor;
+        lightColor.r = 0xFF;
+        lightColor.g = 0xFF;
+        lightColor.b = 0xFF;
+        lightColor.a = 0xFF;
+
+        Vec lightDir;
+        lightDir.x = 1.0f;
+        lightDir.y = 1.0f;
+        lightDir.z = 1.0f;
+
+        Mtx cameraMtx;
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
+        Vec lightPos;
+        lightPos.x = kMapLargeDistance * -lightDir.x;
+        lightPos.y = kMapLargeDistance * -lightDir.y;
+        lightPos.z = kMapLargeDistance * -lightDir.z;
+
+        GXLightObj lightObj;
+        GXInitLightColor(&lightObj, lightColor);
+        PSMTXMultVec(cameraMtx, &lightPos, &lightPos);
+        GXInitLightPos(&lightObj, lightPos.x, lightPos.y, lightPos.z);
+        PSMTXMultVecSR(cameraMtx, &lightDir, &lightDir);
+        GXInitLightDir(&lightObj, lightDir.x, lightDir.y, lightDir.z);
+        GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj, GX_LIGHT0);
+
+        lightDir.x = -1.0f;
+        lightDir.y = 1.0f;
+        lightDir.z = -1.0f;
+
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        lightPos.x = kMapLargeDistance * -lightDir.x;
+        lightPos.y = kMapLargeDistance * -lightDir.y;
+        lightPos.z = kMapLargeDistance * -lightDir.z;
+
+        GXInitLightColor(&lightObj, lightColor);
+        PSMTXMultVec(cameraMtx, &lightPos, &lightPos);
+        GXInitLightPos(&lightObj, lightPos.x, lightPos.y, lightPos.z);
+        PSMTXMultVecSR(cameraMtx, &lightDir, &lightDir);
+        GXInitLightDir(&lightObj, lightDir.x, lightDir.y, lightDir.z);
+        GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj, GX_LIGHT1);
+
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),
+                      GX_DF_CLAMP, GX_AF_SPEC);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+
+        _GXColor materialColor;
+        materialColor.r = 0xFF;
+        materialColor.g = 0xFF;
+        materialColor.b = 0xFF;
+        materialColor.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, materialColor);
+
+        _GXColor ambientColor;
+        ambientColor.r = 0x40;
+        ambientColor.g = 0x40;
+        ambientColor.b = 0x40;
+        ambientColor.a = 0xFF;
+        GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
+
+        if ((gMapHitDrawMode.m_byte & 2) == 0) {
+            _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_COPY);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            GXSetCullMode(GX_CULL_FRONT);
+        } else {
+            _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
+            _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+            GXSetZCompLoc(1);
+            GXSetZMode(0, GX_ALWAYS, 0);
+            GXSetCullMode(GX_CULL_FRONT);
+        }
+
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, 0, GX_PTIDENTITY);
+        GXSetNumTevStages(1);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+        CMapObj* mapObj = MapMng.GetMapObjArray();
+        for (int i = 0; i < m_mapObjCount; i++) {
+            mapObj->DrawHit();
+            mapObj++;
+        }
+
+        CameraPcs.SetOffsetZBuff(kMapZero);
+    }
+
     if ((gMapHitDrawMode.m_byte & 4) != 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);

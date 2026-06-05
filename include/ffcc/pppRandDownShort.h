@@ -3,6 +3,8 @@
 
 
 struct _pppPObject;
+struct _pppCtrlTable;
+struct RandDownShortParam;
 #include "types.h"
 
 #ifdef __cplusplus

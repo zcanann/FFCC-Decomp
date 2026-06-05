@@ -3,6 +3,8 @@
 
 
 struct _pppPObject;
+struct _pppCtrlTable;
+struct RandUpIntParams;
 #ifdef __cplusplus
 extern "C" {
 #endif

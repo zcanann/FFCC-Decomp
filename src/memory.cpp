@@ -1517,32 +1517,6 @@ void CAmemCacheSet::Destroy()
     }
 }
 
-static inline void freeAmemCacheBlock(unsigned long ptr)
-{
-    CMemory::CStage::CBlock* block = stageBlockAt(ptr - sizeof(CMemory::CStage::CBlock));
-    if ((block->m_magicStart != 0x4b41) || (block->m_magicEnd != 0x4d49)) {
-        System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
-    }
-
-    block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
-
-    CMemory::CStage::CBlock* blockPrev = block->m_next;
-    if ((blockPrev->m_flags & 4) == 0) {
-        block->m_size = block->m_size + sizeof(CMemory::CStage::CBlock) + blockPrev->m_size;
-        blockPrev->m_next->m_prev = block;
-        block->m_next = blockPrev->m_next;
-    }
-
-    CMemory::CStage::CBlock* blockNext = block->m_prev;
-    if ((blockNext->m_flags & 4) == 0) {
-        blockNext->m_size = blockNext->m_size + sizeof(CMemory::CStage::CBlock) + block->m_size;
-        block->m_prev->m_next = block->m_next;
-        block->m_next->m_prev = block->m_prev;
-    }
-
-    block->m_stage->m_allocCount -= 1;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8001D468
@@ -1560,7 +1534,7 @@ void CAmemCacheSet::DestroyCache(int index)
         unsigned long cacheData = reinterpret_cast<unsigned long>(entry.m_cacheData);
         if (cacheData != 0) {
             if (cacheData != 0) {
-                freeAmemCacheBlock(cacheData);
+                freeStageBlock(reinterpret_cast<void*>(cacheData));
             }
             entry.m_cacheData = 0;
         }
@@ -1572,7 +1546,7 @@ void CAmemCacheSet::DestroyCache(int index)
         unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
         if (workData != 0) {
             if (workData != 0) {
-                freeAmemCacheBlock(workData);
+                freeStageBlock(reinterpret_cast<void*>(workData));
             }
         }
         entry.m_cacheData = 0;
@@ -2003,13 +1977,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            freeAmemCacheBlock(reinterpret_cast<unsigned long>(bestEntry->m_cacheData));
+            freeStageBlock(bestEntry->m_cacheData);
             bestEntry->m_cacheData = 0;
         }
 
         int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
         if (allocated != 0) {
-            freeAmemCacheBlock(static_cast<unsigned long>(allocated));
+            freeStageBlock(reinterpret_cast<void*>(allocated));
             return;
         }
 
@@ -2068,7 +2042,7 @@ void CAmemCacheSet::CacheClear()
             void* data = entry.m_cacheData;
             if (data != 0) {
                 if (data != 0) {
-                    freeAmemCacheBlock(reinterpret_cast<unsigned long>(data));
+                    freeStageBlock(reinterpret_cast<void*>(data));
                 }
                 entry.m_cacheData = 0;
             }

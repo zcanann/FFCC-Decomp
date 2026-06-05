@@ -3398,32 +3398,28 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
     int objIndex = 0;
     int numMapObj = m_mapObjCount;
-    CMapObj* scan = GetMapObjArray();
 
     while (0 < numMapObj) {
-        if (scan->m_objId == static_cast<unsigned short>(id)) {
+        if (m_mapObjArray[objIndex].m_objId == static_cast<unsigned short>(id)) {
             goto found;
         }
-        scan++;
         objIndex++;
         numMapObj--;
     }
     objIndex = -1;
 
 found:
+    const Vec spotPosition = position;
     const _GXColor spotColor = color;
-    const float posX = position.x;
-    const float posY = position.y;
-    const float posZ = position.z;
-    CMapObj* mapObj = GetMapObjArray() + objIndex;
+    CMapObj* mapObj = m_mapObjArray + objIndex;
     CMapObjAtr* attr = mapObj->m_attribute;
 
     if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
         spotAttr->m_color = spotColor;
-        mapObj->m_localRotationX = posX;
-        mapObj->m_localRotationY = posY;
-        mapObj->m_localRotationZ = posZ;
+        mapObj->m_localRotationX = spotPosition.x;
+        mapObj->m_localRotationY = spotPosition.y;
+        mapObj->m_localRotationZ = spotPosition.z;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
     }

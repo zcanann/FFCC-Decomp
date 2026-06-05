@@ -312,7 +312,6 @@ void CMapObj::Init()
  */
 inline CMapObjAtr::CMapObjAtr()
 {
-    m_type = static_cast<TYPE>(-1);
 }
 
 /*

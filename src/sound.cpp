@@ -1887,7 +1887,7 @@ found_se:
                     if (playId < 0) {
                         System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
                     } else {
-                        reinterpret_cast<CRedSound*>(sound + 8)->SeStop(playId);
+                        m_redSound.SeStop(playId);
                     }
                     foundSe->m_bits.m_active = 0;
                 }

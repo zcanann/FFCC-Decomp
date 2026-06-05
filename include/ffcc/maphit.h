@@ -50,13 +50,16 @@ public:
 
     CMapCylinder(float min, float max)
     {
-        m_bound.m_min.z = min;
-        m_bound.m_min.y = min;
-        m_bound.m_min.x = min;
+        float minBound = min;
+        float maxBound = max;
 
-        m_bound.m_max.z = max;
-        m_bound.m_max.y = max;
-        m_bound.m_max.x = max;
+        m_bound.m_min.z = minBound;
+        m_bound.m_min.y = minBound;
+        m_bound.m_min.x = minBound;
+
+        m_bound.m_max.z = maxBound;
+        m_bound.m_max.y = maxBound;
+        m_bound.m_max.x = maxBound;
     }
 
     CBound* GetBound() { return reinterpret_cast<CBound*>(&m_bound); }

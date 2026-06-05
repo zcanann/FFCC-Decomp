@@ -23,19 +23,12 @@ struct Vec;
 
 static inline void InitMapObjAtrColorKeyFrame(CMapKeyFrame& keyFrame)
 {
-    keyFrame.m_mode = 0;
-    keyFrame.m_junCount = 0;
-    keyFrame.m_keyCount = 0;
-    keyFrame.m_loop = 1;
-    keyFrame.m_isRun = 0;
-    keyFrame.m_currentFrame = 0;
-    keyFrame.m_startFrame = 0;
-    keyFrame.m_endFrame = 0;
-    keyFrame.m_frameCount = 0;
     keyFrame.m_junTable = 0;
     keyFrame.m_keyFrame = 0;
     keyFrame.m_keyValue = 0;
     keyFrame.m_splineTable = 0;
+    keyFrame.m_loop = 1;
+    keyFrame.m_isRun = 0;
 }
 
 class CMapObjAtr
@@ -128,11 +121,11 @@ class CMapObjAtrPointLight : public CMapObjAtr
 public:
     CMapObjAtrPointLight()
     {
+        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
+        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
         m_type = POINT_LIGHT;
         m_colorMode = 0;
         m_unknown20 = 0;
-        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
-        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
     }
 
     ~CMapObjAtrPointLight();

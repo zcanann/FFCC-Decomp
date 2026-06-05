@@ -312,7 +312,6 @@ void CMapObj::Init()
  */
 inline CMapObjAtr::CMapObjAtr()
 {
-    m_type = static_cast<TYPE>(-1);
 }
 
 /*
@@ -333,11 +332,9 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
+    InitMapObjAtrColorKeyFrame(m_keyFrame);
     m_type = CMapObjAtr::MIME;
-    m_vertexListCount = 0;
     m_vertexLists = 0;
-    m_vertexCount = 0;
-    new (&m_keyFrame) CMapKeyFrame;
 }
 
 /*
@@ -348,7 +345,6 @@ inline CMapObjAtrMime::CMapObjAtrMime()
 inline CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
     m_type = CMapObjAtr::MESH_NAME;
-    memset(m_name, 0, sizeof(m_name));
 }
 
 /*
@@ -500,9 +496,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
-                    if (meshName != 0) {
-                        strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
-                    }
+                    strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
                     m_mapData = 0;
                 } else {
                     m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
@@ -556,18 +550,18 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
             if (animRun != 0) {
                 animRun->m_currentFrame = -1;
-                animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
-                animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
-                animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
-                animRun->m_triggerFrame = static_cast<int>(chunkFile.Get4());
-                animRun->m_loop = chunkFile.Get1();
-                if (chunk.m_version == 1) {
-                    animRun->m_animId = chunkFile.Get1();
-                } else {
-                    animRun->m_animId = 0;
-                }
-                MapMng.GetMapAnimRunArray().Add(animRun);
             }
+            animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
+            animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_triggerFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_loop = chunkFile.Get1();
+            if (chunk.m_version == 1) {
+                animRun->m_animId = chunkFile.Get1();
+            } else {
+                animRun->m_animId = 0;
+            }
+            MapMng.GetMapAnimRunArray().Add(animRun);
             break;
         }
         case CHUNK_MIME: {
@@ -577,17 +571,6 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             CMapObjAtrMime* mimeAttr =
                 new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
-
-            if (mime != 0) {
-                mime->m_type = CMapObjAtr::MIME;
-                mime->m_vertexLists = 0;
-                mime->m_vertexCount = 0;
-                *reinterpret_cast<int*>(&mime->m_keyFrame.m_mode) = 0;
-                *reinterpret_cast<int*>(&mime->m_keyFrame.m_isRun) = 0;
-                mime->m_keyFrame.m_loop = 1;
-                mime->m_vertexListCount = 0;
-                mime->m_keyFrame.m_currentFrame = 0;
-            }
 
             chunkFile.PushChunk();
             CChunkFile::CChunk mimeChunk;
@@ -894,6 +877,7 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 
                 CMapObj* grandChild = child->m_child;
                 if (grandChild != 0) {
+                    float (*childWorldMtx)[4] = child->m_worldMtx;
                     do {
                         unsigned char grandChildDirty = childDirty;
 
@@ -916,7 +900,7 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                         }
 
                         if (grandChildDirty != 0) {
-                            PSMTXConcat(child->m_worldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
+                            PSMTXConcat(childWorldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
                         }
 
                         if (grandChild->m_child != 0) {
@@ -1441,7 +1425,7 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
-    if (priority != m_drawPriority) {
+    if (m_drawPriority != priority) {
         return;
     }
     if ((m_showFlags & 4) == 0) {
@@ -1641,33 +1625,35 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
-        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
-            ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
-            : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
+        {
+            bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
+                ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
+                : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
 
-        if (xOverlap) {
-            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
-                ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
-                : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
-            if (yOverlap) {
-                xyOverlap = true;
+            if (xOverlap) {
+                bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
+                    ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
+                    : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
+                if (yOverlap) {
+                    xyOverlap = true;
+                }
             }
-        }
 
-        if (xyOverlap) {
-            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
-                ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
-                : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
+            if (xyOverlap) {
+                bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
+                    ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
+                    : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
 
-            if (zOverlap) {
-                hitBounds = true;
+                if (zOverlap) {
+                    hitBounds = true;
+                }
             }
         }
         if (hitBounds) {
             Vec localMove;
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
+            if (reinterpret_cast<CMapHit*>(m_mapData)->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
                 return 1;
             }
         }
@@ -1726,32 +1712,34 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
-        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
-            ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
-            : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
+        {
+            bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
+                ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
+                : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
 
-        if (xOverlap) {
-            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
-                ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
-                : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
-            if (yOverlap) {
-                xyOverlap = true;
+            if (xOverlap) {
+                bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
+                    ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
+                    : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
+                if (yOverlap) {
+                    xyOverlap = true;
+                }
             }
-        }
 
-        if (xyOverlap) {
-            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
-                ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
-                : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
+            if (xyOverlap) {
+                bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
+                    ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
+                    : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
 
-            if (zOverlap) {
-                hitBounds = true;
+                if (zOverlap) {
+                    hitBounds = true;
+                }
             }
         }
         if (hitBounds) {
             PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
             PSMTXMultVecSR(inverseMtx, move, &localMove);
-            mapHit->CheckHitCylinderNear(&localCylinder, &localMove, mask);
+            reinterpret_cast<CMapHit*>(m_mapData)->CheckHitCylinderNear(&localCylinder, &localMove, mask);
         }
     }
 

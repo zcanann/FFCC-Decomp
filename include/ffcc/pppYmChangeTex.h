@@ -1,29 +1,12 @@
 #ifndef _PPP_YMCHANGETEX_H_
 #define _PPP_YMCHANGETEX_H_
 
-#include "ffcc/pppPart.h"
+struct _pppCtrlTable;
+struct _pppPObject;
+struct ChangeTexStep;
 
-#include <dolphin/types.h>
-
-struct pppYmChangeTex {
-    _pppPObject m_object;
-};
-
-struct pppYmChangeTexStep {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    float m_initWOrk;
-    float m_stepValue;
-    float m_arg3;
-    union {
-        u8 m_payload[6];
-        struct Payload {
-            u8 m_mode;
-            u8 m_pad01[5];
-        } m_changeTex;
-    };
-    u8 _pad1[1];
-};
+typedef _pppPObject pppYmChangeTex;
+typedef ChangeTexStep pppYmChangeTexStep;
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,7 @@
 #include "ffcc/ptrarray.h"
 #include "global.h"
 #include "ffcc/pppYmLaser.h"
+#include "ffcc/pppLaserCommon.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
@@ -31,6 +32,10 @@ static inline float YmLaserConst(const float& value) { return *reinterpret_cast<
 
 extern "C" const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
+typedef pppLaserWorkBase pppYmLaserWork;
+typedef pppLaserColorBlock pppYmLaserColorData;
+typedef pppLaserMapCylinder pppYmLaserMapCylinder;
+
 static inline f32 LoadLaserFloat(const f32& value)
 {
 	return value;
@@ -41,7 +46,7 @@ static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* c
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
 }
 
-STATIC_ASSERT(offsetof(struct pppYmLaser, m_workArea) == 0x80);
+STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 STATIC_ASSERT(sizeof(pppYmLaserMapCylinder) == sizeof(CMapCylinder));
 
 /*

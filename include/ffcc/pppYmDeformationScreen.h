@@ -1,11 +1,9 @@
 #ifndef _PPP_YMDEFORMATIONSCREEN_H_
 #define _PPP_YMDEFORMATIONSCREEN_H_
 
-#include "ffcc/partMng.h"
+struct _pppPObject;
 
-struct pppYmDeformationScreen {
-	_pppPObject m_object;
-};
+typedef _pppPObject pppYmDeformationScreen;
 
 #ifdef __cplusplus
 extern "C" {

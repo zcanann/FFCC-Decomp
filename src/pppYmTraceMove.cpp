@@ -8,6 +8,15 @@ extern const float kPppYmTraceMoveOne;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
+struct pppYmTraceMoveStep {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_payload;
+};
+
 struct pppYmTraceMoveWork {
     Vec m_direction;
     u32 _pad0C;
@@ -41,7 +50,7 @@ static inline Vec* GetYmTraceMoveBasePosition(_pppMngSt* pppMngSt)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, pppYmTraceMoveCtrl* param_3)
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, _pppCtrlTable* param_3)
 {
 	if (ppvUserStopPartF != 0) {
 		return;
@@ -50,7 +59,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	s32 workOffset = *param_3->m_serializedDataOffsets;
 	_pppMngSt* pppMngSt = ppvMng;
 	CGObject* lookTarget = pppMngSt->m_lookTarget;
-	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + workOffset);
+	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + workOffset);
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;
@@ -63,7 +72,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
 
-	if (param_2->m_graphId == pppYmTraceMove->m_object.m_graphId) {
+	if (param_2->m_graphId == pppYmTraceMove->m_graphId) {
 		work->m_distance = work->m_distance + param_2->m_initWOrk;
 		work->m_velocity = work->m_velocity + param_2->m_stepValue;
 		work->m_acceleration = work->m_acceleration + param_2->m_arg3;
@@ -122,10 +131,10 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2)
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* param_2)
 {
 	pppYmTraceMoveWork* work =
-	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_2->m_serializedDataOffsets);
+	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + *param_2->m_serializedDataOffsets);
 	_pppMngSt* pppMngSt = ppvMng;
 	f32 zero;
 

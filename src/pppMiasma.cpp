@@ -39,6 +39,42 @@ struct MiasmaRadiusWork {
     float m_scale;
 };
 
+struct pppMiasmaFrameStep {
+    s32 m_graphId;
+    u8 m_pad_0x4[0x14];
+    s16 m_addPosX;
+    s16 m_addPosY;
+    s16 m_addPosZ;
+    s16 m_addPosW;
+    s16 m_addVelX;
+    s16 m_addVelY;
+    s16 m_addVelZ;
+    s16 m_addVelW;
+    s16 m_addAccX;
+    s16 m_addAccY;
+    s16 m_addAccZ;
+    s16 m_addAccW;
+};
+
+struct pppMiasmaRenderStep {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_initWOrk;
+    u8 m_pad_0x09[3];
+    float m_stepValue;
+    u8 m_arg3;
+    u8 m_pad_0x11[3];
+    union {
+        u8 m_payload[0x1f];
+        struct Payload {
+            u8 m_pad00[0x1C];
+            u8 m_alphaOpScale;
+            u8 m_useSecondaryMask;
+            u8 m_alphaScale;
+        } m_miasma;
+    };
+};
+
 STATIC_ASSERT(offsetof(MiasmaFrameWork, m_position) == 0x00);
 STATIC_ASSERT(offsetof(MiasmaFrameWork, m_velocity) == 0x08);
 STATIC_ASSERT(offsetof(MiasmaFrameWork, m_accel) == 0x10);
@@ -48,17 +84,17 @@ STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
 static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline MiasmaColorWork* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaColorWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[1]);
+    return reinterpret_cast<MiasmaColorWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[1]);
 }
 
 static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_object.m_workArea + ctrl->m_serializedDataOffsets[3]);
+    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
 }
 
 static inline void _GXSetTevOrder(int stage, int texCoord, int texMap, int colorChannel)
@@ -142,7 +178,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlT
     work->m_velocity[3] = work->m_velocity[3] + work->m_accel[3];
     work->m_position[3] = work->m_position[3] + work->m_velocity[3];
 
-    if (pppMiasma->m_object.m_graphId != param_2->m_graphId) {
+    if (pppMiasma->m_graphId != param_2->m_graphId) {
         return;
     }
 
@@ -342,7 +378,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
-            &drawColor, &pppMiasma->m_object.m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
+            &drawColor, &pppMiasma->m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
 
         _GXSetTevOrder(0, 0xFF, 0xFF, 4);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -364,15 +400,15 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         GXSetChanMatColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-        GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
+        GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
         GXSetNumTevStages(1);
         GXSetNumTexGens(0);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         GXSetProjection(screenMtx, GX_PERSPECTIVE);
         PSMTXScale(firstScaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
-        PSMTXConcat(firstScaleMtx, pppMiasma->m_object.m_localMatrix.value, firstLocalMtx);
-        PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_object.m_drawMatrix.value);
-        GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
+        PSMTXConcat(firstScaleMtx, pppMiasma->m_localMatrix.value, firstLocalMtx);
+        PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_drawMatrix.value);
+        GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
 
         GXSetTevDirect(GX_TEVSTAGE0);
         pppInitBlendMode();
@@ -388,7 +424,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
         if (!isCameraInside) {
             Graphic.SetDrawDoneDebugData(0x32);
-            pppDrawMesh(model, pppMiasma->m_object.m_drawMatrixPtr, 0);
+            pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
             Graphic.SetDrawDoneDebugData(0x33);
         }
 
@@ -405,7 +441,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
 
         Graphic.SetDrawDoneDebugData(0x34);
-        pppDrawMesh(model, pppMiasma->m_object.m_drawMatrixPtr, 0);
+        pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
         Graphic.SetDrawDoneDebugData(0x35);
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
@@ -436,7 +472,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             GXSetChanAmbColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
             GXSetChanMatColor(GX_COLOR0A0, *static_cast<GXColor*>(model->m_colors));
             GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-            GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
+            GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
             GXSetNumTevStages(1);
             GXSetNumTexGens(0);
             GXSetTevDirect(GX_TEVSTAGE0);
@@ -447,9 +483,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
             radius = FLOAT_80331940 - param_2->m_stepValue;
             PSMTXScale(secondScaleMtx, radius, radius, radius);
-            PSMTXConcat(secondScaleMtx, pppMiasma->m_object.m_localMatrix.value, secondLocalMtx);
-            PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_object.m_drawMatrix.value);
-            GXLoadPosMtxImm(pppMiasma->m_object.m_drawMatrix.value, 0);
+            PSMTXConcat(secondScaleMtx, pppMiasma->m_localMatrix.value, secondLocalMtx);
+            PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_drawMatrix.value);
+            GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
 
             _GXSetTevColorIn(
                 0, 0xF, 0xF, 0xF, 0xC);
@@ -460,7 +496,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
             if (!isCameraInside) {
                 Graphic.SetDrawDoneDebugData(0x36);
-                pppDrawMesh(model, pppMiasma->m_object.m_drawMatrixPtr, 0);
+                pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
                 Graphic.SetDrawDoneDebugData(0x37);
             }
 
@@ -477,7 +513,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
 
             Graphic.SetDrawDoneDebugData(0x38);
-            pppDrawMesh(model, pppMiasma->m_object.m_drawMatrixPtr, 0);
+            pppDrawMesh(model, pppMiasma->m_drawMatrixPtr, 0);
             Graphic.SetDrawDoneDebugData(0x39);
 
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight,

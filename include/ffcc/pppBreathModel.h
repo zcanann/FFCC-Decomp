@@ -2,8 +2,10 @@
 #define _FFCC_PPBBREATHMODEL_H_
 
 struct _pppCtrlTable;
-struct pppBreathModel;
+struct _pppPObject;
 struct PBreathModel;
+
+typedef _pppPObject pppBreathModel;
 
 #ifdef __cplusplus
 extern "C" {

@@ -72,7 +72,7 @@ static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWo
 
 static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	return reinterpret_cast<ChangeTexWork*>(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 /*
@@ -115,12 +115,12 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrl
 
 	int colorOffset = data->m_serializedDataOffsets[1];
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	u8* colorData = changeTex->m_object.m_workArea + colorOffset;
+	u8* colorData = changeTex->m_workArea + colorOffset;
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
 	CalcGraphValue(
-	    &changeTex->m_object, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
+	    changeTex, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
 	    step->m_stepValue, step->m_arg3);
 
 	work->m_charaObj = ppvMng->m_owner;

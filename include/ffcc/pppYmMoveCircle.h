@@ -1,21 +1,9 @@
 #ifndef _FFCC_PPP_YMMOVECIRCLE_H_
 #define _FFCC_PPP_YMMOVECIRCLE_H_
 
-#include <dolphin/mtx.h>
-#include <dolphin/types.h>
-
 struct _pppCtrlTable;
 struct _pppPObject;
-
-struct pppYmMoveCircleStep {
-    int m_graphId;
-    float m_angleStep;
-    float m_angleStepStep;
-    float m_angleStepStepStep;
-    float m_radius;
-    float m_radiusStep;
-    float m_radiusStepStep;
-};
+struct pppYmMoveCircleStep;
 
 #ifdef __cplusplus
 extern "C" {

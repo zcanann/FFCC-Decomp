@@ -3,6 +3,8 @@
 #include "ffcc/pppYmEnv.h"
 #include "dolphin/gx/GXPixel.h"
 
+void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+
 /*
  * --INFO--
  * PAL Address: 0x8013e584
@@ -19,7 +21,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 	}
 
 	int dataOffset = *param_3->m_serializedDataOffsets;
-	void* work = pppCharaZEnvCtrl->m_object.m_workArea + dataOffset;
+	void* work = pppCharaZEnvCtrl->m_workArea + dataOffset;
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
 	model->SetCallbackContext(work, param_2);

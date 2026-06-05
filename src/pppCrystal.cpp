@@ -60,11 +60,30 @@ struct CrystalWork {
     GXTexObj* m_refractionTexObj;
 };
 
+struct pppCrystalUnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    s32 m_initWOrk;
+    float m_stepValue;
+    float m_arg3;
+    union {
+        u8 m_payload[6];
+        struct Payload {
+            u8 m_refractionMode;
+            u8 m_blendMode;
+            u8 m_drawFlag;
+            u8 m_zMode;
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+        } m_crystal;
+    };
+};
+
 inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
 
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<CrystalWork*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<CrystalWork*>(crystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 union CrystalFloatBits {
@@ -121,7 +140,7 @@ static inline float CrystalSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct _pppCtrlTable* param_3)
+void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalUnkB* param_2, _pppCtrlTable* param_3)
 {
 	float texW;
 	float texH;
@@ -129,7 +148,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
 	pppCrystalColorBlock* colorBlock =
-		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[1]);
+		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_workArea + serializedDataOffsets[1]);
 
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -158,7 +177,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	pppSetBlendMode(param_2->m_crystal.m_blendMode);
 	pppSetDrawEnv(
-		&colorBlock->m_color, &pppCrystal->m_object.m_drawMatrix, param_2->m_arg3,
+		&colorBlock->m_color, &pppCrystal->m_drawMatrix, param_2->m_arg3,
 		param_2->m_crystal.m_drawEnvColor1, param_2->m_crystal.m_drawEnvColor0, param_2->m_crystal.m_blendMode, param_2->m_crystal.m_drawFlag, 1, 1, param_2->m_crystal.m_zMode);
 
 	Mtx lightMtx;
@@ -226,7 +245,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
-	pppDrawMesh(model, pppCrystal->m_object.m_drawMatrixPtr, 0);
+	pppDrawMesh(model, pppCrystal->m_drawMatrixPtr, 0);
 	GXSetNumIndStages(0);
 	GXSetTevDirect((GXTevStageID)0);
 	memset(&indMtx, 0, sizeof(indMtx));
@@ -242,7 +261,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct _pppCtrlTable* param_3)
+void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalUnkB* param_2, _pppCtrlTable* param_3)
 {
 	u32 y;
 	CrystalWork* work;
@@ -363,7 +382,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
+void pppDestructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
 {
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
 	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
@@ -390,7 +409,7 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* par
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
+void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
 {
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_2);
 

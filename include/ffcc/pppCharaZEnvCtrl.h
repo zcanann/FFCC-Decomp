@@ -1,17 +1,12 @@
 #ifndef _FFCC_PPPCHARAZENVCTRL_H_
 #define _FFCC_PPPCHARAZENVCTRL_H_
 
-#include "ffcc/chara.h"
-#include "ffcc/partMng.h"
-
+struct _pppCtrlTable;
+struct _pppPObjLink;
+struct _pppPObject;
 struct pppCharaZEnvCtrlUnkB;
 
-struct pppCharaZEnvCtrl
-{
-    _pppPObject m_object;
-};
-
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+typedef _pppPObject pppCharaZEnvCtrl;
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +21,3 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl*, pppCharaZEnvCtrlUnkB*, _pppCtrlTab
 #endif
 
 #endif // _FFCC_PPPCHARAZENVCTRL_H_
-

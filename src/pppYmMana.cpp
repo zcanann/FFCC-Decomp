@@ -69,11 +69,6 @@ static inline Mtx44& CameraScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
-struct Vec2d {
-    float x;
-    float y;
-};
-
 extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
 
 struct pppYmManaUnkB {

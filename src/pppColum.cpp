@@ -3,17 +3,13 @@
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/util.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/textureman.h"
 
 #include <math.h>
 #include <stddef.h>
-
-struct Vec2d {
-    float x;
-    float y;
-};
 
 union ColumFloatBits {
     float value;
@@ -127,9 +123,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *para
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     pppColumValue* values;
-    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
+    pppColumFrameWork* frameWork = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
     pppColumPositionWork* positionWork =
-        (pppColumPositionWork*)(column->m_object.m_workArea + serializedDataOffsets[2]);
+        (pppColumPositionWork*)(column->m_workArea + serializedDataOffsets[2]);
     int textureIndex = 0;
     pppCVECTOR color;
 
@@ -274,7 +270,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param
 
     if (ppvUserStopPartF == 0) {
         serializedDataOffsets = param_3->m_serializedDataOffsets;
-        work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
+        work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc(
                 (unsigned long)param_2->m_count * 0xc, ppvEnv->m_stagePtr,
@@ -315,7 +311,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param
 void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
 {
     int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
+    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
 
     if (work->m_values != 0) {
         pppHeapUseRate((CMemory::CStage*)work->m_values);
@@ -335,7 +331,7 @@ void pppDestructColum(pppColum *column, _pppCtrlTable *param_2)
 void pppConstructColum(pppColum *column, _pppCtrlTable *param_2)
 {
     int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_object.m_workArea + serializedDataOffsets[3]);
+    pppColumFrameWork* work = (pppColumFrameWork*)(column->m_workArea + serializedDataOffsets[3]);
     work->m_shapeC = 0;
     work->m_shapeB = 0;
     work->m_shapeA = 0;

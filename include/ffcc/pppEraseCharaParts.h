@@ -1,20 +1,11 @@
 #ifndef _PPP_ERASECHARAPARTS_H_
 #define _PPP_ERASECHARAPARTS_H_
 
-#include "ffcc/chara.h"
-#include "ffcc/partMng.h"
-#include <dolphin/types.h>
+struct _pppCtrlTable;
+struct _pppPObject;
+struct pppEraseCharaPartsUnkB;
 
-struct pppEraseCharaParts {
-    _pppPObject m_object;
-};
-
-struct pppEraseCharaPartsUnkB {
-    u8 m_unk0[4];
-    s8 m_meshIndex;
-};
-
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+typedef _pppPObject pppEraseCharaParts;
 
 #ifdef __cplusplus
 extern "C" {

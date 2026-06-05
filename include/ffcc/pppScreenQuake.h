@@ -1,10 +1,11 @@
 #ifndef _PPP_SCREENQUAKE_H_
 #define _PPP_SCREENQUAKE_H_
 
-#include "ffcc/partMng.h"
-
-struct pppScreenQuake;
+struct _pppCtrlTable;
+struct _pppPObject;
 struct pppScreenQuakeStep;
+
+typedef _pppPObject pppScreenQuake;
 
 #ifdef __cplusplus
 extern "C" {

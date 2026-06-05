@@ -3,6 +3,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
@@ -25,11 +26,6 @@ extern const u32 DAT_80330B28[2] = {0x0000003f, 0x00000000};
 extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
-
-struct Vec2d {
-    f32 x;
-    f32 y;
-};
 
 struct YmMeltMapCylinder {
     Vec m_bottom;
@@ -83,11 +79,6 @@ struct VERTEX_DATA
     u8 m_hideWhenNoGround;
 };
 
-struct PYmMeltDataOffsets {
-    u8 _pad[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 struct YmMeltCtrl {
     s32 m_graphId;
     s32 m_dataValIndex;
@@ -128,12 +119,12 @@ STATIC_ASSERT(sizeof(YmMeltMapCylinder) == sizeof(CMapCylinder));
 
 static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltWork*>(ymMelt->m_object.m_workArea + *offsets->m_serializedDataOffsets);
+    return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + *offsets->m_serializedDataOffsets);
 }
 
 static inline YmMeltColorWork* GetYmMeltColorWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_object.m_workArea + offsets->m_serializedDataOffsets[1]);
+    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_workArea + offsets->m_serializedDataOffsets[1]);
 }
 
 static inline float LoadFloat(const float& value)
@@ -393,7 +384,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     work->m_phaseVelocity = work->m_phaseVelocity + work->m_phaseAccel;
     work->m_phase = work->m_phase + work->m_phaseVelocity;
 
-    if (ctrl->m_graphId == ymMelt->m_object.m_graphId) {
+    if (ctrl->m_graphId == ymMelt->m_graphId) {
         work->m_phase += ctrl->m_melt.m_phaseDelta;
         work->m_phaseVelocity += ctrl->m_melt.m_phaseVelocityDelta;
         work->m_phaseAccel += ctrl->m_melt.m_phaseAccelDelta;

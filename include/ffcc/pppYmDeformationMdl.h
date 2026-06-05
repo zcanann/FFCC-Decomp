@@ -1,33 +1,11 @@
 #ifndef _PPP_YMDEFORMATIONMDL_H_
 #define _PPP_YMDEFORMATIONMDL_H_
 
-#include "ffcc/pppPart.h"
+struct _pppCtrlTable;
+struct _pppPObject;
+struct pppYmDeformationMdlUnkB;
 
-#include <dolphin/types.h>
-
-struct pppYmDeformationMdlUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    f32 m_scaleValueAdd;
-    f32 m_scaleVelocityAdd;
-    f32 m_scaleAccelerationAdd;
-    f32 m_angleValueAdd;
-    f32 m_angleVelocityAdd;
-    f32 m_angleAccelerationAdd;
-    s16 m_angleLimit;
-    u8 m_pad22[2];
-    f32 m_envDepth;
-    u8 m_blendMode;
-    u8 m_cullMode;
-    u8 m_fogIndex;
-    u8 m_lightTarget;
-    u8 m_disableZ;
-    u8 m_pad2D[0xF];
-};
-
-struct pppYmDeformationMdl {
-    _pppPObject m_object;
-};
+typedef _pppPObject pppYmDeformationMdl;
 
 #ifdef __cplusplus
 extern "C" {

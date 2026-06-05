@@ -4,6 +4,12 @@
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
 
+struct pppCallBackDistanceUnkB {
+    u32 m_unk0;
+    f32 m_dataValIndex;
+    s16 m_initWOrk;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80141204

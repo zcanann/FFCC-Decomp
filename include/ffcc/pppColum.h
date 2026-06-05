@@ -1,11 +1,12 @@
 #ifndef _FFCC_PPPCOLUM_H_
 #define _FFCC_PPPCOLUM_H_
 
-#include "ffcc/partMng.h"
+#include <dolphin/types.h>
 
-struct pppColum {
-    _pppPObject m_object;
-};
+struct _pppCtrlTable;
+struct _pppPObject;
+
+typedef _pppPObject pppColum;
 
 struct pppColumUnkB {
     u32 m_unk0;            // 0x00

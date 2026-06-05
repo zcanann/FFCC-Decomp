@@ -1,15 +1,12 @@
 #ifndef _FFCC_PPP_YMMELT_H_
 #define _FFCC_PPP_YMMELT_H_
 
-#include "ffcc/pppPart.h"
-
-struct PYmMelt
-{
-    _pppPObject m_object;
-};
-
-struct PYmMeltDataOffsets;
+struct _pppCtrlTable;
+struct _pppPObject;
 struct YmMeltCtrl;
+
+typedef _pppCtrlTable PYmMeltDataOffsets;
+typedef _pppPObject PYmMelt;
 
 #ifdef __cplusplus
 extern "C" {

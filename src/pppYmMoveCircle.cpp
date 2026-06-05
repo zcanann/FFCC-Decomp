@@ -6,6 +6,16 @@
 #include "dolphin/mtx.h"
 #include <math.h>
 
+struct pppYmMoveCircleStep {
+    int m_graphId;
+    float m_angleStep;
+    float m_angleStepStep;
+    float m_angleStepStepStep;
+    float m_radius;
+    float m_radiusStep;
+    float m_radiusStepStep;
+};
+
 struct pppYmMoveCircleWork {
     f32 m_angle;
     f32 m_angleStep;

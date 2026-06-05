@@ -60,7 +60,7 @@ static inline MtxPtr ChangeTexModelMtx(CChara::CModel* model)
 static inline pppYmChangeTexState* GetChangeTexState(pppYmChangeTex* ymChangeTex, _pppCtrlTable* data)
 {
 	return reinterpret_cast<pppYmChangeTexState*>(
-	    ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+	    ymChangeTex->m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
@@ -135,7 +135,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	state->m_value1 = state->m_value1 + state->m_value2;
 	state->m_value0 = state->m_value0 + state->m_value1;
-	if (step->m_graphId == ymChangeTex->m_object.m_graphId) {
+	if (step->m_graphId == ymChangeTex->m_graphId) {
 		state->m_value0 = state->m_value0 + step->m_initWOrk;
 		state->m_value1 = state->m_value1 + step->m_stepValue;
 		state->m_value2 = state->m_value2 + step->m_arg3;

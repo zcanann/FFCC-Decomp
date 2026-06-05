@@ -10,6 +10,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
@@ -17,18 +18,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-struct Vec2d {
-    float x;
-    float y;
-};
-
-struct Vec4d {
-    float x;
-    float y;
-    float z;
-    float w;
-};
 
 extern const f32 FLOAT_80331030;
 extern const f32 FLOAT_80331034;
@@ -63,6 +52,21 @@ struct BlurCharaTexData {
     GXTexObj* m_texObj;
 };
 
+struct pppBlurCharaUnkB {
+    s32 m_graphId;
+    u8 m_afterDrawPass;
+    u8 m_textureMode;
+    u8 m_smallTextureDiv;
+    u8 _pad7;
+    s32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_afterDrawOffsetY;
+    u8 _pad18;
+    u8 m_alpha;
+    u8 _pad1A[2];
+};
+
 STATIC_ASSERT(sizeof(pppBlurCharaWork) == 0x10);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
@@ -73,8 +77,11 @@ STATIC_ASSERT(offsetof(BlurCharaTexData, m_objPosBase) == 0x04);
 STATIC_ASSERT(offsetof(BlurCharaTexData, m_texObj) == 0x08);
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const _pppCtrlTable* data) {
-    return (pppBlurCharaWork*)(blurChara->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+    return (pppBlurCharaWork*)(blurChara->m_workArea + data->m_serializedDataOffsets[2]);
 }
+
+void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 
 /*
  * --INFO--
@@ -90,9 +97,9 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _ppp
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
     BlurCharaTexData* texData =
-        reinterpret_cast<BlurCharaTexData*>(blurChara->m_object.m_workArea + texDataOffset);
+        reinterpret_cast<BlurCharaTexData*>(blurChara->m_workArea + texDataOffset);
     BlurCharaColorData* colorData =
-        reinterpret_cast<BlurCharaColorData*>(blurChara->m_object.m_workArea + colorDataOffset);
+        reinterpret_cast<BlurCharaColorData*>(blurChara->m_workArea + colorDataOffset);
     CTexture* texture = 0;
     CGObject* objPosBase;
     _GXTexObj smallBackTex;

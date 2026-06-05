@@ -1,16 +1,9 @@
 #ifndef _FFCC_PPPCALLBACKDISTANCE_H_
 #define _FFCC_PPPCALLBACKDISTANCE_H_
 
-#include <dolphin/types.h>
-
 struct _pppPObject;
 struct _pppCtrlTable;
-
-struct pppCallBackDistanceUnkB {
-    u32 m_unk0;
-    f32 m_dataValIndex;
-    s16 m_initWOrk;
-};
+struct pppCallBackDistanceUnkB;
 
 #ifdef __cplusplus
 extern "C" {

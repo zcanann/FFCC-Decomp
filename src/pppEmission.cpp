@@ -36,6 +36,33 @@ typedef CChara::CMesh EmissionMeshRef;
 struct EmissionState;
 struct EmissionParticle;
 
+struct PEmissionPayload {
+    f32 m_scaleAccelerationAdd;
+    f32 m_scaleRandomRange;
+    u8 m_blendMode;
+    u8 m_particleMode;
+    u8 m_texGenMode;
+    u8 m_targetAlpha;
+    u8 m_fadeOutFrames;
+    u8 m_lifeJitterFrames;
+    u8 m_holdFrames;
+    u8 m_fadeInFrames;
+    u8 m_pad10[0x10];
+};
+
+struct PEmission {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_initWOrk;
+    u8 _pad8[3];
+    f32 m_stepValue;
+    f32 m_arg3;
+    union {
+        u8 m_payload[0x20];
+        PEmissionPayload m_emission;
+    };
+};
+
 struct EmissionState {
     EmissionParticle* m_particles;
     CTexture* m_texture;
@@ -75,13 +102,16 @@ STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
 static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<EmissionState*>(
-        emission->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+        emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
 {
     return model->m_meshes[meshIndex].m_data;
 }
+
+void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, pppEmissionUnkB* step)
 {
@@ -125,7 +155,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
 
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     EmissionState* state = GetEmissionState(pppEmission_, param_3);
-    u8* dataSet = pppEmission_->m_object.m_workArea + serializedDataOffsets[1];
+    u8* dataSet = pppEmission_->m_workArea + serializedDataOffsets[1];
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
@@ -138,7 +168,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppC
     state->m_colorA = dataSet[0xB];
 
     CalcGraphValue(
-        &pppEmission_->m_object, param_2->m_graphId,
+        pppEmission_, param_2->m_graphId,
         state->m_scale0, state->m_scale1, state->m_scale2,
         param_2->m_stepValue, param_2->m_arg3, param_2->m_emission.m_scaleAccelerationAdd);
 

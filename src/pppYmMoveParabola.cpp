@@ -6,6 +6,15 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
+struct pppYmMoveParabolaUnkB {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_payload;
+};
+
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -17,7 +26,7 @@ struct pppYmMoveParabolaWork {
 
 static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
 static inline Vec* ParabolaPreviousPosition(_pppMngSt* mng)
@@ -39,7 +48,7 @@ static inline Vec* ParabolaBasePosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData)
+extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData)
 {
     if (ppvUserStopPartF != 0) {
         return;
@@ -50,7 +59,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
 
     work->m_velocity = work->m_velocity + work->m_acceleration;
     work->m_distance = work->m_distance + work->m_velocity;
-    if (stepData->m_graphId == basePtr->m_object.m_graphId) {
+    if (stepData->m_graphId == basePtr->m_graphId) {
         work->m_distance = work->m_distance + stepData->m_stepValue;
         work->m_velocity = work->m_velocity + stepData->m_arg3;
         work->m_acceleration = work->m_acceleration + stepData->m_payload;
@@ -109,7 +118,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
+extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr)
 {
     const f32 zero = gPppYmMoveParabolaZero;
     _pppMngSt* pppMngSt = ppvMng;

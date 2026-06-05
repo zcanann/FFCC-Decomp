@@ -14,8 +14,27 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-STATIC_ASSERT(offsetof(pppYmDeformationMdl, m_object) == 0);
 STATIC_ASSERT(offsetof(_pppPObject, m_workArea) == 0x80);
+
+struct pppYmDeformationMdlUnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    f32 m_scaleValueAdd;
+    f32 m_scaleVelocityAdd;
+    f32 m_scaleAccelerationAdd;
+    f32 m_angleValueAdd;
+    f32 m_angleVelocityAdd;
+    f32 m_angleAccelerationAdd;
+    s16 m_angleLimit;
+    u8 m_pad22[2];
+    f32 m_envDepth;
+    u8 m_blendMode;
+    u8 m_cullMode;
+    u8 m_fogIndex;
+    u8 m_lightTarget;
+    u8 m_disableZ;
+    u8 m_pad2D[0xF];
+};
 
 struct YmDeformationMdlColorInfo {
     u32 m_unk0;
@@ -42,7 +61,7 @@ struct _pppEnvStYmDeformationMdl {
 template <typename T>
 static inline T* PppWorkArea(pppYmDeformationMdl* object, _pppCtrlTable* ctrl, int index)
 {
-    return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
+    return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
 static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
@@ -178,7 +197,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     u8 zEnable = param_2->m_disableZ == 0;
     pppSetDrawEnv(
-        &colorInfo->m_color, &pppYmDeformationMdl->m_object.m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
+        &colorInfo->m_color, &pppYmDeformationMdl->m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
         param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode, zEnable, 1, 0);
 
     GXSetNumTevStages(1);
@@ -234,7 +253,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         texMtx[0][2] = kYmDeformationMdlTexOffset;
         texMtx[1][2] = kYmDeformationMdlTexOffset;
         texMtx[2][2] = kYmDeformationMdlTexDepth;
-        PSMTXConcat(texMtx, pppYmDeformationMdl->m_object.m_drawMatrix.value, texMtx);
+        PSMTXConcat(texMtx, pppYmDeformationMdl->m_drawMatrix.value, texMtx);
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -258,7 +277,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         GXLoadTexObj(backTexture, GX_TEXMAP0);
         GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
-        pppDrawMesh(model, pppYmDeformationMdl->m_object.m_drawMatrixPtr, 0);
+        pppDrawMesh(model, pppYmDeformationMdl->m_drawMatrixPtr, 0);
 
         GXSetTevDirect((GXTevStageID)1);
         GXSetNumIndStages(0);
@@ -296,11 +315,11 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
         ((state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2)),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
-            &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_scale, state->m_values[0],
+            pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
             state->m_values[1], param_2->m_scaleValueAdd, param_2->m_scaleVelocityAdd,
             param_2->m_scaleAccelerationAdd);
         CalcGraphValue(
-            &pppYmDeformationMdl->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3],
+            pppYmDeformationMdl, param_2->m_graphId, state->m_values[2], state->m_values[3],
             state->m_values[4], param_2->m_angleValueAdd, param_2->m_angleVelocityAdd,
             param_2->m_angleAccelerationAdd);
 

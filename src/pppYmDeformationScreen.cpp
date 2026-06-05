@@ -7,6 +7,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
@@ -15,13 +16,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
-
-struct Vec4d {
-	float x;
-	float y;
-	float z;
-	float w;
-};
 
 struct YmDeformationScreenOffsetData {
 	int unk0;
@@ -92,7 +86,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 {
 	YmDeformationScreenStep* step = (YmDeformationScreenStep*)param2;
 	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(param1->m_object.m_workArea +
+		(VYmDeformationScreen*)(param1->m_workArea +
 								((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
@@ -271,13 +265,13 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	if (ppvUserStopPartF == 0) {
 		step = (YmDeformationScreenStep*)param2;
 		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
-		work = (VYmDeformationScreen*)(param1->m_object.m_workArea + serializedDataOffsets[2]);
+		work = (VYmDeformationScreen*)(param1->m_workArea + serializedDataOffsets[2]);
 
 		CalcGraphValue(
-			&param1->m_object, step->m_graphId, work->m_scale, work->m_values[0],
+			param1, step->m_graphId, work->m_scale, work->m_values[0],
 			work->m_values[1], step->m_initWOrk, step->m_stepValue, step->m_arg3);
 		CalcGraphValue(
-			&param1->m_object, step->m_graphId, work->m_values[2], work->m_values[3], work->m_values[4],
+			param1, step->m_graphId, work->m_values[2], work->m_values[3], work->m_values[4],
 			step->m_payload0, step->m_payload1, step->m_payload2);
 
 		if (ppvIsLoopCalc == 0) {
@@ -293,7 +287,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				}
 			}
 
-			if (param1->m_object.m_graphId == 0) {
+			if (param1->m_graphId == 0) {
 				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 				inVec.x = kYmDeformationScreenZero;
 				inVec.y = kYmDeformationScreenZero;
@@ -353,7 +347,7 @@ void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
 	float zero = kYmDeformationScreenZero;
 	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(obj->m_object.m_workArea + ((YmDeformationScreenParam*)param2)->offsetData->offset);
+		(VYmDeformationScreen*)(obj->m_workArea + ((YmDeformationScreenParam*)param2)->offsetData->offset);
 
 	work->m_values[1] = zero;
 	work->m_values[0] = zero;
@@ -378,7 +372,7 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 	short angle = 0;
 	char direction = 1;
 	float zero = kYmDeformationScreenZero;
-	VYmDeformationScreen* work = (VYmDeformationScreen*)(obj->m_object.m_workArea + offsetData->offset);
+	VYmDeformationScreen* work = (VYmDeformationScreen*)(obj->m_workArea + offsetData->offset);
 
 	work->m_angle = angle;
 	work->m_direction = direction;

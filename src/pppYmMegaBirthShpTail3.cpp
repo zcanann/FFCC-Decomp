@@ -14,20 +14,6 @@ const float FLOAT_803305AC = 0.00787f;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-struct pppYmMegaBirthShpTail3
-{
-    _pppPObjLink m_link;
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX field_0x40;
-    char field_0x70[0x4c];
-    unsigned int field_0xbc;
-    unsigned int field_0xc0;
-    unsigned int field_0xc4;
-    unsigned int field_0xc8;
-    char m_data[0x500];
-};
-
 struct VYmMegaBirthShpTail3
 {
     pppFMATRIX m_emitterMatrix;
@@ -94,11 +80,12 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     const u32 dataValIndex = *(u32*)(step + 4);
     const s32 colorOffset = offsets->m_serializedDataOffsets[1];
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
-    VColor* colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
-    _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
-    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
-    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
-    const u32 maxParticles = *(u32*)((u8*)&object->field_0xc8 + particleDataOffset);
+    u8* workBytes = object->m_workArea + particleDataOffset;
+    VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
+    _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)(workBytes + 0x3c);
+    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
+    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
+    const u32 maxParticles = *(u32*)(workBytes + 0x48);
     bool hasRequiredMemory = false;
 
     if (particles != 0 && wmats != 0) {
@@ -110,10 +97,10 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
     pppShapeAnimData* shapeAnim =
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
-    u16 workRand = *(u16*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + particleDataOffset + 0x78);
+    u16 workRand = *(u16*)(workBytes + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
-        0, &object->field_0x40, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
+        0, &object->m_drawMatrix, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
         payload[0x58], 0, zEnable, 1, 0);
     pppSetBlendMode(payload[0x58]);
 
@@ -135,23 +122,23 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const float stepDivisor = (float)((s32)frameCountRaw - 1);
                 const float drawScaleStep =
                     (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
-                float fadeR = (float)(*(s16*)((u8*)&object->m_data[4] + particleDataOffset) >> 7);
-                float fadeG = (float)(*(s16*)((u8*)&object->m_data[6] + particleDataOffset) >> 7);
-                float fadeB = (float)(*(s16*)((u8*)&object->m_data[8] + particleDataOffset) >> 7);
-                float fadeA = (float)(*(s16*)((u8*)&object->m_data[10] + particleDataOffset) >> 7) * alphaScale;
+                float fadeR = (float)(*(s16*)(workBytes + 0x50) >> 7);
+                float fadeG = (float)(*(s16*)(workBytes + 0x52) >> 7);
+                float fadeB = (float)(*(s16*)(workBytes + 0x54) >> 7);
+                float fadeA = (float)(*(s16*)(workBytes + 0x56) >> 7) * alphaScale;
                 float fadeRStep = kPppYmMegaBirthShpTail3Zero;
                 float fadeGStep = kPppYmMegaBirthShpTail3Zero;
                 float fadeBStep = kPppYmMegaBirthShpTail3Zero;
                 float fadeAStep = kPppYmMegaBirthShpTail3Zero;
                 if (stepDivisor != kPppYmMegaBirthShpTail3Zero) {
                     fadeRStep =
-                        (fadeR - (float)(*(s16*)((u8*)&object->m_data[16] + particleDataOffset) >> 7)) / stepDivisor;
+                        (fadeR - (float)(*(s16*)(workBytes + 0x5c) >> 7)) / stepDivisor;
                     fadeGStep =
-                        (fadeG - (float)(*(s16*)((u8*)&object->m_data[18] + particleDataOffset) >> 7)) / stepDivisor;
+                        (fadeG - (float)(*(s16*)(workBytes + 0x5e) >> 7)) / stepDivisor;
                     fadeBStep =
-                        (fadeB - (float)(*(s16*)((u8*)&object->m_data[20] + particleDataOffset) >> 7)) / stepDivisor;
+                        (fadeB - (float)(*(s16*)(workBytes + 0x60) >> 7)) / stepDivisor;
                     fadeAStep =
-                        (fadeA - (float)(*(s16*)((u8*)&object->m_data[22] + particleDataOffset) >> 7) * alphaScale) /
+                        (fadeA - (float)(*(s16*)(workBytes + 0x62) >> 7) * alphaScale) /
                         stepDivisor;
                 }
                 const float spacing = *(float*)(payload + 0x98);
@@ -322,8 +309,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     VYmMegaBirthShpTail3* const work =
-        (VYmMegaBirthShpTail3*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + offsets->m_serializedDataOffsets[2]);
-    VColor* const colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
+        (VYmMegaBirthShpTail3*)(object->m_workArea + offsets->m_serializedDataOffsets[2]);
+    VColor* const colorWork = (VColor*)(object->m_workArea + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -834,7 +821,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
 void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
 {
     int offset = param_2->m_serializedDataOffsets[2];
-    u8* work = reinterpret_cast<_pppPObject*>(pppYmMegaBirthShpTail3_)->m_workArea + offset;
+    u8* work = pppYmMegaBirthShpTail3_->m_workArea + offset;
     void** ptrBc = (void**)(work + 0x3c);
     void** ptrC0 = (void**)(work + 0x40);
     void** ptrC4 = (void**)(work + 0x44);
@@ -865,7 +852,7 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
 void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
 {
     pppFMATRIX* work =
-        (pppFMATRIX*)(reinterpret_cast<_pppPObject*>(pppYmMegaBirthShpTail3_)->m_workArea + param_2->m_serializedDataOffsets[2]);
+        (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + param_2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix(*work);

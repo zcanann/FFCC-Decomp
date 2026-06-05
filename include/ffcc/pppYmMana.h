@@ -2,6 +2,7 @@
 #define _PPP_YMMANA_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/pppVec.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -11,7 +12,6 @@ struct PYmMana;
 struct VYmMana;
 struct CTexture;
 struct CGObject;
-struct Vec2d;
 struct pppYmManaUnkB;
 
 void SetEnvMap(PYmMana*, VYmMana*);

@@ -1,34 +1,12 @@
 #ifndef _FFCC_PPPCRYSTAL2_H_
 #define _FFCC_PPPCRYSTAL2_H_
 
-#include "ffcc/partMng.h"
+struct _pppCtrlTable;
+struct _pppPObject;
 
-#include <dolphin/types.h>
+typedef _pppPObject pppCrystal2;
 
-struct pppCrystal2 {
-    _pppPObject m_object; // 0x0
-};
-
-struct pppCrystal2UnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    union {
-        u8 m_payload[8];
-        struct Payload {
-            u8 m_refractionMode;
-            u8 m_blendMode;
-            u8 m_drawFlag;
-            u8 m_zMode;
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-            u8 m_pad06[2];
-        } m_crystal;
-    };
-    f32 m_perspectiveScale;
-};
+struct pppCrystal2UnkB;
 
 #ifdef __cplusplus
 extern "C" {

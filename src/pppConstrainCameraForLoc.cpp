@@ -9,10 +9,6 @@ extern const float kPppConstrainCameraForLocZero[2] = {0.0f, 0.0f};
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-struct pppConstrainCameraForLoc {
-    _pppPObject m_object;
-};
-
 struct pppConstrainCameraForLocParams {
     int m_graphId;
     float m_dataValIndex;
@@ -24,7 +20,7 @@ struct pppConstrainCameraForLocWork {
     Vec m_cameraOffset;
     float m_fieldC;
     Mtx m_worldBaseMtx;
-    pppConstrainCameraForLoc* m_owner;
+    _pppPObject* m_owner;
 };
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
@@ -39,7 +35,7 @@ static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
     pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppConstrainCameraForLocWork*>(
-        constrainCameraForLoc->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+        constrainCameraForLoc->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*);
@@ -67,7 +63,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 		model->SetCallbackContext(value, params);
 		model->SetBeforeCalcMatrixCallback(CC_BeforeCalcMatrixCallback);
 
-		CalcGraphValue(&constrainCameraForLoc->m_object, params->m_graphId, value->m_cameraOffset.x,
+		CalcGraphValue(constrainCameraForLoc, params->m_graphId, value->m_cameraOffset.x,
 		               value->m_cameraOffset.y, value->m_cameraOffset.z, params->m_dataValIndex,
 		               params->m_initWork, params->m_stepValue);
 	}
@@ -135,7 +131,7 @@ void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
 static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
     pppConstrainCameraForLocWork* work = (pppConstrainCameraForLocWork*)param_2;
-    _pppPObject* owner = &work->m_owner->m_object;
+    _pppPObject* owner = work->m_owner;
     float fVar1;
     float fVar2;
     float fVar3;

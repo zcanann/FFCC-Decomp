@@ -28,10 +28,6 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-struct pppYmBreath {
-    _pppPObject m_object;
-};
-
 struct YmBreathParams {
     unsigned char _pad00[0x04];
     float m_groupRadius;
@@ -179,7 +175,7 @@ extern "C" const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
     YmBreathParticleGroup* group;
-    VYmBreath* state = (VYmBreath*)(ymBreath->m_object.m_workArea + *dataOffsets->m_serializedDataOffsets);
+    VYmBreath* state = (VYmBreath*)(ymBreath->m_workArea + *dataOffsets->m_serializedDataOffsets);
 
     if (state->m_particleData != NULL) {
         pppHeapUseRate((CMemory::CStage*)state->m_particleData);
@@ -244,7 +240,7 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  */
 extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
-    VYmBreath* state = (VYmBreath*)(ymBreath->m_object.m_workArea + *dataOffsets->m_serializedDataOffsets);
+    VYmBreath* state = (VYmBreath*)(ymBreath->m_workArea + *dataOffsets->m_serializedDataOffsets);
     float zero;
 
     PSMTXIdentity(state->m_matrix);
@@ -305,8 +301,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
 
     workOffset = offsets->m_serializedDataOffsets[0];
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(ymBreath->m_object.m_workArea + workOffset);
-    color = reinterpret_cast<VColor*>(ymBreath->m_object.m_workArea + colorOffset);
+    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + workOffset);
+    color = reinterpret_cast<VColor*>(ymBreath->m_workArea + colorOffset);
     particle = reinterpret_cast<YmBreathParticleData*>(work->m_particleData);
     matrixList = work->m_particleWmats;
     particleColor = work->m_particleColors;
@@ -346,7 +342,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
             }
 
             pppUnitMatrix(viewMtx);
-            PSMTXConcat(matrixList->m_matrix, ymBreath->m_object.m_localMatrix.value, viewMtx.value);
+            PSMTXConcat(matrixList->m_matrix, ymBreath->m_localMatrix.value, viewMtx.value);
             PSMTXConcat(ppvCameraMatrix, viewMtx.value, viewMtx.value);
             PSMTXMultVec(viewMtx.value, &particle->m_position, &pos);
             drawMtx[0][3] = pos.x;
@@ -459,7 +455,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
                 sphereMtx[1][1] = groupScale;
                 sphereMtx[2][2] = groupScale;
 
-                PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_object.m_localMatrix.value, tempMtx);
+                PSMTXConcat(work->m_particleWmats[firstParticle].m_matrix, ymBreath->m_localMatrix.value, tempMtx);
                 PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
                 PSMTXMultVec(tempMtx, &debugGroupData->position, &debugPos);
                 sphereMtx[0][3] = debugPos.x;
@@ -518,8 +514,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = ppvMng;
     int colorOffset = dataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(ymBreath->m_object.m_workArea + dataOffsets[0]);
-    color = (VColor*)(ymBreath->m_object.m_workArea + colorOffset);
+    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + dataOffsets[0]);
+    color = (VColor*)(ymBreath->m_workArea + colorOffset);
 
     if (work->m_particleData == NULL) {
         YmBreathParticleGroup* groupTable;
@@ -582,7 +578,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
     }
 
     PSMTXCopy(ppvMng->m_matrix.value, work->m_matrix);
-    UpdateAllParticle(reinterpret_cast<_pppPObject*>(ymBreath), work, pYmBreath, color);
+    UpdateAllParticle(ymBreath, work, pYmBreath, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
@@ -612,7 +608,7 @@ group_ready:
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
             particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * sizeof(PARTICLE_WMAT));
-            PSMTXConcat(*particleMtx, ymBreath->m_object.m_localMatrix.value, worldMtx);
+            PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = kCharaAnimZero;

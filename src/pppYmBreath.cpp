@@ -21,6 +21,10 @@ static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 static const double DOUBLE_80330CA0 = 4503599627370496.0;
 static const float kYmBreathSpreadScale = 2.0f;
 static const double kYmBreathHalfChance = 0.5;
+extern const char s_CardGameCode_80330CB8[] = "FFCC";
+extern const char s_CardMakerCode_80330CC0[] = "GDS";
+extern const char s_CardMachineCode_80330CC4[] = "GC";
+extern const char s_CardVersion_80330CC8[] = "1.00";
 
 static inline float LoadFloat(const float& value)
 {

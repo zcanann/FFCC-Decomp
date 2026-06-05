@@ -37,7 +37,7 @@ static inline int GetMesNibbleValue(const char* data)
 	return low | (high << 4);
 }
 
-static int ReadTagU8(char** text)
+static inline int ReadTagU8(char** text)
 {
 	unsigned char high = (unsigned char)(*text)[0];
 	unsigned char low = (unsigned char)(*text)[1];
@@ -46,7 +46,7 @@ static int ReadTagU8(char** text)
 	return value;
 }
 
-static int ReadTagS8(char** text)
+static inline int ReadTagS8(char** text)
 {
 	unsigned char high = (unsigned char)(*text)[0];
 	unsigned char low = (unsigned char)(*text)[1];
@@ -55,7 +55,7 @@ static int ReadTagS8(char** text)
 	return (int)(signed char)value;
 }
 
-static int ReadTagS16(char** text)
+static inline int ReadTagS16(char** text)
 {
 	int a = (unsigned char)(*text)[0] & 0x0F;
 	int b = (unsigned char)(*text)[1] & 0x0F;
@@ -65,7 +65,7 @@ static int ReadTagS16(char** text)
 	return (int)(short)((a << 12) | (b << 8) | (c << 4) | d);
 }
 
-static void ApplyCaseMode(char* text, int& caseMode)
+static inline void ApplyCaseMode(char* text, int& caseMode)
 {
 	if ((text[0] == '\0') || (caseMode == 0))
 	{
@@ -93,7 +93,7 @@ static inline char* FlatNameDirect(int tableIndex, int entryIndex)
 	return Game.m_cFlatDataArr[1].TableStrings(tableIndex)[entryIndex];
 }
 
-static void AdvanceMesLine(CMes* mes, CFont* font)
+static inline void AdvanceMesLine(CMes* mes, CFont* font)
 {
 	*(float*)((char*)mes + 0x3C84) = FLOAT_8033089c;
 	*(float*)((char*)mes + 0x3C88) =
@@ -107,7 +107,7 @@ static void AdvanceMesLine(CMes* mes, CFont* font)
 	}
 }
 
-static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short value)
+static inline void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short value)
 {
 	int count = *(int*)((char*)mes + 0x3C0C);
 	unsigned char* entry = (unsigned char*)mes + count * 6 + 0x3C14;

@@ -571,18 +571,14 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     CCameraPcs* camera = &CameraPcs;
-    const float& zero = FLOAT_80331cc4;
-    const float& one = FLOAT_80331cd0;
-    const float& attnA = FLOAT_80331cec;
-    const float& attnB = FLOAT_80331cf0;
 
-    lightDir.x = camera->m_directionX - (FLOAT_80331ce8 + camera->m_positionX);
-    lightDir.y = camera->m_directionY - (FLOAT_80331ce8 + camera->m_positionY);
-    lightDir.z = camera->m_directionZ - (FLOAT_80331ce8 + camera->m_positionZ);
+    lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
+    lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
+    lightDir.z = camera->m_directionZ - (30.0f + camera->m_positionZ);
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, one, zero);
-    GXInitLightAttn(&lightObj, zero, zero, one, attnA, zero, attnB);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, 0.0f, 1.0f, 0.0f);
+    GXInitLightAttn(&lightObj, 0.0f, 0.0f, 1.0f, 4.0f, 0.0f, -3.0f);
 
     GXInitLightColor(&lightObj, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXLoadLightObjImm(&lightObj, (GXLightID)1);

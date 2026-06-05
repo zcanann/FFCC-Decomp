@@ -691,8 +691,8 @@ void CMenuPcs::ArtiInit1()
 void CMenuPcs::ArtiInit()
 {
 	int index;
-	short yOffset;
-	short count;
+	int yOffset;
+	int count;
 	ArtiOpenAnim* entry;
 	ArtiOpenAnimList* list;
 

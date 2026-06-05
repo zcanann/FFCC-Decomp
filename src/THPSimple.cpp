@@ -784,7 +784,7 @@ s32 THPSimpleCalcNeedMemory(void)
     s32 need;
 
     if (SimpleControl.isOpen != 0) {
-        need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+        need = ((SimpleControl.header.mBufferSize + 0x1F) & ~0x1F) * 8;
         need += (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
         need += ((((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize)) >> 2) + 0x1F) & ~0x1F;
         need += ((((u32)(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize)) >> 2) + 0x1F) & ~0x1F;

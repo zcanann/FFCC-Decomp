@@ -328,11 +328,13 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -550,11 +552,13 @@ CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -585,11 +589,13 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -868,11 +874,13 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -948,11 +956,13 @@ CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

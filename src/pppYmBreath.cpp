@@ -11,6 +11,7 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
 #undef PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
+#include "ffcc/pppBreathParticle.h"
 #include "ffcc/pppShape.h"
 
 extern const float kCharaAnimZero;
@@ -41,15 +42,6 @@ struct YmBreathParticleGroup {
 
 struct PARTICLE_DATA {
     u8 _pad[0x60];
-};
-
-struct PARTICLE_WMAT {
-    Mtx m_matrix;
-};
-
-struct PARTICLE_COLOR {
-    float m_color[4];
-    float m_colorFrameDeltas[4];
 };
 
 struct VYmBreath {

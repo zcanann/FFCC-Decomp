@@ -9,12 +9,11 @@
 #define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppPart.h"
 #undef PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
+#include "ffcc/pppBreathParticle.h"
 #include <string.h>
 
 struct pppModelSt;
 struct PARTICLE_DATA;
-struct PARTICLE_WMAT;
-struct PARTICLE_COLOR;
 
 extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
@@ -58,15 +57,6 @@ struct BreathParticleData {
 
 struct PARTICLE_DATA {
     u8 _pad[0x98];
-};
-
-struct PARTICLE_WMAT {
-    Mtx m_matrix;
-};
-
-struct PARTICLE_COLOR {
-    float m_color[4];
-    float m_colorFrameDeltas[4];
 };
 
 /*

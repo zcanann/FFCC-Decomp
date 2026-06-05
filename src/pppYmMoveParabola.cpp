@@ -6,6 +6,15 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
+struct pppYmMoveParabolaWork {
+    f32 m_distance;
+    f32 m_velocity;
+    f32 m_acceleration;
+    u16 m_frame;
+    u16 _pad0x0E;
+    Vec m_basePosition;
+};
+
 static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_object.m_workArea + *ctrl->m_serializedDataOffsets);

@@ -49,8 +49,7 @@ struct MoneyMenuState
     char pad_20[0x2];
     short frame;
     char pad_24[0x2];
-    short selectedIndex;
-    short subMenuIndex;
+    short selections[2];
     char pad_2a[0x6];
     short mode;
     short prevMode;

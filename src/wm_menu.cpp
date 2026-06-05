@@ -436,8 +436,7 @@ static inline WmCharaSelectEntry* GetWmCharaSelectEntries(CMenuPcs* menu)
 
 static inline unsigned char* GetWmMenuCharaState(CMenuPcs* menu)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
-	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
+	return menu->m_wmCharaState;
 }
 
 static inline unsigned char* GetWmCharaModelData(CMenuPcs* menu)
@@ -547,9 +546,9 @@ void CMenuPcs::WmInit()
 	reinterpret_cast<unsigned int*>(bytes + 0x824)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x828)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x838)[0] = 0;
+	m_wmCharaState = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x840)[0] = 0;
+	m_effectWork = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
 	FLOAT_8032ee18 = initValue;
 	bytes[0x858] = 0;
@@ -759,9 +758,9 @@ void CMenuPcs::loadData()
 	    operator new(0x48, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246);
 	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
 
-	reinterpret_cast<void**>(bytes + 0x838)[0] =
-	    operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A);
-	memset(reinterpret_cast<void**>(bytes + 0x838)[0], 0, kWmMenuCharaStateBytes);
+	m_wmCharaState =
+	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
+	memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
 
 	reinterpret_cast<void**>(bytes + 0x83C)[0] =
 	    operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E);
@@ -769,12 +768,12 @@ void CMenuPcs::loadData()
 
 	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
 	memset(effectRaw, 0, 0xCDB0 + 0x10);
-	reinterpret_cast<void**>(bytes + 0x840)[0] = effectRaw + 0x10;
+	m_effectWork = reinterpret_cast<EffectInfo*>(effectRaw + 0x10);
 	for (int i = 0; i < 0x28; i++) {
-		unsigned char* const effect = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x840)[0]) + i * 0x524;
-		*reinterpret_cast<int*>(effect + 0x0) = -1;
-		*reinterpret_cast<int*>(effect + 0x4) = -1;
-		*reinterpret_cast<int*>(effect + 0x8) = -1;
+		EffectInfo* const effect = &m_effectWork[i];
+		effect->m_effectNo = -1;
+		effect->m_partNo = -1;
+		effect->m_slotNo = -1;
 	}
 
 	reinterpret_cast<void**>(bytes + 0x844)[0] =
@@ -1087,19 +1086,19 @@ void CMenuPcs::destroyWorld()
 		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x82C)[0]);
 		reinterpret_cast<void**>(bytes + 0x82C)[0] = 0;
 	}
-	if (reinterpret_cast<void**>(bytes + 0x838)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x838)[0]);
-		reinterpret_cast<void**>(bytes + 0x838)[0] = 0;
+	if (m_wmCharaState != 0) {
+		delete[] m_wmCharaState;
+		m_wmCharaState = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x83C)[0] != 0) {
 		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x83C)[0]);
 		reinterpret_cast<void**>(bytes + 0x83C)[0] = 0;
 	}
 	{
-		int iVar = *reinterpret_cast<int*>(bytes + 0x840);
-		if (iVar != 0) {
-			operator delete[](reinterpret_cast<void*>(iVar - 0x10));
-			reinterpret_cast<void**>(bytes + 0x840)[0] = 0;
+		EffectInfo* const effectWork = m_effectWork;
+		if (effectWork != 0) {
+			operator delete[](reinterpret_cast<unsigned char*>(effectWork) - 0x10);
+			m_effectWork = 0;
 		}
 	}
 	if (reinterpret_cast<void**>(bytes + 0x848)[0] != 0) {

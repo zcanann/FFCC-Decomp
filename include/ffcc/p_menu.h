@@ -421,7 +421,14 @@ public:
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
     };
-    unsigned char m_pad830[0x850 - 0x830];
+    unsigned char m_pad830[0x838 - 0x830];
+    union {
+        unsigned char* m_effectEntries;
+        unsigned char* m_wmCharaState;
+    };
+    void* m_pad83C;
+    EffectInfo* m_effectWork;
+    unsigned char m_pad844[0x850 - 0x844];
     union {
         ArtiOpenAnimList* m_artiList;
         EquipOpenAnimList* m_equipList;
@@ -441,5 +448,7 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
+STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 
 #endif // _FFCC_P_MENU_H_

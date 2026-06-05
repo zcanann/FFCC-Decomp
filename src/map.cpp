@@ -2928,7 +2928,7 @@ void CMapMng::DrawAfter()
                 octTree++;
             }
 
-            CMapObj* mapObj = GetMapObjArray();
+            CMapObj* mapObj = MapMng.GetMapObjArray();
             for (int i = 0; i < m_mapObjCount; i++) {
                 mapObj->Draw(2);
                 mapObj++;

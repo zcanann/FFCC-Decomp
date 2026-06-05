@@ -388,7 +388,7 @@ public:
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
-    Mtx& FlatPosMtx() { return *reinterpret_cast<Mtx*>(m_sharedState.m_storage + 0x8C); }
+    Mtx& FlatPosMtx() { return m_sharedState.m_flat.m_posMtx; }
     MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
 private:
@@ -401,6 +401,11 @@ private:
     union CSharedState
     {
         MogFurState m_mogFur;
+        struct FlatState
+        {
+            u8 _pad00[0x8C];
+            Mtx m_posMtx;
+        } m_flat;
         u8 m_storage[0x2054];
     };
 

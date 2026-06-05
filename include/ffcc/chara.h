@@ -353,9 +353,9 @@ public:
 	void Destroy();
 	void FlipDBuffer();
 	void gqrInit(unsigned long, unsigned long, unsigned long);
-    void SetAmemStage(CMemory::CStage* stage) { m_amemStage = stage; }
+    void SetAmemStage(CMemory::CStage* stage) { m_amemLoadStage = stage; }
     CMemory::CStage* GetMemoryStage() { return m_amemStage; }
-    u32 GetAmemBaseAddress() const { return m_amemStage->m_heapTop; }
+    u32 GetAmemBaseAddress() const { return m_amemLoadStage->m_heapTop; }
     u32& AmemSize() { return m_amemSize; }
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
@@ -406,7 +406,11 @@ private:
 
     CSharedState m_sharedState;               // 0x004
     CMemory::CStage* m_amemStage;             // 0x2058
-    u32 m_amemSize;                           // 0x205C
+    union
+    {
+        CMemory::CStage* m_amemLoadStage;     // 0x205C
+        u32 m_amemSize;                       // 0x205C
+    };
     int m_drawBufferIndex;                    // 0x2060
     CDrawBuffer m_drawBuffers[2];             // 0x2064
     u32 m_amemAnimSize;                       // 0x2074

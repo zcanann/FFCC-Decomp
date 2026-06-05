@@ -68,12 +68,42 @@ struct PARTICLE_DATA {
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void get_rand()
+inline void get_rand()
 {
-	// TODO
+    Math.RandF();
 }
-#endif
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MTXGetCol(Mtx matrix, int col, Vec& out)
+{
+    out.x = matrix[0][col];
+    out.y = matrix[1][col];
+    out.z = matrix[2][col];
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void MTXSetCol(Mtx& matrix, int col, Vec in)
+{
+    matrix[0][col] = in.x;
+    matrix[1][col] = in.y;
+    matrix[2][col] = in.z;
+}
 
 void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
 void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
@@ -959,12 +989,23 @@ void BirthParticle(
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
+inline void SetParticleMatrix(
+    _pppPObject* pppObject, VBreathModel* vBreathModel, PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat,
+    _pppMngSt*)
 {
-	// TODO
+    BreathParticleData* particle = reinterpret_cast<BreathParticleData*>(particleData);
+    Mtx workMtx;
+
+    PSMTXCopy(vBreathModel->m_matrix, particleWmat->m_matrix);
+    PSMTXCopy(particleWmat->m_matrix, workMtx);
+    workMtx[0][3] = 0.0f;
+    workMtx[1][3] = 0.0f;
+    workMtx[2][3] = 0.0f;
+
+    PSMTXMultVec(workMtx, &particle->m_direction, &particle->m_direction);
+    PSVECNormalize(&particle->m_direction, &particle->m_direction);
+    PSMTXConcat(particleWmat->m_matrix, pppObject->m_localMatrix.value, particleWmat->m_matrix);
 }
-#endif
 
 /*
  * --INFO--
@@ -975,8 +1016,7 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMA
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
+inline void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
 {
     int i;
     bool isDead = true;
@@ -1004,7 +1044,6 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
         groupData->active = 0;
     }
 }
-#endif
 
 /*
  * --INFO--
@@ -1015,8 +1054,7 @@ void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, s
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
+inline void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
 {
     BreathParticleGroup* groupTable = vBreathModel->m_groups;
     short g;
@@ -1036,7 +1074,6 @@ void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& 
     slotIndex = -1;
     groupIndex = -1;
 }
-#endif
 
 /*
  * --INFO--
@@ -1047,8 +1084,7 @@ void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& 
  * JP Address: TODO
  * JP Size: TODO
  */
-#ifndef VERSION_GCCP01
-void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short particleIndex)
+inline void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short particleIndex)
 {
     short slotIndex;
     short groupIndex;
@@ -1060,4 +1096,3 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
         groupArray[groupIndex].particleIndices[slotIndex] = -1;
     }
 }
-#endif

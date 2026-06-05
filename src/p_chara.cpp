@@ -2092,7 +2092,7 @@ CCharaPcs::CHandle::CHandle()
 	}
 
 	// PDT load ref
-	m_pdtLoadRef = (CRef*)nullptr;
+	m_pdtLoadRef = (CLoadPdt*)nullptr;
 
 	// Playback / state
 	m_currentAnimIndex = -1;

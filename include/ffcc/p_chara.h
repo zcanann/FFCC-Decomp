@@ -25,6 +25,8 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 class CCharaPcs : public CProcess
 {
 public:
+    class CLoadPdt;
+
     class CHandle
     {
     public:
@@ -50,6 +52,7 @@ public:
         void loadModelASyncFrame();
         int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
+        int GetPdtSlot() const;
 
         int m_charaKind;                    // 0x000
         int m_charaNo;                      // 0x004
@@ -71,7 +74,7 @@ public:
         CTextureSet* m_textureSet;          // 0x16C
         CRef* m_modelLoadRef;               // 0x170
         CRef* m_texLoadRef;                 // 0x174
-        CRef* m_pdtLoadRef;                 // 0x178
+        CLoadPdt* m_pdtLoadRef;             // 0x178
         int m_asyncCharaKind;               // 0x17C
         int m_asyncCharaNo;                 // 0x180
         int m_asyncTextureVariant;          // 0x184
@@ -145,7 +148,7 @@ public:
         int m_mergeFileId;              // 0x18
         int m_mergeFlags;               // 0x1C
     };
-	
+
     enum RESET
 	{
 		TODO,
@@ -270,6 +273,11 @@ public:
     u32 m_loadStreamCursor;                   // 0x714
     u32 m_noFreeMergeMask;                    // 0x718
 };
+
+inline int CCharaPcs::CHandle::GetPdtSlot() const
+{
+    return m_pdtLoadRef != 0 ? m_pdtLoadRef->m_pdtSlot : -1;
+}
 
 extern CCharaPcs CharaPcs;
 

@@ -20,7 +20,7 @@ STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape(void* pppShape, ShapeControlData* data, void* additionalData){
+void pppDrawShape(_pppPObject* pppShape, ShapeControlData* data, _pppCtrlTable* additionalData){
 	_pppPObject* object = (_pppPObject*)pppShape;
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)additionalData;
 	ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
@@ -64,7 +64,7 @@ void pppDrawShape(void* pppShape, ShapeControlData* data, void* additionalData){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcShape(void* pppShape, ShapeControlData* data, void* additionalData){
+void pppCalcShape(_pppPObject* pppShape, ShapeControlData* data, _pppCtrlTable* additionalData){
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
@@ -115,7 +115,7 @@ void pppCalcShape(void* pppShape, ShapeControlData* data, void* additionalData){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShapeConstruct(void* pppShape, void* data)
+void pppDrawShapeConstruct(_pppPObject* pppShape, _pppCtrlTable* data)
 {
 	_pppPObject* object = (_pppPObject*)pppShape;
 	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)data;

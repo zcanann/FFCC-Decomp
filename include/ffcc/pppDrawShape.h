@@ -3,6 +3,9 @@
 
 #include "ffcc/pppDrawShapeCommon.h"
 
+struct _pppCtrlTable;
+struct _pppPObject;
+
 struct ShapeControlData {
     u8 _pad0[4];
     u32 type;
@@ -20,9 +23,9 @@ struct ShapeControlData {
 extern "C" {
 #endif
 
-void pppDrawShapeConstruct(void* pppShape, void* data);
-void pppCalcShape(void* pppShape, struct ShapeControlData* data, void* additionalData);
-void pppDrawShape(void* pppShape, struct ShapeControlData* data, void* additionalData);
+void pppDrawShapeConstruct(_pppPObject* pppShape, _pppCtrlTable* data);
+void pppCalcShape(_pppPObject* pppShape, struct ShapeControlData* data, _pppCtrlTable* additionalData);
+void pppDrawShape(_pppPObject* pppShape, struct ShapeControlData* data, _pppCtrlTable* additionalData);
 
 #ifdef __cplusplus
 }

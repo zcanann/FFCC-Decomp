@@ -1,8 +1,32 @@
+#include "global.h"
 #include "ffcc/pppAccele.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
 const float kPppAcceleZero = 0.0f;
+}
+
+struct PppAcceleDataOffsets {
+	s32 m_valueOffset;
+	s32 m_accelOffset;
+};
+
+STATIC_ASSERT(offsetof(PppAcceleDataOffsets, m_valueOffset) == 0x0);
+STATIC_ASSERT(offsetof(PppAcceleDataOffsets, m_accelOffset) == 0x4);
+
+static inline PppAcceleDataOffsets* GetPppAcceleDataOffsets(_pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<PppAcceleDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline float* GetPppAcceleValue(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<float*>(obj->m_workArea + GetPppAcceleDataOffsets(ctrl)->m_valueOffset);
+}
+
+static inline float* GetPppAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<float*>(obj->m_workArea + GetPppAcceleDataOffsets(ctrl)->m_accelOffset);
 }
 
 /*
@@ -16,7 +40,7 @@ const float kPppAcceleZero = 0.0f;
  */
 void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
 {
-	float* puVar2 = (float*)(obj->m_workArea + param->m_serializedDataOffsets[1]);
+	float* puVar2 = GetPppAcceleAccel(obj, param);
 	float uVar1 = kPppAcceleZero;
 
 	puVar2[2] = uVar1;
@@ -35,8 +59,8 @@ void pppAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
  */
 void pppAccele(_pppPObject* obj, pppAcceleStep* param_2, _pppCtrlTable* param_3)
 {
-	float* pfVar1 = (float*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
-	float* pfVar2 = (float*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
+	float* pfVar1 = GetPppAcceleValue(obj, param_3);
+	float* pfVar2 = GetPppAcceleAccel(obj, param_3);
 
 	if (ppvUserStopPartF != 0) {
 		return;

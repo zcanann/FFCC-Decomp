@@ -1,7 +1,24 @@
+#include "global.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/partMng.h"
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
+
+struct PppColorDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(PppColorDataOffsets, m_workOffset) == 0x0);
+
+static inline PppColorDataOffsets* GetPppColorDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<PppColorDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline _pppColorWork* GetPppColorWork(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<_pppColorWork*>(obj->m_workArea + GetPppColorDataOffsets(ctrl)->m_workOffset);
+}
 
 /*
  * --INFO--
@@ -13,7 +30,7 @@
  * JP Size: TODO
  */
 void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
-    _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param2->m_serializedDataOffsets[0]);
+    _pppColorWork* work = GetPppColorWork(param1, param2);
     
     work->a = 0;
     work->b = 0;
@@ -31,7 +48,7 @@ void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
  * JP Size: TODO
  */
 void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3){
-    _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
+    _pppColorWork* work = GetPppColorWork(param1, param3);
 
     if (ppvUserStopPartF != 0) {
         return;

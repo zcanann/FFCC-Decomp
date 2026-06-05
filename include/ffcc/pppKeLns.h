@@ -10,8 +10,8 @@ struct pppNoStep;
 extern "C" {
 #endif
 
-void pppKeLnsLpCon(void* pObject, void* pPart);
-void pppKeLnsLpCon2(void* pObject, void* pPart);
+void pppKeLnsLpCon(_pppPObject* obj, _pppCtrlTable* ctrlTable);
+void pppKeLnsLpCon2(_pppPObject* obj, _pppCtrlTable* ctrlTable);
 void pppKeLnsLpDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable);
 void pppKeLnsFlsCon(_pppPObjLink* obj, _pppCtrlTable* ctrlTable);
 void pppKeLnsFlsDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable);

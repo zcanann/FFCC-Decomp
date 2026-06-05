@@ -43,6 +43,12 @@ public:
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
     unsigned int GetSoundMode() { return m_redSound.GetSoundMode(); }
+    int DMAEntry(int flags, int direction, int mainMemory, int aramMemory, int size,
+                 RedDmaCallback callback, void* callbackData)
+    {
+        return m_redSound.DMAEntry(flags, direction, mainMemory, aramMemory, size, callback, callbackData);
+    }
+    int DMACheck(int id) { return m_redSound.DMACheck(id); }
     int GetBgmMasterVolume() const { return m_bgmMasterVolume; }
     int GetSeMasterVolume() const { return m_seMasterVolume; }
     void SeMaxVolume(int);

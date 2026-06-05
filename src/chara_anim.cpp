@@ -157,7 +157,6 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
 	CChunkFile chunkFile(data);
 	CChunkFile::CChunk chunk;
-	CChunkFile::CChunk nodeChunk;
 
 	m_stage = stage;
 
@@ -210,49 +209,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					    reinterpret_cast<CAnimNode*>(reinterpret_cast<unsigned char*>(m_nodes) + nodeOffset);
 					nodeOffset += sizeof(CAnimNode);
 
-					chunkFile.PushChunk();
-					while (chunkFile.GetNextChunk(nodeChunk)) {
-						int nodeChunkId = static_cast<int>(nodeChunk.m_id);
-						switch (nodeChunkId) {
-						case 0x4E414D45:
-							strcpy(currentNode->m_name, chunkFile.GetString());
-							break;
-						case 0x44415441: {
-							int i = 0;
-							int shift = 0;
-							do {
-								int type = chunkFile.Get4();
-								int mode;
-
-								if (type == 0) {
-									mode = 0;
-								} else if (type == 1) {
-									mode = 1;
-								} else {
-									mode = 2;
-								}
-
-								unsigned int dataOffset = chunkFile.Get4();
-								if (i == 0) {
-									currentNode->m_dataOffset = dataOffset;
-								}
-
-								unsigned int flags = ((currentNode->m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
-								currentNode->m_flags = __rlwimi(currentNode->m_flags, flags, 13, 1, 18);
-
-								if ((i >= 6) && (type != 0)) {
-									unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&currentNode->m_flags);
-									*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
-								}
-
-								i++;
-								shift += 2;
-							} while (i < 9);
-							break;
-						}
-						}
-					}
-					chunkFile.PopChunk();
+					currentNode->Create(chunkFile);
 					break;
 				}
 				case 0x42414E4B:
@@ -262,7 +219,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 					Memory.CopyToAMemorySync(
 					    m_bank,
-					    reinterpret_cast<void*>(Chara.GetAmemBaseAddress() + Chara.AmemAnimSize()),
+					    reinterpret_cast<void*>(Chara.AmemAnimSize() + Chara.GetAmemBaseAddress()),
 					    m_bankSize);
 
 					m_bankAddress = Chara.AmemAnimSize();

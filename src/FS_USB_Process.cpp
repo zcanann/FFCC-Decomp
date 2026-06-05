@@ -123,7 +123,7 @@ void CFunnyShapePcs::SetUSBData()
         break;
     }
     case 5: {
-        s16* tmp = reinterpret_cast<s16*>(
+        OSFS_TEXTURE_ST* tmp = reinterpret_cast<OSFS_TEXTURE_ST*>(
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x55)
                 u8[usb->m_sizeBytes]);
         m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount] =
@@ -131,16 +131,16 @@ void CFunnyShapePcs::SetUSBData()
                 OSFS_TEXTURE_ST;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
-        tmp[0] = LoadSwap16(tmp[0]);
-        tmp[1] = LoadSwap16(tmp[1]);
-        tmp[2] = LoadSwap16(tmp[2]);
-        tmp[3] = LoadSwap16(tmp[3]);
-        tmp[4] = LoadSwap16(tmp[4]);
-        tmp[5] = LoadSwap16(tmp[5]);
-        tmp[6] = LoadSwap16(tmp[6]);
-        tmp[7] = LoadSwap16(tmp[7]);
-        reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x10]);
-        reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x11]);
+        tmp->unk00 = LoadSwap16(tmp->unk00);
+        tmp->unk02 = LoadSwap16(tmp->unk02);
+        tmp->width = LoadSwap16(tmp->width);
+        tmp->height = LoadSwap16(tmp->height);
+        tmp->unk08 = LoadSwap16(tmp->unk08);
+        tmp->unk0A = LoadSwap16(tmp->unk0A);
+        tmp->unk0C = LoadSwap16(tmp->unk0C);
+        tmp->unk0E = LoadSwap16(tmp->unk0E);
+        reinterpret_cast<u16*>(tmp->unk10)[0x8] = LoadSwapU16(reinterpret_cast<u16*>(tmp->unk10)[0x8]);
+        reinterpret_cast<u16*>(tmp->unk10)[0x9] = LoadSwapU16(reinterpret_cast<u16*>(tmp->unk10)[0x9]);
 
         DCFlushRange(tmp, sizeof(OSFS_TEXTURE_ST));
         memcpy(m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
@@ -148,14 +148,14 @@ void CFunnyShapePcs::SetUSBData()
         m_funnyShape.m_textureData[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x6C)
                 u8[usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST)];
-        memcpy(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp + sizeof(OSFS_TEXTURE_ST) / sizeof(*tmp),
+        memcpy(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], reinterpret_cast<u8*>(tmp) + sizeof(OSFS_TEXTURE_ST),
                usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
         DCFlushRange(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
 
         m_funnyShape.m_texObjData[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
                 GXTexObj;
-        GXInitTexObj(static_cast<GXTexObj*>(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount]), m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(static_cast<GXTexObj*>(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount]), m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp->width, tmp->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
         m_funnyShape.m_textureCount++;
         if (tmp != 0) {
@@ -209,7 +209,7 @@ void CFunnyShapePcs::SetUSBData()
             list[1] = LoadSwap16(list[1]);
 
             src2c = 0;
-            src24 = src2c;
+            src24 = 0;
             int j = 0;
             int dst24 = 0;
             int dst2c = 0;
@@ -289,7 +289,7 @@ void CFunnyShapePcs::SetUSBData()
         *reinterpret_cast<s16*>(meshData + 0x2) = LoadSwap16(*reinterpret_cast<s16*>(meshData + 0x2));
 
         int src2c = 0;
-        int src24 = src2c;
+        int src24 = 0;
         int i = 0;
         int dst24 = 0;
         int dst2c = 0;

@@ -10,20 +10,20 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 extern "C" {
-extern const float FLOAT_803305f0 = 0.017453292f;
-extern const float kPppYmDeformationShpZero = 0.0f;
-extern const float FLOAT_803305f8 = 1.0f;
-extern const double DOUBLE_80330600 = 4503601774854144.0;
-extern const double DOUBLE_80330608 = 4503599627370496.0;
-extern const float FLOAT_80330610 = 320.0f;
-extern const float FLOAT_80330614 = 0.003125f;
-extern const float FLOAT_80330618 = 224.0f;
-extern const float FLOAT_8033061c = 0.004464f;
-extern const float FLOAT_80330620 = 1000.0f;
-extern const float FLOAT_80330624 = -1000.0f;
-extern const float FLOAT_80330628 = -0.5f;
-extern const float FLOAT_8033062c = -1.0f;
-extern const float FLOAT_80330630 = 0.5f;
+static const float FLOAT_803305f0 = 0.017453292f;
+static const float kPppYmDeformationShpZero = 0.0f;
+static const float FLOAT_803305f8 = 1.0f;
+static const double DOUBLE_80330600 = 4503601774854144.0;
+static const double DOUBLE_80330608 = 4503599627370496.0;
+static const float FLOAT_80330610 = 320.0f;
+static const float FLOAT_80330614 = 0.003125f;
+static const float FLOAT_80330618 = 224.0f;
+static const float FLOAT_8033061c = 0.004464f;
+static const float FLOAT_80330620 = 1000.0f;
+static const float FLOAT_80330624 = -1000.0f;
+static const float FLOAT_80330628 = -0.5f;
+static const float FLOAT_8033062c = -1.0f;
+static const float FLOAT_80330630 = 0.5f;
 }
 #include "ffcc/util.h"
 

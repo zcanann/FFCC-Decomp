@@ -1465,7 +1465,7 @@ void CSound::StopSe(int seId)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeStop(seId);
+        m_redSound.SeStop(seId);
     }
 }
 
@@ -1483,7 +1483,7 @@ void CSound::FadeOutSe(int seId, int fadeFrames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeFadeOut(seId, fadeFrames);
+        m_redSound.SeFadeOut(seId, fadeFrames);
     }
 }
 
@@ -1501,7 +1501,7 @@ void CSound::ChangeSeVolume(int seId, int volume, int frames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeVolume(seId, volume, frames);
+        m_redSound.SeVolume(seId, volume, frames);
     }
 }
 
@@ -1519,7 +1519,7 @@ void CSound::ChangeSePan(int seId, int pan, int frames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SePan(seId, pan, frames);
+        m_redSound.SePan(seId, pan, frames);
     }
 }
 
@@ -2163,7 +2163,7 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         }
 
         if (se != 0) {
-            RedSound(this)->SePitch(reinterpret_cast<CSe3D*>(se)->m_playId, pitch << 8, frames);
+            m_redSound.SePitch(reinterpret_cast<CSe3D*>(se)->m_playId, pitch << 8, frames);
         }
     }
 }

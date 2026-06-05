@@ -16,7 +16,6 @@ extern "C" {
 extern const float kPppYmMeltZero;
 extern const float FLOAT_80330af4;
 extern const float FLOAT_80330b08 = 0.5f;
-extern const float FLOAT_80330b0c = 0.017453292f;
 extern const float FLOAT_80330b10 = -2000.0f;
 extern const float FLOAT_80330b14 = 10000000000.0f;
 extern const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
@@ -359,7 +358,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         halfWidth = ctrl->m_stepValue * LoadFloat(FLOAT_80330b08);
         phaseWork = work->m_phaseOffset;
         step = ctrl->m_stepValue / (f32)ctrl->m_gridSize;
-        rot = FLOAT_80330b0c * (f32)phaseWork;
+        rot = 0.017453292f * (f32)phaseWork;
         vertex = vertexBase;
 
         for (z = -halfWidth; z <= halfWidth; z += step) {

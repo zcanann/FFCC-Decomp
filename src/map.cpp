@@ -3237,19 +3237,21 @@ startMapObjAnim:
 #pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
-    CMapAnimRun* mapAnimRun = 0;
-    int mapAnimRunCount = mapAnimRunArray->GetSize();
+    CMapAnimRun* mapAnimRun;
+    int mapAnimRunCount = GetMapAnimRunArray().GetSize();
 
     for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* current = (*mapAnimRunArray)[i];
+        CMapAnimRun* current = GetMapAnimRunArray()[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
-            break;
+            goto startMapAnim;
         }
     }
 
-    mapAnimRun->Start(startFrame, endFrame, static_cast<char>(loop));
+    mapAnimRun = 0;
+
+startMapAnim:
+    mapAnimRun->Start(startFrame, endFrame, loop);
 }
 #pragma dont_inline reset
 

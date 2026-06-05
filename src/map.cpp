@@ -1893,7 +1893,7 @@ int CMapMng::ReadMpl(char* mapName)
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
-        bool canRead = false;
+        bool canRead;
         if (asyncLoadState.m_mapReadMode == 1) {
             canRead = true;
         } else {
@@ -1901,6 +1901,8 @@ int CMapMng::ReadMpl(char* mapName)
             if (existsHandle != 0) {
                 File.Close(existsHandle);
                 canRead = true;
+            } else {
+                canRead = false;
             }
         }
 

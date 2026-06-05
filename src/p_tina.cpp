@@ -569,19 +569,11 @@ void CPartPcs::drawAfterViewer()
  */
 void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 {
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	color.x = pppMngSt->r;
-	color.y = pppMngSt->g;
-	color.z = pppMngSt->b;
-	color.w = pppMngSt->a;
+	_pppMngSt& pppMngSt = PartMng.m_pppMng[index];
+	color.x = pppMngSt.m_userFloat0;
+	color.y = pppMngSt.m_userFloat1;
+	color.z = pppMngSt.m_scaleFactor;
+	color.w = pppMngSt.m_ownerScale;
 }
 
 /*
@@ -595,21 +587,13 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
  */
 void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	_pppMngSt& pppMngSt = PartMng.m_pppMng[index];
 	float one = 1.0f;
 
-	pppMngSt->r = color.x;
-	pppMngSt->g = color.y;
-	pppMngSt->b = color.z;
-	pppMngSt->a = color.w;
+	pppMngSt.m_userFloat0 = color.x;
+	pppMngSt.m_userFloat1 = color.y;
+	pppMngSt.m_scaleFactor = color.z;
+	pppMngSt.m_ownerScale = color.w;
 
 	if (one == color.x && one == color.y && one == color.z && one == color.w) {
 		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;

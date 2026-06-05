@@ -306,12 +306,12 @@ struct _pppMngSt
     int m_lifeEnd;                     // 0x24
     Vec m_scale;                       // 0x28
     int m_currentFrame;                // 0x34
-    int m_previousFrame;               // 0x38
-    int m_field3C;                     // 0x3C
+    float m_userFloat0;                // 0x38
+    float m_userFloat1;                // 0x3C
     float m_scaleFactor;               // 0x40
     float m_ownerScale;                // 0x44
-    float m_userFloat0;                // 0x48
-    float m_userFloat1;                // 0x4C
+    float m_userPositionX;             // 0x48
+    float m_userPositionY;             // 0x4C
     Vec m_savedPosition;               // 0x50
     Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
     Vec m_paramVec0;                   // 0x68
@@ -369,9 +369,9 @@ struct _pppMngSt
     PPPIFPARAM m_hitParams;            // 0x130
     short m_hitObjectIds[0x10];        // 0x138
 
-    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userFloat0); }
+    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userPositionX); }
     Vec& BasePosition() { return *reinterpret_cast<Vec*>(&m_savedPosition.z); }
-    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userFloat0); }
+    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userPositionX); }
     const Vec& BasePosition() const { return *reinterpret_cast<const Vec*>(&m_savedPosition.z); }
 }; // Size: 0x158
 

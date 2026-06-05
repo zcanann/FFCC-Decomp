@@ -4,6 +4,13 @@ extern "C" {
 const float kPppMoveZero = 0.0f;
 }
 
+struct PppMoveInput {
+    f32 field_0;     // 0x0
+    f32 field_4;     // 0x4
+    f32 x;           // 0x8
+    f32 y;           // 0xc
+    f32 z;           // 0x10
+};
 
 struct PppMoveObj {
     f32 x;           // 0x0

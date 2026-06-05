@@ -2051,7 +2051,7 @@ void CMenuPcs::SingleCalcCtrl()
         if (proc == 0) {
             result = TmpArtiOpen();
         } else if (proc == 1) {
-            TmpArtiCtrl();
+            result = TmpArtiCtrl();
         } else {
             result = TmpArtiClose();
         }

@@ -75,7 +75,7 @@ public:
     int ArtiCtrl();
     int ArtiClose();
     unsigned int TmpArtiOpen();
-    void TmpArtiCtrl();
+    int TmpArtiCtrl();
     unsigned int TmpArtiClose();
     bool MoneyOpen();
     int MoneyCtrl();

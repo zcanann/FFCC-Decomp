@@ -66,7 +66,7 @@ public:
     void DrawSingleIcon(int, int, int, float, int, float);
 
     unsigned int TmpArtiOpen();
-    void TmpArtiCtrl();
+    int TmpArtiCtrl();
     unsigned int TmpArtiClose();
     void TmpArtiDraw();
     void TmpArtiInit();

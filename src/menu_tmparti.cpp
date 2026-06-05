@@ -420,7 +420,7 @@ unsigned int CMenuPcs::TmpArtiClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::TmpArtiCtrl()
+int CMenuPcs::TmpArtiCtrl()
 {
 	bool hasInput;
 	unsigned int uVar5;
@@ -469,7 +469,7 @@ void CMenuPcs::TmpArtiCtrl()
 				} while (uVar9 != 0);
 				uVar5 = uVar5 & 7;
 				if (uVar5 == 0) {
-					return;
+					return hasInput;
 				}
 			}
 			do {
@@ -481,6 +481,8 @@ void CMenuPcs::TmpArtiCtrl()
 			} while (uVar5 != 0);
 		}
 	}
+
+	return hasInput;
 }
 
 /*

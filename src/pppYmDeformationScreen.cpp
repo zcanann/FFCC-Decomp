@@ -251,8 +251,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 				inVec.w = kYmDeformationScreenOne;
 				Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 				{
+					float zero = kYmDeformationScreenZero;
 					float outW = outVec.w;
-					if (outW != kYmDeformationScreenZero) {
+					if (outW != zero) {
 						outVec.z /= outW;
 					}
 				}

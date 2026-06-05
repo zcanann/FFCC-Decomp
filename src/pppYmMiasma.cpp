@@ -1,5 +1,3 @@
-#define PPP_YMMIASMA_CUSTOM_PARTICLE_TYPES
-
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/math.h"
 #include "ffcc/game.h"

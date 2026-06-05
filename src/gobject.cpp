@@ -211,17 +211,6 @@ static const float sDefaultBgDownDist = 0.033333335f; // FLOAT_80330440
  * Address:	TODO
  * Size:	TODO
  */
-void VECNormalizeZero(Vec*, Vec*)
-{
-	// TODO
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGBaseObj::onFrame()
 {
 	// TODO

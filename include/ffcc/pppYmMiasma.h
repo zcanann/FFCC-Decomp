@@ -8,7 +8,6 @@ struct _pppPObject;
 
 typedef _pppPObject pppYmMiasma;
 
-struct pppYmMiasmaUnkB;
 struct VYmMiasma;
 
 struct PYmMiasma {

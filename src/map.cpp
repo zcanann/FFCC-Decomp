@@ -2874,13 +2874,13 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
-        CMapObj* mapObj = GetMapObjArray();
+        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitWire();
             mapObj++;
         }
 
-        mapObj = GetMapObjArray();
+        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitNormal();
             mapObj++;

@@ -42,12 +42,6 @@ struct VertexApMtxState
 	u16 countdown;
 };
 
-struct VertexApMtxCtrl
-{
-	u8 unk0[0xC];
-	s32* stateOffset;
-};
-
 struct VertexApMtxSource
 {
 	u8 unk0[0x2C];
@@ -66,11 +60,10 @@ extern "C" const f64 kPppVertexApMtxDoubleBias = 4503599627370496.0;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
+void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, _pppCtrlTable* ctrl)
 {
 	VertexApMtxData* data = (VertexApMtxData*)dataRaw;
-	VertexApMtxCtrl* ctrl = (VertexApMtxCtrl*)ctrlRaw;
-	s32 stateOffset = *ctrl->stateOffset;
+	s32 stateOffset = *ctrl->m_serializedDataOffsets;
 	VertexApMtxState* state = (VertexApMtxState*)(parent->m_workArea + stateOffset);
 
 	if (ppvUserStopPartF != 0) {

@@ -39,12 +39,6 @@ struct VertexApLcState
     u16 countdown;
 };
 
-struct VertexApLcCtrl
-{
-    u8 unk0[0xC];
-    s32* stateOffset;
-};
-
 struct VertexApLcSource
 {
     u8 unk0[0x2C];
@@ -60,11 +54,10 @@ struct VertexApLcSource
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
+void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctrl)
 {
     VertexApLcData* data = (VertexApLcData*)dataRaw;
-    VertexApLcCtrl* ctrl = (VertexApLcCtrl*)ctrlRaw;
-    s32 stateOffset = *ctrl->stateOffset;
+    s32 stateOffset = *ctrl->m_serializedDataOffsets;
     VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
 
     if (ppvUserStopPartF != 0) {

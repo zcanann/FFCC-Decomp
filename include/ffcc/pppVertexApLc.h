@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 void pppVertexApLcCon(_pppPObject*, _pppCtrlTable*);
-void pppVertexApLc(_pppPObject*, PVertexApLc*, void*);
+void pppVertexApLc(_pppPObject*, PVertexApLc*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

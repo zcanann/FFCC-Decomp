@@ -12,6 +12,11 @@ struct PppAngMoveInput {
     int z;
 };
 
+struct PppAngMoveOffsets {
+    int m_angleOffset;
+    int m_velocityOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

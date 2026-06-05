@@ -14,6 +14,11 @@ struct pppPointApStep {
     u8 m_useWorldMatrix;
 };
 
+struct pppPointApOffsets {
+    u32 m_srcOffset;
+    u32 m_targetOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

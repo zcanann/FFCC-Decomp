@@ -12,7 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrix(struct _pppPObject* object, void*, struct _pppCtrlTable*)
+void pppDrawMatrix(struct _pppPObject* object, pppNoStep*, struct _pppCtrlTable*)
 {
 	PSMTXConcat(ppvWorldMatrix, object->m_localMatrix.value, object->m_drawMatrix.value);
 }

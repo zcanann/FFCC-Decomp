@@ -7,7 +7,6 @@ struct _pppCtrlTable;
 struct _pppPObject;
 
 typedef _pppPObject pppChangeTex;
-typedef ChangeTexStep pppChangeTexUnkB;
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,8 +15,8 @@ extern "C" {
 void pppConstructChangeTex(pppChangeTex*, _pppCtrlTable*);
 void pppConstruct2ChangeTex(pppChangeTex*, _pppCtrlTable*);
 void pppDestructChangeTex(pppChangeTex*, _pppCtrlTable*);
-void pppFrameChangeTex(pppChangeTex*, pppChangeTexUnkB*, _pppCtrlTable*);
-void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB*, _pppCtrlTable*);
+void pppFrameChangeTex(pppChangeTex*, ChangeTexStep*, _pppCtrlTable*);
+void pppRenderChangeTex(pppChangeTex*, ChangeTexStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

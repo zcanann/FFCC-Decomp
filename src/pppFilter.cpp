@@ -28,7 +28,7 @@ struct _pppFilterSerializedData {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterStep* param_2, _pppCtrlTable* param_3)
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     int serializedOffset = *serializedDataOffsets;
@@ -63,7 +63,7 @@ void pppRenderFilter(_pppPObject* pppFilterObj, pppFilterUnkB* param_2, _pppCtrl
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
+void pppFrameFilter(_pppPObject*, pppFilterStep*, _pppCtrlTable*)
 {
 	volatile int* stateFlag = &ppvUserStopPartF;
 	if (*stateFlag == 0) {

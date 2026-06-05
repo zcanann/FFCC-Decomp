@@ -3,12 +3,13 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
+struct pppNoStep;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppDrawMatrixFront(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
+void pppDrawMatrixFront(_pppPObject* object, pppNoStep* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

@@ -8,11 +8,6 @@
 
 extern const float FLOAT_80330108;
 
-static inline pppShapeAnimData* ShapeAnimData(long* animData)
-{
-    return reinterpret_cast<pppShapeAnimData*>(animData);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80065678
@@ -25,7 +20,7 @@ static inline pppShapeAnimData* ShapeAnimData(long* animData)
 void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, short& frameTime,
                        short deltaTime)
 {
-    pppShapeAnimData* shapeAnim = ShapeAnimData(animData);
+    pppShapeAnimData* shapeAnim = pppShapeAnim(animData);
     pppShapeAnimFrame* frameData = &shapeAnim->m_frames[currentFrame];
 
     drawFrame = currentFrame;
@@ -53,15 +48,15 @@ void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, sh
  */
 void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv, int shapeIndex)
 {
-    int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
-    int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
+    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+    unsigned char* displayList = shape->m_entries[shapeIndex].m_displayList;
     float* minUvF = (float*)&minUv;
     float* maxUvF = (float*)&maxUv;
 
-    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * FLOAT_80330108;
-    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * FLOAT_80330108;
-    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * FLOAT_80330108;
-    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * FLOAT_80330108;
+    minUvF[0] = (float)*(short*)(displayList + 0x13) * FLOAT_80330108;
+    minUvF[1] = (float)*(short*)(displayList + 0x15) * FLOAT_80330108;
+    maxUvF[0] = (float)*(short*)(displayList + 0x3b) * FLOAT_80330108;
+    maxUvF[1] = (float)*(short*)(displayList + 0x3d) * FLOAT_80330108;
 }
 
 /*
@@ -75,9 +70,8 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
  */
 void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, int shapeIndex)
 {
-    int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
-    u8* shapeEntry = (u8*)*(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
-    u8* minSrc = shapeEntry + 3;
+    tagOAN3_SHAPE* shape = pppShapeFrame(animData, frameIndex);
+    unsigned char* minSrc = shape->m_entries[shapeIndex].m_displayList + 3;
 
     memcpy(&minPos, minSrc, 0xc);
     memcpy(&maxPos, minSrc + 0x28, 0xc);

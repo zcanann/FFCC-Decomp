@@ -77,7 +77,7 @@ enum ItemObjStringOffset {
 
 static inline CFlatRuntime2* ItemCFlatRuntime()
 {
-	return reinterpret_cast<CFlatRuntime2*>(CFlat);
+	return &CFlat;
 }
 
 /*

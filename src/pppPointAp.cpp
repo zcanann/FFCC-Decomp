@@ -5,11 +5,6 @@
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
-struct _pppPointApOffsets {
-    u32 srcOffset;
-    u32 targetOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80060c04
@@ -21,9 +16,9 @@ struct _pppPointApOffsets {
  */
 void pppPointAp(_pppPObject* pObject, pppPointApStep* step, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
-    u32 srcOffset = data->srcOffset;
-    u32 targetOffset = data->targetOffset;
+    pppPointApOffsets* data = (pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
+    u32 srcOffset = data->m_srcOffset;
+    u32 targetOffset = data->m_targetOffset;
     Vec* src = (Vec*)(pObject->m_workArea + srcOffset);
     u8* target = pObject->m_workArea + targetOffset;
 
@@ -72,7 +67,7 @@ void pppPointAp(_pppPObject* pObject, pppPointApStep* step, _pppCtrlTable* ctrlT
  */
 void pppPointApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
-    u8* target = pObject->m_workArea + data->targetOffset;
+    pppPointApOffsets* data = (pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
+    u8* target = pObject->m_workArea + data->m_targetOffset;
     target[1] = 0;
 }

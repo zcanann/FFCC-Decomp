@@ -5,7 +5,7 @@
 #include "ffcc/partMng.h"
 
 struct PCharaBreak;
-struct CharaBreakUnkB;
+struct CharaBreakStep;
 struct CharaBreakDisplayListPair;
 
 typedef _pppPObject pppCharaBreak;
@@ -22,7 +22,7 @@ struct POLYGON_DATA {
     u16 m_texIndices[3];
 };
 
-struct CharaBreakUnkB {
+struct CharaBreakStep {
     s32 m_graphId;
     f32 m_dataValIndex;
     f32 m_graphInit;
@@ -83,8 +83,8 @@ extern "C" {
 void pppConstructCharaBreak(pppCharaBreak*, _pppCtrlTable*);
 void pppConstruct2CharaBreak(pppCharaBreak*, _pppCtrlTable*);
 void pppDestructCharaBreak(pppCharaBreak*, _pppCtrlTable*);
-void pppFrameCharaBreak(pppCharaBreak*, CharaBreakUnkB*, _pppCtrlTable*);
-void pppRenderCharaBreak(pppCharaBreak*, CharaBreakUnkB*, _pppCtrlTable*);
+void pppFrameCharaBreak(pppCharaBreak*, CharaBreakStep*, _pppCtrlTable*);
+void pppRenderCharaBreak(pppCharaBreak*, CharaBreakStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

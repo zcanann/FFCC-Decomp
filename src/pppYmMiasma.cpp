@@ -39,20 +39,6 @@ struct PARTICLE_DATA {
 };
 STATIC_ASSERT(sizeof(PARTICLE_DATA) == 0x50);
 
-struct VYmMiasma {
-    PARTICLE_DATA* m_particles;
-    float m_speedDecay;
-    u8 m_emitTimer;
-    u8 m_pad09[7];
-    Vec m_impulse;
-    float m_radius;
-    float m_radiusVelocity;
-    float m_radiusAcceleration;
-    Vec m_prevPosition;
-    u8 m_prevPositionChanged;
-    u8 m_pad35[3];
-};
-
 struct YmMiasmaParticleColor {
     s16 m_r;
     s16 m_g;

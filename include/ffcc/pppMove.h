@@ -14,6 +14,11 @@ struct PppMoveInput {
     f32 z;
 };
 
+struct PppMoveOffsets {
+    u32 m_positionOffset;
+    u32 m_velocityOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

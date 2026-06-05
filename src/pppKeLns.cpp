@@ -11,7 +11,7 @@ const float kPppKeLnsZero = 0.0f;
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsFlsDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppKeLnsFlsDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;
@@ -36,7 +36,7 @@ void pppKeLnsFlsCon(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  * Address:	TODO
  * Size:	TODO
  */
-void pppKeLnsLpDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppKeLnsLpDraw(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;
@@ -53,10 +53,8 @@ void pppKeLnsLpDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeLnsLpCon2(void* pObject, void* pPart)
+void pppKeLnsLpCon2(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	_pppPObject* object = (_pppPObject*)pObject;
-	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)pPart;
 	u32 offset = ctrlTable->m_serializedDataOffsets[0];
 	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + offset);
 	f32 zero = kPppKeLnsZero;
@@ -74,10 +72,8 @@ void pppKeLnsLpCon2(void* pObject, void* pPart)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeLnsLpCon(void* pObject, void* pPart)
+void pppKeLnsLpCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	_pppPObject* object = (_pppPObject*)pObject;
-	_pppCtrlTable* ctrlTable = (_pppCtrlTable*)pPart;
 	u32 offset = ctrlTable->m_serializedDataOffsets[0];
 	_KeLnsLp* keLnsLp = (_KeLnsLp*)(object->m_workArea + offset);
 

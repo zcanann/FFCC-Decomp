@@ -8,6 +8,14 @@ struct _pppPObject;
 
 typedef _pppPObject pppYmDeformationMdl;
 
+struct VYmDeformationMdl {
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad;
+    float m_scale;
+    float m_values[5];
+};
+
 struct pppYmDeformationMdlStep {
     s32 m_graphId;
     s32 m_dataValIndex;

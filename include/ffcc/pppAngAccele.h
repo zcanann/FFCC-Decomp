@@ -6,7 +6,7 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
-struct pppAngAcceleUnkB {
+struct pppAngAcceleStep {
     s32 m_graphId;
     s32 m_field_04;
     s32 m_x;
@@ -18,7 +18,7 @@ struct pppAngAcceleUnkB {
 extern "C" {
 #endif
 
-void pppAngAccele(_pppPObject* obj, pppAngAcceleUnkB* param_2, _pppCtrlTable* param_3);
+void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* param_2, _pppCtrlTable* param_3);
 void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param);
 
 #ifdef __cplusplus

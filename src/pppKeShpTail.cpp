@@ -28,7 +28,7 @@ STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTailDraw(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppKeShpTailDraw(_pppPObject* obj, pppKeShpTailStep* stepData, _pppCtrlTable* ctrlTable)
 {
 	(void)obj;
 	(void)stepData;
@@ -65,7 +65,7 @@ void pppKeShpTailCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, _pppCtrlTable* offsets)
+void pppKeShpTail(_pppPObject* obj, pppKeShpTailStep*, _pppCtrlTable* offsets)
 {
 	KeShpTailWork* work;
 	if (ppvUserStopPartF != 0) {

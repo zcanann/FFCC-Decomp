@@ -8,11 +8,6 @@ struct PppAngMoveObj {
     int z;
 };
 
-struct PppAngMoveOffsets {
-    int a;
-    int b;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80064e5c
@@ -25,10 +20,10 @@ struct PppAngMoveOffsets {
 void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
 {
     int offset = ctrlTable->m_serializedDataOffsets[1];
-    int* ptr = (int*)(dest->m_workArea + offset);
-    ptr[2] = 0;
-    ptr[1] = 0;
-    ptr[0] = 0;
+    PppAngMoveObj* work = (PppAngMoveObj*)(dest->m_workArea + offset);
+    work->z = 0;
+    work->y = 0;
+    work->x = 0;
 }
 
 /*
@@ -43,8 +38,8 @@ void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
 void pppAngMove(_pppPObject* basePtr, PppAngMoveInput* inputData, _pppCtrlTable* ctrlTable)
 {
     PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDataOffsets;
-    PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets->a);
-    PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->b);
+    PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets->m_angleOffset);
+    PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
 
     if (ppvUserStopPartF != 0) {
         return;

@@ -3,11 +3,13 @@
 
 #include "ffcc/partMng.h"
 
+struct pppNoStep;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable);
+void pppParMoveMatrix(_pppPObject* obj, pppNoStep* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

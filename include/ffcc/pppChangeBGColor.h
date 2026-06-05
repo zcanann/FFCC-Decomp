@@ -4,6 +4,9 @@
 #include "ffcc/partMng.h"
 
 struct _GXColor;
+struct pppNoStep;
+
+typedef _pppPObject pppChangeBGColor;
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,7 +14,7 @@ extern "C" {
 
 void pppConChangeBGColor(_pppPObjLink*, _pppCtrlTable*);
 void pppDesChangeBGColor(_pppPObjLink*, _pppCtrlTable*);
-void pppFrameChangeBGColor(_pppPObject* pppChangeBGColor, void* param_2, _pppCtrlTable* param_3);
+void pppFrameChangeBGColor(pppChangeBGColor* changeBGColor, pppNoStep* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

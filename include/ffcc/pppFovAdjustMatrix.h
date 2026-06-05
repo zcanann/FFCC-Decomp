@@ -3,11 +3,13 @@
 
 #include "ffcc/partMng.h"
 
+struct pppNoStep;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppFrameFovAdjustMatrix(_pppPObject*, void*, _pppCtrlTable*);
+void pppFrameFovAdjustMatrix(_pppPObject*, pppNoStep*, _pppCtrlTable*);
 void pppConstructFovAdjustMatrix(_pppPObjLink*, _pppCtrlTable*);
 void pppDestructFovAdjustMatrix(_pppPObjLink*, _pppCtrlTable*);
 

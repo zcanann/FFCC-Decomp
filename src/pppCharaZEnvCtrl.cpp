@@ -14,7 +14,7 @@ void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlStep* step, _pppCtrlTable* param_3)
 {
 	if (ppvUserStopPartF != 0) {
 		return;
@@ -24,7 +24,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 	void* work = pppCharaZEnvCtrl->m_workArea + dataOffset;
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
-	model->SetCallbackContext(work, param_2);
+	model->SetCallbackContext(work, step);
 	model->SetBeforeMeshLockEnvCallback(CharaZEnvCtrl_BeforeMeshLockEnvCallback);
 }
 
@@ -71,6 +71,6 @@ void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
  */
 void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* data, int)
 {
-    unsigned char* zModeState = (unsigned char*)data;
-    GXSetZMode((GXBool)zModeState[4], GX_LEQUAL, (GXBool)zModeState[5]);
+    pppCharaZEnvCtrlStep* step = (pppCharaZEnvCtrlStep*)data;
+    GXSetZMode((GXBool)step->m_zEnable, GX_LEQUAL, (GXBool)step->m_zWriteEnable);
 }

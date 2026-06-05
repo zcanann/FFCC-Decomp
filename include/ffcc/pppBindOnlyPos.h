@@ -3,12 +3,14 @@
 
 #include "ffcc/partMng.h"
 
+struct pppNoStep;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void pppConstructBindOnlyPos(_pppPObjLink*, _pppCtrlTable*);
-void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*);
+void pppFrameBindOnlyPos(_pppPObject*, pppNoStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

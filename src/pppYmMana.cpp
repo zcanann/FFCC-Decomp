@@ -71,49 +71,6 @@ static inline Mtx44& CameraScreenMatrix()
 
 extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
 
-struct VYmMana {
-    CGObject* m_object;
-    void* m_manager;
-    CTexture* m_sourceTextures[6];
-    GXTexObj* m_baseParaboloidTexObjs;
-    void* m_paraboloidMap;
-    GXTexObj* m_generatedTexObj0;
-    GXTexObj* m_generatedTexObj1;
-    void* m_generatedTexture0;
-    void* m_generatedTexture1;
-    GXColor m_runtimeColor;
-    Vec* m_positions;
-    Vec* m_normals;
-    Vec* m_reflectionVec;
-    float* m_waterHeightA;
-    float* m_waterHeightB;
-    u16* m_indices;
-    Vec2d* m_texCoord0;
-    Vec2d* m_texCoord1;
-    GXColor* m_colors;
-    void** m_displayListCopies;
-    Vec* m_meshReflectionVec;
-    GXColor* m_meshColors;
-    S16Vec2d* m_meshTexCoords0;
-    S16Vec2d* m_meshTexCoords1;
-    pppYmManaStep* m_step;
-    GXTexObj* m_captureTexObjs;
-    CTexture* m_envTexture0;
-    CTexture* m_envTexture1;
-    u8 _pad84[4];
-    Mtx m_waterMtx;
-    Mtx m_reflectionMtx;
-    u8 m_manaAlpha;
-    u8 _padE9[3];
-    u32 m_paraboloidMapSize;
-    u32 m_displayListSize;
-    u8 m_paraboloidReady;
-    u8 _padF5[3];
-    CGObject* m_attachedObject;
-    GXColor m_shadowColor;
-    GXColor m_baseColor;
-};
-
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);
 STATIC_ASSERT(offsetof(VYmMana, m_meshReflectionVec) == 0x64);

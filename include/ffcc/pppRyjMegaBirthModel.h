@@ -96,7 +96,7 @@ extern "C" {
 #endif
 
 void pppRyjMegaBirthModel(_pppPObject*, PRyjMegaBirthModel*, PRyjMegaBirthModelOffsets*);
-void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable);
+void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _pppCtrlTable* ctrlTable);
 void pppRyjMegaBirthModelCon(_pppPObject*, PRyjMegaBirthModelOffsets*);
 void pppRyjMegaBirthModelDes(_pppPObject*, PRyjMegaBirthModelOffsets*);
 

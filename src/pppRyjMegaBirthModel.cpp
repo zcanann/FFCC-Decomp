@@ -918,7 +918,7 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _pppCtrlTable* ctrlTable)
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
     VColor* baseColor = (VColor*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);

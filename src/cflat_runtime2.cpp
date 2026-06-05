@@ -36,27 +36,17 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void __dt__13CFlatRuntime2Fv(void*);
-extern "C" void __ct__8CGMonObjFv(CGMonObj*);
-extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
-extern "C" void __ct__9CGItemObjFv(CGItemObj*);
-extern "C" void __ct__8CGObjectFv(CGObject*);
-extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
-extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern const float FLOAT_80330138;
 extern const float FLOAT_8033013C;
 
-// Linkage definitions from config/GCCP01/symbols.txt.
-// Keeping these as raw byte buffers matches current decomp access patterns.
-unsigned char CFlat_guard[0xC];
-unsigned char CFlat[0x10440] ATTRIBUTE_ALIGN(32);
-CFlatRuntime2& gCFlatRuntime2 = *reinterpret_cast<CFlatRuntime2*>(CFlat);
-unsigned char m_objBase[0xC80];
-unsigned char m_objQuad[0x1020];
-unsigned char m_obj[0x11D40];
-unsigned char m_objItem[0xAF80];
-unsigned char m_objParty[0x1BE0];
-unsigned char m_objMon[0x1D000];
+CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
+CFlatRuntime2& gCFlatRuntime2 = CFlat;
+CGBaseObj m_objBase[0x40];
+CGQuadObj m_objQuad[0x18];
+CGObject m_obj[0x38];
+CGItemObj m_objItem[0x20];
+CGPartyObj m_objParty[4];
+CGMonObj m_objMon[0x40];
 u32 CFlatFlags;
 
 enum {
@@ -521,32 +511,6 @@ CFlatRuntime2::~CFlatRuntime2()
 
 /*
  * --INFO--
- * PAL Address: 0x8006E864
- * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_cflat_runtime2_cpp(void)
-{
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-	new (CFlat) CFlatRuntime2;
-	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
-
-	__construct_array(m_objBase, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, sizeof(CGBaseObj), kFlatBaseObjCount);
-	__construct_array(m_objQuad, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, sizeof(CGQuadObj), kFlatQuadObjCount);
-	__construct_array(m_obj, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, sizeof(CGObject), kFlatObjectCount);
-	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, sizeof(CGItemObj), kFlatItemObjCount);
-	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, sizeof(CGPartyObj), kFlatPartyObjCount);
-	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, sizeof(CGMonObj), kFlatMonObjCount);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8006E960
  * PAL Size: 92b
  * EN Address: TODO
@@ -768,19 +732,19 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
 	if (classType == 3) {
-		unsigned char* obj = m_objParty;
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objParty);
 		for (int i = 0; i < 4; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objParty + i * 0x6F8);
+				return reinterpret_cast<CGObject*>(&m_objParty[i]);
 			}
 			obj += 0x6F8;
 		}
 	} else if (classType < 3) {
 		if (classType == 1) {
-			unsigned char* obj = m_objQuad;
+			unsigned char* obj = reinterpret_cast<unsigned char*>(m_objQuad);
 			for (int i = 0; i < 0x18; i++) {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_objQuad + i * 0xAC);
+					return reinterpret_cast<CGObject*>(&m_objQuad[i]);
 				}
 				obj += 0xAC;
 			}
@@ -789,35 +753,35 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 				return 0;
 			}
 
-			unsigned char* obj = m_objBase;
+			unsigned char* obj = reinterpret_cast<unsigned char*>(m_objBase);
 			for (int i = 0; i < 0x28; i++) {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_objBase + i * 0x50);
+					return reinterpret_cast<CGObject*>(&m_objBase[i]);
 				}
 				obj += 0x50;
 			}
 		} else {
-			unsigned char* obj = m_obj;
+			unsigned char* obj = reinterpret_cast<unsigned char*>(m_obj);
 			for (int i = 0; i < 0x38; i++) {
 				if (static_cast<signed char>(obj[0x4C]) >= 0) {
-					return reinterpret_cast<CGObject*>(m_obj + i * 0x518);
+					return &m_obj[i];
 				}
 				obj += 0x518;
 			}
 		}
 	} else if (classType == 5) {
-		unsigned char* obj = m_objItem;
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objItem);
 		for (int i = 0; i < 0x20; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objItem + i * 0x57C);
+				return reinterpret_cast<CGObject*>(&m_objItem[i]);
 			}
 			obj += 0x57C;
 		}
 	} else if (classType < 5) {
-		unsigned char* obj = m_objMon;
+		unsigned char* obj = reinterpret_cast<unsigned char*>(m_objMon);
 		for (int i = 0; i < 0x40; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_objMon + i * 0x740);
+				return reinterpret_cast<CGObject*>(&m_objMon[i]);
 			}
 			obj += 0x740;
 		}
@@ -842,17 +806,17 @@ void* CFlatRuntime2::intToClass(int classId)
 
 	switch (classType) {
 	case 0:
-		return m_objBase + (slot - 1) * 0x50;
+		return &m_objBase[slot - 1];
 	case 1:
-		return m_objQuad + (slot - 1) * 0xAC;
+		return &m_objQuad[slot - 1];
 	case 2:
-		return m_obj + (slot - 1) * 0x518;
+		return &m_obj[slot - 1];
 	case 3:
-		return reinterpret_cast<CGPartyObj*>(m_objParty) + (slot - 1);
+		return &m_objParty[slot - 1];
 	case 4:
-		return reinterpret_cast<CGMonObj*>(m_objMon) + (slot - 1);
+		return &m_objMon[slot - 1];
 	case 5:
-		return m_objItem + (slot - 1) * 0x57C;
+		return &m_objItem[slot - 1];
 	default:
 		return this;
 	}
@@ -2486,7 +2450,7 @@ int CFlatRuntime2::GetSysControl(int controlNo)
 
 	switch (controlNo) {
 	case 3:
-		return reinterpret_cast<RuntimeSysControlView*>(CFlat)->m_control;
+		return reinterpret_cast<RuntimeSysControlView*>(&CFlat)->m_control;
 	default:
 		return 0;
 	}

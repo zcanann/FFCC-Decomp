@@ -7,7 +7,6 @@ struct _pppCtrlTable;
 struct _pppPObject;
 
 typedef _pppPObject pppLaser;
-typedef pppLaserStep pppLaserUnkB;
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,8 +15,8 @@ extern "C" {
 void pppConstructLaser(pppLaser* pppLaser, _pppCtrlTable* param_2);
 void pppConstruct2Laser(pppLaser* pppLaser, _pppCtrlTable* param_2);
 void pppDestructLaser(pppLaser* pppLaser, _pppCtrlTable* param_2);
-void pppFrameLaser(pppLaser* pppLaser, pppLaserUnkB* param_2, _pppCtrlTable* param_3);
-void pppRenderLaser(pppLaser* pppLaser, pppLaserUnkB* param_2, _pppCtrlTable* param_3);
+void pppFrameLaser(pppLaser* pppLaser, pppLaserStep* param_2, _pppCtrlTable* param_3);
+void pppRenderLaser(pppLaser* pppLaser, pppLaserStep* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

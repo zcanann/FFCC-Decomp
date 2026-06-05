@@ -12,7 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixNoRot(struct _pppPObject* object, void*, struct _pppCtrlTable*)
+void pppDrawMatrixNoRot(struct _pppPObject* object, pppNoStep*, struct _pppCtrlTable*)
 {
     PSMTXScaleApply(
         object->m_localMatrix.value,

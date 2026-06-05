@@ -200,7 +200,7 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, voi
  * PAL Address: TODO
  * PAL Size: TODO
  */
-void pppFrameConstrainCameraForLoc(_pppPObject*, void*, _pppCtrlTable*)
+void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*, _pppCtrlTable*)
 {
 	// TODO - frame processing function
 }

@@ -320,7 +320,7 @@ static inline void set_matrix(
  * Address:	TODO
  * Size:	TODO
  */
-void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
+void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTable* ctrlTable)
 {
 	PRyjMegaBirth* params = (PRyjMegaBirth*)stepData;
 	u8* payload = (u8*)params;

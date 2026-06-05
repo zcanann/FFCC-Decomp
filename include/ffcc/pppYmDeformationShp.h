@@ -1,12 +1,26 @@
 #ifndef _PPP_YMDEFORMATIONSHP_H_
 #define _PPP_YMDEFORMATIONSHP_H_
 
+#include "ffcc/pppVec.h"
+
+#include <dolphin/gx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
 struct _pppPObject;
 
 typedef _pppPObject pppYmDeformationShp;
+
+struct VYmDeformationShp {
+    GXTexObj* m_backBuffer;
+    int m_pad0;
+    int m_pad1;
+    s16 m_angle;
+    u8 m_direction;
+    u8 m_pad2;
+    float m_scale;
+    float m_values[5];
+};
 
 struct pppYmDeformationShpGraphArgs {
     f32 m_valueAdd;

@@ -11,9 +11,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixLoc(_pppPObject* target, void* unused, _pppCtrlTable* param)
+void pppMatrixLoc(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param)
 {
-    (void)unused;
+    (void)stepData;
 
     int* offsetPtr = param->m_serializedDataOffsets;
     f32* posData = (f32*)(target->m_workArea + *offsetPtr);

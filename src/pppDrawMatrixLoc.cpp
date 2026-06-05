@@ -11,7 +11,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixLoc(_pppPObject* object, void*, _pppCtrlTable*)
+void pppDrawMatrixLoc(_pppPObject* object, pppNoStep*, _pppCtrlTable*)
 {
     Vec local_2c;
     Vec local_38;

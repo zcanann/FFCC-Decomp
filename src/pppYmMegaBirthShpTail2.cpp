@@ -20,24 +20,6 @@ extern const double DOUBLE_80330598 = 1.0;
 #include <dolphin/mtx.h>
 #include <string.h>
 
-struct PYmMegaBirthShpTail2
-{
-    Mtx m_matrix;
-    Vec m_directionTail;
-    float m_colorDeltaAdd[4];
-    float m_sizeStart;
-    float m_sizeVal;
-    float m_speedRandRange;
-    float field_0x58;
-    Vec m_speedScale;
-    unsigned char m_randType;
-    unsigned char m_enableParticleColor;
-    unsigned char m_pad0x6a[0x6c - 0x6a];
-    short m_tail2PathIndex;
-    unsigned char m_pad0x6e[0xb9 - 0x6e];
-    unsigned char m_tail2MatrixMode;
-};
-
 struct VYmMegaBirthShpTail2
 {
     pppFMATRIX m_emitterMatrix;
@@ -71,7 +53,7 @@ static inline float LoadFloat(const float& value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, _pppCtrlTable* offsets)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2RenderStep* stepData, _pppCtrlTable* offsets)
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;

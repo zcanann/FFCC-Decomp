@@ -92,7 +92,7 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2UnkC* unkC)
+extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
     int serializedOffset;
     int graphFrame;
@@ -215,7 +215,7 @@ extern const char s_locationNodeName[] = "loc";
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2UnkC* unkC)
+extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
     int serializedOffset;
     int colorOffset;
@@ -378,7 +378,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkC* unkC)
+extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* unkC)
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
@@ -401,7 +401,7 @@ extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppL
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkC* unkC)
+extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Offsets* unkC)
 {
     LocationTitle2Work* work;
     f32 value;

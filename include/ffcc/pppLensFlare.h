@@ -10,8 +10,8 @@ extern "C" {
 
 void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable);
 void pppDestructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable);
-void pppFrameLensFlare(pppColum* obj, pppColumUnkB* step, _pppCtrlTable* ctrlTable);
-void pppRenderLensFlare(pppColum* obj, pppColumUnkB* step, _pppCtrlTable* ctrlTable);
+void pppFrameLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable);
+void pppRenderLensFlare(pppColum* obj, pppColumStep* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

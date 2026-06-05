@@ -3,11 +3,13 @@
 
 #include "ffcc/partMng.h"
 
+struct pppNoStep;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppWDrawMatrixLoop(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
+void pppWDrawMatrixLoop(_pppPObject* object, pppNoStep* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

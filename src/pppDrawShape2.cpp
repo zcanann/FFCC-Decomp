@@ -20,13 +20,11 @@ STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2(void* param1, Shape2ControlData* param2, void* param3){
-    _pppPObject* object = (_pppPObject*)param1;
-    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
+void pppDrawShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrlTable* ctrlTable){
     ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
     ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
     ShapePositionData* posData = (ShapePositionData*)(object->m_workArea + runtimeData->posDataOffset);
-    s32 type = param2->type;
+    s32 type = controlData->type;
 
     if (type == 0xFFFF) {
         return;
@@ -40,18 +38,18 @@ void pppDrawShape2(void* param1, Shape2ControlData* param2, void* param3){
     pppSetDrawEnv(
         &posData->color,
         &object->m_drawMatrix,
-        param2->scale,
-        param2->param15,
-        param2->paramE,
-        param2->blendMode,
+        controlData->scale,
+        controlData->param15,
+        controlData->paramE,
+        controlData->blendMode,
         0,
-        param2->param14,
+        controlData->param14,
         1,
         0
     );
 
-    pppSetBlendMode(param2->blendMode);
-    pppDrawShp((tagOAN3_SHAPE*)drawShape, ppvEnv->m_materialSetPtr, param2->blendMode);
+    pppSetBlendMode(controlData->blendMode);
+    pppDrawShp((tagOAN3_SHAPE*)drawShape, ppvEnv->m_materialSetPtr, controlData->blendMode);
 }
 
 
@@ -64,16 +62,14 @@ void pppDrawShape2(void* param1, Shape2ControlData* param2, void* param3){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcShape2(void* param1, Shape2ControlData* param2, void* param3){
+void pppCalcShape2(_pppPObject* object, Shape2ControlData* controlData, _pppCtrlTable* ctrlTable){
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    _pppPObject* object = (_pppPObject*)param1;
-    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
     ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
     ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-    s32 type = param2->type;
+    s32 type = controlData->type;
 
     if (type == 0xFFFF) {
         return;
@@ -84,7 +80,7 @@ void pppCalcShape2(void* param1, Shape2ControlData* param2, void* param3){
     pppShapeAnimFrame* shape = &shapeSpec->m_frames[shapeData->counter];
 
     shapeData->currentId = shapeData->counter;
-    shapeData->value = (u16)(shapeData->value + param2->step);
+    shapeData->value = (u16)(shapeData->value + controlData->step);
     s32 value = shapeData->value;
     s32 maxValue = shape->m_duration;
 
@@ -117,10 +113,8 @@ void pppCalcShape2(void* param1, Shape2ControlData* param2, void* param3){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2Construct(void* param1, void* param2)
+void pppDrawShape2Construct(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    _pppPObject* object = (_pppPObject*)param1;
-    _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param2;
     ShapeRuntimeData* data = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
     ShapeState* shapeData = (ShapeState*)(object->m_workArea + data->shapeDataOffset);
 

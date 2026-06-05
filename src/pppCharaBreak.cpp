@@ -40,8 +40,6 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
-typedef CharaBreakUnkB CharaBreakStep;
-
 STATIC_ASSERT(sizeof(POLYGON_DATA) == 0x34);
 STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
 STATIC_ASSERT(sizeof(CharaBreakWork) == 0x48);
@@ -127,7 +125,7 @@ static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTable* data)
+void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTable* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
@@ -163,7 +161,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, _pppCtrlTab
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, _pppCtrlTable* data)
+void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
     CharaBreakWork* work;
     CChara::CModel* model;

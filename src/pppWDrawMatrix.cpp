@@ -12,7 +12,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppWDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
+void pppWDrawMatrix(_pppPObject* object, pppNoStep*, _pppCtrlTable*)
 {
     PSMTXConcat(ppvCameraMatrix, object->m_localMatrix.value, object->m_drawMatrix.value);
     PSVECScale((Vec*)object->m_drawMatrix.value[0], (Vec*)object->m_drawMatrix.value[0], ppvMng->m_scale.x);

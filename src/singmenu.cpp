@@ -871,26 +871,23 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
         return dynamicText;
     }
 
-    u8 languageId = Game.m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
     if (languageId == 3) {
         return gSingMenuTextTableIt[staticText];
-    }
-    if (languageId >= 3) {
-        if (languageId == 5) {
-            return gSingMenuTextTableEs[staticText];
+    } else if (languageId < 3) {
+        if ((languageId == 1) || (languageId == 0)) {
+            return gSingMenuTextTableEn[staticText];
+        } else {
+            return gSingMenuTextTableDe[staticText];
         }
-        if (languageId >= 5) {
+    } else if (languageId == 5) {
+        return gSingMenuTextTableEs[staticText];
+    } else {
+        if (4 < languageId) {
             return gSingMenuTextTableEn[staticText];
         }
         return gSingMenuTextTableFr[staticText];
     }
-    if (languageId == 1) {
-        return gSingMenuTextTableEn[staticText];
-    }
-    if (languageId >= 1) {
-        return gSingMenuTextTableDe[staticText];
-    }
-    return gSingMenuTextTableEn[staticText];
 }
 
 static inline double SingWinUIntToDouble(unsigned int value)
@@ -1571,7 +1568,7 @@ void CMenuPcs::DrawSingleBase(float alpha)
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    u8 languageId = Game.m_gameWork.m_languageId;
+    int languageId = Game.m_gameWork.m_languageId;
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

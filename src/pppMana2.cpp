@@ -36,6 +36,16 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
 static const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 static const char s_pppMana2_cpp[] = "pppMana2.cpp";
+
+struct Mana2DataOffsets
+{
+    s32 m_unusedOffset;
+    s32 m_setupOffset;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
+STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
 extern const float FLOAT_80331898 = 0.0f;
 extern const float FLOAT_8033189c = -1.0f;
 extern const float FLOAT_803318a0 = 1.0f;
@@ -83,6 +93,11 @@ static inline Mtx& CameraMatrix()
 static inline Mtx44& CameraScreenMatrix()
 {
     return CameraPcs.m_screenMatrix;
+}
+
+static inline Mana2DataOffsets* GetMana2DataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<Mana2DataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
 static inline float LoadFloat(const float& value)
@@ -1047,9 +1062,10 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    setupOffset = param_3->m_serializedDataOffsets[1];
+    Mana2DataOffsets* serializedOffsets = GetMana2DataOffsets(param_3);
+    setupOffset = serializedOffsets->m_setupOffset;
     mana2Work =
-        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_3->m_serializedDataOffsets[2]);
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + serializedOffsets->m_workOffset);
     setup = reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + setupOffset;
     if (gObject == NULL) {
         return;
@@ -1277,7 +1293,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     u32 j;
 
     work =
-        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + param_2->m_serializedDataOffsets[2]);
+        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + GetMana2DataOffsets(param_2)->m_workOffset);
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
@@ -1425,7 +1441,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     VMana2* work;
     s32 workOffset;
 
-    workOffset = param_2->m_serializedDataOffsets[2];
+    workOffset = GetMana2DataOffsets(param_2)->m_workOffset;
     work =
         reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + workOffset);
     gObject = (CGObject*)ppvMng->m_lookTarget;

@@ -1,5 +1,4 @@
 #include "ffcc/ptrarray.h"
-#define FFCC_PARTMNG_NO_INLINE_PPPCREATEPARAM
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
 #include "ffcc/line_constants.h"
@@ -1193,42 +1192,6 @@ extern "C" char* GetNumSysMes__5CGameFv(void* game, int index)
 CMesMenu* CMenuPcs::GetMesMenu(int index)
 {
     return reinterpret_cast<CMesMenu**>(reinterpret_cast<char*>(this) + 0x10C)[index];
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B9538
- * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-PPPCREATEPARAM::PPPCREATEPARAM()
-{
-    m_soundEffectParams.m_soundEffectHandle = -1;
-    m_soundEffectParams.m_soundEffectSlot = -1;
-    m_soundEffectParams.m_soundEffectStopFlag = 0;
-    m_soundEffectParams.m_soundEffectKind = 1;
-    m_soundEffectParams.m_soundEffectStartFrame = 0;
-    m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    m_hitParamA = 0;
-    m_hitParamB = 0;
-    m_hitObjectCount = 0;
-    m_hitFlags = 0;
-    m_positionOffsetPtr = 0;
-    m_rotationPtr = 0;
-    m_scalePtr = 0;
-    m_extraPositionPtr = 0;
-    m_paramA = 0;
-    m_paramB = 0;
-    m_lookTargetPtr = 0;
-    m_objectHitMask = 0;
-    m_cylinderAttribute = 0;
-    m_paramC = FLOAT_80330B34;
-    m_paramD = FLOAT_80330B34;
-    *reinterpret_cast<unsigned char*>(&m_owner) = 0;
 }
 
 /*

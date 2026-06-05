@@ -20,6 +20,39 @@ struct RainColorData {
     pppCVECTOR color;
 };
 
+struct PRain {
+    s32 m_graphId;
+    u16 m_dataValIndex;
+    u8 _pad0[2];
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_unk14;
+    f32 m_moveYDelta;
+    f32 m_accelYDelta;
+    f32 m_accelZDelta;
+    f32 m_driftY;
+    u16 m_lifeBase;
+    u16 m_lifeRange;
+    u8 _pad2c[0x30 - 0x2C];
+    f32 m_minX;
+    f32 m_unk34;
+    f32 m_minZ;
+    f32 m_unk3c;
+    f32 m_maxX;
+    f32 m_maxY;
+    f32 m_maxZ;
+    u8 _pad4c[0x50 - 0x4C];
+    u8 m_lineWidth;
+    u8 _pad51[3];
+    f32 m_lengthBase;
+    f32 m_lengthRand;
+    u8 m_blendMode;
+    u8 m_fogIndex;
+    u8 m_lightTarget;
+    u8 _pad63;
+};
+
 struct RainDrop {
     f32 posX;
     f32 posY;
@@ -49,7 +82,7 @@ STATIC_ASSERT(sizeof(RainDrop) == 0x20);
 
 static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
 {
-    return reinterpret_cast<VRain*>(rain->m_object.m_workArea + data->m_serializedDataOffsets[2]);
+    return reinterpret_cast<VRain*>(rain->m_workArea + data->m_serializedDataOffsets[2]);
 }
 
 /*
@@ -61,7 +94,7 @@ static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DATA* param_3)
+void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     int i;
     int colorOffset;
@@ -74,12 +107,12 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     float baseY;
     float baseZ;
     Vec segment;
-    s32* serializedDataOffsets;
+    int* serializedDataOffsets;
 
     serializedDataOffsets = param_3->m_serializedDataOffsets;
     colorOffset = serializedDataOffsets[1];
-    work = reinterpret_cast<VRain*>(pppRain->m_object.m_workArea + serializedDataOffsets[2]);
-    colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
+    work = reinterpret_cast<VRain*>(pppRain->m_workArea + serializedDataOffsets[2]);
+    colorData = (RainColorData*)(pppRain->m_workArea + colorOffset);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -144,7 +177,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DATA* param_3)
+void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     int i;
     RainDrop* drop;
@@ -155,7 +188,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         return;
     }
 
-    work = (VRain*)(pppRain->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
+    work = (VRain*)(pppRain->m_workArea + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
         RainDrop* dropData;
 
@@ -212,7 +245,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
     work->accelY += work->accelZ;
     work->moveY += work->accelY;
-    if (param_2->m_graphId == pppRain->m_object.m_graphId) {
+    if (param_2->m_graphId == pppRain->m_graphId) {
         work->moveY += param_2->m_moveYDelta;
         work->accelY += param_2->m_accelYDelta;
         work->accelZ += param_2->m_accelZDelta;
@@ -299,7 +332,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
+void pppDestructRain(pppRain* pppRain, RAIN_DATA* param_2)
 {
     VRain* work;
 
@@ -319,7 +352,7 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
+void pppConstructRain(pppRain* pppRain, RAIN_DATA* param_2)
 {
     float fVar1;
     VRain* work;

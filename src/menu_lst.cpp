@@ -228,8 +228,10 @@ int CMenuPcs::MLstCtrl()
 {
 	bool blocked;
 	float one;
-	unsigned int press;
-	u16 hold;
+	unsigned int rawPress;
+	unsigned int rawHold;
+	short press;
+	short hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
 	int i;
@@ -244,38 +246,42 @@ int CMenuPcs::MLstCtrl()
 		blocked = true;
 	}
 	if (blocked) {
-		press = 0;
+		rawPress = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
+		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	press = rawPress & 0xffff;
 
 	blocked = false;
 	if ((padLock != 0) || (Pad._448_4_ != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
-		hold = 0;
+		rawHold = 0;
 	} else {
 		int padIndex = 0;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		hold = Pad.GetPadInputs()[padIndex].repeatButton;
+		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
+	hold = rawHold & 0xffff;
 
 	if (hold == 0) {
 		result = 0;
 	} else {
 		if ((hold & 0x48) != 0) {
-			if (this->lstState->cursor != 0) {
-				this->lstState->cursor = this->lstState->cursor - 1;
+			int cursor = this->lstState->cursor;
+			if (cursor != 0) {
+				this->lstState->cursor = cursor - 1;
 			} else {
 				this->lstState->cursor = 8;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 0x24) != 0) {
-			if (this->lstState->cursor < 8) {
-				this->lstState->cursor = this->lstState->cursor + 1;
+			int cursor = this->lstState->cursor;
+			if (cursor < 8) {
+				this->lstState->cursor = cursor + 1;
 			} else {
 				this->lstState->cursor = 0;
 			}

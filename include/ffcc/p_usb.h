@@ -21,7 +21,7 @@ public:
         u8 m_reserved34[0xC];
     };
 
-    static CSmallProcessTable m_table;
+    static CProcessTable m_table;
 
     CUSBPcs();
 

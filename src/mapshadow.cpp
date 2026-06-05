@@ -10,7 +10,7 @@
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
 
-extern const double kMapShadowDepthBias = 0.5;
+extern const double kMapShadowDepthBias;
 static const float kMapShadowScaleStep = 0.5f;
 static const double DOUBLE_8032FCF8 = 4503599627370496.0;
 extern const float FLOAT_8032FD00 = 0.0f;

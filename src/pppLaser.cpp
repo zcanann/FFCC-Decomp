@@ -35,14 +35,22 @@ static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 typedef pppLaserWork LaserWork;
 typedef pppLaserColorBlock LaserColorData;
 
+STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
+STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_workOffset) == 0x8);
+
 static inline f32 LaserConst(const f32& value)
 {
     return *reinterpret_cast<const f32*>(&value);
 }
 
+static inline pppLaserDataOffsets* GetLaserDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<pppLaserDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
 static inline LaserWork* GetLaserWork(pppLaser* laser, _pppCtrlTable* ctrlTable)
 {
-    return reinterpret_cast<LaserWork*>(laser->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+    return reinterpret_cast<LaserWork*>(laser->m_workArea + GetLaserDataOffsets(ctrlTable)->m_workOffset);
 }
 
 STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
@@ -333,9 +341,9 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
 extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtrlTable *param_3)
 {
     pppLaserStep* step = param_2;
-    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    pppLaserDataOffsets* serializedDataOffsets = GetLaserDataOffsets(param_3);
     LaserWork* work = GetLaserWork(pppLaser, param_3);
-    int colorOffset = serializedDataOffsets[1];
+    int colorOffset = serializedDataOffsets->m_colorBlockOffset;
     LaserColorData* colorData = (LaserColorData*)(pppLaser->m_workArea + colorOffset);
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;

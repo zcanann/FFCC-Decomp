@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppVertexApLc.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
@@ -39,6 +40,18 @@ struct VertexApLcState
     u16 countdown;
 };
 
+struct VertexApLcDataOffsets
+{
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(VertexApLcDataOffsets, m_stateOffset) == 0x0);
+
+static inline VertexApLcDataOffsets* GetVertexApLcDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VertexApLcDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 struct VertexApLcSource
 {
     u8 unk0[0x2C];
@@ -57,7 +70,7 @@ struct VertexApLcSource
 void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctrl)
 {
     VertexApLcData* data = (VertexApLcData*)dataRaw;
-    s32 stateOffset = *ctrl->m_serializedDataOffsets;
+    s32 stateOffset = GetVertexApLcDataOffsets(ctrl)->m_stateOffset;
     VertexApLcState* state = (VertexApLcState*)(parent->m_workArea + stateOffset);
 
     if (ppvUserStopPartF != 0) {
@@ -166,7 +179,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, _pppCtrlTable* ctr
  */
 void pppVertexApLcCon(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    s32 offset = *ctrl->m_serializedDataOffsets;
+    s32 offset = GetVertexApLcDataOffsets(ctrl)->m_stateOffset;
     u16* state = (u16*)(obj->m_workArea + offset);
 
     state[0] = 0;

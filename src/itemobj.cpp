@@ -877,6 +877,7 @@ void CGItemObj::onFrameStat()
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
 			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(&attachOffset);
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -908,7 +909,7 @@ void CGItemObj::onFrameStat()
 			if (useBossAttachName) {
 				attachName = s_itemAttachCenterItem3;
 			}
-			Attach(m_owner, const_cast<char*>(attachName), reinterpret_cast<Vec*>(&attachOffset));
+			Attach(m_owner, const_cast<char*>(attachName), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = FLOAT_80331b20;
 		}
@@ -948,21 +949,24 @@ void CGItemObj::onFrameStat()
 			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 
 			if (FLOAT_80331b20 < safeDist) {
-				m_owner->moveVectorHRot(FLOAT_80331b8c + *(float*)((unsigned char*)m_owner + 0x1A8), FLOAT_80331b20,
-				                          safeDist / FLOAT_80331b90, 3);
+				m_owner->moveVectorHRot(FLOAT_80331b8c + m_owner->m_rotBaseY, FLOAT_80331b20,
+				                        safeDist / FLOAT_80331b90, 3);
 			}
 
 			Detach();
 			m_worldPosition = safePos;
 
-			if (m_lastStateId != 0xC) {
-				launchSpeed = FLOAT_80331b40;
+			float moveSpeed;
+			if (m_lastStateId == 0xC) {
+				moveSpeed = launchSpeed;
+			} else {
+				moveSpeed = FLOAT_80331b40;
 			}
 
-			float ownerCos = (float)cos((double)*(float*)((unsigned char*)m_owner + 0x1B4));
-			float ownerSin = (float)sin((double)*(float*)((unsigned char*)m_owner + 0x1B4));
+			float ownerCos = (float)cos((double)m_owner->m_rotTargetY);
+			float ownerSin = (float)sin((double)m_owner->m_rotTargetY);
 			CVector moveVec(ownerSin, FLOAT_80331b54, ownerCos);
-			MoveVector(reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
+			MoveVector(reinterpret_cast<Vec*>(&moveVec), moveSpeed, 1, 0, 1, 0);
 
 			m_owner = 0;
 			m_itemJumpCountdown = 8;
@@ -1272,7 +1276,7 @@ void CGItemObj::onFrame()
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), FLOAT_80331bb8, FLOAT_80331bb8,
-			             reinterpret_cast<Vec*>(&zero));
+			             zero);
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();
 		}

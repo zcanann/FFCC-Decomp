@@ -1622,10 +1622,10 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
         }
 
+        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
         {
-            CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
             bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
                 ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
                 : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
@@ -1709,10 +1709,10 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
         }
 
+        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
         bool hitBounds = false;
         bool xyOverlap = false;
         {
-            CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
             bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
                 ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
                 : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;

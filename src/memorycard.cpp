@@ -24,10 +24,10 @@ public:
     static char* MCDAT_VERSION;
 };
 
-const char s_CardGameCode_80330CD0[] = "FFCC";
-const char s_CardMakerCode_80330CD8[] = "GDS";
-const char s_CardMachineCode_80330CDC[] = "GC";
-const char s_CardVersion_80330CE0[] = "1.00";
+const char s_CardGameCode_80330CB8[] = "FFCC";
+const char s_CardMakerCode_80330CC0[] = "GDS";
+const char s_CardMachineCode_80330CC4[] = "GC";
+const char s_CardVersion_80330CC8[] = "1.00";
 
 static const char s_dvd_gba_801DA9C0[] = "dvd/gba/";
 static const char s_ffcc_cli_bin_801DA9CC[] = "ffcc_cli.bin";
@@ -36,12 +36,12 @@ static const char s_icon_dat_801DA9E8[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
 
 char* CardConst::MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
-char* CardConst::MC_FNAME = const_cast<char*>(s_CardGameCode_80330CD0);
+char* CardConst::MC_FNAME = const_cast<char*>(s_CardGameCode_80330CB8);
 char* CardConst::MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
-char* CardConst::MCDAT_MAKER = const_cast<char*>(s_CardMakerCode_80330CD8);
-char* CardConst::MCDAT_TITLE = const_cast<char*>(s_CardGameCode_80330CD0);
-char* CardConst::MCDAT_MACHINE = const_cast<char*>(s_CardMachineCode_80330CDC);
-char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CE0);
+char* CardConst::MCDAT_MAKER = const_cast<char*>(s_CardMakerCode_80330CC0);
+char* CardConst::MCDAT_TITLE = const_cast<char*>(s_CardGameCode_80330CB8);
+char* CardConst::MCDAT_MACHINE = const_cast<char*>(s_CardMachineCode_80330CC4);
+char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CC8);
 
 CMemoryCardMan MemoryCardMan;
 
@@ -1313,9 +1313,8 @@ void CMemoryCardMan::SetLoadData()
     memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
     memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
     memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
-    u32 serial0 = *reinterpret_cast<u32*>(save + 0x13D0);
+    Game.m_gameWork.m_mcSerial0 = *reinterpret_cast<u32*>(save + 0x13D0);
     Game.m_gameWork.m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
-    Game.m_gameWork.m_mcSerial0 = serial0;
     Game.m_gameWork.m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));

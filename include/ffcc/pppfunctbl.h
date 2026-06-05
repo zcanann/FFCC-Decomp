@@ -19,7 +19,6 @@ inline pppProg* pppGetSysProgTable()
 #include "ffcc/pppAngMove.h"
 #include "ffcc/pppBindOnlyPos.h"
 #include "ffcc/pppBlurChara.h"
-#include "ffcc/pppBreathModel.h"
 #include "ffcc/pppCallBackDistance.h"
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/pppChangeTex.h"
@@ -151,7 +150,6 @@ inline pppProg* pppGetSysProgTable()
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppYmMelt.h"
-#include "ffcc/pppYmMiasma.h"
 #include "ffcc/pppYmMoveCircle.h"
 #include "ffcc/pppYmMoveParabola.h"
 #include "ffcc/pppYmTraceMove.h"
@@ -163,6 +161,26 @@ inline pppProg* pppGetSysProgTable()
 #define PPP_RENDER(fn) ((pppProgAnyCallback)(pppProgRenderCallback)(fn))
 #define PPP_CONSTRUCT(fn) ((pppProgAnyCallback)(pppProgConstructCallback)(fn))
 #define PPP_DESTRUCT(fn) ((pppProgAnyCallback)(pppProgDestructCallback)(fn))
+
+struct PBreathModel;
+struct PYmMiasma;
+struct YmMiasmaFrameStep;
+struct YmMiasmaRenderStep;
+typedef _pppPObject pppBreathModel;
+typedef _pppPObject pppYmMiasma;
+
+extern "C" {
+void pppFrameBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppRenderBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppConstructBreathModel(pppBreathModel*, _pppCtrlTable*);
+void pppDestructBreathModel(pppBreathModel*, _pppCtrlTable*);
+
+void pppFrameYmMiasma(pppYmMiasma*, YmMiasmaFrameStep*, _pppCtrlTable*);
+void pppRenderYmMiasma(pppYmMiasma*, YmMiasmaRenderStep*, _pppCtrlTable*);
+void pppConstructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppConstruct2YmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppDestructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+}
 
 pppProg pppSysProgTbl[159] = {
     {

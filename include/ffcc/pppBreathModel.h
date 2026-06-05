@@ -7,15 +7,9 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 struct BreathParticleGroup;
-#ifndef FFCC_HAS_DEFAULT_PARTICLE_DATA_TYPE
 struct PARTICLE_DATA;
-#endif
-#ifndef FFCC_HAS_DEFAULT_PARTICLE_WMAT_TYPE
 struct PARTICLE_WMAT;
-#endif
-#ifndef FFCC_HAS_DEFAULT_PARTICLE_COLOR_TYPE
 struct PARTICLE_COLOR;
-#endif
 
 typedef _pppPObject pppBreathModel;
 

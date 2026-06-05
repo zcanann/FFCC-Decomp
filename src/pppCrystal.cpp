@@ -70,7 +70,7 @@ struct CrystalDataOffsets {
 STATIC_ASSERT(offsetof(CrystalDataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(CrystalDataOffsets, m_workOffset) == 0x8);
 
-inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
+void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
 
 static inline CrystalDataOffsets* GetCrystalDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -422,7 +422,7 @@ void pppConstructCrystal(pppCrystal* pppCrystal, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
+void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
 {
     u32 y;
     u32 x;
@@ -491,7 +491,7 @@ inline void MakeRefractionMap(HSD_ImageBuffer* imageBuffer)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
+void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32)
 {
     u32 yTile = y >> 2;
     u32 yFine = (y & 3) * 4;

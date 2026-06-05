@@ -6,12 +6,13 @@
 
 struct _pppCtrlTable;
 struct _pppPObject;
+struct pppNoStep;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixYZX(_pppPObject* target, void* unused, _pppCtrlTable* param);
+void pppMatrixYZX(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param);
 
 #ifdef __cplusplus
 }

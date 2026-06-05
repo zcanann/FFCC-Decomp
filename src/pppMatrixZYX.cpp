@@ -12,9 +12,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixZYX(_pppPObject* target, void* unused, _pppCtrlTable* param)
+void pppMatrixZYX(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param)
 {
-    (void)unused;
+    (void)stepData;
     int* offsets = param->m_serializedDataOffsets;
     u32 translationOffset = offsets[0];
     u32 scaleOffset = offsets[2];

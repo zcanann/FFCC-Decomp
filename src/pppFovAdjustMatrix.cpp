@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppFrameFovAdjustMatrix(_pppPObject*, void*, _pppCtrlTable*)
+void pppFrameFovAdjustMatrix(_pppPObject*, pppNoStep*, _pppCtrlTable*)
 {
 	return;
 }

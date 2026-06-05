@@ -11,9 +11,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixScl(_pppPObject* target, void* unused, _pppCtrlTable* param)
+void pppMatrixScl(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param)
 {
-    (void)unused;
+    (void)stepData;
 
     int* dataPtr = param->m_serializedDataOffsets;
     u32 index1 = dataPtr[0];

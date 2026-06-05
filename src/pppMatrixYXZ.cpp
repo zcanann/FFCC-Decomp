@@ -12,9 +12,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixYXZ(_pppPObject* target, void* unused, _pppCtrlTable* param)
+void pppMatrixYXZ(_pppPObject* target, pppNoStep* stepData, _pppCtrlTable* param)
 {
-    (void)unused;
+    (void)stepData;
     int* offsets = param->m_serializedDataOffsets;
     pppIVECTOR4* angle = (pppIVECTOR4*)(target->m_workArea + offsets[1]);
     f32* translation = (f32*)(target->m_workArea + offsets[0]);

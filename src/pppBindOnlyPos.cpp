@@ -11,7 +11,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*)
+void pppFrameBindOnlyPos(_pppPObject*, pppNoStep*, _pppCtrlTable*)
 {
 	if (ppvUserStopPartF != 0) {
 		return;

@@ -11,12 +11,12 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSpMatrix(_pppPObject* mtx, void* src, _pppCtrlTable* data)
+void pppSpMatrix(_pppPObject* mtx, pppNoStep* stepData, _pppCtrlTable* data)
 {
     int offset = *data->m_serializedDataOffsets;
     Mtx* mtxSrc = (Mtx*)(mtx->m_workArea + offset);
     Mtx* mtxOut = &mtx->m_localMatrix.value;
 
-    (void)src;
+    (void)stepData;
     PSMTXConcat(*mtxSrc, *mtxOut, *mtxOut);
 }

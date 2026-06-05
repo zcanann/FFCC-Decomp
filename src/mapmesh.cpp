@@ -16,7 +16,6 @@ extern "C" const float FLOAT_8032F930;
 extern "C" const float FLOAT_8032F934;
 
 CMemory::CStage* g_pStage;
-u32 s_insertShadowNo;
 
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)

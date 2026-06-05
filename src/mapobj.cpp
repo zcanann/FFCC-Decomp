@@ -348,7 +348,6 @@ inline CMapObjAtrMime::CMapObjAtrMime()
 inline CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
     m_type = CMapObjAtr::MESH_NAME;
-    memset(m_name, 0, sizeof(m_name));
 }
 
 /*

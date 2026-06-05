@@ -9,7 +9,14 @@
 
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
+STATIC_ASSERT(offsetof(ShapeRuntimeData, shapeDataOffset) == 0x0);
+STATIC_ASSERT(offsetof(ShapeRuntimeData, posDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
+
+static inline ShapeRuntimeData* GetDrawShapeRuntimeData(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<ShapeRuntimeData*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -21,7 +28,7 @@ STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
  * JP Size: TODO
  */
 void pppDrawShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ctrlTable){
-	ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
 	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
 	ShapePositionData* posData = (ShapePositionData*)(object->m_workArea + runtimeData->posDataOffset);
 	s32 type = data->type;
@@ -67,7 +74,7 @@ void pppCalcShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ct
 		return;
 	}
 
-	ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
 	ShapeState* shapeData = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
 	s32 type = data->type;
 	if (type == 0xFFFF) {
@@ -113,9 +120,9 @@ void pppCalcShape(_pppPObject* object, ShapeControlData* data, _pppCtrlTable* ct
  */
 void pppDrawShapeConstruct(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
+	ShapeRuntimeData* runtimeData = GetDrawShapeRuntimeData(ctrlTable);
 	ShapeState* targetPtr = (ShapeState*)(object->m_workArea + runtimeData->shapeDataOffset);
-	
+
 	targetPtr->currentId = 0;
 	targetPtr->counter = 0;
 	targetPtr->value = 0;

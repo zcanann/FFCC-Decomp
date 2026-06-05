@@ -6,8 +6,8 @@
 
 struct VertexAttendStream
 {
-    s32 sourceOffset;
-    s32 destOffset;
+    s32 m_sourceOffset;
+    s32 m_destOffset;
 };
 
 struct VertexSetEntry
@@ -32,7 +32,13 @@ struct VertexAttendEnv
 };
 
 STATIC_ASSERT(offsetof(pppVertexAttendStep, m_entryIndex) == 0xC);
+STATIC_ASSERT(offsetof(VertexAttendStream, m_sourceOffset) == 0x0);
+STATIC_ASSERT(offsetof(VertexAttendStream, m_destOffset) == 0x4);
 
+static inline VertexAttendStream* GetVertexAttendStream(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VertexAttendStream*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -60,11 +66,11 @@ void pppVertexAttend(_pppPObject* object, pppVertexAttendStep* step, _pppCtrlTab
         return;
     }
 
-    stream = reinterpret_cast<VertexAttendStream*>(ctrl->m_serializedDataOffsets);
+    stream = GetVertexAttendStream(ctrl);
     env = (VertexAttendEnv*)ppvEnv;
     setEntry = (VertexSetEntry*)((u8*)env->vertexSetTable + (entryIndex * sizeof(VertexSetEntry)));
-    sourceIndex = *(u16*)(object->m_workArea + stream->sourceOffset);
-    output = (f32*)(object->m_workArea + stream->destOffset);
+    sourceIndex = *(u16*)(object->m_workArea + stream->m_sourceOffset);
+    output = (f32*)(object->m_workArea + stream->m_destOffset);
     model = env->modelTable[setEntry->modelIndex];
     sourceVertex = &model->vertexData[setEntry->vertexRemap[sourceIndex]];
     matrix = reinterpret_cast<_pppPObject*>(object->m_link.m_previous)->m_localMatrix.value;

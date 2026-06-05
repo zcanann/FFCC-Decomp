@@ -196,11 +196,6 @@ static inline CChara* GetCharaGlobal()
     return &Chara;
 }
 
-static inline CRedSound* GetRedSoundGlobal()
-{
-    return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(&Sound) + 8);
-}
-
 static inline u8 MakeSaveBool(u8 value)
 {
     return static_cast<u8>((0U - static_cast<u32>(value)) >> 31);
@@ -1320,7 +1315,7 @@ void CMemoryCardMan::SetLoadData()
     Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
-    Sound.SetStereo(static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode())) >> 5);
+    Sound.SetStereo(static_cast<u32>(__cntlzw(Sound.GetSoundMode())) >> 5);
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
@@ -1596,7 +1591,7 @@ void CMemoryCardMan::MakeSaveData()
     save[0x13DD] = static_cast<u8>(Sound.GetBgmMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
     save[0x13DE] = static_cast<u8>(Sound.GetSeMasterVolume());
-    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode()) >> 5)) >> 31);
+    save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(Sound.GetSoundMode()) >> 5)) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);
     save[0x13E1] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[0]);
     save[0x13E2] = MakeSaveBool(Game.m_gameWork.m_spModeFlags[1]);

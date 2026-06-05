@@ -23,7 +23,7 @@ typedef struct ShapePositionData {
     pppCVECTOR color;
 } ShapePositionData;
 
-typedef struct ShapeControlData {
+typedef struct Shape2ControlData {
     u8 _pad0[4];
     u32 type;
     u32 step;
@@ -34,7 +34,7 @@ typedef struct ShapeControlData {
     f32 scale;
     u8 param14;
     u8 param15;
-} ShapeControlData;
+} Shape2ControlData;
 
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
@@ -49,7 +49,7 @@ STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
+void pppDrawShape2(void* param1, Shape2ControlData* param2, void* param3){
     _pppPObject* object = (_pppPObject*)param1;
     _pppCtrlTable* ctrlTable = (_pppCtrlTable*)param3;
     ShapeRuntimeData* runtimeData = (ShapeRuntimeData*)ctrlTable->m_serializedDataOffsets;
@@ -93,7 +93,7 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
+void pppCalcShape2(void* param1, Shape2ControlData* param2, void* param3){
     if (ppvUserStopPartF != 0) {
         return;
     }

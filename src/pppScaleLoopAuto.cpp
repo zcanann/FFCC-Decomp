@@ -20,24 +20,6 @@ struct pppScaleLoopAutoWork {
     float m_delta;
 };
 
-struct pppScaleLoopAutoStep {
-    s32 m_index;
-    u8 _pad0x04[4];
-    float m_addScale[3];
-    u8 _pad0x14[4];
-    float m_amplitude;
-    u8 m_stepCount;
-    s8 m_countA;
-    s8 m_countB;
-    u8 _pad0x1f;
-    float m_scale;
-};
-
-struct pppScaleLoopAutoContext {
-    s32 _pad0x00[3];
-    s32* m_serializedDataOffsets;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8012b4f4
@@ -47,7 +29,7 @@ struct pppScaleLoopAutoContext {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoopAutoContext* arg3){
+void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, _pppCtrlTable* arg3){
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -122,11 +104,9 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, pppScaleLoo
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScaleLoopAutoCon(void* arg1, void* arg2)
+void pppScaleLoopAutoCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	_pppPObject* object = (_pppPObject*)arg1;
-	int** arg2Data = (int**)arg2;
-	int* data = arg2Data[3];
+	int* data = ctrlTable->m_serializedDataOffsets;
 	int offset = data[0];
 	const float* zeroPtr = &gPppScaleLoopAutoZero;
 	float zero = *zeroPtr;

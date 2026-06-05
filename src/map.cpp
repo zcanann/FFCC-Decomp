@@ -2676,7 +2676,7 @@ void CMapMng::Draw()
             octTree++;
         }
 
-        CMapObj* mapObj = GetMapObjArray();
+        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0x40);
             mapObj++;
@@ -2690,7 +2690,7 @@ void CMapMng::Draw()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        mapObj = GetMapObjArray();
+        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0);
             mapObj++;

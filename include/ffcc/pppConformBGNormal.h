@@ -1,25 +1,13 @@
 #ifndef _FFCC_PPPCONFORMBGNORMAL_H_
 #define _FFCC_PPPCONFORMBGNORMAL_H_
 
-#include "types.h"
-#include "ffcc/partMng.h"
+struct _pppCtrlTable;
+struct pppConformBGNormal;
+struct pppConformBGNormalUnkB;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct pppConformBGNormal {
-    _pppPObject m_object;
-};
-
-struct pppConformBGNormalUnkB {
-    u32 _pad0;
-    float m_dataValIndex;
-    float m_initWOrk;
-    u8 m_stepValue;
-    u8 padding[3];
-    float m_arg3;
-};
 
 void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* data);
 void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* data);

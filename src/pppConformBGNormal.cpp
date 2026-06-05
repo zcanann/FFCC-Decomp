@@ -16,6 +16,19 @@ extern const f32 kPppConformBgNormalOne;
 #include "dolphin/gx.h"
 #include <math.h>
 
+struct pppConformBGNormal {
+    _pppPObject m_object;
+};
+
+struct pppConformBGNormalUnkB {
+    u32 _pad0;
+    float m_dataValIndex;
+    float m_initWOrk;
+    u8 m_stepValue;
+    u8 padding[3];
+    float m_arg3;
+};
+
 struct ConformBgNormalState {
     Vec m_normal;
     u8 m_initialized;

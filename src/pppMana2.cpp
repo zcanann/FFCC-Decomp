@@ -18,43 +18,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-struct VMana2 {
-    CGObject* m_object;
-    void* m_manager;
-    CTexture* m_sourceTextures[6];
-    GXTexObj* m_baseParaboloidTexObjs;
-    void* m_paraboloidMap;
-    GXTexObj* m_generatedTexObj0;
-    GXTexObj* m_generatedTexObj1;
-    void* m_generatedTexture0;
-    void* m_generatedTexture1;
-    GXColor m_runtimeColor;
-    Vec* m_positions;
-    Vec* m_normals;
-    Vec* m_reflectionVec;
-    float* m_waterHeightA;
-    float* m_waterHeightB;
-    u16* m_indices;
-    Vec2d* m_texCoord0;
-    Vec2d* m_texCoord1;
-    GXColor* m_colors;
-    void** m_displayListCopies;
-    Vec* m_meshReflectionVec;
-    GXColor* m_meshColors;
-    S16Vec2d* m_meshTexCoords;
-    pppMana2Step* m_step;
-    GXTexObj* m_sourceTexObjs;
-    CTexture* m_envTexture0;
-    CTexture* m_envTexture1;
-    Mtx m_waterMtx;
-    Mtx m_reflectionMtx;
-    u8 m_waterAlpha;
-    u8 _padE1[3];
-    u32 m_paraboloidMapSize;
-    u32 m_displayListSize;
-    u8 m_paraboloidReady;
-};
-
 STATIC_ASSERT(offsetof(VMana2, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VMana2, m_positions) == 0x3C);
 STATIC_ASSERT(offsetof(VMana2, m_indices) == 0x50);

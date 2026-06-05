@@ -4,13 +4,15 @@
 #include "ffcc/chara.h"
 #include "ffcc/pppVec.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 struct Vec;
 struct _GXColor;
 struct _pppCtrlTable;
-struct VMana2;
 struct pppMana2;
+struct CTexture;
+struct CGObject;
 
 struct pppMana2Step {
     u8 m_pad00[0x4];
@@ -23,6 +25,43 @@ struct pppMana2Step {
     float m_waterScale;
     u8 m_pad34[0x4];
     u8 m_rippleLevel;
+};
+
+struct VMana2 {
+    CGObject* m_object;
+    void* m_manager;
+    CTexture* m_sourceTextures[6];
+    GXTexObj* m_baseParaboloidTexObjs;
+    void* m_paraboloidMap;
+    GXTexObj* m_generatedTexObj0;
+    GXTexObj* m_generatedTexObj1;
+    void* m_generatedTexture0;
+    void* m_generatedTexture1;
+    GXColor m_runtimeColor;
+    Vec* m_positions;
+    Vec* m_normals;
+    Vec* m_reflectionVec;
+    float* m_waterHeightA;
+    float* m_waterHeightB;
+    u16* m_indices;
+    Vec2d* m_texCoord0;
+    Vec2d* m_texCoord1;
+    GXColor* m_colors;
+    void** m_displayListCopies;
+    Vec* m_meshReflectionVec;
+    GXColor* m_meshColors;
+    S16Vec2d* m_meshTexCoords;
+    pppMana2Step* m_step;
+    GXTexObj* m_sourceTexObjs;
+    CTexture* m_envTexture0;
+    CTexture* m_envTexture1;
+    Mtx m_waterMtx;
+    Mtx m_reflectionMtx;
+    u8 m_waterAlpha;
+    u8 _padE1[3];
+    u32 m_paraboloidMapSize;
+    u32 m_displayListSize;
+    u8 m_paraboloidReady;
 };
 
 void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);

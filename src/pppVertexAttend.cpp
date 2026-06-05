@@ -10,12 +10,6 @@ struct VertexAttendStream
     s32 destOffset;
 };
 
-struct pppVertexAttendStep
-{
-    u8 pad0[0xC];
-    s16 m_entryIndex;
-};
-
 struct VertexSetEntry
 {
     s16 modelIndex;

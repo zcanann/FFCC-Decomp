@@ -18,7 +18,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
+void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirStep* param_2,
                                  _pppCtrlTable* param_3)
 {
     if (ppvUserStopPartF == 0) {

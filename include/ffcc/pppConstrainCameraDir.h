@@ -3,8 +3,17 @@
 
 #include "ffcc/partMng.h"
 
-struct pppConstrainCameraDir;
-struct pppConstrainCameraDirUnkB;
+typedef _pppPObject pppConstrainCameraDir;
+
+struct pppConstrainCameraDirStep {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    u8 m_applyPosition;
+    u8 m_applyCameraInverse;
+    u8 m_pad12[2];
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +22,7 @@ extern "C" {
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
 void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*);
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirUnkB* param2, _pppCtrlTable* param3);
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirStep* param2, _pppCtrlTable* param3);
 
 #ifdef __cplusplus
 }

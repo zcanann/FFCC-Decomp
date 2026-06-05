@@ -8,10 +8,6 @@ extern const float kPppYmTraceMoveOne;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-struct pppYmTraceMove {
-    _pppPObject m_object;
-};
-
 struct pppYmTraceMoveStep {
     s32 m_graphId;
     f32 m_dataValIndex;
@@ -63,7 +59,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	s32 workOffset = *param_3->m_serializedDataOffsets;
 	_pppMngSt* pppMngSt = ppvMng;
 	CGObject* lookTarget = pppMngSt->m_lookTarget;
-	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + workOffset);
+	pppYmTraceMoveWork* work = reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + workOffset);
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;
@@ -76,7 +72,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
 
-	if (param_2->m_graphId == pppYmTraceMove->m_object.m_graphId) {
+	if (param_2->m_graphId == pppYmTraceMove->m_graphId) {
 		work->m_distance = work->m_distance + param_2->m_initWOrk;
 		work->m_velocity = work->m_velocity + param_2->m_stepValue;
 		work->m_acceleration = work->m_acceleration + param_2->m_arg3;
@@ -138,7 +134,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* param_2)
 {
 	pppYmTraceMoveWork* work =
-	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_object.m_workArea + *param_2->m_serializedDataOffsets);
+	    reinterpret_cast<pppYmTraceMoveWork*>(pppYmTraceMove->m_workArea + *param_2->m_serializedDataOffsets);
 	_pppMngSt* pppMngSt = ppvMng;
 	f32 zero;
 

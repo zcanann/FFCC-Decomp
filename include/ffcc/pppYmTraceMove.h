@@ -2,8 +2,10 @@
 #define _FFCC_PPP_YMTRACEMOVE_H_
 
 struct _pppCtrlTable;
-struct pppYmTraceMove;
+struct _pppPObject;
 struct pppYmTraceMoveStep;
+
+typedef _pppPObject pppYmTraceMove;
 
 #ifdef __cplusplus
 extern "C" {

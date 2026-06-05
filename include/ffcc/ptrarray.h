@@ -142,7 +142,7 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
         T item = m_items[i];
         if (item != 0) {
             CRef* ref = reinterpret_cast<CRef*>(item);
-            if (ref->DecRef() == 0) {
+            if (--ref->refCount == 0) {
                 delete ref;
             }
             m_items[i] = 0;

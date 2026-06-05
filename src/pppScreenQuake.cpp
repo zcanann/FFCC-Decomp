@@ -6,10 +6,6 @@ extern "C" {
 extern const float kPppScreenQuakeZero[2];
 }
 
-struct pppScreenQuake {
-    _pppPObject m_object;
-};
-
 struct pppScreenQuakeStep {
     int m_graphId;
     float m_dataValIndex;
@@ -28,7 +24,7 @@ struct pppScreenQuakeStep {
 
 static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<float*>(quake->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<float*>(quake->m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
 /*
@@ -58,9 +54,9 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, _ppp
     if (ppvUserStopPartF == 0) {
         float *value = GetScreenQuakeWork(quake, param3);
 
-        CalcGraphValue(&quake->m_object, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);
-        CalcGraphValue(&quake->m_object, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
-        CalcGraphValue(&quake->m_object, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
+        CalcGraphValue(quake, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);
+        CalcGraphValue(quake, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
+        CalcGraphValue(quake, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
 
         CameraPcs.SetQuakeParameter(
             1,

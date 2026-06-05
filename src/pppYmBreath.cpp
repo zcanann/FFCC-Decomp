@@ -1,16 +1,16 @@
-#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/partMng.h"
+#undef PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppShape.h"
 
 extern const float kCharaAnimZero;
@@ -160,6 +160,10 @@ struct YmBreathParticleData {
     s16 m_shapeFrame2;
     unsigned char _pad5C[0x04];
 };
+
+void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
+void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
+void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 
 extern "C" const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 

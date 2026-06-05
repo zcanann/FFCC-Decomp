@@ -1,4 +1,3 @@
-#define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathModel.h"
 #include "ffcc/linkage.h"
 #include "ffcc/graphic.h"
@@ -7,10 +6,15 @@
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
 #include "ffcc/ppp_linkage.h"
+#define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppPart.h"
+#undef PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include <string.h>
 
 struct pppModelSt;
+struct PARTICLE_DATA;
+struct PARTICLE_WMAT;
+struct PARTICLE_COLOR;
 
 extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
@@ -167,6 +171,8 @@ void get_rand()
 }
 #endif
 
+void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
+void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, VColor* vColor);
 
 /*

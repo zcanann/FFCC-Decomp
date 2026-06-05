@@ -2,13 +2,7 @@
 #define _FFCC_PPPALIGNMENTSCALE_H_
 
 struct pppAlignmentScale;
-
-struct pppAlignmentScaleData
-{
-    float m_unk0x0;
-    float m_unk0x4;
-    float m_unk0x8;
-};
+struct pppAlignmentScaleData;
 
 #ifdef __cplusplus
 extern "C" {

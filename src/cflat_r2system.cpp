@@ -12,6 +12,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/joybus.h"
+#include "ffcc/line.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
@@ -1731,35 +1732,6 @@ int CCameraPcs::IsAbsolute()
  * JP Address: TODO
  * JP Size: TODO
  */
-template <int count>
-class CLine;
-
-struct CLineSegment64
-{
-    Vec delta;
-    Vec normal;
-    float length;
-    float startLength;
-};
-
-template <>
-class CLine<64>
-{
-public:
-    int Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
-             float* nearestSegmentRatio, Vec* targetPosition, float maxDistance);
-    int IsInner(Vec* position, float margin);
-
-    Vec m_min;
-    Vec m_max;
-    unsigned int m_numPoints;
-    unsigned int m_unused;
-    float m_0x20[4];
-    Vec m_points[64];
-    CLineSegment64 m_segments[63];
-    float m_totalLength;
-};
-
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
@@ -1771,8 +1743,8 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
     float bestT = kLineSegmentMinT;
     Vec bestPosition;
 
-    for (unsigned int i = 0; i + 1 < m_numPoints; i++) {
-        Vec* candidate = &m_points[i];
+    for (unsigned int i = 0; i + 1 < pointCount; i++) {
+        Vec* candidate = &points[i];
         float distanceSq = PSVECSquareDistance(candidate, targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             Vec candidatePosition = *candidate;
@@ -1786,8 +1758,8 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             }
         }
 
-        if (i + 1 == m_numPoints - 1) {
-            candidate = &m_points[i + 1];
+        if (i + 1 == pointCount - 1) {
+            candidate = &points[i + 1];
             distanceSq = PSVECSquareDistance(candidate, targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 Vec candidatePosition = *candidate;
@@ -1802,15 +1774,15 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             }
         }
 
-        CLineSegment64& segment = m_segments[i];
+        CLineSegment& segment = segments[i];
         float dotTarget = PSVECDotProduct(targetPosition, &segment.delta);
-        float dotPoint = PSVECDotProduct(&m_points[i], &segment.delta);
+        float dotPoint = PSVECDotProduct(&points[i], &segment.delta);
         float segmentT = (dotTarget - dotPoint) / (segment.length * segment.length);
         if (((kLineSegmentMinT <= segmentT) && (segmentT <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
             PSVECScale(&segment.delta, &scaled, segmentT);
-            PSVECAdd(&m_points[i], &scaled, &projected);
+            PSVECAdd(&points[i], &scaled, &projected);
             float distance = PSVECDistance(targetPosition, &projected);
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -1842,13 +1814,13 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
 int CLine<64>::IsInner(Vec* position, float margin)
 {
-    if (m_numPoints == 0) {
+    if (pointCount == 0) {
         return 0;
     }
 
-    if ((m_min.x - margin) <= position->x && (m_min.y - margin) <= position->y &&
-        (m_min.z - margin) <= position->z && (m_max.x + margin) >= position->x &&
-        (m_max.y + margin) >= position->y && (m_max.z + margin) >= position->z) {
+    if ((min.x - margin) <= position->x && (min.y - margin) <= position->y &&
+        (min.z - margin) <= position->z && (max.x + margin) >= position->x &&
+        (max.y + margin) >= position->y && (max.z + margin) >= position->z) {
         return 1;
     }
 
@@ -1857,44 +1829,44 @@ int CLine<64>::IsInner(Vec* position, float margin)
 
 extern "C" void CalcBound__9CLine(CLine<64>* line)
 {
-    line->m_min.x = kLineBoundsInitMin;
-    line->m_min.y = kLineBoundsInitMin;
-    line->m_min.z = kLineBoundsInitMin;
-    line->m_max.x = kLineBoundsInitMax;
-    line->m_max.y = kLineBoundsInitMax;
-    line->m_max.z = kLineBoundsInitMax;
-    line->m_totalLength = kLineSegmentMinT;
+    line->min.x = kLineBoundsInitMin;
+    line->min.y = kLineBoundsInitMin;
+    line->min.z = kLineBoundsInitMin;
+    line->max.x = kLineBoundsInitMax;
+    line->max.y = kLineBoundsInitMax;
+    line->max.z = kLineBoundsInitMax;
+    line->totalLength = kLineSegmentMinT;
 
-    Vec* point = line->m_points;
-    CLineSegment64* segment = line->m_segments;
-    for (unsigned int i = 0; i < line->m_numPoints; i++, point++, segment++) {
+    Vec* point = line->points;
+    CLineSegment* segment = line->segments;
+    for (unsigned int i = 0; i < line->pointCount; i++, point++, segment++) {
 
-        if (point->x < line->m_min.x) {
-            line->m_min.x = point->x;
+        if (point->x < line->min.x) {
+            line->min.x = point->x;
         }
-        if (point->y < line->m_min.y) {
-            line->m_min.y = point->y;
+        if (point->y < line->min.y) {
+            line->min.y = point->y;
         }
-        if (point->z < line->m_min.z) {
-            line->m_min.z = point->z;
+        if (point->z < line->min.z) {
+            line->min.z = point->z;
         }
 
-        if (point->x > line->m_max.x) {
-            line->m_max.x = point->x;
+        if (point->x > line->max.x) {
+            line->max.x = point->x;
         }
-        if (point->y > line->m_max.y) {
-            line->m_max.y = point->y;
+        if (point->y > line->max.y) {
+            line->max.y = point->y;
         }
-        if (point->z > line->m_max.z) {
-            line->m_max.z = point->z;
+        if (point->z > line->max.z) {
+            line->max.z = point->z;
         }
 
         if (i != 0) {
-            CLineSegment64* prevSegment = segment - 1;
+            CLineSegment* prevSegment = segment - 1;
             PSVECSubtract(point, point - 1, &prevSegment->delta);
             prevSegment->length = PSVECMag(&prevSegment->delta);
-            prevSegment->startLength = line->m_totalLength;
-            line->m_totalLength += prevSegment->length;
+            prevSegment->startLength = line->totalLength;
+            line->totalLength += prevSegment->length;
             if (prevSegment->length != kLineSegmentMinT) {
                 PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
             }
@@ -2383,7 +2355,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         for (unsigned int i = 0; i < 0x10; i++) {
             CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + i * 0xB14);
             const unsigned int lineMask = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(line) + 0x2C);
-            if (line->m_numPoints == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
+            if (line->pointCount == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
                 continue;
             }
 
@@ -2395,7 +2367,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 found = 1;
                 bestLine = i;
                 bestDistance = nearestDistance;
-                bestLineDistance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+                bestLineDistance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
             }
         }
 
@@ -2416,17 +2388,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
         Vec position = {0.0f, 0.0f, 0.0f};
 
-        if (line->m_numPoints > 0) {
-            if (distance < 0.0f || line->m_numPoints == 1) {
-                position = line->m_points[0];
-            } else if (distance >= line->m_totalLength) {
-                position = line->m_points[line->m_numPoints - 1];
+        if (line->pointCount > 0) {
+            if (distance < 0.0f || line->pointCount == 1) {
+                position = line->points[0];
+            } else if (distance >= line->totalLength) {
+                position = line->points[line->pointCount - 1];
             } else {
-                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
-                    CLineSegment64& segment = line->m_segments[i];
+                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
+                    CLineSegment& segment = line->segments[i];
                     if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
                         const float t = (distance - segment.startLength) / segment.length;
-                        VECLerp(&line->m_points[i], &line->m_points[i + 1], &position, t);
+                        VECLerp(&line->points[i], &line->points[i + 1], &position, t);
                         break;
                     }
                 }
@@ -2446,14 +2418,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
         Vec direction = {0.0f, 0.0f, 0.0f};
 
-        if (line->m_numPoints > 1) {
+        if (line->pointCount > 1) {
             if (distance < 0.0f) {
-                direction = line->m_segments[0].normal;
-            } else if (distance >= line->m_totalLength) {
-                direction = line->m_segments[line->m_numPoints - 2].normal;
+                direction = line->segments[0].normal;
+            } else if (distance >= line->totalLength) {
+                direction = line->segments[line->pointCount - 2].normal;
             } else {
-                for (unsigned int i = 0; i + 1 < line->m_numPoints; i++) {
-                    CLineSegment64& segment = line->m_segments[i];
+                for (unsigned int i = 0; i + 1 < line->pointCount; i++) {
+                    CLineSegment& segment = line->segments[i];
                     if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
                         direction = segment.normal;
                         break;
@@ -2488,7 +2460,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float distance = 0.0f;
 
         if (line->Calc((Vec*)0, (float*)0, &segment, &segmentRatio, &target, 0.0f) != 0) {
-            distance = line->m_segments[segment].length * segmentRatio + line->m_segments[segment].startLength;
+            distance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
         }
 
         *reinterpret_cast<float*>(object->m_localBase[4]) = distance;

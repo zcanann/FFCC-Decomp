@@ -8,6 +8,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
+#include "ffcc/line.h"
 #include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
@@ -134,62 +135,45 @@ static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime
 	return 0;
 }
 
-template <int count>
-class CLine;
-
-template <>
-class CLine<64>
-{
-public:
-	CLine();
-	void Draw();
-
-private:
-	u8 m_0x00[0x18];
-	u32 m_numPoints;
-	u8 m_0x1C[0x14];
-	Vec m_points[64];
-};
-
 CLine<64>::CLine()
 {
-	m_numPoints = 0;
+	pointCount = 0;
 }
 
 void CLine<64>::Draw()
 {
-	if (m_numPoints == 0) {
+	if (pointCount == 0) {
 		return;
 	}
 
-	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	u32 i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 
 	const float yOffset = 1.0f;
-	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
 	i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = yOffset + m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = yOffset + points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 
-	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((m_numPoints & 0x7FFF) << 1));
+	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
 	i = 0;
-	while (i < m_numPoints) {
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
-		GXWGFifo.f32 = m_points[i].x;
-		GXWGFifo.f32 = yOffset + m_points[i].y;
-		GXWGFifo.f32 = m_points[i].z;
+	while (i < pointCount) {
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = points[i].y;
+		GXWGFifo.f32 = points[i].z;
+		GXWGFifo.f32 = points[i].x;
+		GXWGFifo.f32 = yOffset + points[i].y;
+		GXWGFifo.f32 = points[i].z;
 		i++;
 	}
 }

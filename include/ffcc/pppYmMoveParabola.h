@@ -2,15 +2,17 @@
 #define _FFCC_PPP_YMMOVEPARABOLA_H_
 
 struct _pppCtrlTable;
-struct pppYmMoveParabola;
+struct _pppPObject;
 struct pppYmMoveParabolaUnkB;
+
+typedef _pppPObject pppYmMoveParabola;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr);
-void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData);
+void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlTable* dataPtr);
+void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData);
 
 #ifdef __cplusplus
 }

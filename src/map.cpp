@@ -1650,8 +1650,8 @@ void CMapMng::SetLightSource()
                 light.m_attenRadius = pointAttr->m_radius;
                 light.m_range = pointAttr->m_intensity;
                 light.m_attenFalloff = 1.0f;
-                light.m_targetColor[0] = pointAttr->m_color;
-                light.m_targetColor[1] = pointAttr->m_altColor;
+                light.m_targetColor[0] = pointAttr->m_altColor;
+                light.m_targetColor[1] = pointAttr->m_color;
                 *(u32*)light.m_targetEnable = 0;
                 light.m_spotFn = pointAttr->m_colorMode;
                 light.m_unk4D = 4;
@@ -1704,8 +1704,8 @@ void CMapMng::SetLightSource()
                     light.m_range = spotAttr->m_nearRange;
                     light.m_attenFalloff = spotAttr->m_farRange;
 
-                    light.m_targetColor[0] = spotAttr->m_color;
-                    light.m_targetColor[1] = spotAttr->m_altColor;
+                    light.m_targetColor[0] = spotAttr->m_altColor;
+                    light.m_targetColor[1] = spotAttr->m_color;
 
                     light.m_spotFn = spotAttr->m_colorMode;
                     light.m_unk4D = (spotAttr->m_useAltColor == 0) ? 4 : 2;

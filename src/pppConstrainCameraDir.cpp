@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ffcc/pppConstrainCameraDir.h"
+#include "ffcc/pppConstrainCameraDir_internal.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
@@ -13,6 +14,11 @@ extern const float kInfiniteCost = 10000000.0f;
 extern const char kAStarStepDebugFormat[] = "%d ";
 extern const char kAStarNewLine[4] = "\n";
 }
+
+extern const float kConstrainCameraDirScaleOne;
+extern const float kConstrainCameraDirBaseFov;
+extern const float kConstrainCameraDirWideAspect;
+extern const float kConstrainCameraDirZero;
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 

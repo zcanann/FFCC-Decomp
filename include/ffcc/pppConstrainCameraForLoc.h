@@ -25,7 +25,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable
 void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*,
                                       _pppCtrlTable*);
 void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
-void pppFrameConstrainCameraForLoc(_pppPObject*, void*, _pppCtrlTable*);
+void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

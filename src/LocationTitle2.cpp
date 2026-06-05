@@ -58,7 +58,7 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
-extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
 
 /*

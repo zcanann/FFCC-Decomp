@@ -20,7 +20,6 @@ struct Vec;
 extern int gCFlatRuntime2DebugDrawOverflowFrame;
 extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
 extern const char sCFlatRuntime2DebugDrawOverflowMsg[];
-extern unsigned char CFlat[0x10440];
 extern u32 CFlatFlags;
 
 class CFlatRuntime2 : public CFlatRuntime
@@ -167,5 +166,6 @@ private:
 };
 
 extern CFlatRuntime2& gCFlatRuntime2;
+extern CFlatRuntime2 CFlat;
 
 #endif // _FFCC_CFLAT_RUNTIME2_H_

@@ -10,12 +10,11 @@
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
 
-extern const double kMapShadowDepthBias = 0.5;
-static const float kMapShadowScaleStep = 0.5f;
+extern const double kMapShadowDepthBias;
 static const double DOUBLE_8032FCF8 = 4503599627370496.0;
-extern const float FLOAT_8032FD00 = 0.0f;
-extern const float FLOAT_8032FD04 = 1.0f;
-extern const double DOUBLE_8032FD08 = 4503601774854144.0;
+extern const float FLOAT_8032FD00;
+extern const float FLOAT_8032FD04;
+extern const double DOUBLE_8032FD08;
 
 static inline float LoadFloat(const float& value)
 {
@@ -122,14 +121,18 @@ void CMapShadow::Init()
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
 		double scaleBias = kMapShadowDepthBias;
-		float scaleStep = LoadFloat(kMapShadowScaleStep);
+		float scaleStep = LoadFloat(0.5f);
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
 		double scaleBias = kMapShadowDepthBias;
-		float scaleStep = LoadFloat(kMapShadowScaleStep);
+		float scaleStep = LoadFloat(0.5f);
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}
 }
+
+extern const float FLOAT_8032FD00 = 0.0f;
+extern const float FLOAT_8032FD04 = 1.0f;
+extern const double DOUBLE_8032FD08 = 4503601774854144.0;

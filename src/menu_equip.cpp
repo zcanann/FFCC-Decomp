@@ -155,17 +155,16 @@ bool CMenuPcs::EquipClose0()
 	int doneCount;
 	int timer;
 	s16* item;
-	s16* list;
 	int itemCount;
 	int selectedOffset;
-	EquipMenuState* menuState;
+	s16* menuState;
 
-	menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	selectedOffset = menuState->selectedIndex * 0x40 + 8;
-	list = GetEquipList(this);
+	menuState = GetEquipState(this);
+	menuState[0x11] = menuState[0x11] + 1;
+	timer = static_cast<int>(menuState[0x11]);
+	selectedOffset = menuState[0x13] * 0x40 + 8;
 	if (7 < timer) {
+		s16* list = GetEquipList(this);
 		*(s16*)((int)list + selectedOffset) = *(s16*)((int)list + selectedOffset) + 0x13;
 	}
 
@@ -199,7 +198,7 @@ bool CMenuPcs::EquipClose0()
 	}
 
 	if (itemCount == doneCount) {
-		selected = (s16*)(GetEquipListBase(this) + selectedOffset);
+		selected = (s16*)(GetEquipListBase(this) + menuState[0x13] * 0x40 + 8);
 		*selected = (s16)(int)-(((double)selected[2] - DOUBLE_80332ed8) * DOUBLE_80332ed0 - DOUBLE_80332ec8);
 		return true;
 	}
@@ -223,18 +222,17 @@ bool CMenuPcs::EquipOpen0()
 	int timer;
 	int selectedOffset;
 	s16* item;
-	s16* list;
 	int doneCount;
 	int itemCount;
-	EquipMenuState* menuState;
+	s16* menuState;
 
-	menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	selectedOffset = menuState->selectedIndex * 0x40 + 8;
-	list = GetEquipList(this);
+	menuState = GetEquipState(this);
+	menuState[0x11] = menuState[0x11] + 1;
+	timer = static_cast<int>(menuState[0x11]);
+	selectedOffset = menuState[0x13] * 0x40 + 8;
 
 	if (timer < 5) {
+		s16* list = GetEquipList(this);
 		*(s16*)((int)list + selectedOffset) = *(s16*)((int)list + selectedOffset) - 0x13;
 	}
 

@@ -18,6 +18,7 @@ static const float kMapOctTreeDefaultOffsetZ = 0.0f;
 static CBound s_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static Vec s_mvec;
+static unsigned long s_insertShadowBitIndex = 0;
 static int s_light_no = 0;
 static unsigned long s_shadow_no = 0;
 static unsigned long InsertShadow_level = 0;
@@ -1354,9 +1355,9 @@ void InsertShadow_r(COctNode* node)
 	}
 
 	if ((s_light_no >= 3) && (node->m_meshCount != 0)) {
-		unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_shadowFlags, byteOffset));
-		*bits |= 1UL << (s_shadow_no & 0x1f);
+		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
 	}
 
 	COctNode* nodeIter = node;
@@ -1416,9 +1417,9 @@ void InsertShadow_r(COctNode* node)
 
 		if (childOverlap) {
 			if ((s_light_no >= 3) && (child->m_meshCount != 0)) {
-				unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
-				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_shadow_no & 0x1f);
+				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_insertShadowBitIndex & 0x1f);
 			}
 
 			COctNode* childIter = child;
@@ -1432,7 +1433,7 @@ void InsertShadow_r(COctNode* node)
 
 				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
-						setbit32(&grandChild->m_shadowFlags, s_shadow_no);
+						setbit32(&grandChild->m_shadowFlags, s_insertShadowBitIndex);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1471,7 +1472,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 	Mtx inverseMtx;
 
 	if (m_type == 0) {
-		s_shadow_no = bitIndex;
+		s_insertShadowBitIndex = bitIndex;
 		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 

@@ -597,16 +597,18 @@ int CMaterialEditorPcs::GetTable(unsigned long index)
 void CMaterialEditorPcs::Quit()
 {
     unsigned int textureIndex;
+    CMaterialEditorPcs* textureSlot = this;
     m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
 
     do {
-        MemFree(m_textureData[textureIndex]);
-        MemFree(m_tlutData[textureIndex]);
-        MemFree(m_texObj[textureIndex]);
-        MemFree(m_tlutObj0[textureIndex]);
-        MemFree(m_tlutObj1[textureIndex]);
-        MemFree(m_textureHeader[textureIndex]);
+        MemFree(textureSlot->m_textureData[0]);
+        MemFree(textureSlot->m_tlutData[0]);
+        MemFree(textureSlot->m_texObj[0]);
+        MemFree(textureSlot->m_tlutObj0[0]);
+        MemFree(textureSlot->m_tlutObj1[0]);
+        MemFree(textureSlot->m_textureHeader[0]);
         textureIndex += 1;
+        textureSlot = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<char*>(textureSlot) + sizeof(void*));
     } while (textureIndex < 0x10);
 
     if (m_rsdIndex != 0) {

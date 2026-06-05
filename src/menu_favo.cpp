@@ -10,7 +10,7 @@
 
 typedef signed short s16;
 
-FoodRank s_rank[8];
+static FoodRank s_rank[8];
 
 extern "C" const float FLOAT_80333038 = 0.75f;
 extern "C" const float FLOAT_8033303C = 72.0f;

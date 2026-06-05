@@ -15,7 +15,7 @@
 struct pppModelSt;
 struct PARTICLE_DATA;
 
-extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
+static const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
 struct BreathParticleGroup {
     int active;

@@ -14,7 +14,7 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-extern const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
+static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
 extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;

@@ -23,15 +23,8 @@ struct Vec;
 
 static inline void InitMapObjAtrColorKeyFrame(CMapKeyFrame& keyFrame)
 {
-    keyFrame.m_mode = 0;
-    keyFrame.m_junCount = 0;
-    keyFrame.m_keyCount = 0;
     keyFrame.m_loop = 1;
     keyFrame.m_isRun = 0;
-    keyFrame.m_currentFrame = 0;
-    keyFrame.m_startFrame = 0;
-    keyFrame.m_endFrame = 0;
-    keyFrame.m_frameCount = 0;
     keyFrame.m_junTable = 0;
     keyFrame.m_keyFrame = 0;
     keyFrame.m_keyValue = 0;

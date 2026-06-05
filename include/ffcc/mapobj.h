@@ -121,11 +121,11 @@ class CMapObjAtrPointLight : public CMapObjAtr
 public:
     CMapObjAtrPointLight()
     {
+        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
+        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
         m_type = POINT_LIGHT;
         m_colorMode = 0;
         m_unknown20 = 0;
-        InitMapObjAtrColorKeyFrame(m_colorKeyFrame);
-        InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
     }
 
     ~CMapObjAtrPointLight();

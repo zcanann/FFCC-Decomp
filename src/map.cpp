@@ -851,10 +851,12 @@ CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
  * Size:	TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnimRun*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -888,10 +890,12 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -935,10 +939,12 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapShadow*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -972,10 +978,12 @@ void CPtrArray<CMapShadow*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

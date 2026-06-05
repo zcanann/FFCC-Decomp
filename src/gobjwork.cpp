@@ -28,21 +28,19 @@ struct ShoukiByteFlags {
 	int middle : 1;
 };
 
-struct LetterFlags {
-	unsigned char opened : 1;
-	unsigned char flag6 : 1;
-	unsigned char replySent : 1;
-	unsigned char hasReply : 1;
-	unsigned char hasMoney : 1;
-	unsigned char low : 3;
-};
-
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * kGObjWorkStatusScaleStep) +
 		   kGObjWorkStatusScaleBase;
 }
 }
+
+STATIC_ASSERT(offsetof(CRomLetterWork, m_priorityFlags) == 0x06);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_personalConditions) == 0x18);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_linkConditions) == 0x1A);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_linkValueConditions) == 0x1C);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_compareRules) == 0x1E);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_eventRules) == 0x2E);
 
 extern char s_WorldMapSortFmts_801D9EC8[];
 static const char s_NoWorldReturnItem_801D9F64[] = {
@@ -407,31 +405,27 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i].m_word0 = m_letters[i - 1].m_word0;
-		m_letters[i].m_word1 = m_letters[i - 1].m_word1;
-		m_letters[i].m_word2 = m_letters[i - 1].m_word2;
+		m_letters[i].m_words.m_word0 = m_letters[i - 1].m_words.m_word0;
+		m_letters[i].m_words.m_word1 = m_letters[i - 1].m_words.m_word1;
+		m_letters[i].m_words.m_word2 = m_letters[i - 1].m_words.m_word2;
 	}
 
-	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-
-	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(&m_letters[0]);
-	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(&m_letters[0]);
-	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(&m_letters[0]);
-	letterWords16[0] |= static_cast<unsigned short>(letterType << 2);
-	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	letterFlags->hasMoney = hasMoneyFlag;
-	if (letterFlags->hasMoney != 0) {
+	CCaravanWork::CLetterWork* letter = &m_letters[0];
+	memset(letter, 0, sizeof(*letter));
+	letter->m_half.m_header = static_cast<unsigned short>(letterType << 2);
+	letter->m_words.m_word0 = (letter->m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
+	if (hasMoneyFlag != 0) {
+		letter->SetFlags(letter->Flags() | 8);
 		moneyValue /= 100;
 	}
-	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
-	letterFlags->opened = 0;
-	letterFlags->flag6 = 0;
-	letterFlags->replySent = 0;
-	letterFlags->hasReply = hasReplyFlag;
-	letterWords16[2] = (unsigned short)itemA;
-	letterWords16[3] = (unsigned short)itemB;
-	letterWords16[4] = (unsigned short)itemC;
-	letterWords16[5] = (unsigned short)itemD;
+	letter->m_half.m_attachment = (letter->m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
+	if (hasReplyFlag != 0) {
+		letter->SetFlags(letter->Flags() | 0x10);
+	}
+	letter->m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
+	letter->m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
+	letter->m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
+	letter->m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
 	int nextCount = m_letterCount + 1;
 	int letterCount = 100;
@@ -454,36 +448,32 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	unsigned char* letterBytes =
-		reinterpret_cast<unsigned char*>(m_letters) + letterIdx * sizeof(CLetterWork);
-	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letterBytes);
-	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letterBytes);
-	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letterBytes);
+	CLetterWork* letter = &m_letters[letterIdx];
 	CFlatRuntime::CStack stack[2];
 
-	stack[0].m_word = (letterWords16[0] >> 2) & 0x1FF;
-	stack[1].m_word = (letterWords32[0] >> 9) & 0x1FF;
+	stack[0].m_word = letter->MessageType();
+	stack[1].m_word = letter->SenderId();
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
-	CMes::m_tempVar[0] = letterWords16[2];
-	CMes::m_tempVar[1] = letterWords16[3];
-	CMes::m_tempVar[2] = letterWords16[4];
-	CMes::m_tempVar[3] = letterWords16[5];
-	CMes::m_tempVar[4] = (letterWords16[0] >> 2) & 0x1FF;
-	CMes::m_tempVar[5] = (letterWords32[0] >> 9) & 0x1FF;
+	CMes::m_tempVar[0] = letter->TempVar(0);
+	CMes::m_tempVar[1] = letter->TempVar(1);
+	CMes::m_tempVar[2] = letter->TempVar(2);
+	CMes::m_tempVar[3] = letter->TempVar(3);
+	CMes::m_tempVar[4] = letter->MessageType();
+	CMes::m_tempVar[5] = letter->SenderId();
 
 	int money;
-	if (((letterBytes[0] >> 3) & 1) != 0) {
+	if (letter->AttachmentIsGil()) {
 		money = 0;
 	} else {
-		money = letterWords16[1] & 0x1FF;
+		money = letter->AttachmentValue();
 	}
 	CMes::m_tempVar[6] = money;
 
 	int gil;
-	if (((letterBytes[0] >> 3) & 1) != 0) {
-		gil = (letterWords16[1] & 0x1FF) * 100;
+	if (letter->AttachmentIsGil()) {
+		gil = letter->AttachmentValue() * 100;
 	} else {
 		gil = 0;
 	}
@@ -491,7 +481,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	CMes::m_tempVar[8] = m_saveSlot;
 
-	letterFlags->opened = 1;
+	letter->SetOpened();
 }
 
 /*
@@ -507,12 +497,9 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 {
 	CFlatRuntime::CStack stack[5];
 	CLetterWork* letter = &m_letters[letterIdx];
-	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letter);
-	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letter);
-	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letter);
 
-	stack[0].m_word = (letterWords16[0] >> 2) & 0x1FF;
-	stack[1].m_word = (letterWords32[0] >> 9) & 0x1FF;
+	stack[0].m_word = letter->MessageType();
+	stack[1].m_word = letter->SenderId();
 	stack[2].m_word = param3;
 	stack[3].m_word = param4;
 	stack[4].m_word = param5;
@@ -520,7 +507,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
-	letterFlags->replySent = 1;
+	letter->SetReplySent();
 }
 
 /*
@@ -990,9 +977,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	}
 
-	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.m_romLetterWorkBase);
-	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter += 0x3E) {
-		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
+	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
+		unsigned short condBits = curLetter->m_personalConditions;
 
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
@@ -1100,7 +1087,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedPersonalConditions:
 
-		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1A);
+		condBits = curLetter->m_linkConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
 				if ((condBits & 0x8000) == 0) {
@@ -1214,7 +1201,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkConditions:
 
-		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1C);
+		condBits = curLetter->m_linkValueConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
@@ -1323,7 +1310,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		unsigned int cmpValue = 0;
 		for (int i = 0; i < 4; i++) {
-			const unsigned short cmpType = *reinterpret_cast<unsigned short*>(curLetter + 0x1E + i * 4);
+			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
 			const int sourceIdx = cmpType & 0x7FF;
 
@@ -1345,7 +1332,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 
 				const int op = cmpType >> 13;
-				const unsigned int compareValue = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(curLetter + 0x20 + i * 4));
+				const unsigned int compareValue = static_cast<unsigned int>(curLetter->m_compareRules[i].m_value);
 				if (op == 0) {
 					if (cmpValue != compareValue) {
 						goto NextLetter;
@@ -1381,7 +1368,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			unsigned char* evtWorkBytes = reinterpret_cast<unsigned char*>(m_evtWorkArr);
 
 			for (int i = 0; i < 8; i++) {
-				const unsigned short evtRule = *reinterpret_cast<unsigned short*>(curLetter + 0x2E + i * 2);
+				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
 				const int sourceIdx = evtRule & 0x7FF;
 				int checkValue = bit0;
@@ -1452,20 +1439,19 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			unsigned short minPriority = 0xFFFF;
 			int replaceIndex = 0;
 			for (int i = 0; i < maxResults; i++) {
-				unsigned char* existing = reinterpret_cast<unsigned char*>(romLetterWork[i]);
-				unsigned short priority = *reinterpret_cast<unsigned short*>(existing + 6) & 0xF00;
+				unsigned short priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
 					replaceIndex = i;
 				}
 			}
 
-			const unsigned short curPriority = *reinterpret_cast<unsigned short*>(curLetter + 6) & 0xF00;
+			const unsigned short curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
-				romLetterWork[replaceIndex] = reinterpret_cast<CRomLetterWork*>(curLetter);
+				romLetterWork[replaceIndex] = curLetter;
 			}
 		} else {
-			romLetterWork[foundCount] = reinterpret_cast<CRomLetterWork*>(curLetter);
+			romLetterWork[foundCount] = curLetter;
 			foundCount++;
 		}
 
@@ -1488,22 +1474,7 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
 	case 0:
 		m_shopListCount = 0;
 		m_shopRequestState = 0;
-		m_shopList[0] = 0;
-		m_shopList[1] = 0;
-		m_shopList[2] = 0;
-		m_shopList[3] = 0;
-		m_shopList[4] = 0;
-		m_shopList[5] = 0;
-		m_shopList[6] = 0;
-		m_shopList[7] = 0;
-		m_shopList[8] = 0;
-		m_shopList[9] = 0;
-		m_shopList[10] = 0;
-		m_shopList[11] = 0;
-		m_shopList[12] = 0;
-		m_shopList[13] = 0;
-		m_shopList[14] = 0;
-		m_shopList[15] = 0;
+		memset(m_shopList, 0, sizeof(m_shopList));
 		break;
 		case 1: {
 			short idx = m_shopListCount;

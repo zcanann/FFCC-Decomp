@@ -1102,8 +1102,7 @@ void CGraphicPcs::ReqScreenCapture()
 extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 {
     unsigned char result = 0;
-    if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) <= 1 &&
-        reinterpret_cast<CMes*>(reinterpret_cast<char*>(mesMenu) + 0x1C)->GetWait() != 4) {
+    if (reinterpret_cast<CMesMenu*>(mesMenu)->IsActiveMessage()) {
         result = 1;
     }
 
@@ -2860,18 +2859,19 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x50: {
-        u8* graphicsPcs = reinterpret_cast<u8*>(&GraphicPcs);
-        *reinterpret_cast<int*>(graphicsPcs + 0x24) = 2;
-        graphicsPcs[0x12] = 0xFF;
-        graphicsPcs[0x13] = 0xFF;
-        graphicsPcs[0x14] = 0xFF;
-        graphicsPcs[0x15] = 0xFF;
-        *reinterpret_cast<int*>(graphicsPcs + 0x20) = 0;
-        *reinterpret_cast<int*>(graphicsPcs + 0x4) = object->m_localBase[0];
-        *reinterpret_cast<int*>(graphicsPcs + 0x44) = object->m_localBase[1];
-        *reinterpret_cast<int*>(graphicsPcs + 0x36) = object->m_localBase[2];
-        *reinterpret_cast<int*>(graphicsPcs + 0x40) = object->m_localBase[3];
-        *reinterpret_cast<int*>(graphicsPcs + 0x8) = *reinterpret_cast<int*>(graphicsPcs + 0x4);
+        CGraphicPcs::ScreenFadeSlot* screenFade = &GraphicPcs.m_screenFade[0];
+        unsigned int phase = 2;
+        screenFade->m_phase = *reinterpret_cast<float*>(&phase);
+        screenFade->m_colorA.r = 0xFF;
+        screenFade->m_colorA.g = 0xFF;
+        screenFade->m_colorB.r = 0xFF;
+        screenFade->m_colorB.g = 0xFF;
+        screenFade->m_targetYOffs = 0.0f;
+        screenFade->m_timer = object->m_localBase[0];
+        GraphicPcs.m_screenFade[1].m_mode = object->m_localBase[1];
+        screenFade->m_stretch = *reinterpret_cast<float*>(&object->m_localBase[2]);
+        GraphicPcs.m_screenFade[1].m_timer = object->m_localBase[3];
+        screenFade->m_duration = screenFade->m_timer;
         GraphicPcs.ReqScreenCapture();
         runtime->push(object, 0);
         outResult = 0;
@@ -3669,17 +3669,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Game.m_caravanWorkArr[*object->m_localBase].SearchRomLetterWork(romLetterWork, 8);
 
         for (int i = 0; i < 8; i++) {
-            u16* letter = reinterpret_cast<u16*>(romLetterWork[i]);
+            CRomLetterWork* letter = romLetterWork[i];
             int dstOffs = i * 4;
-            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter[0] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter[1] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter[2] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter[3] : -1;
+            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter->m_from : -1;
+            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter->m_subject : -1;
+            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter->m_message : -1;
+            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter->m_priorityFlags : -1;
             if (letter == 0) {
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
             } else {
                 int letterIndex =
-                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / 0x3E;
+                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / sizeof(CRomLetterWork);
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
             }
         }
@@ -3941,9 +3941,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xDC: {
-        u8* base = reinterpret_cast<u8*>(Game.m_romLetterWorkBase);
-        runtime->push(
-            object, *reinterpret_cast<u16*>(base + *object->m_localBase * 0x3E + object->m_localBase[1] * 2));
+        CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+        runtime->push(object, letters[*object->m_localBase].Word(object->m_localBase[1]));
         outResult = 0;
         return 1;
     }

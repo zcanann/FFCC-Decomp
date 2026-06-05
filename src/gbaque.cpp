@@ -2274,14 +2274,14 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		int matchedNpc = -1;
 
 		const CCaravanWork::CLetterWork* cur = &caravanWork->m_letters[i];
-		const unsigned int curWord = cur->m_word0;
+		const unsigned int curWord = cur->Word0();
 		const unsigned short curHalf = cur->HeaderWord();
 		const unsigned int npcId = (curWord >> 9) & 0x1FF;
 		const unsigned int subjectId = (curHalf >> 2) & 0x1FF;
 
 		for (int j = 0; j < i; j++) {
 			const CCaravanWork::CLetterWork* prev = &caravanWork->m_letters[j];
-			if (npcId == ((prev->m_word0 >> 9) & 0x1FF)) {
+			if (npcId == ((prev->Word0() >> 9) & 0x1FF)) {
 				matchedNpc = j;
 			}
 			if (subjectId == ((prev->HeaderWord() >> 2) & 0x1FF)) {

@@ -425,7 +425,7 @@ void CMenuPcs::LetterInit4()
 	unsigned char languageId = Game.m_gameWork.m_languageId;
 	char lines[8][0x80];
 	memset(lines, 0, sizeof(lines));
-	unsigned int letterWord = letter->m_word0;
+	unsigned int letterWord = letter->Word0();
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
 	char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
 
@@ -1547,7 +1547,7 @@ bool CMenuPcs::LetterConfirmOpen()
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
-		unsigned int letterWord = letter->m_word0;
+		unsigned int letterWord = letter->Word0();
 		char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
 		char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
 
@@ -1738,7 +1738,7 @@ void CMenuPcs::LetterListDraw()
 		}
 
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
-		const unsigned int letterWord = letter->m_word0;
+		const unsigned int letterWord = letter->Word0();
 
 		int tlut = 9;
 		if (letter->IsOpened()) {

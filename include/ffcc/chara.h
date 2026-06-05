@@ -370,8 +370,16 @@ public:
     struct MogFurState
     {
         u16 m_texels[0x1000];                 // 0x0000
-        u32 m_dirty;                          // 0x2000
-        u32 m_prevRadarType;                  // 0x2004
+        union
+        {
+            u32 m_dirty;                      // 0x2000
+            int m_commandIndex;
+        };
+        union
+        {
+            u32 m_prevRadarType;              // 0x2004
+            int m_trackedCommandIndex;
+        };
         u32 m_cursorX;                        // 0x2008
         u32 m_cursorY;                        // 0x200C
         int m_timestamp;                      // 0x2010
@@ -388,7 +396,7 @@ public:
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);
-    Mtx& FlatPosMtx() { return *reinterpret_cast<Mtx*>(m_sharedState.m_storage + 0x8C); }
+    Mtx& FlatPosMtx() { return m_sharedState.m_flat.m_posMtx; }
     MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
 private:
@@ -401,6 +409,11 @@ private:
     union CSharedState
     {
         MogFurState m_mogFur;
+        struct FlatState
+        {
+            u8 _pad00[0x8C];
+            Mtx m_posMtx;
+        } m_flat;
         u8 m_storage[0x2054];
     };
 

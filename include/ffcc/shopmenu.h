@@ -67,6 +67,31 @@ public:
     void DrawDec(int, int, int, float, float, int, int, int);
     void DrawDecScale(int, int, int, float, float, float, int, int, int);
     void setFaceAlpha(int, int);
+
+    void* m_unk00;
+    int m_mode;
+    int m_nextMode;
+    int m_timer;
+    int m_subMode;
+    int m_listType;
+    int m_pdtSlot;
+    float m_fade;
+    CCaravanWork* m_caravanWork;
+    int m_listTop;
+    int m_selectedIndex;
+    int m_visibleRows;
+    int m_canScrollUp;
+    int m_canScrollDown;
+    int m_figureMode;
+    int m_yesNo;
+    int m_faceAlpha;
+    int m_quantity;
+    unsigned char m_topChoice;
+    unsigned char m_pad49[3];
+    int m_itemCount;
+    int m_itemTable[0x40];
+    int m_resultItem;
+    int m_resultParam;
 };
 
 #endif // _FFCC_PPP_SHOPMENU_H_

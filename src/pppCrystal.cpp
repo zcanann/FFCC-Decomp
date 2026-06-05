@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppCrystal.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -60,11 +61,25 @@ struct CrystalWork {
     GXTexObj* m_refractionTexObj;
 };
 
+struct CrystalDataOffsets {
+    s32 _unused0;
+    s32 m_colorBlockOffset;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(CrystalDataOffsets, m_colorBlockOffset) == 0x4);
+STATIC_ASSERT(offsetof(CrystalDataOffsets, m_workOffset) == 0x8);
+
 inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
+
+static inline CrystalDataOffsets* GetCrystalDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<CrystalDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<CrystalWork*>(crystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<CrystalWork*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_workOffset);
 }
 
 union CrystalFloatBits {
@@ -125,11 +140,11 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 {
 	float texW;
 	float texH;
-	int* serializedDataOffsets = param_3->m_serializedDataOffsets;
+	CrystalDataOffsets* serializedDataOffsets = GetCrystalDataOffsets(param_3);
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
 	pppCrystalColorBlock* colorBlock =
-		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_workArea + serializedDataOffsets[1]);
+		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_workArea + serializedDataOffsets->m_colorBlockOffset);
 
 	if (dataValIndex == 0xFFFF) {
 		return;

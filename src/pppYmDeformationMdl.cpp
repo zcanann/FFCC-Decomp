@@ -30,10 +30,30 @@ struct _pppEnvStYmDeformationMdl {
     CMapMesh** m_mapMeshPtr;
 };
 
-template <typename T>
-static inline T* PppWorkArea(pppYmDeformationMdl* object, _pppCtrlTable* ctrl, int index)
+struct YmDeformationMdlDataOffsets {
+    s32 _unused0;
+    s32 m_colorInfoOffset;
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_colorInfoOffset) == 0x4);
+STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_stateOffset) == 0x8);
+
+static inline YmDeformationMdlDataOffsets* DeformationMdlDataOffsets(_pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
+    return reinterpret_cast<YmDeformationMdlDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline YmDeformationMdlState* DeformationMdlState(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmDeformationMdlState*>(
+        object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_stateOffset);
+}
+
+static inline YmDeformationMdlColorInfo* DeformationMdlColorInfo(pppYmDeformationMdl* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmDeformationMdlColorInfo*>(
+        object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
 static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
@@ -135,9 +155,9 @@ inline void DisableIndWarp()
  */
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlStep* param_2, _pppCtrlTable* param_3)
 {
-    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl, param_3);
     YmDeformationMdlColorInfo* colorInfo;
-    pppModelSt* model;
+    CMapMesh* model;
     Mtx indWarpMtx;
     Mtx44 screenMtx;
     Mtx cameraMtx;
@@ -155,9 +175,9 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     }
 
     _pppEnvStYmDeformationMdl* env = DeformationMdlEnv();
-    model = (pppModelSt*)env->m_mapMeshPtr[param_2->m_dataValIndex];
-    colorInfo = PppWorkArea<YmDeformationMdlColorInfo>(pppYmDeformationMdl, param_3, 1);
-    texture = reinterpret_cast<CMapMesh*>(model)->GetTexture(env->m_materialSetPtr, textureIndex);
+    model = env->m_mapMeshPtr[param_2->m_dataValIndex];
+    colorInfo = DeformationMdlColorInfo(pppYmDeformationMdl, param_3);
+    texture = model->GetTexture(env->m_materialSetPtr, textureIndex);
 
     PSMTXIdentity(indWarpMtx);
     pppSetBlendMode(0);
@@ -229,7 +249,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
         GXLoadTexObj(backTexture, GX_TEXMAP0);
         GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
-        pppDrawMesh(model, pppYmDeformationMdl->m_drawMatrixPtr, 0);
+        pppDrawMesh(reinterpret_cast<pppModelSt*>(model), pppYmDeformationMdl->m_drawMatrixPtr, 0);
 
         DisableIndWarp();
 
@@ -253,7 +273,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
     YmDeformationMdlState* state;
 
     if ((ppvUserStopPartF == 0) &&
-        ((state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2)),
+        ((state = DeformationMdlState(pppYmDeformationMdl, param_3)),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
             pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
@@ -306,7 +326,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
     const float& value = kYmDeformationMdlZero;
-    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
 
     state->m_values[1] = value;
     state->m_values[0] = value;
@@ -328,7 +348,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
     const float& zero = kYmDeformationMdlZero;
-    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
+    YmDeformationMdlState* state = DeformationMdlState(pppYmDeformationMdl_, param_2);
 
     state->m_angle = 0;
     state->m_direction = 1;

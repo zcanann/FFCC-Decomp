@@ -189,6 +189,7 @@ static const char sDebugReadWriteFailedMsg[] = {
 enum {
     kMemoryCardStageSize = 0x16000,
     kMemoryCardSaveBufferSize = 0xA000,
+    kMemoryCardSaveLetterOffset = 0x104,
 };
 
 static inline CChara* GetCharaGlobal()
@@ -1381,24 +1382,7 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
         memcpy(caravanWork->m_name, src + 0xF0, 0x10);
         caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
-        for (int i = 0; i < 100; i++)
-        {
-            u8* dstLetter = reinterpret_cast<u8*>(&caravanWork->m_letters[i]);
-            u8* srcLetter = src + 0x104 + i * 0x0C;
-
-            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
-            *reinterpret_cast<u16*>(dstLetter) =
-                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
-            *reinterpret_cast<u32*>(dstLetter) =
-                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(dstLetter + 2) =
-                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
-            memcpy(dstLetter + 4, srcLetter + 4, 8);
-            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
-            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
-            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
-            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
-        }
+        memcpy(caravanWork->m_letters, src + kMemoryCardSaveLetterOffset, sizeof(caravanWork->m_letters));
 
         for (int artifact = 0; artifact < 96; artifact += 2)
         {
@@ -1645,24 +1629,7 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
         memcpy(dst + 0xF0, caravanWork->m_name, 0x10);
         *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
-        for (int i = 0; i < 100; i++)
-        {
-            u8* dstLetter = dst + 0x104 + i * 0x0C;
-            u8* srcLetter = reinterpret_cast<u8*>(&caravanWork->m_letters[i]);
-
-            dstLetter[0] = static_cast<u8>(((srcLetter[0] >> 3) & 1) << 3) | (dstLetter[0] & 0xF7);
-            *reinterpret_cast<u16*>(dstLetter) =
-                (*reinterpret_cast<u16*>(srcLetter) & 0x07FC) | (*reinterpret_cast<u16*>(dstLetter) & 0xF803);
-            *reinterpret_cast<u32*>(dstLetter) =
-                (*reinterpret_cast<u32*>(srcLetter) & 0x0003FE00) | (*reinterpret_cast<u32*>(dstLetter) & 0xFFFC01FF);
-            *reinterpret_cast<u16*>(dstLetter + 2) =
-                (*reinterpret_cast<u16*>(srcLetter + 2) & 0x01FF) | (*reinterpret_cast<u16*>(dstLetter + 2) & 0xFE00);
-            memcpy(dstLetter + 4, srcLetter + 4, 8);
-            dstLetter[0] = (srcLetter[0] & 0x80) | (dstLetter[0] & 0x7F);
-            dstLetter[0] = (srcLetter[0] & 0x40) | (dstLetter[0] & 0xBF);
-            dstLetter[0] = (srcLetter[0] & 0x20) | (dstLetter[0] & 0xDF);
-            dstLetter[0] = (srcLetter[0] & 0x10) | (dstLetter[0] & 0xEF);
-        }
+        memcpy(dst + kMemoryCardSaveLetterOffset, caravanWork->m_letters, sizeof(caravanWork->m_letters));
 
         for (int artifact = 0; artifact < 96; artifact += 3)
         {

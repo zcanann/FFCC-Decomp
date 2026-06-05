@@ -97,8 +97,7 @@ STATIC_ASSERT(offsetof(MoneyMenuState, listState) == 0x10);
 STATIC_ASSERT(offsetof(MoneyMenuState, optionState) == 0x12);
 STATIC_ASSERT(offsetof(MoneyMenuState, moveDirection) == 0x1E);
 STATIC_ASSERT(offsetof(MoneyMenuState, frame) == 0x22);
-STATIC_ASSERT(offsetof(MoneyMenuState, selectedIndex) == 0x26);
-STATIC_ASSERT(offsetof(MoneyMenuState, subMenuIndex) == 0x28);
+STATIC_ASSERT(offsetof(MoneyMenuState, selections) == 0x26);
 STATIC_ASSERT(offsetof(MoneyMenuState, mode) == 0x30);
 STATIC_ASSERT(offsetof(MoneyMenuState, prevMode) == 0x32);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, u) == 0x8);
@@ -162,9 +161,8 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	int menuState = (int)this->moneyState;
-	int mode = (int)*(s16*)(menuState + 0x30);
-	int optBase = menuState + mode * 2;
+	MoneyMenuState* state = this->moneyState;
+	int mode = state->mode;
 	int maxDigits = 1;
 	int maxGil = caravanWork->m_gil;
 	int digitPlace = 10;
@@ -180,7 +178,7 @@ int CMenuPcs::MoneyCtrlCur()
 	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
-		unsigned int cursor = *(s16*)(optBase + 0x26);
+		unsigned int cursor = state->selections[mode];
 		unsigned int placeValue = 1;
 		while (cursor != 0) {
 			placeValue *= 10;
@@ -218,18 +216,18 @@ int CMenuPcs::MoneyCtrlCur()
 		}
 
 		if ((hold & 1) != 0) {
-			if (*(s16*)(optBase + 0x26) < maxDigits - 1) {
-				*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+			if (state->selections[mode] < maxDigits - 1) {
+				state->selections[mode] = state->selections[mode] + 1;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		} else {
 			if ((hold & 2) != 0) {
-				if (*(s16*)(optBase + 0x26) == 0) {
+				if (state->selections[mode] == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+					state->selections[mode] = state->selections[mode] - 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
@@ -238,14 +236,14 @@ int CMenuPcs::MoneyCtrlCur()
 		if ((hold & 0xF) == 0) {
 			if ((press & 0x20) != 0) {
 				if (attachFlag < 0) {
-					*(s16*)(menuState + 0x1E) = 1;
+					state->moveDirection = 1;
 					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 					return 1;
 				}
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else if ((press & 0x40) != 0) {
 				if (attachFlag < 0) {
-					*(s16*)(menuState + 0x1E) = -1;
+					state->moveDirection = -1;
 					Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 					return 1;
 				}
@@ -268,13 +266,13 @@ int CMenuPcs::MoneyCtrlCur()
 					GetSingWinSize(1, &winW, &winH, 0);
 					SetSingWinInfo(0xF0, 0xD0, winW, winH);
 					this->singWindowInfo[5] = 0;
-					*(s16*)(menuState + 0x12) = 0;
-					*(s16*)(menuState + 0x30) = 1;
+					state->optionState = 0;
+					state->mode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
 				if (attachFlag < 0) {
-					*(u8*)(menuState + 0xD) = 1;
+					state->closeRequested = 1;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
@@ -286,40 +284,40 @@ int CMenuPcs::MoneyCtrlCur()
 	} else {
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (*(s16*)(optBase + 0x26) < 1) {
-					*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+				if (state->selections[mode] < 1) {
+					state->selections[mode] = state->selections[mode] + 1;
 				} else {
-					*(s16*)(optBase + 0x26) = 0;
+					state->selections[mode] = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		} else {
-			if (*(s16*)(optBase + 0x26) == 0) {
-				*(s16*)(optBase + 0x26) = 1;
+			if (state->selections[mode] == 0) {
+				state->selections[mode] = 1;
 			} else {
-				*(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+				state->selections[mode] = state->selections[mode] - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)this->moneyState->messageMask & (1 << *(s16*)(optBase + 0x26))) == 0) {
+				if (((int)this->moneyState->messageMask & (1 << state->selections[mode])) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
-					if (*(s16*)(optBase + 0x26) == 0) {
+					if (state->selections[mode] == 0) {
 						caravanWork->FGPutGil(static_cast<int>(s_Money));
 						s_Money = 0;
 						MoneySetPlace(0);
 						MoneySetPlace(1);
 					}
 					this->singWindowInfo[5] = 2;
-					*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+					state->optionState = state->optionState + 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
 				this->singWindowInfo[5] = 2;
-				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+				state->optionState = state->optionState + 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
 		}
@@ -404,7 +402,7 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
+		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->moneyState->selections[0]) * 0x12 + 0x24),
 		                 (float)(drawBase->y + 0x5C), FLOAT_80332f78, FLOAT_80332f6c,
 		                 FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70,
 		                 FLOAT_80332f70, FLOAT_80332f64);
@@ -440,7 +438,7 @@ void CMenuPcs::MoneyDraw()
 	if ((mode != 0) && (this->moneyState->optionState == 1)) {
 		s16* singWindow = this->singWindowInfo;
 		float cursorY = (float)(singWindow[1] + 0x20);
-		cursorY += (float)(this->moneyState->subMenuIndex * SingWinMessHeight());
+		cursorY += (float)(this->moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
 		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
@@ -599,7 +597,7 @@ bool CMenuPcs::MoneyOpen()
 			row = row + 1;
 		} while (row < 2);
 
-		this->moneyState->selectedIndex = 0;
+		this->moneyState->selections[0] = 0;
 		this->moneyState->initialized = 1;
 	}
 

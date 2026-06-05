@@ -4,7 +4,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
-#include "ffcc/RedSound/RedSound.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
@@ -196,11 +195,6 @@ static inline const char* cacheStateName(const CAmemCache& entry)
 static inline const char* cacheTypeName(const CAmemCache& entry)
 {
     return s_amemCacheTypeNames_801E8470[entry.m_type];
-}
-
-static inline CRedSound* RedSound(CSound* sound)
-{
-    return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(sound) + 8);
 }
 
 static inline bool stageHasUnfreedBlocks(CMemory::CStage* stage)
@@ -869,12 +863,11 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
 void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId;
-    CRedSound* redSound = RedSound(&Sound);
-    dmaId = redSound->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
-                               static_cast<int>(size), 0, 0);
+    dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                           static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
-    while (redSound->DMACheck(dmaId) != 0) {
+    while (Sound.DMACheck(dmaId) != 0) {
         watch.Stop();
         watch.Get();
         watch.Start();
@@ -893,13 +886,12 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId;
-    CRedSound* redSound = RedSound(&Sound);
-    dmaId = redSound->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
-                               static_cast<int>(size), 0, 0);
+    dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
+                           static_cast<int>(size), 0, 0);
     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
     watch.Start();
     float timeout = kMemoryDmaTimeout;
-    while (redSound->DMACheck(dmaId) != 0) {
+    while (Sound.DMACheck(dmaId) != 0) {
         watch.Stop();
         if (watch.Get() >= timeout) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -1525,39 +1517,6 @@ void CAmemCacheSet::Destroy()
     }
 }
 
-static inline void freeAmemCacheBlock(unsigned long ptr)
-{
-    unsigned char* block = reinterpret_cast<unsigned char*>(ptr - 0x40);
-    if ((*reinterpret_cast<unsigned short*>(block) != 0x4b41) ||
-        (*reinterpret_cast<unsigned short*>(block + 0x3E) != 0x4d49)) {
-        System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
-    }
-
-    block[2] = static_cast<unsigned char>(block[2] & ~kMemoryBlockUsedFlag);
-
-    int blockPrev = *reinterpret_cast<int*>(block + 8);
-    if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
-        *reinterpret_cast<int*>(block + 0x10) =
-            *reinterpret_cast<int*>(block + 0x10) + 0x40 +
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
-            reinterpret_cast<int>(block);
-        *reinterpret_cast<int*>(block + 8) =
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
-    }
-
-    int blockNext = *reinterpret_cast<int*>(block + 4);
-    if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40 +
-            *reinterpret_cast<int*>(block + 0x10);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 4) + 8) = *reinterpret_cast<int*>(block + 8);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 8) + 4) = *reinterpret_cast<int*>(block + 4);
-    }
-
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 0xC) + 0x124) -= 1;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8001D468
@@ -1575,7 +1534,7 @@ void CAmemCacheSet::DestroyCache(int index)
         unsigned long cacheData = reinterpret_cast<unsigned long>(entry.m_cacheData);
         if (cacheData != 0) {
             if (cacheData != 0) {
-                freeAmemCacheBlock(cacheData);
+                freeStageBlock(reinterpret_cast<void*>(cacheData));
             }
             entry.m_cacheData = 0;
         }
@@ -1587,7 +1546,7 @@ void CAmemCacheSet::DestroyCache(int index)
         unsigned long workData = reinterpret_cast<unsigned long>(entry.m_workData);
         if (workData != 0) {
             if (workData != 0) {
-                freeAmemCacheBlock(workData);
+                freeStageBlock(reinterpret_cast<void*>(workData));
             }
         }
         entry.m_cacheData = 0;
@@ -1700,12 +1659,12 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 if (entry.m_cacheData == 0) {
                     data = 0;
                 } else {
-                    int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
-                                                           reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+                    int dmaId = Sound.DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
+                                               reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
                     watch.Start();
                     float timeout = kMemoryDmaTimeout;
-                    while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
+                    while (Sound.DMACheck(dmaId) != 0) {
                         watch.Stop();
                         if (watch.Get() >= timeout) {
                             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
@@ -1810,11 +1769,11 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         if (entry.m_dmaCopy == 0) {
             memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
         } else {
-            int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
-                                                   reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+            int dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(src),
+                                       reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
             CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
             watch.Start();
-            while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
+            while (Sound.DMACheck(dmaId) != 0) {
                 watch.Stop();
                 watch.Get();
                 watch.Start();
@@ -1866,11 +1825,11 @@ checksum_done_copy:
     if (entry.m_dmaCopy == 0) {
         memcpy(entry.m_workData, src, static_cast<unsigned long>(entry.m_size));
     } else {
-        int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
-                                               reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
+        int dmaId = Sound.DMAEntry(0, 0, reinterpret_cast<int>(src),
+                                   reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
         CStopWatch watch(const_cast<char*>(sMemoryNoNameStopwatchName));
         watch.Start();
-        while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
+        while (Sound.DMACheck(dmaId) != 0) {
             watch.Stop();
             watch.Get();
             watch.Start();
@@ -2018,13 +1977,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            freeAmemCacheBlock(reinterpret_cast<unsigned long>(bestEntry->m_cacheData));
+            freeStageBlock(bestEntry->m_cacheData);
             bestEntry->m_cacheData = 0;
         }
 
         int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
         if (allocated != 0) {
-            freeAmemCacheBlock(static_cast<unsigned long>(allocated));
+            freeStageBlock(reinterpret_cast<void*>(allocated));
             return;
         }
 
@@ -2083,7 +2042,7 @@ void CAmemCacheSet::CacheClear()
             void* data = entry.m_cacheData;
             if (data != 0) {
                 if (data != 0) {
-                    freeAmemCacheBlock(reinterpret_cast<unsigned long>(data));
+                    freeStageBlock(reinterpret_cast<void*>(data));
                 }
                 entry.m_cacheData = 0;
             }

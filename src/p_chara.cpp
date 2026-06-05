@@ -2092,7 +2092,7 @@ CCharaPcs::CHandle::CHandle()
 	}
 
 	// PDT load ref
-	m_pdtLoadRef = (CRef*)nullptr;
+	m_pdtLoadRef = (CLoadPdt*)nullptr;
 
 	// Playback / state
 	m_currentAnimIndex = -1;
@@ -2467,8 +2467,7 @@ int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 {
 	if ((m_asyncState == 0 || m_asyncState == 7)
 		&& m_model != nullptr
-		// TODO: Pending CModel decomp
-		&& (checkModelField == 0 || *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(m_model) + 0xB0) != 0))
+		&& (checkModelField == 0 || m_model->m_texSet != 0))
 	{
 			return true;
 	}

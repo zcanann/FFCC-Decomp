@@ -1146,7 +1146,7 @@ MatrixMode3:
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
 		u8 visible = 0;
-		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		u32 flags = pppMngSt->m_owner->m_displayFlags;
 		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
 			visible = 1;
 		}
@@ -1203,7 +1203,7 @@ MatrixMode5:
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
 		u8 visible = 0;
-		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		u32 flags = pppMngSt->m_owner->m_displayFlags;
 		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
 			visible = 1;
 		}
@@ -1250,7 +1250,7 @@ MatrixMode6:
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
 		u8 visible = 0;
-		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		u32 flags = pppMngSt->m_owner->m_displayFlags;
 		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
 			visible = 1;
 		}
@@ -1300,7 +1300,7 @@ MatrixMode7:
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
 		u8 visible = 0;
-		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		u32 flags = pppMngSt->m_owner->m_displayFlags;
 		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
 			visible = 1;
 		}

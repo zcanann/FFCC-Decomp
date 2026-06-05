@@ -75,10 +75,20 @@ public:
     };
     struct EffectInfo
     {
-        unsigned char m_pad[0xC];
+        int m_effectNo;
+        int m_partNo;
+        int m_slotNo;
         CGObject m_object;
 
         EffectInfo();
+    };
+    struct EffectEntry
+    {
+        unsigned char m_pad00[0x0C];
+        int m_iconType;
+        unsigned char m_pad10[0x28 - 0x10];
+        unsigned int m_flags;
+        unsigned char m_pad2C[0x48 - 0x2C];
     };
     enum MENUMODE
 	{
@@ -419,7 +429,14 @@ public:
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
     };
-    unsigned char m_pad830[0x850 - 0x830];
+    unsigned char m_pad830[0x838 - 0x830];
+    union {
+        EffectEntry* m_effectEntries;
+        unsigned char* m_wmCharaState;
+    };
+    void* m_pad83C;
+    EffectInfo* m_effectWork;
+    unsigned char m_pad844[0x850 - 0x844];
     union {
         ArtiOpenAnimList* m_artiList;
         EquipOpenAnimList* m_equipList;
@@ -439,5 +456,8 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
+STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
+STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 
 #endif // _FFCC_P_MENU_H_

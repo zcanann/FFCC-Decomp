@@ -1,4 +1,5 @@
 #include "ffcc/pppYmDeformationShp.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
@@ -44,10 +45,24 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
-template <typename T>
-static inline T* PppWorkArea(pppYmDeformationShp* object, _pppCtrlTable* ctrl, int index)
+struct YmDeformationShpDataOffsets {
+	s32 _unused0;
+	s32 m_colorInfoOffset;
+	s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
+STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_stateOffset) == 0x8);
+
+static inline YmDeformationShpDataOffsets* DeformationShpDataOffsets(_pppCtrlTable* ctrl)
 {
-	return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
+	return reinterpret_cast<YmDeformationShpDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline VYmDeformationShp* DeformationShpState(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<VYmDeformationShp*>(
+		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_stateOffset);
 }
 
 static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
@@ -138,7 +153,8 @@ inline void SetUpIndWarp(VYmDeformationShp* work)
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
 {
 	_pppPObject* object = pppYmDeformationShp_;
-	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
+	VYmDeformationShp* work = reinterpret_cast<VYmDeformationShp*>(
+		object->m_workArea + DeformationShpDataOffsets(param_3)->m_stateOffset);
 	int textureIndex = 0;
 	Vec2d uvs[4];
 	Mtx rotMtx;
@@ -146,7 +162,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
-			(YmDeformationShpColorInfo*)(object->m_workArea + param_3->m_serializedDataOffsets[1]);
+			reinterpret_cast<YmDeformationShpColorInfo*>(
+				object->m_workArea + DeformationShpDataOffsets(param_3)->m_colorInfoOffset);
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
 		CTexture* texture =
 			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);
@@ -427,7 +444,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		return;
 	}
 
-	state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
+	state = DeformationShpState(pppYmDeformationShp_, param_3);
 
 	CalcGraphValue(
 		pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
@@ -485,7 +502,7 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*)
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
 	float value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
+	VYmDeformationShp* state = DeformationShpState(pppYmDeformationShp_, param_2);
 
 	state->m_values[1] = value;
 	state->m_values[0] = value;
@@ -507,7 +524,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _p
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
 	float value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
+	VYmDeformationShp* state = DeformationShpState(pppYmDeformationShp_, param_2);
 
 	state->m_backBuffer = 0;
 	state->m_pad0 = 0;

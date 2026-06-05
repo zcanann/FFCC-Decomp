@@ -66,21 +66,20 @@ void CGQuadObj::Reset(float base, float height)
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-	CGQuadObj* self;
 	u32 count = m_vertexCount;
 	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
 		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
-			self = this;
+			QuadVertex* vertex = m_vertices;
 			int i = 0;
 			for (; i < (int)count; i++) {
-				float z0 = self->m_vertices[0].z;
-				float x0 = self->m_vertices[0].x;
+				float z0 = vertex->z;
+				float x0 = vertex->x;
 				int quotient = (i + 1) / (int)count;
 				int next = (i + 1) - quotient * (int)count;
 				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}
-				self = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(self) + sizeof(QuadVertex));
+				vertex++;
 			}
 
 			if (i == (int)count) {
@@ -114,7 +113,7 @@ void CGQuadObj::onDraw()
 
         int next;
         QuadVertex* vertex;
-        CGQuadObj* current = this;
+        QuadVertex* current = m_vertices;
         int i = 0;
 
         while (i < (int)(u32)m_vertexCount) {
@@ -122,17 +121,17 @@ void CGQuadObj::onDraw()
 
             next = i + 1;
             i = i + 1;
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
+            GXPosition3f32(current->x, m_yBase, current->z);
             count = m_vertexCount;
             int nextIndex = next % (int)count;
             GXPosition3f32(m_vertices[nextIndex].x, m_yBase, m_vertices[nextIndex].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
+            GXPosition3f32(current->x, m_yBase + m_yHeight, current->z);
             count = m_vertexCount;
             nextIndex = next % (int)count;
             GXPosition3f32(m_vertices[nextIndex].x, m_yBase + m_yHeight, m_vertices[nextIndex].z);
-            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
-            vertex = current->m_vertices;
-            current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<unsigned char*>(current) + sizeof(QuadVertex));
+            GXPosition3f32(current->x, m_yBase, current->z);
+            vertex = current;
+            current++;
             GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
         }
     }

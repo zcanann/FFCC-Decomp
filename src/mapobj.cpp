@@ -477,7 +477,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PIDX: {
             short parentIdx = static_cast<short>(chunkFile.Get2());
-            short meshOrHitIdx = static_cast<short>(chunkFile.Get2());
+            int meshOrHitIdx = static_cast<short>(chunkFile.Get2());
 
             m_meshType = chunkFile.Get1();
             m_mapDataType = chunkFile.Get1();

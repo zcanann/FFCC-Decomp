@@ -4,20 +4,42 @@
 #include "ffcc/partMng.h"
 
 struct _pppPObject;
-struct PYmMegaBirthShpTail3;
-struct pppYmMegaBirthShpTail3UnkB;
-struct pppYmMegaBirthShpTail3UnkC;
+struct pppYmMegaBirthShpTail3RenderStep;
 
 typedef _pppPObject pppYmMegaBirthShpTail3;
+
+struct PYmMegaBirthShpTail3
+{
+    Mtx m_matrix;
+    Vec m_directionTail;
+    float m_colorDeltaAdd[4];
+    float m_sizeStart;
+    float m_sizeVal;
+    float m_speedRandRange;
+    float field_0x58;
+    Vec m_speedScale;
+    unsigned char m_randType;
+    unsigned char m_enableParticleColor;
+    unsigned char m_pad0x6a[0x6C - 0x6A];
+    short m_pathIndex;
+    unsigned char m_pad0x6e[0xB9 - 0x6E];
+    unsigned char m_wmatCopyMode;
+};
+
+struct pppYmMegaBirthShpTail3Offsets
+{
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
+};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
-void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
-void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
-void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkB*, pppYmMegaBirthShpTail3UnkC*);
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3Offsets*);
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3Offsets*);
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3Offsets*);
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3RenderStep*, pppYmMegaBirthShpTail3Offsets*);
 
 #ifdef __cplusplus
 }

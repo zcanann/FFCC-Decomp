@@ -34,30 +34,6 @@ struct VYmMegaBirthShpTail3
     unsigned short m_pathIndex;
 };
 
-struct PYmMegaBirthShpTail3
-{
-    Mtx m_matrix;
-    Vec m_directionTail;
-    float m_colorDeltaAdd[4];
-    float m_sizeStart;
-    float m_sizeVal;
-    float m_speedRandRange;
-    float field_0x58;
-    Vec m_speedScale;
-    unsigned char m_randType;
-    unsigned char m_enableParticleColor;
-    unsigned char m_pad0x6a[0x6C - 0x6A];
-    short m_pathIndex;
-    unsigned char m_pad0x6e[0xB9 - 0x6E];
-    unsigned char m_wmatCopyMode;
-};
-
-struct pppYmMegaBirthShpTail3UnkC
-{
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
 static pppFMATRIX g_matUnit3;
 
 extern "C" const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
@@ -74,7 +50,7 @@ void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3UnkB* stepData, pppYmMegaBirthShpTail3UnkC* offsets)
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirthShpTail3RenderStep* stepData, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
@@ -297,7 +273,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, pppYmMegaBirthShpTail3UnkC* offsets)
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, pppYmMegaBirthShpTail3Offsets* offsets)
 {
     s8 hasRequiredMemory;
     u32 i;
@@ -819,7 +795,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
     int offset = param_2->m_serializedDataOffsets[2];
     u8* work = pppYmMegaBirthShpTail3_->m_workArea + offset;
@@ -850,7 +826,7 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3UnkC* param_2)
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
     pppFMATRIX* work =
         (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + param_2->m_serializedDataOffsets[2]);

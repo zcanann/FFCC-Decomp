@@ -1,10 +1,22 @@
 #include "ffcc/pppRandUpIV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandUpIVDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandUpIVDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandUpIVDataOffsets* GetRandUpIVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandUpIVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -46,13 +58,13 @@ void pppRandUpIV(_pppPObject* basePtr, RandUpIVParams* in, _pppCtrlTable* ctrl)
             value = randValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpIVDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else {
         if (in->targetId != basePtr->m_graphId) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpIVDataOffsets(ctrl)->m_valueOffset);
     }
 
     s32* target = (in->sourceOffset == -1) ? (s32*)gPppDefaultValueBuffer : (s32*)(basePtr->m_workArea + in->sourceOffset);

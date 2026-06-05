@@ -1,10 +1,22 @@
 #include "ffcc/pppRandUpFV.h"
+#include "global.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandUpFVDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandUpFVDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandUpFVDataOffsets* GetRandUpFVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandUpFVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline float randf(float value, float scale)
 {
@@ -36,13 +48,13 @@ void pppRandUpFV(_pppPObject* basePtr, RandUpFVParams* in, _pppCtrlTable* ctrl)
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpFVDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else {
         if (in->targetId != currentIndex) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpFVDataOffsets(ctrl)->m_valueOffset);
     }
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);

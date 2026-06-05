@@ -1,10 +1,22 @@
 #include "ffcc/pppRandUpCV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
+
+struct RandUpCVDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandUpCVDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandUpCVDataOffsets* GetRandUpCVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandUpCVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -47,12 +59,12 @@ void pppRandUpCV(_pppPObject* basePtr, RandUpCVParam* in, _pppCtrlTable* ctrl)
             value = blend * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpCVDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandUpCVDataOffsets(ctrl)->m_valueOffset);
     }
 
     target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(basePtr->m_workArea + in->sourceOffset);

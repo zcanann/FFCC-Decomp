@@ -1,9 +1,18 @@
 #ifndef _FFCC_PPPACCELE_H_
 #define _FFCC_PPPACCELE_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
-struct pppAcceleUnkB;
+
+struct pppAcceleUnkB {
+    s32 m_graphId;
+    s32 m_field_04;
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+};
 
 #ifdef __cplusplus
 extern "C" {

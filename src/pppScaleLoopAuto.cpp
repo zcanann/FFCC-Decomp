@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppScaleLoopAuto.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
@@ -20,6 +21,22 @@ struct pppScaleLoopAutoWork {
     float m_delta;
 };
 
+struct pppScaleLoopAutoDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(pppScaleLoopAutoDataOffsets, m_workOffset) == 0x0);
+
+static inline pppScaleLoopAutoDataOffsets* GetScaleLoopAutoDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppScaleLoopAutoDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline pppScaleLoopAutoWork* GetScaleLoopAutoWork(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppScaleLoopAutoWork*>(object->m_workArea + GetScaleLoopAutoDataOffsets(ctrl)->m_workOffset);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8012b4f4
@@ -34,7 +51,7 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, _pppCtrlTab
         return;
     }
 
-    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)(arg1->m_workArea + arg3->m_serializedDataOffsets[0]);
+    pppScaleLoopAutoWork* work = GetScaleLoopAutoWork(arg1, arg3);
 
     if (arg2->m_index == arg1->m_graphId) {
         work->m_scale[0] += arg2->m_addScale[0];
@@ -106,12 +123,10 @@ void pppScaleLoopAuto(_pppPObject* arg1, pppScaleLoopAutoStep* arg2, _pppCtrlTab
  */
 void pppScaleLoopAutoCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-	int* data = ctrlTable->m_serializedDataOffsets;
-	int offset = data[0];
 	const float* zeroPtr = &gPppScaleLoopAutoZero;
 	float zero = *zeroPtr;
-	
-	pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)(object->m_workArea + offset);
+
+	pppScaleLoopAutoWork* work = GetScaleLoopAutoWork(object, ctrlTable);
 	
 	work->m_scale[2] = zero;
 	work->m_scale[1] = zero;

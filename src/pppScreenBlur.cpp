@@ -5,6 +5,29 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
+struct ScreenBlurDataOffsets {
+    s32 m_valueOffset;
+    s32 m_activeOffset;
+};
+
+STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_valueOffset) == 0x0);
+STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_activeOffset) == 0x4);
+
+static inline ScreenBlurDataOffsets* GetScreenBlurDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<ScreenBlurDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
+static inline u8* GetScreenBlurValue(_pppPObject* blur, _pppCtrlTable* ctrlTable)
+{
+    return blur->m_workArea + GetScreenBlurDataOffsets(ctrlTable)->m_valueOffset;
+}
+
+static inline u8* GetScreenBlurActive(_pppPObject* blur, _pppCtrlTable* ctrlTable)
+{
+    return blur->m_workArea + GetScreenBlurDataOffsets(ctrlTable)->m_activeOffset;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80155504
@@ -16,9 +39,8 @@
  */
 void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurStep* blurParam, _pppCtrlTable* ctrlTable)
 {
-    s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1];
-    u8* blurActive = blur->m_workArea + blurActiveOffset;
-    u8* blurValuePtr = blur->m_workArea + ctrlTable->m_serializedDataOffsets[0];
+    u8* blurActive = GetScreenBlurActive(blur, ctrlTable);
+    u8* blurValuePtr = GetScreenBlurValue(blur, ctrlTable);
     u32 blurMask;
 
     blurParam->m_blurB = 0;
@@ -86,8 +108,7 @@ void pppCon2ScreenBlur(_pppPObject*)
  */
 void pppConScreenBlur(_pppPObject* blur, _pppCtrlTable* ctrlTable)
 {
-    s32 blurOffset = ctrlTable->m_serializedDataOffsets[1];
-    u8* blurActive = blur->m_workArea + blurOffset;
+    u8* blurActive = GetScreenBlurActive(blur, ctrlTable);
 
     Graphic.InitBlurParameter();
     *blurActive = 0;

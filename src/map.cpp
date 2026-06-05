@@ -1480,7 +1480,7 @@ void CMapMng::LoadMapNoSyncCalc()
 CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
     const int objCount = m_mapObjCount;
-    CMapObj* mapObjEnd = GetMapObjArray() + objCount;
+    CMapObj* mapObjEnd = m_mapObjArray + objCount;
 
     for (CMapObj* obj = searchStart; obj < mapObjEnd; obj++) {
         if (obj->m_parent == parentObj) {

@@ -511,7 +511,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if ((mode < 6) && (param->m_speedRandRange != 0.0f)) {
+    if ((mode >= 4) && (mode < 6) && (param->m_speedRandRange != 0.0f)) {
         float speedRandRange = param->m_speedRandRange;
         float speedRandHalf = FLOAT_80330568 * speedRandRange;
         u8 randType = param->m_randType;
@@ -567,7 +567,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 float vz;
 
                 if (param->m_randType == 0 || param->m_randType > 5) {
-                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
 
@@ -594,7 +594,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
-                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
 

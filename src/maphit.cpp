@@ -120,41 +120,36 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
     CMapIdGrp* mapIdGrps = MapMng.GetMapIdGrpArray();
-    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
+    CMapHitFace* face = m_faces;
     int faceIndex = 0;
     while (faceIndex < m_faceCount) {
-        CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
-        if ((hitFace->m_drawFlags & 1) == 0) {
-            const CMapIdGrp* mapIdGrp = mapIdGrps + hitFace->m_groupIndex;
+        if ((face->m_drawFlags & 1) == 0) {
+            const CMapIdGrp* mapIdGrp = mapIdGrps + face->m_groupIndex;
             const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
             const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            unsigned char* index = face + 0x48;
             int i = 0;
-            while (i < static_cast<int>(face[0x46])) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
+            while (i < static_cast<int>(face->m_vertexCount)) {
+                Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
-                             *reinterpret_cast<float*>(face + 0x08));
+                GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);
                 GXColor4u8(colorABytes.r, colorABytes.g, colorABytes.b, colorABytes.a);
                 i++;
-                index += 2;
             }
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face[0x46]) - 1;
+            i = static_cast<int>(face->m_vertexCount) - 1;
             while (i >= 0) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
+                Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
-                             *reinterpret_cast<float*>(face + 0x08));
+                GXNormal3f32(face->m_normal.x, face->m_normal.y, face->m_normal.z);
                 GXColor4u8(colorBBytes.r, colorBBytes.g, colorBBytes.b, colorBBytes.a);
                 i--;
             }
         }
 
-        face += 0x50;
+        face++;
         faceIndex++;
     }
 
@@ -164,38 +159,35 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-    face = reinterpret_cast<unsigned char*>(m_faces);
+    face = m_faces;
     faceIndex = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
-        CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
-        if ((hitFace->m_drawFlags & 1) == 0) {
-            hitFace->m_drawFlags = 0;
+        if ((face->m_drawFlags & 1) == 0) {
+            face->m_drawFlags = 0;
         } else {
-            hitFace->m_drawFlags = 0;
-            hitFace->m_drawFlags = 0;
+            face->m_drawFlags = 0;
+            face->m_drawFlags = 0;
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            unsigned char* index = face + 0x48;
             int i = 0;
-            while (i < static_cast<int>(face[0x46])) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
+            while (i < static_cast<int>(face->m_vertexCount)) {
+                Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
                 i++;
-                index += 2;
             }
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face[0x46]) - 1;
+            i = static_cast<int>(face->m_vertexCount) - 1;
             while (i >= 0) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
+                Vec* vertex = m_vertices + face->m_vertexIndices[i];
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
                 i--;
             }
         }
 
-        face += 0x50;
+        face++;
         faceIndex++;
     }
 }

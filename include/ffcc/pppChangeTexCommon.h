@@ -14,6 +14,22 @@ struct ChangeTexDisplayListCopy {
 typedef CChara::CMesh::CRefData ChangeTexMeshData;
 typedef CChara::CMesh ChangeTexMeshRef;
 
+struct ChangeTexStep {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    float m_initWOrk;
+    float m_stepValue;
+    float m_arg3;
+    union {
+        u8 m_payload[6];
+        struct Payload {
+            u8 m_mode;
+            u8 m_pad01[5];
+        } m_changeTex;
+    };
+    u8 _pad1[1];
+};
+
 static inline ChangeTexMeshRef* ChangeTexMeshes(CChara::CModel* model)
 {
 	return model->m_meshes;

@@ -1769,7 +1769,7 @@ int CMapMng::ReadMtx(char* mapName)
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);
 
-        bool exists = false;
+        bool exists;
         if (asyncLoadState.m_mapReadMode == 1) {
             exists = true;
         } else {
@@ -1777,6 +1777,8 @@ int CMapMng::ReadMtx(char* mapName)
             if (openProbe != 0) {
                 File.Close(openProbe);
                 exists = true;
+            } else {
+                exists = false;
             }
         }
         if (!exists) {

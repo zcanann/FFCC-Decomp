@@ -1782,7 +1782,10 @@ int CMapMng::ReadMtx(char* mapName)
             }
         }
         if (!exists) {
-            if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 2) {
+                return 1;
+            }
+            if (asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {

@@ -173,14 +173,14 @@ static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
 extern const float FLOAT_80330D50 = 0.25f;
 extern const float kGbaQueueMapCoordScale = 3.0f;
-extern const unsigned int DAT_80330D58 = 1;
-extern const unsigned int DAT_80330D5C = 2;
+extern const unsigned int ITEM_USE__11GbaQueConst = 1;
+extern const unsigned int ITEM_PUT__11GbaQueConst = 2;
 extern const unsigned int DAT_80330D60 = 4;
-extern const unsigned int DAT_80330D64 = 0x20;
-extern const unsigned int DAT_80330D68 = 8;
-extern const unsigned int DAT_80330D6C = 0x10;
-extern const unsigned int DAT_80330D70 = 1;
-extern const unsigned int DAT_80330D74 = 2;
+extern const unsigned int OPEN_LETTER__11GbaQueConst = 0x20;
+extern const unsigned int MOVE_ATTACH__11GbaQueConst = 8;
+extern const unsigned int REPLY_LETTER__11GbaQueConst = 0x10;
+extern const unsigned int CAN_REPLY__11GbaQueConst = 1;
+extern const unsigned int ITEM_ATTACH__11GbaQueConst = 2;
 
 /*
  * --INFO--

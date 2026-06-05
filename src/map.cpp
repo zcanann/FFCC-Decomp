@@ -2046,7 +2046,7 @@ int CMapMng::ReadOtm(char* mapName)
 
         Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
         asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(asyncLoadState.m_mapLoadCursor) + size;
-        CheckSum(File.m_readBuffer, size);
+        CheckSum(filePtr, size);
         readIndex += 1;
     } else {
         fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);

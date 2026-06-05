@@ -5,11 +5,8 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-extern const char s_CGbaPcs_80330870[];
-extern const char s_JoyBus__LoadBin___error_801d9de0[];
-
-const char s_CGbaPcs_80330870[] = "CGbaPcs";
-const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
+extern const char s_CGbaPcs_80330870[] = "CGbaPcs";
+static const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
 extern "C" {
 void create__7CGbaPcsFv(CGbaPcs*);

@@ -293,6 +293,7 @@ int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -302,6 +303,7 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
     m_numItems++;
     return 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -395,6 +397,7 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -404,6 +407,7 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
     m_numItems++;
     return 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

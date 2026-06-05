@@ -118,11 +118,6 @@ static inline const CSoundLayout& SoundData(const CSound* self)
     return *reinterpret_cast<const CSoundLayout*>(self);
 }
 
-static inline CRedSound* RedSound(CSound* self)
-{
-    return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
-}
-
 template <int PointCount>
 CLine<PointCount>::CLine()
 {
@@ -667,12 +662,11 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
 
     if (sound.m_pauseAllSe == 0) {
-        reinterpret_cast<CRedSound*>(self + 8)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
-        reinterpret_cast<CRedSound*>(self + 8)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+        m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+        m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     }
 }
 
@@ -683,16 +677,15 @@ void CSound::PauseDiscError(int pause)
  */
 void CSound::CheckDriver(int mode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint(1);
-    reinterpret_cast<CRedSound*>(self + 8)->TestProcess(mode);
-    reinterpret_cast<CRedSound*>(self + 8)->DisplayWaveInfo();
-    reinterpret_cast<CRedSound*>(self + 8)->DisplaySePlayInfo();
+    m_redSound.ReportPrint(1);
+    m_redSound.TestProcess(mode);
+    m_redSound.DisplayWaveInfo();
+    m_redSound.DisplaySePlayInfo();
     sound.m_debugPrint = oldPrint;
-    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    m_redSound.ReportPrint((-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*
@@ -2410,11 +2403,10 @@ inline void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
 
-    reinterpret_cast<CRedSound*>(self + 8)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
-    reinterpret_cast<CRedSound*>(self + 8)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+    m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+    m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     sound.m_pauseAllSe = pause;
 }
 

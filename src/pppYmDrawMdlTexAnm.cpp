@@ -5,8 +5,8 @@
 #include "ffcc/ppp_linkage.h"
 
 extern "C" {
-extern f32 FLOAT_80330548;
-extern f32 FLOAT_8033054c;
+const f32 FLOAT_80330548 = -1.0f;
+const f32 FLOAT_8033054c = 0.0f;
 extern const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
 extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
     (char)0x83, (char)0x52, (char)0x83, (char)0x93, (char)0x83,

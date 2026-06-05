@@ -915,7 +915,7 @@ pppKeShpTail2X.cpp:
 	extab       start:0x80007A18 end:0x80007A38
 	extabindex  start:0x8000DC78 end:0x8000DCA8
 	.text       start:0x80088698 end:0x8008922C
-	.sdata2     start:0x80330510 end:0x80330520
+	.sdata2     start:0x80330508 end:0x80330520
 
 pppKeShpTail3X.cpp:
 	extab       start:0x80007A38 end:0x80007A50
@@ -928,7 +928,7 @@ pppYmDrawMdlTexAnm.cpp:
 	extabindex  start:0x8000DCCC end:0x8000DCFC
 	.text       start:0x8008A38C end:0x8008ABC0
 	.rodata     start:0x801D9C38 end:0x801D9C68
-	.sdata2     start:0x80330550 end:0x80330560
+	.sdata2     start:0x80330548 end:0x80330560
 
 pppDrawMatrixWood.cpp:
 	extab       start:0x80007A70 end:0x80007A78

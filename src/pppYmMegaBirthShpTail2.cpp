@@ -38,20 +38,6 @@ struct PYmMegaBirthShpTail2
     unsigned char m_tail2MatrixMode;
 };
 
-struct pppYmMegaBirthShpTail2
-{
-    _pppPObjLink m_link;
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX field_0x40;
-    char field_0x70[0x4c];
-    unsigned int field_0xbc;
-    unsigned int field_0xc0;
-    unsigned int field_0xc4;
-    unsigned int field_0xc8;
-    char m_data[0x500];
-};
-
 struct VYmMegaBirthShpTail2
 {
     pppFMATRIX m_emitterMatrix;
@@ -93,8 +79,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
     const s32 colorOffset = offsets->m_serializedDataOffsets[1];
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
     VYmMegaBirthShpTail2* work =
-        (VYmMegaBirthShpTail2*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + particleDataOffset);
-    VColor* colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
+        (VYmMegaBirthShpTail2*)(object->m_workArea + particleDataOffset);
+    VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     _PARTICLE_DATA* particles = work->m_particles;
     _PARTICLE_WMAT* wmats = work->m_wmats;
     _PARTICLE_COLOR* colors = work->m_colors;
@@ -112,7 +98,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         static_cast<pppShapeAnimData*>(ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex]->m_animData);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x57])) >> 5);
     pppSetDrawEnv(
-        0, &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x0C],
+        0, &object->m_drawMatrix, *(float*)(payload + 0x74), payload[0x78], step[0x0C],
         payload[0x5A], 0, zEnable, 1, 0);
     pppSetBlendMode(payload[0x5A]);
 
@@ -285,8 +271,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     VYmMegaBirthShpTail2* const work =
-        (VYmMegaBirthShpTail2*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + offsets->m_serializedDataOffsets[2]);
-    VColor* const colorWork = (VColor*)(reinterpret_cast<_pppPObject*>(object)->m_workArea + colorOffset);
+        (VYmMegaBirthShpTail2*)(object->m_workArea + offsets->m_serializedDataOffsets[2]);
+    VColor* const colorWork = (VColor*)(object->m_workArea + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -740,7 +726,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
  */
 void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
-    u8* work = reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2];
+    u8* work = param1->m_workArea + param2->m_serializedDataOffsets[2];
     void** ptrBc = (void**)(work + 0x3c);
     void** ptrC0 = (void**)(work + 0x40);
     void** ptrC4 = (void**)(work + 0x44);
@@ -770,7 +756,7 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTabl
  */
 void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTable* param2)
 {
-    pppFMATRIX* work = (pppFMATRIX*)(reinterpret_cast<_pppPObject*>(param1)->m_workArea + param2->m_serializedDataOffsets[2]);
+    pppFMATRIX* work = (pppFMATRIX*)(param1->m_workArea + param2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix(*work);

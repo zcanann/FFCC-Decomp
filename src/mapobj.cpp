@@ -1091,11 +1091,11 @@ void CMapObj::SetLink()
     CMapObj* mapStart = MapObjArrayStart();
     CMapObj* head0 = 0;
     CMapObj* search0 = mapStart;
-    CMapObj* search2Start = mapStart;
-    CMapObj* search3Start = mapStart;
-    CMapObj* search4Start = mapStart;
-    CMapObj* search5Start = mapStart;
-    CMapObj* search6Start = mapStart;
+    CMapObj* search2Start = MapObjArrayStart();
+    CMapObj* search3Start = MapObjArrayStart();
+    CMapObj* search4Start = MapObjArrayStart();
+    CMapObj* search5Start = MapObjArrayStart();
+    CMapObj* search6Start = MapObjArrayStart();
 
     CMapObj* child0;
     while ((child0 = MapMng.SearchChildMapObj(search0, this)) != 0) {

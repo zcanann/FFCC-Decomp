@@ -6,13 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct RandUpIntParams {
-    s32 targetId;
-    s32 sourceOffset;
-    u32 blend;
-    u8 useNormalDistribution;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80062ce0

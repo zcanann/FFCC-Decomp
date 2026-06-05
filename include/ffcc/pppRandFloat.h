@@ -1,12 +1,17 @@
 #ifndef _PPP_RANDFLOAT_H_
 #define _PPP_RANDFLOAT_H_
 
+#include <dolphin/types.h>
 
 struct _pppPObject;
-#include "dolphin/types.h"
-
 struct _pppCtrlTable;
-struct RandFloatParam;
+
+struct RandFloatParam {
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend;
+    u8 useNormalDistribution;
+};
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,10 +1,18 @@
 #ifndef _PPP_RANDUPINT_H_
 #define _PPP_RANDUPINT_H_
 
+#include <dolphin/types.h>
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct RandUpIntParams;
+
+struct RandUpIntParams {
+    s32 targetId;
+    s32 sourceOffset;
+    u32 blend;
+    u8 useNormalDistribution;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

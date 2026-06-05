@@ -571,14 +571,15 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     Vec lightDir;
     GXLightObj lightObj;
     CCameraPcs* camera = &CameraPcs;
+    const float& zero = FLOAT_80331cc4;
 
     lightDir.x = camera->m_directionX - (30.0f + camera->m_positionX);
     lightDir.y = camera->m_directionY - (30.0f + camera->m_positionY);
     lightDir.z = camera->m_directionZ - (30.0f + camera->m_positionZ);
     PSVECNormalize(&lightDir, &lightDir);
 
-    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, 0.0f, 1.0f, 0.0f);
-    GXInitLightAttn(&lightObj, 0.0f, 0.0f, 1.0f, 4.0f, 0.0f, -3.0f);
+    GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, 1.0f, zero);
+    GXInitLightAttn(&lightObj, zero, zero, 1.0f, 4.0f, zero, -3.0f);
 
     GXInitLightColor(&lightObj, CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
     GXLoadLightObjImm(&lightObj, (GXLightID)1);
@@ -597,7 +598,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
  */
 int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
-    float zero = 0.0f;
+    float zero = FLOAT_80331cc4;
     VScreenBreak* work = static_cast<VScreenBreak*>(param_2);
     PScreenBreak* step = static_cast<PScreenBreak*>(param_3);
     ScreenBreakPiece* pieceData = work->m_pieces;

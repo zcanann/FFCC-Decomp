@@ -3,63 +3,10 @@
 
 #include "ffcc/partMng.h"
 
-struct pppYmMegaBirthShpTail3
-{
-    _pppPObjLink m_link;      // 0x0
-    s32 m_graphId;            // 0xc
-    pppFMATRIX m_localMatrix; // 0x10
-    pppFMATRIX field_0x40;    // 0x40
-    char field_0x70[0x4c];    // 0x70 - padding/other fields
-    unsigned int field_0xbc;  // 0xbc
-    unsigned int field_0xc0;  // 0xc0
-    unsigned int field_0xc4;  // 0xc4
-    unsigned int field_0xc8;  // 0xc8
-    char m_data[0x500];       // 0xcc - additional data
-};
-
-struct VYmMegaBirthShpTail3
-{
-    pppFMATRIX m_emitterMatrix;   // 0x0
-    Vec m_tailScaleDirection;     // 0x30
-    _PARTICLE_DATA* m_particles;  // 0x3c
-    _PARTICLE_WMAT* m_wmats;      // 0x40
-    _PARTICLE_COLOR* m_colors;    // 0x44
-    unsigned int m_maxParticles;  // 0x48
-    unsigned short m_lifeLimit;   // 0x4c
-    unsigned short m_pathIndex;   // 0x4e
-};
-
-struct PYmMegaBirthShpTail3
-{
-    Mtx m_matrix;                  // 0x00
-    Vec m_directionTail;           // 0x30
-    float m_colorDeltaAdd[4];      // 0x3c
-    float m_sizeStart;             // 0x4c
-    float m_sizeVal;               // 0x50
-    float m_speedRandRange;        // 0x54
-    float field_0x58;              // 0x58
-    Vec m_speedScale;              // 0x5c
-    unsigned char m_randType;       // 0x68
-    unsigned char m_enableParticleColor; // 0x69
-    unsigned char m_pad0x6a[0x6C - 0x6A];
-    short m_pathIndex;             // 0x6c
-    unsigned char m_pad0x6e[0xB9 - 0x6E];
-    unsigned char m_wmatCopyMode;  // 0xb9
-};
-
+struct pppYmMegaBirthShpTail3;
+struct PYmMegaBirthShpTail3;
 struct pppYmMegaBirthShpTail3UnkB;
-struct pppYmMegaBirthShpTail3UnkC
-{
-    u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
-void get_rand(void);
-void S4ToF32(pppFVECTOR4*, short*);
-void alloc_check(VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*);
-void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
-void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
-void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*);
+struct pppYmMegaBirthShpTail3UnkC;
 
 #ifdef __cplusplus
 extern "C" {

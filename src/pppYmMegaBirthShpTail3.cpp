@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
@@ -38,6 +39,21 @@ static pppFMATRIX g_matUnit3;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
+struct YmMegaBirthShpTail3DataOffsets
+{
+    s32 m_unusedOffset;
+    s32 m_colorOffset;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(YmMegaBirthShpTail3DataOffsets, m_colorOffset) == 0x4);
+STATIC_ASSERT(offsetof(YmMegaBirthShpTail3DataOffsets, m_workOffset) == 0x8);
+
+static inline YmMegaBirthShpTail3DataOffsets* GetYmMegaBirthShpTail3DataOffsets(pppYmMegaBirthShpTail3Offsets* offsets)
+{
+    return reinterpret_cast<YmMegaBirthShpTail3DataOffsets*>(offsets->m_serializedDataOffsets);
+}
+
 void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
@@ -55,8 +71,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
     const u32 dataValIndex = *(u32*)(step + 4);
-    const s32 colorOffset = offsets->m_serializedDataOffsets[1];
-    const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
+    YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
+    const s32 colorOffset = serializedOffsets->m_colorOffset;
+    const s32 particleDataOffset = serializedOffsets->m_workOffset;
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)(workBytes + 0x3c);
@@ -284,9 +301,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     _PARTICLE_WMAT* worldMat;
     int spawnCount;
 
-    colorOffset = offsets->m_serializedDataOffsets[1];
+    YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
+    colorOffset = serializedOffsets->m_colorOffset;
     VYmMegaBirthShpTail3* const work =
-        (VYmMegaBirthShpTail3*)(object->m_workArea + offsets->m_serializedDataOffsets[2]);
+        (VYmMegaBirthShpTail3*)(object->m_workArea + serializedOffsets->m_workOffset);
     VColor* const colorWork = (VColor*)(object->m_workArea + colorOffset);
     paramPayload = (u8*)param;
 
@@ -797,7 +815,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
  */
 void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
-    int offset = param_2->m_serializedDataOffsets[2];
+    int offset = GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset;
     u8* work = pppYmMegaBirthShpTail3_->m_workArea + offset;
     void** ptrBc = (void**)(work + 0x3c);
     void** ptrC0 = (void**)(work + 0x40);
@@ -829,7 +847,7 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
 void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
     pppFMATRIX* work =
-        (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + param_2->m_serializedDataOffsets[2]);
+        (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset);
     float initVal;
 
     pppUnitMatrix(*work);

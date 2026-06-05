@@ -18,11 +18,11 @@ extern const float kCharaAnimZero;
 extern const float kCharaAnimDegToRad;
 extern const float kCharaAnimNegativeOne;
 extern const float kCharaAnimFullTurnDegrees;
-extern const float kYmBreathHalfCircleDegrees = 180.0f;
-extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-extern const double DOUBLE_80330CA0 = 4503599627370496.0;
-extern const float kYmBreathSpreadScale = 2.0f;
-extern const double kYmBreathHalfChance;
+static const float kYmBreathHalfCircleDegrees = 180.0f;
+static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
+static const double DOUBLE_80330CA0 = 4503599627370496.0;
+static const float kYmBreathSpreadScale = 2.0f;
+static const double kYmBreathHalfChance = 0.5;
 
 static inline float LoadFloat(const float& value)
 {

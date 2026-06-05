@@ -3604,12 +3604,12 @@ void CGMonObj::sysControl(int controlType)
 		m_unk6BE = 0;
 		break;
 
-	case 0xC:
-		m_unk6C1 = 1;
-		break;
-
 	case 0xD:
 		m_unk6C1 = 0;
+		break;
+
+	case 0xC:
+		m_unk6C1 = 1;
 		break;
 
 	case 0xF:
@@ -3625,11 +3625,13 @@ void CGMonObj::sysControl(int controlType)
 		break;
 
 	case 0x15:
-		object->m_weaponNodeFlags = (object->m_weaponNodeFlags & 0xF7) | 8;
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
 		break;
 
 	case 0x16:
-		object->m_weaponNodeFlags &= 0xF7;
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 0, 3, 28, 28));
 		break;
 	}
 }

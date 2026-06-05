@@ -427,10 +427,12 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnim*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -464,10 +466,12 @@ void CPtrArray<CMapAnim*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -524,10 +528,12 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnimKeyDt*>::GetSize()
 {
     return m_numItems;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -539,10 +545,12 @@ int CPtrArray<CMapAnimKeyDt*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

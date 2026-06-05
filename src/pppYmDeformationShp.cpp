@@ -155,8 +155,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 		if (param_2->m_splitMode == 0) {
 			u8 size = param_2->m_size;
+			s8 orientation = param_2->m_orientation;
 			float quadSize = (float)size;
-			setVertexPos(vertices, (s8)param_2->m_orientation, -quadSize, quadSize, quadSize, -quadSize);
+			setVertexPos(vertices, orientation, -quadSize, quadSize, quadSize, -quadSize);
 			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, FLOAT_803305f8, FLOAT_803305f8);
 			RenderDeformationShape(object, work, vertices, uvs);
 		} else {

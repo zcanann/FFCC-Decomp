@@ -92,7 +92,7 @@ void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*
 void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 
-extern "C" const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
+static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--

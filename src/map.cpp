@@ -219,10 +219,12 @@ int CPtrArray<CMaterial*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 {
     m_defaultSize = defaultSize;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -234,10 +236,12 @@ void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
     m_growCapacity = growCapacity;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -316,6 +316,16 @@ CChara::CAnimNode::CAnimNode()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CChara::CAnimNode::~CAnimNode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 296b
  * EN Address: TODO
@@ -383,16 +393,6 @@ void CChara::CAnimNode::Create(CChunkFile& chunkFile)
  */
 void CChara::CAnimNode::mapping(CChara::CAnim*)
 {
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CChara::CAnimNode::~CAnimNode()
-{
-	// TODO
 }
 
 /*

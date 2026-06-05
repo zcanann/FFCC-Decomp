@@ -199,8 +199,12 @@ void CDbgMenuPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012cd88
+ * PAL Size: 1144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::calc()
 {
@@ -228,8 +232,7 @@ void CDbgMenuPcs::calc()
 			CFlatEventMask() = ~CFlatEventMask();
 			break;
 		case 0x65:
-			stackData[0].m_word = 0;
-			stackData[2].m_word = 0;
+			stackData[0].m_word = stackData[2].m_word = 0;
 			unsigned char gameFlags = CFlatGameFlags();
 			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f));
 			gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (gameFlags & ~CFlatGameFlag_Shouki);

@@ -22,6 +22,11 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004c71c
@@ -35,23 +40,25 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
 	CPtrArray<CMapShadow*>* mapShadowArray;
 	CMapShadow* shadow;
+	int target;
 	int i;
 	u32 octTreeMask;
 	Vec pos;
 
+	target = (int)mapShadow;
 	octTree.ClearShadow();
 	if (octTree.GetMapObject()->m_shadowTarget != 0) {
         mapShadowArray = &MapMng.GetMapShadowArray();
 		for (i = 0; i < (u32)mapShadowArray->GetSize(); i++) {
 			octTreeMask = octTree.GetMapObject()->m_shadowTarget;
 			if (((octTreeMask & (1U << i)) != 0) &&
-			    ((shadow = (*mapShadowArray)[i])->m_targetEnabled[(int)mapShadow] != 0) &&
+			    ((shadow = (*mapShadowArray)[i])->m_targetEnabled[target] != 0) &&
 			    (shadow->m_materialMode == 0)) {
 				pos.x = shadow->m_modelA->m_worldMtx[0][3];
 				pos.y = shadow->m_modelA->m_worldMtx[1][3];
 				pos.z = shadow->m_modelA->m_worldMtx[2][3];
 
-				octTree.InsertShadow(i, pos, shadow->m_targetBounds[(int)mapShadow]);
+				octTree.InsertShadow(i, pos, shadow->m_targetBounds[target]);
 			}
 		}
 	}
@@ -121,15 +128,19 @@ void CMapShadow::Init()
 	m_materialMode = texture->m_wrapMode;
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
-		double scaleBias = kMapShadowDepthBias;
+		double scaleBias = LoadDouble(kMapShadowDepthBias);
 		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
-		double scaleBias = kMapShadowDepthBias;
+		double scaleBias = LoadDouble(kMapShadowDepthBias);
 		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}
 }
+
+extern const float FLOAT_8032FD00 = 0.0f;
+extern const float FLOAT_8032FD04 = 1.0f;
+extern const double DOUBLE_8032FD08 = 4503601774854144.0;

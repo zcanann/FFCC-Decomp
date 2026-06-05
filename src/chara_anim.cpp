@@ -333,7 +333,7 @@ CChara::CAnimNode::~CAnimNode()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CAnimNode::Create(CChunkFile& chunkFile)
+inline void CChara::CAnimNode::Create(CChunkFile& chunkFile)
 {
 	CChunkFile::CChunk chunk;
 
@@ -391,7 +391,7 @@ void CChara::CAnimNode::Create(CChunkFile& chunkFile)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CAnimNode::mapping(CChara::CAnim*)
+inline void CChara::CAnimNode::mapping(CChara::CAnim*)
 {
 }
 

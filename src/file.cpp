@@ -824,5 +824,3 @@ void CFile::Init()
         ((CHandle*)(m_handlePoolHead.m_currentOffset + i * sizeof(CHandle)))->m_previous = nextHandle;
     }
 }
-
-extern "C" const char s_SN_EXIT_8032F630[] = "SN_EXIT";

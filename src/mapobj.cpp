@@ -529,7 +529,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_localScaleZ = chunkFile.GetF4();
 
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
-                ((m_localScaleX != kMapObjZero) || (m_localScaleY != kMapObjZero) || (m_localScaleZ != kMapObjZero))) {
+                ((kMapObjZero != m_localScaleX) || (kMapObjZero != m_localScaleY) || (kMapObjZero != m_localScaleZ))) {
                 if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
                 } else {

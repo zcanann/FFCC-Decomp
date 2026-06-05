@@ -149,23 +149,23 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-extern "C" const char s_no_texture[] = "no texture...";
+static const char s_no_texture[] = "no texture...";
 static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
-extern "C" const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
-extern "C" const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
-extern "C" const char s_anim_path_fmt[] = "%splot%d.cha";
-extern "C" const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
-extern "C" const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
-extern "C" const char s_cont_fmt[] = "CONT = %d";
-extern "C" const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
-extern "C" const char s_load_model[] = "CCharaPcs LoadModel";
-extern "C" const char s_load_texture[] = "CCharaPcs LoadTexture";
-extern "C" const char s_load_anim[] = "CCharaPcs LoadAnim";
-extern "C" const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
-extern "C" const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
-extern "C" const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
-extern "C" const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
-extern "C" const char s_back_tex_fmt[] = "%sback.tex";
+static const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
+static const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
+static const char s_anim_path_fmt[] = "%splot%d.cha";
+static const char s_frame_speed_fmt[] = "FRAME = %.2f SPEED=%.2f";
+static const char s_iframe_fmt[] = "I = %s IFRAME = %.2f %s";
+static const char s_cont_fmt[] = "CONT = %d";
+static const char s_cpu_profile_fmt[] = "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES";
+static const char s_load_model[] = "CCharaPcs LoadModel";
+static const char s_load_texture[] = "CCharaPcs LoadTexture";
+static const char s_load_anim[] = "CCharaPcs LoadAnim";
+static const char s_default_chm_path[] = "plot/kmitsuru/plot.chm";
+static const char s_default_chd_path[] = "plot/kmitsuru/plot.chd";
+static const char s_default_cha_path[] = "plot/kmitsuru/plot.cha";
+static const char s_default_tex_path[] = "plot/kmitsuru/plot.tex";
+static const char s_back_tex_fmt[] = "%sback.tex";
 
 /*
  * --INFO--

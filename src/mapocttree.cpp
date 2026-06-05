@@ -1082,14 +1082,11 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 {
 	Mtx inverseMtx;
 	Vec localPosition;
-	unsigned char* mapObj;
-
 	if (m_type != 0) {
 		return;
 	}
 
-	mapObj = reinterpret_cast<unsigned char*>(m_mapObject);
-	if ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0) {
+	if ((m_mapObject->m_lightSetIndex & mask) == 0) {
 		return;
 	}
 

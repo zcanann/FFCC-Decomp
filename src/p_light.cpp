@@ -356,20 +356,22 @@ void CLightPcs::draw()
 
             float cutoff;
             if (static_cast<int>(light->m_type) == 1) {
-                cutoff = FLOAT_8032fc94 * light->m_spotScale;
+                cutoff = LoadFloat(FLOAT_8032fc94) * light->m_spotScale;
             } else {
-                cutoff = FLOAT_8032fc74;
+                cutoff = LoadFloat(FLOAT_8032fc74);
             }
 
             GXInitLightSpot(&light->m_gxLightObj, cutoff, (GXSpotFn)light->m_unk4D);
-            GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc84 / light->m_attenFalloff,
-                             FLOAT_8032fc84 / light->m_attenRadius, FLOAT_8032fc84 / light->m_attenRadius);
+            GXInitLightAttnK(&light->m_gxLightObj, LoadFloat(FLOAT_8032fc84) / light->m_attenFalloff,
+                             LoadFloat(FLOAT_8032fc84) / light->m_attenRadius,
+                             LoadFloat(FLOAT_8032fc84) / light->m_attenRadius);
         } else {
             PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
             GXInitSpecularDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
-            GXInitLightAttn(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc1c,
-                            light->m_specularScale * FLOAT_8032fc18, FLOAT_8032fc14,
-                            FLOAT_8032fc1c - (light->m_specularScale * FLOAT_8032fc18));
+            GXInitLightAttn(&light->m_gxLightObj, LoadFloat(FLOAT_8032fc14), LoadFloat(FLOAT_8032fc14),
+                            LoadFloat(FLOAT_8032fc1c), light->m_specularScale * LoadFloat(FLOAT_8032fc18),
+                            LoadFloat(FLOAT_8032fc14),
+                            LoadFloat(FLOAT_8032fc1c) - (light->m_specularScale * LoadFloat(FLOAT_8032fc18)));
         }
     }
 }
@@ -526,7 +528,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
     GXSetChanMatColor((GXChannelID)4, mapColor);
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
-    if ((enable != 0) && (alpha != 0) && (atten < FLOAT_8032fc80)) {
+    if ((enable != 0) && (alpha != 0) && (atten < LoadFloat(FLOAT_8032fc80))) {
         Mtx cam;
         Vec eyePos;
         Vec eyeDir;
@@ -548,7 +550,8 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         PSMTXMultVecSR(cam, &eyeDir, &transformedDir);
         GXInitLightDir(&m_mapLightObj, transformedDir.x, transformedDir.y, transformedDir.z);
         GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
-        GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
+        GXInitLightAttnK(&m_mapLightObj, LoadFloat(FLOAT_8032fc84) / dist, LoadFloat(FLOAT_8032fc88) / atten,
+                         LoadFloat(FLOAT_8032fc8c) / atten);
 
         mcol.a = alpha;
         GXInitLightColor(&m_mapLightObj, mcol);
@@ -1121,10 +1124,11 @@ void CLightPcs::MakeLightMap()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetColorUpdate(GX_TRUE);
     GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
-    GXSetViewport(FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc28, FLOAT_8032fc28, FLOAT_8032fc14, FLOAT_8032fc1c);
+    GXSetViewport(LoadFloat(FLOAT_8032fc14), LoadFloat(FLOAT_8032fc14), LoadFloat(FLOAT_8032fc28),
+                  LoadFloat(FLOAT_8032fc28), LoadFloat(FLOAT_8032fc14), LoadFloat(FLOAT_8032fc1c));
     GXSetScissor(0, 0, 0x40, 0x40);
-    C_MTXOrtho(projection, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc1c,
-               FLOAT_8032fc30);
+    C_MTXOrtho(projection, LoadFloat(FLOAT_8032fc2c), LoadFloat(FLOAT_8032fc1c), LoadFloat(FLOAT_8032fc2c),
+               LoadFloat(FLOAT_8032fc1c), LoadFloat(FLOAT_8032fc1c), LoadFloat(FLOAT_8032fc30));
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);

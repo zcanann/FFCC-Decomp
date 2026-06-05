@@ -95,6 +95,39 @@ static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void SetUpIndWarp(VYmDeformationShp* work)
+{
+	float indMtx[2][3];
+	Mtx drawMtx;
+
+	GXSetNumIndStages(1);
+	GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
+	GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
+
+	if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
+		work->m_angle = 1;
+	}
+
+	PSMTXRotRad(drawMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
+	float scale = work->m_scale;
+	indMtx[0][0] = drawMtx[0][0] * scale;
+	indMtx[0][1] = drawMtx[0][1] * scale;
+	indMtx[0][2] = kPppYmDeformationShpZero;
+	indMtx[1][0] = drawMtx[1][0] * scale;
+	indMtx[1][1] = drawMtx[1][1] * scale;
+	indMtx[1][2] = kPppYmDeformationShpZero;
+	GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8008eec8
  * PAL Size: 2904b
  * EN Address: TODO
@@ -108,10 +141,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	Vec2d uvs[4];
-	float indMtx[2][3];
 	Mtx rotMtx;
 	Vec vertices[4];
-	Mtx drawMtx;
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
@@ -135,23 +166,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		gUtil.SetVtxFmt_POS_TEX0_TEX1();
 		GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
-		GXSetNumIndStages(1);
-		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
-		GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
-
-		if ((work->m_angle == 0) || (work->m_angle == 0x168)) {
-			work->m_angle = 1;
-		}
-
-		PSMTXRotRad(drawMtx, 'z', FLOAT_803305f0 * (float)work->m_angle);
-		float scale = work->m_scale;
-		indMtx[0][0] = drawMtx[0][0] * scale;
-		indMtx[0][1] = drawMtx[0][1] * scale;
-		indMtx[0][2] = kPppYmDeformationShpZero;
-		indMtx[1][0] = drawMtx[1][0] * scale;
-		indMtx[1][1] = drawMtx[1][1] * scale;
-		indMtx[1][2] = kPppYmDeformationShpZero;
-		GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+		SetUpIndWarp(work);
 
 		if (param_2->m_splitMode == 0) {
 			u8 size = param_2->m_size;

@@ -1190,13 +1190,13 @@ void CMapMng::Create()
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
     m_stage = stage;
 
-    GetMapAnimRunArray().SetStage(stage);
-    GetMapAnimArray().SetStage(stage);
-    GetMapAnimKeyDtArray().SetStage(stage);
-    GetMapShadowArray().SetStage(stage);
+    GetMapAnimRunArray().SetStage(m_stage);
+    GetMapAnimArray().SetStage(m_stage);
+    GetMapAnimKeyDtArray().SetStage(m_stage);
+    GetMapShadowArray().SetStage(m_stage);
 
     for (int i = 0; i < 2; i++) {
-        GetMapLightHolderArray(i).SetStage(stage);
+        GetMapLightHolderArray(i).SetStage(m_stage);
     }
 
     gMapHitFaceFlag = 0;

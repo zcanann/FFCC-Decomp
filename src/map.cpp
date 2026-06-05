@@ -2706,7 +2706,7 @@ void CMapMng::Draw()
             CharaPcs.drawMakeTexShadow();
             MaterialMan.InitVtxFmt(-1, GX_RGB565, 0, GX_U16, 0xE, GX_U16, 10);
             MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
-            Graphic.SetFog(m_fogEnable, 0);
+            Graphic.SetFog(MapMng.m_fogEnable, 0);
 
             GXSetColorUpdate(1);
             GXSetAlphaUpdate(0);

@@ -2913,17 +2913,11 @@ void CMapMng::Draw()
         GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
 
         _GXColor materialColor;
-        materialColor.r = 0xFF;
-        materialColor.g = 0xFF;
-        materialColor.b = 0xFF;
-        materialColor.a = 0xFF;
+        *reinterpret_cast<u32*>(&materialColor) = 0xFFFFFFFF;
         GXSetChanMatColor(GX_COLOR0A0, materialColor);
 
         _GXColor ambientColor;
-        ambientColor.r = 0x40;
-        ambientColor.g = 0x40;
-        ambientColor.b = 0x40;
-        ambientColor.a = 0xFF;
+        *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
         GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
         if ((gMapHitDrawMode.m_byte & 2) == 0) {

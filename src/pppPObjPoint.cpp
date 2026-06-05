@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppPObjPoint.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -12,6 +13,23 @@ struct pppPObjPointWork {
     u8 m_pad[4];       // 0xc
     Vec* m_source;     // 0x10
 };
+
+struct PObjPointDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(PObjPointDataOffsets, m_workOffset) == 0x0);
+
+static inline PObjPointDataOffsets* GetPObjPointDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<PObjPointDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
+static inline pppPObjPointWork* GetPObjPointWork(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<pppPObjPointWork*>(
+        pObject->m_workArea + GetPObjPointDataOffsets(ctrlTable)->m_workOffset);
+}
 
 /*
  * --INFO--
@@ -28,8 +46,7 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
         return;
     }
 
-    s32 objOffset = ctrlTable->m_serializedDataOffsets[0];
-    pppPObjPointWork* objPtr = (pppPObjPointWork*)(pObject->m_workArea + objOffset);
+    pppPObjPointWork* objPtr = GetPObjPointWork(pObject, ctrlTable);
 
     if (step->m_graphId == pObject->m_graphId) {
         Vec* source = (step->m_createProgramIndex == -1)

@@ -1384,7 +1384,8 @@ void CCameraPcs::createFullShadow()
 
     GXInitTexObj(&m_fullScreenShadow.m_texObjs[1], rampTex, 0x10, 0x10, GX_TF_I8,
                  GX_CLAMP, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[1], GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f,
+    GXInitTexObjLOD(&m_fullScreenShadow.m_texObjs[1], GX_NEAR, GX_NEAR,
+                    FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 

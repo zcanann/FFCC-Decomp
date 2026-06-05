@@ -162,9 +162,9 @@ void pppDestructLaser(pppLaser *pppLaser, _pppCtrlTable *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserUnkB *param_2, _pppCtrlTable *param_3)
+extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtrlTable *param_3)
 {
-    pppLaserUnkB* step = param_2;
+    pppLaserStep* step = param_2;
     LaserWork* work;
     Vec localB;
     Vec localA;
@@ -338,9 +338,9 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserUnkB *param_2, _pppCtr
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserUnkB *param_2, _pppCtrlTable *param_3)
+extern "C" void pppRenderLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtrlTable *param_3)
 {
-    pppLaserUnkB* step = param_2;
+    pppLaserStep* step = param_2;
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     LaserWork* work = GetLaserWork(pppLaser, param_3);
     int colorOffset = serializedDataOffsets[1];

@@ -63,7 +63,7 @@ static inline float LoadFloat(const float& value)
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
-static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, pppChangeTexUnkB* step)
+static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, ChangeTexStep* step)
 {
 	model->SetCallbackContext(work, step);
 	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
@@ -84,7 +84,7 @@ static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, _pppCtrlTable*)
+void pppRenderChangeTex(pppChangeTex*, ChangeTexStep* step, _pppCtrlTable*)
 {
 	int textureIndex;
 
@@ -107,7 +107,7 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, _pppCtrlTable* data)
+void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTable* data)
 {
 	if (ppvUserStopPartF != 0) {
 		return;
@@ -376,7 +376,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
 	ChangeTexWork* work = static_cast<ChangeTexWork*>(param_2);
-	pppChangeTexUnkB* step = static_cast<pppChangeTexUnkB*>(param_3);
+	ChangeTexStep* step = static_cast<ChangeTexStep*>(param_3);
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	int displayListIdx;
 	ChangeTexDisplayListCopy* displayListPtr;
@@ -428,7 +428,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
 	ChangeTexWork* work = static_cast<ChangeTexWork*>(param_2);
-	pppChangeTexUnkB* step = static_cast<pppChangeTexUnkB*>(param_3);
+	ChangeTexStep* step = static_cast<ChangeTexStep*>(param_3);
 	ChangeTexMeshRef* meshes = ChangeTexMeshes(model);
 	meshes += param_4;
 	ChangeTexMeshData* meshData = meshes->m_data;

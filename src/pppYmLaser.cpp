@@ -57,7 +57,7 @@ STATIC_ASSERT(sizeof(pppYmLaserMapCylinder) == sizeof(CMapCylinder));
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
+extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
 {
 	int* serializedDataOffsets = data->m_serializedDataOffsets;
 	pppYmLaserWork* work = GetYmLaserWork(laser, data);
@@ -329,7 +329,7 @@ extern "C" const f64 DOUBLE_80330E08 = 4503601774854144.0;
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
+extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
 {
 	pppYmLaserWork* work;
 	Vec localB;

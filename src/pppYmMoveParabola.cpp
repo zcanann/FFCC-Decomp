@@ -6,15 +6,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-struct pppYmMoveParabolaUnkB {
-    s32 m_graphId;
-    f32 m_dataValIndex;
-    f32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    f32 m_payload;
-};
-
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;
@@ -48,7 +39,7 @@ static inline Vec* ParabolaBasePosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, _pppCtrlTable* offsetData)
+extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMoveParabolaStep* stepData, _pppCtrlTable* offsetData)
 {
     if (ppvUserStopPartF != 0) {
         return;

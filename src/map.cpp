@@ -2652,8 +2652,7 @@ void CMapMng::Draw()
         return;
     }
 
-    const int mapObjCount = m_mapObjCount;
-    if (mapObjCount == 0) {
+    if (m_mapObjCount == 0) {
         return;
     }
 
@@ -2669,16 +2668,14 @@ void CMapMng::Draw()
     m_underWaterTexPending = 1;
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        const int octTreeCount = m_octTreeCount;
-
         COctTree* octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
+        for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(0);
             octTree++;
         }
 
         CMapObj* mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->Draw(0x40);
             mapObj++;
         }
@@ -2692,13 +2689,13 @@ void CMapMng::Draw()
         LightPcs.SetNumDiffuse(0);
 
         mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->Draw(0);
             mapObj++;
         }
 
         octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
+        for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(1);
             octTree++;
         }
@@ -2836,7 +2833,7 @@ void CMapMng::Draw()
                     startIndex += batchCount;
 
                     octTree = GetOctTreeArray();
-                    for (int i = 0; i < octTreeCount; i++) {
+                    for (int i = 0; i < m_octTreeCount; i++) {
                         octTree->DrawCharaShadow(0);
                         octTree++;
                     }
@@ -2876,13 +2873,13 @@ void CMapMng::Draw()
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
         CMapObj* mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->DrawHitWire();
             mapObj++;
         }
 
         mapObj = MapMng.GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->DrawHitNormal();
             mapObj++;
         }

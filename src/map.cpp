@@ -1624,7 +1624,7 @@ void CMapMng::SetLightSource()
     int mapLightIndex = 0;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
-    CMapObj* mapObjEnd = GetMapObjArray() + mapObjCount;
+    CMapObj* mapObjEnd = m_mapObjArray + mapObjCount;
 
     while (mapObj < mapObjEnd) {
         CMapObjAtr* attr = mapObj->m_attribute;

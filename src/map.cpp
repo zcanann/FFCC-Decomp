@@ -2115,7 +2115,7 @@ int CMapMng::ReadOtm(char* mapName)
                 }
 
                 CMapLightHolder* light = static_cast<CMapLightHolder*>(
-                    operator new(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
+                    operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
                 unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
                 lightRaw[0] = chunkFile.Get1();
                 lightRaw[1] = chunkFile.Get1();
@@ -2141,21 +2141,21 @@ int CMapMng::ReadOtm(char* mapName)
                         return 0;
                     }
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
-                    mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
+                    mesh->ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
                     meshCount += 1;
                     continue;
                 }
 
                 if (chunk.m_id == 0x41534554) {
                     CMapTexAnimSet* texAnimSet =
-                        new (m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet = texAnimSet;
                     texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     continue;
                 }
 
                 if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
                     mapAnim->ReadOtmAnim(chunkFile);
                     GetMapAnimArray().Add(mapAnim);
                     continue;
@@ -2185,7 +2185,7 @@ int CMapMng::ReadOtm(char* mapName)
 
                 if (chunk.m_id == 0x4D534554) {
                     CMaterialSet* materialSet =
-                        new (m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     m_materialSet = materialSet;
                     materialSet->m_materials.SetDefaultSize(0x180);
                     materialSet->m_materials.SetGrow(0);

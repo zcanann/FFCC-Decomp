@@ -22,6 +22,11 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+	return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004c71c
@@ -121,13 +126,13 @@ void CMapShadow::Init()
 	m_materialMode = texture->m_wrapMode;
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
-		double scaleBias = kMapShadowDepthBias;
+		double scaleBias = LoadDouble(kMapShadowDepthBias);
 		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
-		double scaleBias = kMapShadowDepthBias;
+		double scaleBias = LoadDouble(kMapShadowDepthBias);
 		float scaleStep = LoadFloat(kMapShadowScaleStep);
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);

@@ -105,10 +105,10 @@ public:
         void SetWord1(unsigned int word) { m_words.m_word1 = word; }
         unsigned int Word2() const { return m_words.m_word2; }
         void SetWord2(unsigned int word) { m_words.m_word2 = word; }
-        unsigned char Flags() const { return static_cast<unsigned char>(m_half.m_header >> 8); }
+        unsigned char Flags() const { return reinterpret_cast<const unsigned char*>(&m_half.m_header)[0]; }
         void SetFlags(unsigned char flags)
         {
-            m_half.m_header = (m_half.m_header & 0x00FF) | (static_cast<unsigned short>(flags) << 8);
+            reinterpret_cast<unsigned char*>(&m_half.m_header)[0] = flags;
         }
         bool IsOpened() const { return static_cast<signed char>(Flags()) < 0; }
         void SetOpened() { SetFlags(Flags() | 0x80); }

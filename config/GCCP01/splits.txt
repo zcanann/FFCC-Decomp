@@ -109,10 +109,11 @@ pad.cpp:
 	extabindex  start:0x8000B4AC end:0x8000B4D0
 	.text       start:0x80020494 end:0x800211D4
 	.ctors      start:0x801D53C0 end:0x801D53C4
+	.rodata     start:0x801D6D34 end:0x801D6D80
 	.data       start:0x801E8818 end:0x801E8838
 	.bss        start:0x80244140 end:0x8024433C
 	.sdata      start:0x8032E458 end:0x8032E468
-	.sdata2     start:0x8032F818 end:0x8032F840
+	.sdata2     start:0x8032F818 end:0x8032F850
 
 stopwatch.cpp:
 	extab       start:0x80005C44 end:0x80005CA8
@@ -165,7 +166,7 @@ mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
 	extabindex  start:0x8000B7C4 end:0x8000B860
 	.text       start:0x80027774 end:0x800287D0
-	.sbss       start:0x8032ECA0 end:0x8032ECA8
+	.sbss       start:0x8032ECA0 end:0x8032ECA4
 	.sdata2     start:0x8032F930 end:0x8032F938
 
 mapobj.cpp:
@@ -182,7 +183,7 @@ mapocttree.cpp:
 	.ctors      start:0x801D53D4 end:0x801D53D8
 	.rodata     start:0x801D7268 end:0x801D7300
 	.bss        start:0x802456F0 end:0x80245754
-	.sbss       start:0x8032ECA8 end:0x8032ECC0
+	.sbss       start:0x8032ECA4 end:0x8032ECC0
 	.sdata2     start:0x8032F938 end:0x8032F944
 
 map.cpp:
@@ -375,7 +376,7 @@ maptexanim.cpp:
 	.rodata     start:0x801D7E98 end:0x801D7EE0
 	.data       start:0x801EA998 end:0x801EA9B0
 	.sdata      start:0x8032E688 end:0x8032E698
-	.sdata2     start:0x8032FD30 end:0x8032FD68
+	.sdata2     start:0x8032FD30 end:0x8032FD55
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0
@@ -386,7 +387,7 @@ FunnyShape.cpp:
 	extab       start:0x80006BF0 end:0x80006C40
 	extabindex  start:0x8000C898 end:0x8000C910
 	.text       start:0x8005051C end:0x80051F38
-	.sdata2     start:0x8032FD68 end:0x8032FDBC
+	.sdata2     start:0x8032FD58 end:0x8032FDBC
 
 p_tina.cpp:
 	extab       start:0x80006C40 end:0x80006D48
@@ -797,6 +798,11 @@ pppVtMime.cpp:
 	.sdata2     start:0x803300F0 end:0x803300F4
 	.rodata     start:0x801D8520 end:0x801D8530
 
+pppfunctbl.cpp:
+	.rodata     start:0x801D8530 end:0x801D8EE1
+	.data       start:0x801EAE98 end:0x801EC9EC
+	.sdata2     start:0x803300F8 end:0x80330108
+
 pppDrawMatrix.cpp:
 	extab       start:0x800071E8 end:0x800071F0
 	extabindex  start:0x8000D18C end:0x8000D198
@@ -827,7 +833,7 @@ cflat_runtime.cpp:
 	extab       start:0x80007248 end:0x80007310
 	extabindex  start:0x8000D21C end:0x8000D2F4
 	.text       start:0x80065CAC end:0x80069B08
-	.rodata     start:0x801D8EF8 end:0x801D8F10
+	.rodata     start:0x801D8EE8 end:0x801D8F10
 	.data       start:0x801FC9F0 end:0x801FCC08
 	.sdata      start:0x8032E6C0 end:0x8032E6C8
 
@@ -1652,7 +1658,7 @@ pppChangeTex.cpp:
 	extabindex  start:0x80010D80 end:0x80010DBC
 	.text       start:0x8013EF94 end:0x8013F9D0
 	.rodata     start:0x801DD660 end:0x801DD678
-	.sdata2     start:0x80332020 end:0x80332040
+	.sdata2     start:0x80332020 end:0x80332044
 
 pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84

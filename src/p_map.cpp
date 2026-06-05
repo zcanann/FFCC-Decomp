@@ -164,9 +164,16 @@ CRelProfile g_mapSection;
 CRelProfile g_hit_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
 unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
-extern const float DrawRangeDefault;
-extern const float kPMapBoundMinInit;
-extern const float kPMapBoundMaxInit;
+static const float kPMapBoundMinInit = 10000000000.0f;
+static const float kPMapBoundMaxInit = -10000000000.0f;
+static const float DrawRangeDefault = 1000000000.0f;
+static const float kMapBoundsCenterScale = 0.5f;
+static const float kMapCameraCenterYOffset = 1.0f;
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
 static const char s_p_map_cpp[] = "p_map.cpp";
 static const char s_map_load_ok_fmt[] =
@@ -178,37 +185,6 @@ static const char s_map_load_ok_fmt[] =
     "=============================================================\n\n\n";
 static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
-
-namespace {
-struct PMapBound
-{
-    PMapBound()
-    {
-        float min = kPMapBoundMinInit;
-        float max = kPMapBoundMaxInit;
-
-        m_min.z = min;
-        m_min.y = min;
-        m_min.x = min;
-        m_max.z = max;
-        m_max.y = max;
-        m_max.x = max;
-    }
-
-    void operator=(const CBound& other)
-    {
-        *this = *reinterpret_cast<const PMapBound*>(&other);
-    }
-
-    CBound& AsBound()
-    {
-        return *reinterpret_cast<CBound*>(this);
-    }
-
-    Vec m_min;
-    Vec m_max;
-};
-}
 
 /*
  * --INFO--
@@ -301,8 +277,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     if (mode != 2) {
         MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(DrawRangeDefault);
-        MapMng.SetDrawRangeMapObj(DrawRangeDefault);
+        MapMng.SetDrawRangeOctTree(LoadFloat(DrawRangeDefault));
+        MapMng.SetDrawRangeMapObj(LoadFloat(DrawRangeDefault));
     }
 
     MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
@@ -336,12 +312,12 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
-                    float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
-                    cameraPos.x = center * kMapBoundsCenterScale;
-                    center = rootNode->m_boundMinY + rootNode->m_boundMaxY;
-                    cameraPos.y = center * kMapBoundsCenterScale;
-                    center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
-                    cameraPos.z = center * kMapBoundsCenterScale;
+                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
+                    cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
+                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
+                    cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
+                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
+                    cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localTranslateX;
@@ -349,7 +325,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                     cameraPos.z = mapObj->m_localTranslateZ;
                 }
             }
-            cameraPos.y += kMapCameraCenterYOffset;
+            cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
             CameraPcs.m_positionX = cameraPos.x;
             CameraPcs.m_positionY = cameraPos.y;
             CameraPcs.m_positionZ = cameraPos.z;
@@ -492,8 +468,8 @@ void CMapPcs::calc()
     if (m_forceMapReload != 0) {
         MapMng.DestroyMap();
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-        MapMng.SetDrawRangeOctTree(DrawRangeDefault);
-        MapMng.SetDrawRangeMapObj(DrawRangeDefault);
+        MapMng.SetDrawRangeOctTree(LoadFloat(DrawRangeDefault));
+        MapMng.SetDrawRangeMapObj(LoadFloat(DrawRangeDefault));
         MapMng.m_asyncLoadState.m_mapLoadStart = 0;
         MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
         MapMng.m_asyncLoadState.m_mapLoadSize = 0;
@@ -510,12 +486,12 @@ void CMapPcs::calc()
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
-                    float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
-                    cameraPos.x = center * kMapBoundsCenterScale;
-                    center = rootNode->m_boundMinY + rootNode->m_boundMaxY;
-                    cameraPos.y = center * kMapBoundsCenterScale;
-                    center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
-                    cameraPos.z = center * kMapBoundsCenterScale;
+                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
+                    cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
+                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
+                    cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
+                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
+                    cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
                     cameraPos.x = mapObj->m_localTranslateX;
@@ -523,7 +499,7 @@ void CMapPcs::calc()
                     cameraPos.z = mapObj->m_localTranslateZ;
                 }
             }
-            cameraPos.y += kMapCameraCenterYOffset;
+            cameraPos.y += LoadFloat(kMapCameraCenterYOffset);
             CameraPcs.m_positionX = cameraPos.x;
             CameraPcs.m_positionY = cameraPos.y;
             CameraPcs.m_positionZ = cameraPos.z;
@@ -833,9 +809,9 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                PMapBound bound;
+                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
                 bound = CameraPcs.m_shadowRectBound;
-                Graphic.DrawBound(bound.AsBound(), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -883,11 +859,11 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                PMapBound bound;
+                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
                 bound = CameraPcs.m_shadowRectBound;
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
-                Graphic.DrawBound(bound.AsBound(), color);
+                Graphic.DrawBound(bound, color);
             }
         }
     }

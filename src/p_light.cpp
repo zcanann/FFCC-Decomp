@@ -209,43 +209,9 @@ int CLightPcs::GetTable(unsigned long index)
  */
 void CLightPcs::create()
 {
-    char* ptr = (char*)this;
-
-    for (int i = 2; i != 0; i--) {
-        *(u8*)(ptr + 0x1CEC) = 0;
-        *(u32*)(ptr + 0x1CF0) = 0;
-        *(u8*)(ptr + 0x1E24) = 0;
-        *(u32*)(ptr + 0x1E28) = 0;
-        *(u8*)(ptr + 0x1F5C) = 0;
-        *(u32*)(ptr + 0x1F60) = 0;
-        *(u8*)(ptr + 0x2094) = 0;
-        *(u32*)(ptr + 0x2098) = 0;
-        *(u8*)(ptr + 0x21CC) = 0;
-        *(u32*)(ptr + 0x21D0) = 0;
-        *(u8*)(ptr + 0x2304) = 0;
-        *(u32*)(ptr + 0x2308) = 0;
-        *(u8*)(ptr + 0x243C) = 0;
-        *(u32*)(ptr + 0x2440) = 0;
-        *(u8*)(ptr + 0x2574) = 0;
-        *(u32*)(ptr + 0x2578) = 0;
-        *(u8*)(ptr + 0x26AC) = 0;
-        *(u32*)(ptr + 0x26B0) = 0;
-        *(u8*)(ptr + 0x27E4) = 0;
-        *(u32*)(ptr + 0x27E8) = 0;
-        *(u8*)(ptr + 0x291C) = 0;
-        *(u32*)(ptr + 0x2920) = 0;
-        *(u8*)(ptr + 0x2A54) = 0;
-        *(u32*)(ptr + 0x2A58) = 0;
-        *(u8*)(ptr + 0x2B8C) = 0;
-        *(u32*)(ptr + 0x2B90) = 0;
-        *(u8*)(ptr + 0x2CC4) = 0;
-        *(u32*)(ptr + 0x2CC8) = 0;
-        *(u8*)(ptr + 0x2DFC) = 0;
-        *(u32*)(ptr + 0x2E00) = 0;
-        *(u8*)(ptr + 0x2F34) = 0;
-        *(u32*)(ptr + 0x2F38) = 0;
-
-        ptr += 0x1380;
+    for (int i = 0; i < 0x20; i++) {
+        m_bumpLights[i].m_hasTexture = 0;
+        m_bumpLights[i].m_textureData = 0;
     }
 }
 
@@ -748,23 +714,21 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
  */
 void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
 {
-    char* lightPcs = (char*)this;
-    char* bumpSlot = lightPcs + 0x63c;
+    CLight* light = m_sceneLights;
 
-    *(u32*)(lightPcs + 0xb0) = 0;
-    *(u32*)(lightPcs + 0xb4) = 0;
+    m_loadedLightCount = 0;
+    m_loadedLightMask = 0;
 
-    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++, bumpSlot += 0xb0) {
-        if ((*(u8*)((int)target + (int)bumpSlot + 0x60) != 0) &&
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
+        if ((light->m_targetEnable[target] != 0) &&
             (((1 << (i & 0x1f)) & *(u32*)((char*)bits + ((i >> 3) & 0x1ffffffc))) != 0))
         {
-            CLight* light = reinterpret_cast<CLight*>(bumpSlot);
             GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
-            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
-            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
-            *(u32*)(lightPcs + 0xb0) += 1;
+            GXLoadLightObjImm(&light->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
+            m_loadedLightMask |= 1 << m_loadedLightCount;
+            m_loadedLightCount += 1;
 
-            if (*(u32*)(lightPcs + 0xb0) >= 8) {
+            if (m_loadedLightCount >= 8) {
                 return;
             }
         }
@@ -1112,21 +1076,17 @@ void CLightPcs::MakeLightMap()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
     GXSetAlphaUpdate(GX_TRUE);
 
-    u32 target = 0;
-    char* lightTarget = (char*)this;
-    do {
+    for (u32 target = 0; target < 4; target++) {
         u32 i = 0;
-        char* bump = lightTarget;
+        CBumpLight* bumpLight = &m_bumpLights[target * 8];
         do {
-            if (*(u8*)(bump + 0x1cec) != 0) {
-                ((CLightPcs::CBumpLight*)(bump + 0x1c3c))->MakeLightMap();
+            if (bumpLight->m_hasTexture != 0) {
+                bumpLight->MakeLightMap();
             }
             i++;
-            bump += 0x138;
+            bumpLight++;
         } while (i < 8);
-        target++;
-        lightTarget += 0x9c0;
-    } while (target < 4);
+    }
 
     Graphic.SetStdPixelFmt();
     GraphicPcs.setViewport();

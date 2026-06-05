@@ -9,25 +9,24 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const GXColor kFunnyShapeTextureChanColor;
-extern const GXColor kFunnyShapeTextureColor;
-extern const GXColor kFunnyShapeRenderColor;
-extern const float kFunnyShapeBoundsMinInitial;
-extern const float kFunnyShapeBoundsMaxInitial = 0.0f;
-extern const float kFunnyShapeZero;
+const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
+const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
+const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
+static const float kFunnyShapeBoundsMinInitial = -1000.0f;
+static const float kFunnyShapeZero = 0.0f;
 static const float kFunnyShapeViewportScale = 2.0f;
-extern const float kFunnyShapeOne;
+static const float kFunnyShapeOne = 1.0f;
 static const float kFunnyShapeTexCoordDivisor = 4096.0f;
 static const float kFunnyShapePaddingScale = 0.5f;
-extern const float kFunnyShapeNegativeOne;
+static const float kFunnyShapeNegativeOne = -1.0f;
 static const float FLOAT_8032fd84 = 0.0f;
-extern const float kFunnyShapeDefaultOffsetX = 480.0f;
-extern const float kFunnyShapeDefaultOffsetY = 336.0f;
-extern const float kFunnyShapeTextureViewportOrigin = 20.0f;
+static const float kFunnyShapeDefaultOffsetX = 480.0f;
+static const float kFunnyShapeDefaultOffsetY = 336.0f;
+static const float kFunnyShapeTextureViewportOrigin = 20.0f;
 static const float kFunnyShapeAnimOffsetX = 320.0f;
 static const float kFunnyShapeAnimOffsetY = 224.0f;
-extern const float kFunnyShapePi;
-extern const float kFunnyShapeHalfTurnDegrees[2];
+static const float kFunnyShapePi = 3.1415927f;
+static const float kFunnyShapeHalfTurnDegrees[2] = {180.0f, 0.0f};
 extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 
@@ -164,9 +163,9 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;
             float minX = kFunnyShapeBoundsMinInitial;
-            float maxX = kFunnyShapeBoundsMaxInitial;
+            float maxX = kFunnyShapeZero;
             float minY = kFunnyShapeBoundsMinInitial;
-            float maxY = kFunnyShapeBoundsMaxInitial;
+            float maxY = kFunnyShapeZero;
             float drawAngle = angle;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);

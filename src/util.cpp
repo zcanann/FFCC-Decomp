@@ -4,21 +4,20 @@
 #include "ffcc/textureman.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 
-extern const float kUtilZero;
-extern const float kUtilOne;
-extern const float kUtilOrthoBottom;
-extern const float kUtilOrthoRight;
-extern const float kUtilQuadDepth;
-extern const float kUtilHermiteCoeff2;
-extern const float kUtilHermiteCoeff3;
-extern const float kUtilHermiteCoeffNeg2;
-extern Vec gUtilUpVector;
-
 struct UtilHermiteBasis {
 	float m_value[4];
 };
 
+static const float kUtilZero = 0.0f;
+static const float kUtilOne = 1.0f;
+static const float kUtilOrthoBottom = 448.0f;
+static const float kUtilOrthoRight = 640.0f;
+static const float kUtilQuadDepth = -0.9999999f;
+static const float kUtilHermiteCoeff2 = 2.0f;
+static const float kUtilHermiteCoeff3 = 3.0f;
+static const float kUtilHermiteCoeffNeg2 = -2.0f;
 extern const UtilHermiteBasis kUtilHermiteBasis;
+extern Vec gUtilUpVector;
 
 static inline MtxPtr GetCameraMatrix()
 {

@@ -1141,7 +1141,7 @@ void CCharaPcs::InitEnv(int envMode)
 int CCharaPcs::GetNumTexShadow()
 {
     int count = 0;
-    CHandle* head = *(CHandle**)((char*)this + 0x4C);
+    CHandle* head = m_handleList;
     CHandle* current = head->m_next;
 
     while (head != current) {

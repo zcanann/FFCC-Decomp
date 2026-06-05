@@ -915,13 +915,12 @@ void CMenuPcs::createSingleMenu()
         if (m_singleMenuStageActive != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
 
-            void* font = *reinterpret_cast<void**>(self + 0x108);
+            CFont* font = m_labelFont;
             if (font != 0) {
-                CRef* ref = reinterpret_cast<CRef*>(font);
-                if (ref->DecRef() == 0) {
-                    delete ref;
+                if (font->DecRef() == 0) {
+                    delete font;
                 }
-                *reinterpret_cast<void**>(self + 0x108) = 0;
+                m_labelFont = 0;
             }
 
             m_singleMenuStageActive = 0;
@@ -970,13 +969,12 @@ void CMenuPcs::destroySingleMenu()
         gSingMenuAsyncFileHandle = 0;
     }
 
-    void* font = *reinterpret_cast<void**>(self + 0x108);
+    CFont* font = m_labelFont;
     if (font != 0) {
-        CRef* ref = reinterpret_cast<CRef*>(font);
-        if (ref->DecRef() == 0) {
-            delete ref;
+        if (font->DecRef() == 0) {
+            delete font;
         }
-        *reinterpret_cast<void**>(self + 0x108) = 0;
+        m_labelFont = 0;
     }
 
     freeTexture(4, 1, 0x20, 0xD);

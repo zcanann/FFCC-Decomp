@@ -213,7 +213,6 @@ GbaQueue::~GbaQueue()
  */
 void GbaQueue::Init()
 {
-	GbaQueue* osSemaphore;
 	int i;
 	char* obj = reinterpret_cast<char*>(this);
 	GbaQueueSetQueueView* queue = GetSetQueueView(this);
@@ -234,11 +233,9 @@ void GbaQueue::Init()
 	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
 
 	i = 0;
-	osSemaphore = this;
 	do {
-		OSInitSemaphore(osSemaphore->accessSemaphores, 1);
+		OSInitSemaphore(&accessSemaphores[i], 1);
 		i = i + 1;
-		osSemaphore = reinterpret_cast<GbaQueue*>(osSemaphore->accessSemaphores + 1);
 	} while (i < 4);
 
 	*reinterpret_cast<unsigned int*>(obj + 0x448) = 0xFF;
@@ -330,7 +327,6 @@ void GbaQueue::ReleaseSem(int channel)
 void GbaQueue::LoadAll()
 {
 	int i;
-	GbaQueue* semaphoreIter;
 	char* obj;
 	unsigned char prevMenuStageMode;
 	unsigned char spModeBits;
@@ -338,10 +334,8 @@ void GbaQueue::LoadAll()
 	unsigned int cflatFlag;
 	int* scriptFoodBase;
 
-	semaphoreIter = this;
 	for (i = 0; i < 4; i++) {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 
 	obj = reinterpret_cast<char*>(this);
@@ -377,10 +371,8 @@ void GbaQueue::LoadAll()
 	}
 	obj[0x2D5C] = static_cast<char>(spModeBits);
 
-	semaphoreIter = this;
 	for (i = 0; i < 4; i++) {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
 	LoadPlayerStat();
@@ -396,16 +388,12 @@ void GbaQueue::LoadAll()
 		obj[0x2CD8] = 0;
 	}
 
-	semaphoreIter = this;
 	for (i = 0; i < 4; i++) {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	obj[0x2CE8] = static_cast<char>(cflatFlag);
-	semaphoreIter = this;
 	for (i = 0; i < 4; i++) {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
 	LoadMapObj();
@@ -427,18 +415,14 @@ void GbaQueue::LoadAll()
 		}
 	}
 
-	semaphoreIter = this;
 	for (i = 0; i < 4; i++) {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		OSWaitSemaphore(&accessSemaphores[i]);
 	}
 	{
 		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
 		obj[0x2D30] = 0;
-		semaphoreIter = this;
 		for (i = 0; i < 4; i++) {
-			OSSignalSemaphore(semaphoreIter->accessSemaphores);
-			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+			OSSignalSemaphore(&accessSemaphores[i]);
 		}
 
 		for (i = 0; i < 4; i++) {
@@ -1116,13 +1100,11 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
     char* obj = reinterpret_cast<char*>(this);
-    GbaQueue* waitSemaphore = this;
     int waitIndex = 0;
 
     do {
-        OSWaitSemaphore(waitSemaphore->accessSemaphores);
+        OSWaitSemaphore(&accessSemaphores[waitIndex]);
         waitIndex++;
-        waitSemaphore = reinterpret_cast<GbaQueue*>(waitSemaphore->accessSemaphores + 1);
     } while (waitIndex < 4);
 
     obj[0x2D38] = 0;
@@ -1142,31 +1124,25 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     obj[0x2D55] = 0xF;
 
     int signalIndex = 0;
-    GbaQueue* signalSemaphore = this;
     do {
-        OSSignalSemaphore(signalSemaphore->accessSemaphores);
+        OSSignalSemaphore(&accessSemaphores[signalIndex]);
         signalIndex++;
-        signalSemaphore = reinterpret_cast<GbaQueue*>(signalSemaphore->accessSemaphores + 1);
     } while (signalIndex < 4);
 
     if (Joybus.LoadMap(stageId, mapId) == 0) {
         int loadWaitIndex = 0;
-        GbaQueue* loadWaitSemaphore = this;
         do {
-            OSWaitSemaphore(loadWaitSemaphore->accessSemaphores);
+            OSWaitSemaphore(&accessSemaphores[loadWaitIndex]);
             loadWaitIndex++;
-            loadWaitSemaphore = reinterpret_cast<GbaQueue*>(loadWaitSemaphore->accessSemaphores + 1);
         } while (loadWaitIndex < 4);
 
         obj[0x44C] = 0xF;
         obj[0x2D37] = 0xF;
 
         int loadSignalIndex = 0;
-        GbaQueue* loadSignalSemaphore = this;
         do {
-            OSSignalSemaphore(loadSignalSemaphore->accessSemaphores);
+            OSSignalSemaphore(&accessSemaphores[loadSignalIndex]);
             loadSignalIndex++;
-            loadSignalSemaphore = reinterpret_cast<GbaQueue*>(loadSignalSemaphore->accessSemaphores + 1);
         } while (loadSignalIndex < 4);
     }
 
@@ -1397,7 +1373,6 @@ void GbaQueue::LoadPlayerStat()
 {
 	unsigned char localNames[kGbaQueueCaravanNameBlockBytes];
 	unsigned char localPlayerStat[kGbaQueuePlayerDataBlockBytes];
-	GbaQueue* semaphoreIter;
 	unsigned int outOfShoukiMask;
 	int i;
 	char* obj;
@@ -1530,11 +1505,9 @@ void GbaQueue::LoadPlayerStat()
 	}
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	obj = reinterpret_cast<char*>(this);
@@ -1587,11 +1560,9 @@ void GbaQueue::LoadPlayerStat()
 	}
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 }
 
@@ -1609,7 +1580,6 @@ void GbaQueue::LoadEnemyStat()
 	unsigned char localEnemyData[kGbaQueueEnemyDataBytes];
 	unsigned int* enemyObjPtrs;
 	unsigned int* enemyWorkPtrs;
-	GbaQueue* semaphoreIter;
 	int i;
 
 	memset(localEnemyData, 0, sizeof(localEnemyData));
@@ -1661,21 +1631,17 @@ void GbaQueue::LoadEnemyStat()
 	}
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	memcpy(reinterpret_cast<char*>(this) + 0xB34, localEnemyData, sizeof(localEnemyData));
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 }
 
@@ -1693,7 +1659,6 @@ void GbaQueue::LoadMapItemStat()
 	unsigned char localMapItems[kGbaQueueMapItemDataBytes];
 	char numMapItems;
 	CGObject* object;
-	GbaQueue* semaphoreIter;
 	int i;
 
 	memset(localMapItems, 0, sizeof(localMapItems));
@@ -1729,21 +1694,17 @@ void GbaQueue::LoadMapItemStat()
 	reinterpret_cast<char*>(this)[0x2AF4] = numMapItems;
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	memcpy(reinterpret_cast<char*>(this) + 0x2434, localMapItems, sizeof(localMapItems));
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 }
 
@@ -2665,16 +2626,13 @@ void GbaQueue::ReplyLetter(int channel)
 void GbaQueue::LoadMapObj()
 {
 	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
-	GbaQueue* semaphoreIter;
 	int i;
 
 	if (*reinterpret_cast<int*>(obj + 0x2AF8) == 0) {
 		i = 0;
-		semaphoreIter = this;
 		do {
-			OSWaitSemaphore(semaphoreIter->accessSemaphores);
+			OSWaitSemaphore(&accessSemaphores[i]);
 			i++;
-			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 
 		if (obj[0x2B00] != 0) {
@@ -2682,11 +2640,9 @@ void GbaQueue::LoadMapObj()
 		}
 
 		i = 0;
-		semaphoreIter = this;
 		do {
-			OSSignalSemaphore(semaphoreIter->accessSemaphores);
+			OSSignalSemaphore(&accessSemaphores[i]);
 			i++;
-			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 	} else {
 		unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
@@ -2735,21 +2691,17 @@ void GbaQueue::LoadMapObj()
 		} while (i < 0x20);
 
 		i = 0;
-		semaphoreIter = this;
 		do {
-			OSWaitSemaphore(semaphoreIter->accessSemaphores);
+			OSWaitSemaphore(&accessSemaphores[i]);
 			i++;
-			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 
 		memcpy(obj + 0x2B00, mapObjWork, sizeof(mapObjWork));
 
 		i = 0;
-		semaphoreIter = this;
 		do {
-			OSSignalSemaphore(semaphoreIter->accessSemaphores);
+			OSSignalSemaphore(&accessSemaphores[i]);
 			i++;
-			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 	}
 }
@@ -2768,26 +2720,21 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 	unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 	unsigned char* workEntry;
 	int i;
-	GbaQueue* semaphoreIter;
 	int outSize;
 	unsigned int drawFlags;
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	memcpy(mapObjWork, reinterpret_cast<char*>(this) + 0x2B00, sizeof(mapObjWork));
 
 	i = 0;
-	semaphoreIter = this;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	workEntry = mapObjWork;
@@ -4909,28 +4856,21 @@ bool GbaQueue::IsSingleMode(int channel)
 void GbaQueue::SetControllerMode(int controllerMode)
 {
 	int i;
-	GbaQueue* semaphoreIter;
-	GbaQueue* queue;
 	int retries;
 	int ret;
 
-	queue = this;
 	i = 0;
-	semaphoreIter = queue;
 	do {
-		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
-	queue->m_controllerMode = static_cast<char>(controllerMode & 1);
+	m_controllerMode = static_cast<char>(controllerMode & 1);
 
 	i = 0;
-	semaphoreIter = queue;
 	do {
-		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 	} while (i < 4);
 
 	for (i = 0; i < 4; i++) {
@@ -4963,25 +4903,20 @@ unsigned int GbaQueue::GetControllerMode()
 	char mode;
 	unsigned int result;
 	int i;
-	GbaQueue* semaphore;
 
 	i = 0;
-	semaphore = this;
 	do {
-		OSWaitSemaphore(semaphore->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
 	} while (i < 4);
 
 	mode = m_controllerMode;
 	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
-	semaphore = this;
 	i = 0;
 	do {
-		OSSignalSemaphore(semaphore->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
 	} while (i < 4);
 
 	return result;
@@ -5131,25 +5066,20 @@ unsigned int GbaQueue::GetPauseMode()
 	char mode;
 	unsigned int result;
 	int i;
-	GbaQueue* semaphore;
 
 	i = 0;
-	semaphore = this;
 	do {
-		OSWaitSemaphore(semaphore->accessSemaphores);
+		OSWaitSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
 	} while (i < 4);
 
 	mode = m_pauseMode;
 	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
-	semaphore = this;
 	i = 0;
 	do {
-		OSSignalSemaphore(semaphore->accessSemaphores);
+		OSSignalSemaphore(&accessSemaphores[i]);
 		i++;
-		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
 	} while (i < 4);
 
 	return result;

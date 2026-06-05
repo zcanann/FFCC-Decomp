@@ -34,7 +34,6 @@ static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 typedef pppLaserWork LaserWork;
 typedef pppLaserColorBlock LaserColorData;
-typedef pppLaserMapCylinder LaserMapCylinder;
 
 static inline f32 LaserConst(const f32& value)
 {
@@ -47,7 +46,6 @@ static inline LaserWork* GetLaserWork(pppLaser* laser, _pppCtrlTable* ctrlTable)
 }
 
 STATIC_ASSERT(offsetof(pppLaser, m_workArea) == 0x80);
-STATIC_ASSERT(sizeof(LaserMapCylinder) == sizeof(CMapCylinder));
 
 /*
  * --INFO--
@@ -170,7 +168,6 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
     Vec localA;
     Mtx tempMtx;
     Mtx charaMtx;
-    LaserMapCylinder cyl;
 
     int emptyHistory;
     int fillIndex;
@@ -241,17 +238,12 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         pppSubVector(localA, work->m_points[i], work->m_origin);
         PSVECScale(&localA, &localA, LaserConst(kPppLaserAxisScale));
 
-        cyl.m_boundsMin.z = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMin.y = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMin.x = LaserConst(kPppLaserBoundsMax);
-        cyl.m_boundsMax.z = LaserConst(kPppLaserBoundsMin);
-        cyl.m_boundsMax.y = LaserConst(kPppLaserBoundsMin);
-        cyl.m_boundsMax.x = LaserConst(kPppLaserBoundsMin);
+        CMapCylinder cyl(LaserConst(kPppLaserBoundsMax), LaserConst(kPppLaserBoundsMin));
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);
 
-        int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
+        int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
         int hit = 0;
         if (check != 0) {
             hit = 1;

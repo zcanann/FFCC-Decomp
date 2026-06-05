@@ -595,8 +595,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             }
 
                             s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
-                            sinValue = *(float*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC));
-                            cosValue = *(float*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC));
+                            sinValue = ppvSinTbl[(sinIndex & 0xFFFC) >> 2];
+                            cosValue = ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2];
                         }
 
                         for (int i = 0; i < 3; i++) {

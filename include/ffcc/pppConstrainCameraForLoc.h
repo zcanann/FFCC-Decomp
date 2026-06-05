@@ -20,11 +20,9 @@ typedef _pppPObject pppConstrainCameraForLoc;
 extern "C" {
 #endif
 
-void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*);
+void pppDestructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*);
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
-void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*,
-                                      _pppCtrlTable*);
-void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
+void pppConstructConstrainCameraForLoc(pppConstrainCameraForLoc*, _pppCtrlTable*);
 void pppFrameConstrainCameraForLoc(pppConstrainCameraForLoc*, pppConstrainCameraForLocParams*, _pppCtrlTable*);
 
 #ifdef __cplusplus

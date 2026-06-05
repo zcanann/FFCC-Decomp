@@ -9,9 +9,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
-extern "C" {
-extern const float kPppChangeTexInit[2];
-}
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <string.h>
@@ -50,9 +47,10 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
-extern const float kPppChangeTexCachedValueInit = -10000.0f;
+static const float kPppChangeTexCachedValueInit = -10000.0f;
 static const char sPppChangeTexMeshObjectName[] = "obj";
 static const float kPppChangeTexAlphaScale = 255.0f;
+static const float kPppChangeTexInit = 0.0f;
 static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
 static inline float LoadFloat(const float& value)
@@ -333,7 +331,7 @@ freeArrays:
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	float init = kPppChangeTexInit[0];
+	float init = LoadFloat(kPppChangeTexInit);
 
 	work->m_value0 = init;
 	work->m_value2 = init;
@@ -351,7 +349,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 {
-	float init = kPppChangeTexInit[0];
+	float init = LoadFloat(kPppChangeTexInit);
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
 
 	work->m_value0 = init;

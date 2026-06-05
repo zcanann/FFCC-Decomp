@@ -85,9 +85,6 @@ struct PPPCREATEPARAM
     int m_hitObjectIds[8];            // 0x4c
 }; // Size 0x6c
 
-#ifndef FFCC_PARTMNG_NO_INLINE_PPPCREATEPARAM
-extern "C" const float FLOAT_8032fe18;
-
 inline PPPCREATEPARAM::PPPCREATEPARAM()
 {
     m_soundEffectParams.m_soundEffectHandle = -1;
@@ -110,28 +107,20 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
     m_lookTargetPtr = 0;
     m_objectHitMask = 0;
     m_cylinderAttribute = 0;
-    m_paramC = FLOAT_8032fe18;
-    m_paramD = FLOAT_8032fe18;
+    m_paramC = 1.0f;
+    m_paramD = 1.0f;
     *reinterpret_cast<unsigned char*>(&m_owner) = 0;
 }
-#endif
 
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern PPPCREATEPARAM g_dcp;
-
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
-typedef Mtx PARTICLE_WMAT;  // Size 0x30
-#endif
 
 struct _PARTICLE_COLOR
 {
     float m_color[4];            // 0x0
     float m_colorFrameDeltas[4]; // 0x10
 };
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
-typedef _PARTICLE_COLOR PARTICLE_COLOR;
-#endif
 
 struct _PARTICLE_DATA
 {
@@ -146,11 +135,6 @@ struct _PARTICLE_DATA
     int m_age;             // 0x68 - 0x6c
     char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
 };
-#if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES) && \
-    !defined(PPP_YMMIASMA_CUSTOM_PARTICLE_TYPES)
-typedef _PARTICLE_DATA PARTICLE_DATA;
-#endif
-
 struct _pppPDataVal;
 struct _pppCtrlTable;
 
@@ -322,12 +306,12 @@ struct _pppMngSt
     int m_lifeEnd;                     // 0x24
     Vec m_scale;                       // 0x28
     int m_currentFrame;                // 0x34
-    int m_previousFrame;               // 0x38
-    int m_field3C;                     // 0x3C
+    float m_userFloat0;                // 0x38
+    float m_userFloat1;                // 0x3C
     float m_scaleFactor;               // 0x40
     float m_ownerScale;                // 0x44
-    float m_userFloat0;                // 0x48
-    float m_userFloat1;                // 0x4C
+    float m_userPositionX;             // 0x48
+    float m_userPositionY;             // 0x4C
     Vec m_savedPosition;               // 0x50
     Vec m_previousPosition;            // 0x5C (third float doubles as a generic param)
     Vec m_paramVec0;                   // 0x68
@@ -385,9 +369,9 @@ struct _pppMngSt
     PPPIFPARAM m_hitParams;            // 0x130
     short m_hitObjectIds[0x10];        // 0x138
 
-    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userFloat0); }
+    Vec& UserPosition() { return *reinterpret_cast<Vec*>(&m_userPositionX); }
     Vec& BasePosition() { return *reinterpret_cast<Vec*>(&m_savedPosition.z); }
-    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userFloat0); }
+    const Vec& UserPosition() const { return *reinterpret_cast<const Vec*>(&m_userPositionX); }
     const Vec& BasePosition() const { return *reinterpret_cast<const Vec*>(&m_savedPosition.z); }
 }; // Size: 0x158
 

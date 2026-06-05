@@ -328,10 +328,10 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets[2]);
 	VColor* baseColor = (VColor*)(obj->m_workArea + offsets[1]);
 	_PARTICLE_DATA* particleBlock = work->m_particleBlock;
-	PARTICLE_WMAT* particleWorldMatBlock = work->m_worldMatrixBlock;
+	_PARTICLE_WMAT* particleWorldMatBlock = work->m_worldMatrixBlock;
 	_PARTICLE_COLOR* colorBlock = work->m_colorBlock;
 	_PARTICLE_DATA* particle = particleBlock;
-	PARTICLE_WMAT* particleWorldMat = particleWorldMatBlock;
+	_PARTICLE_WMAT* particleWorldMat = particleWorldMatBlock;
 	_PARTICLE_COLOR* colorData = colorBlock;
 	s32 numParticles = work->m_numParticles;
 	s8 hasRequiredMemory;
@@ -551,11 +551,11 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 
 		if ((particleData->m_matrixMode == 1) || (particleData->m_matrixMode == 2))
 		{
-			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-				work->m_numParticles * sizeof(PARTICLE_WMAT), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
+			work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
+				work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
-				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
+				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
 			}
 		}
 
@@ -636,7 +636,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	pppShapeAnimData* shapeAnim;
 	pppShapeAnimFrame* frameData;
 	_PARTICLE_DATA* particle;
-	PARTICLE_WMAT* worldMats;
+	_PARTICLE_WMAT* worldMats;
 	_PARTICLE_COLOR* colorData;
 	s32 maxParticles;
 	s32 emitCount;
@@ -691,7 +691,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 			else if ((param->m_emitInterval <= work->m_emitTimer) &&
 			         (emitCount < (s32)param->m_emitCount))
 			{
-				birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
+				birth(pObject, work, param, color, particle, worldMats, colorData);
 				emitCount = emitCount + 1;
 			}
 
@@ -1071,10 +1071,10 @@ void birth(
 
 	switch (payload[0xEC]) {
 	case 1:
-		PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
+		PSMTXCopy(work->m_worldMatrix, worldMat->value);
 		break;
 	case 2:
-		PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
+		PSMTXCopy(pObject->m_localMatrix.value, worldMat->value);
 		break;
 	default:
 		break;

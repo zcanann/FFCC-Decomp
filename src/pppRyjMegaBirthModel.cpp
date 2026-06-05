@@ -12,8 +12,8 @@ extern const float FLOAT_8033049c;
 extern const float FLOAT_803304a0;
 extern const float FLOAT_803304a4;
 
-PARTICLE_WMAT g_matKeep;
-PARTICLE_WMAT g_matTmp;
+_PARTICLE_WMAT g_matKeep;
+_PARTICLE_WMAT g_matTmp;
 
 static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 
@@ -296,11 +296,11 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         }
 
         if (params->m_enableWorldMatrix != 0) {
-            work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-                work->m_numParticles * sizeof(PARTICLE_WMAT), ppvEnv->m_stagePtr,
+            work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
+                work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
             if (work->m_worldMatrixBlock != NULL) {
-                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
+                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
             }
         }
 
@@ -365,7 +365,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
     emitted = 0;
     payload = (u8*)params;
     particleData = work->m_particleBlock;
-    particleWMat = reinterpret_cast<_PARTICLE_WMAT*>(work->m_worldMatrixBlock);
+    particleWMat = work->m_worldMatrixBlock;
     particleColor = work->m_colorBlock;
     maxParticles = work->m_numParticles;
     emitTimer = &work->m_emitTimer;
@@ -925,7 +925,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
     _PARTICLE_DATA* particleBlock = work->m_particleBlock;
-    PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
+    _PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
     _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
     s32 numParticles = work->m_numParticles;
     s8 hasRequiredMemory;
@@ -967,7 +967,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         }
 
         if (particleWorldMatrixBlock != NULL) {
-            particleWorldMatrix = (_PARTICLE_WMAT*)(particleWorldMatrixBlock + i);
+            particleWorldMatrix = particleWorldMatrixBlock + i;
         }
         if (colorBlock != NULL) {
             particleColor = colorBlock + i;

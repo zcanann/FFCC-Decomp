@@ -118,11 +118,6 @@ static inline const CSoundLayout& SoundData(const CSound* self)
     return *reinterpret_cast<const CSoundLayout*>(self);
 }
 
-static inline CRedSound* RedSound(CSound* self)
-{
-    return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
-}
-
 template <int PointCount>
 CLine<PointCount>::CLine()
 {
@@ -448,7 +443,7 @@ void CSound::Quit()
  */
 void CSound::SetStereo(int stereo)
 {
-    RedSound(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    m_redSound.SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
@@ -463,7 +458,7 @@ void CSound::SetStereo(int stereo)
 void CSound::SetBgmMasterVolume(int volume)
 {
     SoundData(this).m_bgmMasterVolume = volume;
-    RedSound(this)->MusicMasterVolume(volume);
+    m_redSound.MusicMasterVolume(volume);
 }
 
 /*
@@ -478,7 +473,7 @@ void CSound::SetBgmMasterVolume(int volume)
 void CSound::SetSeMasterVolume(int volume)
 {
     SoundData(this).m_seMasterVolume = volume;
-    RedSound(this)->SeMasterVolume(volume);
+    m_redSound.SeMasterVolume(volume);
 }
 
 /*
@@ -650,7 +645,7 @@ void CSound::Realloc(int isMinMemoryMode)
  */
 float CSound::GetPerformance()
 {
-    unsigned int programTime = RedSound(this)->GetProgramTime();
+    unsigned int programTime = m_redSound.GetProgramTime();
     float numer = (float)(programTime / 0xF);
     float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
     return 100.0f * (numer / denom);
@@ -667,12 +662,11 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
 
     if (sound.m_pauseAllSe == 0) {
-        reinterpret_cast<CRedSound*>(self + 8)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
-        reinterpret_cast<CRedSound*>(self + 8)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+        m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+        m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     }
 }
 
@@ -683,16 +677,15 @@ void CSound::PauseDiscError(int pause)
  */
 void CSound::CheckDriver(int mode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint(1);
-    reinterpret_cast<CRedSound*>(self + 8)->TestProcess(mode);
-    reinterpret_cast<CRedSound*>(self + 8)->DisplayWaveInfo();
-    reinterpret_cast<CRedSound*>(self + 8)->DisplaySePlayInfo();
+    m_redSound.ReportPrint(1);
+    m_redSound.TestProcess(mode);
+    m_redSound.DisplayWaveInfo();
+    m_redSound.DisplaySePlayInfo();
     sound.m_debugPrint = oldPrint;
-    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    m_redSound.ReportPrint((-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*
@@ -883,9 +876,9 @@ void CSound::loadWaveFrame()
             waveOffset += (int)readSize;
             waveState = 1;
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
-            RedSound(this)->SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
+            m_redSound.SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
 
-            while (RedSound(&Sound)->ReportStandby(0) != 0) {
+            while (Sound.m_redSound.ReportStandby(0) != 0) {
             }
 
             waveState = 0;
@@ -901,7 +894,7 @@ void CSound::loadWaveFrame()
     bool streamPlaying = false;
     int& isStreamEnabled = sound.m_streamPlaying;
     int& streamID = sound.m_streamID;
-    if (isStreamEnabled != 0 && RedSound(this)->StreamPlayState(streamID) != 0) {
+    if (isStreamEnabled != 0 && m_redSound.StreamPlayState(streamID) != 0) {
         streamPlaying = true;
     }
 
@@ -914,7 +907,7 @@ void CSound::loadWaveFrame()
 
         if (streamState == 0) {
             int playPoint[2];
-            RedSound(this)->GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
+            m_redSound.GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
             playPoint[0] = static_cast<int>(static_cast<unsigned int>(playPoint[0]) >> 16);
 
             if (streamHalf != static_cast<unsigned int>(playPoint[0])) {
@@ -1000,14 +993,13 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
  */
 void CSound::CancelLoadWaveASync()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(self + 0x10);
+    CFile::CHandle*& handle = SoundData(this).m_waveFile;
     if (handle != 0) {
         File.Close(handle);
-        *reinterpret_cast<CFile::CHandle**>(self + 0x10) = 0;
+        handle = 0;
         System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
     }
-    reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
+    m_redSound.SetWaveData(-1, nullptr, 0);
 }
 
 /*
@@ -1036,11 +1028,9 @@ int CSound::IsLoadWaveASyncCompleted()
  */
 void CSound::LoadBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentryMusicData(bgmId) == -1) {
+    } else if (m_redSound.ReentryMusicData(bgmId) == -1) {
         char musicPath[256];
         sprintf(musicPath, s_soundMusicPathFmt, bgmId);
 
@@ -1048,7 +1038,7 @@ void CSound::LoadBgm(int bgmId)
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetMusicData(File.m_readBuffer);
+            m_redSound.SetMusicData(File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1065,14 +1055,12 @@ void CSound::LoadBgm(int bgmId)
  */
 void CSound::PlayBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->MusicStop(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
-        reinterpret_cast<CRedSound*>(self + 8)->MusicPlay(bgmId, 0x7F, 0);
+        m_redSound.MusicStop(-1);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
+        m_redSound.MusicPlay(bgmId, 0x7F, 0);
     }
 }
 
@@ -1087,13 +1075,11 @@ void CSound::PlayBgm(int bgmId)
  */
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
-        reinterpret_cast<CRedSound*>(self + 8)->MusicCrossPlay(bgmId, 0x7F, crossFrames);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
+        m_redSound.MusicCrossPlay(bgmId, 0x7F, crossFrames);
     }
 }
 
@@ -1108,13 +1094,11 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->MusicNextPlay(bgmId, 0x7F, 0);
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
+        m_redSound.MusicNextPlay(bgmId, 0x7F, 0);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
     }
 }
 
@@ -1129,7 +1113,7 @@ void CSound::PlayNextBgm(int bgmId)
  */
 void CSound::StopBgm()
 {
-    RedSound(this)->MusicStop(-1);
+    m_redSound.MusicStop(-1);
 }
 
 /*
@@ -1143,7 +1127,7 @@ void CSound::StopBgm()
  */
 void CSound::FadeOutBgm(int fadeFrames)
 {
-    RedSound(this)->MusicFadeOut(-1, fadeFrames);
+    m_redSound.MusicFadeOut(-1, fadeFrames);
 }
 
 /*
@@ -1157,21 +1141,20 @@ void CSound::FadeOutBgm(int fadeFrames)
  */
 void CSound::LoadBlock()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
     char sePath[256];
     char wavePath0[256];
     char wavePath1[256];
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(0) == -1) {
+    if (m_redSound.ReentryWaveData(0) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         sprintf(wavePath0, s_soundWavePathFmt, 0);
         waveFile = File.Open(wavePath0, 0, CFile::PRI_LOW);
@@ -1187,14 +1170,14 @@ void CSound::LoadBlock()
         }
     }
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(500) == -1) {
+    if (m_redSound.ReentryWaveData(500) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         sprintf(wavePath1, s_soundWavePathFmt, 500);
         waveFile = File.Open(wavePath1, 0, CFile::PRI_LOW);
@@ -1216,7 +1199,7 @@ void CSound::LoadBlock()
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetSeBlockData(i, File.m_readBuffer);
+            m_redSound.SetSeBlockData(i, File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1233,12 +1216,10 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(500);
-    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(0);
+    m_redSound.ClearWaveBank(500);
+    m_redSound.ClearWaveBank(0);
     for (int i = 0; i < 4; i++) {
-        reinterpret_cast<CRedSound*>(self + 8)->SetSeBlockData(i, 0);
+        m_redSound.SetSeBlockData(i, 0);
     }
 }
 
@@ -1253,18 +1234,16 @@ void CSound::FreeBlock()
  */
 void CSound::LoadSe(int seId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentrySeSepData(seId) == -1) {
+    } else if (m_redSound.ReentrySeSepData(seId) == -1) {
         char sePath[264];
         sprintf(sePath, s_soundSeSepPathFmt, seId);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetSeSepData(File.m_readBuffer);
+            m_redSound.SetSeSepData(File.m_readBuffer);
             File.Close(handle);
             if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
                 System.Printf(const_cast<char*>(s_soundLoadSeMergeFmt), seId);
@@ -1284,9 +1263,8 @@ void CSound::LoadSe(int seId)
  */
 void CSound::LoadSe(void* seData)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentrySeSepData(*reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
-        reinterpret_cast<CRedSound*>(self + 8)->SetSeSepData(seData);
+    if (m_redSound.ReentrySeSepData(*reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
+        m_redSound.SetSeSepData(seData);
     }
 }
 
@@ -1301,24 +1279,23 @@ void CSound::LoadSe(void* seData)
  */
 void CSound::LoadWave(int waveId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
     if (waveId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(waveId) == -1) {
+        if (m_redSound.ReentryWaveData(waveId) == -1) {
             if (waveId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-            } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(waveId) == -1) {
+            } else if (m_redSound.ReentryWaveData(waveId) == -1) {
                 if (waveFile != 0) {
                     File.Close(waveFile);
                     waveFile = 0;
                     System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
                 }
 
-                reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
+                m_redSound.SetWaveData(-1, nullptr, 0);
 
                 char wavePath[260];
                 sprintf(wavePath, s_soundWavePathFmt, waveId);
@@ -1354,18 +1331,17 @@ void CSound::LoadWave(int waveId)
  */
 void CSound::LoadWave(void* waveData)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
+    if (m_redSound.ReentryWaveData(reinterpret_cast<s16*>(waveData)[1]) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, waveData, -1);
+        m_redSound.SetWaveData(-1, nullptr, 0);
+        m_redSound.SetWaveData(-1, waveData, -1);
     }
 }
 
@@ -1383,7 +1359,7 @@ void CSound::FreeWave(int waveId)
     if (waveId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->ClearWaveData(waveId);
+        m_redSound.ClearWaveData(waveId);
     }
 }
 
@@ -1398,19 +1374,18 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     if (clearMode != 0) {
-        reinterpret_cast<CRedSound*>(self + 8)->SeStop(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearSeSepData(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearWaveData(-3);
+        m_redSound.SeStop(-1);
+        m_redSound.ClearSeSepData(-1);
+        m_redSound.ClearWaveData(-3);
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->SeStopMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1],
-                                                         sound.m_noFreeSeGroups[2], sound.m_noFreeSeGroups[3]);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearSeSepDataMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1],
-                                                                 sound.m_noFreeSeGroups[2], sound.m_noFreeSeGroups[3]);
-        reinterpret_cast<CRedSound*>(self + 8)->ClearWaveDataM(sound.m_noFreeWaves[0], sound.m_noFreeWaves[1],
-                                                               sound.m_noFreeWaves[2], sound.m_noFreeWaves[3]);
+        m_redSound.SeStopMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
+                            sound.m_noFreeSeGroups[3]);
+        m_redSound.ClearSeSepDataMG(sound.m_noFreeSeGroups[0], sound.m_noFreeSeGroups[1], sound.m_noFreeSeGroups[2],
+                                    sound.m_noFreeSeGroups[3]);
+        m_redSound.ClearWaveDataM(sound.m_noFreeWaves[0], sound.m_noFreeWaves[1], sound.m_noFreeWaves[2],
+                                  sound.m_noFreeWaves[3]);
     }
 
     sound.m_seCount = 10000000;
@@ -1431,7 +1406,7 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = RedSound(this);
+    CRedSound* redSound = &m_redSound;
 
     if (seNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
@@ -1465,7 +1440,7 @@ void CSound::StopSe(int seId)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeStop(seId);
+        m_redSound.SeStop(seId);
     }
 }
 
@@ -1483,7 +1458,7 @@ void CSound::FadeOutSe(int seId, int fadeFrames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeFadeOut(seId, fadeFrames);
+        m_redSound.SeFadeOut(seId, fadeFrames);
     }
 }
 
@@ -1501,7 +1476,7 @@ void CSound::ChangeSeVolume(int seId, int volume, int frames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SeVolume(seId, volume, frames);
+        m_redSound.SeVolume(seId, volume, frames);
     }
 }
 
@@ -1519,7 +1494,7 @@ void CSound::ChangeSePan(int seId, int pan, int frames)
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->SePan(seId, pan, frames);
+        m_redSound.SePan(seId, pan, frames);
     }
 }
 
@@ -1568,7 +1543,7 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
         found = 0;
 found_se:
         if (found != 0) {
-            *reinterpret_cast<int*>(found + 0x24) = group;
+            reinterpret_cast<CSe3D*>(found)->m_group = group;
         }
         return result;
     }
@@ -1598,8 +1573,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
         return -1;
     }
 
-    u8* soundObj = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
+    CSoundLayout& sound = SoundData(this);
     se = sound.m_seWork;
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
@@ -1630,16 +1604,16 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = reinterpret_cast<CRedSound*>(soundObj + 8)->SePlay(
-                bank, soundId % 1000, panValue, volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                reinterpret_cast<CRedSound*>(soundObj + 8)->SeVolume(slot, volumeValue, fadeFrames);
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
             }
         } else {
-            slot = reinterpret_cast<CRedSound*>(soundObj + 8)->SePlay(
-                -1, soundId, panValue, volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = m_redSound.SePlay(-1, soundId, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                reinterpret_cast<CRedSound*>(soundObj + 8)->SeVolume(slot, volumeValue, fadeFrames);
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
             }
         }
 
@@ -1674,8 +1648,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
         return -1;
     }
 
-    u8* soundObj = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(soundObj);
+    CSoundLayout& sound = SoundData(this);
     se = sound.m_seWork;
 
     for (loopCount = 0x80; loopCount != 0; loopCount--, se++) {
@@ -1707,16 +1680,16 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
             slot = -1;
         } else if (soundId < 4000) {
             int bank = soundId / 1000;
-            slot = reinterpret_cast<CRedSound*>(soundObj + 8)->SePlay(
-                bank, soundId % 1000, panValue, volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = m_redSound.SePlay(bank, soundId % 1000, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                reinterpret_cast<CRedSound*>(soundObj + 8)->SeVolume(slot, volumeValue, fadeFrames);
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
             }
         } else {
-            slot = reinterpret_cast<CRedSound*>(soundObj + 8)->SePlay(
-                -1, soundId, panValue, volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
+            slot = m_redSound.SePlay(-1, soundId, panValue,
+                                     volumeValue & ~((int)(-fadeFrames | fadeFrames) >> 0x1F), 0);
             if (fadeFrames != 0) {
-                reinterpret_cast<CRedSound*>(soundObj + 8)->SeVolume(slot, volumeValue, fadeFrames);
+                m_redSound.SeVolume(slot, volumeValue, fadeFrames);
             }
         }
 
@@ -1909,13 +1882,14 @@ void CSound::StopSe3DGroup(int group)
                 found = 0;
 found_se:
                 if (found != 0) {
-                    int playId = *reinterpret_cast<int*>(found + 8);
+                    CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+                    int playId = foundSe->m_playId;
                     if (playId < 0) {
                         System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
                     } else {
-                        reinterpret_cast<CRedSound*>(sound + 8)->SeStop(playId);
+                        m_redSound.SeStop(playId);
                     }
-                    reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+                    foundSe->m_bits.m_active = 0;
                 }
             }
             reinterpret_cast<CSe3D*>(se)->m_bits.m_active = 0;
@@ -1979,13 +1953,14 @@ void CSound::StopSe3D(int se3dHandle)
 
 found_entry:
         if (found != 0) {
-            const int playId = *reinterpret_cast<int*>(found + 8);
+            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+            const int playId = foundSe->m_playId;
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
             } else {
-                RedSound(this)->SeStop(playId);
+                m_redSound.SeStop(playId);
             }
-            reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+            foundSe->m_bits.m_active = 0;
         }
     }
 }
@@ -2043,13 +2018,14 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 
 found_entry:
         if (found != 0) {
-            const int playId = *reinterpret_cast<int*>(found + 8);
+            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+            const int playId = foundSe->m_playId;
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
             } else {
-                RedSound(this)->SeFadeOut(playId, fadeFrames);
+                m_redSound.SeFadeOut(playId, fadeFrames);
             }
-            reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+            foundSe->m_bits.m_active = 0;
         }
     }
 }
@@ -2102,9 +2078,7 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
         found = 0;
 found_entry:
         if (found != 0) {
-            *reinterpret_cast<float*>(found + 0x18) = position->x;
-            *reinterpret_cast<float*>(found + 0x1C) = position->y;
-            *reinterpret_cast<float*>(found + 0x20) = position->z;
+            reinterpret_cast<CSe3D*>(found)->m_position = *position;
         }
         return ret;
     }
@@ -2162,7 +2136,7 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         }
 
         if (se != 0) {
-            RedSound(this)->SePitch(*reinterpret_cast<int*>(se + 8), pitch << 8, frames);
+            m_redSound.SePitch(reinterpret_cast<CSe3D*>(se)->m_playId, pitch << 8, frames);
         }
     }
 }
@@ -2219,9 +2193,8 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
  */
 void CSound::SetReverb(int reverb, int depth)
 {
-    u8* soundObj = reinterpret_cast<u8*>(this);
-    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverb(1, reverb);
-    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverbDepth(1, depth, 0xF);
+    m_redSound.SetReverb(1, reverb);
+    m_redSound.SetReverbDepth(1, depth, 0xF);
 }
 
 /*
@@ -2242,13 +2215,13 @@ void CSound::LoadStream(int streamID)
         bool isPlaying = false;
 
         if (sound.m_streamPlaying != 0) {
-            if (RedSound(this)->StreamPlayState(sound.m_streamID) != 0) {
+            if (m_redSound.StreamPlayState(sound.m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            RedSound(this)->StreamStop(sound.m_streamID);
+            m_redSound.StreamStop(sound.m_streamID);
         }
 
         if (sound.m_streamFile != 0) {
@@ -2325,7 +2298,7 @@ void CSound::PlayStreamASync()
         break;
     }
     void* streamBuffer = sound.m_streamBuffer;
-    CRedSound* redSound = RedSound(this);
+    CRedSound* redSound = &m_redSound;
     int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, volume < 0 ? 0 : (volume <= 0x7f ? volume : 0x7f));
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
@@ -2346,14 +2319,14 @@ void CSound::StopStream()
     bool shouldStop = false;
 
     if (sound.m_streamPlaying != 0) {
-        int state = RedSound(this)->StreamPlayState(sound.m_streamID);
+        int state = m_redSound.StreamPlayState(sound.m_streamID);
         if (state != 0) {
             shouldStop = true;
         }
     }
 
     if (shouldStop) {
-        RedSound(this)->StreamStop(sound.m_streamID);
+        m_redSound.StreamStop(sound.m_streamID);
     }
 
     CFile::CHandle* handle = sound.m_streamFile;
@@ -2375,7 +2348,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    RedSound(this)->StreamVolume(-1, volume, frames);
+    m_redSound.StreamVolume(-1, volume, frames);
 }
 
 /*
@@ -2409,11 +2382,10 @@ inline void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
 
-    reinterpret_cast<CRedSound*>(self + 8)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
-    reinterpret_cast<CRedSound*>(self + 8)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+    m_redSound.SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+    m_redSound.StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
     sound.m_pauseAllSe = pause;
 }
 

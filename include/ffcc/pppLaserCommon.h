@@ -35,15 +35,6 @@ struct pppLaserColorBlock {
     pppCVECTOR m_color;
 };
 
-struct pppLaserMapCylinder {
-    Vec m_bottom;
-    Vec m_top;
-    Vec m_axis;
-    float m_radius;
-    Vec m_boundsMin;
-    Vec m_boundsMax;
-};
-
 struct pppLaserStep {
     s32 m_graphId;
     s32 m_dataValIndex;

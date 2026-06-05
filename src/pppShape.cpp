@@ -296,9 +296,9 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  */
 CTexture* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
-    unsigned char* shape = (unsigned char*)animData + *(short*)((int)animData + 0x10) + 8;
+    tagOAN3_SHAPE_ENTRY* shapeEntry = pppShapeFrame(animData, 0)->m_entries;
 
-    textureIndex = shape[2];
-    CMaterial* material = materialSet->GetMaterial(shape[2]);
+    textureIndex = shapeEntry->m_textureIndex;
+    CMaterial* material = materialSet->GetMaterial(shapeEntry->m_textureIndex);
     return material->GetTexture(0);
 }

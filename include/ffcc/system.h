@@ -43,13 +43,6 @@ struct CProcessTable
 };
 typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];
 
-struct CSmallProcessTable
-{
-    char* m_name;
-    u32 m_words[(0x11C - sizeof(char*)) / sizeof(u32)];
-};
-typedef int CSmallProcessTable_size_mismatch[(sizeof(CSmallProcessTable) == 0x11C) ? 1 : -1];
-
 class CProcess : public CManager
 {
 public:

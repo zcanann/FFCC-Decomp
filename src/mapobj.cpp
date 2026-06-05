@@ -26,15 +26,14 @@ extern const char s_CPtrArrayFile[];
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-// Constants defined externally, placed in .sdata2 by the linker.
-extern const float kMapObjBoundMinInit;
-extern const float kMapObjBoundMaxInit;
-extern const float kMapObjZero;
-extern const float kMapObjOne;
-extern const float kMapObjInitNegOne;
-extern const float kMapObjColorBlendScale;
-extern const float kMapObjDegToRad;
-extern const float kMapObjInitValue50;
+static const float kMapObjBoundMinInit = 10000000000.0f;
+static const float kMapObjBoundMaxInit = -10000000000.0f;
+static const float kMapObjZero = 1.0f;
+static const float kMapObjOne = 0.0f;
+static const float kMapObjInitNegOne = 1000000000000000.0f;
+static const float kMapObjColorBlendScale = 255.0f;
+static const float kMapObjDegToRad = 0.017453292f;
+static const float kMapObjInitValue50 = -1.0f;
 extern const char s_mapobj_cpp_801D70C0[];
 _GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -204,16 +203,15 @@ int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
  */
 CBound::CBound()
 {
-    float* bounds = (float*)this;
     float max = kMapObjBoundMaxInit;
     float min = kMapObjBoundMinInit;
 
-    bounds[2] = min;
-    bounds[1] = min;
-    bounds[0] = min;
-    bounds[5] = max;
-    bounds[4] = max;
-    bounds[3] = max;
+    m_min.z = min;
+    m_min.y = min;
+    m_min.x = min;
+    m_max.z = max;
+    m_max.y = max;
+    m_max.x = max;
 }
 
 /*

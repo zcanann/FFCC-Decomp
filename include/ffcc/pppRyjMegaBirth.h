@@ -73,7 +73,7 @@ struct VRyjMegaBirth
     Mtx m_worldMatrix;
     Vec m_accelerationAxis;
     _PARTICLE_DATA* m_particleBlock;
-    PARTICLE_WMAT* m_worldMatrixBlock;
+    _PARTICLE_WMAT* m_worldMatrixBlock;
     _PARTICLE_COLOR* m_colorBlock;
     s32 m_numParticles;
     u16 m_emitTimer;

@@ -8,9 +8,6 @@
 
 struct Vec;
 
-extern const float kMapBoundsCenterScale;
-extern const float kMapCameraCenterYOffset;
-
 class CMapPcs : public CProcess
 {
 public:

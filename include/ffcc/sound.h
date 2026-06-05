@@ -42,6 +42,7 @@ public:
     void SetStereo(int);
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
+    unsigned int GetSoundMode() { return m_redSound.GetSoundMode(); }
     int GetBgmMasterVolume() const { return m_bgmMasterVolume; }
     int GetSeMasterVolume() const { return m_seMasterVolume; }
     void SeMaxVolume(int);

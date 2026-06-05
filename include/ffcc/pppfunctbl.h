@@ -3,8 +3,12 @@
 
 #include "ffcc/partMng.h"
 
-extern pppProg s_pppSysProgTable[];
-pppProg* pppGetSysProgTable();
+extern pppProg pppSysProgTbl[];
+
+inline pppProg* pppGetSysProgTable()
+{
+    return pppSysProgTbl;
+}
 
 #ifdef FFCC_PPPFUNCTBL_IMPLEMENTATION
 #include "ffcc/LocationTitle2.h"
@@ -15,7 +19,6 @@ pppProg* pppGetSysProgTable();
 #include "ffcc/pppAngMove.h"
 #include "ffcc/pppBindOnlyPos.h"
 #include "ffcc/pppBlurChara.h"
-#include "ffcc/pppBreathModel.h"
 #include "ffcc/pppCallBackDistance.h"
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/pppChangeTex.h"
@@ -147,7 +150,6 @@ pppProg* pppGetSysProgTable();
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppYmMelt.h"
-#include "ffcc/pppYmMiasma.h"
 #include "ffcc/pppYmMoveCircle.h"
 #include "ffcc/pppYmMoveParabola.h"
 #include "ffcc/pppYmTraceMove.h"
@@ -160,12 +162,27 @@ pppProg* pppGetSysProgTable();
 #define PPP_CONSTRUCT(fn) ((pppProgAnyCallback)(pppProgConstructCallback)(fn))
 #define PPP_DESTRUCT(fn) ((pppProgAnyCallback)(pppProgDestructCallback)(fn))
 
-struct _pppSysProgTbl
-{
-    pppProg* m_progs;
-};
+struct PBreathModel;
+struct PYmMiasma;
+struct YmMiasmaFrameStep;
+struct YmMiasmaRenderStep;
+typedef _pppPObject pppBreathModel;
+typedef _pppPObject pppYmMiasma;
 
-pppProg s_pppSysProgTable[159] = {
+extern "C" {
+void pppFrameBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppRenderBreathModel(pppBreathModel*, PBreathModel*, _pppCtrlTable*);
+void pppConstructBreathModel(pppBreathModel*, _pppCtrlTable*);
+void pppDestructBreathModel(pppBreathModel*, _pppCtrlTable*);
+
+void pppFrameYmMiasma(pppYmMiasma*, YmMiasmaFrameStep*, _pppCtrlTable*);
+void pppRenderYmMiasma(pppYmMiasma*, YmMiasmaRenderStep*, _pppCtrlTable*);
+void pppConstructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppConstruct2YmMiasma(pppYmMiasma*, _pppCtrlTable*);
+void pppDestructYmMiasma(pppYmMiasma*, _pppCtrlTable*);
+}
+
+pppProg pppSysProgTbl[159] = {
     {
         (char*)"pppDummyFunc",
         0,
@@ -1857,7 +1874,7 @@ pppProg s_pppSysProgTable[159] = {
         { 0, 0, 0 },
         PPP_FN(pppConstructConstrainCameraForLoc),
         PPP_FN(pppConstruct2ConstrainCameraForLoc),
-        PPP_FN(pppConstruct3ConstrainCameraForLoc),
+        0,
         PPP_FN(pppDestructConstrainCameraForLoc)
     },
     {
@@ -1916,15 +1933,6 @@ pppProg s_pppSysProgTable[159] = {
         PPP_FN(pppDestructLaser)
     },
 };
-
-static _pppSysProgTbl pppSysProgTbl = {
-    s_pppSysProgTable,
-};
-
-pppProg* pppGetSysProgTable()
-{
-    return pppSysProgTbl.m_progs;
-}
 #endif // FFCC_PPPFUNCTBL_IMPLEMENTATION
 
 #endif // _FFCC_FUNCTBL_H_

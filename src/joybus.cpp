@@ -19,9 +19,6 @@ JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
 
-extern "C" const unsigned int DAT_80330b20;
-extern "C" const unsigned int DAT_80330b24;
-
 extern const unsigned short JoyBusCrcTable[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
@@ -123,6 +120,8 @@ namespace JoyBusConst {
 char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
 char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
 char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+const unsigned int CTRL_GBA = 0x10;
+const unsigned int JOY_CODE_MASK = 0x1;
 }
 
 enum {
@@ -3072,7 +3071,8 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
             break;
         }
 
-        unsigned char gameFlags = (unsigned char)((Game.m_gameWork.m_languageId - 1) | (unsigned char)DAT_80330b24);
+        unsigned char gameFlags =
+            (unsigned char)((Game.m_gameWork.m_languageId - 1) | (unsigned char)JoyBusConst::CTRL_GBA);
         unsigned int cmdGame = MakeJoyCmd32(0x14, 0x16, gameFlags, 0);
 
         err = 0;
@@ -6579,7 +6579,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
 
     if (!single)
     {
-        mode ^= (unsigned char)DAT_80330b20;
+        mode ^= (unsigned char)JoyBusConst::JOY_CODE_MASK;
 
         unsigned int word = MakeJoyCmd16(0x0900, mode, 0);
         int ret = 0;

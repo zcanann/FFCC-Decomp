@@ -3,14 +3,12 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
-#define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
-#undef PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathParticle.h"
 #include "ffcc/pppShape.h"
 
@@ -18,11 +16,11 @@ extern const float kCharaAnimZero;
 extern const float kCharaAnimDegToRad;
 extern const float kCharaAnimNegativeOne;
 extern const float kCharaAnimFullTurnDegrees;
-extern const float kYmBreathHalfCircleDegrees = 180.0f;
-extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-extern const double DOUBLE_80330CA0 = 4503599627370496.0;
-extern const float kYmBreathSpreadScale = 2.0f;
-extern const double kYmBreathHalfChance = 0.5;
+static const float kYmBreathHalfCircleDegrees = 180.0f;
+static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
+static const double DOUBLE_80330CA0 = 4503599627370496.0;
+static const float kYmBreathSpreadScale = 2.0f;
+static const double kYmBreathHalfChance = 0.5;
 extern const char s_CardGameCode_80330CB8[] = "FFCC";
 extern const char s_CardMakerCode_80330CC0[] = "GDS";
 extern const char s_CardMachineCode_80330CC4[] = "GC";

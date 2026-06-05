@@ -26,11 +26,6 @@ static const float FLOAT_80330664 = 16384.0f;
 static const float FLOAT_80330668 = -1.0f;
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
-static inline float YmMiasmaConst(const float& value)
-{
-    return *reinterpret_cast<const float*>(&value);
-}
-
 struct PARTICLE_DATA {
     Mtx m_matrix;
     Vec m_velocity;
@@ -113,7 +108,6 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             GXColor amb;
             float scale;
             s16 shapeAngle;
-            const float& degToRad = FLOAT_80330640;
 
             pppUnitMatrix(model);
             scale = state->m_speed;
@@ -122,7 +116,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
             model.value[2][2] = ppvMng->m_scale.z * scale;
 
             shapeAngle = state->m_shapeAngle;
-            PSMTXRotRad(rotMatrix.value, 'z', degToRad * (float)shapeAngle);
+            PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
             pppMulMatrix(model, rotMatrix, model);
 
             pppCopyVector(worldPos, state->m_position);
@@ -286,9 +280,9 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(pppYmMiasma_, param_2, 2);
-    float fVar1 = YmMiasmaConst(FLOAT_80330644);
+    float fVar1 = FLOAT_80330644;
 
-    work->m_radius = YmMiasmaConst(FLOAT_80330644);
+    work->m_radius = FLOAT_80330644;
     work->m_radiusVelocity = fVar1;
     work->m_radiusAcceleration = fVar1;
 }
@@ -305,8 +299,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
 {
     VYmMiasma* work = PppWorkArea<VYmMiasma>(pppYmMiasma_, param_2, 2);
-    const float& fVar2 = FLOAT_80330644;
-    const float& fVar1 = FLOAT_80330658;
+    float fVar2 = FLOAT_80330644;
+    float fVar1 = FLOAT_80330658;
 
     work->m_particles = 0;
     work->m_radius = fVar2;
@@ -538,14 +532,12 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     (void)pppPObject;
 
     randomValue = rand();
-    randomScale = YmMiasmaConst(FLOAT_8033065c) * (float)randomValue;
+    randomScale = FLOAT_8033065c * (float)randomValue;
     shape = static_cast<pppShapeAnimData*>(
         ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();
     shapeCount = shape->m_frameCount;
-    angle = (s32)(YmMiasmaConst(FLOAT_80330650) *
-                  (YmMiasmaConst(FLOAT_80330654) * (YmMiasmaConst(FLOAT_80330660) * randomScale)) -
-                  YmMiasmaConst(FLOAT_80330664));
+    angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
     shapeCount = (short)(shapeRandom % shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;
@@ -594,7 +586,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     angleBase = (u32)(int)speedJitter;
     signBit = angleBase >> 0x1f;
     if ((((angleBase & 1U) ^ signBit) - signBit) != 0) {
-        speedJitter = speedJitter * YmMiasmaConst(FLOAT_80330668);
+        speedJitter = speedJitter * FLOAT_80330668;
     }
     state->m_speed = pYmMiasma->m_baseSpeed + speedJitter;
     state->m_fadeFrames = (u16)pYmMiasma->m_fadeFrames;

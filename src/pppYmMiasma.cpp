@@ -22,8 +22,6 @@ static const float FLOAT_80330654 = 3.1415927410125732f;
 static const float FLOAT_80330658 = 1.0f;
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
-static inline float YmMiasmaConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
-
 struct PARTICLE_DATA {
     Mtx m_matrix;
     Vec m_velocity;

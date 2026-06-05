@@ -1532,7 +1532,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 search:
         unsigned int stride =
             reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
-        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
+        CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;

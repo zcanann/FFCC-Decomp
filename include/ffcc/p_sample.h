@@ -20,11 +20,6 @@ public:
     void func1();
 };
 
-extern "C" void create__10CSamplePcsFv(CSamplePcs*);
-extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
-extern "C" void func0__10CSamplePcsFv(CSamplePcs*);
-extern "C" void func1__10CSamplePcsFv(CSamplePcs*);
-
 extern CSamplePcs SamplePcs;
 
 #endif

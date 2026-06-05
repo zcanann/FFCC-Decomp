@@ -5,6 +5,15 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
+struct KeShpTailWork {
+    u8 m_count;
+    u8 m_head;
+    u16 m_field2;
+    u16 m_field4;
+    u16 m_field6;
+    Vec m_posHistory[31];
+};
+
 STATIC_ASSERT(sizeof(KeShpTailWork) == 0x17C);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_count) == 0x00);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_head) == 0x01);

@@ -2414,19 +2414,67 @@ void CMenuPcs::DrawListPosMark(float x, float y, float z)
 int CMenuPcs::EquipChk(int itemNo)
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
+    int slot;
+    int commandItem;
 
-    for (int i = 2; i < caravanWork->m_numCmdListSlots && i < 8; i++) {
-        const short commandItem = caravanWork->m_commandListInventorySlotRef[i];
-        if (commandItem >= 0 && commandItem == itemNo) {
+    slot = 2;
+    if (slot < caravanWork->m_numCmdListSlots) {
+        commandItem = caravanWork->m_commandListInventorySlotRef[2];
+        if ((commandItem >= 0) && (commandItem == itemNo)) {
             return 1;
+        }
+        slot = 3;
+        if (slot < caravanWork->m_numCmdListSlots) {
+            commandItem = caravanWork->m_commandListInventorySlotRef[3];
+            if ((commandItem >= 0) && (commandItem == itemNo)) {
+                return 1;
+            }
+            slot = 4;
+            if (slot < caravanWork->m_numCmdListSlots) {
+                commandItem = caravanWork->m_commandListInventorySlotRef[4];
+                if ((commandItem >= 0) && (commandItem == itemNo)) {
+                    return 1;
+                }
+                slot = 5;
+                if (slot < caravanWork->m_numCmdListSlots) {
+                    commandItem = caravanWork->m_commandListInventorySlotRef[5];
+                    if ((commandItem >= 0) && (commandItem == itemNo)) {
+                        return 1;
+                    }
+                    slot = 6;
+                    if (slot < caravanWork->m_numCmdListSlots) {
+                        commandItem = caravanWork->m_commandListInventorySlotRef[6];
+                        if ((commandItem >= 0) && (commandItem == itemNo)) {
+                            return 1;
+                        }
+                        slot = 7;
+                        if (slot < caravanWork->m_numCmdListSlots) {
+                            commandItem = caravanWork->m_commandListInventorySlotRef[7];
+                            if ((commandItem >= 0) && (commandItem == itemNo)) {
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
-    for (int i = 0; i < 4; i++) {
-        const short equipment = caravanWork->m_equipment[i];
-        if (equipment >= 0 && equipment == itemNo) {
-            return 1;
-        }
+    int equipment = caravanWork->m_equipment[0];
+    if ((equipment >= 0) && (equipment == itemNo)) {
+        return 1;
+    }
+    equipment = caravanWork->m_equipment[1];
+    if ((equipment >= 0) && (equipment == itemNo)) {
+        return 1;
+    }
+    equipment = caravanWork->m_equipment[2];
+    if ((equipment >= 0) && (equipment == itemNo)) {
+        return 1;
+    }
+    equipment = caravanWork->m_equipment[3];
+    if ((equipment >= 0) && (equipment == itemNo)) {
+        return 1;
     }
 
     return 0;

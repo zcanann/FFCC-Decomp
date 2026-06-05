@@ -17,6 +17,23 @@ extern const float kPppChangeTexInit[2];
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 
+struct ChangeTexWork {
+    float m_value0;
+    float m_value1;
+    float m_value2;
+    GXColor** m_meshColorArrays;
+    ChangeTexDisplayListCopy*** m_displayListArrays;
+    int _pad14;
+    CGObject* m_charaObj;
+    CTexture* m_texture;
+    int _pad20;
+    void* m_context;
+    Vec m_bboxMin;
+    int _pad34;
+    Vec m_bboxMax;
+    float m_cachedValue;
+};
+
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
@@ -420,9 +437,10 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	CTexture* texture = work->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
-		unsigned int drawTevBits = 0xADE0F;
+		unsigned int drawTevBits = 0xACE0F;
+		unsigned int fullTevBits = drawTevBits | 0x1000;
 		MaterialMan.SetChangeTexReflectionState(
-		    &texture->m_texObj, drawTevBits, drawTevBits | 0x1000);
+		    &texture->m_texObj, drawTevBits, fullTevBits);
 	}
 
 	MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);

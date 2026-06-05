@@ -106,12 +106,33 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
+inline void pppDrawDrawMdlTs0(_pppPObject* obj, PDrawMdlTs* data, _pppCtrlTable* ctrl)
 {
-	// TODO
+    pppSetDrawEnv(
+        PppDrawMdlTsColor(obj, ctrl),
+        &obj->m_drawMatrix,
+        data->m_texScale,
+        data->m_drawA,
+        data->m_drawB,
+        data->m_blendMode,
+        data->m_drawD,
+        data->m_drawE,
+        data->m_drawF,
+        data->m_drawG);
+
+    f32* texCoords = PppDrawMdlTsTexCoords(obj, ctrl);
+    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0[0], FLOAT_803304F0[0]);
+
+    pppSetBlendMode(data->m_blendMode);
+
+    pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[data->m_modelIndex], obj->m_drawMatrixPtr, 1);
 }
 
 /*

@@ -10,6 +10,13 @@ int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
 
 extern const char sUsbPcsClassName[] = "CUSBPcs";
+
+extern "C" {
+void create__7CUSBPcsFv(CUSBPcs*);
+void destroy__7CUSBPcsFv(CUSBPcs*);
+void func__7CUSBPcsFv(CUSBPcs*);
+}
+
 inline CUSBPcs::CUSBPcs()
 {
     static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
@@ -38,6 +45,8 @@ CSmallProcessTable CUSBPcs::m_table = {
         0x12,
     },
 };
+extern const char sUsbManagerClassName[] = "CManager";
+extern const char sUsbProcessClassName[] = "CProcess";
 extern const char s_p_usb_cpp[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 

@@ -3,14 +3,7 @@
 
 #include "ffcc/partMng.h"
 
-typedef struct {
-    u32 m_dataValIndex;
-    u8 m_blurR;
-    u8 m_blurG;
-    u8 m_blurB;
-    u8 m_pad7;
-    s16 m_initWOrk;
-} pppScreenBlurUnkB;
+struct pppScreenBlurUnkB;
 
 #ifdef __cplusplus
 extern "C" {

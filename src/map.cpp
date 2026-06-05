@@ -9,7 +9,9 @@
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
 #include "ffcc/textureman.h"
+#include "ffcc/graphic.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/p_light.h"
@@ -73,6 +75,7 @@ static const char s_check_hit_cylinder_small_vec_fmt[] =
     "\x93\x96\x82\xe8\x82\xc5\x83\x78\x83\x4e\x83\x67\x83\x8b\x82\xaa\x8f\xac\x82\xb3\x82\xb7\x82\xac\x82\xe9 "
     "vec=(%f,%f,%f)\n";
 static const char s_read_mid_fmt[] = "ReadMid fn=%s\n";
+static const char s_read_otm_fmt[] = "ReadOtm fn=%s\n";
 static const char s_mapReadErrorFmt[] = "CAN NOT READ %s !!!!!!\n";
 static const char s_error_root_mapobj_not_found[] = "Error root mapobj not found\n";
 static const char s_read_mid_mapobj_error[] = "Error CMapMng::ReadMid m_mapobj\n";
@@ -2009,7 +2012,7 @@ int CMapMng::ReadMpl(char* mapName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::ReadOtm(char* mapName)
+int CMapMng::ReadOtm(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
@@ -2018,6 +2021,9 @@ void CMapMng::ReadOtm(char* mapName)
 
     m_mapReadReady = 1;
     sprintf(g_StrTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
+    if (static_cast<unsigned int>(System.m_execParam) > 2) {
+        System.Printf(const_cast<char*>(s_read_otm_fmt), g_StrTmp);
+    }
     m_mapAnimFrame = 0;
 
     if (asyncLoadState.m_mapReadMode == 1) {
@@ -2062,11 +2068,14 @@ void CMapMng::ReadOtm(char* mapName)
     }
 
     if (filePtr == 0) {
-        return;
+        if (System.m_execParam != 0) {
+            System.Printf(const_cast<char*>(s_mapReadErrorFmt), g_StrTmp);
+        }
+        return 0;
     }
 
     if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
-        return;
+        return 1;
     }
 
     CChunkFile chunkFile;
@@ -2083,7 +2092,7 @@ void CMapMng::ReadOtm(char* mapName)
             if (chunk.m_id == 0x4F43544D) {
                 short& octTreeCount = m_octTreeCount;
                 if (octTreeCount > 0xF) {
-                    return;
+                    return 0;
                 }
 
                 COctTree* octTree = GetOctTreeArray() + octTreeCount;
@@ -2117,7 +2126,7 @@ void CMapMng::ReadOtm(char* mapName)
                 if (chunk.m_id == 0x4D455348) {
                     short& meshCount = m_mapMeshCount;
                     if (meshCount > 0x9F) {
-                        return;
+                        return 0;
                     }
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
                     mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
@@ -2147,7 +2156,7 @@ void CMapMng::ReadOtm(char* mapName)
                 if (chunk.m_id == 0x48495420) {
                     short& hitCount = m_mapHitCount;
                     if (hitCount > 0x1F) {
-                        return;
+                        return 0;
                     }
                     CMapHit* hit = GetMapHitArray() + hitCount;
                     hit->ReadOtmHit(chunkFile);
@@ -2158,7 +2167,7 @@ void CMapMng::ReadOtm(char* mapName)
                 if (chunk.m_id == 0x4E4F4445) {
                     short& mapObjCount = m_mapObjCount;
                     if (mapObjCount > 0x1FF) {
-                        return;
+                        return 0;
                     }
                     CMapObj* mapObj = GetMapObjArray() + mapObjCount;
                     mapObj->ReadOtmObj(chunkFile);
@@ -2210,7 +2219,10 @@ void CMapMng::ReadOtm(char* mapName)
 
     m_rootMapObj = root;
     if (root == 0) {
-        return;
+        if (System.m_execParam != 0) {
+            System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
+        }
+        return 0;
     }
 
     root->SetLink();
@@ -2282,6 +2294,7 @@ void CMapMng::ReadOtm(char* mapName)
         }
 
     }
+    return 1;
 }
 
 /*
@@ -2681,6 +2694,147 @@ void CMapMng::Draw()
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(1);
             octTree++;
+        }
+
+        if (Game.m_currentSceneId == 4) {
+            CharaPcs.drawMakeTexShadow();
+            MaterialMan.InitVtxFmt(-1, GX_RGB565, 0, GX_U16, 0xE, GX_U16, 10);
+            MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
+            Graphic.SetFog(m_fogEnable, 0);
+
+            GXSetColorUpdate(1);
+            GXSetAlphaUpdate(0);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+            GXSetColorUpdate(1);
+            GXSetAlphaUpdate(0);
+            GXSetCullMode(GX_CULL_FRONT);
+            GXSetZMode(1, GX_LEQUAL, 1);
+            LightPcs.SetNumDiffuse(0);
+
+            unsigned int shadowCount = CharaPcs.GetNumTexShadow();
+            if (shadowCount != 0) {
+                _GXTexObj texObjs[8];
+                Vec shadowPositions[8];
+                float shadowMatrices[8][3][4];
+
+                GXSetNumIndStages(0);
+                GXSetTevDirect(GX_TEVSTAGE0);
+                GXSetNumChans(1);
+                GXSetColorUpdate(1);
+                GXSetAlphaUpdate(0);
+                GXSetCullMode(GX_CULL_NONE);
+                GXSetZMode(1, GX_LEQUAL, 0);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
+                GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+                GXSetChanMatColor(GX_COLOR0A0, CharaPcs.m_texShadowColor);
+                _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+                _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+                GXSetNumTevStages(1);
+                GXSetZCompLoc(0);
+                _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+
+                int startIndex = 0;
+                do {
+                    unsigned int batchCount = 8;
+                    if (shadowCount < batchCount) {
+                        batchCount = shadowCount;
+                    }
+
+                    CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
+
+                    int texMtx = 0x1E;
+                    int stage = 0;
+                    for (unsigned int i = 0; i < batchCount; i++) {
+                        GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX2x4);
+                        GXLoadTexObj(&texObjs[i], static_cast<GXTexMapID>(i));
+                        GXSetTexCoordGen2(
+                            static_cast<GXTexCoordID>(i), GX_TG_MTX2x4, GX_TG_TEX0,
+                            static_cast<GXTexMtx>(texMtx), 0, GX_PTIDENTITY);
+                        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+                        _GXSetTevOrder(
+                            static_cast<GXTevStageID>(stage), static_cast<GXTexCoordID>(i),
+                            static_cast<GXTexMapID>(i), GX_COLOR0A0);
+                        _GXSetTevSwapMode(static_cast<GXTevStageID>(stage), GX_TEV_SWAP0, GX_TEV_SWAP1);
+                        if (i == 0) {
+                            _GXSetTevColorIn(
+                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+                                GX_CC_ZERO);
+                            _GXSetTevColorOp(
+                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                GX_TEVPREV);
+                            _GXSetTevAlphaIn(
+                                static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
+                                GX_CA_ZERO);
+                            _GXSetTevAlphaOp(
+                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                GX_TEVPREV);
+                        } else {
+                            _GXSetTevColorIn(
+                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
+                                GX_CC_CPREV);
+                            _GXSetTevColorOp(
+                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                GX_TEVPREV);
+                            _GXSetTevAlphaIn(
+                                static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
+                                GX_CA_APREV);
+                            _GXSetTevAlphaOp(
+                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                GX_TEVPREV);
+                        }
+                        texMtx += 3;
+                        stage++;
+                    }
+
+                    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+                    _GXSetTevOrder(static_cast<GXTevStageID>(stage), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+                    _GXSetTevColorIn(
+                        static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+                    _GXSetTevColorOp(
+                        static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1, GX_TEVPREV);
+                    _GXSetTevAlphaIn(
+                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_RASA, GX_CA_APREV, GX_CA_TEXA);
+                    _GXSetTevAlphaOp(
+                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG2);
+
+                    int finalStage = stage + 1;
+                    GXSetTevDirect(static_cast<GXTevStageID>(finalStage));
+                    _GXSetTevOrder(
+                        static_cast<GXTevStageID>(finalStage), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+                    _GXSetTevColorIn(
+                        static_cast<GXTevStageID>(finalStage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+                    _GXSetTevColorOp(
+                        static_cast<GXTevStageID>(finalStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                        GX_TEVPREV);
+                    _GXSetTevAlphaIn(
+                        static_cast<GXTevStageID>(finalStage), GX_CA_A2, GX_CA_TEXA, GX_CA_A2, GX_CA_APREV);
+                    _GXSetTevAlphaOp(
+                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
+                        GX_TEVPREV);
+
+                    GXSetNumTexGens(static_cast<unsigned char>(batchCount));
+                    GXSetNumTevStages(static_cast<unsigned char>(stage + 2));
+
+                    shadowCount -= batchCount;
+                    startIndex += batchCount;
+
+                    octTree = GetOctTreeArray();
+                    for (int i = 0; i < octTreeCount; i++) {
+                        octTree->DrawCharaShadow(0);
+                        octTree++;
+                    }
+                } while (shadowCount != 0);
+            }
         }
     }
 

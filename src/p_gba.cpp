@@ -11,6 +11,13 @@ extern const char s_JoyBus__LoadBin___error_801d9de0[];
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
 
+extern "C" {
+void create__7CGbaPcsFv(CGbaPcs*);
+void destroy__7CGbaPcsFv(CGbaPcs*);
+void calc__7CGbaPcsFv(CGbaPcs*);
+void draw__7CGbaPcsFv(CGbaPcs*);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800979f4

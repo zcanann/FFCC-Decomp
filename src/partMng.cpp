@@ -40,29 +40,40 @@ extern float ppvChrScl[3];
 extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
-extern "C" float FLOAT_8032fe5c;
-extern "C" float FLOAT_8032fe60;
-extern "C" float FLOAT_8032fe64;
-extern "C" float FLOAT_8032fe68;
-extern "C" float FLOAT_8032FE6C;
-extern "C" float FLOAT_8032FE70;
-extern "C" float FLOAT_8032fe8c;
-extern "C" float FLOAT_8032fe90;
-extern "C" float FLOAT_8032fe94;
-extern "C" float FLOAT_8032fe98;
-extern "C" float FLOAT_8032fe9c;
-extern "C" float FLOAT_8032fea0;
-extern "C" float FLOAT_8032fea4;
-extern "C" float FLOAT_8032fea8;
-extern "C" float FLOAT_8032fe4c;
-extern "C" float FLOAT_8032fe50;
-extern "C" float FLOAT_8032fe54;
-extern "C" float FLOAT_8032fe58;
-extern "C" float FLOAT_8032fe18;
-extern "C" float FLOAT_8032FE74;
-extern "C" float FLOAT_8032FE78;
-extern "C" float FLOAT_8032FE7C;
-extern "C" double DOUBLE_8032fe80;
+extern "C" const double DOUBLE_8032FE08 = 0.0;
+extern "C" const float FLOAT_8032FE10 = 32768.0f;
+extern "C" const float FLOAT_8032FE14 = 180.0f;
+extern "C" const float FLOAT_8032fe18 = 1.0f;
+extern "C" const char lbl_8032FE1C[4] = "";
+extern "C" const char lbl_8032FE20[] = "%s.pdt";
+extern "C" const char lbl_8032FE28[] = "%s.pan";
+extern "C" const char lbl_8032FE30[] = "%s.pmd";
+extern "C" const char lbl_8032FE38[] = "%s.ptx";
+extern "C" const double DOUBLE_8032FE40 = -1.0;
+extern "C" const float FLOAT_8032FE48 = -100000000.0f;
+extern "C" const float FLOAT_8032fe4c = 25.0f;
+extern "C" const float FLOAT_8032fe50 = 1.3333334f;
+extern "C" const float FLOAT_8032fe54 = 10.0f;
+extern "C" const float FLOAT_8032fe58 = 10000.0f;
+extern "C" const float FLOAT_8032fe5c = 0.0f;
+extern "C" const float FLOAT_8032fe60 = 448.0f;
+extern "C" const float FLOAT_8032fe64 = 640.0f;
+extern "C" const float FLOAT_8032fe68 = -100.0f;
+extern "C" const float FLOAT_8032FE6C = 3.4028235e38f;
+extern "C" const float FLOAT_8032FE70 = 100.0f;
+extern "C" const float FLOAT_8032FE74 = 224.0f;
+extern "C" const float FLOAT_8032FE78 = 16777216.0f;
+extern "C" const float FLOAT_8032FE7C = 320.0f;
+extern "C" const double DOUBLE_8032fe80 = 4503601774854144.0;
+extern "C" const char lbl_8032FE88[] = "\n\n\n";
+extern "C" const float FLOAT_8032fe8c = 33.3f;
+extern "C" const float FLOAT_8032fe90 = 0.93333334f;
+extern "C" const float FLOAT_8032fe94 = 0.125f;
+extern "C" const float FLOAT_8032fe98 = 200.0f;
+extern "C" const float FLOAT_8032fe9c = 400.0f;
+extern "C" const float FLOAT_8032fea0 = 300.0f;
+extern "C" const float FLOAT_8032fea4 = 600.0f;
+extern "C" const float FLOAT_8032fea8 = 800.0f;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
@@ -3138,34 +3149,9 @@ void CPartMng::pppDrawIdx(int partIndex)
  */
 void CPartMng::pppDraw()
 {
-    struct PppMngStDrawRaw {
-        void* m_pppResSet;                   // 0x00
-        int m_partIndex;                     // 0x04
-        Vec m_position;                      // 0x08
-        int m_baseTime;                      // 0x14
-        unsigned char m_pad18[0x78 - 0x18]; // 0x18
-        pppFMATRIX m_matrix;                 // 0x78
-        unsigned char m_padA8[0xE4 - 0xA8]; // 0xA8
-        unsigned char m_endRequested;        // 0xE4
-        unsigned char m_stopRequested;       // 0xE5
-        unsigned char m_isFinished;          // 0xE6
-        unsigned char m_matrixMode;          // 0xE7
-        unsigned char m_hitBgFlag;           // 0xE8
-        unsigned char m_slotVisible;         // 0xE9
-        unsigned char m_ownerFacing;         // 0xEA
-        unsigned char m_drawVariant;         // 0xEB
-        unsigned char m_rotationOrder;       // 0xEC
-        unsigned char m_drawMode;            // 0xED
-        signed char m_drawSubType;           // 0xEE
-        unsigned char m_useOwnerScaleSign;   // 0xEF
-        unsigned char m_ownerVisible;        // 0xF0
-        unsigned char m_nodeScaleInitialized; // 0xF1
-        unsigned char m_fieldF2;             // 0xF2
-        unsigned char m_padF3[0x108 - 0xF3]; // 0xF3
-        float m_cullRadiusSq;                // 0x108
-        float m_cullRadius;                  // 0x10C
-        float m_cullYOffset;                 // 0x110
-        float m_sortDepth;                   // 0x114
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
     };
 
     Mtx invCamera;
@@ -3180,41 +3166,56 @@ void CPartMng::pppDraw()
     cameraPos.y = invCamera[1][3];
     cameraPos.z = invCamera[2][3];
 
-    PppMngStDrawRaw* mng = reinterpret_cast<PppMngStDrawRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_endRequested == 0 && mng->m_baseTime != -0x1000 && mng->m_drawMode < 3 && mng->m_baseTime < 0
-            && mng->m_slotVisible != 0 && mng->m_ownerVisible != 0) {
+        _pppMngSt* mng = &m_pppMng[i];
+        if (mng->m_hitBgFlag == 0 && mng->m_baseTime != -0x1000 && (signed char)mng->m_drawPass <= 2 && mng->m_baseTime < 0
+            && mng->m_slotVisible != 0 && mng->m_ownerFacing != 0) {
+            ppvMng = mng;
             partPos.x = mng->m_matrix.value[0][3];
             partPos.y = mng->m_matrix.value[1][3];
             partPos.z = mng->m_matrix.value[2][3];
 
-            bool shouldDraw = (mng->m_cullRadiusSq == 0.0f);
-            if (!shouldDraw) {
+            if ((double)mng->m_cullRadiusSq != 0.0) {
+                goto checkCull;
+            }
+
+        drawPart:
+            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+            mng->m_sortDepth = viewPos.z;
+
+            if ((signed char)mng->m_drawPass == 1) {
+                ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
+            } else if ((signed char)mng->m_drawPass < 1) {
+                if ((signed char)mng->m_drawPass >= 0) {
+                    ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+                }
+            } else if ((signed char)mng->m_drawPass < 3) {
+                ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
+            }
+            goto nextPart;
+
+        checkCull:
+            {
                 PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
                 if (PSVECSquareMag(&cameraDelta) < mng->m_cullRadiusSq) {
-                    CBound bound;
-                    Vec min;
-                    min.x = partPos.x - mng->m_cullRadius;
-                    min.y = partPos.y;
-                    min.z = partPos.z - mng->m_cullRadius;
-                    shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) != 0);
+                    PppCullBound bound;
+                    float radius = mng->m_cullRadius;
+                    bound.m_min.x = partPos.x - radius;
+                    bound.m_min.y = partPos.y;
+                    bound.m_min.z = partPos.z - radius;
+                    bound.m_max.x = partPos.x + radius;
+                    bound.m_max.y = partPos.y + mng->m_cullYOffset;
+                    bound.m_max.z = partPos.z + radius;
+                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, FLOAT_8032FE48) == 0) {
+                        goto nextPart;
+                    }
+                    goto drawPart;
                 }
-            }
-
-            if (shouldDraw) {
-                PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                mng->m_sortDepth = viewPos.z;
-
-                if (mng->m_drawMode == 1) {
-                    ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
-                } else if (mng->m_drawMode == 0) {
-                    ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
-                } else if (mng->m_drawMode == 2) {
-                    ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
-                }
+                goto nextPart;
             }
         }
-        mng++;
+    nextPart:
+        ;
     }
 
     ppvDrawMng.DrawOt();
@@ -3485,7 +3486,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     stageLoad->setDefaultParam(pdtSlotIndex);
 
     char path[256];
-    sprintf(path, "%s.ptx", baseName);
+    sprintf(path, lbl_8032FE38, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
@@ -3561,7 +3562,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
     char path[256];
     unsigned long fileSize = 0;
 
-    sprintf(path, "%s.pmd", baseName);
+    sprintf(path, lbl_8032FE30, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPmdLogFormat), path);
     }
@@ -3675,7 +3676,7 @@ void CPartMng::pppLoadPan(const char* baseName)
     char path[256];
     unsigned long fileSize = 0;
 
-    sprintf(path, "%s.pan", baseName);
+    sprintf(path, lbl_8032FE28, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
@@ -3772,7 +3773,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     stageLoad->setDefaultParam(pdtSlotIndex);
 
     char pdtPath[256];
-    sprintf(pdtPath, "%s.pdt", baseName);
+    sprintf(pdtPath, lbl_8032FE20, baseName);
     strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
     pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
 

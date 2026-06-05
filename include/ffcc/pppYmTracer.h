@@ -32,8 +32,6 @@ struct pppYmTracerCtrl {
     s32* m_serializedDataOffsets;
 };
 
-struct TRACE_POLYGON;
-
 struct pppYmTracer {
     _pppPObject m_object;
 };

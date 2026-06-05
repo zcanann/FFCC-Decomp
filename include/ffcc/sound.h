@@ -2,36 +2,12 @@
 #define _FFCC_PPP_SOUND_H_
 
 #include "ffcc/file.h"
+#include "ffcc/line.h"
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
 #include "ffcc/RedSound/RedSound.h"
-#include <dolphin/mtx.h>
 
 struct _pppMngSt;
-
-struct CLineSegment {
-    Vec delta;
-    Vec normal;
-    float length;
-    float startLength;
-};
-
-template <int PointCount>
-struct CLine {
-    CLine();
-    int Calc(Vec*, float*, unsigned long*, float*, Vec*, float);
-    void Draw();
-    void CalcBound();
-
-    Vec min;
-    Vec max;
-    unsigned int pointCount;
-    unsigned int unused;
-    float unk20[4];
-    Vec points[PointCount];
-    CLineSegment segments[PointCount - 1];
-    float totalLength;
-};
 
 class CSound : public CManager
 {

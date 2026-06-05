@@ -3,24 +3,6 @@
 
 #include "ffcc/pppPart.h"
 
-struct pppYmDrawMdlTexAnm {
-    _pppPObject m_object;
-};
-
-struct pppYmDrawMdlTexAnmWork {
-    u32 m_frame;
-    u32 m_wait;
-    u32 m_tilesU;
-    u32 m_tilesV;
-    f32 m_perU;
-    f32 m_perV;
-};
-
-struct pppYmDrawMdlTexAnmColorBlock {
-    u8 _pad0[8];
-    pppCVECTOR m_color;
-};
-
 struct pppYmDrawMdlTexAnmStep {
     s32 m_graphId;
     s32 m_dataValIndex;

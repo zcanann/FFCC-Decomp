@@ -20,9 +20,56 @@ extern const double DOUBLE_80330598 = 1.0;
 #include <dolphin/mtx.h>
 #include <string.h>
 
+struct PYmMegaBirthShpTail2
+{
+    Mtx m_matrix;
+    Vec m_directionTail;
+    float m_colorDeltaAdd[4];
+    float m_sizeStart;
+    float m_sizeVal;
+    float m_speedRandRange;
+    float field_0x58;
+    Vec m_speedScale;
+    unsigned char m_randType;
+    unsigned char m_enableParticleColor;
+    unsigned char m_pad0x6a[0x6c - 0x6a];
+    short m_tail2PathIndex;
+    unsigned char m_pad0x6e[0xb9 - 0x6e];
+    unsigned char m_tail2MatrixMode;
+};
+
+struct pppYmMegaBirthShpTail2
+{
+    _pppPObjLink m_link;
+    s32 m_graphId;
+    pppFMATRIX m_localMatrix;
+    pppFMATRIX field_0x40;
+    char field_0x70[0x4c];
+    unsigned int field_0xbc;
+    unsigned int field_0xc0;
+    unsigned int field_0xc4;
+    unsigned int field_0xc8;
+    char m_data[0x500];
+};
+
+struct VYmMegaBirthShpTail2
+{
+    pppFMATRIX m_emitterMatrix;
+    Vec m_tailScaleDirection;
+    _PARTICLE_DATA* m_particles;
+    _PARTICLE_WMAT* m_wmats;
+    _PARTICLE_COLOR* m_colors;
+    unsigned int m_maxParticles;
+    unsigned short m_lifeLimit;
+    unsigned short m_pathIndex;
+};
+
 static pppFMATRIX g_matUnit2;
 
 extern "C" const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
+
+void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
+void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
 static inline float LoadFloat(const float& value)
 {
@@ -88,10 +135,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
             u8 trailNextIndex = (u8)(trailReadIndex + 1);
             const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_80330564;
-            float stepDivisor = (float)((s32)frameCountRaw - 1);
-            if (stepDivisor == kPppYmMegaBirthShpTail2Zero) {
-                stepDivisor = LoadFloat(FLOAT_80330568);
-            }
+            const float stepDivisor = (float)((s32)frameCountRaw - 1);
             float drawScale = *(float*)(payload + 0x5c);
             const float drawScaleStep =
                 (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
@@ -99,14 +143,16 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeG = (float)payload[0x65];
             float fadeB = (float)payload[0x66];
             float fadeA = (float)payload[0x67] * alphaScale;
-            const float fadeRStep =
-                (fadeR - (float)payload[0x68]) / stepDivisor;
-            const float fadeGStep =
-                (fadeG - (float)payload[0x69]) / stepDivisor;
-            const float fadeBStep =
-                (fadeB - (float)payload[0x6A]) / stepDivisor;
-            const float fadeAStep =
-                (fadeA - (float)payload[0x6B] * alphaScale) / stepDivisor;
+            float fadeRStep = LoadFloat(FLOAT_80330568);
+            float fadeGStep = LoadFloat(FLOAT_80330568);
+            float fadeBStep = LoadFloat(FLOAT_80330568);
+            float fadeAStep = LoadFloat(FLOAT_80330568);
+            if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
+                fadeRStep = (fadeR - (float)payload[0x68]) / stepDivisor;
+                fadeGStep = (fadeG - (float)payload[0x69]) / stepDivisor;
+                fadeBStep = (fadeB - (float)payload[0x6A]) / stepDivisor;
+                fadeAStep = (fadeA - (float)payload[0x6B] * alphaScale) / stepDivisor;
+            }
             const float spacing = *(float*)(payload + 0x6C);
             Vec* history = (Vec*)(particle + 0x40);
             Vec segVec;
@@ -511,7 +557,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if ((mode < 6) && (param->m_speedRandRange != 0.0f)) {
+    if ((mode >= 4) && (mode < 6) && (param->m_speedRandRange != 0.0f)) {
         float speedRandRange = param->m_speedRandRange;
         float speedRandHalf = FLOAT_80330568 * speedRandRange;
         u8 randType = param->m_randType;
@@ -567,7 +613,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 float vz;
 
                 if (param->m_randType == 0 || param->m_randType > 5) {
-                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
 
@@ -594,7 +640,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
-                    if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
+                    if ((int)work->m_pathIndex >= pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
 

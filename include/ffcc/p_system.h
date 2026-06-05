@@ -3,29 +3,12 @@
 
 #include "ffcc/system.h"
 
-class CSystemPcs;
-
-extern "C" void create__10CSystemPcsFv(CSystemPcs*);
-extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
-extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
-
 class CSystemPcs : public CProcess
 {
 public:
     static CProcessTable m_table;
 
-    CSystemPcs()
-    {
-        static CProcessTableCallback desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSystemPcsFv)};
-        static CProcessTableCallback desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSystemPcsFv)};
-        static CProcessTableCallback desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CSystemPcsFv)};
-
-        CProcessTable* table = &m_table;
-
-        table->m_fields.m_create = desc0;
-        table->m_fields.m_destroy = desc1;
-        table->m_fields.m_entries[0].m_callback = desc2;
-    }
+    CSystemPcs();
 
     void Init();
     void Quit();

@@ -27,6 +27,22 @@ private:
     unsigned int m_data;
 };
 
+extern "C" {
+void create__7CMapPcsFv(CMapPcs*);
+void destroy__7CMapPcsFv(CMapPcs*);
+void calcInit__7CMapPcsFv(CMapPcs*);
+void calc__7CMapPcsFv(CMapPcs*);
+void drawShadow__7CMapPcsFv(CMapPcs*);
+void drawBefore__7CMapPcsFv(CMapPcs*);
+void draw__7CMapPcsFv(CMapPcs*);
+void drawAfter__7CMapPcsFv(CMapPcs*);
+void createViewer__7CMapPcsFv(CMapPcs*);
+void calcViewer__7CMapPcsFv(CMapPcs*);
+void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
+void drawViewer__7CMapPcsFv(CMapPcs*);
+void drawAfterViewer__7CMapPcsFv(CMapPcs*);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80036254
@@ -143,9 +159,9 @@ extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
-CRelProfile g_hit_prof;
-unsigned char g_map_calc_prof;
-unsigned char g_map_draw_prof;
+unsigned char g_hit_prof ATTRIBUTE_ALIGN(4);
+unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
+unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;

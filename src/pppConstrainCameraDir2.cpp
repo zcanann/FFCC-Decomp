@@ -1,4 +1,5 @@
 #include "ffcc/pppConstrainCameraDir2.h"
+#include "ffcc/pppConstrainCameraDir_internal.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/p_camera.h"

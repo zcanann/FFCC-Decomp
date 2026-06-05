@@ -45,6 +45,24 @@ extern const double DOUBLE_80331058;
 
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
+struct pppBlurCharaWork {
+    void* m_captureBuffer;
+    CGObject* m_ownerObj;
+    GXTexObj* m_smallTexObj;
+    float m_savedModelField;
+};
+
+struct BlurCharaColorData {
+    u8 _pad0[8];
+    pppCVECTOR m_color;
+};
+
+struct BlurCharaTexData {
+    u8 _pad0[4];
+    CGObject* m_objPosBase;
+    GXTexObj* m_texObj;
+};
+
 STATIC_ASSERT(sizeof(pppBlurCharaWork) == 0x10);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);

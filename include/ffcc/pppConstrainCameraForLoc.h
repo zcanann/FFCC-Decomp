@@ -1,24 +1,10 @@
 #ifndef _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 #define _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 
-#include "ffcc/chara.h"
 #include "ffcc/partMng.h"
-#include "ffcc/pppYmEnv.h"
 
-class CGObject;
-
-typedef struct pppConstrainCameraForLoc {
-    _pppPObject m_object;
-} pppConstrainCameraForLoc;
-
-typedef struct pppConstrainCameraForLocParams {
-    int m_graphId;
-    float m_dataValIndex;
-    float m_initWork;
-    float m_stepValue;
-} pppConstrainCameraForLocParams;
-
-int CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+struct pppConstrainCameraForLoc;
+struct pppConstrainCameraForLocParams;
 
 #ifdef __cplusplus
 extern "C" {

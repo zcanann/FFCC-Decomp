@@ -3,14 +3,7 @@
 
 struct _pppCtrlTable;
 struct _pppPObject;
-
-typedef struct {
-    int m_graphId; // 0x00
-    int m_field_04;
-    int m_x;
-    int m_y;
-    int m_z;
-} pppAngAcceleUnkB;
+struct pppAngAcceleUnkB;
 
 #ifdef __cplusplus
 extern "C" {

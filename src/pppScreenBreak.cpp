@@ -32,6 +32,54 @@ typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
 typedef CChara::CMesh ScreenBreakMeshRef;
 typedef CChara::CMesh::CRefData ScreenBreakMeshData;
 
+struct ScreenBreakPiece {
+    Vec m_velocity;
+    Vec m_offset;
+    Vec m_axis;
+    Vec m_translation;
+    float m_timer;
+    float m_angle;
+    u8 m_active;
+    u8 m_pad39[3];
+};
+
+struct VScreenBreak {
+    float m_graphValue0;
+    float m_graphValue1;
+    float m_graphValue2;
+    ScreenBreakPiece* m_pieces;
+    GXTexObj* m_backBufferTexObj;
+    u8 m_pad14[4];
+    Vec m_extent;
+    u8 m_backBufferReady;
+    u8 m_pad25[3];
+    GXColor m_color;
+};
+
+struct PScreenBreak {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_initWOrk;
+    u8 _pad9[3];
+    float m_stepValue;
+    float m_arg3;
+    float m_graphPayload;
+    float m_gravityScale;
+    u8 m_pad1C[4];
+    Vec m_gravityDir;
+    u8 m_pad2C[4];
+    float m_gravityAmount;
+    u8 m_angleRand;
+    u8 m_pad35[3];
+    float m_speedBase;
+    float m_speedRand;
+};
+
+struct ScreenBreakColorData {
+    u8 m_pad0[8];
+    GXColor m_color;
+};
+
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
@@ -79,12 +127,6 @@ static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
 
-extern "C" {
-int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
-    CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
-void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8012d458
@@ -125,7 +167,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
     }
 
     if (GraphicScreenBreakBlurEnabled() != 0) {
-        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicPcs, 0, 0, 0, 0, 0, 0, 0);
+        GraphicPcs.SetBlurParameter(0, 0, 0, 0, 0, 0, 0);
     }
 
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
@@ -366,7 +408,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     for (uVar15 = 0; uVar15 < ScreenBreakModelRef(model)->m_meshCount;) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
-        node->m_flags &= 0x7F;
+        node->m_flags = static_cast<unsigned char>(__rlwimi(node->m_flags, 0, 7, 24, 24));
         PSMTXIdentity(node->m_localRuntimeMtx);
 
         u32 vertexCount = meshData->m_vertexCount;

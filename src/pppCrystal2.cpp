@@ -32,6 +32,20 @@ struct pppCrystal2ColorBlock {
     pppCVECTOR m_color;
 };
 
+struct HSD_ImageBuffer {
+    u8* m_imageData;
+    GXTexFmt m_format;
+    u32 m_width;
+    u32 m_height;
+    u32 m_imageCount;
+    u32 m_bufferSize;
+};
+
+struct Crystal2Work {
+    HSD_ImageBuffer* m_refractionMap;
+    GXTexObj* m_refractionTexObj;
+};
+
 static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<Crystal2Work*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
@@ -207,7 +221,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
     Crystal2Work* work;
     u32 yTile;
     u32 x;
-    Crystal2RefractionMap* textureInfo;
+    HSD_ImageBuffer* textureInfo;
     u32 textureSize;
     float magnitude;
     float stepX;
@@ -222,8 +236,8 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
 
     work = GetCrystal2Work(pppCrystal2, param_3);
     if ((param_2->m_crystal.m_refractionMode != 0) && (work->m_refractionMap == 0)) {
-        work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc(
-            sizeof(Crystal2RefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
+        work->m_refractionMap = (HSD_ImageBuffer*)pppMemAlloc(
+            sizeof(HSD_ImageBuffer), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
 
         textureInfo = work->m_refractionMap;
         textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);

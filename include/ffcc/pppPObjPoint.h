@@ -14,14 +14,6 @@ struct pppPObjPointStep {
     u32 m_objectId;             // 0xc
 };
 
-struct pppPObjPointWork {
-    float m_x;         // 0x0
-    float m_y;         // 0x4
-    float m_z;         // 0x8
-    u8 m_pad[4];       // 0xc
-    Vec* m_source;     // 0x10
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

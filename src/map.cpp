@@ -55,7 +55,7 @@ extern const float kMapFullTurnDegrees = 360.0f;
 extern const float kMapTinyEpsilon = 5.0e-6f;
 extern const float kMapHitWireZOffset = -0.1f;
 extern char g_MsgFlashy[];
-extern const char s_mapNewLine[] = "\n";
+static const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 
 static const char s_mapMidPathFmt[] = "%s.mid";

@@ -13,7 +13,7 @@ static const char s_texanim_cpp[] = "texanim.cpp";
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
-extern const char s_texAnimSeqE1[] = "e1";
+static const char s_texAnimSeqE1[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 
 static const char s_ptrarray_grow_error_801D7B14[] = {

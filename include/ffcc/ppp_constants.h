@@ -32,8 +32,6 @@ extern const float kPppKeLnsZero;
 extern const float kPppMoveZero;
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;
-extern const float kPppVtMimeZero;
-
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;
 extern float kPppSRandDownFVDualSampleScale;

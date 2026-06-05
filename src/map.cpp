@@ -1756,7 +1756,7 @@ int CMapMng::ReadMtx(char* mapName)
     MapMng.m_mapReadReady = 1;
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
-        CMemory::CStage* stage = m_stage;
+        CMemory::CStage* stage = MapMng.m_stage;
         CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
@@ -1852,7 +1852,7 @@ int CMapMng::ReadMtx(char* mapName)
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;

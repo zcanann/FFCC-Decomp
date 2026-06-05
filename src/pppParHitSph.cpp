@@ -10,12 +10,6 @@ extern const char s_pppParHitSphWin[] = "win";
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-struct ParHitSphParams {
-    u8 m_pad0[4];
-    float m_cylinderScale;
-    float m_radiusScale;
-};
-
 static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -30,9 +24,8 @@ static inline Vec* ParHitSphPreviousPosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParHitSph(struct _pppPObject* param_1, int param_2)
+void pppParHitSph(_pppPObject* param_1, ParHitSphParams* params)
 {
-    ParHitSphParams* params = reinterpret_cast<ParHitSphParams*>(param_2);
     Vec local_88;
     Vec local_94;
     Vec local_a0;

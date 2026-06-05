@@ -5,13 +5,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-struct pppPObjPointStep {
-    s32 m_graphId;              // 0x0
-    u32 m_createProgramIndex;   // 0x4
-    u32 m_sourceOffset;         // 0x8
-    u32 m_objectId;             // 0xc
-};
-
 struct pppPObjPointWork {
     float m_x;         // 0x0
     float m_y;         // 0x4

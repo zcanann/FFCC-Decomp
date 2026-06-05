@@ -495,20 +495,20 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_baseDrawPriority = 0;
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
-                if (meshOrHitIdx == -2) {
+                if (meshOrHitIdx != -2) {
+                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
+                } else {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     strncpy(meshName->m_name, name, 0x20);
                     m_mapData = 0;
-                } else {
-                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
                 }
             }
 
             if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (m_meshType < 10) && (m_meshType > 7)) {
+                (m_meshType < 10) && (m_meshType >= 8)) {
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;

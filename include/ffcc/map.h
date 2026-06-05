@@ -170,7 +170,7 @@ public:
     void InitMapShadow();
     int ReadMtx(char*);
     int ReadMpl(char*);
-    void ReadOtm(char*);
+    int ReadOtm(char*);
     int ReadMid(char*);
     void Calc();
     void DrawMapShadow();

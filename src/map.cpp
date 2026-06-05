@@ -2628,17 +2628,15 @@ void CMapMng::DrawBefore()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if ((gMapHitDrawMode.m_byte & 8) == 0) {
-            CMapObj* mapObj = MapMng.GetMapObjArray();
+        if ((s_bitMask.m_byte & 8) == 0) {
             for (int i = 0; i < m_mapObjCount; i++) {
+                CMapObj* mapObj = MapMng.GetMapObj(i);
                 mapObj->Draw(0xFE);
-                mapObj++;
             }
 
-            COctTree* octTree = GetOctTreeArray();
             for (int i = 0; i < m_octTreeCount; i++) {
+                COctTree* octTree = GetOctTreeArray() + i;
                 octTree->Draw(0xFF);
-                octTree++;
             }
         }
     }
@@ -3015,17 +3013,15 @@ void CMapMng::DrawAfter()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if (gMapHitDrawMode.m_byte == 0) {
-            COctTree* octTree = GetOctTreeArray();
+        if (static_cast<signed char>(s_bitMask.m_byte) == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
+                COctTree* octTree = GetOctTreeArray() + i;
                 octTree->Draw(2);
-                octTree++;
             }
 
-            CMapObj* mapObj = MapMng.GetMapObjArray();
             for (int i = 0; i < m_mapObjCount; i++) {
+                CMapObj* mapObj = MapMng.GetMapObj(i);
                 mapObj->Draw(2);
-                mapObj++;
             }
         }
     }

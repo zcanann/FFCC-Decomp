@@ -1090,11 +1090,6 @@ void CMapObj::SetLink()
 {
     CMapObj* head0 = 0;
     CMapObj* search0 = MapObjArrayStart();
-    CMapObj* search2Start = MapObjArrayStart();
-    CMapObj* search3Start = MapObjArrayStart();
-    CMapObj* search4Start = MapObjArrayStart();
-    CMapObj* search5Start = MapObjArrayStart();
-    CMapObj* search6Start = MapObjArrayStart();
 
     CMapObj* child0;
     while ((child0 = MapMng.SearchChildMapObj(search0, this)) != 0) {
@@ -1109,30 +1104,30 @@ void CMapObj::SetLink()
 
             child1->m_next = head1;
             head1 = child1;
-            CMapObj* cursor2 = search2Start;
+            CMapObj* cursor2 = MapObjArrayStart();
             CMapObj* child2;
             while ((child2 = MapMng.SearchChildMapObj(cursor2, child1)) != 0) {
                 child2->m_next = head2;
                 head2 = child2;
-                CMapObj* cursor3 = search3Start;
+                CMapObj* cursor3 = MapObjArrayStart();
                 CMapObj* head3 = 0;
                 CMapObj* child3;
                 while ((child3 = MapMng.SearchChildMapObj(cursor3, child2)) != 0) {
                     child3->m_next = head3;
                     head3 = child3;
-                    CMapObj* cursor4 = search4Start;
+                    CMapObj* cursor4 = MapObjArrayStart();
                     CMapObj* head4 = 0;
                     CMapObj* child4;
                     while ((child4 = MapMng.SearchChildMapObj(cursor4, child3)) != 0) {
                         child4->m_next = head4;
                         head4 = child4;
-                        CMapObj* cursor5 = search5Start;
+                        CMapObj* cursor5 = MapObjArrayStart();
                         CMapObj* head5 = 0;
                         CMapObj* child5;
                         while ((child5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
                             child5->m_next = head5;
                             head5 = child5;
-                            CMapObj* cursor6 = search6Start;
+                            CMapObj* cursor6 = MapObjArrayStart();
                             CMapObj* head6 = 0;
                             CMapObj* child6;
                             while ((child6 = MapMng.SearchChildMapObj(cursor6, child5)) != 0) {

@@ -1,10 +1,11 @@
 #include "ffcc/pppDrawMdlTs.h"
+#include "global.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
+#include "ffcc/pppColor.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
-#include <stddef.h>
 
 extern const float kPppKeShpTail2XZero = 0.0f;
 extern const float FLOAT_803304F0[2];
@@ -15,15 +16,33 @@ STATIC_ASSERT(offsetof(PDrawMdlTs, m_blendMode) == 0x09);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_texScale) == 0x10);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_texCoordAdd) == 0x14);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_drawA) == 0x2C);
+STATIC_ASSERT(offsetof(_pppColorWork, result) == 0x08);
+
+struct DrawMdlTsDataOffsets {
+    s32 m_colorWorkOffset;
+    s32 _unused04;
+    s32 m_texCoordOffset;
+};
+
+STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_colorWorkOffset) == 0x0);
+STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_texCoordOffset) == 0x8);
+
+static inline DrawMdlTsDataOffsets* PppDrawMdlTsDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<DrawMdlTsDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline f32* PppDrawMdlTsTexCoords(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<f32*>(obj->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<f32*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_texCoordOffset);
 }
 
 static inline pppCVECTOR* PppDrawMdlTsColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppCVECTOR*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0] + 8);
+    _pppColorWork* colorWork =
+        reinterpret_cast<_pppColorWork*>(obj->m_workArea + PppDrawMdlTsDataOffsets(ctrl)->m_colorWorkOffset);
+
+    return reinterpret_cast<pppCVECTOR*>(&colorWork->result);
 }
 
 /*

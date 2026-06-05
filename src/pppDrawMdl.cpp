@@ -1,18 +1,33 @@
 #include "ffcc/pppDrawMdl.h"
 #include "global.h"
+#include "ffcc/pppColor.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_linkage.h"
 #include "dolphin/types.h"
-#include <stddef.h>
 
 STATIC_ASSERT(offsetof(PDrawMdl, m_modelIndex) == 0x04);
 STATIC_ASSERT(offsetof(PDrawMdl, m_blendMode) == 0x09);
 STATIC_ASSERT(offsetof(PDrawMdl, m_texScale) == 0x10);
 STATIC_ASSERT(offsetof(PDrawMdl, m_drawA) == 0x14);
+STATIC_ASSERT(offsetof(_pppColorWork, result) == 0x08);
+
+struct DrawMdlDataOffsets {
+    s32 m_colorWorkOffset;
+};
+
+STATIC_ASSERT(offsetof(DrawMdlDataOffsets, m_colorWorkOffset) == 0x0);
+
+static inline DrawMdlDataOffsets* PppDrawMdlDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<DrawMdlDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline pppCVECTOR* PppDrawMdlColor(_pppPObject* obj, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppCVECTOR*>(obj->m_workArea + ctrl->m_serializedDataOffsets[0] + 8);
+    _pppColorWork* colorWork =
+        reinterpret_cast<_pppColorWork*>(obj->m_workArea + PppDrawMdlDataOffsets(ctrl)->m_colorWorkOffset);
+
+    return reinterpret_cast<pppCVECTOR*>(&colorWork->result);
 }
 
 /*

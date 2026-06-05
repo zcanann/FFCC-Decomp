@@ -39,6 +39,12 @@ struct VRain {
     f32 accelZ;
 };
 
+struct RainDataOffsets {
+    s32 _unused0;
+    s32 m_colorDataOffset;
+    s32 m_workOffset;
+};
+
 STATIC_ASSERT(offsetof(VRain, drops) == 0x0);
 STATIC_ASSERT(offsetof(VRain, moveY) == 0x4);
 STATIC_ASSERT(offsetof(VRain, accelY) == 0x8);
@@ -46,10 +52,17 @@ STATIC_ASSERT(offsetof(VRain, accelZ) == 0xC);
 STATIC_ASSERT(sizeof(VRain) == 0x10);
 STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
 STATIC_ASSERT(sizeof(RainDrop) == 0x20);
+STATIC_ASSERT(offsetof(RainDataOffsets, m_colorDataOffset) == 0x4);
+STATIC_ASSERT(offsetof(RainDataOffsets, m_workOffset) == 0x8);
+
+static inline RainDataOffsets* GetRainDataOffsets(RAIN_DATA* data)
+{
+    return reinterpret_cast<RainDataOffsets*>(data->m_serializedDataOffsets);
+}
 
 static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
 {
-    return reinterpret_cast<VRain*>(rain->m_workArea + data->m_serializedDataOffsets[2]);
+    return reinterpret_cast<VRain*>(rain->m_workArea + GetRainDataOffsets(data)->m_workOffset);
 }
 
 /*
@@ -64,6 +77,7 @@ static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
 void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     int i;
+    RainDataOffsets* offsets;
     int colorOffset;
     RainColorData* colorData;
     VRain* work;
@@ -74,12 +88,11 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
     float baseY;
     float baseZ;
     Vec segment;
-    int* serializedDataOffsets;
 
-    serializedDataOffsets = param_3->m_serializedDataOffsets;
-    colorOffset = serializedDataOffsets[1];
-    work = reinterpret_cast<VRain*>(pppRain->m_workArea + serializedDataOffsets[2]);
-    colorData = (RainColorData*)(pppRain->m_workArea + colorOffset);
+    offsets = GetRainDataOffsets(param_3);
+    colorOffset = offsets->m_colorDataOffset;
+    work = reinterpret_cast<VRain*>(pppRain->m_workArea + offsets->m_workOffset);
+    colorData = reinterpret_cast<RainColorData*>(pppRain->m_workArea + colorOffset);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -155,7 +168,7 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
         return;
     }
 
-    work = (VRain*)(pppRain->m_workArea + param_3->m_serializedDataOffsets[2]);
+    work = reinterpret_cast<VRain*>(pppRain->m_workArea + GetRainDataOffsets(param_3)->m_workOffset);
     if (work->drops == 0) {
         RainDrop* dropData;
 

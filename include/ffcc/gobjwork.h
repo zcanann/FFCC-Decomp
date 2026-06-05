@@ -115,7 +115,7 @@ public:
         bool IsAttachmentClaimed() const { return (Flags() & 0x40) != 0; }
         void SetAttachmentClaimed() { SetFlags((Flags() & 0xBF) | 0x40); }
         bool IsReplySent() const { return (Flags() & 0x20) != 0; }
-        void SetReplySent() { SetFlags(Flags() | 0x20); }
+        void SetReplySent() { SetFlags((Flags() & ~0x20) | (1 << 5)); }
         bool HasReply() const { return (Flags() & 0x10) != 0; }
         bool AttachmentIsGil() const { return (Flags() & 8) != 0; }
         unsigned short HeaderWord() const { return m_half.m_header; }

@@ -884,14 +884,14 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     Vec bitangent;
     Vec axis = cyl.m_axis;
     const f32 axisLen = PSVECMag(&axis);
-    PSVECScale(&axis, &axis, 1.0f / axisLen);
+    PSVECScale(&axis, &axis, kMapHitUnitScale / axisLen);
 
     if (fabs(axis.x) >= fabs(axis.y) && fabs(axis.x) >= fabs(axis.z)) {
         orthogonal.x = -axis.y;
         orthogonal.y = axis.x;
-        orthogonal.z = 0.0f;
+        orthogonal.z = kMapHitZero;
     } else {
-        orthogonal.x = 0.0f;
+        orthogonal.x = kMapHitZero;
         orthogonal.y = axis.z;
         orthogonal.z = -axis.y;
     }
@@ -905,7 +905,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     localDirection.z = PSVECDotProduct(&axis, &direction);
 
     const f32 directionLen = PSVECMag(&localDirection);
-    const f32 tScale = 1.0f / directionLen;
+    const f32 tScale = kMapHitUnitScale / directionLen;
     PSVECScale(&localDirection, &localDirection, tScale);
 
     Vec relStart;

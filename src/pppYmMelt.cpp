@@ -24,10 +24,11 @@ static const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
 extern "C" {
 extern const u32 DAT_80330b20 = 0x00000001;
 extern const u32 DAT_80330b24 = 0x00000010;
-extern const u32 DAT_80330B28[2] = {0x0000003f, 0x00000000};
+extern const u32 DAT_80330B28 = 0x0000003f;
 extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
+static const float FLOAT_80330B2C = 0.0f;
 
 struct YmMeltMapCylinder {
     Vec m_bottom;

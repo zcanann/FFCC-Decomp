@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppParHitSphMat.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
@@ -9,6 +10,19 @@ extern const float kPppParHitSphMatZero[2];
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+
+struct ParHitSphMatDataOffsets
+{
+    s32 m_unusedOffset;
+    s32 m_positionOffset;
+};
+
+STATIC_ASSERT(offsetof(ParHitSphMatDataOffsets, m_positionOffset) == 0x4);
+
+static inline ParHitSphMatDataOffsets* GetParHitSphMatDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<ParHitSphMatDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 static inline Vec* ParHitSphMatPreviousPosition(_pppMngSt* mng)
 {
@@ -40,15 +54,15 @@ void pppParHitSphMat(_pppPObject* pObject, pppParHitSphMatStep* step, _pppCtrlTa
     local_88.x = kPppParHitSphMatZero[0];
 
     if (step->m_useWorkPosition != 0) {
-        int* offsets = ctrlTable->m_serializedDataOffsets;
-        Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
+        ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
+        Vec* src = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
         local_94.x = ppvMng->m_matrix.value[0][3];
         local_94.y = ppvMng->m_matrix.value[1][3];
         local_94.z = ppvMng->m_matrix.value[2][3];
-        int* offsets = ctrlTable->m_serializedDataOffsets;
-        Vec* src = (Vec*)(pObject->m_workArea + offsets[1]);
+        ParHitSphMatDataOffsets* offsets = GetParHitSphMatDataOffsets(ctrlTable);
+        Vec* src = (Vec*)(pObject->m_workArea + offsets->m_positionOffset);
         local_94.x += src->x;
         local_94.y += src->y;
         local_94.z += src->z;

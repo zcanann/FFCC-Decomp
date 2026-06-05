@@ -13,49 +13,52 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
-extern float FLOAT_80331dd0;
 static const float FLOAT_80331cf8 = 0.0f;
-extern float FLOAT_80331dcc;
-extern float FLOAT_80331dc8;
-extern float FLOAT_80331d18;
-extern float FLOAT_80331d1c;
-extern float FLOAT_80331d20;
-extern float FLOAT_80331dd4;
-extern float FLOAT_80331d24;
-extern float FLOAT_80331d28;
-extern float FLOAT_80331d2c;
-extern float FLOAT_80331d30;
-extern float FLOAT_80331d58;
-extern float FLOAT_80331d5c;
-extern float FLOAT_80331d6c;
-extern float FLOAT_80331d70;
-extern float FLOAT_80331d74;
-extern float FLOAT_80331d7c;
-extern float FLOAT_80331d80;
-extern float FLOAT_80331d78;
-extern float FLOAT_80331d84;
-extern float FLOAT_80331d88;
-extern float FLOAT_80331d8c;
-extern float FLOAT_80331d90;
-extern float FLOAT_80331d94;
-extern float FLOAT_80331d98;
-extern float FLOAT_80331d9c;
-extern float FLOAT_80331da0;
-extern float FLOAT_80331da4;
-extern float FLOAT_80331da8;
-extern float FLOAT_80331dac;
-extern float FLOAT_80331db0;
-extern float FLOAT_80331db4;
-extern float FLOAT_80331dd8;
-extern float FLOAT_80331d60;
-extern float FLOAT_80331db8;
-extern double DOUBLE_80331d00 = 0.5;
-extern double DOUBLE_80331d08 = 3.0;
-extern double DOUBLE_80331d10;
-extern double DOUBLE_80331d38;
-extern double DOUBLE_80331dc0;
-extern "C" char s_c_item_80331D50[7];
-extern "C" char s_meteo_3_80331D64[8];
+extern const double DOUBLE_80331d00 = 0.5;
+extern const double DOUBLE_80331d08 = 3.0;
+extern const double DOUBLE_80331d10 = 0.0;
+extern const float FLOAT_80331d18 = 1.0f;
+extern const float FLOAT_80331d1c = 0.25f;
+extern const float FLOAT_80331d20 = 37.5f;
+extern const float FLOAT_80331d24 = 1.5707963705062866f;
+extern const float FLOAT_80331D28 = 0.125f;
+extern const float FLOAT_80331d2c = 3.1415927410125732f;
+extern const float FLOAT_80331d30 = 0.5f;
+extern const double DOUBLE_80331d38 = 4503601774854144.0;
+extern const float FLOAT_80331D40 = 90.0f;
+extern const float FLOAT_80331D44 = 25.0f;
+extern const double DOUBLE_80331D48 = 0.7853981852531433;
+extern "C" const char s_c_item_80331D50[] = "c_item";
+extern const float FLOAT_80331d58 = 2.0f;
+extern const float FLOAT_80331d5c = 12.0f;
+extern const float FLOAT_80331d60 = 0.009999999776482582f;
+extern "C" const char s_meteo_3_80331D64[] = "meteo_3";
+extern const float FLOAT_80331d6c = -172.0f;
+extern const float FLOAT_80331d70 = 3.4100000858306885f;
+extern const float FLOAT_80331d74 = -73.0f;
+extern const float FLOAT_80331d78 = 2.5f;
+extern const float FLOAT_80331d7c = 0.0010000000474974513f;
+extern const float FLOAT_80331d80 = -1.0f;
+extern const float FLOAT_80331d84 = 130.0f;
+extern const float FLOAT_80331d88 = 300.0f;
+extern const float FLOAT_80331d8c = 190.0f;
+extern const float FLOAT_80331d90 = -100.0f;
+extern const float FLOAT_80331d94 = -110.0f;
+extern const float FLOAT_80331d98 = 200.0f;
+extern const float FLOAT_80331d9c = 110.0f;
+extern const float FLOAT_80331da0 = 1.5f;
+extern const float FLOAT_80331da4 = 180.0f;
+extern const float FLOAT_80331da8 = 30.0f;
+extern const float FLOAT_80331dac = 80.0f;
+extern const float FLOAT_80331db0 = 0.0005000000237487257f;
+extern const float FLOAT_80331db4 = 0.02500000037252903f;
+extern const float FLOAT_80331db8 = 0.00000010000000116860974f;
+extern const double DOUBLE_80331dc0 = 4503599627370496.0;
+extern const float FLOAT_80331dc8 = 40.0f;
+extern const float FLOAT_80331dcc = -40.0f;
+extern const float FLOAT_80331dd0 = -50.0f;
+extern const float FLOAT_80331dd4 = 0.0625f;
+extern const float FLOAT_80331dd8 = 4.71238899230957f;
 extern char SoundBuffer[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
 extern "C" char g_errCt;
@@ -2404,7 +2407,7 @@ void CGMonObj::initFinishedFuncLastBoss()
 	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj) = this;
 
-	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(s_c_item_80331D50);
+	int nodeIndex = object->m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_c_item_80331D50));
 	CChara::CModel* model = object->m_charaModelHandle->m_model;
 	*reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj + 4) = model->m_nodes + nodeIndex;
 }
@@ -2695,7 +2698,7 @@ void CGMonObj::teleport(
 
 	if (stateFrame <= blendStartFrame) {
 		if (startFrame <= stateFrame) {
-			const float angle = FLOAT_80331d24 * static_cast<float>(stateFrame - startFrame) * FLOAT_80331d28;
+			const float angle = FLOAT_80331d24 * static_cast<float>(stateFrame - startFrame) * FLOAT_80331D28;
 			const float wave = static_cast<float>(cos(angle));
 			object->m_rotationZ = wave;
 			object->m_rotationX = wave;
@@ -2770,7 +2773,7 @@ void CGMonObj::teleport(
 				}
 			}
 
-			const float angle = FLOAT_80331d24 * (FLOAT_80331d18 - static_cast<float>(stateFrame - blendEndFrame) * FLOAT_80331d28);
+			const float angle = FLOAT_80331d24 * (FLOAT_80331d18 - static_cast<float>(stateFrame - blendEndFrame) * FLOAT_80331D28);
 			const float wave = static_cast<float>(cos(angle));
 			object->m_rotationZ = wave;
 			object->m_rotationX = wave;

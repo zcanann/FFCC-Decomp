@@ -1,9 +1,18 @@
+#include "global.h"
 #include "ffcc/pppSclMove.h"
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
 const float kPppSclMoveZero = 0.0f;
+
+STATIC_ASSERT(offsetof(PppSclMoveOffsets, m_scaleOffset) == 0x0);
+STATIC_ASSERT(offsetof(PppSclMoveOffsets, m_velocityOffset) == 0x4);
+
+static inline PppSclMoveOffsets* GetSclMoveOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<PppSclMoveOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -16,7 +25,7 @@ const float kPppSclMoveZero = 0.0f;
  */
 void pppSclMoveCon(_pppPObject* param1, _pppCtrlTable* param2)
 {
-    PppSclMoveOffsets* offsets = (PppSclMoveOffsets*)param2->m_serializedDataOffsets;
+    PppSclMoveOffsets* offsets = GetSclMoveOffsets(param2);
     float* data1 = (float*)(param1->m_workArea + offsets->m_velocityOffset);
     float zero = kPppSclMoveZero;
     data1[2] = zero;
@@ -35,7 +44,7 @@ void pppSclMoveCon(_pppPObject* param1, _pppCtrlTable* param2)
  */
 void pppSclMove(_pppPObject* param1, PppSclMoveInput* input, _pppCtrlTable* param3)
 {
-    PppSclMoveOffsets* offsets = (PppSclMoveOffsets*)param3->m_serializedDataOffsets;
+    PppSclMoveOffsets* offsets = GetSclMoveOffsets(param3);
     float* dataA = (float*)(param1->m_workArea + offsets->m_scaleOffset);
     float* dataB = (float*)(param1->m_workArea + offsets->m_velocityOffset);
 

@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
 extern "C" {
@@ -10,6 +11,14 @@ struct PppMoveObj {
     f32 z;           // 0x8
 };
 
+STATIC_ASSERT(offsetof(PppMoveOffsets, m_positionOffset) == 0x0);
+STATIC_ASSERT(offsetof(PppMoveOffsets, m_velocityOffset) == 0x4);
+
+static inline PppMoveOffsets* GetPppMoveOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<PppMoveOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80065b18
@@ -21,8 +30,8 @@ struct PppMoveObj {
  */
 void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
 {
-    u32 offset = static_cast<u32>(ctrlTable->m_serializedDataOffsets[1]);
-    PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offset);
+    PppMoveOffsets* offsets = GetPppMoveOffsets(ctrlTable);
+    PppMoveObj* moveObj = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
     
     f32 zero = kPppMoveZero;
     moveObj->z = zero;
@@ -41,7 +50,7 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
  */
 void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
 {
-    PppMoveOffsets* offsets = (PppMoveOffsets*)ctrlTable->m_serializedDataOffsets;
+    PppMoveOffsets* offsets = GetPppMoveOffsets(ctrlTable);
     PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->m_positionOffset);
     PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
 

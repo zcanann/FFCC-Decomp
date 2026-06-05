@@ -1,4 +1,5 @@
 #include "ffcc/pppYmMoveCircle.h"
+#include "global.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
@@ -19,6 +20,12 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
+struct pppYmMoveCircleDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(pppYmMoveCircleDataOffsets, m_workOffset) == 0x0);
+
 static inline Vec* MoveCirclePreviousPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -34,6 +41,17 @@ static inline Vec* MoveCircleTargetPosition(_pppMngSt* mng)
     return &mng->m_paramVec0;
 }
 
+static inline pppYmMoveCircleDataOffsets* GetMoveCircleDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppYmMoveCircleDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline pppYmMoveCircleWork* GetMoveCircleWork(_pppPObject* object, _pppCtrlTable* ctrl)
+{
+    pppYmMoveCircleDataOffsets* offsets = GetMoveCircleDataOffsets(ctrl);
+    return reinterpret_cast<pppYmMoveCircleWork*>(object->m_workArea + offsets->m_workOffset);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d160c
@@ -46,7 +64,6 @@ static inline Vec* MoveCircleTargetPosition(_pppMngSt* mng)
 extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* stepData, _pppCtrlTable* offsetData)
 {
     pppYmMoveCircleWork* work;
-    int* serializedDataOffsets;
     _pppMngSt* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
@@ -57,8 +74,7 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
         return;
     }
 
-    serializedDataOffsets = offsetData->m_serializedDataOffsets;
-    work = (pppYmMoveCircleWork*)(basePtr->m_workArea + serializedDataOffsets[0]);
+    work = GetMoveCircleWork(basePtr, offsetData);
     pppMngSt = ppvMng;
 
     work->m_radiusStep += work->m_radiusStepStep;
@@ -125,7 +141,7 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
     pppYmMoveCircleWork* work;
 
     pppMngSt = ppvMng;
-    offset = offsetData->m_serializedDataOffsets[0];
+    offset = GetMoveCircleDataOffsets(offsetData)->m_workOffset;
     work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offset);
 
     tempUp.x = 1.0f;

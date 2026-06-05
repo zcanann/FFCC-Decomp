@@ -58,8 +58,21 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
+struct LocationTitle2DataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
+STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
+STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
+
 static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
+
+static inline LocationTitle2DataOffsets* GetLocationTitle2DataOffsets(pppLocationTitle2Offsets* offsets)
+{
+    return reinterpret_cast<LocationTitle2DataOffsets*>(offsets->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -101,7 +114,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
     LocationTitle2Particle* particle;
     LocationTitle2Work* work;
 
-    serializedOffset = *unkC->m_serializedDataOffsets;
+    serializedOffset = GetLocationTitle2DataOffsets(unkC)->m_workOffset;
     work = (LocationTitle2Work*)(locationTitle->m_workArea + serializedOffset);
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -219,7 +232,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
 {
     int serializedOffset;
     int colorOffset;
-    int* serializedOffsets;
+    LocationTitle2DataOffsets* serializedOffsets;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
 
@@ -227,9 +240,9 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
         return;
     }
 
-    serializedOffsets = unkC->m_serializedDataOffsets;
-    serializedOffset = serializedOffsets[0];
-    colorOffset = serializedOffsets[1];
+    serializedOffsets = GetLocationTitle2DataOffsets(unkC);
+    serializedOffset = serializedOffsets->m_workOffset;
+    colorOffset = serializedOffsets->m_colorOffset;
     work = (LocationTitle2Work*)(locationTitle->m_workArea + serializedOffset);
     colorData = (LocationTitle2ColorBlock*)(locationTitle->m_workArea + colorOffset);
     rand();
@@ -383,7 +396,7 @@ extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppL
     int serializedOffset;
     CMemory::CStage** stagePtr;
 
-    serializedOffset = *unkC->m_serializedDataOffsets;
+    serializedOffset = GetLocationTitle2DataOffsets(unkC)->m_workOffset;
     stagePtr = (CMemory::CStage**)(locationTitle->m_workArea + serializedOffset);
 
     if (*stagePtr != 0) {
@@ -407,7 +420,7 @@ extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, ppp
     f32 value;
 
     value = kLocationTitle2WorkZero;
-    work = (LocationTitle2Work*)(locationTitle->m_workArea + *unkC->m_serializedDataOffsets);
+    work = (LocationTitle2Work*)(locationTitle->m_workArea + GetLocationTitle2DataOffsets(unkC)->m_workOffset);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_acc = value;

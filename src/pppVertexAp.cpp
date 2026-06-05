@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppVertexAp.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
@@ -42,6 +43,18 @@ struct VertexApState
     u16 countdown;
 };
 
+struct VertexApDataOffsets
+{
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(VertexApDataOffsets, m_stateOffset) == 0x0);
+
+static inline VertexApDataOffsets* GetVertexApDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VertexApDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 struct VertexApSource
 {
     u8 unk0[0x2C];
@@ -60,7 +73,7 @@ struct VertexApSource
 void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, _pppCtrlTable* ctrl)
 {
     VertexApData* data = (VertexApData*)dataRaw;
-    s32 stateOffset = *ctrl->m_serializedDataOffsets;
+    s32 stateOffset = GetVertexApDataOffsets(ctrl)->m_stateOffset;
     VertexApState* state = (VertexApState*)(parent->m_workArea + stateOffset);
 
     if (ppvUserStopPartF != 0) {
@@ -216,7 +229,7 @@ functionEnd:
  */
 void pppVertexApCon(_pppPObject* pobj, _pppCtrlTable* ctrl)
 {
-    s32 offset = *ctrl->m_serializedDataOffsets;
+    s32 offset = GetVertexApDataOffsets(ctrl)->m_stateOffset;
     u16* state = (u16*)(pobj->m_workArea + offset);
     state[0] = 0;
     state[1] = 0;

@@ -9,12 +9,23 @@ struct ChangeBGColorWork {
     GXColor m_color;
 };
 
+struct ChangeBGColorDataOffsets {
+    s32 _unused0;
+    s32 m_colorWorkOffset;
+};
+
 STATIC_ASSERT(offsetof(ChangeBGColorWork, m_color) == 0x08);
+STATIC_ASSERT(offsetof(ChangeBGColorDataOffsets, m_colorWorkOffset) == 0x4);
+
+static inline ChangeBGColorDataOffsets* GetChangeBGColorDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<ChangeBGColorDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 static inline ChangeBGColorWork* GetChangeBGColorWork(pppChangeBGColor* changeBGColor, _pppCtrlTable* ctrlTable)
 {
     return reinterpret_cast<ChangeBGColorWork*>(
-        changeBGColor->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+        changeBGColor->m_workArea + GetChangeBGColorDataOffsets(ctrlTable)->m_colorWorkOffset);
 }
 
 /*

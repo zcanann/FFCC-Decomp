@@ -1,4 +1,5 @@
 #include "ffcc/pppYmMoveParabola.h"
+#include "global.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
@@ -15,9 +16,21 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
+struct YmMoveParabolaDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
+
+static inline YmMoveParabolaDataOffsets* GetYmMoveParabolaDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmMoveParabolaDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_workArea +
+                                                   GetYmMoveParabolaDataOffsets(ctrl)->m_workOffset);
 }
 
 static inline Vec* ParabolaPreviousPosition(_pppMngSt* mng)

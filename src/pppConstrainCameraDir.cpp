@@ -22,6 +22,18 @@ extern const float kConstrainCameraDirZero;
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
+struct ConstrainCameraDirDataOffsets
+{
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(ConstrainCameraDirDataOffsets, m_workOffset) == 0x0);
+
+static inline ConstrainCameraDirDataOffsets* GetConstrainCameraDirDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<ConstrainCameraDirDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 80143098
@@ -36,7 +48,8 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 {
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)(pppConstrainCameraDir->m_workArea + *param_3->m_serializedDataOffsets);
+        float* value =
+            (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_3)->m_workOffset);
 
         CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
                        param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
@@ -111,7 +124,8 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = kConstrainCameraDirZero;
-    float* puVar2 = (float*)(pppConstrainCameraDir->m_workArea + *param_2->m_serializedDataOffsets);
+    float* puVar2 =
+        (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
@@ -129,7 +143,8 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
     float uVar1 = kConstrainCameraDirZero;
-    float* puVar2 = (float*)(pppConstrainCameraDir->m_workArea + *param_2->m_serializedDataOffsets);
+    float* puVar2 =
+        (float*)(pppConstrainCameraDir->m_workArea + GetConstrainCameraDirDataOffsets(param_2)->m_workOffset);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;

@@ -1,4 +1,5 @@
 #include "ffcc/pppConstrainCameraDir2.h"
+#include "global.h"
 #include "ffcc/pppConstrainCameraDir_internal.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppConstrainCameraDir.h"
@@ -8,6 +9,17 @@
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
+
+struct ConstrainCameraDir2DataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(ConstrainCameraDir2DataOffsets, m_valueOffset) == 0x0);
+
+static inline ConstrainCameraDir2DataOffsets* GetConstrainCameraDir2DataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<ConstrainCameraDir2DataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -23,7 +35,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 {
     if (ppvUserStopPartF == 0) {
         _pppMngSt* pppMngSt = ppvMng;
-        float* value = (float*)(param_1->m_workArea + *param_3->m_serializedDataOffsets);
+        float* value = (float*)(param_1->m_workArea + GetConstrainCameraDir2DataOffsets(param_3)->m_valueOffset);
 
         CalcGraphValue((_pppPObject*)param_1, param_2->m_graphId, value[0], value[1], value[2], param_2->m_dataValIndex,
                        param_2->m_initWOrk, param_2->m_stepValue);

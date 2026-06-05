@@ -56,6 +56,15 @@ struct TracerColorBlock {
     pppCVECTOR color;
 };
 
+struct YmTracer2DataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
+STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_workOffset) == 0x0);
+STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_colorOffset) == 0x4);
+STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);
+
 static PackedColor g_pppYmTracer2_1;
 static PackedColor g_pppYmTracer2_2;
 
@@ -74,6 +83,11 @@ static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
 {
     _pppPObject* object = reinterpret_cast<_pppPObject*>(ppvMng->m_pppPDataVals[dataValueIndex].m_pppPObjLink);
     return reinterpret_cast<float*>(object->m_workArea + offset);
+}
+
+static inline YmTracer2DataOffsets* GetYmTracer2DataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmTracer2DataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
 /*
@@ -104,9 +118,9 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
     int textureIndex[2];
 
     dataValIndex = param_2->m_dataValIndex;
-    dataOffset = *param_3->m_serializedDataOffsets;
+    dataOffset = GetYmTracer2DataOffsets(param_3)->m_workOffset;
     work = (TracerWork*)(pppYmTracer2->m_workArea + dataOffset);
-    colorOffset = param_3->m_serializedDataOffsets[1];
+    colorOffset = GetYmTracer2DataOffsets(param_3)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
     colorData = reinterpret_cast<TracerColorBlock*>(pppYmTracer2->m_workArea + colorOffset);
@@ -233,9 +247,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
     }
 
     useFallback = 0;
-    work = (TracerWork*)(pppYmTracer2->m_workArea + *param_3->m_serializedDataOffsets);
+    work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_3)->m_workOffset);
     colorData = reinterpret_cast<TracerColorBlock*>(
-        pppYmTracer2->m_workArea + param_3->m_serializedDataOffsets[1]);
+        pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_3)->m_colorOffset);
 
     work->initWork = (param_2->m_initWork == 0xffffffff)
                          ? gPppDefaultValueBuffer
@@ -354,7 +368,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
  */
 void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
     if (work->entries != 0) {
         pppHeapUseRate((CMemory::CStage*)work->entries);
     }
@@ -371,7 +385,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
  */
 void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
 
     work->pad2e = 0;
     work->visibleCount = 0;
@@ -390,7 +404,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     float fVar1 = FLOAT_80331840;
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
 
     work->entries = 0;
     work->arg3Work = 0;

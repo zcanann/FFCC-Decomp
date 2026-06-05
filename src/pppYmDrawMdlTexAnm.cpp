@@ -1,4 +1,5 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
+#include "global.h"
 #include "dolphin/os.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
@@ -30,14 +31,29 @@ struct pppYmDrawMdlTexAnmColorBlock {
     pppCVECTOR m_color;
 };
 
+struct pppYmDrawMdlTexAnmDataOffsets {
+    s32 m_colorBlockOffset;
+    s32 _unused04;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_colorBlockOffset) == 0x0);
+STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_workOffset) == 0x8);
+
 static inline CMapMesh** GetMapMeshTable()
 {
     return ppvEnv->m_mapMeshPtr;
 }
 
+static inline pppYmDrawMdlTexAnmDataOffsets* GetYmDrawMdlTexAnmDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppYmDrawMdlTexAnmDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObject* object, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    pppYmDrawMdlTexAnmDataOffsets* offsets = GetYmDrawMdlTexAnmDataOffsets(ctrl);
+    return reinterpret_cast<pppYmDrawMdlTexAnmWork*>(object->m_workArea + offsets->m_workOffset);
 }
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* object, _pppCtrlTable* ctrl)
@@ -48,7 +64,8 @@ static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObjLink* objec
 static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(_pppPObject* object,
                                                                          _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<pppYmDrawMdlTexAnmColorBlock*>(object->m_workArea + ctrl->m_serializedDataOffsets[0]);
+    return reinterpret_cast<pppYmDrawMdlTexAnmColorBlock*>(
+        object->m_workArea + GetYmDrawMdlTexAnmDataOffsets(ctrl)->m_colorBlockOffset);
 }
 
 /*

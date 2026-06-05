@@ -1,10 +1,22 @@
 #include "ffcc/pppRandDownFloat.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandDownFloatDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandDownFloatDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandDownFloatDataOffsets* GetRandDownFloatDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandDownFloatDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -32,13 +44,13 @@ void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTabl
             value = randomValue * scale;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownFloatDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else {
         if (in->targetId != id) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandDownFloatDataOffsets(ctrl)->m_valueOffset);
     }
 
     s32 sourceOffset = in->sourceOffset;

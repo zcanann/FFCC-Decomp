@@ -1,6 +1,30 @@
+#include "global.h"
 #include "ffcc/pppAngAccele.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
+
+struct PppAngAcceleDataOffsets {
+    s32 m_velocityOffset;
+    s32 m_accelOffset;
+};
+
+STATIC_ASSERT(offsetof(PppAngAcceleDataOffsets, m_velocityOffset) == 0x0);
+STATIC_ASSERT(offsetof(PppAngAcceleDataOffsets, m_accelOffset) == 0x4);
+
+static inline PppAngAcceleDataOffsets* GetPppAngAcceleDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<PppAngAcceleDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline int* GetPppAngAcceleVelocity(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<int*>(obj->m_workArea + GetPppAngAcceleDataOffsets(ctrl)->m_velocityOffset);
+}
+
+static inline int* GetPppAngAcceleAccel(_pppPObject* obj, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<int*>(obj->m_workArea + GetPppAngAcceleDataOffsets(ctrl)->m_accelOffset);
+}
 
 /*
  * --INFO--
@@ -13,7 +37,7 @@
  */
 void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
 {
-    int* angularAccel = (int*)(obj->m_workArea + param->m_serializedDataOffsets[1]);
+    int* angularAccel = GetPppAngAcceleAccel(obj, param);
 
     angularAccel[2] = 0;
     angularAccel[1] = 0;
@@ -31,8 +55,8 @@ void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
  */
 void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* param_2, _pppCtrlTable* param_3)
 {
-    int* angularVelocity = (int*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
-    int* angularAccel = (int*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);
+    int* angularVelocity = GetPppAngAcceleVelocity(obj, param_3);
+    int* angularAccel = GetPppAngAcceleAccel(obj, param_3);
 
     if (ppvUserStopPartF != 0) {
         return;

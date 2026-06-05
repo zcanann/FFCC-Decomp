@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppPointRAp.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -8,6 +9,14 @@
 static const float kRandomAngleRange = 32768.0f;
 static const float kRandomAngleBias = 16384.0f;
 static const float kSpinScale = 2.0f;
+
+STATIC_ASSERT(offsetof(pppPointRApOffsets, m_srcOffset) == 0x0);
+STATIC_ASSERT(offsetof(pppPointRApOffsets, m_stateOffset) == 0x4);
+
+static inline pppPointRApOffsets* GetPointRApOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<pppPointRApOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -20,7 +29,7 @@ static const float kSpinScale = 2.0f;
  */
 void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctrlTable)
 {
-    pppPointRApOffsets* ctrlData = (pppPointRApOffsets*)ctrlTable->m_serializedDataOffsets;
+    pppPointRApOffsets* ctrlData = GetPointRApOffsets(ctrlTable);
     u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
 
     if (ppvUserStopPartF != 0) {
@@ -85,7 +94,7 @@ void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctr
  */
 void pppPointRApCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-    pppPointRApOffsets* ctrlData = (pppPointRApOffsets*)ctrlTable->m_serializedDataOffsets;
+    pppPointRApOffsets* ctrlData = GetPointRApOffsets(ctrlTable);
     u8* state = pObject->m_workArea + ctrlData->m_stateOffset;
     state[1] = 0;
 }

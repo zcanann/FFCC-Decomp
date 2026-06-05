@@ -1,10 +1,22 @@
 #include "ffcc/pppRandHCV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandHCVDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandHCVDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandHCVDataOffsets* GetRandHCVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandHCVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline short randshort(short value, float scale)
 {
@@ -37,12 +49,12 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
             value *= 2.0f;
         }
 
-        randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        randomValue = (f32*)(basePtr->m_workArea + GetRandHCVDataOffsets(ctrl)->m_valueOffset);
         *randomValue = value;
     } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
-        randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        randomValue = (f32*)(basePtr->m_workArea + GetRandHCVDataOffsets(ctrl)->m_valueOffset);
     }
 
     target = (in->sourceOffset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + in->sourceOffset);

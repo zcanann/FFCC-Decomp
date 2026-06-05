@@ -1,4 +1,5 @@
 #include "ffcc/pppScreenQuake.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
@@ -6,9 +7,20 @@ extern "C" {
 extern const float kPppScreenQuakeZero[2];
 }
 
+struct ScreenQuakeDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(ScreenQuakeDataOffsets, m_workOffset) == 0x0);
+
+static inline ScreenQuakeDataOffsets* GetScreenQuakeDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<ScreenQuakeDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<float*>(quake->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<float*>(quake->m_workArea + GetScreenQuakeDataOffsets(ctrl)->m_workOffset);
 }
 
 /*

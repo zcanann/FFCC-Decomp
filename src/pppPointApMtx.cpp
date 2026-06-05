@@ -1,7 +1,16 @@
+#include "global.h"
 #include "ffcc/pppPointApMtx.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
+
+STATIC_ASSERT(offsetof(pppPointApMtxOffsets, m_srcOffset) == 0x0);
+STATIC_ASSERT(offsetof(pppPointApMtxOffsets, m_stateOffset) == 0x4);
+
+static inline pppPointApMtxOffsets* GetPointApMtxOffsets(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<pppPointApMtxOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -15,7 +24,7 @@
 void pppPointApMtx(_pppPObject* pObject, pppPointApMtxStep* payload, _pppCtrlTable* ctrlTable)
 {
 	Vec pos;
-	pppPointApMtxOffsets* offsets = (pppPointApMtxOffsets*)ctrlTable->m_serializedDataOffsets;
+	pppPointApMtxOffsets* offsets = GetPointApMtxOffsets(ctrlTable);
 	Vec* source = (Vec*)(pObject->m_workArea + offsets->m_srcOffset);
 	u8* state = pObject->m_workArea + offsets->m_stateOffset;
 	Mtx* target = (Mtx*)state;
@@ -73,7 +82,7 @@ void pppPointApMtx(_pppPObject* pObject, pppPointApMtxStep* payload, _pppCtrlTab
  */
 void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
-	pppPointApMtxOffsets* offsets = (pppPointApMtxOffsets*)ctrlTable->m_serializedDataOffsets;
+	pppPointApMtxOffsets* offsets = GetPointApMtxOffsets(ctrlTable);
 	u8* state = pObject->m_workArea + offsets->m_stateOffset;
 
 	state[1] = 0;

@@ -1,10 +1,22 @@
 #include "ffcc/pppRandFV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct RandFVDataOffsets {
+    s32 m_valueOffset;
+};
+
+STATIC_ASSERT(offsetof(RandFVDataOffsets, m_valueOffset) == 0x0);
+
+static inline RandFVDataOffsets* GetRandFVDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<RandFVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline float randf(float value, float scale)
 {
@@ -37,13 +49,13 @@ void pppRandFV(_pppPObject* basePtr, RandFVParams* in, _pppCtrlTable* ctrl)
             value *= 2.0f;
         }
 
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandFVDataOffsets(ctrl)->m_valueOffset);
         *valuePtr = value;
     } else {
         if (in->targetId != state) {
             return;
         }
-        valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+        valuePtr = (f32*)(basePtr->m_workArea + GetRandFVDataOffsets(ctrl)->m_valueOffset);
     }
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + in->sourceOffset);

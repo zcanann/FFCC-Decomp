@@ -1,8 +1,20 @@
 #include "ffcc/pppCallBackDistance.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
+
+struct CallBackDistanceDataOffsets {
+    s32 m_distanceOffset;
+};
+
+STATIC_ASSERT(offsetof(CallBackDistanceDataOffsets, m_distanceOffset) == 0x0);
+
+static inline CallBackDistanceDataOffsets* GetCallBackDistanceDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<CallBackDistanceDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -16,7 +28,7 @@
 void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceStep* step, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt = ppvMng;
-    s32 distanceOffset = *ctrlTable->m_serializedDataOffsets;
+    s32 distanceOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
     f32* distancePtr = (f32*)(object->m_workArea + distanceOffset);
     f32 distance;
     Vec local_1c;
@@ -82,7 +94,7 @@ void pppConstructCallBackDistance(_pppPObject* object, _pppCtrlTable* ctrlTable)
     f32* distancePtr;
 
     pppMngSt = ppvMng;
-    dataOffset = *ctrlTable->m_serializedDataOffsets;
+    dataOffset = GetCallBackDistanceDataOffsets(ctrlTable)->m_distanceOffset;
     distancePtr = (f32*)(object->m_workArea + dataOffset);
     lookTarget = pppMngSt->m_lookTarget;
     local_28 = lookTarget->m_worldPosition;

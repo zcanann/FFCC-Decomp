@@ -1,8 +1,21 @@
+#include "global.h"
 #include "ffcc/pppScale.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
 const float kPppScaleZero = 0.0f;
+
+struct PppScaleDataOffsets
+{
+	s32 m_scaleOffset;
+};
+
+STATIC_ASSERT(offsetof(PppScaleDataOffsets, m_scaleOffset) == 0x0);
+
+static inline PppScaleDataOffsets* GetPppScaleDataOffsets(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<PppScaleDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -15,10 +28,10 @@ const float kPppScaleZero = 0.0f;
  */
 void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
 {
-	int* data = ctrlTable->m_serializedDataOffsets;
-	float* value = (float*)(obj->m_workArea + data[0]);
+	PppScaleDataOffsets* data = GetPppScaleDataOffsets(ctrlTable);
+	float* value = (float*)(obj->m_workArea + data->m_scaleOffset);
 	float zero = kPppScaleZero;
-	
+
 	value[2] = zero;
 	value[1] = zero;
 	value[0] = zero;
@@ -43,9 +56,9 @@ void pppScale(_pppPObject* obj, PppScaleInput* input, _pppCtrlTable* ctrlTable)
 		return;
 	}
 
-	int* data = ctrlTable->m_serializedDataOffsets;
-	float* scale = (float*)(obj->m_workArea + data[0]);
-	
+	PppScaleDataOffsets* data = GetPppScaleDataOffsets(ctrlTable);
+	float* scale = (float*)(obj->m_workArea + data->m_scaleOffset);
+
 	scale[0] += input->m_scale[0];
 	scale[1] += input->m_scale[1];
 	scale[2] += input->m_scale[2];

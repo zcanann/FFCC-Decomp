@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppRyjMegaBirthModel.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
@@ -17,6 +18,26 @@ _PARTICLE_WMAT g_matTmp;
 
 static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 
+struct RyjMegaBirthModelDataOffsets
+{
+    s32 m_unusedOffset;
+    s32 m_colorOffset;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_colorOffset) == 0x4);
+STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_workOffset) == 0x8);
+
+static inline RyjMegaBirthModelDataOffsets* GetRyjMegaBirthModelDataOffsets(PRyjMegaBirthModelOffsets* offsets)
+{
+    return reinterpret_cast<RyjMegaBirthModelDataOffsets*>(offsets->m_serializedDataOffsets);
+}
+
+static inline RyjMegaBirthModelDataOffsets* GetRyjMegaBirthModelDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<RyjMegaBirthModelDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
+
 extern const float FLOAT_803304a8 = 0.017453292f;
 extern const double DOUBLE_803304b0 = 4503601774854144.0;
 extern const double DOUBLE_803304B8 = 4503599627370496.0;
@@ -31,52 +52,48 @@ extern const float FLOAT_803304E8[2] = { -1.0f, 0.0f };
 extern const float FLOAT_803304F0[2] = { 0.0f, 0.0f };
 extern const float FLOAT_803304F8 = 0.0f;
 
-#define RYJ_STATIC_ASSERT_JOIN_1(a, b) a##b
-#define RYJ_STATIC_ASSERT_JOIN(a, b) RYJ_STATIC_ASSERT_JOIN_1(a, b)
-#define RYJ_STATIC_ASSERT(expr) typedef char RYJ_STATIC_ASSERT_JOIN(ryj_static_assert_, __LINE__)[(expr) ? 1 : -1]
-
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_modelIndex) == 0x04);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fogIndex) == 0x09);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_useEnvDepth) == 0x0D);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_drawDepth) == 0x18);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_maxParticles) == 0x20);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitCount) == 0x22);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emit) == 0x22);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitInterval) == 0x24);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_life) == 0x26);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fadeInFrames) == 0x29);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spawnMode) == 0x2A);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spread) == 0x2B);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorRandom) == 0x2C);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorDeltaAdds) == 0x3C);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorFrameDeltas) == 0xBC);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStepDelta) == 0xD8);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStart) == 0xDC);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStep) == 0xE0);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStep) == 0xE4);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_baseDirection) == 0xE8);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationAxis) == 0xF8);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStart) == 0x108);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStep) == 0x10C);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityRandom) == 0x110);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_acceleration) == 0x114);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationStep) == 0x118);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionScale) == 0x120);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speed) == 0x12C);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speedMode) == 0x130);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_enableParticleColor) == 0x131);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_rotationRandomFlags) == 0x132);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_scaleRandomFlags) == 0x133);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScaleRandomMode) == 0x134);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_matrixMode) == 0x135);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_enableWorldMatrix) == 0x136);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_matrixFinalizeMode) == 0x137);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_zEnable) == 0x13A);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_clampDirectionalSpeed) == 0x13B);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_blendMode) == 0x13C);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_cullMode) == 0x13D);
-RYJ_STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_lightTarget) == 0x13F);
-RYJ_STATIC_ASSERT(sizeof(PRyjMegaBirthModel) == 0x140);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_modelIndex) == 0x04);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fogIndex) == 0x09);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_useEnvDepth) == 0x0D);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_drawDepth) == 0x18);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_maxParticles) == 0x20);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitCount) == 0x22);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emit) == 0x22);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitInterval) == 0x24);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_life) == 0x26);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fadeInFrames) == 0x29);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spawnMode) == 0x2A);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spread) == 0x2B);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorRandom) == 0x2C);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorDeltaAdds) == 0x3C);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_colorFrameDeltas) == 0xBC);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStepDelta) == 0xD8);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStart) == 0xDC);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollUStep) == 0xE0);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScrollVStep) == 0xE4);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_baseDirection) == 0xE8);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationAxis) == 0xF8);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStart) == 0x108);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityStep) == 0x10C);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionVelocityRandom) == 0x110);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_acceleration) == 0x114);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_accelerationStep) == 0x118);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_directionScale) == 0x120);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speed) == 0x12C);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_speedMode) == 0x130);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_enableParticleColor) == 0x131);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_rotationRandomFlags) == 0x132);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_scaleRandomFlags) == 0x133);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_texScaleRandomMode) == 0x134);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_matrixMode) == 0x135);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_enableWorldMatrix) == 0x136);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_matrixFinalizeMode) == 0x137);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_zEnable) == 0x13A);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_clampDirectionalSpeed) == 0x13B);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_blendMode) == 0x13C);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_cullMode) == 0x13D);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_lightTarget) == 0x13F);
+STATIC_ASSERT(sizeof(PRyjMegaBirthModel) == 0x140);
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -282,8 +299,9 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     float posZ;
     s8 hasRequiredMemory;
     VRyjMegaBirthModel* work =
-        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
-    VColor* color = reinterpret_cast<VColor*>(pObject->m_workArea + offsets->m_serializedDataOffsets[1]);
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
+    VColor* color =
+        reinterpret_cast<VColor*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_colorOffset);
     u8* payload = (u8*)params;
 
     if (work->m_particleBlock == 0) {
@@ -921,9 +939,10 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _pppCtrlTable* ctrlTable)
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
-    VColor* baseColor = (VColor*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+    RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
+    VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
     VRyjMegaBirthModel* work =
-        (VRyjMegaBirthModel*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
+        (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
     _PARTICLE_DATA* particleBlock = work->m_particleBlock;
     _PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
     _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
@@ -1150,7 +1169,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
     VRyjMegaBirthModel* work =
-        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
     float value1;
     float value0;
 
@@ -1183,7 +1202,7 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
 void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
     VRyjMegaBirthModel* work =
-        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + GetRyjMegaBirthModelDataOffsets(offsets)->m_workOffset);
 
     if (work->m_particleBlock != 0) {
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));

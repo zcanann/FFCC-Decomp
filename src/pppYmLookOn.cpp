@@ -1,13 +1,25 @@
 #include "ffcc/pppYmLookOn.h"
+#include "global.h"
 #include "ffcc/gobject.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
+struct YmLookOnDataOffsets {
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(YmLookOnDataOffsets, m_workOffset) == 0x0);
+
+static inline YmLookOnDataOffsets* GetYmLookOnDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmLookOnDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<CGObject**>(lookOn->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<CGObject**>(lookOn->m_workArea + GetYmLookOnDataOffsets(ctrl)->m_workOffset);
 }
 
 /*

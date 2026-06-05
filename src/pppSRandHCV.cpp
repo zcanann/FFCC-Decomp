@@ -1,10 +1,22 @@
 #include "ffcc/pppSRandHCV.h"
+#include "global.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 #include "ffcc/pppColor.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
+
+struct SRandHCVDataOffsets {
+    s32 m_stateOffset;
+};
+
+STATIC_ASSERT(offsetof(SRandHCVDataOffsets, m_stateOffset) == 0x0);
+
+static inline SRandHCVDataOffsets* GetSRandHCVDataOffsets(_pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<SRandHCVDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline float randf(unsigned char flag)
 {
@@ -41,7 +53,7 @@ void pppSRandHCV(_pppPObject* basePtr, SRandHCVParams* in, _pppCtrlTable* ctrl)
 	float* target;
 
 	if (in->targetId == basePtr->m_graphId) {
-		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+		target = (float*)(basePtr->m_workArea + GetSRandHCVDataOffsets(ctrl)->m_stateOffset);
 		target[0] = randf(in->useNormalDistribution);
 		target[1] = randf(in->useNormalDistribution);
 		target[2] = randf(in->useNormalDistribution);
@@ -50,7 +62,7 @@ void pppSRandHCV(_pppPObject* basePtr, SRandHCVParams* in, _pppCtrlTable* ctrl)
 		if (in->targetId != basePtr->m_graphId) {
 			return;
 		}
-		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
+		target = (float*)(basePtr->m_workArea + GetSRandHCVDataOffsets(ctrl)->m_stateOffset);
 	}
 	s32 color_offset = in->sourceOffset;
 	s16* target_colors = (color_offset == -1) ? (s16*)gPppDefaultValueBuffer : (s16*)(basePtr->m_workArea + color_offset);

@@ -72,8 +72,6 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
     Vec normalizedSource = direction;
     pppNormalize(direction, normalizedSource);
 
-    s32 sceneDiff = (s32)Game.m_currentSceneId - 7;
-    bool isSceneSeven = sceneDiff == 0;
     s32 sinIndex = (s32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
     f32 xzScale = frameCount * (work->m_distance * ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2]);
     newPosition.x = direction.x * xzScale;
@@ -81,7 +79,7 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
     newPosition.y = (frameCount * (work->m_distance * ppvSinTbl[(sinIndex & 0xFFFC) >> 2])) -
                     (frameCount * (gravityOffset * frameCount));
     newPosition.z = direction.z * xzScale;
-    if (isSceneSeven) {
+    if ((s32)Game.m_currentSceneId == 7) {
         Vec basePosition = work->m_basePosition;
         pppAddVector(newPosition, newPosition, basePosition);
     } else {

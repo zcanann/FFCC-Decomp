@@ -1313,23 +1313,31 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
+    COctTree* octTree = GetOctTreeArray();
     for (int i = 0; i < m_octTreeCount; i++) {
-        GetOctTreeArray()[i].~COctTree();
+        octTree->~COctTree();
+        octTree++;
     }
     m_octTreeCount = 0;
 
+    CMapHit* mapHit = GetMapHitArray();
     for (int i = 0; i < m_mapHitCount; i++) {
-        GetMapHitArray()[i].~CMapHit();
+        mapHit->~CMapHit();
+        mapHit++;
     }
     m_mapHitCount = 0;
 
+    CMapObj* mapObj = GetMapObjArray();
     for (int i = 0; i < m_mapObjCount; i++) {
-        GetMapObjArray()[i].~CMapObj();
+        mapObj->~CMapObj();
+        mapObj++;
     }
     m_mapObjCount = 0;
 
+    CMapMesh* mapMesh = GetMapMeshArray();
     for (int i = 0; i < m_mapMeshCount; i++) {
-        GetMapMeshArray()[i].~CMapMesh();
+        mapMesh->~CMapMesh();
+        mapMesh++;
     }
     m_mapMeshCount = 0;
 

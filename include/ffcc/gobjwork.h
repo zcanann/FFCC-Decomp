@@ -9,7 +9,12 @@ class CRomLetterWork;
 class CGObjWork
 {
 public:
-    CGObjWork();
+    CGObjWork()
+    {
+        m_objType = -1;
+        m_saveSlot = -1;
+        m_ownerObj = 0;
+    }
     virtual ~CGObjWork();
 
     virtual void Init(int, CRomWork*, int);

@@ -74,22 +74,6 @@ static const char s_UnnamedItem_801D9FF0[] = {
 
 /*
  * --INFO--
- * PAL Address: 0x800a2dd4
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObjWork::CGObjWork()
-{
-	m_objType = -1;
-	m_saveSlot = -1;
-	m_ownerObj = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800a2ca8
  * PAL Size: 228b
  * EN Address: TODO
@@ -143,16 +127,6 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
  */
 CGObjWork::~CGObjWork()
 {
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObjWork::CalcStatus()
-{
-	// TODO
 }
 
 /*
@@ -754,16 +728,6 @@ void CCaravanWork::SetArtifact(int artifactIndex, int enabled)
 		artifact = artifactIndex + 0x9F;
 	}
 	m_artifacts[artifactIndex] = (unsigned short)artifact;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::FGAddItemIdx(int, int)
-{
-	// TODO
 }
 
 /*
@@ -1997,16 +1961,6 @@ int CCaravanWork::CanPlayerUseItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::ValidCmdList(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8009fa18
  * PAL Size: 8b
  * EN Address: TODO
@@ -2017,16 +1971,6 @@ void CCaravanWork::ValidCmdList(int)
 int CCaravanWork::GetIdxCmdList()
 {
 	return m_currentCmdListIndex;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::SetIdxCmdList(int)
-{
-	// TODO
 }
 
 /*
@@ -2368,16 +2312,6 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 	}
 
 	return result;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::SearchCombiTop(int)
-{
-	// TODO
 }
 
 /*

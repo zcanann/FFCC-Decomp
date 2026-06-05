@@ -1,4 +1,5 @@
 #include "ffcc/ringmenu.h"
+#include "ffcc/chara.h"
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
@@ -595,7 +596,7 @@ void CRingMenu::onDraw()
 			if (partyObj != 0) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
-				                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004)
+				                   ? Chara.MogFur().m_commandIndex
 				                   : caravanWork->GetIdxCmdList();
 
 				CFont* font = MenuPcs.m_fonts[0];
@@ -961,14 +962,14 @@ void CRingMenu::onCalc()
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 			int currentCmd;
 			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+				currentCmd = Chara.MogFur().m_commandIndex;
 			} else {
 				currentCmd = caravanWork->GetIdxCmdList();
 			}
 
 			int* trackedCmd = &m_currentCommandIndex;
 			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
+				trackedCmd = &Chara.MogFur().m_trackedCommandIndex;
 			}
 
 			float scrollDelta = FLOAT_803309c0;

@@ -1,5 +1,6 @@
 #include "ffcc/ptrarray.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/chara.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/game.h"
@@ -1122,7 +1123,7 @@ void CGPartyObj::command()
 			}
 			if (cmdDir != 0) {
 				Sound.PlaySe(0x0C, 0x40, 0x7F, 0);
-				int& charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+				int& charaCommand = Chara.MogFur().m_commandIndex;
 				charaCommand += cmdDir;
 				if (charaCommand < 0) {
 					charaCommand += 5;
@@ -1130,7 +1131,7 @@ void CGPartyObj::command()
 					charaCommand -= 5;
 				}
 			}
-			const int charaCommand = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+			const int charaCommand = Chara.MogFur().m_commandIndex;
 			ringCommand = charaCommand + 0x1E;
 			ringCommandArg = charaCommand;
 		}

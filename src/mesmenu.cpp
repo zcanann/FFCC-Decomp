@@ -451,7 +451,7 @@ void CMesMenu::onDraw()
 {
     if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)CFlatGameFlags() << 30) < 0)) {
         int iconFrame = 0;
-        int charaMode = *(int*)((char*)&Chara + 0x2004);
+        int charaMode = Chara.MogFur().m_commandIndex;
         if (charaMode == 2) {
             iconFrame = 5;
         } else if (charaMode < 2) {

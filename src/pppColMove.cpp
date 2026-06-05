@@ -1,6 +1,21 @@
+#include "global.h"
 #include "ffcc/pppColMove.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
+
+struct pppColMoveDataOffsets
+{
+    s32 m_sourceMoveOffset;
+    s32 m_accumulatedMoveOffset;
+};
+
+STATIC_ASSERT(offsetof(pppColMoveDataOffsets, m_sourceMoveOffset) == 0x0);
+STATIC_ASSERT(offsetof(pppColMoveDataOffsets, m_accumulatedMoveOffset) == 0x4);
+
+static inline pppColMoveDataOffsets* GetColMoveDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<pppColMoveDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -13,8 +28,8 @@
  */
 void pppColMoveCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    int* data = ctrlTable->m_serializedDataOffsets;
-    pppColMoveVec4S* target = (pppColMoveVec4S*)(object->m_workArea + data[1]);
+    pppColMoveDataOffsets* data = GetColMoveDataOffsets(ctrlTable);
+    pppColMoveVec4S* target = (pppColMoveVec4S*)(object->m_workArea + data->m_accumulatedMoveOffset);
 
     target->w = 0;
     target->z = 0;
@@ -33,9 +48,9 @@ void pppColMoveCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppColMove(_pppPObject* object, pppColMoveInput* step, _pppCtrlTable* ctrlTable)
 {
-    pppColMoveInput* input = (pppColMoveInput*)ctrlTable->m_serializedDataOffsets;
-    pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)(object->m_workArea + input->id);
-    pppColMoveVec4S* movementMove = (pppColMoveVec4S*)(object->m_workArea + input->pad);
+    pppColMoveDataOffsets* offsets = GetColMoveDataOffsets(ctrlTable);
+    pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)(object->m_workArea + offsets->m_sourceMoveOffset);
+    pppColMoveVec4S* movementMove = (pppColMoveVec4S*)(object->m_workArea + offsets->m_accumulatedMoveOffset);
 
     if (ppvUserStopPartF != 0) {
         return;

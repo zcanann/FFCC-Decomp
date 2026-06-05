@@ -1,6 +1,21 @@
+#include "global.h"
 #include "ffcc/pppColAccele.h"
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
+
+struct pppColAcceleDataOffsets
+{
+    s32 m_colorOffset;
+    s32 m_accelerationOffset;
+};
+
+STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_colorOffset) == 0x0);
+STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_accelerationOffset) == 0x4);
+
+static inline pppColAcceleDataOffsets* GetColAcceleDataOffsets(_pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<pppColAcceleDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -13,9 +28,9 @@
  */
 void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    int* offsets = ctrlTable->m_serializedDataOffsets;
-    pppColorDelta* accel = (pppColorDelta*)(object->m_workArea + offsets[1]);
-    
+    pppColAcceleDataOffsets* offsets = GetColAcceleDataOffsets(ctrlTable);
+    pppColorDelta* accel = (pppColorDelta*)(object->m_workArea + offsets->m_accelerationOffset);
+
     accel->a = 0;
     accel->b = 0;
     accel->g = 0;
@@ -33,26 +48,26 @@ void pppColAcceleCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
  */
 void pppColAccele(_pppPObject* object, pppColAcceleStep* data, _pppCtrlTable* ctrlTable)
 {
-    int* offsets = ctrlTable->m_serializedDataOffsets;
-    int offset0 = offsets[0];
-    int offset1 = offsets[1];
+    pppColAcceleDataOffsets* offsets = GetColAcceleDataOffsets(ctrlTable);
+    int offset0 = offsets->m_colorOffset;
+    int offset1 = offsets->m_accelerationOffset;
     pppColorDelta* accel1 = (pppColorDelta*)(object->m_workArea + offset0);
     int frameData;
     pppColorDelta* accel2 = (pppColorDelta*)(object->m_workArea + offset1);
-    
+
     if (ppvUserStopPartF != 0)
         return;
-    
+
     frameData = data->m_graphId;
     if (frameData != object->m_graphId) {
         goto accumulate;
     }
-    
+
     accel2->r += data->m_acceleration.r;
     accel2->g += data->m_acceleration.g;
     accel2->b += data->m_acceleration.b;
     accel2->a += data->m_acceleration.a;
-    
+
 accumulate:
     accel1->r += accel2->r;
     accel1->g += accel2->g;

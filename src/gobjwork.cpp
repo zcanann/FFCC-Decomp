@@ -432,10 +432,10 @@ int CCaravanWork::IsOutOfShouki()
 void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int hasMoneyFlag, int hasReplyFlag,
 							 int itemA, int itemB, int itemC, int itemD)
 {
-	for (int i = 98; i >= 0; i--) {
-		m_letters[i + 1].m_word0 = m_letters[i].m_word0;
-		m_letters[i + 1].m_word1 = m_letters[i].m_word1;
-		m_letters[i + 1].m_word2 = m_letters[i].m_word2;
+	for (int i = 99; i > 0; i--) {
+		m_letters[i].m_word0 = m_letters[i - 1].m_word0;
+		m_letters[i].m_word1 = m_letters[i - 1].m_word1;
+		m_letters[i].m_word2 = m_letters[i - 1].m_word2;
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
@@ -443,7 +443,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(&m_letters[0]);
 	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(&m_letters[0]);
 	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(&m_letters[0]);
-	letterWords16[0] = (unsigned short)((letterWords16[0] & 0xF803) | ((letterType << 2) & 0x7FC));
+	letterWords16[0] |= static_cast<unsigned short>(letterType << 2);
 	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	letterFlags->hasMoney = hasMoneyFlag;
 	if (letterFlags->hasMoney != 0) {

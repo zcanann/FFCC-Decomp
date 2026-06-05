@@ -7,36 +7,6 @@
 #include "ffcc/ppp_linkage.h"
 #include <stddef.h>
 
-
-typedef struct ShapeRuntimeData {
-    u32 shapeDataOffset;
-    u32 posDataOffset;
-} ShapeRuntimeData;
-
-typedef struct ShapeState {
-    u16 value;
-    u16 counter;
-    u16 currentId;
-} ShapeState;
-
-typedef struct ShapeControlData {
-    u8 _pad0[4];
-    u32 type;
-    u32 step;
-    u8 _pad2[1];
-    u8 blendMode;
-    u8 paramE;
-    u8 _pad3[1];
-    f32 scale;
-    u8 param15;
-    u8 param14;
-} ShapeControlData;
-
-typedef struct ShapePositionData {
-    u8 _pad0[8];
-    pppCVECTOR color;
-} ShapePositionData;
-
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frameCount) == 0x6);
 STATIC_ASSERT(offsetof(pppShapeAnimData, m_frames) == 0x10);
 STATIC_ASSERT(offsetof(ShapePositionData, color) == 0x8);

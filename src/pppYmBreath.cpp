@@ -1,4 +1,5 @@
 #include "ffcc/pppYmBreath.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
@@ -90,11 +91,29 @@ struct YmBreathParticleData {
     unsigned char _pad5C[0x04];
 };
 
+struct YmBreathDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
+STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_workOffset) == 0x0);
+STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_colorOffset) == 0x4);
+
 void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
 void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 
 static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
+
+static inline YmBreathDataOffsets* GetYmBreathDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<YmBreathDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline VYmBreath* GetYmBreathWork(pppYmBreath* ymBreath, s32 offset)
+{
+    return reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + offset);
+}
 
 /*
  * --INFO--
@@ -108,7 +127,8 @@ static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
     YmBreathParticleGroup* group;
-    VYmBreath* state = (VYmBreath*)(ymBreath->m_workArea + *dataOffsets->m_serializedDataOffsets);
+    VYmBreath* state =
+        reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + GetYmBreathDataOffsets(dataOffsets)->m_workOffset);
 
     if (state->m_particleData != NULL) {
         pppHeapUseRate((CMemory::CStage*)state->m_particleData);
@@ -173,7 +193,7 @@ void pppConstruct2YmBreath(_pppPObject* obj)
  */
 extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, _pppCtrlTable* dataOffsets)
 {
-    VYmBreath* state = (VYmBreath*)(ymBreath->m_workArea + *dataOffsets->m_serializedDataOffsets);
+    VYmBreath* state = GetYmBreathWork(ymBreath, GetYmBreathDataOffsets(dataOffsets)->m_workOffset);
     float zero;
 
     PSMTXIdentity(state->m_matrix);
@@ -232,8 +252,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _
     pppFMATRIX viewMtx;
     Mtx drawMtx;
 
-    workOffset = offsets->m_serializedDataOffsets[0];
-    colorOffset = offsets->m_serializedDataOffsets[1];
+    workOffset = GetYmBreathDataOffsets(offsets)->m_workOffset;
+    colorOffset = GetYmBreathDataOffsets(offsets)->m_colorOffset;
     work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + workOffset);
     color = reinterpret_cast<VColor*>(ymBreath->m_workArea + colorOffset);
     particle = reinterpret_cast<YmBreathParticleData*>(work->m_particleData);
@@ -418,7 +438,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
     PYmBreath* params = reinterpret_cast<PYmBreath*>(pYmBreath);
     YmBreathParticleGroup* groupData;
     _pppMngSt* mngSt;
-    int* dataOffsets;
+    YmBreathDataOffsets* dataOffsets;
     VColor* color;
     VYmBreath* work;
     Mtx* particleWMat;
@@ -444,10 +464,10 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         return;
     }
 
-    dataOffsets = offsets->m_serializedDataOffsets;
+    dataOffsets = GetYmBreathDataOffsets(offsets);
     mngSt = ppvMng;
-    int colorOffset = dataOffsets[1];
-    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + dataOffsets[0]);
+    int colorOffset = dataOffsets->m_colorOffset;
+    work = reinterpret_cast<VYmBreath*>(ymBreath->m_workArea + dataOffsets->m_workOffset);
     color = (VColor*)(ymBreath->m_workArea + colorOffset);
 
     if (work->m_particleData == NULL) {

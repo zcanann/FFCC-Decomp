@@ -6,9 +6,9 @@
 
 #include <string.h>
 
-extern "C" const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
-extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
-extern "C" const char s_charaAnimAllocWarn[32] =
+static const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
+static const char s_charaAnimSourceFile[] = "chara_anim.cpp";
+static const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern const float kCharaSharedZeroF;

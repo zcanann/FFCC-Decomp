@@ -1,23 +1,30 @@
 #include "ffcc/pppParMatrix.h"
+#include "global.h"
 #include "dolphin/mtx.h"
+#include <stddef.h>
+
+STATIC_ASSERT(offsetof(pppParMatrixWork, m_matrix) == 0x04);
+STATIC_ASSERT(offsetof(pppParMatrixWork, m_positionX) == 0x1C);
+STATIC_ASSERT(offsetof(pppParMatrixWork, m_positionY) == 0x2C);
+STATIC_ASSERT(offsetof(pppParMatrixWork, m_positionZ) == 0x3C);
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	108
  */
-void pppParMatrix(int param)
+void pppParMatrix(pppParMatrixWork* work)
 {
-	Vec local_vec;
-	int* matrix_ptr = *(int**)(param + 4);
-	
-	local_vec.x = *(f32*)(param + 0x1c);
-	local_vec.y = *(f32*)(param + 0x2c);
-	local_vec.z = *(f32*)(param + 0x3c);
-	
-	PSMTXMultVec((f32(*)[4])((u8*)matrix_ptr + 0x10), &local_vec, &local_vec);
-	
-	*(f32*)(param + 0x1c) = local_vec.x;
-	*(f32*)(param + 0x2c) = local_vec.y;
-	*(f32*)(param + 0x3c) = local_vec.z;
+	Vec position;
+	MtxPtr matrix = work->m_matrix;
+
+	position.x = work->m_positionX;
+	position.y = work->m_positionY;
+	position.z = work->m_positionZ;
+
+	PSMTXMultVec(matrix + 1, &position, &position);
+
+	work->m_positionX = position.x;
+	work->m_positionY = position.y;
+	work->m_positionZ = position.z;
 }

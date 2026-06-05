@@ -6,7 +6,7 @@ extern "C" {
 void* memset(void*, int, unsigned int);
 }
 
-extern const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
+static const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
 
 static inline CMemory::CStage* MaterialEditorStage()
 {

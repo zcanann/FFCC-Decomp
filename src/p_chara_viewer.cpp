@@ -150,7 +150,7 @@ static inline float LoadFloat(const float& value)
 }
 
 extern "C" const char s_no_texture[] = "no texture...";
-extern "C" const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
+static const char s_p_chara_viewer_cpp[] = "p_chara_viewer.cpp";
 extern "C" const char s_gpu_profile_fmt[] = "GPU = %f.5%%(C = %.5f%% G = %.5f%%)";
 extern "C" const char s_calc_viewer_fmt[] = "CCharaPcs.calcViewer: %s\n";
 extern "C" const char s_anim_path_fmt[] = "%splot%d.cha";

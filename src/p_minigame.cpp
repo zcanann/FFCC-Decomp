@@ -1586,7 +1586,8 @@ void CMiniGamePcs::calc(void)
  */
 void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
 {
-    unsigned short codeType = padCode & 0x7F00;
+    unsigned int rawPadCode = padCode;
+    unsigned short codeType = rawPadCode & 0x7F00;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     switch (codeType) {
@@ -1595,12 +1596,12 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
             System.Printf(g_MsgFlashy);
         }
         if (1 <= (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_miniGamePadRaceResultFmt), player, padCode & 0xFF);
+            System.Printf(const_cast<char*>(s_miniGamePadRaceResultFmt), player, rawPadCode & 0xFF);
         }
         if (1 <= (unsigned int)System.m_execParam) {
             System.Printf(g_MsgFlashy);
         }
-        m_miniGameParams[player] = static_cast<signed char>(padCode);
+        m_miniGameParams[player] = static_cast<signed char>(rawPadCode);
         break;
     case 0x1100:
         if (1 <= (unsigned int)System.m_execParam) {

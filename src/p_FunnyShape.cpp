@@ -275,28 +275,28 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
 }
 
-CProcessTableCallback CFunnyShapePcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-CProcessTableCallback CFunnyShapePcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-CProcessTableCallback CFunnyShapePcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-CProcessTableCallback CFunnyShapePcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_tableDesc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_tableDesc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_tableDesc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+static CProcessTableCallback s_tableDesc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 CFunnyShapePcs FunnyShapePcs;
 CProcessTable CFunnyShapePcs::m_table = {
     const_cast<char*>(s_CFunnyShapePcsViewer),
     {
-        m_table_desc0.m_thisOffset,
-        m_table_desc0.m_virtualOffset,
-        m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset,
-        m_table_desc1.m_virtualOffset,
-        m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset,
-        m_table_desc2.m_virtualOffset,
-        m_table_desc2.m_function,
+        s_tableDesc0.m_thisOffset,
+        s_tableDesc0.m_virtualOffset,
+        s_tableDesc0.m_function,
+        s_tableDesc1.m_thisOffset,
+        s_tableDesc1.m_virtualOffset,
+        s_tableDesc1.m_function,
+        s_tableDesc2.m_thisOffset,
+        s_tableDesc2.m_virtualOffset,
+        s_tableDesc2.m_function,
         0x21,
         0,
-        m_table_desc3.m_thisOffset,
-        m_table_desc3.m_virtualOffset,
-        m_table_desc3.m_function,
+        s_tableDesc3.m_thisOffset,
+        s_tableDesc3.m_virtualOffset,
+        s_tableDesc3.m_function,
         0x42,
         1,
     },

@@ -1587,9 +1587,50 @@ void CMapMng::SetLightSource()
         if (attr != 0) {
             const int type = attr->m_type;
 
-            if (type == CMapObjAtr::SPOT_LIGHT) {
+            if (type == CMapObjAtr::POINT_LIGHT) {
+                CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
+                CLightPcs::CLight light;
+                light.m_type = 0;
+                light.m_position.x = MapObjWorldX(mapObj);
+                light.m_position.y = MapObjWorldY(mapObj);
+                light.m_position.z = MapObjWorldZ(mapObj);
+                light.m_direction.x = 0.0f;
+                light.m_direction.y = 0.0f;
+                light.m_direction.z = 1.0f;
+                light.m_partMask = 1 << mapLightIndex;
+                light.m_attenRadius = pointAttr->m_radius;
+                light.m_range = pointAttr->m_intensity;
+                light.m_attenFalloff = 1.0f;
+                light.m_targetColor[0] = pointAttr->m_color;
+                light.m_targetColor[1] = pointAttr->m_altColor;
+                *(u32*)light.m_targetEnable = 0;
+                light.m_spotFn = pointAttr->m_colorMode;
+                light.m_unk4D = 4;
+                light.m_directionMode = pointAttr->m_unknown20;
+                LightPcs.Add(&light);
+                mapLightIndex += 1;
+            } else if (type == CMapObjAtr::SPOT_LIGHT) {
                 CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
+                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) != 0) {
+                    CLightPcs::CLight* light = spotAttr->m_light;
+                    light->m_type = 1;
+                    light->m_targetColor[1] = spotAttr->m_color;
+                    light->m_position.x = MapObjWorldX(mapObj);
+                    light->m_position.y = MapObjWorldY(mapObj);
+                    light->m_position.z = MapObjWorldZ(mapObj);
+                    light->m_direction.x = 0.0f;
+                    light->m_direction.y = 0.0f;
+                    light->m_direction.z = 1.0f;
+
+                    CMapObj* targetObj = spotAttr->m_target;
+                    light->m_targetPosition.x = MapObjWorldX(targetObj);
+                    light->m_targetPosition.y = MapObjWorldY(targetObj);
+                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
+                    PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
+                                  reinterpret_cast<Vec*>(&light->m_position),
+                                  reinterpret_cast<Vec*>(&light->m_direction));
+                    PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
+                } else {
                     CLightPcs::CLight light;
                     light.m_type = 1;
                     light.m_position.x = MapObjWorldX(mapObj);
@@ -1623,48 +1664,7 @@ void CMapMng::SetLightSource()
                     light.m_partMask = 1 << mapLightIndex;
                     *(u32*)light.m_targetEnable = 0;
                     LightPcs.Add(&light);
-                } else {
-                    CLightPcs::CLight* light = spotAttr->m_light;
-                    light->m_type = 1;
-                    light->m_targetColor[1] = spotAttr->m_color;
-                    light->m_position.x = MapObjWorldX(mapObj);
-                    light->m_position.y = MapObjWorldY(mapObj);
-                    light->m_position.z = MapObjWorldZ(mapObj);
-                    light->m_direction.x = 0.0f;
-                    light->m_direction.y = 0.0f;
-                    light->m_direction.z = 1.0f;
-
-                    CMapObj* targetObj = spotAttr->m_target;
-                    light->m_targetPosition.x = MapObjWorldX(targetObj);
-                    light->m_targetPosition.y = MapObjWorldY(targetObj);
-                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
-                    PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
-                                  reinterpret_cast<Vec*>(&light->m_position),
-                                  reinterpret_cast<Vec*>(&light->m_direction));
-                    PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
                 }
-                mapLightIndex += 1;
-            } else if (type == CMapObjAtr::POINT_LIGHT) {
-                CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
-                CLightPcs::CLight light;
-                light.m_type = 0;
-                light.m_position.x = MapObjWorldX(mapObj);
-                light.m_position.y = MapObjWorldY(mapObj);
-                light.m_position.z = MapObjWorldZ(mapObj);
-                light.m_direction.x = 0.0f;
-                light.m_direction.y = 0.0f;
-                light.m_direction.z = 1.0f;
-                light.m_partMask = 1 << mapLightIndex;
-                light.m_attenRadius = pointAttr->m_radius;
-                light.m_range = pointAttr->m_intensity;
-                light.m_attenFalloff = 1.0f;
-                light.m_targetColor[0] = pointAttr->m_color;
-                light.m_targetColor[1] = pointAttr->m_altColor;
-                *(u32*)light.m_targetEnable = 0;
-                light.m_spotFn = pointAttr->m_colorMode;
-                light.m_unk4D = 4;
-                light.m_directionMode = pointAttr->m_unknown20;
-                LightPcs.Add(&light);
                 mapLightIndex += 1;
             }
         }

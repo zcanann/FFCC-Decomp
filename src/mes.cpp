@@ -485,10 +485,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
  */
 int CMes::useFlag(int maxCount, int stopOnClear)
 {
-	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-	while (*(int*)((char*)this + 0x3c10) < maxCount)
+	CFlag* flagEntry = &mFlagEntries[mFlagCursor];
+	while (mFlagCursor < maxCount)
 	{
-		int type = *flagEntry;
+		int type = flagEntry->m_type;
 
 		if (type != 3)
 		{
@@ -498,26 +498,25 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 				{
 					if (type != 0)
 					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
-						    (int)*(short*)(flagEntry + 4);
+						mFlagVars[flagEntry->m_index] = flagEntry->m_value;
 					}
 				}
 				else
 				{
-					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
+					int* slot = &mFlagVars[flagEntry->m_index];
 					*slot = *slot + 1;
 				}
 			}
 			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
+			         (mFlagVars[flagEntry->m_index] == 0) &&
 			         (stopOnClear == 0))
 			{
 				return 0;
 			}
 		}
 
-		flagEntry += 6;
-		*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
+		flagEntry++;
+		mFlagCursor = mFlagCursor + 1;
 	}
 
 	return 1;
@@ -530,8 +529,8 @@ int CMes::useFlag(int maxCount, int stopOnClear)
  */
 void CMes::SetPosition(float x, float y)
 {
-	*(float*)&mData[0x3c8c] = x;
-	*(float*)&mData[0x3c90] = y;
+	mBaseX = x;
+	mBaseY = y;
 }
 
 /*
@@ -1447,18 +1446,18 @@ void CMes::Next()
 			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 		}
 		mCounter = 0;
-		*(int*)((char*)this + 0x3c10) = 0;
-		*(int*)((char*)this + 0x3c0c) = 0;
-		*(float*)((char*)this + 0x3c88) = halfVal;
-		*(float*)((char*)this + 0x3c84) = halfVal;
-		*(float*)((char*)this + 0x3c90) = halfVal;
-		*(float*)((char*)this + 0x3c8c) = halfVal;
-		*(int*)((char*)this + 0x3c80) = 0;
-		*(int*)((char*)this + 0x3c7c) = 0;
-		*(int*)((char*)this + 0x3cac) = 0;
-		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
+		mFlagCursor = 0;
+		mFlagCount = 0;
+		mCurrentY = halfVal;
+		mCurrentX = halfVal;
+		mLineHeight = halfVal;
+		mLineWidth = halfVal;
+		mDrawCursor = 0;
+		mRevealCursor = 0;
+		mFadeEnabled = 0;
+		memcpy(tempFlags, mFlagVars, sizeof(tempFlags));
 		addString(&mText, 0);
-		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
+		memcpy(mFlagVars, tempFlags, sizeof(tempFlags));
 		halfVal = FLOAT_803308b0;
 		i = 0;
 		curr = (float*)((char*)this + 0xc);
@@ -1513,70 +1512,70 @@ void CMes::Set(char* text, int param)
 {
 	float zero = FLOAT_8033089c;
 	float one = FLOAT_80330898;
-	*(int*)((char*)this + 4) = (int)text;
-	*(int*)((char*)this + 0x3c74) = 0;
-	*(float*)((char*)this + 0x3ca8) = zero;
-	*(float*)((char*)this + 0x3ca4) = zero;
-	*(int*)((char*)this + 8) = 0;
-	*(int*)((char*)this + 0x3c10) = 0;
-	*(int*)((char*)this + 0x3c0c) = 0;
-	*(int*)((char*)this + 0x3d10) = 0;
-	*(int*)((char*)this + 0x3d30) = param;
-	*(float*)((char*)this + 0x3d3c) = zero;
-	*(int*)((char*)this + 0x3d40) = 0;
-	*(float*)((char*)this + 0x3d44) = one;
-	*(float*)((char*)this + 0x3d48) = one;
-	*(int*)((char*)this + 0x3d4c) = 1;
+	mText = text;
+	mWaitActive = 0;
+	mMaxHeight = zero;
+	mMaxWidth = zero;
+	mCounter = 0;
+	mFlagCursor = 0;
+	mFlagCount = 0;
+	mRubyEnabled = 0;
+	mFontCount = param;
+	mLineSpacing = zero;
+	mFontIndex = 0;
+	mScaleX = one;
+	mScaleY = one;
+	mAdvanceEnabled = 1;
 
 	if (text != 0) {
 		unsigned char flagBackup[0x50];
-		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
+		memcpy(flagBackup, mFlagVars, sizeof(flagBackup));
 		float lineZero = FLOAT_8033089c;
 
-		while (*(int*)((char*)this + 0x3c74) == 0) {
-			*(int*)((char*)this + 8) = 0;
-			*(int*)((char*)this + 0x3c10) = 0;
-			*(int*)((char*)this + 0x3c0c) = 0;
-			*(float*)((char*)this + 0x3c88) = lineZero;
-			*(float*)((char*)this + 0x3c84) = lineZero;
-			*(float*)((char*)this + 0x3c90) = lineZero;
-			*(float*)((char*)this + 0x3c8c) = lineZero;
+		while (mWaitActive == 0) {
+			mCounter = 0;
+			mFlagCursor = 0;
+			mFlagCount = 0;
+			mCurrentY = lineZero;
+			mCurrentX = lineZero;
+			mLineHeight = lineZero;
+			mLineWidth = lineZero;
 
 			addString((char**)((char*)this + 4), 1);
 
-			float width = *(float*)((char*)this + 0x3c8c);
-			if (width < *(float*)((char*)this + 0x3ca4)) {
-				width = *(float*)((char*)this + 0x3ca4);
+			float width = mLineWidth;
+			if (width < mMaxWidth) {
+				width = mMaxWidth;
 			}
-			*(float*)((char*)this + 0x3ca4) = width;
+			mMaxWidth = width;
 
-			float height = *(float*)((char*)this + 0x3c90);
-			if (height < *(float*)((char*)this + 0x3ca8)) {
-				height = *(float*)((char*)this + 0x3ca8);
+			float height = mLineHeight;
+			if (height < mMaxHeight) {
+				height = mMaxHeight;
 			}
-			*(float*)((char*)this + 0x3ca8) = height;
+			mMaxHeight = height;
 		}
 
-		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
+		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));
 		float lineSkip = FLOAT_803308a4;
 		zero = FLOAT_8033089c;
 		one = FLOAT_80330898;
-		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
-		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - lineSkip;
+		mMaxWidth = mMaxWidth - mLineSpacing;
+		mMaxHeight = mMaxHeight - lineSkip;
 
-		*(int*)((char*)this + 4) = (int)text;
-		*(int*)((char*)this + 0x3c74) = 0;
-		*(int*)((char*)this + 0x3cb0) = (unsigned int)__cntlzw((unsigned int)param) >> 5;
-		*(int*)((char*)this + 0x3cb4) = 3;
-		*(int*)((char*)this + 0x3cb8) = 0;
-		*(int*)((char*)this + 0x3d10) = 0;
-		*(int*)((char*)this + 0x3d2c) = 0;
-		*(int*)((char*)this + 0x3d28) = 7;
-		*(float*)((char*)this + 0x3d3c) = zero;
-		*(int*)((char*)this + 0x3d40) = 0;
-		*(float*)((char*)this + 0x3d44) = one;
-		*(float*)((char*)this + 0x3d48) = one;
-		*(int*)((char*)this + 0x3d4c) = 1;
+		mText = text;
+		mWaitActive = 0;
+		mAdvanceStep = (unsigned int)__cntlzw((unsigned int)param) >> 5;
+		mTextAlign = 3;
+		mFadeFrames = 0;
+		mRubyEnabled = 0;
+		mFontAlign = 0;
+		mColor = 7;
+		mLineSpacing = zero;
+		mFontIndex = 0;
+		mScaleX = one;
+		mScaleY = one;
+		mAdvanceEnabled = 1;
 		Next();
 	}
 }
@@ -1600,9 +1599,9 @@ CMes::CMes()
 {
 	mText = 0;
 	mCounter = 0;
-	*(int*)((char*)this + 0x3c10) = 0;
-	*(int*)((char*)this + 0x3c0c) = 0;
-	*(int*)((char*)this + 0x3d34) = 0;
-	*(int*)((char*)this + 0x3d38) = 1;
-	memset((char*)this + 0x3cc0, 0, 0x50);
+	mFlagCursor = 0;
+	mFlagCount = 0;
+	mTlutBase = 0;
+	mShadow = 1;
+	memset(mFlagVars, 0, sizeof(mFlagVars));
 }

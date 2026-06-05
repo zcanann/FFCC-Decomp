@@ -3,8 +3,9 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct pppYmBreath;
 struct PYmBreath;
+
+typedef _pppPObject pppYmBreath;
 
 #ifdef __cplusplus
 extern "C" {

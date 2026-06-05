@@ -70,6 +70,11 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
+struct GraphicSleepAlarm {
+    OSAlarm alarm;
+    OSThread* thread;
+};
+
 STATIC_ASSERT(offsetof(CGraphic, m_renderMode) == 0x71E0);
 STATIC_ASSERT(offsetof(CGraphic, m_graphicStage) == 0x4);
 STATIC_ASSERT(offsetof(CGraphic, m_scratchStage) == 0x8);
@@ -455,8 +460,8 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
  */
 void wakeup(OSAlarm* alarm, OSContext*)
 {
-    OSThread** waitingThread = reinterpret_cast<OSThread**>(reinterpret_cast<u8*>(alarm) + 0x28);
-    OSResumeThread(*waitingThread);
+    GraphicSleepAlarm* sleepAlarm = reinterpret_cast<GraphicSleepAlarm*>(alarm);
+    OSResumeThread(sleepAlarm->thread);
 }
 
 /*
@@ -500,11 +505,6 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  */
 void CGraphic::Thread()
 {
-    struct SleepAlarm {
-        OSAlarm alarm;
-        OSThread* thread;
-    };
-
     char* debugFmtBase = const_cast<char*>(sGraphicSourceStrings);
     int lastCounter = -1;
     int debugCountdown = 5;
@@ -579,7 +579,7 @@ void CGraphic::Thread()
             while (true) {}
         }
 
-        SleepAlarm sleepAlarm;
+        GraphicSleepAlarm sleepAlarm;
         sleepAlarm.thread = OSGetCurrentThread();
         OSCreateAlarm(&sleepAlarm.alarm);
         OSSetAlarmTag(&sleepAlarm.alarm, 1);

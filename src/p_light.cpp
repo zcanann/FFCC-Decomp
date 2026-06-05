@@ -96,6 +96,11 @@ static inline double U32ToDouble(unsigned int value)
     return conv.d - DOUBLE_8032fc68;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -317,7 +322,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 void CLightPcs::calc()
 {
     m_sceneLightCount = 0;
-    FLOAT_8032ed10 = FLOAT_8032ed10 + FLOAT_8032fc90;
+    FLOAT_8032ed10 = FLOAT_8032ed10 + LoadFloat(FLOAT_8032fc90);
 }
 
 /*

@@ -63,23 +63,23 @@ STATIC_ASSERT(offsetof(PScreenBreak, m_angleRand) == 0x34);
 STATIC_ASSERT(offsetof(PScreenBreak, m_speedBase) == 0x38);
 STATIC_ASSERT(offsetof(PScreenBreak, m_speedRand) == 0x3C);
 
-extern const float FLOAT_80331cc0 = 2.0f;
-extern const float FLOAT_80331cc4 = 0.0f;
-extern const float FLOAT_80331cc8 = 0.3f;
-extern const float FLOAT_80331ccc = -0.5f;
-extern const float FLOAT_80331cd0 = 1.0f;
-extern const float FLOAT_80331cd4 = -1.0f;
-extern const float FLOAT_80331cd8 = 0.017453292f;
-extern const double DOUBLE_80331CE0 = 4503599627370496.0;
-extern const float FLOAT_80331ce8 = 30.0f;
-extern const float FLOAT_80331cec = 4.0f;
-extern const float FLOAT_80331cf0 = -3.0f;
-extern const float FLOAT_80331cf4 = 0.5f;
+static const float FLOAT_80331cc0 = 2.0f;
+static const float FLOAT_80331cc4 = 0.0f;
+static const float FLOAT_80331cc8 = 0.3f;
+static const float FLOAT_80331ccc = -0.5f;
+static const float FLOAT_80331cd0 = 1.0f;
+static const float FLOAT_80331cd4 = -1.0f;
+static const float FLOAT_80331cd8 = 0.017453292f;
+static const double DOUBLE_80331CE0 = 4503599627370496.0;
+static const float FLOAT_80331ce8 = 30.0f;
+static const float FLOAT_80331cec = 4.0f;
+static const float FLOAT_80331cf0 = -3.0f;
+static const float FLOAT_80331cf4 = 0.5f;
 
-extern const Vec kScreenBreakCameraUpVector = { 0.0f, 1.0f, 0.0f };
-extern const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
-extern const char sF999Root[] = "f999_root";
-extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
+static const Vec kScreenBreakCameraUpVector = { 0.0f, 1.0f, 0.0f };
+static const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
+static const char sF999Root[] = "f999_root";
+static const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }

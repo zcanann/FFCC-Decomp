@@ -468,15 +468,14 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
-	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
-	state->m_values[1] = value;
-	state->m_values[0] = value;
-	state->m_scale = value;
-	state->m_values[4] = value;
-	state->m_values[3] = value;
-	state->m_values[2] = value;
+	state->m_values[1] = kPppYmDeformationShpZero;
+	state->m_values[0] = kPppYmDeformationShpZero;
+	state->m_scale = kPppYmDeformationShpZero;
+	state->m_values[4] = kPppYmDeformationShpZero;
+	state->m_values[3] = kPppYmDeformationShpZero;
+	state->m_values[2] = kPppYmDeformationShpZero;
 }
 
 /*
@@ -490,7 +489,6 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _p
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pppCtrlTable* param_2)
 {
-	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
 	state->m_backBuffer = 0;
@@ -498,10 +496,10 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, _pp
 	state->m_pad1 = 0;
 	state->m_angle = 0;
 	state->m_direction = 1;
-	state->m_values[1] = value;
-	state->m_values[0] = value;
-	state->m_scale = value;
-	state->m_values[4] = value;
-	state->m_values[3] = value;
-	state->m_values[2] = value;
+	state->m_values[1] = kPppYmDeformationShpZero;
+	state->m_values[0] = kPppYmDeformationShpZero;
+	state->m_scale = kPppYmDeformationShpZero;
+	state->m_values[4] = kPppYmDeformationShpZero;
+	state->m_values[3] = kPppYmDeformationShpZero;
+	state->m_values[2] = kPppYmDeformationShpZero;
 }

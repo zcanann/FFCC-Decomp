@@ -46,9 +46,30 @@ struct Crystal2Work {
     GXTexObj* m_refractionTexObj;
 };
 
+struct pppCrystal2UnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    s32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    union {
+        u8 m_payload[8];
+        struct Payload {
+            u8 m_refractionMode;
+            u8 m_blendMode;
+            u8 m_drawFlag;
+            u8 m_zMode;
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+            u8 m_pad06[2];
+        } m_crystal;
+    };
+    f32 m_perspectiveScale;
+};
+
 static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<Crystal2Work*>(crystal->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<Crystal2Work*>(crystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
 
 union Crystal2FloatBits {
@@ -111,7 +132,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
     s32 dataValIndex = param_2->m_dataValIndex;
     Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_3);
     pppCrystal2ColorBlock* colorBlock =
-        reinterpret_cast<pppCrystal2ColorBlock*>(pppCrystal2->m_object.m_workArea + serializedDataOffsets[1]);
+        reinterpret_cast<pppCrystal2ColorBlock*>(pppCrystal2->m_workArea + serializedDataOffsets[1]);
     pppModelSt* model;
     CTexture* sourceTex;
     _GXTexObj backTexObj;
@@ -142,7 +163,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv(
-            &colorBlock->m_color, &pppCrystal2->m_object.m_drawMatrix, param_2->m_arg3,
+            &colorBlock->m_color, &pppCrystal2->m_drawMatrix, param_2->m_arg3,
             param_2->m_crystal.m_drawEnvColor1, param_2->m_crystal.m_drawEnvColor0, param_2->m_crystal.m_blendMode, param_2->m_crystal.m_drawFlag, 1, 1,
             param_2->m_crystal.m_zMode);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -153,7 +174,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         texMtx = s_crystal2TexMtxBase;
 
         PSMTXIdentity(drawMtx);
-        PSMTXConcat(ppvMng->m_matrix.value, pppCrystal2->m_object.m_localMatrix.value, cameraMtx);
+        PSMTXConcat(ppvMng->m_matrix.value, pppCrystal2->m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {
             f32 perspectiveScale = param_2->m_perspectiveScale;
             C_MTXLightPerspective(lightMtx, 25.0f, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f, 0.5f);

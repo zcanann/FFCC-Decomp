@@ -216,10 +216,9 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
-		int pointOffset = 0;
 		GXColor* vertColors = state->m_meshColorArrays[meshIdx];
 		for (unsigned int v = 0; v < curMesh->m_data->m_vertexCount; v++) {
-			int delta = (int)frameShort - (int)*(short*)((char*)curMesh->m_workPositions + pointOffset + 2);
+			int delta = static_cast<int>(frameShort) - static_cast<int>(curMesh->m_workPositions[v].y);
 			if (delta >= 0) {
 				int level = 0;
 				float threshold = ChangeTexConst(FLOAT_80330df8);
@@ -239,7 +238,6 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				vertColors->a = fallbackAlpha;
 			}
 
-			pointOffset = pointOffset + 6;
 			vertColors++;
 		}
 

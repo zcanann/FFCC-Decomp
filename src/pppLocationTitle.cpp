@@ -78,7 +78,7 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleUnkC* param_3)
+void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3)
 {
     int dataValIndex;
     int serializedOffset;
@@ -151,7 +151,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleUnkC* param_3)
+void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3)
 {
     pppFMATRIX resultMatrix;
     Vec subVec;
@@ -302,7 +302,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkC* param_2)
+void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* param_2)
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
@@ -327,7 +327,7 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkC* param_2)
+void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* param_2)
 {
     LocationTitleWork* work;
     f32 value;

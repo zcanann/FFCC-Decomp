@@ -7,7 +7,7 @@ struct _pppCtrlTable;
 struct _pppPObject;
 
 typedef _pppPObject pppLocationTitle2;
-typedef _pppCtrlTable pppLocationTitle2UnkC;
+typedef _pppCtrlTable pppLocationTitle2Offsets;
 
 struct pppLocationTitle2Step {
     s32 m_graphId;
@@ -32,10 +32,10 @@ struct pppLocationTitle2Step {
 extern "C" {
 #endif
 
-void pppConstructLocationTitle2(pppLocationTitle2*, pppLocationTitle2UnkC*);
-void pppDestructLocationTitle2(pppLocationTitle2*, pppLocationTitle2UnkC*);
-void pppFrameLocationTitle2(pppLocationTitle2*, pppLocationTitle2Step*, pppLocationTitle2UnkC*);
-void pppRenderLocationTitle2(pppLocationTitle2*, pppLocationTitle2Step*, pppLocationTitle2UnkC*);
+void pppConstructLocationTitle2(pppLocationTitle2*, pppLocationTitle2Offsets*);
+void pppDestructLocationTitle2(pppLocationTitle2*, pppLocationTitle2Offsets*);
+void pppFrameLocationTitle2(pppLocationTitle2*, pppLocationTitle2Step*, pppLocationTitle2Offsets*);
+void pppRenderLocationTitle2(pppLocationTitle2*, pppLocationTitle2Step*, pppLocationTitle2Offsets*);
 
 #ifdef __cplusplus
 }

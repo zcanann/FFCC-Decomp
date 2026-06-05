@@ -1,10 +1,12 @@
 #ifndef _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 #define _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 
-#include "ffcc/partMng.h"
-
-struct pppConstrainCameraForLoc;
+struct _pppCtrlTable;
+struct _pppPObjLink;
+struct _pppPObject;
 struct pppConstrainCameraForLocParams;
+
+typedef _pppPObject pppConstrainCameraForLoc;
 
 #ifdef __cplusplus
 extern "C" {

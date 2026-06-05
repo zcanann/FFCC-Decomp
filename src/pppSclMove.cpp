@@ -5,12 +5,6 @@
 
 const float kPppSclMoveZero = 0.0f;
 
-struct PppSclMoveInput {
-    int m_graphId;
-    int m_padding;
-    f32 m_scale[3];
-};
-
 struct PppSclMoveOffsets {
     int m_scaleOffset;
     int m_velocityOffset;
@@ -44,7 +38,7 @@ void pppSclMoveCon(_pppPObject* param1, _pppCtrlTable* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSclMove(_pppPObject* param1, void* param2, _pppCtrlTable* param3)
+void pppSclMove(_pppPObject* param1, PppSclMoveInput* input, _pppCtrlTable* param3)
 {
     PppSclMoveOffsets* offsets = (PppSclMoveOffsets*)param3->m_serializedDataOffsets;
     float* dataA = (float*)(param1->m_workArea + offsets->m_scaleOffset);
@@ -54,7 +48,6 @@ void pppSclMove(_pppPObject* param1, void* param2, _pppCtrlTable* param3)
         return;
     }
 
-    PppSclMoveInput* input = (PppSclMoveInput*)param2;
     if (input->m_graphId == param1->m_graphId) {
         dataB[0] += input->m_scale[0];
         dataB[1] += input->m_scale[1];

@@ -13,14 +13,6 @@ struct PppAngMoveOffsets {
     int b;
 };
 
-struct PppAngMoveInput {
-    int field_0;
-    int field_4;
-    int x;
-    int y;
-    int z;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80064e5c
@@ -48,18 +40,17 @@ void pppAngMoveCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngMove(_pppPObject* basePtr, void* input, _pppCtrlTable* ctrlTable)
+void pppAngMove(_pppPObject* basePtr, PppAngMoveInput* inputData, _pppCtrlTable* ctrlTable)
 {
     PppAngMoveOffsets* offsets = (PppAngMoveOffsets*)ctrlTable->m_serializedDataOffsets;
     PppAngMoveObj* a = (PppAngMoveObj*)(basePtr->m_workArea + offsets->a);
     PppAngMoveObj* b = (PppAngMoveObj*)(basePtr->m_workArea + offsets->b);
-    PppAngMoveInput* inputData = (PppAngMoveInput*)input;
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    int inputId = *(int*)inputData;
+    int inputId = inputData->m_graphId;
     int baseId = basePtr->m_graphId;
 
     if (inputId == baseId) {

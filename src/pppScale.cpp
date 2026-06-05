@@ -4,12 +4,6 @@
 
 const float kPppScaleZero = 0.0f;
 
-struct PppScaleInput {
-	int m_graphId;
-	int m_padding;
-	float m_scale[3];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800630cc
@@ -39,13 +33,12 @@ void pppScaleCon(_pppPObject* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppScale(_pppPObject* obj, void* param2, _pppCtrlTable* ctrlTable)
+void pppScale(_pppPObject* obj, PppScaleInput* input, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
 
-	PppScaleInput* input = (PppScaleInput*)param2;
 	if (input->m_graphId != obj->m_graphId) {
 		return;
 	}

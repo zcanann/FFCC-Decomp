@@ -326,14 +326,6 @@ static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
-struct Vec4d
-{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
 struct WmMenuLightTable
 {
 	int m_diffuseCount;

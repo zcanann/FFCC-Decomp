@@ -482,7 +482,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 {
 	bool firstAllocFailure = true;
 	bool canRetry = true;
-	u8 denied[0x180];
+	char denied[0x180];
 
 	ppvMemAllocErrorF = 0;
 	do
@@ -504,7 +504,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 
 		_pppMngSt* selectedMngSt = 0;
 		u8 selectedPrio = 1;
-		int selectedPrioTime = 0;
+		int selectedPrioTime;
 		for (s32 i = 0; i < 0x180; i += 2)
 		{
 			_pppMngSt* candidateA = &PartMng.m_pppMng[i];
@@ -563,8 +563,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					}
 
-					owner->m_activeCount--;
-					if (owner->m_activeCount == 0)
+					if (--owner->m_activeCount == 0)
 					{
 						owner->m_pppPObjLink = 0;
 					}

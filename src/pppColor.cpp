@@ -3,12 +3,6 @@
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
 
-struct pppColorStep {
-    s32 m_graphId;
-    s32 m_padding;
-    s16 m_colors[4];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8005FF8C  
@@ -36,9 +30,8 @@ void pppColorCon(_pppPObject* param1, _pppCtrlTable* param2){
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColor(_pppPObject* param1, void* param2, _pppCtrlTable* param3){
+void pppColor(_pppPObject* param1, pppColorStep* step, _pppCtrlTable* param3){
     _pppColorWork* work = (_pppColorWork*)(param1->m_workArea + param3->m_serializedDataOffsets[0]);
-    pppColorStep* step = static_cast<pppColorStep*>(param2);
 
     if (ppvUserStopPartF != 0) {
         return;

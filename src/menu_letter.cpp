@@ -13,6 +13,8 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" char* strcat(char*, const char*);
+
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -79,7 +81,7 @@ static char s_ReplyStr[0x80];
 extern "C" const char s_menu_letter_cpp[];
 
 namespace {
-static const char s_letterItemInfoFmt[] = "%s%d%s%s";
+static const char s_letterItemInfoFmt[] = "%s%s%s%s";
 enum {
 	kLetterTextScratchSize = 0x400,
 };
@@ -103,9 +105,9 @@ static inline LetterAnimStorage* GetLetterAnimStorage(CMenuPcs* menu)
 	return *reinterpret_cast<LetterAnimStorage**>(reinterpret_cast<char*>(menu) + 0x850);
 }
 
-static inline int GetLetterItemValue(int itemId)
+static inline char* GetLetterItemName(int itemId)
 {
-	return reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemId];
+	return Game.m_cFlatDataArr[1].TableStrings(0)[itemId];
 }
 
 static inline int GetLetterAnimBase(CMenuPcs* menu)
@@ -309,7 +311,7 @@ void CMenuPcs::LetterInit2()
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	if (!letter->AttachmentIsGil()) {
 		int itemId = letter->AttachmentValue() * 5 + 4;
-		int value = GetLetterItemValue(itemId);
+		char* value = GetLetterItemName(itemId);
 		if (Game.m_gameWork.m_languageId == 2) {
 			sprintf(info, s_letterItemInfoFmt,
 			        GetMenuStr(0x23),
@@ -317,7 +319,7 @@ void CMenuPcs::LetterInit2()
 			        GetMenuStr(0x24),
 			        GetMenuStr(0x22));
 		} else {
-			sprintf(info, "%s%d", GetMenuStr(0x22), value);
+			sprintf(info, "%s%s", GetMenuStr(0x22), value);
 		}
 	} else {
 		int gil = static_cast<int>(letter->AttachmentValue()) * 100;
@@ -446,8 +448,8 @@ void CMenuPcs::LetterInit4()
 	if (s_Attach != 2) {
 		if (languageId == 2) {
 			if (s_Attach == 0) {
-				sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
-				        GetLetterItemValue(s_AttachItem * 5 + 4),
+				sprintf(lines[2], "%s%s%s", GetMenuStr(0x23),
+				        GetLetterItemName(s_AttachItem * 5 + 4),
 				        GetMenuStr(0x24));
 			} else if (s_Attach == 1) {
 				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
@@ -738,7 +740,7 @@ int CMenuPcs::LetterCtrl()
 				CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
 				if (!letter->AttachmentIsGil()) {
 					int itemId = letter->AttachmentValue() * 5 + 4;
-					int value = GetLetterItemValue(itemId);
+					char* value = GetLetterItemName(itemId);
 					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, s_letterItemInfoFmt,
 						        GetMenuStr(0x23),
@@ -746,7 +748,7 @@ int CMenuPcs::LetterCtrl()
 						        GetMenuStr(0x24),
 						        GetMenuStr(0x22));
 					} else {
-						sprintf(info, "%s%d", GetMenuStr(0x22), value);
+						sprintf(info, "%s%s", GetMenuStr(0x22), value);
 					}
 				} else {
 					s16 gil = static_cast<int>(letter->AttachmentValue()) * 100;
@@ -763,9 +765,9 @@ int CMenuPcs::LetterCtrl()
 					}
 				}
 				strcpy(left, "");
-				strcat(left, GetMenuStr(1), 0x10);
+				strcat(left, GetMenuStr(1));
 				strcpy(right, "");
-				strcat(right, GetMenuStr(2), 0x10);
+				strcat(right, GetMenuStr(2));
 				SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 				GetSingWinSize(0, &winW, &winH, 1);
 				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
@@ -1291,7 +1293,7 @@ void CMenuPcs::LetterItemWinOpen()
 		CCaravanWork::CLetterWork* letter = &GetLetterCaravanWork()->m_letters[s_SelLetter];
 		if (!letter->AttachmentIsGil()) {
 			int itemId = letter->AttachmentValue() * 5 + 4;
-			int value = GetLetterItemValue(itemId);
+			char* value = GetLetterItemName(itemId);
 			if (Game.m_gameWork.m_languageId == 2) {
 				sprintf(info, s_letterItemInfoFmt,
 				        GetMenuStr(0x23),
@@ -1299,7 +1301,7 @@ void CMenuPcs::LetterItemWinOpen()
 				        GetMenuStr(0x24),
 				        GetMenuStr(0x22));
 			} else {
-				sprintf(info, "%s%d", GetMenuStr(0x22), value);
+				sprintf(info, "%s%s", GetMenuStr(0x22), value);
 			}
 		} else {
 			int gil = static_cast<int>(letter->AttachmentValue()) * 100;
@@ -1367,25 +1369,22 @@ void CMenuPcs::LetterItemWinClose()
 bool CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	unsigned char languageId = Game.m_gameWork.m_languageId;
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		char lines[8][0x80];
-		char unused0[0x80];
-		char unused1[0x80];
-		char unused2[0x80];
-		char unused3[0x80];
-		char unused4[0x80];
-		char unused5[0x80];
-		char unused6[0x88];
 		memset(lines, 0, sizeof(lines));
 
-		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xEC);
+		if (Game.m_gameWork.m_menuStageMode != '\0') {
+			stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xF4);
+		}
 		char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-		stage = *reinterpret_cast<CMemory::CStage**>(
-			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+		stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xEC);
+		if (Game.m_gameWork.m_menuStageMode != '\0') {
+			stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xF4);
+		}
 		char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
 
 		memset(srcText, 0, kLetterTextScratchSize);
@@ -1424,17 +1423,17 @@ bool CMenuPcs::LetterReplyWinOpen()
 		const char* closeText = GetMenuStr(3);
 		int lineIndex = s_ReplyMax;
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
-		strcat(lines[lineIndex], closeText, 0x80);
+		strcat(lines[lineIndex], closeText);
 
 		SetSingDynamicWinMessInfo(s_ReplyMax,
 			lines[0],
-			unused0,
-			unused1,
-			unused2,
-			unused3,
-			unused4,
-			unused5,
-			unused6);
+			lines[1],
+			lines[2],
+			lines[3],
+			lines[4],
+			lines[5],
+			lines[6],
+			lines[7]);
 
 		s16 winW;
 		s16 winH;
@@ -1591,17 +1590,17 @@ bool CMenuPcs::LetterConfirmOpen()
 		if (s_Attach != 2) {
 			if (languageId == 2) {
 				if (s_Attach == 0) {
-					sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
-					        GetLetterItemValue(s_AttachItem * 5 + 4),
+					sprintf(lines[2], "%s%s%s", GetMenuStr(0x23),
+					        GetLetterItemName(s_AttachItem * 5 + 4),
 					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
 					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
 				}
-				strcat(lines[2], GetMenuStr(0x28), 0x80);
+				strcat(lines[2], GetMenuStr(0x28));
 			} else {
 				strcpy(lines[2], GetMenuStr(0x28));
 				if (s_Attach == 0) {
-					strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
+					strcat(lines[2], itemTable[s_AttachItem * 5 + 4]);
 				} else if (s_Attach == 1) {
 					int offs = strlen(lines[2]);
 					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
@@ -1610,11 +1609,11 @@ bool CMenuPcs::LetterConfirmOpen()
 			lineCount = 3;
 		}
 
-		strcat(lines[lineCount], GetMenuStr(0x21), 0x80);
+		strcat(lines[lineCount], GetMenuStr(0x21));
 		strcpy(lines[lineCount + 1], "");
-		strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
+		strcat(lines[lineCount + 1], GetMenuStr(1));
 		strcpy(lines[lineCount + 2], "");
-		strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
+		strcat(lines[lineCount + 2], GetMenuStr(2));
 
 		SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 

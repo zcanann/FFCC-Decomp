@@ -433,16 +433,17 @@ void CMemory::Quit()
     stageDestroyInternal(activeStage);
     stageMoveToPoolList(this, activeStage);
 
-    for (int pass = 0; pass < 3; pass++) {
+    CMode* modeData = m_modes;
+    for (int pass = 0; pass < 3; pass++, modeData++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            CStage* listHead = &m_modes[pass].m_activeList;
+            CStage* listHead = &modeData->m_activeList;
             CStage* stage = listHead->m_next;
 
             while (stage != listHead) {
                 CStage* next = stage->m_next;
                 if ((pass != 0) ||
                     (stage != m_currentMemoryStage)) {
-                    System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stageGetSourceName(stage));
+                    System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stage->m_allocationSourceStr);
                     stageDestroyInternal(stage);
                     stageMoveToPoolList(this, stage);
                 }
@@ -547,9 +548,10 @@ void CMemory::Draw()
         int useTotalKB = 0;
         int unuseTotalKB = 0;
 
-        for (int mode = 0; mode < 3; mode++) {
+        CMode* modeData = m_modes;
+        for (int mode = 0; mode < 3; mode++, modeData++) {
             if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
-                CMemory::CStage* head = &m_modes[mode].m_activeList;
+                CMemory::CStage* head = &modeData->m_activeList;
                 CMemory::CStage* stage = head->m_next;
                 while (stage != head) {
                     if (pass == 0) {
@@ -707,9 +709,10 @@ void CMemory::HeapWalker()
     System.Printf(const_cast<char*>(sHeapWalkerTitle));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
 
-    for (int mode = 0; mode < 3; mode++) {
+    CMode* modeData = m_modes;
+    for (int mode = 0; mode < 3; mode++, modeData++) {
         if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            CStage* listHead = &m_modes[mode].m_activeList;
+            CStage* listHead = &modeData->m_activeList;
             CStage* stage = listHead->m_next;
             while (stage != listHead) {
                 stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
@@ -724,7 +727,7 @@ void CMemory::HeapWalker()
             do {
                 unsigned int useKB = static_cast<unsigned int>(stage->m_heapBottom - stage->m_heapTop)
                     >> 10;
-                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stageGetSourceName(stage));
+                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stage->m_allocationSourceStr);
                 useTotal += useKB;
 
                 unsigned int unuseKB = static_cast<unsigned int>(

@@ -5,10 +5,18 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-const float FLOAT_803305A0 = 16384.0f;
-const float kPppYmMegaBirthShpTail3Zero = 0.0f;
-const float FLOAT_803305A8 = 0.017453292f;
-const float FLOAT_803305AC = 0.00787f;
+extern const float FLOAT_803305A0 = 16384.0f;
+extern const float kPppYmMegaBirthShpTail3Zero = 0.0f;
+extern const float FLOAT_803305A8 = 0.017453292f;
+extern const float FLOAT_803305AC = 0.00787f;
+extern const float FLOAT_803305B0 = 127.0f;
+extern const double DOUBLE_803305B8 = 4503601774854144.0;
+extern const double DOUBLE_803305C0 = 4503599627370496.0;
+extern const float FLOAT_803305C8 = 2.0f;
+extern const float FLOAT_803305CC = 180.0f;
+extern const float FLOAT_803305D0 = 0.7f;
+extern const float FLOAT_803305D4 = 0.5f;
+extern const double DOUBLE_803305D8 = 1.0;
 }
 #include "dolphin/mtx.h"
 #include <string.h>
@@ -49,13 +57,6 @@ struct pppYmMegaBirthShpTail3UnkC
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 };
-
-static const float FLOAT_803305B0 = 127.0f;
-static const float FLOAT_803305C8 = 2.0f;
-static const float FLOAT_803305CC = 180.0f;
-static const float FLOAT_803305D0 = 0.7f;
-static const float FLOAT_803305D4 = 0.5f;
-static const double DOUBLE_803305D8 = 1.0;
 
 static pppFMATRIX g_matUnit3;
 
@@ -539,8 +540,8 @@ void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
         *blend = *blend +
             (float)alpha / (float)fadeInFrames;
-        if (*blend > 1.0f) {
-            *blend = 1.0f;
+        if (*blend > FLOAT_803305B0) {
+            *blend = FLOAT_803305B0;
         }
     }
 

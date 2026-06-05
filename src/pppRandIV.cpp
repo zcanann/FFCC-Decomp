@@ -6,14 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct RandIVParams {
-    s32 targetId;
-    s32 sourceOffset;
-    s32 blend[3];
-    u8 _pad[4];
-    u8 useNormalDistribution;
-};
-
 static inline int randint(int value, float scale)
 {
     return (int)((float)value * scale - (float)value);

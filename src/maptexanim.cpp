@@ -17,14 +17,10 @@ extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
     0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00, 0x00, 0x00
 };
 extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
+extern const float FLOAT_8032fd38;
+extern const float FLOAT_8032fd48;
+extern const float FLOAT_8032fd4c;
 }
-extern "C" const float FLOAT_8032fd38 = 256.0f;
-extern "C" const float FLOAT_8032fd48 = 1.0f;
-extern "C" const float FLOAT_8032fd4c = 0.0f;
-extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const float lbl_8032FD64 = 1000.0f;
 
 namespace {
 static inline CMaterial* MaterialAt(CMaterialSet* materialSet, unsigned long index)
@@ -50,6 +46,7 @@ static inline void ReplaceRef(CTexture*& slot, CTexture* texture)
     slot = texture;
     texture->AddRef();
 }
+
 }
 
 inline void CMapTexAnim::SetMaterialTextureSlot(CMaterial* material, unsigned long slotIndex, CTexture* texture)
@@ -101,6 +98,8 @@ void CMapTexAnimSet::Calc()
         m_anims[i]->Calc(m_materialSet, m_textureSet);
     }
 }
+
+extern "C" const float FLOAT_8032fd38 = 256.0f;
 
 /*
  * --INFO--
@@ -190,6 +189,9 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
     }
 }
 
+extern "C" const float FLOAT_8032fd48 = 1.0f;
+extern "C" const float FLOAT_8032fd4c = 0.0f;
+
 /*
  * --INFO--
  * PAL Address: 0x80050064
@@ -277,3 +279,8 @@ CMapTexAnim::~CMapTexAnim()
     delete m_frameTable;
     m_frameTable = 0;
 }
+
+extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
+extern const float lbl_8032FD64 = 1000.0f;

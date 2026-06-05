@@ -17,29 +17,6 @@ static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
 STATIC_ASSERT(offsetof(struct pppKeShpTail3X, m_object.m_workArea) == 0x80);
 
-struct KeShpTail3XStep {
-    s32 m_graphId;
-    u32 m_dataValIndex;
-    s32 m_initWork;
-    float m_stepValue;
-    float m_arg3;
-    float m_randomScale;
-    float m_stepDistance;
-    u8 m_drawCount;
-    u8 m_drawFirst;
-    u16 m_rotateEnabled;
-    s16 m_valueSteps[24];
-    u8 m_drawA;
-    u8 _pad51;
-    u8 m_useEnvDepth;
-    u8 m_worldSpaceMode;
-    u8 _pad54;
-    u8 m_zDisable;
-    u8 m_blendMode;
-    u8 _pad57;
-    float m_envDepth;
-};
-
 struct KeShpTail3XWork {
     s16 m_values[24];
     Vec m_posHistory[28];
@@ -138,9 +115,8 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, _pppCtrlTable* param_3)
+void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
-    KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XWork* work;
     tagOAN3_SHAPE* shapeEntry;
     pppShapeAnimData* shapeAnim;
@@ -402,9 +378,8 @@ advance_segment:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, _pppCtrlTable* param_3)
+void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step, _pppCtrlTable* param_3)
 {
-    KeShpTail3XStep* step;
     KeShpTail3XWork* work;
     pppFMATRIX outMatrix;
     Vec historyPos ATTRIBUTE_ALIGN(8);
@@ -415,7 +390,6 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         return;
     }
 
-    step = (KeShpTail3XStep*)param_2;
     work = reinterpret_cast<KeShpTail3XWork*>(obj->m_object.m_workArea + param_3->m_serializedDataOffsets[0]);
 
     if ((obj->m_object.m_graphId == 0) && (((u8*)&obj->m_object)[offsetof(_pppPObject, m_pad7D)] != 0)) {

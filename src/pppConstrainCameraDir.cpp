@@ -31,7 +31,7 @@ STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirUnkB* param_2,
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pppConstrainCameraDirStep* param_2,
                                 _pppCtrlTable* param_3)
 {
     if (ppvUserStopPartF == 0) {

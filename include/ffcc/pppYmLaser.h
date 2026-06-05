@@ -1,9 +1,10 @@
 #ifndef _PPP_YMLASER_H_
 #define _PPP_YMLASER_H_
 
+#include "ffcc/pppLaserCommon.h"
+
 struct _pppCtrlTable;
 struct _pppPObject;
-struct pppLaserStep;
 
 typedef _pppPObject pppYmLaser;
 typedef pppLaserStep pppYmLaserUnkB;

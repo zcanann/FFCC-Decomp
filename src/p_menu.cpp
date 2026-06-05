@@ -53,14 +53,6 @@ extern const f32 FLOAT_8033086C;
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
 extern const char s_CMenuPcs_801d9d3c[] = "CMenuPcs";
 
-struct Vec4d
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
-
 struct MenuFontTlutPalette
 {
     _GXColor shadow;

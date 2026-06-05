@@ -6,14 +6,6 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-struct RandUpCVParam {
-    s32 targetId;
-    s32 sourceOffset;
-    s8 delta[4];
-    u8 useNormalDistribution;
-};
-
-
 /*
  * --INFO--
  * PAL Address: UNUSED

@@ -3,6 +3,9 @@
 
 #include <dolphin/types.h>
 
+struct _pppCtrlTable;
+struct _pppPObject;
+
 struct pppColMoveVec4S {
     s16 x;
     s16 y;
@@ -20,8 +23,8 @@ struct pppColMoveInput {
 extern "C" {
 #endif
 
-void pppColMove(void* param1, void* param2, void* param3);
-void pppColMoveCon(void* param1, void* param2);
+void pppColMove(_pppPObject* object, pppColMoveInput* step, _pppCtrlTable* ctrlTable);
+void pppColMoveCon(_pppPObject* object, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

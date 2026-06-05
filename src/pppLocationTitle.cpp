@@ -30,24 +30,6 @@ struct LOCATION_POLYGON {
 
 typedef LOCATION_POLYGON LocationTitleParticle;
 
-struct pppLocationTitleUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u16 m_maxCount;
-    u8 m_stepCount;
-    u8 m_blendMode;
-    u8 m_pad0E;
-    u8 m_pad0F;
-    float m_arg3;
-    float m_payload0;
-    float m_payload1;
-    u16 m_spawnFrame;
-    u16 m_fadeStartFrame;
-    u16 m_fadeLength;
-    u16 m_pad;
-};
-
 struct LocationTitleColorBlock {
     u8 m_pad[8];
     GXColor m_color;
@@ -96,7 +78,7 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
+void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleUnkC* param_3)
 {
     int dataValIndex;
     int serializedOffset;
@@ -169,7 +151,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
+void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleUnkC* param_3)
 {
     pppFMATRIX resultMatrix;
     Vec subVec;

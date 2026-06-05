@@ -4,12 +4,6 @@
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
 
-struct pppCallBackDistanceUnkB {
-    u32 m_unk0;
-    f32 m_dataValIndex;
-    s16 m_initWOrk;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80141204
@@ -19,7 +13,7 @@ struct pppCallBackDistanceUnkB {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step, _pppCtrlTable* ctrlTable)
+void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceStep* step, _pppCtrlTable* ctrlTable)
 {
     _pppMngSt* pppMngSt = ppvMng;
     s32 distanceOffset = *ctrlTable->m_serializedDataOffsets;
@@ -50,7 +44,7 @@ void pppFrameCallBackDistance(_pppPObject* object, pppCallBackDistanceUnkB* step
         graphFrame = object->m_graphId / 0x1000;
         m_kind = pppMngSt->m_kind;
         m_nodeIndex = pppMngSt->m_nodeIndex;
-        initWork = (s32)*(s16*)&step->m_initWOrk;
+        initWork = step->m_initWOrk;
 
         Game.ParticleFrameCallback(partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
     }

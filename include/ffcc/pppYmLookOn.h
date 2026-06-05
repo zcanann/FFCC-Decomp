@@ -1,9 +1,15 @@
 #ifndef _PPP_YMLOOKON_H_
 #define _PPP_YMLOOKON_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
-struct pppYmLookOnStep;
+
+struct pppYmLookOnStep {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+};
 
 typedef _pppPObject pppYmLookOn;
 

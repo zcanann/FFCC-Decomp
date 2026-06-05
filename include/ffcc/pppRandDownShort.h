@@ -1,9 +1,17 @@
 #ifndef _PPP_RANDDOWNSHORT_H_
 #define _PPP_RANDDOWNSHORT_H_
 
+#include <dolphin/types.h>
 
 struct _pppPObject;
-#include "types.h"
+struct _pppCtrlTable;
+
+struct RandDownShortParam {
+    s32 targetId;
+    s32 sourceOffset;
+    u16 scale;
+    u8 useNormalDistribution;
+};
 
 #ifdef __cplusplus
 extern "C" {

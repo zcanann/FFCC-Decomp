@@ -1,8 +1,18 @@
 #ifndef _PPP_RANDUPCV_H_
 #define _PPP_RANDUPCV_H_
 
+#include <dolphin/types.h>
 
 struct _pppPObject;
+struct _pppCtrlTable;
+
+struct RandUpCVParam {
+    s32 targetId;
+    s32 sourceOffset;
+    s8 delta[4];
+    u8 useNormalDistribution;
+};
+
 #ifdef __cplusplus
 
 extern "C" {

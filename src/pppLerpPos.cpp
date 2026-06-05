@@ -7,11 +7,6 @@
 #include "dolphin/types.h"
 #include <stddef.h>
 
-struct pppLerpPosStep {
-    u8 m_pad[4];
-    u8 m_dataValIndex;
-};
-
 STATIC_ASSERT(offsetof(pppLerpPosStep, m_dataValIndex) == 0x4);
 
 static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)

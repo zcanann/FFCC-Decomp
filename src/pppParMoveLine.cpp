@@ -8,11 +8,6 @@ extern "C" {
 const float FLOAT_80330638 = 0.0f;
 }
 
-struct ParMoveLineParams {
-    u8 m_pad0[4];
-    float m_speed;
-};
-
 static inline Vec* MoveLineCurrentPosition(_pppMngSt* mng)
 {
     return &mng->UserPosition();
@@ -32,17 +27,15 @@ static inline Vec* MoveLinePreviousPosition(_pppMngSt* mng)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppParMoveLine(_pppPObject* param_1, int param_2)
+void pppParMoveLine(_pppPObject* param_1, ParMoveLineParams* params)
 {
     _pppMngSt* pppMngSt;
-    ParMoveLineParams* params;
     Vec local_1c;
     Vec VStack_28;
     float fVar1;
     float x;
 
     pppMngSt = ppvMng;
-    params = reinterpret_cast<ParMoveLineParams*>(param_2);
     PSVECSubtract(&ppvMng->m_paramVec0, MoveLinePreviousPosition(ppvMng), &local_1c);
 
     x = pppMngSt->m_position.x;

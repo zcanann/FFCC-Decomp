@@ -46,27 +46,6 @@ struct Crystal2Work {
     GXTexObj* m_refractionTexObj;
 };
 
-struct pppCrystal2UnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    union {
-        u8 m_payload[8];
-        struct Payload {
-            u8 m_refractionMode;
-            u8 m_blendMode;
-            u8 m_drawFlag;
-            u8 m_zMode;
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-            u8 m_pad06[2];
-        } m_crystal;
-    };
-    f32 m_perspectiveScale;
-};
-
 static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<Crystal2Work*>(crystal->m_workArea + ctrl->m_serializedDataOffsets[2]);
@@ -126,7 +105,7 @@ static inline float Crystal2SqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* param_2, _pppCtrlTable* param_3)
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     s32 dataValIndex = param_2->m_dataValIndex;
@@ -236,7 +215,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 y;
     Crystal2Work* work;

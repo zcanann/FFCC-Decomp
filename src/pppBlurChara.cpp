@@ -52,21 +52,6 @@ struct BlurCharaTexData {
     GXTexObj* m_texObj;
 };
 
-struct pppBlurCharaUnkB {
-    s32 m_graphId;
-    u8 m_afterDrawPass;
-    u8 m_textureMode;
-    u8 m_smallTextureDiv;
-    u8 _pad7;
-    s32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    f32 m_afterDrawOffsetY;
-    u8 _pad18;
-    u8 m_alpha;
-    u8 _pad1A[2];
-};
-
 STATIC_ASSERT(sizeof(pppBlurCharaWork) == 0x10);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
@@ -92,7 +77,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* param_2, _pppCtrlTable* param_3)
 {
     int texDataOffset = param_3->m_serializedDataOffsets[2];
     int colorDataOffset = param_3->m_serializedDataOffsets[1];
@@ -254,7 +239,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _ppp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaStep* param_2, _pppCtrlTable* param_3)
 {
     pppBlurCharaWork* work;
     CCharaPcs::CHandle* handle;
@@ -355,7 +340,7 @@ void pppConstructBlurChara(pppBlurChara* blurChara, _pppCtrlTable* data)
 void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
-    pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
+    pppBlurCharaStep* renderData = reinterpret_cast<pppBlurCharaStep*>(param_3);
     int width;
     int height;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);

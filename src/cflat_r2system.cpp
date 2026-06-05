@@ -56,7 +56,7 @@ extern float FLOAT_80330B50;
 extern float FLOAT_80330B54;
 extern float FLOAT_80330B58;
 
-static const char s_setMiniGameParamFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
+static const char s_SetMiniGameParam_no_0xpct04x_data_pctd_801DA74C[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
 static const char s_cflatCfdPathFmt[] = "dvd/%scft/%s.cfd";
 static const char s_cflatForceAnimInterpDeprecatedFmt[] =
@@ -485,23 +485,22 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        System.Printf(const_cast<char*>(s_setMiniGameParamFmt), id, value);
+        System.Printf(const_cast<char*>(s_SetMiniGameParam_no_0xpct04x_data_pctd_801DA74C), id, value);
     }
 
-    if (id != 0x1202) {
-        if (id < 0x1202) {
-            if (id != 0x1102) {
-                if (id < 0x1102 && id >= 0x1101) {
-                    m_managerIndex = static_cast<char>(value);
-                }
-            } else {
-                m_managerState = 1;
-            }
-        } else if (id < 0x1204) {
-            m_playerMask &= ~(1 << value);
-        }
-    } else {
+    switch (id) {
+    case 0x1101:
+        m_managerIndex = static_cast<char>(value);
+        break;
+    case 0x1102:
+        m_managerState = 1;
+        break;
+    case 0x1202:
         m_playerMask |= 1 << value;
+        break;
+    case 0x1203:
+        m_playerMask &= ~(1 << value);
+        break;
     }
 }
 

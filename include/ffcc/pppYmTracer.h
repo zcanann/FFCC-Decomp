@@ -1,40 +1,12 @@
 #ifndef _FFCC_PPP_YMTRACER_H_
 #define _FFCC_PPP_YMTRACER_H_
 
-#include "ffcc/partMng.h"
+struct _pppCtrlTable;
+struct _pppPObject;
+struct pppYmTracerStep;
 
-#include <dolphin/types.h>
-
-struct pppYmTracerStep {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u32 m_initWOrk;
-    s32 m_stepValue;
-    u32 m_arg3;
-    union {
-        u8 m_payload[0x20];
-        struct {
-            s32 m_arg3WorkOffset;   // 0x00
-            u16 m_entryCount;       // 0x04
-            u16 m_entryLife;        // 0x06
-            u8 m_entryAlpha;        // 0x08
-            u8 m_splineCount;       // 0x09
-            u8 m_blendMode;         // 0x0A
-            u8 m_drawEnvColor0;     // 0x0B
-            u8 m_drawEnvColor1;     // 0x0C
-            u8 m_pad0D[0x13];       // 0x0D
-        } m_tracer;
-    };
-};
-
-struct pppYmTracerCtrl {
-    u8 _pad[0xC];
-    s32* m_serializedDataOffsets;
-};
-
-struct pppYmTracer {
-    _pppPObject m_object;
-};
+typedef _pppCtrlTable pppYmTracerCtrl;
+typedef _pppPObject pppYmTracer;
 
 #ifdef __cplusplus
 extern "C" {

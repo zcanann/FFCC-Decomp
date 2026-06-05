@@ -117,6 +117,11 @@ static inline CFont* GetArtiHelpFont(CMenuPcs* menu)
 }
 } // namespace
 
+static inline float LoadFloat(const float& value)
+{
+	return value;
+}
+
 static inline double IntToF64(unsigned int value)
 {
 	unsigned long long bits = ((unsigned long long)0x43300000 << 32) | (unsigned long long)(value ^ 0x80000000);
@@ -611,7 +616,7 @@ void CMenuPcs::ArtiInit1()
 	entry = GetArtiOpenAnim(this, index++);
 	entry->flags = 2;
 	entry->tex = 0x37;
-	fVar1 = FLOAT_80332fac;
+	fVar1 = LoadFloat(FLOAT_80332fac);
 	entry->startFrame = 0;
 	entry->duration = 5;
 	entry = GetArtiOpenAnim(this, index++);

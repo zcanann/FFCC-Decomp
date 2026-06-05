@@ -8,7 +8,7 @@ struct _pppPObject;
 
 typedef _pppPObject pppColum;
 
-struct pppColumUnkB {
+struct pppColumStep {
     u32 m_unk0;            // 0x00
     s32 m_dataValIndex;    // 0x04
     s16 m_initWOrk;        // 0x08
@@ -48,8 +48,8 @@ extern "C" {
 
 void pppConstructColum(pppColum* column, _pppCtrlTable* param_2);
 void pppDestructColum(pppColum* column, _pppCtrlTable* param_2);
-void pppFrameColum(pppColum* column, pppColumUnkB* param_2, _pppCtrlTable* param_3);
-void pppRenderColum(pppColum* column, pppColumUnkB* param_2, _pppCtrlTable* param_3);
+void pppFrameColum(pppColum* column, pppColumStep* param_2, _pppCtrlTable* param_3);
+void pppRenderColum(pppColum* column, pppColumStep* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

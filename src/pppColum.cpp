@@ -119,7 +119,7 @@ static inline float ColumSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param_3)
+void pppRenderColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param_3)
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     pppColumValue* values;
@@ -261,7 +261,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameColum(pppColum *column, pppColumUnkB *param_2, _pppCtrlTable *param_3)
+void pppFrameColum(pppColum *column, pppColumStep *param_2, _pppCtrlTable *param_3)
 {
         int* serializedDataOffsets;
     pppColumValue* values;

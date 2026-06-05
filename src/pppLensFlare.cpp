@@ -63,7 +63,7 @@ extern const float kPppLensFlareZScale;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
+void pppRenderLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTable)
 {
 	LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);
 	_pppColorWork* colorWork = GetLensFlareColorWork(obj, ctrlTable);
@@ -123,7 +123,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
+void pppFrameLensFlare(pppColum* obj, pppColumStep* unkB, _pppCtrlTable* ctrlTable)
 {
 	if (ppvUserStopPartF == 0) {
 		LensFlareWork* work = GetLensFlareWork(obj, ctrlTable);

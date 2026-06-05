@@ -29,7 +29,7 @@ void pppAngAcceleCon(_pppPObject* obj, _pppCtrlTable* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppAngAccele(_pppPObject* obj, pppAngAcceleUnkB* param_2, _pppCtrlTable* param_3)
+void pppAngAccele(_pppPObject* obj, pppAngAcceleStep* param_2, _pppCtrlTable* param_3)
 {
     int* angularVelocity = (int*)(obj->m_workArea + *param_3->m_serializedDataOffsets);
     int* angularAccel = (int*)(obj->m_workArea + param_3->m_serializedDataOffsets[1]);

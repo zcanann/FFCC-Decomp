@@ -3,7 +3,7 @@
 
 #include "ffcc/partMng.h"
 
-struct pppFilterUnkB {
+struct pppFilterStep {
     unsigned int m_unk0;
     int m_dataValIndex;
 };
@@ -14,8 +14,8 @@ extern "C" {
 
 void pppConstructFilter(_pppPObjLink*, _pppCtrlTable*);
 void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*);
-void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*);
-void pppRenderFilter(_pppPObject* pppFilter, pppFilterUnkB* param_2, _pppCtrlTable* param_3);
+void pppFrameFilter(_pppPObject*, pppFilterStep*, _pppCtrlTable*);
+void pppRenderFilter(_pppPObject* pppFilter, pppFilterStep* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

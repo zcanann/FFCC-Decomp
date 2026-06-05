@@ -1487,22 +1487,7 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
 	case 0:
 		m_shopListCount = 0;
 		m_shopRequestState = 0;
-		m_shopList[0] = 0;
-		m_shopList[1] = 0;
-		m_shopList[2] = 0;
-		m_shopList[3] = 0;
-		m_shopList[4] = 0;
-		m_shopList[5] = 0;
-		m_shopList[6] = 0;
-		m_shopList[7] = 0;
-		m_shopList[8] = 0;
-		m_shopList[9] = 0;
-		m_shopList[10] = 0;
-		m_shopList[11] = 0;
-		m_shopList[12] = 0;
-		m_shopList[13] = 0;
-		m_shopList[14] = 0;
-		m_shopList[15] = 0;
+		memset(m_shopList, 0, sizeof(m_shopList));
 		break;
 		case 1: {
 			short idx = m_shopListCount;

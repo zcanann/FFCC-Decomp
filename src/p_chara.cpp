@@ -1,3 +1,8 @@
+static const char s_p_chara_ptrarray_grow_error[] = "CPtrArray grow error";
+static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
+
+#define FFCC_PTRARRAY_GROW_ERROR s_p_chara_ptrarray_grow_error
+#define FFCC_PTRARRAY_FILE s_p_chara_collection_ptrarray_h
 #include "ffcc/ptrarray.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"

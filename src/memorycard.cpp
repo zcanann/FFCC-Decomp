@@ -442,7 +442,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3)
     {
-        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
+        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : s_CardGameCode_80330CD0);
     }
 
     u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);

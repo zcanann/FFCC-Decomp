@@ -342,6 +342,9 @@ int CMenuPcs::MLstOpen()
 		int i;
 		short initializedCount;
 		short yPos;
+		double itemCenter;
+		double xOrigin;
+		float zero;
 
 		memset(this->lstData, 0, sizeof(MenuLstList));
 		one = FLOAT_803333F0;
@@ -350,7 +353,9 @@ int CMenuPcs::MLstOpen()
 			entry->z = one;
 		}
 
-		zero = 0.0f;
+		xOrigin = DOUBLE_80333420;
+		itemCenter = DOUBLE_803333E8;
+		zero = FLOAT_803333D0;
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
@@ -360,7 +365,7 @@ int CMenuPcs::MLstOpen()
 			entry->tex = 0x5B;
 			entry->width = 0xE0;
 			entry->height = 0x28;
-			entry->x = (short)(int)-(((double)entry->width * DOUBLE_803333E8) - DOUBLE_80333420);
+			entry->x = (short)(int)-(((double)entry->width * itemCenter) - xOrigin);
 			entry->y = yPos;
 			yPos += 0x20;
 			entry->s = zero;

@@ -1424,7 +1424,7 @@ void CMapObj::SetDrawEnv()
  */
 void CMapObj::Draw(unsigned char priority)
 {
-    if (priority != m_drawPriority) {
+    if (m_drawPriority != priority) {
         return;
     }
     if ((m_showFlags & 4) == 0) {

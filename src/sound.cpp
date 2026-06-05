@@ -1568,7 +1568,7 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
         found = 0;
 found_se:
         if (found != 0) {
-            *reinterpret_cast<int*>(found + 0x24) = group;
+            reinterpret_cast<CSe3D*>(found)->m_group = group;
         }
         return result;
     }
@@ -1909,13 +1909,14 @@ void CSound::StopSe3DGroup(int group)
                 found = 0;
 found_se:
                 if (found != 0) {
-                    int playId = *reinterpret_cast<int*>(found + 8);
+                    CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+                    int playId = foundSe->m_playId;
                     if (playId < 0) {
                         System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
                     } else {
                         reinterpret_cast<CRedSound*>(sound + 8)->SeStop(playId);
                     }
-                    reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+                    foundSe->m_bits.m_active = 0;
                 }
             }
             reinterpret_cast<CSe3D*>(se)->m_bits.m_active = 0;
@@ -1979,13 +1980,14 @@ void CSound::StopSe3D(int se3dHandle)
 
 found_entry:
         if (found != 0) {
-            const int playId = *reinterpret_cast<int*>(found + 8);
+            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+            const int playId = foundSe->m_playId;
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
             } else {
                 RedSound(this)->SeStop(playId);
             }
-            reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+            foundSe->m_bits.m_active = 0;
         }
     }
 }
@@ -2043,13 +2045,14 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 
 found_entry:
         if (found != 0) {
-            const int playId = *reinterpret_cast<int*>(found + 8);
+            CSe3D* foundSe = reinterpret_cast<CSe3D*>(found);
+            const int playId = foundSe->m_playId;
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
             } else {
                 RedSound(this)->SeFadeOut(playId, fadeFrames);
             }
-            reinterpret_cast<CSe3D*>(found)->m_bits.m_active = 0;
+            foundSe->m_bits.m_active = 0;
         }
     }
 }
@@ -2102,9 +2105,7 @@ int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
         found = 0;
 found_entry:
         if (found != 0) {
-            *reinterpret_cast<float*>(found + 0x18) = position->x;
-            *reinterpret_cast<float*>(found + 0x1C) = position->y;
-            *reinterpret_cast<float*>(found + 0x20) = position->z;
+            reinterpret_cast<CSe3D*>(found)->m_position = *position;
         }
         return ret;
     }
@@ -2162,7 +2163,7 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         }
 
         if (se != 0) {
-            RedSound(this)->SePitch(*reinterpret_cast<int*>(se + 8), pitch << 8, frames);
+            RedSound(this)->SePitch(reinterpret_cast<CSe3D*>(se)->m_playId, pitch << 8, frames);
         }
     }
 }

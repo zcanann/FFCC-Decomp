@@ -313,6 +313,7 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapLightHolder*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -322,6 +323,7 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -428,6 +430,7 @@ int CPtrArray<CMapAnim*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnim*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -437,6 +440,7 @@ void CPtrArray<CMapAnim*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -570,6 +574,7 @@ void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -579,6 +584,7 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -840,6 +846,7 @@ int CPtrArray<CMapAnimRun*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnimRun*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -849,6 +856,7 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -922,6 +930,7 @@ int CPtrArray<CMapShadow*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapShadow*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -931,6 +940,7 @@ void CPtrArray<CMapShadow*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1284,26 +1294,22 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
-    short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         GetOctTreeArray()[i].~COctTree();
     }
     m_octTreeCount = 0;
 
-    short mapHitCount = m_mapHitCount;
-    for (int i = 0; i < mapHitCount; i++) {
+    for (int i = 0; i < m_mapHitCount; i++) {
         GetMapHitArray()[i].~CMapHit();
     }
     m_mapHitCount = 0;
 
-    short mapObjCount = m_mapObjCount;
-    for (int i = 0; i < mapObjCount; i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         GetMapObjArray()[i].~CMapObj();
     }
     m_mapObjCount = 0;
 
-    short mapMeshCount = m_mapMeshCount;
-    for (int i = 0; i < mapMeshCount; i++) {
+    for (int i = 0; i < m_mapMeshCount; i++) {
         GetMapMeshArray()[i].~CMapMesh();
     }
     m_mapMeshCount = 0;

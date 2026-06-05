@@ -1088,7 +1088,6 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
-    CMapObj* mapStart = MapObjArrayStart();
     CMapObj* head0 = 0;
     CMapObj* search0 = MapObjArrayStart();
     CMapObj* search2Start = MapObjArrayStart();
@@ -1139,13 +1138,13 @@ void CMapObj::SetLink()
                             while ((child6 = MapMng.SearchChildMapObj(cursor6, child5)) != 0) {
                                 child6->m_next = head6;
                                 head6 = child6;
-                                CMapObj* cursor7 = mapStart;
+                                CMapObj* cursor7 = MapObjArrayStart();
                                 CMapObj* head7 = 0;
                                 CMapObj* child7;
                                 while ((child7 = MapMng.SearchChildMapObj(cursor7, child6)) != 0) {
                                     child7->m_next = head7;
                                     head7 = child7;
-                                    CMapObj* cursor8 = mapStart;
+                                    CMapObj* cursor8 = MapObjArrayStart();
                                     CMapObj* head8 = 0;
                                     CMapObj* child8;
                                     while ((child8 = MapMng.SearchChildMapObj(cursor8, child7)) != 0) {

@@ -500,9 +500,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
-                    if (meshName != 0) {
-                        strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
-                    }
+                    strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
                     m_mapData = 0;
                 } else {
                     m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;

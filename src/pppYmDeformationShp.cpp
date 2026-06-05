@@ -36,17 +36,6 @@ struct YmDeformationShpColorInfo {
 	pppCVECTOR m_color;
 };
 
-struct VYmDeformationShp {
-	GXTexObj* m_backBuffer;
-	int m_pad0;
-	int m_pad1;
-	s16 m_angle;
-	u8 m_direction;
-	u8 m_pad2;
-	float m_scale;
-	float m_values[5];
-};
-
 int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
 struct _pppEnvStYmDeformationShp {

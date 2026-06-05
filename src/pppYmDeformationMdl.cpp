@@ -22,14 +22,6 @@ struct YmDeformationMdlColorInfo {
     pppCVECTOR m_color;
 };
 
-struct VYmDeformationMdl {
-    s16 m_angle;
-    u8 m_direction;
-    u8 m_pad;
-    float m_scale;
-    float m_values[5];
-};
-
 typedef VYmDeformationMdl YmDeformationMdlState;
 
 struct _pppEnvStYmDeformationMdl {

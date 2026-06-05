@@ -23,9 +23,9 @@ static const float FLOAT_80332e80 = 255.0f;
 static const float FLOAT_80332e84 = 0.9f;
 static const float FLOAT_80332e88 = 4.0f;
 static const float FLOAT_80332e8c = 320.0f;
-static const float FLOAT_80332e90 = 0.5f;
 static const float FLOAT_80332e94 = 352.0f;
 static const float FLOAT_80332E98 = 3.0f;
+static const float FLOAT_80332e90 = 0.5f;
 static const double DOUBLE_80332ea0 = 4503601774854144.0;
 static const float FLOAT_80332EA8 = 128.0f;
 static const float FLOAT_80332EAC = 8.0f;
@@ -537,11 +537,15 @@ void CMenuPcs::ItemDraw()
     if (!foundSelected) {
         selectedItemId = -1;
     }
+    float helpBaseX = LoadFloat(FLOAT_80332e8c);
+    float helpOffsetX = LoadFloat(FLOAT_80332e90);
+    int helpX = (int)(helpBaseX - (float)(LoadDouble(DOUBLE_80332e78) * (double)helpOffsetX));
+    int helpY = (int)LoadFloat(FLOAT_80332e94);
     DrawHelpMessage(
         selectedItemId,
         helpFont,
-        (int)-((double)(LoadDouble(DOUBLE_80332e78) * (double)LoadFloat(FLOAT_80332e90)) - (double)LoadFloat(FLOAT_80332e8c)),
-        (int)LoadFloat(FLOAT_80332e94),
+        helpX,
+        helpY,
         helpColor.color,
         10,
         LoadFloat(FLOAT_80332e64),
@@ -829,7 +833,7 @@ void CMenuPcs::ItemInit()
     ItemMenuAnimList* itemList;
 
     memset(this->itemList, 0, sizeof(*this->itemList));
-    float one = FLOAT_80332e64;
+    float one = LoadFloat(FLOAT_80332e64);
     entry = this->itemList->anims;
     int initCount = 8;
     do {
@@ -854,7 +858,7 @@ void CMenuPcs::ItemInit()
     entry->h = 0x108;
     float titleAlpha = LoadFloat(FLOAT_80332EA8);
     float titleScale = FLOAT_80332EAC;
-    float zero = FLOAT_80332e60;
+    float zero = LoadFloat(FLOAT_80332e60);
     entry->u = titleAlpha;
     entry->v = titleScale;
     entry->uvScale = one;

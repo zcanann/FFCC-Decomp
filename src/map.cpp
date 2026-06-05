@@ -2861,46 +2861,51 @@ void CMapMng::Draw()
         lightColor.b = 0xFF;
         lightColor.a = 0xFF;
 
-        Vec lightDir;
-        lightDir.x = 1.0f;
-        lightDir.y = 1.0f;
-        lightDir.z = 1.0f;
+        Vec lightDir0;
+        lightDir0.x = 1.0f;
+        lightDir0.y = 1.0f;
+        lightDir0.z = 1.0f;
 
-        Mtx cameraMtx;
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+        Mtx cameraMtx0;
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx0);
 
-        Vec lightPos;
-        lightPos.x = kMapLargeDistance * -lightDir.x;
-        lightPos.y = kMapLargeDistance * -lightDir.y;
-        lightPos.z = kMapLargeDistance * -lightDir.z;
+        Vec lightPos0;
+        lightPos0.x = kMapLargeDistance * -lightDir0.x;
+        lightPos0.y = kMapLargeDistance * -lightDir0.y;
+        lightPos0.z = kMapLargeDistance * -lightDir0.z;
 
-        GXLightObj lightObj;
-        GXInitLightColor(&lightObj, lightColor);
-        PSMTXMultVec(cameraMtx, &lightPos, &lightPos);
-        GXInitLightPos(&lightObj, lightPos.x, lightPos.y, lightPos.z);
-        PSMTXMultVecSR(cameraMtx, &lightDir, &lightDir);
-        GXInitLightDir(&lightObj, lightDir.x, lightDir.y, lightDir.z);
-        GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
-        GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
-        GXLoadLightObjImm(&lightObj, GX_LIGHT0);
+        GXLightObj lightObj0;
+        GXInitLightColor(&lightObj0, lightColor);
+        PSMTXMultVec(cameraMtx0, &lightPos0, &lightPos0);
+        GXInitLightPos(&lightObj0, lightPos0.x, lightPos0.y, lightPos0.z);
+        PSMTXMultVecSR(cameraMtx0, &lightDir0, &lightDir0);
+        GXInitLightDir(&lightObj0, lightDir0.x, lightDir0.y, lightDir0.z);
+        GXInitLightSpot(&lightObj0, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj0, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj0, GX_LIGHT0);
 
-        lightDir.x = -1.0f;
-        lightDir.y = 1.0f;
-        lightDir.z = -1.0f;
+        Vec lightDir1;
+        lightDir1.x = -1.0f;
+        lightDir1.y = 1.0f;
+        lightDir1.z = -1.0f;
 
-        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-        lightPos.x = kMapLargeDistance * -lightDir.x;
-        lightPos.y = kMapLargeDistance * -lightDir.y;
-        lightPos.z = kMapLargeDistance * -lightDir.z;
+        Mtx cameraMtx1;
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx1);
 
-        GXInitLightColor(&lightObj, lightColor);
-        PSMTXMultVec(cameraMtx, &lightPos, &lightPos);
-        GXInitLightPos(&lightObj, lightPos.x, lightPos.y, lightPos.z);
-        PSMTXMultVecSR(cameraMtx, &lightDir, &lightDir);
-        GXInitLightDir(&lightObj, lightDir.x, lightDir.y, lightDir.z);
-        GXInitLightSpot(&lightObj, kMapFullTurnDegrees, GX_SP_SHARP);
-        GXInitLightAttnK(&lightObj, kMapZero, kMapTinyEpsilon, kMapZero);
-        GXLoadLightObjImm(&lightObj, GX_LIGHT1);
+        Vec lightPos1;
+        lightPos1.x = kMapLargeDistance * -lightDir1.x;
+        lightPos1.y = kMapLargeDistance * -lightDir1.y;
+        lightPos1.z = kMapLargeDistance * -lightDir1.z;
+
+        GXLightObj lightObj1;
+        GXInitLightColor(&lightObj1, lightColor);
+        PSMTXMultVec(cameraMtx1, &lightPos1, &lightPos1);
+        GXInitLightPos(&lightObj1, lightPos1.x, lightPos1.y, lightPos1.z);
+        PSMTXMultVecSR(cameraMtx1, &lightDir1, &lightDir1);
+        GXInitLightDir(&lightObj1, lightDir1.x, lightDir1.y, lightDir1.z);
+        GXInitLightSpot(&lightObj1, kMapFullTurnDegrees, GX_SP_SHARP);
+        GXInitLightAttnK(&lightObj1, kMapZero, kMapTinyEpsilon, kMapZero);
+        GXLoadLightObjImm(&lightObj1, GX_LIGHT1);
 
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, 1, GX_SRC_REG, GX_SRC_VTX, static_cast<GXLightID>(GX_LIGHT0 | GX_LIGHT1),

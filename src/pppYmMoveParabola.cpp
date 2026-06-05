@@ -6,6 +6,19 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
+struct pppYmMoveParabola {
+    _pppPObject m_object;
+};
+
+struct pppYmMoveParabolaUnkB {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+    f32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32 m_payload;
+};
+
 struct pppYmMoveParabolaWork {
     f32 m_distance;
     f32 m_velocity;

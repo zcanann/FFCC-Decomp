@@ -1,20 +1,9 @@
 #ifndef _FFCC_PPP_YMMOVEPARABOLA_H_
 #define _FFCC_PPP_YMMOVEPARABOLA_H_
 
-#include "ffcc/partMng.h"
-
-struct pppYmMoveParabola {
-    _pppPObject m_object;
-};
-
-struct pppYmMoveParabolaUnkB {
-    s32 m_graphId;
-    f32 m_dataValIndex;
-    f32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    f32 m_payload;
-};
+struct _pppCtrlTable;
+struct pppYmMoveParabola;
+struct pppYmMoveParabolaUnkB;
 
 #ifdef __cplusplus
 extern "C" {

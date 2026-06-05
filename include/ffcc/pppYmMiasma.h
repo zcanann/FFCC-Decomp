@@ -1,14 +1,28 @@
 #ifndef _FFCC_PPP_YMMIASMA_H_
 #define _FFCC_PPP_YMMIASMA_H_
 
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
 struct _pppPObject;
+struct PARTICLE_DATA;
 
 typedef _pppPObject pppYmMiasma;
 
-struct VYmMiasma;
+struct VYmMiasma {
+    PARTICLE_DATA* m_particles;
+    float m_speedDecay;
+    u8 m_emitTimer;
+    u8 m_pad09[7];
+    Vec m_impulse;
+    float m_radius;
+    float m_radiusVelocity;
+    float m_radiusAcceleration;
+    Vec m_prevPosition;
+    u8 m_prevPositionChanged;
+    u8 m_pad35[3];
+};
 
 struct PYmMiasma {
     s32 m_graphId;

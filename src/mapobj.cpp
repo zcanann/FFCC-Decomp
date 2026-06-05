@@ -356,7 +356,7 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
+int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
     enum {
         CHUNK_AMBI = 0x414D4249,
@@ -811,6 +811,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
     }
     chunkFile.PopChunk();
+    return 1;
 }
 
 /*

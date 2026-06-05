@@ -169,7 +169,7 @@ public:
     void Init();
     CMapObj();
     ~CMapObj();
-    void ReadOtmObj(CChunkFile&);
+    int ReadOtmObj(CChunkFile&);
     void CalcMtx(float (*)[4], unsigned char);
     void SetShow_r(int);
     void SetShow(int);

@@ -45,6 +45,8 @@ CSmallProcessTable CUSBPcs::m_table = {
         0x12,
     },
 };
+extern const char sUsbManagerClassName[] = "CManager";
+extern const char sUsbProcessClassName[] = "CProcess";
 extern const char s_p_usb_cpp[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 

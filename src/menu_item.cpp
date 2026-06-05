@@ -825,8 +825,8 @@ void CMenuPcs::ItemInit1()
 void CMenuPcs::ItemInit()
 {
     int index;
-    short yOffset;
-    short count;
+    int yOffset;
+    int count;
     MenuItemOpenAnim* entry;
     ItemMenuAnimList* itemList;
 
@@ -911,7 +911,7 @@ void CMenuPcs::ItemInit()
         entry->tex = 0x37;
         count = count + 2;
         entry->x = itemList->anims[0].x + 0x24;
-        short nextY = yOffset + 0x20;
+        int nextY = yOffset + 0x20;
         entry->y = itemList->anims[0].y + yOffset;
         entry->w = 200;
         entry->h = 0x28;

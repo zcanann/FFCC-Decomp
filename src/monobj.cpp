@@ -3548,24 +3548,29 @@ void CGMonObj::logicFuncDefault()
 int CGMonObj::calcBranchFuncDefault(int branchType)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-	unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
-	unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+	int result = 0;
 
 	if (branchType == 1) {
-		if (current < (max >> 1)) {
-			return 1;
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		if (static_cast<int>(current) < static_cast<int>(static_cast<unsigned int>(max) >> 1)) {
+			result = 1;
 		}
 	} else if (branchType == 2) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
 		if (current < (max / 3)) {
-			return 2;
+			result = 2;
+		} else if (current < ((max * 2) / 3)) {
+			result = 1;
 		}
-		if (current < ((max * 2) / 3)) {
-			return 1;
-		}
+	} else if (branchType != 0) {
+		result = 0;
 	}
 
-	return 0;
+	return result;
 }
 
 /*
@@ -3599,12 +3604,12 @@ void CGMonObj::sysControl(int controlType)
 		m_unk6BE = 0;
 		break;
 
-	case 0xC:
-		m_unk6C1 = 1;
-		break;
-
 	case 0xD:
 		m_unk6C1 = 0;
+		break;
+
+	case 0xC:
+		m_unk6C1 = 1;
 		break;
 
 	case 0xF:
@@ -3620,11 +3625,13 @@ void CGMonObj::sysControl(int controlType)
 		break;
 
 	case 0x15:
-		object->m_weaponNodeFlags = (object->m_weaponNodeFlags & 0xF7) | 8;
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
 		break;
 
 	case 0x16:
-		object->m_weaponNodeFlags &= 0xF7;
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 0, 3, 28, 28));
 		break;
 	}
 }

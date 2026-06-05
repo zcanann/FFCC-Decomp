@@ -697,41 +697,30 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
  */
 void CMenuPcs::SetCrystalCageAttr()
 {
-	struct CrystalState {
-		unsigned char _pad0[0x80];
-		unsigned char m_effectTimer;
-		unsigned char _pad1[3];
-		int m_crystalElem;
-		short m_crystalPart;
-		short m_crystalAttr;
-	};
-
-	CrystalState* state = reinterpret_cast<CrystalState*>(this);
-
-	if (state->m_crystalPart != -1) {
-		PartMng.pppDeletePart(state->m_crystalPart);
+	if (m_crystalPart != -1) {
+		PartMng.pppDeletePart(m_crystalPart);
 	}
 
 	unsigned int chaliceElement = Game.m_gameWork.m_chaliceElement;
 	if ((chaliceElement & 1U) != 0) {
-		state->m_crystalAttr = 0xE;
-		state->m_crystalElem = 1;
+		m_crystalAttr = 0xE;
+		m_crystalElem = 1;
 	} else if ((chaliceElement & 2U) != 0) {
-		state->m_crystalAttr = 0xF;
-		state->m_crystalElem = 2;
+		m_crystalAttr = 0xF;
+		m_crystalElem = 2;
 	} else if ((chaliceElement & 4U) != 0) {
-		state->m_crystalAttr = 0x10;
-		state->m_crystalElem = 4;
+		m_crystalAttr = 0x10;
+		m_crystalElem = 4;
 	} else if ((chaliceElement & 8U) != 0) {
-		state->m_crystalAttr = 0x11;
-		state->m_crystalElem = 8;
+		m_crystalAttr = 0x11;
+		m_crystalElem = 8;
 	} else if ((chaliceElement & 0x10U) != 0) {
-		state->m_crystalAttr = 0x12;
-		state->m_crystalElem = 0x10;
+		m_crystalAttr = 0x12;
+		m_crystalElem = 0x10;
 	}
 
-	state->m_crystalPart = BindEffect(5, state->m_crystalAttr, -1);
-	state->m_effectTimer = 0;
+	m_crystalPart = BindEffect(5, m_crystalAttr, -1);
+	m_effectTimer = 0;
 }
 
 /*

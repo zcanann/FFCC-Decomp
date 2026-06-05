@@ -325,7 +325,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 void CLightPcs::calc()
 {
     m_sceneLightCount = 0;
-    FLOAT_8032ed10 = FLOAT_8032ed10 + FLOAT_8032fc90;
+    FLOAT_8032ed10 += FLOAT_8032fc90;
 }
 
 /*

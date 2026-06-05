@@ -476,7 +476,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
     case 1:
         return MapMng.m_stage;
     case 2:
-        return PartPcs.m_usbStreamData.m_stageLoad;
+        return PartPcs.m_usbStreamState.m_stageLoad;
     case 3:
         return PartMng.m_pppEnvSt.m_stagePtr;
     case 4:

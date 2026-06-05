@@ -120,6 +120,7 @@ public:
     Vec m_viewerSrtScale; // 0x54
     unsigned char _pad60[0x24];
     CUSBStreamData m_usbStream; // 0x84
+    CUSBStreamDataState m_usbStreamState; // 0x98
     unsigned char _padB4[0x8];
     u32 m_rsdIndex; // 0xBC
     int m_rsdFlag; // 0xC0

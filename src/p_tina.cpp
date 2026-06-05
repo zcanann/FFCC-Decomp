@@ -216,7 +216,7 @@ CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 void CPartPcs::EndMiruraEvent()
 {
     PartMng.pppReleasePdt(7);
-    m_usbStreamData.m_miruraEventActive = 0;
+    m_usbStreamState.m_miruraEventActive = 0;
 }
 
 /*
@@ -237,7 +237,7 @@ void CPartPcs::StartMiruraEvent()
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_miruraEventActive = 1;
+        m_usbStreamState.m_miruraEventActive = 1;
     }
 }
 
@@ -253,7 +253,7 @@ void CPartPcs::StartMiruraEvent()
 void CPartPcs::EndLocationTitle()
 {
     PartMng.pppReleasePdt(6);
-    m_usbStreamData.m_blockOnFrame = 0;
+    m_usbStreamState.m_blockOnFrame = 0;
 }
 
 /*
@@ -274,7 +274,7 @@ void CPartPcs::StartLocationTitle()
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
-        m_usbStreamData.m_blockOnFrame = 1;
+        m_usbStreamState.m_blockOnFrame = 1;
     }
 }
 
@@ -316,7 +316,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
         stage = MenuPcs.m_menuStage;
     }
 
-    m_usbStreamData.m_stageLoad = stage;
+    m_usbStreamState.m_stageLoad = stage;
     ppvAmemCacheSet.SetRStage(stage);
 
     PartMng.m_partAMemBase = 0;
@@ -340,13 +340,13 @@ int CPartPcs::LoadMenuPdt(char* fileName)
                 PartMng.pppReleasePdt(pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
-                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
+                PartPcs.m_usbStreamState.m_printFreeOnNext = 1;
             }
         }
     }
 
-    m_usbStreamData.m_stageLoad = m_usbStreamData.m_stageDefault;
-    ppvAmemCacheSet.SetRStage(m_usbStreamData.m_stageDefault);
+    m_usbStreamState.m_stageLoad = m_usbStreamState.m_stageDefault;
+    ppvAmemCacheSet.SetRStage(m_usbStreamState.m_stageDefault);
 
     return pdtSlotIndex;
 }
@@ -386,7 +386,7 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
                 PartMng.pppReleasePdt(pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
-                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
+                PartPcs.m_usbStreamState.m_printFreeOnNext = 1;
             }
         }
     }
@@ -456,7 +456,7 @@ void LoadFieldPdt0(int mapId, int floorId)
         ppvAmemCacheSet.RefCnt0Compare();
     }
 
-    PartPcs.m_usbStreamData.m_fieldLoadReq = 1;
+    PartPcs.m_usbStreamState.m_fieldLoadReq = 1;
 
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
     pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
@@ -667,7 +667,7 @@ void CPartPcs::SetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::DrawMenuIdx(int index)
 {
-    if (m_usbStreamData.m_disableShokiDraw == 0) {
+    if (m_usbStreamState.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -690,7 +690,7 @@ void CPartPcs::DrawMenuIdx(int index)
  */
 void CPartPcs::DrawShoki()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
 
     if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
@@ -717,7 +717,7 @@ void CPartPcs::DrawShoki()
  */
 void CPartPcs::DrawMenu(int fpNo)
 {
-    if (m_usbStreamData.m_disableShokiDraw == 0) {
+    if (m_usbStreamState.m_disableShokiDraw == 0) {
         Graphic.SetFog(1, 0);
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(0);
@@ -742,7 +742,7 @@ void CPartPcs::drawAfter()
 {
     CGame* game = &Game;
 
-    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamData.m_disableShokiDraw == 0) {
+    if (game->m_gameWork.m_gamePaused == 0 && m_usbStreamState.m_disableShokiDraw == 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         Graphic.SetFog(1, 0);
         pppInitDrawEnv(0);
@@ -810,7 +810,7 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::draw()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
     CGame* game = &Game;
 
     Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
@@ -845,7 +845,7 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawCharaBefore()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
@@ -870,7 +870,7 @@ void CPartPcs::drawCharaBefore()
  */
 void CPartPcs::drawShadow()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
@@ -952,10 +952,10 @@ void CPartPcs::calcViewer()
 void CPartPcs::calc()
 {
 	PartMng.LoadPartNoSyncCalc();
-	if (m_usbStreamData.m_printFreeOnNext != 0) {
+	if (m_usbStreamState.m_printFreeOnNext != 0) {
 		int freeSize;
 
-		m_usbStreamData.m_printFreeOnNext = 0;
+		m_usbStreamState.m_printFreeOnNext = 0;
 		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
 		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
 	}
@@ -993,7 +993,7 @@ void CPartPcs::calcInit()
  */
 void CPartPcs::destroy()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
 
     USBPcs.IsBigAlloc(0);
     PartMng.Destroy();
@@ -1023,7 +1023,7 @@ void CPartPcs::destroy()
  */
 void CPartPcs::createViewer()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     CMemory::CStage* stage;
 
@@ -1049,8 +1049,8 @@ void CPartPcs::createViewer()
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        PartPcs.m_usbStreamData.m_stageLoad,
-        PartPcs.m_usbStreamData.m_stageAmem,
+        PartPcs.m_usbStreamState.m_stageLoad,
+        PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
         pppNotAllocAmemCacheRmem,
         0,
@@ -1107,7 +1107,7 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::create()
 {
-    CUSBStreamData* usb = &m_usbStreamData;
+    CUSBStreamDataState* usb = &m_usbStreamState;
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     CMemory::CStage* stage;
 
@@ -1132,8 +1132,8 @@ void CPartPcs::create()
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        PartPcs.m_usbStreamData.m_stageLoad,
-        PartPcs.m_usbStreamData.m_stageAmem,
+        PartPcs.m_usbStreamState.m_stageLoad,
+        PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
         pppNotAllocAmemCacheRmem,
         0,
@@ -1292,7 +1292,7 @@ int CPartPcs::GetTable(unsigned long index)
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	CUSBStreamData* usbStream = &m_usbStreamData;
+	CUSBStreamDataState* usbStream = &m_usbStreamState;
 	usbStream->m_fieldLoadReq = 0;
 }
 
@@ -1317,7 +1317,7 @@ void CPartPcs::Quit()
  */
 void CPartPcs::Init()
 {
-	CUSBStreamData* usbStream = &m_usbStreamData;
+	CUSBStreamDataState* usbStream = &m_usbStreamState;
 	usbStream->m_fieldLoadReq = 0;
 	usbStream->m_printFreeOnNext = 0;
 }

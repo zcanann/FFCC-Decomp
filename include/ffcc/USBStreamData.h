@@ -19,16 +19,20 @@ public:
     int m_dataReady;                   // 0x8
     unsigned int m_sizeBytes;          // 0xc
     int m_packetCode;                  // 0x10
-    CMemory::CStage* m_stageDefault;   // 0x14
-    CMemory::CStage* m_stageLoad;      // 0x18
-    CMemory::CStage* m_stageAmem;      // 0x1c
-    CMemory::CStage* m_stageExtra;     // 0x20
-    void* m_freePtr;                   // 0x24
-    unsigned char m_fieldLoadReq;      // 0x28
-    unsigned char m_printFreeOnNext;   // 0x29
-    unsigned char m_blockOnFrame;      // 0x2a
-    unsigned char m_miruraEventActive; // 0x2b
-    unsigned char m_disableShokiDraw;  // 0x2c
+};
+
+struct CUSBStreamDataState
+{
+    CMemory::CStage* m_stageDefault;   // 0x00
+    CMemory::CStage* m_stageLoad;      // 0x04
+    CMemory::CStage* m_stageAmem;      // 0x08
+    CMemory::CStage* m_stageExtra;     // 0x0C
+    void* m_freePtr;                   // 0x10
+    unsigned char m_fieldLoadReq;      // 0x14
+    unsigned char m_printFreeOnNext;   // 0x15
+    unsigned char m_blockOnFrame;      // 0x16
+    unsigned char m_miruraEventActive; // 0x17
+    unsigned char m_disableShokiDraw;  // 0x18
 };
 
 #endif // _FFCC_PPP_USBSTREAMDATA_H_

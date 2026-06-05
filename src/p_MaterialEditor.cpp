@@ -563,7 +563,7 @@ void CMaterialEditorPcs::createViewer()
     clear.a = 0xff;
     GXSetCopyClear(clear, 0xffffff);
 
-    m_usbStream.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
+    m_usbStreamState.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 

@@ -23,16 +23,16 @@ extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
-extern "C" const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
+static const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
 extern "C" const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
-extern "C" const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
+static const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
 extern "C" const char sFunnyShapePcsManagerClassName[] = "CManager";
 extern "C" const char sFunnyShapePcsProcessClassName[] = "CProcess";
-extern "C" const char s_funnyShapeFmt[] = "FunnyShape [%c]";
-extern "C" const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
-extern "C" const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
+static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
+static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
+static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 
 inline void* operator new(unsigned long, void* ptr)
 {

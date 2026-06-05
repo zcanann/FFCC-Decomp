@@ -7,14 +7,14 @@
 extern "C" {
 const f32 FLOAT_80330548 = -1.0f;
 const f32 FLOAT_8033054c = 0.0f;
-extern const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
-extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
+}
+static const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
+static const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
     (char)0x83, (char)0x52, (char)0x83, (char)0x93, (char)0x83,
     (char)0x58, (char)0x83, (char)0x67, (char)0x83, (char)0x89,
     (char)0x83, (char)0x4E, (char)0x83, (char)0x5E, '\n',
     '\0',
 };
-}
 
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;

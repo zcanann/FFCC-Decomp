@@ -203,16 +203,15 @@ int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
  */
 CBound::CBound()
 {
-    float* bounds = (float*)this;
     float max = kMapObjBoundMaxInit;
     float min = kMapObjBoundMinInit;
 
-    bounds[2] = min;
-    bounds[1] = min;
-    bounds[0] = min;
-    bounds[5] = max;
-    bounds[4] = max;
-    bounds[3] = max;
+    m_min.z = min;
+    m_min.y = min;
+    m_min.x = min;
+    m_max.z = max;
+    m_max.y = max;
+    m_max.x = max;
 }
 
 /*

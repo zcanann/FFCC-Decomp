@@ -60,25 +60,6 @@ struct CrystalWork {
     GXTexObj* m_refractionTexObj;
 };
 
-struct pppCrystalUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWOrk;
-    float m_stepValue;
-    float m_arg3;
-    union {
-        u8 m_payload[6];
-        struct Payload {
-            u8 m_refractionMode;
-            u8 m_blendMode;
-            u8 m_drawFlag;
-            u8 m_zMode;
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-        } m_crystal;
-    };
-};
-
 inline void ImageBufferSetPixel_IA8(HSD_ImageBuffer* imageBuffer, u32 x, u32 y, u32 intensity, u32 alpha, u32, u32);
 
 static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ctrl)
@@ -140,7 +121,7 @@ static inline float CrystalSqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTable* param_3)
 {
 	float texW;
 	float texH;
@@ -261,7 +242,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalUnkB* param_2, _pppCtrlT
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlTable* param_3)
 {
 	u32 y;
 	CrystalWork* work;

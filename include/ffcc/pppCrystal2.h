@@ -1,12 +1,33 @@
 #ifndef _FFCC_PPPCRYSTAL2_H_
 #define _FFCC_PPPCRYSTAL2_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
 
 typedef _pppPObject pppCrystal2;
 
-struct pppCrystal2UnkB;
+struct pppCrystal2Step {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    s32 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    union {
+        u8 m_payload[8];
+        struct Payload {
+            u8 m_refractionMode;
+            u8 m_blendMode;
+            u8 m_drawFlag;
+            u8 m_zMode;
+            u8 m_drawEnvColor0;
+            u8 m_drawEnvColor1;
+            u8 m_pad06[2];
+        } m_crystal;
+    };
+    f32 m_perspectiveScale;
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,8 +35,8 @@ extern "C" {
 
 void pppConstructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
 void pppDestructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
-void pppFrameCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3);
-void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3);
+void pppFrameCrystal2(pppCrystal2* crystal, pppCrystal2Step* param_2, _pppCtrlTable* param_3);
+void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2Step* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

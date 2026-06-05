@@ -16,10 +16,6 @@ extern const f32 kPppConformBgNormalOne;
 #include "dolphin/gx.h"
 #include <math.h>
 
-struct pppConformBGNormal {
-    _pppPObject m_object;
-};
-
 struct pppConformBGNormalUnkB {
     u32 _pad0;
     float m_dataValIndex;
@@ -68,7 +64,7 @@ static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* param3)
+void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* param3)
 {
     u8 mode;
     f32 matrixX;
@@ -114,7 +110,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     matrixY = pppMngSt->m_matrix.value[1][3];
     matrixZ = pppMngSt->m_matrix.value[2][3];
     dataOffset = *param3->m_serializedDataOffsets;
-    state = (ConformBgNormalState*)(pppConformBGNormal->m_object.m_workArea + dataOffset);
+    state = (ConformBgNormalState*)(pppConformBGNormal->m_workArea + dataOffset);
 
     if (((s32)Game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
             mode = param2->m_stepValue;
@@ -303,14 +299,14 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
+void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
 {
     int* serializedDataOffsets;
     ConformBgNormalState* state;
     f32 scale;
 
     serializedDataOffsets = param2->m_serializedDataOffsets;
-    state = (ConformBgNormalState*)(conformBG->m_object.m_workArea + *serializedDataOffsets);
+    state = (ConformBgNormalState*)(conformBG->m_workArea + *serializedDataOffsets);
     scale = kPppConformBgNormalZero;
     state->m_normal.z = scale;
     state->m_normal.y = scale;

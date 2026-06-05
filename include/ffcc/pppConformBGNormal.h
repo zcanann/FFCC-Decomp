@@ -2,15 +2,17 @@
 #define _FFCC_PPPCONFORMBGNORMAL_H_
 
 struct _pppCtrlTable;
-struct pppConformBGNormal;
+struct _pppPObject;
 struct pppConformBGNormalUnkB;
+
+typedef _pppPObject pppConformBGNormal;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct _pppCtrlTable* data);
-void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* data);
+void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* data);
+void pppFrameConformBGNormal(pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* data);
 
 #ifdef __cplusplus
 }

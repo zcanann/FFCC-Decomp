@@ -2856,10 +2856,7 @@ void CMapMng::Draw()
 
     if ((gMapHitDrawMode.m_byte & 1) != 0) {
         _GXColor lightColor;
-        lightColor.r = 0xFF;
-        lightColor.g = 0xFF;
-        lightColor.b = 0xFF;
-        lightColor.a = 0xFF;
+        *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
 
         Vec lightDir0;
         lightDir0.x = 1.0f;

@@ -29,7 +29,7 @@ extern const f32 FLOAT_80330DC8;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-extern "C" const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
+static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 typedef pppLaserWorkBase pppYmLaserWork;
 typedef pppLaserColorBlock pppYmLaserColorData;

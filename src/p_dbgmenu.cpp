@@ -61,6 +61,11 @@ extern const char sDbgMenuOn[] = "ON";
 extern const char sDbgMenuOff[] = "OFF";
 extern const char sDbgMenuUnknown[] = "?";
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 extern "C" {
 void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
 void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
@@ -491,8 +496,9 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 	do {
 		m_currentMenu = menu;
-		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
-		              kDbgMenuViewportNear, kDbgMenuViewportFar);
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, LoadFloat(kDbgMenuViewportWidth),
+		              LoadFloat(kDbgMenuViewportHeight), LoadFloat(kDbgMenuViewportNear),
+		              LoadFloat(kDbgMenuViewportFar));
 
 		switch (menu->m_type) {
 		case 0:

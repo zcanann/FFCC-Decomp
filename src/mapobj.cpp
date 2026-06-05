@@ -322,7 +322,6 @@ inline CMapObjAtr::CMapObjAtr()
 inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
     m_type = CMapObjAtr::PLAY_STA;
-    m_playStaNo = 0;
 }
 
 /*

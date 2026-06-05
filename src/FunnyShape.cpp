@@ -21,8 +21,8 @@ static const float kFunnyShapeTexCoordDivisor = 4096.0f;
 static const float kFunnyShapePaddingScale = 0.5f;
 extern const float kFunnyShapeNegativeOne;
 static const float FLOAT_8032fd84 = 0.0f;
-static const float kFunnyShapeDefaultOffsetX = 480.0f;
-static const float kFunnyShapeDefaultOffsetY = 336.0f;
+extern const float kFunnyShapeDefaultOffsetX = 480.0f;
+extern const float kFunnyShapeDefaultOffsetY = 336.0f;
 extern const float kFunnyShapeTextureViewportOrigin = 20.0f;
 static const float kFunnyShapeAnimOffsetX = 320.0f;
 static const float kFunnyShapeAnimOffsetY = 224.0f;
@@ -463,8 +463,8 @@ void CFunnyShape::RenderShape()
     GXSetChanMatColor(GX_COLOR0, color);
 
     Vec2d offsetCopy;
-    offsetCopy.x = LoadFloat(kFunnyShapeDefaultOffsetX);
-    offsetCopy.y = LoadFloat(kFunnyShapeDefaultOffsetY);
+    offsetCopy.x = kFunnyShapeDefaultOffsetX;
+    offsetCopy.y = kFunnyShapeDefaultOffsetY;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
     RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeZero));
 }

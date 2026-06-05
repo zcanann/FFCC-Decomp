@@ -141,10 +141,6 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     Mtx44 screenMtx;
     Mtx cameraMtx;
     Mtx texMtx;
-    Mtx rotMtx;
-    Mtx resetRotMtx;
-    float indMtx[2][3];
-    float resetIndMtx[2][3];
     int textureIndex = 0;
     int left;
     int top;
@@ -228,40 +224,13 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_POS, 0x1E, GX_FALSE, GX_PTIDENTITY);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-        GXSetNumIndStages(1);
-        GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
-        GXSetTevIndWarp(GX_TEVSTAGE0, GX_INDTEXSTAGE0, GX_TRUE, GX_FALSE, GX_ITM_0);
-        GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-
-        if ((state->m_angle == 0) || (state->m_angle == 0x168)) {
-            state->m_angle = 1;
-        }
-
-        PSMTXRotRad(rotMtx, 'z', kYmDeformationMdlDegToRad * (float)state->m_angle);
-        indMtx[0][0] = rotMtx[0][0] * state->m_scale;
-        indMtx[0][1] = rotMtx[0][1] * state->m_scale;
-        indMtx[0][2] = DeformationMdlZero();
-        indMtx[1][0] = rotMtx[1][0] * state->m_scale;
-        indMtx[1][1] = rotMtx[1][1] * state->m_scale;
-        indMtx[1][2] = DeformationMdlZero();
-        GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+        SetUpIndWarp(state);
 
         GXLoadTexObj(backTexture, GX_TEXMAP0);
         GXLoadTexObj(&texture->m_texObj, GX_TEXMAP1);
         pppDrawMesh(model, pppYmDeformationMdl->m_drawMatrixPtr, 0);
 
-        GXSetTevDirect((GXTevStageID)1);
-        GXSetNumIndStages(0);
-        GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
-
-        PSMTXRotRad(resetRotMtx, 'z', DeformationMdlZero());
-        resetIndMtx[0][0] = DeformationMdlZero();
-        resetIndMtx[0][1] = DeformationMdlZero();
-        resetIndMtx[0][2] = DeformationMdlZero();
-        resetIndMtx[1][0] = DeformationMdlZero();
-        resetIndMtx[1][1] = DeformationMdlZero();
-        resetIndMtx[1][2] = DeformationMdlZero();
-        GXSetIndTexMtx(GX_ITM_0, resetIndMtx, 1);
+        DisableIndWarp();
 
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);

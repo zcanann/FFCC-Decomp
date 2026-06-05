@@ -11,13 +11,6 @@ CMath Math;
 Vec s_f_vpos;
 Mtx s_f_lvmtx;
 
-struct Vec4d {
-    float x;
-    float y;
-    float z;
-    float w;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x8001a230

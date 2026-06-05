@@ -104,14 +104,6 @@ static inline int clampDecToZero(int value)
 	return static_cast<int>(next & ~static_cast<unsigned int>(static_cast<int>(next) >> 31));
 }
 
-struct Vec4d
-{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
 static inline unsigned int frameNibble(int value)
 {
 	int sign = value >> 31;

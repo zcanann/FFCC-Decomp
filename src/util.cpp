@@ -30,11 +30,6 @@ static inline Mtx44Ptr GetScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
-// Vec2d definition 
-struct Vec2d {
-	float x, y;
-};
-
 CUtil gUtil;
 
 /*

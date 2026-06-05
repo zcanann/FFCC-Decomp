@@ -31,13 +31,6 @@ extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 
-struct Vec4d {
-    float x;
-    float y;
-    float z;
-    float w;
-};
-
 struct GObjectMapCylinder {
     Vec m_bottom;
     CMapCylinderProbeView m_probe;

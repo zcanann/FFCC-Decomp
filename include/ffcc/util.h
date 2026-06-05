@@ -3,13 +3,13 @@
 
 #include "ffcc/manager.h"
 #include "ffcc/math.h"
+#include "ffcc/pppVec.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 class CTexture;
 struct Vec;
-struct Vec2d;
 
 class CUtil : public CManager
 {

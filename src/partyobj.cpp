@@ -50,33 +50,45 @@ static const char s_partyBonusAddFmt[] = "bonus slot:%d add:%d";
 static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
 static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
-extern float FLOAT_80331a78;
 extern float FLOAT_80331A50;
 extern const float FLOAT_80331a54;
-extern float FLOAT_80331A58;
-extern float FLOAT_80331A5C;
-extern float FLOAT_80331a70;
-extern float FLOAT_80331a74;
-extern float FLOAT_80331A7C;
-extern float FLOAT_80331A88;
-extern float FLOAT_80331a9c;
-extern float FLOAT_80331aa0;
-extern float FLOAT_80331A98;
-extern float FLOAT_80331AB0;
-extern float FLOAT_80331AB8;
-extern float FLOAT_80331ABC;
-extern float FLOAT_80331AC0;
-extern float FLOAT_80331ac4;
-extern float FLOAT_80331ac8;
-extern float FLOAT_80331acc;
-extern float FLOAT_80331ad0;
-extern float FLOAT_80331ad4;
-extern float FLOAT_80331ad8;
-extern float FLOAT_80331ADC;
-extern double DOUBLE_80331AA8;
-extern float FLOAT_80331b00;
-extern float FLOAT_80331b04;
-extern float FLOAT_80331b08;
+extern const float FLOAT_80331A58 = 0.5f;
+extern const float FLOAT_80331A5C = 1800.0f;
+extern const double DOUBLE_80331A60 = 4503601774854144.0;
+extern const double DOUBLE_80331A68 = 4503599627370496.0;
+extern const float FLOAT_80331A70 = 0.1f;
+extern const float FLOAT_80331a74 = 0.95f;
+extern const float FLOAT_80331a78 = 0.0f;
+extern const float FLOAT_80331A7C = 0.3f;
+extern const float FLOAT_80331A80 = 0.7f;
+extern const float FLOAT_80331A84 = 1.5f;
+extern const float FLOAT_80331A88 = 4.0f;
+extern const double DOUBLE_80331A90 = 90.0;
+extern const float FLOAT_80331A98 = 10.0f;
+extern const float FLOAT_80331a9c = 10000000000.0f;
+extern const float FLOAT_80331aa0 = -10000000000.0f;
+extern const double DOUBLE_80331AA8 = 300.0;
+extern const float FLOAT_80331AB0 = 3.0f;
+extern const float FLOAT_80331AB4 = 0.15f;
+extern const float FLOAT_80331AB8 = 3.1415927f;
+extern const float FLOAT_80331ABC = 0.25f;
+extern const float FLOAT_80331AC0 = 11.0f;
+extern const float FLOAT_80331ac4 = 6.0f;
+extern const float FLOAT_80331ac8 = 1.5707964f;
+extern const float FLOAT_80331acc = -100.0f;
+extern const float FLOAT_80331ad0 = 5.0f;
+extern const float FLOAT_80331ad4 = 2.0f;
+extern const float FLOAT_80331ad8 = 0.7853982f;
+extern const float FLOAT_80331ADC = 0.01f;
+extern const float FLOAT_80331AE0 = 0.017453292f;
+extern const double DOUBLE_80331AE8 = 0.5;
+extern const double DOUBLE_80331AF0 = 3.0;
+extern const double DOUBLE_80331AF8 = 0.0;
+extern const float FLOAT_80331b00 = 1.1f;
+extern const float FLOAT_80331b04 = 1.2f;
+extern const float FLOAT_80331b08 = 1.25f;
+extern const char lbl_80331B0C[] = "%d\n";
+extern const char s_CMcPcs_80331B10[] = "CMcPcs";
 extern float FLOAT_8032EE78;
 extern float FLOAT_8032EE7C;
 extern float FLOAT_8032EE80;
@@ -4166,7 +4178,7 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.settleTimer = 0;
 	}
 
-	if (sGhostPartyWork.carrySpeed > FLOAT_80331a70) {
+	if (sGhostPartyWork.carrySpeed > FLOAT_80331A70) {
 		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
 	}
 	sGhostPartyWork.carrySpeed *= FLOAT_80331a74;
@@ -4387,7 +4399,7 @@ void CGPartyObj::gpmMove()
 		moveDir = toLeader;
 	}
 
-	float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331a70;
+	float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331A70;
 	float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
 	float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
 	sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;

@@ -75,10 +75,10 @@ extern "C" void pppFrameYmMoveParabola(pppYmMoveParabola* basePtr, pppYmMovePara
     s32 sceneDiff = (s32)Game.m_currentSceneId - 7;
     bool isSceneSeven = sceneDiff == 0;
     s32 sinIndex = (s32)((gPppYmMoveParabolaAngleScale * stepData->m_dataValIndex) / gPppYmMoveParabolaAngleDivisor);
-    f32 xzScale = frameCount * (work->m_distance * *(f32*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC)));
+    f32 xzScale = frameCount * (work->m_distance * ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2]);
     newPosition.x = direction.x * xzScale;
     f32 gravityOffset = gPppYmMoveParabolaGravityScale * stepData->m_initWOrk;
-    newPosition.y = (frameCount * (work->m_distance * *(f32*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC)))) -
+    newPosition.y = (frameCount * (work->m_distance * ppvSinTbl[(sinIndex & 0xFFFC) >> 2])) -
                     (frameCount * (gravityOffset * frameCount));
     newPosition.z = direction.z * xzScale;
     if (isSceneSeven) {

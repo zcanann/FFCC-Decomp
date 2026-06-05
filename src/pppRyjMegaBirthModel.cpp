@@ -15,7 +15,7 @@ extern const float FLOAT_803304a4;
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
 
-extern "C" const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
+static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 
 extern const float FLOAT_803304a8 = 0.017453292f;
 extern const double DOUBLE_803304b0 = 4503601774854144.0;

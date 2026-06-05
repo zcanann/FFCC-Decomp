@@ -48,7 +48,7 @@ CProcessTable CMiniGamePcs::m_table = {
         0x24,
     },
 };
-extern const char s_miniGameManagerTag[] = "GMGR";
+static const char s_miniGameManagerTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
 static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";

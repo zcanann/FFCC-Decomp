@@ -47,7 +47,7 @@ STATIC_ASSERT(offsetof(LocationTitleParticle, m_frame) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_shapeB) == 0x18);
 STATIC_ASSERT(offsetof(LocationTitleColorBlock, m_color) == 0x08);
 
-extern "C" const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--

@@ -8,9 +8,6 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/linkage.h"
-extern "C" {
-extern const f32 kPppYmLaserOne;
-}
 #include "ffcc/util.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -19,13 +16,9 @@ extern const f32 kPppYmLaserOne;
 
 #include <string.h>
 
-extern const f32 FLOAT_80330df0[2];
-extern const f32 FLOAT_80330de0;
-extern const f32 FLOAT_80330de4;
-extern const f32 FLOAT_80330de8;
-extern const f32 FLOAT_80330dec;
-extern const f32 FLOAT_80330DC4;
-extern const f32 FLOAT_80330DC8;
+static const f32 kPppYmLaserOne = 0.0f;
+static const f32 FLOAT_80330DC4 = 1.0f;
+static const f32 FLOAT_80330DC8 = 2.0f;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
@@ -311,15 +304,15 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	}
 }
 
-extern const f32 FLOAT_80330de0 = -1.0f;
-extern const f32 FLOAT_80330de4 = 1.2f;
-extern const f32 FLOAT_80330de8 = 10000000000.0f;
-extern const f32 FLOAT_80330dec = -10000000000.0f;
-extern const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
+static const f32 FLOAT_80330de0 = -1.0f;
+static const f32 FLOAT_80330de4 = 1.2f;
+static const f32 FLOAT_80330de8 = 10000000000.0f;
+static const f32 FLOAT_80330dec = -10000000000.0f;
+static const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
 extern const f32 FLOAT_80330df8 = 2.0f;
 extern const f32 FLOAT_80330dfc = 0.5f;
 extern const f32 FLOAT_80330e00 = 0.25f;
-extern "C" const f64 DOUBLE_80330E08 = 4503601774854144.0;
+static const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 /*
  * --INFO--

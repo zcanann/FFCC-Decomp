@@ -8,8 +8,8 @@
 extern const char s_CMath_8032F738[] = "CMath";
 
 CMath Math;
-Vec s_f_vpos;
-Mtx s_f_lvmtx;
+static Vec s_f_vpos;
+static Mtx s_f_lvmtx;
 
 /*
  * --INFO--

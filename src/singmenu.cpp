@@ -749,8 +749,8 @@ extern "C" char* gSingMenuAttrTableEs[] = {
 };
 extern "C" {
 int s_DynamicMess[5];
-char s_DynamicMessStr[0x400];
 }
+static char s_DynamicMessStr[0x400];
 
 extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
     {4, {14, 15, 16, 3, 0, 0, 0, 0}},

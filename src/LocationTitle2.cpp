@@ -58,7 +58,7 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
-extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
 extern float kLocationTitle2WorkZero;
 
 /*
@@ -204,7 +204,7 @@ extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLoc
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
-extern const char s_locationNodeName[] = "loc";
+static const char s_locationNodeName[] = "loc";
 
 /*
  * --INFO--

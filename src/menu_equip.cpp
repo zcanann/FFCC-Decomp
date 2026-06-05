@@ -19,25 +19,25 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, 
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
                                                            CMenuPcs*, int, void*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
-extern const float FLOAT_80332eb8 = 0.0f;
-extern const double DOUBLE_80332ec0 = 1.0;
-extern const double DOUBLE_80332ec8 = 216.0;
-extern const double DOUBLE_80332ed0 = 0.5;
-extern const double DOUBLE_80332ed8 = 4503601774854144.0;
-extern const float FLOAT_80332ee0 = 1.0f;
-extern const float FLOAT_80332ee4 = 255.0f;
-extern const float FLOAT_80332ee8 = 0.9f;
-extern const float FLOAT_80332eec = 4.0f;
-extern const float FLOAT_80332ef0 = 12.0f;
-extern const float FLOAT_80332ef4 = 24.0f;
-extern const float FLOAT_80332ef8 = 320.0f;
-extern const float FLOAT_80332efc = 0.5f;
-extern const float FLOAT_80332f00 = 352.0f;
-extern const float FLOAT_80332F04 = 3.0f;
-extern const double DOUBLE_80332F08 = 0.0;
-extern const float FLOAT_80332f10 = 128.0f;
-extern const float FLOAT_80332f14 = 8.0f;
-extern const float FLOAT_80332f18 = 0.75f;
+static const float FLOAT_80332eb8 = 0.0f;
+static const double DOUBLE_80332ec0 = 1.0;
+static const double DOUBLE_80332ec8 = 216.0;
+static const double DOUBLE_80332ed0 = 0.5;
+static const double DOUBLE_80332ed8 = 4503601774854144.0;
+static const float FLOAT_80332ee0 = 1.0f;
+static const float FLOAT_80332ee4 = 255.0f;
+static const float FLOAT_80332ee8 = 0.9f;
+static const float FLOAT_80332eec = 4.0f;
+static const float FLOAT_80332ef0 = 12.0f;
+static const float FLOAT_80332ef4 = 24.0f;
+static const float FLOAT_80332ef8 = 320.0f;
+static const float FLOAT_80332efc = 0.5f;
+static const float FLOAT_80332f00 = 352.0f;
+static const float FLOAT_80332F04 = 3.0f;
+static const double DOUBLE_80332F08 = 0.0;
+static const float FLOAT_80332f10 = 128.0f;
+static const float FLOAT_80332f14 = 8.0f;
+static const float FLOAT_80332f18 = 0.75f;
 
 namespace {
 struct MenuEquipMembers {

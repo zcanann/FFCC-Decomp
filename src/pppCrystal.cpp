@@ -77,7 +77,7 @@ extern const CrystalTexMtx s_crystalTexMtxBase = {
 
 extern const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
-extern const char s_pppCrystalCpp[] = "pppCrystal.cpp";
+static const char s_pppCrystalCpp[] = "pppCrystal.cpp";
 
 static inline int CrystalFpClassify(float value)
 {

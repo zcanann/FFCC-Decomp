@@ -32,7 +32,7 @@ extern const f32 FLOAT_80331054;
 extern const double DOUBLE_80330FE8 = 3.0;
 extern const double DOUBLE_80331058;
 
-extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
+static const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
 struct pppBlurCharaWork {
     void* m_captureBuffer;

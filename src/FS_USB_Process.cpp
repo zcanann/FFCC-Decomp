@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-extern "C" const char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
+static const char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
 
 namespace {
 

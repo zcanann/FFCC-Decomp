@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-extern "C" const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
+static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
 extern "C" const float FLOAT_8032FD00;
 extern "C" const float FLOAT_8032FD04;

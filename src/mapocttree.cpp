@@ -18,18 +18,17 @@ extern const float kMapObjBoundMinInit = 10000000000.0f;
 extern const float kMapObjBoundMaxInit = -10000000000.0f;
 extern const float kMapObjZero = 1.0f;
 
-CBound s_bound(kMapObjBoundMinInit, kMapObjBoundMaxInit);
-CMapCylinder s_cyl(kMapObjBoundMinInit, kMapObjBoundMaxInit);
-Vec s_mvec;
-int s_light_no = 0;
-unsigned long s_shadow_no = 0;
-unsigned long InsertShadow_level = 0;
-unsigned long clear_flag_mask = 0;
+static CBound s_bound(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+static CMapCylinder s_cyl(kMapObjBoundMinInit, kMapObjBoundMaxInit);
+static Vec s_mvec;
+static int s_light_no = 0;
+static unsigned long s_shadow_no = 0;
+static unsigned long InsertShadow_level = 0;
+static unsigned long clear_flag_mask = 0;
 UMapHitDrawMode s_bitMask;
-unsigned long octtree_draw_node_ct = 0;
+static unsigned long octtree_draw_node_ct = 0;
 
 extern unsigned long g_pStage;
-extern unsigned long s_insertShadowNo;
 
 static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
@@ -1358,9 +1357,9 @@ void InsertShadow_r(COctNode* node)
 	}
 
 	if ((s_light_no >= 3) && (node->m_meshCount != 0)) {
-		unsigned long byteOffset = (s_insertShadowNo >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_shadowFlags, byteOffset));
-		*bits |= 1UL << (s_insertShadowNo & 0x1f);
+		*bits |= 1UL << (s_shadow_no & 0x1f);
 	}
 
 	COctNode* nodeIter = node;
@@ -1420,9 +1419,9 @@ void InsertShadow_r(COctNode* node)
 
 		if (childOverlap) {
 			if ((s_light_no >= 3) && (child->m_meshCount != 0)) {
-				unsigned long byteOffset = (s_insertShadowNo >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_shadow_no >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
-				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_insertShadowNo & 0x1f);
+				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_shadow_no & 0x1f);
 			}
 
 			COctNode* childIter = child;
@@ -1436,7 +1435,7 @@ void InsertShadow_r(COctNode* node)
 
 				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
-						setbit32(&grandChild->m_shadowFlags, s_insertShadowNo);
+						setbit32(&grandChild->m_shadowFlags, s_shadow_no);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1475,7 +1474,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 	Mtx inverseMtx;
 
 	if (m_type == 0) {
-		s_insertShadowNo = bitIndex;
+		s_shadow_no = bitIndex;
 		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 

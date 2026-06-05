@@ -89,7 +89,7 @@ extern const float kMemoryDrawOrthoFar = -100.0f;
 extern const char sHeapWalkerSlashLine[] = "//\n";
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
-int s_RefCnt0Compare;
+static int s_RefCnt0Compare;
 
 STATIC_ASSERT(sizeof(CMemory::CStage) == 0x12C);
 STATIC_ASSERT(sizeof(CMemory::CStage::CBlock) == 0x40);

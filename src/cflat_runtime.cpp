@@ -13,7 +13,7 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
-extern "C" const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
+static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 
 /*

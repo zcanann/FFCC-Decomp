@@ -14,7 +14,7 @@ static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)
     return reinterpret_cast<Vec**>(object->m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
-extern "C" const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
+static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--

@@ -12,10 +12,8 @@
 #include "dolphin/mtx.h"
 #include "dolphin/os/OSCache.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
-extern "C" {
-extern const float kPppYmMeltZero;
-extern const float FLOAT_80330af4;
-}
+static const float kPppYmMeltZero = 0.0f;
+static const float FLOAT_80330af4 = 1.0f;
 static const float FLOAT_80330b08 = 0.5f;
 static const float FLOAT_80330b0c = 0.017453292f;
 static const float FLOAT_80330b10 = -2000.0f;
@@ -24,10 +22,10 @@ static const float FLOAT_80330b18[2] = {-10000000000.0f, 0.0f};
 extern "C" {
 extern const u32 DAT_80330b20 = 0x00000001;
 extern const u32 DAT_80330b24 = 0x00000010;
-extern const u32 DAT_80330B28 = 0x0000003f;
 extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
+static const u32 DAT_80330B28 = 0x0000003f;
 static const float FLOAT_80330B2C = 0.0f;
 
 struct YmMeltMapCylinder {

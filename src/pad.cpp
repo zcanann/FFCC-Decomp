@@ -18,14 +18,18 @@ CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
-extern const char s_CPad[] = "CPad";
+static const char s_CPad[] = "CPad";
 static const float FLOAT_8032f820 = 0.0f;
 static const float FLOAT_8032f824 = 0.0078125f;
 static const float FLOAT_8032f828 = 255.0f;
-extern const char s_pad_cpp[8];
-extern const char s_rb[3];
-extern const char s_replay_dat[12];
-extern const char s_replay_host_msg[64];
+static const char s_pad_cpp[8] = "pad.cpp";
+static const char s_rb[3] = "rb";
+static const char s_replay_dat[12] = "/replay.dat";
+static const char s_replay_host_msg[64] =
+	"CPad.Init: host\202\251\202\347\226\361%d\225\142\202\314"
+	"\203\212\203\166\203\214\203\103\203\146\201\133\203\136"
+	"\202\360\223\307\202\335\215\236\202\335\202\334\202\265"
+	"\202\275\201\102\n";
 
 extern "C" {
 PADStatus g_pad[4];

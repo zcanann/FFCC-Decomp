@@ -14,21 +14,21 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-extern "C" const float FLOAT_80332f60 = 255.0f;
-extern "C" const float FLOAT_80332f64 = 0.0f;
-extern "C" const float FLOAT_80332f68 = 32.0f;
-extern "C" const float FLOAT_80332f6c = 24.0f;
-extern "C" const float FLOAT_80332f70 = 1.0f;
-extern "C" const float FLOAT_80332f74 = 18.0f;
-extern "C" const float FLOAT_80332f78 = 16.0f;
-extern "C" const float FLOAT_80332f7c = 0.9f;
-extern "C" const float FLOAT_80332f80 = 19.8f;
-extern "C" const float FLOAT_80332f84 = 4.0f;
-extern "C" const double DOUBLE_80332F90 = 1.0;
-extern "C" const double DOUBLE_80332F98 = 216.0;
-extern "C" const double DOUBLE_80332FA0 = 0.5;
-unsigned int s_Money = 0;
-signed char s_place[16];
+static const float FLOAT_80332f60 = 255.0f;
+static const float FLOAT_80332f64 = 0.0f;
+static const float FLOAT_80332f68 = 32.0f;
+static const float FLOAT_80332f6c = 24.0f;
+static const float FLOAT_80332f70 = 1.0f;
+static const float FLOAT_80332f74 = 18.0f;
+static const float FLOAT_80332f78 = 16.0f;
+static const float FLOAT_80332f7c = 0.9f;
+static const float FLOAT_80332f80 = 19.8f;
+static const float FLOAT_80332f84 = 4.0f;
+static const double DOUBLE_80332F90 = 1.0;
+static const double DOUBLE_80332F98 = 216.0;
+static const double DOUBLE_80332FA0 = 0.5;
+static unsigned int s_Money = 0;
+static signed char s_place[16];
 
 static inline float LoadFloat(const float& value)
 {

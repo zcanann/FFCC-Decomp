@@ -11,12 +11,11 @@
 
 class CMapHitFace;
 
-extern "C" char s_mapmesh_cpp[];
-extern "C" const float FLOAT_8032F930;
-extern "C" const float FLOAT_8032F934;
+static const char s_mapmesh_cpp[] = "mapmesh.cpp";
+static const float FLOAT_8032F930 = 10000000000.0f;
+static const float FLOAT_8032F934 = -10000000000.0f;
 
-CMemory::CStage* g_pStage;
-u32 s_insertShadowNo;
+static CMemory::CStage* g_pStage;
 
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)
@@ -109,6 +108,56 @@ void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet
                 entry->m_materialIdx = 0;
             } else {
                 materialSet->CacheDumpTexture(entry->m_materialIdx, cacheSet);
+            }
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
+{
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
+    while (remaining-- != 0) {
+        if (entry->m_size != 0) {
+            if (entry->m_materialIdx == 0xFFFF) {
+                entry->m_materialIdx = 0;
+            } else {
+                materialSet->CacheRefCnt0UpTexture(entry->m_materialIdx, cacheSet);
+            }
+        }
+        entry++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
+{
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
+    while (remaining-- != 0) {
+        if (entry->m_size != 0) {
+            if (entry->m_materialIdx == 0xFFFF) {
+                entry->m_materialIdx = 0;
+            } else {
+                materialSet->CacheUnLoadTexture(entry->m_materialIdx, cacheSet);
             }
         }
         entry++;
@@ -384,7 +433,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = new (MapMeshAllocStage(), s_mapmesh_cpp, 0x13A) unsigned char[workSize];
+            m_meshData = new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x13A) unsigned char[workSize];
 
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
@@ -462,7 +511,8 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
-                m_displayListData = new (MapMeshAllocStage(), s_mapmesh_cpp, 0x1D5) unsigned char[workSize];
+                m_displayListData =
+                    new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x1D5) unsigned char[workSize];
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
@@ -655,15 +705,12 @@ void CMapMesh::Destroy()
  */
 CMapMesh::CMapMesh()
 {
-    const float minInit = 10000000000.0f;
-    const float maxInit = -10000000000.0f;
-
-    m_bound.m_min.z = minInit;
-    m_bound.m_min.y = minInit;
-    m_bound.m_min.x = minInit;
-    m_bound.m_max.z = maxInit;
-    m_bound.m_max.y = maxInit;
-    m_bound.m_max.x = maxInit;
+    m_bound.m_min.z = FLOAT_8032F930;
+    m_bound.m_min.y = FLOAT_8032F930;
+    m_bound.m_min.x = FLOAT_8032F930;
+    m_bound.m_max.z = FLOAT_8032F934;
+    m_bound.m_max.y = FLOAT_8032F934;
+    m_bound.m_max.x = FLOAT_8032F934;
 
     m_meshData = 0;
     m_displayListData = 0;

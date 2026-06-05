@@ -34,14 +34,14 @@ extern const float FLOAT_80330E78 = 5.0f;
 extern const float FLOAT_80330E7C = 90.0f;
 extern const float FLOAT_80330E80 = 100000.0f;
 extern const float FLOAT_80330E84 = 128.0f;
-extern const char s_ymManaShapeObj5[] = "obj5";
-extern const char s_ymManaShapeObj3[] = "obj3";
-extern const char s_ymManaShapeObj1[] = "obj1";
-extern const char s_ymManaShapeObj4[] = "obj4";
-extern const char s_ymManaShapeObj2[] = "obj2";
+static const char s_ymManaShapeObj5[] = "obj5";
+static const char s_ymManaShapeObj3[] = "obj3";
+static const char s_ymManaShapeObj1[] = "obj1";
+static const char s_ymManaShapeObj4[] = "obj4";
+static const char s_ymManaShapeObj2[] = "obj2";
 extern const double DOUBLE_80330EB0 = 4503599627370496.0;
 extern const float FLOAT_80330eb8 = 0.99999f;
-extern const char s_ymManaShapeObj[] = "obj";
+static const char s_ymManaShapeObj[] = "obj";
 extern const float FLOAT_80330ec0 = 255.0f;
 
 static inline float CameraWorldX()
@@ -69,7 +69,7 @@ static inline Mtx44& CameraScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
-extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
+static const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VYmMana, m_displayListCopies) == 0x60);

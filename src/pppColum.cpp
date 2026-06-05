@@ -50,7 +50,7 @@ COLUM_STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
 COLUM_STATIC_ASSERT(offsetof(pppColumPositionWork, m_position) == 0x10);
 COLUM_STATIC_ASSERT(offsetof(pppColumPositionWork, m_alpha) == 0x32);
 
-extern const char s_pppColum_cpp[] = "pppColum.cpp";
+static const char s_pppColum_cpp[] = "pppColum.cpp";
 
 extern const float FLOAT_80331008 = 5.0f;
 extern const float FLOAT_8033100C = 128.0f;

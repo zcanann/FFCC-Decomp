@@ -182,6 +182,7 @@ static const float sQuarterTurn = 1.5707964f;         // FLOAT_80330344
 static const double sLoopBias = 1.2;                  // DOUBLE_80330378
 extern "C" const float sZeroFloat;                    // FLOAT_80330350
 static const float sPushDistance = 1000.0f;           // FLOAT_80330354
+extern const float FLOAT_80330358 = -1.0f;
 static const float sDownProbeDistance = -10000.0f;    // FLOAT_8033035c
 static const float sStepProbeHeight = 5.0f;           // FLOAT_80330360
 static const float sBgAttrSlow = 0.75f;               // FLOAT_80330364
@@ -3131,7 +3132,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             bodyCylinder.m_bottom = m_worldPosition;
             bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : sPushDistance;
             bodyCylinder.Probe().m_direction.x = sZeroFloat;
-            bodyCylinder.Probe().m_direction.y = -1.0f;
+            bodyCylinder.Probe().m_direction.y = FLOAT_80330358;
             bodyCylinder.Probe().m_direction.z = sZeroFloat;
             bodyCylinder.Probe().m_radius = 0.3f;
             bodyCylinder.Probe().m_height = 0.3f;

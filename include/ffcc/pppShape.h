@@ -1,6 +1,8 @@
 #ifndef _PPP_SHAPE_H_
 #define _PPP_SHAPE_H_
 
+#include <stddef.h>
+
 class CMaterialSet;
 class pppShapeSt;
 struct Vec;
@@ -28,7 +30,7 @@ struct tagOAN3_SHAPE_ENTRY
     unsigned char m_field1;          // 0x1
     unsigned char m_textureIndex;    // 0x2
     unsigned char m_field3;          // 0x3
-    void* m_displayList;             // 0x4
+    unsigned char* m_displayList;    // 0x4
 }; // Size 0x8
 
 struct tagOAN3_SHAPE
@@ -38,6 +40,25 @@ struct tagOAN3_SHAPE
     char m_pad4[4];                  // 0x4
     tagOAN3_SHAPE_ENTRY m_entries[1]; // 0x8
 };
+
+static inline pppShapeAnimData* pppShapeAnim(long* animData)
+{
+    return reinterpret_cast<pppShapeAnimData*>(animData);
+}
+
+static inline tagOAN3_SHAPE* pppShapeFrame(pppShapeAnimData* animData, short frameIndex)
+{
+    short shapeOffset = *reinterpret_cast<short*>(
+        reinterpret_cast<int>(animData) + frameIndex * sizeof(pppShapeAnimFrame) +
+        offsetof(pppShapeAnimData, m_frames));
+    return reinterpret_cast<tagOAN3_SHAPE*>(
+        reinterpret_cast<unsigned char*>(animData) + shapeOffset);
+}
+
+static inline tagOAN3_SHAPE* pppShapeFrame(long* animData, short frameIndex)
+{
+    return pppShapeFrame(pppShapeAnim(animData), frameIndex);
+}
 
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);

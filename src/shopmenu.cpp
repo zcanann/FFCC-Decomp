@@ -225,12 +225,12 @@ static unsigned short GetShopMenuListButtons()
 
 static inline int ShopMenuCaravan(CShopMenu* shopMenu)
 {
-    return ShopMenuInt(shopMenu, 0x20);
+    return reinterpret_cast<int>(shopMenu->m_caravanWork);
 }
 
 static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
 {
-    return reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(shopMenu));
+    return shopMenu->m_caravanWork;
 }
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
@@ -240,7 +240,7 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 {
-    int listType = ShopMenuInt(shopMenu, 0x14);
+    int listType = shopMenu->m_listType;
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     if (listType == 0) {
         return caravanWork->m_shopListCount;
@@ -249,14 +249,14 @@ static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
         return 0x40;
     }
     if (listType == 2) {
-        return ShopMenuInt(shopMenu, 0x4C);
+        return shopMenu->m_itemCount;
     }
     return 0;
 }
 
 static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 {
-    int listType = ShopMenuInt(shopMenu, 0x14);
+    int listType = shopMenu->m_listType;
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     if (listType == 0) {
         return caravanWork->m_shopList[index];
@@ -265,7 +265,7 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
         return caravanWork->m_inventoryItems[index];
     }
     if (listType == 2) {
-        int mapped = ShopMenuInt(shopMenu, 0x50 + index * 4);
+        int mapped = shopMenu->m_itemTable[index];
         if (mapped == -1) {
             return -1;
         }
@@ -276,7 +276,7 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 
 static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
 {
-    return ResolveShopMenuItemNo(shopMenu, ShopMenuInt(shopMenu, 0x28));
+    return ResolveShopMenuItemNo(shopMenu, shopMenu->m_selectedIndex);
 }
 
 static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
@@ -316,10 +316,10 @@ static int GetShopMenuItemBaseGil(int itemNo, int offset)
 static int CalcShopMenuTradeGil(CShopMenu* shopMenu, int itemNo)
 {
     int gilValue = CalcShopMenuGilRatio(shopMenu, GetShopMenuItemBaseGil(itemNo, 0x20));
-    if (ShopMenuInt(shopMenu, 0x14) == 1) {
+    if (shopMenu->m_listType == 1) {
         return static_cast<int>(FLOAT_80332d60 * static_cast<float>(gilValue));
     }
-    if ((ShopMenuInt(shopMenu, 0x14) != 0) && (ShopMenuInt(shopMenu, 0x14) != 1)) {
+    if ((shopMenu->m_listType != 0) && (shopMenu->m_listType != 1)) {
         return -1;
     }
     return gilValue;
@@ -346,7 +346,7 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
         return false;
     }
 
-    int listType = ShopMenuInt(shopMenu, 0x14);
+    int listType = shopMenu->m_listType;
     if (listType == 0) {
         return true;
     }
@@ -365,27 +365,26 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 
 static void UpdateShopMenuListWindow(CShopMenu* shopMenu)
 {
-    if (ShopMenuInt(shopMenu, 0x28) < ShopMenuInt(shopMenu, 0x24)) {
-        ShopMenuInt(shopMenu, 0x24) = ShopMenuInt(shopMenu, 0x28);
+    if (shopMenu->m_selectedIndex < shopMenu->m_listTop) {
+        shopMenu->m_listTop = shopMenu->m_selectedIndex;
     }
-    if ((ShopMenuInt(shopMenu, 0x24) + ShopMenuInt(shopMenu, 0x2C)) <= ShopMenuInt(shopMenu, 0x28)) {
-        ShopMenuInt(shopMenu, 0x24) = (ShopMenuInt(shopMenu, 0x28) - ShopMenuInt(shopMenu, 0x2C)) + 1;
+    if ((shopMenu->m_listTop + shopMenu->m_visibleRows) <= shopMenu->m_selectedIndex) {
+        shopMenu->m_listTop = (shopMenu->m_selectedIndex - shopMenu->m_visibleRows) + 1;
     }
 
-    ShopMenuInt(shopMenu, 0x30) = (ShopMenuInt(shopMenu, 0x24) < 1) ? 0 : 1;
+    shopMenu->m_canScrollUp = (shopMenu->m_listTop < 1) ? 0 : 1;
 
     int itemCount = ResolveShopMenuItemCount(shopMenu);
-    ShopMenuInt(shopMenu, 0x34) = ((ShopMenuInt(shopMenu, 0x24) + ShopMenuInt(shopMenu, 0x2C)) < itemCount) ? 1 : 0;
+    shopMenu->m_canScrollDown = ((shopMenu->m_listTop + shopMenu->m_visibleRows) < itemCount) ? 1 : 0;
 }
 
 static void ExecuteShopMenuBuyConfirm(CShopMenu* shopMenu)
 {
-    int caravan = ShopMenuCaravan(shopMenu);
     CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
     int itemId = ResolveShopMenuSelectedItemId(shopMenu);
     int quantity = 0;
 
-    while ((quantity < ShopMenuInt(shopMenu, 0x44)) && ((unsigned short)(*reinterpret_cast<unsigned short*>(caravan + 0x94) + 1) < 0x41)) {
+    while ((quantity < shopMenu->m_quantity) && ((unsigned short)(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
         int gilValue = CalcShopMenuTradeGil(shopMenu, itemId);
         if (caravanWork->CanAddGil(-gilValue) == 0) {
             return;
@@ -407,7 +406,7 @@ static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
         return;
     }
 
-    caravanWork->DeleteItemIdx(ShopMenuInt(shopMenu, 0x28), 0);
+    caravanWork->DeleteItemIdx(shopMenu->m_selectedIndex, 0);
     caravanWork->AddGil(CalcShopMenuTradeGil(shopMenu, itemId));
 }
 
@@ -490,7 +489,7 @@ static void DrawShopMenuCenteredText(CFont* font, const char* text, float center
 
 static int GetShopMenuFigureStep(CShopMenu* shopMenu)
 {
-    return (ShopMenuInt(shopMenu, 0x38) == 1) ? 10 : 1;
+    return (shopMenu->m_figureMode == 1) ? 10 : 1;
 }
 
 
@@ -639,7 +638,7 @@ int CShopMenu::getMakeGil(int itemNo)
  */
 int CShopMenu::getBuySellGil(int itemNo)
 {
-    int listType = ShopMenuInt(this, 0x14);
+    int listType = m_listType;
     if (listType == 0) {
         return getBuyGil(itemNo);
     }
@@ -673,16 +672,15 @@ char* CShopMenu::GetItemName(int itemNo)
  */
 int CShopMenu::GetMaxExchange()
 {
-    int itemNo = getItemNo(ShopMenuInt(this, 0x28));
+    int itemNo = getItemNo(m_selectedIndex);
     if (itemNo < 1) {
         return 0;
     }
 
-    int caravan = ShopMenuCaravan(this);
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-    int listType = ShopMenuInt(this, 0x14);
+    int listType = m_listType;
     if (listType == 0) {
-        int maxCount = 0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94);
+        int maxCount = 0x40 - caravanWork->m_inventoryItemCount;
         int unitGil = getBuyGil(itemNo);
         if (unitGil > 0) {
             int byMoney = caravanWork->m_gil / unitGil;
@@ -708,12 +706,12 @@ int CShopMenu::GetMaxExchange()
  */
 int CShopMenu::GetTotalGil()
 {
-    int unitGil = getBuySellGil(getItemNo(ShopMenuInt(this, 0x28)));
+    int unitGil = getBuySellGil(getItemNo(m_selectedIndex));
     if (unitGil < 0) {
         return unitGil;
     }
 
-    return ShopMenuInt(this, 0x44) * unitGil;
+    return m_quantity * unitGil;
 }
 
 /*
@@ -728,7 +726,7 @@ int CShopMenu::CanAddGil()
         return 0;
     }
 
-    if (ShopMenuInt(this, 0x14) != 1) {
+    if (m_listType != 1) {
         totalGil = -totalGil;
     }
     return ShopMenuCaravanWork(this)->CanAddGil(totalGil);
@@ -902,7 +900,7 @@ void CShopMenu::Init(int mode)
  */
 void CShopMenu::Destroy()
 {
-    PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
+    PartPcs.ReleasePdt(m_pdtSlot);
     if (MenuPcs.m_shopMenu == this) {
         MenuPcs.m_shopMenu = nullptr;
     }

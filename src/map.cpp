@@ -2615,8 +2615,7 @@ void setDbgLight(int, Vec&, _GXColor&)
  */
 void CMapMng::DrawBefore()
 {
-    const int mapObjCount = m_mapObjCount;
-    if ((mapObjCount != 0) && (m_mapReadReady != 0)) {
+    if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
         GXSetColorUpdate(1);
         GXSetAlphaUpdate(0);
         GXSetCullMode(GX_CULL_FRONT);
@@ -2625,14 +2624,13 @@ void CMapMng::DrawBefore()
 
         if ((gMapHitDrawMode.m_byte & 8) == 0) {
             CMapObj* mapObj = MapMng.GetMapObjArray();
-            for (int i = 0; i < mapObjCount; i++) {
+            for (int i = 0; i < m_mapObjCount; i++) {
                 mapObj->Draw(0xFE);
                 mapObj++;
             }
 
-            const short octTreeCount = m_octTreeCount;
             COctTree* octTree = GetOctTreeArray();
-            for (int i = 0; i < octTreeCount; i++) {
+            for (int i = 0; i < m_octTreeCount; i++) {
                 octTree->Draw(0xFF);
                 octTree++;
             }

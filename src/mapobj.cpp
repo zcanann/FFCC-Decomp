@@ -333,7 +333,6 @@ inline CMapObjAtrMime::CMapObjAtrMime()
 {
     InitMapObjAtrColorKeyFrame(m_keyFrame);
     m_type = CMapObjAtr::MIME;
-    m_vertexLists = 0;
 }
 
 /*

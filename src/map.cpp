@@ -2101,7 +2101,11 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (chunk.m_id == 0x4C495448) {
+            if (static_cast<int>(chunk.m_id) < 0x4F43544D) {
+                if (chunk.m_id != 0x4C495448) {
+                    break;
+                }
+
                 CMapLightHolder* light = static_cast<CMapLightHolder*>(
                     operator new(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
                 unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
@@ -2118,7 +2122,7 @@ int CMapMng::ReadOtm(char* mapName)
             }
 
             if (chunk.m_id != 0x5343454E) {
-                continue;
+                break;
             }
 
             chunkFile.PushChunk();

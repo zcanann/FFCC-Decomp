@@ -32,14 +32,6 @@ static inline float randfloat(float value, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-struct SRandFVParams {
-    s32 targetId;
-    s32 sourceOffset;
-    f32 blend[3];
-    u8 _pad[4];
-    u8 useNormalDistribution;
-};
-
 void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
 {
     f32* randVec;

@@ -264,8 +264,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 					}
 					else if (behindBestDist < dist)
 					{
-						behindBest = &m_portals[i];
 						behindBestDist = dist;
+						behindBest = &m_portals[i];
 					}
 				}
 			}

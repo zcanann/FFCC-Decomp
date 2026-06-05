@@ -142,7 +142,7 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
         T item = m_items[i];
         if (item != 0) {
             CRef* ref = reinterpret_cast<CRef*>(item);
-            if (ref->DecRef() == 0) {
+            if (--ref->refCount == 0) {
                 delete ref;
             }
             m_items[i] = 0;
@@ -169,7 +169,7 @@ template <class T>
 void CPtrArray<T>::RemoveAt(unsigned long index)
 {
     m_items[index] = 0;
-    for (; index < m_numItems - 1; index++) {
+    for (; index < m_numItems; index++) {
         m_items[index] = m_items[index + 1];
     }
 

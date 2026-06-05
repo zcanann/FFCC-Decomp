@@ -20,6 +20,25 @@ static inline int GetGraphFrameFromId(s32 graphId)
 
 struct LocationTitle2Particle;
 
+struct pppLocationTitle2UnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u16 m_initWOrk;
+    u16 m_maxCount;
+    u8 m_stepCount;
+    u8 m_blendMode;
+    u8 _pad0x0E;
+    u8 _pad0x0F;
+    float m_arg3;
+    float m_payload0;
+    float m_payload1;
+    u16 _pad0x1C;
+    u16 _pad0x1E;
+    u16 _pad0x20;
+    u8 m_enableColorUpdate;
+    u8 _pad0x23;
+};
+
 struct LocationTitle2Work {
     LocationTitle2Particle* m_particles;
     u16 m_count;
@@ -92,7 +111,7 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
+extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkB* unkB, pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
     int graphFrame;
@@ -215,7 +234,7 @@ extern const char s_locationNodeName[] = "loc";
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
+extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkB* unkB, pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
     int colorOffset;
@@ -378,7 +397,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
+extern "C" void pppDestructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
@@ -401,7 +420,7 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
+extern "C" void pppConstructLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2UnkC* unkC)
 {
     LocationTitle2Work* work;
     f32 value;

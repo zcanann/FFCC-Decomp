@@ -1,31 +1,13 @@
 #ifndef _PPP_LOCATIONTITLE_H_
 #define _PPP_LOCATIONTITLE_H_
 
-#include <dolphin/types.h>
-
-#include "ffcc/pppPart.h"
+struct _pppCtrlTable;
+struct _pppPObject;
 
 typedef _pppPObject pppLocationTitle;
-
-struct pppLocationTitleUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u16 m_maxCount;
-    u8 m_stepCount;
-    u8 m_blendMode;
-    u8 m_pad0E;
-    u8 m_pad0F;
-    float m_arg3;
-    float m_payload0;
-    float m_payload1;
-    u16 m_spawnFrame;
-    u16 m_fadeStartFrame;
-    u16 m_fadeLength;
-    u16 m_pad;
-};
-
 typedef _pppCtrlTable pppLocationTitleUnkC;
+
+struct pppLocationTitleUnkB;
 
 #ifdef __cplusplus
 extern "C" {

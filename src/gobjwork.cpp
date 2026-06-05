@@ -454,18 +454,17 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	CCaravanWork* self = this;
+	unsigned char* letterBytes =
+		reinterpret_cast<unsigned char*>(m_letters) + letterIdx * sizeof(CLetterWork);
+	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letterBytes);
+	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letterBytes);
+	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letterBytes);
 	CFlatRuntime::CStack stack[2];
-	CLetterWork* letter = &self->m_letters[letterIdx];
-	unsigned char* letterBytes = reinterpret_cast<unsigned char*>(letter);
-	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(letter);
-	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(letter);
-	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(letter);
 
 	stack[0].m_word = (letterWords16[0] >> 2) & 0x1FF;
 	stack[1].m_word = (letterWords32[0] >> 9) & 0x1FF;
 	gCFlatRuntime().SystemCall(
-		Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
+		Game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	CMes::m_tempVar[0] = letterWords16[2];
 	CMes::m_tempVar[1] = letterWords16[3];
@@ -490,7 +489,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	}
 	CMes::m_tempVar[7] = gil;
 
-	CMes::m_tempVar[8] = self->m_saveSlot;
+	CMes::m_tempVar[8] = m_saveSlot;
 
 	letterFlags->opened = 1;
 }

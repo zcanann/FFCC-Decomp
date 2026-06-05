@@ -1206,9 +1206,9 @@ unsigned int pppFreeMngStPrioForData()
 		}
 
 		char* nextPartMngBase = partMngBase + sizeof(_pppMngSt);
-		CPartMng* nextPartMng = reinterpret_cast<CPartMng*>(nextPartMngBase);
-		_pppMngSt* candidateB = nextPartMng->m_pppMng;
+		_pppMngSt* candidateB = &partMng->m_pppMng[1];
 		partMngBase = nextPartMngBase;
+		partMng = reinterpret_cast<CPartMng*>(partMngBase);
 		if (candidateB != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {
 			unsigned char prioB = candidateB->m_prio;
@@ -1227,7 +1227,7 @@ unsigned int pppFreeMngStPrioForData()
 			}
 		}
 
-		partMngBase += sizeof(_pppMngSt);
+		partMngBase = reinterpret_cast<char*>(partMng) + sizeof(_pppMngSt);
 		index++;
 	}
 

@@ -125,7 +125,7 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         press = 0;
     } else {
-        int padIndex = blocked;
+        int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         press = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
@@ -137,7 +137,7 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         hold = 0;
     } else {
-        int padIndex = blocked;
+        int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         hold = Pad.GetPadInputs()[padIndex].repeatButton;
     }
@@ -241,27 +241,25 @@ int CMenuPcs::ItemCtrlCur()
             }
         }
     } else {
-        int optBase = (int)this->itemMenuState + mode * 2;
-
         if ((hold & 8) != 0) {
-            if (*(s16*)(optBase + 0x26) != 0) {
-                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+            if (this->itemMenuState->subMenuIndex != 0) {
+                this->itemMenuState->subMenuIndex = this->itemMenuState->subMenuIndex - 1;
             } else {
-                *(s16*)(optBase + 0x26) = 3;
+                this->itemMenuState->subMenuIndex = 3;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((hold & 4) != 0) {
-            if (*(s16*)(optBase + 0x26) < 3) {
-                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+            if (this->itemMenuState->subMenuIndex < 3) {
+                this->itemMenuState->subMenuIndex = this->itemMenuState->subMenuIndex + 1;
             } else {
-                *(s16*)(optBase + 0x26) = 0;
+                this->itemMenuState->subMenuIndex = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((hold & 0xC) == 0) {
             if ((press & 0x100) != 0) {
-                int option = (int)*(s16*)(optBase + 0x26);
+                int option = (int)this->itemMenuState->subMenuIndex;
                 if (((int)this->itemMenuState->optionFlags & (1 << option)) == 0) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {

@@ -41,7 +41,6 @@ static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
     return reinterpret_cast<_pppEnvStYmDeformationMdl*>(ppvEnv);
 }
 
-static const float kYmDeformationMdlZero = 0.0f;
 extern const float kYmDeformationMdlScreenWidth;
 extern const float kYmDeformationMdlScreenHeight;
 extern const float kYmDeformationMdlTexOffset;
@@ -60,7 +59,7 @@ static inline Mtx44& CameraScreenMatrix()
 
 static inline float DeformationMdlZero()
 {
-    return *reinterpret_cast<const float*>(&kYmDeformationMdlZero);
+    return 0.0f;
 }
 
 /*
@@ -167,10 +166,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     pppSetBlendMode(0);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    u8 zEnable = param_2->m_disableZ == 0;
     pppSetDrawEnv(
         &colorInfo->m_color, &pppYmDeformationMdl->m_drawMatrix, param_2->m_envDepth, param_2->m_lightTarget,
-        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode, zEnable, 1, 0);
+        param_2->m_fogIndex, param_2->m_blendMode, param_2->m_cullMode,
+        static_cast<u8>(static_cast<u32>(__cntlzw(static_cast<u32>(param_2->m_disableZ))) >> 5), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);
@@ -336,7 +335,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, _pppCtrlTable*)
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
-    const float& value = kYmDeformationMdlZero;
+    const float& value = DeformationMdlZero();
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
 
     state->m_values[1] = value;
@@ -358,7 +357,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _p
  */
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, _pppCtrlTable* param_2)
 {
-    const float& zero = kYmDeformationMdlZero;
+    const float& zero = DeformationMdlZero();
     YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
 
     state->m_angle = 0;

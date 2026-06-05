@@ -33,7 +33,7 @@ struct VtMimeEnv
     void** sourceTable;
 };
 
-extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
+static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 static const float kVtMimeZero = 0.0f;
 
 static inline VtMimeState* GetVtMimeState(_pppPObject* object, _pppCtrlTable* ctrl)

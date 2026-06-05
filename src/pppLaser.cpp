@@ -30,7 +30,7 @@ extern const f32 kPppLaserBoundsMin = -10000000000.0f;
 extern const f32 kPppLaserMaxLengthMargin = 15.5f;
 extern const f32 kPppLaserTau = 6.2831855f;
 
-extern "C" const char s_pppLaser_cpp[] = "pppLaser.cpp";
+static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 typedef pppLaserWork LaserWork;
 typedef pppLaserColorBlock LaserColorData;

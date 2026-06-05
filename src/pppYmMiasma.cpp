@@ -64,6 +64,7 @@ struct YmMiasmaRenderParticleState {
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
+void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
 template <typename T>
 static inline T* PppWorkArea(_pppPObject* object, _pppCtrlTable* ctrl, int index)
@@ -314,7 +315,7 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
     YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;

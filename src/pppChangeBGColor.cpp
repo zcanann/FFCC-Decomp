@@ -4,6 +4,19 @@
 #include "ffcc/map.h"
 #include "ffcc/ppp_linkage.h"
 
+struct ChangeBGColorWork {
+    u8 m_pad[8];
+    GXColor m_color;
+};
+
+STATIC_ASSERT(offsetof(ChangeBGColorWork, m_color) == 0x08);
+
+static inline ChangeBGColorWork* GetChangeBGColorWork(pppChangeBGColor* changeBGColor, _pppCtrlTable* ctrlTable)
+{
+    return reinterpret_cast<ChangeBGColorWork*>(
+        changeBGColor->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8012d3fc
@@ -13,22 +26,20 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeBGColor(_pppPObject* pppChangeBGColor, void* param_2, _pppCtrlTable* param_3)
+void pppFrameChangeBGColor(pppChangeBGColor* changeBGColor, pppNoStep* stepData, _pppCtrlTable* ctrlTable)
 {
-    unsigned char* data;
-    int dataOffset;
+    (void)stepData;
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    dataOffset = param_3->m_serializedDataOffsets[1];
-    data = pppChangeBGColor->m_workArea + dataOffset;
+    ChangeBGColorWork* work = GetChangeBGColorWork(changeBGColor, ctrlTable);
     MapMng.m_colorScaleEnable = 1;
-    MapMng.m_colorScale.r = data[8];
-    MapMng.m_colorScale.g = data[9];
-    MapMng.m_colorScale.b = data[10];
-    MapMng.m_colorScale.a = data[11];
+    MapMng.m_colorScale.r = work->m_color.r;
+    MapMng.m_colorScale.g = work->m_color.g;
+    MapMng.m_colorScale.b = work->m_color.b;
+    MapMng.m_colorScale.a = work->m_color.a;
 }
 
 /*

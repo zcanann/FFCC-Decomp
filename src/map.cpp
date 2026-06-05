@@ -2621,7 +2621,7 @@ void CMapMng::DrawBefore()
     LightPcs.SetNumDiffuse(0);
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        CMapObj* mapObj = GetMapObjArray();
+        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0xFE);
             mapObj++;

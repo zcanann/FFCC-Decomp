@@ -9,11 +9,11 @@ extern "C" {
 extern const f32 kFunnyShapeNdcMax = 1.0f;
 extern const f32 kFunnyShapeNdcMin = -1.0f;
 extern const f32 kFunnyShapeOrthoFarZ = 100.0f;
-extern const char s_funnyShapeSpinner[5] = "|/-\\";
 extern const f32 kFunnyShapeViewportOrigin = 0.0f;
 extern const f32 kFunnyShapeViewportWidth = 640.0f;
 extern const f32 kFunnyShapeViewportHeight = 448.0f;
 }
+static const char s_funnyShapeSpinner[5] = "|/-\\";
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/mtx.h"
 

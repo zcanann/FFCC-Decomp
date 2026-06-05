@@ -1141,21 +1141,20 @@ void CSound::FadeOutBgm(int fadeFrames)
  */
 void CSound::LoadBlock()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
+    CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
     char sePath[256];
     char wavePath0[256];
     char wavePath1[256];
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(0) == -1) {
+    if (m_redSound.ReentryWaveData(0) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         sprintf(wavePath0, s_soundWavePathFmt, 0);
         waveFile = File.Open(wavePath0, 0, CFile::PRI_LOW);
@@ -1171,14 +1170,14 @@ void CSound::LoadBlock()
         }
     }
 
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(500) == -1) {
+    if (m_redSound.ReentryWaveData(500) == -1) {
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         sprintf(wavePath1, s_soundWavePathFmt, 500);
         waveFile = File.Open(wavePath1, 0, CFile::PRI_LOW);
@@ -1200,7 +1199,7 @@ void CSound::LoadBlock()
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetSeBlockData(i, File.m_readBuffer);
+            m_redSound.SetSeBlockData(i, File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1217,12 +1216,10 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(500);
-    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(0);
+    m_redSound.ClearWaveBank(500);
+    m_redSound.ClearWaveBank(0);
     for (int i = 0; i < 4; i++) {
-        reinterpret_cast<CRedSound*>(self + 8)->SetSeBlockData(i, 0);
+        m_redSound.SetSeBlockData(i, 0);
     }
 }
 
@@ -1237,18 +1234,16 @@ void CSound::FreeBlock()
  */
 void CSound::LoadSe(int seId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (seId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentrySeSepData(seId) == -1) {
+    } else if (m_redSound.ReentrySeSepData(seId) == -1) {
         char sePath[264];
         sprintf(sePath, s_soundSeSepPathFmt, seId);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetSeSepData(File.m_readBuffer);
+            m_redSound.SetSeSepData(File.m_readBuffer);
             File.Close(handle);
             if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
                 System.Printf(const_cast<char*>(s_soundLoadSeMergeFmt), seId);
@@ -1268,9 +1263,8 @@ void CSound::LoadSe(int seId)
  */
 void CSound::LoadSe(void* seData)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    if (reinterpret_cast<CRedSound*>(self + 8)->ReentrySeSepData(*reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
-        reinterpret_cast<CRedSound*>(self + 8)->SetSeSepData(seData);
+    if (m_redSound.ReentrySeSepData(*reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
+        m_redSound.SetSeSepData(seData);
     }
 }
 

@@ -223,10 +223,12 @@ int CPtrArray<CMaterial*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 {
     m_defaultSize = defaultSize;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -238,10 +240,12 @@ void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
     m_growCapacity = growCapacity;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -297,6 +301,7 @@ int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -306,6 +311,7 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
     m_numItems++;
     return 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -317,6 +323,7 @@ int CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapLightHolder*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -326,17 +333,20 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -395,6 +405,7 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
 {
     if (setSize(m_numItems + 1) == 0) {
@@ -404,6 +415,7 @@ int CPtrArray<CMapAnim*>::Add(CMapAnim* item)
     m_numItems++;
     return 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -430,6 +442,7 @@ int CPtrArray<CMapAnim*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnim*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -439,6 +452,7 @@ void CPtrArray<CMapAnim*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -554,11 +568,13 @@ CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -570,6 +586,7 @@ void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -579,6 +596,7 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -589,11 +607,13 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -649,6 +669,7 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CPtrArray<CMapAnimRun*>::CPtrArray()
 {
     m_size = 0;
@@ -658,6 +679,7 @@ CPtrArray<CMapAnimRun*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -689,6 +711,7 @@ CPtrArray<CMapAnimRun*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CPtrArray<CMapAnim*>::CPtrArray()
 {
     m_size = 0;
@@ -698,6 +721,7 @@ CPtrArray<CMapAnim*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -730,6 +754,7 @@ CPtrArray<CMapAnim*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CPtrArray<CMapAnimKeyDt*>::CPtrArray()
 {
     m_size = 0;
@@ -739,6 +764,7 @@ CPtrArray<CMapAnimKeyDt*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -771,6 +797,7 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 CPtrArray<CMapShadow*>::CPtrArray()
 {
     m_size = 0;
@@ -780,6 +807,7 @@ CPtrArray<CMapShadow*>::CPtrArray()
     m_stage = 0;
     m_growCapacity = 1;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -838,6 +866,7 @@ int CPtrArray<CMapAnimRun*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapAnimRun*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -847,6 +876,7 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -872,11 +902,13 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -918,6 +950,7 @@ int CPtrArray<CMapShadow*>::GetSize()
  * JP Size: TODO
  */
 template <>
+#pragma dont_inline on
 void CPtrArray<CMapShadow*>::RemoveAll()
 {
     if (m_items != 0) {
@@ -927,6 +960,7 @@ void CPtrArray<CMapShadow*>::RemoveAll()
     m_size = 0;
     m_numItems = 0;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -952,11 +986,13 @@ CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 template <>
 void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1155,13 +1191,13 @@ void CMapMng::Create()
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
     m_stage = stage;
 
-    GetMapAnimRunArray().SetStage(stage);
-    GetMapAnimArray().SetStage(stage);
-    GetMapAnimKeyDtArray().SetStage(stage);
-    GetMapShadowArray().SetStage(stage);
+    GetMapAnimRunArray().SetStage(m_stage);
+    GetMapAnimArray().SetStage(m_stage);
+    GetMapAnimKeyDtArray().SetStage(m_stage);
+    GetMapShadowArray().SetStage(m_stage);
 
     for (int i = 0; i < 2; i++) {
-        GetMapLightHolderArray(i).SetStage(stage);
+        GetMapLightHolderArray(i).SetStage(m_stage);
     }
 
     gMapHitFaceFlag = 0;
@@ -1278,27 +1314,31 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
-    short octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
-        GetOctTreeArray()[i].~COctTree();
+    COctTree* octTree = GetOctTreeArray();
+    for (int i = 0; i < m_octTreeCount; i++) {
+        octTree->~COctTree();
+        octTree++;
     }
     m_octTreeCount = 0;
 
-    short mapHitCount = m_mapHitCount;
-    for (int i = 0; i < mapHitCount; i++) {
-        GetMapHitArray()[i].~CMapHit();
+    CMapHit* mapHit = GetMapHitArray();
+    for (int i = 0; i < m_mapHitCount; i++) {
+        mapHit->~CMapHit();
+        mapHit++;
     }
     m_mapHitCount = 0;
 
-    short mapObjCount = m_mapObjCount;
-    for (int i = 0; i < mapObjCount; i++) {
-        GetMapObjArray()[i].~CMapObj();
+    CMapObj* mapObj = GetMapObjArray();
+    for (int i = 0; i < m_mapObjCount; i++) {
+        mapObj->~CMapObj();
+        mapObj++;
     }
     m_mapObjCount = 0;
 
-    short mapMeshCount = m_mapMeshCount;
-    for (int i = 0; i < mapMeshCount; i++) {
-        GetMapMeshArray()[i].~CMapMesh();
+    CMapMesh* mapMesh = GetMapMeshArray();
+    for (int i = 0; i < m_mapMeshCount; i++) {
+        mapMesh->~CMapMesh();
+        mapMesh++;
     }
     m_mapMeshCount = 0;
 
@@ -1319,36 +1359,32 @@ void CMapMng::DestroyMap()
 
     CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
-        CMapAnim* mapAnim = (*mapAnimArray)[i];
-        if (mapAnim != 0) {
-            delete mapAnim;
+        if ((*mapAnimArray)[i] != 0) {
+            delete (*mapAnimArray)[i];
         }
     }
     mapAnimArray->RemoveAll();
 
     CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &GetMapAnimKeyDtArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
-        CMapAnimKeyDt* mapAnimKeyDt = (*mapAnimKeyDtArray)[i];
-        if (mapAnimKeyDt != 0) {
-            delete mapAnimKeyDt;
+        if ((*mapAnimKeyDtArray)[i] != 0) {
+            delete (*mapAnimKeyDtArray)[i];
         }
     }
     mapAnimKeyDtArray->RemoveAll();
 
     CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
-        if (mapAnimRun != 0) {
-            operator delete(mapAnimRun);
+        if ((*mapAnimRunArray)[i] != 0) {
+            operator delete((*mapAnimRunArray)[i]);
         }
     }
     mapAnimRunArray->RemoveAll();
 
     CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
-        if (mapShadow != 0) {
-            operator delete(mapShadow);
+        if ((*mapShadowArray)[i] != 0) {
+            operator delete((*mapShadowArray)[i]);
         }
     }
     mapShadowArray->RemoveAll();
@@ -1357,9 +1393,8 @@ void CMapMng::DestroyMap()
         CPtrArray<CMapLightHolder*>* mapLightHolderArray = &GetMapLightHolderArray(i);
 
         for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
-            CMapLightHolder* holder = (*mapLightHolderArray)[j];
-            if (holder != 0) {
-                operator delete(holder);
+            if ((*mapLightHolderArray)[j] != 0) {
+                operator delete((*mapLightHolderArray)[j]);
             }
         }
         mapLightHolderArray->RemoveAll();
@@ -1397,10 +1432,9 @@ void CMapMng::MapFileRead(char*, unsigned long&)
 {
     for (int i = 0; i < 0x10; i++) {
         void** handleSlot = &m_asyncLoadState.m_asyncHandles[i];
-        CFile::CHandle* handle = reinterpret_cast<CFile::CHandle*>(*handleSlot);
-        if (handle != 0 && File.IsCompleted(handle)) {
-            int len = File.GetLength(handle);
+        if (*handleSlot != 0 && File.IsCompleted(reinterpret_cast<CFile::CHandle*>(*handleSlot))) {
             void* readBuffer = File.m_readBuffer;
+            int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(*handleSlot));
             void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
             Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
@@ -1409,7 +1443,7 @@ void CMapMng::MapFileRead(char*, unsigned long&)
             m_asyncLoadState.m_asyncReadIndex++;
             m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
 
-            File.Close(handle);
+            File.Close(reinterpret_cast<CFile::CHandle*>(*handleSlot));
             *handleSlot = 0;
         }
     }
@@ -1447,7 +1481,7 @@ void CMapMng::LoadMapNoSyncCalc()
 CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
     const int objCount = m_mapObjCount;
-    CMapObj* mapObjEnd = GetMapObjArray() + objCount;
+    CMapObj* mapObjEnd = m_mapObjArray + objCount;
 
     for (CMapObj* obj = searchStart; obj < mapObjEnd; obj++) {
         if (obj->m_parent == parentObj) {
@@ -1497,8 +1531,9 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
         mapObj++;
 
 search:
-        unsigned int stride = sizeof(CMapObj);
-        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
+        unsigned int stride =
+            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
+        CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1547,8 +1582,9 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
         mapObj++;
 
 search:
-        unsigned int stride = sizeof(CMapObj);
-        CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
+        unsigned int stride =
+            reinterpret_cast<unsigned int>(mapObj + 1) - reinterpret_cast<unsigned int>(mapObj);
+        CMapObj* mapObjEnd = m_mapObjArray + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1589,16 +1625,57 @@ void CMapMng::SetLightSource()
     int mapLightIndex = 0;
     const short mapObjCount = m_mapObjCount;
     CMapObj* mapObj = GetMapObjArray();
-    CMapObj* mapObjEnd = GetMapObjArray() + mapObjCount;
+    CMapObj* mapObjEnd = m_mapObjArray + mapObjCount;
 
     while (mapObj < mapObjEnd) {
         CMapObjAtr* attr = mapObj->m_attribute;
         if (attr != 0) {
             const int type = attr->m_type;
 
-            if (type == CMapObjAtr::SPOT_LIGHT) {
+            if (type == CMapObjAtr::POINT_LIGHT) {
+                CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
+                CLightPcs::CLight light;
+                light.m_type = 0;
+                light.m_position.x = MapObjWorldX(mapObj);
+                light.m_position.y = MapObjWorldY(mapObj);
+                light.m_position.z = MapObjWorldZ(mapObj);
+                light.m_direction.x = 0.0f;
+                light.m_direction.y = 0.0f;
+                light.m_direction.z = 1.0f;
+                light.m_partMask = 1 << mapLightIndex;
+                light.m_attenRadius = pointAttr->m_radius;
+                light.m_range = pointAttr->m_intensity;
+                light.m_attenFalloff = 1.0f;
+                light.m_targetColor[0] = pointAttr->m_color;
+                light.m_targetColor[1] = pointAttr->m_altColor;
+                *(u32*)light.m_targetEnable = 0;
+                light.m_spotFn = pointAttr->m_colorMode;
+                light.m_unk4D = 4;
+                light.m_directionMode = pointAttr->m_unknown20;
+                LightPcs.Add(&light);
+                mapLightIndex += 1;
+            } else if (type == CMapObjAtr::SPOT_LIGHT) {
                 CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
-                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) == 0) {
+                if (*reinterpret_cast<int*>(&spotAttr->m_baseColor) != 0) {
+                    CLightPcs::CLight* light = spotAttr->m_light;
+                    light->m_type = 1;
+                    light->m_targetColor[1] = spotAttr->m_color;
+                    light->m_position.x = MapObjWorldX(mapObj);
+                    light->m_position.y = MapObjWorldY(mapObj);
+                    light->m_position.z = MapObjWorldZ(mapObj);
+                    light->m_direction.x = 0.0f;
+                    light->m_direction.y = 0.0f;
+                    light->m_direction.z = 1.0f;
+
+                    CMapObj* targetObj = spotAttr->m_target;
+                    light->m_targetPosition.x = MapObjWorldX(targetObj);
+                    light->m_targetPosition.y = MapObjWorldY(targetObj);
+                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
+                    PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
+                                  reinterpret_cast<Vec*>(&light->m_position),
+                                  reinterpret_cast<Vec*>(&light->m_direction));
+                    PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
+                } else {
                     CLightPcs::CLight light;
                     light.m_type = 1;
                     light.m_position.x = MapObjWorldX(mapObj);
@@ -1632,48 +1709,7 @@ void CMapMng::SetLightSource()
                     light.m_partMask = 1 << mapLightIndex;
                     *(u32*)light.m_targetEnable = 0;
                     LightPcs.Add(&light);
-                } else {
-                    CLightPcs::CLight* light = spotAttr->m_light;
-                    light->m_type = 1;
-                    light->m_targetColor[1] = spotAttr->m_color;
-                    light->m_position.x = MapObjWorldX(mapObj);
-                    light->m_position.y = MapObjWorldY(mapObj);
-                    light->m_position.z = MapObjWorldZ(mapObj);
-                    light->m_direction.x = 0.0f;
-                    light->m_direction.y = 0.0f;
-                    light->m_direction.z = 1.0f;
-
-                    CMapObj* targetObj = spotAttr->m_target;
-                    light->m_targetPosition.x = MapObjWorldX(targetObj);
-                    light->m_targetPosition.y = MapObjWorldY(targetObj);
-                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
-                    PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
-                                  reinterpret_cast<Vec*>(&light->m_position),
-                                  reinterpret_cast<Vec*>(&light->m_direction));
-                    PSVECNormalize(reinterpret_cast<Vec*>(&light->m_direction), reinterpret_cast<Vec*>(&light->m_direction));
                 }
-                mapLightIndex += 1;
-            } else if (type == CMapObjAtr::POINT_LIGHT) {
-                CMapObjAtrPointLight* pointAttr = static_cast<CMapObjAtrPointLight*>(attr);
-                CLightPcs::CLight light;
-                light.m_type = 0;
-                light.m_position.x = MapObjWorldX(mapObj);
-                light.m_position.y = MapObjWorldY(mapObj);
-                light.m_position.z = MapObjWorldZ(mapObj);
-                light.m_direction.x = 0.0f;
-                light.m_direction.y = 0.0f;
-                light.m_direction.z = 1.0f;
-                light.m_partMask = 1 << mapLightIndex;
-                light.m_attenRadius = pointAttr->m_radius;
-                light.m_range = pointAttr->m_intensity;
-                light.m_attenFalloff = 1.0f;
-                light.m_targetColor[0] = pointAttr->m_color;
-                light.m_targetColor[1] = pointAttr->m_altColor;
-                *(u32*)light.m_targetEnable = 0;
-                light.m_spotFn = pointAttr->m_colorMode;
-                light.m_unk4D = 4;
-                light.m_directionMode = pointAttr->m_unknown20;
-                LightPcs.Add(&light);
                 mapLightIndex += 1;
             }
         }
@@ -1718,10 +1754,10 @@ int CMapMng::ReadMtx(char* mapName)
     int loadIndex = 0;
     int append = 0;
 
-    m_mapReadReady = 1;
+    MapMng.m_mapReadReady = 1;
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
-        CMemory::CStage* stage = m_stage;
+        CMemory::CStage* stage = MapMng.m_stage;
         CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
@@ -1740,7 +1776,16 @@ int CMapMng::ReadMtx(char* mapName)
             }
         }
         if (!exists) {
-            break;
+            if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
+                return 1;
+            }
+            if (loadIndex == 0) {
+                if (System.m_execParam != 0) {
+                    System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
+                }
+                return 0;
+            }
+            return 1;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) > 2) {
@@ -1808,7 +1853,7 @@ int CMapMng::ReadMtx(char* mapName)
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, MapMng.m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return 1;
@@ -1819,17 +1864,6 @@ int CMapMng::ReadMtx(char* mapName)
         }
 
         loadIndex += 1;
-    }
-
-    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
-        return 1;
-    }
-
-    if (loadIndex == 0) {
-        if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_mapReadOpenErrorFmt), g_StrTmp);
-        }
-        return 0;
     }
 
     return 1;
@@ -1850,14 +1884,13 @@ int CMapMng::ReadMpl(char* mapName)
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
 
-    m_mapReadReady = 1;
+    MapMng.m_mapReadReady = 1;
 
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         bool canRead = false;
-        const int readMode = asyncLoadState.m_mapReadMode;
-        if (readMode == 1) {
+        if (asyncLoadState.m_mapReadMode == 1) {
             canRead = true;
         } else {
             CFile::CHandle* existsHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
@@ -1868,7 +1901,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         if (!canRead) {
-            if (readMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {
@@ -1885,7 +1918,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         void* filePtr = File.m_readBuffer;
-        if (readMode == 1) {
+        if (asyncLoadState.m_mapReadMode == 1) {
             int& readIndex = asyncLoadState.m_asyncReadIndex;
             const int size = asyncLoadState.m_fileSizes[readIndex];
             void* amemCursor = asyncLoadState.m_mapLoadCursor;
@@ -1900,7 +1933,7 @@ int CMapMng::ReadMpl(char* mapName)
                 filePtr = 0;
             } else {
                 const int size = File.GetLength(fileHandle);
-                if (readMode == 3) {
+                if (asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(fileHandle);
                     filePtr = reinterpret_cast<void*>(1);
                     int& openIndex = asyncLoadState.m_asyncOpenIndex;
@@ -1911,7 +1944,7 @@ int CMapMng::ReadMpl(char* mapName)
                     File.SyncCompleted(fileHandle);
                     filePtr = File.m_readBuffer;
                     File.Close(fileHandle);
-                    if (readMode == 2) {
+                    if (asyncLoadState.m_mapReadMode == 2) {
                         int& readIndex = asyncLoadState.m_asyncReadIndex;
                         void* amemCursor = asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
@@ -1932,12 +1965,12 @@ int CMapMng::ReadMpl(char* mapName)
             return 0;
         }
 
-        if (readMode != 3) {
+        if (asyncLoadState.m_mapReadMode != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (readMode == 2) {
+            if (asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
                         return 1;
@@ -2002,8 +2035,7 @@ int CMapMng::ReadOtm(char* mapName)
     }
     m_mapAnimFrame = 0;
 
-    const int readMode = asyncLoadState.m_mapReadMode;
-    if (readMode == 1) {
+    if (asyncLoadState.m_mapReadMode == 1) {
         int& readIndex = asyncLoadState.m_asyncReadIndex;
         const int size = asyncLoadState.m_fileSizes[readIndex];
         void* amemCursor = asyncLoadState.m_mapLoadCursor;
@@ -2016,7 +2048,7 @@ int CMapMng::ReadOtm(char* mapName)
         fileHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             const int size = File.GetLength(fileHandle);
-            if (readMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
                 int& openIndex = asyncLoadState.m_asyncOpenIndex;
@@ -2028,7 +2060,7 @@ int CMapMng::ReadOtm(char* mapName)
                 filePtr = File.m_readBuffer;
                 File.Close(fileHandle);
 
-                if (readMode == 2) {
+                if (asyncLoadState.m_mapReadMode == 2) {
                     int& readIndex = asyncLoadState.m_asyncReadIndex;
                     void* amemCursor = asyncLoadState.m_mapLoadCursor;
                     Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
@@ -2051,7 +2083,7 @@ int CMapMng::ReadOtm(char* mapName)
         return 0;
     }
 
-    if (readMode == 2 || readMode == 3) {
+    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2078,9 +2110,13 @@ int CMapMng::ReadOtm(char* mapName)
                 continue;
             }
 
-            if (chunk.m_id == 0x4C495448) {
+            if (static_cast<int>(chunk.m_id) < 0x4F43544D) {
+                if (chunk.m_id != 0x4C495448) {
+                    break;
+                }
+
                 CMapLightHolder* light = static_cast<CMapLightHolder*>(
-                    operator new(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
+                    operator new(0x10, MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
                 unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
                 lightRaw[0] = chunkFile.Get1();
                 lightRaw[1] = chunkFile.Get1();
@@ -2095,7 +2131,7 @@ int CMapMng::ReadOtm(char* mapName)
             }
 
             if (chunk.m_id != 0x5343454E) {
-                continue;
+                break;
             }
 
             chunkFile.PushChunk();
@@ -2106,27 +2142,23 @@ int CMapMng::ReadOtm(char* mapName)
                         return 0;
                     }
                     CMapMesh* mesh = GetMapMeshArray() + meshCount;
-                    mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
+                    mesh->ReadOtmMesh(chunkFile, MapMng.m_stage, 0, 1);
                     meshCount += 1;
                     continue;
                 }
 
                 if (chunk.m_id == 0x41534554) {
                     CMapTexAnimSet* texAnimSet =
-                        new (m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet = texAnimSet;
-                    if (texAnimSet != 0) {
-                        texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
-                    }
+                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     continue;
                 }
 
                 if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
-                    if (mapAnim != 0) {
-                        mapAnim->ReadOtmAnim(chunkFile);
-                        GetMapAnimArray().Add(mapAnim);
-                    }
+                    CMapAnim* mapAnim = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    mapAnim->ReadOtmAnim(chunkFile);
+                    GetMapAnimArray().Add(mapAnim);
                     continue;
                 }
 
@@ -2154,13 +2186,11 @@ int CMapMng::ReadOtm(char* mapName)
 
                 if (chunk.m_id == 0x4D534554) {
                     CMaterialSet* materialSet =
-                        new (m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                        new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     m_materialSet = materialSet;
-                    if (materialSet != 0) {
-                        materialSet->m_materials.SetDefaultSize(0x180);
-                        materialSet->m_materials.SetGrow(0);
-                        materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
-                    }
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
+                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                 }
             }
             chunkFile.PopChunk();
@@ -2296,8 +2326,7 @@ int CMapMng::ReadMid(char* mapName)
         System.Printf(const_cast<char*>(s_read_mid_fmt), g_StrTmp);
     }
 
-    const int readMode = asyncLoadState.m_mapReadMode;
-    if (readMode == 1) {
+    if (asyncLoadState.m_mapReadMode == 1) {
         int& readIndex = asyncLoadState.m_asyncReadIndex;
         const int size = asyncLoadState.m_fileSizes[readIndex];
         void* amemCursor = asyncLoadState.m_mapLoadCursor;
@@ -2312,7 +2341,7 @@ int CMapMng::ReadMid(char* mapName)
             filePtr = 0;
         } else {
             const int size = File.GetLength(fileHandle);
-            if (readMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 3) {
                 File.ReadASync(fileHandle);
                 filePtr = reinterpret_cast<void*>(1);
                 int& openIndex = asyncLoadState.m_asyncOpenIndex;
@@ -2324,7 +2353,7 @@ int CMapMng::ReadMid(char* mapName)
                 filePtr = File.m_readBuffer;
                 File.Close(fileHandle);
 
-                if (readMode == 2) {
+                if (asyncLoadState.m_mapReadMode == 2) {
                     int& readIndex = asyncLoadState.m_asyncReadIndex;
                     void* amemCursor = asyncLoadState.m_mapLoadCursor;
                     Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
@@ -2345,7 +2374,7 @@ int CMapMng::ReadMid(char* mapName)
         return 0;
     }
 
-    if (readMode == 2 || readMode == 3) {
+    if (asyncLoadState.m_mapReadMode == 2 || asyncLoadState.m_mapReadMode == 3) {
         return 1;
     }
 
@@ -2432,8 +2461,8 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     const int mapObjCount = m_mapObjCount;
+    CMapObj* obj = MapMng.GetMapObjArray();
     for (int i = 0; i < mapObjCount; i++) {
-        CMapObj* obj = GetMapObjArray() + i;
         unsigned char type = obj->m_mapDataType;
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
@@ -2445,6 +2474,7 @@ int CMapMng::ReadMid(char* mapName)
                 obj->m_mapData = 0;
             }
         }
+        obj++;
     }
 
     if (ok) {
@@ -2480,15 +2510,13 @@ void CMapMng::Calc()
 {
     m_calcCount += 1;
 
-    const int mapObjCount = m_mapObjCount;
-    if (mapObjCount == 0) {
+    if (m_mapObjCount == 0) {
         return;
     }
 
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
-    const int mapAnimRunCount = mapAnimRunArray->GetSize();
+    const int mapAnimRunCount = GetMapAnimRunArray().GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
+        CMapAnimRun* mapAnimRun = GetMapAnimRunArray()[i];
         mapAnimRun->Calc(m_mapAnimFrame);
     }
 
@@ -2509,15 +2537,13 @@ void CMapMng::Calc()
 
     SetLightSource();
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
-    const int mapShadowCount = mapShadowArray->GetSize();
-    for (int i = 0; i < mapShadowCount; i++) {
-        CMapShadow* mapShadow = (*mapShadowArray)[i];
+    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+        CMapShadow* mapShadow = GetMapShadowArray()[i];
         mapShadow->Calc();
     }
 
-    for (int i = 0; i < mapObjCount; i++) {
-        GetMapObjArray()[i].Calc();
+    for (int i = 0; i < m_mapObjCount; i++) {
+        MapMng.GetMapObjArray()[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -2528,23 +2554,22 @@ void CMapMng::Calc()
     CMaterialSet* materialSet = m_materialSet;
     materialSet->Calc();
 
-    const int octTreeCount = m_octTreeCount;
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
     }
 
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
         CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
     }
 
-    for (int i = 0; i < octTreeCount; i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         GetOctTreeArray()[i].SetDrawFlag();
     }
 
-    for (int i = 0; i < mapObjCount; i++) {
-        GetMapObjArray()[i].SetDrawFlag();
+    for (int i = 0; i < m_mapObjCount; i++) {
+        MapMng.GetMapObjArray()[i].SetDrawFlag();
     }
 }
 
@@ -2557,8 +2582,8 @@ void CMapMng::Calc()
 void CMapMng::DrawMapShadow()
 {
     if (m_mapObjCount != 0) {
-        for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-            CMapShadow* mapShadow = GetMapShadowArray()[i];
+        for (unsigned int i = 0; i < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
+            CMapShadow* mapShadow = m_mapShadowArray[i];
             mapShadow->Draw();
         }
     }
@@ -2587,28 +2612,26 @@ void setDbgLight(int, Vec&, _GXColor&)
 void CMapMng::DrawBefore()
 {
     const int mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
-        return;
-    }
+    if ((mapObjCount != 0) && (m_mapReadReady != 0)) {
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
 
-    GXSetColorUpdate(1);
-    GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_FRONT);
-    GXSetZMode(1, GX_LEQUAL, 1);
-    LightPcs.SetNumDiffuse(0);
+        if ((gMapHitDrawMode.m_byte & 8) == 0) {
+            CMapObj* mapObj = MapMng.GetMapObjArray();
+            for (int i = 0; i < mapObjCount; i++) {
+                mapObj->Draw(0xFE);
+                mapObj++;
+            }
 
-    if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        CMapObj* mapObj = GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
-            mapObj->Draw(0xFE);
-            mapObj++;
-        }
-
-        const short octTreeCount = m_octTreeCount;
-        COctTree* octTree = GetOctTreeArray();
-        for (int i = 0; i < octTreeCount; i++) {
-            octTree->Draw(0xFF);
-            octTree++;
+            const short octTreeCount = m_octTreeCount;
+            COctTree* octTree = GetOctTreeArray();
+            for (int i = 0; i < octTreeCount; i++) {
+                octTree->Draw(0xFF);
+                octTree++;
+            }
         }
     }
 }
@@ -2653,7 +2676,7 @@ void CMapMng::Draw()
             octTree++;
         }
 
-        CMapObj* mapObj = GetMapObjArray();
+        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0x40);
             mapObj++;
@@ -2667,7 +2690,7 @@ void CMapMng::Draw()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        mapObj = GetMapObjArray();
+        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0);
             mapObj++;
@@ -2683,7 +2706,7 @@ void CMapMng::Draw()
             CharaPcs.drawMakeTexShadow();
             MaterialMan.InitVtxFmt(-1, GX_RGB565, 0, GX_U16, 0xE, GX_U16, 10);
             MaterialMan.SetDefaultDrawEnv(0x000ACE0F);
-            Graphic.SetFog(m_fogEnable, 0);
+            Graphic.SetFog(MapMng.m_fogEnable, 0);
 
             GXSetColorUpdate(1);
             GXSetAlphaUpdate(0);
@@ -2851,13 +2874,13 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
-        CMapObj* mapObj = GetMapObjArray();
+        CMapObj* mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitWire();
             mapObj++;
         }
 
-        mapObj = GetMapObjArray();
+        mapObj = MapMng.GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitNormal();
             mapObj++;
@@ -2888,33 +2911,29 @@ void GXSetTexCoordGen(void)
  */
 void CMapMng::DrawAfter()
 {
-    const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
-        return;
-    }
+    if ((m_mapObjCount != 0) && (m_mapReadReady != 0)) {
+        Mtx44 projection;
+        PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+        GXSetProjection(projection, GX_PERSPECTIVE);
 
-    Mtx44 projection;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
-    GXSetProjection(projection, GX_PERSPECTIVE);
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
 
-    GXSetColorUpdate(1);
-    GXSetAlphaUpdate(0);
-    GXSetCullMode(GX_CULL_FRONT);
-    GXSetZMode(1, GX_LEQUAL, 1);
-    LightPcs.SetNumDiffuse(0);
+        if (gMapHitDrawMode.m_byte == 0) {
+            COctTree* octTree = GetOctTreeArray();
+            for (int i = 0; i < m_octTreeCount; i++) {
+                octTree->Draw(2);
+                octTree++;
+            }
 
-    if (gMapHitDrawMode.m_byte == 0) {
-        COctTree* octTree = GetOctTreeArray();
-        const short octTreeCount = m_octTreeCount;
-        for (int i = 0; i < octTreeCount; i++) {
-            octTree->Draw(2);
-            octTree++;
-        }
-
-        CMapObj* mapObj = GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
-            mapObj->Draw(2);
-            mapObj++;
+            CMapObj* mapObj = MapMng.GetMapObjArray();
+            for (int i = 0; i < m_mapObjCount; i++) {
+                mapObj->Draw(2);
+                mapObj++;
+            }
         }
     }
 }
@@ -3349,16 +3368,14 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 #pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
-    CPtrArray<CMapAnim*>* mapAnimArray = &m_mapAnimArray;
-    CMapAnimRun* foundMapAnimRun = 0;
+    CMapAnimRun* foundMapAnimRun;
     CMapObj* mapObj = m_mapObjArray + mapObjIndex;
-    int mapAnimRunCount = mapAnimRunArray->GetSize();
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
 
     for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
-        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
+        CMapAnimRun* mapAnimRun = m_mapAnimRunArray[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
-            reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimRun->m_mapAnimIndex]);
+            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(m_mapAnimArray[mapAnimRun->m_mapAnimIndex]);
         int mapAnimNodeCount = mapAnimNodeArray->GetSize();
 
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
@@ -3369,6 +3386,8 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
             }
         }
     }
+
+    foundMapAnimRun = 0;
 
 startMapObjAnim:
     foundMapAnimRun->Start(startFrame, endFrame, loop);
@@ -3387,19 +3406,21 @@ startMapObjAnim:
 #pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &m_mapAnimRunArray;
-    CMapAnimRun* mapAnimRun = 0;
-    int mapAnimRunCount = mapAnimRunArray->GetSize();
+    CMapAnimRun* mapAnimRun;
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
 
     for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* current = (*mapAnimRunArray)[i];
+        CMapAnimRun* current = m_mapAnimRunArray[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
-            break;
+            goto startMapAnim;
         }
     }
 
-    mapAnimRun->Start(startFrame, endFrame, static_cast<char>(loop));
+    mapAnimRun = 0;
+
+startMapAnim:
+    mapAnimRun->Start(startFrame, endFrame, loop);
 }
 #pragma dont_inline reset
 
@@ -3546,32 +3567,28 @@ void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
     int objIndex = 0;
     int numMapObj = m_mapObjCount;
-    CMapObj* scan = GetMapObjArray();
 
     while (0 < numMapObj) {
-        if (scan->m_objId == static_cast<unsigned short>(id)) {
+        if (m_mapObjArray[objIndex].m_objId == static_cast<unsigned short>(id)) {
             goto found;
         }
-        scan++;
         objIndex++;
         numMapObj--;
     }
     objIndex = -1;
 
 found:
+    const Vec spotPosition = position;
     const _GXColor spotColor = color;
-    const float posX = position.x;
-    const float posY = position.y;
-    const float posZ = position.z;
-    CMapObj* mapObj = GetMapObjArray() + objIndex;
+    CMapObj* mapObj = m_mapObjArray + objIndex;
     CMapObjAtr* attr = mapObj->m_attribute;
 
     if (attr->m_type == CMapObjAtr::SPOT_LIGHT) {
         CMapObjAtrSpotLight* spotAttr = static_cast<CMapObjAtrSpotLight*>(attr);
         spotAttr->m_color = spotColor;
-        mapObj->m_localRotationX = posX;
-        mapObj->m_localRotationY = posY;
-        mapObj->m_localRotationZ = posZ;
+        mapObj->m_localRotationX = spotPosition.x;
+        mapObj->m_localRotationY = spotPosition.y;
+        mapObj->m_localRotationZ = spotPosition.z;
         mapObj->m_localMtxDirty = 1;
         mapObj->m_calcMtxPending = 1;
     }

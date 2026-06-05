@@ -9,9 +9,9 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const GXColor kFunnyShapeTextureChanColor;
-extern const GXColor kFunnyShapeTextureColor;
-extern const GXColor kFunnyShapeRenderColor;
+const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
+const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
+const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
 static const float kFunnyShapeBoundsMinInitial = -1000.0f;
 static const float kFunnyShapeZero = 0.0f;
 static const float kFunnyShapeViewportScale = 2.0f;

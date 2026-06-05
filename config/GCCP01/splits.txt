@@ -375,7 +375,7 @@ maptexanim.cpp:
 	.rodata     start:0x801D7E98 end:0x801D7EE0
 	.data       start:0x801EA998 end:0x801EA9B0
 	.sdata      start:0x8032E688 end:0x8032E698
-	.sdata2     start:0x8032FD30 end:0x8032FD68
+	.sdata2     start:0x8032FD30 end:0x8032FD55
 
 USBStreamData.cpp:
 	extab       start:0x80006BE0 end:0x80006BF0
@@ -386,7 +386,7 @@ FunnyShape.cpp:
 	extab       start:0x80006BF0 end:0x80006C40
 	extabindex  start:0x8000C898 end:0x8000C910
 	.text       start:0x8005051C end:0x80051F38
-	.sdata2     start:0x8032FD68 end:0x8032FDBC
+	.sdata2     start:0x8032FD58 end:0x8032FDBC
 
 p_tina.cpp:
 	extab       start:0x80006C40 end:0x80006D48

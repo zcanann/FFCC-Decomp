@@ -284,8 +284,3 @@ CMapTexAnim::~CMapTexAnim()
         m_keyFrame.Destroy();
     }
 }
-
-extern const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
-extern const float lbl_8032FD64 = 1000.0f;

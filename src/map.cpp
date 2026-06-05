@@ -1432,19 +1432,23 @@ void CMapMng::MapFileRead(char*, unsigned long&)
 {
     for (int i = 0; i < 0x10; i++) {
         void** handleSlot = &m_asyncLoadState.m_asyncHandles[i];
-        if (*handleSlot != 0 && File.IsCompleted(reinterpret_cast<CFile::CHandle*>(*handleSlot))) {
+        if (*handleSlot != 0) {
+            int completed = File.IsCompleted(reinterpret_cast<CFile::CHandle*>(*handleSlot));
             void* readBuffer = File.m_readBuffer;
-            int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(*handleSlot));
-            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
+            if (completed != 0) {
+                int len = File.GetLength(reinterpret_cast<CFile::CHandle*>(*handleSlot));
+                void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
-            Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
-            m_asyncLoadState.m_fileSizes[i] = len;
-            m_asyncLoadState.m_fileChecksums[i] = CheckSum(readBuffer, len);
-            m_asyncLoadState.m_asyncReadIndex++;
-            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
+                Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
+                m_asyncLoadState.m_fileSizes[i] = len;
+                m_asyncLoadState.m_fileChecksums[i] = CheckSum(readBuffer, len);
+                m_asyncLoadState.m_asyncReadIndex++;
+                m_asyncLoadState.m_mapLoadCursor =
+                    reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
 
-            File.Close(reinterpret_cast<CFile::CHandle*>(*handleSlot));
-            *handleSlot = 0;
+                File.Close(reinterpret_cast<CFile::CHandle*>(*handleSlot));
+                *handleSlot = 0;
+            }
         }
     }
 }

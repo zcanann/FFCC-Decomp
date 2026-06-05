@@ -63,6 +63,12 @@ struct EmissionParticle {
     u8 m_padF;
 };
 
+struct EmissionDataOffsets {
+    s32 _unused0;
+    s32 m_colorDataOffset;
+    s32 m_stateOffset;
+};
+
 STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
@@ -71,11 +77,24 @@ STATIC_ASSERT(offsetof(EmissionState, m_scale0) == 0xC);
 STATIC_ASSERT(offsetof(EmissionState, m_field1C) == 0x1C);
 STATIC_ASSERT(sizeof(EmissionState) == 0x20);
 STATIC_ASSERT(sizeof(EmissionParticle) == 0x10);
+STATIC_ASSERT(offsetof(EmissionDataOffsets, m_colorDataOffset) == 0x4);
+STATIC_ASSERT(offsetof(EmissionDataOffsets, m_stateOffset) == 0x8);
+
+static inline EmissionDataOffsets* GetEmissionDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<EmissionDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline EmissionState* GetEmissionState(pppEmission* emission, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<EmissionState*>(
-        emission->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
+    return reinterpret_cast<EmissionState*>(emission->m_workArea + offsets->m_stateOffset);
+}
+
+static inline u8* GetEmissionColorData(pppEmission* emission, _pppCtrlTable* ctrl)
+{
+    EmissionDataOffsets* offsets = GetEmissionDataOffsets(ctrl);
+    return emission->m_workArea + offsets->m_colorDataOffset;
 }
 
 static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIndex)
@@ -126,9 +145,8 @@ void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTab
         return;
     }
 
-    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     EmissionState* state = GetEmissionState(pppEmission_, param_3);
-    u8* dataSet = pppEmission_->m_workArea + serializedDataOffsets[1];
+    u8* dataSet = GetEmissionColorData(pppEmission_, param_3);
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
     CChara::CModel* model = GetCharaModelPtr(handle);

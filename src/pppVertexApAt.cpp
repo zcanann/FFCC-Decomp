@@ -18,12 +18,6 @@ struct VertexApAtEnv
     VertexApAtEntry* entries;
 };
 
-struct VertexApAtCtrl
-{
-    u8 unk0[0xC];
-    s32* stateOffset;
-};
-
 struct VertexApAtData
 {
     u8 unk0[0x4];
@@ -53,11 +47,10 @@ struct _pppPDataVal;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
+void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, _pppCtrlTable* ctrl)
 {
     VertexApAtData* vtxData = (VertexApAtData*)data;
-    VertexApAtCtrl* vtxCtrl = (VertexApAtCtrl*)ctrl;
-    s32 stateOffset = *vtxCtrl->stateOffset;
+    s32 stateOffset = *ctrl->m_serializedDataOffsets;
     VertexApAtState* state = (VertexApAtState*)(parent->m_workArea + stateOffset);
 
     if (ppvUserStopPartF != 0) {

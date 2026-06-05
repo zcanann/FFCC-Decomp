@@ -4,17 +4,6 @@
 
 #include <dolphin/mtx.h>
 
-struct pppYmCallBack {
-    u8 m_pad0[0xc];
-    u32 m_graphId;
-};
-
-struct pppYmCallBackUnkB {
-    u32 m_unk0;
-    s16 m_graphId;
-    s16 m_initWOrk;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800A5FCC
@@ -24,7 +13,7 @@ struct pppYmCallBackUnkB {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, void*)
+void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackStep* param_2, pppYmCallBackCtrl*)
 {
     _pppMngSt* mngSt;
     Vec position;
@@ -50,7 +39,7 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
  * PAL Address: TODO
  * PAL Size: 4b
  */
-void pppDestructYmCallBack(pppYmCallBack*, void*)
+void pppDestructYmCallBack(pppYmCallBack*, pppYmCallBackCtrl*)
 {
 	return;
 }
@@ -60,7 +49,7 @@ void pppDestructYmCallBack(pppYmCallBack*, void*)
  * PAL Address: 0x800a6090
  * PAL Size: 4b
  */
-void pppConstructYmCallBack(pppYmCallBack*, void*)
+void pppConstructYmCallBack(pppYmCallBack*, pppYmCallBackCtrl*)
 {
 	return;
 }

@@ -1,10 +1,18 @@
 #ifndef _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 #define _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObjLink;
 struct _pppPObject;
-struct pppConstrainCameraForLocParams;
+
+struct pppConstrainCameraForLocParams {
+    s32 m_graphId;
+    f32 m_dataValIndex;
+    f32 m_initWork;
+    f32 m_stepValue;
+};
 
 typedef _pppPObject pppConstrainCameraForLoc;
 

@@ -3,7 +3,14 @@
 
 #include "ffcc/partMng.h"
 
-struct pppScreenBlurUnkB;
+struct pppScreenBlurStep {
+    u32 m_dataValIndex;
+    u8 m_blurR;
+    u8 m_blurG;
+    u8 m_blurB;
+    u8 m_pad7;
+    s16 m_initWOrk;
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,8 +19,8 @@ extern "C" {
 void pppConScreenBlur(_pppPObject* blur, _pppCtrlTable* ctrlTable);
 void pppCon2ScreenBlur(_pppPObject* blur);
 void pppDesScreenBlur(_pppPObjLink* object, _pppCtrlTable* ctrlTable);
-void pppFrameScreenBlur(_pppPObject* object, void* step, _pppCtrlTable* ctrlTable);
-void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* step, _pppCtrlTable* ctrlTable);
+void pppFrameScreenBlur(_pppPObject* object, pppScreenBlurStep* step, _pppCtrlTable* ctrlTable);
+void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurStep* step, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

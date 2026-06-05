@@ -19,29 +19,6 @@ extern const float FLOAT_80331844;
 
 extern "C" const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
-struct pppYmTracer2UnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWork;
-    s32 m_stepValue;
-    s32 m_arg3;
-    union {
-        u8 m_payload[0x20];
-        struct {
-            s32 m_arg3WorkOffset;
-            u16 m_entryCount;
-            u16 m_entryLife;
-            u8 m_entryAlpha;
-            u8 m_historyFrameCount;
-            u8 m_blendMode;
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-            u8 m_useTextureTev;
-            u8 m_pad0E[0x12];
-        } m_tracer;
-    };
-};
-
 struct TRACE_POLYGON {
     Vec pos;
     float pad0;
@@ -108,7 +85,7 @@ static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
     TracerWork* work;
     CMapMesh* mapMesh;
@@ -234,7 +211,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, _
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
     TracerWork* work;
     TracerColorBlock* colorData;

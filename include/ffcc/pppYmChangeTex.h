@@ -1,9 +1,10 @@
 #ifndef _PPP_YMCHANGETEX_H_
 #define _PPP_YMCHANGETEX_H_
 
+#include "ffcc/pppChangeTexCommon.h"
+
 struct _pppCtrlTable;
 struct _pppPObject;
-struct ChangeTexStep;
 
 typedef _pppPObject pppYmChangeTex;
 typedef ChangeTexStep pppYmChangeTexStep;

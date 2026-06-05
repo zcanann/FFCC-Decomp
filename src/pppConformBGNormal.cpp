@@ -16,15 +16,6 @@ extern const f32 kPppConformBgNormalOne;
 #include "dolphin/gx.h"
 #include <math.h>
 
-struct pppConformBGNormalUnkB {
-    u32 _pad0;
-    float m_dataValIndex;
-    float m_initWOrk;
-    u8 m_stepValue;
-    u8 padding[3];
-    float m_arg3;
-};
-
 struct ConformBgNormalState {
     Vec m_normal;
     u8 m_initialized;
@@ -64,7 +55,7 @@ static inline Vec* ConformBgNormalHitNormal(CGObject* owner)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct _pppCtrlTable* param3)
+void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformBGNormalStep* param2, struct _pppCtrlTable* param3)
 {
     u8 mode;
     f32 matrixX;

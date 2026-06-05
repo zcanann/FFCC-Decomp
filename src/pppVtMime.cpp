@@ -20,16 +20,6 @@ struct VtMimeState
     void* vertexBuffer;
 };
 
-struct VtMimeData
-{
-    int id;
-    int sourceA;
-    int sourceB;
-    float addX;
-    float addY;
-    float addZ;
-};
-
 struct VtMimeSource
 {
     unsigned short vertexCount;
@@ -125,10 +115,8 @@ void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
+void pppDrawVtMime(_pppPObject* object, VtMimeData* data, _pppCtrlTable* ctrl)
 {
-    VtMimeData* data = (VtMimeData*)step;
-
     object->m_drawMatrixPtr = 0;
 
     int vertIdx1 = data->sourceA;
@@ -177,10 +165,9 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
+void pppVtMime(_pppPObject* object, VtMimeData* data, _pppCtrlTable* ctrl)
 {
     VtMimeState* state = GetVtMimeState(object, ctrl);
-    VtMimeData* data = (VtMimeData*)step;
 
     if (ppvUserStopPartF != 0) {
         return;

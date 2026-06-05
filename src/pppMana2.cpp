@@ -42,7 +42,7 @@ struct VMana2 {
     Vec* m_meshReflectionVec;
     GXColor* m_meshColors;
     S16Vec2d* m_meshTexCoords;
-    pppMana2UnkB* m_step;
+    pppMana2Step* m_step;
     GXTexObj* m_sourceTexObjs;
     CTexture* m_envTexture0;
     CTexture* m_envTexture1;
@@ -55,19 +55,6 @@ struct VMana2 {
     u8 m_paraboloidReady;
 };
 
-struct pppMana2UnkB {
-    u8 _pad00[0x4];
-    s32 m_sourceTextureIds[6];
-    u8 m_type;
-    u8 _pad1D[0x7];
-    s32 m_envTextureId0;
-    s32 m_envTextureId1;
-    u8 _pad2C[0x4];
-    float m_waterScale;
-    u8 _pad34[0x4];
-    u8 m_rippleLevel;
-};
-
 STATIC_ASSERT(offsetof(VMana2, m_runtimeColor) == 0x38);
 STATIC_ASSERT(offsetof(VMana2, m_positions) == 0x3C);
 STATIC_ASSERT(offsetof(VMana2, m_indices) == 0x50);
@@ -77,12 +64,12 @@ STATIC_ASSERT(offsetof(VMana2, m_waterMtx) == 0x80);
 STATIC_ASSERT(offsetof(VMana2, m_reflectionMtx) == 0xB0);
 STATIC_ASSERT(offsetof(VMana2, m_waterAlpha) == 0xE0);
 STATIC_ASSERT(offsetof(VMana2, m_paraboloidReady) == 0xEC);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_sourceTextureIds) == 0x04);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_type) == 0x1C);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_envTextureId0) == 0x24);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_envTextureId1) == 0x28);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_waterScale) == 0x30);
-STATIC_ASSERT(offsetof(pppMana2UnkB, m_rippleLevel) == 0x38);
+STATIC_ASSERT(offsetof(pppMana2Step, m_sourceTextureIds) == 0x04);
+STATIC_ASSERT(offsetof(pppMana2Step, m_type) == 0x1C);
+STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId0) == 0x24);
+STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId1) == 0x28);
+STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x30);
+STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
 extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 extern "C" const char s_pppMana2_cpp[] = "pppMana2.cpp";
@@ -147,7 +134,7 @@ static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
     model->SetDrawMeshDLCallback(0);
 }
 
-static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2UnkB* step)
+static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2Step* step)
 {
     model->SetCallbackContext(work, step);
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
@@ -891,7 +878,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     s32 i;
 
     work = static_cast<VMana2*>(param_2);
-    pppMana2UnkB* step = static_cast<pppMana2UnkB*>(param_3);
+    pppMana2Step* step = static_cast<pppMana2Step*>(param_3);
     baseParaboloidTexObjs = work->m_baseParaboloidTexObjs;
     if (step->m_type == 0) {
         return;
@@ -1056,7 +1043,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*)
+void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
 {
     Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
     GXSetNumTevStages(1);
@@ -1075,7 +1062,7 @@ void pppRenderMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
     VMana2* mana2Work;
@@ -1321,7 +1308,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     CChara::CMesh* mesh;
-    pppMana2UnkB* step;
+    pppMana2Step* step;
     u32 i;
     u32 j;
 
@@ -1541,7 +1528,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
     VMana2* mana2 = (VMana2*)work;
-    pppMana2UnkB* stepData = static_cast<pppMana2UnkB*>(step);
+    pppMana2Step* stepData = static_cast<pppMana2Step*>(step);
     int type = stepData->m_type;
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;

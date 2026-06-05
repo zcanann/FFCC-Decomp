@@ -11,7 +11,19 @@ struct _GXColor;
 struct _pppCtrlTable;
 struct VMana2;
 struct pppMana2;
-struct pppMana2UnkB;
+
+struct pppMana2Step {
+    u8 m_pad00[0x4];
+    s32 m_sourceTextureIds[6];
+    u8 m_type;
+    u8 m_pad1D[0x7];
+    s32 m_envTextureId0;
+    s32 m_envTextureId1;
+    u8 m_pad2C[0x4];
+    float m_waterScale;
+    u8 m_pad34[0x4];
+    u8 m_rippleLevel;
+};
 
 void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
@@ -24,8 +36,8 @@ extern "C" {
 
 void pppConstructMana2(pppMana2*, _pppCtrlTable*);
 void pppDestructMana2(pppMana2*, _pppCtrlTable*);
-void pppFrameMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*);
-void pppRenderMana2(pppMana2*, pppMana2UnkB*, _pppCtrlTable*);
+void pppFrameMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*);
+void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

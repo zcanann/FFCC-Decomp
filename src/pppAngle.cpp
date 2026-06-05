@@ -1,12 +1,6 @@
 #include "ffcc/pppAngle.h"
 #include "ffcc/partMng.h"
 
-struct PppAngleInput {
-    int m_graphId;
-    int m_padding;
-    int m_angle[3];
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80064dd8
@@ -27,13 +21,12 @@ void pppAngleCon(_pppPObject* dest, _pppCtrlTable* ctrlTable)
  * PAL Address: 0x80064dfc
  * PAL Size: 96b
  */
-void pppAngle(_pppPObject* dest, void* src, _pppCtrlTable* ctrlTable)
+void pppAngle(_pppPObject* dest, PppAngleInput* srcData, _pppCtrlTable* ctrlTable)
 {
     if (ppvUserStopPartF != 0) {
         return;
     }
 
-    PppAngleInput* srcData = (PppAngleInput*)src;
     if (srcData->m_graphId != dest->m_graphId) {
         return;
     }

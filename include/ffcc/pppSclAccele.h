@@ -1,11 +1,19 @@
 #ifndef _PPP_SCLACCELE_H_
 #define _PPP_SCLACCELE_H_
 
-
+#include <dolphin/types.h>
 
 struct _pppPObject;
 struct _pppCtrlTable;
-struct PppSclAcceleStep;
+
+struct PppSclAcceleStep {
+    s32 m_graphId;
+    s32 m_pad;
+    f32 m_x;
+    f32 m_y;
+    f32 m_z;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

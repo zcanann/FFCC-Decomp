@@ -2,13 +2,9 @@
 #define _FFCC_FUNNYSHAPE_H_
 
 #include "ffcc/FS_USB_Process.h"
+#include "ffcc/pppVec.h"
 
 class FS_tagOAN3_SHAPE;
-
-struct Vec2d {
-    float x;
-    float y;
-};
 
 struct CFunnyShapeAnmWork
 {

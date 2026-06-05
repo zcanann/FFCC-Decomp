@@ -6,22 +6,6 @@ extern "C" {
 extern const float kPppScreenQuakeZero[2];
 }
 
-struct pppScreenQuakeStep {
-    int m_graphId;
-    float m_dataValIndex;
-    float m_initWOrk;
-    float m_stepValue;
-    float m_arg3;
-    float m_initWOrk2;
-    float m_stepValue2;
-    float m_arg4;
-    float m_initWOrk3;
-    float m_stepValue3;
-    float m_quakeParam0;
-    float m_quakeParam1;
-    float m_quakeParam2;
-};
-
 static inline float* GetScreenQuakeWork(pppScreenQuake* quake, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<float*>(quake->m_workArea + *ctrl->m_serializedDataOffsets);

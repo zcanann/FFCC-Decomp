@@ -53,40 +53,6 @@ struct VYmMiasma {
     u8 m_pad35[3];
 };
 
-struct PYmMiasma {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_shapeFrameStep;
-    u16 m_particleCount;
-    u16 m_pad0E;
-    float m_baseSpeed;
-    float m_speedVariance;
-    float m_unk18;
-    float m_minDistance;
-    float m_gravity;
-    u8 m_colorStartR;
-    u8 m_colorStartG;
-    u8 m_colorStartB;
-    u8 m_colorStartA;
-    s16 m_colorEndR;
-    s16 m_colorEndG;
-    s16 m_colorEndB;
-    s16 m_colorEndA;
-    s16 m_colorStepFrames;
-    s16 m_pad32;
-    float m_initialSpeedDecay;
-    float m_speedDecay;
-    float m_radiusJitter;
-    float m_spawnHeightJitter;
-    float m_heightJitter;
-    u8 m_lifeBase;
-    u8 m_lifeRange;
-    u8 m_pad4A[2];
-    float m_minSpeed;
-    s16 m_fadeFrames;
-    s16 m_colorDecayFrames;
-};
-
 struct YmMiasmaParticleColor {
     s16 m_r;
     s16 m_g;
@@ -123,31 +89,6 @@ struct YmMiasmaRenderParticleState {
     float m_speed;
     u8 m_pad44[0xA];
     s16 m_shapeDrawFrame;
-};
-
-struct YmMiasmaRenderStep {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_pad8[4];
-    u16 m_particleCount;
-    u8 m_pad0E[0x24];
-    u8 m_blendMode;
-    u8 m_pad33[0x41];
-    u8 m_drawEnvA;
-    u8 m_drawEnvB;
-};
-
-struct YmMiasmaFrameStep : PYmMiasma {
-    u8 m_pad54[4];
-    float m_radiusDelta;
-    float m_radiusVelocity;
-    float m_radiusAcceleration;
-    u8 m_emitInterval;
-    u8 m_pad65;
-    s16 m_baseAngle;
-    s16 m_angleRange;
-    u8 m_pad6A[2];
-    float m_speedDecayStep;
 };
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);

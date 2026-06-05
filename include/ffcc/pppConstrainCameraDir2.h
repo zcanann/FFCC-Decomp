@@ -1,17 +1,13 @@
 #ifndef _FFCC_PPPCONSTRAINCAMERADIR2_H_
 #define _FFCC_PPPCONSTRAINCAMERADIR2_H_
 
-#include "ffcc/partMng.h"
-
-// Forward declarations for parameter types
-typedef struct pppConstrainCameraDir pppConstrainCameraDir;
-typedef struct pppConstrainCameraDirUnkB pppConstrainCameraDirUnkB;
+#include "ffcc/pppConstrainCameraDir.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirUnkB* param_2,
+void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCameraDirStep* param_2,
                                  _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
@@ -19,4 +15,3 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 #endif
 
 #endif // _FFCC_PPPCONSTRAINCAMERADIR2_H_
-

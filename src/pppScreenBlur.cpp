@@ -5,15 +5,6 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct pppScreenBlurUnkB {
-    u32 m_dataValIndex;
-    u8 m_blurR;
-    u8 m_blurG;
-    u8 m_blurB;
-    u8 m_pad7;
-    s16 m_initWOrk;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80155504
@@ -23,7 +14,7 @@ struct pppScreenBlurUnkB {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* blurParam, _pppCtrlTable* ctrlTable)
+void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurStep* blurParam, _pppCtrlTable* ctrlTable)
 {
     s32 blurActiveOffset = ctrlTable->m_serializedDataOffsets[1];
     u8* blurActive = blur->m_workArea + blurActiveOffset;
@@ -48,7 +39,7 @@ void pppRenderScreenBlur(_pppPObject* blur, pppScreenBlurUnkB* blurParam, _pppCt
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenBlur(_pppPObject*, void*, _pppCtrlTable*)
+void pppFrameScreenBlur(_pppPObject*, pppScreenBlurStep*, _pppCtrlTable*)
 {
     if (ppvUserStopPartF == 0) {
         return;

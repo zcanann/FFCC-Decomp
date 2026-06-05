@@ -19,28 +19,6 @@ extern u32 kYmTracerBottomColorBase;
 
 extern "C" const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
-struct pppYmTracerStep {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u32 m_initWOrk;
-    s32 m_stepValue;
-    u32 m_arg3;
-    union {
-        u8 m_payload[0x20];
-        struct {
-            s32 m_arg3WorkOffset;
-            u16 m_entryCount;
-            u16 m_entryLife;
-            u8 m_entryAlpha;
-            u8 m_splineCount;
-            u8 m_blendMode;
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-            u8 m_pad0D[0x13];
-        } m_tracer;
-    };
-};
-
 struct TRACE_POLYGON {
     Vec from;
     float _pad0;

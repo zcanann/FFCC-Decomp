@@ -3,12 +3,22 @@
 
 #include "ffcc/partMng.h"
 
+struct VtMimeData
+{
+    int id;
+    int sourceA;
+    int sourceB;
+    float addX;
+    float addY;
+    float addZ;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl);
-void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl);
+void pppVtMime(_pppPObject* object, VtMimeData* step, _pppCtrlTable* ctrl);
+void pppDrawVtMime(_pppPObject* object, VtMimeData* step, _pppCtrlTable* ctrl);
 void pppVtMimeCon(_pppPObjLink* object, _pppCtrlTable* ctrl);
 void pppVtMimeCon2(_pppPObjLink* object, _pppCtrlTable* ctrl);
 void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl);

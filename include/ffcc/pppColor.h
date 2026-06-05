@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPPCOLOR_H_
 #define _FFCC_PPPCOLOR_H_
 
+#include <dolphin/types.h>
+
 #include "ffcc/ppp_linkage.h"
 
 struct _pppPObject;
@@ -22,6 +24,12 @@ struct _pppColorWork
     _pppColor result; // 0x8
 }; // Size 0xC
 
+struct pppColorStep {
+    s32 m_graphId;
+    s32 m_padding;
+    s16 m_colors[4];
+};
+
 struct _pppMngSt;
 extern _pppMngSt* ppvMng;
 extern const double kPppColorScale;
@@ -30,7 +38,7 @@ extern const double kPppColorScale;
 extern "C" {
 #endif
 
-void pppColor(struct _pppPObject* param1, void* param2, struct _pppCtrlTable* param3);
+void pppColor(struct _pppPObject* param1, pppColorStep* param2, struct _pppCtrlTable* param3);
 void pppColorCon(struct _pppPObject* param1, struct _pppCtrlTable* param2);
 
 #ifdef __cplusplus

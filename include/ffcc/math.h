@@ -3,9 +3,9 @@
 
 #include "ffcc/mapocttree.h"
 #include "ffcc/manager.h"
+#include "ffcc/pppVec.h"
 
 struct Vec;
-struct Vec4d;
 struct SRT;
 
 void VECMultAdd(Vec*, Vec*, Vec*, float);

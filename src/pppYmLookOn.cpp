@@ -5,11 +5,6 @@
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
-struct pppYmLookOnStep {
-    int m_graphId;
-    float m_dataValIndex;
-};
-
 static inline CGObject** GetYmLookOnWork(pppYmLookOn* lookOn, _pppCtrlTable* ctrl)
 {
     return reinterpret_cast<CGObject**>(lookOn->m_workArea + *ctrl->m_serializedDataOffsets);

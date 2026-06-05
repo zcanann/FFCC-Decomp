@@ -3,7 +3,10 @@
 
 #include "ffcc/partMng.h"
 
-struct pppFilterUnkB;
+struct pppFilterUnkB {
+    unsigned int m_unk0;
+    int m_dataValIndex;
+};
 
 #ifdef __cplusplus
 extern "C" {

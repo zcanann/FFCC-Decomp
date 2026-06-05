@@ -8,15 +8,6 @@ extern const float kPppYmTraceMoveOne;
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
 
-struct pppYmTraceMoveStep {
-    s32 m_graphId;
-    f32 m_dataValIndex;
-    f32 m_initWOrk;
-    f32 m_stepValue;
-    f32 m_arg3;
-    f32 m_payload;
-};
-
 struct pppYmTraceMoveWork {
     Vec m_direction;
     u32 _pad0C;

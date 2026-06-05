@@ -11,10 +11,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColMoveCon(void* param1, void* param2)
+void pppColMoveCon(_pppPObject* object, _pppCtrlTable* ctrlTable)
 {
-    _pppPObject* object = (_pppPObject*)param1;
-    int* data = ((int**)param2)[3];
+    int* data = ctrlTable->m_serializedDataOffsets;
     pppColMoveVec4S* target = (pppColMoveVec4S*)(object->m_workArea + data[1]);
 
     target->w = 0;
@@ -32,10 +31,9 @@ void pppColMoveCon(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppColMove(void* param1, void* param2, void* param3)
+void pppColMove(_pppPObject* object, pppColMoveInput* step, _pppCtrlTable* ctrlTable)
 {
-    _pppPObject* object = (_pppPObject*)param1;
-    pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
+    pppColMoveInput* input = (pppColMoveInput*)ctrlTable->m_serializedDataOffsets;
     pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)(object->m_workArea + input->id);
     pppColMoveVec4S* movementMove = (pppColMoveVec4S*)(object->m_workArea + input->pad);
 
@@ -43,8 +41,8 @@ void pppColMove(void* param1, void* param2, void* param3)
         return;
     }
 
-    if (((int*)param2)[0] == object->m_graphId) {
-        pppColMoveVec4S* paramMove = (pppColMoveVec4S*)((char*)param2 + 8);
+    if (step->id == object->m_graphId) {
+        pppColMoveVec4S* paramMove = &step->move;
         movementMove->x += paramMove->x;
         movementMove->y += paramMove->y;
         movementMove->z += paramMove->z;

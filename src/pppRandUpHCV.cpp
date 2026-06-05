@@ -6,13 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct RandUpHCVParams {
-    s32 targetId;
-    s32 sourceOffset;
-    s16 delta[4];
-    u8 useNormalDistribution;
-};
-
 static inline short randshort(short value, float scale)
 {
     return (short)((f32)value * scale);

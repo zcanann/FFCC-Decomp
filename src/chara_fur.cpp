@@ -60,14 +60,6 @@ STATIC_ASSERT(offsetof(CChara::MogFurState, m_timestamp) == 0x2010);
 STATIC_ASSERT(offsetof(CChara::MogFurState, m_score) == 0x2014);
 STATIC_ASSERT(offsetof(CChara::MogFurState, m_alphaScore) == 0x2050);
 
-struct Vec4d
-{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
 class CMaterial;
 
 extern "C" char* sMogRadarTypeLabels[];

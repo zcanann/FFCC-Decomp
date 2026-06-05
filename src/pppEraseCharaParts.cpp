@@ -11,11 +11,6 @@ typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
 typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
 typedef CChara::CMesh EraseCharaPartsMesh;
 
-struct pppEraseCharaPartsUnkB {
-    u8 m_unk0[4];
-    s8 m_meshIndex;
-};
-
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 
 static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s32 offset)
@@ -32,7 +27,7 @@ static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s3
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2,
+void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsStep* param_2,
                              _pppCtrlTable* param_3)
 {
     CCharaPcs::CHandle* handle;
@@ -124,7 +119,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
                                         int meshIndex, int param_5, float (*) [4])
 {
     u8* colorArray = (u8*)param_2;
-    pppEraseCharaPartsUnkB* callbackData = (pppEraseCharaPartsUnkB*)param_3;
+    pppEraseCharaPartsStep* callbackData = (pppEraseCharaPartsStep*)param_3;
     CMaterialMan* materialMan = &MaterialMan;
     EraseCharaPartsMesh* mesh = model->m_meshes;
     mesh += meshIndex;

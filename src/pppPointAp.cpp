@@ -10,15 +10,6 @@ struct _pppPointApOffsets {
     u32 targetOffset;
 };
 
-struct _pppPointApStep {
-    u32 m_unknown0;
-    u32 m_createProgramIndex;
-    u32 m_childDstOffset;
-    u8 m_cooldown;
-    u8 m_useWorldMatrix;
-};
-
-
 /*
  * --INFO--
  * PAL Address: 0x80060c04
@@ -28,26 +19,25 @@ struct _pppPointApStep {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
+void pppPointAp(_pppPObject* pObject, pppPointApStep* step, _pppCtrlTable* ctrlTable)
 {
     _pppPointApOffsets* data = (_pppPointApOffsets*)ctrlTable->m_serializedDataOffsets;
     u32 srcOffset = data->srcOffset;
     u32 targetOffset = data->targetOffset;
     Vec* src = (Vec*)(pObject->m_workArea + srcOffset);
     u8* target = pObject->m_workArea + targetOffset;
-    _pppPointApStep* payload = (_pppPointApStep*)step;
 
     if (ppvUserStopPartF != 0) {
         return;
     }
 
     if (target[1] == 0) {
-        if ((payload->m_createProgramIndex + 0x10000) == 0xFFFF) {
+        if ((step->m_createProgramIndex + 0x10000) == 0xFFFF) {
             return;
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = ppvMng->m_pppPDataVals + payload->m_createProgramIndex;
+        _pppPDataVal* objData = ppvMng->m_pppPDataVals + step->m_createProgramIndex;
 
         if (objData == 0) {
             obj = 0;
@@ -56,8 +46,8 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             obj->m_link.m_previous = &pObject->m_link;
         }
 
-        Vec* dst = (Vec*)(obj->m_workArea + payload->m_childDstOffset);
-        if (payload->m_useWorldMatrix == 0) {
+        Vec* dst = (Vec*)(obj->m_workArea + step->m_childDstOffset);
+        if (step->m_useWorldMatrix == 0) {
             dst->x = src->x;
             dst->y = src->y;
             dst->z = src->z;
@@ -65,7 +55,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             PSMTXMultVec(ppvMng->m_matrix.value, src, dst);
         }
 
-        target[1] = payload->m_cooldown;
+        target[1] = step->m_cooldown;
     }
 
     target[1]--;

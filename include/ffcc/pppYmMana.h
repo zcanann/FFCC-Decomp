@@ -12,7 +12,26 @@ struct PYmMana;
 struct VYmMana;
 struct CTexture;
 struct CGObject;
-struct pppYmManaUnkB;
+
+struct pppYmManaStep {
+    u8 m_pad00[4];
+    s32 m_sourceTextureId2;
+    s32 m_sourceTextureId1;
+    s32 m_sourceTextureId0;
+    s32 m_sourceTextureId3;
+    s32 m_sourceTextureId4;
+    s32 m_sourceTextureId5;
+    u8 m_type;
+    u8 m_pad1D[7];
+    s32 m_envTextureId0;
+    s32 m_envTextureId1;
+    float m_waterScale;
+    float m_waterOffset;
+    u32 m_rippleLevel;
+    u8 m_map21Flag;
+    u8 m_pad39[3];
+    GXColor m_baseColor;
+};
 
 void SetEnvMap(PYmMana*, VYmMana*);
 void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
@@ -27,8 +46,8 @@ extern "C" {
 
 void pppConstructYmMana(PYmMana*, _pppCtrlTable*);
 void pppDestructYmMana(PYmMana*, _pppCtrlTable*);
-void pppFrameYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*);
-void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*);
+void pppFrameYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*);
+void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

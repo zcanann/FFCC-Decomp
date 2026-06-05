@@ -1,9 +1,17 @@
 #ifndef _PPP_PARHITSPHMAT_H_
 #define _PPP_PARHITSPHMAT_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
-struct pppParHitSphMatStep;
+
+struct pppParHitSphMatStep {
+    s32 m_unused0;
+    f32 m_height;
+    f32 m_radiusScale;
+    u8 m_useWorkPosition;
+};
 
 #ifdef __cplusplus
 extern "C" {

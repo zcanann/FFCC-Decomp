@@ -15,11 +15,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <math.h>
 
-struct Vec2d {
-	float x;
-	float y;
-};
-
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern char lbl_801E3058[];
 extern "C" const char s_MenuOptionMusic[] = "Music";

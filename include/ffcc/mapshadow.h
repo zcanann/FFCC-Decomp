@@ -23,7 +23,7 @@ public:
     void Calc();
     void Draw();
 
-    u8 _pad00[4];            // 0x00
+    int m_enabled;           // 0x00
     u16 m_materialIndex;     // 0x04
     u8 m_useFrustum;         // 0x06
     u8 m_materialMode;       // 0x07

@@ -1864,8 +1864,7 @@ int CMapMng::ReadMpl(char* mapName)
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
 
         bool canRead = false;
-        const int readMode = asyncLoadState.m_mapReadMode;
-        if (readMode == 1) {
+        if (asyncLoadState.m_mapReadMode == 1) {
             canRead = true;
         } else {
             CFile::CHandle* existsHandle = File.Open(g_StrTmp, 0, CFile::PRI_LOW);
@@ -1876,7 +1875,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         if (!canRead) {
-            if (readMode == 3) {
+            if (asyncLoadState.m_mapReadMode == 3) {
                 return 1;
             }
             if (loadIndex == 0) {
@@ -1893,7 +1892,7 @@ int CMapMng::ReadMpl(char* mapName)
         }
 
         void* filePtr = File.m_readBuffer;
-        if (readMode == 1) {
+        if (asyncLoadState.m_mapReadMode == 1) {
             int& readIndex = asyncLoadState.m_asyncReadIndex;
             const int size = asyncLoadState.m_fileSizes[readIndex];
             void* amemCursor = asyncLoadState.m_mapLoadCursor;
@@ -1908,7 +1907,7 @@ int CMapMng::ReadMpl(char* mapName)
                 filePtr = 0;
             } else {
                 const int size = File.GetLength(fileHandle);
-                if (readMode == 3) {
+                if (asyncLoadState.m_mapReadMode == 3) {
                     File.ReadASync(fileHandle);
                     filePtr = reinterpret_cast<void*>(1);
                     int& openIndex = asyncLoadState.m_asyncOpenIndex;
@@ -1919,7 +1918,7 @@ int CMapMng::ReadMpl(char* mapName)
                     File.SyncCompleted(fileHandle);
                     filePtr = File.m_readBuffer;
                     File.Close(fileHandle);
-                    if (readMode == 2) {
+                    if (asyncLoadState.m_mapReadMode == 2) {
                         int& readIndex = asyncLoadState.m_asyncReadIndex;
                         void* amemCursor = asyncLoadState.m_mapLoadCursor;
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
@@ -1940,12 +1939,12 @@ int CMapMng::ReadMpl(char* mapName)
             return 0;
         }
 
-        if (readMode != 3) {
+        if (asyncLoadState.m_mapReadMode != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (readMode == 2) {
+            if (asyncLoadState.m_mapReadMode == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
                         return 1;

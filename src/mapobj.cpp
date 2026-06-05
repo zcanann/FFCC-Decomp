@@ -1150,8 +1150,8 @@ void CMapObj::SetLink()
                                     CMapObj* child8;
                                     while ((child8 = MapMng.SearchChildMapObj(cursor8, child7)) != 0) {
                                         child8->m_next = head8;
-                                        child8->SetLink();
                                         head8 = child8;
+                                        child8->SetLink();
                                         cursor8 = NextSlot(child8);
                                     }
 

@@ -2544,8 +2544,8 @@ void CMapMng::Calc()
 void CMapMng::DrawMapShadow()
 {
     if (m_mapObjCount != 0) {
-        for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
-            CMapShadow* mapShadow = GetMapShadowArray()[i];
+        for (unsigned int i = 0; i < static_cast<unsigned int>(m_mapShadowArray.GetSize()); i++) {
+            CMapShadow* mapShadow = m_mapShadowArray[i];
             mapShadow->Draw();
         }
     }

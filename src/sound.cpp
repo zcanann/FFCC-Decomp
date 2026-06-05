@@ -883,9 +883,9 @@ void CSound::loadWaveFrame()
             waveOffset += (int)readSize;
             waveState = 1;
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
-            RedSound(this)->SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
+            m_redSound.SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
 
-            while (RedSound(&Sound)->ReportStandby(0) != 0) {
+            while (Sound.m_redSound.ReportStandby(0) != 0) {
             }
 
             waveState = 0;
@@ -901,7 +901,7 @@ void CSound::loadWaveFrame()
     bool streamPlaying = false;
     int& isStreamEnabled = sound.m_streamPlaying;
     int& streamID = sound.m_streamID;
-    if (isStreamEnabled != 0 && RedSound(this)->StreamPlayState(streamID) != 0) {
+    if (isStreamEnabled != 0 && m_redSound.StreamPlayState(streamID) != 0) {
         streamPlaying = true;
     }
 
@@ -914,7 +914,7 @@ void CSound::loadWaveFrame()
 
         if (streamState == 0) {
             int playPoint[2];
-            RedSound(this)->GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
+            m_redSound.GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
             playPoint[0] = static_cast<int>(static_cast<unsigned int>(playPoint[0]) >> 16);
 
             if (streamHalf != static_cast<unsigned int>(playPoint[0])) {
@@ -1383,7 +1383,7 @@ void CSound::FreeWave(int waveId)
     if (waveId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        RedSound(this)->ClearWaveData(waveId);
+        m_redSound.ClearWaveData(waveId);
     }
 }
 
@@ -1431,7 +1431,7 @@ void CSound::StopAndFreeAllSe(int clearMode)
 int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
     int seId;
-    CRedSound* redSound = RedSound(this);
+    CRedSound* redSound = &m_redSound;
 
     if (seNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
@@ -2243,13 +2243,13 @@ void CSound::LoadStream(int streamID)
         bool isPlaying = false;
 
         if (sound.m_streamPlaying != 0) {
-            if (RedSound(this)->StreamPlayState(sound.m_streamID) != 0) {
+            if (m_redSound.StreamPlayState(sound.m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            RedSound(this)->StreamStop(sound.m_streamID);
+            m_redSound.StreamStop(sound.m_streamID);
         }
 
         if (sound.m_streamFile != 0) {
@@ -2326,7 +2326,7 @@ void CSound::PlayStreamASync()
         break;
     }
     void* streamBuffer = sound.m_streamBuffer;
-    CRedSound* redSound = RedSound(this);
+    CRedSound* redSound = &m_redSound;
     int streamNo = redSound->StreamPlay(streamBuffer, 0x20000, 0x40, volume < 0 ? 0 : (volume <= 0x7f ? volume : 0x7f));
     sound.m_streamID = streamNo;
     sound.m_streamPlaying = 1;
@@ -2347,14 +2347,14 @@ void CSound::StopStream()
     bool shouldStop = false;
 
     if (sound.m_streamPlaying != 0) {
-        int state = RedSound(this)->StreamPlayState(sound.m_streamID);
+        int state = m_redSound.StreamPlayState(sound.m_streamID);
         if (state != 0) {
             shouldStop = true;
         }
     }
 
     if (shouldStop) {
-        RedSound(this)->StreamStop(sound.m_streamID);
+        m_redSound.StreamStop(sound.m_streamID);
     }
 
     CFile::CHandle* handle = sound.m_streamFile;
@@ -2376,7 +2376,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    RedSound(this)->StreamVolume(-1, volume, frames);
+    m_redSound.StreamVolume(-1, volume, frames);
 }
 
 /*

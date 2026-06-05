@@ -503,7 +503,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     strncpy(meshName->m_name, name, 0x20);
-                    m_mapData = 0;
                 }
             }
 

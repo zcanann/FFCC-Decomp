@@ -125,6 +125,7 @@ public:
         InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
         m_type = POINT_LIGHT;
         m_colorMode = 0;
+        m_useAltColor = 0;
         m_unknown20 = 0;
     }
 

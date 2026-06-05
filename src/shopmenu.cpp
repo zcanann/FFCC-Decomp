@@ -223,11 +223,6 @@ static unsigned short GetShopMenuListButtons()
     return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
-static inline int ShopMenuCaravan(CShopMenu* shopMenu)
-{
-    return reinterpret_cast<int>(shopMenu->m_caravanWork);
-}
-
 static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
 {
     return shopMenu->m_caravanWork;
@@ -1564,7 +1559,7 @@ void CShopMenu::DrawShopBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    int mode = ShopMenuInt(this, 0x4);
+    int mode = m_mode;
     int panelY;
     if (mode < 3) {
         panelY = 0xE6;
@@ -1632,8 +1627,8 @@ void CShopMenu::DrawShopBase()
 
         DrawInit__5CFontFv(font);
         Graphic.SetDrawDoneDebugData(0x10);
-        char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
-                                                             ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
+        char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
+                                                ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
         SetPosX__5CFontFf(CalcCenteredShopMenuX(font, confirmText), font);
         SetPosY__5CFontFf(312.0f, font);
         Draw__5CFontFPc(font, confirmText);
@@ -1647,9 +1642,9 @@ void CShopMenu::DrawShopBase()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
         Graphic.SetDrawDoneDebugData(0x13);
 
-        if (ShopMenuInt(this, 0x10) == 2) {
+        if (m_subMode == 2) {
             Graphic.SetDrawDoneDebugData(0x14);
-            MenuPcs.DrawCursor(0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, FLOAT_80332d28);
+            MenuPcs.DrawCursor(0x2C, m_yesNo * 0x18 + 0x134, FLOAT_80332d28);
             Graphic.SetDrawDoneDebugData(0x15);
         }
     }
@@ -1662,11 +1657,11 @@ void CShopMenu::DrawShopBase()
 void CShopMenu::Draw()
 {
     Graphic.SetDrawDoneDebugData(0x46);
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[ShopMenuInt(this, 0x18)].m_envFields);
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[m_pdtSlot].m_envFields);
 
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    int mode = ShopMenuInt(this, 0x4);
+    int mode = m_mode;
     if ((mode >= 0) && (mode < 3)) {
         DrawShop0();
     } else if (mode < 6) {
@@ -1687,7 +1682,7 @@ void CShopMenu::Draw()
         DrawSoubi();
     }
 
-    float fade = ShopMenuFloat(this, 0x1C);
+    float fade = m_fade;
     if (fade != FLOAT_80332d28) {
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
         unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
@@ -1745,7 +1740,7 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
-    int resultItem = ShopMenuInt(this, 0x150);
+    int resultItem = m_resultItem;
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
@@ -1801,7 +1796,7 @@ void CShopMenu::DrawSoubi()
     Draw__5CFontFPc(labelFont, cancelText);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, ShopMenuInt(this, 0x3C) * 0x18 + 0x13C, 1.0f);
+    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, 1.0f);
 }
 /*
  * --INFO--
@@ -1812,9 +1807,9 @@ void CShopMenu::DrawMake()
 {
     DrawMakeBase();
 
-    int resultItem = ShopMenuInt(this, 0x150);
-    int listType = ShopMenuInt(this, 0x14);
-    int selectedIndex = ShopMenuInt(this, 0x28);
+    int resultItem = m_resultItem;
+    int listType = m_listType;
+    int selectedIndex = m_selectedIndex;
     CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
     int selectedItem = ResolveShopMenuItemNo(this, selectedIndex);
 
@@ -1983,8 +1978,8 @@ void CShopMenu::DrawMake()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
-    DrawItemHelp(ShopMenuInt(this, 0x28), 0x140, 0x172);
-    MenuPcs.DrawCursor(0xD8, ShopMenuInt(this, 0x3C) * 0x18 + 0x14C, 1.0f);
+    DrawItemHelp(m_selectedIndex, 0x140, 0x172);
+    MenuPcs.DrawCursor(0xD8, m_yesNo * 0x18 + 0x14C, 1.0f);
 }
 /*
  * --INFO--
@@ -2000,7 +1995,7 @@ void CShopMenu::DrawSmith0()
     DrawShopBase();
     drawShapeSeqScale(0x11, 0, 0, 0x154, FLOAT_80332e48, FLOAT_80332d28, 0xFF);
     DrawItemList();
-    DrawItemHelp(ShopMenuInt(this, 0x28), 0x140, 0x172);
+    DrawItemHelp(m_selectedIndex, 0x140, 0x172);
 
     CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -2012,9 +2007,8 @@ void CShopMenu::DrawSmith0()
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    int caravan = ShopMenuInt(this, 0x20);
     const char* title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
-    if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
+    if (m_caravanWork->m_shopRequestFlags != '\0') {
         title = MenuPcs.GetJobStr(1);
     }
 

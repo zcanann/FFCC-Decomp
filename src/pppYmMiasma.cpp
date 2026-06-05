@@ -527,6 +527,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     float randomHeight;
     float radiusJitter;
     float randomScale;
+    float randomFloat;
     float x;
     Vec basePos;
     u32 angleBase;
@@ -538,14 +539,13 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     (void)pppPObject;
 
     randomValue = rand();
-    randomScale = YmMiasmaConst(FLOAT_8033065c) * (float)randomValue;
+    randomFloat = (float)randomValue;
+    randomScale = randomFloat * FLOAT_8033065c;
     shape = static_cast<pppShapeAnimData*>(
         ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex]->m_animData);
     shapeRandom = rand();
     shapeCount = shape->m_frameCount;
-    angle = (s32)(YmMiasmaConst(FLOAT_80330650) *
-                  (YmMiasmaConst(FLOAT_80330654) * (YmMiasmaConst(FLOAT_80330660) * randomScale)) -
-                  YmMiasmaConst(FLOAT_80330664));
+    angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
     shapeCount = (short)(shapeRandom % shapeCount);
     state->m_shapeDrawFrame = shapeCount;
     state->m_shapeCurrentFrame = shapeCount;

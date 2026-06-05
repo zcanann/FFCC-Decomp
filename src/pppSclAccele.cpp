@@ -4,14 +4,6 @@
 
 const float kPppSclAcceleZero = 0.0f;
 
-struct PppSclAcceleStep {
-    int m_graphId;
-    int m_pad;
-    float m_x;
-    float m_y;
-    float m_z;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80063150
@@ -47,7 +39,7 @@ void pppSclAccele(_pppPObject* arg1, PppSclAcceleStep* arg2, _pppCtrlTable* arg3
         return;
     }
 
-    if (arg2->m_graphId == ((int*)arg1)[3]) {
+    if (arg2->m_graphId == arg1->m_graphId) {
         accel[0] += arg2->m_x;
         accel[1] += arg2->m_y;
         accel[2] += arg2->m_z;

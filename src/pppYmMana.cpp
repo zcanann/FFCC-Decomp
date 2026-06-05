@@ -71,26 +71,6 @@ static inline Mtx44& CameraScreenMatrix()
 
 extern "C" const char s_pppYmMana_cpp[16] = "pppYmMana.cpp";
 
-struct pppYmManaUnkB {
-    u8 _pad00[4];
-    s32 m_sourceTextureId2;
-    s32 m_sourceTextureId1;
-    s32 m_sourceTextureId0;
-    s32 m_sourceTextureId3;
-    s32 m_sourceTextureId4;
-    s32 m_sourceTextureId5;
-    u8 m_type;
-    u8 _pad1D[7];
-    s32 m_envTextureId0;
-    s32 m_envTextureId1;
-    float m_waterScale;
-    float m_waterOffset;
-    u32 m_rippleLevel;
-    u8 m_map21Flag;
-    u8 _pad39[3];
-    GXColor m_baseColor;
-};
-
 struct VYmMana {
     CGObject* m_object;
     void* m_manager;
@@ -116,7 +96,7 @@ struct VYmMana {
     GXColor* m_meshColors;
     S16Vec2d* m_meshTexCoords0;
     S16Vec2d* m_meshTexCoords1;
-    pppYmManaUnkB* m_step;
+    pppYmManaStep* m_step;
     GXTexObj* m_captureTexObjs;
     CTexture* m_envTexture0;
     CTexture* m_envTexture1;
@@ -150,15 +130,15 @@ STATIC_ASSERT(offsetof(VYmMana, m_paraboloidReady) == 0xF4);
 STATIC_ASSERT(offsetof(VYmMana, m_attachedObject) == 0xF8);
 STATIC_ASSERT(offsetof(VYmMana, m_shadowColor) == 0xFC);
 STATIC_ASSERT(offsetof(VYmMana, m_baseColor) == 0x100);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_sourceTextureId2) == 0x04);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_type) == 0x1C);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_envTextureId0) == 0x24);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_envTextureId1) == 0x28);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_waterScale) == 0x2C);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_waterOffset) == 0x30);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_rippleLevel) == 0x34);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_map21Flag) == 0x38);
-STATIC_ASSERT(offsetof(pppYmManaUnkB, m_baseColor) == 0x3C);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_sourceTextureId2) == 0x04);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_type) == 0x1C);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_envTextureId0) == 0x24);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_envTextureId1) == 0x28);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_waterScale) == 0x2C);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_waterOffset) == 0x30);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_rippleLevel) == 0x34);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_map21Flag) == 0x38);
+STATIC_ASSERT(offsetof(pppYmManaStep, m_baseColor) == 0x3C);
 
 static inline float LoadFloat(const float& value)
 {
@@ -172,7 +152,7 @@ static inline void ClearManaModelCallbacks(CChara::CModel* model)
     model->SetDrawMeshDLCallback(0);
 }
 
-static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaUnkB* step)
+static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaStep* step)
 {
     model->SetCallbackContext(work, step);
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
@@ -369,7 +349,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     CChara::CMesh::CRefData* mesh = model->m_meshes[partIndex].m_data;
     CChara::CMesh::CDisplayList* displayList = &mesh->m_displayLists[dlIndex];
     VYmMana* mana = static_cast<VYmMana*>(work);
-    pppYmManaUnkB* stepData = static_cast<pppYmManaUnkB*>(step);
+    pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
     int type = stepData->m_type;
     CGObject* object = mana->m_object;
     int draw = 0;
@@ -578,7 +558,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     CChara::CMesh* mesh;
-    pppYmManaUnkB* step;
+    pppYmManaStep* step;
     u32 i;
     u32 j;
 
@@ -726,7 +706,7 @@ void pppDestructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaStep* param_2, _pppCtrlTable* param_3)
 {
     u32 texBufferSize;
     VYmMana* mana;
@@ -985,7 +965,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, _pppCtrlTable* p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*)
+void pppRenderYmMana(PYmMana*, pppYmManaStep*, _pppCtrlTable*)
 {
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
@@ -1006,7 +986,7 @@ void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, _pppCtrlTable*)
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     VYmMana* mana = static_cast<VYmMana*>(workPtr);
-    pppYmManaUnkB* stepData = static_cast<pppYmManaUnkB*>(step);
+    pppYmManaStep* stepData = static_cast<pppYmManaStep*>(step);
     Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;

@@ -186,37 +186,6 @@ static const char s_map_load_ok_fmt[] =
 static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
-namespace {
-struct PMapBound
-{
-    PMapBound()
-    {
-        float min = LoadFloat(kPMapBoundMinInit);
-        float max = LoadFloat(kPMapBoundMaxInit);
-
-        m_min.z = min;
-        m_min.y = min;
-        m_min.x = min;
-        m_max.z = max;
-        m_max.y = max;
-        m_max.x = max;
-    }
-
-    void operator=(const CBound& other)
-    {
-        *this = *reinterpret_cast<const PMapBound*>(&other);
-    }
-
-    CBound& AsBound()
-    {
-        return *reinterpret_cast<CBound*>(this);
-    }
-
-    Vec m_min;
-    Vec m_max;
-};
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -840,9 +809,9 @@ void CMapPcs::drawAfter()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                PMapBound bound;
+                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
                 bound = CameraPcs.m_shadowRectBound;
-                Graphic.DrawBound(bound.AsBound(), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                Graphic.DrawBound(bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -890,11 +859,11 @@ void CMapPcs::drawAfterViewer()
             MapMng.DrawAfter();
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
-                PMapBound bound;
+                CBound bound(kPMapBoundMinInit, kPMapBoundMaxInit);
                 bound = CameraPcs.m_shadowRectBound;
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
-                Graphic.DrawBound(bound.AsBound(), color);
+                Graphic.DrawBound(bound, color);
             }
         }
     }

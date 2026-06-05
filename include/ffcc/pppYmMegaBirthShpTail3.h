@@ -3,10 +3,12 @@
 
 #include "ffcc/partMng.h"
 
-struct pppYmMegaBirthShpTail3;
+struct _pppPObject;
 struct PYmMegaBirthShpTail3;
 struct pppYmMegaBirthShpTail3UnkB;
 struct pppYmMegaBirthShpTail3UnkC;
+
+typedef _pppPObject pppYmMegaBirthShpTail3;
 
 #ifdef __cplusplus
 extern "C" {

@@ -125,7 +125,7 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         press = 0;
     } else {
-        int padIndex = blocked;
+        int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         press = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
@@ -137,7 +137,7 @@ int CMenuPcs::ItemCtrlCur()
     if (blocked) {
         hold = 0;
     } else {
-        int padIndex = blocked;
+        int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
         hold = Pad.GetPadInputs()[padIndex].repeatButton;
     }

@@ -67,6 +67,11 @@ struct YmMeltColorWork {
     };
 };
 
+struct YmMeltDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorWorkOffset;
+};
+
 struct VERTEX_DATA
 {
     u8 _pad0[0xA];
@@ -117,15 +122,22 @@ STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltMapCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_workOffset) == 0x0);
+STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_colorWorkOffset) == 0x4);
+
+static inline YmMeltDataOffsets* GetYmMeltDataOffsets(PYmMeltDataOffsets* offsets)
+{
+    return reinterpret_cast<YmMeltDataOffsets*>(offsets->m_serializedDataOffsets);
+}
 
 static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + *offsets->m_serializedDataOffsets);
+    return reinterpret_cast<YmMeltWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_workOffset);
 }
 
 static inline YmMeltColorWork* GetYmMeltColorWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_workArea + offsets->m_serializedDataOffsets[1]);
+    return reinterpret_cast<YmMeltColorWork*>(ymMelt->m_workArea + GetYmMeltDataOffsets(offsets)->m_colorWorkOffset);
 }
 
 static inline float LoadFloat(const float& value)

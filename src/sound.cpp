@@ -448,7 +448,7 @@ void CSound::Quit()
  */
 void CSound::SetStereo(int stereo)
 {
-    RedSound(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    m_redSound.SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
@@ -463,7 +463,7 @@ void CSound::SetStereo(int stereo)
 void CSound::SetBgmMasterVolume(int volume)
 {
     SoundData(this).m_bgmMasterVolume = volume;
-    RedSound(this)->MusicMasterVolume(volume);
+    m_redSound.MusicMasterVolume(volume);
 }
 
 /*
@@ -478,7 +478,7 @@ void CSound::SetBgmMasterVolume(int volume)
 void CSound::SetSeMasterVolume(int volume)
 {
     SoundData(this).m_seMasterVolume = volume;
-    RedSound(this)->SeMasterVolume(volume);
+    m_redSound.SeMasterVolume(volume);
 }
 
 /*
@@ -650,7 +650,7 @@ void CSound::Realloc(int isMinMemoryMode)
  */
 float CSound::GetPerformance()
 {
-    unsigned int programTime = RedSound(this)->GetProgramTime();
+    unsigned int programTime = m_redSound.GetProgramTime();
     float numer = (float)(programTime / 0xF);
     float denom = (float)(((OS_TIMER_CLOCK / 125000) * 0x8235) >> 3);
     return 100.0f * (numer / denom);
@@ -1129,7 +1129,7 @@ void CSound::PlayNextBgm(int bgmId)
  */
 void CSound::StopBgm()
 {
-    RedSound(this)->MusicStop(-1);
+    m_redSound.MusicStop(-1);
 }
 
 /*
@@ -1143,7 +1143,7 @@ void CSound::StopBgm()
  */
 void CSound::FadeOutBgm(int fadeFrames)
 {
-    RedSound(this)->MusicFadeOut(-1, fadeFrames);
+    m_redSound.MusicFadeOut(-1, fadeFrames);
 }
 
 /*
@@ -1985,7 +1985,7 @@ found_entry:
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
             } else {
-                RedSound(this)->SeStop(playId);
+                m_redSound.SeStop(playId);
             }
             foundSe->m_bits.m_active = 0;
         }
@@ -2050,7 +2050,7 @@ found_entry:
             if (playId < 0) {
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt), fadeFrames, ret);
             } else {
-                RedSound(this)->SeFadeOut(playId, fadeFrames);
+                m_redSound.SeFadeOut(playId, fadeFrames);
             }
             foundSe->m_bits.m_active = 0;
         }

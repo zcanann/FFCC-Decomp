@@ -676,23 +676,21 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
  */
 void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int textureStart, int textureCount)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     for (int i = 0; i < textureCount; i++) {
-        CRef* refObject = reinterpret_cast<CRef*>(m_textures[i + textureStart]);
-        if (refObject != nullptr) {
-            if (refObject->DecRef() == 0) {
-                delete refObject;
+        CTexture* texture = m_textures[i + textureStart];
+        if (texture != nullptr) {
+            if (texture->DecRef() == 0) {
+                delete texture;
             }
             m_textures[i + textureStart] = 0;
         }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        CRef* refObject = reinterpret_cast<CRef*>(m_textureSets[i + textureSetStart]);
-        if (refObject != nullptr) {
-            if (refObject->DecRef() == 0) {
-                delete refObject;
+        CTextureSet* textureSet = m_textureSets[i + textureSetStart];
+        if (textureSet != nullptr) {
+            if (textureSet->DecRef() == 0) {
+                delete textureSet;
             }
             m_textureSets[i + textureSetStart] = 0;
         }

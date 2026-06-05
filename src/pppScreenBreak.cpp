@@ -79,11 +79,6 @@ static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
 
-extern "C" {
-int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
-    CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8012d458

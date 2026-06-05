@@ -1409,7 +1409,7 @@ void CFlatRuntime2::Calc()
 		saveData[4] = SwapF32(CameraPcs.m_targetY);
 		saveData[5] = SwapF32(CameraPcs.m_targetZ);
 		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((FLOAT_80330138 * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / FLOAT_8033013C);
+		saveData[7] = SwapF32((FLOAT_80330138 * CameraPcs.m_zRotate) / FLOAT_8033013C);
 
 		u32 lastX = 0;
 		u32 lastY = 0;
@@ -2454,7 +2454,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x17:
-	*reinterpret_cast<unsigned int*>(PadRaw() + 0x1C8) = static_cast<unsigned int>(controlValue);
+	Pad._1c8_4_ = static_cast<int>(controlValue);
 		break;
 
 	case 0x18:
@@ -2621,9 +2621,9 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
-	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
+	Pad._1c8_4_ = 1;
 	GraphicPcs.m_screenFade[1].m_mode = 0;
-	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;
+	CameraPcs.m_shadowAuto = 1;
 	AStar.reset();
 }
 

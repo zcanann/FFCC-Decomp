@@ -369,6 +369,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
         CHUNK_LDAT = 0x4C444154,
+        CHUNK_LSDW = 0x4C534457,
         CHUNK_MIME = 0x4D494D45,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
@@ -449,6 +450,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else if (chunkFile.Get1() == 0) {
                 m_lightSetIndex = 0;
             }
+            break;
+        }
+        case CHUNK_LSDW: {
             break;
         }
         case CHUNK_SDST: {

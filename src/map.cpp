@@ -1755,6 +1755,7 @@ int CMapMng::ReadMtx(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
+    int append = 0;
 
     MapMng.m_mapReadReady = 1;
 
@@ -1764,7 +1765,6 @@ int CMapMng::ReadMtx(char* mapName)
         m_textureSet = textureSet;
     }
 
-    int append = 0;
     int loadIndex = 0;
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMtxPathFmt), mapName, loadIndex);

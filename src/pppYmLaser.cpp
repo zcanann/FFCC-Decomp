@@ -16,9 +16,9 @@
 
 #include <string.h>
 
-static const f32 kPppYmLaserOne = 0.0f;
-static const f32 FLOAT_80330DC4 = 1.0f;
-static const f32 FLOAT_80330DC8 = 2.0f;
+extern const f32 kPppYmLaserOne;
+extern const f32 FLOAT_80330DC4;
+extern const f32 FLOAT_80330DC8;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 

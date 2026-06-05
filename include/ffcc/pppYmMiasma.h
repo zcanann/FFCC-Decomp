@@ -1,18 +1,16 @@
 #ifndef _FFCC_PPP_YMMIASMA_H_
 #define _FFCC_PPP_YMMIASMA_H_
 
-#include "ffcc/partMng.h"
+struct _pppCtrlTable;
+struct _pppPObject;
 
-struct pppYmMiasma {
-    _pppPObject m_object;
-};
+typedef _pppPObject pppYmMiasma;
+
 struct pppYmMiasmaUnkB;
 struct YmMiasmaRenderStep;
 struct YmMiasmaFrameStep;
 struct VYmMiasma;
 struct PYmMiasma;
-struct _pppPObject;
-struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {

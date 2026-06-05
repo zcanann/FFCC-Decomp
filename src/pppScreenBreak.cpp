@@ -122,10 +122,16 @@ extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 static inline MtxPtr ScreenBreakModelMtx(CChara::CModel* model) { return model->m_drawMtx; }
 static inline CCharaModelData* ScreenBreakModelRef(CChara::CModel* model) { return model->m_data; }
 static inline u32 ScreenBreakMeshNodeIndex(ScreenBreakMeshData* meshData) { return meshData->m_nodeIndex; }
-static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
+static inline u8* GetScreenBreakWork(pppScreenBreak* screenBreak, s32 offset) { return screenBreak->m_workArea + offset; }
 static inline VScreenBreak* GetScreenBreakValue(pppScreenBreak* screenBreak, s32 offset) { return reinterpret_cast<VScreenBreak*>(GetScreenBreakWork(screenBreak, offset)); }
 
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
+
+int SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
+void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*);
+void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
 /*
  * --INFO--
@@ -183,7 +189,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
     value->m_color = colorSource->m_color;
     DCFlushRange(&value->m_color, sizeof(value->m_color));
 
-    CalcGraphValue(&screenBreak->m_object, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
+    CalcGraphValue(screenBreak, param_2->m_graphId, value->m_graphValue0, value->m_graphValue1, value->m_graphValue2,
                    param_2->m_stepValue, param_2->m_arg3, param_2->m_graphPayload);
 
     ScreenBreakPiece* pieceStorage = value->m_pieces;

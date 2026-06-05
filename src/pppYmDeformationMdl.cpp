@@ -58,9 +58,14 @@ static inline Mtx44& CameraScreenMatrix()
     return CameraPcs.m_screenMatrix;
 }
 
+static inline float LoadDeformationMdlFloat(const float& value)
+{
+    return value;
+}
+
 static inline float DeformationMdlZero()
 {
-    return kYmDeformationMdlZero;
+    return LoadDeformationMdlFloat(kYmDeformationMdlZero);
 }
 
 /*

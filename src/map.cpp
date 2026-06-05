@@ -2968,9 +2968,9 @@ void CMapMng::Draw()
         GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
         GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         _GXColor wireColor;
-        wireColor.r = 0x80;
-        wireColor.g = 0x80;
-        wireColor.b = 0x80;
+        wireColor.r = 0xFF;
+        wireColor.g = 0xFF;
+        wireColor.b = 0xFF;
         wireColor.a = 0x80;
         GXSetChanMatColor(GX_COLOR0A0, wireColor);
 

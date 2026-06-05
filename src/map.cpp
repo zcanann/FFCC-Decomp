@@ -2142,18 +2142,14 @@ int CMapMng::ReadOtm(char* mapName)
                     CMapTexAnimSet* texAnimSet =
                         new (m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet = texAnimSet;
-                    if (texAnimSet != 0) {
-                        texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
-                    }
+                    texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     continue;
                 }
 
                 if (chunk.m_id == 0x414E494D) {
                     CMapAnim* mapAnim = new (m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
-                    if (mapAnim != 0) {
-                        mapAnim->ReadOtmAnim(chunkFile);
-                        GetMapAnimArray().Add(mapAnim);
-                    }
+                    mapAnim->ReadOtmAnim(chunkFile);
+                    GetMapAnimArray().Add(mapAnim);
                     continue;
                 }
 
@@ -2183,11 +2179,9 @@ int CMapMng::ReadOtm(char* mapName)
                     CMaterialSet* materialSet =
                         new (m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     m_materialSet = materialSet;
-                    if (materialSet != 0) {
-                        materialSet->m_materials.SetDefaultSize(0x180);
-                        materialSet->m_materials.SetGrow(0);
-                        materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
-                    }
+                    materialSet->m_materials.SetDefaultSize(0x180);
+                    materialSet->m_materials.SetGrow(0);
+                    materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                 }
             }
             chunkFile.PopChunk();

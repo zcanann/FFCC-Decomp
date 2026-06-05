@@ -1621,8 +1621,8 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        int hitBounds = 0;
-        int xyOverlap = 0;
+        unsigned char hitBounds = 0;
+        unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;
@@ -1728,8 +1728,8 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        int hitBounds = 0;
-        int xyOverlap = 0;
+        unsigned char hitBounds = 0;
+        unsigned char xyOverlap = 0;
         {
             int xOverlap = 0;
             float positionMinX = mapHit->m_positionMin.x;

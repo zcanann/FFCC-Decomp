@@ -18,6 +18,13 @@ extern "C" {
 int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
 int g_errCt = 0;
 }
+
+extern "C" {
+void create__12CMiniGamePcsFv(CMiniGamePcs*);
+void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
+void calc__12CMiniGamePcsFv(CMiniGamePcs*);
+}
+
 CProcessTableCallback CMiniGamePcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};

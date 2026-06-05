@@ -26,6 +26,22 @@ private:
     unsigned int m_data;
 };
 
+extern "C" {
+void create__7CMapPcsFv(CMapPcs*);
+void destroy__7CMapPcsFv(CMapPcs*);
+void calcInit__7CMapPcsFv(CMapPcs*);
+void calc__7CMapPcsFv(CMapPcs*);
+void drawShadow__7CMapPcsFv(CMapPcs*);
+void drawBefore__7CMapPcsFv(CMapPcs*);
+void draw__7CMapPcsFv(CMapPcs*);
+void drawAfter__7CMapPcsFv(CMapPcs*);
+void createViewer__7CMapPcsFv(CMapPcs*);
+void calcViewer__7CMapPcsFv(CMapPcs*);
+void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
+void drawViewer__7CMapPcsFv(CMapPcs*);
+void drawAfterViewer__7CMapPcsFv(CMapPcs*);
+}
+
 CProcessTableCallback CMapPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
 CProcessTableCallback CMapPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
 CProcessTableCallback CMapPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};

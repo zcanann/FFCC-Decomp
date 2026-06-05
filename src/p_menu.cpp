@@ -138,6 +138,16 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 FLOAT_8033086C = 0.125f;
 
+extern "C" {
+void create__8CMenuPcsFv(CMenuPcs*);
+void destroy__8CMenuPcsFv(CMenuPcs*);
+void calc__8CMenuPcsFv(CMenuPcs*);
+void draw__8CMenuPcsFv(CMenuPcs*);
+void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
+    CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
+void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
+}
+
 CProcessTableCallback CMenuPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 CProcessTableCallback CMenuPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
 CProcessTableCallback CMenuPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};

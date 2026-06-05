@@ -3548,24 +3548,29 @@ void CGMonObj::logicFuncDefault()
 int CGMonObj::calcBranchFuncDefault(int branchType)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-	unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
-	unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+	int result = 0;
 
 	if (branchType == 1) {
-		if (current < (max >> 1)) {
-			return 1;
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+		if (static_cast<int>(current) < static_cast<int>(static_cast<unsigned int>(max) >> 1)) {
+			result = 1;
 		}
 	} else if (branchType == 2) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+		unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
 		if (current < (max / 3)) {
-			return 2;
+			result = 2;
+		} else if (current < ((max * 2) / 3)) {
+			result = 1;
 		}
-		if (current < ((max * 2) / 3)) {
-			return 1;
-		}
+	} else if (branchType != 0) {
+		result = 0;
 	}
 
-	return 0;
+	return result;
 }
 
 /*

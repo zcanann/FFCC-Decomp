@@ -3,15 +3,6 @@
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
-
-struct pppPointApMtxStep {
-	u32 m_unknown0;
-	u32 m_createProgramIndex;
-	u32 m_childMatrixOffset;
-	u8 m_cooldown;
-	u8 m_useWorldMatrix;
-};
-
 struct pppPointApMtxOffsets {
 	u32 m_srcOffset;
 	u32 m_stateOffset;
@@ -26,9 +17,8 @@ struct pppPointApMtxOffsets {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
+void pppPointApMtx(_pppPObject* pObject, pppPointApMtxStep* payload, _pppCtrlTable* ctrlTable)
 {
-	pppPointApMtxStep* payload = (pppPointApMtxStep*)step;
 	Vec pos;
 	pppPointApMtxOffsets* offsets = (pppPointApMtxOffsets*)ctrlTable->m_serializedDataOffsets;
 	Vec* source = (Vec*)(pObject->m_workArea + offsets->m_srcOffset);

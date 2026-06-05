@@ -41,6 +41,15 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
+extern const char s_SN_EXIT_8032F630[] = "SN_EXIT";
+extern const char s_SN_MAP_8032F638[] = "SN_MAP";
+extern const char s_SN_GAME_8032F640[] = "SN_GAME";
+extern const char lbl_8032F648[] = "jp/";
+extern const char lbl_8032F64C[] = "uk/";
+extern const char lbl_8032F650[] = "gr/";
+extern const char lbl_8032F654[] = "it/";
+extern const char lbl_8032F658[] = "fr/";
+extern const char lbl_8032F65C[] = "sp/";
 extern const float kGamePartyBoundsMinInit = 1.0E+10;
 extern const float kGamePartyBoundsMaxInit = -1.0E+10;
 extern const float kGameZero = 0.0;

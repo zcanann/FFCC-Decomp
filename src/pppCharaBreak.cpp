@@ -93,9 +93,24 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
+struct CharaBreakDataOffsets {
+    s32 m_colorWorkOffset;
+    s32 _unused1;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_colorWorkOffset) == 0x0);
+STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_workOffset) == 0x8);
+
+static inline CharaBreakDataOffsets* GetCharaBreakDataOffsets(_pppCtrlTable* data)
+{
+    return reinterpret_cast<CharaBreakDataOffsets*>(data->m_serializedDataOffsets);
+}
+
 static inline CharaBreakWork* GetCharaBreakWork(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    return reinterpret_cast<CharaBreakWork*>(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    return reinterpret_cast<CharaBreakWork*>(
+        charaBreak->m_workArea + GetCharaBreakDataOffsets(data)->m_workOffset);
 }
 
 static inline void SetCharaBreakModelCallbacks(CChara::CModel* model, CharaBreakWork* work, CharaBreakStep* step)
@@ -127,7 +142,7 @@ static inline void ClearCharaBreakModelCallbacks(CChara::CModel* model)
  */
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTable* data)
 {
-    int colorOffset = data->m_serializedDataOffsets[0];
+    int colorOffset = GetCharaBreakDataOffsets(data)->m_colorWorkOffset;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
     _pppColorWork* colorWork = reinterpret_cast<_pppColorWork*>(charaBreak->m_workArea + colorOffset);
 
@@ -799,7 +814,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                             keepTri = 0;
                         }
                         outVertex = 0;
-                        polygonData = reinterpret_cast<POLYGON_DATA*>((u8*)polygonData + 0x34);
+                        polygonData++;
                     }
                 } else if (primitive == 0x98) {
                     if (outVertex == 1) {
@@ -813,7 +828,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                             stream = previousRestart;
                         }
                         outVertex = 0;
-                        polygonData = reinterpret_cast<POLYGON_DATA*>((u8*)polygonData + 0x34);
+                        polygonData++;
                     }
                 }
             }
@@ -846,13 +861,11 @@ static void CharaBreak_AfterDrawMeshCallback(
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
         s32 materialIndex = meshData->m_displayListCount - 1;
-        s32 materialOffset = materialIndex * 4;
 
         for (; materialIndex >= 0; materialIndex--, materialData++) {
             CharaBreakDisplayListPair** meshTable =
                 workData->m_meshBuffers[meshIndex];
-            CharaBreakDisplayListPair** displayListEntry =
-                reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(meshTable) + materialOffset);
+            CharaBreakDisplayListPair** displayListEntry = &meshTable[materialIndex];
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             MaterialMan.SetMaterial(
@@ -917,8 +930,6 @@ static void CharaBreak_AfterDrawMeshCallback(
                 polygon++;
                 GXWGFifo.u16 = polygon[-1].m_texIndices[2];
             }
-
-            materialOffset -= 4;
         }
     }
 }

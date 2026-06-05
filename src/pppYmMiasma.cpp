@@ -22,6 +22,11 @@ static const float FLOAT_80330654 = 3.1415927410125732f;
 static const float FLOAT_80330658 = 1.0f;
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
+static inline float YmMiasmaConst(const float& value)
+{
+    return *reinterpret_cast<const float*>(&value);
+}
+
 struct PARTICLE_DATA {
     Mtx m_matrix;
     Vec m_velocity;
@@ -214,7 +219,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         }
 
         angleDelta += step->m_baseAngle;
-        angleScale = ((FLOAT_80330650) * ((FLOAT_80330640) * (float)angleDelta)) /
+        angleScale = ((FLOAT_80330650) * (YmMiasmaConst(FLOAT_80330640) * (float)angleDelta)) /
                      (FLOAT_80330654);
         angleIdx = (s32)angleScale;
         impulseX = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));

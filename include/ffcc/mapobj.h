@@ -204,7 +204,7 @@ public:
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
-    unsigned char m_meshType;    // 0x1E
+    signed char m_meshType;      // 0x1E
     signed char m_octTreeIndex;      // 0x1F
     unsigned char m_unknown20;     // 0x20
     unsigned char m_useAmbientColor; // 0x21

@@ -46,19 +46,35 @@ STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
 STATIC_ASSERT(offsetof(MiasmaColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
+struct MiasmaDataOffsets {
+    s32 _unused0;
+    s32 m_colorWorkOffset;
+    s32 m_frameWorkOffset;
+    s32 m_radiusWorkOffset;
+};
+
+STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_colorWorkOffset) == 0x4);
+STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_frameWorkOffset) == 0x8);
+STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_radiusWorkOffset) == 0xC);
+
+static inline MiasmaDataOffsets* GetMiasmaDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<MiasmaDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline MiasmaFrameWork* GetMiasmaFrameWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<MiasmaFrameWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_frameWorkOffset);
 }
 
 static inline MiasmaColorWork* GetMiasmaColorWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaColorWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[1]);
+    return reinterpret_cast<MiasmaColorWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_colorWorkOffset);
 }
 
 static inline MiasmaRadiusWork* GetMiasmaRadiusWork(pppMiasma* miasma, _pppCtrlTable* ctrl)
 {
-    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + ctrl->m_serializedDataOffsets[3]);
+    return reinterpret_cast<MiasmaRadiusWork*>(miasma->m_workArea + GetMiasmaDataOffsets(ctrl)->m_radiusWorkOffset);
 }
 
 static inline void _GXSetTevOrder(int stage, int texCoord, int texMap, int colorChannel)

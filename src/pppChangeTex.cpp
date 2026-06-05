@@ -49,9 +49,9 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
-static const float kPppChangeTexCachedValueInit = -10000.0f;
+extern const float kPppChangeTexCachedValueInit = -10000.0f;
 static const char sPppChangeTexMeshObjectName[] = "obj";
-static const float kPppChangeTexAlphaScale = 255.0f;
+extern const float kPppChangeTexAlphaScale = 255.0f;
 static const float kPppChangeTexInit = 0.0f;
 static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
@@ -443,7 +443,8 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 
 	if (step->m_changeTex.m_mode == 0) {
 		unsigned int drawTevBits = 0xACE0F;
-		unsigned int fullTevBits = drawTevBits | 0x1000;
+		unsigned int fullTevBits = drawTevBits;
+		fullTevBits |= 0x1000;
 		MaterialMan.SetChangeTexReflectionState(
 		    &texture->m_texObj, drawTevBits, fullTevBits);
 	}

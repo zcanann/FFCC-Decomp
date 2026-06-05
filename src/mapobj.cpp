@@ -504,7 +504,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
 
             if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (static_cast<signed char>(m_meshType) > 7) && (static_cast<signed char>(m_meshType) < 10)) {
+                (static_cast<signed char>(m_meshType) < 10) && (static_cast<signed char>(m_meshType) > 7)) {
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;

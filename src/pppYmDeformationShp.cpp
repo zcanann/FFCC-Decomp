@@ -30,35 +30,6 @@ extern const float FLOAT_80330630 = 0.5f;
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-struct pppYmDeformationShpGraphArgs {
-    f32 m_valueAdd;
-    f32 m_velocityAdd;
-    f32 m_accelerationAdd;
-};
-
-struct pppYmDeformationShpUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_size;
-    u8 m_pad_0x9[3];
-    union {
-        f32 m_payload[6];
-        struct Payload {
-            pppYmDeformationShpGraphArgs m_scale;
-            pppYmDeformationShpGraphArgs m_angle;
-        } m_deformation;
-    };
-    s16 m_payload3;
-    s8 m_splitMode;
-    u8 m_splitSize;
-    u8 m_orientation;
-    u8 m_pad_0x29[3];
-    f32 m_drawZ;
-    u8 m_pad_0x30;
-    u8 m_alpha;
-    u8 m_pad_0x32[0xA];
-};
-
 struct YmDeformationShpColorInfo {
 	u32 m_unk0;
 	u32 m_unk4;
@@ -142,7 +113,7 @@ static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, _pppCtrlTable* param_3)
+void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
 {
 	_pppPObject* object = pppYmDeformationShp_;
 	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
@@ -443,7 +414,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, _pppCtrlTable* param_3)
+void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
 {
 	VYmDeformationShp* state;
 
@@ -470,14 +441,14 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		int step = (int)state->m_values[2];
 
 		state->m_angle = state->m_angle + step;
-		if (state->m_angle > param_2->m_payload3) {
+		if (state->m_angle > param_2->m_angleLimit) {
 			state->m_direction = 0;
 		}
 	} else {
 		int step = (int)state->m_values[2];
 
 		state->m_angle = state->m_angle - step;
-		if ((int)state->m_angle < -(int)param_2->m_payload3) {
+		if ((int)state->m_angle < -(int)param_2->m_angleLimit) {
 			state->m_direction = 1;
 		}
 	}

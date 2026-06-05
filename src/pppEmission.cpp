@@ -36,33 +36,6 @@ typedef CChara::CMesh EmissionMeshRef;
 struct EmissionState;
 struct EmissionParticle;
 
-struct PEmissionPayload {
-    f32 m_scaleAccelerationAdd;
-    f32 m_scaleRandomRange;
-    u8 m_blendMode;
-    u8 m_particleMode;
-    u8 m_texGenMode;
-    u8 m_targetAlpha;
-    u8 m_fadeOutFrames;
-    u8 m_lifeJitterFrames;
-    u8 m_holdFrames;
-    u8 m_fadeInFrames;
-    u8 m_pad10[0x10];
-};
-
-struct PEmission {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_initWOrk;
-    u8 _pad8[3];
-    f32 m_stepValue;
-    f32 m_arg3;
-    union {
-        u8 m_payload[0x20];
-        PEmissionPayload m_emission;
-    };
-};
-
 struct EmissionState {
     EmissionParticle* m_particles;
     CTexture* m_texture;
@@ -113,7 +86,7 @@ static inline EmissionMeshData* EmissionMeshAt(CChara::CModel* model, int meshIn
 void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
-static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, pppEmissionUnkB* step)
+static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, PEmission* step)
 {
     model->SetCallbackContext(state, step);
     model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
@@ -136,7 +109,7 @@ static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderEmission(pppEmission*, pppEmissionUnkB*, _pppCtrlTable*) {
+void pppRenderEmission(pppEmission*, PEmission*, _pppCtrlTable*) {
     pppInitBlendMode();
 }
 /*
@@ -148,7 +121,7 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, _pppCtrlTable*) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, _pppCtrlTable* param_3) {
+void pppFrameEmission(pppEmission* pppEmission_, PEmission* param_2, _pppCtrlTable* param_3) {
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -347,7 +320,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     Graphic.SetDrawDoneDebugData(0x66);
 
     EmissionState* state = (EmissionState*)param_2;
-    pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
+    PEmission* step = (PEmission*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(model, meshIndex);
     if ((strcmp(meshData->m_name, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         u32 drawTevBits = 0xACE0F;

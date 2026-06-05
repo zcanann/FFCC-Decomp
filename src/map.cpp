@@ -2460,8 +2460,8 @@ int CMapMng::ReadMid(char* mapName)
     }
 
     const int mapObjCount = m_mapObjCount;
+    CMapObj* obj = MapMng.GetMapObjArray();
     for (int i = 0; i < mapObjCount; i++) {
-        CMapObj* obj = GetMapObjArray() + i;
         unsigned char type = obj->m_mapDataType;
         CMapHit* hit = static_cast<CMapHit*>(obj->m_mapData);
         if ((type == 2 || type == 3) && hit != 0) {
@@ -2473,6 +2473,7 @@ int CMapMng::ReadMid(char* mapName)
                 obj->m_mapData = 0;
             }
         }
+        obj++;
     }
 
     if (ok) {

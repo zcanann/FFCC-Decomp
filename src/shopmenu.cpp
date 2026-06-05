@@ -103,6 +103,18 @@ extern char s_Plus_80332d4c[];
 extern char s_Minus_80332d50[];
 extern "C" char* g_strShopMenuMes[];
 
+STATIC_ASSERT(offsetof(CShopMenu, m_mode) == 0x4);
+STATIC_ASSERT(offsetof(CShopMenu, m_subMode) == 0x10);
+STATIC_ASSERT(offsetof(CShopMenu, m_listType) == 0x14);
+STATIC_ASSERT(offsetof(CShopMenu, m_pdtSlot) == 0x18);
+STATIC_ASSERT(offsetof(CShopMenu, m_fade) == 0x1C);
+STATIC_ASSERT(offsetof(CShopMenu, m_caravanWork) == 0x20);
+STATIC_ASSERT(offsetof(CShopMenu, m_selectedIndex) == 0x28);
+STATIC_ASSERT(offsetof(CShopMenu, m_quantity) == 0x44);
+STATIC_ASSERT(offsetof(CShopMenu, m_topChoice) == 0x48);
+STATIC_ASSERT(offsetof(CShopMenu, m_itemCount) == 0x4C);
+STATIC_ASSERT(sizeof(CShopMenu) == 0x158);
+
 struct ShopMenuTopMenuEntry {
     int x;
     int y;
@@ -2037,7 +2049,7 @@ void CShopMenu::DrawShop0()
         s_shopMenuTopMenuTextInitialized = 1;
     }
 
-    int selected = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x48);
+    int selected = m_topChoice;
 
     CFont* font;
     ShopMenuTopMenuEntry* entry = s_shopMenuTopMenuEntries;
@@ -2484,7 +2496,7 @@ void CShopMenu::Calc()
     int& timer = ShopMenuInt(this, 0xC);
     int& subMode = ShopMenuInt(this, 0x10);
     int& shopMode = ShopMenuInt(this, 0x14);
-    unsigned char& choice = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x48);
+    unsigned char& choice = m_topChoice;
 
     switch (mode) {
     case 0:
@@ -2719,13 +2731,12 @@ void CMenuPcs::CreateSmithMenu()
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
-    *reinterpret_cast<void**>(shopMenu) = nullptr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
+    shopMenu->m_unk00 = nullptr;
+    shopMenu->m_caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
     shopMenu->SetMode(9);
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        PartPcs.LoadMenuPdt(s_shop_80332e54);
+    shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(s_shop_80332e54);
 
-    int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
+    int slotIndex = shopMenu->m_pdtSlot;
     _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
@@ -2757,13 +2768,12 @@ void CMenuPcs::CreateShopMenu()
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
-    *reinterpret_cast<void**>(shopMenu) = nullptr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
+    shopMenu->m_unk00 = nullptr;
+    shopMenu->m_caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
     shopMenu->SetMode(0);
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        PartPcs.LoadMenuPdt(s_shop_80332e54);
+    shopMenu->m_pdtSlot = PartPcs.LoadMenuPdt(s_shop_80332e54);
 
-    int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
+    int slotIndex = shopMenu->m_pdtSlot;
     _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
@@ -2985,82 +2995,80 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
  */
 void CShopMenu::SetMode(int mode)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    m_mode = mode;
+    m_timer = 0;
 
-    *reinterpret_cast<int*>(self + 0x4) = mode;
-    *reinterpret_cast<int*>(self + 0xC) = 0;
-
-    switch (*reinterpret_cast<int*>(self + 0x4)) {
+    switch (m_mode) {
     case 0:
-        *reinterpret_cast<float*>(self + 0x1C) = 0.0f;
-        *reinterpret_cast<unsigned char*>(self + 0x48) = 0xFF;
+        m_fade = 0.0f;
+        m_topChoice = 0xFF;
         break;
     case 1:
-        *reinterpret_cast<unsigned char*>(self + 0x48) = 0;
+        m_topChoice = 0;
         break;
     case 3:
-        *reinterpret_cast<int*>(self + 0x14) = 0;
+        m_listType = 0;
         goto mode_3_6_common;
     case 6:
-        *reinterpret_cast<int*>(self + 0x14) = 1;
+        m_listType = 1;
 mode_3_6_common:
-        *reinterpret_cast<int*>(self + 0x10) = 0;
-        *reinterpret_cast<int*>(self + 0x28) = -1;
-        *reinterpret_cast<int*>(self + 0x24) = 0;
-        *reinterpret_cast<int*>(self + 0x2C) = 8;
-        *reinterpret_cast<int*>(self + 0x34) = 0;
-        *reinterpret_cast<int*>(self + 0x30) = 0;
-        *reinterpret_cast<int*>(self + 0x40) = 0;
-        *reinterpret_cast<int*>(self + 0x44) = 1;
-        *reinterpret_cast<int*>(self + 0x38) = 0;
-        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        m_subMode = 0;
+        m_selectedIndex = -1;
+        m_listTop = 0;
+        m_visibleRows = 8;
+        m_canScrollDown = 0;
+        m_canScrollUp = 0;
+        m_faceAlpha = 0;
+        m_quantity = 1;
+        m_figureMode = 0;
+        m_yesNo = 0;
         break;
     case 4:
     case 7:
-        *reinterpret_cast<int*>(self + 0x28) = 0;
-        *reinterpret_cast<int*>(self + 0x24) = 0;
-        *reinterpret_cast<int*>(self + 0x38) = 0;
+        m_selectedIndex = 0;
+        m_listTop = 0;
+        m_figureMode = 0;
         break;
     case 9: {
-        *reinterpret_cast<float*>(self + 0x1C) = 0.0f;
-        *reinterpret_cast<unsigned char*>(self + 0x48) = 0xFF;
-        *reinterpret_cast<int*>(self + 0x14) = 2;
-        *reinterpret_cast<int*>(self + 0x10) = 0;
-        *reinterpret_cast<int*>(self + 0x28) = 0;
-        *reinterpret_cast<int*>(self + 0x24) = 0;
-        *reinterpret_cast<int*>(self + 0x2C) = 8;
-        *reinterpret_cast<int*>(self + 0x34) = 0;
-        *reinterpret_cast<int*>(self + 0x30) = 0;
-        *reinterpret_cast<int*>(self + 0x40) = 0;
-        *reinterpret_cast<int*>(self + 0x44) = 1;
-        *reinterpret_cast<int*>(self + 0x38) = 0;
-        *reinterpret_cast<int*>(self + 0x3C) = 0;
-        *reinterpret_cast<int*>(self + 0x154) = -1;
-        *reinterpret_cast<int*>(self + 0x4C) = 0;
+        m_fade = 0.0f;
+        m_topChoice = 0xFF;
+        m_listType = 2;
+        m_subMode = 0;
+        m_selectedIndex = 0;
+        m_listTop = 0;
+        m_visibleRows = 8;
+        m_canScrollDown = 0;
+        m_canScrollUp = 0;
+        m_faceAlpha = 0;
+        m_quantity = 1;
+        m_figureMode = 0;
+        m_yesNo = 0;
+        m_resultParam = -1;
+        m_itemCount = 0;
 
         CMenuPcs* menuPcs = &MenuPcs;
         for (int i = 0; i < 0x40; i++) {
             if (menuPcs->GetItemType(i, 0) == 9) {
-                int count = *reinterpret_cast<int*>(self + 0x4C);
-                *reinterpret_cast<int*>(self + 0x4C) = count + 1;
-                *reinterpret_cast<int*>(self + 0x50 + count * 4) = i;
+                int count = m_itemCount;
+                m_itemCount = count + 1;
+                m_itemTable[count] = i;
             }
         }
 
-        if (*reinterpret_cast<int*>(self + 0x4C) == 0) {
+        if (m_itemCount == 0) {
             for (int i = 0; i < 8; i++) {
-                int count = *reinterpret_cast<int*>(self + 0x4C);
-                *reinterpret_cast<int*>(self + 0x4C) = count + 1;
-                *reinterpret_cast<int*>(self + 0x50 + count * 4) = -1;
+                int count = m_itemCount;
+                m_itemCount = count + 1;
+                m_itemTable[count] = -1;
             }
         }
         break;
     }
     case 10:
-        *reinterpret_cast<unsigned char*>(self + 0x48) = 0;
+        m_topChoice = 0;
         break;
     case 12:
-        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        m_yesNo = 0;
         break;
     case 13:
     case 14:

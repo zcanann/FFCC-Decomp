@@ -441,8 +441,13 @@ void CMemory::Quit()
 
             while (stage != listHead) {
                 CStage* next = stage->m_next;
-                if ((pass != 0) ||
-                    (stage != m_currentMemoryStage)) {
+                if (pass == 0) {
+                    if (stage != m_currentMemoryStage) {
+                        System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stage->m_allocationSourceStr);
+                        stageDestroyInternal(stage);
+                        stageMoveToPoolList(this, stage);
+                    }
+                } else {
                     System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stage->m_allocationSourceStr);
                     stageDestroyInternal(stage);
                     stageMoveToPoolList(this, stage);

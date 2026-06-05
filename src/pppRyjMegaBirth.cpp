@@ -1,3 +1,4 @@
+#include "global.h"
 #include "ffcc/pppRyjMegaBirth.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
@@ -23,6 +24,26 @@ extern const float FLOAT_80330490[2];
 Mtx g_matUnit;
 
 static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
+
+struct RyjMegaBirthDataOffsets
+{
+	s32 m_unusedOffset;
+	s32 m_colorOffset;
+	s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_colorOffset) == 0x4);
+STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_workOffset) == 0x8);
+
+static inline RyjMegaBirthDataOffsets* GetRyjMegaBirthDataOffsets(PRyjMegaBirthOffsets* offsets)
+{
+	return reinterpret_cast<RyjMegaBirthDataOffsets*>(offsets->m_serializedDataOffsets);
+}
+
+static inline RyjMegaBirthDataOffsets* GetRyjMegaBirthDataOffsets(_pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<RyjMegaBirthDataOffsets*>(ctrlTable->m_serializedDataOffsets);
+}
 
 extern const float FLOAT_80330458 = 360.0f;
 extern const float FLOAT_8033045c = 180.0f;
@@ -206,7 +227,7 @@ static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 fla
 void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
 	VRyjMegaBirth* work =
-		reinterpret_cast<VRyjMegaBirth*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
+		reinterpret_cast<VRyjMegaBirth*>(pObject->m_workArea + GetRyjMegaBirthDataOffsets(offsets)->m_workOffset);
 
 	if (work->m_particleBlock != 0)
 	{
@@ -238,7 +259,7 @@ void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
  */
 void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	VRyjMegaBirth* work = (VRyjMegaBirth*)(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
+	VRyjMegaBirth* work = (VRyjMegaBirth*)(pObject->m_workArea + GetRyjMegaBirthDataOffsets(offsets)->m_workOffset);
 	float zero;
 
 	PSMTXIdentity(work->m_worldMatrix);
@@ -324,9 +345,9 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 {
 	PRyjMegaBirth* params = (PRyjMegaBirth*)stepData;
 	u8* payload = (u8*)params;
-	int* offsets = ctrlTable->m_serializedDataOffsets;
-	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets[2]);
-	VColor* baseColor = (VColor*)(obj->m_workArea + offsets[1]);
+	RyjMegaBirthDataOffsets* offsets = GetRyjMegaBirthDataOffsets(ctrlTable);
+	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets->m_workOffset);
+	VColor* baseColor = (VColor*)(obj->m_workArea + offsets->m_colorOffset);
 	_PARTICLE_DATA* particleBlock = work->m_particleBlock;
 	_PARTICLE_WMAT* particleWorldMatBlock = work->m_worldMatrixBlock;
 	_PARTICLE_COLOR* colorBlock = work->m_colorBlock;
@@ -527,15 +548,15 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMegaBirthOffsets* offsets)
 {
 	s8 hasRequiredMemory;
-	s32* serializedDataOffsets;
+	RyjMegaBirthDataOffsets* serializedDataOffsets;
 	s32 workOffset;
 	s32 colorOffset;
 	VRyjMegaBirth* work;
 	VColor* color;
 
-	serializedDataOffsets = offsets->m_serializedDataOffsets;
-	workOffset = serializedDataOffsets[2];
-	colorOffset = serializedDataOffsets[1];
+	serializedDataOffsets = GetRyjMegaBirthDataOffsets(offsets);
+	workOffset = serializedDataOffsets->m_workOffset;
+	colorOffset = serializedDataOffsets->m_colorOffset;
 	work = reinterpret_cast<VRyjMegaBirth*>(pObject->m_workArea + workOffset);
 	color = reinterpret_cast<VColor*>(pObject->m_workArea + colorOffset);
 

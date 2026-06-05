@@ -2847,9 +2847,9 @@ void CMapMng::Draw()
 
     if ((gMapHitDrawMode.m_byte & 8) != 0) {
         _GXColor clearColor;
-        clearColor.r = 0xFF;
-        clearColor.g = 0xFF;
-        clearColor.b = 0xFF;
+        clearColor.r = 0;
+        clearColor.g = 0;
+        clearColor.b = 0;
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
     }

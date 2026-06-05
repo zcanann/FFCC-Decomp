@@ -5,11 +5,6 @@
 
 const float kPppSclMoveZero = 0.0f;
 
-struct PppSclMoveOffsets {
-    int m_scaleOffset;
-    int m_velocityOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80063210

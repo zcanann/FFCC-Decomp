@@ -10,11 +10,6 @@ struct PppMoveObj {
     f32 z;           // 0x8
 };
 
-struct PppMoveOffsets {
-    u32 a;           // 0x0
-    u32 b;           // 0x4
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80065b18
@@ -47,8 +42,8 @@ void pppMoveCon(_pppPObject* basePtr, _pppCtrlTable* ctrlTable)
 void pppMove(_pppPObject* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
 {
     PppMoveOffsets* offsets = (PppMoveOffsets*)ctrlTable->m_serializedDataOffsets;
-    PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->a);
-    PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->b);
+    PppMoveObj* a = (PppMoveObj*)(basePtr->m_workArea + offsets->m_positionOffset);
+    PppMoveObj* b = (PppMoveObj*)(basePtr->m_workArea + offsets->m_velocityOffset);
 
     if (ppvUserStopPartF != 0) {
         return;

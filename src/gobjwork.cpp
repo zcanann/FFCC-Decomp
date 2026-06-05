@@ -44,6 +44,13 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
+STATIC_ASSERT(offsetof(CRomLetterWork, m_priorityFlags) == 0x06);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_personalConditions) == 0x18);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_linkConditions) == 0x1A);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_linkValueConditions) == 0x1C);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_compareRules) == 0x1E);
+STATIC_ASSERT(offsetof(CRomLetterWork, m_eventRules) == 0x2E);
+
 extern char s_WorldMapSortFmts_801D9EC8[];
 static const char s_NoWorldReturnItem_801D9F64[] = {
 	(char)0x83, (char)0x8F, (char)0x81, (char)0x5B, (char)0x83, (char)0x8B, (char)0x83, (char)0x68,
@@ -990,9 +997,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	}
 
-	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.m_romLetterWorkBase);
-	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter += 0x3E) {
-		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
+	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
+		unsigned short condBits = curLetter->m_personalConditions;
 
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
@@ -1100,7 +1107,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedPersonalConditions:
 
-		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1A);
+		condBits = curLetter->m_linkConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
 				if ((condBits & 0x8000) == 0) {
@@ -1214,7 +1221,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkConditions:
 
-		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1C);
+		condBits = curLetter->m_linkValueConditions;
 		if ((condBits & 0x7FFF) != 0) {
 			if ((condBits & 0x0001) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
@@ -1323,7 +1330,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		unsigned int cmpValue = 0;
 		for (int i = 0; i < 4; i++) {
-			const unsigned short cmpType = *reinterpret_cast<unsigned short*>(curLetter + 0x1E + i * 4);
+			const unsigned short cmpType = curLetter->m_compareRules[i].m_rule;
 			const int sourceType = (cmpType >> 11) & 3;
 			const int sourceIdx = cmpType & 0x7FF;
 
@@ -1345,7 +1352,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 				}
 
 				const int op = cmpType >> 13;
-				const unsigned int compareValue = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(curLetter + 0x20 + i * 4));
+				const unsigned int compareValue = static_cast<unsigned int>(curLetter->m_compareRules[i].m_value);
 				if (op == 0) {
 					if (cmpValue != compareValue) {
 						goto NextLetter;
@@ -1381,7 +1388,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			unsigned char* evtWorkBytes = reinterpret_cast<unsigned char*>(m_evtWorkArr);
 
 			for (int i = 0; i < 8; i++) {
-				const unsigned short evtRule = *reinterpret_cast<unsigned short*>(curLetter + 0x2E + i * 2);
+				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
 				const int sourceIdx = evtRule & 0x7FF;
 				int checkValue = bit0;
@@ -1452,20 +1459,19 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			unsigned short minPriority = 0xFFFF;
 			int replaceIndex = 0;
 			for (int i = 0; i < maxResults; i++) {
-				unsigned char* existing = reinterpret_cast<unsigned char*>(romLetterWork[i]);
-				unsigned short priority = *reinterpret_cast<unsigned short*>(existing + 6) & 0xF00;
+				unsigned short priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
 					replaceIndex = i;
 				}
 			}
 
-			const unsigned short curPriority = *reinterpret_cast<unsigned short*>(curLetter + 6) & 0xF00;
+			const unsigned short curPriority = curLetter->m_priorityFlags & 0xF00;
 			if (minPriority < curPriority) {
-				romLetterWork[replaceIndex] = reinterpret_cast<CRomLetterWork*>(curLetter);
+				romLetterWork[replaceIndex] = curLetter;
 			}
 		} else {
-			romLetterWork[foundCount] = reinterpret_cast<CRomLetterWork*>(curLetter);
+			romLetterWork[foundCount] = curLetter;
 			foundCount++;
 		}
 

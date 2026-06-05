@@ -4,7 +4,28 @@
 #include "global.h"
 
 class CRomWork;
-class CRomLetterWork;
+struct CRomLetterWork
+{
+    unsigned short Word(int index) const { return reinterpret_cast<const unsigned short*>(this)[index]; }
+
+    unsigned short m_from;
+    unsigned short m_subject;
+    unsigned short m_message;
+    unsigned short m_priorityFlags;
+    unsigned char m_pad08[0x18 - 0x08];
+    unsigned short m_personalConditions;
+    unsigned short m_linkConditions;
+    unsigned short m_linkValueConditions;
+
+    struct CompareRule
+    {
+        unsigned short m_rule;
+        unsigned short m_value;
+    };
+
+    CompareRule m_compareRules[4];
+    unsigned short m_eventRules[8];
+};
 
 class CGObjWork
 {
@@ -240,6 +261,7 @@ public:
 
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
+STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);
 
 CMonWork* SAFE_CAST_MON_WORK(CGObjWork*);
 CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork*);

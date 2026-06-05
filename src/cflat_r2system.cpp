@@ -3668,17 +3668,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Game.m_caravanWorkArr[*object->m_localBase].SearchRomLetterWork(romLetterWork, 8);
 
         for (int i = 0; i < 8; i++) {
-            u16* letter = reinterpret_cast<u16*>(romLetterWork[i]);
+            CRomLetterWork* letter = romLetterWork[i];
             int dstOffs = i * 4;
-            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter[0] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter[1] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter[2] : -1;
-            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter[3] : -1;
+            *reinterpret_cast<int*>(object->m_localBase[1] + dstOffs) = letter != 0 ? letter->m_from : -1;
+            *reinterpret_cast<int*>(object->m_localBase[2] + dstOffs) = letter != 0 ? letter->m_subject : -1;
+            *reinterpret_cast<int*>(object->m_localBase[3] + dstOffs) = letter != 0 ? letter->m_message : -1;
+            *reinterpret_cast<int*>(object->m_localBase[4] + dstOffs) = letter != 0 ? letter->m_priorityFlags : -1;
             if (letter == 0) {
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = -1;
             } else {
                 int letterIndex =
-                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / 0x3E;
+                    (reinterpret_cast<int>(letter) - static_cast<int>(Game.m_romLetterWorkBase)) / sizeof(CRomLetterWork);
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
             }
         }
@@ -3940,9 +3940,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xDC: {
-        u8* base = reinterpret_cast<u8*>(Game.m_romLetterWorkBase);
-        runtime->push(
-            object, *reinterpret_cast<u16*>(base + *object->m_localBase * 0x3E + object->m_localBase[1] * 2));
+        CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+        runtime->push(object, letters[*object->m_localBase].Word(object->m_localBase[1]));
         outResult = 0;
         return 1;
     }

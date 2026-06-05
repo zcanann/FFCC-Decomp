@@ -208,11 +208,6 @@ static inline u8* MenuPcsRaw()
 	return reinterpret_cast<u8*>(&MenuPcs);
 }
 
-static inline u8* GraphicPcsRaw()
-{
-	return reinterpret_cast<u8*>(&GraphicPcs);
-}
-
 static inline u8* CameraPcsRaw()
 {
 	return reinterpret_cast<u8*>(&CameraPcs);
@@ -2627,7 +2622,7 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
 	*reinterpret_cast<u32*>(PadRaw() + 0x1C8) = 1;
-	*reinterpret_cast<u32*>(GraphicPcsRaw() + 0x44) = 0;
+	GraphicPcs.m_screenFade[1].m_mode = 0;
 	*reinterpret_cast<u32*>(CameraPcsRaw() + 0x434) = 1;
 	AStar.reset();
 }

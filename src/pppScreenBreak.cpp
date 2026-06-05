@@ -82,7 +82,6 @@ static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive;
 extern "C" {
 int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
     CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
-void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 }
 
 /*
@@ -125,7 +124,7 @@ void pppFrameScreenBreak(pppScreenBreak* screenBreak, PScreenBreak* param_2, _pp
     }
 
     if (GraphicScreenBreakBlurEnabled() != 0) {
-        SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(&GraphicPcs, 0, 0, 0, 0, 0, 0, 0);
+        GraphicPcs.SetBlurParameter(0, 0, 0, 0, 0, 0, 0);
     }
 
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;

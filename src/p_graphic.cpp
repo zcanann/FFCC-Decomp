@@ -19,6 +19,19 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" {
+void create__11CGraphicPcsFv(CGraphicPcs*);
+void destroy__11CGraphicPcsFv(CGraphicPcs*);
+void calc__11CGraphicPcsFv(CGraphicPcs*);
+void drawBegin__11CGraphicPcsFv(CGraphicPcs*);
+void drawWait__11CGraphicPcsFv(CGraphicPcs*);
+void drawFlip__11CGraphicPcsFv(CGraphicPcs*);
+void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
+void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
+void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
+void stdDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
+}
+
 CProcessTableCallback CGraphicPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__11CGraphicPcsFv)};
 CProcessTableCallback CGraphicPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__11CGraphicPcsFv)};
 CProcessTableCallback CGraphicPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__11CGraphicPcsFv)};

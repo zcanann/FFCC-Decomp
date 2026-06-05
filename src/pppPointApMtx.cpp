@@ -3,11 +3,6 @@
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
-struct pppPointApMtxOffsets {
-	u32 m_srcOffset;
-	u32 m_stateOffset;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800de210  

@@ -169,7 +169,7 @@ template <class T>
 void CPtrArray<T>::RemoveAt(unsigned long index)
 {
     m_items[index] = 0;
-    for (; index < m_numItems - 1; index++) {
+    for (; index < m_numItems; index++) {
         m_items[index] = m_items[index + 1];
     }
 

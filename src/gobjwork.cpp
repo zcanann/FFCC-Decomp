@@ -28,15 +28,6 @@ struct ShoukiByteFlags {
 	int middle : 1;
 };
 
-struct LetterFlags {
-	unsigned char opened : 1;
-	unsigned char flag6 : 1;
-	unsigned char replySent : 1;
-	unsigned char hasReply : 1;
-	unsigned char hasMoney : 1;
-	unsigned char low : 3;
-};
-
 static inline float GetStatusMultiplier(int offset)
 {
 	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * kGObjWorkStatusScaleStep) +
@@ -414,31 +405,27 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 							 int itemA, int itemB, int itemC, int itemD)
 {
 	for (int i = 99; i > 0; i--) {
-		m_letters[i].m_word0 = m_letters[i - 1].m_word0;
-		m_letters[i].m_word1 = m_letters[i - 1].m_word1;
-		m_letters[i].m_word2 = m_letters[i - 1].m_word2;
+		m_letters[i].m_words.m_word0 = m_letters[i - 1].m_words.m_word0;
+		m_letters[i].m_words.m_word1 = m_letters[i - 1].m_words.m_word1;
+		m_letters[i].m_words.m_word2 = m_letters[i - 1].m_words.m_word2;
 	}
 
-	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-
-	LetterFlags* letterFlags = reinterpret_cast<LetterFlags*>(&m_letters[0]);
-	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(&m_letters[0]);
-	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(&m_letters[0]);
-	letterWords16[0] |= static_cast<unsigned short>(letterType << 2);
-	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
-	letterFlags->hasMoney = hasMoneyFlag;
-	if (letterFlags->hasMoney != 0) {
+	CCaravanWork::CLetterWork* letter = &m_letters[0];
+	memset(letter, 0, sizeof(*letter));
+	letter->m_half.m_header = static_cast<unsigned short>(letterType << 2);
+	letter->m_words.m_word0 = (letter->m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
+	if (hasMoneyFlag != 0) {
+		letter->SetFlags(letter->Flags() | 8);
 		moneyValue /= 100;
 	}
-	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
-	letterFlags->opened = 0;
-	letterFlags->flag6 = 0;
-	letterFlags->replySent = 0;
-	letterFlags->hasReply = hasReplyFlag;
-	letterWords16[2] = (unsigned short)itemA;
-	letterWords16[3] = (unsigned short)itemB;
-	letterWords16[4] = (unsigned short)itemC;
-	letterWords16[5] = (unsigned short)itemD;
+	letter->m_half.m_attachment = (letter->m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
+	if (hasReplyFlag != 0) {
+		letter->SetFlags(letter->Flags() | 0x10);
+	}
+	letter->m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
+	letter->m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);
+	letter->m_half.m_tempVars[2] = static_cast<unsigned short>(itemC);
+	letter->m_half.m_tempVars[3] = static_cast<unsigned short>(itemD);
 
 	int nextCount = m_letterCount + 1;
 	int letterCount = 100;

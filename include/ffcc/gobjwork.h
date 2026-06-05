@@ -85,10 +85,30 @@ public:
     class CLetterWork
     {
     public:
-        unsigned char Flags() const { return static_cast<unsigned char>(m_word0 >> 24); }
+        struct Halfwords {
+            unsigned short m_header;
+            unsigned short m_attachment;
+            unsigned short m_tempVars[4];
+        };
+        struct Words {
+            unsigned int m_word0;
+            unsigned int m_word1;
+            unsigned int m_word2;
+        };
+
+        unsigned int Word0() const { return m_words.m_word0; }
+        void SetWord0(unsigned int word)
+        {
+            m_words.m_word0 = word;
+        }
+        unsigned int Word1() const { return m_words.m_word1; }
+        void SetWord1(unsigned int word) { m_words.m_word1 = word; }
+        unsigned int Word2() const { return m_words.m_word2; }
+        void SetWord2(unsigned int word) { m_words.m_word2 = word; }
+        unsigned char Flags() const { return static_cast<unsigned char>(m_half.m_header >> 8); }
         void SetFlags(unsigned char flags)
         {
-            m_word0 = (m_word0 & 0x00FFFFFF) | (static_cast<unsigned int>(flags) << 24);
+            m_half.m_header = (m_half.m_header & 0x00FF) | (static_cast<unsigned short>(flags) << 8);
         }
         bool IsOpened() const { return static_cast<signed char>(Flags()) < 0; }
         void SetOpened() { SetFlags(Flags() | 0x80); }
@@ -98,20 +118,17 @@ public:
         void SetReplySent() { SetFlags(Flags() | 0x20); }
         bool HasReply() const { return (Flags() & 0x10) != 0; }
         bool AttachmentIsGil() const { return (Flags() & 8) != 0; }
-        unsigned short HeaderWord() const { return static_cast<unsigned short>(m_word0 >> 16); }
+        unsigned short HeaderWord() const { return m_half.m_header; }
         unsigned short MessageType() const { return (HeaderWord() >> 2) & 0x1FF; }
-        unsigned int SenderId() const { return (m_word0 >> 9) & 0x1FF; }
-        unsigned short AttachmentWord() const { return static_cast<unsigned short>(m_word0); }
+        unsigned int SenderId() const { return (Word0() >> 9) & 0x1FF; }
+        unsigned short AttachmentWord() const { return m_half.m_attachment; }
         unsigned int AttachmentValue() const { return AttachmentWord() & 0x1FF; }
-        unsigned short TempVar(int index) const
-        {
-            unsigned int word = (index < 2) ? m_word1 : m_word2;
-            return (index & 1) ? static_cast<unsigned short>(word) : static_cast<unsigned short>(word >> 16);
-        }
+        unsigned short TempVar(int index) const { return m_half.m_tempVars[index]; }
 
-        unsigned int m_word0;
-        unsigned int m_word1;
-        unsigned int m_word2;
+        union {
+            Halfwords m_half;
+            Words m_words;
+        };
     };
 
     CCaravanWork();

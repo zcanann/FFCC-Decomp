@@ -1,12 +1,33 @@
 #ifndef _FFCC_PPBBREATHMODEL_H_
 #define _FFCC_PPBBREATHMODEL_H_
 
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
 struct _pppPObject;
+struct BreathParticleGroup;
+struct PARTICLE_DATA;
+struct PARTICLE_WMAT;
+struct PARTICLE_COLOR;
 
 typedef _pppPObject pppBreathModel;
+
+struct VBreathModel {
+    Mtx m_matrix;
+    PARTICLE_DATA* m_particleData;
+    PARTICLE_WMAT* m_particleWmats;
+    PARTICLE_COLOR* m_particleColors;
+    BreathParticleGroup* m_groups;
+    int m_particleCount;
+    u16 m_emitFrameCounter;
+    u16 _pad46;
+    Vec m_direction;
+    s16 m_groupCount;
+    s16 m_slotCount;
+    u8 m_flags;
+    u8 _pad59[3];
+};
 
 struct PBreathModel {
     int m_graphId;

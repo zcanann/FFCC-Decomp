@@ -29,22 +29,6 @@ struct BreathParticleGroup {
     Mtx matrix;
 };
 
-struct VBreathModel {
-    Mtx m_matrix;
-    PARTICLE_DATA* m_particleData;
-    PARTICLE_WMAT* m_particleWmats;
-    PARTICLE_COLOR* m_particleColors;
-    BreathParticleGroup* m_groups;
-    int m_particleCount;
-    u16 m_emitFrameCounter;
-    u16 _pad46;
-    Vec m_direction;
-    s16 m_groupCount;
-    s16 m_slotCount;
-    u8 m_flags;
-    u8 _pad59[3];
-};
-
 struct BreathParticleData {
     Mtx m_modelMtx;
     Vec m_position;

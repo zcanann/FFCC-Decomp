@@ -1,4 +1,5 @@
 #include "ffcc/pppYmDeformationScreen.h"
+#include "global.h"
 #include "ffcc/graphic.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
@@ -23,6 +24,14 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
+struct YmDeformationScreenDataOffsets {
+	s32 _unused0;
+	s32 _unused1;
+	s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(YmDeformationScreenDataOffsets, m_workOffset) == 0x8);
+
 static const float kYmDeformationScreenZero = 0.0f;
 static const float kYmDeformationScreenOrthoScaleX = 0.003125f;
 static const float kYmDeformationScreenOrthoScaleY = -0.004464f;
@@ -32,6 +41,16 @@ static const float kYmDeformationScreenAngleToRad = 0.017453292f;
 static const float kYmDeformationScreenQuadRight = 640.0f;
 static const float kYmDeformationScreenQuadMiddleY = 224.0f;
 static const float kYmDeformationScreenQuadBottom = 448.0f;
+
+static inline YmDeformationScreenDataOffsets* GetYmDeformationScreenDataOffsets(_pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<YmDeformationScreenDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline VYmDeformationScreen* GetYmDeformationScreenWork(pppYmDeformationScreen* obj, s32 offset)
+{
+	return reinterpret_cast<VYmDeformationScreen*>(obj->m_workArea + offset);
+}
 
 /*
  * --INFO--
@@ -44,8 +63,8 @@ static const float kYmDeformationScreenQuadBottom = 448.0f;
  */
 void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationScreenStep* step, _pppCtrlTable* param3)
 {
-	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(param1->m_workArea + param3->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = GetYmDeformationScreenWork(
+		param1, GetYmDeformationScreenDataOffsets(param3)->m_workOffset);
 	int textureIndex = 0;
 	GXTexObj backTexObj;
 	Mtx identity;
@@ -214,14 +233,14 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, YmDeformationSc
 	Vec4d inVec;
 	Mtx44 screenMtx;
 	VYmDeformationScreen* work;
-	int* serializedDataOffsets;
+	YmDeformationScreenDataOffsets* serializedDataOffsets;
 	float cameraX;
 	float cameraY;
 	float cameraZ;
 
 	if (ppvUserStopPartF == 0) {
-		serializedDataOffsets = param3->m_serializedDataOffsets;
-		work = (VYmDeformationScreen*)(param1->m_workArea + serializedDataOffsets[2]);
+		serializedDataOffsets = GetYmDeformationScreenDataOffsets(param3);
+		work = GetYmDeformationScreenWork(param1, serializedDataOffsets->m_workOffset);
 
 		CalcGraphValue(
 			param1, step->m_graphId, work->m_scale, work->m_values[0],
@@ -303,8 +322,8 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, _pppCtrlTable*)
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable* param2)
 {
 	float zero = kYmDeformationScreenZero;
-	VYmDeformationScreen* work =
-		(VYmDeformationScreen*)(obj->m_workArea + param2->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = GetYmDeformationScreenWork(
+		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 
 	work->m_values[1] = zero;
 	work->m_values[0] = zero;
@@ -328,7 +347,8 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, _pppCtrlTable*
 	short angle = 0;
 	char direction = 1;
 	float zero = kYmDeformationScreenZero;
-	VYmDeformationScreen* work = (VYmDeformationScreen*)(obj->m_workArea + param2->m_serializedDataOffsets[2]);
+	VYmDeformationScreen* work = GetYmDeformationScreenWork(
+		obj, GetYmDeformationScreenDataOffsets(param2)->m_workOffset);
 
 	work->m_angle = angle;
 	work->m_direction = direction;

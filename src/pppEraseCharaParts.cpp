@@ -1,4 +1,5 @@
 #include "ffcc/pppEraseCharaParts.h"
+#include "global.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
@@ -11,7 +12,20 @@ typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
 typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
 typedef CChara::CMesh EraseCharaPartsMesh;
 
+struct EraseCharaPartsDataOffsets {
+    s32 m_sourceColorOffset;
+    s32 m_callbackColorOffset;
+};
+
+STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_sourceColorOffset) == 0x0);
+STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_callbackColorOffset) == 0x4);
+
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+
+static inline EraseCharaPartsDataOffsets* GetEraseCharaPartsDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<EraseCharaPartsDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
 
 static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s32 offset)
 {
@@ -32,15 +46,15 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
 {
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
-    int* offsets;
+    EraseCharaPartsDataOffsets* offsets;
     int colorIndex;
     u8* dstColor;
     u8* srcColor;
 
     if (ppvUserStopPartF == 0) {
-        offsets = param_3->m_serializedDataOffsets;
-        colorIndex = offsets[0];
-        dstColor = GetEraseCharaPartsWork(pppEraseCharaParts, offsets[1]);
+        offsets = GetEraseCharaPartsDataOffsets(param_3);
+        colorIndex = offsets->m_sourceColorOffset;
+        dstColor = GetEraseCharaPartsWork(pppEraseCharaParts, offsets->m_callbackColorOffset);
         srcColor = GetEraseCharaPartsWork(pppEraseCharaParts, colorIndex);
         handle = GetCharaHandlePtr(ppvMng->m_owner, 0);
         model = GetCharaModelPtr(handle);
@@ -87,14 +101,14 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, _pppCtrlTable*)
  */
 void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, _pppCtrlTable* param_2)
 {
-    int* serializedDataOffsets;
+    EraseCharaPartsDataOffsets* serializedDataOffsets;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     u8* colorPtr;
     void* gObject;
 
-    serializedDataOffsets = param_2->m_serializedDataOffsets;
-    colorPtr = GetEraseCharaPartsWork(pppEraseCharaParts, serializedDataOffsets[1]);
+    serializedDataOffsets = GetEraseCharaPartsDataOffsets(param_2);
+    colorPtr = GetEraseCharaPartsWork(pppEraseCharaParts, serializedDataOffsets->m_callbackColorOffset);
     gObject = ppvMng->m_owner;
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;

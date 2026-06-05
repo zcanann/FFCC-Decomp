@@ -26,7 +26,6 @@ static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 typedef pppLaserWorkBase pppYmLaserWork;
 typedef pppLaserColorBlock pppYmLaserColorData;
-typedef pppLaserMapCylinder pppYmLaserMapCylinder;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
@@ -39,7 +38,6 @@ static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* c
 }
 
 STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
-STATIC_ASSERT(sizeof(pppYmLaserMapCylinder) == sizeof(CMapCylinder));
 
 /*
  * --INFO--
@@ -330,7 +328,6 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 	Vec localA;
 	Mtx tempMtx;
 	Mtx charaMtx;
-	pppYmLaserMapCylinder cyl;
 	int emptyHistory;
 	int fillIndex;
 
@@ -395,17 +392,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, YmLaserConst(FLOAT_80330de4));
 
-		cyl.m_boundsMin.z = YmLaserConst(FLOAT_80330de8);
-		cyl.m_boundsMin.y = YmLaserConst(FLOAT_80330de8);
-		cyl.m_boundsMin.x = YmLaserConst(FLOAT_80330de8);
-		cyl.m_boundsMax.z = YmLaserConst(FLOAT_80330dec);
-		cyl.m_boundsMax.y = YmLaserConst(FLOAT_80330dec);
-		cyl.m_boundsMax.x = YmLaserConst(FLOAT_80330dec);
+		CMapCylinder cyl(YmLaserConst(FLOAT_80330de8), YmLaserConst(FLOAT_80330dec));
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

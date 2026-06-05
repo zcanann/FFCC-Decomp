@@ -786,7 +786,7 @@ void CMenuPcs::CmdOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmdCtrl()
+int CMenuPcs::CmdCtrl()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	u32 actionHandled = 0;

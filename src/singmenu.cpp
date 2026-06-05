@@ -2021,7 +2021,7 @@ void CMenuPcs::SingleCalcCtrl()
         if (proc == 0) {
             CmdOpen();
         } else if (proc == 1) {
-            CmdCtrl();
+            result = CmdCtrl();
         } else {
             result = CmdClose();
         }

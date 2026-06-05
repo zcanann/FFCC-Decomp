@@ -35,7 +35,7 @@ public:
     void CmdInit1();
     void CmdInit2();
     void CmdOpen();
-    void CmdCtrl();
+    int CmdCtrl();
     int CmdClose();
     void CmdDraw();
     unsigned int CmdCtrlCur();

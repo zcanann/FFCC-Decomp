@@ -3410,10 +3410,10 @@ startMapObjAnim:
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
     CMapAnimRun* mapAnimRun;
-    int mapAnimRunCount = GetMapAnimRunArray().GetSize();
+    int mapAnimRunCount = m_mapAnimRunArray.GetSize();
 
     for (int i = 0; i < mapAnimRunCount; i++) {
-        CMapAnimRun* current = GetMapAnimRunArray()[i];
+        CMapAnimRun* current = m_mapAnimRunArray[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
             goto startMapAnim;

@@ -993,14 +993,13 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
  */
 void CSound::CancelLoadWaveASync()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(self + 0x10);
+    CFile::CHandle*& handle = SoundData(this).m_waveFile;
     if (handle != 0) {
         File.Close(handle);
-        *reinterpret_cast<CFile::CHandle**>(self + 0x10) = 0;
+        handle = 0;
         System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
     }
-    reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, nullptr, 0);
+    m_redSound.SetWaveData(-1, nullptr, 0);
 }
 
 /*
@@ -1029,11 +1028,9 @@ int CSound::IsLoadWaveASyncCompleted()
  */
 void CSound::LoadBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (reinterpret_cast<CRedSound*>(self + 8)->ReentryMusicData(bgmId) == -1) {
+    } else if (m_redSound.ReentryMusicData(bgmId) == -1) {
         char musicPath[256];
         sprintf(musicPath, s_soundMusicPathFmt, bgmId);
 
@@ -1041,7 +1038,7 @@ void CSound::LoadBgm(int bgmId)
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            reinterpret_cast<CRedSound*>(self + 8)->SetMusicData(File.m_readBuffer);
+            m_redSound.SetMusicData(File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1058,14 +1055,12 @@ void CSound::LoadBgm(int bgmId)
  */
 void CSound::PlayBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->MusicStop(-1);
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
-        reinterpret_cast<CRedSound*>(self + 8)->MusicPlay(bgmId, 0x7F, 0);
+        m_redSound.MusicStop(-1);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
+        m_redSound.MusicPlay(bgmId, 0x7F, 0);
     }
 }
 
@@ -1080,13 +1075,11 @@ void CSound::PlayBgm(int bgmId)
  */
 void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
-        reinterpret_cast<CRedSound*>(self + 8)->MusicCrossPlay(bgmId, 0x7F, crossFrames);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
+        m_redSound.MusicCrossPlay(bgmId, 0x7F, crossFrames);
     }
 }
 
@@ -1101,13 +1094,11 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
  */
 void CSound::PlayNextBgm(int bgmId)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     if (bgmId < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
-        reinterpret_cast<CRedSound*>(self + 8)->MusicNextPlay(bgmId, 0x7F, 0);
-        reinterpret_cast<CRedSound*>(self + 8)->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
+        m_redSound.MusicNextPlay(bgmId, 0x7F, 0);
+        m_redSound.SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
     }
 }
 

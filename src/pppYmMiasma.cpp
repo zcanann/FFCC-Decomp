@@ -207,8 +207,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, _pppCt
         angleDelta += step->m_baseAngle;
         angleScale = (32768.0f * (0.01745329238474369f * (float)angleDelta)) / 3.1415927410125732f;
         angleIdx = (s32)angleScale;
-        impulseX = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
-        impulseZ = *(float*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
+        impulseX = ppvSinTbl[((angleIdx + 0x4000) & 0xfffc) >> 2];
+        impulseZ = ppvSinTbl[(angleIdx & 0xfffc) >> 2];
         zero = 0.0f;
         work->m_impulse.x = impulseX;
         work->m_impulse.y = zero;

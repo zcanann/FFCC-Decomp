@@ -1,4 +1,5 @@
 #include "ffcc/pppConstrainCameraForLoc.h"
+#include "global.h"
 #include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
@@ -16,6 +17,14 @@ struct pppConstrainCameraForLocWork {
     _pppPObject* m_owner;
 };
 
+struct pppConstrainCameraForLocDataOffsets {
+    s32 _unused0;
+    s32 _unused1;
+    s32 m_workOffset;
+};
+
+STATIC_ASSERT(offsetof(pppConstrainCameraForLocDataOffsets, m_workOffset) == 0x8);
+
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
 static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
@@ -24,11 +33,17 @@ static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
+static inline pppConstrainCameraForLocDataOffsets* GetConstrainCameraDataOffsets(_pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppConstrainCameraForLocDataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
 static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
     pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* ctrl)
 {
+    pppConstrainCameraForLocDataOffsets* offsets = GetConstrainCameraDataOffsets(ctrl);
     return reinterpret_cast<pppConstrainCameraForLocWork*>(
-        constrainCameraForLoc->m_workArea + ctrl->m_serializedDataOffsets[2]);
+        constrainCameraForLoc->m_workArea + offsets->m_workOffset);
 }
 
 static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*);

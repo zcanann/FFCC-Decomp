@@ -15,7 +15,7 @@ static const char s_mapmesh_cpp[] = "mapmesh.cpp";
 static const float FLOAT_8032F930 = 10000000000.0f;
 static const float FLOAT_8032F934 = -10000000000.0f;
 
-static CMemory::CStage* g_pStage;
+CMemory::CStage* g_pStage;
 
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)
@@ -123,7 +123,7 @@ void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
+inline void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
     int remaining = static_cast<int>(m_displayListCount);
     CMapMeshDrawEntry* entry = m_drawEntries;
@@ -148,7 +148,7 @@ void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet* materialSet, CAmemCac
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
+inline void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
     int remaining = static_cast<int>(m_displayListCount);
     CMapMeshDrawEntry* entry = m_drawEntries;

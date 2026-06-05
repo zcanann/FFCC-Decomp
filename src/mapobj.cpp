@@ -875,9 +875,9 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
                 }
 
-                float (*childWorldMtx)[4] = child->m_worldMtx;
                 CMapObj* grandChild = child->m_child;
                 if (grandChild != 0) {
+                    float (*childWorldMtx)[4] = child->m_worldMtx;
                     do {
                         unsigned char grandChildDirty = childDirty;
 

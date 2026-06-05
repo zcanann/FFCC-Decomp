@@ -343,11 +343,11 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
-                    float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
+                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
                     cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
-                    center = rootNode->m_boundMinY + rootNode->m_boundMaxY;
+                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
                     cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
-                    center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
+                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);
@@ -517,11 +517,11 @@ void CMapPcs::calc()
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
-                    float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
+                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
                     cameraPos.x = center * LoadFloat(kMapBoundsCenterScale);
-                    center = rootNode->m_boundMinY + rootNode->m_boundMaxY;
+                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
                     cameraPos.y = center * LoadFloat(kMapBoundsCenterScale);
-                    center = rootNode->m_boundMinZ + rootNode->m_boundMaxZ;
+                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
                     cameraPos.z = center * LoadFloat(kMapBoundsCenterScale);
                 } else {
                     CMapObj* mapObj = MapMng.GetMapObj(1);

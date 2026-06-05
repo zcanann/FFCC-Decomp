@@ -1519,35 +1519,28 @@ void CAmemCacheSet::Destroy()
 
 static inline void freeAmemCacheBlock(unsigned long ptr)
 {
-    unsigned char* block = reinterpret_cast<unsigned char*>(ptr - 0x40);
-    if ((*reinterpret_cast<unsigned short*>(block) != 0x4b41) ||
-        (*reinterpret_cast<unsigned short*>(block + 0x3E) != 0x4d49)) {
-        System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
+    CMemory::CStage::CBlock* block = stageBlockAt(ptr - sizeof(CMemory::CStage::CBlock));
+    if ((block->m_magicStart != 0x4b41) || (block->m_magicEnd != 0x4d49)) {
+        System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block->m_source, block->m_line);
     }
 
-    block[2] = static_cast<unsigned char>(block[2] & ~kMemoryBlockUsedFlag);
+    block->m_flags = static_cast<unsigned char>(block->m_flags & ~kMemoryBlockUsedFlag);
 
-    int blockPrev = *reinterpret_cast<int*>(block + 8);
-    if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
-        *reinterpret_cast<int*>(block + 0x10) =
-            *reinterpret_cast<int*>(block + 0x10) + 0x40 +
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
-            reinterpret_cast<int>(block);
-        *reinterpret_cast<int*>(block + 8) =
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+    CMemory::CStage::CBlock* blockPrev = block->m_next;
+    if ((blockPrev->m_flags & 4) == 0) {
+        block->m_size = block->m_size + sizeof(CMemory::CStage::CBlock) + blockPrev->m_size;
+        blockPrev->m_next->m_prev = block;
+        block->m_next = blockPrev->m_next;
     }
 
-    int blockNext = *reinterpret_cast<int*>(block + 4);
-    if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40 +
-            *reinterpret_cast<int*>(block + 0x10);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 4) + 8) = *reinterpret_cast<int*>(block + 8);
-        *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 8) + 4) = *reinterpret_cast<int*>(block + 4);
+    CMemory::CStage::CBlock* blockNext = block->m_prev;
+    if ((blockNext->m_flags & 4) == 0) {
+        blockNext->m_size = blockNext->m_size + sizeof(CMemory::CStage::CBlock) + block->m_size;
+        block->m_prev->m_next = block->m_next;
+        block->m_next->m_prev = block->m_prev;
     }
 
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 0xC) + 0x124) -= 1;
+    block->m_stage->m_allocCount -= 1;
 }
 
 /*

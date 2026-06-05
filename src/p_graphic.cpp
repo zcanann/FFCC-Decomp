@@ -60,9 +60,9 @@ inline CGraphicPcs::CGraphicPcs()
 }
 
 CGraphicPcs GraphicPcs;
-extern const char s_CGraphicPcs[] = "CGraphicPcs";
-extern const char s_CManager_801D7B8C[] = "CManager";
-extern const char s_CProcess_801D7B98[] = "CProcess";
+static const char s_CGraphicPcs[] = "CGraphicPcs";
+static const char s_CManager_801D7B8C[] = "CManager";
+static const char s_CProcess_801D7B98[] = "CProcess";
 
 CProcessTable CGraphicPcs::m_table = {
     const_cast<char*>(s_CGraphicPcs),
@@ -88,50 +88,50 @@ CProcessTable CGraphicPcs::m_table = {
     },
 };
 
-extern "C" const char s_scenegraph_step_none[4] = "";
-extern "C" const char s_scenegraph_step_x8[3] = "x8";
-extern "C" const char s_scenegraph_step_x0[3] = "x0";
-extern "C" const char s_scenegraph_step_x1_8[5] = "x1/8";
-extern "C" const char s_scenegraph_step_x1_4[5] = "x1/4";
-extern "C" const char s_scenegraph_step_x1_2[5] = "x1/2";
-extern "C" const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
-extern "C" const float FLOAT_8032fb78 = 0.0f;
-extern "C" const float FLOAT_8032FB7C = 448.0f;
-extern "C" const float FLOAT_8032FB80 = 640.0f;
-extern "C" const float FLOAT_8032FB84 = -100.0f;
-extern "C" const float FLOAT_8032FB88 = 1.0f;
-extern "C" const float FLOAT_8032FB8C = 1.5707964f;
-extern "C" const float FLOAT_8032FB90 = 255.0f;
-extern "C" const float FLOAT_8032FB94 = 48.0f;
-extern "C" const float FLOAT_8032FB98 = 8.0f;
-extern "C" const float FLOAT_8032FB9C = 320.0f;
-extern "C" const float FLOAT_8032FBA0 = 224.0f;
-extern "C" const float FLOAT_8032FBA4 = 1280.0f;
-extern "C" const float FLOAT_8032FBA8 = 0.5f;
-extern "C" const double DOUBLE_8032FBB0 = 4503601774854144.0;
-extern "C" const double DOUBLE_8032FBB8 = 4503599627370496.0;
-extern "C" const float FLOAT_8032FBC0 = 0.19634955f;
-extern "C" const float FLOAT_8032FBC4 = 16.0f;
-extern "C" const float FLOAT_8032FBC8 = 440.0f;
-extern "C" const float FLOAT_8032FBCC = 336.0f;
-extern "C" const float FLOAT_8032FBD0 = 441.0f;
-extern "C" const float FLOAT_8032FBD4 = 100.0f;
-extern "C" const float FLOAT_8032FBD8 = 436.0f;
-extern "C" const float FLOAT_8032FBDC = 432.0f;
-extern "C" const float FLOAT_8032FBE0 = 420.0f;
-extern "C" const float FLOAT_8032FBE4 = 32.0f;
-extern "C" const float FLOAT_8032FBE8 = 424.0f;
-extern "C" const float FLOAT_8032FBEC = 40.0f;
-extern "C" const float FLOAT_8032FBF0 = 56.0f;
-extern "C" const char s_debug_pad_port_fmt[4] = "%dP";
-extern "C" const char s_debug_frame_fmt[3] = "%d";
-extern "C" const float FLOAT_8032fbfc = 0.6f;
-extern "C" const float FLOAT_8032fc00 = 200.0f;
+static const char s_scenegraph_step_none[] = "";
+static const char s_scenegraph_step_x8[] = "x8";
+static const char s_scenegraph_step_x0[] = "x0";
+static const char s_scenegraph_step_x1_8[] = "x1/8";
+static const char s_scenegraph_step_x1_4[] = "x1/4";
+static const char s_scenegraph_step_x1_2[] = "x1/2";
+static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
+static const float FLOAT_8032fb78 = 0.0f;
+static const float FLOAT_8032FB7C = 448.0f;
+static const float FLOAT_8032FB80 = 640.0f;
+static const float FLOAT_8032FB84 = -100.0f;
+static const float FLOAT_8032FB88 = 1.0f;
+static const float FLOAT_8032FB8C = 1.5707964f;
+static const float FLOAT_8032FB90 = 255.0f;
+static const float FLOAT_8032FB94 = 48.0f;
+static const float FLOAT_8032FB98 = 8.0f;
+static const float FLOAT_8032FB9C = 320.0f;
+static const float FLOAT_8032FBA0 = 224.0f;
+static const float FLOAT_8032FBA4 = 1280.0f;
+static const float FLOAT_8032FBA8 = 0.5f;
+static const double DOUBLE_8032FBB0 = 4503601774854144.0;
+static const double DOUBLE_8032FBB8 = 4503599627370496.0;
+static const float FLOAT_8032FBC0 = 0.19634955f;
+static const float FLOAT_8032FBC4 = 16.0f;
+static const float FLOAT_8032FBC8 = 440.0f;
+static const float FLOAT_8032FBCC = 336.0f;
+static const float FLOAT_8032FBD0 = 441.0f;
+static const float FLOAT_8032FBD4 = 100.0f;
+static const float FLOAT_8032FBD8 = 436.0f;
+static const float FLOAT_8032FBDC = 432.0f;
+static const float FLOAT_8032FBE0 = 420.0f;
+static const float FLOAT_8032FBE4 = 32.0f;
+static const float FLOAT_8032FBE8 = 424.0f;
+static const float FLOAT_8032FBEC = 40.0f;
+static const float FLOAT_8032FBF0 = 56.0f;
+static const char s_debug_pad_port_fmt[] = "%dP";
+static const char s_debug_frame_fmt[] = "%d";
+static const float FLOAT_8032fbfc = 0.6f;
+static const float FLOAT_8032fc00 = 200.0f;
 
-extern const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
-extern const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
-extern const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
-extern const char s_p_graphic_cpp[] = "p_graphic.cpp";
+static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
+static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
+static const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
+static const char s_p_graphic_cpp[] = "p_graphic.cpp";
 static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_none,
     s_scenegraph_step_x8,

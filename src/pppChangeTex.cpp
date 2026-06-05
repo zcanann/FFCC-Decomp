@@ -50,10 +50,10 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
-extern const float kPppChangeTexCachedValueInit = -10000.0f;
-extern const char sPppChangeTexMeshObjectName[] = "obj";
-extern const float kPppChangeTexAlphaScale = 255.0f;
-extern "C" const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
+static const float kPppChangeTexCachedValueInit = -10000.0f;
+static const char sPppChangeTexMeshObjectName[] = "obj";
+static const float kPppChangeTexAlphaScale = 255.0f;
+static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
 
 static inline float LoadFloat(const float& value)
 {

@@ -3,10 +3,6 @@
 
 extern float ppvSinTbl[];
 
-extern const float gPppPointRApRandomAngleRange;
-extern const float gPppPointRApRandomAngleBias;
-extern const float gPppPointRApSpinScale;
-
 extern const float gPppScaleLoopAutoZero;
 
 extern const float gPppYmMoveParabolaYOffsetStep;
@@ -36,8 +32,6 @@ extern const float kPppKeLnsZero;
 extern const float kPppMoveZero;
 extern float kPppSclAcceleZero;
 extern float kPppSclMoveZero;
-extern const float kPppVtMimeZero;
-
 extern float kPppSRandCVSingleSampleScale;
 extern float kPppSRandDownCVDualSampleScale;
 extern float kPppSRandDownFVDualSampleScale;

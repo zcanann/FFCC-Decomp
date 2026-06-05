@@ -17,7 +17,7 @@ extern const f32 FLOAT_803306ec;
 extern u32 kYmTracerTopColorBase;
 extern u32 kYmTracerBottomColorBase;
 
-extern "C" const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
+static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
 struct TRACE_POLYGON {
     Vec from;
@@ -410,4 +410,4 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
 }
 
 extern const f64 kPppParHitSphZero = 0.0;
-extern const char s_common_80330708[8] = "common";
+static const char s_common_80330708[8] = "common";

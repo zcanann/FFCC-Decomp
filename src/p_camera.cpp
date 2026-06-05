@@ -27,13 +27,13 @@
 
 CCameraPcs CameraPcs;
 
-extern "C" const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
-extern "C" const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
-extern "C" const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
-extern "C" const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
-extern "C" const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
-extern "C" const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
-extern "C" const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
+static const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
+static const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
+static const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
+static const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
+static const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
+static const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
+static const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;

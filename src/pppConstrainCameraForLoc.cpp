@@ -4,7 +4,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 extern "C" {
-extern const float kPppConstrainCameraForLocZero[2] = {0.0f, 0.0f};
+static const float kPppConstrainCameraForLocZero = 0.0f;
 }
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
@@ -86,7 +86,7 @@ void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                         _pppCtrlTable* data)
 {
-    float fVar1 = kPppConstrainCameraForLocZero[0];
+    float fVar1 = kPppConstrainCameraForLocZero;
     pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
     value->m_cameraOffset.z = fVar1;
     value->m_cameraOffset.y = fVar1;
@@ -104,7 +104,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  */
 void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
-    float fVar1 = kPppConstrainCameraForLocZero[0];
+    float fVar1 = kPppConstrainCameraForLocZero;
     pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
     value->m_cameraOffset.z = fVar1;
     value->m_cameraOffset.y = fVar1;
@@ -174,8 +174,8 @@ static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, voi
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
-    fVar1 = kPppConstrainCameraForLocZero[0];
-    model->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero[0];
+    fVar1 = kPppConstrainCameraForLocZero;
+    model->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero;
     model->m_worldBaseMtx[1][3] = fVar1;
     model->m_worldBaseMtx[2][3] = fVar1;
     if ((s32)Game.m_currentSceneId == 7) {

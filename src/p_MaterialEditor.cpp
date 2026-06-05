@@ -4,10 +4,10 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 extern "C" {
-extern const unsigned int kMaterialEditorDefaultColorRgba = 0xFFFFFFFF;
-extern const float kMaterialEditorControlMaxInit = 10000.0f;
-extern const float kMaterialEditorControlMinInit = -10000.0f;
-extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
+static const unsigned int kMaterialEditorDefaultColorRgba = 0xFFFFFFFF;
+static const float kMaterialEditorControlMaxInit = 10000.0f;
+static const float kMaterialEditorControlMinInit = -10000.0f;
+static const char sMaterialEditorSpinnerText[5] = "|/-\\";
 }
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -19,11 +19,11 @@ extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
-extern "C" const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
-extern "C" const char sMaterialEditorCManagerName[] = "CManager";
-extern "C" const char sMaterialEditorCProcessName[] = "CProcess";
-extern "C" const char s_MaterialEditorFmt[] = "MaterialEditor [%c]";
+static const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
+static const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
+static const char sMaterialEditorCManagerName[] = "CManager";
+static const char sMaterialEditorCProcessName[] = "CProcess";
+static const char s_MaterialEditorFmt[] = "MaterialEditor [%c]";
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -58,11 +58,11 @@ CProcessTable CMaterialEditorPcs::m_table = {
         1,
     },
 };
-extern "C" const double DOUBLE_8032FCC0 = 1.0;
-extern "C" const float FLOAT_8032FCC8 = 1.0f;
-extern "C" const double DOUBLE_8032FCD0 = 4503601774854144.0;
-extern "C" const float FLOAT_8032FCD8 = 0.0f;
-extern "C" const float FLOAT_8032FCDC = -1.0f;
+static const double DOUBLE_8032FCC0 = 1.0;
+static const float FLOAT_8032FCC8 = 1.0f;
+static const double DOUBLE_8032FCD0 = 4503601774854144.0;
+static const float FLOAT_8032FCD8 = 0.0f;
+static const float FLOAT_8032FCDC = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {

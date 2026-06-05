@@ -14,7 +14,7 @@
 
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
 extern float FLOAT_80331dd0;
-extern const float FLOAT_80331cf8 = 0.0f;
+static const float FLOAT_80331cf8 = 0.0f;
 extern float FLOAT_80331dcc;
 extern float FLOAT_80331dc8;
 extern float FLOAT_80331d18;

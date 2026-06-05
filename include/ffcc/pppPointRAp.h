@@ -17,6 +17,11 @@ struct pppPointRApStep {
     u8 m_cooldown;
 };
 
+struct pppPointRApOffsets {
+    u32 m_srcOffset;
+    u32 m_stateOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

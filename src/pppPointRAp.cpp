@@ -1,19 +1,13 @@
 #include "ffcc/pppPointRAp.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
-#include "ffcc/ppp_constants.h"
 #include "ffcc/pppsintbl.h"
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-extern "C" const float gPppPointRApRandomAngleRange = 32768.0f;
-extern "C" const float gPppPointRApRandomAngleBias = 16384.0f;
-extern "C" const float gPppPointRApSpinScale = 2.0f;
-
-struct pppPointRApOffsets {
-    u32 m_srcOffset;
-    u32 m_stateOffset;
-};
+static const float kRandomAngleRange = 32768.0f;
+static const float kRandomAngleBias = 16384.0f;
+static const float kSpinScale = 2.0f;
 
 /*
  * --INFO--
@@ -51,14 +45,14 @@ void pppPointRAp(_pppPObject* pObject, pppPointRApStep* step, _pppCtrlTable* ctr
             obj->m_link.m_previous = &pObject->m_link;
         }
 
-        s32 angleA = (s32)(gPppPointRApRandomAngleRange * Math.RandF() - gPppPointRApRandomAngleBias);
+        s32 angleA = (s32)(kRandomAngleRange * Math.RandF() - kRandomAngleBias);
         float scaleA = step->m_radius;
         float yOff;
         float planarOff = scaleA * pppCosFromTable(angleA);
         yOff = scaleA * pppSinFromTable(angleA);
         float spinRand = Math.RandF();
-        float spinAngle = gPppPointRApRandomAngleRange * spinRand;
-        s32 angleB = (s32)(gPppPointRApSpinScale * spinAngle);
+        float spinAngle = kRandomAngleRange * spinRand;
+        s32 angleB = (s32)(kSpinScale * spinAngle);
         u32 childPosOffset = step->m_childPosOffset;
         u32 childVelocityOffset = step->m_childVelocityOffset;
         float xOff = planarOff * pppSinFromTable(angleB);

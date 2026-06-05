@@ -55,10 +55,10 @@ static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
-extern const char sLightPcsClassName[] = "CLightPcs";
-extern const char sLightManagerClassName[] = "CManager";
-extern const char sLightProcessClassName[] = "CProcess";
-extern "C" const char sLightTextureFullMsg[0x18] =
+static const char sLightPcsClassName[] = "CLightPcs";
+static const char sLightManagerClassName[] = "CManager";
+static const char sLightProcessClassName[] = "CProcess";
+static const char sLightTextureFullMsg[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
 extern "C" {
@@ -91,7 +91,7 @@ CProcessTable CLightPcs::m_table = {
 };
 
 _GXColor s_ambientAlphaColor;
-extern const char s_p_light_cpp[] = "p_light.cpp";
+static const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {

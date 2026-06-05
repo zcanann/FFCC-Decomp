@@ -41,7 +41,7 @@ static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
     return reinterpret_cast<_pppEnvStYmDeformationMdl*>(ppvEnv);
 }
 
-extern const float kYmDeformationMdlZero = 0.0f;
+static const float kYmDeformationMdlZero = 0.0f;
 extern const float kYmDeformationMdlScreenWidth;
 extern const float kYmDeformationMdlScreenHeight;
 extern const float kYmDeformationMdlTexOffset;

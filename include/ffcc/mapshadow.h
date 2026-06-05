@@ -38,7 +38,8 @@ public:
     Mtx m_shadowMtx;         // 0x78
     float m_shadowScale;     // 0xA8
     float m_frustumNear;     // 0xAC
-    u8 _padB0[8];            // 0xB0
+    float m_frustumFar;      // 0xB0
+    float m_targetBoundsScale; // 0xB4
     float m_scrollStepX;     // 0xB8
     float m_scrollStepY;     // 0xBC
     CBound m_targetBounds[2]; // 0xC0

@@ -4,7 +4,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 extern "C" {
-static const unsigned int kMaterialEditorDefaultColorRgba = 0xFFFFFFFF;
+static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
 static const float kMaterialEditorControlMaxInit = 10000.0f;
 static const float kMaterialEditorControlMinInit = -10000.0f;
 static const char sMaterialEditorSpinnerText[5] = "|/-\\";
@@ -168,10 +168,8 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-        GXColor ambColor;
-        *reinterpret_cast<u32*>(&ambColor) = kMaterialEditorDefaultColorRgba;
-        GXColor matColor;
-        *reinterpret_cast<u32*>(&matColor) = kMaterialEditorDefaultColorRgba;
+        GXColor ambColor = kMaterialEditorDefaultColorRgba;
+        GXColor matColor = kMaterialEditorDefaultColorRgba;
         GXSetChanAmbColor(GX_COLOR0, ambColor);
         GXSetChanMatColor(GX_COLOR0, matColor);
 

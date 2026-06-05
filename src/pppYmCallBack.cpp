@@ -4,6 +4,17 @@
 
 #include <dolphin/mtx.h>
 
+struct pppYmCallBack {
+    u8 m_pad0[0xc];
+    u32 m_graphId;
+};
+
+struct pppYmCallBackUnkB {
+    u32 m_unk0;
+    s16 m_graphId;
+    s16 m_initWOrk;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800A5FCC

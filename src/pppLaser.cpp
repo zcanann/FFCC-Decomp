@@ -20,15 +20,15 @@
 
 #include <string.h>
 
-extern const f32 kPppLaserZero = 0.0f;
-extern const f32 kPppLaserOne = 1.0f;
-extern const f32 kPppLaserDebugPointScale = 2.0f;
-extern const f32 kPppLaserMaxLengthDisabled = -1.0f;
-extern const f32 kPppLaserAxisScale = 1.2f;
-extern const f32 kPppLaserBoundsMax = 10000000000.0f;
-extern const f32 kPppLaserBoundsMin = -10000000000.0f;
-extern const f32 kPppLaserMaxLengthMargin = 15.5f;
-extern const f32 kPppLaserTau = 6.2831855f;
+static const f32 kPppLaserZero = 0.0f;
+static const f32 kPppLaserOne = 1.0f;
+static const f32 kPppLaserDebugPointScale = 2.0f;
+static const f32 kPppLaserMaxLengthDisabled = -1.0f;
+static const f32 kPppLaserAxisScale = 1.2f;
+static const f32 kPppLaserBoundsMax = 10000000000.0f;
+static const f32 kPppLaserBoundsMin = -10000000000.0f;
+static const f32 kPppLaserMaxLengthMargin = 15.5f;
+static const f32 kPppLaserTau = 6.2831855f;
 
 static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 

@@ -1099,12 +1099,12 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
  */
 void CShopMenu::DrawItemInfo0()
 {
-    int itemIndex = ShopMenuInt(this, 0x28);
+    int itemIndex = m_selectedIndex;
     if (itemIndex == -1) {
         return;
     }
 
-    int listType = ShopMenuInt(this, 0x14);
+    int listType = m_listType;
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
     int itemNo = ResolveShopMenuItemNo(this, itemIndex);
 
@@ -1198,12 +1198,12 @@ void CShopMenu::DrawItemInfo0()
         DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
     }
 
-    if (ShopMenuInt(this, 0x10) == 0) {
+    if (m_subMode == 0) {
         DrawItemInfo(itemNo, 0, 0xA8, 0, 0xC6, 0, 0, 0);
     }
 
-    if ((ShopMenuInt(this, 0x10) == 1) && (listType == 0)) {
-        int amount = ShopMenuInt(this, 0x44);
+    if ((m_subMode == 1) && (listType == 0)) {
+        int amount = m_quantity;
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
         font->SetColor(white.color);
@@ -1221,7 +1221,7 @@ void CShopMenu::DrawItemInfo0()
         DrawInit__5CFontFv(font);
         DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
 
-        int x = static_cast<int>(-(static_cast<float>(ShopMenuInt(this, 0x38)) * FLOAT_80332d74 - FLOAT_80332d70));
+        int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
         drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
     }
 }
@@ -1238,8 +1238,8 @@ void CShopMenu::DrawBuySellInfo()
 {
     CFont* font = MenuPcs.m_infoPanelFont;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    int selected = ShopMenuInt(this, 0x28);
-    int listType = ShopMenuInt(this, 0x14);
+    int selected = m_selectedIndex;
+    int listType = m_listType;
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetupShopMenuInfoFont(font, &white);
@@ -1297,7 +1297,7 @@ void CShopMenu::DrawBuySellInfo()
                 gil = gil / 100 + (gil >> 0x1F);
                 gil = gil - (gil >> 0x1F);
             }
-            totalGil = ShopMenuInt(this, 0x44) * gil;
+            totalGil = m_quantity * gil;
         } else if (listType == 1) {
             int sellGil = 0;
             if (itemNo >= 1) {
@@ -1308,7 +1308,7 @@ void CShopMenu::DrawBuySellInfo()
                 sellGil = sellGil - (sellGil >> 0x1F);
             }
             sellGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(sellGil));
-            totalGil = ShopMenuInt(this, 0x44) * sellGil;
+            totalGil = m_quantity * sellGil;
         }
     }
 
@@ -1349,14 +1349,14 @@ void CShopMenu::DrawBuySellInfo()
 void CShopMenu::DrawItemList()
 {
     int y = 0x4C;
-    int itemIndex = ShopMenuInt(this, 0x24);
+    int itemIndex = m_listTop;
     int selectableFrame = 10;
-    if (ShopMenuInt(this, 0x14) == 2) {
+    if (m_listType == 2) {
         selectableFrame = 0xF;
     }
 
-    for (int row = 0; row < ShopMenuInt(this, 0x2C); ++row) {
-        int listType = ShopMenuInt(this, 0x14);
+    for (int row = 0; row < m_visibleRows; ++row) {
+        int listType = m_listType;
         int itemCount = ResolveShopMenuItemCount(this);
 
         if (itemCount <= itemIndex) {
@@ -1390,11 +1390,11 @@ void CShopMenu::DrawItemList()
         }
 
         int frameX;
-        if (ShopMenuInt(this, 0x28) == itemIndex) {
+        if (m_selectedIndex == itemIndex) {
             frameX = 0x198;
             drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332d9c, 0);
             DrawInit__8CMenuPcsFv(MenuPcsVoid());
-            if (ShopMenuInt(this, 0x10) == 0) {
+            if (m_subMode == 0) {
                 MenuPcs.DrawCursor(0x114 + (System.m_frameCounter & 7), y - 0x14, FLOAT_80332d28);
             } else if ((System.m_frameCounter & 1) == 0) {
                 MenuPcs.DrawCursor(0x114, y - 0x14, FLOAT_80332d28);
@@ -1433,10 +1433,10 @@ void CShopMenu::DrawItemList()
     int alpha = static_cast<int>(DOUBLE_80332DA0 * (DOUBLE_80332DB0 * static_cast<double>(pulse) + DOUBLE_80332DA8));
     float scale = static_cast<float>(DOUBLE_80332DA8 * (DOUBLE_80332DC0 * static_cast<double>(pulse) + DOUBLE_80332DB8));
 
-    if (ShopMenuInt(this, 0x30) != 0) {
+    if (m_canScrollUp != 0) {
         drawShapeSeqScale(2, 0, 0x24E, 0x6A, scale, -scale, alpha);
     }
-    if (ShopMenuInt(this, 0x34) != 0) {
+    if (m_canScrollDown != 0) {
         drawShapeSeqScale(2, 0, 0x24E, 0xEC, scale, scale, alpha);
     }
 }

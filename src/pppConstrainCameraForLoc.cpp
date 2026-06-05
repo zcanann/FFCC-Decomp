@@ -9,6 +9,24 @@ extern const float kPppConstrainCameraForLocZero[2] = {0.0f, 0.0f};
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
+struct pppConstrainCameraForLoc {
+    _pppPObject m_object;
+};
+
+struct pppConstrainCameraForLocParams {
+    int m_graphId;
+    float m_dataValIndex;
+    float m_initWork;
+    float m_stepValue;
+};
+
+struct pppConstrainCameraForLocWork {
+    Vec m_cameraOffset;
+    float m_fieldC;
+    Mtx m_worldBaseMtx;
+    pppConstrainCameraForLoc* m_owner;
+};
+
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
 static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
@@ -17,12 +35,14 @@ static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
-static inline float* GetConstrainCameraWork(pppConstrainCameraForLoc* constrainCameraForLoc,
-                                            _pppCtrlTable* ctrl)
+static inline pppConstrainCameraForLocWork* GetConstrainCameraWork(
+    pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* ctrl)
 {
-	return reinterpret_cast<float*>(constrainCameraForLoc->m_object.m_workArea +
-	                                ctrl->m_serializedDataOffsets[2]);
+    return reinterpret_cast<pppConstrainCameraForLocWork*>(
+        constrainCameraForLoc->m_object.m_workArea + ctrl->m_serializedDataOffsets[2]);
 }
+
+static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*);
 
 /*
  * --INFO--
@@ -37,7 +57,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
                                       pppConstrainCameraForLocParams* params,
                                       _pppCtrlTable* data)
 {
-	float* value;
+	pppConstrainCameraForLocWork* value;
 	CChara::CModel* model;
 
 	if (ppvUserStopPartF == 0) {
@@ -47,8 +67,9 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 		model->SetCallbackContext(value, params);
 		model->SetBeforeCalcMatrixCallback(CC_BeforeCalcMatrixCallback);
 
-		CalcGraphValue(&constrainCameraForLoc->m_object, params->m_graphId, value[0], value[1], value[2],
-		               params->m_dataValIndex, params->m_initWork, params->m_stepValue);
+		CalcGraphValue(&constrainCameraForLoc->m_object, params->m_graphId, value->m_cameraOffset.x,
+		               value->m_cameraOffset.y, value->m_cameraOffset.z, params->m_dataValIndex,
+		               params->m_initWork, params->m_stepValue);
 	}
 }
 
@@ -77,10 +98,10 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
                                         _pppCtrlTable* data)
 {
     float fVar1 = kPppConstrainCameraForLocZero[0];
-    float* value = GetConstrainCameraWork(constrainCameraForLoc, data);
-    value[2] = fVar1;
-    value[1] = fVar1;
-    value[0] = fVar1;
+    pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
+    value->m_cameraOffset.z = fVar1;
+    value->m_cameraOffset.y = fVar1;
+    value->m_cameraOffset.x = fVar1;
 }
 
 /*
@@ -95,11 +116,11 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
 void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
     float fVar1 = kPppConstrainCameraForLocZero[0];
-    float* value = GetConstrainCameraWork(constrainCameraForLoc, data);
-    value[2] = fVar1;
-    value[1] = fVar1;
-    value[0] = fVar1;
-    *(pppConstrainCameraForLoc**)((char*)value + 0x40) = constrainCameraForLoc;
+    pppConstrainCameraForLocWork* value = GetConstrainCameraWork(constrainCameraForLoc, data);
+    value->m_cameraOffset.z = fVar1;
+    value->m_cameraOffset.y = fVar1;
+    value->m_cameraOffset.x = fVar1;
+    value->m_owner = constrainCameraForLoc;
 }
 
 /*
@@ -111,25 +132,10 @@ void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  * JP Address: TODO
  * JP Size: TODO
  */
-int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
+static int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
-    struct ConstrainCameraForLocModel {
-        unsigned char field0_0x0[0x38];
-        Mtx m_worldBaseMtx;
-        Mtx m_drawMtx;
-    };
-    struct ConstrainCameraForLocWork {
-        float field0_0x0;
-        float field4_0x4;
-        float field8_0x8;
-        float fieldc_0xc;
-        Mtx m_worldBaseMtx;
-        void* m_owner;
-    };
-
-    ConstrainCameraForLocWork* work = (ConstrainCameraForLocWork*)param_2;
-    ConstrainCameraForLocModel* constrainModel = (ConstrainCameraForLocModel*)model;
-    unsigned char* owner = (unsigned char*)work->m_owner;
+    pppConstrainCameraForLocWork* work = (pppConstrainCameraForLocWork*)param_2;
+    _pppPObject* owner = &work->m_owner->m_object;
     float fVar1;
     float fVar2;
     float fVar3;
@@ -151,7 +157,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     local_bc.z = CameraPosZ();
     PSMTXCopy(CameraMatrix(), local_68);
 
-    fVar3 = work->field0_0x0;
+    fVar3 = work->m_cameraOffset.x;
     local_a4.x = fVar3 * local_b0.x;
     local_a4.y = fVar3 * local_b0.y;
     local_a4.z = fVar3 * local_b0.z;
@@ -161,13 +167,13 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
         PSMTXInverse(local_68, local_98);
     }
 
-    PSMTXIdentity(constrainModel->m_drawMtx);
-    PSMTXIdentity(constrainModel->m_worldBaseMtx);
-    PSMTXConcat(local_98, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
+    PSMTXIdentity(model->m_drawMtx);
+    PSMTXIdentity(model->m_worldBaseMtx);
+    PSMTXConcat(local_98, model->m_worldBaseMtx, model->m_worldBaseMtx);
     PSVECAdd(&local_bc, &local_a4, &local_a4);
 
-    fVar3 = *(float*)(owner + 0x1c);
-    fVar2 = *(float*)(owner + 0x2c);
+    fVar3 = owner->m_localMatrix.value[0][3];
+    fVar2 = owner->m_localMatrix.value[1][3];
     gUtil.GetDirectVector(&local_c8, &local_d4, local_b0);
 
     local_e0.x = fVar3 * local_c8.x;
@@ -180,20 +186,20 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
     fVar1 = kPppConstrainCameraForLocZero[0];
-    constrainModel->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero[0];
-    constrainModel->m_worldBaseMtx[1][3] = fVar1;
-    constrainModel->m_worldBaseMtx[2][3] = fVar1;
+    model->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero[0];
+    model->m_worldBaseMtx[1][3] = fVar1;
+    model->m_worldBaseMtx[2][3] = fVar1;
     if ((s32)Game.m_currentSceneId == 7) {
-        constrainModel->m_drawMtx[0][3] = fVar1;
-        constrainModel->m_drawMtx[1][3] = fVar1;
-        constrainModel->m_drawMtx[2][3] = fVar1;
+        model->m_drawMtx[0][3] = fVar1;
+        model->m_drawMtx[1][3] = fVar1;
+        model->m_drawMtx[2][3] = fVar1;
     } else {
-        constrainModel->m_drawMtx[0][3] = local_a4.x;
-        constrainModel->m_drawMtx[1][3] = local_a4.y;
-        constrainModel->m_drawMtx[2][3] = local_a4.z;
+        model->m_drawMtx[0][3] = local_a4.x;
+        model->m_drawMtx[1][3] = local_a4.y;
+        model->m_drawMtx[2][3] = local_a4.z;
     }
 
-    PSMTXCopy(constrainModel->m_worldBaseMtx, work->m_worldBaseMtx);
+    PSMTXCopy(model->m_worldBaseMtx, work->m_worldBaseMtx);
     work->m_worldBaseMtx[0][3] = local_a4.x;
     work->m_worldBaseMtx[1][3] = local_a4.y;
     work->m_worldBaseMtx[2][3] = local_a4.z;

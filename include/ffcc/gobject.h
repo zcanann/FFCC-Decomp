@@ -53,6 +53,9 @@ public:
     void DispCharaParts(int);
     void SetAttackCol(int, char*, float, Vec*);
     void SetDamageCol(int, char*, float, float, Vec*);
+    void SetDamageColMask(int, int);
+    void SetAttackColMask(int, int);
+    int IsFall(int, int);
     void boundCheck();
     void Turn(float, int);
     void HitParticle(int, int, int, int, Vec*, PPPIFPARAM*);

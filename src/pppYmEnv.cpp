@@ -97,9 +97,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     s_yAxisAngles.m_oneEighty = sYmEnvYAxisAngle180;
 
     const unsigned int texWidth = GXGetTexObjWidth(targetTexObj);
-    const unsigned int texHeight = GXGetTexObjHeight(targetTexObj);
-
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    const unsigned int texHeight = GXGetTexObjHeight(targetTexObj);
 
     const unsigned int modeOffset = mode * 5;
 

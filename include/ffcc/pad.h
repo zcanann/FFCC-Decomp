@@ -78,6 +78,7 @@ public:
     float GetLeftStickX(long);
     unsigned short GetButtonRepeat(long);
     unsigned short GetButton(long);
+    int IsGba(long);
     PadInput* GetPadInputs() { return m_padInputs; }
     const PadInput* GetPadInputs() const { return m_padInputs; }
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }

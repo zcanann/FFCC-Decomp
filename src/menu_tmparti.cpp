@@ -422,7 +422,7 @@ unsigned int CMenuPcs::TmpArtiClose()
  */
 int CMenuPcs::TmpArtiCtrl()
 {
-	bool hasInput;
+	int hasInput;
 	unsigned int uVar5;
 	int iVar7;
 	unsigned int uVar9;

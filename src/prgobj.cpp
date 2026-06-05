@@ -221,6 +221,7 @@ void CGPrgObj::ClassControl(int classControl, int value)
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
 	float targetRot;
+	float zero;
 	float deltaX;
 	float deltaZ;
 	CVector targetPos(target->m_worldPosition);
@@ -230,8 +231,9 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	if ((LoadFloat(FLOAT_80331BD4) == deltaX) || (LoadFloat(FLOAT_80331BD4) == deltaZ)) {
-		targetRot = LoadFloat(FLOAT_80331BD4);
+	zero = LoadFloat(FLOAT_80331BD4);
+	if ((zero == deltaX) || (zero == deltaZ)) {
+		targetRot = zero;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -281,6 +283,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
 	float targetRot;
+	float zero;
 	float deltaX;
 	float deltaZ;
 	CVector targetPos(target->m_worldPosition);
@@ -290,8 +293,9 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	if ((LoadFloat(FLOAT_80331BD4) == deltaX) || (LoadFloat(FLOAT_80331BD4) == deltaZ)) {
-		targetRot = LoadFloat(FLOAT_80331BD4);
+	zero = LoadFloat(FLOAT_80331BD4);
+	if ((zero == deltaX) || (zero == deltaZ)) {
+		targetRot = zero;
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}

@@ -1,42 +1,11 @@
 #ifndef _PPP_YMDEFORMATIONSHP_H_
 #define _PPP_YMDEFORMATIONSHP_H_
 
-#include "ffcc/pppPart.h"
+struct _pppCtrlTable;
+struct _pppPObject;
+struct pppYmDeformationShpUnkB;
 
-#include <dolphin/types.h>
-
-struct pppYmDeformationShp {
-    _pppPObject m_object;
-};
-
-struct pppYmDeformationShpGraphArgs {
-    f32 m_valueAdd;
-    f32 m_velocityAdd;
-    f32 m_accelerationAdd;
-};
-
-struct pppYmDeformationShpUnkB {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    u8 m_size;
-    u8 m_pad_0x9[3];
-    union {
-        f32 m_payload[6];
-        struct Payload {
-            pppYmDeformationShpGraphArgs m_scale;
-            pppYmDeformationShpGraphArgs m_angle;
-        } m_deformation;
-    };
-    s16 m_payload3;
-    s8 m_splitMode;
-    u8 m_splitSize;
-    u8 m_orientation;
-    u8 m_pad_0x29[3];
-    f32 m_drawZ;
-    u8 m_pad_0x30;
-    u8 m_alpha;
-    u8 m_pad_0x32[0xA];
-};
+typedef _pppPObject pppYmDeformationShp;
 
 #ifdef __cplusplus
 extern "C" {

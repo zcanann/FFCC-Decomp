@@ -30,6 +30,35 @@ struct Vec4d {
 	float w;
 };
 
+struct pppYmDeformationShpGraphArgs {
+    f32 m_valueAdd;
+    f32 m_velocityAdd;
+    f32 m_accelerationAdd;
+};
+
+struct pppYmDeformationShpUnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_size;
+    u8 m_pad_0x9[3];
+    union {
+        f32 m_payload[6];
+        struct Payload {
+            pppYmDeformationShpGraphArgs m_scale;
+            pppYmDeformationShpGraphArgs m_angle;
+        } m_deformation;
+    };
+    s16 m_payload3;
+    s8 m_splitMode;
+    u8 m_splitSize;
+    u8 m_orientation;
+    u8 m_pad_0x29[3];
+    f32 m_drawZ;
+    u8 m_pad_0x30;
+    u8 m_alpha;
+    u8 m_pad_0x32[0xA];
+};
+
 struct YmDeformationShpColorInfo {
 	u32 m_unk0;
 	u32 m_unk4;
@@ -58,7 +87,7 @@ struct _pppEnvStYmDeformationShp {
 template <typename T>
 static inline T* PppWorkArea(pppYmDeformationShp* object, _pppCtrlTable* ctrl, int index)
 {
-	return reinterpret_cast<T*>(object->m_object.m_workArea + ctrl->m_serializedDataOffsets[index]);
+	return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
 
 static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
@@ -115,7 +144,7 @@ static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, _pppCtrlTable* param_3)
 {
-	_pppPObject* object = &pppYmDeformationShp_->m_object;
+	_pppPObject* object = pppYmDeformationShp_;
 	VYmDeformationShp* work = (VYmDeformationShp*)(object->m_workArea + param_3->m_serializedDataOffsets[2]);
 	int textureIndex = 0;
 	Vec2d uvs[4];
@@ -425,11 +454,11 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 	state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
 
 	CalcGraphValue(
-		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
+		pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
 		param_2->m_deformation.m_scale.m_valueAdd, param_2->m_deformation.m_scale.m_velocityAdd,
 		param_2->m_deformation.m_scale.m_accelerationAdd);
 	CalcGraphValue(
-		&pppYmDeformationShp_->m_object, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
+		pppYmDeformationShp_, param_2->m_graphId, state->m_values[2], state->m_values[3], state->m_values[4],
 		param_2->m_deformation.m_angle.m_valueAdd, param_2->m_deformation.m_angle.m_velocityAdd,
 		param_2->m_deformation.m_angle.m_accelerationAdd);
 

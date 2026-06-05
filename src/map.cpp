@@ -2738,8 +2738,7 @@ void GXSetTexCoordGen(void)
  */
 void CMapMng::DrawAfter()
 {
-    const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
+    if ((m_mapObjCount == 0) || (m_mapReadReady == 0)) {
         return;
     }
 
@@ -2755,14 +2754,13 @@ void CMapMng::DrawAfter()
 
     if (gMapHitDrawMode.m_byte == 0) {
         COctTree* octTree = GetOctTreeArray();
-        const short octTreeCount = m_octTreeCount;
-        for (int i = 0; i < octTreeCount; i++) {
+        for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(2);
             octTree++;
         }
 
         CMapObj* mapObj = GetMapObjArray();
-        for (int i = 0; i < mapObjCount; i++) {
+        for (int i = 0; i < m_mapObjCount; i++) {
             mapObj->Draw(2);
             mapObj++;
         }

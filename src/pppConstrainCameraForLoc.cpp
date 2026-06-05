@@ -9,13 +9,6 @@ extern const float kPppConstrainCameraForLocZero[2] = {0.0f, 0.0f};
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-struct pppConstrainCameraForLocParams {
-    int m_graphId;
-    float m_dataValIndex;
-    float m_initWork;
-    float m_stepValue;
-};
-
 struct pppConstrainCameraForLocWork {
     Vec m_cameraOffset;
     float m_fieldC;

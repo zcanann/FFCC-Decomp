@@ -1,11 +1,13 @@
 #ifndef _PPP_SCREENBREAK_H_
 #define _PPP_SCREENBREAK_H_
 
+#include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 
 struct _pppCtrlTable;
 struct _pppPObject;
+struct ScreenBreakPiece;
 
 typedef _pppPObject pppScreenBreak;
 
@@ -28,7 +30,18 @@ struct PScreenBreak {
     float m_speedRand;
 };
 
-struct VScreenBreak;
+struct VScreenBreak {
+    float m_graphValue0;
+    float m_graphValue1;
+    float m_graphValue2;
+    ScreenBreakPiece* m_pieces;
+    GXTexObj* m_backBufferTexObj;
+    u8 m_pad14[4];
+    Vec m_extent;
+    u8 m_backBufferReady;
+    u8 m_pad25[3];
+    GXColor m_color;
+};
 
 #ifdef __cplusplus
 extern "C" {

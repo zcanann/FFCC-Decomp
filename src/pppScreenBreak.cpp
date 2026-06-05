@@ -37,19 +37,6 @@ struct ScreenBreakPiece {
     u8 m_pad39[3];
 };
 
-struct VScreenBreak {
-    float m_graphValue0;
-    float m_graphValue1;
-    float m_graphValue2;
-    ScreenBreakPiece* m_pieces;
-    GXTexObj* m_backBufferTexObj;
-    u8 m_pad14[4];
-    Vec m_extent;
-    u8 m_backBufferReady;
-    u8 m_pad25[3];
-    GXColor m_color;
-};
-
 struct ScreenBreakColorData {
     u8 m_pad0[8];
     GXColor m_color;

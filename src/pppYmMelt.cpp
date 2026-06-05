@@ -3,6 +3,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
@@ -25,11 +26,6 @@ extern const u32 DAT_80330B28[2] = {0x0000003f, 0x00000000};
 extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
-
-struct Vec2d {
-    f32 x;
-    f32 y;
-};
 
 struct YmMeltMapCylinder {
     Vec m_bottom;

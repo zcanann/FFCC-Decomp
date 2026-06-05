@@ -3,17 +3,13 @@
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/util.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/textureman.h"
 
 #include <math.h>
 #include <stddef.h>
-
-struct Vec2d {
-    float x;
-    float y;
-};
 
 union ColumFloatBits {
     float value;

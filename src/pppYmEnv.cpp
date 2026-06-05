@@ -5,6 +5,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
@@ -47,11 +48,6 @@ struct GraphValueState {
     float velocity;
     float acceleration;
     s32 graphId;
-};
-
-struct Vec2d {
-    float x;
-    float y;
 };
 
 struct YmEnvPackedXAxisIds {

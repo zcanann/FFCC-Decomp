@@ -18,11 +18,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-struct Vec2d {
-    float x;
-    float y;
-};
-
 struct VMana2 {
     CGObject* m_object;
     void* m_manager;

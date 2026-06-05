@@ -10,6 +10,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
@@ -17,18 +18,6 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-struct Vec2d {
-    float x;
-    float y;
-};
-
-struct Vec4d {
-    float x;
-    float y;
-    float z;
-    float w;
-};
 
 extern const f32 FLOAT_80331030;
 extern const f32 FLOAT_80331034;

@@ -12,6 +12,7 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/ptrarray_fwd.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/util.h"
@@ -20,13 +21,6 @@
 #include "dolphin/os/OSCache.h"
 
 #include <string.h>
-
-struct Vec4d {
-    float x;
-    float y;
-    float z;
-    float w;
-};
 
 typedef CChara::CMesh::CDisplayList ScreenBreakDisplayList;
 typedef CChara::CMesh ScreenBreakMeshRef;

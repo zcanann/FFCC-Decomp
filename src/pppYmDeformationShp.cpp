@@ -5,6 +5,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
@@ -17,18 +18,6 @@ const float FLOAT_803305f8 = 1.0f;
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-struct Vec2d {
-	float x;
-	float y;
-};
-
-struct Vec4d {
-	float x;
-	float y;
-	float z;
-	float w;
-};
 
 struct pppYmDeformationShpGraphArgs {
     f32 m_valueAdd;

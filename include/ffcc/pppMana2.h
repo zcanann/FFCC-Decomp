@@ -2,11 +2,11 @@
 #define _PPP_MANA2_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/pppVec.h"
 
 #include <dolphin/mtx.h>
 
 struct Vec;
-struct Vec2d;
 struct _GXColor;
 struct _pppCtrlTable;
 struct VMana2;

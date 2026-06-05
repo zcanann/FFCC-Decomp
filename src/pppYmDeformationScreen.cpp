@@ -7,6 +7,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
@@ -15,13 +16,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
-
-struct Vec4d {
-	float x;
-	float y;
-	float z;
-	float w;
-};
 
 struct YmDeformationScreenOffsetData {
 	int unk0;

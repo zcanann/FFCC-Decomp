@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
-extern const float kPppAcceleZero;
+const float kPppAcceleZero = 0.0f;
 }
 
 

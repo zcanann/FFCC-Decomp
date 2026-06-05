@@ -1,7 +1,7 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-extern const float kPppPointZero[2];
+extern "C" const float kPppPointZero = 0.0f;
 
 /*
  * --INFO--
@@ -16,7 +16,7 @@ void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 {
 	int dataOffset = ctrlTable->m_serializedDataOffsets[0];
 	float* dst = (float*)(pObject->m_workArea + dataOffset);
-	float value = kPppPointZero[0];
+	float value = kPppPointZero;
 
 	dst[2] = value;
 	dst[1] = value;

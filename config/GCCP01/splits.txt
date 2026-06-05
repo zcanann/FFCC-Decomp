@@ -467,6 +467,7 @@ pppGetRotMatrixZYX.cpp:
 
 pppAccele.cpp:
 	.text       start:0x8005FB00 end:0x8005FBC0
+	.sdata2     start:0x8032FEC8 end:0x8032FECC
 
 pppAngAccele.cpp:
 	.text       start:0x8005FBC0 end:0x8005FC80
@@ -531,6 +532,7 @@ pppMatrixZYX.cpp:
 
 pppMove.cpp:
 	.text       start:0x800609C0 end:0x80060A80
+	.sdata2     start:0x8032FED8 end:0x8032FEDC
 
 pppParMatrix.cpp:
 	extab       start:0x80007098 end:0x800070A0
@@ -542,6 +544,7 @@ pppPObjPoint.cpp:
 
 pppPoint.cpp:
 	.text       start:0x80060B80 end:0x80060C04
+	.sdata2     start:0x8032FEE0 end:0x8032FEE4
 
 pppPointAp.cpp:
 	extab       start:0x800070A0 end:0x800070A8
@@ -552,6 +555,7 @@ pppPointRAp.cpp:
 	extab       start:0x800070A8 end:0x800070B0
 	extabindex  start:0x8000CFAC end:0x8000CFB8
 	.text       start:0x80060D20 end:0x80060EFC
+	.sdata2     start:0x8032FEE8 end:0x8032FEF4
 
 pppRandChar.cpp:
 	extab       start:0x800070B0 end:0x800070B8

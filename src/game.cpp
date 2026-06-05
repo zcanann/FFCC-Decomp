@@ -50,6 +50,12 @@ extern const char lbl_8032F650[] = "gr/";
 extern const char lbl_8032F654[] = "it/";
 extern const char lbl_8032F658[] = "fr/";
 extern const char lbl_8032F65C[] = "sp/";
+extern const char s_cGame_8032F660[] = "CGame";
+static const char s_numNameFmt[] = "%d %s";
+static const char s_nameSep[] = " ";
+static const char s_nameNoSep[4] = "";
+static const char s_nameJoinFmt[] = "%s%s%s";
+extern const double DOUBLE_8032F680 = 4503601774854144.0;
 extern const float kGamePartyBoundsMinInit = 1.0E+10;
 extern const float kGamePartyBoundsMaxInit = -1.0E+10;
 extern const float kGameZero = 0.0;
@@ -120,10 +126,6 @@ const char* PTR_s_dvd__scft_param_cfd[] = {
     s_dvd_pctscft_newbattle_cfd_801D6098,
 };
 float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
-static const char s_numNameFmt[] = "%d %s";
-static const char s_nameJoinFmt[] = "%s%s%s";
-static const char s_nameSep[] = " ";
-static const char s_nameNoSep[4] = "";
 
 struct GameNameRow
 {

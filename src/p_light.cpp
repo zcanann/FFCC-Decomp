@@ -714,23 +714,21 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
  */
 void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
 {
-    char* lightPcs = (char*)this;
-    char* bumpSlot = lightPcs + 0x63c;
+    CLight* light = m_sceneLights;
 
-    *(u32*)(lightPcs + 0xb0) = 0;
-    *(u32*)(lightPcs + 0xb4) = 0;
+    m_loadedLightCount = 0;
+    m_loadedLightMask = 0;
 
-    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++, bumpSlot += 0xb0) {
-        if ((*(u8*)((int)target + (int)bumpSlot + 0x60) != 0) &&
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
+        if ((light->m_targetEnable[target] != 0) &&
             (((1 << (i & 0x1f)) & *(u32*)((char*)bits + ((i >> 3) & 0x1ffffffc))) != 0))
         {
-            CLight* light = reinterpret_cast<CLight*>(bumpSlot);
             GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
-            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
-            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
-            *(u32*)(lightPcs + 0xb0) += 1;
+            GXLoadLightObjImm(&light->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
+            m_loadedLightMask |= 1 << m_loadedLightCount;
+            m_loadedLightCount += 1;
 
-            if (*(u32*)(lightPcs + 0xb0) >= 8) {
+            if (m_loadedLightCount >= 8) {
                 return;
             }
         }

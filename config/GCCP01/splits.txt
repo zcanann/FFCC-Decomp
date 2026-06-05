@@ -1008,6 +1008,7 @@ pppYmDeformationScreen.cpp:
 	extab       start:0x80007B50 end:0x80007B60
 	extabindex  start:0x8000DE4C end:0x8000DE64
 	.text       start:0x8009159C end:0x80091E58
+	.sdata2     start:0x80330670 end:0x803306A8
 
 fontman.cpp:
 	extab       start:0x80007B60 end:0x80007BF0

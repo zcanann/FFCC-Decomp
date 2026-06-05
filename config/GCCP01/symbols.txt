@@ -15065,7 +15065,6 @@ FLOAT_8033065c = .sdata2:0x8033065C; // type:object size:0x4 align:4 data:float
 FLOAT_80330660 = .sdata2:0x80330660; // type:object size:0x4 align:4 data:float
 FLOAT_80330664 = .sdata2:0x80330664; // type:object size:0x4 align:4 data:float
 FLOAT_80330668 = .sdata2:0x80330668; // type:object size:0x4 align:4 data:float
-FLOAT_8033066c = .sdata2:0x8033066C; // type:object size:0x4 align:4 data:float
 kYmDeformationScreenZero = .sdata2:0x80330670; // type:object size:0x4 align:4 data:float
 kYmDeformationScreenOrthoScaleX = .sdata2:0x80330674; // type:object size:0x4 align:4 data:float
 kYmDeformationScreenOrthoScaleY = .sdata2:0x80330678; // type:object size:0x4 align:4 data:float

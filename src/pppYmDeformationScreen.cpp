@@ -29,15 +29,17 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern const float kYmDeformationScreenZero;
-extern const float kYmDeformationScreenOrthoScaleX;
-extern const float kYmDeformationScreenOrthoScaleY;
-extern const float kYmDeformationScreenOne;
-extern const float kYmDeformationScreenOrthoOffsetX;
-extern const float kYmDeformationScreenAngleToRad;
-extern const float kYmDeformationScreenQuadRight;
-extern const float kYmDeformationScreenQuadMiddleY;
-extern const float kYmDeformationScreenQuadBottom;
+extern "C" {
+extern const float kYmDeformationScreenZero = 0.0f;
+extern const float kYmDeformationScreenOrthoScaleX = 0.003125f;
+extern const float kYmDeformationScreenOrthoScaleY = -0.004464f;
+extern const float kYmDeformationScreenOne = 1.0f;
+extern const float kYmDeformationScreenOrthoOffsetX = -1.0f;
+extern const float kYmDeformationScreenAngleToRad = 0.017453292f;
+extern const float kYmDeformationScreenQuadRight = 640.0f;
+extern const float kYmDeformationScreenQuadMiddleY = 224.0f;
+extern const float kYmDeformationScreenQuadBottom = 448.0f;
+}
 
 /*
  * --INFO--

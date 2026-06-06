@@ -70,12 +70,12 @@ static inline char* RuntimeString(CFlatRuntime2* runtime, unsigned int index)
 
 static inline unsigned int& RuntimeWorkAssignIndex(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x1040C);
+	return runtime->m_workAssignIndex;
 }
 
 static inline unsigned int& RuntimePartyAssignIndex(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x10410);
+	return runtime->m_partyAssignIndex;
 }
 
 static inline CCaravanWork* ScriptCaravan(CGObject* engineObject)

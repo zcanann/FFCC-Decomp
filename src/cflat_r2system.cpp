@@ -1862,14 +1862,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (CameraPcs.IsAbsolute() != 0) {
             const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
             CVector refPosition(localFloats[0], localFloats[1], localFloats[2]);
-            if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
+            if (m_cameraScriptTargetMode == 0) {
                 CameraPcs.SetRefPosition(refPosition);
             } else {
                 CharaPcs.m_overlapTargetPos = refPosition;
             }
 
             CVector position(localFloats[3], localFloats[4], localFloats[5]);
-            if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
+            if (m_cameraScriptTargetMode == 0) {
                 CameraPcs.SetPosition(position);
             } else {
                 CharaPcs.m_overlapEyePos = position;
@@ -2907,31 +2907,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x54: {
-        int index = m_unknown10400;
-        m_unknown10400 = index + 1;
-        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        runtime->push(object, m_debugDataBuffer[index]);
         outResult = 0;
         return 1;
     }
     case -0x55: {
-        int index = m_unknown10400;
-        m_unknown10400 = index + 1;
-        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        runtime->push(object, m_debugDataBuffer[index]);
         outResult = 0;
         return 1;
     }
     case -0x56: {
-        int index = m_unknown10400;
-        m_unknown10400 = index + 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        m_debugDataBuffer[index] = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x57: {
-        int index = m_unknown10400;
-        m_unknown10400 = index + 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        m_debugDataBuffer[index] = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2939,7 +2939,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x58: {
         char filename[0x80];
         sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
-        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2947,13 +2947,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x59: {
         char filename[0x80];
         sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
-        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x5A:
-        m_unknown10400 = 0;
+        m_debugDataIndex = 0;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3023,7 +3023,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -100:
         this->initAllFinished();
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x10404) = 1;
+        m_initAllFinishedFlag = 1;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3641,7 +3641,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xBA:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) = *object->m_localBase;
+        m_cameraScriptTargetMode = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;

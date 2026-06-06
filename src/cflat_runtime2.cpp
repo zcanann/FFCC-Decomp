@@ -421,7 +421,7 @@ CFlatRuntime2::CFlatRuntime2()
 	m_eventFlags = 0;
 	m_eventMask = -1;
 	m_gameFlags = (m_gameFlags & 0xFB) | 4;
-	m_unknown10400 = 0;
+	m_debugDataIndex = 0;
 	m_letterEventEnabled = 0;
 	memset(runtime + 0x15CC, 0, 0x100);
 	memset(LayerResources(this), 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
@@ -2441,7 +2441,7 @@ void CFlatRuntime2::resetChangeScript()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	*reinterpret_cast<u32*>(m_pad_10404_10408) = 0;
+	m_initAllFinishedFlag = 0;
 	m_padInputDisableMask = 0;
 	m_centerState = 0;
 	for (int i = 0; i < 16; i++) {
@@ -2488,9 +2488,9 @@ void CFlatRuntime2::resetChangeScript()
 		count--;
 	} while (count != 0);
 
-	*reinterpret_cast<u32*>(m_pad_1040C_10418) = 0;
-	*reinterpret_cast<u32*>(m_pad_1040C_10418 + 4) = 0;
-	*reinterpret_cast<u32*>(m_pad_1040C_10418 + 8) = 0;
+	m_workAssignIndex = 0;
+	m_partyAssignIndex = 0;
+	m_cameraScriptTargetMode = 0;
 	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
 	m_gameFlags &= 0xDF;
 	m_gameFlags &= 0xEF;

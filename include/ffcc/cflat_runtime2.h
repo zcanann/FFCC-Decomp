@@ -214,11 +214,15 @@ public:
 	int m_debugDrawCCCount;         // 0xCD1C
 	CDebugDrawCC m_debugDrawCCEntries[16]; // 0xCD20
 	CFlatData m_flatData;
-	u8 m_pad_E3F4_10400[0x200C];
-	int m_unknown10400;             // 0x10400
-	u8 m_pad_10404_10408[0x4];      // 0x10404
+	u8 m_pad_E3F4_E400[0xC];        // 0xE3F4
+	int m_debugDataBuffer[0x800];   // 0xE400
+	int m_debugDataIndex;           // 0x10400
+	u8 m_initAllFinishedFlag;       // 0x10404
+	u8 m_pad_10405_10408[0x3];      // 0x10405
 	int m_letterEventEnabled;       // 0x10408
-	u8 m_pad_1040C_10418[0xC];      // 0x1040C
+	unsigned int m_workAssignIndex; // 0x1040C
+	unsigned int m_partyAssignIndex; // 0x10410
+	int m_cameraScriptTargetMode;   // 0x10414
 	int m_saveSceneEnabled;         // 0x10418
 	int m_partyTraceParticleSlot[4]; // 0x1041C
 	int m_itemTraceParticleSlot;    // 0x1042C
@@ -249,8 +253,13 @@ STATIC_ASSERT(sizeof(CFlatRuntime2::CDebugDrawCC) == 0x20);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDrawCCCount) == 0xCD1C);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDrawCCEntries) == 0xCD20);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_flatData) == 0xCF20);
-STATIC_ASSERT(offsetof(CFlatRuntime2, m_unknown10400) == 0x10400);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDataBuffer) == 0xE400);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDataIndex) == 0x10400);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_initAllFinishedFlag) == 0x10404);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_letterEventEnabled) == 0x10408);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_workAssignIndex) == 0x1040C);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_partyAssignIndex) == 0x10410);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_cameraScriptTargetMode) == 0x10414);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_saveSceneEnabled) == 0x10418);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_partyTraceParticleSlot) == 0x1041C);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_itemTraceParticleSlot) == 0x1042C);

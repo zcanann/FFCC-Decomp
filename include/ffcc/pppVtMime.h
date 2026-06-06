@@ -13,6 +13,10 @@ struct VtMimeData
     float addZ;
 };
 
+struct VtMimeDataOffsets {
+    s32 m_stateOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -278,7 +278,7 @@ void CMenuPcs::Init()
         i = i + -1;
     } while (i != 0);
 
-    *reinterpret_cast<void**>(self + 0x878) = nullptr;
+    m_shopMenu = 0;
     self[0x87C] = 1;
     self[0x888] = 0;
     self[0x889] = 0;

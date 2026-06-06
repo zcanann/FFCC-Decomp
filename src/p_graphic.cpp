@@ -705,11 +705,11 @@ void CGraphicPcs::drawBar()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     int padState = 0;
     if (!useDebugPad) {
         int padIndex = useDebugPad;
-        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
         padState = Pad.GetPadInputs()[padIndex].holdOverride;
     }
     const bool drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
@@ -895,8 +895,8 @@ void CGraphicPcs::drawEnd()
 			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
 		}
 
-		if (Pad._448_4_ != -1) {
-			sprintf(debugPadString, s_debug_pad_port_fmt, Pad._448_4_ + 1);
+		if (Pad.m_debugPadPort != -1) {
+			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.m_debugPadPort + 1);
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
@@ -904,13 +904,13 @@ void CGraphicPcs::drawEnd()
 		int port = 0;
 		x = 0x10;
 		for (; port < 4; port++) {
-			bool suppress = (Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1));
+			bool suppress = (Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1));
 
 			u16 buttons;
 			if (suppress) {
 				buttons = 0;
 			} else {
-				int selectedPort = Pad._448_4_;
+				int selectedPort = Pad.m_debugPadPort;
 				u32 portIndex = port & ~((int)~((selectedPort - port) | (port - selectedPort)) >> 31);
 				buttons = Pad.GetPadInputs()[portIndex].button[0];
 			}

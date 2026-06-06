@@ -5,6 +5,7 @@
 #include "ffcc/goout.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_camera.h"
@@ -305,8 +306,8 @@ int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
-static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
-static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
+static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
+static const char s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
 static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
 static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
@@ -760,18 +761,19 @@ void CMenuPcs::InitFrameInfo()
  */
 void CMenuPcs::InitFrame0Info()
 {
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+	float one = FLOAT_803313e8;
+	float zero = FLOAT_803313dc;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
+	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
+
 	unsigned char* frame = m_wm.m_frameInfo;
-
-	*reinterpret_cast<unsigned short*>(frame + 4) = 0x10;
-	*reinterpret_cast<unsigned short*>(frame + 6) = 0x10;
-	*reinterpret_cast<unsigned short*>(frame + 8) = 0xE8;
-	*reinterpret_cast<unsigned short*>(frame + 0xA) = 0x168;
-	*reinterpret_cast<float*>(frame + 0xC) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(frame + 0x10) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(frame + 0x14) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(frame + 0x18) = FLOAT_803313e8;
-	*reinterpret_cast<unsigned int*>(frame + 0x1C) = 0;
-
 	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
 	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
 	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
@@ -782,8 +784,9 @@ void CMenuPcs::InitFrame0Info()
 	*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
 	*reinterpret_cast<unsigned int*>(frame + 0x38) = *reinterpret_cast<unsigned int*>(frame + 0x1C);
 
+	frame = m_wm.m_frameInfo;
 	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<unsigned int*>(frame + 0x38) = 8;
+	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
 }
 
 /*
@@ -811,8 +814,8 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
  */
 void CMenuPcs::InitCharaInfo()
 {
-	unsigned char* const worldObjData = m_wm.m_worldObjData;
-
+	float z = FLOAT_803314a4;
+	float zero = FLOAT_803313dc;
 	int row = 0;
 	int baseSlot = 0x20;
 	short baseY = 0x66;
@@ -825,26 +828,26 @@ void CMenuPcs::InitCharaInfo()
 				y = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0xA) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0xC) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0xE) = 0xE0;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x10) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x14) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x18) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0xA) = static_cast<short>(y - 0x70);
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xC) = 0x140;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xE) = 0xE0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x10) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
 			short y2 = baseY;
 			if (row != 0) {
 				y2 = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0x5C) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0x5E) = 0xE0;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x60) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x64) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x68) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5C) = 0x140;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5E) = 0xE0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x60) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x64) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
 
 			slotOffset += 0xA0;
 			baseX = static_cast<short>(baseX + 0x120);
@@ -854,33 +857,32 @@ void CMenuPcs::InitCharaInfo()
 		baseSlot += 4;
 	}
 
-	unsigned char* modelData = m_wm.m_charaModelData;
-	unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[0]);
+	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int modelOffset = 0;
 	for (int i = 4; i != 0; i--) {
-		unsigned char* entry0 = modelData + modelOffset;
-		if (*reinterpret_cast<int*>(caravan + 0x3A4) == 0) {
+		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
+		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(caravan + 0x3E2) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 200;
+			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(gameData + 0x17D2) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 200;
 			}
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x3E4);
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;
-		if (*reinterpret_cast<int*>(caravan + 0xFD4) == 0) {
+		if (*reinterpret_cast<int*>(gameData + 0x23C4) == 0) {
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(caravan + 0x1012) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 200;
+			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(gameData + 0x2402) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 200;
 			}
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x1014);
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x2404);
 		}
 
-		caravan += 0x1860;
+		gameData += 0x1860;
 		modelOffset += 0x68;
 	}
 }
@@ -2157,29 +2159,27 @@ void CMenuPcs::CalcMoveMenu()
 void CMenuPcs::InitSaveLoadMenu()
 {
 	float posX = FLOAT_803313dc;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
-	WmWorldState* const worldState = MenuPcs.m_wmWorldState;
 	float posY = FLOAT_803313e8;
 	int zero = 0;
 
-	worldState->m_frameCounter = zero;
-	worldState->m_titleState = zero;
-	worldState->m_worldReady = static_cast<unsigned char>(zero);
-	worldState->m_flag09 = static_cast<unsigned char>(zero);
-	worldState->m_flag0A = static_cast<unsigned char>(zero);
-	worldState->m_state0E = zero;
-	worldState->m_mainState = zero;
-	worldState->m_state12 = zero;
-	worldState->m_subState = zero;
-	worldState->m_delay = zero;
-	worldState->m_counter1A = zero;
-	worldState->m_posY = posY;
-	worldState->m_posX = posX;
-	worldState->m_mcResult = zero;
-	worldState->m_flag0B = static_cast<unsigned char>(zero);
-	worldState->m_cardChannel = zero;
-	m_wmTransitionCode = zero;
-	m_textureLocIndex = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_frameCounter = zero;
+	MenuPcs.m_wmWorldState->m_titleState = zero;
+	MenuPcs.m_wmWorldState->m_worldReady = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_flag09 = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_flag0A = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_state0E = zero;
+	MenuPcs.m_wmWorldState->m_mainState = zero;
+	MenuPcs.m_wmWorldState->m_state12 = zero;
+	MenuPcs.m_wmWorldState->m_subState = zero;
+	MenuPcs.m_wmWorldState->m_delay = zero;
+	MenuPcs.m_wmWorldState->m_counter1A = zero;
+	MenuPcs.m_wmWorldState->m_posY = posY;
+	MenuPcs.m_wmWorldState->m_posX = posX;
+	MenuPcs.m_wmWorldState->m_mcResult = zero;
+	MenuPcs.m_wmWorldState->m_flag0B = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_cardChannel = zero;
+	MenuPcs.m_wmTransitionCode = zero;
+	MenuPcs.m_textureLocIndex = static_cast<unsigned char>(zero);
 }
 
 /*
@@ -5505,12 +5505,10 @@ void CMenuPcs::DrawObj(int kind)
 void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
+	unsigned char* worldObj = m_wm.m_worldObjData;
 
-	const short state = worldState->m_mainState;
-	if (state <= 0 || state >= 3) {
+	short state = m_wmWorldState->m_mainState;
+	if (state == 0 || state >= 3) {
 		return;
 	}
 
@@ -5540,21 +5538,27 @@ void CMenuPcs::CalcPitcher()
 	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-	CChara::CModel* const model = reinterpret_cast<CChara::CModel*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-
-	const unsigned int step = static_cast<unsigned int>(worldState->m_frameCounter);
-	float blend = FLOAT_803313e8;
+	short step = m_wmWorldState->m_frameCounter;
+	float blendStep = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(step));
 	if (state == 1 && step < 10) {
-		blend = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] = blendStep;
 	} else if (state == 2 && bytes[0x13] != 0) {
-		blend = static_cast<float>(DOUBLE_80331420 - DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
+			static_cast<float>(DOUBLE_80331420 - static_cast<double>(blendStep));
+	} else {
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
+			FLOAT_803313e8;
 	}
-	reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x9C)[0] = blend;
 
-	model->SetMatrix(scaleMtx);
-	reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0x98)[0] = static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
-	model->CalcMatrix();
-	model->CalcSkin();
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->SetMatrix(scaleMtx);
+	reinterpret_cast<int*>(
+		reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x98)[0] =
+		static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcMatrix();
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcSkin();
 }
 
 /*
@@ -7463,7 +7467,7 @@ void CMenuPcs::CalcCharaSelect()
 					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
-							System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), i,
+							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
 						modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
@@ -8628,7 +8632,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	unsigned char* const selectData = m_wm.m_charaSelectData;
 	selectData[channel * 0x10 + 0xC] = 1;
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), channel,
+		System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
 		              (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
 	}
 }
@@ -8646,15 +8650,73 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = m_wm.m_charaSelectData;
-	unsigned char* const modelData = m_wm.m_charaModelData;
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
 	if ((unsigned int)System.m_execParam > 2) {
-		System.Printf(const_cast<char*>(s_ClrCMakeFlg___chan____d_cur____d_801dc390), channel, current);
+		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	modelData[current * 0x34 + 0xC] = 0;
+	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800eeb9c
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ChgAllModel2()
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* handleData = bytes;
+	int modelOffset = 0;
+	int pdtOffset = 0;
+
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+		unsigned char* pdtData =
+		    m_cmakeWork + pdtOffset + 0x14D0;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
+		unsigned int race;
+		unsigned int variant;
+		unsigned int index;
+		int modelId;
+		int loadMode;
+
+		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+		} else {
+			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
+			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
+			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		}
+
+		modelData = m_wm.m_charaModelData + modelOffset;
+		if ((int)race < 0) {
+			modelData[0xC] = 0;
+			loadMode = 3;
+			modelId = 0x43;
+		} else {
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId += 100;
+			}
+			modelData[0xC] = 1;
+			loadMode = 0;
+			modelId += index;
+		}
+
+		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
+		handleData += 4;
+		modelOffset += 0x34;
+		pdtOffset += 0x9C0;
+	}
 }
 
 /*
@@ -8671,12 +8733,11 @@ void CMenuPcs::ChgAllModel()
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	unsigned char* handleData = bytes;
-	unsigned char* const modelDataBase = m_wm.m_charaModelData;
 	int modelOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
-		unsigned char* modelData = modelDataBase + modelOffset;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
 		unsigned int variant;
 		unsigned int index;
@@ -8698,78 +8759,22 @@ void CMenuPcs::ChgAllModel()
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
 		}
 
-		modelData = modelDataBase + modelOffset;
+		modelData = m_wm.m_charaModelData + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
 		}
 
 		gameData += 0xC30;
 		handleData += 4;
 		modelOffset += 0x34;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eeb9c
- * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ChgAllModel2()
-{
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* handleData = bytes;
-	unsigned char* const modelDataBase = m_wm.m_charaModelData;
-	int modelOffset = 0;
-	int pdtOffset = 0;
-
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* pdtData =
-		    m_cmakeWork + pdtOffset + 0x14D0;
-		unsigned char* modelData = modelDataBase + modelOffset;
-		unsigned int race;
-		unsigned int variant;
-		unsigned int index;
-		int modelId;
-
-		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
-			race = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			index = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
-		} else {
-			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
-			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
-			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
-		}
-
-		modelData = modelDataBase + modelOffset;
-		if ((int)race < 0) {
-			modelData[0xC] = 0;
-			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
-		} else {
-			modelId = race * 200 + 100;
-			if (variant != 0) {
-				modelId += 100;
-			}
-			modelData[0xC] = 1;
-			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
-		}
-
-		handleData += 4;
-		modelOffset += 0x34;
-		pdtOffset += 0x9C0;
 	}
 }
 
@@ -8870,37 +8875,35 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 void CMenuPcs::SetAnim(int anim)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[anim];
-	if (handle == 0 || handle->m_charaKind == 3) {
+	CCharaPcs::CHandle** const handles = GetWmCharaHandles(this);
+	CCharaPcs::CHandle* const handle = handles[anim];
+	if (handle->m_charaKind == 3) {
 		return;
 	}
-	unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
 
 	const unsigned int charaNo = handle->m_charaNo;
 	const int modelBase = static_cast<int>(charaNo / 100) * 100;
 	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
 	handle->LoadAnim(s_wmCharaAnimStand, animBase + 0, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
 
 	int* const animState = m_wmCharaAnimState + anim * 5;
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
+	const int currentAnimIndex = handles[anim]->m_currentAnimIndex;
 	const int blendMode = -1 - (currentAnimIndex >> 31);
-	handle->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
+	handles[anim]->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(handle->m_model);
-	if (model != 0) {
-		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-		animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-	}
+	unsigned char* const model = reinterpret_cast<unsigned char*>(handles[anim]->m_model);
+	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
+	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
 }
 
 /*
@@ -8914,12 +8917,16 @@ void CMenuPcs::SetAnim(int anim)
  */
 void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80331458) * static_cast<double>(scale)));
-	GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = alpha;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0));
-	DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
+	MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -10207,30 +10214,7 @@ void CMenuPcs::ClrMcList()
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char createParam[0x88];
-	*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
-	*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
-	createParam[0x54] = 0;
-	createParam[0x53] = 1;
-	*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
-	createParam[0x52] = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
-	*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
-	*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
-	createParam[0x3E] = 0;
-	createParam[0x3D] = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-	*reinterpret_cast<void**>(createParam + 0x14) = 0;
-	*reinterpret_cast<void**>(createParam + 0x18) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-	*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
-	createParam[0x2C] = 0;
+	PPPCREATEPARAM createParam;
 
 	if (cameraSlot < 0) {
 		cameraSlot = slot;
@@ -10239,25 +10223,23 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	EffectInfo* effect = &m_effectWork[slot];
 	if (slot == 5 && effectNo < 0x13) {
 		effect++;
-	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+	} else if (slot >= 0x11 && slot <= 0x14 && effectNo > 0x19) {
 		effect += 4;
 	}
 
 	effect->m_effectNo = effectNo;
-	effect->m_slotNo = slot;
-	effect->m_object.Create();
-	effect->m_object.m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
-
-	*reinterpret_cast<void**>(createParam + 0x74) = &effect->m_object;
-	*reinterpret_cast<void**>(createParam + 0x70) = &effect->m_object;
-	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(createParam + 0x60) = FLOAT_803313e8;
-	createParam[0x5C] = 0;
-
 	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
-	const unsigned int partId = PartMng.pppCreate(group, effectNo, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+	CGObject* const object = &effect->m_object;
+	effect->m_slotNo = slot;
+	object->Create();
+	object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
+
+	createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+	createParam.m_lookTargetPtr = object;
+
+	const unsigned int partId = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	effect->m_partNo = partId;
-	return partId;
+	return effect->m_partNo;
 }
 
 /*
@@ -10271,9 +10253,9 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
  */
 void CMenuPcs::SetLight(int mode)
 {
+	Graphic.SetFog(1, 0);
 	WmMenuLightTable& lightTable = gWmMenuLightTables[mode];
 
-	Graphic.SetFog(1, 0);
 	LightPcs.SetAmbient(lightTable.m_ambient);
 	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable.m_diffuseCount));
 
@@ -10993,12 +10975,15 @@ void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, uns
 {
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(2));
 
-	unsigned int packed = (static_cast<unsigned int>(r) << 24) | (static_cast<unsigned int>(g) << 16) | (static_cast<unsigned int>(b) << 8) | static_cast<unsigned int>(a);
-	GXColor color = *reinterpret_cast<GXColor*>(&packed);
+	GXColor color;
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	color.a = a;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(-1));
-	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(-1));
+	_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
@@ -12065,44 +12050,7 @@ int McCtrl::ChkEmpty(int param_2)
 
 	int state = m_state;
 
-	if (state == 2)
-	{
-		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
-
-		if (m_lastResult < 0)
-		{
-			if (m_lastResult == -4)
-			{
-				if (param_2 != 0)
-				{
-					MemoryCardMan.McUnmount(m_cardChannel);
-					m_state = -1;
-					return -6;
-				}
-
-				m_state = 3;
-			}
-			else
-			{
-				if (m_lastResult == -5)
-				{
-					MemoryCardMan.McUnmount(m_cardChannel);
-					m_state = -1;
-					return -5;
-				}
-
-				MemoryCardMan.McUnmount(m_cardChannel);
-				m_state = -1;
-			}
-		}
-		else
-		{
-			MemoryCardMan.McClose();
-			MemoryCardMan.McUnmount(m_cardChannel);
-			m_state = 4;
-		}
-	}
-	else if (state < 2)
+	if (state < 2)
 	{
 		if (state == 0)
 		{
@@ -12151,6 +12099,43 @@ int McCtrl::ChkEmpty(int param_2)
 			}
 		}
 	}
+	else if (state == 2)
+	{
+		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
+
+		if (m_lastResult < 0)
+		{
+			if (m_lastResult == -4)
+			{
+				if (param_2 != 0)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -6;
+				}
+
+				m_state = 3;
+			}
+			else
+			{
+				if (m_lastResult == -5)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -5;
+				}
+
+				MemoryCardMan.McUnmount(m_cardChannel);
+				m_state = -1;
+			}
+		}
+		else
+		{
+			MemoryCardMan.McClose();
+			MemoryCardMan.McUnmount(m_cardChannel);
+			m_state = 4;
+		}
+	}
 	else if (state != 4 && state < 4)
 	{
 		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
@@ -12184,18 +12169,20 @@ int McCtrl::ChkEmpty(int param_2)
 		}
 	}
 
+	int result;
 	if (m_state == -1)
 	{
-		return -1;
+		result = -1;
 	}
 	else if (m_state == 4)
 	{
-		return 1;
+		result = 1;
 	}
 	else
 	{
-		return 0;
+		result = 0;
 	}
+	return result;
 }
 
 /*

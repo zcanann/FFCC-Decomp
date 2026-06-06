@@ -1320,8 +1320,6 @@ void CMenuPcs::drawSingleMenu()
  */
 void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, int)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     gSingMenuHasScriptFoodBase = static_cast<int>(SingleCaravanWork()->m_shopRequestState != 0);
     if (Game.m_gameWork.m_menuStageMode == 0) {
         if (m_singleMenuStageActive == 0) {
@@ -1366,7 +1364,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
 
                 CTextureSet* textureSet = new (stage, s_singmenu_cpp, 0x748) CTextureSet;
-                *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
+                m_textureSets[loadIndex + 5] = textureSet;
 
                 stage = m_menuStage;
                 if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1385,10 +1383,10 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             } else {
                 SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
                 for (int i = 0; i < 0x33; i++) {
-                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
+                    CTextureSet* set = m_textureSets[mapping->textureSetIndex];
                     int texIdx = set->Find(mapping->textureName);
                     CTexture* tex = set->GetTexture(static_cast<unsigned long>(texIdx));
-                    *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
+                    m_textures[i + 45] = tex;
                     tex->AddRef();
                     ++mapping;
                 }
@@ -1446,11 +1444,9 @@ post_texture_load:
  */
 void CMenuPcs::SingCalcChara(float frameStep)
 {
-    u8* self = reinterpret_cast<u8*>(this);
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
-    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+    if (model->m_animEnd <= model->m_time) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(frameStep);
@@ -1720,7 +1716,6 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
  */
 void CMenuPcs::SingleCalcFadeIn()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     SingleFadeState* fadeState = m_singleFadeState;
     if (fadeState->active == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
@@ -1765,8 +1760,7 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+    if (model->m_animEnd <= model->m_time) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(FLOAT_80332934);
@@ -1823,7 +1817,6 @@ void CMenuPcs::SingleDrawFadeIn()
  */
 void CMenuPcs::SingleCalcFadeOut()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     SingleFadeState* fadeState = m_singleFadeState;
 
     if (fadeState->active == 0) {
@@ -1870,8 +1863,7 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+    if (model->m_animEnd <= model->m_time) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(FLOAT_80332934);
@@ -1941,8 +1933,7 @@ void CMenuPcs::SingleCalcCtrl()
 
     unsigned short result = 0;
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
-        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+    if (model->m_animEnd <= model->m_time) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(FLOAT_80332934);
@@ -2054,8 +2045,6 @@ void CMenuPcs::SingleCalcCtrl()
  */
 void CMenuPcs::SingleDrawCtrl()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2591,7 +2580,7 @@ void CMenuPcs::DrawSingWin(short mode)
  */
 void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 {
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    CFont* font = m_fonts[0];
     font->SetMargin(FLOAT_80332934);
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
@@ -2666,7 +2655,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
  */
 void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    CFont* font = m_fonts[0];
     font->SetMargin(FLOAT_80332934);
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);

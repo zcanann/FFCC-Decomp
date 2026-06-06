@@ -4811,11 +4811,10 @@ void CMenuPcs::DrawTitleMenu()
 		DrawInit();
 
 		// Fade-in overlay (state 1)
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			state = *reinterpret_cast<short*>(worldState + 0x10);
+			state = typedWorldState->m_mainState;
 			if (state == 1 && DAT_8032e8ac == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
-				                                        (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) -
+				                                        (static_cast<double>(typedWorldState->m_frameCounter) -
 				                                         DOUBLE_80331408) -
 				                                        DOUBLE_80331420));
 				SetAttrFmt((FMT)2);
@@ -4835,17 +4834,16 @@ void CMenuPcs::DrawTitleMenu()
 		SetAttrFmt((FMT)0);
 		SetTexture((TEX)0x43);
 
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		state = *reinterpret_cast<short*>(worldState + 0x10);
+		state = typedWorldState->m_mainState;
 		if (state > 1) {
 			float fX = FLOAT_80331778 - FLOAT_80331414;
 			float fY = FLOAT_8033177c;
-			if (*reinterpret_cast<short*>(worldState + 0x26) != 0) {
-				fY = FLOAT_8033177c + (float)(*reinterpret_cast<short*>(worldState + 0x26) * 0x28 - 8);
+			if (typedWorldState->m_cardChannel != 0) {
+				fY = FLOAT_8033177c + (float)(typedWorldState->m_cardChannel * 0x28 - 8);
 			}
 			float alpha = FLOAT_803313e8;
-			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
-				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+			if (state == 2 && typedWorldState->m_state12 == 0) {
+				int timer = (int)typedWorldState->m_titleState;
 				fX = static_cast<float>(-(DOUBLE_80331790 *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
@@ -4860,14 +4858,14 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCALPHA, GX_LO_SET);
 			float secondAlpha = alpha;
-			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
-				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+			if (state == 2 && typedWorldState->m_state12 == 0) {
+				int timer = (int)typedWorldState->m_titleState;
 				fX = static_cast<float>(DOUBLE_80331790 *
 				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
 				                         static_cast<double>(FLOAT_80331778 - FLOAT_80331414));
-			} else if ((state == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) ||
-			           (state == 3 && *reinterpret_cast<short*>(worldState + 0x0E) == 0)) {
-				int pulse = (int)*reinterpret_cast<short*>(worldState + 0x24) % 0x28 - 0x14;
+			} else if ((state == 2 && typedWorldState->m_delay == 0) ||
+			           (state == 3 && typedWorldState->m_state0E == 0)) {
+				int pulse = (int)typedWorldState->m_titleState % 0x28 - 0x14;
 				if (pulse < 0) {
 					pulse = -pulse;
 				}

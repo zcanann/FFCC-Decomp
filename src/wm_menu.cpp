@@ -1313,7 +1313,7 @@ void CMenuPcs::CalcDiaryMenu()
 		CalcMCardMenu();
 		break;
 	case 3:
-		if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
+		if (m_singleCmakeMode == 0) {
 			if (worldState->m_modelFlagsInitialized == 0) {
 				unsigned char* const modelData = m_wm.m_charaModelData;
 				modelData[0x0C] = 1;
@@ -3468,7 +3468,7 @@ void CMenuPcs::drawWorld()
 			DrawMCardMenu();
 			break;
 		case 3:
-			if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
+			if (m_singleCmakeMode == 0) {
 				DrawCMakeMenu();
 			} else {
 				DrawSingCMake();
@@ -7692,7 +7692,7 @@ void CMenuPcs::CalcCharaSelect()
 										GbaQue.InitCmakeInfo(i, currentSlot);
 										entry.m_cmakePending = 1;
 									} else {
-										*reinterpret_cast<short*>(bytes + 0x86A) = static_cast<short>(currentSlot);
+										m_singleCmakeSlot = static_cast<short>(currentSlot);
 									}
 									Sound.PlaySe(2, 0x40, 0x7F, 0);
 								} else {
@@ -7795,11 +7795,11 @@ void CMenuPcs::CalcCharaSelect()
 				readyMask |= 1u << i;
 			}
 		}
-		if ((Game.m_gameWork.m_menuStageMode == 0 || *reinterpret_cast<short*>(bytes + 0x86A) < 0) &&
+		if ((Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) &&
 		    finishedMask != 0 && finishedMask == readyMask) {
 			worldState->m_nextMenuMode = 1;
 			worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
-		} else if (Game.m_gameWork.m_menuStageMode != 0 && *reinterpret_cast<short*>(bytes + 0x86A) >= 0) {
+		} else if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
 			worldState->m_nextMenuMode = 1;
 			worldState->m_delay = 10;
 		}
@@ -8303,18 +8303,18 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<int*>(frame + 0x38) = 8;
 
 	if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
-	    && *reinterpret_cast<short*>(bytes + 0x86A) >= 0
-	    && *reinterpret_cast<short*>(bytes + 0x86A) < 8) {
-		*reinterpret_cast<short*>(bytes + 0x868) = 1;
+	    && m_singleCmakeSlot >= 0
+	    && m_singleCmakeSlot < 8) {
+		m_singleCmakeMode = 1;
 		typedWorldState->m_menuMode = 3;
 	} else if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
-	           && *reinterpret_cast<short*>(bytes + 0x86A) > 7) {
-		*reinterpret_cast<short*>(bytes + 0x868) = 0;
-		*reinterpret_cast<short*>(bytes + 0x86A) = (short)0xFFFF;
+	           && m_singleCmakeSlot > 7) {
+		m_singleCmakeMode = 0;
+		m_singleCmakeSlot = (short)0xFFFF;
 		typedWorldState->m_menuMode = 3;
 	} else {
-		*reinterpret_cast<short*>(bytes + 0x868) = 0;
-		*reinterpret_cast<short*>(bytes + 0x86A) = (short)0xFFFF;
+		m_singleCmakeMode = 0;
+		m_singleCmakeSlot = (short)0xFFFF;
 	}
 
 	int iVar8 = 0;

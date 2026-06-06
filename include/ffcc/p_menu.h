@@ -799,7 +799,8 @@ public:
         short m_singleMenuMode;
     };
     short m_singleMenuPhase;
-    unsigned char m_pad868[0x86C - 0x868];
+    short m_singleCmakeMode;
+    short m_singleCmakeSlot;
     short m_menuResultCode;
     unsigned char m_textureLocIndex;
     unsigned char m_pad86F;
@@ -881,6 +882,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_wmThpActive) == 0x858);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuMode) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuPhase) == 0x866);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleCmakeMode) == 0x868);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleCmakeSlot) == 0x86A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuResultCode) == 0x86C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_textureLocIndex) == 0x86E);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmTransitionCode) == 0x870);

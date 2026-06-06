@@ -80,7 +80,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	pppYmLaserWork* work = GetYmLaserWork(laser, data);
 	pppYmLaserColorData* colorData = GetYmLaserColorData(laser, data);
 	s32 dataValIndex = step->m_dataValIndex;
-	s32 count;
+	u32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;

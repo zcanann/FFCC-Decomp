@@ -28,7 +28,9 @@ void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 CProcessTableCallback CMiniGamePcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 CProcessTableCallback CMiniGamePcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
-extern const char s_miniGameGbaAssets[] = "dvd/gba/\0\0\0ffcc_cli.bin\0\0\0objdat.spt";
+extern const char s_miniGameDvdGbaDir[] = "dvd/gba/";
+extern const char s_miniGameClientFile[] = "ffcc_cli.bin";
+extern const char s_miniGameObjFile[] = "objdat.spt";
 extern const char s_CMiniGamePcs_GAME_801DD098[] = "CMiniGamePcs(GAME)";
 extern const char s_CMiniGamePcs_801DD0AC[] = "CMiniGamePcs";
 extern const char s_CManager_801DD0BC[] = "CManager";
@@ -1455,7 +1457,7 @@ void CMiniGamePcs::calc(void)
             sprintf(managerFile, s_miniGameManagerFileFmt, s_miniGameManagerDir, m_managerIndex);
             sprintf(managerSpFile, s_miniGameManagerSpFileFmt, s_miniGameManagerDir, m_managerIndex);
 
-            if ((unsigned int)System.m_execParam > 2)
+            if ((unsigned int)System.m_execParam >= 3)
             {
                 System.Printf(const_cast<char*>(s_miniGameFileInfoFmt), managerFile, managerSpFile);
             }
@@ -1497,7 +1499,7 @@ void CMiniGamePcs::calc(void)
         m_miniGameParams[1] = -1;
         m_miniGameParams[2] = -1;
         m_miniGameParams[3] = -1;
-        if ((unsigned int)System.m_execParam > 2)
+        if ((unsigned int)System.m_execParam >= 3)
         {
             System.Printf(const_cast<char*>(s_miniGameContinueText));
         }
@@ -1514,7 +1516,7 @@ void CMiniGamePcs::calc(void)
         return;
     }
 
-    if (System.m_execParam != 0)
+    if (1 <= (unsigned int)System.m_execParam)
     {
         System.Printf(const_cast<char*>(s_miniGameMgrEndStartText));
     }
@@ -1527,9 +1529,13 @@ void CMiniGamePcs::calc(void)
         gCFlatRuntime().SystemCall(0, 1, 8, 3, mgrEndStack, 0);
     }
 
-    if (System.m_execParam != 0)
+    if (1 <= (unsigned int)System.m_execParam)
     {
         System.Printf(const_cast<char*>(s_miniGameMgrEndEndText));
+    }
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
         System.Printf(const_cast<char*>(s_miniGameEnd0000Text));
     }
 
@@ -1560,18 +1566,30 @@ void CMiniGamePcs::calc(void)
     }
 
     m_playerMask = 0xF;
-    if (System.m_execParam != 0)
+    if (1 <= (unsigned int)System.m_execParam)
     {
         System.Printf(const_cast<char*>(s_miniGameEnd1111Text));
     }
 
     Joybus.RestartThread();
 
-    if (System.m_execParam != 0)
+    if (1 <= (unsigned int)System.m_execParam)
     {
         System.Printf(const_cast<char*>(s_miniGameEnd2222Text));
+    }
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
         System.Printf(g_MsgFlashy);
+    }
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
         System.Printf(const_cast<char*>(s_miniGameEndBannerText));
+    }
+
+    if (1 <= (unsigned int)System.m_execParam)
+    {
         System.Printf(g_MsgFlashy);
     }
 

@@ -101,10 +101,7 @@ inline int CMenuPcs::TmpArtiCtrlCur()
 
     if ((buttonDown & 0x100) != 0) {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    if ((buttonDown & 0x200) != 0) {
+    } else if ((buttonDown & 0x200) != 0) {
         m_tmpArtiState->closeRequested = 1;
         Sound.PlaySe(3, 0x40, 0x7f, 0);
         return 1;
@@ -425,7 +422,7 @@ int CMenuPcs::TmpArtiCtrl()
 	int hasInput;
 	int itemCount;
 	int iVar7;
-	int blockCount;
+	unsigned int blockCount;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	hasInput = TmpArtiCtrlCur();
@@ -446,7 +443,7 @@ int CMenuPcs::TmpArtiCtrl()
 		TmpArtiEntry* entries = GetTmpArtiEntries(this);
 		int setupIndex = itemCount - 1;
 		if (setupIndex > -1) {
-			blockCount = itemCount >> 3;
+			blockCount = (unsigned int)itemCount >> 3;
 			if (blockCount != 0) {
 				do {
 					TmpArtiEntry* setupEntry = entries + setupIndex;

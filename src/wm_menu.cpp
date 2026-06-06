@@ -1169,7 +1169,7 @@ void CMenuPcs::calcWorld()
 		}
 	}
 
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	worldObj[0x50] = 1;
 	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
 	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
@@ -1453,15 +1453,16 @@ void CMenuPcs::CalcMCardMenu()
 		uVar15 = 0;
 	}
 
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = 0x10;
-	int iVar12 = *reinterpret_cast<int*>(bytes + 0x820);
+	unsigned char* const frame = m_wm.m_frameInfo;
+	*reinterpret_cast<short*>(frame + 4) = 0x10;
+	int iVar12 = reinterpret_cast<int>(frame);
 	int frameSum = (int)*reinterpret_cast<short*>(iVar12 + 8) + (int)*reinterpret_cast<short*>(iVar12 + 4);
 	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
 	*reinterpret_cast<short*>(iVar12 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
 		double dVar22;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 8) + (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4));
+		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 > -11) {
 			unsigned int absOff;
 			if ((int)uVar15 < 0) {
@@ -1478,10 +1479,10 @@ void CMenuPcs::CalcMCardMenu()
 			dVar22 = (double)baseWidth;
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) - (float)dVar22);
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) + (float)dVar22);
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar22);
+		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar22);
+		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
 	}
 
 	float fVar2 = FLOAT_803313e8;

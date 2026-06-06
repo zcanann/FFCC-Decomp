@@ -8098,15 +8098,16 @@ void CMenuPcs::DrawCharaName()
 			} else {
 				text = emptyText[1];
 				font->SetTlut(0x10);
+				int textAlpha = alpha;
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
 				if (worldState->m_mainState == 2) {
-					const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
-					const int blink = static_cast<int>(FLOAT_80331458 *
-					                                   static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
-					                                                        DOUBLE_80331420)));
-					CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(blink));
-					font->SetColor(blinkColor.color);
+					textAlpha = static_cast<int>(FLOAT_80331458 *
+					                             static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
+					                                                  DOUBLE_80331420)));
 					restoreColor = true;
 				}
+				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha));
+				font->SetColor(blinkColor.color);
 			}
 
 			const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) +

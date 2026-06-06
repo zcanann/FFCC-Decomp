@@ -853,8 +853,10 @@ void CCameraPcs::SetStdProjectionMatrix()
 {
     float fov = m_fov;
 
-    if (fov < FLOAT_8032fac8 && static_cast<unsigned int>(System.m_execParam) >= 1) {
-        System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+    if (fov < FLOAT_8032fac8) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
+        }
         fov = FLOAT_8032fab4;
     }
 

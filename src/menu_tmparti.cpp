@@ -425,7 +425,7 @@ int CMenuPcs::TmpArtiCtrl()
 	int hasInput;
 	int itemCount;
 	int iVar7;
-	int blockCount;
+	unsigned int blockCount;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	hasInput = TmpArtiCtrlCur();
@@ -446,7 +446,7 @@ int CMenuPcs::TmpArtiCtrl()
 		TmpArtiEntry* entries = GetTmpArtiEntries(this);
 		int setupIndex = itemCount - 1;
 		if (setupIndex > -1) {
-			blockCount = itemCount >> 3;
+			blockCount = (unsigned int)itemCount >> 3;
 			if (blockCount != 0) {
 				do {
 					TmpArtiEntry* setupEntry = entries + setupIndex;

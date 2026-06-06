@@ -114,16 +114,6 @@ enum PppChunkId {
     kChunkTSET = 0x54534554,
 };
 
-struct CPtrArrayBare {
-    void* m_vtable;
-    unsigned long m_size;
-    unsigned long m_numItems;
-    unsigned long m_defaultSize;
-    void* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
-
 struct CPartMngLoadState {
     unsigned char m_unk0[0x236F4];
     unsigned int m_partAMemBase;
@@ -146,10 +136,13 @@ struct CPartMngLoadState {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetGrow__21CPtrArray(CPtrArrayBare* ptrArray, int growCapacity)
+template <>
+#pragma dont_inline on
+void CPtrArray<CTexture*>::SetGrow(int growCapacity)
 {
-    ptrArray->m_growCapacity = growCapacity;
+    m_growCapacity = growCapacity;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

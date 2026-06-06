@@ -1830,8 +1830,9 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		u8* chunkData = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
-		cacheChunks[(i << 2)] = ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
-		delete[] chunkData;
+		reinterpret_cast<s16*>(pppDataHead->m_cacheChunks)[i << 2] =
+		    ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
+		delete chunkData;
 		chunkOffsets++;
 	}
 

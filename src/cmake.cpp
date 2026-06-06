@@ -147,12 +147,12 @@ STATIC_ASSERT(offsetof(CmakeMenuState, m_fieldSelect) == 0x30);
 
 static inline void*& CmakeVillageWork(CMenuPcs* menu)
 {
-    return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(menu) + 0x830);
+    return menu->m_cmakeVillageWork;
 }
 
 static inline CmakeMenuState* CmakeState(CMenuPcs* menu)
 {
-    return *reinterpret_cast<CmakeMenuState**>(reinterpret_cast<unsigned char*>(menu) + 0x82C);
+    return menu->m_cmakeState;
 }
 
 static inline CmakeMenuState* CmakeVillageState(CMenuPcs* menu)

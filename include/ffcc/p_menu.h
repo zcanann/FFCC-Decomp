@@ -29,6 +29,7 @@ struct MenuLstState;
 struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
+struct CmakeMenuState;
 
 struct MenuBoardEntry
 {
@@ -683,10 +684,14 @@ public:
         SingMenuState* m_singMenuState;
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
+        CmakeMenuState* m_cmakeState;
         short* m_cmdState;
         int m_bonusStatePtr;
     };
-    unsigned char m_pad830[0x838 - 0x830];
+    union {
+        unsigned char m_pad830[0x838 - 0x830];
+        void* m_cmakeVillageWork;
+    };
     union {
         EffectEntry* m_effectEntries;
         unsigned char* m_wmCharaState;
@@ -762,8 +767,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);

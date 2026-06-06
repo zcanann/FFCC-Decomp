@@ -232,7 +232,7 @@ void CMenuPcs::Init()
 
     m_singleMenuStageActive = 0;
     *reinterpret_cast<u16*>(self + 0x86C) = 0;
-    *reinterpret_cast<u32*>(self + 0x830) = 0;
+    m_cmakeVillageWork = 0;
     m_artiList = 0;
     m_battleStateFlag = 0;
 

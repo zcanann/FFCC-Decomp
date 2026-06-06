@@ -917,7 +917,7 @@ void CMenuPcs::createSingleMenu()
             *reinterpret_cast<int*>(self + 0x814) = 0;
             m_singleFadeState = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
-            *reinterpret_cast<int*>(self + 0x848) = 0;
+            m_singWindowInfo = 0;
             m_shopMenu = 0;
         }
     }
@@ -975,10 +975,10 @@ void CMenuPcs::destroySingleMenu()
         *reinterpret_cast<void**>(self + 0x82C) = 0;
     }
 
-    ptr = *reinterpret_cast<void**>(self + 0x848);
+    ptr = m_singWindowInfo;
     if (ptr != 0) {
         delete static_cast<u8*>(ptr);
-        *reinterpret_cast<void**>(self + 0x848) = 0;
+        m_singWindowInfo = 0;
     }
 
     GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
@@ -1083,8 +1083,8 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw;
-    memset(*reinterpret_cast<void**>(self + 0x848), 0, sizeof(SingleMenuWindowRaw));
+    m_singWindowInfo = reinterpret_cast<s16*>(new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw);
+    memset(m_singWindowInfo, 0, sizeof(SingleMenuWindowRaw));
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
     if (gSingMenuForcedSelection >= 0) {
@@ -1181,9 +1181,9 @@ void CMenuPcs::drawSingleMenu()
                 m_singleFadeState = 0;
             }
 
-            if (*reinterpret_cast<void**>(self + 0x848) != 0) {
-                delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x848));
-                *reinterpret_cast<void**>(self + 0x848) = 0;
+            if (m_singWindowInfo != 0) {
+                delete reinterpret_cast<u8*>(m_singWindowInfo);
+                m_singWindowInfo = 0;
             }
 
             m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
@@ -2489,13 +2489,11 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
  */
 void CMenuPcs::DrawSingWin(short mode)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    if (mode >= 0 && (*reinterpret_cast<s16**>(self + 0x848))[5] != mode) {
-        (*reinterpret_cast<s16**>(self + 0x848))[5] = mode;
+    s16* win = m_singWindowInfo;
+    if (mode >= 0 && win[5] != mode) {
+        win[5] = mode;
     }
 
-    s16* win = *reinterpret_cast<s16**>(self + 0x848);
     if (win[5] == 3) {
         return;
     }
@@ -2579,23 +2577,22 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x42));
     MenuPcs.DrawRect(0, innerX, innerY, innerW, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    int winStatePtr = *reinterpret_cast<int*>(self + 0x848);
-    s16 state = *reinterpret_cast<s16*>(winStatePtr + 10);
+    s16 state = win[5];
     if (state == 0) {
-        *reinterpret_cast<s16*>(winStatePtr + 8) = *reinterpret_cast<s16*>(winStatePtr + 8) + 1;
-        if (*reinterpret_cast<s16*>(winStatePtr + 8) > 5) {
-            *reinterpret_cast<s16*>(winStatePtr + 8) = 6;
-            *reinterpret_cast<s16*>(winStatePtr + 10) = 1;
+        win[4] = win[4] + 1;
+        if (win[4] > 5) {
+            win[4] = 6;
+            win[5] = 1;
         }
     } else if (state == 1) {
-        if (*reinterpret_cast<s16*>(winStatePtr + 8) != 6) {
-            *reinterpret_cast<s16*>(winStatePtr + 8) = 6;
+        if (win[4] != 6) {
+            win[4] = 6;
         }
     } else if (state == 2) {
-        *reinterpret_cast<s16*>(winStatePtr + 8) = *reinterpret_cast<s16*>(winStatePtr + 8) - 1;
-        if (*reinterpret_cast<s16*>(winStatePtr + 8) < 1) {
-            *reinterpret_cast<s16*>(winStatePtr + 8) = 0;
-            *reinterpret_cast<s16*>(winStatePtr + 10) = 3;
+        win[4] = win[4] - 1;
+        if (win[4] < 1) {
+            win[4] = 0;
+            win[5] = 3;
         }
     }
 }
@@ -2642,7 +2639,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         dynamicText += 0x80;
     }
 
-    s16* win = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
+    s16* win = m_singWindowInfo;
     int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
     if (FLOAT_8033294c < FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
         lineHeight++;
@@ -2748,12 +2745,13 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
  */
 void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
 {
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[0] = static_cast<s16>(x);
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[1] = static_cast<s16>(y);
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[2] = static_cast<s16>(w);
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[3] = static_cast<s16>(h);
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[4] = 0;
-    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[5] = 3;
+    s16* win = m_singWindowInfo;
+    win[0] = static_cast<s16>(x);
+    win[1] = static_cast<s16>(y);
+    win[2] = static_cast<s16>(w);
+    win[3] = static_cast<s16>(h);
+    win[4] = 0;
+    win[5] = 3;
 }
 
 /*

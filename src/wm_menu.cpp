@@ -7922,19 +7922,22 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		unsigned int finishedMask = 0;
-		unsigned int readyMask = 0;
 		for (int i = 0; i < 4; i++) {
 			if (selectEntries[i].m_confirmed != 0) {
 				finishedMask |= 1u << i;
 			}
-			if (selectEntries[i].m_connected == 0 && selectEntries[i].m_disconnectTime < 0x1E) {
-				readyMask |= 1u << i;
-			}
 		}
-		if ((Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) &&
-		    finishedMask != 0 && finishedMask == readyMask) {
-			worldState->m_nextMenuMode = 1;
-			worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
+		if (Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) {
+			unsigned int readyMask = 0;
+			for (int i = 0; i < 4; i++) {
+				if (selectEntries[i].m_connected == 0 && selectEntries[i].m_disconnectTime < 0x1E) {
+					readyMask |= 1u << i;
+				}
+			}
+			if (finishedMask != 0 && finishedMask == readyMask) {
+				worldState->m_nextMenuMode = 1;
+				worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
+			}
 		} else if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
 			worldState->m_nextMenuMode = 1;
 			worldState->m_delay = 10;

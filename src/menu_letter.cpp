@@ -172,8 +172,8 @@ void CMenuPcs::LetterInit()
 	*reinterpret_cast<int*>(anim + 0x30) = 10;
 	*reinterpret_cast<int*>(anim + 0x64) = 0;
 	*reinterpret_cast<unsigned int*>(anim + 0x6C) =
-	    ~(((-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872))) |
-	        static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)))) >>
+	    ~(((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+	        static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
 	       31)) &
 	    10;
 	*reinterpret_cast<int*>(anim + 0x70) = 10;
@@ -523,8 +523,8 @@ bool CMenuPcs::LetterOpen()
 		iVar4 = GetLetterAnimBase(this);
 		*reinterpret_cast<int*>(iVar4 + 0x64) = 0;
 		*reinterpret_cast<unsigned int*>(iVar4 + 0x6C) =
-			~(((-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872))) |
-				static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)))) >>
+			~(((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+				static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
 			   31)) &
 			10;
 		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
@@ -1241,8 +1241,8 @@ int CMenuPcs::LetterMessClose()
 				*reinterpret_cast<int*>(anim + 0x30) = 10;
 				*reinterpret_cast<int*>(anim + 0x64) = 0;
 				*reinterpret_cast<int*>(anim + 0x6C) =
-				    ~(((-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872))) |
-				        static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)))) >>
+				    ~(((-static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag)) |
+				        static_cast<int>(static_cast<char>(m_singleMenuCtrlResetFlag))) >>
 				       31)) &
 				    10;
 				*reinterpret_cast<int*>(anim + 0x70) = 10;
@@ -1689,7 +1689,7 @@ void CMenuPcs::LetterListDraw()
 {
 	int menuDataBase = GetLetterAnimBase(this);
 
-	if ((s_OpenClose != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
+	if ((s_OpenClose != 0) && (m_singleMenuCtrlResetFlag == '\0')) {
 		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
 		DrawSingleCrescent(FLOAT_803330f8, anim);
 		DrawSingleStat(anim);

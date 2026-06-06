@@ -6187,82 +6187,74 @@ void CMenuPcs::CalcPitcher()
 void CMenuPcs::CalcFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	float fVar1 = FLOAT_803313dc;
-	if (bytes[0x09] != 1) {
+	if ((char)bytes[0x09] != 1) {
 		return;
 	}
+	float fVar1 = FLOAT_803313dc;
+#define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData)) = *reinterpret_cast<short*>(bytes + 0x1C);
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 4) = 0xF0;
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 6) = 0xC4;
-	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x0C) = fVar1;
-	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 8) = FLOAT_803313dc;
+#define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
+	*reinterpret_cast<short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
+	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
+	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;
+	*reinterpret_cast<float*>(BUB() + 0x0C) = fVar1;
+	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_803313dc;
 	} else {
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 8) = FLOAT_80331704;
+		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_80331704;
 	}
 
 	fVar1 = FLOAT_80331708;
-	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x3F0) != 0) {
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x20) = 0x50;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+		*reinterpret_cast<short*>(BUB() + 0x20) = 0x50;
 		float fVar2 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x22) = 0x48;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x24) = fVar1;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x28) = fVar2;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) + 0x1C;
-		if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) + 0x10;
+		*reinterpret_cast<short*>(BUB() + 0x22) = 0x48;
+		*reinterpret_cast<float*>(BUB() + 0x24) = fVar1;
+		*reinterpret_cast<float*>(BUB() + 0x28) = fVar2;
+		*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 2) + 0x1C;
+		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+			*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 0x1E) + 0x10;
 		}
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData));
-		if ((uVar3 & 0xF) == 0) {
-			if ((uVar3 & 0x200) == 0) {
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x38;
+		*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB());
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) == 0) {
+			if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) == 0) {
+				*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
 			} else {
-				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x50;
+				*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
 			}
 		} else {
-			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x20;
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x20;
 		}
 	}
 
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x1FF) != 0) {
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x3C) = 0x20;
-		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x3E) = 0x20;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x40) = fVar1;
-		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x44) = fVar1;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x1FF) != 0) {
+		*reinterpret_cast<short*>(BUB() + 0x3C) = 0x20;
+		*reinterpret_cast<short*>(BUB() + 0x3E) = 0x20;
+		*reinterpret_cast<float*>(BUB() + 0x40) = fVar1;
+		*reinterpret_cast<float*>(BUB() + 0x44) = fVar1;
 
 		// Copy first icon rect to second
-		int iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+		int iVar9 = BUB();
 		*reinterpret_cast<short*>(iVar9 + 0x54) = *reinterpret_cast<short*>(iVar9 + 0x38);
 		*reinterpret_cast<short*>(iVar9 + 0x56) = *reinterpret_cast<short*>(iVar9 + 0x3A);
 		*reinterpret_cast<short*>(iVar9 + 0x58) = *reinterpret_cast<short*>(iVar9 + 0x3C);
 		*reinterpret_cast<short*>(iVar9 + 0x5A) = *reinterpret_cast<short*>(iVar9 + 0x3E);
-		*reinterpret_cast<int*>(iVar9 + 0x5C) = *reinterpret_cast<int*>(iVar9 + 0x40);
-		*reinterpret_cast<int*>(iVar9 + 0x60) = *reinterpret_cast<int*>(iVar9 + 0x44);
-		*reinterpret_cast<int*>(iVar9 + 0x64) = *reinterpret_cast<int*>(iVar9 + 0x48);
-		*reinterpret_cast<int*>(iVar9 + 0x68) = *reinterpret_cast<int*>(iVar9 + 0x4C);
+		*reinterpret_cast<float*>(iVar9 + 0x5C) = *reinterpret_cast<float*>(iVar9 + 0x40);
+		*reinterpret_cast<float*>(iVar9 + 0x60) = *reinterpret_cast<float*>(iVar9 + 0x44);
+		*reinterpret_cast<float*>(iVar9 + 0x64) = *reinterpret_cast<float*>(iVar9 + 0x48);
+		*reinterpret_cast<float*>(iVar9 + 0x68) = *reinterpret_cast<float*>(iVar9 + 0x4C);
 		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
 
-		iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+		iVar9 = BUB();
 		short sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
-		if ((uVar3 & 0xF) == 0) {
-			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
-			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15 + 8;
-			*reinterpret_cast<short*>(iVar9 + 0x3A) =
-			    *reinterpret_cast<short*>(iVar9 + 0x1E);
-			*reinterpret_cast<short*>(iVar9 + 0x3A) =
-			    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
-		} else {
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
 			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
 			int cnt = 0;
 			int iter = 4;
 			int iVar11 = 0;
-			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15;
+			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15;
 			do {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar11)) != 0) {
 					cnt++;
@@ -6271,17 +6263,24 @@ void CMenuPcs::CalcFukidashi()
 				iter--;
 			} while (iter != 0);
 			if (cnt == 1) {
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x1E);
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x1E);
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
 			} else {
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x1E);
-				iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x1E);
+				iVar9 = BUB();
 				*reinterpret_cast<short*>(iVar9 + 0x56) =
 				    *reinterpret_cast<short*>(iVar9 + 0x1E) + *reinterpret_cast<short*>(iVar9 + 0x22) - 0x20;
 			}
+		} else {
+			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
+			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15 + 8;
+			*reinterpret_cast<short*>(BUB() + 0x3A) =
+			    *reinterpret_cast<short*>(BUB() + 0x1E);
+			*reinterpret_cast<short*>(BUB() + 0x3A) =
+			    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
 		}
 	}
 
@@ -6292,13 +6291,26 @@ void CMenuPcs::CalcFukidashi()
 	fontFC->SetScale(FLOAT_803313e8);
 
 	char nameBuffer[64];
+	char secondLine[64];
+	char tempBuf[64];
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
-		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+		char* const townName = Game.m_gameWork.m_townName;
+		strcpy(nameBuffer, townName);
+		if (Game.m_gameWork.m_languageId == 2) {
+			strcpy(nameBuffer, townName);
+			strcat(nameBuffer, lbl_80210D10[Game.m_gameWork.m_languageId - 1], sizeof(nameBuffer));
+		} else {
+			strcpy(nameBuffer, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
+			strcat(nameBuffer, townName, sizeof(nameBuffer));
+		}
 	} else {
 		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
+	}
+	if (nameBuffer[0] != '\0') {
+		nameBuffer[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameBuffer[0])));
 	}
 
 	unsigned int textWidth = 0xD8;
@@ -6310,67 +6322,125 @@ void CMenuPcs::CalcFukidashi()
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 	double dVar23 = (double)font->GetWidth(nameBuffer);
+	if (dVar23 > static_cast<double>(static_cast<float>(static_cast<int>(textWidth)))) {
+		strcpy(tempBuf, nameBuffer);
+		char* spacePos = strrchr(tempBuf, 0x20);
+		if (spacePos == NULL) {
+			secondLine[0] = 0;
+		} else {
+			*spacePos = 0;
+			strcpy(secondLine, spacePos + 1);
+		}
+		strcpy(nameBuffer, tempBuf);
+	}
+	dVar23 = (double)fontFC->GetWidth(nameBuffer);
 
-	short sVar15 = 0x4C;
+	int sVar15 = 0x4C;
+	*reinterpret_cast<short*>(BUB() + 0x38) =
+	    static_cast<short>(static_cast<int>(
+	        static_cast<float>(static_cast<double>(FLOAT_80331704) - dVar23) * FLOAT_80331434 +
+	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
 	float fVar2 = FLOAT_803314a4;
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		sVar15 = 0x6C;
 	}
-	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
 		sVar15 = sVar15 + 0x10;
 	}
 
 	// Set text position
-	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x72) =
-	    *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) + sVar15 - 4;
-
-	// Setup model viewport slots
 	int iVar11 = 6;
 	int iVar9 = 0x1E0;
-	short sVar22 = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData)) - 0x28;
-	short sVarY = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) - 0x0E;
+	*reinterpret_cast<short*>(BUB() + 0x72) =
+	    *reinterpret_cast<short*>(BUB() + 2) + sVar15;
+	*reinterpret_cast<short*>(BUB() + 0x72) =
+	    *reinterpret_cast<short*>(BUB() + 0x72) - 4;
+
+	// Setup model viewport slots
+	short sVar15b = *reinterpret_cast<short*>(BUB()) - 0x28;
+	short sVar22 = *reinterpret_cast<short*>(BUB() + 2) - 0x0E;
 	int iVar13 = 2;
 	do {
-		int* puVar20 = reinterpret_cast<int*>(worldObj + iVar9);
-		// Initialize 5 viewport slots per iteration
-		for (int k = 0; k < 5; k++) {
-			int* slot = reinterpret_cast<int*>(worldObj + iVar9 + k * 0x50);
-			slot[0] = 0;
-			*reinterpret_cast<short*>(slot + 2) = sVar22;
-			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
-			*reinterpret_cast<short*>(slot + 3) = 0x140;
-			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
-			*reinterpret_cast<float*>(slot + 4) = fVar1;
-			*reinterpret_cast<float*>(slot + 5) = fVar1;
-			*reinterpret_cast<float*>(slot + 6) = fVar2;
-		}
+		int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar9);
+		int iVar19 = iVar9 + 0x50;
+		puVar20[0] = 0;
+		int iVar18 = iVar9 + 0xA0;
+		int iVar17 = iVar9 + 0xF0;
+		int iVar16 = iVar9 + 0x140;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
 		iVar9 = iVar9 + 400;
 		iVar11 = iVar11 + 5;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar19);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar18);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar17);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar16);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		fVar2 = FLOAT_803314a4;
+		fVar1 = FLOAT_803313dc;
 		iVar13--;
 	} while (iVar13 != 0);
 
 	// Fill remaining viewport slots
-	int remaining = 0x11 - iVar11;
-	int fillOff = iVar11 * 0x50;
+	iVar9 = 0x11 - iVar11;
+	iVar13 = iVar11 * 0x50;
 	if (iVar11 < 0x11) {
 		do {
-			int* slot = reinterpret_cast<int*>(worldObj + fillOff);
-			fillOff += 0x50;
-			slot[0] = 0;
-			*reinterpret_cast<short*>(slot + 2) = sVar22;
-			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
-			*reinterpret_cast<short*>(slot + 3) = 0x140;
-			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
-			*reinterpret_cast<float*>(slot + 4) = fVar1;
-			*reinterpret_cast<float*>(slot + 5) = fVar1;
-			*reinterpret_cast<float*>(slot + 6) = fVar2;
-			remaining--;
-		} while (remaining != 0);
+			int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar13);
+			iVar13 += 0x50;
+			puVar20[0] = 0;
+			*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+			*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+			*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+			*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+			*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+			*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+			*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+			iVar9--;
+		} while (iVar9 != 0);
 	}
 
 	// Setup tribe/character model slot
+	fVar2 = FLOAT_8033170c;
+	fVar1 = FLOAT_803313dc;
 	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		int modelIdx;
@@ -6382,23 +6452,41 @@ void CMenuPcs::CalcFukidashi()
 			if ((uVar3 & 0x80) == 0) { modelIdx = 4;
 			if ((uVar3 & 0x100) == 0) { modelIdx = 5; }}}}}
 			modelIdx = modelIdx + 0x0C;
-		} else if (bytes[0x06] == 1) {
+		} else if ((char)bytes[0x06] == 1) {
 			modelIdx = 7;
 		} else {
 			modelIdx = 6;
 		}
 
-		int* puVar20 = reinterpret_cast<int*>(worldObj + modelIdx * 0x50);
+		int* puVar20 = reinterpret_cast<int*>(WOBJ() + modelIdx * 0x50);
 		puVar20[0] = 1;
 		*reinterpret_cast<float*>(puVar20 + 7) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 8) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 9) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_8033170c;
-		*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_8033170c;
-		*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_8033170c;
+		*reinterpret_cast<float*>(puVar20 + 0xD) = fVar2;
+		*reinterpret_cast<float*>(puVar20 + 0xE) = fVar2;
+		*reinterpret_cast<float*>(puVar20 + 0xF) = fVar2;
+		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+			*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
+		}
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) == 0) {
+			if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) == 0) {
+				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331718;
+				*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+				    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331720);
+			} else {
+				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_803313dc;
+				*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+				    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+			}
+		} else {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331714;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+		}
 
 		// Spline evaluation for Y position
-		float t = (float)(puVar20[1]) / FLOAT_803314c0;
+		float t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 		float yResult = fVar1;
 		if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
 			int idx = 0;
@@ -6434,7 +6522,7 @@ void CMenuPcs::CalcFukidashi()
 
 		// Spline evaluation for rotation
 		float rotResult = FLOAT_803313dc;
-		t = (float)(puVar20[1]) / FLOAT_803314c0;
+		t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 		if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
 			int idx = 0;
 			float* pf = gWmModelRotationSpline;
@@ -6486,8 +6574,8 @@ void CMenuPcs::CalcFukidashi()
 		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
-		if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
+		    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
 			puVar20[1] = 0;
 		}
 	}
@@ -6507,7 +6595,7 @@ void CMenuPcs::CalcFukidashi()
 		int slotIdx = 0;
 		for (int padIdx = 0; padIdx < 4; padIdx++) {
 			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
-				int* puVar20 = reinterpret_cast<int*>(worldObj + (padIdx + 8) * 0x50);
+				int* puVar20 = reinterpret_cast<int*>(WOBJ() + (padIdx + 8) * 0x50);
 				puVar20[0] = 1;
 				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
 				if (slotIdx == 0) {
@@ -6519,8 +6607,14 @@ void CMenuPcs::CalcFukidashi()
 				} else {
 					*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
 				}
-				if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-					*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) - (float)DOUBLE_80331738;
+				if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+					if (padIdx == 0 && playerCount == 1) {
+						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331730);
+					} else {
+						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331738);
+					}
 				}
 				*reinterpret_cast<float*>(puVar20 + 9) = FLOAT_803313dc;
 				*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_80331740;
@@ -6528,7 +6622,7 @@ void CMenuPcs::CalcFukidashi()
 				*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_80331740;
 
 				// Spline Y for player models
-				float t2 = (float)(puVar20[1]) / FLOAT_803314c0;
+				float t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 				float yRes2 = FLOAT_803313dc;
 				if (t2 < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
 					int si = 0;
@@ -6564,7 +6658,7 @@ void CMenuPcs::CalcFukidashi()
 
 				// Spline rotation for player models
 				float rotRes2 = FLOAT_803313dc;
-				t2 = (float)(puVar20[1]) / FLOAT_803314c0;
+				t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 				if (t2 < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
 					int si = 0;
 					float* spf = gWmModelRotationSpline;
@@ -6619,14 +6713,16 @@ void CMenuPcs::CalcFukidashi()
 				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
-				if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-				    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+				if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
+				    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;
 			}
 		}
 	}
+#undef BUB
+#undef WOBJ
 }
 
 /*

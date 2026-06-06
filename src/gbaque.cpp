@@ -88,6 +88,26 @@ struct GbaQueueCMakeInfoView
 STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
 
+struct GbaQueueMapObjEntryView
+{
+	unsigned char m_type;
+	unsigned char _pad01[3];
+	short m_x;
+	short m_y;
+	short m_z;
+	short m_radius;
+};
+STATIC_ASSERT(sizeof(GbaQueueMapObjEntryView) == 0xC);
+
+struct GbaQueueMapObjWorkView
+{
+	unsigned char m_count;
+	unsigned char _pad01[3];
+	unsigned int m_drawFlags;
+	GbaQueueMapObjEntryView m_entries[32];
+};
+STATIC_ASSERT(sizeof(GbaQueueMapObjWorkView) == 0x188);
+
 struct GbaQueueSetQueueView
 {
 	unsigned char _pad00[0x30];
@@ -121,6 +141,7 @@ STATIC_ASSERT(kGbaQueuePlayerDataBlockBytes == 0x370);
 STATIC_ASSERT(sizeof(GbaPInfo) == kGbaQueuePlayerDataBlockBytes);
 STATIC_ASSERT(kGbaQueueEnemyHistoryBlockBytes == 0x1400);
 STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
+STATIC_ASSERT(sizeof(GbaQueueMapObjWorkView) == kGbaQueueMapObjWorkBytes);
 
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
@@ -140,6 +161,11 @@ static inline GbaQueuePlayerDataView* GetPlayerDataBlock(GbaQueue* gbaQueue)
 static inline GbaQueueSetQueueView* GetSetQueueView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueSetQueueView*>(gbaQueue);
+}
+
+static inline GbaQueueMapObjWorkView* GetMapObjWorkView(GbaQueue* gbaQueue)
+{
+	return reinterpret_cast<GbaQueueMapObjWorkView*>(reinterpret_cast<unsigned char*>(gbaQueue) + 0x2B00);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -230,7 +256,7 @@ void GbaQueue::Init()
 	memset(obj + 0x2434, 0, kGbaQueueMapItemDataBytes);
 	memset(obj + 0x2574, 0, kGbaQueueMapItemHistoryBlockBytes);
 	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
-	memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
+	memset(GetMapObjWorkView(this), 0, sizeof(GbaQueueMapObjWorkView));
 	memset(obj + 0x2C8E, 0, 8);
 	memset(cmakeInfo, 0, sizeof(cmakeInfo));
 	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
@@ -1115,7 +1141,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     m_startBonusFlags = 0;
     *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
     obj[0x2C88] = 0;
-    memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
+    memset(GetMapObjWorkView(this), 0, sizeof(GbaQueueMapObjWorkView));
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
         obj[0x44C] = 0xF;
@@ -2629,6 +2655,7 @@ void GbaQueue::ReplyLetter(int channel)
 void GbaQueue::LoadMapObj()
 {
 	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	GbaQueueMapObjWorkView* mapObjWorkView = GetMapObjWorkView(this);
 	int i;
 
 	if (*reinterpret_cast<int*>(obj + 0x2AF8) == 0) {
@@ -2638,8 +2665,8 @@ void GbaQueue::LoadMapObj()
 			i++;
 		} while (i < 4);
 
-		if (obj[0x2B00] != 0) {
-			memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
+		if (mapObjWorkView->m_count != 0) {
+			memset(mapObjWorkView, 0, sizeof(GbaQueueMapObjWorkView));
 		}
 
 		i = 0;
@@ -2648,15 +2675,15 @@ void GbaQueue::LoadMapObj()
 			i++;
 		} while (i < 4);
 	} else {
-		unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
-		memset(mapObjWork, 0, sizeof(mapObjWork));
+		GbaQueueMapObjWorkView mapObjWork;
+		memset(&mapObjWork, 0, sizeof(mapObjWork));
 
 		CFlatRuntime2::CMapObjectInfo* mapObj = CFlat.m_mapObjectInfo;
 		i = 0;
 		do {
 			char objType = mapObj->m_type;
 			if (objType != -1) {
-				unsigned int count = mapObjWork[0];
+				unsigned int count = mapObjWork.m_count;
 				if (objType >= 0x19) {
 					if (static_cast<unsigned int>(System.m_execParam) >= 2) {
 						System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
@@ -2670,22 +2697,18 @@ void GbaQueue::LoadMapObj()
 					float z = mapObj->m_z;
 					float r = mapObj->m_radius;
 					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
-					unsigned int entryBase = count * 0xC;
+					GbaQueueMapObjEntryView* entry = &mapObjWork.m_entries[count];
 
-					mapObjWork[8 + entryBase] = static_cast<unsigned char>(objType);
-					*reinterpret_cast<short*>(mapObjWork + 0xC + entryBase) =
-						static_cast<short>((int)(x / scale));
-					*reinterpret_cast<short*>(mapObjWork + 0xE + entryBase) =
-						static_cast<short>((int)(y / scale));
-					*reinterpret_cast<short*>(mapObjWork + 0x10 + entryBase) =
-						static_cast<short>((int)(z / scale));
-					*reinterpret_cast<short*>(mapObjWork + 0x12 + entryBase) =
-						static_cast<short>((int)(r / scale));
+					entry->m_type = static_cast<unsigned char>(objType);
+					entry->m_x = static_cast<short>((int)(x / scale));
+					entry->m_y = static_cast<short>((int)(y / scale));
+					entry->m_z = static_cast<short>((int)(z / scale));
+					entry->m_radius = static_cast<short>((int)(r / scale));
 
-					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
+					unsigned int drawMask = mapObjWork.m_drawFlags;
 					drawMask = (drawMask & clearMask) | (mask & ((-drawFlag | drawFlag) >> 31));
-					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
-					mapObjWork[0] = static_cast<unsigned char>(count + 1);
+					mapObjWork.m_drawFlags = drawMask;
+					mapObjWork.m_count = static_cast<unsigned char>(count + 1);
 				}
 			}
 
@@ -2699,7 +2722,7 @@ void GbaQueue::LoadMapObj()
 			i++;
 		} while (i < 4);
 
-		memcpy(obj + 0x2B00, mapObjWork, sizeof(mapObjWork));
+		memcpy(mapObjWorkView, &mapObjWork, sizeof(mapObjWork));
 
 		i = 0;
 		do {
@@ -2720,8 +2743,8 @@ void GbaQueue::LoadMapObj()
  */
 int GbaQueue::GetMapObj(unsigned char* outData)
 {
-	unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
-	unsigned char* workEntry;
+	GbaQueueMapObjWorkView mapObjWork;
+	GbaQueueMapObjEntryView* workEntry;
 	int i;
 	int outSize;
 	unsigned int drawFlags;
@@ -2732,7 +2755,7 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 		i++;
 	} while (i < 4);
 
-	memcpy(mapObjWork, reinterpret_cast<char*>(this) + 0x2B00, sizeof(mapObjWork));
+	memcpy(&mapObjWork, GetMapObjWorkView(this), sizeof(mapObjWork));
 
 	i = 0;
 	do {
@@ -2740,33 +2763,29 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 		i++;
 	} while (i < 4);
 
-	workEntry = mapObjWork;
+	workEntry = mapObjWork.m_entries;
 	outSize = 5;
-	outData[0] = mapObjWork[0];
-	drawFlags = *reinterpret_cast<unsigned int*>(mapObjWork + 4);
+	outData[0] = mapObjWork.m_count;
+	drawFlags = mapObjWork.m_drawFlags;
 	outData[1] = static_cast<unsigned char>(drawFlags);
 	outData[2] = static_cast<unsigned char>(drawFlags >> 8);
 	outData[3] = static_cast<unsigned char>(drawFlags >> 16);
 	outData[4] = static_cast<unsigned char>(drawFlags >> 24);
 
-	for (i = 0; i < mapObjWork[0]; i++) {
+	for (i = 0; i < mapObjWork.m_count; i++) {
 		unsigned char* outEntry = outData + outSize;
 		outSize += 9;
-		outEntry[0] = workEntry[8];
-		outEntry[1] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xC));
-		outEntry[2] =
-			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xC)) >> 8);
-		outEntry[3] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0xE));
-		outEntry[4] =
-			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0xE)) >> 8);
-		outEntry[5] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x10));
-		outEntry[6] =
-			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x10)) >> 8);
-		outEntry[7] = static_cast<unsigned char>(*reinterpret_cast<short*>(workEntry + 0x12));
-		outEntry[8] =
-			static_cast<unsigned char>(static_cast<unsigned short>(*reinterpret_cast<short*>(workEntry + 0x12)) >> 8);
+		outEntry[0] = workEntry->m_type;
+		outEntry[1] = static_cast<unsigned char>(workEntry->m_x);
+		outEntry[2] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_x) >> 8);
+		outEntry[3] = static_cast<unsigned char>(workEntry->m_y);
+		outEntry[4] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_y) >> 8);
+		outEntry[5] = static_cast<unsigned char>(workEntry->m_z);
+		outEntry[6] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_z) >> 8);
+		outEntry[7] = static_cast<unsigned char>(workEntry->m_radius);
+		outEntry[8] = static_cast<unsigned char>(static_cast<unsigned short>(workEntry->m_radius) >> 8);
 
-		workEntry += 0xC;
+		workEntry++;
 	}
 
 	reinterpret_cast<char*>(this)[0x2C88] = 1;
@@ -2791,7 +2810,7 @@ void GbaQueue::GetMapObjDrawFlg(unsigned int* drawFlags)
 		semaphoreQueue++;
 	}
 
-	*drawFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0x2B04);
+	*drawFlags = GetMapObjWorkView(this)->m_drawFlags;
 
 	semaphoreQueue = reinterpret_cast<OSSemaphore*>(this);
 	for (int i = 0; i < 4; i++) {

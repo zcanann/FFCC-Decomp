@@ -420,8 +420,8 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     BreathModelDataOffsets* dataOffsets;
     VColor* color;
     VBreathModel* work;
-    Mtx* particleWMat;
-    Mtx* particleMtx;
+    PARTICLE_WMAT* particleWMat;
+    PARTICLE_WMAT* particleMtx;
     int groupIndex;
     int firstParticle;
     short slotIndex;
@@ -511,7 +511,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     PSMTXCopy(ppvMng->m_matrix.value, work->m_matrix);
     UpdateAllParticle(breathModel, work, pBreathModel, color);
 
-    particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
+    particleWMat = work->m_particleWmats;
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
         groupCheck = &work->m_groups[(short)groupIndex];
@@ -538,8 +538,8 @@ group_ready:
             scaleMtx[0][0] = scaledOwner;
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
-            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * sizeof(PARTICLE_WMAT));
-            PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
+            particleMtx = &particleWMat[firstParticle];
+            PSMTXConcat(particleMtx->m_matrix, object->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
             rotMtx.value[0][3] = 0.0f;

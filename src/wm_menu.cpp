@@ -1404,6 +1404,7 @@ void CMenuPcs::CalcDiaryMenu()
 void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	WmWorldState* const worldState = m_wmWorldState;
 	McCtrl& mcCtrl = *GetMcCtrl();
 
 	bool bVar1 = false;
@@ -1419,7 +1420,7 @@ void CMenuPcs::CalcMCardMenu()
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) == 0) {
+	if (worldState->m_worldReady == 0) {
 		mcCtrl.m_previousState = 0;
 		mcCtrl.m_state = 0;
 		mcCtrl.m_lastResult = 0;
@@ -1437,22 +1438,21 @@ void CMenuPcs::CalcMCardMenu()
 			mcCtrl.m_saveIndex = (int)uRam8032ee21;
 		}
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-		int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
-		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
-		Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(iVar14 + 0x3A);
-		Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(iVar14 + 0x3C);
-		*reinterpret_cast<unsigned char*>(iVar14 + 10) = 0;
-		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 1;
+		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];
+		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
+		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
+		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
+		worldState->m_flag0A = 0;
+		worldState->m_worldReady = 1;
 	}
 
-	int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-	short sVar7 = *reinterpret_cast<short*>(iVar14 + 0x10);
+	int iVar14;
+	short sVar7 = worldState->m_mainState;
 	unsigned int uVar15;
 	if (sVar7 == 0) {
-		uVar15 = (int)*reinterpret_cast<short*>(iVar14 + 0x22) - 10;
+		uVar15 = static_cast<int>(worldState->m_frameCounter) - 10;
 	} else if (sVar7 < 1 || sVar7 > 3) {
-		uVar15 = -(int)*reinterpret_cast<short*>(iVar14 + 0x22);
+		uVar15 = -static_cast<int>(worldState->m_frameCounter);
 	} else {
 		uVar15 = 0;
 	}
@@ -1489,17 +1489,17 @@ void CMenuPcs::CalcMCardMenu()
 	}
 
 	float fVar2 = FLOAT_803313e8;
-	iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-	if (*reinterpret_cast<short*>(iVar14 + 0x10) != 2) {
+	if (worldState->m_mainState != 2) {
 		return;
 	}
 
-	iVar12 = (int)*reinterpret_cast<short*>(iVar14 + 0x16);
+	iVar14 = reinterpret_cast<int>(worldState);
+	iVar12 = worldState->m_subState;
 	switch (iVar12) {
 	case 0:
 	case 2:
-		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
-			*reinterpret_cast<short*>(iVar14 + 0x26) = (short)mcCtrl.m_cardChannel;
+		if (worldState->m_flag09 == 0) {
+			worldState->m_cardChannel = static_cast<short>(mcCtrl.m_cardChannel);
 			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
@@ -1532,49 +1532,48 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
+			worldState->m_flag09 = 1;
+			worldState->m_flag0A = 0;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+			if (worldState->m_counter1A == 0) {
 				if ((uVar6 & 3) == 0) {
 					if ((uVar3 & 0x100) == 0) {
 						if ((uVar3 & 0x200) != 0) {
-							*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
-							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+							worldState->m_state0E = -1;
+							worldState->m_counter1A = 1;
 							Sound.PlaySe(3, 0x40, 0x7F, 0);
 						}
 					} else {
-						*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
-						mcCtrl.m_cardChannel = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
-						if ((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) == (int)DAT_8032ee20) {
+						worldState->m_state0E = 1;
+						mcCtrl.m_cardChannel = worldState->m_cardChannel;
+						if (worldState->m_cardChannel == static_cast<signed char>(DAT_8032ee20)) {
 							mcCtrl.m_saveIndex = (int)uRam8032ee21;
 						}
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+						worldState->m_counter1A = 10;
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
 				} else {
-					*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+					worldState->m_cardChannel ^= 1;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			sVar7 = worldState->m_counter1A;
 			if (sVar7 != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				worldState->m_counter1A = sVar7 - 1;
+				if (worldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
 		}
 		break;
 	case 3:
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		worldState->m_mcResult = static_cast<short>(MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel));
 		break;
 	case 4:
-		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+		if (worldState->m_flag09 == 0) {
 			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
@@ -1612,16 +1611,16 @@ void CMenuPcs::CalcMCardMenu()
 			mcCtrl.m_iteration = 0;
 			mcCtrl.m_userBuffer = 0;
 			mcCtrl.m_createFlag = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			worldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
-		           && *reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
+		           && worldState->m_counter1A == 0) {
 			short chkResult = (short)mcCtrl.ChkEmpty(0);
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = chkResult;
-			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) {
+			worldState->m_mcResult = chkResult;
+			if (worldState->m_mcResult < 0) {
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = 0xFF;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				worldState->m_state0E = -1;
+				worldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {

@@ -112,7 +112,8 @@ struct WmWorldState
     short m_cardChannel;
     unsigned char m_pad28[0x2E - 0x28];
     short m_mcResult;
-    unsigned char m_pad30[0x3E - 0x30];
+    unsigned char m_pad30[0x36 - 0x30];
+    short m_originalBackupParams[4];
     short m_backupParams[4];
     short m_pad46;
 };
@@ -870,6 +871,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(WmWorldState) == 0x48);
+STATIC_ASSERT(offsetof(WmWorldState, m_originalBackupParams) == 0x36);
+STATIC_ASSERT(offsetof(WmWorldState, m_backupParams) == 0x3E);
 STATIC_ASSERT(sizeof(SingMenuState) == 0x48);
 STATIC_ASSERT(offsetof(SingMenuState, initialized) == 0x0B);
 STATIC_ASSERT(offsetof(SingMenuState, closeRequested) == 0x0D);

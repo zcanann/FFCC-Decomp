@@ -422,7 +422,7 @@ extern "C" char lbl_80333228[];
 extern "C" char lbl_80333230[];
 extern "C" char lbl_80333238[];
 
-extern "C" const char* s_NameEntryStr[] = {
+static const char* s_NameEntryStr[] = {
     s_ABCDEFGHIJKL_801E2F30,
     s_MNOPQRSTUVWX_801E2F40,
     lbl_801E2F50,

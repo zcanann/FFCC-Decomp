@@ -128,7 +128,7 @@ extern const char* const s_localLangDirs[] = {
     s_localLangDirSp,
 };
 
-const char* l_tError[4][6][3] = {
+static const char* l_tError[4][6][3] = {
     {
         {s_diskReadErrorJp0, s_diskReadErrorJp1, s_emptyErrorText},
         {s_diskReadErrorEn0, s_diskReadErrorEn1, s_diskReadErrorEn2},

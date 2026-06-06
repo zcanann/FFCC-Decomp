@@ -103,7 +103,7 @@ CProcessTable CDbgMenuPcs::m_table = {
     },
 };
 
-DbgMenuDef tWork[] = {
+static DbgMenuDef tWork[] = {
     { sDbgMenuMenu, 100, 2, 1 },      { sDbgMenuShouki, 101, 2, 1 },
     { sDbgMenuMark, 102, 2, 1 },      { sDbgMenuBar, 103, 2, 1 },
     { sDbgMenuSpeed, 104, 2, 1 },     { sDbgMenuMuteki, 105, 2, 1 },

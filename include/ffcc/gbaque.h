@@ -36,6 +36,24 @@ struct GbaQueueHitInfo
     short m_enemyType;
 };
 
+struct GbaQueueMapObjEntry
+{
+    unsigned char m_type;
+    unsigned char _pad01[3];
+    short m_x;
+    short m_y;
+    short m_z;
+    short m_radius;
+};
+
+struct GbaQueueMapObjWork
+{
+    unsigned char m_count;
+    unsigned char _pad01[3];
+    unsigned int m_drawFlags;
+    GbaQueueMapObjEntry m_entries[32];
+};
+
 class GbaQueue
 {
 public:
@@ -178,14 +196,22 @@ public:
 
 private:
     OSSemaphore accessSemaphores[4];  // 0x0000
-    unsigned char _pad30[0x2C59];    // 0x0030
+    unsigned char _pad30[0x2ACC];     // 0x0030
+    unsigned char m_letterDatFlg;     // 0x2AFC
+    unsigned char _pad2AFD[0x3];      // 0x2AFD
+    GbaQueueMapObjWork m_mapObjWork;  // 0x2B00
+    unsigned char m_makeMapObjFlg;    // 0x2C88
     unsigned char m_letterFlags;      // 0x2C89
-    unsigned char _pad2C8A[0x28];     // 0x2C8A
+    unsigned char m_compatibilityFlg[4]; // 0x2C8A
+    unsigned char _pad2C8E[0x24];     // 0x2C8E
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
     unsigned char _pad2D32[0x6];      // 0x2D32
     unsigned char m_shopFlags;        // 0x2D38
     unsigned char m_shopStatusFlags;  // 0x2D39
-    unsigned char _pad2D3A[0x0A];     // 0x2D3A
+    unsigned char m_sellFlg;          // 0x2D3A
+    unsigned char m_buyFlg;           // 0x2D3B
+    unsigned char m_mkSmithFlg;       // 0x2D3C
+    unsigned char _pad2D3D[0x7];      // 0x2D3D
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55

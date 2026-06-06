@@ -1234,8 +1234,7 @@ void CCameraPcs::calcMap()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-        buttons = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x4);
+        buttons = Pad.GetPadInputs()[0].button[0];
     }
 
     stickH = FLOAT_8032fa34;

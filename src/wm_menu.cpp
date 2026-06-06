@@ -5097,7 +5097,7 @@ void CMenuPcs::DrawTitleMenu()
 void CMenuPcs::SetWorldParam(int code, int value)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char bVar6 = static_cast<unsigned char>(value);
 	unsigned short uVar5 = static_cast<unsigned short>(value);
 	unsigned char bVar1 = static_cast<unsigned char>(static_cast<unsigned int>(value) >> 24);
@@ -5138,7 +5138,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
 			bytes[0xD] = bVar6;
 		}
-		*reinterpret_cast<unsigned short*>(worldState + 0x20) = 2;
+		worldState->m_changeRequest = 2;
 		break;
 	case 10:
 		bytes[0x10] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
@@ -5557,11 +5557,11 @@ void CMenuPcs::DrawObj(int kind)
 void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
 
-	const short state = reinterpret_cast<short*>(worldState + 0x10)[0];
+	const short state = worldState->m_mainState;
 	if (state <= 0 || state >= 3) {
 		return;
 	}
@@ -5594,7 +5594,7 @@ void CMenuPcs::CalcPitcher()
 
 	CChara::CModel* const model = reinterpret_cast<CChara::CModel*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
 
-	const unsigned int step = static_cast<unsigned int>(reinterpret_cast<short*>(worldState + 0x22)[0]);
+	const unsigned int step = static_cast<unsigned int>(worldState->m_frameCounter);
 	float blend = FLOAT_803313e8;
 	if (state == 1 && step < 10) {
 		blend = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
@@ -6369,8 +6369,8 @@ void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, in
 void CMenuPcs::CalcWMFrame()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	short sVar3 = *reinterpret_cast<short*>(worldState + 0x10);
+	WmWorldState* const worldState = m_wmWorldState;
+	short sVar3 = worldState->m_mainState;
 	if (sVar3 == 0) {
 		return;
 	}
@@ -6425,7 +6425,7 @@ LAB_calc:
 	    (short)(10 - *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
-	     (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2 && bytes[0x13] != 0))
+	     (worldState->m_mainState == 2 && bytes[0x13] != 0))
 	    && *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) > 9) {
 		*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) = 0;
 		bytes[0x0A] = bytes[0x0A] & 0xFD;
@@ -6501,7 +6501,7 @@ LAB_calc:
 
 	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
 	if ((bytes[0x0A] & 2) == 0 &&
-	    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) != 2 || bytes[0x13] == 0)) {
+	    (worldState->m_mainState != 2 || bytes[0x13] == 0)) {
 		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(wmFrame + 8);
 		float t = (float)(uVar) / FLOAT_803314c0;
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <

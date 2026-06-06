@@ -1280,16 +1280,15 @@ int CGame::GetFoodLevel(int playerIndex, int foodIndex)
  */
 void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-    unsigned int* data = (unsigned int*)(m_scriptFoodBase[playerIndex] + 0xBAC);
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
 
-    posA.x = *(f32*)&data[0];
-    posA.y = *(f32*)&data[1];
-    posA.z = *(f32*)&data[2];
+    posA.x = caravanWork->m_targetCursorPosA.x;
+    posA.y = caravanWork->m_targetCursorPosA.y;
+    posA.z = caravanWork->m_targetCursorPosA.z;
 
-    data = (unsigned int*)(m_scriptFoodBase[playerIndex] + 0xBB8);
-    posB.x = *(f32*)&data[0];
-    posB.y = *(f32*)&data[1];
-    posB.z = *(f32*)&data[2];
+    posB.x = caravanWork->m_targetCursorPosB.x;
+    posB.y = caravanWork->m_targetCursorPosB.y;
+    posB.z = caravanWork->m_targetCursorPosB.z;
 }
 
 /*

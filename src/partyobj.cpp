@@ -2112,9 +2112,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
-			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =
-			    m_comboCenter;
-			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			caravanWork->m_targetCursorPosA = m_comboCenter;
+			hitObj->GetHitFaceNormal(&caravanWork->m_targetCursorPosB);
 		}
 		m_comboTarget = m_comboCenter;
 	}
@@ -2357,9 +2357,9 @@ void CGPartyObj::checkTargetParticle()
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
-				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-				*reinterpret_cast<Vec*>(work + 0xBAC) = *targetPos;
-				getMapHitObject()->GetHitFaceNormal(reinterpret_cast<Vec*>(work + 0xBB8));
+				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+				work->m_targetCursorPosA = *targetPos;
+				getMapHitObject()->GetHitFaceNormal(&work->m_targetCursorPosB);
 			}
 		}
 
@@ -2423,12 +2423,12 @@ void CGPartyObj::moveCenterTargetParticle()
 		hitObj->CalcHitPosition(&hitPos);
 		hitObj->GetHitFaceNormal(&hitNormal);
 
-		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		*reinterpret_cast<Vec*>(work + 0xBB8) = hitNormal;
+		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+		work->m_targetCursorPosB = hitNormal;
 	}
 
-	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	*reinterpret_cast<Vec*>(work + 0xBAC) = hitPos;
+	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+	work->m_targetCursorPosA = hitPos;
 }
 
 /*

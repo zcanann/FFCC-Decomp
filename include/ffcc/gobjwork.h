@@ -2,6 +2,7 @@
 #define _FFCC_GOBJWORK_H_
 
 #include "global.h"
+#include "dolphin/mtx.h"
 
 class CRomWork;
 struct CRomLetterWork
@@ -254,17 +255,8 @@ public:
     unsigned char m_cmdListFlags;               // 0x0BA7
     short m_baseCmdListSlots;                   // 0x0BA8
     short m_numCmdListSlots;                    // 0x0BAA
-    int m_timedBuffCounter;                     // 0x0BAC
-    int m_timedBuffItemId;                      // 0x0BB0
-    char m_bonusFire;                           // 0x0BB4
-    char m_bonusIce;                            // 0x0BB5
-    char m_bonusThunder;                        // 0x0BB6
-    char m_bonusHoly;                           // 0x0BB7
-    char m_bonusStr;                            // 0x0BB8
-    char m_bonusDef;                            // 0x0BB9
-    char m_bonusMag;                            // 0x0BBA
-    char m_bonusOther;                          // 0x0BBB
-    unsigned char unk_0xbbc_0xbc4[8];           // 0x0BBC
+    Vec m_targetCursorPosA;                     // 0x0BAC
+    Vec m_targetCursorPosB;                     // 0x0BB8
     unsigned short m_artifactRelated[5];        // 0x0BC4
     unsigned char m_tempBuffFlags;              // 0x0BCE
     unsigned char m_tempBuffIndex;              // 0x0BCF
@@ -293,6 +285,8 @@ public:
 STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
 STATIC_ASSERT(sizeof(CCaravanWork::CLetterWork) == 0x0C);
 STATIC_ASSERT(sizeof(CRomLetterWork) == 0x3E);
+STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosA) == 0x0BAC);
+STATIC_ASSERT(offsetof(CCaravanWork, m_targetCursorPosB) == 0x0BB8);
 
 CMonWork* SAFE_CAST_MON_WORK(CGObjWork*);
 CCaravanWork* SAFE_CAST_CARAVAN_WORK(CGObjWork*);

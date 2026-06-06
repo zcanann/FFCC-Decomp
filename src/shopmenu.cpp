@@ -138,11 +138,6 @@ static inline char* ShopMenuMes(int languageIndex, int textIndex)
     return g_strShopMenuMes[languageIndex * 0x15 + textIndex];
 }
 
-static inline unsigned char* MenuPcsRaw()
-{
-    return reinterpret_cast<unsigned char*>(&MenuPcs);
-}
-
 static inline void* PartPcsVoid()
 {
     return &PartPcs;
@@ -2461,7 +2456,7 @@ void CShopMenu::Calc()
             } else if (choice == 2) {
                 PartPcs.ReleasePdt(m_pdtSlot);
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
-                *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
+                MenuPcs.m_singleFadeState->done = 1;
                 operator delete(MenuPcs.m_shopMenu);
                 MenuPcs.m_shopMenu = 0;
                 return;
@@ -2552,7 +2547,7 @@ void CShopMenu::Calc()
             if (m_nextMode == -1) {
                 PartPcs.ReleasePdt(m_pdtSlot);
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
-                *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
+                MenuPcs.m_singleFadeState->done = 1;
                 operator delete(MenuPcs.m_shopMenu);
                 MenuPcs.m_shopMenu = 0;
                 return;

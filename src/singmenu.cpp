@@ -40,26 +40,6 @@ extern char* gSingMenuAttrTableEs[];
 typedef signed short s16;
 typedef unsigned char u8;
 
-struct SingleFadeEntry
-{
-    char pad_00[0x10];
-    float alpha;
-    char pad_14[0x0C];
-    int elapsed;
-    int startFrame;
-    int duration;
-    char pad_2C[0x14];
-};
-
-struct SingleFadeState
-{
-    s16 count;
-    s16 pad_02;
-    s16 active;
-    s16 done;
-    SingleFadeEntry entries[64];
-};
-
 struct SingleMenuStateRaw
 {
     u8 bytes[0x48];
@@ -70,8 +50,6 @@ struct SingleMenuWindowRaw
     u8 bytes[0x0C];
 };
 
-STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
-STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(SingleMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(SingleMenuWindowRaw) == 0x0C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
@@ -937,7 +915,7 @@ void CMenuPcs::createSingleMenu()
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
-            *reinterpret_cast<int*>(self + 0x850) = 0;
+            m_singleFadeState = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
             *reinterpret_cast<int*>(self + 0x848) = 0;
             m_shopMenu = 0;
@@ -985,10 +963,10 @@ void CMenuPcs::destroySingleMenu()
         *reinterpret_cast<void**>(self + 0x814) = 0;
     }
 
-    ptr = *reinterpret_cast<void**>(self + 0x850);
+    ptr = m_singleFadeState;
     if (ptr != 0) {
         delete static_cast<SingleFadeState*>(ptr);
-        *reinterpret_cast<void**>(self + 0x850) = 0;
+        m_singleFadeState = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x82C);
@@ -1091,8 +1069,8 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
-    memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
+    m_singleFadeState = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
+    memset(m_singleFadeState, 0, sizeof(SingleFadeState));
 
     stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1171,7 +1149,7 @@ void CMenuPcs::drawSingleMenu()
             m_shopMenu->Draw();
         }
 
-        if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
+        if ((gSingMenuHasScriptFoodBase != 0) && (m_singleFadeState->done != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
             Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
             m_singleMenuInitialized = 0;
@@ -1198,9 +1176,9 @@ void CMenuPcs::drawSingleMenu()
                 *reinterpret_cast<void**>(self + 0x82C) = 0;
             }
 
-            if (*reinterpret_cast<void**>(self + 0x850) != 0) {
-                delete static_cast<SingleFadeState*>(*reinterpret_cast<void**>(self + 0x850));
-                *reinterpret_cast<void**>(self + 0x850) = 0;
+            if (m_singleFadeState != 0) {
+                delete m_singleFadeState;
+                m_singleFadeState = 0;
             }
 
             if (*reinterpret_cast<void**>(self + 0x848) != 0) {
@@ -1226,7 +1204,7 @@ void CMenuPcs::drawSingleMenu()
         }
 
         if (mode == 0) {
-            SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
+            SingleFadeState* fadeState = m_singleFadeState;
             SingleFadeEntry* entry = fadeState->entries;
             for (int i = 0; i < fadeState->count; i++) {
                 if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
@@ -1283,7 +1261,7 @@ void CMenuPcs::drawSingleMenu()
                 ++entry;
             }
         } else if (mode == 2) {
-            SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
+            SingleFadeState* fadeState = m_singleFadeState;
             SingleFadeEntry* entry = fadeState->entries;
             for (int i = 0; i < fadeState->count; i++) {
                 if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
@@ -1434,10 +1412,10 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
 post_texture_load:
-    if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0) {
+    if (m_singleFadeState->done != 0) {
         *reinterpret_cast<s16*>(self + 0x866) = *reinterpret_cast<s16*>(self + 0x866) + 1;
-        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 0;
-        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 4) = 0;
+        m_singleFadeState->done = 0;
+        m_singleFadeState->active = 0;
         *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xB) = 0;
         *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xD) = 0;
         *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x10) = 0;
@@ -1756,51 +1734,45 @@ void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
 void CMenuPcs::SingleCalcFadeIn()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    if (*(short*)(*reinterpret_cast<int*>(self + 0x850) + 4) == 0) {
+    SingleFadeState* fadeState = m_singleFadeState;
+    if (fadeState->active == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
+        memset(fadeState, 0, sizeof(SingleFadeState));
 
-        int fadePtr = *reinterpret_cast<int*>(self + 0x850);
         int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
-        *(int*)(fadePtr + 0x2C) = 0;
-        *(int*)(fadePtr + 0x30) = 10;
+        fadeState->entries[0].startFrame = 0;
+        fadeState->entries[0].duration = 10;
+        fadeState->entries[1].startFrame = phase;
+        fadeState->entries[1].duration = 10;
+        fadeState->entries[2].startFrame = phase;
+        fadeState->entries[2].duration = 10;
+        fadeState->entries[3].startFrame = phase;
+        fadeState->entries[3].duration = 10;
 
-        fadePtr = *reinterpret_cast<int*>(self + 0x850);
-        *(int*)(fadePtr + 0x6C) = phase;
-        *(int*)(fadePtr + 0x70) = 10;
-
-        fadePtr = *reinterpret_cast<int*>(self + 0x850);
-        *(int*)(fadePtr + 0xAC) = phase;
-        *(int*)(fadePtr + 0xB0) = 10;
-
-        fadePtr = *reinterpret_cast<int*>(self + 0x850);
-        *(int*)(fadePtr + 0xEC) = phase;
-        *(int*)(fadePtr + 0xF0) = 10;
-
-        **reinterpret_cast<short**>(self + 0x850) = 4;
-        *(short*)(*reinterpret_cast<int*>(self + 0x850) + 6) = 0;
-        *(short*)(*reinterpret_cast<int*>(self + 0x850) + 4) = 1;
+        fadeState->count = 4;
+        fadeState->done = 0;
+        fadeState->active = 1;
     }
 
     int completed = 0;
     *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) + 1;
 
-    int count = (int)**reinterpret_cast<short**>(self + 0x850);
-    short* entry = *reinterpret_cast<short**>(self + 0x850) + 4;
+    int count = static_cast<int>(fadeState->count);
+    SingleFadeEntry* entry = fadeState->entries;
     int frame = (int)*(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22);
     if (0 < count) {
         do {
-            if (*(int*)(entry + 0x12) <= frame) {
-                if (frame < *(int*)(entry + 0x12) + *(int*)(entry + 0x14)) {
-                    *(int*)(entry + 0x10) = *(int*)(entry + 0x10) + 1;
-                    *(float*)(entry + 8) = static_cast<float>((DOUBLE_80332980 / (double)*(int*)(entry + 0x14)) *
-                                                              (double)*(int*)(entry + 0x10));
+            if (entry->startFrame <= frame) {
+                if (frame < entry->startFrame + entry->duration) {
+                    entry->elapsed = entry->elapsed + 1;
+                    entry->alpha = static_cast<float>((DOUBLE_80332980 / (double)entry->duration) *
+                                                      (double)entry->elapsed);
                 } else {
                     completed = completed + 1;
-                    *(float*)(entry + 8) = FLOAT_80332934;
+                    entry->alpha = FLOAT_80332934;
                 }
             }
-            entry = entry + 0x20;
+            entry = entry + 1;
             count = count - 1;
         } while (count != 0);
     }
@@ -1827,8 +1799,8 @@ void CMenuPcs::SingleCalcFadeIn()
     model->CalcMatrix();
     model->CalcSkin();
 
-    if (**reinterpret_cast<short**>(self + 0x850) == completed) {
-        (*reinterpret_cast<short**>(self + 0x850))[3] = 1;
+    if (fadeState->count == completed) {
+        fadeState->done = 1;
     }
 }
 
@@ -1839,7 +1811,7 @@ void CMenuPcs::SingleCalcFadeIn()
  */
 void CMenuPcs::SingleDrawFadeIn()
 {
-    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(reinterpret_cast<u8*>(this) + 0x850);
+    SingleFadeState* fadeState = m_singleFadeState;
     if (fadeState == 0) {
         return;
     }
@@ -1866,7 +1838,7 @@ void CMenuPcs::SingleDrawFadeIn()
 void CMenuPcs::SingleCalcFadeOut()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(self + 0x850);
+    SingleFadeState* fadeState = m_singleFadeState;
 
     if (fadeState->active == 0) {
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
@@ -1945,7 +1917,7 @@ void CMenuPcs::SingleCalcFadeOut()
  */
 void CMenuPcs::SingleDrawFadeOut()
 {
-    SingleFadeState* fadeState = *reinterpret_cast<SingleFadeState**>(reinterpret_cast<u8*>(this) + 0x850);
+    SingleFadeState* fadeState = m_singleFadeState;
     if (fadeState == 0) {
         return;
     }
@@ -2083,7 +2055,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     if ((press & 0x800) != 0) {
-        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 1;
+        m_singleFadeState->done = 1;
     }
 }
 
@@ -2195,7 +2167,7 @@ void CMenuPcs::SingleDrawCtrl()
     if (*reinterpret_cast<char*>(statePtr + 0xD) != 0) {
         s16 mode = *reinterpret_cast<s16*>(self + 0x864);
         if (mode == 9) {
-            *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 1;
+            m_singleFadeState->done = 1;
         } else {
             *reinterpret_cast<s16*>(self + 0x864) = 9;
             previousMode = mode;

@@ -30,6 +30,26 @@ struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
 struct SingMenuState;
+struct SingleFadeEntry
+{
+    char pad_00[0x10];
+    float alpha;
+    char pad_14[0x0C];
+    int elapsed;
+    int startFrame;
+    int duration;
+    char pad_2C[0x14];
+};
+
+struct SingleFadeState
+{
+    short count;
+    short pad_02;
+    short active;
+    short done;
+    SingleFadeEntry entries[64];
+};
+
 struct FavoListStorage;
 struct CompaMenuState;
 struct CompaOpenAnimList;
@@ -644,6 +664,7 @@ public:
         CompaOpenAnimList* m_compaList;
         TmpArtiList* m_tmpArtiList;
         short* m_cmdList;
+        SingleFadeState* m_singleFadeState;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -699,7 +720,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleFadeState) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
+STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
+STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 
 #endif // _FFCC_P_MENU_H_

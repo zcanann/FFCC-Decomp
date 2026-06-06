@@ -26,6 +26,8 @@ struct MoneyMenuState;
 struct MoneyMenuAnimList;
 struct MenuLstState;
 struct MenuLstList;
+struct ItemMenuState;
+struct ItemMenuAnimList;
 
 struct McListInfo
 {
@@ -162,6 +164,7 @@ public:
     void DrawSingleIcon(int, int, int, float, int, float);
     double CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
+    void DrawSingLife();
     float CalcCenteringPos(char*, CFont*);
     float CalcCenteringPos2(char*, float, float);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
@@ -322,6 +325,14 @@ public:
     int ChkEquipPossible(int);
     int GetEquipType(int);
     int EquipChk(int);
+    void ItemInit();
+    void ItemInit1();
+    bool ItemOpen();
+    int ItemCtrl();
+    bool ItemClose();
+    void ItemDraw();
+    int ItemCtrlCur();
+    void SingLifeInit(int);
     bool MoneyOpen();
     int MoneyCtrl();
     bool MoneyClose();
@@ -481,6 +492,7 @@ public:
         EquipMenuState* m_equipState;
         MoneyMenuState* m_moneyState;
         MenuLstState* m_menuLstState;
+        ItemMenuState* m_itemMenuState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -497,6 +509,7 @@ public:
         EquipOpenAnimList* m_equipList;
         MoneyMenuAnimList* m_moneyPanel;
         MenuLstList* m_menuLstList;
+        ItemMenuAnimList* m_itemList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -523,10 +536,12 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

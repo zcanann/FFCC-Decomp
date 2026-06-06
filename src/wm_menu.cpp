@@ -6885,7 +6885,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
 	float alpha = baseAlpha;
 
@@ -6894,8 +6894,8 @@ void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 	}
 
 	if (worldState != 0) {
-		const short state = *reinterpret_cast<short*>(worldState + 0x10);
-		const short step = *reinterpret_cast<short*>(worldState + 0x22);
+		const short state = worldState->m_mainState;
+		const short step = worldState->m_frameCounter;
 		if (state == 0) {
 			alpha *= static_cast<float>(step) * 0.1f;
 		} else if (state >= 3) {
@@ -6942,13 +6942,13 @@ void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 void CMenuPcs::CalcCharaBase()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 	if (worldState == 0 || worldObj == 0) {
 		return;
 	}
 
-	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	const short state = worldState->m_mainState;
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			unsigned char* const slot = worldObj + 0x1E0 + (row * 4 + col) * 0x50;
@@ -6975,21 +6975,20 @@ void CMenuPcs::CalcCharaBase()
  */
 void CMenuPcs::DrawCharaBase()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 
-	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	const short state = worldState->m_mainState;
 	if (state <= 0) {
 		return;
 	}
 
 	float alpha;
 	if (state == 1) {
-		alpha = static_cast<float>(DOUBLE_803316C0 * static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)));
+		alpha = static_cast<float>(DOUBLE_803316C0 * static_cast<double>(worldState->m_frameCounter));
 	} else if (state == 2) {
 		alpha = FLOAT_80331668;
 	} else {
-		alpha = static_cast<float>(1.0 - DOUBLE_803316C0 * static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)));
+		alpha = static_cast<float>(1.0 - DOUBLE_803316C0 * static_cast<double>(worldState->m_frameCounter));
 	}
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));

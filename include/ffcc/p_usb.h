@@ -8,6 +8,20 @@
 class CUSBPcs : public CProcess
 {
 public:
+    struct CUSBProcessTable
+    {
+        char* m_name;
+        union
+        {
+            u32 m_words[(0x11C - sizeof(char*)) / sizeof(u32)];
+            struct Fields
+            {
+                CProcessTableCallback m_create;
+                CProcessTableCallback m_destroy;
+                CProcessTableEntry m_entries[12];
+            } m_fields;
+        };
+    };
     class CDataHeader
     {
     public:
@@ -21,7 +35,7 @@ public:
         u8 m_reserved34[0xC];
     };
 
-    static CProcessTable m_table;
+    static CUSBProcessTable m_table;
 
     CUSBPcs();
 

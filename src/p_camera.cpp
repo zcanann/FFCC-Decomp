@@ -100,6 +100,11 @@ static inline CPad::PadInput& CameraShadowPadInput()
     return Pad.GetPadInputs()[(Pad.m_debugPadPort == 1) ? 0 : 1];
 }
 
+static inline float CameraConst(const float& value)
+{
+    return value;
+}
+
 extern "C" {
 void create__10CCameraPcsFv(CCameraPcs*);
 void destroy__10CCameraPcsFv(CCameraPcs*);
@@ -790,11 +795,11 @@ void CCameraPcs::calc()
     CalcQuake();
 
     float fov = m_fov;
-    if (fov < FLOAT_8032fac8 && static_cast<unsigned int>(System.m_execParam) >= 1) {
+    if (fov < CameraConst(FLOAT_8032fac8) && static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
-        fov = FLOAT_8032fab4;
+        fov = CameraConst(FLOAT_8032fab4);
     }
-    C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    C_MTXPerspective(m_screenMatrix, fov, CameraConst(FLOAT_8032fa3c), m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     up.x = FLOAT_8032fa34;
@@ -853,12 +858,12 @@ void CCameraPcs::SetStdProjectionMatrix()
 {
     float fov = m_fov;
 
-    if (fov < FLOAT_8032fac8 && static_cast<unsigned int>(System.m_execParam) >= 1) {
+    if (fov < CameraConst(FLOAT_8032fac8) && static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
-        fov = FLOAT_8032fab4;
+        fov = CameraConst(FLOAT_8032fab4);
     }
 
-    C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    C_MTXPerspective(m_screenMatrix, fov, CameraConst(FLOAT_8032fa3c), m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 }
 
@@ -1061,7 +1066,7 @@ void CCameraPcs::calcChara()
     Vec scaledDir;
     Vec targetPos;
 
-    C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    C_MTXPerspective(m_screenMatrix, m_fov, CameraConst(FLOAT_8032fa3c), m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (m_viewerOverride == 0) {
@@ -1333,7 +1338,7 @@ void CCameraPcs::calcMap()
         }
     }
 
-    C_MTXPerspective(m_screenMatrix, m_fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    C_MTXPerspective(m_screenMatrix, m_fov, CameraConst(FLOAT_8032fa3c), m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     PSVECAdd(&TargetVec(), &PositionVec(), &DirectionVec());
@@ -1994,7 +1999,7 @@ void CCameraPcs::calcMaterialEditor()
     Mtx mtxInv;
     float stick;
 
-    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa54);
+    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, CameraConst(FLOAT_8032fa3c), FLOAT_8032fa40, FLOAT_8032fa54);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad.m_debugPadLock == 0) {
@@ -2120,7 +2125,7 @@ void CCameraPcs::calcFunnyShape()
     Mtx mtxInv;
     float stick;
 
-    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa44);
+    C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, CameraConst(FLOAT_8032fa3c), FLOAT_8032fa40, FLOAT_8032fa44);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad.m_debugPadLock == 0) {

@@ -473,13 +473,13 @@ static inline char* GetCmakeNameBuffer()
 
 static void LoadCmakeVillageName()
 {
-    strcpy(s_CmakeInfo.m_name, s_CmakeVillageName);
+    strcpy(s_CmakeInfo.m_name, Game.m_gameWork.m_townName);
 }
 
 static void StoreCmakeVillageName()
 {
-    memset(s_CmakeVillageName, 0, sizeof(s_CmakeVillageName));
-    strcpy(s_CmakeVillageName, s_CmakeInfo.m_name);
+    memset(Game.m_gameWork.m_townName, 0, sizeof(Game.m_gameWork.m_townName));
+    strcpy(Game.m_gameWork.m_townName, s_CmakeInfo.m_name);
 }
 
 static bool IsCmakeNameBlank(const char* name)
@@ -3686,8 +3686,9 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
+    int tableBase = villageWork->m_table * 5;
     for (int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[villageWork->m_table * 5 + i];
+        const char* rowText = s_NameEntryStr[tableBase + i];
         font->SetPosX(FLOAT_803332c8);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);

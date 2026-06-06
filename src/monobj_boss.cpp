@@ -1688,9 +1688,10 @@ void CGMonObj::frameStatFuncMolbol()
 
 	if (state != 0x65) {
 		if (state < 0x65) {
-			if (state > 99) {
-				suikomi(0x53, FLOAT_80331cf8);
+			if (state < 100) {
+				return;
 			}
+			suikomi(0x53, FLOAT_80331cf8);
 		}
 		return;
 	}

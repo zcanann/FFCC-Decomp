@@ -861,9 +861,9 @@ doneAdvance:
  */
 int CMes::GetWait()
 {
-	if (*(int*)((char*)this + 0x3c7c) < *(int*)((char*)this + 0x3c80))
+	if (mRevealCursor < mDrawCursor)
 	{
-		return *(int*)((char*)this + 0x3c78);
+		return mWaitFrames;
 	}
 	return 0;
 }

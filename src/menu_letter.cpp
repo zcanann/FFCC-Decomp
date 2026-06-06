@@ -151,8 +151,11 @@ static inline void ClearLetterAnimStorage(CMenuPcs* menu)
 
 static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
 {
-	return *reinterpret_cast<CMemory::CStage**>(
-	    reinterpret_cast<char*>(menu) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	(void)menu;
+	if (Game.m_gameWork.m_menuStageMode != '\0') {
+		return MenuPcs.m_stageF4;
+	}
+	return MenuPcs.m_menuStage;
 }
 } // namespace
 
@@ -1368,24 +1371,18 @@ bool CMenuPcs::LetterReplyWinOpen()
 	unsigned char languageId = Game.m_gameWork.m_languageId;
 	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
-		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
-		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xEC);
-		if (Game.m_gameWork.m_menuStageMode != '\0') {
-			stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xF4);
-		}
+		CMemory::CStage* stage = GetLetterMenuStage(this);
 		char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-		stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xEC);
-		if (Game.m_gameWork.m_menuStageMode != '\0') {
-			stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<char*>(this) + 0xF4);
-		}
+		stage = GetLetterMenuStage(this);
 		char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
 
 		memset(srcText, 0, kLetterTextScratchSize);
 		memset(workText, 0, kLetterTextScratchSize);
 
+		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		unsigned short msgIndex = letter->HeaderWord();
 		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 		CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
@@ -1417,11 +1414,11 @@ bool CMenuPcs::LetterReplyWinOpen()
 		delete[] workText;
 
 		const char* closeText = GetMenuStr(3);
-		int lineIndex = s_ReplyMax;
+		int lineIndex = static_cast<signed char>(s_ReplyMax);
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		strcat(lines[lineIndex], closeText);
 
-		SetSingDynamicWinMessInfo(s_ReplyMax,
+		SetSingDynamicWinMessInfo(static_cast<signed char>(s_ReplyMax),
 			lines[0],
 			lines[1],
 			lines[2],
@@ -1837,7 +1834,6 @@ void CMenuPcs::LetterMessDraw()
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
-	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	int state = GetLetterStateBase(this);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
 	s16* animBase = reinterpret_cast<s16*>(m_singleFadeState);
@@ -1872,16 +1868,15 @@ void CMenuPcs::LetterMessDraw()
 		font->SetColor(color.color);
 	}
 
-	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	CMemory::CStage* stage = GetLetterMenuStage(this);
 	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
-	stage = *reinterpret_cast<CMemory::CStage**>(
-	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	stage = GetLetterMenuStage(this);
 	char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
 
 	memset(srcText, 0, kLetterTextScratchSize);
 	memset(workText, 0, kLetterTextScratchSize);
 
+	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	u16 msgIndex = letter->HeaderWord();
 	strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
@@ -2157,11 +2152,9 @@ int CMenuPcs::LetterCtrlCur()
 			s16 curReply = *reinterpret_cast<s16*>(state + 0x28);
 			if (static_cast<int>(curReply) < maxReply - 1) {
 				s_ReplyPos = static_cast<u8>(curReply);
-				CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
-				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+				CMemory::CStage* stage = GetLetterMenuStage(this);
 				char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
-				stage = *reinterpret_cast<CMemory::CStage**>(
-				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+				stage = GetLetterMenuStage(this);
 				char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
 				memset(srcText, 0, kLetterTextScratchSize);
 				memset(workText, 0, kLetterTextScratchSize);

@@ -2717,13 +2717,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
  */
 void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
 {
-    MenuWindowInfo* win = m_menuWindowInfo;
-    win->x = static_cast<s16>(x);
-    win->y = static_cast<s16>(y);
-    win->width = static_cast<s16>(w);
-    win->height = static_cast<s16>(h);
-    win->frame = 0;
-    win->state = 3;
+    m_menuWindowInfo->x = static_cast<s16>(x);
+    m_menuWindowInfo->y = static_cast<s16>(y);
+    m_menuWindowInfo->width = static_cast<s16>(w);
+    m_menuWindowInfo->height = static_cast<s16>(h);
+    m_menuWindowInfo->frame = 0;
+    m_menuWindowInfo->state = 3;
 }
 
 /*

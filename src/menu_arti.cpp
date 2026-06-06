@@ -155,26 +155,25 @@ int CMenuPcs::ArtiCtrlCur()
 		return 0;
 	}
 
-	ArtiState* state = GetArtiState(this);
-	selection = state->currentSelection;
+	selection = GetArtiState(this)->currentSelection;
 	if ((uVar4 & 8) != 0) {
-		sVar1 = state->selections[selection];
+		sVar1 = GetArtiState(this)->selections[selection];
 		if (sVar1 != 0) {
-			state->selections[selection] = sVar1 + -1;
+			GetArtiState(this)->selections[selection] = sVar1 + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if (state->scrollOffset != 0) {
-			state->scrollOffset = state->scrollOffset + -1;
+		} else if (GetArtiState(this)->scrollOffset != 0) {
+			GetArtiState(this)->scrollOffset = GetArtiState(this)->scrollOffset + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		}
 	} else if ((uVar4 & 4) != 0) {
-		sVar1 = state->selections[selection];
+		sVar1 = GetArtiState(this)->selections[selection];
 		if (sVar1 < 7) {
-			state->selections[selection] = sVar1 + 1;
+			GetArtiState(this)->selections[selection] = sVar1 + 1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((int)state->scrollOffset + (int)sVar1 < 0x48) {
-			state->scrollOffset = state->scrollOffset + 1;
+		} else if ((int)GetArtiState(this)->scrollOffset + (int)sVar1 < 0x48) {
+			GetArtiState(this)->scrollOffset = GetArtiState(this)->scrollOffset + 1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -183,19 +182,19 @@ int CMenuPcs::ArtiCtrlCur()
 
 	if ((uVar4 & 0xc) == 0) {
 		if ((uVar3 & 0x20) != 0) {
-			state->moveDirection = 1;
+			GetArtiState(this)->moveDirection = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x40) != 0) {
-			state->moveDirection = -1;
+			GetArtiState(this)->moveDirection = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x100) != 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else if ((uVar3 & 0x200) != 0) {
-			state->closeRequested = 1;
+			GetArtiState(this)->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			return 1;
 		}
@@ -425,13 +424,12 @@ int CMenuPcs::ArtiClose()
 	int frame;
 	int finished;
 
-	ArtiState* state = GetArtiState(this);
-	state->frame++;
+	GetArtiState(this)->frame++;
 	finished = 0;
 
 	count = GetArtiOpenAnimList(this)->count;
 	anim = GetArtiOpenAnimList(this)->entries;
-	frame = state->frame;
+	frame = GetArtiState(this)->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
@@ -501,16 +499,15 @@ int CMenuPcs::ArtiOpen()
 	int finished;
 	int frame;
 
-	ArtiState* state = GetArtiState(this);
-	if (state->initialized == '\0') {
+	if (GetArtiState(this)->initialized == '\0') {
 		ArtiInit();
 	}
 
-	state->frame = state->frame + 1;
+	GetArtiState(this)->frame = GetArtiState(this)->frame + 1;
 	finished = 0;
 	count = GetArtiOpenAnimList(this)->count;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
-	frame = (int)state->frame;
+	frame = (int)GetArtiState(this)->frame;
 
 	for (int i = 0; i < count; i++, entry++) {
 		float zero = FLOAT_80332fa8;

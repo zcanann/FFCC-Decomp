@@ -40,12 +40,17 @@ extern "C" const char s_MenuOptionNorm_803334E8[];
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
-static inline double LoadDouble(const double& value)
+static inline double LoadDouble(double value)
 {
 	return value;
 }
 
-static inline float LoadFloat(const float& value)
+static inline float LoadFloat(float value)
+{
+	return value;
+}
+
+static inline float LoadFloatRef(const float& value)
 {
 	return value;
 }
@@ -138,7 +143,7 @@ void CMenuPcs::CompaDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(entry->duration)) * w;
+					float remainW = static_cast<float>((LoadDouble(DOUBLE_80333008) / (double)entry->duration) * (double)w);
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -590,7 +595,7 @@ void CMenuPcs::CompaInit()
 	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
 	CompaOpenAnim* entry = this->m_compaList->entries;
-	float one = LoadFloat(FLOAT_80333000);
+	float one = LoadFloatRef(FLOAT_80333000);
 	int count = 8;
 	do {
 		entry[0].uvScale = one;

@@ -8628,12 +8628,11 @@ void CMenuPcs::SetParty()
  */
 void CMenuPcs::SetCMakeEnd(int channel)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const selectData = m_wm.m_charaSelectData;
-	selectData[channel * 0x10 + 0xC] = 1;
-	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
-		              (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
+	CSystem* system = &System;
+	m_wm.m_charaSelectData[channel * 0x10 + 0xC] = 1;
+	if ((unsigned int)system->m_execParam >= 3) {
+		system->Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
+		               (int)*reinterpret_cast<short*>(m_wm.m_charaSelectData + channel * 0x10 + 4));
 	}
 }
 
@@ -10486,14 +10485,12 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-    MenuWindowInfo* const win = m_menuWindowInfo;
-
-    win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - x) * 0.5f));
-    win->y = static_cast<short>(static_cast<int>((FLOAT_80331430 - static_cast<float>(y)) * 0.5f));
-    win->width = static_cast<short>(x);
-    win->height = static_cast<short>(y);
-    win->frame = 0;
-    win->state = 3;
+    m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - x) * 0.5f));
+    m_menuWindowInfo->y = static_cast<short>(static_cast<int>((FLOAT_80331430 - static_cast<float>(y)) * 0.5f));
+    m_menuWindowInfo->width = static_cast<short>(x);
+    m_menuWindowInfo->height = static_cast<short>(y);
+    m_menuWindowInfo->frame = 0;
+    m_menuWindowInfo->state = 3;
 }
 
 /*

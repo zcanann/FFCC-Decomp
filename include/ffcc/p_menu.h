@@ -29,6 +29,33 @@ struct MenuLstState;
 struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
+
+struct MenuBoardEntry
+{
+    int m_modelHandle;
+    int m_effectHandle;
+    short m_centerX;
+    short m_centerY;
+    short m_width;
+    short m_height;
+    float m_posX;
+    float m_posY;
+    float m_depth;
+    float m_rotX;
+    float m_rotY;
+    float m_rotZ;
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
+    float m_unk34;
+    float m_unk38;
+    float m_unk3c;
+    int m_screenX;
+    int m_screenY;
+    int m_screenWidth;
+    int m_screenHeight;
+};
+
 struct SingleFadeEntry
 {
     char pad_00[0x10];
@@ -714,6 +741,7 @@ extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
+STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);

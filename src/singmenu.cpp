@@ -908,7 +908,7 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
-            *reinterpret_cast<int*>(self + 0x814) = 0;
+            m_bonusBoardPtr = 0;
             m_singleFadeState = 0;
             m_singMenuState = 0;
             m_singWindowInfo = 0;
@@ -951,10 +951,10 @@ void CMenuPcs::destroySingleMenu()
     m_singleMenuStageActive = 0;
     gSingMenuForcedSelection = -1;
 
-    void* ptr = *reinterpret_cast<void**>(self + 0x814);
+    void* ptr = reinterpret_cast<void*>(m_bonusBoardPtr);
     if (ptr != 0) {
         delete[] static_cast<u8*>(ptr);
-        *reinterpret_cast<void**>(self + 0x814) = 0;
+        m_bonusBoardPtr = 0;
     }
 
     ptr = m_singleFadeState;
@@ -1022,42 +1022,42 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp, 0x5DD) u8[0x50];
+    m_bonusBoardPtr = reinterpret_cast<int>(new (stage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
 
-    int state = *reinterpret_cast<int*>(self + 0x814);
-    *reinterpret_cast<float*>(state + 0x24) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x20) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x1C) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x30) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x2C) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x28) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(state + 0x3C) = FLOAT_80332934;
-    *reinterpret_cast<float*>(state + 0x38) = FLOAT_80332934;
-    *reinterpret_cast<float*>(state + 0x34) = FLOAT_80332934;
-    **reinterpret_cast<int**>(self + 0x814) = 0;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 4) = 0;
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 8) = 0;
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 10) = 0;
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 12) = 0x280;
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 14) = 0x1C0;
-    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x10) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x14) = FLOAT_8033294c;
-    *reinterpret_cast<float*>(*reinterpret_cast<int*>(self + 0x814) + 0x18) = FLOAT_80332a2c;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x40) = 0;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x44) = 0;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x48) = 0x280;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x4C) = 0x1C0;
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 8) = static_cast<s16>(static_cast<int>(
+    MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonusBoardPtr);
+    boardEntry->m_rotZ = FLOAT_8033294c;
+    boardEntry->m_rotY = FLOAT_8033294c;
+    boardEntry->m_rotX = FLOAT_8033294c;
+    boardEntry->m_scaleZ = FLOAT_8033294c;
+    boardEntry->m_scaleY = FLOAT_8033294c;
+    boardEntry->m_scaleX = FLOAT_8033294c;
+    boardEntry->m_unk3c = FLOAT_80332934;
+    boardEntry->m_unk38 = FLOAT_80332934;
+    boardEntry->m_unk34 = FLOAT_80332934;
+    boardEntry->m_modelHandle = 0;
+    boardEntry->m_effectHandle = 0;
+    boardEntry->m_centerX = 0;
+    boardEntry->m_centerY = 0;
+    boardEntry->m_width = 0x280;
+    boardEntry->m_height = 0x1C0;
+    boardEntry->m_posX = FLOAT_8033294c;
+    boardEntry->m_posY = FLOAT_8033294c;
+    boardEntry->m_depth = FLOAT_80332a2c;
+    boardEntry->m_screenX = 0;
+    boardEntry->m_screenY = 0;
+    boardEntry->m_screenWidth = 0x280;
+    boardEntry->m_screenHeight = 0x1C0;
+    boardEntry->m_centerX = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(DOUBLE_80332a30 + static_cast<double>(FLOAT_803329f4) * DOUBLE_80332968
                 + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec)) - DOUBLE_80332a38) - DOUBLE_80332a30));
-    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x814) + 10) = static_cast<s16>(static_cast<int>(
+    boardEntry->m_centerY = static_cast<s16>(static_cast<int>(
         static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803329f0) * DOUBLE_80332968
                 + static_cast<double>(FLOAT_803329f0))) - DOUBLE_80332a40));
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x40) = static_cast<int>(static_cast<double>(FLOAT_80332a48)
-                + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec));
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x44) = static_cast<int>(FLOAT_80332950);
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x48) = 0x48;
-    *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x4C) = 0x58;
+    boardEntry->m_screenX = static_cast<int>(static_cast<double>(FLOAT_80332a48)
+                                             + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec));
+    boardEntry->m_screenY = static_cast<int>(FLOAT_80332950);
+    boardEntry->m_screenWidth = 0x48;
+    boardEntry->m_screenHeight = 0x58;
 
     stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1160,9 +1160,9 @@ void CMenuPcs::drawSingleMenu()
                 *reinterpret_cast<void**>(self + 0x774) = 0;
             }
 
-            if (*reinterpret_cast<void**>(self + 0x814) != 0) {
-                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x814));
-                *reinterpret_cast<void**>(self + 0x814) = 0;
+            if (m_bonusBoardPtr != 0) {
+                delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonusBoardPtr));
+                m_bonusBoardPtr = 0;
             }
 
             if (m_singMenuState != 0) {

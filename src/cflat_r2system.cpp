@@ -2241,27 +2241,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -0x1E:
         if (*object->m_localBase < 0x10) {
-            const int lineOffset = *object->m_localBase * 0xB14;
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset) = 0;
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + lineOffset) = object->m_localBase[1];
+            CLine<64>& line = m_debugLines[*object->m_localBase];
+            line.pointCount = 0;
+            line.m_mask = object->m_localBase[1];
         }
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x1F:
         if (*object->m_localBase < 0x10) {
-            const int lineOffset = *object->m_localBase * 0xB14;
-            unsigned int* pointCount = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset);
-            if (*pointCount < 0x40) {
-                const unsigned int pointOffset = *pointCount * 0xC + lineOffset;
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C0C + pointOffset) =
-                    object->m_localBase[1];
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C10 + pointOffset) =
-                    object->m_localBase[2];
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C14 + pointOffset) =
-                    object->m_localBase[3];
-                *pointCount = *pointCount + 1;
-                CalcBound__9CLine(reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + lineOffset));
+            CLine<64>& line = m_debugLines[*object->m_localBase];
+            if (line.pointCount < 0x40) {
+                const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+                Vec& point = line.points[line.pointCount];
+                point.x = localFloats[1];
+                point.y = localFloats[2];
+                point.z = localFloats[3];
+                line.pointCount++;
+                CalcBound__9CLine(&line);
             }
         }
         runtime->push(object, 0);
@@ -2314,29 +2311,27 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float bestLineDistance = 0.0f;
 
         for (unsigned int i = 0; i < 0x10; i++) {
-            CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + i * 0xB14);
-            const unsigned int lineMask = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(line) + 0x2C);
-            if (line->pointCount == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
+            CLine<64>& line = m_debugLines[i];
+            if (line.pointCount == 0 || (line.m_mask & mask) == 0 || line.IsInner(&target, margin) == 0) {
                 continue;
             }
 
             unsigned long segment = 0;
             float segmentRatio = 0.0f;
             float nearestDistance = 0.0f;
-            if (line->Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
+            if (line.Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
                 nearestDistance < bestDistance) {
                 found = 1;
                 bestLine = i;
                 bestDistance = nearestDistance;
-                bestLineDistance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
+                bestLineDistance = line.segments[segment].length * segmentRatio + line.segments[segment].startLength;
             }
         }
 
         if (found != 0) {
             *reinterpret_cast<unsigned int*>(object->m_localBase[5]) = bestLine;
             *reinterpret_cast<float*>(object->m_localBase[6]) = bestLineDistance;
-            *reinterpret_cast<unsigned int*>(object->m_localBase[7]) =
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x26EC + bestLine * 0xB14);
+            *reinterpret_cast<float*>(object->m_localBase[7]) = m_debugLines[bestLine].totalLength;
         }
 
         runtime->push(object, found);
@@ -2346,7 +2341,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x23: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec position = {0.0f, 0.0f, 0.0f};
 
         if (line->pointCount > 0) {
@@ -2376,7 +2371,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x24: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec direction = {0.0f, 0.0f, 0.0f};
 
         if (line->pointCount > 1) {
@@ -2415,7 +2410,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             localFloats[2],
             localFloats[3],
         };
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment = 0;
         float segmentRatio = 0.0f;
         float distance = 0.0f;
@@ -2430,8 +2425,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x26:
-        runtime->push(
-            object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x26EC + *object->m_localBase * 0xB14));
+        runtime->push(object, *reinterpret_cast<int*>(&m_debugLines[*object->m_localBase].totalLength));
         outResult = 0;
         return 1;
     case -0x27: {
@@ -2478,8 +2472,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x28:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + *object->m_localBase * 0xB14) =
-            *object->m_localBase;
+        m_debugLines[*object->m_localBase].m_mask = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;

@@ -22,7 +22,8 @@ struct CLine {
     Vec max;
     unsigned int pointCount;
     unsigned int unused;
-    float unk20[4];
+    float unk20[3];
+    unsigned int m_mask;
     Vec points[PointCount];
     CLineSegment segments[PointCount - 1];
     float totalLength;

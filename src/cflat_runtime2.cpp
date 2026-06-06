@@ -2444,22 +2444,9 @@ void CFlatRuntime2::resetChangeScript()
 	*reinterpret_cast<u32*>(m_pad_10404_10408) = 0;
 	m_padInputDisableMask = 0;
 	m_centerState = 0;
-	*reinterpret_cast<u32*>(runtime + 0x1BF4) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x2708) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x321C) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x3D30) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x4844) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x5358) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x5E6C) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x6980) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x7494) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x7FA8) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x8ABC) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x95D0) = 0;
-	*reinterpret_cast<u32*>(runtime + 0xA0E4) = 0;
-	*reinterpret_cast<u32*>(runtime + 0xABF8) = 0;
-	*reinterpret_cast<u32*>(runtime + 0xB70C) = 0;
-	*reinterpret_cast<u32*>(runtime + 0xC220) = 0;
+	for (int i = 0; i < 16; i++) {
+		m_debugLines[i].pointCount = 0;
+	}
 
 	int count = 2;
 	u8* block = runtime;

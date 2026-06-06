@@ -59,6 +59,11 @@ static inline Mtx& MapObjHitDrawMtx()
     return MapMng.m_viewMtx;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 }
 
 /*
@@ -1590,7 +1595,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = kMapObjZero + localCylinder.m_radius;
+        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1600,7 +1605,8 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
-        float marginY = kMapObjZero + localCylinder.m_radius;
+        float marginY = LoadFloat(kMapObjZero);
+        marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
             localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
             localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
@@ -1609,7 +1615,8 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
-        float marginZ = kMapObjZero + localCylinder.m_radius;
+        float marginZ = LoadFloat(kMapObjZero);
+        marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
             localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
             localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;
@@ -1697,7 +1704,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float marginX = kMapObjZero + localCylinder.m_radius;
+        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
             localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
@@ -1707,7 +1714,8 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
-        float marginY = kMapObjZero + localCylinder.m_radius;
+        float marginY = LoadFloat(kMapObjZero);
+        marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
             localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
             localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
@@ -1716,7 +1724,8 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
-        float marginZ = kMapObjZero + localCylinder.m_radius;
+        float marginZ = LoadFloat(kMapObjZero);
+        marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
             localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
             localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;

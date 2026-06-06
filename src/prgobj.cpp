@@ -153,18 +153,6 @@ int CGPrgObj::GetClassControl(int classControl)
  */
 void CGPrgObj::ClassControl(int classControl, int value)
 {
-	struct WeaponNodeFlagBits {
-		signed char m_prg : 1;
-		signed char m_unk40 : 1;
-		signed char m_unk20 : 1;
-		signed char m_unk10 : 1;
-		signed char m_control3 : 1;
-		signed char m_unk04 : 1;
-		signed char m_unk02 : 1;
-		signed char m_unk01 : 1;
-	};
-	WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
-
 	switch (classControl) {
 	case 0:
 		static_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
@@ -173,9 +161,9 @@ void CGPrgObj::ClassControl(int classControl, int value)
 		static_cast<CGPartyObj*>(this)->changeMotionMode(value);
 		break;
 	case 2:
-		if (weaponNodeFlags->m_prg != value) {
+		if (m_weaponNodeFlagBits.m_prg != value) {
 			onChangePrg(value);
-			weaponNodeFlags->m_prg = value;
+			m_weaponNodeFlagBits.m_prg = value;
 		}
 		break;
 	case 3:
@@ -536,7 +524,7 @@ void CGPrgObj::onFrame()
 {
     onFrameAlways();
 
-	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) {
+	if (m_weaponNodeFlagBits.m_prg != 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x2d) == 0x2d &&
 		    static_cast<int>(PartPcs.m_usbStreamState.m_blockOnFrame) != 0) {
 			return;

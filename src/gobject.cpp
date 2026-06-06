@@ -55,6 +55,10 @@ struct GObjectSRT {
     Vec m_scale;
 };
 
+STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlags) == 0x9A);
+STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBits) == 0x9A);
+STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBits) == 1);
+
 static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
 {
     return *reinterpret_cast<CModelAnimState*>(model);
@@ -2076,13 +2080,7 @@ void CGObject::onDraw()
  */
 void CGObject::Detach()
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
-    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
-
-    if (weaponNodeFlags->m_attached != 0) {
+    if (m_weaponNodeFlagBits.m_attached != 0) {
         CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
 
         m_worldPosition.x = node->m_mtx[0][3];
@@ -2095,7 +2093,7 @@ void CGObject::Detach()
         m_rotBaseY = rotY;
     }
 
-    weaponNodeFlags->m_attached = false;
+    m_weaponNodeFlagBits.m_attached = false;
 }
 
 /*
@@ -2109,10 +2107,6 @@ void CGObject::Detach()
  */
 void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
 
@@ -2123,7 +2117,7 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
     if (hasModel) {
         int nodeIndex = handle->m_model->SearchNode(nodeName);
         if (nodeIndex >= 0) {
-            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
+            m_weaponNodeFlagBits.m_attached = true;
 
             m_attachOwner = owner;
             m_attachNode = nodeIndex;

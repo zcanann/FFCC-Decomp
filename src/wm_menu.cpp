@@ -5733,11 +5733,11 @@ void CMenuPcs::CalcFukidashi()
 	char nameBuffer[64];
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
 	}
 
 	unsigned int textWidth = 0xD8;

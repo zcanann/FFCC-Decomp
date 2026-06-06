@@ -532,7 +532,7 @@ void CMenuPcs::WmInit()
 	m_wmWorkBuffer = 0;
 	FLOAT_8032ee18 = initValue;
 	m_wmThpActive = 0;
-	bytes[0x86E] = 0;
+	m_textureLocIndex = 0;
 	memset(bytes + 4, 0, 0x1C);
 	bytes[0xD] = 0;
 	bytes[0x10] = 0;
@@ -2181,8 +2181,8 @@ void CMenuPcs::InitSaveLoadMenu()
 	worldState->m_mcResult = zero;
 	worldState->m_flag0B = static_cast<unsigned char>(zero);
 	worldState->m_cardChannel = zero;
-	*reinterpret_cast<short*>(bytes + 0x870) = zero;
-	bytes[0x86E] = static_cast<unsigned char>(zero);
+	m_wmTransitionCode = zero;
+	m_textureLocIndex = static_cast<unsigned char>(zero);
 }
 
 /*
@@ -2199,7 +2199,7 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
 	McCtrl& mcCtrl = *GetMcCtrl();
-	bytes[0x86E] = 0;
+	m_textureLocIndex = 0;
 
 	bool bVar1 = false;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
@@ -3854,7 +3854,7 @@ void CMenuPcs::DrawMCardMenu()
 				if (typedWorldState->m_state0E < 0) {
 					typedWorldState->m_nextMenuMode = -1;
 					typedWorldState->m_delay = 1;
-					*reinterpret_cast<short*>(bytes + 0x870) = 1;
+					m_wmTransitionCode = 1;
 				} else if (subState == 2) {
 					typedWorldState->m_subState = 3;
 				} else {
@@ -3976,7 +3976,7 @@ void CMenuPcs::DrawMCardMenu()
 				else if (cRes == -999) {
 					typedWorldState->m_nextMenuMode = -1;
 					typedWorldState->m_delay = 1;
-					*reinterpret_cast<short*>(bytes + 0x870) = 2;
+					m_wmTransitionCode = 2;
 				} else {
 					typedWorldState->m_subState = 0x11;
 				}
@@ -4055,7 +4055,7 @@ void CMenuPcs::DrawMCardMenu()
 				if (typedWorldState->m_menuMode != 8) {
 					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
 				}
-				bytes[0x86E] = 1;
+				m_textureLocIndex = 1;
 				typedWorldState->m_nextMenuMode = 0;
 			}
 		}
@@ -4495,7 +4495,7 @@ void CMenuPcs::DrawLoadMenu()
 				if (typedWorldState->m_state0E < 0) {
 					typedWorldState->m_nextMenuMode = -1;
 					typedWorldState->m_delay = 1;
-					*reinterpret_cast<short*>(bytes + 0x870) = 1;
+					m_wmTransitionCode = 1;
 				} else if (subState == 2) {
 					typedWorldState->m_subState = 3;
 				} else {
@@ -4586,7 +4586,7 @@ void CMenuPcs::DrawLoadMenu()
 				} else if (subState == 0x18) {
 					typedWorldState->m_nextMenuMode = 1;
 					typedWorldState->m_delay = 1;
-					*reinterpret_cast<short*>(bytes + 0x870) = 4;
+					m_wmTransitionCode = 4;
 				} else {
 					typedWorldState->m_subState = 2;
 				}
@@ -4647,7 +4647,7 @@ void CMenuPcs::DrawLoadMenu()
 				else if (cRes == -999) {
 					typedWorldState->m_nextMenuMode = -1;
 					typedWorldState->m_delay = 1;
-					*reinterpret_cast<short*>(bytes + 0x870) = 2;
+					m_wmTransitionCode = 2;
 				} else {
 					typedWorldState->m_subState = 0x11;
 				}
@@ -4724,7 +4724,7 @@ void CMenuPcs::DrawLoadMenu()
 				if (typedWorldState->m_menuMode != 8) {
 					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
 				}
-				bytes[0x86E] = 1;
+				m_textureLocIndex = 1;
 				typedWorldState->m_nextMenuMode = 0;
 			}
 		}
@@ -8280,7 +8280,7 @@ void CMenuPcs::WMChgMenu()
 	m_menuWindowInfo->height = 0;
 	m_menuWindowInfo->frame = 0;
 	m_menuWindowInfo->state = 3;
-	bytes[0x86E] = 0;
+	m_textureLocIndex = 0;
 
 	int frame = *reinterpret_cast<int*>(bytes + 0x820);
 	*reinterpret_cast<short*>(frame + 4) = 0x10;
@@ -8324,7 +8324,7 @@ void CMenuPcs::WMChgMenu()
 	}
 
 	int iVar8 = 0;
-	*reinterpret_cast<short*>(bytes + 0x870) = 0;
+	m_wmTransitionCode = 0;
 
 	sVar2 = typedWorldState->m_menuMode;
 	if (sVar2 == 4) {
@@ -10806,14 +10806,13 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
  */
 void CMenuPcs::SetTextureLoc(int index)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	if (index < 0) {
 		index = 0;
 	}
 	if (index > 0xFF) {
 		index = 0xFF;
 	}
-	bytes[0x86E] = static_cast<unsigned char>(index);
+	m_textureLocIndex = static_cast<unsigned char>(index);
 	SetTexture(static_cast<CMenuPcs::TEX>(index));
 	gWmMenuWorkA = index;
 }

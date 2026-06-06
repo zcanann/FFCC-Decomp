@@ -4890,9 +4890,8 @@ void CMenuPcs::DrawTitleMenu()
 		unsigned int uVar6 = 0x70;
 		for (int i = 0; i < 2; i++) {
 			float labelAlpha = FLOAT_803313e8;
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
-				labelAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+			if (typedWorldState->m_mainState == 1) {
+				labelAlpha = (float)typedWorldState->m_frameCounter;
 			}
 			unsigned int labelColor = (unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF;
 			labelColor = labelColor | 0xFFFFFF00;
@@ -4908,10 +4907,9 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 
 			// Cursor on selected item
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<char*>(worldState + 9) == 0 &&
-			    i == *reinterpret_cast<short*>(worldState + 0x26)) {
-				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+			if (typedWorldState->m_flag09 == 0 &&
+			    i == typedWorldState->m_cardChannel) {
+				int timer = (int)typedWorldState->m_titleState;
 				float cursorAlpha = FLOAT_803313e8;
 				if (timer > 0) {
 					cursorAlpha = (float)(timer);
@@ -4938,9 +4936,8 @@ void CMenuPcs::DrawTitleMenu()
 
 		SetTexture((TEX)0x44);
 		float copyrightAlpha = FLOAT_803313e8;
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
-			copyrightAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+		if (typedWorldState->m_mainState == 1) {
+			copyrightAlpha = (float)typedWorldState->m_frameCounter;
 		}
 		unsigned int crColor = (unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF;
 		crColor = crColor | 0xFFFFFF00;

@@ -170,6 +170,11 @@ static inline short& CmakeMcState(CMenuPcs* menu)
     return CmakeWindowInfo(menu)->state;
 }
 
+static inline short& CmakeStateSelectField(CmakeMenuState* state, int index)
+{
+    return (&state->m_select)[index];
+}
+
 static inline unsigned char* MenuPcsRaw()
 {
     return reinterpret_cast<unsigned char*>(&MenuPcs);
@@ -941,13 +946,12 @@ void CMenuPcs::CalcSingCMake()
  */
 void CMenuPcs::DrawSingCMake()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short step = *reinterpret_cast<short*>(state + 0x16);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
-    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short step = cmakeState->m_step;
+    short& mode = cmakeState->m_mode;
+    short& resultDir = cmakeState->m_resultDir;
+    short& resultFlag = cmakeState->m_resultFlag;
+    short& frame = cmakeState->m_frame;
 
     switch (step) {
     case 0: {
@@ -1766,10 +1770,10 @@ void CMenuPcs::CmakeDraw()
  */
 void CMenuPcs::CmakeNameOpen()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x16) = 1;
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_step = 1;
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -1784,9 +1788,8 @@ void CMenuPcs::CmakeNameOpen()
  */
 int CMenuPcs::CmakeNameCtrl()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultDir = cmakeState->m_resultDir;
     short& select = cmakeState->m_select;
     short& row = cmakeState->m_row;
     short& table = cmakeState->m_table;
@@ -1963,9 +1966,9 @@ int CMenuPcs::CmakeNameCtrl()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeNameClose()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -1981,12 +1984,12 @@ void CMenuPcs::CmakeNameClose()
 void CMenuPcs::CmakeNameDraw()
 {
     CmakeMenuState* cmakeState = CmakeState(this);
-    int frame = static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x22)) - 1;
+    int frame = static_cast<int>(cmakeState->m_frame) - 1;
     if (frame < 0) {
         frame = 0;
     }
 
-    short mode = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10);
+    short mode = cmakeState->m_mode;
     float alpha;
     if (mode == 0) {
         alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
@@ -2036,11 +2039,10 @@ void CMenuPcs::CmakeNameDraw()
         0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    if ((gCmakePreviousStep == 2) && (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 0)) {
+    if ((gCmakePreviousStep == 2) && (cmakeState->m_mode == 0)) {
         DrawNamePreviewChara(this, FLOAT_80333258, 0xFF);
         DrawCmakeTitle(1, alpha, FLOAT_80333258);
-    } else if ((*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) != 2) ||
-               (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x1E) == -1)) {
+    } else if ((cmakeState->m_mode != 2) || (cmakeState->m_resultDir == -1)) {
         DrawNamePreviewChara(this, alpha, a);
         DrawCmakeTitle(1, FLOAT_80333258, alpha);
     } else {
@@ -2069,8 +2071,7 @@ void CMenuPcs::CmakeNameDraw()
         0, static_cast<float>(static_cast<int>(DOUBLE_803332b8)), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    int state = MenuS32(this, 0x82C);
-    if ((*reinterpret_cast<short*>(state + 0x10) == 1) && (cmakeState->m_row < 5)) {
+    if ((cmakeState->m_mode == 1) && (cmakeState->m_row < 5)) {
         short row = cmakeState->m_row;
         int cellX = static_cast<int>(
             FLOAT_803332c0 * static_cast<float>(cmakeState->m_select) +
@@ -2089,7 +2090,7 @@ void CMenuPcs::CmakeNameDraw()
             FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
     }
 
-    short table = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x2A);
+    short table = cmakeState->m_table;
     CFont* font = GetCmakeKeyboardFont(this);
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
@@ -2111,8 +2112,7 @@ void CMenuPcs::CmakeNameDraw()
     reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
     DrawInit();
 
-    state = MenuS32(this, 0x82C);
-    if ((*reinterpret_cast<short*>(state + 0x10) == 1) && (cmakeState->m_row < 5)) {
+    if ((cmakeState->m_mode == 1) && (cmakeState->m_row < 5)) {
         int cursorX = static_cast<int>(
             FLOAT_803332c0 * static_cast<float>(cmakeState->m_select) +
             static_cast<float>(FLOAT_803332c8));
@@ -2121,8 +2121,8 @@ void CMenuPcs::CmakeNameDraw()
     }
 
     char* name = GetCmakeNameBuffer();
-    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10))) >> 5;
-    if (4 < *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) {
+    int nameCursor = __cntlzw(static_cast<unsigned int>(1 - cmakeState->m_mode)) >> 5;
+    if (4 < cmakeState->m_row) {
         nameCursor = 0;
     }
     unsigned int nameLen = strlen(name);
@@ -2131,8 +2131,8 @@ void CMenuPcs::CmakeNameDraw()
     }
     DrawCmakeName(0, nameCursor, name, alpha);
     DrawCmakeDecision(
-        (static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28)) >> 31) +
-            (static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28))) > 4),
+        (static_cast<int>(cmakeState->m_row) >> 31) +
+            (static_cast<unsigned int>(static_cast<int>(cmakeState->m_row)) > 4),
         alpha);
 
     if (CmakeMcState(this) != 3) {
@@ -2155,10 +2155,10 @@ void CMenuPcs::CmakeNameDraw()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexOpen()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x16) = 2;
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_step = 2;
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2174,10 +2174,9 @@ void CMenuPcs::CmakeSexOpen()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexCtrl()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& mode = cmakeState->m_mode;
+    short& frame = cmakeState->m_frame;
     short& sel = cmakeState->m_select;
     unsigned short repeat = GetButtonRepeat(0);
     unsigned short down = GetButtonDown(0);
@@ -2193,12 +2192,12 @@ void CMenuPcs::CmakeSexCtrl()
             MenuS16(this, 0x860) = sel;
             mode = 2;
             frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = 1;
+            cmakeState->m_resultDir = 1;
             Sound.PlaySe(2, 0x40, 0x7F, 0);
         } else if (((repeat & 0x3) == 0) && ((down & 0x200) != 0)) {
             mode = 2;
             frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = -1;
+            cmakeState->m_resultDir = -1;
             Sound.PlaySe(3, 0x40, 0x7F, 0);
         } else if (frame < 30) {
             frame = frame + 1;
@@ -2219,9 +2218,9 @@ void CMenuPcs::CmakeSexCtrl()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeSexClose()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2236,6 +2235,7 @@ void CMenuPcs::CmakeSexClose()
  */
 void CMenuPcs::CmakeSexDraw()
 {
+    CmakeMenuState* cmakeState = CmakeState(this);
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0(1, FLOAT_80333258);
 
@@ -2306,8 +2306,8 @@ void CMenuPcs::CmakeSexDraw()
     }
     DrawInit();
 
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
-        int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
+    if (cmakeState->m_mode == 1) {
+        int sel = cmakeState->m_select;
         int frame = System.m_frameCounter & 7;
         int cursorX = static_cast<int>(
             static_cast<double>(static_cast<float>(DOUBLE_80333288 - static_cast<double>(maxWidth) * DOUBLE_80333298) +
@@ -2331,10 +2331,10 @@ void CMenuPcs::CmakeSexDraw()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeTribeOpen()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x16) = 3;
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_step = 3;
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2349,9 +2349,8 @@ void CMenuPcs::CmakeTribeOpen()
  */
 unsigned short CMenuPcs::CmakeTribeCtrl()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultDir = cmakeState->m_resultDir;
     short& tribe = cmakeState->m_select;
     short& crest = cmakeState->m_row;
     short selectField = cmakeState->m_fieldSelect;
@@ -2388,7 +2387,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     }
 
     if (mcState == 3) {
-        short& currentValue = *reinterpret_cast<short*>(state + 0x26 + selectField * 2);
+        short& currentValue = CmakeStateSelectField(cmakeState, selectField);
 
         if ((repeat & 0x8) != 0) {
             if (currentValue == 0) {
@@ -2488,9 +2487,9 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeTribeClose()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2506,7 +2505,6 @@ void CMenuPcs::CmakeTribeClose()
 void CMenuPcs::CmakeTribeDraw()
 {
     float alpha = CalcCmakeFadeAlpha(this);
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
@@ -2598,7 +2596,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawInit();
 
-    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
+    if (cmakeState->m_mode == 1) {
         int select = cmakeState->m_select;
         int frame = System.m_frameCounter & 7;
         int tribeCursorY = 0x88 + select * 0x1C;
@@ -2635,10 +2633,10 @@ void CMenuPcs::CmakeTribeDraw()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeJobOpen()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x16) = 4;
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_step = 4;
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2653,12 +2651,11 @@ void CMenuPcs::CmakeJobOpen()
  */
 unsigned short CMenuPcs::CmakeJobCtrl()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
     short& job = cmakeState->m_select;
     unsigned short down;
     unsigned short repeat;
-    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short& resultDir = cmakeState->m_resultDir;
     short& mcState = CmakeMcState(this);
 
     bool padBusy = false;
@@ -2789,9 +2786,9 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeJobClose()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2806,9 +2803,8 @@ void CMenuPcs::CmakeJobClose()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = *reinterpret_cast<short*>(state + 0x10);
+    short mode = cmakeState->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
@@ -2885,7 +2881,7 @@ void CMenuPcs::CmakeJobDraw()
         font->Draw(txt);
     }
 
-    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
+    if (cmakeState->m_mode == 1) {
         int sel = cmakeState->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
@@ -2914,10 +2910,10 @@ void CMenuPcs::CmakeJobDraw()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultOpen()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x16) = 5;
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_step = 5;
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2933,12 +2929,11 @@ void CMenuPcs::CmakeResultOpen()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultCtrl()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& mode = cmakeState->m_mode;
     short& sel = cmakeState->m_select;
-    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& resultDir = cmakeState->m_resultDir;
+    short& frame = cmakeState->m_frame;
     unsigned short repeat = GetButtonRepeat(0);
     unsigned short down = GetButtonDown(0);
 
@@ -2977,9 +2972,9 @@ void CMenuPcs::CmakeResultCtrl()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultClose()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -2994,10 +2989,9 @@ void CMenuPcs::CmakeResultClose()
  */
 void CMenuPcs::CmakeResultDraw()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = *reinterpret_cast<short*>(state + 0x10);
-    short resultDir = *reinterpret_cast<short*>(state + 0x1E);
+    short mode = cmakeState->m_mode;
+    short resultDir = cmakeState->m_resultDir;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
@@ -3101,7 +3095,7 @@ void CMenuPcs::CmakeResultDraw()
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, crestAlpha);
 
     int yesNoSel = 0;
-    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
+    if (cmakeState->m_mode == 1) {
         yesNoSel = cmakeState->m_select + 1;
     }
     DrawCmakeYesNo(yesNoSel, alpha);
@@ -3195,9 +3189,9 @@ void CMenuPcs::CmakeResultDraw()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultOpen1()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 0;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 0;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -3213,9 +3207,9 @@ void CMenuPcs::CmakeResultOpen1()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultCtrl1()
 {
-    int state = MenuS32(this, 0x82C);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    CmakeMenuState* cmakeState = CmakeState(this);
+    short& mode = cmakeState->m_mode;
+    short& frame = cmakeState->m_frame;
     unsigned short down = GetButtonDown(0);
 
     if (frame < 10) {
@@ -3242,9 +3236,9 @@ void CMenuPcs::CmakeResultCtrl1()
 #ifndef VERSION_GCCP01
 void CMenuPcs::CmakeResultClose1()
 {
-    int state = MenuS32(this, 0x82C);
-    *reinterpret_cast<short*>(state + 0x10) = 2;
-    *reinterpret_cast<short*>(state + 0x22) = 0;
+    CmakeMenuState* cmakeState = CmakeState(this);
+    cmakeState->m_mode = 2;
+    cmakeState->m_frame = 0;
 }
 #endif
 
@@ -3259,9 +3253,8 @@ void CMenuPcs::CmakeResultClose1()
  */
 void CMenuPcs::CmakeResultDraw1()
 {
-    int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = *reinterpret_cast<short*>(state + 0x10);
+    short mode = cmakeState->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
     float popupAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
 
@@ -3384,7 +3377,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawInit();
 
-    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
+    if (cmakeState->m_mode == 1) {
         int cursorX = static_cast<int>(FLOAT_80333304 + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
         int cursorY = 0x70 + cmakeState->m_select * 0x28;
         DrawCursor(cursorX, cursorY, alpha);

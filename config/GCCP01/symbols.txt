@@ -13813,6 +13813,7 @@ g_hit_edge_idx_min = .sbss:0x8032EC78; // type:object size:0x4 data:4byte
 g_hit_t = .sbss:0x8032EC7C; // type:object size:0x4 align:4 data:float
 g_hit_t_min = .sbss:0x8032EC80; // type:object size:0x4 align:4 data:float
 g_hit_t_slide_min = .sbss:0x8032EC84; // type:object size:0x4 align:4 data:float
+g_hit_edge_t = .sbss:0x8032EC88; // type:object size:0x4 align:4 data:float
 g_hit_lpface = .sbss:0x8032EC8C; // type:object size:0x4 data:4byte
 g_hit_f = .sbss:0x8032EC90; // type:object size:0x4 data:4byte
 g_hit_lpface_min = .sbss:0x8032EC94; // type:object size:0x4 data:4byte

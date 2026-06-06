@@ -15,7 +15,11 @@
 #include <math.h>
 
 extern "C" char s_MenuUtil_cpp_801e37fc[];
-extern char lbl_801E3058[];
+struct MenuOptionEstandarData {
+	char m_text[0x0C];
+	u32 m_helpLineBaseY[4];
+};
+
 extern "C" const char s_MenuOptionMusic[] = "Music";
 extern "C" const char s_MenuOptionOn[] = "On";
 extern "C" const char s_MenuOptionOff[] = "Off";
@@ -165,7 +169,7 @@ extern char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[];
 extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
-extern char s_MenuOptionEstandar_801E36C4[];
+extern MenuOptionEstandarData s_MenuOptionEstandar_801E36C4;
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];
@@ -230,7 +234,7 @@ extern "C" char* g_strMenuUtilMes[] = {
 	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
 	const_cast<char*>(s_Apagado_80333528), const_cast<char*>(s_MenuOptionEstereo_80333530), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
-	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4,
+	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4.m_text,
 };
 
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
@@ -386,7 +390,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const u32* lineBaseData = reinterpret_cast<const u32*>(lbl_801E3058 + 0x678);
+	const u32* lineBaseData = s_MenuOptionEstandar_801E36C4.m_helpLineBaseY;
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];

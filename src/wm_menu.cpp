@@ -3726,11 +3726,12 @@ void CMenuPcs::DrawDiaryMenu()
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		Vec target = {FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc};
-		Vec up = {FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc};
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
 		Mtx savedCamera;
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60), &up, &target);
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60), reinterpret_cast<Vec*>(&up),
+		    reinterpret_cast<Point3d*>(&target));
 		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);

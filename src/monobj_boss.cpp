@@ -124,6 +124,21 @@ struct DuctBossWork {
     CGMonObj* m_objs[3];
 };
 
+struct SawBossWork {
+    u8 m_pad00[0x08];
+    int m_cooldown;
+    u8 m_pad0C[0x08];
+    union {
+        u8 m_flags;
+        struct {
+            s8 m_bit80 : 1;
+            u8 m_rest : 7;
+        } bits;
+    };
+};
+STATIC_ASSERT(offsetof(SawBossWork, m_cooldown) == 0x08);
+STATIC_ASSERT(offsetof(SawBossWork, m_flags) == 0x14);
+
 struct LKShooterBossWork {
     u8 m_pad00[0x08];
     int m_stunTimer;
@@ -875,22 +890,23 @@ void CGMonObj::frameStatFuncSaw()
 void CGMonObj::logicFuncSaw()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	int& bossState = CFlatBossState();
-	unsigned char& aiWork = m_unk6D4[0];
+	int bossState = CFlatBossState();
 
-	if (bossState == 0 && (aiWork & 0x80) != 0) {
-		aiWork &= 0x7F;
+	if (bossState == 0 && reinterpret_cast<SawBossWork*>(m_boss__8CGMonObj)->bits.m_bit80 != 0) {
+		reinterpret_cast<SawBossWork*>(m_boss__8CGMonObj)->bits.m_bit80 = 0;
 	}
 
-	if ((bossState == 0) || ((aiWork & 0x80) != 0)) {
+	if ((bossState != 0) && (reinterpret_cast<SawBossWork*>(m_boss__8CGMonObj)->bits.m_bit80 == 0)) {
+		if (prgObj->m_lastStateId != 100) {
+			prgObj->changeStat(100, 0, 0);
+		}
+	} else {
 		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
 			prgObj->addSubStat();
 		}
-	} else if (prgObj->m_lastStateId != 100) {
-		prgObj->changeStat(100, 0, 0);
 	}
-	int& cooldown = *reinterpret_cast<int*>(SoundBuffer + 1268);
-	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
+	int cooldown = reinterpret_cast<SawBossWork*>(m_boss__8CGMonObj)->m_cooldown - 1;
+	reinterpret_cast<SawBossWork*>(m_boss__8CGMonObj)->m_cooldown = cooldown & ~(cooldown >> 31);
 }
 
 /*

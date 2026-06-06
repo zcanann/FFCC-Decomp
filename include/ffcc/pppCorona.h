@@ -6,6 +6,13 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct CoronaDataOffsets {
+    s32 _unused0;
+    s32 _unused1;
+    s32 m_vecWorkOffset;
+    s32 m_workOffset;
+};
+
 struct CoronaParam {
     s32 m_graphId;
     s32 m_dataValIndex;

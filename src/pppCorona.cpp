@@ -42,18 +42,12 @@ struct CoronaVecWork {
     u8 m_alpha;
 };
 
-struct CoronaDataOffsets {
-    s32 _unused0;
-    s32 _unused1;
-    s32 m_vecWorkOffset;
-    s32 m_workOffset;
-};
-
 STATIC_ASSERT(offsetof(CoronaWork, m_shapeX) == 0x0);
 STATIC_ASSERT(offsetof(CoronaWork, m_scaleX) == 0x8);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_cameraOffset) == 0x10);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_translate) == 0x20);
 STATIC_ASSERT(offsetof(CoronaVecWork, m_alpha) == 0x32);
+STATIC_ASSERT(sizeof(CoronaDataOffsets) == 0x10);
 STATIC_ASSERT(offsetof(CoronaDataOffsets, m_vecWorkOffset) == 0x8);
 STATIC_ASSERT(offsetof(CoronaDataOffsets, m_workOffset) == 0xC);
 

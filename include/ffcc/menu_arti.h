@@ -13,7 +13,7 @@ struct ArtiState
     short state;
     unsigned char pad_0012[0x0C];
     short moveDirection;
-    unsigned char pad_0020[2];
+    unsigned short optionCloseReady;
     short frame;
     unsigned char pad_0024[2];
     short selections[5];

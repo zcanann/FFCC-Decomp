@@ -4,10 +4,7 @@
 
 extern "C" const float kPppPointZero = 0.0f;
 
-struct PppPointDataOffsets {
-	s32 m_pointOffset;
-};
-
+STATIC_ASSERT(sizeof(PppPointDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppPointDataOffsets, m_pointOffset) == 0x0);
 
 static inline PppPointDataOffsets* GetPppPointDataOffsets(_pppCtrlTable* ctrlTable)

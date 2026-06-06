@@ -1,16 +1,22 @@
 #ifndef _PPP_POINT_H_
 #define _PPP_POINT_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct PppPointDataOffsets {
+    s32 m_pointOffset;
+};
+
 struct pppPointStep
 {
-    int m_graphId;
-    float m_unknown4;
-    float m_x;
-    float m_y;
-    float m_z;
+    s32 m_graphId;
+    f32 m_unknown4;
+    f32 m_x;
+    f32 m_y;
+    f32 m_z;
 };
 
 #ifdef __cplusplus

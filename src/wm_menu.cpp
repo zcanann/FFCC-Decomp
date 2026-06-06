@@ -4744,15 +4744,16 @@ void CMenuPcs::DrawTitleMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx m_cameraMatrix;
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	short state = *reinterpret_cast<short*>(worldState + 0x10);
+	WmWorldState* const typedWorldState = m_wmWorldState;
+	int worldState = reinterpret_cast<int>(typedWorldState);
+	short state = typedWorldState->m_mainState;
 
-		if (state == 0 && *reinterpret_cast<char*>(worldState + 8) != 0) {
+		if (state == 0 && typedWorldState->m_worldReady != 0) {
 			if (m_wmThpActive != 0) {
 				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
 			}
-		short sVarE = *reinterpret_cast<short*>(worldState + 0x0E);
-		if (sVarE != 0 || *reinterpret_cast<short*>(worldState + 0x22) > 0xB42) {
+		short sVarE = typedWorldState->m_state0E;
+		if (sVarE != 0 || typedWorldState->m_frameCounter > 0xB42) {
 			if (sVarE != -1) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -4764,12 +4765,11 @@ void CMenuPcs::DrawTitleMenu()
 				}
 				m_wmThpActive = 0;
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
-			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) = 0;
+			typedWorldState->m_mainState++;
+			typedWorldState->m_frameCounter = 0;
+			typedWorldState->m_titleState = 0;
+			typedWorldState->m_state0E = 0;
+			typedWorldState->m_state12 = 0;
 			CFlatRuntime::CStack flatArgs[3];
 			flatArgs[0].m_word = 9;
 			flatArgs[1].m_word = 0;

@@ -1893,35 +1893,41 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	memcpy(localMapItems, obj + 0x2434, sizeof(localMapItems));
 
 	localEntry = localMapItems;
-	for (i = 0; i < m_mapItemCount; i++) {
-		int localX = static_cast<int>(*reinterpret_cast<short*>(localEntry + 8)) - static_cast<int>(baseX);
-		int localZ = static_cast<int>(*reinterpret_cast<short*>(localEntry + 10)) - static_cast<int>(baseZ);
+	i = 0;
+	while (i < m_mapItemCount) {
+		*reinterpret_cast<short*>(localEntry + 8) =
+			static_cast<short>(*reinterpret_cast<short*>(localEntry + 8) - baseX);
+		*reinterpret_cast<short*>(localEntry + 10) =
+			static_cast<short>(*reinterpret_cast<short*>(localEntry + 10) - baseZ);
 
-		*reinterpret_cast<short*>(localEntry + 8) = static_cast<short>(localX);
-		*reinterpret_cast<short*>(localEntry + 10) = static_cast<short>(localZ);
+		short localX = *reinterpret_cast<short*>(localEntry + 8);
+		short localZ = *reinterpret_cast<short*>(localEntry + 10);
 
 		if ((localX < 0 ? -localX : localX) < 0x50 && (localZ < 0 ? -localZ : localZ) < 0x40) {
 			localEntry[0] = 1;
 		} else {
-			localEntry[8] = -1;
-			localEntry[9] = -1;
-			localEntry[10] = -1;
-			localEntry[11] = -1;
+			*reinterpret_cast<short*>(localEntry + 8) = -1;
+			*reinterpret_cast<short*>(localEntry + 10) = -1;
 			localEntry[0] = 0;
 		}
 
-		if (localEntry[2] == 0 || m_radarType[channel] != 3) {
+		if (localEntry[2] == 0) {
+			localEntry[0] = 0;
+		}
+		if (m_radarType[channel] != 3) {
 			localEntry[0] = 0;
 		}
 
 		localEntry += 0x14;
+		i++;
 	}
 
 	count = 0;
 	localEntry = localMapItems;
 	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
-	for (i = 0; i < m_mapItemCount; i++) {
+	i = 0;
+	while (i < m_mapItemCount) {
 		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
 			count++;
 			outPtr[0] = 0x21;
@@ -1933,6 +1939,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 		localEntry += 0x14;
 		prevEntry += 0x14;
+		i++;
 	}
 
 	*outCount = count;

@@ -3627,11 +3627,10 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 inline void GbaQueue::ClrShopFlg(int channel)
 {
 	const unsigned char playerMask = static_cast<unsigned char>(1 << channel);
-	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	flags[0] = static_cast<unsigned char>(flags[0] & ~playerMask);
-	flags[1] = static_cast<unsigned char>(flags[1] & ~playerMask);
+	m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~playerMask);
+	m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~playerMask);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (int retry = 0; retry < 10; retry++) {
@@ -3649,11 +3648,10 @@ inline void GbaQueue::ClrShopFlg(int channel)
 inline void GbaQueue::ClrSmithFlg(int channel)
 {
 	const unsigned char shopMask = static_cast<unsigned char>(0x10 << channel);
-	unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x2D38;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	flags[0] = static_cast<unsigned char>(flags[0] & ~shopMask);
-	flags[1] = static_cast<unsigned char>(flags[1] & ~shopMask);
+	m_shopFlags = static_cast<unsigned char>(m_shopFlags & ~shopMask);
+	m_shopStatusFlags = static_cast<unsigned char>(m_shopStatusFlags & ~shopMask);
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	for (int retry = 0; retry < 10; retry++) {

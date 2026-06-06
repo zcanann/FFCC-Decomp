@@ -24,10 +24,9 @@ static const double DOUBLE_80333410 = 1.0;
 static const double DOUBLE_80333418 = 0.0;
 static const double DOUBLE_80333420 = 216.0;
 
-STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
-STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
-STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, lstData) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(MenuLstEntry, tex) == 0x1C);
 STATIC_ASSERT(offsetof(MenuLstEntry, timer) == 0x20);
 STATIC_ASSERT(offsetof(MenuLstEntry, startFrame) == 0x24);
@@ -55,10 +54,10 @@ void CMenuPcs::MLstDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	short menuMode = this->lstState->mode;
-	MenuLstEntry* item = this->lstData->entries;
+	short menuMode = this->m_menuLstState->mode;
+	MenuLstEntry* item = this->m_menuLstList->entries;
 
-	for (int i = 0; i < this->lstData->count; i++) {
+	for (int i = 0; i < this->m_menuLstList->count; i++) {
 		int tex = item->tex;
 		if (tex >= 0) {
 			float x = (float)item->x;
@@ -77,7 +76,7 @@ void CMenuPcs::MLstDraw()
 			color.a = (unsigned char)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			if ((menuMode == 1) && (i == this->lstState->cursor)) {
+			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				x = (float)(x + 20.0);
 				v += (float)((double)item->height);
 			}
@@ -88,7 +87,7 @@ void CMenuPcs::MLstDraw()
 			float iconX = (float)item->x;
 			float iconY = (float)(item->y - 6);
 			v = zero;
-			if ((menuMode == 1) && (i == this->lstState->cursor)) {
+			if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 				v += (float)((double)item->height);
 			}
 			MenuPcs.DrawRect(
@@ -106,14 +105,14 @@ void CMenuPcs::MLstDraw()
 		item++;
 	}
 
-	CFont* font = this->listFont;
+	CFont* font = this->m_fonts[4];
 	font->SetMargin(FLOAT_803333F0);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803333F0);
 	font->DrawInit();
 
-	item = this->lstData->entries;
-	for (int i = 0; i < this->lstData->count; i++) {
+	item = this->m_menuLstList->entries;
+	for (int i = 0; i < this->m_menuLstList->count; i++) {
 		CColor color(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha));
 		font->SetColor(color.color);
 
@@ -122,7 +121,7 @@ void CMenuPcs::MLstDraw()
 
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y + 3);
-		if ((menuMode == 1) && (i == this->lstState->cursor)) {
+		if ((menuMode == 1) && (i == this->m_menuLstState->cursor)) {
 			textX = (float)(textX + 20.0);
 		}
 
@@ -135,7 +134,7 @@ void CMenuPcs::MLstDraw()
 
 	DrawInit();
 	if (menuMode == 1) {
-		MenuLstEntry* curItem = &this->lstData->entries[this->lstState->cursor];
+		MenuLstEntry* curItem = &this->m_menuLstList->entries[this->m_menuLstState->cursor];
 		float cursorYF = (float)((double)(curItem->height - 0x20) * DOUBLE_803333E8 + (double)curItem->y);
 		int cursorY = (int)cursorYF;
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
@@ -143,9 +142,9 @@ void CMenuPcs::MLstDraw()
 	}
 
 	DrawInit();
-	int helpMessageId = this->lstState->cursor + 0x25c;
-	CFont* helpFont = this->helpFont;
-	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->lstData->entries[0].alpha));
+	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
+	CFont* helpFont = this->m_fonts[0];
+	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha));
 	float helpX = FLOAT_803333F8;
 	float helpY = 352.0f;
 	DrawHelpMessage(
@@ -179,10 +178,10 @@ int CMenuPcs::MLstClose()
 	int result;
 
 	completedItems = 0;
-	this->lstState->frame = this->lstState->frame + 1;
-	itemCount = this->lstData->count;
-	entry = this->lstData->entries;
-	currentFrame = (int)this->lstState->frame;
+	this->m_menuLstState->frame = this->m_menuLstState->frame + 1;
+	itemCount = this->m_menuLstList->count;
+	entry = this->m_menuLstList->entries;
+	currentFrame = (int)this->m_menuLstState->frame;
 	for (int remaining = itemCount; remaining > 0; remaining--) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
@@ -200,9 +199,9 @@ int CMenuPcs::MLstClose()
 		entry++;
 	}
 	result = 0;
-	if (this->lstData->count == completedItems) {
+	if (this->m_menuLstList->count == completedItems) {
 		zero = FLOAT_803333D0;
-		entry = this->lstData->entries;
+		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;
@@ -241,28 +240,28 @@ int CMenuPcs::MLstCtrl()
 	int result;
 
 	blocked = false;
-	padLock = Pad._452_4_;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	padLock = Pad.m_debugPadLock;
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		rawPress = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	press = rawPress & 0xffff;
 
 	blocked = false;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		rawHold = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 	hold = rawHold & 0xffff;
@@ -271,19 +270,19 @@ int CMenuPcs::MLstCtrl()
 		result = 0;
 	} else {
 		if ((hold & 0x48) != 0) {
-			int cursor = this->lstState->cursor;
+			int cursor = this->m_menuLstState->cursor;
 			if (cursor != 0) {
-				this->lstState->cursor = cursor - 1;
+				this->m_menuLstState->cursor = cursor - 1;
 			} else {
-				this->lstState->cursor = 8;
+				this->m_menuLstState->cursor = 8;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 0x24) != 0) {
-			int cursor = this->lstState->cursor;
+			int cursor = this->m_menuLstState->cursor;
 			if (cursor < 8) {
-				this->lstState->cursor = cursor + 1;
+				this->m_menuLstState->cursor = cursor + 1;
 			} else {
-				this->lstState->cursor = 0;
+				this->m_menuLstState->cursor = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
@@ -293,7 +292,7 @@ int CMenuPcs::MLstCtrl()
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
 				result = 1;
 			} else if ((press & 0x200) != 0) {
-				this->lstState->closeRequested = (char)0xFF;
+				this->m_menuLstState->closeRequested = (char)0xFF;
 				Sound.PlaySe(3, 0x40, 0x7f, 0);
 				result = 1;
 			} else {
@@ -306,8 +305,8 @@ int CMenuPcs::MLstCtrl()
 
 	if (result != 0) {
 		one = FLOAT_803333F0;
-		MenuLstEntry* entry = this->lstData->entries;
-		for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
+		MenuLstEntry* entry = this->m_menuLstList->entries;
+		for (i = 0; (itemCount = (unsigned int)this->m_menuLstList->count), i < (int)itemCount; i++) {
 			entry->alpha = one;
 			entry->z = one;
 			entry++;
@@ -315,13 +314,13 @@ int CMenuPcs::MLstCtrl()
 
 		startFrame = 0;
 		duration = 4;
-		for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
-			MenuLstEntry* closeEntry = &this->lstData->entries[idx];
+		for (int idx = this->m_menuLstList->count - 1; idx >= 0; idx--) {
+			MenuLstEntry* closeEntry = &this->m_menuLstList->entries[idx];
 			closeEntry->startFrame = startFrame++;
 			closeEntry->duration = duration;
 		}
 
-		this->lstState->frame = 0;
+		this->m_menuLstState->frame = 0;
 	}
 	return result;
 }
@@ -345,7 +344,7 @@ int CMenuPcs::MLstOpen()
 	int currentFrame;
 	int count;
 
-	if (this->lstState->initialized == '\0') {
+	if (this->m_menuLstState->initialized == '\0') {
 		int i;
 		short initializedCount;
 		short yPos;
@@ -353,9 +352,9 @@ int CMenuPcs::MLstOpen()
 		double xOrigin;
 		float zero;
 
-		memset(this->lstData, 0, sizeof(MenuLstList));
+		memset(this->m_menuLstList, 0, sizeof(MenuLstList));
 		one = FLOAT_803333F0;
-		entry = this->lstData->entries;
+		entry = this->m_menuLstList->entries;
 		for (i = 0; i < 64; i++, entry++) {
 			entry->z = one;
 		}
@@ -366,7 +365,7 @@ int CMenuPcs::MLstOpen()
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
-			entry = &this->lstData->entries[i];
+			entry = &this->m_menuLstList->entries[i];
 			entry->unk_2C = 2;
 			initializedCount++;
 			entry->tex = 0x5B;
@@ -380,15 +379,15 @@ int CMenuPcs::MLstOpen()
 			entry->startFrame = i;
 			entry->duration = 4;
 		}
-		this->lstData->count = initializedCount;
-		this->lstState->initialized = 1;
+		this->m_menuLstList->count = initializedCount;
+		this->m_menuLstState->initialized = 1;
 	}
 
 	completedItems = 0;
-	this->lstState->frame = this->lstState->frame + 1;
-	itemCount = this->lstData->count;
-	entry = this->lstData->entries;
-	currentFrame = (int)this->lstState->frame;
+	this->m_menuLstState->frame = this->m_menuLstState->frame + 1;
+	itemCount = this->m_menuLstList->count;
+	entry = this->m_menuLstList->entries;
+	currentFrame = (int)this->m_menuLstState->frame;
 	for (int remaining = itemCount; remaining > 0; remaining--) {
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
@@ -404,9 +403,9 @@ int CMenuPcs::MLstOpen()
 	}
 
 	int result = 0;
-	if (this->lstData->count == completedItems) {
+	if (this->m_menuLstList->count == completedItems) {
 		one = FLOAT_803333F0;
-		entry = this->lstData->entries;
+		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
 			entry->duration = 1;

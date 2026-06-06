@@ -301,10 +301,10 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 
 	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
 
-	int padLock = Pad._452_4_;
+	int padLock = Pad.m_debugPadLock;
 	bool padBusy = false;
 
-	if (padLock != 0 || Pad._448_4_ != -1)
+	if (padLock != 0 || Pad.m_debugPadPort != -1)
 	{
 		padBusy = true;
 	}
@@ -317,7 +317,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	else
 	{
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 		trig1 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
@@ -327,7 +327,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 
 	padBusy = false;
-	if (padLock != 0 || Pad._448_4_ != -1)
+	if (padLock != 0 || Pad.m_debugPadPort != -1)
 	{
 		padBusy = true;
 	}
@@ -340,7 +340,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	else
 	{
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 		trig2 = Pad.GetPadInputs()[padIndex].button[0];
 	}
 

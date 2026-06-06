@@ -114,7 +114,7 @@ static const char s_cflatLoadNotCompleted[] = "\226\242\212\256\227\271";
 
 static inline int RemapPadSlot(CPad* pad, int padIndex)
 {
-    int activePad = pad->_448_4_;
+    int activePad = pad->m_debugPadPort;
     return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
 }
 
@@ -714,11 +714,11 @@ unsigned short CPad::GetGbaButtonDown(long padIndex)
     bool isInvalidPad = false;
     unsigned int result;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -748,11 +748,11 @@ float CPad::GetRightStickY(long padIndex)
 {
     bool isInvalidPad = false;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -780,11 +780,11 @@ float CPad::GetRightStickX(long padIndex)
 {
     bool isInvalidPad = false;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -812,11 +812,11 @@ float CPad::GetLeftStickY(long padIndex)
 {
     bool isInvalidPad = false;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -844,11 +844,11 @@ float CPad::GetLeftStickX(long padIndex)
 {
     bool isInvalidPad = false;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -877,11 +877,11 @@ unsigned short CPad::GetButtonRepeat(long padIndex)
     bool isInvalidPad = false;
     unsigned int result;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }
@@ -912,11 +912,11 @@ unsigned short CPad::GetButton(long padIndex)
     bool isInvalidPad = false;
     unsigned int result;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto done_check;
         }
     }

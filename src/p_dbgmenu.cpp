@@ -219,10 +219,10 @@ void CDbgMenuPcs::calc()
 		return;
 	}
 
-	if (Pad._452_4_ != 0) {
+	if (Pad.m_debugPadLock != 0) {
 		padInput = 0;
 	} else {
-		padOffset = (Pad._448_4_ == 4) ? 0 : 4U;
+		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 
@@ -311,10 +311,10 @@ void CDbgMenuPcs::calc()
 		}
 	}
 
-	if (Pad._452_4_ != 0) {
+	if (Pad.m_debugPadLock != 0) {
 		padInput = 0;
 	} else {
-		padOffset = (Pad._448_4_ == 4) ? 0 : 4U;
+		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 4) != 0) {
@@ -329,10 +329,10 @@ void CDbgMenuPcs::calc()
 		m_selectedMenu->m_statusBits.m_selected = 1;
 	}
 
-	if (Pad._452_4_ != 0) {
+	if (Pad.m_debugPadLock != 0) {
 		padInput = 0;
 	} else {
-		padOffset = (Pad._448_4_ == 4) ? 0 : 4U;
+		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 8) != 0) {
@@ -351,10 +351,10 @@ void CDbgMenuPcs::calc()
 		calcMenu(m_rootMenuNode.m_firstChild);
 	}
 
-	if (Pad._452_4_ != 0) {
+	if (Pad.m_debugPadLock != 0) {
 		padInput = 0;
 	} else {
-		padOffset = (Pad._448_4_ == 4) ? 0 : 4U;
+		padOffset = (Pad.m_debugPadPort == 4) ? 0 : 4U;
 		padInput = Pad.GetPadInputs()[padOffset].buttonDown[0];
 	}
 	if ((padInput & 0x200) != 0) {
@@ -364,7 +364,7 @@ void CDbgMenuPcs::calc()
 		m_selectedMenu = 0;
 	}
 
-	Pad._452_4_ = 1;
+	Pad.m_debugPadLock = 1;
 }
 
 /*

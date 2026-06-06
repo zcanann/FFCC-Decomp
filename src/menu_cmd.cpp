@@ -158,19 +158,6 @@ static const char* GetUniteListName(int itemId)
 	return flatText[itemId * 5 + 4];
 }
 
-struct MenuCmdMembers {
-	unsigned char pad_0000[0xF8];
-	CFont* m_helpFont;
-	unsigned char pad_00FC[0x0C];
-	CFont* m_nameFont;
-	unsigned char pad_010C[0x720];
-	s16* m_cmdState;
-	unsigned char pad_0830[0x20];
-	s16* m_cmdList;
-	unsigned char pad_0854[0x10];
-	s16 m_cmdLayoutFlag;
-};
-
 struct CmdListStorage {
 	s16 count;
 	s16 selected;
@@ -178,32 +165,17 @@ struct CmdListStorage {
 	unsigned char entries[64][0x40];
 };
 
-STATIC_ASSERT(offsetof(MenuCmdMembers, m_helpFont) == 0xF8);
-STATIC_ASSERT(offsetof(MenuCmdMembers, m_nameFont) == 0x108);
-STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdState) == 0x82C);
-STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdList) == 0x850);
-STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CmdListStorage, entries) == 8);
 STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
 
-static inline MenuCmdMembers& GetMenuCmdMembers(CMenuPcs* menu)
-{
-	return *reinterpret_cast<MenuCmdMembers*>(menu);
-}
-
-static inline const MenuCmdMembers& GetMenuCmdMembers(const CMenuPcs* menu)
-{
-	return *reinterpret_cast<const MenuCmdMembers*>(menu);
-}
-
 static inline s16* GetCmdState(CMenuPcs* menu)
 {
-	return GetMenuCmdMembers(menu).m_cmdState;
+	return menu->m_cmdState;
 }
 
 static inline s16* GetCmdList(CMenuPcs* menu)
 {
-	return GetMenuCmdMembers(menu).m_cmdList;
+	return menu->m_cmdList;
 }
 
 static inline CmdListStorage* GetCmdListStorage(CMenuPcs* menu)
@@ -223,7 +195,7 @@ static inline int GetCmdListBase(CMenuPcs* menu)
 
 static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 {
-	return GetMenuCmdMembers(menu).m_cmdLayoutFlag;
+	return menu->m_cmdLayoutFlag;
 }
 
 static inline s16 GetUniteRecipeCmd(int recipe)
@@ -1104,7 +1076,7 @@ void CMenuPcs::CmdDraw()
 		entry += 0x20;
 	}
 
-	CFont* nameFont = GetMenuCmdMembers(this).m_nameFont;
+	CFont* nameFont = m_fonts[4];
 	nameFont->SetMargin(FLOAT_80332a70);
 	nameFont->SetShadow(0);
 	nameFont->SetScale(FLOAT_80332ad8);
@@ -1184,7 +1156,7 @@ void CMenuPcs::CmdDraw()
 		    *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
 		    FLOAT_80332a70, *reinterpret_cast<float*>(panel + 10), 0.0f);
 
-		CFont* choiceFont = GetMenuCmdMembers(this).m_helpFont;
+		CFont* choiceFont = m_fonts[0];
 		choiceFont->SetMargin(FLOAT_80332a70);
 		choiceFont->SetShadow(1);
 		choiceFont->SetScale(FLOAT_80332ad8);
@@ -1329,7 +1301,7 @@ void CMenuPcs::CmdDraw()
 	helpColor.b = 0xFF;
 	helpColor.a = static_cast<u8>(FLOAT_80332acc * helpAlpha);
 	DrawHelpMessage(
-	    helpId, GetMenuCmdMembers(this).m_helpFont, 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
+	    helpId, m_fonts[0], 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
 	    FLOAT_80332a88, FLOAT_80332b08);
 }
 
@@ -1349,7 +1321,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	u16 hold;
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -1359,7 +1331,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	}
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -2171,7 +2143,7 @@ void CMenuPcs::DrawUniteList()
 			FLOAT_80332a70);
 	}
 
-	CFont* const font = GetMenuCmdMembers(this).m_helpFont;
+	CFont* const font = m_fonts[0];
 	font->SetMargin(FLOAT_80332a70);
 	font->SetShadow(1);
 	font->SetScale(FLOAT_80332ad8);

@@ -475,25 +475,25 @@ void CCharaPcs::calcViewer()
     unsigned int heldButtons;
     unsigned int triggerButtons;
     bool padDisabled = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         padDisabled = true;
     }
     if (padDisabled) {
         heldButtons = 0;
     } else {
         int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
         heldButtons = Pad.GetPadInputs()[padIndex].button[0];
     }
     padDisabled = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         padDisabled = true;
     }
     if (padDisabled) {
         triggerButtons = 0;
     } else {
         int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
         triggerButtons = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
 
@@ -627,11 +627,11 @@ void CCharaPcs::calcViewer()
         }
 
         float rotY;
-        if (Pad._452_4_ != 0) {
+        if (Pad.m_debugPadLock != 0) {
             rotY = LoadFloat(kCharaViewerZero);
         } else {
             unsigned int padIndex = 4;
-            padIndex &= ~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31);
+            padIndex &= ~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 31);
             rotY = Pad.GetPadInputs()[padIndex].substickXF;
         }
         srt.rotY = srt.rotY + rotY;

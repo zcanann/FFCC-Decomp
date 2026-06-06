@@ -335,25 +335,25 @@ void CSystem::ExecScenegraph()
         File.Frame();
         Memory.Frame();
 
-        if (Pad._452_4_ != 0)
+        if (Pad.m_debugPadLock != 0)
         {
             stepTrigger = 0;
         }
         else
         {
-            unsigned int stepPad = (Pad._448_4_ == 4) ? 0 : 4;
-            stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
+            unsigned int stepPad = (Pad.m_debugPadPort == 4) ? 0 : 4;
+            stepTrigger = Pad.GetPadInputs()[stepPad].lockedButton[1];
         }
         stepTrigger = (unsigned short)stepTrigger;
 
-        if (Pad._452_4_ != 0)
+        if (Pad.m_debugPadLock != 0)
         {
             perfTrigger = 0;
         }
         else
         {
-            unsigned int perfPad = (Pad._448_4_ == 4) ? 0 : 4;
-            perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + perfPad * 0x54);
+            unsigned int perfPad = (Pad.m_debugPadPort == 4) ? 0 : 4;
+            perfTrigger = Pad.GetPadInputs()[perfPad].lockedButton[0];
         }
         perfTrigger = (unsigned short)perfTrigger;
 
@@ -393,7 +393,7 @@ void CSystem::ExecScenegraph()
                 bool noInput;
 
                 noInput = false;
-                if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                if ((Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1)))
                 {
                     noInput = true;
                 }
@@ -403,13 +403,13 @@ void CSystem::ExecScenegraph()
                 }
                 else
                 {
-                    unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
-                    trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
+                    unsigned int padIndex = (Pad.m_debugPadPort == port) ? 0 : port;
+                    trigger = Pad.GetPadInputs()[padIndex].buttonDown[1];
                 }
                 trigger = (unsigned short)trigger;
 
                 noInput = false;
-                if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+                if ((Pad.m_debugPadLock != 0) || ((port == 0) && (Pad.m_debugPadPort != -1)))
                 {
                     noInput = true;
                 }
@@ -419,8 +419,8 @@ void CSystem::ExecScenegraph()
                 }
                 else
                 {
-                    unsigned int padIndex = (Pad._448_4_ == port) ? 0 : port;
-                    held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
+                    unsigned int padIndex = (Pad.m_debugPadPort == port) ? 0 : port;
+                    held = Pad.GetPadInputs()[padIndex].buttonDown[0];
                 }
                 held = (unsigned short)held;
 

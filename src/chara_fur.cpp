@@ -917,7 +917,7 @@ namespace {
 
 static inline bool HasDebugPadOverride()
 {
-	return (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+	return (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
 }
 
 static inline unsigned short MogHeldButtons()

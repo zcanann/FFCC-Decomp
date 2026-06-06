@@ -439,17 +439,17 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 void CGItemObj::onFrameAlways()
 {
 	unsigned char* self = (unsigned char*)this;
-	int countdown = *(int*)(self + 0x56C);
+	int countdown = m_itemJumpCountdown;
 
 	if (countdown != 0) {
 		const float& scale = FLOAT_80331b68;
 		int next = countdown - 1;
-		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
-		float radius = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C));
-		*(float*)(self + 0x144) = radius * scale;
+		m_itemJumpCountdown = next & ~(next >> 0x1F);
+		float radius = m_savedBodyRadius * (float)(8 - m_itemJumpCountdown);
+		m_bodyEllipsoidRadius = radius * scale;
 	}
 
-	if (*(int*)(self + 0x500) == 0xA) {
+	if (m_worldParamA == 0xA) {
 		int canUseTrace;
 
 		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&

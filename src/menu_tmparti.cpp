@@ -54,7 +54,7 @@ static inline TmpArtiEntry* GetTmpArtiEntries(CMenuPcs* menu)
 
 static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 {
-    return menu->m_tmpArtiFont;
+    return menu->m_fonts[4];
 }
 } // namespace
 
@@ -70,7 +70,7 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 inline int CMenuPcs::TmpArtiCtrlCur()
 {
     bool hasInput = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         hasInput = true;
     }
 
@@ -79,7 +79,7 @@ inline int CMenuPcs::TmpArtiCtrlCur()
         buttonDown = 0;
     } else {
         int padIndex = 0;
-        padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+        padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
         buttonDown = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
 

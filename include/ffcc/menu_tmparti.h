@@ -1,7 +1,7 @@
 #ifndef _FFCC_MENU_TMPARTI_H_
 #define _FFCC_MENU_TMPARTI_H_
 
-class CFont;
+#include "ffcc/p_menu.h"
 
 struct TmpArtiState
 {
@@ -44,41 +44,6 @@ struct TmpArtiList
     short pad_02;
     int pad_04;
     TmpArtiEntry entries[64];
-};
-
-class CMenuPcs
-{
-public:
-    enum FMT
-    {
-        TODO_FMT
-    };
-
-    enum TEX
-    {
-        TODO_TEX
-    };
-
-    void DrawInit();
-    void SetAttrFmt(FMT);
-    void SetTexture(TEX);
-    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
-    void DrawSingleIcon(int, int, int, float, int, float);
-
-    unsigned int TmpArtiOpen();
-    int TmpArtiCtrl();
-    unsigned int TmpArtiClose();
-    void TmpArtiDraw();
-    void TmpArtiInit();
-    void TmpArtiInit0();
-    int TmpArtiCtrlCur();
-
-    char pad_0000[0x108];
-    CFont* m_tmpArtiFont;
-    char pad_010C[0x720];
-    TmpArtiState* m_tmpArtiState;
-    char pad_0830[0x20];
-    TmpArtiList* m_tmpArtiList;
 };
 
 #endif // _FFCC_MENU_TMPARTI_H_

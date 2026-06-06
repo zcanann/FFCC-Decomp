@@ -393,10 +393,10 @@ void CGraphic::BeginFrame()
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 
-    const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    const bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     u16 buttons = 0;
     if (!useDebugPad) {
-        int padIndex = (Pad._448_4_ == 0) ? Pad._448_4_ : 0;
+        int padIndex = (Pad.m_debugPadPort == 0) ? Pad.m_debugPadPort : 0;
         buttons = Pad.GetPadInputs()[padIndex].lockedButton[1];
     }
 

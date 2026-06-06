@@ -1,6 +1,9 @@
 #ifndef _FFCC_PPP_YMTRACER_H_
 #define _FFCC_PPP_YMTRACER_H_
 
+#include "ffcc/pppPart.h"
+
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
@@ -34,6 +37,37 @@ typedef _pppPObject pppYmTracer;
 struct YmTracerDataOffsets {
     s32 m_workOffset;
     s32 m_colorOffset;
+};
+
+struct YmTracerPolygon {
+    Vec from;
+    f32 _pad0;
+    Vec to;
+    u8 colorR;
+    u8 colorG;
+    u8 colorB;
+    u8 alpha;
+    s16 life;
+    u8 decay;
+    u8 _pad21;
+    u32 _pad24;
+};
+
+struct YmTracerWork {
+    Vec from;
+    f32 _pad0;
+    Vec to;
+    f32 _pad1c;
+    f32* initWork;
+    f32* arg3Work;
+    YmTracerPolygon* entries;
+    u16 count;
+    u16 _pad2e;
+};
+
+struct YmTracerColorBlock {
+    u8 pad[8];
+    pppCVECTOR color;
 };
 
 #ifdef __cplusplus

@@ -46,6 +46,12 @@ struct pppCVECTOR
     unsigned char rgba[4];
 };
 
+union pppPackedColor
+{
+    u32 value;
+    u8 bytes[4];
+};
+
 void pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest);
 void pppUnitMatrix(pppFMATRIX& pppFMtx);
 void pppRotMatrix(pppFMATRIX&, pppFMATRIX, Vec);

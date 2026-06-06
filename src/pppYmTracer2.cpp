@@ -19,52 +19,25 @@ extern const float FLOAT_80331844;
 
 static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
-struct TRACE_POLYGON {
-    Vec pos;
-    float pad0;
-    Vec targetPos;
-    u8 colorR;
-    u8 colorG;
-    u8 colorB;
-    u8 alpha;
-    u8 active;
-    u8 pad1[7];
-};
-STATIC_ASSERT(sizeof(TRACE_POLYGON) == 0x28);
-
-struct TracerWork {
-    Vec pos;
-    float pad0;
-    Vec targetPos;
-    float pad1c;
-    float* initWork;
-    float* arg3Work;
-    TRACE_POLYGON* entries;
-    u16 visibleCount;
-    u16 pad2e;
-    s16 alphaStep;
-    u16 pad32;
-};
-
-union PackedColor {
-    u32 value;
-    u8 bytes[4];
-};
-
-struct TracerColorBlock {
-    u8 pad[8];
-    pppCVECTOR color;
-};
-
 STATIC_ASSERT(sizeof(YmTracer2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_colorOffset) == 0x4);
-STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);
+STATIC_ASSERT(sizeof(YmTracer2Polygon) == 0x28);
+STATIC_ASSERT(offsetof(YmTracer2Polygon, pos) == 0x0);
+STATIC_ASSERT(offsetof(YmTracer2Polygon, targetPos) == 0x10);
+STATIC_ASSERT(offsetof(YmTracer2Polygon, colorR) == 0x1c);
+STATIC_ASSERT(offsetof(YmTracer2Polygon, active) == 0x20);
+STATIC_ASSERT(sizeof(YmTracer2Work) == 0x34);
+STATIC_ASSERT(offsetof(YmTracer2Work, initWork) == 0x20);
+STATIC_ASSERT(offsetof(YmTracer2Work, entries) == 0x28);
+STATIC_ASSERT(offsetof(YmTracer2Work, visibleCount) == 0x2c);
+STATIC_ASSERT(offsetof(YmTracer2Work, alphaStep) == 0x30);
+STATIC_ASSERT(offsetof(YmTracer2ColorBlock, color) == 0x8);
 
-static PackedColor g_pppYmTracer2_1;
-static PackedColor g_pppYmTracer2_2;
+static pppPackedColor g_pppYmTracer2_1;
+static pppPackedColor g_pppYmTracer2_2;
 
-static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
+static inline void copyPolygonData(YmTracer2Polygon* dst, YmTracer2Polygon* src)
 {
     dst->active = src->active;
     pppCopyVector(dst->pos, src->pos);
@@ -97,17 +70,17 @@ static inline YmTracer2DataOffsets* GetYmTracer2DataOffsets(_pppCtrlTable* ctrl)
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
-    TracerWork* work;
+    YmTracer2Work* work;
     CMapMesh* mapMesh;
-    TRACE_POLYGON* poly;
-    TracerColorBlock* colorData;
+    YmTracer2Polygon* poly;
+    YmTracer2ColorBlock* colorData;
     CTexture* texture;
     s32 i;
     s32 dataOffset;
     s32 colorOffset;
     s32 dataValIndex;
-    PackedColor colorTop;
-    PackedColor colorBottom;
+    pppPackedColor colorTop;
+    pppPackedColor colorBottom;
     f32 uTop;
     f32 uBottom;
     f32 uvStep;
@@ -115,11 +88,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
 
     dataValIndex = param_2->m_dataValIndex;
     dataOffset = GetYmTracer2DataOffsets(param_3)->m_workOffset;
-    work = (TracerWork*)(pppYmTracer2->m_workArea + dataOffset);
+    work = (YmTracer2Work*)(pppYmTracer2->m_workArea + dataOffset);
     colorOffset = GetYmTracer2DataOffsets(param_3)->m_colorOffset;
     poly = work->entries;
     mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
-    colorData = reinterpret_cast<TracerColorBlock*>(pppYmTracer2->m_workArea + colorOffset);
+    colorData = reinterpret_cast<YmTracer2ColorBlock*>(pppYmTracer2->m_workArea + colorOffset);
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
@@ -162,11 +135,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
 
                 GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (work->visibleCount - 1) * 4);
 
-                TRACE_POLYGON* current = poly;
+                YmTracer2Polygon* current = poly;
 
                 i = 0;
                 while (i < (s32)(work->visibleCount - 1)) {
-                    TRACE_POLYGON* next = current + 1;
+                    YmTracer2Polygon* next = current + 1;
 
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
@@ -223,10 +196,10 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _pppCtrlTable* param_3)
 {
-    TracerWork* work;
-    TracerColorBlock* colorData;
-    TRACE_POLYGON* entries;
-    TRACE_POLYGON* entry;
+    YmTracer2Work* work;
+    YmTracer2ColorBlock* colorData;
+    YmTracer2Polygon* entries;
+    YmTracer2Polygon* entry;
     s32 useFallback;
     float fVar2;
     s16 alpha;
@@ -243,8 +216,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
     }
 
     useFallback = 0;
-    work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_3)->m_workOffset);
-    colorData = reinterpret_cast<TracerColorBlock*>(
+    work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_3)->m_workOffset);
+    colorData = reinterpret_cast<YmTracer2ColorBlock*>(
         pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_3)->m_colorOffset);
 
     work->initWork = (param_2->m_initWork == 0xffffffff)
@@ -258,8 +231,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
     if (work->entries == nullptr) {
         useFallback = 1;
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
-        work->entries = (TRACE_POLYGON*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
+        work->entries = (YmTracer2Polygon*)pppMemAlloc(
+            (u32)param_2->m_tracer.m_entryCount * sizeof(YmTracer2Polygon), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
         fVar2 = FLOAT_80331840;
@@ -328,7 +301,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
     }
 
     if (useFallback) {
-        TRACE_POLYGON* pFallback = entries;
+        YmTracer2Polygon* pFallback = entries;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar4++) {
             pppCopyVector(pFallback->pos, entries->pos);
@@ -364,7 +337,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
  */
 void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
+    YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
     if (work->entries != 0) {
         pppHeapUseRate((CMemory::CStage*)work->entries);
     }
@@ -381,7 +354,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
  */
 void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
+    YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
 
     work->pad2e = 0;
     work->visibleCount = 0;
@@ -400,7 +373,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
     float fVar1 = FLOAT_80331840;
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
+    YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
 
     work->entries = 0;
     work->arg3Work = 0;

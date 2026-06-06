@@ -8534,57 +8534,56 @@ void CMenuPcs::DrawCMLife()
 {
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		fade = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter));
 	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		fade = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter) -
 		                            DOUBLE_80331420));
 	}
-	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int readyMask = 0;
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
+	for (int i = 0; i < 4; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;
 		}
 	}
+	const float alphaF = FLOAT_80331458 * fade;
 
 	for (int slot = 0; slot < 8; slot++) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
 
-		unsigned short life = 0;
-		bool enabled = false;
-		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
-		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
-			enabled = true;
+		int count;
+		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0 &&
+		    *reinterpret_cast<int*>(m_cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+			count = static_cast<int>(*reinterpret_cast<unsigned short*>(m_cmakeWork + slot * 0x9C0 + 0x14D6)) >> 1;
 		} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-			life = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A);
-			enabled = true;
-		}
-
-		if (!enabled) {
+			count = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A)) >> 1;
+		} else {
 			continue;
 		}
-
-		const int count = static_cast<int>(life) >> 1;
-		float red = FLOAT_80331434;
-		float green = FLOAT_80331668;
+		float red;
+		float green;
+		float blue;
 		if ((readyMask & (1u << slot)) != 0) {
 			red = FLOAT_803313e8;
 			green = FLOAT_803313e8;
+			blue = FLOAT_803313e8;
+		} else {
+			red = FLOAT_80331434;
+			green = FLOAT_80331668;
+			blue = FLOAT_80331668;
 		}
 
-		CColor color(static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red)),
-		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
-		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
-		             static_cast<unsigned char>(alpha));
-		GXSetChanMatColor(GX_COLOR0A0, color.color);
+		GXColor color;
+		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
+		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
+		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
+		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		const int row = slot / 4;
 		const int col = slot - row * 4;
@@ -8594,17 +8593,24 @@ void CMenuPcs::DrawCMLife()
 		}
 		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 		const float yBase = y + FLOAT_8033166C;
-		float x = xBase + static_cast<float>(0x90 - count * 0x10) * static_cast<float>(DOUBLE_803313f8);
-		float step = static_cast<float>(8 - count) * static_cast<float>(DOUBLE_803313f8);
+		float x = static_cast<float>(xBase + static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8);
+		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313f8);
+
+		const float kSplineDiv = FLOAT_803314c0;
+		const float kZero = FLOAT_803313dc;
+		const float kRectSize = FLOAT_80331558;
+		const double kStepDelta = DOUBLE_80331420;
 
 		for (int i = 0; i < count; i++) {
-			float yAdd = FLOAT_803313dc;
-			const float t = step / FLOAT_803314c0;
-			if (t < gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
+			float yAdd = kZero;
+			const float t = step / kSplineDiv;
+			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
+				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
+			} else {
 				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
 					if (t <= gWmLifeYOffsetSpline[j * 4]) {
 						if (j == 0) {
-							yAdd = gWmLifeYOffsetSpline[1];
+							yAdd = gWmLifeYOffsetSpline[j * 4 + 1];
 						} else {
 							float* const cur = gWmLifeYOffsetSpline + j * 4;
 							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
@@ -8612,43 +8618,41 @@ void CMenuPcs::DrawCMLife()
 							const float u = (t - prev[0]) / width;
 							const float u2 = u * u;
 							const float u3 = u2 * u;
-							yAdd = width * (prev[3] * (u - (FLOAT_803314c8 * u2 - u3)) +
+							yAdd = width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) +
 							                cur[2] * (u3 - u2)) +
-							       prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							       cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							       (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
 				}
-			} else {
-				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
 			}
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
-			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			step += static_cast<float>(DOUBLE_80331420);
-			x += FLOAT_80331558;
+			    0, x, yBase + yAdd, kRectSize, kRectSize,
+			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			step += static_cast<float>(kStepDelta);
+			x += kRectSize;
 		}
 
-		char statusFlagA;
-		char statusFlagB;
-		if (m_cmakeWorkActive == 1 && cmakeWork != 0) {
-			const unsigned char* const work = cmakeWork + slot * 0x9C0;
-			statusFlagA = work[0x1D90];
-			statusFlagB = work[0x1D91];
+		unsigned char flagA;
+		unsigned char flagB;
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
+			flagA = work[0x1D90];
+			flagB = work[0x1D91];
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			statusFlagA = caravanWork.m_shopBusyFlag;
-			statusFlagB = caravanWork.m_caravanLocalFlags;
+			flagA = caravanWork.m_shopBusyFlag;
+			flagB = caravanWork.m_caravanLocalFlags;
 		}
-		if (statusFlagA != 0 || statusFlagB != 0) {
+		if (flagA != 0 || flagB != 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 			MenuPcs.DrawRect(
-			    0, xBase + static_cast<float>(DOUBLE_80331670),
+			    0, static_cast<float>(xBase + DOUBLE_80331670),
 			                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
 			                                FLOAT_80331440, FLOAT_803313dc,
-			                                statusFlagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
+			                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
 			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}

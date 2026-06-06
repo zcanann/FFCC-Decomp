@@ -7575,7 +7575,7 @@ void CMenuPcs::CalcCharaSelect()
 		unsigned int pendingMask = 0;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0 && selectEntries[i].m_currentSlot >= 0) {
+				if (selectEntries[i].m_cmakePending != 0) {
 					pendingMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
 				}
 			}
@@ -7591,13 +7591,11 @@ void CMenuPcs::CalcCharaSelect()
 				GbaQue.ClrCmakeInfo(i);
 				if (entry.m_cmakeReady != 0) {
 					entry.m_cmakeReady = 0;
-				} else if ((entry.m_currentSlot >= 0) &&
-				           ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0)) {
+				} else if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
 					continue;
 				}
 
-				if (entry.m_currentSlot >= 0 &&
-				    Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
+				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
 				    entry.m_cmakeReady == 0) {
 					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
@@ -7616,7 +7614,7 @@ void CMenuPcs::CalcCharaSelect()
 
 		unsigned int confirmedSlotMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (selectEntries[i].m_confirmed != 0 && selectEntries[i].m_currentSlot >= 0) {
+			if (selectEntries[i].m_confirmed != 0) {
 				confirmedSlotMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
 			}
 		}

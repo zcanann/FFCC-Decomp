@@ -811,8 +811,8 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
  */
 void CMenuPcs::InitCharaInfo()
 {
-	unsigned char* const worldObjData = m_wm.m_worldObjData;
-
+	float z = FLOAT_803314a4;
+	float zero = FLOAT_803313dc;
 	int row = 0;
 	int baseSlot = 0x20;
 	short baseY = 0x66;
@@ -825,26 +825,26 @@ void CMenuPcs::InitCharaInfo()
 				y = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0xA) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0xC) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0xE) = 0xE0;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x10) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x14) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x18) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0xA) = static_cast<short>(y - 0x70);
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xC) = 0x140;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0xE) = 0xE0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x10) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x14) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x18) = z;
 
 			short y2 = baseY;
 			if (row != 0) {
 				y2 = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(worldObjData + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0x5C) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObjData + slotOffset + 0x5E) = 0xE0;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x60) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x64) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObjData + slotOffset + 0x68) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5C) = 0x140;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + slotOffset + 0x5E) = 0xE0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x60) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x64) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + slotOffset + 0x68) = z;
 
 			slotOffset += 0xA0;
 			baseX = static_cast<short>(baseX + 0x120);
@@ -854,33 +854,32 @@ void CMenuPcs::InitCharaInfo()
 		baseSlot += 4;
 	}
 
-	unsigned char* modelData = m_wm.m_charaModelData;
-	unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[0]);
+	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	int modelOffset = 0;
 	for (int i = 4; i != 0; i--) {
-		unsigned char* entry0 = modelData + modelOffset;
-		if (*reinterpret_cast<int*>(caravan + 0x3A4) == 0) {
+		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
+		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(caravan + 0x3E2) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 200;
+			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(gameData + 0x17D2) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 200;
 			}
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x3E4);
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;
-		if (*reinterpret_cast<int*>(caravan + 0xFD4) == 0) {
+		if (*reinterpret_cast<int*>(gameData + 0x23C4) == 0) {
 			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
 		} else {
-			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 100;
-			if (*reinterpret_cast<unsigned short*>(caravan + 0x1012) != 0) {
-				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 200;
+			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(gameData + 0x2402) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x2400) * 200 + 200;
 			}
-			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x1014);
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x2404);
 		}
 
-		caravan += 0x1860;
+		gameData += 0x1860;
 		modelOffset += 0x68;
 	}
 }
@@ -8868,37 +8867,35 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 void CMenuPcs::SetAnim(int anim)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[anim];
-	if (handle == 0 || handle->m_charaKind == 3) {
+	CCharaPcs::CHandle** const handles = GetWmCharaHandles(this);
+	CCharaPcs::CHandle* const handle = handles[anim];
+	if (handle->m_charaKind == 3) {
 		return;
 	}
-	unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
 
 	const unsigned int charaNo = handle->m_charaNo;
 	const int modelBase = static_cast<int>(charaNo / 100) * 100;
 	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
 	handle->LoadAnim(s_wmCharaAnimStand, animBase + 0, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
+	handles[anim]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
 
 	int* const animState = m_wmCharaAnimState + anim * 5;
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
+	const int currentAnimIndex = handles[anim]->m_currentAnimIndex;
 	const int blendMode = -1 - (currentAnimIndex >> 31);
-	handle->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
+	handles[anim]->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(handle->m_model);
-	if (model != 0) {
-		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-		animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-	}
+	unsigned char* const model = reinterpret_cast<unsigned char*>(handles[anim]->m_model);
+	reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
+	reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(model + 0xC0)[0];
 }
 
 /*

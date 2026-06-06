@@ -262,6 +262,8 @@ extern double DOUBLE_803314E8;
 extern double DOUBLE_80331498;
 extern double DOUBLE_80331510;
 extern double DOUBLE_80331580;
+extern double DOUBLE_803315A0;
+extern double DOUBLE_803315A8;
 extern double DOUBLE_803315C0;
 extern double DOUBLE_803315D8;
 extern double DOUBLE_803315F0;
@@ -9986,42 +9988,29 @@ void CMenuPcs::ChkSelectParty()
  */
 void CMenuPcs::DrawMainMenuSub()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldObj == 0 || worldState == 0) {
-		return;
-	}
+	int worldObj = reinterpret_cast<int>(m_wm.m_worldObjData);
 
-	Mtx savedCamera;
-	Mtx lookAtMtx;
 	Mtx modelMtx;
-	Mtx44 projectionMtx;
 	Mtx44 screenMtx;
-	GXColor clearColor = {0, 0, 0, 0};
-	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-	Vec target;
-	Vec up;
+	GXColor white;
 	float depthValues[5];
 	unsigned int drawOrder[5];
 
-	target.x = FLOAT_803313dc;
-	target.y = FLOAT_803313dc;
-	target.z = FLOAT_803313dc;
-	up.x = FLOAT_803313dc;
-	up.y = FLOAT_803313e8;
-	up.z = FLOAT_803313dc;
-
-	PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
-
+	Mtx44 projectionMtx;
+	Mtx lookAtMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), &up, reinterpret_cast<Point3d*>(&target));
+	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
+	CColor clearColor0(0, 0, 0, 0);
+	GXColor clearColor = clearColor0.color;
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	GXSetColorUpdate(1);
 	GXSetAlphaUpdate(1);
@@ -10033,79 +10022,112 @@ void CMenuPcs::DrawMainMenuSub()
 	             *reinterpret_cast<unsigned int*>(worldObj + 0x778), *reinterpret_cast<unsigned int*>(worldObj + 0x77C));
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
+	const double one = DOUBLE_80331420;
+	const double scaleX = DOUBLE_803315A0;
+	const float zSub = FLOAT_80331598;
+	const float zero = FLOAT_803313dc;
+	const float subY = FLOAT_803315b4;
+	const float subX = FLOAT_803315b0;
+	const double scaleY = DOUBLE_803315A8;
+	const Vec* posPtr = s_MMenuPos;
+	int viewOff = 0;
 	for (int i = 0; i < 5; i++) {
-		Vec viewPos = s_MMenuPos[i];
+		Vec viewPos;
 		Vec4d clipPos;
-		unsigned char* const view = worldObj + i * 0x50;
-		viewPos.z -= FLOAT_80331598;
+		viewPos.x = posPtr->x;
+		viewPos.z = posPtr->z - zSub;
+		viewPos.y = posPtr->y;
 		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
-		float ndcX = 0.0f;
-		float ndcY = 0.0f;
-		if (clipPos.w != 0.0f) {
-			ndcX = clipPos.x / clipPos.w;
-			ndcY = clipPos.y / clipPos.w;
-		}
+		posPtr++;
 
-		*reinterpret_cast<short*>(view + 8) = static_cast<short>(320.0f * (1.0f + ndcX) - FLOAT_803315b0);
-		*reinterpret_cast<short*>(view + 0xA) = static_cast<short>(240.0f * (1.0f - ndcY) - FLOAT_803315b4);
-		*reinterpret_cast<unsigned short*>(view + 0xC) = 0x280;
-		*reinterpret_cast<unsigned short*>(view + 0xE) = 0x1C0;
-		*reinterpret_cast<float*>(view + 0x10) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(view + 0x14) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(view + 0x18) = FLOAT_80331598;
+		clipPos.x = clipPos.x / clipPos.w;
+		clipPos.y = clipPos.y / clipPos.w;
+		double negY = -static_cast<double>(clipPos.y);
+		clipPos.x = static_cast<float>(scaleX * (one + static_cast<double>(clipPos.x)));
+		clipPos.y = static_cast<float>(scaleY * (one + negY));
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 8) =
+		    static_cast<short>(static_cast<int>(clipPos.x - subX));
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xA) =
+		    static_cast<short>(static_cast<int>(clipPos.y - subY));
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xC) = 0x280;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xE) = 0x1C0;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x10) = zero;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x14) = zero;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x18) = zSub;
+		viewOff += 0x50;
+	}
 
-		drawOrder[i] = static_cast<unsigned int>(i);
-		depthValues[i] = FLOAT_803313dc;
+	float* depthPtr = depthValues;
+	unsigned int* orderPtr = drawOrder;
+	unsigned char* handlePtr = reinterpret_cast<unsigned char*>(this);
+	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
+		PSMTXCopy(reinterpret_cast<MtxPtr>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(handlePtr + 0x774) + 0x168) + 8),
+		          modelMtx);
+		*orderPtr = i;
+		handlePtr += 4;
+		orderPtr++;
+		*depthPtr = modelMtx[2][3];
+		depthPtr++;
+	}
 
-		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x774)[i]);
-		if (handle != 0) {
-			void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-			if (model != 0) {
-				PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(model) + 8), modelMtx);
-				depthValues[i] = modelMtx[2][3];
+	{
+		float* fp = depthValues;
+		unsigned int* op = drawOrder;
+		for (int i = 0; i < 5; i++) {
+			int next = i + 1;
+			int remaining = 5 - next;
+			float* fpInner = depthValues + next;
+			unsigned int* opInner = drawOrder + next;
+			if (next < 5) {
+				do {
+					float depth = *fp;
+					if (*fpInner < depth) {
+						unsigned int idx = *op;
+						unsigned int idxInner = *opInner;
+						*fp = *fpInner;
+						*op = idxInner;
+						*fpInner = depth;
+						*opInner = idx;
+					}
+					fpInner++;
+					opInner++;
+					remaining--;
+				} while (remaining != 0);
 			}
+			op++;
+			fp++;
 		}
 	}
 
-	for (int i = 0; i < 5; i++) {
-		for (int j = i + 1; j < 5; j++) {
-			if (depthValues[j] < depthValues[i]) {
-				const float depth = depthValues[i];
-				const unsigned int index = drawOrder[i];
-				depthValues[i] = depthValues[j];
-				drawOrder[i] = drawOrder[j];
-				depthValues[j] = depth;
-				drawOrder[j] = index;
-			}
-		}
-	}
-
-	const short state = worldState->m_mainState;
+	white.r = 0xFF;
+	white.g = 0xFF;
+	white.b = 0xFF;
+	white.a = 0xFF;
 	for (int orderIndex = 0; orderIndex < 5; orderIndex++) {
-		unsigned int handleIndex = drawOrder[orderIndex];
-		if ((state < 1 || state > 3) && (worldState->m_cardChannel != 1 || orderIndex != 1)) {
-			continue;
-		}
-		if ((state < 1 || state > 3) && worldState->m_cardChannel == 1 && orderIndex == 1) {
-			handleIndex = 1;
-		}
-
-		CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[handleIndex];
-		if (handle == 0) {
-			continue;
+		short state = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10);
+		if (state < 1 || state > 3) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x26) != 1 || orderIndex != 1) {
+				continue;
+			}
+			drawOrder[orderIndex] = 1;
 		}
 
-		unsigned char* const view = worldObj + handleIndex * 0x50;
-
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+		int view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
+		Mtx44 projectionMtx0;
+		Mtx lookAtMtx0;
+		C_MTXPerspective(projectionMtx0, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
+		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
+		CVector target0(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up0(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up0), reinterpret_cast<Point3d*>(&target0));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		PSMTXCopy(lookAtMtx0, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
+		CColor clearColor0(0, 0, 0, 0);
+		GXColor clearColor = clearColor0.color;
 		GXSetCopyClear(clearColor, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
@@ -10124,20 +10146,29 @@ void CMenuPcs::DrawMainMenuSub()
 				&lightTable.m_diffuseDirs[lightIndex], 0);
 		}
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
-		handle->Draw(5);
+		reinterpret_cast<CCharaPcs::CHandle*>(
+		    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + drawOrder[orderIndex] * 4 + 0x774))
+		    ->Draw(5);
 		DrawInit();
 
-		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
+		view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
+		Mtx44 projectionMtx1;
+		Mtx lookAtMtx1;
+		C_MTXPerspective(projectionMtx1, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+		GXSetProjection(projectionMtx1, GX_PERSPECTIVE);
+		PSMTX44Copy(projectionMtx1, CameraPcs.m_screenMatrix);
+		CVector target1(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up1(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+		C_MTXLookAt(lookAtMtx1, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up1), reinterpret_cast<Point3d*>(&target1));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		PSMTXCopy(lookAtMtx1, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		GXSetCopyClear(clearColor, 0x00FFFFFF);
+		CColor clearColor1(0, 0, 0, 0);
+		GXColor clearColorB = clearColor1.color;
+		GXSetCopyClear(clearColorB, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
@@ -10146,15 +10177,17 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 
-		if (state == 2) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-			const float frameWidth = s_MainMenuSubFrameWidths[handleIndex];
-			DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
-			           static_cast<float>(static_cast<double>(s_MMenuPos[handleIndex].z) + DOUBLE_80331418 - DOUBLE_803315C0),
+			unsigned int idx = drawOrder[orderIndex];
+			float frameWidth = reinterpret_cast<float*>(lbl_801DC294)[idx];
+			MenuPcs.DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
+			           static_cast<float>(DOUBLE_80331418 + static_cast<double>(s_MMenuPos[idx].z) - DOUBLE_803315C0),
 			           frameWidth, FLOAT_80331554, FLOAT_803313dc,
-			           FLOAT_80331554 * static_cast<float>(handleIndex) + FLOAT_80331528, FLOAT_803315C8, FLOAT_803315C8);
+			           FLOAT_80331554 * static_cast<float>(static_cast<int>(idx)) + FLOAT_80331528,
+			           FLOAT_803315C8, FLOAT_803315C8);
 		}
 	}
 }

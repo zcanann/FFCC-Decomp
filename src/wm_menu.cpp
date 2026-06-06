@@ -3649,6 +3649,25 @@ void CMenuPcs::DrawMainMenu()
 			SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 			DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 			         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
+			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+			char* messages[5];
+			messages[0] = lbl_80210750[languageIndex + 0];
+			messages[1] = lbl_80210750[languageIndex + 1];
+			messages[2] = lbl_80210750[languageIndex + 2];
+			messages[3] = lbl_80210750[languageIndex + 3];
+			messages[4] = lbl_80210750[languageIndex + 4];
+			unsigned int textAlpha;
+			if (helpAlpha <= FLOAT_803313e8) {
+				textAlpha = static_cast<unsigned int>(FLOAT_80331458 * helpAlpha);
+			} else {
+				textAlpha = 0xFF;
+			}
+			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+			char* const text = messages[worldState->m_cardChannel];
+			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}
 

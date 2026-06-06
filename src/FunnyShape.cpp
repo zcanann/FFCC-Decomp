@@ -12,6 +12,7 @@
 const GXColor kFunnyShapeTextureChanColor = { 0x80, 0x80, 0x80, 0x80 };
 const GXColor kFunnyShapeTextureColor = { 0x80, 0x80, 0x80, 0x80 };
 const GXColor kFunnyShapeRenderColor = { 0x80, 0x80, 0x80, 0x80 };
+static const float kFunnyShapeBoundsMaxInitial = 1000.0f;
 static const float kFunnyShapeBoundsMinInitial = -1000.0f;
 static const float kFunnyShapeZero = 0.0f;
 static const float kFunnyShapeViewportScale = 2.0f;
@@ -25,8 +26,8 @@ static const float kFunnyShapeDefaultOffsetY = 336.0f;
 static const float kFunnyShapeTextureViewportOrigin = 20.0f;
 static const float kFunnyShapeAnimOffsetX = 320.0f;
 static const float kFunnyShapeAnimOffsetY = 224.0f;
-static const float kFunnyShapePi = 3.1415927f;
-static const float kFunnyShapeHalfTurnDegrees[2] = {180.0f, 0.0f};
+static const float kFunnyShapePi = 3.14f;
+static const float kFunnyShapeHalfTurnDegrees = 180.0f;
 extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 
@@ -162,10 +163,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;
-            float minX = kFunnyShapeBoundsMinInitial;
-            float maxX = kFunnyShapeZero;
-            float minY = kFunnyShapeBoundsMinInitial;
-            float maxY = kFunnyShapeZero;
+            float minX = kFunnyShapeBoundsMaxInitial;
+            float maxX = kFunnyShapeBoundsMinInitial;
+            float minY = kFunnyShapeBoundsMaxInitial;
+            float maxY = kFunnyShapeBoundsMinInitial;
             float drawAngle = angle;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
@@ -253,6 +254,11 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s16 texY = S16At(entry, 0x32);
             const s16 texW = S16At(entry, 0x34);
             const s16 texH = S16At(entry, 0x36);
+            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
+            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
+            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
+            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
+
             const float padScale = kFunnyShapePaddingScale;
             const float padW = viewportW * padScale * padScale;
             const float padH = viewportH * padScale * padScale;
@@ -260,11 +266,6 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float viewMaxY = maxY - padH;
             const float invPadH = kFunnyShapeOne / padH;
             const float invPadW = -(kFunnyShapeOne / padW);
-
-            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
-            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
-            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
-            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
 
             p0x = invPadW * (rx0 - viewMaxX);
             p0y = invPadH * (ry0 - viewMaxY);
@@ -465,7 +466,7 @@ void CFunnyShape::RenderShape()
     offsetCopy.x = kFunnyShapeDefaultOffsetX;
     offsetCopy.y = kFunnyShapeDefaultOffsetY;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offsetCopy, LoadFloat(kFunnyShapeZero));
+    RenderShape(shape, offsetCopy, 0.0f);
 }
 
 /*
@@ -650,7 +651,7 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
-                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees[0];
+                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
 
                 r = rand();
                 if ((r % 2) != 0) {
@@ -718,7 +719,7 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         work->angle = static_cast<float>(r % 0x168);
-        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees[0];
+        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
 
         r = rand();
         if ((r % 2) != 0) {

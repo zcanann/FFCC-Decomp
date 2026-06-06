@@ -60,20 +60,6 @@ struct GbaQueuePlayerPosView
 };
 STATIC_ASSERT(sizeof(GbaQueuePlayerPosView) == 0xDC);
 
-struct GbaQueueCMakeInfoView
-{
-	unsigned char m_active;
-	unsigned char m_resultCode;
-	short m_packetCount;
-	unsigned short m_crc;
-	unsigned char m_playerSlot;
-	char m_name[0x11];
-	unsigned char m_charaType;
-	unsigned char m_favoriteLead[2];
-	unsigned char m_favorite[4];
-	unsigned char m_jobType;
-};
-STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
 STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
 
 STATIC_ASSERT(sizeof(GbaQueueMapObjEntry) == 0xC);
@@ -229,9 +215,9 @@ void GbaQueue::Init()
 		i = i + 1;
 	} while (i < 4);
 
-	*reinterpret_cast<unsigned int*>(obj + 0x448) = 0xFF;
-	*reinterpret_cast<unsigned int*>(obj + 0x444) = 0xFF;
-	obj[0x44C] = 0;
+	m_mapNo = 0xFF;
+	m_stageNo = 0xFF;
+	m_stageFlags = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
 
@@ -259,8 +245,8 @@ void GbaQueue::Init()
 	m_singleMode = 0;
 	m_controllerMode = 0;
 	obj[0x2D58] = 0;
-	obj[0x2D59] = 0;
-	obj[0x2D5A] = 0;
+	m_prevOutOfShoukiFlags = 0;
+	m_outOfShoukiFlags = 0;
 	m_pauseMode = 0;
 	m_spModeBits = 0;
 	m_spModeFlags = 0xF;
@@ -1087,7 +1073,6 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
  */
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
-    char* obj = reinterpret_cast<char*>(this);
     int waitIndex = 0;
 
     do {
@@ -1102,13 +1087,13 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     m_makeMapObjFlg = 0;
     memset(&m_mapObjWork, 0, sizeof(GbaQueueMapObjWork));
 
-    if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
-        obj[0x44C] = 0xF;
+    if ((m_stageNo != stageId) || (m_mapNo != mapId)) {
+        m_stageFlags = 0xF;
         m_chgUseItemFlags = 0xF;
     }
 
-    *reinterpret_cast<int*>(obj + 0x444) = stageId;
-    *reinterpret_cast<int*>(obj + 0x448) = mapId;
+    m_stageNo = stageId;
+    m_mapNo = mapId;
     m_chgScouFlags = 0xF;
 
     int signalIndex = 0;
@@ -1124,7 +1109,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
             loadWaitIndex++;
         } while (loadWaitIndex < 4);
 
-        obj[0x44C] = 0xF;
+        m_stageFlags = 0xF;
         m_chgUseItemFlags = 0xF;
 
         int loadSignalIndex = 0;
@@ -1149,11 +1134,9 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
  */
 void GbaQueue::GetStageNo(int channel, int* stageNo, int* mapNo)
 {
-	char* obj = reinterpret_cast<char*>(this);
-
 	OSWaitSemaphore(accessSemaphores + channel);
-	*stageNo = *reinterpret_cast<int*>(obj + 0x444);
-	*mapNo = *reinterpret_cast<int*>(obj + 0x448);
+	*stageNo = m_stageNo;
+	*mapNo = m_mapNo;
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1172,7 +1155,7 @@ unsigned int GbaQueue::GetStageFlg(int channel)
 	char stageFlg;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	stageFlg = *(reinterpret_cast<char*>(this) + 0x44C);
+	stageFlg = static_cast<char>(m_stageFlags);
 	flag = static_cast<int>(stageFlg) & (1 << channel);
 	flag = static_cast<unsigned int>(-flag | flag) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
@@ -1191,11 +1174,10 @@ unsigned int GbaQueue::GetStageFlg(int channel)
  */
 void GbaQueue::ClrStageFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * sizeof(OSSemaphore));
+	OSSemaphore* semaphore = accessSemaphores + channel;
 
 	OSWaitSemaphore(semaphore);
-	obj[0x44C] = obj[0x44C] & ~(1 << channel);
+	m_stageFlags = static_cast<unsigned char>(m_stageFlags & ~(1 << channel));
 	m_chgScouFlags = m_chgScouFlags | (1 << channel);
 	OSSignalSemaphore(semaphore);
 }
@@ -1503,8 +1485,8 @@ void GbaQueue::LoadPlayerStat()
 	memcpy(GetPlayerDataBlock(this), localPlayerStat, kGbaQueuePlayerDataBlockBytes);
 	memcpy(obj + 0x2A74, localNames, kGbaQueueCaravanNameBlockBytes);
 
-	obj[0x2D59] = obj[0x2D5A];
-	obj[0x2D5A] = static_cast<char>(outOfShoukiMask);
+	m_prevOutOfShoukiFlags = m_outOfShoukiFlags;
+	m_outOfShoukiFlags = static_cast<unsigned char>(outOfShoukiMask);
 
 	for (i = 0; i < 4; i++) {
 		const int oldBase = 0x7C4 + (i * 0xDC);
@@ -2179,14 +2161,14 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	if (hp != prevHp) {
 		changed = 1;
 	}
-	if ((obj[0x2D5A] & channelMask) != (obj[0x2D59] & channelMask)) {
+	if ((m_outOfShoukiFlags & channelMask) != (m_prevOutOfShoukiFlags & channelMask)) {
 		changed = 1;
 	}
 
 	outData[0] = 0x13;
 	outData[1] = static_cast<unsigned char>(hpFlags);
 	outData[2] = static_cast<unsigned char>(hp);
-	outData[3] = ((obj[0x2D5A] & channelMask) != 0);
+	outData[3] = ((m_outOfShoukiFlags & channelMask) != 0);
 
 	return changed;
 }
@@ -2978,7 +2960,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		return;
 	}
 
-	GbaQueueCMakeInfoView localInfo;
+	GbaCMakeInfo localInfo;
 
 	OSWaitSemaphore(semaphore);
 	{
@@ -2991,7 +2973,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		writeBase[0x2CB9] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(cmakeBase + 0x2CB4) >= 6) {
-			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
+			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
 		}
 	}
 	OSSignalSemaphore(semaphore);
@@ -3246,7 +3228,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		return;
 	}
 
-	GbaQueueCMakeInfoView localInfo;
+	GbaCMakeInfo localInfo;
 
 	OSWaitSemaphore(semaphore);
 	{
@@ -3258,7 +3240,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 		obj[0x2CCD + cmakeOffset + writeOffset] = static_cast<char>(valueBytes[3]);
 
 		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) >= 2) {
-			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
+			memcpy(&localInfo, &cmakeInfo[channel], sizeof(localInfo));
 		}
 	}
 	OSSignalSemaphore(semaphore);

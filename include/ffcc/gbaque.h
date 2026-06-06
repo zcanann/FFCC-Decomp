@@ -3,15 +3,13 @@
 
 #include <Dolphin/os.h>
 
-class GbaPInfo;
-class GbaCMakeInfo;
+struct GbaPInfo;
+struct GbaCMakeInfo;
 class HitEInfo;
 
 struct GbaPInfo
 {
     unsigned char m_data[0x370];
-
-    GbaPInfo &operator=(const GbaPInfo&);
 };
 
 struct GbaCMakeInfo
@@ -26,8 +24,6 @@ struct GbaCMakeInfo
     unsigned char m_favoriteLead[2];
     unsigned char m_favorite[4];
     unsigned char m_jobType;
-
-    GbaCMakeInfo &operator=(const GbaCMakeInfo&);
 };
 
 struct GbaQueueHitInfo
@@ -196,7 +192,11 @@ public:
 
 private:
     OSSemaphore accessSemaphores[4];  // 0x0000
-    unsigned char _pad30[0x2AC4];     // 0x0030
+    unsigned char _pad30[0x414];      // 0x0030
+    int m_stageNo;                    // 0x0444
+    int m_mapNo;                      // 0x0448
+    unsigned char m_stageFlags;       // 0x044C
+    unsigned char _pad44D[0x26A7];    // 0x044D
     unsigned char m_mapItemCount;     // 0x2AF4
     unsigned char _pad2AF5[0x3];      // 0x2AF5
     int m_scrInitEnd;                 // 0x2AF8
@@ -235,7 +235,9 @@ private:
     unsigned char m_chgScouFlags;     // 0x2D55
     char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57
-    unsigned char _pad2D58[0x3];      // 0x2D58
+    unsigned char _pad2D58;           // 0x2D58
+    unsigned char m_prevOutOfShoukiFlags; // 0x2D59
+    unsigned char m_outOfShoukiFlags;     // 0x2D5A
     char m_pauseMode;                 // 0x2D5B
     unsigned char m_spModeBits;       // 0x2D5C
     unsigned char m_spModeFlags;      // 0x2D5D

@@ -12,13 +12,12 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
+#include "ffcc/mes.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_tina.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
-
-extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 
 char s_shopmenu_cpp[] = "shopmenu.cpp";
 extern char s_shop_80332e54[];
@@ -906,7 +905,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
         return;
     }
     memset(helpText, 0, 0x200);
-    MakeAgbString__4CMesFPcPcii(helpText, const_cast<char*>(sourceText), 0, 1);
+    CMes::MakeAgbString(helpText, const_cast<char*>(sourceText), 0, 1);
 
     CFont* font = MenuPcs.m_fonts[0];
     font->SetMargin(FLOAT_80332d28);

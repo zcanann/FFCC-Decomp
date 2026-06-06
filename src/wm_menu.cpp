@@ -10590,10 +10590,22 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	const int cornerTex = (kind == 0) ? 0x2C : 0x24;
-	const int edgeHTex = (kind == 0) ? 0x2D : 0x26;
-	const int edgeVTex = (kind == 0) ? 0x2E : 0x25;
-	const int fillTex = (kind == 0) ? 0x2F : 0x27;
+	int cornerTex = 0x2C;
+	if (kind != 0) {
+		cornerTex = 0x24;
+	}
+	int edgeHTex = 0x2D;
+	if (kind != 0) {
+		edgeHTex = 0x26;
+	}
+	int edgeVTex = 0x2E;
+	if (kind != 0) {
+		edgeVTex = 0x25;
+	}
+	int fillTex = 0x2F;
+	if (kind != 0) {
+		fillTex = 0x27;
+	}
 	const float border = FLOAT_80331410;
 	const float right = (sx + sw) - border;
 	const float bottom = (sy + sh) - border;

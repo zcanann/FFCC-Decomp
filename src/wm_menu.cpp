@@ -1320,15 +1320,15 @@ void CMenuPcs::CalcDiaryMenu()
 	case 3:
 		if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
 			if (worldState[0x0C] == 0) {
-				unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
-				selectData[0x0C] = 1;
-				selectData[0x40] = 1;
-				selectData[0x74] = 1;
-				selectData[0xA8] = 1;
-				selectData[0xDC] = 1;
-				selectData[0x110] = 1;
-				selectData[0x144] = 1;
-				selectData[0x178] = 1;
+				unsigned char* const modelData = m_wm.m_charaModelData;
+				modelData[0x0C] = 1;
+				modelData[0x40] = 1;
+				modelData[0x74] = 1;
+				modelData[0xA8] = 1;
+				modelData[0xDC] = 1;
+				modelData[0x110] = 1;
+				modelData[0x144] = 1;
+				modelData[0x178] = 1;
 				worldState[0x0C] = 1;
 			}
 			if (*reinterpret_cast<short*>(worldState + 0x10) <= 4) {
@@ -3205,7 +3205,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 
 	if (worldState[8] != 2) {
 		return;
@@ -3378,8 +3378,8 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcChara();
 	}
 
-	unsigned char* const selectState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* const animState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+	unsigned char* const selectState = m_wm.m_charaSelectData;
+	unsigned char* const animState = reinterpret_cast<unsigned char*>(m_wmCharaAnimState);
 	if (selectState[0x0E] != 0) {
 		return -2;
 	}
@@ -3422,7 +3422,7 @@ void CMenuPcs::CalcGoOutSelCharInit()
 void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	int* const menuCharaAnims = *reinterpret_cast<int**>(bytes + 0x844);
+	int* const menuCharaAnims = m_wmCharaAnimState;
 
 	menuCharaAnims[charaIndex * 5 + 1] = animIndex;
 }
@@ -3438,8 +3438,7 @@ void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
  */
 extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs* menuPcs)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menuPcs);
-	unsigned char* const data = *reinterpret_cast<unsigned char**>(bytes + 0x828);
+	unsigned char* const data = menuPcs->m_wm.m_charaSelectData;
 
 	data[0xA] = 0;
 	data[0xE] = 0;
@@ -3457,7 +3456,7 @@ extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs* menuPcs)
 unsigned int CMenuPcs::IsMenuCharaAnimIdle(int charaIndex)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const menuCharaAnims = *reinterpret_cast<unsigned char**>(bytes + 0x844);
+	unsigned char* const menuCharaAnims = reinterpret_cast<unsigned char*>(m_wmCharaAnimState);
 
 	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<unsigned int*>(menuCharaAnims + charaIndex * 0x14)[0])) >> 5 & 0xff;
 }
@@ -7024,8 +7023,8 @@ void CMenuPcs::DrawCharaBase()
 void CMenuPcs::CalcChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const charaSelect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const charaSelect = m_wm.m_charaSelectData;
+	unsigned char* modelData = m_wm.m_charaModelData;
 	int* charaWork = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0] + 0xA00);
 	unsigned int selectedMask = 0;
 
@@ -7213,7 +7212,7 @@ void CMenuPcs::CalcChara()
 void CMenuPcs::PCAnimCtrl()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const charaSelect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned int selectedMask = 0;
 
 	if (charaSelect[0x0D] != 0 && charaSelect[0x0A] != 0) {
@@ -7229,7 +7228,7 @@ void CMenuPcs::PCAnimCtrl()
 		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x34)[0];
 	}
 
-	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+	int* animState = m_wmCharaAnimState;
 	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		const int blendMode = -1 - (handle->m_currentAnimIndex >> 31);
@@ -8647,7 +8646,7 @@ void CMenuPcs::WMChgMenu()
 void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const modelData = m_wm.m_charaModelData;
 	unsigned char* const mcList = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
 	int partyCount = 0;
 
@@ -8682,7 +8681,7 @@ void CMenuPcs::SetParty()
 void CMenuPcs::SetCMakeEnd(int channel)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const selectData = m_wm.m_charaSelectData;
 	selectData[channel * 0x10 + 0xC] = 1;
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), channel,
@@ -8702,8 +8701,8 @@ void CMenuPcs::SetCMakeEnd(int channel)
 void CMenuPcs::ClrCMakeFlg(int channel)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const selectData = m_wm.m_charaSelectData;
+	unsigned char* const modelData = m_wm.m_charaModelData;
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
@@ -8728,11 +8727,12 @@ void CMenuPcs::ChgAllModel()
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	unsigned char* handleData = bytes;
+	unsigned char* const modelDataBase = m_wm.m_charaModelData;
 	int modelOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
-		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		unsigned char* modelData = modelDataBase + modelOffset;
 		unsigned int race;
 		unsigned int variant;
 		unsigned int index;
@@ -8754,7 +8754,7 @@ void CMenuPcs::ChgAllModel()
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
 		}
 
-		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		modelData = modelDataBase + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
 			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
@@ -8786,13 +8786,14 @@ void CMenuPcs::ChgAllModel2()
 {
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* handleData = bytes;
+	unsigned char* const modelDataBase = m_wm.m_charaModelData;
 	int modelOffset = 0;
 	int pdtOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
 		    m_cmakeWork + pdtOffset + 0x14D0;
-		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		unsigned char* modelData = modelDataBase + modelOffset;
 		unsigned int race;
 		unsigned int variant;
 		unsigned int index;
@@ -8809,7 +8810,7 @@ void CMenuPcs::ChgAllModel2()
 			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
 		}
 
-		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
+		modelData = modelDataBase + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
 			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
@@ -8840,8 +8841,8 @@ void CMenuPcs::ChgAllModel2()
 void CMenuPcs::SetMakeChara(int slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const selectData = m_wm.m_charaSelectData;
+	unsigned char* const modelData = m_wm.m_charaModelData;
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 
 	if (slot < 0) {
@@ -8891,7 +8892,7 @@ void CMenuPcs::SetMakeChara(int slot)
 void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* modelData = m_wm.m_charaModelData;
 	modelData += slot * 0x34;
 	int modelNo;
 	int charaKind;
@@ -8942,7 +8943,7 @@ void CMenuPcs::SetAnim(int anim)
 	handle->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
 	handle->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
 
-	int* const animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]) + anim * 5;
+	int* const animState = m_wmCharaAnimState + anim * 5;
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
@@ -9225,7 +9226,7 @@ void CMenuPcs::CalcMainMenuSub()
 void CMenuPcs::ChkSelectParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const modelData = m_wm.m_charaModelData;
 	int selected = 0;
 
 	if (modelData == 0) {
@@ -11230,7 +11231,7 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 		loadedCount++;
 	}
 	if (ready != 0) {
-		const unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+		const unsigned char* const selectData = m_wm.m_charaSelectData;
 		if (selectData != 0) {
 			for (int i = 0; i < 4; i++) {
 				if (selectData[i * 0x10 + 0xB] != 0 && selectData[i * 0x10 + 0xC] == 0) {

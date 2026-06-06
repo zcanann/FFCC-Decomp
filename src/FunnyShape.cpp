@@ -520,30 +520,33 @@ void CFunnyShape::RenderTexture()
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
     const u32 colorWord = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = kFunnyShapeNegativeOne;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeZero;
+    float negOne = kFunnyShapeNegativeOne;
+    float one = kFunnyShapeOne;
+    float zero = kFunnyShapeZero;
+    GXWGFifo.f32 = negOne;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = zero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = kFunnyShapeZero;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = zero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeNegativeOne;
-    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = negOne;
+    GXWGFifo.f32 = zero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = kFunnyShapeOne;
-    GXWGFifo.f32 = kFunnyShapeZero;
-    GXWGFifo.f32 = kFunnyShapeNegativeOne;
-    GXWGFifo.f32 = kFunnyShapeNegativeOne;
-    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = one;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = negOne;
+    GXWGFifo.f32 = negOne;
+    GXWGFifo.f32 = zero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = kFunnyShapeZero;
-    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = zero;
+    GXWGFifo.f32 = zero;
 }
 
 /*

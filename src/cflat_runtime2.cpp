@@ -1335,9 +1335,9 @@ void CFlatRuntime2::Calc()
 	}
 
 	u16 button = 0;
-	if (Pad._452_4_ == 0) {
-		const u32 padIndex = static_cast<u32>((1 - Pad._448_4_) | (Pad._448_4_ - 1)) >> 31;
-		button = *reinterpret_cast<u16*>(PadRaw() + padIndex * 0x54 + 0x36);
+	if (Pad.m_debugPadLock == 0) {
+		const u32 padIndex = static_cast<u32>((1 - Pad.m_debugPadPort) | (Pad.m_debugPadPort - 1)) >> 31;
+		button = Pad.GetPadInputs()[padIndex].lockedButton[1];
 	}
 
 	if (((button & 0x400) != 0) && (CFlatSaveSceneEnabled() != 0)) {
@@ -2402,7 +2402,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0x17:
-	Pad._1c8_4_ = static_cast<int>(controlValue);
+	Pad.m_stickDigitalThreshold = static_cast<int>(controlValue);
 		break;
 
 	case 0x18:
@@ -2569,7 +2569,7 @@ void CFlatRuntime2::resetChangeScript()
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;
-	Pad._1c8_4_ = 1;
+	Pad.m_stickDigitalThreshold = 1;
 	GraphicPcs.m_screenFade[1].m_mode = 0;
 	CameraPcs.m_shadowAuto = 1;
 	AStar.reset();

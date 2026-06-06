@@ -333,7 +333,7 @@ void CMenuPcs::LetterInit2()
 	SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 	GetSingWinSize(0, &winW, &winH, 1);
 	SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-	m_singWindowInfo[5] = 0;
+	m_menuWindowInfo->state = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
 }
@@ -399,7 +399,7 @@ void CMenuPcs::LetterInit3()
 	s16 winH;
 	GetSingWinSize(0, &winW, &winH, 1);
 	SetMcWinInfo(winW, winH);
-	m_singWindowInfo[5] = 0;
+	m_menuWindowInfo->state = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
 }
@@ -474,7 +474,7 @@ void CMenuPcs::LetterInit4()
 	s16 winH;
 	GetSingWinSize(0, &winW, &winH, 1);
 	SetMcWinInfo(winW, winH);
-	m_singWindowInfo[5] = 0;
+	m_menuWindowInfo->state = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -767,11 +767,11 @@ int CMenuPcs::LetterCtrl()
 				SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 				GetSingWinSize(0, &winW, &winH, 1);
 				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-				m_singWindowInfo[5] = 0;
+				m_menuWindowInfo->state = 0;
 				*reinterpret_cast<s16*>(state + 0x28) = 0;
 				*reinterpret_cast<char*>(state + 0xC) = 1;
 			}
-			if (m_singWindowInfo[5] == 1) {
+			if (m_menuWindowInfo->state == 1) {
 				*reinterpret_cast<s16*>(state + 0x12) = 1;
 			}
 		} else if (mode == 3) {
@@ -784,12 +784,12 @@ int CMenuPcs::LetterCtrl()
 				s16 winH;
 				GetSingWinSize(2, &winW, &winH, 0);
 				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-				m_singWindowInfo[5] = 0;
+				m_menuWindowInfo->state = 0;
 				*reinterpret_cast<s16*>(state + 0x28) = 0;
 				*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
 				*reinterpret_cast<char*>(state + 0xC) = 1;
 			}
-			if (m_singWindowInfo[5] == 1) {
+			if (m_menuWindowInfo->state == 1) {
 				*reinterpret_cast<s16*>(state + 0x12) = 1;
 			}
 		} else if (mode == 5) {
@@ -841,7 +841,7 @@ int CMenuPcs::LetterCtrl()
 		} else if (mode == 1) {
 			ret = LetterMessClose();
 		} else if (mode == 2) {
-			if (m_singWindowInfo[5] == 3) {
+			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(state + 0xC) = 0;
 				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 					*reinterpret_cast<s16*>(state + 0x30) = 1;
@@ -854,7 +854,7 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<s16*>(state + 0x28) = 0;
 			}
 		} else if (mode == 3) {
-			if (m_singWindowInfo[5] == 3) {
+			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(state + 0xC) = 0;
 				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 					*reinterpret_cast<s16*>(state + 0x30) = 1;
@@ -866,7 +866,7 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<char*>(state + 0xC) = 0;
 			}
 		} else if (mode == 4) {
-			if (m_singWindowInfo[5] == 3) {
+			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(state + 0xC) = 0;
 				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 					*reinterpret_cast<s16*>(state + 0x30) = 3;
@@ -904,7 +904,7 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 5) {
-			if (m_singWindowInfo[5] == 3) {
+			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(state + 0xC) = 0;
 				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 					*reinterpret_cast<s16*>(state + 0x30) = 3;
@@ -1321,12 +1321,12 @@ void CMenuPcs::LetterItemWinOpen()
 		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 		GetSingWinSize(0, &winW, &winH, 1);
 		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-		m_singWindowInfo[5] = 0;
+		m_menuWindowInfo->state = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
 	}
 
-	if (m_singWindowInfo[5] == 1) {
+	if (m_menuWindowInfo->state == 1) {
 		*reinterpret_cast<s16*>(state + 0x12) = 1;
 	}
 }
@@ -1339,7 +1339,7 @@ void CMenuPcs::LetterItemWinOpen()
 void CMenuPcs::LetterItemWinClose()
 {
 	int state = GetLetterStateBase(this);
-	if (m_singWindowInfo[5] == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
 		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 			*reinterpret_cast<s16*>(state + 0x30) = 1;
@@ -1435,11 +1435,11 @@ bool CMenuPcs::LetterReplyWinOpen()
 		s16 winH;
 		GetSingWinSize(0, &winW, &winH, 1);
 		SetMcWinInfo(winW, winH);
-		m_singWindowInfo[5] = 0;
+		m_menuWindowInfo->state = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
 	}
-	return m_singWindowInfo[5] == 1;
+	return m_menuWindowInfo->state == 1;
 }
 
 /*
@@ -1450,7 +1450,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 void CMenuPcs::LetterReplyWinClose()
 {
 	int state = GetLetterStateBase(this);
-	if (m_singWindowInfo[5] == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
 		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 			*reinterpret_cast<s16*>(state + 0x30) = 1;
@@ -1476,13 +1476,13 @@ void CMenuPcs::LetterAttachWinOpen()
 		s16 winH;
 		GetSingWinSize(2, &winW, &winH, 0);
 		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
-		m_singWindowInfo[5] = 0;
+		m_menuWindowInfo->state = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
 	}
 
-	if (m_singWindowInfo[5] == 1) {
+	if (m_menuWindowInfo->state == 1) {
 		*reinterpret_cast<s16*>(state + 0x12) = 1;
 	}
 }
@@ -1495,7 +1495,7 @@ void CMenuPcs::LetterAttachWinOpen()
 void CMenuPcs::LetterAttachWinClose()
 {
 	int state = GetLetterStateBase(this);
-	if (m_singWindowInfo[5] == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
 		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
@@ -1617,13 +1617,13 @@ bool CMenuPcs::LetterConfirmOpen()
 		s16 winH;
 		GetSingWinSize(0, &winW, &winH, 1);
 		SetMcWinInfo(winW, winH);
-		m_singWindowInfo[5] = 0;
+		m_menuWindowInfo->state = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
 	}
 
-	return m_singWindowInfo[5] == 1;
+	return m_menuWindowInfo->state == 1;
 }
 
 /*
@@ -1634,7 +1634,7 @@ bool CMenuPcs::LetterConfirmOpen()
 void CMenuPcs::LetterConfirmClose()
 {
 	int state = GetLetterStateBase(this);
-	if (m_singWindowInfo[5] == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
 		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
@@ -1926,7 +1926,7 @@ void CMenuPcs::LetterMessDraw()
 
 	DrawSingWin(-1);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
-	    (m_singWindowInfo[5] == 1)) {
+	    (m_menuWindowInfo->state == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
 		if (mode == 4) {
 			DrawSingWinMess(2, msgType, 0);
@@ -1936,7 +1936,7 @@ void CMenuPcs::LetterMessDraw()
 
 		float cursorX;
 		float cursorY;
-		short* singWin = m_singWindowInfo;
+		MenuWindowInfo* window = m_menuWindowInfo;
 		int itemSel = *reinterpret_cast<s16*>(state + 0x28);
 		if ((mode == 2) || (mode == 5)) {
 			if (mode == 2) {
@@ -1944,14 +1944,14 @@ void CMenuPcs::LetterMessDraw()
 			} else {
 				itemSel += ((s_Attach == 2) ? 1 : 0) + 4;
 			}
-			cursorX = static_cast<float>(singWin[0] + 0x14);
-			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight() + 0x20);
+			cursorX = static_cast<float>(window->x + 0x14);
+			cursorY = static_cast<float>(window->y + itemSel * SingWinMessHeight() + 0x20);
 		} else if ((mode == 3) || (mode == 4)) {
-			cursorX = static_cast<float>(singWin[0] - 8);
+			cursorX = static_cast<float>(window->x - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
+			cursorY = static_cast<float>(window->y + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
 		int frame = static_cast<int>(System.m_frameCounter);
@@ -2086,7 +2086,7 @@ int CMenuPcs::LetterCtrlCur()
 					*reinterpret_cast<u8*>(state + 8) = 1;
 				}
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-				m_singWindowInfo[5] = 2;
+				m_menuWindowInfo->state = 2;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 0;
 			}
@@ -2111,7 +2111,7 @@ int CMenuPcs::LetterCtrlCur()
 					*reinterpret_cast<u8*>(state + 8) = 1;
 				}
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-				m_singWindowInfo[5] = 2;
+				m_menuWindowInfo->state = 2;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
 			}
@@ -2149,7 +2149,7 @@ int CMenuPcs::LetterCtrlCur()
 				}
 				*reinterpret_cast<u8*>(state + 8) = 0xFF;
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-				m_singWindowInfo[5] = 2;
+				m_menuWindowInfo->state = 2;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 0;
 			}
@@ -2196,7 +2196,7 @@ int CMenuPcs::LetterCtrlCur()
 			}
 
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-			m_singWindowInfo[5] = 2;
+			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;
 		}
@@ -2235,7 +2235,7 @@ int CMenuPcs::LetterCtrlCur()
 				*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
 				s_AttachMode = 0;
 				s_AttachItem = 0;
-				m_singWindowInfo[5] = 2;
+				m_menuWindowInfo->state = 2;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				return 0;
 			}
@@ -2244,7 +2244,7 @@ int CMenuPcs::LetterCtrlCur()
 			}
 			*reinterpret_cast<u8*>(state + 8) = 0xFF;
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-			m_singWindowInfo[5] = 2;
+			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
 			return 0;
 		}
@@ -2284,7 +2284,7 @@ int CMenuPcs::LetterCtrlCur()
 			}
 
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-			m_singWindowInfo[5] = 2;
+			m_menuWindowInfo->state = 2;
 			Sound.PlaySe(2, 0x40, 0x7F, 0);
 			return 0;
 		}
@@ -2293,7 +2293,7 @@ int CMenuPcs::LetterCtrlCur()
 		}
 		*reinterpret_cast<u8*>(state + 8) = 0xFF;
 		*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-		m_singWindowInfo[5] = 2;
+		m_menuWindowInfo->state = 2;
 		Sound.PlaySe(3, 0x40, 0x7F, 0);
 		return 0;
 	}

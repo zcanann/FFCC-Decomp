@@ -30,6 +30,7 @@ struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
 struct CmakeMenuState;
+struct GoOutMenuState;
 
 struct MenuBoardEntry
 {
@@ -749,6 +750,7 @@ public:
         CmakeMenuState* m_cmakeState;
         short* m_cmdState;
         WmWorldState* m_wmWorldState;
+        GoOutMenuState* m_goOutState;
         int m_bonusStatePtr;
     };
     union {
@@ -859,6 +861,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);

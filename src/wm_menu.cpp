@@ -3851,35 +3851,32 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(0, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
-					*reinterpret_cast<short*>(worldState + 0x1E) = -1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+				if (typedWorldState->m_state0E < 0) {
+					typedWorldState->m_nextMenuMode = -1;
+					typedWorldState->m_delay = 1;
 					*reinterpret_cast<short*>(bytes + 0x870) = 1;
 				} else if (subState == 2) {
-					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+					typedWorldState->m_subState = 3;
 				} else {
-					*reinterpret_cast<short*>(worldState + 0x16) = 1;
+					typedWorldState->m_subState = 1;
 				}
 			}
 			break;
 		case 1:
-			if (*reinterpret_cast<short*>(worldState + 0x22) > 0x12) {
-				*reinterpret_cast<short*>(worldState + 0x16) = 3;
+			if (typedWorldState->m_frameCounter > 0x12) {
+				typedWorldState->m_subState = 3;
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) =
-			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) + 1;
+			typedWorldState->m_frameCounter++;
 			break;
 		case 3:
-			if (*reinterpret_cast<short*>(worldState + 0x2E) != 1) {
+			if (typedWorldState->m_mcResult != 1) {
 				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				short mcResult = *reinterpret_cast<short*>(worldState + 0x2E);
-				if (mcResult == -1) *reinterpret_cast<short*>(worldState + 0x16) = 5;
-				else if (mcResult == -2) *reinterpret_cast<short*>(worldState + 0x16) = 8;
-				else if (mcResult == -3) *reinterpret_cast<short*>(worldState + 0x16) = 6;
-				else if (mcResult == -4) *reinterpret_cast<short*>(worldState + 0x16) = 7;
-				else if (mcResult == 0) *reinterpret_cast<short*>(worldState + 0x16) = 4;
+				short mcResult = typedWorldState->m_mcResult;
+				if (mcResult == -1) typedWorldState->m_subState = 5;
+				else if (mcResult == -2) typedWorldState->m_subState = 8;
+				else if (mcResult == -3) typedWorldState->m_subState = 6;
+				else if (mcResult == -4) typedWorldState->m_subState = 7;
+				else if (mcResult == 0) typedWorldState->m_subState = 4;
 			}
 			break;
 		case 4:
@@ -3888,13 +3885,12 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				short mcRes = *reinterpret_cast<short*>(worldState + 0x2E);
-				if (mcRes == -3) *reinterpret_cast<short*>(worldState + 0x16) = 8;
-				else if (mcRes == -4) *reinterpret_cast<short*>(worldState + 0x16) = 8;
-				else if (mcRes == -5) *reinterpret_cast<short*>(worldState + 0x16) = 7;
-				else if (mcRes == -6) *reinterpret_cast<short*>(worldState + 0x16) = 0x10;
-				else *reinterpret_cast<short*>(worldState + 0x16) = 10;
+				short mcRes = typedWorldState->m_mcResult;
+				if (mcRes == -3) typedWorldState->m_subState = 8;
+				else if (mcRes == -4) typedWorldState->m_subState = 8;
+				else if (mcRes == -5) typedWorldState->m_subState = 7;
+				else if (mcRes == -6) typedWorldState->m_subState = 0x10;
+				else typedWorldState->m_subState = 10;
 			}
 			break;
 		case 5:

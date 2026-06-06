@@ -7,10 +7,7 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct SRandFVDataOffsets {
-    s32 m_stateOffset;
-};
-
+STATIC_ASSERT(sizeof(SRandFVDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(SRandFVDataOffsets, m_stateOffset) == 0x0);
 
 static inline SRandFVDataOffsets* GetSRandFVDataOffsets(_pppCtrlTable* ctrl)

@@ -473,6 +473,41 @@ static inline CFont* GetWmFont(CMenuPcs* menu)
 	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
 }
 
+static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
+{
+	unsigned char* const frame = menu->m_wm.m_frameInfo;
+
+	*reinterpret_cast<short*>(frame + 4) = 0x10;
+	int frameAddr = reinterpret_cast<int>(frame);
+	*reinterpret_cast<short*>(frameAddr + 0x20) =
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(
+	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 8)) +
+	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 4)))));
+
+	if (param < 0) {
+		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) +
+		                                  static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
+		if (param > -11) {
+			unsigned int sign = static_cast<unsigned int>(param) >> 31;
+			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
+			float tUnclamped = static_cast<float>(static_cast<int>(absParam));
+			float scaledOffset = offset * 0.1f * tUnclamped;
+			if (static_cast<int>(absParam) < 0) {
+				absParam = 0;
+			}
+			if (static_cast<int>(absParam) > 10) {
+				absParam = 10;
+			}
+			float tClamped = static_cast<float>(static_cast<int>(absParam));
+			offset = scaledOffset * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * tClamped * FLOAT_803316d4)));
+		}
+		*reinterpret_cast<short*>(frame + 4) =
+		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 4))) - offset));
+		*reinterpret_cast<short*>(frame + 0x20) =
+		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
+	}
+}
+
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
 {
 	if (slot < 0 || slot >= kWmMenuPlayerCount) {
@@ -1313,7 +1348,7 @@ void CMenuPcs::CalcDiaryMenu()
 			} else if (state < 1 || state > 3) {
 				frameStep = -worldState->m_frameCounter;
 			}
-			CalcWMFrame0(frameStep);
+			CalcWmFrame0Inline(this, frameStep);
 		}
 		CalcMainMenuSub();
 		break;
@@ -1346,7 +1381,7 @@ void CMenuPcs::CalcDiaryMenu()
 				} else if (state < 1 || state > 3) {
 					frameStep = -worldState->m_frameCounter;
 				}
-				CalcWMFrame0(frameStep);
+				CalcWmFrame0Inline(this, frameStep);
 				const short animState = worldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();

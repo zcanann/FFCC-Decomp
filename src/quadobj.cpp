@@ -113,7 +113,7 @@ void CGQuadObj::onDraw()
 
         int next;
         QuadVertex* vertex;
-        QuadVertex* current = m_vertices;
+        CGQuadObj* current = this;
         int i = 0;
 
         while (i < (int)(u32)m_vertexCount) {
@@ -121,17 +121,17 @@ void CGQuadObj::onDraw()
 
             next = i + 1;
             i = i + 1;
-            GXPosition3f32(current->x, m_yBase, current->z);
+            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
             count = m_vertexCount;
             int nextIndex = next % (int)count;
             GXPosition3f32(m_vertices[nextIndex].x, m_yBase, m_vertices[nextIndex].z);
-            GXPosition3f32(current->x, m_yBase + m_yHeight, current->z);
+            GXPosition3f32(current->m_vertices[0].x, m_yBase + m_yHeight, current->m_vertices[0].z);
             count = m_vertexCount;
             nextIndex = next % (int)count;
             GXPosition3f32(m_vertices[nextIndex].x, m_yBase + m_yHeight, m_vertices[nextIndex].z);
-            GXPosition3f32(current->x, m_yBase, current->z);
-            vertex = current;
-            current++;
+            GXPosition3f32(current->m_vertices[0].x, m_yBase, current->m_vertices[0].z);
+            vertex = current->m_vertices;
+            current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<char*>(current) + sizeof(QuadVertex));
             GXPosition3f32(vertex->x, m_yBase + m_yHeight, vertex->z);
         }
     }

@@ -350,7 +350,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFunnyShape::ClearShapeData()
+inline void CFunnyShape::ClearShapeData()
 {
 }
 

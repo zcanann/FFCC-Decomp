@@ -89,6 +89,7 @@ public:
     ArtiState* m_artiState;             // 0x82C
     char pad_830[0x838 - 0x830];
     EffectEntry* m_effectEntries;       // 0x838
+    char pad_83C[0x840 - 0x83C];
     EffectInfo* m_effectWork;           // 0x840
     char pad_844[0x864 - 0x844];
     unsigned short m_battleStateFlag;   // 0x864

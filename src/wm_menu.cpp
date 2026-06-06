@@ -8115,7 +8115,8 @@ void CMenuPcs::DrawCharaName()
 			font->SetPosY(y);
 			font->Draw(text);
 			if (restoreColor) {
-				font->SetColor(shade.color);
+				CColor restore(0xFF, 0xFF, 0xFF, 0xFF);
+				font->SetColor(restore.color);
 			}
 		}
 	}

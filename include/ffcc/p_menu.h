@@ -92,7 +92,7 @@ struct WmWorldState
 {
     float m_posX;
     float m_posY;
-    unsigned char m_worldReady;
+    char m_worldReady;
     unsigned char m_flag09;
     unsigned char m_flag0A;
     unsigned char m_flag0B;

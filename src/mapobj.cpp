@@ -624,82 +624,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_attribute = mimeAttr;
             break;
         }
-        case CHUNK_PLIT: {
-            if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
-            }
-            CMapObjAtrPointLight* pointLightAttr =
-                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0xD4) CMapObjAtrPointLight();
-            CMapObjAtrPointLight* pointLight = pointLightAttr;
-
-            if (chunk.m_version == 2) {
-                chunkFile.PushChunk();
-                while (chunkFile.GetNextChunk(chunk) != 0) {
-                    if (chunk.m_id == CHUNK_LDAT) {
-                        pointLight->m_radius = chunkFile.GetF4();
-                        pointLight->m_intensity = chunkFile.GetF4();
-                        pointLight->m_colorMode = chunkFile.Get1();
-                        pointLight->m_useAltColor = chunkFile.Get1();
-                        pointLight->m_unknown20 = chunkFile.Get1();
-                        chunkFile.Get1();
-
-                        pointLight->m_colorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
-                            pointLight->m_colors[i].r = chunkFile.Get1();
-                            pointLight->m_colors[i].g = chunkFile.Get1();
-                            pointLight->m_colors[i].b = chunkFile.Get1();
-                            pointLight->m_colors[i].a = chunkFile.Get1();
-                        }
-
-                        pointLight->m_altColorCount = chunkFile.Get1();
-                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
-                            pointLight->m_altColors[i].r = chunkFile.Get1();
-                            pointLight->m_altColors[i].g = chunkFile.Get1();
-                            pointLight->m_altColors[i].b = chunkFile.Get1();
-                            pointLight->m_altColors[i].a = chunkFile.Get1();
-                        }
-
-                        pointLight->m_color = pointLight->m_colors[0];
-                        pointLight->m_altColor = pointLight->m_altColors[0];
-                    } else {
-                        if (static_cast<int>(chunk.m_id) < CHUNK_LDAT) {
-                            if (chunk.m_id == CHUNK_CJUN) {
-                                pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                            } else if (static_cast<int>(chunk.m_id) < CHUNK_CJUN) {
-                                if (chunk.m_id == CHUNK_CFRM) {
-                                    pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                                }
-                            } else if (chunk.m_id == CHUNK_CKEY) {
-                                pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                            }
-                        } else if (chunk.m_id == CHUNK_MJUN) {
-                            pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        } else if (static_cast<int>(chunk.m_id) < CHUNK_MJUN) {
-                            if (chunk.m_id == CHUNK_MFRM) {
-                                pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                            }
-                        } else if (chunk.m_id == CHUNK_MKEY) {
-                            pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        }
-                    }
-                }
-                chunkFile.PopChunk();
-            } else if (chunk.m_version == 1) {
-                pointLight->m_color.r = chunkFile.Get1();
-                pointLight->m_color.g = chunkFile.Get1();
-                pointLight->m_color.b = chunkFile.Get1();
-                pointLight->m_color.a = chunkFile.Get1();
-                pointLight->m_altColor.r = chunkFile.Get1();
-                pointLight->m_altColor.g = chunkFile.Get1();
-                pointLight->m_altColor.b = chunkFile.Get1();
-                pointLight->m_altColor.a = chunkFile.Get1();
-                pointLight->m_radius = chunkFile.GetF4();
-                pointLight->m_intensity = chunkFile.GetF4();
-                pointLight->m_colorMode = chunkFile.Get1();
-            }
-            m_attribute = pointLightAttr;
-            break;
-        }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
@@ -803,6 +727,82 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_unknown2E = chunkFile.Get1();
             }
             m_attribute = spotLightAttr;
+            break;
+        }
+        case CHUNK_PLIT: {
+            if (m_attribute != 0) {
+                System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
+            }
+            CMapObjAtrPointLight* pointLightAttr =
+                new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0xD4) CMapObjAtrPointLight();
+            CMapObjAtrPointLight* pointLight = pointLightAttr;
+
+            if (chunk.m_version == 2) {
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk) != 0) {
+                    if (chunk.m_id == CHUNK_LDAT) {
+                        pointLight->m_radius = chunkFile.GetF4();
+                        pointLight->m_intensity = chunkFile.GetF4();
+                        pointLight->m_colorMode = chunkFile.Get1();
+                        pointLight->m_useAltColor = chunkFile.Get1();
+                        pointLight->m_unknown20 = chunkFile.Get1();
+                        chunkFile.Get1();
+
+                        pointLight->m_colorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_colorCount); i++) {
+                            pointLight->m_colors[i].r = chunkFile.Get1();
+                            pointLight->m_colors[i].g = chunkFile.Get1();
+                            pointLight->m_colors[i].b = chunkFile.Get1();
+                            pointLight->m_colors[i].a = chunkFile.Get1();
+                        }
+
+                        pointLight->m_altColorCount = chunkFile.Get1();
+                        for (int i = 0; i < static_cast<int>(pointLight->m_altColorCount); i++) {
+                            pointLight->m_altColors[i].r = chunkFile.Get1();
+                            pointLight->m_altColors[i].g = chunkFile.Get1();
+                            pointLight->m_altColors[i].b = chunkFile.Get1();
+                            pointLight->m_altColors[i].a = chunkFile.Get1();
+                        }
+
+                        pointLight->m_color = pointLight->m_colors[0];
+                        pointLight->m_altColor = pointLight->m_altColors[0];
+                    } else {
+                        if (static_cast<int>(chunk.m_id) < CHUNK_LDAT) {
+                            if (chunk.m_id == CHUNK_CJUN) {
+                                pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                            } else if (static_cast<int>(chunk.m_id) < CHUNK_CJUN) {
+                                if (chunk.m_id == CHUNK_CFRM) {
+                                    pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                                }
+                            } else if (chunk.m_id == CHUNK_CKEY) {
+                                pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                            }
+                        } else if (chunk.m_id == CHUNK_MJUN) {
+                            pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        } else if (static_cast<int>(chunk.m_id) < CHUNK_MJUN) {
+                            if (chunk.m_id == CHUNK_MFRM) {
+                                pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                            }
+                        } else if (chunk.m_id == CHUNK_MKEY) {
+                            pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        }
+                    }
+                }
+                chunkFile.PopChunk();
+            } else if (chunk.m_version == 1) {
+                pointLight->m_color.r = chunkFile.Get1();
+                pointLight->m_color.g = chunkFile.Get1();
+                pointLight->m_color.b = chunkFile.Get1();
+                pointLight->m_color.a = chunkFile.Get1();
+                pointLight->m_altColor.r = chunkFile.Get1();
+                pointLight->m_altColor.g = chunkFile.Get1();
+                pointLight->m_altColor.b = chunkFile.Get1();
+                pointLight->m_altColor.a = chunkFile.Get1();
+                pointLight->m_radius = chunkFile.GetF4();
+                pointLight->m_intensity = chunkFile.GetF4();
+                pointLight->m_colorMode = chunkFile.Get1();
+            }
+            m_attribute = pointLightAttr;
             break;
         }
         case CHUNK_PSTA: {

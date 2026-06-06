@@ -617,7 +617,7 @@ void CMenuPcs::ChkNumItemAll()
 void CMenuPcs::loadData()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<unsigned short*>(bytes + 0x86C) = 0;
+	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
 	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
 

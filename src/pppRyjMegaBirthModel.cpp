@@ -1043,22 +1043,16 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
 void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMegaBirthModel* params,
                 _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, pppFMATRIX& out, unsigned char copyOut)
 {
-    u8* payload = (u8*)params;
-    const u8 matrixMode = params->m_spawnMode;
-    const u8 flagsMatrix = params->m_matrixMode;
-    const u8 flagsEnd = params->m_matrixFinalizeMode;
     pppFMATRIX tmp;
     Mtx scale;
-    pppFMATRIX* objectMatrix = &pObject->m_drawMatrix;
-    bool copyOutMatrix = true;
 
-    if (flagsMatrix == 0) {
+    if (params->m_matrixMode != 0) {
+        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
+    } else {
         pppUnitMatrix(mtxB);
         mtxB.value[0][3] = particleData->m_matrix[0][3];
         mtxB.value[1][3] = particleData->m_matrix[1][3];
         mtxB.value[2][3] = particleData->m_matrix[2][3];
-    } else {
-        pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     }
 
     if (*s32_at(particleData, 0x38) != 0 ||
@@ -1080,7 +1074,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     pppMulMatrix(mtxB, tmp, *(pppFMATRIX*)&scale);
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
 
-    switch (matrixMode) {
+    switch (params->m_spawnMode) {
     case 1:
     case 3:
     case 5:
@@ -1099,6 +1093,9 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         mtxB.value[0][3] = transformedPos.x;
         mtxB.value[1][3] = transformedPos.y;
         mtxB.value[2][3] = transformedPos.z;
+        if (copyOut != 0) {
+            pppCopyMatrix(out, mtxB);
+        }
         break;
     }
     default:
@@ -1111,22 +1108,18 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         } else {
             pppCopyMatrix(tmp, mtxB);
             pppMulMatrix(mtxB, ppvMng->m_matrix, tmp);
-            copyOutMatrix = false;
+        }
+
+        pppCopyMatrix(tmp, mtxB);
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, tmp);
+        pppCopyMatrix(pObject->m_drawMatrix, mtxB);
+        if (copyOut != 0) {
+            pppCopyMatrix(out, mtxB);
         }
         break;
     }
 
-    if (matrixMode != 1 && matrixMode != 3 && matrixMode != 5 && matrixMode != 7 && matrixMode != 9) {
-        pppCopyMatrix(tmp, mtxB);
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, tmp);
-        pppCopyMatrix(*objectMatrix, mtxB);
-    }
-
-    if ((copyOut != 0) && copyOutMatrix) {
-        pppCopyMatrix(out, mtxB);
-    }
-
-    if (flagsEnd != 0) {
+    if (params->m_matrixFinalizeMode != 0) {
         Vec objectPos;
         Vec endPos;
 
@@ -1140,7 +1133,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);
-        PSMTXScaleApply(mtxB.value, objectMatrix->value, *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
+        PSMTXScaleApply(mtxB.value, pObject->m_drawMatrix.value, *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
                         *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
                         *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
@@ -1148,12 +1141,12 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppFMATRIX rot;
 
         PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)*s32_at(particleData, 0x40));
-        pppCopyMatrix(tmp, *objectMatrix);
-        pppMulMatrix(*objectMatrix, rot, tmp);
+        pppCopyMatrix(tmp, pObject->m_drawMatrix);
+        pppMulMatrix(pObject->m_drawMatrix, rot, tmp);
 
-        objectMatrix->value[0][3] = endPos.x;
-        objectMatrix->value[1][3] = endPos.y;
-        objectMatrix->value[2][3] = endPos.z;
+        pObject->m_drawMatrix.value[0][3] = endPos.x;
+        pObject->m_drawMatrix.value[1][3] = endPos.y;
+        pObject->m_drawMatrix.value[2][3] = endPos.z;
     }
 }
 

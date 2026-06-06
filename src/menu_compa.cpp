@@ -366,7 +366,7 @@ bool CMenuPcs::CompaClose()
 void CMenuPcs::CompaCtrl()
 {
 	bool activeInput = false;
-	int padState = Pad._452_4_;
+	int padState = Pad.m_debugPadLock;
 	unsigned int rawPress;
 	unsigned int rawHold;
 	short press;
@@ -374,7 +374,7 @@ void CMenuPcs::CompaCtrl()
 	int doReset;
 
 	if (padState == 0) {
-		if (Pad._448_4_ != -1) {
+		if (Pad.m_debugPadPort != -1) {
 			goto activePress;
 		}
 	} else {
@@ -386,7 +386,7 @@ activePress:
 		rawPress = 0;
 	} else {
 		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		port &= ~mask;
 		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
 	}
@@ -394,7 +394,7 @@ activePress:
 
 	activeInput = false;
 	if (padState == 0) {
-		if (Pad._448_4_ != -1) {
+		if (Pad.m_debugPadPort != -1) {
 			goto activeHold;
 		}
 	} else {
@@ -406,7 +406,7 @@ activeHold:
 		rawHold = 0;
 	} else {
 		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		port &= ~mask;
 		rawHold = Pad.GetPadInputs()[port].repeatButton;
 	}

@@ -110,26 +110,26 @@ int CMenuPcs::MoneyCtrlCur()
 	unsigned int hold;
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	blocked = false;
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		hold = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 

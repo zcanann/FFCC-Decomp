@@ -2039,12 +2039,12 @@ void CMenuPcs::SingleCalcCtrl()
     reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
     state->result = result;
 
-    bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     unsigned short press;
     if (hasInput) {
         press = 0;
     } else {
-        __cntlzw((unsigned int)Pad._448_4_);
+        __cntlzw((unsigned int)Pad.m_debugPadPort);
         press = Pad.GetPadInputs()[0].buttonDown[0];
     }
 

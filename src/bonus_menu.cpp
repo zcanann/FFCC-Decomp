@@ -1146,16 +1146,16 @@ void CMenuPcs::CalcSelectWait()
 	int padSlot = currentParty->m_partySlot;
 	unsigned short repeat;
 	unsigned short down;
-	if (Pad._452_4_ != 0 || (padSlot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
 		repeat = 0;
 	} else {
-		int resolvedPadSlot = (Pad._448_4_ == padSlot) ? 0 : padSlot;
+		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		repeat = Pad.m_padInputs[resolvedPadSlot].repeatButton;
 	}
-	if (Pad._452_4_ != 0 || (padSlot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (padSlot == 0 && Pad.m_debugPadPort != -1)) {
 		down = 0;
 	} else {
-		int resolvedPadSlot = (Pad._448_4_ == padSlot) ? 0 : padSlot;
+		int resolvedPadSlot = (Pad.m_debugPadPort == padSlot) ? 0 : padSlot;
 		down = Pad.m_padInputs[resolvedPadSlot].buttonDown[0];
 	}
 	int unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
@@ -2493,8 +2493,8 @@ void CMenuPcs::CalcResultCountAnim()
 
 	if (*(short*)(statePtr + 0x10) != 0) {
 		unsigned short buttons = 0;
-		int padRemap = Pad._448_4_;
-		int padLock = Pad._452_4_;
+		int padRemap = Pad.m_debugPadPort;
+		int padLock = Pad.m_debugPadLock;
 		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 			unsigned int padIndex = s_Rinfo->m_party[i].m_partySlot;
 			unsigned short down;
@@ -3091,7 +3091,7 @@ void CMenuPcs::calcBonus()
  */
 void CMenuPcs::destroyBonus()
 {
-	Pad._456_4_ = 1;
+	Pad.m_stickDigitalThreshold = 1;
 
 	if (this->m_fonts[1] != 0) {
 		ReleaseBonusRefObject(this->m_fonts[1]);
@@ -3167,7 +3167,7 @@ void CMenuPcs::createBonus()
 	int auxPtr = this->m_bonusAuxPtr;
 	int boardPtr = this->m_bonusBoardPtr;
 
-	Pad._456_4_ = 0x28;
+	Pad.m_stickDigitalThreshold = 0x28;
 	for (int i = 0; i < 4; i++) {
 		GbaQue.OpenMenu(i, 0, 0);
 		GbaQue.SetRadarMode(i, 0);

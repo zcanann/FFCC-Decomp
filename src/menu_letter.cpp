@@ -1975,29 +1975,29 @@ int CMenuPcs::LetterCtrlCur()
 	bool blocked = false;
 	unsigned int press;
 	u16 hold;
-	int padState = Pad._452_4_;
+	int padState = Pad.m_debugPadLock;
 
-	if ((padState != 0) || (Pad._448_4_ != -1)) {
+	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		press = 0;
 	} else {
 		int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		padIndex &= ~mask;
 		press = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	blocked = false;
-	if ((padState != 0) || (Pad._448_4_ != -1)) {
+	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		hold = 0;
 	} else {
 		int padIndex = 0;
-		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		padIndex &= ~mask;
 		hold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}

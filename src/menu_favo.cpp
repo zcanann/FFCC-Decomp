@@ -306,8 +306,8 @@ unsigned int CMenuPcs::FavoCtrl()
 	short press;
 	int doReset;
 
-	if (Pad._452_4_ == 0) {
-		if (Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock == 0) {
+		if (Pad.m_debugPadPort != -1) {
 			goto active;
 		}
 	} else {
@@ -319,7 +319,7 @@ active:
 		rawPress = 0;
 	} else {
 		unsigned int port = 0;
-		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
+		int mask = -((__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5) & 1);
 		port &= ~mask;
 		rawPress = Pad.GetPadInputs()[port].buttonDown[0];
 	}

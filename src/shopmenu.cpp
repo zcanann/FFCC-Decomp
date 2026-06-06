@@ -160,7 +160,7 @@ static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)
 
 static inline unsigned short GetPadButtons()
 {
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         return 0;
     }
     return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
@@ -169,18 +169,18 @@ static inline unsigned short GetPadButtons()
 static unsigned short GetShopMenuListButtons()
 {
     if (gShopMenuInputLatch == 0) {
-        if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
             return 0;
         }
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         return Pad.GetPadInputs()[0].repeatButton;
     }
 
     unsigned short buttons;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         buttons = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         buttons = Pad.GetPadInputs()[0].button[0];
     }
 
@@ -188,10 +188,10 @@ static unsigned short GetShopMenuListButtons()
         gShopMenuInputLatch = 0;
     }
 
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         return 0;
     }
-    __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+    __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
     return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
@@ -490,19 +490,19 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
     unsigned short buttons;
 
     if (gShopMenuInputLatch == 0) {
-        bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
         if (hasInput) {
             buttons = 0;
         } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             buttons = Pad.GetPadInputs()[0].repeatButton;
         }
     } else {
-        bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        bool hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
         if (hasInput) {
             buttons = 0;
         } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             buttons = Pad.GetPadInputs()[0].button[0];
         }
 
@@ -510,11 +510,11 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
             gShopMenuInputLatch = 0;
         }
 
-        hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+        hasInput = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
         if (hasInput) {
             buttons = 0;
         } else {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             buttons = Pad.GetPadInputs()[0].buttonDown[0];
         }
     }

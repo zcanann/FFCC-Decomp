@@ -240,28 +240,28 @@ int CMenuPcs::MLstCtrl()
 	int result;
 
 	blocked = false;
-	padLock = Pad._452_4_;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	padLock = Pad.m_debugPadLock;
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		rawPress = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawPress = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	press = rawPress & 0xffff;
 
 	blocked = false;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
 		rawHold = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		rawHold = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 	hold = rawHold & 0xffff;

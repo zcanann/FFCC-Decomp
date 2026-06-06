@@ -700,10 +700,10 @@ void CCameraPcs::calc()
     Mtx zRotMtx;
     Vec up;
 
-    bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     unsigned short buttons = 0;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         buttons = *reinterpret_cast<unsigned short*>(pad + 0x54);
     }
 
@@ -719,15 +719,15 @@ void CCameraPcs::calc()
         float moveInOut = FLOAT_8032fa34;
 
         if (!useDebugPad) {
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             stickH = *reinterpret_cast<float*>(pad + 0x44);
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             stickV = *reinterpret_cast<float*>(pad + 0x48);
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             triggerL = *reinterpret_cast<float*>(pad + 0x36);
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             triggerR = *reinterpret_cast<float*>(pad + 0x28);
-            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
             moveInOut = *reinterpret_cast<float*>(pad + 0x40);
         }
 
@@ -1039,9 +1039,9 @@ void CCameraPcs::calcChara()
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (m_viewerOverride == 0) {
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                            ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                                            ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         } else {
             padButtons = 0;
         }
@@ -1054,30 +1054,30 @@ void CCameraPcs::calcChara()
         }
 
         stick = FLOAT_8032fa34;
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
         m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
         stick = FLOAT_8032fa34;
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
         m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
         stick = FLOAT_8032fa34;
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
         m_viewer.m_distance = -((FLOAT_8032fabc * stick) - m_viewer.m_distance);
 
         stick = FLOAT_8032fa34;
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
         m_viewer.m_distance = FLOAT_8032fabc * stick + m_viewer.m_distance;
     } else {
@@ -1185,7 +1185,7 @@ void CCameraPcs::destroyMap()
  */
 void CCameraPcs::calcMap()
 {
-    bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    bool useDebugPad = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
     u16 buttons;
     float stickH;
     float stickV;
@@ -1213,27 +1213,27 @@ void CCameraPcs::calcMap()
     if (useDebugPad) {
         buttons = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         buttons = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x4);
     }
 
     stickH = FLOAT_8032fa34;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         stickH = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x44);
     }
     stickH = FLOAT_8032fa70 * (stickH / FLOAT_8032fa40);
 
     stickV = FLOAT_8032fa34;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         stickV = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x48);
     }
     stickV = FLOAT_8032fa70 * (stickV / FLOAT_8032fa40);
 
     triggerL = FLOAT_8032fa34;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        __cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
         triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
     }
 
@@ -1565,11 +1565,11 @@ void CCameraPcs::drawShadowBegin()
         float stickX = FLOAT_8032fa34;
         float stickY = FLOAT_8032fa34;
 
-        if (Pad._452_4_ == 0) {
+        if (Pad.m_debugPadLock == 0) {
             stickX = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                               (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
+                                               (((1 - Pad.m_debugPadPort | Pad.m_debugPadPort - 1) >> 0x1f) * -0x54));
             stickY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                               (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
+                                               (((1 - Pad.m_debugPadPort | Pad.m_debugPadPort - 1) >> 0x1f) * -0x54));
         }
 
         m_fullScreenShadow.m_rotY += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
@@ -1970,9 +1970,9 @@ void CCameraPcs::calcMaterialEditor()
     C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa54);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                        ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                                        ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     } else {
         padButtons = 0;
     }
@@ -1985,30 +1985,30 @@ void CCameraPcs::calcMaterialEditor()
     }
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
@@ -2092,9 +2092,9 @@ void CCameraPcs::calcFunnyShape()
     C_MTXPerspective(m_screenMatrix, FLOAT_8032fa30, FLOAT_8032fa3c, FLOAT_8032fa40, FLOAT_8032fa44);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                        ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                                        ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     } else {
         padButtons = 0;
     }
@@ -2107,30 +2107,30 @@ void CCameraPcs::calcFunnyShape()
     }
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
     m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 

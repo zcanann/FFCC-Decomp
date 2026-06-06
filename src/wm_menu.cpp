@@ -1469,14 +1469,14 @@ void CMenuPcs::CalcMCardMenu()
 	McCtrl& mcCtrl = *GetMcCtrl();
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short uVar3;
 	if (bVar1) {
 		uVar3 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		uVar3 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
@@ -2272,14 +2272,14 @@ void CMenuPcs::CalcLoadMenu()
 	bytes[0x86E] = 0;
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short uVar4;
 	if (bVar1) {
 		uVar4 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		uVar4 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
@@ -3083,14 +3083,14 @@ void CMenuPcs::CalcTitleMenu()
 	}
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short down;
 	if (bVar1) {
 		down = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		down = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	const unsigned short repeat = GetButtonRepeat(0);
@@ -7530,14 +7530,14 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
 				bool noInput = false;
-				if (Pad._452_4_ != 0 || (i == 0 && Pad._448_4_ != -1)) {
+				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
 					noInput = true;
 				}
 				if (noInput) {
 					padRepeat[i] = 0;
 					padTrig[i] = 0;
 				} else {
-					const unsigned int padIndex = (Pad._448_4_ == i) ? 0 : static_cast<unsigned int>(i);
+					const unsigned int padIndex = (Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i);
 					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
 					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
 				}

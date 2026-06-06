@@ -1035,11 +1035,11 @@ u16 CMenuPcs::GetButtonDown(int port)
     bool noInput = false;
     u32 result;
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         if (port != 0) {
             goto input_check_done;
         }
-        if (Pad._448_4_ == -1) {
+        if (Pad.m_debugPadPort == -1) {
             goto input_check_done;
         }
     }
@@ -1049,7 +1049,7 @@ input_check_done:
     if (noInput) {
         result = 0;
     } else {
-        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
         result = Pad.GetPadInputs()[clamped].buttonDown[0];
     }
 
@@ -1070,11 +1070,11 @@ u16 CMenuPcs::GetButtonRepeat(int port)
     bool noInput = false;
     u32 result;
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         if (port != 0) {
             goto repeat_check_done;
         }
-        if (Pad._448_4_ == -1) {
+        if (Pad.m_debugPadPort == -1) {
             goto repeat_check_done;
         }
     }
@@ -1084,7 +1084,7 @@ repeat_check_done:
     if (noInput) {
         result = 0;
     } else {
-        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
         result = Pad.GetPadInputs()[clamped].repeatButton;
     }
 

@@ -543,10 +543,10 @@ void CGObject::move()
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
 
         if (canReadPad) {
-            const bool useDebugPad = (Pad._452_4_ != 0) || ((player == 0) && (Pad._448_4_ != -1));
+            const bool useDebugPad = (Pad.m_debugPadLock != 0) || ((player == 0) && (Pad.m_debugPadPort != -1));
             const u32 playerIndex = static_cast<u32>(player)
-                & ~((static_cast<int>(~(Pad._448_4_ - static_cast<int>(player)
-                                        | static_cast<int>(player) - Pad._448_4_))
+                & ~((static_cast<int>(~(Pad.m_debugPadPort - static_cast<int>(player)
+                                        | static_cast<int>(player) - Pad.m_debugPadPort))
                      >> 31));
             const u8* padBytes = reinterpret_cast<u8*>(&Pad);
 

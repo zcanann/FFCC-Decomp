@@ -284,7 +284,7 @@ static inline unsigned short GetMenuPress()
 {
 	bool activeInput = false;
 
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		activeInput = true;
 	}
 
@@ -293,7 +293,7 @@ static inline unsigned short GetMenuPress()
 	}
 
 	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 	return Pad.GetPadInputs()[padIndex].buttonDown[0];
 }
 

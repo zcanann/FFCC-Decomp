@@ -609,6 +609,7 @@ public:
         SingMenuState* m_singMenuState;
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
+        short* m_cmdState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -629,6 +630,7 @@ public:
         FavoListStorage* m_favoList;
         CompaOpenAnimList* m_compaList;
         TmpArtiList* m_tmpArtiList;
+        short* m_cmdList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -636,7 +638,10 @@ public:
     unsigned char m_pad85B[0x85C - 0x85B];
     int m_singleMenuTextureLoadIndex;
     int m_singleMenuTextureLoadState;
-    unsigned short m_battleStateFlag;
+    union {
+        unsigned short m_battleStateFlag;
+        short m_cmdLayoutFlag;
+    };
     unsigned char m_pad866[0x878 - 0x866];
     CShopMenu* m_shopMenu;
     unsigned char m_pad87C[0x8A0 - 0x87C];
@@ -663,6 +668,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
@@ -672,6 +678,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmdList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
 
 #endif // _FFCC_P_MENU_H_

@@ -56,11 +56,7 @@ struct TracerColorBlock {
     pppCVECTOR color;
 };
 
-struct YmTracer2DataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
+STATIC_ASSERT(sizeof(YmTracer2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);

@@ -58,11 +58,7 @@ struct LocationTitle2ColorBlock {
     GXColor m_color;
 };
 
-struct LocationTitle2DataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
+STATIC_ASSERT(sizeof(LocationTitle2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
 

@@ -11,12 +11,7 @@ extern const float kPppParHitSphMatZero[2];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-struct ParHitSphMatDataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_positionOffset;
-};
-
+STATIC_ASSERT(sizeof(ParHitSphMatDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(ParHitSphMatDataOffsets, m_positionOffset) == 0x4);
 
 static inline ParHitSphMatDataOffsets* GetParHitSphMatDataOffsets(_pppCtrlTable* ctrlTable)

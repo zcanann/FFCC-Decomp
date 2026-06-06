@@ -6,6 +6,11 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct ParHitSphMatDataOffsets {
+    s32 m_unusedOffset;
+    s32 m_positionOffset;
+};
+
 struct pppParHitSphMatStep {
     s32 m_unused0;
     f32 m_height;

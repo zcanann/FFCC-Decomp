@@ -67,11 +67,6 @@ struct YmMeltColorWork {
     };
 };
 
-struct YmMeltDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorWorkOffset;
-};
-
 struct VERTEX_DATA
 {
     u8 _pad0[0xA];
@@ -122,6 +117,7 @@ STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltMapCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(sizeof(YmMeltDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_colorWorkOffset) == 0x4);
 

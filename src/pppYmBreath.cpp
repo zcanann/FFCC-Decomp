@@ -92,11 +92,7 @@ struct YmBreathParticleData {
     unsigned char _pad5C[0x04];
 };
 
-struct YmBreathDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
+STATIC_ASSERT(sizeof(YmBreathDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmBreathDataOffsets, m_colorOffset) == 0x4);
 

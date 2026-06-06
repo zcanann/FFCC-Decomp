@@ -71,13 +71,7 @@ static inline Mtx44& CameraScreenMatrix()
 
 static const char s_pppYmMana_cpp[] = "pppYmMana.cpp";
 
-struct YmManaDataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_setupOffset;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmManaDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmManaDataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmManaDataOffsets, m_workOffset) == 0x8);
 STATIC_ASSERT(offsetof(VYmMana, m_runtimeColor) == 0x38);

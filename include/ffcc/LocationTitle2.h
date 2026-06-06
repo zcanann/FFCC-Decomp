@@ -9,6 +9,11 @@ struct _pppPObject;
 typedef _pppPObject pppLocationTitle2;
 typedef _pppCtrlTable pppLocationTitle2Offsets;
 
+struct LocationTitle2DataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
 struct pppLocationTitle2Step {
     s32 m_graphId;
     s32 m_dataValIndex;

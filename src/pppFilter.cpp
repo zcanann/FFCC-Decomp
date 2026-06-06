@@ -20,11 +20,7 @@ struct _pppFilterSerializedData {
     _GXColor m_color;
 };
 
-struct pppFilterDataOffsets
-{
-    s32 m_serializedDataOffset;
-};
-
+STATIC_ASSERT(sizeof(pppFilterDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(pppFilterDataOffsets, m_serializedDataOffset) == 0x0);
 
 static inline pppFilterDataOffsets* GetFilterDataOffsets(_pppCtrlTable* ctrl)

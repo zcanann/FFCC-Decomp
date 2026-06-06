@@ -69,6 +69,11 @@ struct PYmBreath {
 
 typedef _pppPObject pppYmBreath;
 
+struct YmBreathDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

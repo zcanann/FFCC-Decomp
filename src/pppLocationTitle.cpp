@@ -35,11 +35,6 @@ struct LocationTitleColorBlock {
     GXColor m_color;
 };
 
-struct LocationTitleDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
 STATIC_ASSERT(sizeof(LocationTitleWork) == 0x14);
 STATIC_ASSERT(offsetof(LocationTitleWork, m_particles) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitleWork, m_count) == 0x04);
@@ -51,6 +46,7 @@ STATIC_ASSERT(offsetof(LocationTitleParticle, m_color) == 0x0C);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_frame) == 0x10);
 STATIC_ASSERT(offsetof(LocationTitleParticle, m_shapeB) == 0x18);
 STATIC_ASSERT(offsetof(LocationTitleColorBlock, m_color) == 0x08);
+STATIC_ASSERT(sizeof(LocationTitleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitleDataOffsets, m_colorOffset) == 0x04);
 

@@ -725,40 +725,39 @@ void CMenuPcs::EquipDraw()
 int CMenuPcs::EquipClose()
 {
 	EquipMenuState* menuState = GetEquipMenuState(this);
-	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	EquipOpenAnimList* menuData = GetEquipListStorage(this);
 	int doneCount = 0;
 
 	menuState->frame = menuState->frame + 1;
 	int timer = static_cast<int>(menuState->frame);
-	int itemCount = static_cast<int>(*menuData);
-	s16* item = menuData + 4;
+	int itemCount = static_cast<int>(menuData->count);
+	EquipOpenAnim* item = menuData->entries;
 
 	for (int i = 0; i < itemCount; i++) {
-		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
-			if (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14) <= timer) {
+		if (item->startFrame <= timer) {
+			if (item->startFrame + item->duration <= timer) {
 				doneCount++;
-				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+				item->alpha = FLOAT_80332eb8;
 			} else {
-				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
-				*reinterpret_cast<float*>(item + 8) =
-				    (float)-((DOUBLE_80332ec0 / static_cast<double>(*reinterpret_cast<int*>(item + 0x14))) *
-				                 static_cast<double>(*reinterpret_cast<int*>(item + 0x10)) -
-				             DOUBLE_80332ec0);
-				if ((double)*reinterpret_cast<float*>(item + 8) < DOUBLE_80332F08) {
-					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+				item->step = item->step + 1;
+				item->alpha = (float)-((DOUBLE_80332ec0 / static_cast<double>(item->duration)) *
+				                           static_cast<double>(item->step) -
+				                       DOUBLE_80332ec0);
+				if ((double)item->alpha < DOUBLE_80332F08) {
+					item->alpha = FLOAT_80332eb8;
 				}
 			}
 		}
-		item += 0x20;
+		item++;
 	}
 
 	if (itemCount == doneCount) {
-		item = menuData + 4;
+		item = menuData->entries;
 		for (int i = 0; i < itemCount; i++) {
-			*reinterpret_cast<int*>(item + 0x12) = 0;
-			*reinterpret_cast<int*>(item + 0x14) = 1;
-			*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
-			item += 0x20;
+			item->startFrame = 0;
+			item->duration = 1;
+			item->alpha = FLOAT_80332eb8;
+			item++;
 		}
 		return 1;
 	}
@@ -781,11 +780,8 @@ void CMenuPcs::EquipCtrl()
 	float scale;
 	int state;
 	EquipMenuState* menuState;
-	int item;
 	int index;
 	u32 equipCount;
-	u32 blockCount;
-	int offset;
 
 	state = 0;
 	menuState = GetEquipMenuState(this);
@@ -810,61 +806,23 @@ void CMenuPcs::EquipCtrl()
 	scale = FLOAT_80332ee0;
 	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	if (state != 0) {
-		item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
-		for (index = 0; index < **reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850); index++) {
-			*reinterpret_cast<float*>(item + 0x10) = scale;
-			*reinterpret_cast<float*>(item + 0x14) = scale;
-			item += 0x40;
+		EquipOpenAnimList* list = GetEquipListStorage(this);
+		EquipOpenAnim* entry = list->entries;
+		for (index = 0; index < list->count; index++) {
+			entry->alpha = scale;
+			entry->scale = scale;
+			entry++;
 		}
 
 		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
 		index = 0;
-		offset = (equipCount - 1) * 0x40;
-		if (-1 < static_cast<int>(equipCount - 1)) {
-			blockCount = equipCount >> 3;
-			if (blockCount != 0) {
-				do {
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + 8;
-					*reinterpret_cast<int*>(item + 0x24) = index;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x38;
-					*reinterpret_cast<int*>(item + 0x24) = index + 1;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x78;
-					*reinterpret_cast<int*>(item + 0x24) = index + 2;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0xb8;
-					*reinterpret_cast<int*>(item + 0x24) = index + 3;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0xf8;
-					*reinterpret_cast<int*>(item + 0x24) = index + 4;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x138;
-					*reinterpret_cast<int*>(item + 0x24) = index + 5;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x178;
-					*reinterpret_cast<int*>(item + 0x24) = index + 6;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = offset + -0x1b8;
-					offset = offset + -0x200;
-					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + item;
-					*reinterpret_cast<int*>(item + 0x24) = index + 7;
-					index = index + 8;
-					*reinterpret_cast<int*>(item + 0x28) = 3;
-					blockCount = blockCount - 1;
-				} while (blockCount != 0);
-				equipCount = equipCount & 7;
-				if (equipCount == 0) {
-					return;
-				}
-			}
+		if (static_cast<int>(equipCount - 1) >= 0) {
+			entry = &list->entries[equipCount - 1];
 			do {
-				item = offset + 8;
-				offset = offset + -0x40;
-				item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + item;
-				*reinterpret_cast<int*>(item + 0x24) = index;
+				entry->startFrame = index;
+				entry->duration = 3;
 				index = index + 1;
-				*reinterpret_cast<int*>(item + 0x28) = 3;
+				entry--;
 				equipCount = equipCount - 1;
 			} while (equipCount != 0);
 		}

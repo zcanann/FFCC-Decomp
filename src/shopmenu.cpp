@@ -18,20 +18,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-extern "C" {
-void SetScale__5CFontFf(float, CFont*);
-void SetScaleX__5CFontFf(float, CFont*);
-void SetScaleY__5CFontFf(float, CFont*);
-void SetMargin__5CFontFf(float, CFont*);
-void SetShadow__5CFontFi(CFont*, int);
-void SetPosX__5CFontFf(float, CFont*);
-void SetPosY__5CFontFf(float, CFont*);
-void SetTlut__5CFontFi(CFont*, int);
-void DrawInit__5CFontFv(CFont*);
-float GetWidth__5CFontFPc(CFont*, const char*);
-void Draw__5CFontFPc(CFont*, const char*);
-void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-}
+extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 
 char s_shopmenu_cpp[] = "shopmenu.cpp";
 extern char s_shop_80332e54[];
@@ -221,7 +208,7 @@ static inline CCaravanWork* ShopMenuCaravanWork(CShopMenu* shopMenu)
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
 {
-    return static_cast<float>(static_cast<int>((464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f + 80.0f));
+    return static_cast<float>(static_cast<int>((464.0f - font->GetWidth(text)) * 0.5f + 80.0f));
 }
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
@@ -398,37 +385,37 @@ static void ExecuteShopMenuSellConfirm(CShopMenu* shopMenu)
 
 static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
 {
-    DrawInit__5CFontFv(font);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
     font->SetColor(*color);
 }
 
 static void SetupShopMenuUnitFont(CFont* font)
 {
-    DrawInit__5CFontFv(font);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-    SetScaleY__5CFontFf(FLOAT_80332d28, font);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    font->DrawInit();
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
+    font->SetMargin(FLOAT_80332d28);
 }
 
 static void SetupShopMenuAmountFont(CFont* font, _GXColor* color)
 {
-    SetShadow__5CFontFi(font, 1);
-    SetScaleX__5CFontFf(FLOAT_80332d28, font);
-    SetScaleY__5CFontFf(FLOAT_80332d8c, font);
+    font->SetShadow(1);
+    font->SetScaleX(FLOAT_80332d28);
+    font->SetScaleY(FLOAT_80332d8c);
     font->SetColor(*color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
-    SetMargin__5CFontFf(FLOAT_80332d64, font);
+    font->SetMargin(FLOAT_80332d64);
 }
 
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
 {
     char amountBuffer[64];
     sprintf(amountBuffer, s_DecimalFormat_80332d14, value);
-    float amountWidth = GetWidth__5CFontFPc(font, amountBuffer);
+    float amountWidth = font->GetWidth(amountBuffer);
     MenuPcs.DrawNoShadowFont(font, amountBuffer, rightEdge - amountWidth, y, tlut, 0x12);
     MenuPcs.DrawInit();
 }
@@ -439,18 +426,18 @@ static void DrawShopMenuRightAlignedText(CFont* font, const char* text, float ri
         return;
     }
 
-    float textWidth = GetWidth__5CFontFPc(font, text);
+    float textWidth = font->GetWidth(text);
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(text), rightEdge - textWidth, y, tlut, 0x12);
     MenuPcs.DrawInit();
 }
 
 static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
 {
-    DrawInit__5CFontFv(font);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 0);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(0);
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
     font->SetColor(*color);
 }
 
@@ -465,11 +452,11 @@ static void DrawShopMenuCenteredText(CFont* font, const char* text, float center
         return;
     }
 
-    float textX = centerX - GetWidth__5CFontFPc(font, text) * FLOAT_80332d78;
-    DrawInit__5CFontFv(font);
-    SetPosX__5CFontFf(textX, font);
-    SetPosY__5CFontFf(y, font);
-    Draw__5CFontFPc(font, text);
+    float textX = centerX - font->GetWidth(text) * FLOAT_80332d78;
+    font->DrawInit();
+    font->SetPosX(textX);
+    font->SetPosY(y);
+    font->Draw(text);
 }
 
 static int GetShopMenuFigureStep(CShopMenu* shopMenu)
@@ -922,24 +909,24 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     MakeAgbString__4CMesFPcPcii(helpText, const_cast<char*>(sourceText), 0, 1);
 
     CFont* font = MenuPcs.m_fonts[0];
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
 
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    float width = GetWidth__5CFontFPc(font, helpText);
+    float width = font->GetWidth(helpText);
     float x = static_cast<float>(centerX) - width * 0.5f;
-    DrawInit__5CFontFv(font);
-    SetPosX__5CFontFf(x + 1.0f, font);
-    SetPosY__5CFontFf(static_cast<float>(y - 3), font);
-    SetTlut__5CFontFi(font, 0x12);
-    Draw__5CFontFPc(font, helpText);
-    SetPosX__5CFontFf(x, font);
-    SetPosY__5CFontFf(static_cast<float>(y - 4), font);
-    SetTlut__5CFontFi(font, 7);
-    Draw__5CFontFPc(font, helpText);
+    font->DrawInit();
+    font->SetPosX(x + 1.0f);
+    font->SetPosY(static_cast<float>(y - 3));
+    font->SetTlut(0x12);
+    font->Draw(helpText);
+    font->SetPosX(x);
+    font->SetPosY(static_cast<float>(y - 4));
+    font->SetTlut(7);
+    font->Draw(helpText);
     delete[] helpText;
 }
 /*
@@ -963,13 +950,13 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     }
 
     CFont* font = GetShopMenuInfoPanelFont();
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
     int equipType = MenuPcs.GetEquipType(itemNo);
@@ -994,10 +981,10 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     char textBuffer[256];
 
     if (label == 0) {
-        SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-        SetScaleY__5CFontFf(FLOAT_80332d28, font);
+        font->SetScaleX(FLOAT_80332d2c);
+        font->SetScaleY(FLOAT_80332d28);
         char* attrStr = MenuPcs.GetAttrStr(attr);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
         MenuPcs.DrawInit();
 
@@ -1016,9 +1003,9 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
             sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
         }
 
-        SetScaleX__5CFontFf(FLOAT_80332d28, font);
-        float valueWidth = GetWidth__5CFontFPc(font, textBuffer);
-        DrawInit__5CFontFv(font);
+        font->SetScaleX(FLOAT_80332d28);
+        float valueWidth = font->GetWidth(textBuffer);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(y), fontColor, 0x12);
         MenuPcs.DrawInit();
         return;
@@ -1026,43 +1013,43 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
 
     strcpy(textBuffer, label);
     strcat(textBuffer, s_Colon_80332d30);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
     MenuPcs.DrawInit();
 
     int valueRightX = x + 0x108;
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
-    SetMargin__5CFontFf(FLOAT_80332d34, font);
+    font->SetMargin(FLOAT_80332d34);
 
     char valueBuffer[64];
     sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
-    float valueWidth = GetWidth__5CFontFPc(font, valueBuffer);
+    float valueWidth = font->GetWidth(valueBuffer);
     MenuPcs.DrawNoShadowFont(font, valueBuffer, static_cast<float>(valueRightX) - valueWidth, static_cast<float>(y), 0x1A, 0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->DrawInit();
+    font->SetMargin(FLOAT_80332d28);
+    font->SetScale(FLOAT_80332d28);
 
     if ((statType == 1) && (attr != 0)) {
-        SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-        SetScaleY__5CFontFf(FLOAT_80332d28, font);
+        font->SetScaleX(FLOAT_80332d2c);
+        font->SetScaleY(FLOAT_80332d28);
         char* attrStr = MenuPcs.GetAttrStr(attr);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(attrY), 0x18, 0x12);
         MenuPcs.DrawInit();
 
-        SetScaleX__5CFontFf(FLOAT_80332d28, font);
+        font->SetScaleX(FLOAT_80332d28);
         attrStr = MenuPcs.GetAttrStr(attr);
-        GetWidth__5CFontFPc(font, attrStr);
+        font->GetWidth(attrStr);
         if ((attr != 0) && (attr < 9)) {
             strcpy(textBuffer, s_PlusOne_80332d38);
-            valueWidth = GetWidth__5CFontFPc(font, textBuffer);
-            DrawInit__5CFontFv(font);
+            valueWidth = font->GetWidth(textBuffer);
+            font->DrawInit();
             MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(attrY), 9, 0x12);
             MenuPcs.DrawInit();
         }
@@ -1095,24 +1082,24 @@ void CShopMenu::DrawItemInfo0()
     }
 
     CFont* font = GetShopMenuInfoPanelFont();
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScaleX(FLOAT_80332d2c);
+    font->SetScaleY(FLOAT_80332d28);
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
 
     if (itemNo > 0) {
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        font->SetMargin(FLOAT_80332d28);
         char* itemName = 0;
         if (itemNo >= 1) {
             itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
         }
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
         MenuPcs.DrawInit();
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        font->SetMargin(FLOAT_80332d28);
     }
 
     bool canTrade = false;
@@ -1135,7 +1122,7 @@ void CShopMenu::DrawItemInfo0()
     if (canTrade) {
         SetupShopMenuUnitFont(font);
         char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
-        float unitWidth = GetWidth__5CFontFPc(font, unitText);
+        float unitWidth = font->GetWidth(unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         float amountRightX = rightX - FLOAT_80332d5c;
         int totalGil;
@@ -1166,14 +1153,14 @@ void CShopMenu::DrawItemInfo0()
         DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
         SetupShopMenuUnitFont(font);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, unitText, rightX, FLOAT_80332d68, 0x19, 0x12);
         MenuPcs.DrawInit();
     } else {
         SetupShopMenuUnitFont(font);
         const char* message = (listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_SELL);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
     }
 
@@ -1183,21 +1170,21 @@ void CShopMenu::DrawItemInfo0()
 
     if ((m_subMode == 1) && (listType == 0)) {
         int amount = m_quantity;
-        SetShadow__5CFontFi(font, 1);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
+        font->SetShadow(1);
+        font->SetScale(FLOAT_80332d28);
         font->SetColor(white.color);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
-        SetMargin__5CFontFf(FLOAT_80332d34, font);
+        font->SetMargin(FLOAT_80332d34);
         char countBuffer[64];
         sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
-        float countRightX = FLOAT_80332d70 - GetWidth__5CFontFPc(font, countBuffer);
+        float countRightX = FLOAT_80332d70 - font->GetWidth(countBuffer);
         MenuPcs.DrawNoShadowFont(font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
         SetupShopMenuInfoFont(font, &white.color);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
 
         int x = static_cast<int>(-(static_cast<float>(m_figureMode) * FLOAT_80332d74 - FLOAT_80332d70));
@@ -1224,24 +1211,24 @@ void CShopMenu::DrawBuySellInfo()
     SetupShopMenuInfoFont(font, &white);
 
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
-    float priceWidth = GetWidth__5CFontFPc(font, priceText);
-    DrawInit__5CFontFv(font);
+    float priceWidth = font->GetWidth(priceText);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, priceText, FLOAT_80332d7c - priceWidth, FLOAT_80332d80, 0x13, 0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332d7c, FLOAT_80332d80, 0x18, 0x12);
     MenuPcs.DrawInit();
 
     char* moneyText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY);
-    float separatorWidth = GetWidth__5CFontFPc(font, s_Slash_80332d84);
-    DrawInit__5CFontFv(font);
+    float separatorWidth = font->GetWidth(s_Slash_80332d84);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, moneyText, FLOAT_80332d7c + separatorWidth, FLOAT_80332d80, 0x14, 0x12);
     MenuPcs.DrawInit();
 
     SetupShopMenuUnitFont(font);
     char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
-    float unitWidth = GetWidth__5CFontFPc(font, unitText);
+    float unitWidth = font->GetWidth(unitText);
 
     int itemNo = -1;
     bool canTrade = false;
@@ -1300,15 +1287,15 @@ void CShopMenu::DrawBuySellInfo()
     DrawShopMenuAmount(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, unitText, rightPrice, FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332d7c, FLOAT_80332d98, 0x1B, 0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, unitText, rightMoney, FLOAT_80332d98, 0x19, 0x12);
     MenuPcs.DrawInit();
 }
@@ -1381,16 +1368,16 @@ void CShopMenu::DrawItemList()
 
         if (itemNo > 0) {
             CFont* font = MenuPcs.m_fonts[4];
-            SetMargin__5CFontFf(FLOAT_80332d28, font);
-            SetShadow__5CFontFi(font, 0);
-            SetScale__5CFontFf(FLOAT_80332d28, font);
+            font->SetMargin(FLOAT_80332d28);
+            font->SetShadow(0);
+            font->SetScale(FLOAT_80332d28);
 
             CColor white(0xFF, 0xFF, 0xFF, 0xFF);
             font->SetColor(white.color);
-            DrawInit__5CFontFv(font);
-            SetPosX__5CFontFf(static_cast<float>(frameX - 0x54), font);
-            SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
-            Draw__5CFontFPc(font, reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
+            font->DrawInit();
+            font->SetPosX(static_cast<float>(frameX - 0x54));
+            font->SetPosY(static_cast<float>(y - 0x14));
+            font->Draw(reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
             MenuPcs.DrawInit();
             MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }
@@ -1598,25 +1585,25 @@ void CShopMenu::DrawShopBase()
         drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0xF);
         CFont* font = MenuPcs.m_fonts[4];
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
-        SetShadow__5CFontFi(font, 0);
-        SetScaleX__5CFontFf(FLOAT_80332d2c, font);
-        SetScaleY__5CFontFf(FLOAT_80332d28, font);
+        font->SetMargin(FLOAT_80332d28);
+        font->SetShadow(0);
+        font->SetScaleX(FLOAT_80332d2c);
+        font->SetScaleY(FLOAT_80332d28);
         font->SetColor(white);
 
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         Graphic.SetDrawDoneDebugData(0x10);
         char* confirmText = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        SetPosX__5CFontFf(CalcCenteredShopMenuX(font, confirmText), font);
-        SetPosY__5CFontFf(312.0f, font);
-        Draw__5CFontFPc(font, confirmText);
+        font->SetPosX(CalcCenteredShopMenuX(font, confirmText));
+        font->SetPosY(312.0f);
+        font->Draw(confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
         char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
-        SetPosX__5CFontFf(CalcCenteredShopMenuX(font, cancelText), font);
-        SetPosY__5CFontFf(346.0f, font);
-        Draw__5CFontFPc(font, cancelText);
+        font->SetPosX(CalcCenteredShopMenuX(font, cancelText));
+        font->SetPosY(346.0f);
+        font->Draw(cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
         MenuPcs.DrawInit();
         Graphic.SetDrawDoneDebugData(0x13);
@@ -1725,13 +1712,13 @@ void CShopMenu::DrawSoubi()
     MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
 
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
 
     char* itemName = 0;
     if (resultItem >= 1) {
@@ -1753,25 +1740,25 @@ void CShopMenu::DrawSoubi()
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     CFont* labelFont = MenuPcs.m_fonts[4];
-    SetMargin__5CFontFf(FLOAT_80332d28, labelFont);
-    SetShadow__5CFontFi(labelFont, 0);
-    SetScaleX__5CFontFf(FLOAT_80332d2c, labelFont);
-    SetScaleY__5CFontFf(FLOAT_80332d28, labelFont);
+    labelFont->SetMargin(FLOAT_80332d28);
+    labelFont->SetShadow(0);
+    labelFont->SetScaleX(FLOAT_80332d2c);
+    labelFont->SetScaleY(FLOAT_80332d28);
     labelFont->SetColor(white.color);
 
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
-    DrawInit__5CFontFv(labelFont);
-    SetPosX__5CFontFf(equipTextX, labelFont);
-    SetPosY__5CFontFf(312.0f, labelFont);
-    Draw__5CFontFPc(labelFont, equipText);
+    labelFont->DrawInit();
+    labelFont->SetPosX(equipTextX);
+    labelFont->SetPosY(312.0f);
+    labelFont->Draw(equipText);
 
     char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
     float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText);
-    DrawInit__5CFontFv(labelFont);
-    SetPosX__5CFontFf(cancelTextX, labelFont);
-    SetPosY__5CFontFf(346.0f, labelFont);
-    Draw__5CFontFPc(labelFont, cancelText);
+    labelFont->DrawInit();
+    labelFont->SetPosX(cancelTextX);
+    labelFont->SetPosY(346.0f);
+    labelFont->Draw(cancelText);
     MenuPcs.DrawInit();
 
     MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, 1.0f);
@@ -1803,14 +1790,14 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     font->SetColor(white);
 
     const char* itemName = GetItemName(resultItem);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawShadowFont(font, const_cast<char*>(itemName), FLOAT_80332d54, FLOAT_80332e0c, 0x18, 0x12);
     MenuPcs.DrawInit();
 
@@ -1819,24 +1806,24 @@ void CShopMenu::DrawMake()
     const int raceColor = (MenuPcs.ChkEquipPossible(resultItem) != 0) ? 0x18 : 2;
     const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(raceText), 176.0f, 120.0f, 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    float raceX = 176.0f + FLOAT_80332d5c + GetWidth__5CFontFPc(font, raceText);
-    DrawInit__5CFontFv(font);
+    float raceX = 176.0f + FLOAT_80332d5c + font->GetWidth(raceText);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
     MenuPcs.DrawInit();
 
     const char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     SetupShopMenuUnitFont(font);
-    float gilUnitWidth = GetWidth__5CFontFPc(font, gilUnitText);
+    float gilUnitWidth = font->GetWidth(gilUnitText);
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font,
         const_cast<char*>(gilUnitText),
         FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c,
@@ -1845,7 +1832,7 @@ void CShopMenu::DrawMake()
         0x12);
     MenuPcs.DrawInit();
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
     MenuPcs.DrawInit();
 
@@ -1862,17 +1849,17 @@ void CShopMenu::DrawMake()
 
     DrawObi(0);
 
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
     font->SetColor(white);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
-    float materialsX = FLOAT_80332e30 - GetWidth__5CFontFPc(font, materialsText) * FLOAT_80332d78;
+    float materialsX = FLOAT_80332e30 - font->GetWidth(materialsText) * FLOAT_80332d78;
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialsText), materialsX, FLOAT_80332e34, 4, 0x12);
     MenuPcs.DrawInit();
     const char* stockText = ShopMenuMes(languageId, SHOP_MENU_TEXT_STOCK);
-    float stockX = FLOAT_80332e38 - GetWidth__5CFontFPc(font, stockText) * FLOAT_80332d78;
+    float stockX = FLOAT_80332e38 - font->GetWidth(stockText) * FLOAT_80332d78;
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(stockText), stockX, FLOAT_80332e34, 9, 0x12);
     MenuPcs.DrawInit();
 
@@ -1891,31 +1878,31 @@ void CShopMenu::DrawMake()
         char ownedBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
 
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
-        SetShadow__5CFontFi(font, 1);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
+        font->SetMargin(FLOAT_80332d28);
+        font->SetShadow(1);
+        font->SetScale(FLOAT_80332d28);
         font->SetColor(white);
 
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, 60.0f, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
         SetupShopMenuAmountFont(font, &white);
-        float neededX = 244.0f - GetWidth__5CFontFPc(font, neededBuffer);
+        float neededX = 244.0f - font->GetWidth(neededBuffer);
         MenuPcs.DrawNoShadowFont(font, neededBuffer, neededX, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        SetMargin__5CFontFf(FLOAT_80332d28, font);
-        SetShadow__5CFontFi(font, 1);
-        SetScale__5CFontFf(FLOAT_80332d28, font);
+        font->SetMargin(FLOAT_80332d28);
+        font->SetShadow(1);
+        font->SetScale(FLOAT_80332d28);
         font->SetColor(white);
-        float slashX = neededX - FLOAT_80332d28 - GetWidth__5CFontFPc(font, "/");
-        DrawInit__5CFontFv(font);
+        float slashX = neededX - FLOAT_80332d28 - font->GetWidth("/");
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>("/"), slashX, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        float nameX = slashX - FLOAT_80332d28 - GetWidth__5CFontFPc(font, materialName);
-        DrawInit__5CFontFv(font);
+        float nameX = slashX - FLOAT_80332d28 - font->GetWidth(materialName);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialName), nameX, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
@@ -1928,7 +1915,7 @@ void CShopMenu::DrawMake()
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
 
         SetupShopMenuAmountFont(font, &white);
-        float ownedX = 356.0f - GetWidth__5CFontFPc(font, ownedBuffer);
+        float ownedX = 356.0f - font->GetWidth(ownedBuffer);
         MenuPcs.DrawNoShadowFont(font, ownedBuffer, ownedX, rowY, (ownedCount >= neededCount) ? 0x1B : 2, 0x12);
         MenuPcs.DrawInit();
     }
@@ -1966,13 +1953,13 @@ void CShopMenu::DrawSmith0()
     DrawItemHelp(m_selectedIndex, 0x140, 0x172);
 
     CFont* font = MenuPcs.m_fonts[0];
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d8c, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d8c);
 
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     const char* title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
@@ -1980,9 +1967,9 @@ void CShopMenu::DrawSmith0()
         title = MenuPcs.GetJobStr(1);
     }
 
-    float textX = 264.0f - GetWidth__5CFontFPc(font, title);
+    float textX = 264.0f - font->GetWidth(title);
 
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), textX, FLOAT_80332e4c, 9, 0x12);
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
@@ -2030,27 +2017,27 @@ void CShopMenu::DrawShop0()
         font = MenuPcs.m_fonts[0];
     }
 
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetShadow__5CFontFi(font, 1);
-    SetScale__5CFontFf(FLOAT_80332d8c, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d8c);
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x21);
-    DrawInit__5CFontFv(font);
+    font->DrawInit();
     MenuPcs.DrawNoShadowFont(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, FLOAT_80332e30, 9, 0x12);
     MenuPcs.DrawInit();
 
     Graphic.SetDrawDoneDebugData(0x22);
-    SetMargin__5CFontFf(FLOAT_80332d28, font);
-    SetScale__5CFontFf(FLOAT_80332d28, font);
+    font->SetMargin(FLOAT_80332d28);
+    font->SetScale(FLOAT_80332d28);
 
     entry = s_shopMenuTopMenuEntries;
     for (int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         Graphic.SetDrawDoneDebugData(0x23);
-        DrawInit__5CFontFv(font);
+        font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, s_currentShopMenuTopMenuEntry->text,
             static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10),
             static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B), 0x18, 0x12);

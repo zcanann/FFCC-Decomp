@@ -546,7 +546,6 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
                 amemCacheSet->GetData(m_cacheId, const_cast<char*>(s_textureman_cpp), 0x1DD));
 
             unsigned int format = m_format;
-            void* tlutData;
             if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
@@ -573,7 +572,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
+                             static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
             }
 
             if (1 < m_maxLod) {
@@ -723,7 +722,6 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
     }
 
     format = m_format;
-    void* tlutData;
     if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
@@ -750,7 +748,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
+                     static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {
@@ -771,7 +769,6 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 void CTexture::InitTexObj()
 {
     unsigned int format = m_format;
-    void* tlutData;
     if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
@@ -798,7 +795,7 @@ void CTexture::InitTexObj()
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), static_cast<u32>(1 - m_maxLod) >> 31);
+                     static_cast<GXTexWrapMode>(m_wrapMode), (1 - m_maxLod) >> 31);
     }
 
     if (1 < m_maxLod) {

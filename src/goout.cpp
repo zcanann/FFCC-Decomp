@@ -2075,7 +2075,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         if (m_deleteInitSelChar == 0) {
             MenuPcs.InitSaveLoadMenu();
         }
-        MenuPcs.SetMenuCharaAnim(m_selectedChara, 0);
+        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
         m_deleteInitSelChar = 1;
         break;
     case 1:
@@ -2092,7 +2092,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                 }
             }
 
-            if (activeMainCharacterCount < 2) {
+            if (activeMainCharacterCount <= 1) {
                 int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
                 SetMenuStr(0, 4,
                            GetGoOutMessageLine(languageId, 70),

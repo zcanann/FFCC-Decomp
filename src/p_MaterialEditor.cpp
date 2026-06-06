@@ -633,8 +633,8 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].b = 0x7f;
     m_viewerLightColors[0].a = 0xff;
 
-    float minusOne = FLOAT_8032FCDC;
-    float zero = FLOAT_8032FCD8;
+    float zero = LoadFloat(FLOAT_8032FCD8);
+    float minusOne = LoadFloat(FLOAT_8032FCDC);
     float one = LoadFloat(FLOAT_8032FCC8);
 
     for (int i = 0; i < 3; i++) {

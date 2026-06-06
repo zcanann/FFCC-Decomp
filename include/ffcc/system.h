@@ -82,7 +82,7 @@ public:
 	{
         unsigned int m_priority; // 0x00
         float m_lastTime;        // 0x04
-        void* m_debugName;       // 0x08
+        const char* m_debugName; // 0x08
         int m_insertIndex;       // 0x0C
         COrder* m_previous;      // 0x10
         COrder* m_next;          // 0x14

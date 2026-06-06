@@ -271,7 +271,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
                 order->m_descBlock = description;
                 order->m_owner = process;
                 order->m_priority = entry->m_priority;
-                order->m_debugName = (void*)description->m_debugName;
+                order->m_debugName = description->m_debugName;
                 m_orderCount++;
                 break;
             }

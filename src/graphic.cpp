@@ -540,7 +540,7 @@ void CGraphic::Thread()
                 } else {
                     orderIndex = -1;
                 }
-                void* orderName;
+                const char* orderName;
                 if (order != nullptr) {
                     orderName = order->m_debugName;
                 } else {

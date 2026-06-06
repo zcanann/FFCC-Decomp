@@ -1590,51 +1590,45 @@ unsigned int CMenuPcs::CmdCtrlCur()
  */
 unsigned int CMenuPcs::CmdOpen0()
 {
-	s16* psVar5;
-	s32 iVar7;
-	s32 iVar8;
+	CmdState* cmd = GetCmdStateView(this);
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
 
-	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22) =
-		static_cast<s16>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22) + 1);
-	const s32 iVar4 = static_cast<s32>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22));
-	s32 iVar6 = static_cast<s32>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26)) * 0x40 + 8;
-	if (iVar4 < 5) {
-		*reinterpret_cast<s16*>(GetCmdListBase(this) + iVar6) =
-			static_cast<s16>(*reinterpret_cast<s16*>(GetCmdListBase(this) + iVar6) - 0x13);
+	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
+	const s32 timer = static_cast<s32>(cmd->transitionTimer);
+	if (timer < 5) {
+		entries[cmd->selected].x = static_cast<s16>(entries[cmd->selected].x - 0x13);
 	}
 
-	psVar5 = GetCmdList(this);
-	iVar7 = 0;
-	iVar8 = static_cast<s32>(psVar5[1]) - static_cast<s32>(psVar5[0]);
-	psVar5 = psVar5 + psVar5[0] * 0x20 + 4;
+	s32 doneCount = 0;
+	s32 entryCount = static_cast<s32>(list->listEnd) - static_cast<s32>(list->count);
+	CmdListEntry* entry = &entries[list->count];
 	const float fVar1 = FLOAT_80332ab0;
 
-	for (iVar6 = 0; iVar6 < iVar8; iVar6++) {
-		if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
-			if (iVar4 >= *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
-				iVar7 = iVar7 + 1;
-				*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
-				*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
-				*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
+	for (s32 i = 0; i < entryCount; i++) {
+		if (entry->startFrame <= timer) {
+			if (timer >= entry->startFrame + entry->duration) {
+				doneCount++;
+				entry->alpha = FLOAT_80332a70;
+				entry->dx = fVar1;
+				entry->dy = fVar1;
 			} else {
-				*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
+				entry->timer++;
 				const float t = static_cast<float>(
-					(DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
-					static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
-				*reinterpret_cast<float*>(psVar5 + 8) = t;
-				if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
-					*reinterpret_cast<float*>(psVar5 + 0x18) =
-						t * (*reinterpret_cast<float*>(psVar5 + 0x1c) - static_cast<float>(*psVar5));
-					*reinterpret_cast<float*>(psVar5 + 0x1a) =
-						t * (*reinterpret_cast<float*>(psVar5 + 0x1e) - static_cast<float>(psVar5[1]));
+					(DOUBLE_80332a58 / static_cast<double>(entry->duration)) *
+					static_cast<double>(entry->timer));
+				entry->alpha = t;
+				if ((entry->flags & 2) == 0) {
+					entry->dx = t * (entry->targetX - static_cast<float>(entry->x));
+					entry->dy = t * (entry->targetY - static_cast<float>(entry->y));
 				}
 			}
 		}
 
-		psVar5 = psVar5 + 0x20;
+		entry++;
 	}
 
-	return static_cast<unsigned int>(iVar8 == iVar7);
+	return static_cast<unsigned int>(entryCount == doneCount);
 }
 
 /*
@@ -1649,50 +1643,46 @@ unsigned int CMenuPcs::CmdOpen0()
 unsigned int CMenuPcs::CmdClose0()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	u8* menuState = reinterpret_cast<u8*>(GetCmdState(this));
+	CmdState* cmd = GetCmdStateView(this);
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
 
-	*reinterpret_cast<s16*>(menuState + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(menuState + 0x22) + 1);
-	s32 time = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x22));
-	s32 selectedOffset = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x26)) * 0x40 + 8;
+	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
+	s32 time = static_cast<s32>(cmd->transitionTimer);
 
 	if (time > 7) {
-		*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) =
-		    static_cast<s16>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) + 0x13);
+		entries[cmd->selected].x = static_cast<s16>(entries[cmd->selected].x + 0x13);
 	}
 
-	s16* base = GetCmdList(this);
 	s32 doneCount = 0;
-	s32 entryCount = static_cast<s32>(base[1]) - static_cast<s32>(base[0]);
-	s16* entry = base + base[0] * 0x20 + 4;
+	s32 entryCount = static_cast<s32>(list->listEnd) - static_cast<s32>(list->count);
+	CmdListEntry* entry = &entries[list->count];
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
-			if (time >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+		if (entry->startFrame <= time) {
+			if (time >= (entry->startFrame + entry->duration)) {
 				doneCount++;
-				*reinterpret_cast<f32*>(entry + 8) = 0.0f;
-				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
+				entry->alpha = 0.0f;
+				entry->dx = 0.0f;
+				entry->dy = 0.0f;
 			} else {
-				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+				entry->timer++;
 				const f32 t = static_cast<f32>(
-				    1.0 - (static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10)) /
-				           static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14))));
+				    1.0 - (static_cast<f64>(entry->timer) /
+				           static_cast<f64>(entry->duration)));
 
-				*reinterpret_cast<f32*>(entry + 8) = t;
-				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
-					*reinterpret_cast<f32*>(entry + 0x18) =
-					    t * (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0]));
-					*reinterpret_cast<f32*>(entry + 0x1a) =
-					    t * (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1]));
+				entry->alpha = t;
+				if ((entry->flags & 2) == 0) {
+					entry->dx = t * (entry->targetX - static_cast<f32>(entry->x));
+					entry->dy = t * (entry->targetY - static_cast<f32>(entry->y));
 				}
 			}
 		}
-		entry += 0x20;
+		entry++;
 	}
 
 	if (entryCount == doneCount) {
-		*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) =
-		    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + 8);
+		entries[cmd->selected].x = entries[0].x;
 	}
 
 	return static_cast<unsigned int>(entryCount == doneCount);

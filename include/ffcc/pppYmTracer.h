@@ -31,6 +31,11 @@ struct pppYmTracerStep {
 typedef _pppCtrlTable pppYmTracerCtrl;
 typedef _pppPObject pppYmTracer;
 
+struct YmTracerDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

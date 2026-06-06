@@ -12,8 +12,8 @@
 class CMapHitFace;
 
 static const char s_mapmesh_cpp[] = "mapmesh.cpp";
-static const float FLOAT_8032F930 = 10000000000.0f;
-static const float FLOAT_8032F934 = -10000000000.0f;
+static const float kMapMeshInitialMinBound = 10000000000.0f;
+static const float kMapMeshInitialMaxBound = -10000000000.0f;
 
 static CMemory::CStage* g_pStage;
 
@@ -440,12 +440,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             m_vertices = reinterpret_cast<Vec*>(cursor);
             cursor += chunk.m_size;
-            m_bound.m_min.z = FLOAT_8032F930;
-            m_bound.m_min.y = FLOAT_8032F930;
-            m_bound.m_min.x = FLOAT_8032F930;
-            m_bound.m_max.z = FLOAT_8032F934;
-            m_bound.m_max.y = FLOAT_8032F934;
-            m_bound.m_max.x = FLOAT_8032F934;
+            m_bound.m_min.z = kMapMeshInitialMinBound;
+            m_bound.m_min.y = kMapMeshInitialMinBound;
+            m_bound.m_min.x = kMapMeshInitialMinBound;
+            m_bound.m_max.z = kMapMeshInitialMaxBound;
+            m_bound.m_max.y = kMapMeshInitialMaxBound;
+            m_bound.m_max.x = kMapMeshInitialMaxBound;
 
             int vertexIndex = 0;
             for (; vertexIndex < static_cast<int>(m_vertexCount); vertexIndex++) {
@@ -705,12 +705,12 @@ void CMapMesh::Destroy()
  */
 CMapMesh::CMapMesh()
 {
-    m_bound.m_min.z = FLOAT_8032F930;
-    m_bound.m_min.y = FLOAT_8032F930;
-    m_bound.m_min.x = FLOAT_8032F930;
-    m_bound.m_max.z = FLOAT_8032F934;
-    m_bound.m_max.y = FLOAT_8032F934;
-    m_bound.m_max.x = FLOAT_8032F934;
+    m_bound.m_min.z = kMapMeshInitialMinBound;
+    m_bound.m_min.y = kMapMeshInitialMinBound;
+    m_bound.m_min.x = kMapMeshInitialMinBound;
+    m_bound.m_max.z = kMapMeshInitialMaxBound;
+    m_bound.m_max.y = kMapMeshInitialMaxBound;
+    m_bound.m_max.x = kMapMeshInitialMaxBound;
 
     m_meshData = 0;
     m_displayListData = 0;

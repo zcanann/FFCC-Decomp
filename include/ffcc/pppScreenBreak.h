@@ -11,6 +11,12 @@ struct ScreenBreakPiece;
 
 typedef _pppPObject pppScreenBreak;
 
+struct ScreenBreakDataOffsets {
+    s32 m_colorDataOffset;
+    s32 _unused04;
+    s32 m_valueOffset;
+};
+
 struct PScreenBreak {
     s32 m_graphId;
     s32 m_dataValIndex;

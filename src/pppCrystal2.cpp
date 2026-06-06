@@ -2,6 +2,7 @@
 #include "ffcc/pppCrystal2.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/hsd_image.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
@@ -33,26 +34,13 @@ struct pppCrystal2ColorBlock {
     pppCVECTOR m_color;
 };
 
-struct HSD_ImageBuffer {
-    u8* m_imageData;
-    GXTexFmt m_format;
-    u32 m_width;
-    u32 m_height;
-    u32 m_imageCount;
-    u32 m_bufferSize;
-};
-
 struct Crystal2Work {
     HSD_ImageBuffer* m_refractionMap;
     GXTexObj* m_refractionTexObj;
 };
 
-struct Crystal2DataOffsets {
-    s32 _unused0;
-    s32 m_colorBlockOffset;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(HSD_ImageBuffer) == 0x18);
+STATIC_ASSERT(sizeof(Crystal2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(Crystal2DataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(Crystal2DataOffsets, m_workOffset) == 0x8);
 

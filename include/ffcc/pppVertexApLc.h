@@ -1,10 +1,16 @@
 #ifndef _PPP_VERTEXAPLC_H_
 #define _PPP_VERTEXAPLC_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObject;
 struct _pppCtrlTable;
 class PVertexApLc;
 struct Vec;
+
+struct VertexApLcDataOffsets {
+    s32 m_stateOffset;
+};
 
 #ifdef __cplusplus
 extern "C" {

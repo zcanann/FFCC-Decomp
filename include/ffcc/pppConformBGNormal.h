@@ -8,13 +8,17 @@ struct _pppPObject;
 
 typedef _pppPObject pppConformBGNormal;
 
+struct ConformBgNormalDataOffsets {
+    s32 m_stateOffset;
+};
+
 struct pppConformBGNormalStep {
     u32 m_unk0;
-    float m_dataValIndex;
-    float m_initWOrk;
+    f32 m_dataValIndex;
+    f32 m_initWOrk;
     u8 m_stepValue;
     u8 m_pad0D[3];
-    float m_arg3;
+    f32 m_arg3;
 };
 
 #ifdef __cplusplus

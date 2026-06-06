@@ -9,16 +9,16 @@
 #include "ffcc/linkage.h"
 #include <string.h>
 
-static const double DOUBLE_80332f20 = 0.5;
-static const float FLOAT_80332F28 = 255.0f;
-static const float FLOAT_80332f2c = 0.0f;
-static const float FLOAT_80332f30 = 1.0f;
-static const float FLOAT_80332F34 = 0.9f;
-static const float FLOAT_80332F38 = 4.0f;
-static const double DOUBLE_80332f40 = 4503601774854144.0;
-static const double DOUBLE_80332f48 = 1.0;
-static const double DOUBLE_80332f50 = 0.0;
-static const double DOUBLE_80332f58 = 216.0;
+static const double kTmpArtiHalfDouble = 0.5;
+static const float kTmpArtiColorMax = 255.0f;
+static const float kTmpArtiZero = 0.0f;
+static const float kTmpArtiOne = 1.0f;
+static const float kTmpArtiFontScale = 0.9f;
+static const float kTmpArtiTextYOffset = 4.0f;
+static const double kTmpArtiIntToDoubleBias = 4503601774854144.0;
+static const double kTmpArtiOneDouble = 1.0;
+static const double kTmpArtiZeroDouble = 0.0;
+static const double kTmpArtiCenterX = 216.0;
 
 static inline float TmpArtiIntToFloat(int value)
 {
@@ -122,7 +122,7 @@ inline int CMenuPcs::TmpArtiCtrlCur()
 inline void CMenuPcs::TmpArtiInit0()
 {
     TmpArtiEntry* entry = GetTmpArtiEntries(this);
-    float alpha = FLOAT_80332f30;
+    float alpha = kTmpArtiOne;
 
     for (int count = GetTmpArtiList(this)->count; count > 0; count--) {
         entry->startFrame = 0;
@@ -145,7 +145,7 @@ inline void CMenuPcs::TmpArtiInit()
 {
     memset(m_tmpArtiList, 0, sizeof(TmpArtiList));
 
-    float one = FLOAT_80332f30;
+    float one = kTmpArtiOne;
     TmpArtiEntry* entry = GetTmpArtiEntries(this);
     int i = 8;
     do {
@@ -161,9 +161,9 @@ inline void CMenuPcs::TmpArtiInit()
         i--;
     } while (i != 0);
 
-    double center = DOUBLE_80332f58;
-    double half = DOUBLE_80332f20;
-    float zero = FLOAT_80332f2c;
+    double center = kTmpArtiCenterX;
+    double half = kTmpArtiHalfDouble;
+    float zero = kTmpArtiZero;
     int row = 0;
     entry = GetTmpArtiEntries(this);
     for (int pairCount = 0; pairCount < 2; pairCount++) {
@@ -223,7 +223,7 @@ void CMenuPcs::TmpArtiDraw()
 
 			if (caravanWork->m_treasures[i] < 0) {
 				tex = 0x34;
-				alpha = (float)(DOUBLE_80332f20 * (double)alpha);
+				alpha = (float)(kTmpArtiHalfDouble * (double)alpha);
 			}
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -232,11 +232,11 @@ void CMenuPcs::TmpArtiDraw()
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
-			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
+			color.a = (unsigned char)(int)(kTmpArtiColorMax * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float z = entry->z;
-			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
+			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, kTmpArtiZero);
 		}
 		entry++;
 	}
@@ -246,32 +246,32 @@ void CMenuPcs::TmpArtiDraw()
 		short icon = caravanWork->m_treasures[i];
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
-			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - FLOAT_80332f30);
-			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, FLOAT_80332f2c);
+			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - kTmpArtiOne);
+			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, kTmpArtiZero);
 		}
 		entry++;
 	}
 
 	CFont* font = GetTmpArtiFont(this);
-	font->SetMargin(FLOAT_80332f30);
+	font->SetMargin(kTmpArtiOne);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_80332F34);
+	font->SetScale(kTmpArtiFontScale);
 	font->DrawInit();
 
 	entry = GetTmpArtiEntries(this);
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_treasures[i] >= 0) {
 			float alpha = entry->alpha;
-			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
+			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(kTmpArtiColorMax * alpha));
 			font->SetColor(textColor.color);
 
 			const char* text = Game.m_cFlatDataArr[1].TableStrings(0)[caravanWork->m_treasures[i] * 5 + 4];
 			float width = font->GetWidth(text);
-			float posX = (float)((((float)entry->width - width) * DOUBLE_80332f20) + (float)entry->x);
+			float posX = (float)((((float)entry->width - width) * kTmpArtiHalfDouble) + (float)entry->x);
 			float posY = (float)(entry->y + 11);
 
 			font->SetPosX(posX);
-			font->SetPosY(posY - FLOAT_80332F38);
+			font->SetPosY(posY - kTmpArtiTextYOffset);
 			font->Draw(text);
 		}
 		entry++;
@@ -308,13 +308,13 @@ unsigned int CMenuPcs::TmpArtiClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_80332f2c;
+				entry->alpha = kTmpArtiZero;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80332f48 / (double)entry->duration;
-				entry->alpha = (float)(DOUBLE_80332f48 - ratio * (double)entry->timer);
-				if ((double)entry->alpha < DOUBLE_80332f50) {
-					entry->alpha = FLOAT_80332f2c;
+				double ratio = kTmpArtiOneDouble / (double)entry->duration;
+				entry->alpha = (float)(kTmpArtiOneDouble - ratio * (double)entry->timer);
+				if ((double)entry->alpha < kTmpArtiZeroDouble) {
+					entry->alpha = kTmpArtiZero;
 				}
 			}
 		}
@@ -323,7 +323,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 
 	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
-		zero = FLOAT_80332f2c;
+		zero = kTmpArtiZero;
 		entry = this->m_tmpArtiList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
@@ -357,7 +357,7 @@ int CMenuPcs::TmpArtiCtrl()
 	hasInput = TmpArtiCtrlCur();
 
 	if (hasInput) {
-		float fVar2 = FLOAT_80332f30;
+		float fVar2 = kTmpArtiOne;
 		const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 		TmpArtiEntry* entry = this->m_tmpArtiList->entries;
@@ -443,10 +443,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_80332f30;
+				entry->alpha = kTmpArtiOne;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80332f48 / (double)entry->duration;
+				double ratio = kTmpArtiOneDouble / (double)entry->duration;
 				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
 		}

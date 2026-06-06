@@ -8,6 +8,11 @@ struct pppKeShpTail3X
     _pppPObject m_object;
 };
 
+struct KeShpTail3XDataOffsets {
+    s32 m_workOffset;
+    s32 m_alphaWorkOffset;
+};
+
 struct pppKeShpTail3XStep {
     s32 m_graphId;
     u32 m_dataValIndex;

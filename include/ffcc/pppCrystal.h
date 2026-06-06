@@ -8,6 +8,12 @@ struct _pppPObject;
 
 typedef _pppPObject pppCrystal;
 
+struct CrystalDataOffsets {
+    s32 _unused0;
+    s32 m_colorBlockOffset;
+    s32 m_workOffset;
+};
+
 struct pppCrystalStep {
     s32 m_graphId;
     s32 m_dataValIndex;

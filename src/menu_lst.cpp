@@ -8,21 +8,21 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-static const float FLOAT_803333D0 = 0.0f;
-static const float FLOAT_803333D4 = 255.0f;
-static const double DOUBLE_803333D8 = 20.0;
-static const float FLOAT_803333E0 = 40.0f;
-static const double DOUBLE_803333E8 = 0.5;
-static const float FLOAT_803333F0 = 1.0f;
-static const float FLOAT_803333F4 = 4.0f;
-static const float FLOAT_803333F8 = 320.0f;
-static const float FLOAT_803333FC = 0.5f;
-static const float FLOAT_80333400 = 352.0f;
-static const float FLOAT_80333404 = 3.0f;
-static const double DOUBLE_80333408 = 4503601774854144.0;
-static const double DOUBLE_80333410 = 1.0;
-static const double DOUBLE_80333418 = 0.0;
-static const double DOUBLE_80333420 = 216.0;
+static const float kMLstZero = 0.0f;
+static const float kMLstColorMax = 255.0f;
+static const double kMLstSelectedOffsetX = 20.0;
+static const float kMLstRowHeight = 40.0f;
+static const double kMLstHalfDouble = 0.5;
+static const float kMLstOne = 1.0f;
+static const float kMLstTextYOffset = 4.0f;
+static const float kMLstHelpCenterX = 320.0f;
+static const float kMLstHalf = 0.5f;
+static const float kMLstHelpY = 352.0f;
+static const float kMLstHelpScale = 3.0f;
+static const double kMLstIntToDoubleBias = 4503601774854144.0;
+static const double kMLstOneDouble = 1.0;
+static const double kMLstZeroDouble = 0.0;
+static const double kMLstWindowCenterX = 216.0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
@@ -64,7 +64,7 @@ void CMenuPcs::MLstDraw()
 			float y = (float)item->y;
 			float w = (float)item->width;
 			float h = (float)item->height;
-			float zero = FLOAT_803333D0;
+			float zero = kMLstZero;
 			float v = zero;
 			float alpha = item->alpha;
 
@@ -92,7 +92,7 @@ void CMenuPcs::MLstDraw()
 			}
 			MenuPcs.DrawRect(
 				0,
-				(float)-((FLOAT_803333E0 * DOUBLE_803333E8) - (double)iconX),
+				(float)-((kMLstRowHeight * kMLstHalfDouble) - (double)iconX),
 				iconY,
 				40.0f,
 				40.0f,
@@ -106,9 +106,9 @@ void CMenuPcs::MLstDraw()
 	}
 
 	CFont* font = this->m_fonts[4];
-	font->SetMargin(FLOAT_803333F0);
+	font->SetMargin(kMLstOne);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_803333F0);
+	font->SetScale(kMLstOne);
 	font->DrawInit();
 
 	item = this->m_menuLstList->entries;
@@ -134,16 +134,16 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->m_menuLstList->entries[this->m_menuLstState->cursor];
-		float cursorYF = (float)((double)(curItem->height - 0x20) * DOUBLE_803333E8 + (double)curItem->y);
+		float cursorYF = (float)((double)(curItem->height - 0x20) * kMLstHalfDouble + (double)curItem->y);
 		int cursorY = (int)cursorYF;
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
+		DrawCursor(cursorX, cursorY, kMLstOne);
 	}
 
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	float helpX = FLOAT_803333F8;
+	float helpX = kMLstHelpCenterX;
 	float helpY = 352.0f;
 	DrawHelpMessage(
 		helpMessageId,
@@ -152,7 +152,7 @@ void CMenuPcs::MLstDraw()
 		(int)helpY,
 		CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
-		FLOAT_803333F0,
+		kMLstOne,
 		3.0f);
 }
 
@@ -184,13 +184,13 @@ int CMenuPcs::MLstClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333D0;
+				entry->alpha = kMLstZero;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80333410 / (double)entry->duration;
-				entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
-				if ((double)entry->alpha < DOUBLE_80333418) {
-					entry->alpha = FLOAT_803333D0;
+				double ratio = kMLstOneDouble / (double)entry->duration;
+				entry->alpha = (float)(kMLstOneDouble - ratio * (double)entry->timer);
+				if ((double)entry->alpha < kMLstZeroDouble) {
+					entry->alpha = kMLstZero;
 				}
 			}
 		}
@@ -198,7 +198,7 @@ int CMenuPcs::MLstClose()
 	}
 	result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		zero = FLOAT_803333D0;
+		zero = kMLstZero;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;
@@ -302,7 +302,7 @@ int CMenuPcs::MLstCtrl()
 	}
 
 	if (result != 0) {
-		one = FLOAT_803333F0;
+		one = kMLstOne;
 		MenuLstEntry* entry = this->m_menuLstList->entries;
 		for (i = 0; (itemCount = (unsigned int)this->m_menuLstList->count), i < (int)itemCount; i++) {
 			entry->alpha = one;
@@ -351,15 +351,15 @@ int CMenuPcs::MLstOpen()
 		float zero;
 
 		memset(this->m_menuLstList, 0, sizeof(MenuLstList));
-		one = FLOAT_803333F0;
+		one = kMLstOne;
 		entry = this->m_menuLstList->entries;
 		for (i = 0; i < 64; i++, entry++) {
 			entry->z = one;
 		}
 
-		xOrigin = DOUBLE_80333420;
-		itemCenter = DOUBLE_803333E8;
-		zero = FLOAT_803333D0;
+		xOrigin = kMLstWindowCenterX;
+		itemCenter = kMLstHalfDouble;
+		zero = kMLstZero;
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
@@ -390,10 +390,10 @@ int CMenuPcs::MLstOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333F0;
+				entry->alpha = kMLstOne;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80333410 / (double)entry->duration;
+				double ratio = kMLstOneDouble / (double)entry->duration;
 				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
 		}
@@ -402,7 +402,7 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->m_menuLstList->count == completedItems) {
-		one = FLOAT_803333F0;
+		one = kMLstOne;
 		entry = this->m_menuLstList->entries;
 		for (count = itemCount; count > 0; count--) {
 			entry->startFrame = 0;

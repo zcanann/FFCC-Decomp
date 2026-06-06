@@ -37,19 +37,13 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 static const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 static const char s_pppMana2_cpp[] = "pppMana2.cpp";
 
-struct Mana2DataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_setupOffset;
-    s32 m_workOffset;
-};
-
 struct Mana2SetupBlock
 {
     u8 m_pad0[8];
     pppCVECTOR m_color;
 };
 
+STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
 extern const float FLOAT_80331898 = 0.0f;

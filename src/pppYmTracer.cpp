@@ -51,16 +51,12 @@ struct TracerColorBlock {
     pppCVECTOR color;
 };
 
-struct YmTracerDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
 union PackedColor {
     u32 value;
     u8 bytes[4];
 };
 
+STATIC_ASSERT(sizeof(YmTracerDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(TracerColorBlock, color) == 0x8);

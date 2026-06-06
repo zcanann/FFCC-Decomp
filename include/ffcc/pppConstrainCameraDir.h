@@ -5,6 +5,10 @@
 
 typedef _pppPObject pppConstrainCameraDir;
 
+struct ConstrainCameraDirDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppConstrainCameraDirStep {
     s32 m_graphId;
     f32 m_dataValIndex;

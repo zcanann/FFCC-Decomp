@@ -8,6 +8,12 @@ struct _pppPObject;
 
 typedef _pppPObject pppEmission;
 
+struct EmissionDataOffsets {
+    s32 _unused0;
+    s32 m_colorDataOffset;
+    s32 m_stateOffset;
+};
+
 struct PEmissionPayload {
     f32 m_scaleAccelerationAdd;
     f32 m_scaleRandomRange;

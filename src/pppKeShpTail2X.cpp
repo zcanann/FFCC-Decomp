@@ -30,11 +30,7 @@ struct KeShpTail2XAlphaWork {
 };
 STATIC_ASSERT(offsetof(KeShpTail2XAlphaWork, m_alpha) == 6);
 
-struct KeShpTail2XDataOffsets {
-    s32 m_workOffset;
-    s32 m_alphaWorkOffset;
-};
-
+STATIC_ASSERT(sizeof(KeShpTail2XDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(KeShpTail2XDataOffsets, m_alphaWorkOffset) == 0x4);
 

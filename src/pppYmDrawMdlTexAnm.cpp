@@ -31,12 +31,7 @@ struct pppYmDrawMdlTexAnmColorBlock {
     pppCVECTOR m_color;
 };
 
-struct pppYmDrawMdlTexAnmDataOffsets {
-    s32 m_colorBlockOffset;
-    s32 _unused04;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(pppYmDrawMdlTexAnmDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_colorBlockOffset) == 0x0);
 STATIC_ASSERT(offsetof(pppYmDrawMdlTexAnmDataOffsets, m_workOffset) == 0x8);
 

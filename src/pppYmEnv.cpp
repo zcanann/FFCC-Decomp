@@ -37,12 +37,6 @@ extern const u16 sYmEnvXAxisIdsTail;
 extern const u32 sYmEnvYAxisAngle0;
 extern const u32 sYmEnvYAxisAngle180;
 
-struct _pppEnvStYmEnv {
-    void* m_stagePtr;
-    CMaterialSet* m_materialSetPtr;
-    CMapMesh** m_mapMeshPtr;
-};
-
 struct YmEnvPackedXAxisIds {
     u32 m_word;
     u16 m_tail;
@@ -502,19 +496,16 @@ CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle* handle)
  */
 CTexture* GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 {
-    _pppEnvStYmEnv* ymEnv = (_pppEnvStYmEnv*)env;
     int textureIndex;
     CMapMesh* mapMesh;
-    CMapMesh** mapMeshArray;
 
     if (mapMeshIndex == 0xFFFF) {
         return 0;
     }
 
-    mapMeshArray = ymEnv->m_mapMeshPtr;
-    mapMesh = mapMeshArray[mapMeshIndex];
+    mapMesh = env->m_mapMeshPtr[mapMeshIndex];
     textureIndex = 0;
-    return static_cast<CTexture*>(mapMesh->GetTexture(ymEnv->m_materialSetPtr, textureIndex));
+    return static_cast<CTexture*>(mapMesh->GetTexture(env->m_materialSetPtr, textureIndex));
 }
 
 /*

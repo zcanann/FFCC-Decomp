@@ -25,13 +25,7 @@ static Mtx g_matUnit;
 
 static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 
-struct RyjMegaBirthDataOffsets
-{
-	s32 m_unusedOffset;
-	s32 m_colorOffset;
-	s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(RyjMegaBirthDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_workOffset) == 0x8);
 

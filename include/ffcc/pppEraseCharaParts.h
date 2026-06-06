@@ -8,6 +8,11 @@ struct _pppPObject;
 
 typedef _pppPObject pppEraseCharaParts;
 
+struct EraseCharaPartsDataOffsets {
+    s32 m_sourceColorOffset;
+    s32 m_callbackColorOffset;
+};
+
 struct pppEraseCharaPartsStep {
     u8 m_pad0[4];
     s8 m_meshIndex;

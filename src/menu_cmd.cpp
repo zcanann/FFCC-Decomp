@@ -158,15 +158,70 @@ static const char* GetUniteListName(int itemId)
 	return flatText[itemId * 5 + 4];
 }
 
-struct CmdListStorage {
-	s16 count;
-	s16 selected;
-	unsigned char pad_0004[4];
-	unsigned char entries[64][0x40];
+struct CmdListEntry {
+	s16 x;
+	s16 y;
+	s16 width;
+	s16 height;
+	float u;
+	float v;
+	float alpha;
+	float scale;
+	s32 unk_18;
+	s32 tex;
+	s32 timer;
+	s32 startFrame;
+	s32 duration;
+	u32 flags;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
 };
 
+struct CmdListStorage {
+	s16 count;
+	s16 listEnd;
+	unsigned char pad_0004[4];
+	CmdListEntry entries[64];
+};
+
+struct CmdState {
+	unsigned char pad_0000[0x08];
+	u8 transitionFlag;
+	unsigned char pad_0009[0x0B - 0x09];
+	u8 initialized;
+	unsigned char pad_000C[0x22 - 0x0C];
+	s16 transitionTimer;
+	unsigned char pad_0024[0x26 - 0x24];
+	s16 selected;
+	unsigned char pad_0028[0x30 - 0x28];
+	s16 mode;
+	s16 prevMode;
+};
+
+STATIC_ASSERT(offsetof(CmdListEntry, u) == 0x08);
+STATIC_ASSERT(offsetof(CmdListEntry, v) == 0x0C);
+STATIC_ASSERT(offsetof(CmdListEntry, alpha) == 0x10);
+STATIC_ASSERT(offsetof(CmdListEntry, scale) == 0x14);
+STATIC_ASSERT(offsetof(CmdListEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(CmdListEntry, timer) == 0x20);
+STATIC_ASSERT(offsetof(CmdListEntry, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(CmdListEntry, duration) == 0x28);
+STATIC_ASSERT(offsetof(CmdListEntry, flags) == 0x2C);
+STATIC_ASSERT(offsetof(CmdListEntry, dx) == 0x30);
+STATIC_ASSERT(offsetof(CmdListEntry, dy) == 0x34);
+STATIC_ASSERT(offsetof(CmdListEntry, targetX) == 0x38);
+STATIC_ASSERT(offsetof(CmdListEntry, targetY) == 0x3C);
+STATIC_ASSERT(sizeof(CmdListEntry) == 0x40);
 STATIC_ASSERT(offsetof(CmdListStorage, entries) == 8);
 STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
+STATIC_ASSERT(offsetof(CmdState, transitionFlag) == 0x08);
+STATIC_ASSERT(offsetof(CmdState, initialized) == 0x0B);
+STATIC_ASSERT(offsetof(CmdState, transitionTimer) == 0x22);
+STATIC_ASSERT(offsetof(CmdState, selected) == 0x26);
+STATIC_ASSERT(offsetof(CmdState, mode) == 0x30);
+STATIC_ASSERT(offsetof(CmdState, prevMode) == 0x32);
 
 static inline s16* GetCmdState(CMenuPcs* menu)
 {
@@ -181,6 +236,16 @@ static inline s16* GetCmdList(CMenuPcs* menu)
 static inline CmdListStorage* GetCmdListStorage(CMenuPcs* menu)
 {
 	return reinterpret_cast<CmdListStorage*>(GetCmdList(menu));
+}
+
+static inline CmdListEntry* GetCmdListEntries(CMenuPcs* menu)
+{
+	return GetCmdListStorage(menu)->entries;
+}
+
+static inline CmdState* GetCmdStateView(CMenuPcs* menu)
+{
+	return reinterpret_cast<CmdState*>(GetCmdState(menu));
 }
 
 static inline int GetCmdStateBase(CMenuPcs* menu)
@@ -236,56 +301,58 @@ void CMenuPcs::CmdInit()
 	memset(GetCmdListStorage(this), 0, sizeof(*GetCmdListStorage(this)));
 
 	float fVar2 = FLOAT_80332a70;
-	s32 iVar5 = GetCmdListBase(this) + 8;
+	CmdListEntry* entries = GetCmdListEntries(this);
+	CmdListEntry* entry = entries;
 	s32 iVar8 = 8;
 	do {
-		*reinterpret_cast<float*>(iVar5 + 0x14) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x54) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x94) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0xD4) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x114) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x154) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x194) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x1D4) = fVar2;
-		iVar5 += 0x200;
+		entry[0].scale = fVar2;
+		entry[1].scale = fVar2;
+		entry[2].scale = fVar2;
+		entry[3].scale = fVar2;
+		entry[4].scale = fVar2;
+		entry[5].scale = fVar2;
+		entry[6].scale = fVar2;
+		entry[7].scale = fVar2;
+		entry += 8;
 		iVar8--;
 	} while (iVar8 != 0);
 
-	s16* puVar7 = reinterpret_cast<s16*>(GetCmdListBase(this) + 8);
-	iVar5 = 0;
+	entry = entries;
+	int iVar5 = 0;
 	iVar8 = 8;
 	float fVar3 = FLOAT_80332ab0;
 	float fVar4 = FLOAT_80332ad0;
 	do {
 		if (iVar5 < caravanWork->m_numCmdListSlots) {
-			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0x2D;
+			entry->tex = 0x2D;
 		} else {
-			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0xFFFFFFFF;
+			entry->tex = 0xFFFFFFFF;
 		}
 
-		puVar7[2] = 200;
-		puVar7[3] = 0x20;
-		*puVar7 = 0x74;
-		puVar7[1] = static_cast<s16>(iVar5 * puVar7[3] + 0x28);
-		*reinterpret_cast<float*>(puVar7 + 4) = fVar3;
-		*reinterpret_cast<float*>(puVar7 + 6) = fVar4;
+		entry->width = 200;
+		entry->height = 0x20;
+		entry->x = 0x74;
+		entry->y = static_cast<s16>(iVar5 * entry->height + 0x28);
+		entry->u = fVar3;
+		entry->v = fVar4;
 
 		if ((1 < iVar5) && (caravanWork->m_commandListInventorySlotRef[iVar5] < 0)) {
-			*reinterpret_cast<float*>(puVar7 + 6) += static_cast<float>(static_cast<double>(puVar7[3]));
+			entry->v += static_cast<float>(static_cast<double>(entry->height));
 		}
 
-		*reinterpret_cast<s32*>(puVar7 + 0x12) = iVar5;
+		entry->startFrame = iVar5;
 		iVar5++;
-		*reinterpret_cast<u32*>(puVar7 + 0x14) = 3;
-		puVar7 += 0x20;
+		entry->duration = 3;
+		entry++;
 		iVar8--;
 	} while (iVar8 != 0);
 
 	*GetCmdList(this) = 8;
 	CmdInit1();
 	GetCmdItem();
-	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26) = 2;
-	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 0x0B) = 1;
+	CmdState* cmd = GetCmdStateView(this);
+	cmd->selected = 2;
+	cmd->initialized = 1;
 }
 
 /*
@@ -295,11 +362,12 @@ void CMenuPcs::CmdInit()
  */
 void CMenuPcs::CmdInit0()
 {
-	s16* list = GetCmdList(this);
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
 
-	for (s32 i = 0; i < list[0]; i++) {
-		*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = FLOAT_80332a70;
-		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
+	for (s32 i = 0; i < list->count; i++) {
+		entries[i].alpha = FLOAT_80332a70;
+		entries[i].scale = FLOAT_80332a70;
 	}
 
 	const u32 count = static_cast<u32>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->m_numCmdListSlots);
@@ -308,11 +376,11 @@ void CMenuPcs::CmdInit0()
 	}
 
 	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
-		*reinterpret_cast<s32*>(list + i * 0x20 + 0x14) = idx;
-		*reinterpret_cast<s32*>(list + i * 0x20 + 0x16) = 3;
+		entries[i].startFrame = idx;
+		entries[i].duration = 3;
 	}
 
-	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 8) = 0;
+	GetCmdStateView(this)->transitionFlag = 0;
 }
 
 /*
@@ -512,134 +580,48 @@ void CMenuPcs::CmdInit1()
  */
 void CMenuPcs::CmdInit2()
 {
-	s16* psVar7;
-	s16 sVar1;
-	float fVar2;
-	u32 uVar4;
-	u32 uVar5;
-	u32 uVar8;
-	int iVar3;
-	int iVar6;
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
+	const s16 start = list->count;
+	const s32 startIndex = start;
 
-	uVar4 = 0x2f;
-	psVar7 = GetCmdList(this);
-	int listBase = GetCmdListBase(this);
-	sVar1 = *psVar7;
-	iVar3 = (int)sVar1;
-	(psVar7 + iVar3 * 0x20 + 0x12)[0] = 0;
-	(psVar7 + iVar3 * 0x20 + 0x12)[1] = 0x2e;
-	(psVar7 + iVar3 * 0x20 + 0x16)[0] = 0;
-	(psVar7 + iVar3 * 0x20 + 0x16)[1] = 2;
-	(psVar7 + iVar3 * 0x20 + 0x18)[0] = 0;
-	(psVar7 + iVar3 * 0x20 + 0x18)[1] = 5;
-	iVar6 = listBase + (iVar3 + 1) * 0x40 + 8;
+	entries[startIndex].tex = 0x2e;
+	entries[startIndex].startFrame = 2;
+	entries[startIndex].duration = 5;
+
+	u32 tex = 0x2f;
 	if (GetCmdLayoutFlag(this) == 0) {
-		uVar4 = 0x46;
+		tex = 0x46;
 	}
-	*(u32*)(iVar6 + 0x1c) = uVar4;
-	*(u32*)(iVar6 + 0x24) = 7;
-	uVar4 = 0x2f;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 2) * 0x40 + 8;
-	if (GetCmdLayoutFlag(this) == 0) {
-		uVar4 = 0x46;
+
+	entries[startIndex + 1].tex = tex;
+	entries[startIndex + 1].startFrame = 7;
+	entries[startIndex + 1].duration = 5;
+	entries[startIndex + 2].tex = tex;
+	entries[startIndex + 2].startFrame = 7;
+	entries[startIndex + 2].duration = 5;
+
+	entries[startIndex + 3].flags = 2;
+	entries[startIndex + 3].tex = 0x2e;
+	entries[startIndex + 3].startFrame = 7;
+	entries[startIndex + 3].duration = 5;
+
+	for (s32 i = 4; i < 12; i++) {
+		CmdListEntry* entry = &entries[startIndex + i];
+		entry->flags = 2;
+		entry->tex = 0x37;
+		entry->startFrame = 0;
+		entry->duration = 5;
 	}
-	*(u32*)(iVar6 + 0x1c) = uVar4;
-	*(u32*)(iVar6 + 0x24) = 7;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 3) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x2e;
-	*(u32*)(iVar6 + 0x24) = 7;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 4) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 5) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 6) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 7) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 8) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = listBase + (iVar3 + 9) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	fVar2 = FLOAT_80332a70;
-	iVar6 = listBase + (iVar3 + 10) * 0x40 + 8;
-	*(u32*)(iVar6 + 0x2c) = 2;
-	*(u32*)(iVar6 + 0x1c) = 0x37;
-	*(u32*)(iVar6 + 0x24) = 0;
-	*(u32*)(iVar6 + 0x28) = 5;
-	iVar3 = listBase + (iVar3 + 0xb) * 0x40 + 8;
-	*(u32*)(iVar3 + 0x2c) = 2;
-	*(u32*)(iVar3 + 0x1c) = 0x37;
-	*(u32*)(iVar3 + 0x24) = 0;
-	*(u32*)(iVar3 + 0x28) = 5;
-	*(s16*)(listBase + 2) = sVar1 + 0xc;
-	psVar7 = reinterpret_cast<s16*>(listBase);
-	uVar5 = (u32)((int)psVar7[1] - (int)*psVar7);
-	psVar7 = psVar7 + *psVar7 * 0x20 + 4;
-	if ((int)uVar5 > 0) {
-		uVar8 = uVar5 >> 3;
-		if (uVar8 != 0) {
-			do {
-				psVar7[0x10] = 0;
-				psVar7[0x11] = 0;
-				*(float*)(psVar7 + 8) = fVar2;
-				psVar7[0x30] = 0;
-				psVar7[0x31] = 0;
-				*(float*)(psVar7 + 0x28) = fVar2;
-				psVar7[0x50] = 0;
-				psVar7[0x51] = 0;
-				*(float*)(psVar7 + 0x48) = fVar2;
-				psVar7[0x70] = 0;
-				psVar7[0x71] = 0;
-				*(float*)(psVar7 + 0x68) = fVar2;
-				psVar7[0x90] = 0;
-				psVar7[0x91] = 0;
-				*(float*)(psVar7 + 0x88) = fVar2;
-				psVar7[0xb0] = 0;
-				psVar7[0xb1] = 0;
-				*(float*)(psVar7 + 0xa8) = fVar2;
-				psVar7[0xd0] = 0;
-				psVar7[0xd1] = 0;
-				*(float*)(psVar7 + 200) = fVar2;
-				psVar7[0xf0] = 0;
-				psVar7[0xf1] = 0;
-				*(float*)(psVar7 + 0xe8) = fVar2;
-				psVar7 += 0x100;
-				uVar8 -= 1;
-			} while (uVar8 != 0);
-			uVar5 &= 7;
-			if (uVar5 == 0) {
-				return;
-			}
-		}
-		do {
-			psVar7[0x10] = 0;
-			psVar7[0x11] = 0;
-			*(float*)(psVar7 + 8) = fVar2;
-			psVar7 += 0x20;
-			uVar5 -= 1;
-		} while (uVar5 != 0);
+
+	list->listEnd = start + 0xc;
+
+	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
+	CmdListEntry* entry = &entries[list->count];
+	const float alpha = FLOAT_80332a70;
+	for (u32 i = 0; i < count; i++) {
+		entry[i].timer = 0;
+		entry[i].alpha = alpha;
 	}
 }
 

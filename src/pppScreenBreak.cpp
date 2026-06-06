@@ -42,12 +42,6 @@ struct ScreenBreakColorData {
     GXColor m_color;
 };
 
-struct ScreenBreakDataOffsets {
-    s32 m_colorDataOffset;
-    s32 _unused04;
-    s32 m_valueOffset;
-};
-
 STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
 STATIC_ASSERT(offsetof(CChara::CNode, m_localRuntimeMtx) == 0x14);
 STATIC_ASSERT(offsetof(CChara::CNode, m_flags) == 0xBC);
@@ -68,6 +62,7 @@ STATIC_ASSERT(offsetof(PScreenBreak, m_gravityAmount) == 0x30);
 STATIC_ASSERT(offsetof(PScreenBreak, m_angleRand) == 0x34);
 STATIC_ASSERT(offsetof(PScreenBreak, m_speedBase) == 0x38);
 STATIC_ASSERT(offsetof(PScreenBreak, m_speedRand) == 0x3C);
+STATIC_ASSERT(sizeof(ScreenBreakDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_colorDataOffset) == 0x0);
 STATIC_ASSERT(offsetof(ScreenBreakDataOffsets, m_valueOffset) == 0x8);
 

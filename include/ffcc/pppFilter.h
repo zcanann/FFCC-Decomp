@@ -3,6 +3,10 @@
 
 #include "ffcc/partMng.h"
 
+struct pppFilterDataOffsets {
+    s32 m_serializedDataOffset;
+};
+
 struct pppFilterStep {
     unsigned int m_unk0;
     int m_dataValIndex;

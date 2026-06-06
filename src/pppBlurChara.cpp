@@ -52,12 +52,6 @@ struct BlurCharaTexData {
     GXTexObj* m_texObj;
 };
 
-struct BlurCharaDataOffsets {
-    s32 _unused0;
-    s32 m_colorDataOffset;
-    s32 m_texDataOffset;
-};
-
 STATIC_ASSERT(sizeof(pppBlurCharaWork) == 0x10);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_captureBuffer) == 0x00);
 STATIC_ASSERT(offsetof(pppBlurCharaWork, m_ownerObj) == 0x04);
@@ -66,6 +60,7 @@ STATIC_ASSERT(offsetof(pppBlurCharaWork, m_savedModelField) == 0x0C);
 STATIC_ASSERT(offsetof(BlurCharaColorData, m_color) == 0x08);
 STATIC_ASSERT(offsetof(BlurCharaTexData, m_objPosBase) == 0x04);
 STATIC_ASSERT(offsetof(BlurCharaTexData, m_texObj) == 0x08);
+STATIC_ASSERT(sizeof(BlurCharaDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_colorDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(BlurCharaDataOffsets, m_texDataOffset) == 0x8);
 

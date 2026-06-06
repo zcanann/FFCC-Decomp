@@ -24,12 +24,6 @@ struct YmDeformationMdlColorInfo {
 
 typedef VYmDeformationMdl YmDeformationMdlState;
 
-struct _pppEnvStYmDeformationMdl {
-    void* m_stagePtr;
-    CMaterialSet* m_materialSetPtr;
-    CMapMesh** m_mapMeshPtr;
-};
-
 STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_colorInfoOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_stateOffset) == 0x8);
 STATIC_ASSERT(sizeof(YmDeformationMdlDataOffsets) == 0xC);
@@ -51,9 +45,9 @@ static inline YmDeformationMdlColorInfo* DeformationMdlColorInfo(pppYmDeformatio
         object->m_workArea + DeformationMdlDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
-static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
+static inline _pppEnvSt* DeformationMdlEnv()
 {
-    return reinterpret_cast<_pppEnvStYmDeformationMdl*>(ppvEnv);
+    return ppvEnv;
 }
 
 extern const float kYmDeformationMdlScreenWidth;
@@ -169,7 +163,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         return;
     }
 
-    _pppEnvStYmDeformationMdl* env = DeformationMdlEnv();
+    _pppEnvSt* env = DeformationMdlEnv();
     model = env->m_mapMeshPtr[param_2->m_dataValIndex];
     colorInfo = DeformationMdlColorInfo(pppYmDeformationMdl, param_3);
     texture = model->GetTexture(env->m_materialSetPtr, textureIndex);

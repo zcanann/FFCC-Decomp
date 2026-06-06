@@ -37,13 +37,7 @@ static pppFMATRIX g_matUnit;
 
 static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
 
-struct YmMegaBirthShpTail2DataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_colorOffset;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmMegaBirthShpTail2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmMegaBirthShpTail2DataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmMegaBirthShpTail2DataOffsets, m_workOffset) == 0x8);
 

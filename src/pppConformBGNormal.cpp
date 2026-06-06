@@ -42,10 +42,7 @@ struct ConformBgNormalCylinder {
     Vec m_boundsMax;
 };
 
-struct ConformBgNormalDataOffsets {
-    s32 m_stateOffset;
-};
-
+STATIC_ASSERT(sizeof(ConformBgNormalDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(ConformBgNormalDataOffsets, m_stateOffset) == 0x0);
 
 static inline ConformBgNormalDataOffsets* GetConformBgNormalDataOffsets(_pppCtrlTable* ctrl)

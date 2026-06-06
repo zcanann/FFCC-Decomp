@@ -95,38 +95,38 @@ static const char s_scenegraph_step_x1_8[] = "x1/8";
 static const char s_scenegraph_step_x1_4[] = "x1/4";
 static const char s_scenegraph_step_x1_2[] = "x1/2";
 static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
-static const float FLOAT_8032fb78 = 0.0f;
-static const float FLOAT_8032FB7C = 448.0f;
-static const float FLOAT_8032FB80 = 640.0f;
-static const float FLOAT_8032FB84 = -100.0f;
-static const float FLOAT_8032FB88 = 1.0f;
-static const float FLOAT_8032FB8C = 1.5707964f;
-static const float FLOAT_8032FB90 = 255.0f;
-static const float FLOAT_8032FB94 = 48.0f;
-static const float FLOAT_8032FB98 = 8.0f;
-static const float FLOAT_8032FB9C = 320.0f;
-static const float FLOAT_8032FBA0 = 224.0f;
-static const float FLOAT_8032FBA4 = 1280.0f;
-static const float FLOAT_8032FBA8 = 0.5f;
-static const double DOUBLE_8032FBB0 = 4503601774854144.0;
-static const double DOUBLE_8032FBB8 = 4503599627370496.0;
-static const float FLOAT_8032FBC0 = 0.19634955f;
-static const float FLOAT_8032FBC4 = 16.0f;
-static const float FLOAT_8032FBC8 = 440.0f;
-static const float FLOAT_8032FBCC = 336.0f;
-static const float FLOAT_8032FBD0 = 441.0f;
-static const float FLOAT_8032FBD4 = 100.0f;
-static const float FLOAT_8032FBD8 = 436.0f;
-static const float FLOAT_8032FBDC = 432.0f;
-static const float FLOAT_8032FBE0 = 420.0f;
-static const float FLOAT_8032FBE4 = 32.0f;
-static const float FLOAT_8032FBE8 = 424.0f;
-static const float FLOAT_8032FBEC = 40.0f;
-static const float FLOAT_8032FBF0 = 56.0f;
+static const float kGraphicZero = 0.0f;
+static const float kGraphicScreenHeight = 448.0f;
+static const float kGraphicScreenWidth = 640.0f;
+static const float kGraphicOrthoFarZ = -100.0f;
+static const float kGraphicOne = 1.0f;
+static const float kScreenFadeHalfPi = 1.5707964f;
+static const float kGraphicColorMax = 255.0f;
+static const float kScreenFadeBarEdge = 48.0f;
+static const float kScreenFadeRingWidth = 8.0f;
+static const float kGraphicScreenCenterX = 320.0f;
+static const float kGraphicScreenCenterY = 224.0f;
+static const float kScreenFadeCircleRadius = 1280.0f;
+static const float kGraphicHalf = 0.5f;
+static const double kIntToDoubleBias = 4503601774854144.0;
+static const double kUnsignedToDoubleBias = 4503599627370496.0;
+static const float kSFCircleAngleStep = 0.19634955f;
+static const float kDebugBarLeft = 16.0f;
+static const float kDebugBarTop = 440.0f;
+static const float kDebugBarRight = 336.0f;
+static const float kDebugBarBottom = 441.0f;
+static const float kDebugBarFrameBudget = 100.0f;
+static const float kDebugBarMoveBottom = 436.0f;
+static const float kDebugBarObjectTop = 432.0f;
+static const float kDebugIndicatorTop = 420.0f;
+static const float kDebugIndicatorFrameRight = 32.0f;
+static const float kDebugIndicatorBottom = 424.0f;
+static const float kDebugIndicatorFifoLeft = 40.0f;
+static const float kDebugIndicatorFifoRight = 56.0f;
 static const char s_debug_pad_port_fmt[] = "%dP";
 static const char s_debug_frame_fmt[] = "%d";
-static const float FLOAT_8032fbfc = 0.6f;
-static const float FLOAT_8032fc00 = 200.0f;
+static const float kDofDefaultNearZ = 0.6f;
+static const float kDofDefaultFarZ = 200.0f;
 
 static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
@@ -170,7 +170,7 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
-    C_MTXOrtho(orthoMtx, FLOAT_8032fb78, FLOAT_8032FB7C, FLOAT_8032fb78, FLOAT_8032FB80, FLOAT_8032fb78, FLOAT_8032FB84);
+    C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, kGraphicOrthoFarZ);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -228,7 +228,7 @@ void CGraphicPcs::drawScreenFade()
         if (invert != 0) {
             t = 1.0f - t;
         }
-        const float fadeWave = (float)sin((double)(FLOAT_8032FB8C * t));
+        const float fadeWave = (float)sin((double)(kScreenFadeHalfPi * t));
         const u8 fadeAlpha = (u8)(255.0f * fadeWave);
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
@@ -305,7 +305,7 @@ void CGraphicPcs::drawScreenFade()
                     PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
                     float sx = pos.x * 320.0f + 320.0f;
-                    float sy = -(pos.y * FLOAT_8032FBA0 - FLOAT_8032FBA0);
+                    float sy = -(pos.y * kGraphicScreenCenterY - kGraphicScreenCenterY);
                     if (sx < 0.0f) {
                         sx = 0.0f;
                     } else if (sx > 640.0f) {
@@ -313,8 +313,8 @@ void CGraphicPcs::drawScreenFade()
                     }
                     if (sy < 0.0f) {
                         sy = 0.0f;
-                    } else if (sy > FLOAT_8032FB7C) {
-                        sy = FLOAT_8032FB7C;
+                    } else if (sy > kGraphicScreenHeight) {
+                        sy = kGraphicScreenHeight;
                     }
 
                     const int radius = (int)(640.0f * (1.0f - fadeWave));
@@ -353,11 +353,11 @@ void CGraphicPcs::drawScreenFade()
                 const float amp = slotData->m_amplitude * (1.0f - t);
                 const float size = amp + 1.0f;
                 const float offX = stretch * (320.0f * amp) * (float)sin((double)phase);
-                const float offY = stretch * (FLOAT_8032FBA0 * amp) * (float)cos((double)phase);
+                const float offY = stretch * (kGraphicScreenCenterY * amp) * (float)cos((double)phase);
                 const float cx = 320.0f + offX;
-                const float cy = FLOAT_8032FBA0 + offY;
+                const float cy = kGraphicScreenCenterY + offY;
                 const float w = 320.0f * size;
-                const float h = FLOAT_8032FBA0 * size;
+                const float h = kGraphicScreenCenterY * size;
 
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 GXPosition3f32(cx - w, cy - h, 0.0f);
@@ -483,7 +483,7 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
     float ringPoints[32][4];
-    const float step = FLOAT_8032FBC0;
+    const float step = kSFCircleAngleStep;
 
     for (int i = 0; i < 32; i++) {
         const float angle = step * (float)i;
@@ -497,7 +497,7 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int outerRadius, int centerX, in
     }
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
-    const float z = FLOAT_8032fb78;
+    const float z = kGraphicZero;
     const u32 innerColorWord = *(u32*)&innerColor;
     const u32 outerColorWord = *(u32*)&outerColor;
     for (int i = 0; i < 32; i++) {
@@ -677,7 +677,7 @@ void CGraphicPcs::drawBar()
 {
     Mtx44 ortho;
     Mtx identity;
-    C_MTXOrtho(ortho, FLOAT_8032fb78, FLOAT_8032FB7C, FLOAT_8032fb78, FLOAT_8032FB80, FLOAT_8032fb78, FLOAT_8032FB84);
+    C_MTXOrtho(ortho, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, kGraphicOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
 
     _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
@@ -1071,11 +1071,11 @@ void CGraphicPcs::create()
 
     _InitGxFunc();
     m_unkB8 = 0;
-    nearZ = FLOAT_8032fbfc;
+    nearZ = kDofDefaultNearZ;
     m_copySaveFlag = 0;
-    farZ = FLOAT_8032fc00;
+    farZ = kDofDefaultFarZ;
     m_dofFlag = 0;
-    dofDefault = FLOAT_8032fb78;
+    dofDefault = kGraphicZero;
     m_dofFlagB = 1;
     m_dofNearZ = nearZ;
     m_dofFarZ = farZ;

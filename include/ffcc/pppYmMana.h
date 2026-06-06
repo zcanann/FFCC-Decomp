@@ -12,6 +12,12 @@ struct PYmMana;
 struct CTexture;
 struct CGObject;
 
+struct YmManaDataOffsets {
+    s32 m_unusedOffset;
+    s32 m_setupOffset;
+    s32 m_workOffset;
+};
+
 struct pppYmManaStep {
     u8 m_pad00[4];
     s32 m_sourceTextureId2;

@@ -3506,18 +3506,17 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 void GbaQueue::SetSmithFlg(int channel)
 {
 	OSSemaphore* semaphore = accessSemaphores + channel;
-	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
 	int mask = 0x10;
 	mask <<= channel;
-	*flags = static_cast<u8>(*flags | mask);
+	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
 	OSSignalSemaphore(semaphore);
 
 	if (Joybus.SetMType(channel, 3) != 0) {
-		flags[1] = static_cast<u8>(flags[1] | mask);
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
 	} else {
-		flags[1] = static_cast<u8>(flags[1] & ~mask);
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
 	}
 }
 
@@ -3533,18 +3532,17 @@ void GbaQueue::SetSmithFlg(int channel)
 void GbaQueue::SetShopFlg(int channel)
 {
 	OSSemaphore* semaphore = accessSemaphores + channel;
-	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
 	int mask = 1;
 	mask <<= channel;
-	*flags = static_cast<u8>(*flags | mask);
+	m_shopFlags = static_cast<u8>(m_shopFlags | mask);
 	OSSignalSemaphore(semaphore);
 
 	if (Joybus.SetMType(channel, 2) != 0) {
-		flags[1] = static_cast<u8>(flags[1] | mask);
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags | mask);
 	} else {
-		flags[1] = static_cast<u8>(flags[1] & ~mask);
+		m_shopStatusFlags = static_cast<u8>(m_shopStatusFlags & ~mask);
 	}
 }
 

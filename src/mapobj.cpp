@@ -661,25 +661,26 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 
                         pointLight->m_color = pointLight->m_colors[0];
                         pointLight->m_altColor = pointLight->m_altColors[0];
-                    } else switch (chunk.m_id) {
-                    case CHUNK_CFRM:
-                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CJUN:
-                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_CKEY:
-                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MFRM:
-                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MJUN:
-                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
-                        break;
-                    case CHUNK_MKEY:
-                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
-                        break;
+                    } else {
+                        if (static_cast<int>(chunk.m_id) < CHUNK_LDAT) {
+                            if (chunk.m_id == CHUNK_CJUN) {
+                                pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                            } else if (static_cast<int>(chunk.m_id) < CHUNK_CJUN) {
+                                if (chunk.m_id == CHUNK_CFRM) {
+                                    pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                                }
+                            } else if (chunk.m_id == CHUNK_CKEY) {
+                                pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                            }
+                        } else if (chunk.m_id == CHUNK_MJUN) {
+                            pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
+                        } else if (static_cast<int>(chunk.m_id) < CHUNK_MJUN) {
+                            if (chunk.m_id == CHUNK_MFRM) {
+                                pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
+                            }
+                        } else if (chunk.m_id == CHUNK_MKEY) {
+                            pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
+                        }
                     }
                 }
                 chunkFile.PopChunk();

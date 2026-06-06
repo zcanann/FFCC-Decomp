@@ -28,7 +28,7 @@ static const float kFunnyShapeAnimOffsetX = 320.0f;
 static const float kFunnyShapeAnimOffsetY = 224.0f;
 static const float kFunnyShapePi = 3.14f;
 static const float kFunnyShapeHalfTurnDegrees = 180.0f;
-extern const char sDebugSpinnerText[5];
+extern const char sDebugSpinnerText[5] ATTRIBUTE_ALIGN(8);
 extern const float kPppHeapUseRateDivisor;
 
 namespace {
@@ -834,5 +834,5 @@ CFunnyShape::CFunnyShape()
     m_textureCount = 0;
 }
 
-extern const char sDebugSpinnerText[5] = "|/-\\";
+extern const char sDebugSpinnerText[5] ATTRIBUTE_ALIGN(8) = "|/-\\";
 extern const float kPppHeapUseRateDivisor = 100.0f;

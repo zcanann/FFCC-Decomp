@@ -9968,8 +9968,8 @@ LAB_draw:
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_80331588);
 				fontF8->DrawInit();
-				unsigned int nameColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&nameColor);
+				CColor nameColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(nameColor.color);
 				fontF8->SetTlut(0x2C);
 				fontF8->SetPosX(FLOAT_80331520);
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));

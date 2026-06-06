@@ -967,7 +967,7 @@ void CMenuPcs::destroyWorld()
 	} while (iVar4 < 6);
 
 	{
-		void** piVar2 = reinterpret_cast<void**>(bytes + 0xFC);
+		void** piVar2 = reinterpret_cast<void**>(&m_fonts[1]);
 		if (*piVar2 != 0) {
 			releaseRefCounted(piVar2);
 		}
@@ -1497,7 +1497,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 2:
 		if (worldState->m_flag09 == 0) {
 			worldState->m_cardChannel = static_cast<short>(mcCtrl.m_cardChannel);
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -1571,7 +1571,7 @@ void CMenuPcs::CalcMCardMenu()
 		break;
 	case 4:
 		if (worldState->m_flag09 == 0) {
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -1656,7 +1656,7 @@ void CMenuPcs::CalcMCardMenu()
 			else if (iVar12 == 0x1B) { uVar20 = 1; uVar17 = 0x1C; }
 			else if (iVar12 == 0x15) { bVar1 = false; uVar17 = 0xE; }
 			else { uVar17 = 0xF; }
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -1763,7 +1763,7 @@ void CMenuPcs::CalcMCardMenu()
 				uVar17 = 0x12;
 				worldState->m_cardChannel = 1;
 			}
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -1950,7 +1950,7 @@ void CMenuPcs::CalcMCardMenu()
 			if (iVar12 == 0xD) { uVar17 = 7; }
 			else if (iVar12 == 0x1A) { uVar17 = 0x1A; uVar20 = 1; }
 			else { uVar17 = 8; }
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -2316,7 +2316,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 2:
 		if (worldState->m_flag09 == 0) {
 			worldState->m_cardChannel = (short)mcCtrl.m_cardChannel;
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -2388,7 +2388,7 @@ void CMenuPcs::CalcLoadMenu()
 		break;
 	case 4:
 		if (worldState->m_flag09 == 0) {
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -2476,7 +2476,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (bVar1) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -2571,7 +2571,7 @@ void CMenuPcs::CalcLoadMenu()
 				uVar19 = 5;
 				worldState->m_cardChannel = 1;
 			}
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -2775,7 +2775,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar10 == 0xD) { uVar19 = 7; }
 			else if (iVar10 == 0x1A) { uVar19 = 0x1A; uVar22 = 1; }
 			else { uVar19 = 9; }
-			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
+			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
 			pFont->SetShadow(0);
 			pFont->SetScale(FLOAT_803313e8);
@@ -5671,7 +5671,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Font name text processing
-	CFont* fontFC = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	CFont* fontFC = m_fonts[1];
 	fontFC->SetMargin(FLOAT_803313e8);
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
@@ -5687,7 +5687,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	unsigned int textWidth = 0xD8;
-	CFont* font = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	CFont* font = m_fonts[1];
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textWidth = 0xA2;
 	}
@@ -6030,7 +6030,7 @@ void CMenuPcs::DrawFukidashi()
 	unsigned char* const bubbleData = m_wm.m_bubbleData;
 	unsigned char* const worldObj = m_wm.m_worldObjData;
 	Mtx m_cameraMatrix;
-	CFont* fontFC = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	CFont* fontFC = m_fonts[1];
 	if (bytes[0x09] != 1) {
 		return;
 	}
@@ -6121,7 +6121,7 @@ void CMenuPcs::DrawFukidashi()
 	unsigned int textW = 0xD8;
 	char secondLine[64];
 	secondLine[0] = 0;
-	CFont* font = *reinterpret_cast<CFont**>(bytes + 0xFC);
+	CFont* font = m_fonts[1];
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textW = 0xA2;
 	}
@@ -9444,7 +9444,7 @@ void CMenuPcs::ChkMcDataCnt()
 void CMenuPcs::DrawMCList()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CFont* fontF8 = *reinterpret_cast<CFont**>(bytes + 0xF8);
+	CFont* fontF8 = m_fonts[0];
 	WmWorldState* const worldState = m_wmWorldState;
 	short state = worldState->m_mainState;
 
@@ -10649,8 +10649,7 @@ void CMenuPcs::DrawMcWin(short state, short kind)
  */
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CFont* const font = reinterpret_cast<CFont**>(bytes + 0xF8)[0];
+	CFont* const font = m_fonts[0];
 	MenuWindowInfo* const win = m_menuWindowInfo;
 
 	font->SetMargin(FLOAT_803313e8);
@@ -10751,8 +10750,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
  */
 void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	CFont* const font = *reinterpret_cast<CFont**>(bytes + 0xF8);
+	CFont* const font = m_fonts[0];
 
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
@@ -13057,6 +13055,5 @@ void CMenuPcs::AlphaAdd()
  */
 void CMenuPcs::GetFontWorld()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	gWmMenuWorkA = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
+	gWmMenuWorkA = static_cast<int>(reinterpret_cast<unsigned int>(m_fonts[1]));
 }

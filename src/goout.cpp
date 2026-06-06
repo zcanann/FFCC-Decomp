@@ -580,9 +580,7 @@ struct CMenuPcsGoOutLayout
     McCtrl m_mcCtrl;
     unsigned char unkAfterMcCtrl[0x7E4];
     int m_goOutStatePtr;
-    unsigned char unk830[0x18];
-    int m_mcWinStatePtr;
-    unsigned char unk84C[0x26];
+    unsigned char unk830[0x3E];
     unsigned char m_loadFinished;
     unsigned char unk86F;
     signed short m_loadResult;
@@ -611,16 +609,6 @@ struct CMenuGoOutState
     signed short m_animFrame;
 };
 
-struct CMenuMcWinState
-{
-    signed short m_x;
-    signed short m_y;
-    signed short m_width;
-    signed short m_height;
-    signed short unk8;
-    signed short m_mode;
-};
-
 struct CGoOutSaveCaravan
 {
     int m_dataPresent;
@@ -641,11 +629,6 @@ static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset) { return *
 static inline CMenuGoOutState& MenuGoOutState(CMenuPcsGoOutLayout& layout)
 {
     return *reinterpret_cast<CMenuGoOutState*>(layout.m_goOutStatePtr);
-}
-
-static inline CMenuMcWinState& MenuMcWinState(CMenuPcsGoOutLayout& layout)
-{
-    return *reinterpret_cast<CMenuMcWinState*>(layout.m_mcWinStatePtr);
 }
 
 static inline unsigned short GetGoOutInputMask()
@@ -739,16 +722,16 @@ void DrawGoOutMenu()
 
     if (goOutMenu.m_currentMessage != -1) {
         MenuPcs.DrawMcWin(-1, 0);
-        if (MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             const int message = static_cast<int>(goOutMenu.m_currentMessage);
             MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
         }
     }
 
-    if (MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode == 1 && goOutMenu.m_drawCursor != 0) {
-        const float cursorY = (float)(MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_y +
-            MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_height - 0x3E);
-        const float cursorX = (float)(MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_x + 0x20);
+    if (MenuPcs.m_menuWindowInfo->state == 1 && goOutMenu.m_drawCursor != 0) {
+        const float cursorY = (float)(MenuPcs.m_menuWindowInfo->y +
+            MenuPcs.m_menuWindowInfo->height - 0x3E);
+        const float cursorX = (float)(MenuPcs.m_menuWindowInfo->x + 0x20);
         const unsigned char cursorMode = goOutMenu.m_cursorMode;
 
         if (cursorMode == 0) {
@@ -851,13 +834,13 @@ int CGoOutMenu::SetMemCardError()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     if (m_memCardResult == -5) {
-        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -871,7 +854,7 @@ int CGoOutMenu::SetMemCardError()
         }
 
         if ((m_memCardResult == -999 || m_memCardResult == -1000) && m_memCardProc == 1) {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
@@ -884,13 +867,13 @@ int CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 3),
                        GetGoOutMessageLine(languageId, 4));
         } else if (m_memCardProc == 3) {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
             if (m_currentMessage >= 0) {
-                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             m_messageWindowOpen = 0;
@@ -898,13 +881,13 @@ int CGoOutMenu::SetMemCardError()
             m_messageCloseMode = 0;
             m_pendingMessageTimer = 0;
         } else if (m_memCardProc == 2) {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
             if (m_currentMessage >= 0) {
-                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             m_messageWindowOpen = 0;
@@ -913,13 +896,13 @@ int CGoOutMenu::SetMemCardError()
             m_pendingMessageTimer = 0;
         }
     } else if (m_memCardResult == -1 || m_memCardResult == -3) {
-        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -927,13 +910,13 @@ int CGoOutMenu::SetMemCardError()
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
     } else if (m_memCardResult == -2) {
-        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuPcs.m_menuWindowInfo->state = 3;
         MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         m_currentMessage = -1;
         m_messageTimer = 0;
         m_messageState = 1;
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -942,13 +925,13 @@ int CGoOutMenu::SetMemCardError()
         m_pendingMessageTimer = 0;
     } else if (m_memCardResult == -4) {
         if (m_memCardProc != 1) {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
             if (m_currentMessage >= 0) {
-                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             m_messageWindowOpen = 0;
@@ -956,7 +939,7 @@ int CGoOutMenu::SetMemCardError()
             m_messageCloseMode = 0;
             m_pendingMessageTimer = 0;
         } else {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
@@ -987,7 +970,7 @@ void CGoOutMenu::SetMenu(short message, long timer)
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     if (m_currentMessage >= 0) {
-        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuPcs.m_menuWindowInfo->state = 2;
         MenuGoOutState(menuPcsLayout).m_animFrame = 0;
     }
 
@@ -1031,7 +1014,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 
     messageIndex = m_menuStringSlot + 0x22;
     if (m_currentMessage >= 0) {
-        MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode = 2;
+        MenuPcs.m_menuWindowInfo->state = 2;
         MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_animFrame = 0;
     }
 
@@ -1050,12 +1033,12 @@ void CGoOutMenu::CalcMenu()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
-    if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+    if (MenuPcs.m_menuWindowInfo->state == 1) {
         m_messageState = 1;
         m_messageWindowOpen = 1;
     }
 
-    if (m_messageState != 0 && MenuMcWinState(menuPcsLayout).m_mode == 3) {
+    if (m_messageState != 0 && MenuPcs.m_menuWindowInfo->state == 3) {
         short x;
         short y;
 
@@ -1064,7 +1047,7 @@ void CGoOutMenu::CalcMenu()
             MenuPcs.GetWinSize(static_cast<unsigned short>(m_currentMessage), &x, &y,
                                (m_currentMessage >= 0x1E) ? 2 : 0);
             MenuPcs.SetMcWinInfo(x, y);
-            MenuMcWinState(menuPcsLayout).m_mode = 0;
+            MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_messageTimer = m_pendingMessageTimer;
             m_messageState = 0;
@@ -1090,7 +1073,7 @@ void CGoOutMenu::DrawMenu()
 
     if (m_currentMessage != -1) {
         MenuPcs.DrawMcWin(-1, 0);
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             const int message = static_cast<int>(m_currentMessage);
             MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
         }
@@ -1107,7 +1090,7 @@ void CGoOutMenu::SetMenuForceClose()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     if (m_currentMessage >= 0) {
-        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuPcs.m_menuWindowInfo->state = 2;
         MenuGoOutState(menuPcsLayout).m_animFrame = 0;
     }
 
@@ -1161,7 +1144,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
         MenuPcs.ChgAllModel();
         if (m_currentMessage >= 0) {
-            MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1325,7 +1308,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		break;
 	case 3:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
 		m_messageWindowOpen = 0;
@@ -1336,7 +1319,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		break;
 	case 4:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
 		m_messageWindowOpen = 0;
@@ -1359,7 +1342,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             m_memCardProc = 3;
         }
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1368,15 +1351,15 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         m_pendingMessageTimer = 0;
         break;
     case 6:
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
             m_messageState = 1;
         }
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1405,7 +1388,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0xC:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1438,7 +1421,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         menuPcsLayout.m_unknown_88A = 1;
         menuPcsLayout.m_transferWorkActive = menuPcsLayout.m_transferWork;
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1454,7 +1437,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
         m_saveLoadMenuOpen = 1;
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1487,7 +1470,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x11:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1564,7 +1547,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x14:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -1598,7 +1581,7 @@ void CGoOutMenu::CalcGoOut()
             m_watchCardDisconnect = 0;
             m_returnGoOutMode = -1;
             m_goOutMode = 0;
-            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_currentMessage = -1;
             m_messageTimer = 0;
@@ -1659,7 +1642,7 @@ void CGoOutMenu::CalcGoOut()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1695,7 +1678,7 @@ void CGoOutMenu::CalcGoOut()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1955,7 +1938,7 @@ void CGoOutMenu::CalcGoOut()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1997,7 +1980,7 @@ void CGoOutMenu::CalcGoOut()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -2134,7 +2117,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
     switch (m_deleteMode) {
     case 2:
         if (m_currentMessage >= 0) {
-            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuPcs.m_menuWindowInfo->state = 2;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         m_messageWindowOpen = 0;
@@ -2311,7 +2294,7 @@ void CGoOutMenu::CalcDel()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -2352,7 +2335,7 @@ void CGoOutMenu::CalcDel()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -2406,7 +2389,7 @@ void CGoOutMenu::CalcDel()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -2447,7 +2430,7 @@ void CGoOutMenu::CalcDel()
         m_cursorMode = 0;
         next = 0;
 
-        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+        if (MenuPcs.m_menuWindowInfo->state == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -2523,7 +2506,7 @@ void CGoOutMenu::Calc()
 
     if (menuPcsLayout.m_resetGoOutFlag != 0) {
         menuPcsLayout.m_resetGoOutFlag = 0;
-        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuPcs.m_menuWindowInfo->state = 3;
         m_currentMessage = -1;
         m_pendingMessage = -1;
         m_menuStringSlot = 0;
@@ -2557,7 +2540,7 @@ void CGoOutMenu::Calc()
         winMessageEntries[5] = 15;
         winMessageEntries[6] = 16;
         winMessageEntries[7] = 17;
-        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuPcs.m_menuWindowInfo->state = 3;
         m_messageState = 1;
     }
 
@@ -2605,7 +2588,7 @@ void CGoOutMenu::Calc()
                 m_cursorMode = 1;
 
                 unsigned char nextMode = 0;
-                if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+                if (MenuPcs.m_menuWindowInfo->state == 1) {
                     input = GetGoOutInputMask();
                     if ((input & 0xC) == 0) {
                         input = GetGoOutInputMask();
@@ -2641,7 +2624,7 @@ void CGoOutMenu::Calc()
                     } else {
                         SetMainMode(3);
                         if (m_currentMessage >= 0) {
-                            MenuMcWinState(menuPcsLayout).m_mode = 2;
+                            MenuPcs.m_menuWindowInfo->state = 2;
                             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
                         }
                         m_messageWindowOpen = 0;
@@ -2700,12 +2683,12 @@ void CGoOutMenu::Calc()
         }
     }
 
-    if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+    if (MenuPcs.m_menuWindowInfo->state == 1) {
         m_messageState = 1;
         m_messageWindowOpen = 1;
     }
 
-    if (m_messageState != 0 && MenuMcWinState(menuPcsLayout).m_mode == 3) {
+    if (m_messageState != 0 && MenuPcs.m_menuWindowInfo->state == 3) {
         short x;
         short y;
 
@@ -2715,7 +2698,7 @@ void CGoOutMenu::Calc()
         } else {
             MenuPcs.GetWinSize(static_cast<unsigned short>(m_currentMessage), &x, &y, (m_currentMessage >= 0x1E) ? 2 : 0);
             MenuPcs.SetMcWinInfo(x, y);
-            MenuMcWinState(menuPcsLayout).m_mode = 0;
+            MenuPcs.m_menuWindowInfo->state = 0;
             MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             m_messageTimer = m_pendingMessageTimer;
             m_messageState = 0;
@@ -2726,7 +2709,7 @@ void CGoOutMenu::Calc()
         m_messageTimer--;
         if (m_messageTimer == 0) {
             if (m_currentMessage >= 0) {
-                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuPcs.m_menuWindowInfo->state = 2;
                 MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             m_messageWindowOpen = 0;
@@ -2761,14 +2744,14 @@ void CGoOutMenu::DrawSelectYesNo()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
-    if (MenuMcWinState(menuPcsLayout).m_mode == 1 && m_drawCursor != 0) {
-        const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
+    if (MenuPcs.m_menuWindowInfo->state == 1 && m_drawCursor != 0) {
+        const int cursorY = MenuPcs.m_menuWindowInfo->y + MenuPcs.m_menuWindowInfo->height - 0x3E;
 
         if (m_cursorMode == 0) {
             const int cursorX = MenuPcs.GetYesNoXPos(m_cursorChoice);
             MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
         } else {
-            const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;
+            const int cursorX = MenuPcs.m_menuWindowInfo->x + 0x20;
             const int localY = m_cursorListY0 + m_cursorChoice * 0x1E;
             MenuPcs.DrawCursor(cursorX, localY, 1.0f);
         }

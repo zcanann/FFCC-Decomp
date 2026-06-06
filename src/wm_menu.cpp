@@ -8671,12 +8671,11 @@ void CMenuPcs::ChgAllModel()
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
 	unsigned char* handleData = bytes;
-	unsigned char* const modelDataBase = m_wm.m_charaModelData;
 	int modelOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
-		unsigned char* modelData = modelDataBase + modelOffset;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
 		unsigned int variant;
 		unsigned int index;
@@ -8698,17 +8697,17 @@ void CMenuPcs::ChgAllModel()
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
 		}
 
-		modelData = modelDataBase + modelOffset;
+		modelData = m_wm.m_charaModelData + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
 		}
 
 		gameData += 0xC30;
@@ -8730,14 +8729,13 @@ void CMenuPcs::ChgAllModel2()
 {
 	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* handleData = bytes;
-	unsigned char* const modelDataBase = m_wm.m_charaModelData;
 	int modelOffset = 0;
 	int pdtOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
 		    m_cmakeWork + pdtOffset + 0x14D0;
-		unsigned char* modelData = modelDataBase + modelOffset;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
 		unsigned int variant;
 		unsigned int index;
@@ -8754,17 +8752,17 @@ void CMenuPcs::ChgAllModel2()
 			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
 		}
 
-		modelData = modelDataBase + modelOffset;
+		modelData = m_wm.m_charaModelData + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
 		}
 
 		handleData += 4;
@@ -10207,30 +10205,7 @@ void CMenuPcs::ClrMcList()
 unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char createParam[0x88];
-	*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
-	*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
-	createParam[0x54] = 0;
-	createParam[0x53] = 1;
-	*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
-	createParam[0x52] = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
-	*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
-	*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
-	createParam[0x3E] = 0;
-	createParam[0x3D] = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
-	*reinterpret_cast<void**>(createParam + 0x14) = 0;
-	*reinterpret_cast<void**>(createParam + 0x18) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
-	*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
-	*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
-	createParam[0x2C] = 0;
+	PPPCREATEPARAM createParam;
 
 	if (cameraSlot < 0) {
 		cameraSlot = slot;
@@ -10239,25 +10214,23 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	EffectInfo* effect = &m_effectWork[slot];
 	if (slot == 5 && effectNo < 0x13) {
 		effect++;
-	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+	} else if (slot >= 0x11 && slot <= 0x14 && effectNo > 0x19) {
 		effect += 4;
 	}
 
 	effect->m_effectNo = effectNo;
-	effect->m_slotNo = slot;
-	effect->m_object.Create();
-	effect->m_object.m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
-
-	*reinterpret_cast<void**>(createParam + 0x74) = &effect->m_object;
-	*reinterpret_cast<void**>(createParam + 0x70) = &effect->m_object;
-	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(createParam + 0x60) = FLOAT_803313e8;
-	createParam[0x5C] = 0;
-
 	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
-	const unsigned int partId = PartMng.pppCreate(group, effectNo, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
+	CGObject* const object = &effect->m_object;
+	effect->m_slotNo = slot;
+	object->Create();
+	object->m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x4A8)[cameraSlot];
+
+	createParam.m_paramB = reinterpret_cast<unsigned int>(object);
+	createParam.m_lookTargetPtr = object;
+
+	const unsigned int partId = PartMng.pppCreate(group, effectNo, &createParam, 1);
 	effect->m_partNo = partId;
-	return partId;
+	return effect->m_partNo;
 }
 
 /*

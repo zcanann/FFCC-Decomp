@@ -451,11 +451,6 @@ static inline WmWorldState* GetWmWorldState(CMenuPcs* menu)
 	return menu->m_wmWorldState;
 }
 
-static inline short* GetWmWorldStateWords(CMenuPcs* menu)
-{
-	return reinterpret_cast<short*>(GetWmWorldState(menu));
-}
-
 static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
 {
 	return menu->m_cmakeWorkActive == 1 ? menu->m_cmakeWork : 0;
@@ -7444,7 +7439,7 @@ void CMenuPcs::CalcCharaSelect()
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const modelData = GetWmCharaModelData(this);
 	int* const animState = GetWmCharaAnimState(this);
-	short* const worldState = GetWmWorldStateWords(this);
+	WmWorldState* const worldState = GetWmWorldState(this);
 
 	unsigned short padTrig[4];
 	unsigned short padRepeat[4];
@@ -7488,7 +7483,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 	}
 
-	if (worldState[8] != 2 || worldState[0x0F] != 0) {
+	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
 		return;
 	}
 
@@ -7818,8 +7813,8 @@ void CMenuPcs::CalcCharaSelect()
 			if (anySelected) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				worldState[0x0F] = -1;
-				worldState[0x0C] = 10;
+				worldState->m_nextMenuMode = -1;
+				worldState->m_delay = 10;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
 		}
@@ -7841,8 +7836,8 @@ void CMenuPcs::CalcCharaSelect()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				worldState[0x0F] = 1;
-				worldState[0x0C] = 10;
+				worldState->m_nextMenuMode = 1;
+				worldState->m_delay = 10;
 			}
 		}
 
@@ -7858,14 +7853,14 @@ void CMenuPcs::CalcCharaSelect()
 		}
 		if ((Game.m_gameWork.m_menuStageMode == 0 || *reinterpret_cast<short*>(bytes + 0x86A) < 0) &&
 		    finishedMask != 0 && finishedMask == readyMask) {
-			worldState[0x0F] = 1;
-			worldState[0x0C] = static_cast<short>(FLOAT_8032ee18);
+			worldState->m_nextMenuMode = 1;
+			worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
 		} else if (Game.m_gameWork.m_menuStageMode != 0 && *reinterpret_cast<short*>(bytes + 0x86A) >= 0) {
-			worldState[0x0F] = 1;
-			worldState[0x0C] = 10;
+			worldState->m_nextMenuMode = 1;
+			worldState->m_delay = 10;
 		}
 
-		if (worldState[0x0F] != 0) {
+		if (worldState->m_nextMenuMode != 0) {
 			GbaQue.SetControllerMode(1);
 			for (int i = 0; i < 4; i++) {
 				if (selectEntries[i].m_cmakePending != 0) {

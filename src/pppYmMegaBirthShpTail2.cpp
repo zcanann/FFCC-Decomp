@@ -33,7 +33,7 @@ struct VYmMegaBirthShpTail2
     unsigned short m_pathIndex;
 };
 
-static pppFMATRIX g_matUnit2;
+static pppFMATRIX g_matUnit;
 
 static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
 
@@ -772,5 +772,5 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, _pppCtrlTab
     *(u16*)(work[1].value[1] + 3) = 0;
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
-    pppUnitMatrix(g_matUnit2);
+    pppUnitMatrix(g_matUnit);
 }

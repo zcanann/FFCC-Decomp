@@ -130,6 +130,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     Vec zeroVec ATTRIBUTE_ALIGN(8);
     Vec pos ATTRIBUTE_ALIGN(8);
     Vec seg ATTRIBUTE_ALIGN(8);
+    Vec initialSeg ATTRIBUTE_ALIGN(8);
     float trailLen;
     float segLen;
     float segCursor;
@@ -218,13 +219,13 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
-    seg.x = segDx;
-    seg.y = segDy;
-    seg.z = segDz;
+    initialSeg.x = segDx;
+    initialSeg.y = segDy;
+    initialSeg.z = segDz;
     zeroVec.x = zero;
     zeroVec.y = zero;
     zeroVec.z = zero;
-    segLen = PSVECDistance(&zeroVec, &seg);
+    segLen = PSVECDistance(&zeroVec, &initialSeg);
     segRemain = segLen;
     segCursor = zero;
 
@@ -287,6 +288,7 @@ update_step:
         return;
     }
 
+advance_segment:
     if (segRemain >= trailStep) {
         pos.x = (segDx * segCursor) / segLen + segBaseX;
         pos.y = (segDy * segCursor) / segLen + segBaseY;
@@ -299,7 +301,6 @@ update_step:
         goto draw_loop;
     }
 
-advance_segment:
     nextIndex++;
     if (nextIndex > lastIndex) {
         nextIndex = 0;
@@ -328,7 +329,7 @@ move_next_segment:
     segLen = PSVECDistance(&zeroVec, &seg);
     segCursor = trailLen;
     segRemain += segLen;
-    goto draw_loop;
+    goto advance_segment;
 }
 
 /*

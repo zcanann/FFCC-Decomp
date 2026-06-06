@@ -45,6 +45,7 @@ int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
 float g_hit_t_slide_min;
+float g_hit_edge_t;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface_min;

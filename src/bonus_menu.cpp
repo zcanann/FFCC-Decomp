@@ -196,10 +196,10 @@ struct BonusBaseRaw {
 struct BonusBoardEntryRaw {
 	int m_modelHandle;
 	int m_effectHandle;
-	short m_kind;
-	short m_state;
 	short m_centerX;
 	short m_centerY;
+	short m_width;
+	short m_height;
 	float m_posX;
 	float m_posY;
 	float m_depth;
@@ -262,10 +262,10 @@ static inline void InitBonusBoardEntry(BonusBoardEntryRaw* entry)
 {
 	entry->m_modelHandle = 0;
 	entry->m_effectHandle = 0;
-	entry->m_kind = 0;
-	entry->m_state = 0;
-	entry->m_centerX = 0x280;
-	entry->m_centerY = 0x1C0;
+	entry->m_centerX = 0;
+	entry->m_centerY = 0;
+	entry->m_width = 0x280;
+	entry->m_height = 0x1C0;
 	entry->m_posX = 0.0f;
 	entry->m_posY = 0.0f;
 	entry->m_depth = 1000.0f;

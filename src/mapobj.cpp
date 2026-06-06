@@ -789,7 +789,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     }
                 }
                 chunkFile.PopChunk();
-            } else if (chunk.m_version == 1) {
+            } else if (static_cast<int>(chunk.m_version) == 1) {
                 pointLight->m_color.r = chunkFile.Get1();
                 pointLight->m_color.g = chunkFile.Get1();
                 pointLight->m_color.b = chunkFile.Get1();

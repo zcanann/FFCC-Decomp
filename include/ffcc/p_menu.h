@@ -712,9 +712,7 @@ public:
         int m_bonusListPtr;
     };
     unsigned char m_pad844[0x848 - 0x844];
-    union {
-        MenuWindowInfo* m_menuWindowInfo;
-    };
+    MenuWindowInfo* m_menuWindowInfo;
     union {
         int m_pad84C;
         int m_bonusAnimPtr;

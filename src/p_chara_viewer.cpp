@@ -471,28 +471,33 @@ void CCharaPcs::calcViewer()
 
     unsigned int heldButtons;
     unsigned int triggerButtons;
+    u16 heldButtonsRaw;
+    u16 triggerButtonsRaw;
+    int debugPadLock = Pad.m_debugPadLock;
     bool padDisabled = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         padDisabled = true;
     }
     if (padDisabled) {
-        heldButtons = 0;
+        heldButtonsRaw = 0;
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        heldButtons = Pad.GetPadInputs()[padIndex].button[0];
+        heldButtonsRaw = Pad.GetPadInputs()[padIndex].button[0];
     }
+    heldButtons = heldButtonsRaw;
     padDisabled = false;
-    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+    if ((debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         padDisabled = true;
     }
     if (padDisabled) {
-        triggerButtons = 0;
+        triggerButtonsRaw = 0;
     } else {
         int padIndex = 0;
         padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
-        triggerButtons = Pad.GetPadInputs()[padIndex].buttonDown[0];
+        triggerButtonsRaw = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
+    triggerButtons = triggerButtonsRaw;
 
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
         if (self->m_viewerIFrameEnabled == 0) {

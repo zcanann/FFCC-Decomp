@@ -11512,7 +11512,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		hasError = 0;
 	} else {
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
-		const unsigned int crcOk = MemoryCardMan.ChkCrc(0);
+		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
 			unsigned int playTime = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
 			memcpy(entry + 0x00, save + 0x8AD0, 8);

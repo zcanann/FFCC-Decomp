@@ -723,7 +723,7 @@ public:
         EffectEntry* m_effectEntries;
         unsigned char* m_wmCharaState;
     };
-    void* m_pad83C;
+    unsigned char* m_wmWorldParams;
     union {
         EffectInfo* m_effectWork;
         int m_bonusListPtr;
@@ -811,6 +811,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);

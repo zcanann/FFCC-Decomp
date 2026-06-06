@@ -527,7 +527,7 @@ void CMenuPcs::WmInit()
 	m_wm.m_charaSelectData = 0;
 	m_wmWorldState = 0;
 	m_wmCharaState = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
+	m_wmWorldParams = 0;
 	m_effectWork = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
 	FLOAT_8032ee18 = initValue;
@@ -702,9 +702,9 @@ void CMenuPcs::loadData()
 	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
 	memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
 
-	reinterpret_cast<void**>(bytes + 0x83C)[0] =
-	    operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E);
-	memset(reinterpret_cast<void**>(bytes + 0x83C)[0], 0, 0x10);
+	m_wmWorldParams =
+	    static_cast<unsigned char*>(operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E));
+	memset(m_wmWorldParams, 0, 0x10);
 
 	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
 	memset(effectRaw, 0, 0xCDB0 + 0x10);
@@ -1028,9 +1028,9 @@ void CMenuPcs::destroyWorld()
 		delete[] m_wmCharaState;
 		m_wmCharaState = 0;
 	}
-	if (reinterpret_cast<void**>(bytes + 0x83C)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x83C)[0]);
-		reinterpret_cast<void**>(bytes + 0x83C)[0] = 0;
+	if (m_wmWorldParams != 0) {
+		delete[] m_wmWorldParams;
+		m_wmWorldParams = 0;
 	}
 	{
 		EffectInfo* const effectWork = m_effectWork;
@@ -1085,7 +1085,7 @@ void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = m_wmWorldState;
-	unsigned char* const worldParams = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x83C)[0]);
+	unsigned char* const worldParams = m_wmWorldParams;
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
@@ -8236,7 +8236,7 @@ void CMenuPcs::WMChgMenu()
 				*reinterpret_cast<short*>(worldState + 0x1C) = 3;
 			} else if (sVar2b == 1) {
 				*reinterpret_cast<short*>(worldState + 0x1C) = 1;
-				memset(*reinterpret_cast<void**>(bytes + 0x83C), 0, 0x10);
+				memset(m_wmWorldParams, 0, 0x10);
 			} else if (sVar2b == 2) {
 				*reinterpret_cast<short*>(worldState + 0x1C) = 8;
 			} else if (sVar2b == 3) {
@@ -8513,7 +8513,7 @@ void CMenuPcs::WMChgMenu()
 		break;
 	}
 	case 1:
-		memset(*reinterpret_cast<void**>(bytes + 0x83C), 0, 0x10);
+		memset(m_wmWorldParams, 0, 0x10);
 		bytes[0x11] = 0;
 		break;
 	case 3: {

@@ -293,6 +293,8 @@ extern double DOUBLE_80331788;
 extern double DOUBLE_80331790;
 extern double DOUBLE_80331798;
 extern double DOUBLE_803317A0;
+extern double DOUBLE_803317A8;
+extern double DOUBLE_803317B0;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
@@ -5350,12 +5352,13 @@ void CMenuPcs::DrawTitleMenu()
 	Mtx m_cameraMatrix;
 	short state = m_wmWorldState->m_mainState;
 
-		if (state == 0 && m_wmWorldState->m_worldReady != 0) {
-			if (m_wmThpActive != 0) {
-				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
+			if (static_cast<signed char>(m_wmThpActive) != 0) {
+				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)Graphic.m_renderMode, 0, 0, 0x280, 0x1C0);
+				Graphic._WaitDrawDone(const_cast<char*>(s_wm_menu_cpp), 0x12A2);
 			}
 		short sVarE = m_wmWorldState->m_state0E;
-		if (sVarE != 0 || m_wmWorldState->m_frameCounter > 0xB42) {
+		if (sVarE != 0 || m_wmWorldState->m_frameCounter >= 0xB43) {
 			if (sVarE != -1) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -5383,19 +5386,24 @@ void CMenuPcs::DrawTitleMenu()
 		Mtx44 projMtx;
 		C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projMtx, GX_PERSPECTIVE);
+		PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-		Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_80331768 };
+		Vec eye;
+		eye.x = FLOAT_803313dc;
+		eye.y = FLOAT_803313dc;
+		eye.z = FLOAT_80331768;
 		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Point3d*)&target);
+		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Vec*)&target);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		unsigned int clearColor = 0;
-		GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+		CColor clearColor(0, 0, 0, 0);
+		_GXColor clearGxColor = *reinterpret_cast<_GXColor*>(&clearColor);
+		GXSetCopyClear(clearGxColor, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
@@ -5416,15 +5424,13 @@ void CMenuPcs::DrawTitleMenu()
 			state = m_wmWorldState->m_mainState;
 			if (state == 1 && DAT_8032e8ac == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
-				                                        (static_cast<double>(m_wmWorldState->m_frameCounter) -
-				                                         DOUBLE_80331408) -
+				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
-				MenuPcs.SetAttrFmt((FMT)2);
-			unsigned int fadeColor = (unsigned int)(FLOAT_80331458 * fadeAlpha) & 0xFF;
-			fadeColor = fadeColor | (fadeColor << 8) | (fadeColor << 16) | (fadeColor << 24);
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor);
+				SetAttrFmt((FMT)2);
+			GXColor fadeColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha))};
+			GXSetChanMatColor(GX_COLOR0A0, fadeColor);
 			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
@@ -5437,12 +5443,13 @@ void CMenuPcs::DrawTitleMenu()
 		MenuPcs.SetTexture((TEX)0x43);
 
 		state = m_wmWorldState->m_mainState;
-		if (state > 1) {
+		if (state >= 2) {
 			float fX = FLOAT_80331778 - FLOAT_80331414;
 			float fY = FLOAT_8033177c;
 			if (m_wmWorldState->m_cardChannel != 0) {
 				fY = FLOAT_8033177c + (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
 			}
+			float fYRect = fY - FLOAT_80331780;
 			float alpha = FLOAT_803313e8;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
@@ -5451,20 +5458,21 @@ void CMenuPcs::DrawTitleMenu()
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
 			}
-			unsigned int itemColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
-			MenuPcs.DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
+			GXColor itemColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha))};
+			GXSetChanMatColor(GX_COLOR0A0, itemColor);
+			MenuPcs.DrawRect(0xFFFFFFFF, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCALPHA, GX_LO_SET);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(1), static_cast<_GXLogicOp>(5));
+			state = m_wmWorldState->m_mainState;
 			float secondAlpha = alpha;
+			fX = FLOAT_80331778 - FLOAT_80331414;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(DOUBLE_80331790 *
 				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
-				                         static_cast<double>(FLOAT_80331778 - FLOAT_80331414));
+				                         static_cast<double>(fX));
 			} else if ((state == 2 && m_wmWorldState->m_delay == 0) ||
 			           (state == 3 && m_wmWorldState->m_state0E == 0)) {
 				int pulse = (int)m_wmWorldState->m_titleState % 0x28 - 0x14;
@@ -5473,31 +5481,33 @@ void CMenuPcs::DrawTitleMenu()
 				}
 				secondAlpha = static_cast<float>(-(DOUBLE_803317A0 * static_cast<double>(pulse) -
 				                                  DOUBLE_80331420));
+			} else {
+				secondAlpha = FLOAT_803313e8;
 			}
-			itemColor = (unsigned int)(FLOAT_80331458 * secondAlpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
-			MenuPcs.DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
+			GXColor itemColor2 = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha))};
+			GXSetChanMatColor(GX_COLOR0A0, itemColor2);
+			MenuPcs.DrawRect(0xFFFFFFFF, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 		}
 
 		// Menu item labels (2 items: New Game, Continue)
 		MenuPcs.SetAttrFmt((FMT)0);
-		unsigned int itemLabelColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemLabelColor);
+		GXColor itemLabelColor = {0xFF, 0xFF, 0xFF, 0xFF};
+		GXSetChanMatColor(GX_COLOR0A0, itemLabelColor);
+		const float kColorScale = FLOAT_80331458;
+		const float kZero = FLOAT_803313dc;
 		unsigned int uVar7 = 0xFFFFFFF8;
 		unsigned int uVar6 = 0x70;
 		for (int i = 0; i < 2; i++) {
 			float labelAlpha = FLOAT_803313e8;
 			if (m_wmWorldState->m_mainState == 1) {
-				labelAlpha = (float)m_wmWorldState->m_frameCounter;
+				labelAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 			}
-			unsigned int labelColor = (unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF;
-			labelColor = labelColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&labelColor);
+			GXColor labelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(kColorScale * labelAlpha))};
+			GXSetChanMatColor(GX_COLOR0A0, labelColor);
 
 			float yPos = FLOAT_8033177c;
 			if (i != 0) {
@@ -5505,24 +5515,32 @@ void CMenuPcs::DrawTitleMenu()
 			}
 			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
 			         FLOAT_80331568, FLOAT_80331440,
-			         FLOAT_803313dc, (float)((int)uVar6),
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
+			         kZero, (float)((int)uVar6),
+			         FLOAT_803313e8, FLOAT_803313e8, kZero);
 
 			// Cursor on selected item
 			if (m_wmWorldState->m_flag09 == 0 &&
 			    i == m_wmWorldState->m_cardChannel) {
 				int timer = (int)m_wmWorldState->m_titleState;
-				float cursorAlpha = FLOAT_803313e8;
-				if (timer > 0) {
-					cursorAlpha = (float)(timer);
+				float cursorScale = static_cast<float>(DOUBLE_803317A8 * static_cast<double>(timer) +
+				                                        static_cast<double>(FLOAT_803313e8));
+				int cursorAlpha = static_cast<int>(kColorScale *
+				                                   static_cast<float>(-(DOUBLE_803317B0 * static_cast<double>(timer) -
+				                                                        DOUBLE_80331420)));
+				GXColor cursorColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(cursorAlpha)};
+				GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+				float cursorY = FLOAT_8033177c - static_cast<float>(static_cast<double>(FLOAT_80331440) * static_cast<double>(cursorScale) -
+				                                                    static_cast<double>(FLOAT_80331440));
+				if (i != 0) {
+					cursorY = cursorY + (float)((int)uVar7);
 				}
-				unsigned int cursorColor = (unsigned int)(FLOAT_80331458 * cursorAlpha) & 0xFF;
-				cursorColor = cursorColor | 0xFFFFFF00;
-				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
-				MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+				MenuPcs.DrawRect(0xFFFFFFFF,
+				         static_cast<float>(-static_cast<float>((static_cast<double>(FLOAT_80331568) * static_cast<double>(cursorScale) -
+				                                                 static_cast<double>(FLOAT_803313e0)) * DOUBLE_803313f8)),
+				         cursorY,
 				         FLOAT_80331568, FLOAT_80331440,
-				         FLOAT_803313dc, (float)((int)uVar6),
-				         FLOAT_803313e8, FLOAT_803313e8, 0);
+				         kZero, (float)((int)uVar6),
+				         cursorScale, cursorScale, kZero);
 			}
 			uVar6 += 0x28;
 			uVar7 += 0x28;
@@ -5530,29 +5548,28 @@ void CMenuPcs::DrawTitleMenu()
 
 		// Logo and copyright textures
 		MenuPcs.SetAttrFmt((FMT)0);
-		unsigned int logoColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&logoColor);
+		GXColor logoColor = {0xFF, 0xFF, 0xFF, 0xFF};
+		GXSetChanMatColor(GX_COLOR0A0, logoColor);
 		MenuPcs.SetTexture((TEX)0x42);
 		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
-		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		MenuPcs.SetTexture((TEX)0x44);
 		float copyrightAlpha = FLOAT_803313e8;
 		if (m_wmWorldState->m_mainState == 1) {
-			copyrightAlpha = (float)m_wmWorldState->m_frameCounter;
+			copyrightAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		}
-		unsigned int crColor = (unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF;
-		crColor = crColor | 0xFFFFFF00;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&crColor);
+		GXColor crColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * copyrightAlpha))};
+		GXSetChanMatColor(GX_COLOR0A0, crColor);
 		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
-		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		// Timer / state transitions
 		state = m_wmWorldState->m_mainState;
-		if (state > 1) {
+		if (state >= 2) {
 			m_wmWorldState->m_titleState++;
 			if (m_wmWorldState->m_state12 == 0 &&
-			    m_wmWorldState->m_titleState > 4) {
+			    m_wmWorldState->m_titleState >= 5) {
 				m_wmWorldState->m_flag09 = 1;
 				m_wmWorldState->m_state12++;
 				m_wmWorldState->m_titleState = 0x14;
@@ -5564,17 +5581,17 @@ void CMenuPcs::DrawTitleMenu()
 		if (state == 3 || (state == 1 && DAT_8032e8ac != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
-				fadeAlpha2 = (float)(m_wmWorldState->m_frameCounter + 1);
+				fadeAlpha2 = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
 			} else {
-				fadeAlpha2 = (float)m_wmWorldState->m_frameCounter;
+				fadeAlpha2 = static_cast<float>(-(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter) -
+				                                 DOUBLE_80331420));
 			}
-			if (fadeAlpha2 > FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
-			MenuPcs.SetAttrFmt((FMT)2);
-			unsigned int fadeColor2 = (unsigned int)(FLOAT_80331458 * fadeAlpha2) & 0xFF;
-			fadeColor2 = fadeColor2 | (fadeColor2 << 8) | (fadeColor2 << 16) | (fadeColor2 << 24);
+			if (FLOAT_803313e8 <= fadeAlpha2) fadeAlpha2 = FLOAT_803313e8;
+			SetAttrFmt((FMT)2);
+			unsigned int fadeColor2 = static_cast<int>(FLOAT_80331458 * fadeAlpha2) & 0xFF;
 			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor2);
 			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
@@ -5584,11 +5601,9 @@ void CMenuPcs::DrawTitleMenu()
 
 		// End state handling
 		state = m_wmWorldState->m_mainState;
-		if (state == 3 && m_wmWorldState->m_frameCounter > 9) {
+		if (state == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
-			if (m_wmWorldState->m_state0E == 0) {
-				DAT_8032e8ac = 0;
-			} else {
+			if (m_wmWorldState->m_state0E != 0) {
 				DAT_8032e8ac = 1;
 				CFlatRuntime::CStack flatArgs2[3];
 				flatArgs2[0].m_word = 7;
@@ -5597,35 +5612,13 @@ void CMenuPcs::DrawTitleMenu()
 				m_wmWorldState->m_changeRequest = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
+			} else {
+				DAT_8032e8ac = 0;
 			}
 			m_wmWorldState->m_mainState = 0;
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
-		} else if (state == 2) {
-			if (m_wmWorldState->m_delay != 0) {
-				m_wmWorldState->m_delay--;
-				if (m_wmWorldState->m_delay < 1) {
-					m_wmWorldState->m_mainState++;
-					m_wmWorldState->m_frameCounter = 0;
-					m_wmWorldState->m_titleState = 0;
-					CFlatRuntime::CStack flatArgs3[3];
-					flatArgs3[0].m_word = 9;
-					flatArgs3[1].m_word = 1;
-					flatArgs3[2].m_word = 0;
-					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
-				}
-			} else if (m_wmWorldState->m_frameCounter > 0x991) {
-				m_wmWorldState->m_state0E = 0;
-				m_wmWorldState->m_mainState++;
-				m_wmWorldState->m_frameCounter = 0;
-				m_wmWorldState->m_titleState = 0;
-				CFlatRuntime::CStack flatArgs4[3];
-				flatArgs4[0].m_word = 9;
-				flatArgs4[1].m_word = 1;
-				flatArgs4[2].m_word = 0;
-				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs4, 0);
-			}
-		} else {
+		} else if (state != 2) {
 			short threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
@@ -5635,6 +5628,30 @@ void CMenuPcs::DrawTitleMenu()
 				m_wmWorldState->m_frameCounter = 0;
 				m_wmWorldState->m_titleState = 0;
 				m_wmWorldState->m_mainState++;
+			}
+		} else {
+			if (state == 2 && m_wmWorldState->m_delay != 0) {
+				m_wmWorldState->m_delay--;
+				if (m_wmWorldState->m_delay <= 0) {
+					m_wmWorldState->m_mainState++;
+					m_wmWorldState->m_frameCounter = 0;
+					m_wmWorldState->m_titleState = 0;
+					CFlatRuntime::CStack flatArgs3[3];
+					flatArgs3[0].m_word = 9;
+					flatArgs3[1].m_word = 1;
+					flatArgs3[2].m_word = 0;
+					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
+				}
+			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= 0x992) {
+				m_wmWorldState->m_state0E = 0;
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				m_wmWorldState->m_titleState = 0;
+				CFlatRuntime::CStack flatArgs4[3];
+				flatArgs4[0].m_word = 9;
+				flatArgs4[1].m_word = 1;
+				flatArgs4[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs4, 0);
 			}
 		}
 	}

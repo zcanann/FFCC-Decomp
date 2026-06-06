@@ -701,7 +701,8 @@ public:
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;
     unsigned char m_pad74[0x80 - 0x74];
-    int m_effectTimer;
+    unsigned char m_effectTimer;
+    unsigned char m_pad81[0x84 - 0x81];
     int m_crystalElem;
     short m_crystalPart;
     short m_crystalAttr;

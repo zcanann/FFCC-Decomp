@@ -87,10 +87,19 @@ public:
         unsigned short m_values[4]; // 0x00
     }; // Size 0x08
 
+    struct CBossArtifactEntryGroups
+    {
+        CBossArtifactEntry m_artifactEntries[8]; // 0x00
+        CBossArtifactEntry m_bonusEntries[32];   // 0x40
+    }; // Size 0x140
+
     struct CBossArtifactStage
     {
         unsigned short m_bonusConditions[16];    // 0x00
-        CBossArtifactEntry m_entries[40];        // 0x20
+        union {
+            CBossArtifactEntry m_entries[40];        // 0x20
+            CBossArtifactEntryGroups m_entryGroups;  // 0x20
+        };
         unsigned short m_rankThresholds[4];      // 0x160
     }; // Size 0x168
 
@@ -200,8 +209,11 @@ public:
 
 STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactEntry) == 0x08);
+STATIC_ASSERT(sizeof(CGame::CBossArtifactEntryGroups) == 0x140);
+STATIC_ASSERT(offsetof(CGame::CBossArtifactEntryGroups, m_bonusEntries) == 0x40);
 STATIC_ASSERT(sizeof(CGame::CBossArtifactStage) == 0x168);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entries) == 0x20);
+STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entryGroups) == 0x20);
 STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_rankThresholds) == 0x160);
 STATIC_ASSERT(offsetof(CGame, m_bossArtifactBase) == 0xC7E4);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);

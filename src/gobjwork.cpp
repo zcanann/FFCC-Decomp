@@ -350,11 +350,14 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 {
 	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	CGame::CBossArtifactStage* bossArtifacts =
-		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-	CGame::CBossArtifactEntry* entry = &bossArtifacts->m_entries[bonusCondition + 8];
-	m_artifactRelated[3] = entry->m_values[1];
-	m_artifactRelated[4] = entry->m_values[2];
+	m_artifactRelated[3] =
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
+			.m_entryGroups.m_bonusEntries[bonusCondition]
+			.m_values[1];
+	m_artifactRelated[4] =
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
+			.m_entryGroups.m_bonusEntries[bonusCondition]
+			.m_values[2];
 }
 
 /*

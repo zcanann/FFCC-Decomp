@@ -41,7 +41,7 @@ extern const float FLOAT_8033013C;
 
 CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = CFlat;
-CGBaseObj m_objBase[0x40];
+CGBaseObj m_objBase[0x28];
 CGQuadObj m_objQuad[0x18];
 CGObject m_obj[0x38];
 CGItemObj m_objItem[0x20];
@@ -98,7 +98,7 @@ STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 
 static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 {
-	object->m_isActive &= 0x7F;
+	object->m_isActiveBits.active = 0;
 	object->m_particleId = particleId;
 }
 
@@ -420,36 +420,7 @@ CFlatRuntime2::CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
-	*reinterpret_cast<int*>(runtime + 0x16FC) = -1;
-	runtime[0x1700] = 0;
-	runtime[0x1701] = 1;
-	*reinterpret_cast<int*>(runtime + 0x1704) = 0;
-	runtime[0x1702] = 0;
-	*reinterpret_cast<int*>(runtime + 0x1708) = 0x1E;
-	*reinterpret_cast<int*>(runtime + 0x1710) = 0;
-	*reinterpret_cast<short*>(runtime + 0x1714) = 0;
-	runtime[0x1716] = 0;
-	runtime[0x1717] = 0;
-	*reinterpret_cast<int*>(runtime + 0x16CC) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16D0) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16D4) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16D8) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16E0) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16E4) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16E8) = 0;
-	*reinterpret_cast<int*>(runtime + 0x16EC) = 0;
-	*reinterpret_cast<float*>(runtime + 0x16F0) = 1.0f;
-	*reinterpret_cast<float*>(runtime + 0x16F4) = 1.0f;
-	runtime[0x16F8] = 0;
-
-	for (int i = 0; i < 16; i++) {
-		*reinterpret_cast<u32*>(runtime + 0x1BDC + i * 0xB14 + 0x18) = 0;
-	}
-
-	new (runtime + 0xCF20) CFlatData;
-	CFlatSaveSceneEnabled() = 0;
+	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
 	RuntimeDebugFlags(runtime) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A4) = -1;
@@ -504,9 +475,7 @@ CFlatRuntime2::CFlatRuntime2()
  */
 CFlatRuntime2::~CFlatRuntime2()
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
 	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
-	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
 }
 
 /*
@@ -1487,16 +1456,16 @@ void CFlatRuntime2::Draw()
 		GXSetChanMatColor(GX_COLOR0A0, lineColor);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
 
-		CLine<64>* line = reinterpret_cast<CLine<64>*>(runtime + 0x1BDC);
+		CLine<64>* line = m_debugLines;
 		for (int i = 0; i < 0x10; i++) {
 			line->Draw();
-			line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(line) + 0x17C);
+			line++;
 		}
 	}
 
 	const bool showDebugCC =
 		((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) ||
-		((MiniGamePcsRaw()[0x25732] & 0x80) != 0);
+		((DbgMenuPcsRaw()[4] & 0x80) != 0);
 	const int debugCount = DebugDrawCCCount(runtime);
 	if (showDebugCC && debugCount != 0) {
 		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};

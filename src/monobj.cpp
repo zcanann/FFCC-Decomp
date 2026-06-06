@@ -24,10 +24,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern unsigned char ARRAY_8030918c[];
-extern "C" {
-u8 m_aiWork__8CGMonObj[0xC];
-u8 m_boss__8CGMonObj[0x8C];
-}
+u8 CGMonObj::m_aiWork[0xC];
+u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
@@ -698,7 +696,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 
 	case 0x21:
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
@@ -735,7 +733,7 @@ void CGMonObj::isValidTarget()
 
 	if ((m_targetPartyIndex >= 0) &&
 	    ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0)) {
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_chaseState = 2;
 		m_chaseTimer = 0;
@@ -745,7 +743,7 @@ void CGMonObj::isValidTarget()
 
 	if (((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_chaseState = 0;
 		m_chaseTimer = 0;
@@ -754,7 +752,7 @@ void CGMonObj::isValidTarget()
 	}
 
 	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
 		if (m_moveWork.m_mode != 3) {
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x806;
@@ -803,13 +801,13 @@ check_home:
 	if ((homeDist < FLOAT_803319F8) ||
 	    (static_cast<unsigned int>(m_chaseTimer) == *reinterpret_cast<unsigned short*>(script9 + 0x1B8))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
 	} else if (*reinterpret_cast<short*>(script9 + 0x10C) != 1) {
-		*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x1C;
+		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
 	}
 }
 
@@ -861,13 +859,13 @@ void CGMonObj::seKiduki()
 
 		if ((action == 0) && ((noticeFlags & 0x80) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x32;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x32;
 		} else if ((action == 0) && ((noticeFlags & 0x20) != 0)) {
 			notice = true;
-			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x33;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x33;
 		} else if ((action == 0) && (((noticeFlags & 0x40) != 0) || (scriptHandle[4] == 0x39))) {
 			notice = true;
-			*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x34;
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x34;
 		}
 	}
 
@@ -876,7 +874,7 @@ void CGMonObj::seKiduki()
 		if (classId < 0x70) {
 			if (classId == 0x6A) {
 				notice = true;
-				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x35;
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x35;
 			}
 		} else if (classId == 0x7B) {
 			notice = true;
@@ -3048,7 +3046,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
-	int& actionState = *reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4);
+	int& actionState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
 	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 
 	if (targetPartyIndex >= 0) {
@@ -3237,7 +3235,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
-	int& actionState = *reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4);
+	int& actionState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
 	int& chaseState = monObj->m_chaseState;
 	int& chaseTimer = monObj->m_chaseTimer;
@@ -3386,7 +3384,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
  */
 extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
 {
-	*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 }
 
@@ -3416,13 +3414,13 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 	if (state > 2) {
 		if (state == 5) {
 			if (*targetPartyIdx < 0) {
-				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 				*chaseState = 0;
 				*chaseTimer = 0;
 				monObj->m_chaseDirty = 1;
 			} else {
-				*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0x21;
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
 				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
 				if (monObj->m_moveWork.m_mode != 4) {
 					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
@@ -3453,7 +3451,7 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 				monObj->m_moveWork.m_target = partyObj;
 				if (((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 					((object->m_stateFlags0 & 0x40) != 0)) {
-					*reinterpret_cast<int*>(m_aiWork__8CGMonObj + 4) = 0;
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 					memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 					if (*targetPartyIdx >= 0) {
 						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));

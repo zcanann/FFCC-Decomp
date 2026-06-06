@@ -13,8 +13,8 @@ extern const float FLOAT_8033049c;
 extern const float FLOAT_803304a0;
 extern const float FLOAT_803304a4;
 
-_PARTICLE_WMAT g_matKeep;
-_PARTICLE_WMAT g_matTmp;
+static _PARTICLE_WMAT g_matKeep;
+static _PARTICLE_WMAT g_matTmp;
 
 static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 

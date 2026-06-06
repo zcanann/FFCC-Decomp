@@ -603,8 +603,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     if (edgeIndex != -1 || hitT < kMapHitEdgeMinT || g_hit_t_min <= hitT) {
-        if (gMapHitDrawMode.m_byte != 0) {
-            g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
+        if (s_bitMask.m_fields.m_mode != 0) {
+            g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
         }
 
         if (g_hit_lpface->m_edgeFlags == 0) {
@@ -646,8 +646,8 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_t_min = hitT;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
-    if (gMapHitDrawMode.m_byte != 0) {
-        g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
+    if (s_bitMask.m_fields.m_mode != 0) {
+        g_hit_lpface->m_drawFlags = s_bitMask.m_fields.m_drawFlags;
     }
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;

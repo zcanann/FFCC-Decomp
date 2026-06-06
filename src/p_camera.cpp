@@ -9,6 +9,7 @@
 #include "ffcc/mapocttree.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_map.h"
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
@@ -82,7 +83,6 @@ extern const float FLOAT_8032fac8 = 0.0010000000474974513f;
 extern const char s_p_camera_cpp[];
 extern const char sCameraInvalidFovFmt[0x40];
 unsigned char g_IsDbgDrawShadowPos;
-extern unsigned char g_map_draw_prof;
 
 inline void* operator new(unsigned long, void* ptr)
 {

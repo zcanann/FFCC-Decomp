@@ -88,7 +88,7 @@ unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
-PPPCREATEPARAM g_dcp;
+static PPPCREATEPARAM g_dcp;
 static const char s_partMng_cpp[] = "partMng.cpp";
 static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";

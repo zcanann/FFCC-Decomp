@@ -26,14 +26,14 @@ extern const float FLOAT_80331FBC;
 extern const float s_BonusModelYPos[];
 extern const float s_BonusModelScale[];
 
-float s_BallTrnsXspl[] = {
+static float s_BallTrnsXspl[] = {
     0.03333299979567528f, 27.700000762939453f, 0.0f, 0.0f,
     0.23524600267410278f, 12.29898452758789f, -55.570411682128906f, -55.570411682128906f,
     0.3703629970550537f, 6.334517955780029f, -25.889270782470703f, -25.889270782470703f,
     1.0f, -14.300000190734863f, 0.0f, 0.0f,
 };
 
-float s_BallTrnsYspl[] = {
+static float s_BallTrnsYspl[] = {
     0.03333299979567528f, 8.5f, 0.0f, 0.0f,
     0.241907000541687f, -1.2000000476837158f, 0.0f, 0.0f,
     0.3153750002384186f, 1.6390860080718994f, 0.0f, 0.0f,
@@ -42,8 +42,8 @@ float s_BallTrnsYspl[] = {
     1.3333330154418945f, 0.30000001192092896f, 0.0f, 0.0f,
 };
 
-CMenuPcs::FCV s_BallTrnsX = {4, s_BallTrnsXspl};
-CMenuPcs::FCV s_BallTrnsY = {6, s_BallTrnsYspl};
+static CMenuPcs::FCV s_BallTrnsX = {4, s_BallTrnsXspl};
+static CMenuPcs::FCV s_BallTrnsY = {6, s_BallTrnsYspl};
 
 extern const char s_bonus_80331DE0[] = "bonus";
 extern const char s_bonus1_80331DE8[] = "bonus1";
@@ -65,7 +65,7 @@ extern const char s_bonus16_80331E60[] = "bonus16";
 extern const char s_bonus17_80331E68[] = "bonus17";
 extern const char s_bonus18_80331E70[] = "bonus18";
 
-extern "C" char* PTR_s_bonus[] = {
+char* PTR_s_bonus[] = {
     const_cast<char*>(s_bonus_80331DE0),
     0,
     0,
@@ -77,7 +77,7 @@ extern "C" char* PTR_s_bonus[] = {
     0,
 };
 
-extern "C" CMenuPcs::CTmp s_bonusTextureTable[] = {
+CMenuPcs::CTmp s_bonusTextureTable[] = {
     {2, const_cast<char*>(s_bonus1_80331DE8)},
     {2, const_cast<char*>(s_bonus2_80331DF0)},
     {2, const_cast<char*>(s_bonus3_80331DF8)},
@@ -127,15 +127,11 @@ struct BonusSummaryData {
 
 STATIC_ASSERT(sizeof(BonusSummaryData) == 0xCC);
 
-#pragma force_active on
-extern "C" {
-BonusSummaryData* s_Rinfo = 0;
-unsigned char s_CntTop = 0;
-unsigned char s_ArtiTop = 0;
-unsigned char s_PlayerTop = 0;
-float* s_Base[1];
-}
-#pragma force_active reset
+static BonusSummaryData* s_Rinfo = 0;
+static unsigned char s_CntTop = 0;
+static unsigned char s_ArtiTop = 0;
+static unsigned char s_PlayerTop = 0;
+static float* s_Base[1];
 extern "C" const char sDrawBonusFmt[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };

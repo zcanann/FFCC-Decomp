@@ -203,7 +203,7 @@ extern const char s_Apagado_80333528[];
 extern const char s_MenuOptionEstereo_80333530[];
 extern const char s_MenuOptionMinEs_80333538[];
 extern const char s_MenuOptionMaxEs_80333540[];
-extern "C" char* g_strMenuUtilMes[] = {
+char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
 	const_cast<char*>(s_MenuOptionMusic), s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
 	s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100,

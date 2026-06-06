@@ -4,9 +4,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
-extern "C" {
 static const float kPppConstrainCameraForLocZero = 0.0f;
-}
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 

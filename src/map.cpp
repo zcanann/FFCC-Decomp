@@ -54,7 +54,6 @@ extern const float kMapLargeDistance = 100000.0f;
 extern const float kMapFullTurnDegrees = 360.0f;
 extern const float kMapTinyEpsilon = 5.0e-6f;
 extern const float kMapHitWireZOffset = -0.1f;
-extern char g_MsgFlashy[];
 static const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 
@@ -1216,7 +1215,7 @@ void CMapMng::Create()
         GetMapLightHolderArray(i).SetStage(m_stage);
     }
 
-    gMapHitFaceFlag = 0;
+    s_bitMask.m_fields.m_drawFlags = 0;
 }
 
 /*
@@ -2643,7 +2642,7 @@ void CMapMng::DrawBefore()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if ((s_bitMask.m_byte & 8) == 0) {
+        if ((s_bitMask.m_fields.m_mode & 8) == 0) {
             for (int i = 0; i < m_mapObjCount; i++) {
                 CMapObj* mapObj = MapMng.GetMapObj(i);
                 mapObj->Draw(0xFE);
@@ -2683,7 +2682,7 @@ void CMapMng::Draw()
     GXSetProjection(projection, GX_PERSPECTIVE);
     m_underWaterTexPending = 1;
 
-    if ((gMapHitDrawMode.m_byte & 8) == 0) {
+    if ((s_bitMask.m_fields.m_mode & 8) == 0) {
         COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < m_octTreeCount; i++) {
             octTree->Draw(0);
@@ -2858,7 +2857,7 @@ void CMapMng::Draw()
         }
     }
 
-    if ((gMapHitDrawMode.m_byte & 8) != 0) {
+    if ((s_bitMask.m_fields.m_mode & 8) != 0) {
         _GXColor clearColor;
         clearColor.r = 0;
         clearColor.g = 0;
@@ -2867,7 +2866,7 @@ void CMapMng::Draw()
         GXSetCopyClear(clearColor, 0x00FFFFFF);
     }
 
-    if ((gMapHitDrawMode.m_byte & 1) != 0) {
+    if ((s_bitMask.m_fields.m_mode & 1) != 0) {
         _GXColor lightColor;
         *reinterpret_cast<u32*>(&lightColor) = 0xFFFFFFFF;
 
@@ -2930,7 +2929,7 @@ void CMapMng::Draw()
         *reinterpret_cast<u32*>(&ambientColor) = 0x404040FF;
         GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
 
-        if ((gMapHitDrawMode.m_byte & 2) == 0) {
+        if ((s_bitMask.m_fields.m_mode & 2) == 0) {
             _GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_COPY);
             _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
             GXSetZCompLoc(1);
@@ -2959,7 +2958,7 @@ void CMapMng::Draw()
         CameraPcs.SetOffsetZBuff(kMapZero);
     }
 
-    if ((gMapHitDrawMode.m_byte & 4) != 0) {
+    if ((s_bitMask.m_fields.m_mode & 4) != 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZCompLoc(0);
@@ -3028,7 +3027,7 @@ void CMapMng::DrawAfter()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        if (static_cast<signed char>(s_bitMask.m_byte) == 0) {
+        if (static_cast<signed char>(s_bitMask.m_fields.m_mode) == 0) {
             for (int i = 0; i < m_octTreeCount; i++) {
                 COctTree* octTree = GetOctTreeArray() + i;
                 octTree->Draw(2);

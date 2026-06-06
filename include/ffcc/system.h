@@ -6,25 +6,31 @@
 #include "ffcc/manager.h"
 
 class CStage;
+class CProcess;
 struct OSContext;
 struct OSThread;
-struct CScenegraphDesc;
-struct CScenegraphEntry;
+
+typedef void (CProcess::*CProcessCallback)();
+typedef int CProcessCallback_size_mismatch[(sizeof(CProcessCallback) == 0xC) ? 1 : -1];
 
 struct CProcessTableCallback
 {
     u32 m_thisOffset;
     u32 m_virtualOffset;
     u32 m_function;
+
+    CProcessCallback& callback() { return *reinterpret_cast<CProcessCallback*>(this); }
+    const CProcessCallback& callback() const { return *reinterpret_cast<const CProcessCallback*>(this); }
 };
 typedef int CProcessTableCallback_size_mismatch[(sizeof(CProcessTableCallback) == 0xC) ? 1 : -1];
 
-struct CProcessTableEntry
+struct CScenegraphEntry
 {
     CProcessTableCallback m_callback;
     u32 m_priority;
     u32 m_flags;
 };
+typedef CScenegraphEntry CProcessTableEntry;
 typedef int CProcessTableEntry_size_mismatch[(sizeof(CProcessTableEntry) == 0x14) ? 1 : -1];
 
 struct CProcessTable
@@ -42,6 +48,14 @@ struct CProcessTable
     };
 };
 typedef int CProcessTable_size_mismatch[(sizeof(CProcessTable) == 0x15C) ? 1 : -1];
+
+struct CScenegraphDesc
+{
+    const char* m_debugName;
+    CProcessTableCallback m_createCallback;
+    CProcessTableCallback m_destroyCallback;
+    CScenegraphEntry m_entries[1];
+};
 
 class CProcess : public CManager
 {
@@ -68,7 +82,7 @@ public:
 	{
         unsigned int m_priority; // 0x00
         float m_lastTime;        // 0x04
-        void* m_debugName;       // 0x08
+        const char* m_debugName; // 0x08
         int m_insertIndex;       // 0x0C
         COrder* m_previous;      // 0x10
         COrder* m_next;          // 0x14

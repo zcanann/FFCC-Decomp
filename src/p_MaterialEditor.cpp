@@ -3,12 +3,10 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
-extern "C" {
 static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
 static const float kMaterialEditorControlMaxInit = 10000.0f;
 static const float kMaterialEditorControlMinInit = -10000.0f;
 static const char sMaterialEditorSpinnerText[5] = "|/-\\";
-}
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
@@ -35,7 +33,7 @@ CProcessTableCallback CMaterialEditorPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinte
 CProcessTableCallback CMaterialEditorPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
 CProcessTableCallback CMaterialEditorPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
-char* q;
+static char* q;
 
 CProcessTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),

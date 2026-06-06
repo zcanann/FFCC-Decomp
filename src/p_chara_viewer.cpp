@@ -16,9 +16,6 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include "ffcc/texanim.h"
-extern "C" {
-extern u8* gCharaPartWorkPtr;
-}
 
 extern "C" const double kCharaViewerColorCenterBias;
 extern "C" const float kCharaViewerZero;
@@ -51,7 +48,7 @@ extern "C" const float kCharaSharedZeroF = 0.0f;
 extern "C" const float kCharaSharedOneF = 1.0f;
 extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 
-extern "C" CLightPcs::CBumpLight* g_pLight = 0;
+CLightPcs::CBumpLight* g_pLight = 0;
 
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>
@@ -858,8 +855,7 @@ void CCharaPcs::createViewer()
     bumpLight.m_bumpShade[3] = 0xFF;
     bumpLight.m_offsetX = LoadFloat(kCharaViewerZero);
     bumpLight.m_offsetZ = LoadFloat(kCharaViewerZero);
-    gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
+    gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
 
     Chara.Create();
 }

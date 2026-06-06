@@ -124,7 +124,11 @@ public:
 union UMapHitDrawMode
 {
     unsigned long m_word;
-    unsigned char m_byte;
+    struct {
+        unsigned char m_mode;
+        unsigned char m_drawFlags;
+        unsigned char m_pad[2];
+    } m_fields;
 };
 
 struct CMapHitDrawMode
@@ -134,7 +138,6 @@ struct CMapHitDrawMode
 
 extern UMapHitDrawMode s_bitMask;
 extern CMapHitDrawMode g_MapHitDrawMode;
-#define gMapHitDrawMode g_MapHitDrawMode
 extern int g_hit_edge_idx_min;
 extern float g_hit_edge_t;
 extern float g_hit_t;

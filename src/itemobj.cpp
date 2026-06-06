@@ -730,7 +730,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
 			}
-			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
+			*(CGPrgObj**)(CGMonObj::m_boss + (int)ownerScriptSlot * 4 + 8) = newItem;
 
 			CCharaPcs::CHandle* handle =
 			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
@@ -1106,7 +1106,7 @@ void CGItemObj::onFrameStat()
 		    -FLOAT_80331b50 * (prgObj->m_worldPosition.z - *(float*)(*(unsigned char**)(self + 0x550) + 0x164));
 		break;
 	case 0x25: {
-		CVector monTarget(*reinterpret_cast<Vec*>(m_aiWork__8CGMonObj + 4));
+		CVector monTarget(*reinterpret_cast<Vec*>(CGMonObj::m_aiWork + 4));
 		CVector worldPos(prgObj->m_worldPosition);
 		CVector delta;
 
@@ -1144,7 +1144,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}
@@ -1160,7 +1160,7 @@ void CGItemObj::onFrameStat()
 				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleSuccessFmt, ownerSlot);
 			}
 
-			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
+			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
 			if (newItem == 0) {
 				if ((unsigned int)System.m_execParam > 1U) {
@@ -1197,7 +1197,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			ItemCFlatRuntime()->EndParticleSlot(m_particleSlot, 0);
 
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}
@@ -1215,7 +1215,7 @@ void CGItemObj::onFrameStat()
 
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
-			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
+			*(int*)(CGMonObj::m_boss + ownerSlot * 4 + 8) = 0;
 			gCFlatRuntime().SystemCall(
 			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
@@ -1262,7 +1262,7 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(CGMonObj::m_boss) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
 			} else {

@@ -2534,7 +2534,7 @@ void CFlatRuntime2::resetChangeScript()
 	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
 	memset(&CFlatPartyTraceParticleSlot(0), 0, sizeof(int) * 5);
-	memset(m_boss__8CGMonObj, 0, sizeof(m_boss__8CGMonObj));
+	memset(CGMonObj::m_boss, 0, sizeof(CGMonObj::m_boss));
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;

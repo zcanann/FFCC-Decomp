@@ -722,7 +722,7 @@ extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
     {(char*)s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
-extern "C" CMenuPcs::CTmp s_singleMenuTextureTable[] = {
+CMenuPcs::CTmp s_singleMenuTextureTable[] = {
     {4, (char*)s_solo1_80332720},
     {4, s_solo4_80332728},
     {4, s_solo5_80332730},

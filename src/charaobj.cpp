@@ -28,10 +28,8 @@ extern "C" char lbl_801DC8D8[];
 extern "C" char lbl_801DC8EC[];
 extern "C" char lbl_801DC940[];
 
-extern "C" {
-Vec* l_pHitCross = 0;
-int l_idxAttackCol = 0;
-}
+static Vec* l_pHitCross = 0;
+static int l_idxAttackCol = 0;
 int gCGCharaObjCreateSerial = 0;
 char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
@@ -2249,11 +2247,11 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x9A) &&
 			    static_cast<CGMonObj*>(this)->m_actionBranch == 0) {
-				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24) -= delta;
+				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x24) -= delta;
 				delta = 0;
 			}
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x88)) {
-				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x88) -= delta;
+				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) -= delta;
 			}
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x70) &&
 			    static_cast<int>(hpValue + delta) < 1) {

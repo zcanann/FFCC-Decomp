@@ -12,12 +12,12 @@ class CVector;
 class CMapPcs;
 struct MonAiFuncTable;
 
-extern "C" u8 m_aiWork__8CGMonObj[0xC];
-extern "C" u8 m_boss__8CGMonObj[0x8C];
-
 class CGMonObj : public CGCharaObj
 {
 public:
+    static u8 m_aiWork[0xC];
+    static u8 m_boss[0x8C];
+
     CGMonObj();
 
     class CMoveWork

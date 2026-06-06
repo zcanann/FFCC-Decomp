@@ -10,7 +10,6 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/textureman.h"
-extern "C" {
 static const float FLOAT_803305f0 = 0.017453292f;
 static const float kPppYmDeformationShpZero = 0.0f;
 static const float FLOAT_803305f8 = 1.0f;
@@ -25,7 +24,6 @@ static const float FLOAT_80330624 = -1000.0f;
 static const float FLOAT_80330628 = -0.5f;
 static const float FLOAT_8033062c = -1.0f;
 static const float FLOAT_80330630 = 0.5f;
-}
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>

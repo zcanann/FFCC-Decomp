@@ -24,9 +24,6 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
-extern "C" {
-extern u8* gCharaPartWorkPtr;
-}
 
 extern const float FLOAT_80330288;
 extern const float FLOAT_8033028c;
@@ -42,10 +39,7 @@ extern const float FLOAT_80330320;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
-
-extern "C" {
-u8* gCharaPartWorkPtr = 0;
-}
+CLightPcs::CBumpLight* gCharaPartWorkPtr = 0;
 
 extern "C" void create__9CCharaPcsFv(CCharaPcs*);
 extern "C" void destroy__9CCharaPcsFv(CCharaPcs*);
@@ -83,7 +77,7 @@ static unsigned int s_charaTableDescPartCalc[3] = {0, 0xFFFFFFFF, reinterpret_ca
 static unsigned int s_charaTableDescPartDraw[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
 static unsigned int s_charaTableDescPartCalcAfter[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
 
-extern "C" CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
+CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
     {
         const_cast<char*>(s_CCharaPcs_GAME),
         {
@@ -720,8 +714,7 @@ void CCharaPcs::create()
     bumpLight.m_offsetX = FLOAT_80330288;
     bumpLight.m_offsetZ = FLOAT_80330288;
 
-    gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
+    gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
     Chara.Create();
 }
 
@@ -848,7 +841,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     CharaAmemSize() = 0;
 
 complete:
-    gCharaPartWorkPtr[0x6B] = 0xFF;
+    gCharaPartWorkPtr->m_bumpShade[3] = 0xFF;
     FreeMergeMask(this) = 0;
 }
 
@@ -1137,7 +1130,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
  */
 void CCharaPcs::SetSpecularAlpha(int alpha)
 {
-    gCharaPartWorkPtr[0x6B] = (u8)alpha;
+    gCharaPartWorkPtr->m_bumpShade[3] = (u8)alpha;
 }
 
 /*

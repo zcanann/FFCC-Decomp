@@ -18,13 +18,7 @@ static _PARTICLE_WMAT g_matTmp;
 
 static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 
-struct RyjMegaBirthModelDataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_colorOffset;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(RyjMegaBirthModelDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_workOffset) == 0x8);
 

@@ -86,6 +86,12 @@ struct PRyjMegaBirthOffsets
     s32* m_serializedDataOffsets;
 };
 
+struct RyjMegaBirthDataOffsets {
+	s32 m_unusedOffset;
+	s32 m_colorOffset;
+	s32 m_workOffset;
+};
+
 void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*);

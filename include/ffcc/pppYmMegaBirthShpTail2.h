@@ -8,6 +8,12 @@ struct pppYmMegaBirthShpTail2RenderStep;
 
 typedef _pppPObject pppYmMegaBirthShpTail2;
 
+struct YmMegaBirthShpTail2DataOffsets {
+    s32 m_unusedOffset;
+    s32 m_colorOffset;
+    s32 m_workOffset;
+};
+
 struct PYmMegaBirthShpTail2
 {
     Mtx m_matrix;

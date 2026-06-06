@@ -13,6 +13,11 @@ struct PARTICLE_COLOR;
 
 typedef _pppPObject pppBreathModel;
 
+struct BreathModelDataOffsets {
+    s32 m_workOffset;
+    s32 m_colorOffset;
+};
+
 struct VBreathModel {
     Mtx m_matrix;
     PARTICLE_DATA* m_particleData;

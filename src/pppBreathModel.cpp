@@ -58,11 +58,7 @@ struct PARTICLE_DATA {
     u8 _pad[0x98];
 };
 
-struct BreathModelDataOffsets {
-    s32 m_workOffset;
-    s32 m_colorOffset;
-};
-
+STATIC_ASSERT(sizeof(BreathModelDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(BreathModelDataOffsets, m_colorOffset) == 0x4);
 

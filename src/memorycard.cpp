@@ -1517,48 +1517,51 @@ void CMemoryCardMan::MakeSaveData()
     save[0x11] = static_cast<u8>(Math.Rand(0xFF));
     save[0x12] = 0;
 
-    int wm0 = Game.m_gameWork.m_wmBackupParams[0];
-    int wm1 = Game.m_gameWork.m_wmBackupParams[1];
-    int wm2 = Game.m_gameWork.m_wmBackupParams[2];
-    int wm3 = Game.m_gameWork.m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]].m_shopState == 0)
+    CGame::CGameWork* gameWork = &Game.m_gameWork;
+    CCaravanWork* caravanWorkArr = Game.m_caravanWorkArr;
+    int* wmBackupParams = gameWork->m_wmBackupParams;
+    int wm0 = wmBackupParams[0];
+    int wm1 = wmBackupParams[1];
+    int wm2 = wmBackupParams[2];
+    int wm3 = wmBackupParams[3];
+    if (caravanWorkArr[wm0].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[wm0].m_shopBusyFlag != 0)
+    if (caravanWorkArr[wm0].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]].m_shopState == 0)
+    if (caravanWorkArr[wm1].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[wm1].m_shopBusyFlag != 0)
+    if (caravanWorkArr[wm1].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]].m_shopState == 0)
+    if (caravanWorkArr[wm2].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[wm2].m_shopBusyFlag != 0)
+    if (caravanWorkArr[wm2].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]].m_shopState == 0)
+    if (caravanWorkArr[wm3].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        wmBackupParams[3] = -1;
     }
-    if (Game.m_caravanWorkArr[wm3].m_shopBusyFlag != 0)
+    if (caravanWorkArr[wm3].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        wmBackupParams[3] = -1;
     }
 
-    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0);
-    *reinterpret_cast<int*>(save + 0x24) = Game.m_gameWork.m_timerA;
-    *reinterpret_cast<int*>(save + 0x28) = Game.m_gameWork.m_scriptGlobalTime;
-    *reinterpret_cast<int*>(save + 0x2C) = Game.m_gameWork.m_frameCounter;
-    memcpy(save + 0x30, Game.m_gameWork.m_wmBackupParams, 0x10);
+    *reinterpret_cast<u32*>(save + 0x20) = *reinterpret_cast<u32*>(&gameWork->m_scriptSysVal0);
+    *reinterpret_cast<int*>(save + 0x24) = gameWork->m_timerA;
+    *reinterpret_cast<int*>(save + 0x28) = gameWork->m_scriptGlobalTime;
+    *reinterpret_cast<int*>(save + 0x2C) = gameWork->m_frameCounter;
+    memcpy(save + 0x30, gameWork->m_wmBackupParams, 0x10);
     memcpy(save + 0x40, Game.m_gameWork.m_bossArtifactStageTable, 0x3C);
     memcpy(save + 0x7C, Game.m_gameWork.m_unkStageTable, 0x3C);
     *reinterpret_cast<int*>(save + 0xB8) = Game.m_gameWork.m_chaliceElement;

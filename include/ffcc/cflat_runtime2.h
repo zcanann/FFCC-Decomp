@@ -33,6 +33,15 @@ public:
 		u32 m_hi;
 	};
 
+	struct CDebugDrawCC
+	{
+		u8 m_flags;
+		u8 m_pad[3];
+		Vec m_from;
+		Vec m_to;
+		float m_radius;
+	};
+
 	class CParticleWork
 	{
 	public:
@@ -202,7 +211,8 @@ public:
 	Vec m_particleWorkTarget;       // 0x1764
 	u8 m_pad_1770_1BDC[0x46C];      // 0x1770
 	CLine<64> m_debugLines[16];
-	u8 m_pad_CD1C_CF20[0x204];
+	int m_debugDrawCCCount;         // 0xCD1C
+	CDebugDrawCC m_debugDrawCCEntries[16]; // 0xCD20
 	CFlatData m_flatData;
 	u8 m_pad_E3F4_10400[0x200C];
 	int m_unknown10400;             // 0x10400
@@ -229,6 +239,9 @@ STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkPos) == 0x1740);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkScale) == 0x1758);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkTarget) == 0x1764);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugLines) == 0x1BDC);
+STATIC_ASSERT(sizeof(CFlatRuntime2::CDebugDrawCC) == 0x20);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDrawCCCount) == 0xCD1C);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugDrawCCEntries) == 0xCD20);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_flatData) == 0xCF20);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_unknown10400) == 0x10400);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_letterEventEnabled) == 0x10408);

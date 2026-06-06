@@ -80,14 +80,6 @@ static const char sCFlatRuntime2LoadMsg[] = "CFlatRuntime2::Load\n";
 static const char sCFlatRuntime2FileTag[] = "cflat_runtime2.cpp";
 static const char sCFlatRuntime2TexturePathFmt[] = "dvd/%s%s.tex";
 
-struct CFlatDebugDrawCC {
-	u8 m_flags;
-	u8 m_pad[3];
-	Vec m_from;
-	Vec m_to;
-	float m_radius;
-};
-
 struct CFlatLayerResource {
 	int m_allocStage;
 	CTextureSet* m_textureSet;
@@ -208,12 +200,12 @@ static inline u32& RuntimeDebugFlags(u8* runtime)
 
 static inline int& DebugDrawCCCount(u8* runtime)
 {
-	return *reinterpret_cast<int*>(runtime + 0xCD1C);
+	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCCount;
 }
 
-static inline CFlatDebugDrawCC* DebugDrawCCEntries(u8* runtime)
+static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 {
-	return reinterpret_cast<CFlatDebugDrawCC*>(runtime + 0xCD20);
+	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugDrawCCEntries;
 }
 
 static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
@@ -1468,7 +1460,7 @@ void CFlatRuntime2::Draw()
 		Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[8][3];
 
-		CFlatDebugDrawCC* entry = DebugDrawCCEntries(runtime);
+		CFlatRuntime2::CDebugDrawCC* entry = DebugDrawCCEntries(runtime);
 		for (int i = 0; i < debugCount; i++) {
 			const u8 flags = entry->m_flags;
 			GXColor* drawColor = &greenColor;
@@ -1556,7 +1548,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 	int& count = DebugDrawCCCount(runtime);
 
 	if (static_cast<unsigned int>(count) < 0x10U) {
-		CFlatDebugDrawCC* slot = &DebugDrawCCEntries(runtime)[count];
+		CFlatRuntime2::CDebugDrawCC* slot = &DebugDrawCCEntries(runtime)[count];
 		slot->m_from = *from;
 		slot->m_to = *to;
 

@@ -22,6 +22,8 @@ struct ArtiState;
 struct ArtiOpenAnimList;
 struct EquipMenuState;
 struct EquipOpenAnimList;
+struct MoneyMenuState;
+struct MoneyMenuAnimList;
 
 struct McListInfo
 {
@@ -318,6 +320,12 @@ public:
     int ChkEquipPossible(int);
     int GetEquipType(int);
     int EquipChk(int);
+    bool MoneyOpen();
+    int MoneyCtrl();
+    bool MoneyClose();
+    void MoneyDraw();
+    int MoneyCtrlCur();
+    inline void MoneySetPlace(int);
     void CmdInit1();
     void CmdInit2();
     char* GetAttrStr(int);
@@ -365,6 +373,13 @@ public:
     void ChgModel(int, int, int, int);
     void SetAnim(int);
     void DrawCursor(int, int, float);
+    void DrawSingWin(short);
+    void DrawSingWinMess(int, int, int);
+    int SingWinMessHeight();
+    void GetSingWinSize(int, short*, short*, int);
+    void SetSingWinInfo(int, int, int, int);
+    int SingGetLetterAttachflg();
+    void LetterSetAttachItem(unsigned int, int);
     void CalcMainMenuSub();
     void ChkSelectParty();
     void DrawMainMenuSub();
@@ -455,6 +470,7 @@ public:
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
+        MoneyMenuState* m_moneyState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -463,10 +479,13 @@ public:
     };
     void* m_pad83C;
     EffectInfo* m_effectWork;
-    unsigned char m_pad844[0x850 - 0x844];
+    unsigned char m_pad844[0x848 - 0x844];
+    short* m_singWindowInfo;
+    int m_pad84C;
     union {
         ArtiOpenAnimList* m_artiList;
         EquipOpenAnimList* m_equipList;
+        MoneyMenuAnimList* m_moneyPanel;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -490,7 +509,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_optionOpenAnim) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionRowAnim) == 0xA0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
+STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
+STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

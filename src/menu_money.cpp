@@ -63,10 +63,10 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	} while (digitCount != 0);
 }
 
-STATIC_ASSERT(offsetof(CMenuPcs, moneyFont) == 0x108);
-STATIC_ASSERT(offsetof(CMenuPcs, moneyState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, singWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, moneyPanel) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
+STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(MoneyMenuState, messageMask) == 0x9);
 STATIC_ASSERT(offsetof(MoneyMenuState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(MoneyMenuState, closeRequested) == 0xD);
@@ -138,7 +138,7 @@ int CMenuPcs::MoneyCtrlCur()
 	}
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	MoneyMenuState* state = this->moneyState;
+	MoneyMenuState* state = this->m_moneyState;
 	int mode = state->mode;
 	int maxDigits = 1;
 	int maxGil = caravanWork->m_gil;
@@ -236,13 +236,13 @@ int CMenuPcs::MoneyCtrlCur()
 					}
 					s16 winW;
 					s16 winH;
-					this->moneyState->messageMask = 2;
+					this->m_moneyState->messageMask = 2;
 					if (caravanWork->CanPlayerPutItem() != 0) {
-						this->moneyState->messageMask = this->moneyState->messageMask | 1;
+						this->m_moneyState->messageMask = this->m_moneyState->messageMask | 1;
 					}
 					GetSingWinSize(1, &winW, &winH, 0);
 					SetSingWinInfo(0xF0, 0xD0, winW, winH);
-					this->singWindowInfo[5] = 0;
+					this->m_singWindowInfo[5] = 0;
 					state->optionState = 0;
 					state->mode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -279,7 +279,7 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)this->moneyState->messageMask & (1 << state->selections[mode])) == 0) {
+				if (((int)this->m_moneyState->messageMask & (1 << state->selections[mode])) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (state->selections[mode] == 0) {
@@ -288,12 +288,12 @@ int CMenuPcs::MoneyCtrlCur()
 						MoneySetPlace(0);
 						MoneySetPlace(1);
 					}
-					this->singWindowInfo[5] = 2;
+					this->m_singWindowInfo[5] = 2;
 					state->optionState = state->optionState + 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				this->singWindowInfo[5] = 2;
+				this->m_singWindowInfo[5] = 2;
 				state->optionState = state->optionState + 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
@@ -316,11 +316,11 @@ void CMenuPcs::MoneyDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	s16 selectionState = this->moneyState->listState;
-	s16 mode = this->moneyState->mode;
-	MoneyMenuAnim* entry = this->moneyPanel->anims;
+	s16 selectionState = this->m_moneyState->listState;
+	s16 mode = this->m_moneyState->mode;
+	MoneyMenuAnim* entry = this->m_moneyPanel->anims;
 
-	for (int i = 0; i < this->moneyPanel->count; i++, entry++) {
+	for (int i = 0; i < this->m_moneyPanel->count; i++, entry++) {
 		int tex = entry->tex;
 		if (tex < 0) {
 			continue;
@@ -343,7 +343,7 @@ void CMenuPcs::MoneyDraw()
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
 
-	MoneyMenuAnim* drawBase = this->moneyPanel->anims;
+	MoneyMenuAnim* drawBase = this->m_moneyPanel->anims;
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
 		GXColor color;
@@ -379,13 +379,13 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->moneyState->selections[0]) * 0x12 + 0x24),
+		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->m_moneyState->selections[0]) * 0x12 + 0x24),
 		                 (float)(drawBase->y + 0x5C), 16.0f, 24.0f,
 		                 0.0f, 0.0f, 1.0f,
 		                 1.0f, 0.0f);
 	}
 
-	CFont* font = this->moneyFont;
+	CFont* font = this->m_fonts[4];
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
 	font->SetScale(0.9f);
@@ -407,15 +407,15 @@ void CMenuPcs::MoneyDraw()
 	DrawInit();
 	if (mode == 1) {
 		DrawSingWin(-1);
-		if (this->moneyState->optionState == 1) {
-			DrawSingWinMess(1, (int)this->moneyState->messageMask, 0);
+		if (this->m_moneyState->optionState == 1) {
+			DrawSingWinMess(1, (int)this->m_moneyState->messageMask, 0);
 		}
 	}
 
-	if ((mode != 0) && (this->moneyState->optionState == 1)) {
-		s16* singWindow = this->singWindowInfo;
+	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
+		s16* singWindow = this->m_singWindowInfo;
 		float cursorY = (float)(singWindow[1] + 0x20);
-		cursorY += (float)(this->moneyState->selections[1] * SingWinMessHeight());
+		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
 		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, 1.0f);
@@ -433,13 +433,13 @@ void CMenuPcs::MoneyDraw()
  */
 bool CMenuPcs::MoneyClose()
 {
-	this->moneyState->frame++;
+	this->m_moneyState->frame++;
 
-	MoneyMenuAnimList* panel = this->moneyPanel;
+	MoneyMenuAnimList* panel = this->m_moneyPanel;
 	MoneyMenuAnim* anim = panel->anims;
 	int finished = 0;
 	int count = panel->count;
-	int frame = this->moneyState->frame;
+	int frame = this->m_moneyState->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
 		if (frame < anim->startFrame) {
@@ -495,25 +495,25 @@ int CMenuPcs::MoneyCtrl()
 	int mode;
 
 	result = 0;
-	this->moneyState->prevMode = this->moneyState->mode;
-	state = this->moneyState;
+	this->m_moneyState->prevMode = this->m_moneyState->mode;
+	state = this->m_moneyState;
 	mode = state->mode;
 	if ((mode == 0) || ((mode != 0) && (state->optionState == 1))) {
 		result = MoneyCtrlCur();
 	} else if ((mode == 1) && ((int)state->optionState == 0)) {
-		if (this->singWindowInfo[5] == 1) {
+		if (this->m_singWindowInfo[5] == 1) {
 			result = 0;
 			state->optionState = state->optionState + 1;
 		}
-	} else if (((mode == 1) && (state->optionState == 2)) && (this->singWindowInfo[5] == 3)) {
+	} else if (((mode == 1) && (state->optionState == 2)) && (this->m_singWindowInfo[5] == 3)) {
 		result = 0;
 		state->optionState = 0;
-		this->moneyState->mode = 0;
-		this->moneyState->frame = 0;
+		this->m_moneyState->mode = 0;
+		this->m_moneyState->frame = 0;
 	}
 
 	if (result != 0) {
-		MoneyMenuAnim* anim = this->moneyPanel->anims;
+		MoneyMenuAnim* anim = this->m_moneyPanel->anims;
 		anim->alpha = 1.0f;
 		anim->startFrame = 0;
 		anim->duration = 10;
@@ -534,11 +534,11 @@ int CMenuPcs::MoneyCtrl()
  */
 bool CMenuPcs::MoneyOpen()
 {
-	if (this->moneyState->initialized == '\0') {
-		memset(this->moneyPanel, 0, sizeof(*this->moneyPanel));
+	if (this->m_moneyState->initialized == '\0') {
+		memset(this->m_moneyPanel, 0, sizeof(*this->m_moneyPanel));
 
 		float one = 1.0f;
-		MoneyMenuAnim* initAnim = this->moneyPanel->anims;
+		MoneyMenuAnim* initAnim = this->m_moneyPanel->anims;
 		int initCount = 8;
 		do {
 			initAnim[0].uvScale = one;
@@ -553,7 +553,7 @@ bool CMenuPcs::MoneyOpen()
 		} while (--initCount != 0);
 
 		int entryIndex = 0;
-		MoneyMenuAnim* firstAnim = &this->moneyPanel->anims[entryIndex++];
+		MoneyMenuAnim* firstAnim = &this->m_moneyPanel->anims[entryIndex++];
 		firstAnim->tex = 0x3b;
 		firstAnim->y = 0x68;
 		firstAnim->w = 0xf8;
@@ -565,7 +565,7 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->uvScale = 1.0f;
 		firstAnim->flags = 0;
 		firstAnim->duration = 10;
-		this->moneyPanel->count = 1;
+		this->m_moneyPanel->count = 1;
 
 		s_Money = 0;
 		int row = 0;
@@ -574,17 +574,17 @@ bool CMenuPcs::MoneyOpen()
 			row = row + 1;
 		} while (row < 2);
 
-		this->moneyState->selections[0] = 0;
-		this->moneyState->initialized = 1;
+		this->m_moneyState->selections[0] = 0;
+		this->m_moneyState->initialized = 1;
 	}
 
-	this->moneyState->frame++;
+	this->m_moneyState->frame++;
 
-	MoneyMenuAnimList* panel = this->moneyPanel;
+	MoneyMenuAnimList* panel = this->m_moneyPanel;
 	MoneyMenuAnim* anim = panel->anims;
 	int finished = 0;
 	int count = panel->count;
-	int frame = this->moneyState->frame;
+	int frame = this->m_moneyState->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
 		if (frame >= anim->startFrame) {

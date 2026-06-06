@@ -1285,6 +1285,7 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
     posA.y = caravanWork->m_targetCursorPosA.y;
     posA.z = caravanWork->m_targetCursorPosA.z;
 
+    caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptFoodBase[playerIndex]);
     posB.x = caravanWork->m_targetCursorPosB.x;
     posB.y = caravanWork->m_targetCursorPosB.y;
     posB.z = caravanWork->m_targetCursorPosB.z;

@@ -16,10 +16,7 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
-struct YmMoveParabolaDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmMoveParabolaDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
 
 static inline YmMoveParabolaDataOffsets* GetYmMoveParabolaDataOffsets(_pppCtrlTable* ctrl)

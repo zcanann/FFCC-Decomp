@@ -6,6 +6,10 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct pppYmMoveCircleDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppYmMoveCircleStep {
     s32 m_graphId;
     f32 m_angleStep;

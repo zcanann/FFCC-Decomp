@@ -4569,7 +4569,7 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				int msgId = 0;
 				int msgParam = 0;
-				short ss = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				short ss = typedWorldState->m_subState;
 				if (ss == 5) msgId = 1;
 				else if (ss == 6) msgId = 2;
 				else if (ss == 7) msgId = 3;
@@ -4584,16 +4584,15 @@ void CMenuPcs::DrawLoadMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0 ||
+				if (typedWorldState->m_state0E < 0 ||
 				    subState == 0x1C || subState == 0x1B || subState == 0x17) {
-					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+					typedWorldState->m_subState = 3;
 				} else if (subState == 0x18) {
-					*reinterpret_cast<short*>(worldState + 0x1E) = 1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 1;
+					typedWorldState->m_nextMenuMode = 1;
+					typedWorldState->m_delay = 1;
 					*reinterpret_cast<short*>(bytes + 0x870) = 4;
 				} else {
-					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+					typedWorldState->m_subState = 2;
 				}
 			}
 			break;

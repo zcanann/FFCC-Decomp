@@ -98,18 +98,20 @@ extern "C" const char s_CPartPcs_heap_801D821C[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005773C
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-_pppMngSt* pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest)
+void pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest)
 {
 	if (pppSest->m_soundEffectSlot >= 0 && pppSest->m_soundEffectHandle >= 0)
 	{
 		Sound.FadeOutSe3D(pppSest->m_soundEffectHandle, pppSest->m_soundEffectFadeFrames);
 		pppSest->m_soundEffectHandle = -1;
 	}
-
-	return pppMngSt;
 }
 
 /*

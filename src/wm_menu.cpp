@@ -3473,7 +3473,7 @@ void CMenuPcs::drawWorld()
 			menu->Draw();
 		}
 	} else {
-		const short menuMode = *reinterpret_cast<short*>(*reinterpret_cast<unsigned int*>(bytes + 0x82C) + 0x1C);
+		const short menuMode = m_wmWorldState->m_menuMode;
 
 		switch (menuMode) {
 		case 0:
@@ -3654,7 +3654,7 @@ void CMenuPcs::DrawMainMenu()
 void CMenuPcs::DrawDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
 	if (handle != 0 && handle->m_model != 0) {
@@ -3696,17 +3696,17 @@ void CMenuPcs::DrawDiaryMenu()
 		DrawInit();
 	}
 
-	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	const short state = worldState->m_mainState;
 	if (state > 0 && state < 4) {
 		float alpha;
 		if (state == 1) {
 			alpha = static_cast<float>(DOUBLE_803314e8 *
-			                           (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408));
+			                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
 			alpha = static_cast<float>(-(DOUBLE_803314e8 *
-			                             (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408) -
+			                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
 			                             DOUBLE_80331420));
 		}
 		DrawDiaryBase(0, alpha);

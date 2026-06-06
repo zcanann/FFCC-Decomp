@@ -1129,7 +1129,7 @@ void CGMonObj::frameStatFuncDragonZombie()
 		if (prgObj->isLoopAnim() != 0) {
 			prgObj->changeStat(0, 0, 0);
 		}
-	} else if (state < 0x65 && state > 99) {
+	} else if (state < 0x65 && state >= 100) {
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	}
 }
@@ -1465,7 +1465,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			moveFrame();
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-	} else if (state > 99) {
+	} else if (state >= 100) {
 		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
 			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
@@ -1688,7 +1688,7 @@ void CGMonObj::frameStatFuncMolbol()
 
 	if (state != 0x65) {
 		if (state < 0x65) {
-			if (state > 99) {
+			if (state >= 100) {
 				suikomi(0x53, FLOAT_80331cf8);
 			}
 		}
@@ -2091,7 +2091,7 @@ void CGMonObj::frameStatFuncMeteoParasite()
 				object->SetAnimSlot(0xB, 0);
 				prgObj->changeStat(0, 0, 0);
 			}
-		} else if (state > 99) {
+		} else if (state >= 100) {
 			if (prgObj->m_stateFrame == 0) {
 				prgObj->reqAnim(0xD, 0, 0);
 			} else if (prgObj->isLoopAnim() != 0) {

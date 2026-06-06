@@ -3893,6 +3893,13 @@ void CMenuPcs::DrawMCardMenu()
 						&lightTable.m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				GetWmCharaHandles(this)[i]->Draw(5);
+				if (m_effectWork[i + 0x11].m_partNo >= 0) {
+					PartPcs.DrawMenuIdx(m_effectWork[i + 0x11].m_partNo);
+				}
+				if (m_effectWork[i + 0x15].m_partNo >= 0) {
+					PartPcs.DrawMenuIdx(m_effectWork[i + 0x15].m_partNo);
+				}
 			}
 		}
 		DrawInit();

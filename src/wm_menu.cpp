@@ -2547,6 +2547,7 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	WmWorldState* const worldState = m_wmWorldState;
 	McCtrl& mcCtrl = *GetMcCtrl();
 	m_textureLocIndex = 0;
 
@@ -2564,31 +2565,32 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned short uVar7 = GetButtonRepeat(0);
 
 	if (m_wmWorldState->m_worldReady == 0) {
-		int frame = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(frame + 4) = 0x10;
-		float fVar5 = FLOAT_803313e8;
-		float fVar4 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(frame + 6) = 0x10;
-		*reinterpret_cast<short*>(frame + 8) = 0xE8;
-		*reinterpret_cast<short*>(frame + 10) = 0x168;
-		*reinterpret_cast<float*>(frame + 0xC) = fVar4;
-		*reinterpret_cast<float*>(frame + 0x10) = fVar4;
-		*reinterpret_cast<float*>(frame + 0x14) = fVar5;
-		*reinterpret_cast<float*>(frame + 0x18) = fVar5;
-		*reinterpret_cast<int*>(frame + 0x1C) = 0;
-		int iVar14 = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(iVar14 + 0x20) = *reinterpret_cast<short*>(iVar14 + 4);
-		*reinterpret_cast<short*>(iVar14 + 0x22) = *reinterpret_cast<short*>(iVar14 + 6);
-		*reinterpret_cast<short*>(iVar14 + 0x24) = *reinterpret_cast<short*>(iVar14 + 8);
-		*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 10);
-		*reinterpret_cast<int*>(iVar14 + 0x28) = *reinterpret_cast<int*>(iVar14 + 0xC);
-		*reinterpret_cast<int*>(iVar14 + 0x2C) = *reinterpret_cast<int*>(iVar14 + 0x10);
-		*reinterpret_cast<int*>(iVar14 + 0x30) = *reinterpret_cast<int*>(iVar14 + 0x14);
-		*reinterpret_cast<int*>(iVar14 + 0x34) = *reinterpret_cast<int*>(iVar14 + 0x18);
-		*reinterpret_cast<int*>(iVar14 + 0x38) = *reinterpret_cast<int*>(iVar14 + 0x1C);
-		iVar14 = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(iVar14 + 0x20) = 0x280 - (*reinterpret_cast<short*>(iVar14 + 8) + *reinterpret_cast<short*>(iVar14 + 4));
-		*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = 8;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+		float one = FLOAT_803313e8;
+		float zero = FLOAT_803313dc;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
+		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
+
+		unsigned char* frame0 = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame0 + 0x20) = *reinterpret_cast<short*>(frame0 + 4);
+		*reinterpret_cast<short*>(frame0 + 0x22) = *reinterpret_cast<short*>(frame0 + 6);
+		*reinterpret_cast<short*>(frame0 + 0x24) = *reinterpret_cast<short*>(frame0 + 8);
+		*reinterpret_cast<short*>(frame0 + 0x26) = *reinterpret_cast<short*>(frame0 + 0xA);
+		*reinterpret_cast<float*>(frame0 + 0x28) = *reinterpret_cast<float*>(frame0 + 0xC);
+		*reinterpret_cast<float*>(frame0 + 0x2C) = *reinterpret_cast<float*>(frame0 + 0x10);
+		*reinterpret_cast<float*>(frame0 + 0x30) = *reinterpret_cast<float*>(frame0 + 0x14);
+		*reinterpret_cast<float*>(frame0 + 0x34) = *reinterpret_cast<float*>(frame0 + 0x18);
+		*reinterpret_cast<unsigned int*>(frame0 + 0x38) = *reinterpret_cast<unsigned int*>(frame0 + 0x1C);
+
+		frame0 = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame0 + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame0 + 8) + *reinterpret_cast<short*>(frame0 + 4));
+		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
 
 		mcCtrl.m_previousState = 0;
 		mcCtrl.m_state = 0;
@@ -2618,23 +2620,23 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned int uVar15;
 	if (sVar8 == 0) {
 		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
-	} else if (sVar8 < 1 || sVar8 > 3) {
-		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
-	} else {
+	} else if (sVar8 > 0 && sVar8 < 4) {
 		uVar15 = 0;
+	} else {
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	unsigned char* const frame = m_wm.m_frameInfo;
-	*reinterpret_cast<short*>(frame + 4) = 0x10;
-	int iVar10 = reinterpret_cast<int>(frame);
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	int iVar10 = reinterpret_cast<int>(m_wm.m_frameInfo);
 	int frameSum = (int)*reinterpret_cast<short*>(iVar10 + 8) + (int)*reinterpret_cast<short*>(iVar10 + 4);
 	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
 	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
+		unsigned char* const frame = m_wm.m_frameInfo;
 		double dVar26;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 >= -10) {
+		if ((int)uVar15 > -11) {
 			unsigned int absOff;
 			if ((int)uVar15 < 0) {
 				absOff = -(int)uVar15;
@@ -2661,7 +2663,7 @@ void CMenuPcs::CalcLoadMenu()
 		return;
 	}
 
-	iVar14 = reinterpret_cast<int>(m_wmWorldState);
+	iVar14 = reinterpret_cast<int>(worldState);
 	iVar10 = m_wmWorldState->m_subState;
 	switch (iVar10) {
 	case 0:
@@ -2735,6 +2737,7 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	case 3:
+		MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		break;
 	case 4:

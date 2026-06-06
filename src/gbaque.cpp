@@ -246,7 +246,7 @@ void GbaQueue::Init()
 
 	obj[0x2AFC] = 0;
 	obj[0x2C88] = 0;
-	obj[0x2C89] = 0;
+	m_letterFlags = 0;
 	obj[0x2D38] = 0;
 	obj[0x2D39] = 0;
 	obj[0x2D3A] = 0;
@@ -263,20 +263,20 @@ void GbaQueue::Init()
 	obj[0x2D40] = 0;
 	obj[0x2D41] = 0xF;
 	obj[0x2D42] = 0;
-	obj[0x2D54] = 0;
-	obj[0x2D55] = 0;
+	m_chgHitFlags = 0;
+	m_chgScouFlags = 0;
 	m_singleMode = 0;
-	obj[0x2D57] = 0;
+	m_controllerMode = 0;
 	obj[0x2D58] = 0;
 	obj[0x2D59] = 0;
 	obj[0x2D5A] = 0;
-	obj[0x2D5B] = 0;
-	obj[0x2D5C] = 0;
-	obj[0x2D5D] = 0xF;
-	obj[0x2D5E] = 0;
-	obj[0x2D5F] = 0;
-	obj[0x2D60] = 0xF;
-	obj[0x2D61] = 0;
+	m_pauseMode = 0;
+	m_spModeBits = 0;
+	m_spModeFlags = 0xF;
+	m_memorysFlags = 0;
+	m_cmdNumFlags = 0;
+	m_playModeFlags = 0xF;
+	m_startBonusFlags = 0;
 	obj[0x2C96] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
 	obj[0x2CAC] = 0;
@@ -356,20 +356,20 @@ void GbaQueue::LoadAll()
 		spModeBits |= 8;
 	}
 
-	spModeChangeBits = static_cast<unsigned char>(spModeBits ^ static_cast<unsigned char>(obj[0x2D5C]));
+	spModeChangeBits = static_cast<unsigned char>(spModeBits ^ m_spModeBits);
 	if ((spModeChangeBits & 1) != 0) {
-		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 1);
+		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 1);
 	}
 	if ((spModeChangeBits & 2) != 0) {
-		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 2);
+		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 2);
 	}
 	if ((spModeChangeBits & 4) != 0) {
-		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 4);
+		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 4);
 	}
 	if ((spModeChangeBits & 8) != 0) {
-		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 8);
+		m_spModeFlags = static_cast<unsigned char>(m_spModeFlags | 8);
 	}
-	obj[0x2D5C] = static_cast<char>(spModeBits);
+	m_spModeBits = spModeBits;
 
 	for (i = 0; i < 4; i++) {
 		OSSignalSemaphore(&accessSemaphores[i]);

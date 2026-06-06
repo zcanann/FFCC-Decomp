@@ -470,8 +470,9 @@ void LoadFieldPdt0(int mapId, int floorId)
 
             pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;
             createParam = PartMng.pppGetDefaultCreateParam();
+            i = 0;
             fieldParticleOffset = 0;
-            for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
+            for (; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
                 _pppFieldParticleData* fieldParticle = reinterpret_cast<_pppFieldParticleData*>(
                     reinterpret_cast<unsigned char*>(PartMng.m_pdtSlots[0].m_pppDataHead) + sizeof(_pppDataHead) +
                     fieldParticleOffset);

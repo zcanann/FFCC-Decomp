@@ -866,7 +866,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     gObject = work->m_object;
     if (gObject == NULL) {
@@ -879,22 +879,22 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.x = LoadFloat(FLOAT_80331898);
-        centerPos.y = LoadFloat(FLOAT_80331898);
         centerPos.z = LoadFloat(FLOAT_80331898);
+        centerPos.y = LoadFloat(FLOAT_80331898);
+        centerPos.x = LoadFloat(FLOAT_80331898);
     } else {
         centerPos.x = gObject->m_worldPosition.x;
         centerPos.y = gObject->m_worldPosition.y;
         centerPos.z = gObject->m_worldPosition.z;
     }
-    centerPos.y += LoadFloat(FLOAT_803318c4);
+    centerPos.y = LoadFloat(FLOAT_803318c4) + centerPos.y;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
     sourceTexObjs = work->m_sourceTexObjs;
 
     if (step->m_rippleLevel != 0) {
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
         GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
                       LoadFloat(FLOAT_803318c8), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318a0));
@@ -925,7 +925,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                 }
             } else if (i == 5) {
                 cameraPos.z = centerPos.z - LoadFloat(FLOAT_803318a0);
-            } else {
+            } else if (i < 5) {
                 cameraPos.z = centerPos.z + LoadFloat(FLOAT_803318a0);
             }
 
@@ -1513,44 +1513,44 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
-    int draw = 0;
+    bool draw = false;
 
     if (type == 2) {
         if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
-            draw = 1;
+            draw = true;
         }
     } else if (type < 2) {
         if (type == 0) {
             if (strcmp(shape, s_manaShapeObj) == 0) {
-                draw = 1;
+                draw = true;
             }
         } else if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
-            draw = 1;
+            draw = true;
         }
     } else if (type < 4 && (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0)) {
-        draw = 1;
+        draw = true;
     }
 
     int waterCmp = strcmp(shape, s_manaShapeObj4);
-    if ((waterCmp == 0 && type == 1) || (strcmp(shape, s_manaShapeObj2) == 0 && type == 2)) {
+    if ((waterCmp == 0 && stepData->m_type == 1) || (strcmp(shape, s_manaShapeObj2) == 0 && stepData->m_type == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
         Vec offset;
-        float x = mtx[0][3];
-        float y = mtx[1][3];
-        float z = mtx[2][3];
 
         PSMTXCopy(CameraMatrix(), cameraMtx);
         PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
+        float x = mtx[0][3];
+        float y = mtx[1][3];
+        float z = mtx[2][3];
         mtx[0][3] = LoadFloat(FLOAT_80331898);
         mtx[1][3] = LoadFloat(FLOAT_80331898);
         mtx[2][3] = LoadFloat(FLOAT_80331898);
         PSMTXConcat(mtx, rotMtx, mtx);
 
+        offset.z = LoadFloat(FLOAT_80331898);
         offset.x = LoadFloat(FLOAT_80331898);
         offset.y = stepData->m_waterScale;
-        offset.z = LoadFloat(FLOAT_80331898);
         PSMTXMultVec(mtx, &offset, &offset);
 
         mtx[0][3] = x;

@@ -84,8 +84,6 @@ static const float FLOAT_80331cec = 4.0f;
 static const float FLOAT_80331cf0 = -3.0f;
 static const float FLOAT_80331cf4 = 0.5f;
 
-static const Vec kScreenBreakCameraUpVector = { 0.0f, 1.0f, 0.0f };
-static const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
 static const char sF999Root[] = "f999_root";
 static const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
@@ -481,7 +479,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         piece->m_velocity.y = dVar20;
         piece->m_velocity.z = dVar21;
         PSVECNormalize(&piece->m_velocity, &piece->m_velocity);
-        Vec up = kScreenBreakPieceUpVector;
+        Vec up = {0.0f, 1.0f, 0.0f};
         PSVECCrossProduct(&piece->m_velocity, &up, &piece->m_axis);
 
         dVar17 = Math.RandF(stepData->m_speedRand);
@@ -617,7 +615,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Vec4d clipOutput;
     Vec screenOffset;
     Vec cameraOffset;
-    Vec basis = kScreenBreakCameraUpVector;
+    Vec basis = {0.0f, 1.0f, 0.0f};
     Vec gravityAdd;
     Vec axis;
     Quaternion meshQuat;

@@ -1132,8 +1132,8 @@ void CMapObj::SetLink()
                         head4 = child4;
                         CMapObj* cursor5 = MapObjArrayStart();
                         head5 = 0;
-                        CMapObj* child5;
-                        while ((child5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
+                        while ((cursor5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
+                            CMapObj* child5 = cursor5;
                             child5->m_next = head5;
                             head5 = child5;
                             CMapObj* cursor6 = MapObjArrayStart();
@@ -1167,7 +1167,7 @@ void CMapObj::SetLink()
                             }
 
                             child5->m_child = head6;
-                            cursor5 = NextSlot(child5);
+                            cursor5 = NextSlot(cursor5);
                         }
 
                         child4->m_child = head5;

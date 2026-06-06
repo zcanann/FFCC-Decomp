@@ -1297,11 +1297,11 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    float radius = FLOAT_8032fc1c;
+    float f1 = FLOAT_8032fc10;
     float f2 = FLOAT_8032fc14;
+    float radius = FLOAT_8032fc1c;
 
     m_radius = radius;
-    float f1 = FLOAT_8032fc10;
     m_offsetZ = f2;
     m_offsetX = f2;
     m_attenFalloff = f1;

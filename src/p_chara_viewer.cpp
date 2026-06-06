@@ -525,24 +525,31 @@ void CCharaPcs::calcViewer()
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
         frameAdvance = LoadFloat(kCharaViewerZero);
+        float step;
         if ((triggerButtons & 0x100) != 0) {
-            frameAdvance += LoadFloat(kCharaViewerUnitStep);
+            step = LoadFloat(kCharaViewerUnitStep);
         } else {
-            frameAdvance += LoadFloat(kCharaViewerZero);
+            step = frameAdvance;
         }
+        frameAdvance += step;
         if ((triggerButtons & 0x200) != 0) {
-            frameAdvance += LoadFloat(kCharaViewerFineStep);
+            step = LoadFloat(kCharaViewerFineStep);
         } else {
-            frameAdvance += LoadFloat(kCharaViewerZero);
+            step = LoadFloat(kCharaViewerZero);
         }
+        frameAdvance += step;
     } else {
-        float deltaY = LoadFloat(kCharaViewerUnitStep);
+        float deltaY;
         if ((heldButtons & 0x200) != 0) {
             deltaY = LoadFloat(kCharaViewerFineStep);
+        } else {
+            deltaY = LoadFloat(kCharaViewerUnitStep);
         }
-        float speedScale = LoadFloat(kCharaViewerUnitStep);
+        float speedScale;
         if ((heldButtons & 0x100) != 0) {
             speedScale = LoadFloat(kCharaViewerLerpScale);
+        } else {
+            speedScale = LoadFloat(kCharaViewerUnitStep);
         }
         frameAdvance = deltaY * speedScale;
     }
@@ -666,11 +673,13 @@ void CCharaPcs::calcViewer()
                 if (self->m_viewerSavedAnimState == 0) {
                     iframeState = kCharaViewerOrg;
                 }
+                CGraphic* graphic = &Graphic;
+                const char* iframeFmt = s_iframe_fmt;
                 const char* iframeMode = kCharaViewerOff;
                 if (self->m_viewerIFrameEnabled != 0) {
                     iframeMode = kCharaViewerOn;
                 }
-                Graphic.Printf(const_cast<char*>(s_iframe_fmt), iframeMode, self->m_viewerSavedFrame, iframeState);
+                graphic->Printf(const_cast<char*>(iframeFmt), iframeMode, self->m_viewerSavedFrame, iframeState);
             }
             if (self->m_viewerAnimLoadedCount != 0) {
                 Graphic.Printf(const_cast<char*>(s_cont_fmt), self->m_viewerAnimLoopIndex);

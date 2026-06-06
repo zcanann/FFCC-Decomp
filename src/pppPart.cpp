@@ -1154,17 +1154,16 @@ MatrixMode3:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1211,17 +1210,16 @@ MatrixMode5:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1258,17 +1256,16 @@ MatrixMode6:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1308,17 +1305,16 @@ MatrixMode7:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {

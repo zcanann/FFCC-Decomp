@@ -158,15 +158,70 @@ static const char* GetUniteListName(int itemId)
 	return flatText[itemId * 5 + 4];
 }
 
-struct CmdListStorage {
-	s16 count;
-	s16 selected;
-	unsigned char pad_0004[4];
-	unsigned char entries[64][0x40];
+struct CmdListEntry {
+	s16 x;
+	s16 y;
+	s16 width;
+	s16 height;
+	float u;
+	float v;
+	float alpha;
+	float scale;
+	s32 unk_18;
+	s32 tex;
+	s32 timer;
+	s32 startFrame;
+	s32 duration;
+	u32 flags;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
 };
 
+struct CmdListStorage {
+	s16 count;
+	s16 listEnd;
+	unsigned char pad_0004[4];
+	CmdListEntry entries[64];
+};
+
+struct CmdState {
+	unsigned char pad_0000[0x08];
+	u8 transitionFlag;
+	unsigned char pad_0009[0x0B - 0x09];
+	u8 initialized;
+	unsigned char pad_000C[0x22 - 0x0C];
+	s16 transitionTimer;
+	unsigned char pad_0024[0x26 - 0x24];
+	s16 selected;
+	unsigned char pad_0028[0x30 - 0x28];
+	s16 mode;
+	s16 prevMode;
+};
+
+STATIC_ASSERT(offsetof(CmdListEntry, u) == 0x08);
+STATIC_ASSERT(offsetof(CmdListEntry, v) == 0x0C);
+STATIC_ASSERT(offsetof(CmdListEntry, alpha) == 0x10);
+STATIC_ASSERT(offsetof(CmdListEntry, scale) == 0x14);
+STATIC_ASSERT(offsetof(CmdListEntry, tex) == 0x1C);
+STATIC_ASSERT(offsetof(CmdListEntry, timer) == 0x20);
+STATIC_ASSERT(offsetof(CmdListEntry, startFrame) == 0x24);
+STATIC_ASSERT(offsetof(CmdListEntry, duration) == 0x28);
+STATIC_ASSERT(offsetof(CmdListEntry, flags) == 0x2C);
+STATIC_ASSERT(offsetof(CmdListEntry, dx) == 0x30);
+STATIC_ASSERT(offsetof(CmdListEntry, dy) == 0x34);
+STATIC_ASSERT(offsetof(CmdListEntry, targetX) == 0x38);
+STATIC_ASSERT(offsetof(CmdListEntry, targetY) == 0x3C);
+STATIC_ASSERT(sizeof(CmdListEntry) == 0x40);
 STATIC_ASSERT(offsetof(CmdListStorage, entries) == 8);
 STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
+STATIC_ASSERT(offsetof(CmdState, transitionFlag) == 0x08);
+STATIC_ASSERT(offsetof(CmdState, initialized) == 0x0B);
+STATIC_ASSERT(offsetof(CmdState, transitionTimer) == 0x22);
+STATIC_ASSERT(offsetof(CmdState, selected) == 0x26);
+STATIC_ASSERT(offsetof(CmdState, mode) == 0x30);
+STATIC_ASSERT(offsetof(CmdState, prevMode) == 0x32);
 
 static inline s16* GetCmdState(CMenuPcs* menu)
 {
@@ -181,6 +236,16 @@ static inline s16* GetCmdList(CMenuPcs* menu)
 static inline CmdListStorage* GetCmdListStorage(CMenuPcs* menu)
 {
 	return reinterpret_cast<CmdListStorage*>(GetCmdList(menu));
+}
+
+static inline CmdListEntry* GetCmdListEntries(CMenuPcs* menu)
+{
+	return GetCmdListStorage(menu)->entries;
+}
+
+static inline CmdState* GetCmdStateView(CMenuPcs* menu)
+{
+	return reinterpret_cast<CmdState*>(GetCmdState(menu));
 }
 
 static inline int GetCmdStateBase(CMenuPcs* menu)
@@ -236,56 +301,58 @@ void CMenuPcs::CmdInit()
 	memset(GetCmdListStorage(this), 0, sizeof(*GetCmdListStorage(this)));
 
 	float fVar2 = FLOAT_80332a70;
-	s32 iVar5 = GetCmdListBase(this) + 8;
+	CmdListEntry* entries = GetCmdListEntries(this);
+	CmdListEntry* entry = entries;
 	s32 iVar8 = 8;
 	do {
-		*reinterpret_cast<float*>(iVar5 + 0x14) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x54) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x94) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0xD4) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x114) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x154) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x194) = fVar2;
-		*reinterpret_cast<float*>(iVar5 + 0x1D4) = fVar2;
-		iVar5 += 0x200;
+		entry[0].scale = fVar2;
+		entry[1].scale = fVar2;
+		entry[2].scale = fVar2;
+		entry[3].scale = fVar2;
+		entry[4].scale = fVar2;
+		entry[5].scale = fVar2;
+		entry[6].scale = fVar2;
+		entry[7].scale = fVar2;
+		entry += 8;
 		iVar8--;
 	} while (iVar8 != 0);
 
-	s16* puVar7 = reinterpret_cast<s16*>(GetCmdListBase(this) + 8);
-	iVar5 = 0;
+	entry = entries;
+	int iVar5 = 0;
 	iVar8 = 8;
 	float fVar3 = FLOAT_80332ab0;
 	float fVar4 = FLOAT_80332ad0;
 	do {
 		if (iVar5 < caravanWork->m_numCmdListSlots) {
-			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0x2D;
+			entry->tex = 0x2D;
 		} else {
-			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0xFFFFFFFF;
+			entry->tex = 0xFFFFFFFF;
 		}
 
-		puVar7[2] = 200;
-		puVar7[3] = 0x20;
-		*puVar7 = 0x74;
-		puVar7[1] = static_cast<s16>(iVar5 * puVar7[3] + 0x28);
-		*reinterpret_cast<float*>(puVar7 + 4) = fVar3;
-		*reinterpret_cast<float*>(puVar7 + 6) = fVar4;
+		entry->width = 200;
+		entry->height = 0x20;
+		entry->x = 0x74;
+		entry->y = static_cast<s16>(iVar5 * entry->height + 0x28);
+		entry->u = fVar3;
+		entry->v = fVar4;
 
 		if ((1 < iVar5) && (caravanWork->m_commandListInventorySlotRef[iVar5] < 0)) {
-			*reinterpret_cast<float*>(puVar7 + 6) += static_cast<float>(static_cast<double>(puVar7[3]));
+			entry->v += static_cast<float>(static_cast<double>(entry->height));
 		}
 
-		*reinterpret_cast<s32*>(puVar7 + 0x12) = iVar5;
+		entry->startFrame = iVar5;
 		iVar5++;
-		*reinterpret_cast<u32*>(puVar7 + 0x14) = 3;
-		puVar7 += 0x20;
+		entry->duration = 3;
+		entry++;
 		iVar8--;
 	} while (iVar8 != 0);
 
 	*GetCmdList(this) = 8;
 	CmdInit1();
 	GetCmdItem();
-	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26) = 2;
-	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 0x0B) = 1;
+	CmdState* cmd = GetCmdStateView(this);
+	cmd->selected = 2;
+	cmd->initialized = 1;
 }
 
 /*
@@ -295,11 +362,12 @@ void CMenuPcs::CmdInit()
  */
 void CMenuPcs::CmdInit0()
 {
-	s16* list = GetCmdList(this);
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
 
-	for (s32 i = 0; i < list[0]; i++) {
-		*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = FLOAT_80332a70;
-		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
+	for (s32 i = 0; i < list->count; i++) {
+		entries[i].alpha = FLOAT_80332a70;
+		entries[i].scale = FLOAT_80332a70;
 	}
 
 	const u32 count = static_cast<u32>(reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->m_numCmdListSlots);
@@ -308,11 +376,11 @@ void CMenuPcs::CmdInit0()
 	}
 
 	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
-		*reinterpret_cast<s32*>(list + i * 0x20 + 0x14) = idx;
-		*reinterpret_cast<s32*>(list + i * 0x20 + 0x16) = 3;
+		entries[i].startFrame = idx;
+		entries[i].duration = 3;
 	}
 
-	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 8) = 0;
+	GetCmdStateView(this)->transitionFlag = 0;
 }
 
 /*

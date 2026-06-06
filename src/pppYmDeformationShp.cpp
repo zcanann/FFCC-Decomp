@@ -64,7 +64,75 @@ static inline YmDeformationShpColorInfo* DeformationShpColorInfo(pppYmDeformatio
 		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
-static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
+inline void oddToEven(float& value)
+{
+	if (((int)value % 2) != 0) {
+		value += FLOAT_803305f8;
+	}
+}
+
+inline void oddToEven(int& value)
+{
+	if ((value % 2) != 0) {
+		value++;
+	}
+}
+
+inline void calcScreenPos(Vec4d& out, Vec pos, Mtx drawMtx, Mtx44 screenMtx)
+{
+	Vec4d clipPos;
+	Vec worldPos;
+
+	PSMTXMultVec(drawMtx, &pos, &worldPos);
+	clipPos.x = worldPos.x;
+	clipPos.y = worldPos.y;
+	clipPos.z = worldPos.z;
+	clipPos.w = FLOAT_803305f8;
+	Math.MTX44MultVec4(screenMtx, &clipPos, &out);
+	out.x = out.x / out.w;
+	out.y = out.y / out.w;
+	out.z = out.z / out.w;
+	out.x = FLOAT_80330610 + out.x / FLOAT_80330614;
+	out.y = FLOAT_80330618 - out.y / FLOAT_8033061c;
+}
+
+inline void calcBoundaryBox(Vec& boundsMin, Vec& boundsMax, Vec4d* projected)
+{
+	boundsMin.y = FLOAT_80330620;
+	boundsMax.y = FLOAT_80330624;
+	boundsMin.x = boundsMin.y;
+	boundsMax.x = boundsMax.y;
+
+	for (int i = 0; i < 4; i++) {
+		if (projected[i].x > boundsMax.x) {
+			boundsMax.x = projected[i].x;
+		}
+		if (projected[i].y > boundsMax.y) {
+			boundsMax.y = projected[i].y;
+		}
+		if (projected[i].x < boundsMin.x) {
+			boundsMin.x = projected[i].x;
+		}
+		if (projected[i].y < boundsMin.y) {
+			boundsMin.y = projected[i].y;
+		}
+	}
+
+	if (((int)boundsMin.x % 2) != 0) {
+		boundsMin.x -= FLOAT_803305f8;
+	}
+	if (((int)boundsMin.y % 2) != 0) {
+		boundsMin.y -= FLOAT_803305f8;
+	}
+	if (((int)boundsMax.x % 2) != 0) {
+		boundsMax.x += FLOAT_803305f8;
+	}
+	if (((int)boundsMax.y % 2) != 0) {
+		boundsMax.y += FLOAT_803305f8;
+	}
+}
+
+inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
 {
 	uvs[0].x = left;
 	uvs[0].y = top;
@@ -76,7 +144,7 @@ static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, f
 	uvs[3].y = bottom;
 }
 
-static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float top, float right, float bottom)
+inline void setVertexPos(Vec* vertices, s8 orientation, float left, float top, float right, float bottom)
 {
 	if (orientation == 0) {
 		vertices[0].x = left;
@@ -104,6 +172,68 @@ static inline void setVertexPos(Vec* vertices, s8 orientation, float left, float
 		vertices[3].x = left;
 		vertices[3].y = kPppYmDeformationShpZero;
 		vertices[3].z = bottom;
+	}
+}
+
+inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfSize, s8 orientation)
+{
+	if (orientation == 0) {
+		v0.x = -halfSize;
+		v0.y = halfSize;
+		v0.z = kPppYmDeformationShpZero;
+		v1.x = halfSize;
+		v1.y = halfSize;
+		v1.z = kPppYmDeformationShpZero;
+		v2.x = halfSize;
+		v2.y = -halfSize;
+		v2.z = kPppYmDeformationShpZero;
+		v3.x = -halfSize;
+		v3.y = -halfSize;
+		v3.z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		v0.x = -halfSize;
+		v0.y = kPppYmDeformationShpZero;
+		v0.z = halfSize;
+		v1.x = halfSize;
+		v1.y = kPppYmDeformationShpZero;
+		v1.z = halfSize;
+		v2.x = halfSize;
+		v2.y = kPppYmDeformationShpZero;
+		v2.z = -halfSize;
+		v3.x = -halfSize;
+		v3.y = kPppYmDeformationShpZero;
+		v3.z = -halfSize;
+	}
+}
+
+inline void setVertexPos(Vec& v0, Vec& v1, Vec& v2, Vec& v3, float halfX, float halfY, s8 orientation)
+{
+	if (orientation == 0) {
+		v0.x = -halfX;
+		v0.y = halfY;
+		v0.z = kPppYmDeformationShpZero;
+		v1.x = halfX;
+		v1.y = halfY;
+		v1.z = kPppYmDeformationShpZero;
+		v2.x = halfX;
+		v2.y = -halfY;
+		v2.z = kPppYmDeformationShpZero;
+		v3.x = -halfX;
+		v3.y = -halfY;
+		v3.z = kPppYmDeformationShpZero;
+	} else if (orientation == 1) {
+		v0.x = -halfX;
+		v0.y = kPppYmDeformationShpZero;
+		v0.z = halfY;
+		v1.x = halfX;
+		v1.y = kPppYmDeformationShpZero;
+		v1.z = halfY;
+		v2.x = halfX;
+		v2.y = kPppYmDeformationShpZero;
+		v2.z = -halfY;
+		v3.x = -halfX;
+		v3.y = kPppYmDeformationShpZero;
+		v3.z = -halfY;
 	}
 }
 
@@ -185,7 +315,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			u8 size = param_2->m_size;
 			s8 orientation = param_2->m_orientation;
 			float quadSize = (float)size;
-			setVertexPos(vertices, orientation, -quadSize, quadSize, quadSize, -quadSize);
+			setVertexPos(vertices[0], vertices[1], vertices[2], vertices[3], quadSize, orientation);
 			setVertexUV(uvs, kPppYmDeformationShpZero, kPppYmDeformationShpZero, FLOAT_803305f8, FLOAT_803305f8);
 			RenderDeformationShape(object, work, vertices, uvs);
 		} else {
@@ -229,10 +359,8 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
 	Vec4d projected[4];
-	float minY;
-	float maxY;
-	float minX;
-	float maxX;
+	Vec boundsMin;
+	Vec boundsMax;
 	int left = 0;
 	int top = 0;
 	int width = 0;
@@ -251,65 +379,18 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	float offsetX;
 	float offsetY;
 	float one = FLOAT_803305f8;
-	float screenCenterX = FLOAT_80330610;
-	float screenScaleX = FLOAT_80330614;
-	float screenCenterY = FLOAT_80330618;
-	float screenScaleY = FLOAT_8033061c;
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		Vec localVertex = vertices[i];
-		Vec4d clipPos;
-		Vec worldPos;
-		PSMTXMultVec(obj->m_drawMatrix.value, &localVertex, &worldPos);
-		clipPos.x = worldPos.x;
-		clipPos.y = worldPos.y;
-		clipPos.z = worldPos.z;
-		clipPos.w = one;
-		Math.MTX44MultVec4(ppvScreenMatrix, &clipPos, &projected[i]);
-		projected[i].x = projected[i].x / projected[i].w;
-		projected[i].y = projected[i].y / projected[i].w;
-		projected[i].z = projected[i].z / projected[i].w;
-		projected[i].x = screenCenterX + projected[i].x / screenScaleX;
-		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
+		calcScreenPos(projected[i], vertices[i], obj->m_drawMatrix.value, ppvScreenMatrix);
 	}
 
-	minY = FLOAT_80330620;
-	maxY = FLOAT_80330624;
-	minX = minY;
-	maxX = maxY;
-	for (i = 0; i < 4; i++) {
-		if (projected[i].x > maxX) {
-			maxX = projected[i].x;
-		}
-		if (projected[i].y > maxY) {
-			maxY = projected[i].y;
-		}
-		if (projected[i].x < minX) {
-			minX = projected[i].x;
-		}
-		if (projected[i].y < minY) {
-			minY = projected[i].y;
-		}
-	}
+	calcBoundaryBox(boundsMin, boundsMax, projected);
 
-	if (((int)minX % 2) != 0) {
-		minX = minX - FLOAT_803305f8;
-	}
-	if (((int)minY % 2) != 0) {
-		minY = minY - FLOAT_803305f8;
-	}
-	if (((int)maxX % 2) != 0) {
-		maxX = maxX + FLOAT_803305f8;
-	}
-	if (((int)maxY % 2) != 0) {
-		maxY = maxY + FLOAT_803305f8;
-	}
-
-	left = (int)minX;
-	top = (int)minY;
-	width = (int)maxX - left;
-	height = (int)maxY - top;
+	left = (int)boundsMin.x;
+	top = (int)boundsMin.y;
+	width = (int)boundsMax.x - left;
+	height = (int)boundsMax.y - top;
 
 	pppSetBlendMode(3);
 	work->m_backBuffer = Graphic.GetBackBufferRect(left, top, width, height, 0);

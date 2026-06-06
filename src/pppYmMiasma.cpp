@@ -63,7 +63,7 @@ struct YmMiasmaRenderParticleState {
 
 void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
-void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
+inline void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
 struct YmMiasmaDataOffsets {
     s32 _unused0[2];
@@ -84,6 +84,69 @@ static inline VYmMiasma* YmMiasmaWork(_pppPObject* object, _pppCtrlTable* ctrl)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
+{
+    YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
+    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
+    pppShapeSt* shape;
+    pppFMATRIX model;
+    pppFMATRIX rotMatrix;
+    Vec worldPos;
+    GXColor amb;
+    float scale;
+    s16 shapeAngle;
+
+    (void)pppPObject;
+
+    if (pYmMiasma->m_dataValIndex == 0xffff) {
+        return;
+    }
+
+    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
+
+    pppUnitMatrix(model);
+    scale = state->m_speed;
+    model.value[0][0] = ppvMng->m_scale.x * scale;
+    model.value[1][1] = ppvMng->m_scale.y * scale;
+    model.value[2][2] = ppvMng->m_scale.z * scale;
+
+    shapeAngle = state->m_shapeAngle;
+    PSMTXRotRad(rotMatrix.value, 'z', 0.01745329238474369f * (float)shapeAngle);
+    pppMulMatrix(model, rotMatrix, model);
+
+    pppCopyVector(worldPos, state->m_position);
+    if ((s32)Game.m_currentSceneId == 7) {
+        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+    } else {
+        PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
+    }
+
+    model.value[0][3] = worldPos.x;
+    model.value[1][3] = worldPos.y;
+    model.value[2][3] = worldPos.z;
+
+    pppSetDrawEnv(
+        0, &model, 0.0f, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
+
+    amb.r = state->m_color.m_r;
+    amb.g = state->m_color.m_g;
+    amb.b = state->m_color.m_b;
+    amb.a = state->m_color.m_a;
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+    pppSetBlendMode(step->m_blendMode);
+    pppDrawShp(static_cast<long*>(shape->m_animData), state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr,
+               step->m_blendMode);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800907c4
  * PAL Size: 736b
  * EN Address: TODO
@@ -100,49 +163,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, _ppp
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     for (i = 0; i < (int)step->m_particleCount; i++) {
-        if (step->m_dataValIndex != 0xffff) {
-            YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            pppShapeSt* shape = ppvEnv->m_resourceTables.m_shapeTablePtr[step->m_dataValIndex];
-            pppFMATRIX model;
-            pppFMATRIX rotMatrix;
-            Vec worldPos;
-            GXColor amb;
-            float scale;
-            s16 shapeAngle;
-            pppUnitMatrix(model);
-            scale = state->m_speed;
-            model.value[0][0] = ppvMng->m_scale.x * scale;
-            model.value[1][1] = ppvMng->m_scale.y * scale;
-            model.value[2][2] = ppvMng->m_scale.z * scale;
-
-            shapeAngle = state->m_shapeAngle;
-            PSMTXRotRad(rotMatrix.value, 'z', 0.01745329238474369f * (float)shapeAngle);
-            pppMulMatrix(model, rotMatrix, model);
-
-            pppCopyVector(worldPos, state->m_position);
-            if ((s32)Game.m_currentSceneId == 7) {
-                PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
-            } else {
-                PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
-            }
-
-            model.value[0][3] = worldPos.x;
-            model.value[1][3] = worldPos.y;
-            model.value[2][3] = worldPos.z;
-
-            pppSetDrawEnv(
-                0, &model, 0.0f, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
-
-            amb.r = state->m_color.m_r;
-            amb.g = state->m_color.m_g;
-            amb.b = state->m_color.m_b;
-            amb.a = state->m_color.m_a;
-            GXSetChanAmbColor(GX_COLOR0A0, amb);
-            pppSetBlendMode(step->m_blendMode);
-            pppDrawShp(static_cast<long*>(shape->m_animData), state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr,
-                       step->m_blendMode);
-        }
-
+        RenderParticle(pppYmMiasma_, (PYmMiasma*)step, particleData);
         particleData++;
     }
 }
@@ -314,69 +335,6 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, _pppCtrlTable* param_2)
     work->m_prevPosition.y = fVar2;
     work->m_prevPosition.x = fVar2;
     work->m_prevPositionChanged = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 656b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
-{
-    YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-    YmMiasmaRenderStep* step = (YmMiasmaRenderStep*)pYmMiasma;
-    pppShapeSt* shape;
-    pppFMATRIX model;
-    pppFMATRIX rotMatrix;
-    Vec worldPos;
-    GXColor amb;
-    float scale;
-    s16 shapeAngle;
-
-    (void)pppPObject;
-
-    if (pYmMiasma->m_dataValIndex == 0xffff) {
-        return;
-    }
-
-    shape = ppvEnv->m_resourceTables.m_shapeTablePtr[pYmMiasma->m_dataValIndex];
-
-    pppUnitMatrix(model);
-    scale = state->m_speed;
-    model.value[0][0] = ppvMng->m_scale.x * scale;
-    model.value[1][1] = ppvMng->m_scale.y * scale;
-    model.value[2][2] = ppvMng->m_scale.z * scale;
-
-    shapeAngle = state->m_shapeAngle;
-    PSMTXRotRad(rotMatrix.value, 'z', 0.01745329238474369f * (float)shapeAngle);
-    pppMulMatrix(model, rotMatrix, model);
-
-    pppCopyVector(worldPos, state->m_position);
-    if ((s32)Game.m_currentSceneId == 7) {
-        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
-    } else {
-        PSMTXMultVec(ppvCameraMatrix, &worldPos, &worldPos);
-    }
-
-    model.value[0][3] = worldPos.x;
-    model.value[1][3] = worldPos.y;
-    model.value[2][3] = worldPos.z;
-
-    pppSetDrawEnv(
-        0, &model, 0.0f, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
-
-    amb.r = state->m_color.m_r;
-    amb.g = state->m_color.m_g;
-    amb.b = state->m_color.m_b;
-    amb.a = state->m_color.m_a;
-    GXSetChanAmbColor(GX_COLOR0A0, amb);
-    pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(static_cast<long*>(shape->m_animData), state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr,
-               step->m_blendMode);
 }
 
 /*

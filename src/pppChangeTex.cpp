@@ -55,7 +55,7 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
 static const float kPppChangeTexCachedValueInit = -10000.0f;
-static const char sPppChangeTexMeshObjectName[] = "obj";
+static const unsigned int sPppChangeTexMeshObjectName = 0x6F626A00;
 static const float kPppChangeTexAlphaScale = 255.0f;
 static const float kPppChangeTexInit = 0.0f;
 static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
@@ -179,7 +179,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		GXColor** colorArray = work->m_meshColorArrays;
 		for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
-			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
+			if (strcmp(meshData->m_name, reinterpret_cast<const char*>(&sPppChangeTexMeshObjectName)) == 0) {
 				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, meshList->m_workPositions,
 				    meshData->m_vertexCount, model0->m_data->m_posQuant);
 			}
@@ -453,7 +453,7 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 	CTexture* texture = work->m_texture;
 
 	if (step->m_changeTex.m_mode == 0) {
-		unsigned int drawTevBits = (0xB << 16) - 0x31F1;
+		unsigned int drawTevBits = 0xADE0F;
 		unsigned int fullTevBits = drawTevBits | 0x1000;
 		MaterialMan.SetChangeTexReflectionState(
 		    &texture->m_texObj, drawTevBits, fullTevBits);

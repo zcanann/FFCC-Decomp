@@ -725,6 +725,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_bumpObjId = chunkFile.Get2();
             break;
         }
+        case CHUNK_GBID: {
+            m_groupId = chunkFile.Get2();
+            break;
+        }
         case CHUNK_PLIT: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
@@ -800,10 +804,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 pointLight->m_colorMode = chunkFile.Get1();
             }
             m_attribute = pointLightAttr;
-            break;
-        }
-        case CHUNK_GBID: {
-            m_groupId = chunkFile.Get2();
             break;
         }
         case CHUNK_PSTA: {

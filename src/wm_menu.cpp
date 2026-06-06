@@ -8003,7 +8003,16 @@ void CMenuPcs::DrawCharaName()
 		emptyText = s_wmEmptyCreatingTextFr_8032E908;
 	}
 
-	const int alpha = GetWmMenuFade(worldState->m_mainState, worldState->m_frameCounter);
+	float fade;
+	if (worldState->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+	} else if (worldState->m_mainState == 2) {
+		fade = FLOAT_803313e8;
+	} else {
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		                            DOUBLE_80331420));
+	}
+	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;

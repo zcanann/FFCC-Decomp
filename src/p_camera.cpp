@@ -90,6 +90,11 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
+static inline CPad::PadInput& CameraDebugPadInput()
+{
+    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 4 : 0];
+}
+
 extern "C" {
 void create__10CCameraPcsFv(CCameraPcs*);
 void destroy__10CCameraPcsFv(CCameraPcs*);
@@ -1056,8 +1061,7 @@ void CCameraPcs::calcChara()
 
     if (m_viewerOverride == 0) {
         if (Pad.m_debugPadLock == 0) {
-            padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                            ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+            padButtons = CameraDebugPadInput().button[0];
         } else {
             padButtons = 0;
         }
@@ -1071,29 +1075,25 @@ void CCameraPcs::calcChara()
 
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
-            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+            stick = CameraDebugPadInput().stickXF;
         }
         m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
-            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+            stick = CameraDebugPadInput().stickYF;
         }
         m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
-            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+            stick = CameraDebugPadInput().triggerLeftF;
         }
         m_viewer.m_distance = -((FLOAT_8032fabc * stick) - m_viewer.m_distance);
 
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
-            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                              ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+            stick = CameraDebugPadInput().triggerRightF;
         }
         m_viewer.m_distance = FLOAT_8032fabc * stick + m_viewer.m_distance;
     } else {
@@ -1987,8 +1987,7 @@ void CCameraPcs::calcMaterialEditor()
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad.m_debugPadLock == 0) {
-        padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                        ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        padButtons = CameraDebugPadInput().button[0];
     } else {
         padButtons = 0;
     }
@@ -2002,29 +2001,25 @@ void CCameraPcs::calcMaterialEditor()
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().stickXF;
     }
     m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().stickYF;
     }
     m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().triggerLeftF;
     }
     m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().triggerRightF;
     }
     m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 
@@ -2109,8 +2104,7 @@ void CCameraPcs::calcFunnyShape()
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 
     if (Pad.m_debugPadLock == 0) {
-        padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
-                                                        ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        padButtons = CameraDebugPadInput().button[0];
     } else {
         padButtons = 0;
     }
@@ -2124,29 +2118,25 @@ void CCameraPcs::calcFunnyShape()
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().stickXF;
     }
     m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().stickYF;
     }
     m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().triggerLeftF;
     }
     m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
-        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
-                                          ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
+        stick = CameraDebugPadInput().triggerRightF;
     }
     m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
 

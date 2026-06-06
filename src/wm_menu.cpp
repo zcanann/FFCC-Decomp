@@ -1624,10 +1624,10 @@ void CMenuPcs::CalcMCardMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			sVar7 = worldState->m_counter1A;
 			if (sVar7 != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				worldState->m_counter1A = sVar7 - 1;
+				if (worldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -1644,7 +1644,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x15:
 	case 0x1B:
 	case 0x1C: {
-		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+		if (worldState->m_flag09 == 0) {
 			bVar1 = true;
 			int uVar20 = 0;
 			int uVar17;
@@ -1690,45 +1690,44 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
+			worldState->m_flag09 = 1;
+			worldState->m_counter1A = 0;
 			if (bVar1) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
-			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+		    && worldState->m_counter1A == 0) {
+			sVar7 = worldState->m_subState;
 			if (sVar7 == 0xE || sVar7 == 0x15) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) < 0) goto LAB_chk;
+				worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				if (worldState->m_mcResult < 0) goto LAB_chk;
 			} else if (sVar7 == 5) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 			LAB_chk:
-				iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-				sVar7 = *reinterpret_cast<short*>(iVar14 + 0x16);
+				sVar7 = worldState->m_subState;
 				short sVar16;
 				if (sVar7 == 5) { sVar16 = -1; }
 				else if (sVar7 == 6) { sVar16 = -3; }
 				else if (sVar7 == 7) { sVar16 = -4; }
 				else { sVar16 = 0; }
 				if (sVar7 == 7) {
-					short chk = *reinterpret_cast<short*>(iVar14 + 0x2E);
+					short chk = worldState->m_mcResult;
 					if (chk != 0 && chk != sVar16 && chk != 1) {
-						*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+						worldState->m_state0E = -1;
+						worldState->m_counter1A = 1;
 						break;
 					}
-				} else if (*reinterpret_cast<short*>(iVar14 + 0x2E) != sVar16 && *reinterpret_cast<short*>(iVar14 + 0x2E) != 1) {
-					*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 1;
+				} else if (worldState->m_mcResult != sVar16 && worldState->m_mcResult != 1) {
+					worldState->m_state0E = -1;
+					worldState->m_counter1A = 1;
 					break;
 				}
 			}
 			if ((uVar3 & 0x300) != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x15) {
+				worldState->m_state0E = 1;
+				worldState->m_counter1A = 10;
+				if (worldState->m_subState == 0x15) {
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else {
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
@@ -1736,10 +1735,10 @@ void CMenuPcs::CalcMCardMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			sVar7 = worldState->m_counter1A;
 			if (sVar7 != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar7 - 1;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				worldState->m_counter1A = sVar7 - 1;
+				if (worldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}

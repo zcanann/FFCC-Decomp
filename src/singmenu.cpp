@@ -907,7 +907,7 @@ void CMenuPcs::createSingleMenu()
     gSingMenuAsyncLoadCompleted = 0;
     if (Game.m_gameWork.m_menuStageMode == 0) {
         if (m_singleMenuStageActive != 0) {
-            *reinterpret_cast<int*>(self + 0xF0) = 0;
+            m_stageF0 = 0;
 
             CFont* font = m_fonts[4];
             if (font != 0) {
@@ -922,7 +922,7 @@ void CMenuPcs::createSingleMenu()
         }
     } else {
         if (m_singleMenuStageActive == 0) {
-            *reinterpret_cast<CMemory::CStage**>(self + 0xF0) = CharaPcs.m_viewerAnimStage;
+            m_stageF0 = CharaPcs.m_viewerAnimStage;
             m_singleMenuStageActive = 1;
         }
 
@@ -974,7 +974,7 @@ void CMenuPcs::destroySingleMenu()
     freeTexture(4, 1, 0x20, 0xD);
     freeTexture(5, 2, 0x2D, 0x33);
 
-    *reinterpret_cast<int*>(self + 0xF0) = 0;
+    m_stageF0 = 0;
     m_singleMenuInitialized = 0;
     m_singleMenuStageActive = 0;
     gSingMenuForcedSelection = -1;
@@ -1018,18 +1018,17 @@ void CMenuPcs::destroySingleMenu()
 void CMenuPcs::SingMenuInit()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    u8* menu = reinterpret_cast<u8*>(&MenuPcs);
 
     Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
     Graphic.DestroyTempBuffer();
 
-    *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
+    m_stageF4 = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<u8*>(&Graphic) + 8);
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
     *reinterpret_cast<void**>(self + 0x774) = 0;
 
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
+    CMemory::CStage* stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
+        stage = m_stageF4;
     }
 
     CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
@@ -1047,9 +1046,9 @@ void CMenuPcs::SingMenuInit()
     (*handlePtr)->LoadAnim(s_stand_80332a24, 0, 1, 0, ((*handlePtr)->m_charaNo / 100) * 100, -1, 0);
     (*handlePtr)->SetAnim(0, -1, -1, -1, 0);
 
-    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
+    stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
+        stage = m_stageF4;
     }
     *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp, 0x5DD) u8[0x50];
 
@@ -1088,23 +1087,23 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x48) = 0x48;
     *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x814) + 0x4C) = 0x58;
 
-    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
+    stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
+        stage = m_stageF4;
     }
     *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
 
-    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
+    stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
+        stage = m_stageF4;
     }
     *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) SingleMenuStateRaw;
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, sizeof(SingleMenuStateRaw));
 
-    stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xEC);
+    stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = *reinterpret_cast<CMemory::CStage**>(menu + 0xF4);
+        stage = m_stageF4;
     }
     *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw;
     memset(*reinterpret_cast<void**>(self + 0x848), 0, sizeof(SingleMenuWindowRaw));
@@ -1209,9 +1208,9 @@ void CMenuPcs::drawSingleMenu()
                 *reinterpret_cast<void**>(self + 0x848) = 0;
             }
 
-            (*reinterpret_cast<CMemory::CStage**>(self + 0xF4))->heapWalker(-1, 0, 0xFFFFFFFF);
+            m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
             Graphic.CreateTempBuffer();
-            *reinterpret_cast<void**>(self + 0xF4) = 0;
+            m_stageF4 = 0;
             self[0x872] = 0;
             Joybus.SetCtrlMode(0, 0);
         }
@@ -1363,7 +1362,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             return;
         }
 
-        *reinterpret_cast<int*>(self + 0xF0) = 0;
+        m_stageF0 = 0;
         m_singleMenuStageActive = 0;
         m_singleMenuInitialized = 0;
         return;
@@ -1395,17 +1394,17 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     goto post_texture_load;
                 }
 
-                CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                CMemory::CStage* stage = m_menuStage;
                 if (Game.m_gameWork.m_menuStageMode != 0) {
-                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                    stage = m_stageF4;
                 }
 
                 CTextureSet* textureSet = new (stage, s_singmenu_cpp, 0x748) CTextureSet;
                 *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
 
-                stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                stage = m_menuStage;
                 if (Game.m_gameWork.m_menuStageMode != 0) {
-                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                    stage = m_stageF4;
                 }
 
                 textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
@@ -1623,7 +1622,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, FLOAT_803329f0, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
-    CFont* font = *reinterpret_cast<CFont**>(self + 0xF8);
+    CFont* font = m_fonts[0];
     font->SetMargin(0.0f);
     font->SetShadow(1);
     font->SetScale(FLOAT_803329b8);

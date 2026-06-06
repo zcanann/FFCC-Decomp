@@ -39,20 +39,10 @@ static pppFMATRIX g_matUnit;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
-struct YmMegaBirthShpTail3DataOffsets
-{
-    s32 m_unusedOffset;
-    s32 m_colorOffset;
-    s32 m_workOffset;
-};
-
 STATIC_ASSERT(offsetof(YmMegaBirthShpTail3DataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmMegaBirthShpTail3DataOffsets, m_workOffset) == 0x8);
-
-static inline YmMegaBirthShpTail3DataOffsets* GetYmMegaBirthShpTail3DataOffsets(pppYmMegaBirthShpTail3Offsets* offsets)
-{
-    return reinterpret_cast<YmMegaBirthShpTail3DataOffsets*>(offsets->m_serializedDataOffsets);
-}
+STATIC_ASSERT(sizeof(YmMegaBirthShpTail3DataOffsets) == 0xC);
+STATIC_ASSERT(offsetof(pppYmMegaBirthShpTail3Offsets, m_serializedDataOffsets) == 0xC);
 
 void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
@@ -76,7 +66,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
     const u32 dataValIndex = *(u32*)(step + 4);
-    YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
+    YmMegaBirthShpTail3DataOffsets* serializedOffsets = offsets->m_serializedDataOffsets;
     const s32 colorOffset = serializedOffsets->m_colorOffset;
     const s32 particleDataOffset = serializedOffsets->m_workOffset;
     u8* workBytes = object->m_workArea + particleDataOffset;
@@ -306,7 +296,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     _PARTICLE_WMAT* worldMat;
     int spawnCount;
 
-    YmMegaBirthShpTail3DataOffsets* serializedOffsets = GetYmMegaBirthShpTail3DataOffsets(offsets);
+    YmMegaBirthShpTail3DataOffsets* serializedOffsets = offsets->m_serializedDataOffsets;
     colorOffset = serializedOffsets->m_colorOffset;
     VYmMegaBirthShpTail3* const work =
         (VYmMegaBirthShpTail3*)(object->m_workArea + serializedOffsets->m_workOffset);
@@ -600,9 +590,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
 
         pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail3->field_0x58;
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail3->m_speedScale.x;
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= pYmMegaBirthShpTail3->m_speedScale.y;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail3->m_speedScaleX;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail3->m_speedScaleYZ.x;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= pYmMegaBirthShpTail3->m_speedScaleYZ.y;
         tempVec = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
@@ -668,9 +658,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
             particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         }
 
-        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->field_0x58;
-        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScale.x;
-        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScale.y;
+        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail3->m_speedScaleX;
+        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScaleYZ.x;
+        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScaleYZ.y;
     } else if ((mode >= 6) && (mode < 10)) {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
@@ -726,9 +716,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                     vz = pathVec[2];
                 }
 
-                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail3->field_0x58;
-                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScale.x;
-                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScale.y;
+                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail3->m_speedScaleX;
+                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScaleYZ.x;
+                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScaleYZ.y;
 
                 if ((mode == 8) || (mode == 9)) {
                     Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
@@ -820,23 +810,20 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
  */
 void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
-    int offset = GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset;
-    u8* work = pppYmMegaBirthShpTail3_->m_workArea + offset;
-    void** ptrBc = (void**)(work + 0x3c);
-    void** ptrC0 = (void**)(work + 0x40);
-    void** ptrC4 = (void**)(work + 0x44);
+    int offset = param_2->m_serializedDataOffsets->m_workOffset;
+    VYmMegaBirthShpTail3* work = reinterpret_cast<VYmMegaBirthShpTail3*>(pppYmMegaBirthShpTail3_->m_workArea + offset);
 
-    if (*ptrBc != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrBc));
-        *ptrBc = 0;
+    if (work->m_particles != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        work->m_particles = 0;
     }
-    if (*ptrC0 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC0));
-        *ptrC0 = 0;
+    if (work->m_wmats != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_wmats));
+        work->m_wmats = 0;
     }
-    if (*ptrC4 != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC4));
-        *ptrC4 = 0;
+    if (work->m_colors != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colors));
+        work->m_colors = 0;
     }
 }
 
@@ -852,7 +839,7 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
 void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, pppYmMegaBirthShpTail3Offsets* param_2)
 {
     pppFMATRIX* work =
-        (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + GetYmMegaBirthShpTail3DataOffsets(param_2)->m_workOffset);
+        (pppFMATRIX*)(pppYmMegaBirthShpTail3_->m_workArea + param_2->m_serializedDataOffsets->m_workOffset);
     float initVal;
 
     pppUnitMatrix(*work);

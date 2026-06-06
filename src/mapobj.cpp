@@ -462,26 +462,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         case CHUNK_LSDW: {
             break;
         }
-        case CHUNK_SDST: {
-            if (chunk.m_version == 2) {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                chunkFile.Get1();
-                chunkFile.Get1();
-                chunkFile.Get1();
-                m_shadowTarget = static_cast<int>(chunkFile.Get4());
-            } else if (chunk.m_version == 1) {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                if (chunkFile.Get1() == 0) {
-                    m_shadowTarget = 0;
-                } else {
-                    m_shadowTarget = -1;
-                }
-            } else {
-                m_enableFullScreenShadow = chunkFile.Get1();
-                m_shadowTarget = -1;
-            }
-            break;
-        }
         case CHUNK_PIDX: {
             short parentIdx = static_cast<short>(chunkFile.Get2());
             int meshOrHitIdx = static_cast<short>(chunkFile.Get2());
@@ -518,6 +498,26 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
+            }
+            break;
+        }
+        case CHUNK_SDST: {
+            if (chunk.m_version == 2) {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                m_shadowTarget = static_cast<int>(chunkFile.Get4());
+            } else if (chunk.m_version == 1) {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                if (chunkFile.Get1() == 0) {
+                    m_shadowTarget = 0;
+                } else {
+                    m_shadowTarget = -1;
+                }
+            } else {
+                m_enableFullScreenShadow = chunkFile.Get1();
+                m_shadowTarget = -1;
             }
             break;
         }

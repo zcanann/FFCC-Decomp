@@ -10246,9 +10246,9 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
  */
 void CMenuPcs::SetLight(int mode)
 {
+	Graphic.SetFog(1, 0);
 	WmMenuLightTable& lightTable = gWmMenuLightTables[mode];
 
-	Graphic.SetFog(1, 0);
 	LightPcs.SetAmbient(lightTable.m_ambient);
 	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable.m_diffuseCount));
 

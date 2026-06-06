@@ -14,31 +14,8 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-static const float FLOAT_80332f60 = 255.0f;
-static const float FLOAT_80332f64 = 0.0f;
-static const float FLOAT_80332f68 = 32.0f;
-static const float FLOAT_80332f6c = 24.0f;
-static const float FLOAT_80332f70 = 1.0f;
-static const float FLOAT_80332f74 = 18.0f;
-static const float FLOAT_80332f78 = 16.0f;
-static const float FLOAT_80332f7c = 0.9f;
-static const float FLOAT_80332f80 = 19.8f;
-static const float FLOAT_80332f84 = 4.0f;
-static const double DOUBLE_80332F90 = 1.0;
-static const double DOUBLE_80332F98 = 216.0;
-static const double DOUBLE_80332FA0 = 0.5;
 static unsigned int s_Money = 0;
 static signed char s_place[16];
-
-static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
-static inline double LoadDouble(const double& value)
-{
-	return value;
-}
 
 /*
  * --INFO--
@@ -360,10 +337,10 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * entry->alpha);
+		color.a = (u8)(255.0f * entry->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		float uvScale = entry->uvScale;
-		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
+		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 	}
 
 	MoneyMenuAnim* drawBase = this->moneyPanel->anims;
@@ -373,21 +350,21 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * drawBase->alpha);
+		color.a = (u8)(255.0f * drawBase->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
 	for (int i = 0; i < 2; i++) {
-		float y = (float)(drawBase->y + 0x18) + FLOAT_80332f68 * (float)i;
+		float y = (float)(drawBase->y + 0x18) + 32.0f * (float)i;
 		float x = (float)(drawBase->x + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
-				MenuPcs.DrawRect(0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
-				                 FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)i,
-				                 FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
+				MenuPcs.DrawRect(0, x, y, 24.0f, 32.0f,
+				                 24.0f * (float)digit, 32.0f * (float)i,
+				                 1.0f, 1.0f, 0.0f);
 			}
-			x += FLOAT_80332f74;
+			x += 18.0f;
 		}
 	}
 
@@ -398,32 +375,32 @@ void CMenuPcs::MoneyDraw()
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
-			color.a = (u8)(FLOAT_80332f60 * drawBase->alpha);
+			color.a = (u8)(255.0f * drawBase->alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
 		MenuPcs.DrawRect(0, (float)(drawBase->x + (7 - this->moneyState->selections[0]) * 0x12 + 0x24),
-		                 (float)(drawBase->y + 0x5C), FLOAT_80332f78, FLOAT_80332f6c,
-		                 FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70,
-		                 FLOAT_80332f70, FLOAT_80332f64);
+		                 (float)(drawBase->y + 0x5C), 16.0f, 24.0f,
+		                 0.0f, 0.0f, 1.0f,
+		                 1.0f, 0.0f);
 	}
 
 	CFont* font = this->moneyFont;
-	font->SetMargin(FLOAT_80332f70);
+	font->SetMargin(1.0f);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_80332f7c);
+	font->SetScale(0.9f);
 	font->DrawInit();
 
 	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * drawBase->alpha));
+		CColor color(0xFF, 0xFF, 0xFF, (u8)(255.0f * drawBase->alpha));
 		font->SetColor(color.color);
 	}
 
 	const char* label = GetMenuStr(0x15);
 	for (int i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase->x + 0xB6));
-		font->SetPosY((FLOAT_80332f68 + ((float)(drawBase->y + 0x18) + FLOAT_80332f68 * (float)i)) -
-		              FLOAT_80332f80 - FLOAT_80332f84);
+		font->SetPosY((32.0f + ((float)(drawBase->y + 0x18) + 32.0f * (float)i)) -
+		              19.8f - 4.0f);
 		font->Draw(label);
 	}
 
@@ -441,7 +418,7 @@ void CMenuPcs::MoneyDraw()
 		cursorY += (float)(this->moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
+		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, 1.0f);
 	}
 }
 
@@ -470,14 +447,14 @@ bool CMenuPcs::MoneyClose()
 		}
 
 		if (anim->startFrame + anim->duration <= frame) {
-			float zero = LoadFloat(FLOAT_80332f64);
+			float zero = 0.0f;
 			finished++;
 			anim->alpha = zero;
 			anim->dx = zero;
 			anim->dy = zero;
 		} else {
 			anim->frame++;
-			double one = LoadDouble(DOUBLE_80332F90);
+			double one = 1.0;
 			double duration = (double)anim->duration;
 			double animFrame = (double)anim->frame;
 			double rate = one / duration;
@@ -537,7 +514,7 @@ int CMenuPcs::MoneyCtrl()
 
 	if (result != 0) {
 		MoneyMenuAnim* anim = this->moneyPanel->anims;
-		anim->alpha = LoadFloat(FLOAT_80332f70);
+		anim->alpha = 1.0f;
 		anim->startFrame = 0;
 		anim->duration = 10;
 		anim->frame = 0;
@@ -560,7 +537,7 @@ bool CMenuPcs::MoneyOpen()
 	if (this->moneyState->initialized == '\0') {
 		memset(this->moneyPanel, 0, sizeof(*this->moneyPanel));
 
-		float one = FLOAT_80332f70;
+		float one = 1.0f;
 		MoneyMenuAnim* initAnim = this->moneyPanel->anims;
 		int initCount = 8;
 		do {
@@ -582,10 +559,10 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->w = 0xf8;
 		firstAnim->h = 0x88;
 		firstAnim->x =
-			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)firstAnim->w * DOUBLE_80332FA0));
-		firstAnim->u = FLOAT_80332f64;
-		firstAnim->v = FLOAT_80332f64;
-		firstAnim->uvScale = FLOAT_80332f70;
+			static_cast<short>(static_cast<int>(216.0 - (double)firstAnim->w * 0.5));
+		firstAnim->u = 0.0f;
+		firstAnim->v = 0.0f;
+		firstAnim->uvScale = 1.0f;
 		firstAnim->flags = 0;
 		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
@@ -613,15 +590,15 @@ bool CMenuPcs::MoneyOpen()
 		if (frame >= anim->startFrame) {
 			if (anim->startFrame + anim->duration <= frame) {
 				finished++;
-				anim->alpha = FLOAT_80332f70;
-				anim->dx = FLOAT_80332f64;
-				anim->dy = FLOAT_80332f64;
+				anim->alpha = 1.0f;
+				anim->dx = 0.0f;
+				anim->dy = 0.0f;
 			} else {
 				anim->frame++;
-				double one = DOUBLE_80332F90;
+				double one = 1.0;
 				double duration = (double)anim->duration;
 				double animFrame = (double)anim->frame;
-				double rate = DOUBLE_80332F90 / duration;
+				double rate = 1.0 / duration;
 				anim->alpha = (float)(rate * animFrame);
 				if ((anim->flags & 2) == 0) {
 					duration = (double)anim->duration;

@@ -187,7 +187,11 @@ struct CmdListStorage {
 };
 
 struct CmdState {
-	unsigned char pad_0000[0x08];
+	unsigned char pad_0000[0x04];
+	s8 commandResult;
+	unsigned char pad_0005;
+	u8 submenuFlag;
+	unsigned char pad_0007;
 	u8 transitionFlag;
 	unsigned char pad_0009[0x0B - 0x09];
 	u8 initialized;
@@ -196,7 +200,9 @@ struct CmdState {
 	s16 animState;
 	s16 phase;
 	s16 uniteState;
-	unsigned char pad_0016[0x22 - 0x16];
+	unsigned char pad_0016[0x1E - 0x16];
+	s16 action;
+	unsigned char pad_0020[0x22 - 0x20];
 	s16 transitionTimer;
 	unsigned char pad_0024[0x26 - 0x24];
 	s16 selected;
@@ -225,12 +231,15 @@ STATIC_ASSERT(offsetof(CmdListEntry, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(CmdListEntry) == 0x40);
 STATIC_ASSERT(offsetof(CmdListStorage, entries) == 8);
 STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
+STATIC_ASSERT(offsetof(CmdState, commandResult) == 0x04);
+STATIC_ASSERT(offsetof(CmdState, submenuFlag) == 0x06);
 STATIC_ASSERT(offsetof(CmdState, transitionFlag) == 0x08);
 STATIC_ASSERT(offsetof(CmdState, initialized) == 0x0B);
 STATIC_ASSERT(offsetof(CmdState, unitePanelInitialized) == 0x0C);
 STATIC_ASSERT(offsetof(CmdState, animState) == 0x10);
 STATIC_ASSERT(offsetof(CmdState, phase) == 0x12);
 STATIC_ASSERT(offsetof(CmdState, uniteState) == 0x14);
+STATIC_ASSERT(offsetof(CmdState, action) == 0x1E);
 STATIC_ASSERT(offsetof(CmdState, transitionTimer) == 0x22);
 STATIC_ASSERT(offsetof(CmdState, selected) == 0x26);
 STATIC_ASSERT(offsetof(CmdState, itemSelected) == 0x28);
@@ -1232,50 +1241,51 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	s16* menuState = GetCmdState(this);
-	int mode = menuState[0x18];
+	CmdState* cmd = GetCmdStateView(this);
+	CmdListStorage* cmdList = GetCmdListStorage(this);
+	int mode = cmd->mode;
 
 	if (mode == 0) {
 		s16 cmdCount = caravanWork->m_numCmdListSlots;
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (menuState[0x13] < cmdCount - 1) {
-					menuState[0x13]++;
+				if (cmd->selected < cmdCount - 1) {
+					cmd->selected++;
 				} else {
-					menuState[0x13] = 2;
+					cmd->selected = 2;
 				}
 
-				int cursor = menuState[0x13];
+				int cursor = cmd->selected;
 				if (caravanWork->m_commandListExtra[cursor] < 0) {
 					if (caravanWork->m_commandListExtra[cursor + 1] < 0) {
 						if (caravanWork->m_commandListExtra[cursor + 2] >= 0) {
-							menuState[0x13] = static_cast<s16>(cursor + 2);
+							cmd->selected = static_cast<s16>(cursor + 2);
 						}
 					} else {
-						menuState[0x13] = static_cast<s16>(cursor + 1);
+						cmd->selected = static_cast<s16>(cursor + 1);
 					}
-					if (menuState[0x13] > cmdCount - 1) {
-						menuState[0x13] = 2;
+					if (cmd->selected > cmdCount - 1) {
+						cmd->selected = 2;
 					}
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		} else {
-			if (menuState[0x13] < 3) {
-				menuState[0x13] = static_cast<s16>(cmdCount - 1);
+			if (cmd->selected < 3) {
+				cmd->selected = static_cast<s16>(cmdCount - 1);
 			} else {
-				menuState[0x13]--;
+				cmd->selected--;
 			}
 
-			int cursor = menuState[0x13];
+			int cursor = cmd->selected;
 			if (caravanWork->m_commandListExtra[cursor] < 0) {
 				if (caravanWork->m_commandListExtra[cursor - 1] < 0) {
 					if (caravanWork->m_commandListExtra[cursor - 2] >= 0) {
-						menuState[0x13] = static_cast<s16>(cursor - 2);
+						cmd->selected = static_cast<s16>(cursor - 2);
 					}
 				} else {
-					menuState[0x13] = static_cast<s16>(cursor - 1);
+					cmd->selected = static_cast<s16>(cursor - 1);
 				}
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1283,30 +1293,30 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x20) != 0) {
-				menuState[0x0F] = 1;
+				cmd->action = 1;
 				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 				return 1;
 			}
 			if ((press & 0x40) != 0) {
-				menuState[0x0F] = -1;
+				cmd->action = -1;
 				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
 				return 1;
 			}
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					*reinterpret_cast<u8*>(menuState + 6) = 1;
+					cmd->submenuFlag = 1;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
 			} else {
-				if (caravanWork->m_commandListExtra[menuState[0x13]] == 0) {
-					menuState[0x18] = 1;
+				if (caravanWork->m_commandListExtra[cmd->selected] == 0) {
+					cmd->mode = 1;
 				} else {
-					*reinterpret_cast<u8*>(menuState + 6) = 0;
-					menuState[0x18] = 2;
+					cmd->submenuFlag = 0;
+					cmd->mode = 2;
 				}
-				menuState[0x09] = 0;
-				menuState[0x11] = 0;
+				cmd->phase = 0;
+				cmd->transitionTimer = 0;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}
@@ -1316,34 +1326,34 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (((itemCount < 9) || (menuState[0x14] < 7)) &&
-				    ((itemCount <= 8) || ((itemCount - 1) > menuState[0x14]))) {
+				if (((itemCount < 9) || (cmd->itemSelected < 7)) &&
+				    ((itemCount <= 8) || ((itemCount - 1) > cmd->itemSelected))) {
 					if (itemCount < 9) {
-						menuState[0x14] = 0;
-					} else if (menuState[0x1A] < itemCount - 1) {
-						menuState[0x1A]++;
+						cmd->itemSelected = 0;
+					} else if (cmd->scrollTop < itemCount - 1) {
+						cmd->scrollTop++;
 					} else {
-						menuState[0x1A] = 0;
+						cmd->scrollTop = 0;
 					}
 				} else {
-					menuState[0x14]++;
+					cmd->itemSelected++;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		} else {
-			if (menuState[0x14] == 0) {
+			if (cmd->itemSelected == 0) {
 				if (itemCount < 9) {
-					menuState[0x14] = static_cast<s16>(itemCount - 1);
+					cmd->itemSelected = static_cast<s16>(itemCount - 1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else if (menuState[0x1A] == 0) {
-					menuState[0x1A] = static_cast<s16>(itemCount - 1);
+				} else if (cmd->scrollTop == 0) {
+					cmd->scrollTop = static_cast<s16>(itemCount - 1);
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				} else {
-					menuState[0x1A]--;
+					cmd->scrollTop--;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			} else {
-				menuState[0x14]--;
+				cmd->itemSelected--;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		}
@@ -1351,14 +1361,14 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					menuState[0x09]++;
-					menuState[0x11] = 0;
-					*reinterpret_cast<u8*>(menuState + 4) = 0;
+					cmd->phase++;
+					cmd->transitionTimer = 0;
+					cmd->commandResult = 0;
 					CmdInit2();
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 				}
 			} else {
-				int selected = static_cast<int>(menuState[0x1A]) + static_cast<int>(menuState[0x14]);
+				int selected = static_cast<int>(cmd->scrollTop) + static_cast<int>(cmd->itemSelected);
 				if (itemCount <= selected) {
 					selected -= itemCount;
 				}
@@ -1367,10 +1377,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				if (selected < 0 || list[0] <= selected) {
 					canUse = 0;
 				} else if (selected == 0) {
-					canUse = static_cast<u32>(caravanWork->m_commandListInventorySlotRef[menuState[0x13]] >= 0);
+					canUse = static_cast<u32>(caravanWork->m_commandListInventorySlotRef[cmd->selected] >= 0);
 				} else if (selected == 1) {
 					int combo[5][2];
-					canUse = static_cast<u32>(ChkUnite(menuState[0x13], combo) > 0);
+					canUse = static_cast<u32>(ChkUnite(cmd->selected, combo) > 0);
 				} else {
 					canUse = static_cast<u32>(EquipChk(static_cast<int>(list[selected - 1])) != 0);
 				}
@@ -1379,26 +1389,26 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (selected == 0) {
-						caravanWork->ChgCmdLst(menuState[0x13], -1);
+						caravanWork->ChgCmdLst(cmd->selected, -1);
 					} else if (selected != 1) {
-						caravanWork->ChgCmdLst(menuState[0x13], list[selected - 1]);
+						caravanWork->ChgCmdLst(cmd->selected, list[selected - 1]);
 					}
 
-					*reinterpret_cast<u8*>(menuState + 4) = 0;
+					cmd->commandResult = 0;
 					if (selected != 0) {
 						int comboChoice[2][2];
-						int comboCount = ChkUnite(menuState[0x13], comboChoice);
+						int comboCount = ChkUnite(cmd->selected, comboChoice);
 						if (comboCount == 1) {
 							const int recipe = comboChoice[0][0];
 							caravanWork->UniteComList(
 							    comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 						} else if (comboCount > 1) {
-							*reinterpret_cast<u8*>(menuState + 4) = 1;
+							cmd->commandResult = 1;
 						}
 					}
 
-					menuState[0x09]++;
-					menuState[0x11] = 0;
+					cmd->phase++;
+					cmd->transitionTimer = 0;
 					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
@@ -1406,9 +1416,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		}
 	} else if (mode == 2) {
 		int maxPos;
-		if (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(
-		                         reinterpret_cast<u8*>(GetCmdList(this)) +
-		                         ((GetCmdList(this)[1] + 3) * 0x40 + 0x1C)))) {
+		if (DOUBLE_80332a58 == static_cast<double>(cmdList->entries[cmdList->listEnd + 3].scale)) {
 			maxPos = 2;
 		} else {
 			maxPos = 3;
@@ -1416,41 +1424,41 @@ unsigned int CMenuPcs::CmdCtrlCur()
 
 		if ((hold & 8) == 0) {
 			if ((hold & 4) != 0) {
-				if (menuState[0x15] < maxPos - 1) {
-					menuState[0x15]++;
+				if (cmd->choice < maxPos - 1) {
+					cmd->choice++;
 				} else {
-					menuState[0x15] = 0;
+					cmd->choice = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 		} else {
-			if (menuState[0x15] == 0) {
-				menuState[0x15] = static_cast<s16>(maxPos - 1);
+			if (cmd->choice == 0) {
+				cmd->choice = static_cast<s16>(maxPos - 1);
 			} else {
-				menuState[0x15]--;
+				cmd->choice--;
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xC) == 0) {
-			menuState[0x0A] = 0;
+			cmd->uniteState = 0;
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					menuState[0x09]++;
-					menuState[0x11] = 0;
-					*reinterpret_cast<u8*>(menuState + 4) = 0xFF;
+					cmd->phase++;
+					cmd->transitionTimer = 0;
+					cmd->commandResult = -1;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 				}
 			} else {
-				menuState[0x09]++;
-				menuState[0x11] = 0;
-				*reinterpret_cast<u8*>(menuState + 4) = 1;
+				cmd->phase++;
+				cmd->transitionTimer = 0;
+				cmd->commandResult = 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}
 	} else {
 		if ((hold & 0xC) != 0) {
-			int selected = menuState[0x13];
+			int selected = cmd->selected;
 			int prev = selected - 1;
 			int remaining = selected - 3;
 			if (prev > 2) {
@@ -1475,28 +1483,28 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				} while (remaining != 0);
 			}
 
-			s16* modeCursor = menuState + mode;
-			if (modeCursor[0x13] == prev) {
-				modeCursor[0x13] = static_cast<s16>(next);
+			s16* modeCursor = GetCmdStateSelections(cmd) + mode;
+			if (*modeCursor == prev) {
+				*modeCursor = static_cast<s16>(next);
 			} else {
-				modeCursor[0x13] = static_cast<s16>(prev);
+				*modeCursor = static_cast<s16>(prev);
 			}
 			Sound.PlaySe(1, 0x40, 0x7F, 0);
 		}
 
 		if ((hold & 0xC) == 0) {
-			*reinterpret_cast<u8*>(menuState + 4) = 0;
-			menuState[0x0A] = 0;
+			cmd->commandResult = 0;
+			cmd->uniteState = 0;
 			if ((press & 0x100) == 0) {
 				if ((press & 0x200) != 0) {
-					*reinterpret_cast<u8*>(menuState + 4) = 0xFF;
-					menuState[0x09]++;
-					menuState[0x11] = 0;
+					cmd->commandResult = -1;
+					cmd->phase++;
+					cmd->transitionTimer = 0;
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 				}
 			} else {
-				menuState[0x09]++;
-				menuState[0x11] = 0;
+				cmd->phase++;
+				cmd->transitionTimer = 0;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}

@@ -54,7 +54,7 @@ static inline TmpArtiEntry* GetTmpArtiEntries(CMenuPcs* menu)
 
 static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 {
-    return menu->m_tmpArtiFont;
+    return menu->m_fonts[4];
 }
 } // namespace
 

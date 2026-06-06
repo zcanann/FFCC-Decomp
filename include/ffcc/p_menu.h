@@ -32,6 +32,8 @@ struct SingMenuState;
 struct FavoListStorage;
 struct CompaMenuState;
 struct CompaOpenAnimList;
+struct TmpArtiState;
+struct TmpArtiList;
 
 struct McListInfo
 {
@@ -329,6 +331,13 @@ public:
     int ChkEquipPossible(int);
     int GetEquipType(int);
     int EquipChk(int);
+    void TmpArtiInit();
+    void TmpArtiInit0();
+    unsigned int TmpArtiOpen();
+    int TmpArtiCtrl();
+    unsigned int TmpArtiClose();
+    void TmpArtiDraw();
+    int TmpArtiCtrlCur();
     void ItemInit();
     void ItemInit1();
     bool ItemOpen();
@@ -513,6 +522,7 @@ public:
         ItemMenuState* m_itemMenuState;
         SingMenuState* m_singMenuState;
         CompaMenuState* m_compaMenuState;
+        TmpArtiState* m_tmpArtiState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -532,6 +542,7 @@ public:
         ItemMenuAnimList* m_itemList;
         FavoListStorage* m_favoList;
         CompaOpenAnimList* m_compaList;
+        TmpArtiList* m_tmpArtiList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -561,6 +572,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
@@ -569,5 +581,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

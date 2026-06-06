@@ -266,16 +266,6 @@ static inline s16* GetCmdStateSelections(CmdState* cmd)
 	return &cmd->selected;
 }
 
-static inline int GetCmdStateBase(CMenuPcs* menu)
-{
-	return reinterpret_cast<int>(GetCmdState(menu));
-}
-
-static inline int GetCmdListBase(CMenuPcs* menu)
-{
-	return reinterpret_cast<int>(GetCmdList(menu));
-}
-
 static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 {
 	return menu->m_cmdLayoutFlag;
@@ -925,11 +915,14 @@ void CMenuPcs::CmdDraw()
 	u8* self = reinterpret_cast<u8*>(this);
 	s16* cmdState = GetCmdState(this);
 	s16* drawList = GetCmdList(this);
+	CmdState* cmd = GetCmdStateView(this);
+	CmdListStorage* cmdList = GetCmdListStorage(this);
+	CmdListEntry* entries = cmdList->entries;
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	s32 caravanIter = caravanWork;
 	s16* entry = drawList + 4;
-	const s16 cmdMode = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x30);
+	const s16 cmdMode = cmd->mode;
 	const s16 animState = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x10);
 	s32 i;
 	s32 helpId = -1;
@@ -1039,22 +1032,19 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if (cmdMode == 2) {
-		s16* panel = reinterpret_cast<s16*>(
-		    GetCmdListBase(this) +
-		    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + 3) * 0x40 + 8);
-		SetTexture(static_cast<CMenuPcs::TEX>(*reinterpret_cast<s32*>(panel + 0xE)));
+		CmdListEntry* panel = &entries[cmdList->listEnd + 3];
+		SetTexture(static_cast<CMenuPcs::TEX>(panel->tex));
 
 		GXColor panelColor;
 		panelColor.r = 0xFF;
 		panelColor.g = 0xFF;
 		panelColor.b = 0xFF;
-		panelColor.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(panel + 8));
+		panelColor.a = static_cast<u8>(FLOAT_80332acc * panel->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, panelColor);
 		DrawRect(
-		    0, static_cast<float>(panel[0]), static_cast<float>(panel[1]),
-		    static_cast<float>(panel[2]), static_cast<float>(panel[3]),
-		    *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
-		    FLOAT_80332a70, *reinterpret_cast<float*>(panel + 10), 0.0f);
+		    0, static_cast<float>(panel->x), static_cast<float>(panel->y),
+		    static_cast<float>(panel->width), static_cast<float>(panel->height),
+		    panel->u, panel->v, FLOAT_80332a70, panel->scale, 0.0f);
 
 		CFont* choiceFont = m_fonts[0];
 		choiceFont->SetMargin(FLOAT_80332a70);
@@ -1064,9 +1054,9 @@ void CMenuPcs::CmdDraw()
 		choiceFont->SetTlut(7);
 		choiceFont->SetColor(panelColor);
 
-		const s32 choices = (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(panel + 10))) ? 2 : 3;
+		const s32 choices = (DOUBLE_80332a58 == static_cast<double>(panel->scale)) ? 2 : 3;
 		const float pitch = static_cast<float>(
-		    ((static_cast<float>(panel[3]) * *reinterpret_cast<float*>(panel + 10)) - DOUBLE_80332b20) /
+		    ((static_cast<float>(panel->height) * panel->scale) - DOUBLE_80332b20) /
 		    static_cast<float>(choices));
 		for (s32 choice = 0; choice < choices; choice++) {
 			const char* text;
@@ -1078,10 +1068,10 @@ void CMenuPcs::CmdDraw()
 				text = GetMenuStr(0x37);
 			}
 			choiceFont->GetWidth(text);
-			choiceFont->SetPosX(static_cast<float>(panel[0] + 0x18));
+			choiceFont->SetPosX(static_cast<float>(panel->x + 0x18));
 			choiceFont->SetPosY(
 			    ((pitch - static_cast<float>(DOUBLE_80332af8)) * static_cast<float>(DOUBLE_80332a60)) +
-			    ((pitch * static_cast<float>(choice)) + static_cast<float>(panel[1] + 8)) -
+			    ((pitch * static_cast<float>(choice)) + static_cast<float>(panel->y + 8)) -
 			    FLOAT_80332ae8);
 			choiceFont->Draw(text);
 		}
@@ -1101,29 +1091,27 @@ void CMenuPcs::CmdDraw()
 	    ((cmdMode != 0) && (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x12) == 1))) {
 		float cursorX = FLOAT_80332a70;
 		float cursorY = FLOAT_80332a70;
-		s16* cursorEntry = drawList + 4;
+		CmdListEntry* cursorEntry = entries;
 		bool cursorOnUnite = false;
 
 		if ((cmdMode == 0) || (cmdMode == 3)) {
-			s32 index = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + cmdMode * 2 + 0x26);
+			s32 index = GetCmdStateSelections(cmd)[cmdMode];
 			if (caravan->m_commandListExtra[index] == 0) {
-				cursorEntry = reinterpret_cast<s16*>(GetCmdListBase(this) + index * 0x40 + 8);
+				cursorEntry = &entries[index];
 			} else {
 				s32 uniteIdx = 0;
 				while ((uniteIdx < s_unitePanelCount) && (s_UniteTop[uniteIdx] != index)) {
 					uniteIdx++;
 				}
-				cursorEntry = reinterpret_cast<s16*>(
-				    GetCmdListBase(this) +
-				    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + uniteIdx) * 0x40 + 8);
+				cursorEntry = &entries[cmdList->listEnd + uniteIdx];
 				cursorOnUnite = true;
 			}
-			cursorX = static_cast<float>(cursorEntry[0] - 0x14);
+			cursorX = static_cast<float>(cursorEntry->x - 0x14);
 			if (cursorOnUnite) {
-				cursorY = static_cast<float>(cursorEntry[1]) +
-				          (static_cast<float>(cursorEntry[3] - 0x20) * static_cast<float>(DOUBLE_80332a60));
+				cursorY = static_cast<float>(cursorEntry->y) +
+				          (static_cast<float>(cursorEntry->height - 0x20) * static_cast<float>(DOUBLE_80332a60));
 			} else {
-				cursorY = static_cast<float>(cursorEntry[1]);
+				cursorY = static_cast<float>(cursorEntry->y);
 				if (cmdMode != 0) {
 					cursorY += FLOAT_80332ad0;
 				}
@@ -1148,17 +1136,14 @@ void CMenuPcs::CmdDraw()
 			cursorX = static_cast<float>(scan[0] - 0x14);
 			cursorY = static_cast<float>(scan[1]);
 		} else {
-			s16* panel = reinterpret_cast<s16*>(
-			    GetCmdListBase(this) +
-			    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + 3) * 0x40 + 8);
-			const s32 choices = (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(panel + 10))) ? 2 : 3;
+			CmdListEntry* panel = &entries[cmdList->listEnd + 3];
+			const s32 choices = (DOUBLE_80332a58 == static_cast<double>(panel->scale)) ? 2 : 3;
 			const float pitch = static_cast<float>(
-			    ((static_cast<float>(panel[3]) * *reinterpret_cast<float*>(panel + 10)) - DOUBLE_80332b20) /
+			    ((static_cast<float>(panel->height) * panel->scale) - DOUBLE_80332b20) /
 			    static_cast<float>(choices));
-			cursorX = static_cast<float>(panel[0] - 0x14);
+			cursorX = static_cast<float>(panel->x - 0x14);
 			cursorY = ((pitch - static_cast<float>(DOUBLE_80332af8)) * static_cast<float>(DOUBLE_80332a60)) +
-			          ((pitch * static_cast<float>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x2A))) +
-			           static_cast<float>(panel[1] + 8));
+			          ((pitch * static_cast<float>(cmd->choice)) + static_cast<float>(panel->y + 8));
 		}
 
 		const s32 frame = System.m_frameCounter & 7;
@@ -1183,16 +1168,16 @@ void CMenuPcs::CmdDraw()
 		}
 	}
 	if (cmdMode == 2) {
-		if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x2A) == 0) {
+		if (cmd->choice == 0) {
 			helpId = 0x25B;
 		} else {
 			helpId = -1;
 		}
 	}
 
-	float helpAlpha = *reinterpret_cast<float*>(drawList + drawList[0] * 0x20 + 0xC);
+	float helpAlpha = entries[cmdList->count].alpha;
 	if ((cmdMode == 0) || (cmdMode == 2)) {
-		helpAlpha = *reinterpret_cast<float*>(drawList + 0xC);
+		helpAlpha = entries[0].alpha;
 	}
 
 	GXColor helpColor;

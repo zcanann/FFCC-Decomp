@@ -2411,7 +2411,7 @@ void pppClearDrawEnv()
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
 	if (DOUBLE_8032fdf0 != (double)depth) {
-		float sortDepth = *(float*)((u8*)ppvMng + 0x114);
+		float sortDepth = ppvMng->m_sortDepth;
 		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
 	}
 

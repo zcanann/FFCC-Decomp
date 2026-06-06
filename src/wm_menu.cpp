@@ -4477,18 +4477,17 @@ void CMenuPcs::DrawCMakeMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	const short state = m_wmWorldState->m_mainState;
-	const short step = m_wmWorldState->m_frameCounter;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (state == 1) {
-		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	} else if (state == 2) {
 		frameAlpha = FLOAT_80331434;
 	} else if (state == 3) {
-		frameAlpha = static_cast<float>(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) + DOUBLE_803313f8);
+		frameAlpha = static_cast<float>(DOUBLE_80331460 * static_cast<double>(m_wmWorldState->m_frameCounter) + DOUBLE_803313f8);
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -4499,26 +4498,30 @@ void CMenuPcs::DrawCMakeMenu()
 	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = m_wm.m_frameInfo;
-	if (frame != 0) {
+	if (m_wm.m_frameInfo != 0) {
+		int byteOffset = 0;
 		for (int i = 0; i < 2; i++) {
-			unsigned char* const entry = frame + 4 + i * 0x1C;
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
-			         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
-			         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
-			         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
+			if (((1 << i) & 3) != 0) {
+				unsigned char* const entry = m_wm.m_frameInfo + byteOffset + 4;
+				MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
+				         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
+				         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
+				         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
+				         *reinterpret_cast<float*>(entry + 0x18));
+			}
+			byteOffset += 0x1C;
 		}
 	}
 
-	if (state > 0 && state < 4) {
+	const short contentState = m_wmWorldState->m_mainState;
+	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
-		if (state == 1) {
-			contentAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
-		} else if (state == 2) {
+		if (contentState == 1) {
+			contentAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else if (contentState == 2) {
 			contentAlpha = FLOAT_803313e8;
 		} else {
-			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 
 		DrawCharaBase();
@@ -4547,6 +4550,12 @@ void CMenuPcs::DrawCMakeMenu()
 			}
 		}
 
+		unsigned int textAlpha;
+		if (contentAlpha <= FLOAT_803313e8) {
+			textAlpha = static_cast<unsigned int>(FLOAT_80331458 * contentAlpha);
+		} else {
+			textAlpha = 0xFF;
+		}
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		GXColor helpColor;
 		helpColor.r = 0xFF;
@@ -4557,53 +4566,48 @@ void CMenuPcs::DrawCMakeMenu()
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-
-		unsigned int textAlpha;
-		if (contentAlpha <= FLOAT_803313e8) {
-			textAlpha = static_cast<unsigned int>(FLOAT_80331458 * contentAlpha);
-		} else {
-			textAlpha = 0xFF;
-		}
-		_GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)};
-		char* text = 0;
-		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
 		if (m_wmWorldState->m_menuMode == 3) {
-			char* textList[3];
+			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
+			char* textList[3] = {lbl_80210750[5], lbl_80210750[6], lbl_80210750[7]};
 			textList[0] = lbl_80210750[languageIndex + 5];
 			textList[1] = lbl_80210750[languageIndex + 6];
 			textList[2] = lbl_80210750[languageIndex + 7];
-			text = textList[textIndex - (textIndex >> 31)];
-		} else if (m_wmWorldState->m_menuMode == 8) {
-			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
-				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
-					text = lbl_80210750[languageIndex + 10];
-				}
-			} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 2) {
-				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0F) {
-					text = lbl_80210750[languageIndex + 9];
-				} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
-					text = lbl_80210750[languageIndex + 8];
-				}
-			}
-		}
-		if (text != 0) {
+			char* const text = textList[textIndex - (textIndex >> 31)];
+			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
 			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+		} else if (m_wmWorldState->m_menuMode == 8) {
+			const int mainMode = *(reinterpret_cast<char*>(g_pGoOutMenu) + 0x2C);
+			if (mainMode == 3) {
+				if (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24) == 2) {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 10];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+				}
+			} else if (mainMode == 2) {
+				const int goOutMode = *(reinterpret_cast<char*>(g_pGoOutMenu) + 0x18);
+				if (goOutMode == 0x0F) {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 9];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+				} else if (goOutMode == 0x0E) {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 8];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+				}
+			}
 		}
 	}
 
-	if (m_wmWorldState->m_mainState == 2) {
-		if (m_wmWorldState->m_delay != 0) {
-			m_wmWorldState->m_delay--;
-			if (m_wmWorldState->m_delay < 1) {
-				m_wmWorldState->m_mainState++;
-				m_wmWorldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31 - (m_wmWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
-			}
-		}
-	} else {
+	if (m_wmWorldState->m_mainState != 2) {
 		m_wmWorldState->m_frameCounter++;
 		if (m_wmWorldState->m_frameCounter > 9) {
 			m_wmWorldState->m_mainState++;
@@ -4611,6 +4615,15 @@ void CMenuPcs::DrawCMakeMenu()
 			if (m_wmWorldState->m_mainState > 4) {
 				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
 				m_wmWorldState->m_nextMenuMode = 0;
+			}
+		}
+	} else {
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+			if (m_wmWorldState->m_delay < 1) {
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				Sound.PlaySe(0x31 + static_cast<int>(static_cast<unsigned int>(static_cast<int>(m_wmWorldState->m_nextMenuMode)) >> 31), 0x40, 0x7F, 0);
 			}
 		}
 	}

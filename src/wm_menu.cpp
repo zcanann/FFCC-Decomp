@@ -4097,10 +4097,10 @@ void CMenuPcs::DrawMCardMenu()
 void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 
-	const short state = worldState[0x10 / sizeof(short)];
-	const short step = worldState[0x22 / sizeof(short)];
+	const short state = worldState->m_mainState;
+	const short step = worldState->m_frameCounter;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
@@ -4153,7 +4153,7 @@ void CMenuPcs::DrawCMakeMenu()
 		DrawCharaName();
 		DrawCMLife();
 
-		if (worldState[0x1C / sizeof(short)] == 3) {
+		if (worldState->m_menuMode == 3) {
 			short winState = m_menuWindowInfo->state;
 			if (winState != 3) {
 				DrawMcWin(-1, 0);
@@ -4182,14 +4182,14 @@ void CMenuPcs::DrawCMakeMenu()
 		_GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)};
 		char* text = 0;
 		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
-		if (worldState[0x1C / sizeof(short)] == 3) {
+		if (worldState->m_menuMode == 3) {
 			char* textList[3];
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			textList[0] = lbl_80210750[languageIndex + 5];
 			textList[1] = lbl_80210750[languageIndex + 6];
 			textList[2] = lbl_80210750[languageIndex + 7];
 			text = textList[textIndex - (textIndex >> 31)];
-		} else if (worldState[0x1C / sizeof(short)] == 8) {
+		} else if (worldState->m_menuMode == 8) {
 			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
 				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
 					text = lbl_80210750[languageIndex + 10];
@@ -4209,23 +4209,23 @@ void CMenuPcs::DrawCMakeMenu()
 		}
 	}
 
-	if (worldState[0x10 / sizeof(short)] == 2) {
-		if (worldState[0x18 / sizeof(short)] != 0) {
-			worldState[0x18 / sizeof(short)]--;
-			if (worldState[0x18 / sizeof(short)] < 1) {
-				worldState[0x10 / sizeof(short)]++;
-				worldState[0x22 / sizeof(short)] = 0;
-				Sound.PlaySe(0x31 - (worldState[0x1E / sizeof(short)] >> 31), 0x40, 0x7F, 0);
+	if (worldState->m_mainState == 2) {
+		if (worldState->m_delay != 0) {
+			worldState->m_delay--;
+			if (worldState->m_delay < 1) {
+				worldState->m_mainState++;
+				worldState->m_frameCounter = 0;
+				Sound.PlaySe(0x31 - (worldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
 			}
 		}
 	} else {
-		worldState[0x22 / sizeof(short)]++;
-		if (worldState[0x22 / sizeof(short)] > 9) {
-			worldState[0x10 / sizeof(short)]++;
-			worldState[0x22 / sizeof(short)] = 0;
-			if (worldState[0x10 / sizeof(short)] > 4) {
-				worldState[0x20 / sizeof(short)] = worldState[0x1E / sizeof(short)];
-				worldState[0x1E / sizeof(short)] = 0;
+		worldState->m_frameCounter++;
+		if (worldState->m_frameCounter > 9) {
+			worldState->m_mainState++;
+			worldState->m_frameCounter = 0;
+			if (worldState->m_mainState > 4) {
+				worldState->m_changeRequest = worldState->m_nextMenuMode;
+				worldState->m_nextMenuMode = 0;
 			}
 		}
 	}

@@ -683,16 +683,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 	do
 	{
 		int other0 = pos0->m_groupA;
-		bool connected0 = false;
-
-		if (other0 == startGroup)
-		{
-			connected0 = true;
-		}
-		else if (pos0->m_groupB == startGroup)
-		{
-			connected0 = true;
-		}
+		bool connected0 = (other0 == startGroup || pos0->m_groupB == startGroup);
 
 		if (connected0)
 		{
@@ -701,7 +692,9 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				other0 = pos0->m_groupB;
 			}
 
-			if (temp.m_visited[other0] == 0)
+			int other0Index = static_cast<unsigned char>(other0);
+
+			if (temp.m_visited[other0Index] == 0)
 			{
 				CAStarTempWork level1;
 				unsigned int* visited1 = reinterpret_cast<unsigned int*>(level1.m_visited);
@@ -743,14 +736,14 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 				level1.m_pathLength = temp.m_pathLength;
 				level1.m_cost = temp.m_cost;
-				float distance1 = PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				float distance1 = PSVECDistance(&pos0->m_position, &m_portals[other0Index].m_position);
 				int pathSlot1 = level1.m_pathLength;
 				level1.m_pathLength = pathSlot1 + 1;
 				level1.m_cost += distance1;
 				level1.m_path[pathSlot1] = static_cast<unsigned char>(idx0);
-				level1.m_visited[other0] = 1;
+				level1.m_visited[other0Index] = 1;
 
-				if (other0 == goalGroup)
+				if (other0Index == goalGroup)
 				{
 					if (level1.m_cost < m_bestPath.m_cost)
 					{
@@ -802,25 +795,18 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 					do
 					{
 						int other1 = pos1->m_groupA;
-						bool connected1 = false;
-
-						if (other1 == other0)
-						{
-							connected1 = true;
-						}
-						else if (pos1->m_groupB == other0)
-						{
-							connected1 = true;
-						}
+						bool connected1 = (other1 == other0Index || pos1->m_groupB == other0Index);
 
 						if (connected1)
 						{
-							if (other1 == other0)
+							if (other1 == other0Index)
 							{
 								other1 = pos1->m_groupB;
 							}
 
-							if (level1.m_visited[other1] == 0)
+							int other1Index = static_cast<unsigned char>(other1);
+
+							if (level1.m_visited[other1Index] == 0)
 							{
 								CAStarTempWork level2;
 								unsigned int* level2Visited = reinterpret_cast<unsigned int*>(level2.m_visited);
@@ -861,14 +847,14 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								level2Path[15] = path1[15];
 								level2.m_pathLength = level1.m_pathLength;
 								level2.m_cost = level1.m_cost;
-								float distance2 = PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
+								float distance2 = PSVECDistance(&pos1->m_position, &m_portals[other1Index].m_position);
 								int pathSlot2 = level2.m_pathLength;
 								level2.m_pathLength = pathSlot2 + 1;
 								level2.m_cost += distance2;
 								level2.m_path[pathSlot2] = static_cast<unsigned char>(idx1);
-								level2.m_visited[other1] = 1;
+								level2.m_visited[other1Index] = 1;
 
-								if (other1 == goalGroup)
+								if (other1Index == goalGroup)
 								{
 									if (level2.m_cost < m_bestPath.m_cost)
 									{
@@ -882,9 +868,9 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 									do
 									{
-										if (edge->IsExist(other1) != 0)
+										if (edge->IsExist(other1Index) != 0)
 										{
-											int nextGroup = edge->GetOthers(other1);
+											int nextGroup = edge->GetOthers(other1Index);
 
 											if (level2.m_visited[nextGroup] == 0)
 											{

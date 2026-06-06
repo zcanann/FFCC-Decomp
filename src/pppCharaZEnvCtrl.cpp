@@ -6,10 +6,7 @@
 
 void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
-struct CharaZEnvCtrlDataOffsets {
-	s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(CharaZEnvCtrlDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(CharaZEnvCtrlDataOffsets, m_workOffset) == 0x0);
 
 static inline CharaZEnvCtrlDataOffsets* GetCharaZEnvCtrlDataOffsets(_pppCtrlTable* ctrl)

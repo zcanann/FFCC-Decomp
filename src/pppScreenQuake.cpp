@@ -7,10 +7,7 @@ extern "C" {
 extern const float kPppScreenQuakeZero[2];
 }
 
-struct ScreenQuakeDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(ScreenQuakeDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(ScreenQuakeDataOffsets, m_workOffset) == 0x0);
 
 static inline ScreenQuakeDataOffsets* GetScreenQuakeDataOffsets(_pppCtrlTable* ctrl)

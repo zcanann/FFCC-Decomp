@@ -5,10 +5,7 @@
 #include "ffcc/gobject.h"
 #include <dolphin/mtx.h>
 
-struct CallBackDistanceDataOffsets {
-    s32 m_distanceOffset;
-};
-
+STATIC_ASSERT(sizeof(CallBackDistanceDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(CallBackDistanceDataOffsets, m_distanceOffset) == 0x0);
 
 static inline CallBackDistanceDataOffsets* GetCallBackDistanceDataOffsets(_pppCtrlTable* ctrl)

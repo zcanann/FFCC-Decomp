@@ -5688,51 +5688,48 @@ void CMenuPcs::CalcFukidashi()
 		return;
 	}
 
-	int bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-	*reinterpret_cast<short*>(bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
-	*reinterpret_cast<short*>(bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
-	*reinterpret_cast<short*>(bubbleData + 4) = 0xF0;
-	*reinterpret_cast<short*>(bubbleData + 6) = 0xC4;
-	*reinterpret_cast<float*>(bubbleData + 0x0C) = fVar1;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData)) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 4) = 0xF0;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 6) = 0xC4;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x0C) = fVar1;
 	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 8) = FLOAT_803313dc;
 	} else {
-		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_80331704;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 8) = FLOAT_80331704;
 	}
 
 	fVar1 = FLOAT_80331708;
 	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
-		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x20) = 0x50;
 		float fVar2 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(bubbleData + 0x22) = 0x48;
-		*reinterpret_cast<float*>(bubbleData + 0x24) = fVar1;
-		*reinterpret_cast<float*>(bubbleData + 0x28) = fVar2;
-		*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 2) + 0x1C;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x22) = 0x48;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x24) = fVar1;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x28) = fVar2;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) + 0x1C;
 		if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-			*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 0x1E) + 0x10;
+			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1E) + 0x10;
 		}
-		*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData);
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData));
 		if ((uVar3 & 0xF) == 0) {
 			if ((uVar3 & 0x200) == 0) {
-				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x38;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x38;
 			} else {
-				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x50;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x50;
 			}
 		} else {
-			*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x20;
+			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x1C) + 0x20;
 		}
 	}
 
 	fVar1 = FLOAT_803313dc;
 	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x1FF) != 0) {
-		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;
-		*reinterpret_cast<short*>(bubbleData + 0x3E) = 0x20;
-		*reinterpret_cast<float*>(bubbleData + 0x40) = fVar1;
-		*reinterpret_cast<float*>(bubbleData + 0x44) = fVar1;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x3C) = 0x20;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x3E) = 0x20;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x40) = fVar1;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x44) = fVar1;
 
 		// Copy first icon rect to second
 		int iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
@@ -5821,15 +5818,14 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Set text position
-	bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-	*reinterpret_cast<short*>(bubbleData + 0x72) =
-	    *reinterpret_cast<short*>(bubbleData + 2) + sVar15 - 4;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 0x72) =
+	    *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) + sVar15 - 4;
 
 	// Setup model viewport slots
 	int iVar11 = 6;
 	int iVar9 = 0x1E0;
-	short sVar22 = *reinterpret_cast<short*>(bubbleData) - 0x28;
-	short sVarY = *reinterpret_cast<short*>(bubbleData + 2) - 0x0E;
+	short sVar22 = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData)) - 0x28;
+	short sVarY = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_bubbleData) + 2) - 0x0E;
 	int iVar13 = 2;
 	do {
 		int* puVar20 = reinterpret_cast<int*>(worldObj + iVar9);

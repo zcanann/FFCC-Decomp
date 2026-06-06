@@ -20,11 +20,11 @@ extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
 
-extern "C" const double kCharaViewerColorCenterBias = 4503601774854144.0;
-extern "C" const float kCharaViewerZero = 0.0f;
-extern "C" const float kCharaViewerBackOrthoRight = 448.0f;
-extern "C" const float kCharaViewerBackOrthoBottom = 640.0f;
-extern "C" const float kCharaViewerGridMax = -100.0f;
+extern "C" const double kCharaViewerColorCenterBias;
+extern "C" const float kCharaViewerZero;
+extern "C" const float kCharaViewerBackOrthoRight;
+extern "C" const float kCharaViewerBackOrthoBottom;
+extern "C" const float kCharaViewerGridMax;
 
 static const float kCharaViewerUnitStep = 1.0f;
 static const float kCharaViewerGridSpacing = 10.0f;
@@ -525,16 +525,16 @@ void CCharaPcs::calcViewer()
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
         frameAdvance = LoadFloat(kCharaViewerZero);
-        float offsetA = frameAdvance;
         if ((triggerButtons & 0x100) != 0) {
-            offsetA = LoadFloat(kCharaViewerUnitStep);
+            frameAdvance += LoadFloat(kCharaViewerUnitStep);
+        } else {
+            frameAdvance += LoadFloat(kCharaViewerZero);
         }
-        frameAdvance += offsetA;
-        float offsetB = LoadFloat(kCharaViewerZero);
         if ((triggerButtons & 0x200) != 0) {
-            offsetB = LoadFloat(kCharaViewerFineStep);
+            frameAdvance += LoadFloat(kCharaViewerFineStep);
+        } else {
+            frameAdvance += LoadFloat(kCharaViewerZero);
         }
-        frameAdvance += offsetB;
     } else {
         float deltaY = LoadFloat(kCharaViewerUnitStep);
         if ((heldButtons & 0x200) != 0) {
@@ -616,6 +616,7 @@ void CCharaPcs::calcViewer()
         if (bFirst != 0) {
             srt.transZ = LoadFloat(kCharaViewerZero);
             srt.transY = LoadFloat(kCharaViewerZero);
+            srt.transX = LoadFloat(kCharaViewerZero);
             srt.rotZ = LoadFloat(kCharaViewerZero);
             srt.rotY = LoadFloat(kCharaViewerZero);
             srt.rotX = LoadFloat(kCharaViewerZero);

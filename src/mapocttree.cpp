@@ -13,7 +13,7 @@
 static const float kMapOctTreeBoundMinInit = 10000000000.0f;
 static const float kMapOctTreeBoundMaxInit = -10000000000.0f;
 static const float kMapOctTreeRadiusPad = 1.0f;
-static const float kMapOctTreeDefaultOffsetZ = 0.0f;
+extern const float kMapOctTreeDefaultOffsetZ;
 
 static CBound s_bound(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);
 static CMapCylinder s_cyl(kMapOctTreeBoundMinInit, kMapOctTreeBoundMaxInit);

@@ -77,7 +77,7 @@ static inline pppYmDrawMdlTexAnmColorBlock* GetYmDrawMdlTexAnmColorBlock(_pppPOb
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
+static inline void SetUpPerUV(pppModelSt* model, f32& perU, f32& perV)
 {
     s32 i;
 

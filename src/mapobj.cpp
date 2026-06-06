@@ -63,6 +63,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline float LoadFloatVolatile(const volatile float& value)
+{
+    return value;
+}
+
 }
 
 /*
@@ -1611,7 +1616,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
-        float marginY = LoadFloat(kMapObjZero);
+        float marginY = LoadFloatVolatile(kMapObjZero);
         marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
             localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
@@ -1621,7 +1626,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
             localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
-        float marginZ = LoadFloat(kMapObjZero);
+        float marginZ = LoadFloatVolatile(kMapObjZero);
         marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
             localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
@@ -1720,7 +1725,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
-        float marginY = LoadFloat(kMapObjZero);
+        float marginY = LoadFloatVolatile(kMapObjZero);
         marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
             localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
@@ -1730,7 +1735,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
             localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
-        float marginZ = LoadFloat(kMapObjZero);
+        float marginZ = LoadFloatVolatile(kMapObjZero);
         marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
             localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;

@@ -477,9 +477,12 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
         tlutData = m_tlutData;
     }
 
-    int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
-    GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
-    GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + numEntries * 2, GX_TL_IA8, numEntries);
+    int numEntries0 = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+    GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries0);
+
+    int numEntries1 = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+    int offsetEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+    GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + offsetEntries * 2, GX_TL_IA8, numEntries1);
 
     if (loadToGX != 0) {
         GXLoadTlut(&m_tlutObj0, GX_TLUT0);

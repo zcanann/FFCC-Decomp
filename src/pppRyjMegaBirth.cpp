@@ -21,7 +21,7 @@ extern const double DOUBLE_80330480;
 extern const double DOUBLE_80330488;
 extern const float FLOAT_80330490[2];
 
-Mtx g_matUnit;
+static Mtx g_matUnit;
 
 static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 

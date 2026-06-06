@@ -114,7 +114,6 @@ inline PPPCREATEPARAM::PPPCREATEPARAM()
 
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
-extern PPPCREATEPARAM g_dcp;
 extern int gPppHeapUseRateWords[3];
 
 struct _PARTICLE_COLOR

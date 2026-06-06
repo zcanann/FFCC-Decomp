@@ -1348,10 +1348,10 @@ void CMenuPcs::CalcDiaryMenu()
 	case 4:
 		if (((worldState->m_mainState != 0) || bytes[0x12] != 0) &&
 		    worldState->m_mainState < 4) {
-			if (Game.m_gameWork.m_chaliceElement != *reinterpret_cast<int*>(bytes + 0x84)) {
+			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 				SetCrystalCageAttr();
 			}
-			if (Game.m_gameWork.m_timerA != *reinterpret_cast<int*>(bytes + 0x70)) {
+			if (Game.m_gameWork.m_timerA != m_manaWaterTimerA) {
 				SetManaWaterEffect();
 			}
 			CalcFukidashi();
@@ -4297,17 +4297,17 @@ void CMenuPcs::DrawMoveMenu()
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
 		if (handle != 0 && handle->m_model != 0) {
-			*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x1E70) = handle->m_model->m_lightAlpha;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_effectWork) + 0x1E70) = handle->m_model->m_lightAlpha;
 			handle->Draw(5);
 			pppFVECTOR4 color;
-			const short partColorIndex = *reinterpret_cast<short*>(bytes + 0x88);
+			const short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = handle->m_model->m_lightAlpha;
 			PartPcs.SetParColIdx(partColorIndex, color);
-			if (bytes[0x80] == 0) {
-				bytes[0x80] = 1;
+			if (m_effectTimer == 0) {
+				m_effectTimer = 1;
 			} else {
-				PartPcs.DrawMenu(*reinterpret_cast<short*>(bytes + 0x8A));
+				PartPcs.DrawMenu(m_crystalAttr);
 			}
 		}
 
@@ -8354,7 +8354,7 @@ void CMenuPcs::WMChgMenu()
 
 			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)typedWorldState->m_cardChannel));
 			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)typedWorldState->m_cardChannel));
-			*reinterpret_cast<int*>(bytes + 0x80) = 0;
+			m_effectTimer = 0;
 		} else if (sVar2 > 0 && sVar2 > 2) {
 			int iVar11 = 0;
 			double dVar16b = (double)FLOAT_80331664;

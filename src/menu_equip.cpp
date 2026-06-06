@@ -14,10 +14,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*,
-                                                 int);
-extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
-                                                           CMenuPcs*, int, void*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
 static const float FLOAT_80332eb8 = 0.0f;
 static const double DOUBLE_80332ec0 = 1.0;
@@ -472,8 +468,10 @@ void CMenuPcs::EquipDraw()
 			color.b = 0xff;
 			color.a = (u8)(FLOAT_80332ee4 * *(float*)(item + 8));
 			GXSetChanMatColor((GXChannelID)4, color);
-			DrawRect__8CMenuPcsFUlfffffffff(x, (double)(float)((double)item[1] - DOUBLE_80332ed8), w, h, y, sx,
-			                                (double)*(float*)(item + 10), (double)*(float*)(item + 10), &MenuPcs, 0);
+			MenuPcs.DrawRect(
+			    0, static_cast<float>(x), static_cast<float>((double)(float)((double)item[1] - DOUBLE_80332ed8)),
+			    static_cast<float>(w), static_cast<float>(h), static_cast<float>(y), static_cast<float>(sx),
+			    *(float*)(item + 10), *(float*)(item + 10), 0.0f);
 		}
 		item += 0x20;
 	}
@@ -553,9 +551,10 @@ void CMenuPcs::EquipDraw()
 					GXSetChanMatColor((GXChannelID)4, color);
 					double fillWidth = (double)(float)(alpha * w);
 					if ((double)FLOAT_80332eb8 < fillWidth) {
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-						    x, y, fillWidth, h, u, v, (double)FLOAT_80332ee0, (double)FLOAT_80332ee0, &MenuPcs, 0,
-						    colors);
+						MenuPcs.DrawRect(
+						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fillWidth),
+						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
+						    FLOAT_80332ee0, FLOAT_80332ee0, 0.0f);
 						x = (double)(float)(x + fillWidth);
 						u = (double)(float)(u + fillWidth);
 					}
@@ -564,9 +563,10 @@ void CMenuPcs::EquipDraw()
 						colors[3].a = 0;
 						double fadeWidth =
 						    (double)((float)(DOUBLE_80332ec0 / (double)*(int*)(listItem + 0x14)) * (float)listItem[2]);
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-						    x, y, fadeWidth, h, u, v, (double)FLOAT_80332ee0, (double)FLOAT_80332ee0, &MenuPcs, 0,
-						    colors);
+						MenuPcs.DrawRect(
+						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fadeWidth),
+						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
+						    FLOAT_80332ee0, FLOAT_80332ee0, 0.0f);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else if (tex == 0x37) {
@@ -602,8 +602,10 @@ void CMenuPcs::EquipDraw()
 					color.b = 0xff;
 					color.a = (u8)((double)FLOAT_80332ee4 * alpha);
 					GXSetChanMatColor((GXChannelID)4, color);
-					DrawRect__8CMenuPcsFUlfffffffff(x, y, w, h, u, v, (double)*(float*)(listItem + 10),
-					                                (double)*(float*)(listItem + 10), &MenuPcs, 0);
+					MenuPcs.DrawRect(
+					    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h),
+					    static_cast<float>(u), static_cast<float>(v), *(float*)(listItem + 10),
+					    *(float*)(listItem + 10), 0.0f);
 				}
 			}
 			listItem += 0x20;

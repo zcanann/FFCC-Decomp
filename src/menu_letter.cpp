@@ -19,10 +19,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
-extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
-
 extern float FLOAT_80333088;
 extern float FLOAT_8033308c;
 extern float FLOAT_803330a0;
@@ -1790,18 +1786,17 @@ void CMenuPcs::LetterListDraw()
 		const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
 
 		if ((pageMark & 1) != 0) {
-			DrawRect__8CMenuPcsFUlfffffffff(
-			    markX, markY, iconSize, iconSize,
-			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-			    markScale, markScale, this, 4);
+			DrawRect(
+			    4, static_cast<float>(markX), static_cast<float>(markY), static_cast<float>(iconSize),
+			    static_cast<float>(iconSize), FLOAT_803330bc, FLOAT_803330bc, static_cast<float>(markScale),
+			    static_cast<float>(markScale), 0.0f);
 		}
 
 		if ((pageMark & 2) != 0) {
-			DrawRect__8CMenuPcsFUlfffffffff(
-			    markX, static_cast<double>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
-			    iconSize, iconSize,
-			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-			    markScale, markScale, this, 0);
+			DrawRect(
+			    0, static_cast<float>(markX), static_cast<float>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
+			    static_cast<float>(iconSize), static_cast<float>(iconSize), FLOAT_803330bc, FLOAT_803330bc,
+			    static_cast<float>(markScale), static_cast<float>(markScale), 0.0f);
 		}
 	}
 
@@ -1816,9 +1811,7 @@ void CMenuPcs::LetterListDraw()
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[letterIndex];
 		if (letter->AttachmentValue() != 0) {
 			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
-			DrawSingleIcon__8CMenuPcsFiiifif(
-			    FLOAT_803330f8, this, icon, iconX,
-			    static_cast<int>(iconY), FLOAT_803330f8);
+			DrawSingleIcon(icon, iconX, static_cast<int>(iconY), FLOAT_803330f8, 0, FLOAT_803330f8);
 		}
 		iconY += 0x20;
 	}
@@ -1826,7 +1819,7 @@ void CMenuPcs::LetterListDraw()
 	const int cursorState = *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26);
 	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(System.m_frameCounter & 7));
 	const int cursorY = cursorState * 0x20 + 0x60;
-	DrawCursor__8CMenuPcsFiif(FLOAT_803330f8, this, cursorX, cursorY);
+	DrawCursor(cursorX, cursorY, FLOAT_803330f8);
 }
 
 /*
@@ -1860,14 +1853,10 @@ void CMenuPcs::LetterMessDraw()
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color.color);
 		SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    static_cast<double>(panel[0]), static_cast<double>(panel[1]),
-		    static_cast<double>(panel[2]), static_cast<double>(panel[3]),
-		    static_cast<double>(*reinterpret_cast<float*>(panel + 4)),
-		    static_cast<double>(*reinterpret_cast<float*>(panel + 6)),
-		    static_cast<double>(*reinterpret_cast<float*>(panel + 10)),
-		    static_cast<double>(*reinterpret_cast<float*>(panel + 10)),
-		    this, 0);
+		DrawRect(
+		    0, static_cast<float>(panel[0]), static_cast<float>(panel[1]), static_cast<float>(panel[2]),
+		    static_cast<float>(panel[3]), *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
+		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
 	}
 
 	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
@@ -1926,9 +1915,9 @@ void CMenuPcs::LetterMessDraw()
 
 	if (letter->AttachmentValue() != 0) {
 		int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
-		DrawSingleIcon__8CMenuPcsFiiifif(
-		    static_cast<double>(*reinterpret_cast<float*>(animBase + 0xC)), this, icon,
-		    static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150), FLOAT_80333154);
+		DrawSingleIcon(
+		    icon, static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150),
+		    *reinterpret_cast<float*>(animBase + 0xC), 0, FLOAT_80333154);
 	}
 
 	if (mode <= 1) {
@@ -1968,10 +1957,7 @@ void CMenuPcs::LetterMessDraw()
 		int frame = static_cast<int>(System.m_frameCounter);
 		int frameSign = frame >> 31;
 		int frameAnim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
-		DrawCursor__8CMenuPcsFiif(
-		    static_cast<double>(FLOAT_803330f8), this,
-		    static_cast<int>(cursorX + static_cast<float>(frameAnim)),
-		    static_cast<int>(cursorY));
+		DrawCursor(static_cast<int>(cursorX + static_cast<float>(frameAnim)), static_cast<int>(cursorY), FLOAT_803330f8);
 	}
 }
 
@@ -2453,10 +2439,9 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		}
 
 		SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    x, y, static_cast<double>(FLOAT_803330f4), static_cast<double>(FLOAT_803330f4),
-		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+		DrawRect(
+		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_803330f4, FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
 	double innerW = static_cast<double>(static_cast<float>(w - DOUBLE_803330d8));
@@ -2468,27 +2453,24 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		int tex = (i == 0) ? 0x49 : 0x4C;
 		double y = (i == 0) ? y0 : y1;
 		SetTexture(static_cast<CMenuPcs::TEX>(tex));
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    innerX, y, innerW, static_cast<double>(FLOAT_803330f4),
-		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+		DrawRect(
+		    0, static_cast<float>(innerX), static_cast<float>(y), static_cast<float>(innerW), FLOAT_803330f4,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
 	for (int i = 0; i < 2; ++i) {
 		int flip = (i == 0) ? 0 : 8;
 		double x = (i == 0) ? x0 : x1;
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    x, innerY, static_cast<double>(FLOAT_803330f4), innerH,
-		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+		DrawRect(
+		    flip, static_cast<float>(x), static_cast<float>(innerY), FLOAT_803330f4, static_cast<float>(innerH),
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
-	DrawRect__8CMenuPcsFUlfffffffff(
-	    innerX, innerY, innerW, innerH,
-	    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-	    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+	DrawRect(
+	    0, static_cast<float>(innerX), static_cast<float>(innerY), static_cast<float>(innerW), static_cast<float>(innerH),
+	    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
 	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
@@ -2499,10 +2481,9 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		double x = ((i & 1) == 0) ? static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110))) : decoX1;
 		double y = ((i & 2) == 0) ? decoY0 : decoY1;
 		int flip = ((i & 2) == 0) ? 0 : 4;
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    x, y, static_cast<double>(FLOAT_80333108), static_cast<double>(FLOAT_8033310c),
-		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+		DrawRect(
+		    flip, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, FLOAT_8033310c,
+		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x50));
@@ -2518,28 +2499,23 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			if (DOUBLE_80333118 <= seg) {
 				seg = static_cast<double>(FLOAT_8033310c);
 			}
-			DrawRect__8CMenuPcsFUlfffffffff(
-			    x, y, static_cast<double>(FLOAT_80333108), seg,
-			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-			    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+			DrawRect(
+			    0, static_cast<float>(x), static_cast<float>(y), FLOAT_80333108, static_cast<float>(seg),
+			    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 			y = static_cast<double>(static_cast<float>(y + seg));
 		}
 	}
 
 	if (param >= DOUBLE_803330e8) {
 		SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4))),
-		    static_cast<double>(static_cast<float>(y0 - static_cast<double>(FLOAT_80333108))),
-		    static_cast<double>(FLOAT_80333128), static_cast<double>(FLOAT_8033312c),
-		    static_cast<double>(FLOAT_80333130), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
-		DrawRect__8CMenuPcsFUlfffffffff(
-		    static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333134))),
-		    static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330c0))),
-		    static_cast<double>(FLOAT_80333130), static_cast<double>(FLOAT_80333138),
-		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
-		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+		DrawRect(
+		    0, static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4)),
+		    static_cast<float>(y0 - static_cast<double>(FLOAT_80333108)),
+		    FLOAT_80333128, FLOAT_8033312c, FLOAT_80333130, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
+		DrawRect(
+		    0, static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333134)),
+		    static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330c0)),
+		    FLOAT_80333130, FLOAT_80333138, FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 }
 

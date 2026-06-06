@@ -759,7 +759,7 @@ config.libs = [
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp"),
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on"]),
-            Object(NonMatching, "stopwatch.cpp", extra_cflags=["-Cpp_exceptions off"]),
+            Object(NonMatching, "stopwatch.cpp"),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "texanim.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),

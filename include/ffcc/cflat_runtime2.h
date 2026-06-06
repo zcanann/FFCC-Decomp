@@ -42,6 +42,17 @@ public:
 		float m_radius;
 	};
 
+	struct CMapObjectInfo
+	{
+		s8 m_type;
+		s8 m_drawFlag;
+		u8 m_pad02[2];
+		float m_x;
+		float m_y;
+		float m_z;
+		float m_radius;
+	};
+
 	class CParticleWork
 	{
 	public:
@@ -199,7 +210,8 @@ public:
 	float m_objectCollisionTime;    // 0x1340
 	float m_updateTime;             // 0x1344
 	float m_hitTime;                // 0x1348
-	u8 m_pad_134C_16CC[0x380];      // 0x134C
+	CMapObjectInfo m_mapObjectInfo[32]; // 0x134C
+	char m_savedNextScript[0x100];  // 0x15CC
 	CParticleWork m_particleWork;
 	int m_particleWorkNoHi;         // 0x1738
 	u32 m_particleWorkNoLo;         // 0x173C
@@ -238,6 +250,12 @@ STATIC_ASSERT(offsetof(CFlatRuntime2, m_centerMatrix) == 0x12B4);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_gameFlags) == 0x12E4);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_spawnBits) == 0x12F0);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_moveTime) == 0x1338);
+STATIC_ASSERT(sizeof(CFlatRuntime2::CMapObjectInfo) == 0x14);
+STATIC_ASSERT(offsetof(CFlatRuntime2::CMapObjectInfo, m_drawFlag) == 0x01);
+STATIC_ASSERT(offsetof(CFlatRuntime2::CMapObjectInfo, m_x) == 0x04);
+STATIC_ASSERT(offsetof(CFlatRuntime2::CMapObjectInfo, m_radius) == 0x10);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_mapObjectInfo) == 0x134C);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_savedNextScript) == 0x15CC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWork) == 0x16CC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkNoHi) == 0x1738);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkPos) == 0x1740);

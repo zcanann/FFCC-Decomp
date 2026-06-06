@@ -3403,19 +3403,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -0x97: {
         unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
-        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134C + (slot * 0x14)) =
-            static_cast<char>(object->m_localBase[1]);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1350 + (slot * 0x14)) = object->m_localBase[2];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1354 + (slot * 0x14)) = object->m_localBase[3];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1358 + (slot * 0x14)) = object->m_localBase[4];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x135C + (slot * 0x14)) = object->m_localBase[5];
+        CMapObjectInfo& mapObject = m_mapObjectInfo[slot];
+        mapObject.m_type = static_cast<char>(object->m_localBase[1]);
+        mapObject.m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
+        mapObject.m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
+        mapObject.m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
+        mapObject.m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x98:
-        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134D + (*object->m_localBase * 0x14)) =
-            static_cast<char>(object->m_localBase[1]);
+        m_mapObjectInfo[*object->m_localBase].m_drawFlag = static_cast<char>(object->m_localBase[1]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3859,14 +3858,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xD2: {
-        char* savedNextScript = reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x15CC);
         if (*object->m_localBase == 0) {
             CGame::CNextScript nextScript;
             nextScript.m_flags = 0;
-            strcpy(nextScript.m_name, savedNextScript);
+            strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
         } else {
-            memset(savedNextScript, 0, 0x100);
+            memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
         }
         runtime->push(object, 0);
         outResult = 0;

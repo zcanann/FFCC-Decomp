@@ -2651,10 +2651,10 @@ void GbaQueue::LoadMapObj()
 		unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 		memset(mapObjWork, 0, sizeof(mapObjWork));
 
-		char* mapObjBase = reinterpret_cast<char*>(&CFlat) + 0x134C;
+		CFlatRuntime2::CMapObjectInfo* mapObj = CFlat.m_mapObjectInfo;
 		i = 0;
 		do {
-			char objType = mapObjBase[0];
+			char objType = mapObj->m_type;
 			if (objType != -1) {
 				unsigned int count = mapObjWork[0];
 				if (objType >= 0x19) {
@@ -2662,14 +2662,14 @@ void GbaQueue::LoadMapObj()
 						System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
 					}
 				} else {
-					float x = *reinterpret_cast<float*>(mapObjBase + 4);
+					float x = mapObj->m_x;
 					const float scale = kGbaQueueMapCoordScale;
 					unsigned int mask = 1U << count;
 					unsigned int clearMask = ~mask;
-					float y = *reinterpret_cast<float*>(mapObjBase + 8);
-					float z = *reinterpret_cast<float*>(mapObjBase + 0xC);
-					float r = *reinterpret_cast<float*>(mapObjBase + 0x10);
-					int drawFlag = static_cast<int>(mapObjBase[1]);
+					float y = mapObj->m_y;
+					float z = mapObj->m_z;
+					float r = mapObj->m_radius;
+					int drawFlag = static_cast<int>(mapObj->m_drawFlag);
 					unsigned int entryBase = count * 0xC;
 
 					mapObjWork[8 + entryBase] = static_cast<unsigned char>(objType);
@@ -2690,7 +2690,7 @@ void GbaQueue::LoadMapObj()
 			}
 
 			i++;
-			mapObjBase += 0x14;
+			mapObj++;
 		} while (i < 0x20);
 
 		i = 0;

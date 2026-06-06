@@ -423,7 +423,7 @@ CFlatRuntime2::CFlatRuntime2()
 	m_gameFlags = (m_gameFlags & 0xFB) | 4;
 	m_debugDataIndex = 0;
 	m_letterEventEnabled = 0;
-	memset(runtime + 0x15CC, 0, 0x100);
+	memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
 	memset(LayerResources(this), 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
 
 	resetChangeScript();
@@ -2448,45 +2448,10 @@ void CFlatRuntime2::resetChangeScript()
 		m_debugLines[i].pointCount = 0;
 	}
 
-	int count = 2;
-	u8* block = runtime;
-	do {
-		block[0x134D] = 0;
-		block[0x134C] = 0xFF;
-		block[0x1361] = 0;
-		block[0x1360] = 0xFF;
-		block[0x1375] = 0;
-		block[0x1374] = 0xFF;
-		block[0x1389] = 0;
-		block[0x1388] = 0xFF;
-		block[0x139D] = 0;
-		block[0x139C] = 0xFF;
-		block[0x13B1] = 0;
-		block[0x13B0] = 0xFF;
-		block[0x13C5] = 0;
-		block[0x13C4] = 0xFF;
-		block[0x13D9] = 0;
-		block[0x13D8] = 0xFF;
-		block[0x13ED] = 0;
-		block[0x13EC] = 0xFF;
-		block[0x1401] = 0;
-		block[0x1400] = 0xFF;
-		block[0x1415] = 0;
-		block[0x1414] = 0xFF;
-		block[0x1429] = 0;
-		block[0x1428] = 0xFF;
-		block[0x143D] = 0;
-		block[0x143C] = 0xFF;
-		block[0x1451] = 0;
-		block[0x1450] = 0xFF;
-		block[0x1465] = 0;
-		block[0x1464] = 0xFF;
-		block[0x1479] = 0;
-		block[0x1478] = 0xFF;
-
-		block += 0xF8;
-		count--;
-	} while (count != 0);
+	for (int i = 0; i < 32; i++) {
+		m_mapObjectInfo[i].m_type = -1;
+		m_mapObjectInfo[i].m_drawFlag = 0;
+	}
 
 	m_workAssignIndex = 0;
 	m_partyAssignIndex = 0;

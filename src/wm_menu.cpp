@@ -2156,29 +2156,27 @@ void CMenuPcs::CalcMoveMenu()
 void CMenuPcs::InitSaveLoadMenu()
 {
 	float posX = FLOAT_803313dc;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
-	WmWorldState* const worldState = MenuPcs.m_wmWorldState;
 	float posY = FLOAT_803313e8;
 	int zero = 0;
 
-	worldState->m_frameCounter = zero;
-	worldState->m_titleState = zero;
-	worldState->m_worldReady = static_cast<unsigned char>(zero);
-	worldState->m_flag09 = static_cast<unsigned char>(zero);
-	worldState->m_flag0A = static_cast<unsigned char>(zero);
-	worldState->m_state0E = zero;
-	worldState->m_mainState = zero;
-	worldState->m_state12 = zero;
-	worldState->m_subState = zero;
-	worldState->m_delay = zero;
-	worldState->m_counter1A = zero;
-	worldState->m_posY = posY;
-	worldState->m_posX = posX;
-	worldState->m_mcResult = zero;
-	worldState->m_flag0B = static_cast<unsigned char>(zero);
-	worldState->m_cardChannel = zero;
-	m_wmTransitionCode = zero;
-	m_textureLocIndex = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_frameCounter = zero;
+	MenuPcs.m_wmWorldState->m_titleState = zero;
+	MenuPcs.m_wmWorldState->m_worldReady = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_flag09 = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_flag0A = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_state0E = zero;
+	MenuPcs.m_wmWorldState->m_mainState = zero;
+	MenuPcs.m_wmWorldState->m_state12 = zero;
+	MenuPcs.m_wmWorldState->m_subState = zero;
+	MenuPcs.m_wmWorldState->m_delay = zero;
+	MenuPcs.m_wmWorldState->m_counter1A = zero;
+	MenuPcs.m_wmWorldState->m_posY = posY;
+	MenuPcs.m_wmWorldState->m_posX = posX;
+	MenuPcs.m_wmWorldState->m_mcResult = zero;
+	MenuPcs.m_wmWorldState->m_flag0B = static_cast<unsigned char>(zero);
+	MenuPcs.m_wmWorldState->m_cardChannel = zero;
+	MenuPcs.m_wmTransitionCode = zero;
+	MenuPcs.m_textureLocIndex = static_cast<unsigned char>(zero);
 }
 
 /*
@@ -5504,12 +5502,10 @@ void CMenuPcs::DrawObj(int kind)
 void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
+	unsigned char* worldObj = m_wm.m_worldObjData;
 
-	const short state = worldState->m_mainState;
-	if (state <= 0 || state >= 3) {
+	short state = m_wmWorldState->m_mainState;
+	if (state == 0 || state >= 3) {
 		return;
 	}
 
@@ -5539,21 +5535,27 @@ void CMenuPcs::CalcPitcher()
 	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-	CChara::CModel* const model = reinterpret_cast<CChara::CModel*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-
-	const unsigned int step = static_cast<unsigned int>(worldState->m_frameCounter);
-	float blend = FLOAT_803313e8;
+	short step = m_wmWorldState->m_frameCounter;
+	float blendStep = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(step));
 	if (state == 1 && step < 10) {
-		blend = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] = blendStep;
 	} else if (state == 2 && bytes[0x13] != 0) {
-		blend = static_cast<float>(DOUBLE_80331420 - DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
+			static_cast<float>(DOUBLE_80331420 - static_cast<double>(blendStep));
+	} else {
+		reinterpret_cast<float*>(
+			reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x9C)[0] =
+			FLOAT_803313e8;
 	}
-	reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x9C)[0] = blend;
 
-	model->SetMatrix(scaleMtx);
-	reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0x98)[0] = static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
-	model->CalcMatrix();
-	model->CalcSkin();
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->SetMatrix(scaleMtx);
+	reinterpret_cast<int*>(
+		reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model) + 0x98)[0] =
+		static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcMatrix();
+	reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x788)[0]->m_model->CalcSkin();
 }
 
 /*

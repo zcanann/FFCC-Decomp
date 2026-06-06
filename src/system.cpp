@@ -40,7 +40,7 @@ struct CScenegraphDesc {
     CScenegraphEntry m_entries[1];
 };
 
-static const char s_cSystem[] = "CSystem";
+static const char s_cSystem[] = {'C', 'S', 'y', 's', 't', 'e', 'm', '\0'};
 extern const unsigned char s_systemDebugResources[0x194] = {
     0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
     0x66, 0x66, 0x63, 0x63, 0x5F, 0x63, 0x6C, 0x69, 0x2E, 0x62, 0x69, 0x6E,
@@ -77,7 +77,7 @@ extern const unsigned char s_systemDebugResources[0x194] = {
     0x00, 0x00, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE, 0x8F, 0xAC, 0x90, 0x94,
     0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
 };
-extern const char sSystemManagerClassName[] = "CManager";
+extern const char sSystemManagerClassName[] = {'C', 'M', 'a', 'n', 'a', 'g', 'e', 'r', '\0'};
 static const char s_system_cpp[12] = "system.cpp";
 static const char s_gamePalM_map[16] = "gamePalM.map";
 static const char s_compilerMapLoaded[] =

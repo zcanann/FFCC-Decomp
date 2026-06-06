@@ -6745,31 +6745,30 @@ LAB_calc:
 void CMenuPcs::DrawWMFrame()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 
-	short sVar = worldState->m_mainState;
+	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
-		worldState->m_posX -= FLOAT_80331550;
-		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
-			worldState->m_posX = FLOAT_803313dc;
+		m_wmWorldState->m_posX -= FLOAT_80331550;
+		if (static_cast<double>(m_wmWorldState->m_posX) <= DOUBLE_803314f0) {
+			m_wmWorldState->m_posX = FLOAT_803313dc;
 		}
 		alpha = static_cast<float>(DOUBLE_803316d8 *
-		                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		                           (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
 	} else if (sVar == 3) {
-		worldState->m_posX += FLOAT_80331550;
-		if (DOUBLE_803316e0 <= static_cast<double>(worldState->m_posX)) {
-			worldState->m_posX = FLOAT_80331440;
+		m_wmWorldState->m_posX += FLOAT_80331550;
+		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
+			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
 		alpha = static_cast<float>(-(DOUBLE_803316d8 *
-		                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		                             (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) -
 		                             DOUBLE_80331508));
 	} else {
 		alpha = FLOAT_80331458;
 	}
 	Mtx rotMtx;
-	PSMTXRotRad(rotMtx, 'z', worldState->m_posX * FLOAT_803314bc);
+	PSMTXRotRad(rotMtx, 'z', m_wmWorldState->m_posX * FLOAT_803314bc);
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor frameColor;

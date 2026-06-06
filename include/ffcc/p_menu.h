@@ -28,6 +28,8 @@ struct MenuLstState;
 struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
+struct SingMenuState;
+struct FavoListStorage;
 
 struct McListInfo
 {
@@ -400,6 +402,13 @@ public:
     void SetSingWinInfo(int, int, int, int);
     int SingGetLetterAttachflg();
     void LetterSetAttachItem(unsigned int, int);
+    void DrawSingBar(int, int, int, float);
+    void FavoInit();
+    void FavoInit0();
+    bool FavoOpen();
+    unsigned int FavoCtrl();
+    bool FavoClose();
+    void FavoDraw();
     void CalcMainMenuSub();
     void ChkSelectParty();
     void DrawMainMenuSub();
@@ -493,6 +502,7 @@ public:
         MoneyMenuState* m_moneyState;
         MenuLstState* m_menuLstState;
         ItemMenuState* m_itemMenuState;
+        SingMenuState* m_singMenuState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -510,6 +520,7 @@ public:
         MoneyMenuAnimList* m_moneyPanel;
         MenuLstList* m_menuLstList;
         ItemMenuAnimList* m_itemList;
+        FavoListStorage* m_favoList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -537,11 +548,13 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

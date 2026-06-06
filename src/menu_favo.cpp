@@ -56,8 +56,8 @@ void CMenuPcs::FavoDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	FavoEntry* entry = favoList->entries;
-	for (int i = 0; i < favoList->count; i++) {
+	FavoEntry* entry = m_favoList->entries;
+	for (int i = 0; i < m_favoList->count; i++) {
 		if (entry->tex >= 0) {
 			float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
@@ -159,8 +159,8 @@ void CMenuPcs::FavoDraw()
 		entry++;
 	}
 
-	FavoEntry* rankEntry = favoList->entries;
-	int count = favoList->count;
+	FavoEntry* rankEntry = m_favoList->entries;
+	int count = m_favoList->count;
 	int remaining = count;
 	while (0 < remaining) {
 		if (rankEntry->tex == 0x37) {
@@ -192,7 +192,7 @@ void CMenuPcs::FavoDraw()
 		drawEntry++;
 	}
 
-	CFont* rankFont = font22;
+	CFont* rankFont = m_fonts[0];
 	rankFont->SetShadow(1);
 	rankFont->SetScale(LoadFloat(FLOAT_80333048));
 	rankFont->DrawInit();
@@ -216,7 +216,7 @@ void CMenuPcs::FavoDraw()
 		drawEntry++;
 	}
 
-	CFont* nameFont = font16;
+	CFont* nameFont = m_fonts[4];
 	nameFont->SetShadow(0);
 	nameFont->SetScale(LoadFloat(FLOAT_80333070));
 	nameFont->SetMargin(LoadFloat(FLOAT_80333048));
@@ -255,10 +255,10 @@ bool CMenuPcs::FavoClose()
 	int frame;
 
 	finishedCount = 0;
-	this->singMenuState->frame = this->singMenuState->frame + 1;
-	count = this->favoList->count;
-	entry = this->favoList->entries;
-	frame = this->singMenuState->frame;
+	this->m_singMenuState->frame = this->m_singMenuState->frame + 1;
+	count = this->m_favoList->count;
+	entry = this->m_favoList->entries;
+	frame = this->m_singMenuState->frame;
 	for (int i = 0; i < count; i++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
@@ -328,11 +328,11 @@ active:
 	if (press == 0) {
 		doReset = 0;
 	} else if ((press & 0x20) != 0) {
-		singMenuState->cursorMove = 1;
+		m_singMenuState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = 1;
 	} else if ((press & 0x40) != 0) {
-		singMenuState->cursorMove = -1;
+		m_singMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = 1;
 	} else {
@@ -340,7 +340,7 @@ active:
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 			goto noReset;
 		} else if ((press & 0x200) != 0) {
-			singMenuState->closeRequested = 1;
+			m_singMenuState->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			doReset = 1;
 		} else {
@@ -372,15 +372,15 @@ bool CMenuPcs::FavoOpen()
 	int count;
 	int frame;
 
-	if (this->singMenuState->initialized == '\0') {
+	if (this->m_singMenuState->initialized == '\0') {
 		FavoInit();
 	}
 
 	finishedCount = 0;
-	this->singMenuState->frame = this->singMenuState->frame + 1;
-	count = this->favoList->count;
-	entry = this->favoList->entries;
-	frame = this->singMenuState->frame;
+	this->m_singMenuState->frame = this->m_singMenuState->frame + 1;
+	count = this->m_favoList->count;
+	entry = this->m_favoList->entries;
+	frame = this->m_singMenuState->frame;
 	for (int i = 0; i < count; i++) {
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
@@ -428,76 +428,76 @@ void CMenuPcs::FavoInit0()
 	FavoListStorage* list;
 	int entryIndex;
 
-	list = this->favoList;
+	list = this->m_favoList;
 	entryIndex = 0;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 2;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 7;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->startFrame = 7;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	alpha = LoadFloat(FLOAT_80333048);
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	list = this->favoList;
+	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
 	entry->startFrame = 0;
 	entry->duration = 5;
 
-	count = (unsigned int)this->favoList->count;
-	entry = this->favoList->entries;
+	count = (unsigned int)this->m_favoList->count;
+	entry = this->m_favoList->entries;
 	if (0 < (int)count) {
 		blockCount = count >> 3;
 		if (blockCount != 0) {
@@ -556,8 +556,8 @@ void CMenuPcs::FavoInit()
 	int iVar17;
 
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	memset(favoList, 0, sizeof(*favoList));
-	FavoEntry* entry = favoList->entries;
+	memset(m_favoList, 0, sizeof(*m_favoList));
+	FavoEntry* entry = m_favoList->entries;
 	iVar16 = 8;
 	do {
 		entry[0].uvScale = LoadFloat(FLOAT_80333048);
@@ -572,7 +572,7 @@ void CMenuPcs::FavoInit()
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
 
-	FavoListStorage* list = this->favoList;
+	FavoListStorage* list = this->m_favoList;
 	int entryIndex = 0;
 	FavoEntry* setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x33;
@@ -589,7 +589,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	list = this->favoList;
+	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x32;
 	setupEntry->x = 0x30;
@@ -602,7 +602,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	list = this->favoList;
+	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x33;
 	setupEntry->x = 0x30;
@@ -618,7 +618,7 @@ void CMenuPcs::FavoInit()
 	sVar9 = 0;
 	fVar7 = FLOAT_80333084;
 	sVar11 = 6;
-	list = this->favoList;
+	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x45;
 	setupEntry->x = 0x18;
@@ -631,7 +631,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	list = this->favoList;
+	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->tex = 0x45;
 	setupEntry->x = 0x1d;
@@ -644,7 +644,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	list = this->favoList;
+	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->tex = 0x2e;
@@ -657,10 +657,10 @@ void CMenuPcs::FavoInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	FavoEntry* firstEntry = favoList->entries;
+	FavoEntry* firstEntry = m_favoList->entries;
 	iVar17 = 4;
 	do {
-		setupEntry = &favoList->entries[entryIndex++];
+		setupEntry = &m_favoList->entries[entryIndex++];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		sVar11 = sVar11 + 2;
@@ -674,7 +674,7 @@ void CMenuPcs::FavoInit()
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
 
-		setupEntry = &favoList->entries[entryIndex++];
+		setupEntry = &m_favoList->entries[entryIndex++];
 		setupEntry->flags = 2;
 		setupEntry->tex = 0x37;
 		setupEntry->x = firstEntry->x + 0x28;
@@ -689,7 +689,7 @@ void CMenuPcs::FavoInit()
 		iVar17 = iVar17 - 1;
 	} while (iVar17 != 0);
 
-	favoList->count = sVar11;
+	m_favoList->count = sVar11;
 
 	memset(s_rank, 0, sizeof(s_rank));
 	FoodRank* ranks = s_rank;
@@ -741,6 +741,6 @@ void CMenuPcs::FavoInit()
 		iVar16--;
 	} while (iVar16 != 0);
 
-	singMenuState->selectedIndex = 0;
-	singMenuState->initialized = 1;
+	m_singMenuState->selectedIndex = 0;
+	m_singMenuState->initialized = 1;
 }

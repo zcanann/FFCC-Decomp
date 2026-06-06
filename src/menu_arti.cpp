@@ -501,11 +501,11 @@ int CMenuPcs::ArtiOpen()
 	int finished;
 	int frame;
 
-	ArtiState* state = GetArtiState(this);
-	if (state->initialized == '\0') {
+	if (GetArtiState(this)->initialized == '\0') {
 		ArtiInit();
 	}
 
+	ArtiState* state = GetArtiState(this);
 	state->frame = state->frame + 1;
 	finished = 0;
 	count = GetArtiOpenAnimList(this)->count;

@@ -111,13 +111,24 @@ public:
             reinterpret_cast<unsigned char*>(&m_half.m_header)[0] = flags;
         }
         bool IsOpened() const { return static_cast<signed char>(Flags()) < 0; }
-        void SetOpened() { SetFlags(Flags() | 0x80); }
+        void SetOpened()
+        {
+            unsigned char flags = Flags();
+            flags |= 0x80;
+            SetFlags(flags);
+        }
         bool IsAttachmentClaimed() const { return (Flags() & 0x40) != 0; }
         void SetAttachmentClaimed() { SetFlags((Flags() & 0xBF) | 0x40); }
         bool IsReplySent() const { return (Flags() & 0x20) != 0; }
-        void SetReplySent() { SetFlags((Flags() & ~0x20) | (1 << 5)); }
+        void SetReplySent()
+        {
+            unsigned char flags = Flags();
+            flags &= ~0x20;
+            flags |= 0x20;
+            SetFlags(flags);
+        }
         bool HasReply() const { return (Flags() & 0x10) != 0; }
-        bool AttachmentIsGil() const { return (Flags() & 8) != 0; }
+        bool AttachmentIsGil() const { return Flags() & 8; }
         unsigned short HeaderWord() const { return m_half.m_header; }
         unsigned short MessageType() const { return (HeaderWord() >> 2) & 0x1FF; }
         unsigned int SenderId() const { return (Word0() >> 9) & 0x1FF; }

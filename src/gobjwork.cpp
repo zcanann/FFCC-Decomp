@@ -411,17 +411,18 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	}
 
 	memset(&m_letters[0], 0, sizeof(m_letters[0]));
-	m_letters[0].m_half.m_header =
-		(m_letters[0].m_half.m_header & 0xF803) | static_cast<unsigned short>(letterType << 2);
+	unsigned short header = m_letters[0].m_half.m_header & 0xF803;
+	unsigned short letterTypeBits = static_cast<unsigned short>((letterType & 0x1FF) << 2);
+	m_letters[0].m_half.m_header = header | letterTypeBits;
 	m_letters[0].m_words.m_word0 = (m_letters[0].m_words.m_word0 & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	m_letters[0].SetFlags((m_letters[0].Flags() & ~8) | ((hasMoneyFlag << 3) & 8));
 	if (m_letters[0].AttachmentIsGil()) {
 		moneyValue /= 100;
 	}
 	m_letters[0].m_half.m_attachment = (m_letters[0].m_half.m_attachment & 0xFE00) | (moneyValue & 0x1FF);
-	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x80);
-	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x40);
-	m_letters[0].SetFlags(m_letters[0].Flags() & ~0x20);
+	m_letters[0].SetFlags(m_letters[0].Flags() & 0x7F);
+	m_letters[0].SetFlags(m_letters[0].Flags() & 0xBF);
+	m_letters[0].SetFlags(m_letters[0].Flags() & 0xDF);
 	m_letters[0].SetFlags((m_letters[0].Flags() & ~0x10) | ((hasReplyFlag << 4) & 0x10));
 	m_letters[0].m_half.m_tempVars[0] = static_cast<unsigned short>(itemA);
 	m_letters[0].m_half.m_tempVars[1] = static_cast<unsigned short>(itemB);

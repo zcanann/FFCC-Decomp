@@ -5,6 +5,22 @@
 #include "ffcc/system.h"
 #include "ffcc/usb.h"
 
+struct CUSBProcessTable
+{
+    char* m_name;
+    union
+    {
+        u32 m_words[(0x11C - sizeof(char*)) / sizeof(u32)];
+        struct
+        {
+            CProcessTableCallback m_create;
+            CProcessTableCallback m_destroy;
+            CProcessTableEntry m_entries[12];
+        } m_fields;
+    };
+};
+typedef int CUSBProcessTable_size_mismatch[(sizeof(CUSBProcessTable) == 0x11C) ? 1 : -1];
+
 class CUSBPcs : public CProcess
 {
 public:
@@ -21,7 +37,7 @@ public:
         u8 m_reserved34[0xC];
     };
 
-    static CProcessTable m_table;
+    static CUSBProcessTable m_table;
 
     CUSBPcs();
 

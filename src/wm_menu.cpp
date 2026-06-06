@@ -10030,17 +10030,16 @@ LAB_draw:
 	}
 	if (worldState->m_subState == 0x11) {
 		short mode = worldState->m_menuMode;
-		int msgId = -1;
 		if (mode == 5) {
-			msgId = 2;
+			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+			char* text = const_cast<char*>(GetMcStr(2));
+			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		} else if (mode == 2) {
-			msgId = 3;
-		}
-		if (msgId >= 0) {
-			_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-			char* text = const_cast<char*>(GetMcStr(msgId));
-			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+			char* text = const_cast<char*>(GetMcStr(3));
+			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(3)), FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}
 	DrawInit();

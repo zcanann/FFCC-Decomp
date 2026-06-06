@@ -1000,10 +1000,10 @@ void CRingMenu::onCalc()
 						if ((prevDir != 0) || (nextDir != 0)) {
 							if ((prevDir != 0) && (nextDir != 0)) {
 								unsigned short trigger = 0;
-								if ((Pad._452_4_ == 0) && !((m_menuIndex == 0) && (Pad._448_4_ != -1))) {
+								if ((Pad.m_debugPadLock == 0) && !((m_menuIndex == 0) && (Pad.m_debugPadPort != -1))) {
 									const int idx =
 										m_menuIndex &
-										~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
+										~(static_cast<int>(~(Pad.m_debugPadPort - m_menuIndex | m_menuIndex - Pad.m_debugPadPort)) >> 31);
 									trigger = Pad.GetPadInputs()[idx].button[0];
 								}
 								scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(prevDir) : static_cast<float>(nextDir);

@@ -96,14 +96,17 @@ public:
     union {
         unsigned int _1c0_4_;
         int _448_4_;
+        int m_debugPadPort;
     };
     union {
         unsigned int _1c4_4_;
         int _452_4_;
+        int m_debugPadLock;
     };
     union {
         int _1c8_4_;
         int _456_4_;
+        int m_stickDigitalThreshold;
     };
 };
 

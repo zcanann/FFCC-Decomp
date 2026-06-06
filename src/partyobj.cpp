@@ -29,7 +29,6 @@ public:
 class CDbgMenuPcs;
 extern CDbgMenuPcs DbgMenuPcs;
 
-extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern const char lbl_801DCA48[];
 extern const char lbl_801DCCB0[];
 extern const char lbl_801DCD78[];
@@ -139,31 +138,31 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 
 static unsigned short getPadHeldForSlot(int slot)
 {
-	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
 	return Pad.GetPadInputs()[idx].button[0];
 }
 
 static unsigned short getPadTrigForSlot(int slot)
 {
-	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
 	return Pad.GetPadInputs()[idx].buttonDown[0];
 }
 
 static int getPadConnectedForSlot(int slot)
 {
-	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
 		return 0;
 	}
 
-	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
 	return Pad.GetPadInputs()[idx].gbaMode;
 }
 
@@ -193,21 +192,21 @@ static unsigned short getItemKindFromCfd(int itemId)
 
 static float getPadLeftStickXForSlot(int slot)
 {
-	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
 	return Pad.GetPadInputs()[idx].stickXF;
 }
 
 static float getPadLeftStickYForSlot(int slot)
 {
-	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+	if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
 		return 0.0f;
 	}
 
-	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	int idx = slot & ~((~(Pad.m_debugPadPort - slot | slot - Pad.m_debugPadPort) >> 31));
 	return Pad.GetPadInputs()[idx].stickYF;
 }
 
@@ -2002,13 +2001,13 @@ void CGPartyObj::onStatShield()
 		bool suppressInput = false;
 		unsigned short trig;
 		int padSlot = static_cast<signed char>(m_animStateMisc);
-		if ((Pad._452_4_ != 0) || ((padSlot == 0) && (Pad._448_4_ != -1))) {
+		if ((Pad.m_debugPadLock != 0) || ((padSlot == 0) && (Pad.m_debugPadPort != -1))) {
 			suppressInput = true;
 		}
 		if (suppressInput) {
 			trig = 0;
 		} else {
-			int selectedPort = Pad._448_4_;
+			int selectedPort = Pad.m_debugPadPort;
 			unsigned int padIndex =
 			    padSlot &
 			    ~((int)~(selectedPort - padSlot | padSlot - selectedPort) >> 31);
@@ -2336,7 +2335,7 @@ void CGPartyObj::checkTargetParticle()
 				move.y = 0.0f;
 				move.z = 0.0f;
 			} else {
-				CalcHitSlide__7CMapObjFP3Vecf(getMapHitObject(), &move);
+				getMapHitObject()->CalcHitSlide(&move, FLOAT_80331A98);
 			}
 		}
 

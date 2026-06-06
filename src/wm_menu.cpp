@@ -539,7 +539,7 @@ void CMenuPcs::WmInit()
 	float initValue = FLOAT_803313dc;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
+	m_bonusBoardPtr = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
@@ -716,11 +716,10 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774)[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	reinterpret_cast<void**>(bytes + 0x814)[0] =
-	    operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214);
-	memset(reinterpret_cast<void**>(bytes + 0x814)[0], 0, 0xC80);
+	m_bonusBoardPtr = reinterpret_cast<int>(operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214));
+	memset(reinterpret_cast<void*>(m_bonusBoardPtr), 0, 0xC80);
 	for (int i = 0; i < 0x28; i++) {
-		unsigned char* const entry = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]) + i * 0x50;
+		unsigned char* const entry = reinterpret_cast<unsigned char*>(m_bonusBoardPtr) + i * 0x50;
 		*reinterpret_cast<short*>(entry + 0x0C) = 0;
 		*reinterpret_cast<short*>(entry + 0x0E) = 0;
 		*reinterpret_cast<short*>(entry + 0x10) = 0x280;
@@ -1054,9 +1053,9 @@ void CMenuPcs::destroyWorld()
 		}
 	}
 
-	if (reinterpret_cast<void**>(bytes + 0x814)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]);
-		reinterpret_cast<void**>(bytes + 0x814)[0] = 0;
+	if (m_bonusBoardPtr != 0) {
+		delete[] reinterpret_cast<unsigned char*>(m_bonusBoardPtr);
+		m_bonusBoardPtr = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x818)[0] != 0) {
 		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x818)[0]);
@@ -1469,14 +1468,14 @@ void CMenuPcs::CalcMCardMenu()
 	McCtrl& mcCtrl = *GetMcCtrl();
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short uVar3;
 	if (bVar1) {
 		uVar3 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		uVar3 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
@@ -2272,14 +2271,14 @@ void CMenuPcs::CalcLoadMenu()
 	bytes[0x86E] = 0;
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short uVar4;
 	if (bVar1) {
 		uVar4 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		uVar4 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
@@ -3083,14 +3082,14 @@ void CMenuPcs::CalcTitleMenu()
 	}
 
 	bool bVar1 = false;
-	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
 	unsigned short down;
 	if (bVar1) {
 		down = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
 		down = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	const unsigned short repeat = GetButtonRepeat(0);
@@ -7530,14 +7529,14 @@ void CMenuPcs::CalcCharaSelect()
 
 			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
 				bool noInput = false;
-				if (Pad._452_4_ != 0 || (i == 0 && Pad._448_4_ != -1)) {
+				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
 					noInput = true;
 				}
 				if (noInput) {
 					padRepeat[i] = 0;
 					padTrig[i] = 0;
 				} else {
-					const unsigned int padIndex = (Pad._448_4_ == i) ? 0 : static_cast<unsigned int>(i);
+					const unsigned int padIndex = (Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i);
 					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
 					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
 				}

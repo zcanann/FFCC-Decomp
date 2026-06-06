@@ -651,14 +651,14 @@ static inline CMenuMcWinState& MenuMcWinState(CMenuPcsGoOutLayout& layout)
 static inline unsigned short GetGoOutInputMask()
 {
     bool hasPendingInput = false;
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
         hasPendingInput = true;
     }
     if (hasPendingInput) {
         return 0;
     }
 
-    __cntlzw(Pad._448_4_);
+    __cntlzw(Pad.m_debugPadPort);
     return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 

@@ -561,7 +561,6 @@ void CMes::Draw()
 			globalAlpha = 0xFF;
 		}
 
-		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
 		float* glyph = (float*)((char*)this + 0x0C);
 		CFont* font = 0;
 		unsigned int activeTlut = 0xFFFFFFFF;
@@ -686,12 +685,12 @@ void CMes::Draw()
 					unsigned int fontId = (unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
 					if (activeFontId != fontId)
 					{
-						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+						nextFont = MenuPcs.m_fonts[2];
 						if (fontId != 2)
 						{
 							if (fontId < 2)
 							{
-								nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+								nextFont = MenuPcs.m_fonts[0];
 								if (fontId != 0)
 								{
 									nextFont = font;
@@ -702,7 +701,7 @@ void CMes::Draw()
 								nextFont = font;
 								if (fontId < 4)
 								{
-									nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+									nextFont = MenuPcs.m_fonts[2];
 								}
 							}
 						}
@@ -880,14 +879,13 @@ int CMes::GetWait()
  */
 void CMes::addString(char** text, int branchMode)
 {
-	unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
-	CFont* font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+	CFont* font = MenuPcs.m_fonts[2];
 	int fontSel = *(int*)((char*)this + 0x3D40);
 	int caseMode = 0;
 	int flowMode = branchMode;
 	if (fontSel == 0)
 	{
-		font = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+		font = MenuPcs.m_fonts[0];
 	}
 	else if ((fontSel == 1) || (fontSel >= 4))
 	{
@@ -895,7 +893,7 @@ void CMes::addString(char** text, int branchMode)
 	}
 	else
 	{
-		font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+		font = MenuPcs.m_fonts[2];
 	}
 
 	font->SetShadow(*(int*)((char*)this + 0x3D38));
@@ -1242,11 +1240,11 @@ void CMes::addString(char** text, int branchMode)
 				int nextFontSel = *(int*)((char*)this + 0x3D40);
 				if (nextFontSel == 0)
 				{
-					font = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+					font = MenuPcs.m_fonts[0];
 				}
 				else
 				{
-					font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+					font = MenuPcs.m_fonts[2];
 				}
 				font->SetShadow(*(int*)((char*)this + 0x3D38));
 				font->SetMargin(FLOAT_8033089c);

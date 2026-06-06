@@ -457,10 +457,10 @@ void CMesMenu::onDraw()
             }
         } else if (charaMode == 4) {
             unsigned short buttons;
-            if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+            if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
                 buttons = 0;
             } else {
-                buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad._448_4_) >> 5].button[0];
+                buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad.m_debugPadPort) >> 5].button[0];
             }
 
             iconFrame = s_mesMenuIconFrames[0];

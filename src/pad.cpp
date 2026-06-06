@@ -337,25 +337,25 @@ void CPad::Frame()
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
-							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16) >= _1c8_4_) ||
+							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16) >= m_stickDigitalThreshold) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
-								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16) >= _1c8_4_)))
+								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16) >= m_stickDigitalThreshold)))
 							{
 								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
 								*reinterpret_cast<u32*>(iVar6 + 0x40) = 1;
-								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
+								if (m_stickDigitalThreshold <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_RIGHT);
 								}
-								if (-static_cast<int>(_1c8_4_) >= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
+								if (-static_cast<int>(m_stickDigitalThreshold) >= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_LEFT);
 								}
-								if (_1c8_4_ <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
+								if (m_stickDigitalThreshold <= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_UP);
 								}
-								if (-static_cast<int>(_1c8_4_) >= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
+								if (-static_cast<int>(m_stickDigitalThreshold) >= static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)))
 								{
 									*puVar12 = static_cast<u16>(*puVar12 | PAD_BUTTON_DOWN);
 								}
@@ -602,8 +602,8 @@ void CPad::Init()
 	_1ac_4_ = 0;
 	_1b0_4_ = 0;
 	_1bc_4_ = 0;
-	_1c0_4_ = 0xFFFFFFFF;
-	_1c8_4_ = 1;
+	m_debugPadPort = 0xFFFFFFFF;
+	m_stickDigitalThreshold = 1;
 
 	if (System.IsGdev())
 	{

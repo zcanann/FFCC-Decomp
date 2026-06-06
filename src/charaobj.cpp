@@ -65,12 +65,12 @@ static float CharaObjGetStatusMultiplier(int offset)
 
 static int CharaObjGetPadSlotIndex(unsigned char slot)
 {
-	return slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_) >> 31));
+	return slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort) >> 31));
 }
 
 static bool CharaObjUseDebugPad(unsigned char slot)
 {
-	return (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+	return (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 }
 
 static unsigned short CharaObjGetPadState(unsigned char slot, int baseOffset)
@@ -600,16 +600,16 @@ void CGCharaObj::onFramePostCalc()
 		    statusValue > 0) {
 			char slot = m_animStateMisc;
 			unsigned short padMask = 0;
-			bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
-				int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+				int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
 				padMask = Pad.GetPadInputs()[idx].buttonDown[0];
 			}
 			if ((MiniGamePcs.m_flags & 0x100) != 0) {
-				useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+				useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 				unsigned short heldMask = 0;
 				if (!useDebugPad) {
-					int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+					int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
 					heldMask = Pad.GetPadInputs()[idx].repeatButton;
 				}
 				padMask |= heldMask;
@@ -749,9 +749,9 @@ void CGCharaObj::onFramePreCalc()
 		}
 		unsigned char slot = m_animStateMisc;
 		int padHeld = 0;
-		bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+		bool useDebugPad = (Pad.m_debugPadLock != 0) || ((slot == 0) && (Pad.m_debugPadPort != -1));
 		if (!useDebugPad) {
-			int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+			int idx = slot & ~((~(Pad.m_debugPadPort - static_cast<int>(slot) | static_cast<int>(slot) - Pad.m_debugPadPort)) >> 31);
 			padHeld = Pad.GetPadInputs()[idx].gbaMode;
 		}
 		if (padHeld != 0) {
@@ -1193,14 +1193,15 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	}
 
 	int particleIndex = hitParam->m_particleIndex;
+	int classId = hitParam->m_classId;
 	CGPrgObj* sourceObj;
-	if (hitParam->m_classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(static_cast<int>(hitParam->m_classId)));
+	if (classId != 0) {
+		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(classId));
 	} else {
 		sourceObj = 0;
 	}
 
-	int sourceCid = sourceObj->GetCID();
+	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}

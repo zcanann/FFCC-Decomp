@@ -53,10 +53,10 @@ void CSystemPcs::calc()
     int stepPad;
     unsigned short buttons;
 
-    if ((int)Pad._1c4_4_ != 0) {
+    if (Pad.m_debugPadLock != 0) {
         buttons = 0;
     } else {
-        debugPad = (int)Pad._1c0_4_;
+        debugPad = Pad.m_debugPadPort;
         stepPad = (debugPad == 4) ? 0 : 4;
         buttons = Pad.GetPadInputs()[stepPad].lockedButton[1];
     }
@@ -69,14 +69,14 @@ void CSystemPcs::calc()
         return;
     }
     if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
-        int nextPad = (int)Pad._1c0_4_ + 1;
+        int nextPad = Pad.m_debugPadPort + 1;
         if (nextPad == 0) {
             nextPad++;
         }
         if (nextPad > 3) {
             nextPad = -1;
         }
-        Pad._1c0_4_ = (unsigned int)nextPad;
+        Pad.m_debugPadPort = nextPad;
     }
 }
 

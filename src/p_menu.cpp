@@ -232,34 +232,34 @@ void CMenuPcs::Init()
 
     m_singleMenuStageActive = 0;
     *reinterpret_cast<u16*>(self + 0x86C) = 0;
-    *reinterpret_cast<u32*>(self + 0x830) = 0;
+    m_cmakeVillageWork = 0;
     m_artiList = 0;
     m_battleStateFlag = 0;
 
     WmInit();
     BonusInit();
 
-    self[0x8E] = 0;
+    m_optionIndex = 0;
     one = LoadFloat(kMenuInitOne);
     i = 1;
     cardChannel = reinterpret_cast<int*>(self + 0x28);
-    self[0x8F] = 0;
-    self[0x90] = 0;
-    self[0x91] = 6;
-    self[0x92] = 6;
-    self[0x93] = 0;
-    self[0x94] = 0;
-    self[0x9C] = 0;
-    *reinterpret_cast<f32*>(self + 0x98) = one;
-    self[0x9D] = 0;
-    self[0xA4] = 0;
-    *reinterpret_cast<f32*>(self + 0xA0) = one;
-    *reinterpret_cast<f32*>(self + 0xA8) = one;
-    self[0xAC] = 0;
-    self[0xB5] = 0;
-    self[0xB6] = 0;
-    self[0xB7] = 0;
-    self[0xB8] = 0;
+    m_gameInitMode = 0;
+    m_stereoMode = 0;
+    m_bgmVolume = 6;
+    m_seVolume = 6;
+    m_leftHintTimer = 0;
+    m_rightHintTimer = 0;
+    m_optionMenuState = 0;
+    m_optionOpenAnim = one;
+    m_pad9D[0] = 0;
+    m_optionAnimPhase = 0;
+    m_optionRowAnim = one;
+    m_optionColumnAnim = one;
+    m_optionAnimCounter = 0;
+    m_specialModeFlags[0] = 0;
+    m_specialModeFlags[1] = 0;
+    m_specialModeFlags[2] = 0;
+    m_specialModeFlags[3] = 0;
     *reinterpret_cast<u32*>(self + 0xBC) = 0;
     *reinterpret_cast<u32*>(self + 0xC0) = 0;
     *reinterpret_cast<u32*>(self + 0xC4) = 0;
@@ -278,7 +278,7 @@ void CMenuPcs::Init()
         i = i + -1;
     } while (i != 0);
 
-    *reinterpret_cast<void**>(self + 0x878) = nullptr;
+    m_shopMenu = 0;
     self[0x87C] = 1;
     self[0x888] = 0;
     self[0x889] = 0;
@@ -1035,11 +1035,11 @@ u16 CMenuPcs::GetButtonDown(int port)
     bool noInput = false;
     u32 result;
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         if (port != 0) {
             goto input_check_done;
         }
-        if (Pad._448_4_ == -1) {
+        if (Pad.m_debugPadPort == -1) {
             goto input_check_done;
         }
     }
@@ -1049,7 +1049,7 @@ input_check_done:
     if (noInput) {
         result = 0;
     } else {
-        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
         result = Pad.GetPadInputs()[clamped].buttonDown[0];
     }
 
@@ -1070,11 +1070,11 @@ u16 CMenuPcs::GetButtonRepeat(int port)
     bool noInput = false;
     u32 result;
 
-    if (Pad._452_4_ == 0) {
+    if (Pad.m_debugPadLock == 0) {
         if (port != 0) {
             goto repeat_check_done;
         }
-        if (Pad._448_4_ == -1) {
+        if (Pad.m_debugPadPort == -1) {
             goto repeat_check_done;
         }
     }
@@ -1084,7 +1084,7 @@ repeat_check_done:
     if (noInput) {
         result = 0;
     } else {
-        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
         result = Pad.GetPadInputs()[clamped].repeatButton;
     }
 

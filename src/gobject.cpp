@@ -27,7 +27,6 @@
 
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 
@@ -544,10 +543,10 @@ void CGObject::move()
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
 
         if (canReadPad) {
-            const bool useDebugPad = (Pad._452_4_ != 0) || ((player == 0) && (Pad._448_4_ != -1));
+            const bool useDebugPad = (Pad.m_debugPadLock != 0) || ((player == 0) && (Pad.m_debugPadPort != -1));
             const u32 playerIndex = static_cast<u32>(player)
-                & ~((static_cast<int>(~(Pad._448_4_ - static_cast<int>(player)
-                                        | static_cast<int>(player) - Pad._448_4_))
+                & ~((static_cast<int>(~(Pad.m_debugPadPort - static_cast<int>(player)
+                                        | static_cast<int>(player) - Pad.m_debugPadPort))
                      >> 31));
             const u8* padBytes = reinterpret_cast<u8*>(&Pad);
 
@@ -977,7 +976,7 @@ void CGObject::bgNormalCollision()
         }
 
         m_stateFlags0 = (m_stateFlags0 & 0xBF) | 0x40;
-        CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &move);
+        MapMng.m_hitMapObj->CalcHitSlide(&move, sJumpLift);
 
         if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
             move.x = sZeroFloat;
@@ -1036,7 +1035,7 @@ void CGObject::bgNormalCollision()
         MapMng.m_hitMapObj->GetHitFaceNormal(&HitFaceNormal());
     }
 
-    if (CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &move) != 0) {
+    if (MapMng.m_hitMapObj->CalcHitSlide(&move, sBgAttrNormal) != 0) {
         GObjectMapCylinder hitCylinder;
         hitCylinder.m_bottom = pos;
         hitCylinder.Probe().m_direction = move;

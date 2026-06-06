@@ -1370,10 +1370,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x73: {
 			unsigned int buttons = 0;
 			int playerIndex = ScriptPlayerIndex(engineObject);
-			bool useDebugPad = (Pad._452_4_ != 0) || ((playerIndex == 0) && (Pad._448_4_ != -1));
+			bool useDebugPad = (Pad.m_debugPadLock != 0) || ((playerIndex == 0) && (Pad.m_debugPadPort != -1));
 			if (!useDebugPad) {
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
-				    & ~((static_cast<int>(~(Pad._448_4_ - playerIndex | playerIndex - Pad._448_4_)) >> 31));
+				    & ~((static_cast<int>(~(Pad.m_debugPadPort - playerIndex | playerIndex - Pad.m_debugPadPort)) >> 31));
 				buttons = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&Pad) + 4 + slot * 0x54);
 			}
 			PushValue(this, object, static_cast<int>(buttons));

@@ -298,11 +298,11 @@ unsigned short CPad::GetButtonDown(long padIndex)
     bool shouldZero = false;
     unsigned int result;
 
-    if (_452_4_ == 0) {
+    if (m_debugPadLock == 0) {
         if (padIndex != 0) {
             goto read_slot;
         }
-        if (_448_4_ == -1) {
+        if (m_debugPadPort == -1) {
             goto read_slot;
         }
     }
@@ -312,7 +312,7 @@ read_slot:
     if (shouldZero) {
         result = 0;
     } else {
-        unsigned int resolvedIndex = (_448_4_ == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
+        unsigned int resolvedIndex = (m_debugPadPort == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
         result = GetPadInputs()[resolvedIndex].buttonDown[0];
     }
 

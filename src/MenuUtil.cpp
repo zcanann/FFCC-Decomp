@@ -3,6 +3,7 @@
 #include "ffcc/game.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/memory.h"
+#include "ffcc/menu_arti.h"
 #include "ffcc/mes.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -15,7 +16,11 @@
 #include <math.h>
 
 extern "C" char s_MenuUtil_cpp_801e37fc[];
-extern char lbl_801E3058[];
+struct MenuOptionEstandarData {
+	char m_text[0x0C];
+	u32 m_helpLineBaseY[4];
+};
+
 extern "C" const char s_MenuOptionMusic[] = "Music";
 extern "C" const char s_MenuOptionOn[] = "On";
 extern "C" const char s_MenuOptionOff[] = "Off";
@@ -165,7 +170,7 @@ extern char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[];
 extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
-extern char s_MenuOptionEstandar_801E36C4[];
+extern MenuOptionEstandarData s_MenuOptionEstandar_801E36C4;
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];
@@ -230,7 +235,7 @@ extern "C" char* g_strMenuUtilMes[] = {
 	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
 	const_cast<char*>(s_Apagado_80333528), const_cast<char*>(s_MenuOptionEstereo_80333530), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
-	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4,
+	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4.m_text,
 };
 
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
@@ -264,9 +269,7 @@ static inline CTextureSet* GetMenuTextureSet(CMenuPcs* menu, int offset)
 
 static inline CTexture* GetTextureSetTexture(CTextureSet* set, int index)
 {
-	unsigned char* ptrArray = reinterpret_cast<unsigned char*>(set) + 8;
-	CTexture** textures = *reinterpret_cast<CTexture***>(ptrArray + 0x10);
-	return textures[index];
+	return set->GetTexture(index);
 }
 
 static inline void SetUv(Vec2d& uv, float u, float v)
@@ -280,7 +283,7 @@ static inline unsigned short GetMenuPress()
 {
 	bool activeInput = false;
 
-	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
 		activeInput = true;
 	}
 
@@ -289,7 +292,7 @@ static inline unsigned short GetMenuPress()
 	}
 
 	int padIndex = 0;
-	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
 	return Pad.GetPadInputs()[padIndex].buttonDown[0];
 }
 
@@ -300,7 +303,7 @@ static inline unsigned short GetMenuPress()
  */
 float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 	float width;
 	const float& scaleY = kOptionAnimMax;
 	const float& halfWidth = kMenuCenteringHalfWidth;
@@ -335,7 +338,7 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 #pragma dont_inline on
 void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -361,7 +364,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 #pragma dont_inline on
 void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -386,7 +389,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const u32* lineBaseData = reinterpret_cast<const u32*>(lbl_801E3058 + 0x678);
+	const u32* lineBaseData = s_MenuOptionEstandar_801E36C4.m_helpLineBaseY;
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];
@@ -549,9 +552,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 			font->Draw(scratch);
 
-			if ((m_battleStateFlag == 2) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_artiState) + 0x30) == 1)) {
-				int menuState = reinterpret_cast<int>(m_artiState);
+			if ((m_battleStateFlag == 2) && (m_artiState->currentSelection == 1)) {
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {
@@ -573,8 +574,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					int equipmentSlot = caravanWork->m_equipment[currentItem];
 					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
-					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-					                                              static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34)))) != 0) {
+					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
+					                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
 						int currentItemBase = Game.unkCFlatData0[2] + currentItem * 0x48;
 						unsigned int currentValue;
 						if (currentItem == -1) {
@@ -1043,7 +1044,7 @@ void CMenuPcs::CalcOptionMenu()
  */
 void CMenuPcs::DrawOptionMenu()
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 	int languageBase = (Game.m_gameWork.m_languageId - 1) * 20;
 	_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	Vec2d uv0;

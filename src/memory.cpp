@@ -471,8 +471,8 @@ void CMemory::Frame()
     unsigned short trigger;
 
     activeInput = false;
-    if (Pad._452_4_ == 0) {
-        if (Pad._448_4_ == -1) {
+    if (Pad.m_debugPadLock == 0) {
+        if (Pad.m_debugPadPort == -1) {
             goto frame_input_done;
         }
     }
@@ -484,7 +484,7 @@ frame_input_done:
         trigger = 0;
     } else {
         int port = 0;
-        unsigned int clamped = (unsigned int)port & ~-((int)(__cntlzw(static_cast<unsigned int>(Pad._448_4_)) >> 5));
+        unsigned int clamped = (unsigned int)port & ~-((int)(__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) >> 5));
         trigger = Pad.GetPadInputs()[clamped].lockedButton[1];
     }
 

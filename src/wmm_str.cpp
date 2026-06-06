@@ -128,14 +128,14 @@ int CMenuPcs::GetSlotABXPos(int right)
         break;
     }
 
-    font = menuFont;
+    font = m_fonts[0];
     font->SetMargin(FLOAT_803336CC);
     font->SetShadow(0);
     font->SetScale(FLOAT_803336CC);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
-    short* windowInfo = singWindowInfo;
+    short* windowInfo = m_singWindowInfo;
     double centeredWidth = (double)(windowInfo[2] - slotAWidth);
     double windowLeft = (double)windowInfo[0];
     int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);
@@ -180,13 +180,13 @@ int CMenuPcs::GetYesNoXPos(int right)
         break;
     }
 
-    font = menuFont;
+    font = m_fonts[0];
     font->SetMargin(FLOAT_803336CC);
     font->SetShadow(0);
     font->SetScale(FLOAT_803336CC);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
-    short* windowInfo = singWindowInfo;
+    short* windowInfo = m_singWindowInfo;
     double centeredWidth = (double)(windowInfo[2] - yesWidth);
     double windowLeft = (double)windowInfo[0];
     int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);

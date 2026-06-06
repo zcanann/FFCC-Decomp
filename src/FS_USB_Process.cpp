@@ -285,8 +285,9 @@ void CFunnyShapePcs::SetUSBData()
         u8* meshData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x106)
             u8[usb->m_sizeBytes];
         memcpy(meshData, usb->m_data, usb->m_sizeBytes);
-        *reinterpret_cast<s16*>(meshData + 0x0) = LoadSwap16(*reinterpret_cast<s16*>(meshData + 0x0));
-        *reinterpret_cast<s16*>(meshData + 0x2) = LoadSwap16(*reinterpret_cast<s16*>(meshData + 0x2));
+        OSFS_SHAPE_ST* mesh = reinterpret_cast<OSFS_SHAPE_ST*>(meshData);
+        mesh->flags = LoadSwap16(mesh->flags);
+        mesh->count = LoadSwap16(mesh->count);
 
         int src2c = 0;
         int src24 = 0;

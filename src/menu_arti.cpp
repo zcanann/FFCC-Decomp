@@ -149,27 +149,27 @@ int CMenuPcs::ArtiCtrlCur()
 	int selection;
 
 	bVar2 = false;
-	padLock = Pad._452_4_;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	padLock = Pad.m_debugPadLock;
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		bVar2 = true;
 	}
 	if (bVar2) {
 		uVar3 = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 
 	bVar2 = false;
-	if ((padLock != 0) || (Pad._448_4_ != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		bVar2 = true;
 	}
 	if (bVar2) {
 		uVar4 = 0;
 	} else {
 		int padIndex = 0;
-		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		padIndex &= ~-((__cntlzw((unsigned int)Pad.m_debugPadPort) & 0x20) >> 5);
 		uVar4 = Pad.GetPadInputs()[padIndex].repeatButton;
 	}
 

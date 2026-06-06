@@ -82,6 +82,11 @@ static inline CrystalWork* GetCrystalWork(pppCrystal* crystal, _pppCtrlTable* ct
     return reinterpret_cast<CrystalWork*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_workOffset);
 }
 
+static inline pppCrystalColorBlock* GetCrystalColorBlock(pppCrystal* crystal, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppCrystalColorBlock*>(crystal->m_workArea + GetCrystalDataOffsets(ctrl)->m_colorBlockOffset);
+}
+
 union CrystalFloatBits {
     float value;
     u32 bits;
@@ -140,11 +145,9 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* param_2, _pppCtrlT
 {
 	float texW;
 	float texH;
-	CrystalDataOffsets* serializedDataOffsets = GetCrystalDataOffsets(param_3);
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = GetCrystalWork(pppCrystal, param_3);
-	pppCrystalColorBlock* colorBlock =
-		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_workArea + serializedDataOffsets->m_colorBlockOffset);
+	pppCrystalColorBlock* colorBlock = GetCrystalColorBlock(pppCrystal, param_3);
 
 	if (dataValIndex == 0xFFFF) {
 		return;

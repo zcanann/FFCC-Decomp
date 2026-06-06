@@ -44,6 +44,12 @@ struct Mana2DataOffsets
     s32 m_workOffset;
 };
 
+struct Mana2SetupBlock
+{
+    u8 m_pad0[8];
+    pppCVECTOR m_color;
+};
+
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
 extern const float FLOAT_80331898 = 0.0f;
@@ -98,6 +104,18 @@ static inline Mtx44& CameraScreenMatrix()
 static inline Mana2DataOffsets* GetMana2DataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<Mana2DataOffsets*>(ctrl->m_serializedDataOffsets);
+}
+
+static inline VMana2* GetMana2Work(pppMana2* mana, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<VMana2*>(
+        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_workOffset);
+}
+
+static inline Mana2SetupBlock* GetMana2SetupBlock(pppMana2* mana, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<Mana2SetupBlock*>(
+        reinterpret_cast<_pppPObject*>(mana)->m_workArea + GetMana2DataOffsets(ctrl)->m_setupOffset);
 }
 
 static inline float LoadFloat(const float& value)
@@ -1050,8 +1068,6 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     CChara::CModel* model;
     CGObject* gObject;
     s32 i;
-    s32 setupOffset;
-    u8* setup;
     CChara::CMesh* mesh;
     CChara::CMesh::CRefData* meshData;
     u32 meshIndex;
@@ -1062,11 +1078,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    Mana2DataOffsets* serializedOffsets = GetMana2DataOffsets(param_3);
-    setupOffset = serializedOffsets->m_setupOffset;
-    mana2Work =
-        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + serializedOffsets->m_workOffset);
-    setup = reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + setupOffset;
+    mana2Work = GetMana2Work(pppMana2, param_3);
+    Mana2SetupBlock* setupBlock = GetMana2SetupBlock(pppMana2, param_3);
     if (gObject == NULL) {
         return;
     }
@@ -1081,7 +1094,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
     SetMana2ModelCallbacks(model, mana2Work, param_2);
 
-    MaterialMan.SetManaAlpha(setup[0xB]);
+    MaterialMan.SetManaAlpha(setupBlock->m_color.rgba[3]);
     mana2Work->m_waterAlpha = MaterialMan.GetManaAlpha();
 
     if (*(s32*)pppMana2 != 0) {
@@ -1292,8 +1305,7 @@ void pppDestructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     u32 i;
     u32 j;
 
-    work =
-        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + GetMana2DataOffsets(param_2)->m_workOffset);
+    work = GetMana2Work(pppMana2, param_2);
     MaterialMan.ClearManaParaboloidTexObjs();
 
     if (work->m_generatedTexObj0 != NULL) {
@@ -1439,11 +1451,8 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     VMana2* work;
-    s32 workOffset;
 
-    workOffset = GetMana2DataOffsets(param_2)->m_workOffset;
-    work =
-        reinterpret_cast<VMana2*>(reinterpret_cast<_pppPObject*>(pppMana2)->m_workArea + workOffset);
+    work = GetMana2Work(pppMana2, param_2);
     gObject = (CGObject*)ppvMng->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 

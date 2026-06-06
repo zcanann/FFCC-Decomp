@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "dolphin/mtx.h"
+#include "ffcc/cflat_runtime.h"
 
 class CFlatRuntime2;
 extern CFlatRuntime2 CFlat;
@@ -48,7 +49,6 @@ class CAmemCacheSet;
 extern CAmemCacheSet ppvAmemCacheSet;
 extern u32 CFlatFlags;
 extern CFlatRuntime2& gCFlatRuntime2;
-class CFlatRuntime;
 class CChara;
 extern CChara& gChara;
 
@@ -97,17 +97,17 @@ static inline CFlatRuntime2& CFlatRuntime2Storage()
 
 static inline int& CFlatPermanentVarCount()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x4);
+    return gCFlatRuntime().m_permanentVarCount;
 }
 
 static inline unsigned char*& CFlatPermanentVarDefs()
 {
-    return *reinterpret_cast<unsigned char**>(CFlatBytes() + 0x8);
+    return gCFlatRuntime().m_permanentVarDefs;
 }
 
 static inline unsigned char*& CFlatPermanentVarValues()
 {
-    return *reinterpret_cast<unsigned char**>(CFlatBytes() + 0xC);
+    return gCFlatRuntime().m_permanentVarValues;
 }
 
 static inline u8& CFlatPermanentVarFlagByte(int offset)
@@ -122,7 +122,7 @@ static inline u32& CFlatPermanentVarWord(int offset)
 
 static inline float& CFlatPerformanceTotalTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x48);
+    return gCFlatRuntime().m_performanceTotalTime;
 }
 
 static inline u32& CFlatEventFlags()

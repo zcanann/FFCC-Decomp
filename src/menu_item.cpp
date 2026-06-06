@@ -60,7 +60,7 @@ struct ItemMenuAnimList {
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 STATIC_ASSERT(offsetof(ItemMenuState, optionFlags) == 0x9);
 STATIC_ASSERT(offsetof(ItemMenuState, initialized) == 0xB);
@@ -223,7 +223,7 @@ int CMenuPcs::ItemCtrlCur()
                     GetSingWinSize(0, &winW, &winH, 0);
                     SetSingWinInfo(0xF0, 0xA0, winW, winH);
 
-                    this->m_singWindowInfo[5] = 0;
+                    this->m_menuWindowInfo->state = 0;
                     this->m_itemMenuState->optionFrame = 0;
                     this->m_itemMenuState->mode = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -277,12 +277,12 @@ int CMenuPcs::ItemCtrlCur()
                         caravanWork->DeleteItemIdx(idx, 0);
                     }
 
-                    this->m_singWindowInfo[5] = 2;
+                    this->m_menuWindowInfo->state = 2;
                     this->m_itemMenuState->optionFrame = this->m_itemMenuState->optionFrame + 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                 }
             } else if ((press & 0x200) != 0) {
-                this->m_singWindowInfo[5] = 2;
+                this->m_menuWindowInfo->state = 2;
                 this->m_itemMenuState->optionFrame = this->m_itemMenuState->optionFrame + 1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
             }
@@ -517,9 +517,9 @@ void CMenuPcs::ItemDraw()
             cursorX = (float)(cursorEntry[0] - 0x14);
             cursorY = (float)((float)(cursorEntry[3] - 0x20) * (float)LoadDouble(DOUBLE_80332e78) + (float)cursorEntry[1]);
         } else {
-            s16* singWindow = this->m_singWindowInfo;
-            cursorX = (float)singWindow[0];
-            cursorY = (float)(singWindow[1] + 0x20);
+            MenuWindowInfo* window = this->m_menuWindowInfo;
+            cursorX = (float)window->x;
+            cursorY = (float)(window->y + 0x20);
             int messageHeight = SingWinMessHeight();
             cursorY += (float)(this->m_itemMenuState->subMenuIndex * messageHeight);
         }
@@ -622,12 +622,12 @@ int CMenuPcs::ItemCtrl()
     if ((state->mode == 0) || ((state->mode != 0) && (state->optionFrame == 1))) {
         changed = ItemCtrlCur();
     } else if ((state->mode == 1) && (state->optionFrame == 0)) {
-        if (this->m_singWindowInfo[5] == 1) {
+        if (this->m_menuWindowInfo->state == 1) {
             changed = 0;
             state->optionFrame++;
         }
     } else if (((state->mode == 1) && (state->optionFrame == 2)) &&
-               (this->m_singWindowInfo[5] == 3)) {
+               (this->m_menuWindowInfo->state == 3)) {
         changed = 0;
         state->optionFrame = 0;
         state->mode = 0;

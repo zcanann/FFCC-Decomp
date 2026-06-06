@@ -1106,12 +1106,12 @@ void CMenuPcs::calcWorld()
 		if (animEnd <= animTime) {
 			if (worldState->m_frameCounter > 9) {
 				CFlatRuntime::CStack stackData[3];
-				stackData[0].m_word = 2;
-				stackData[1].m_word = 0;
-				stackData[2].m_word = 0;
 
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+				stackData[0].m_word = 2;
+				stackData[1].m_word = 0;
+				stackData[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
 				worldState->m_mainState = 2;
 				worldState->m_frameCounter = 0;
@@ -1131,7 +1131,16 @@ void CMenuPcs::calcWorld()
 				model->AddFrame(FLOAT_80331698);
 			}
 		} else {
-			if (nextAnim >= 1 && nextAnim <= 4) {
+			if (nextAnim == 1) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 2;
+			} else if (nextAnim == 2) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 3;
+			} else if (nextAnim == 3) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 4;
+			} else if (nextAnim == 4) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
 				nextAnim++;
 			} else if (nextAnim == 5) {

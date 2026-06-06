@@ -100,6 +100,11 @@ static inline CPad::PadInput& CameraShadowPadInput()
     return Pad.GetPadInputs()[(Pad.m_debugPadPort == 1) ? 0 : 1];
 }
 
+static inline float LoadCameraFloat(const float& value)
+{
+    return value;
+}
+
 extern "C" {
 void create__10CCameraPcsFv(CCameraPcs*);
 void destroy__10CCameraPcsFv(CCameraPcs*);
@@ -853,12 +858,12 @@ void CCameraPcs::SetStdProjectionMatrix()
 {
     float fov = m_fov;
 
-    if (fov < FLOAT_8032fac8 && static_cast<unsigned int>(System.m_execParam) >= 1) {
+    if (fov < LoadCameraFloat(FLOAT_8032fac8) && static_cast<unsigned int>(System.m_execParam) >= 1) {
         System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
-        fov = FLOAT_8032fab4;
+        fov = LoadCameraFloat(FLOAT_8032fab4);
     }
 
-    C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
+    C_MTXPerspective(m_screenMatrix, fov, LoadCameraFloat(FLOAT_8032fa3c), m_nearZ, m_farZ);
     GXSetProjection(m_screenMatrix, GX_PERSPECTIVE);
 }
 

@@ -197,7 +197,7 @@ private:
     int m_mapNo;                      // 0x0448
     unsigned char m_stageFlags;       // 0x044C
     unsigned char _pad44D[0x26A7];    // 0x044D
-    unsigned char m_mapItemCount;     // 0x2AF4
+    char m_mapItemCount;              // 0x2AF4
     unsigned char _pad2AF5[0x3];      // 0x2AF5
     int m_scrInitEnd;                 // 0x2AF8
     unsigned char m_letterDatFlg;     // 0x2AFC
@@ -215,7 +215,7 @@ private:
     unsigned char m_moneyFlags;       // 0x2CB0
     unsigned char m_favoriteFlags;    // 0x2CB1
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
-    unsigned char m_radarType[4];     // 0x2D32
+    char m_radarType[4];              // 0x2D32
     unsigned char m_artifactFlags;    // 0x2D36
     unsigned char m_chgUseItemFlags;  // 0x2D37
     unsigned char m_shopFlags;        // 0x2D38
@@ -227,8 +227,8 @@ private:
     unsigned char m_strengthFlags;    // 0x2D3E
     unsigned char m_artiDatFlags;     // 0x2D3F
     unsigned char m_radarTypeFlags;   // 0x2D40
-    unsigned char m_radarMode;        // 0x2D41
-    unsigned char m_chgRadarMode;     // 0x2D42
+    char m_radarMode;                 // 0x2D41
+    char m_chgRadarMode;              // 0x2D42
     unsigned char _pad2D43;           // 0x2D43
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54

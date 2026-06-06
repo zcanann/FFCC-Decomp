@@ -174,7 +174,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     mapMesh = GetMapMeshTable()[step->m_dataValIndex];
     perU = work->m_perU;
     perV = work->m_perV;
-    if ((perU == FLOAT_8033054c) || (perV == FLOAT_8033054c)) {
+    if (!perU || !perV) {
         if (mapMesh != NULL) {
             SetUpPerUV((pppModelSt*)mapMesh, work->m_perU, work->m_perV);
         } else {

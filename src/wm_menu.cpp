@@ -695,8 +695,8 @@ void CMenuPcs::loadData()
 	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
 
 	m_wmWorldState =
-	    static_cast<unsigned char*>(operator new(0x48, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
-	memset(m_wmWorldState, 0, 0x48);
+	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
+	memset(m_wmWorldState, 0, sizeof(WmWorldState));
 
 	m_wmCharaState =
 	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
@@ -940,9 +940,9 @@ void CMenuPcs::InitCSelCurPos()
 	gWmMenuCursorY[0] = static_cast<char>(0xFF);
 	gWmMenuCursorY[1] = static_cast<char>(0xFF);
 
-	unsigned char* const worldState = m_wmWorldState;
+	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState != 0) {
-		*reinterpret_cast<short*>(worldState + 0x26) = 0;
+		worldState->m_cardChannel = 0;
 	}
 }
 
@@ -1084,17 +1084,17 @@ void CMenuPcs::destroyWorld()
 void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = m_wmWorldState;
+	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldParams = m_wmWorldParams;
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
-	if (worldState[8] == 0) {
+	if (worldState->m_worldReady == 0) {
 		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
 		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-		worldState[8] = 1;
-		reinterpret_cast<short*>(worldState + 0x10)[0] = 1;
+		worldState->m_worldReady = 1;
+		worldState->m_mainState = 1;
 	}
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
@@ -1102,11 +1102,11 @@ void CMenuPcs::calcWorld()
 	unsigned char* const modelBytes = reinterpret_cast<unsigned char*>(model);
 	const float animEnd = reinterpret_cast<float*>(modelBytes + 0xC0)[0];
 	const float animTime = reinterpret_cast<float*>(modelBytes + 0xB4)[0];
-	const short animState = reinterpret_cast<short*>(worldState + 0x10)[0];
+	const short animState = worldState->m_mainState;
 
 	if (animState == 1) {
 		if (animEnd <= animTime) {
-			if (reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
+			if (worldState->m_frameCounter > 9) {
 				CFlatRuntime::CStack stackData[3];
 				stackData[0].m_word = 2;
 				stackData[1].m_word = 0;
@@ -1115,12 +1115,12 @@ void CMenuPcs::calcWorld()
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-				reinterpret_cast<short*>(worldState + 0x10)[0] = 2;
-				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+				worldState->m_mainState = 2;
+				worldState->m_frameCounter = 0;
 			}
 		} else {
 			model->AddFrame(FLOAT_80331698);
-			reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+			worldState->m_frameCounter = 0;
 		}
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
@@ -1139,8 +1139,8 @@ void CMenuPcs::calcWorld()
 			} else if (nextAnim == 5) {
 				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;
-				reinterpret_cast<short*>(worldState + 0x10)[0] = 3;
-				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+				worldState->m_mainState = 3;
+				worldState->m_frameCounter = 0;
 			}
 
 			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
@@ -1153,23 +1153,23 @@ void CMenuPcs::calcWorld()
 			}
 			bytes[0xE] = 0;
 		}
-	} else if (animState == 3 && reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
+	} else if (animState == 3 && worldState->m_frameCounter > 9) {
 		if (animEnd <= animTime) {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-			reinterpret_cast<short*>(worldState + 0x18)[0] = 10;
-			reinterpret_cast<short*>(worldState + 0x1E)[0] = -1;
-			reinterpret_cast<short*>(worldState + 0x10)[0] = 4;
+			worldState->m_delay = 10;
+			worldState->m_nextMenuMode = -1;
+			worldState->m_mainState = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		} else {
 			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
-		if (reinterpret_cast<short*>(worldState + 0x18)[0] == 0) {
-			reinterpret_cast<short*>(worldState + 0x20)[0] = reinterpret_cast<short*>(worldState + 0x1E)[0];
-			reinterpret_cast<short*>(worldState + 0x1E)[0] = 0;
+		if (worldState->m_delay == 0) {
+			worldState->m_changeRequest = worldState->m_nextMenuMode;
+			worldState->m_nextMenuMode = 0;
 		} else {
-			reinterpret_cast<short*>(worldState + 0x18)[0]--;
+			worldState->m_delay--;
 		}
 	}
 
@@ -1204,14 +1204,14 @@ void CMenuPcs::calcWorld()
 	model->CalcMatrix();
 	model->CalcSkin();
 
-	const short updatedAnimState = reinterpret_cast<short*>(worldState + 0x10)[0];
+	const short updatedAnimState = worldState->m_mainState;
 
 	if (updatedAnimState == 1 && animTime >= animEnd) {
-		if (reinterpret_cast<short*>(worldState + 0x22)[0] < 10) {
-			reinterpret_cast<short*>(worldState + 0x22)[0]++;
+		if (worldState->m_frameCounter < 10) {
+			worldState->m_frameCounter++;
 		}
-	} else if (updatedAnimState == 3 && reinterpret_cast<short*>(worldState + 0x22)[0] < 10) {
-		reinterpret_cast<short*>(worldState + 0x22)[0]++;
+	} else if (updatedAnimState == 3 && worldState->m_frameCounter < 10) {
+		worldState->m_frameCounter++;
 	}
 }
 
@@ -1227,7 +1227,7 @@ void CMenuPcs::calcWorld()
 void CMenuPcs::CalcMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = m_wmWorldState;
+	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState == 0) {
 		return;
 	}
@@ -1235,8 +1235,8 @@ void CMenuPcs::CalcMainMenu()
 	CalcMainMenuSub();
 	CalcWMFrame();
 
-	const short state = *reinterpret_cast<short*>(worldState + 0x10);
-	const short subState = *reinterpret_cast<short*>(worldState + 0x16);
+	const short state = worldState->m_mainState;
+	const short subState = worldState->m_subState;
 	if (state > 0 && state < 4) {
 		CalcChara();
 		CalcPitcher();
@@ -1244,7 +1244,7 @@ void CMenuPcs::CalcMainMenu()
 	if (subState == 0 || subState == 1 || subState == 4 || state >= 3) {
 		CalcFukidashi();
 	}
-	if (*reinterpret_cast<short*>(worldState + 0x20) != 0) {
+	if (worldState->m_changeRequest != 0) {
 		WMChgMenu();
 	}
 }
@@ -1261,7 +1261,7 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = m_wmWorldState;
+	WmWorldState* const worldState = m_wmWorldState;
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;
@@ -1296,15 +1296,15 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
-	switch (*reinterpret_cast<short*>(worldState + 0x1C)) {
+	switch (worldState->m_menuMode) {
 	case 0:
-		if (*reinterpret_cast<short*>(worldState + 0x10) <= 4) {
-			const short state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (worldState->m_mainState <= 4) {
+			const short state = worldState->m_mainState;
 			int frameStep = 0;
 			if (state == 0) {
-				frameStep = *reinterpret_cast<short*>(worldState + 0x22) - 10;
+				frameStep = worldState->m_frameCounter - 10;
 			} else if (state < 1 || state > 3) {
-				frameStep = -*reinterpret_cast<short*>(worldState + 0x22);
+				frameStep = -worldState->m_frameCounter;
 			}
 			CalcWMFrame0(frameStep);
 		}
@@ -1318,7 +1318,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	case 3:
 		if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
-			if (worldState[0x0C] == 0) {
+			if (worldState->m_modelFlagsInitialized == 0) {
 				unsigned char* const modelData = m_wm.m_charaModelData;
 				modelData[0x0C] = 1;
 				modelData[0x40] = 1;
@@ -1328,19 +1328,19 @@ void CMenuPcs::CalcDiaryMenu()
 				modelData[0x110] = 1;
 				modelData[0x144] = 1;
 				modelData[0x178] = 1;
-				worldState[0x0C] = 1;
+				worldState->m_modelFlagsInitialized = 1;
 			}
-			if (*reinterpret_cast<short*>(worldState + 0x10) <= 4) {
+			if (worldState->m_mainState <= 4) {
 				CalcCharaSelect();
-				const short state = *reinterpret_cast<short*>(worldState + 0x10);
+				const short state = worldState->m_mainState;
 				int frameStep = 0;
 				if (state == 0) {
-					frameStep = *reinterpret_cast<short*>(worldState + 0x22) - 10;
+					frameStep = worldState->m_frameCounter - 10;
 				} else if (state < 1 || state > 3) {
-					frameStep = -*reinterpret_cast<short*>(worldState + 0x22);
+					frameStep = -worldState->m_frameCounter;
 				}
 				CalcWMFrame0(frameStep);
-				const short animState = *reinterpret_cast<short*>(worldState + 0x10);
+				const short animState = worldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();
 				}
@@ -1350,8 +1350,8 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		if (((*reinterpret_cast<short*>(worldState + 0x10) != 0) || bytes[0x12] != 0) &&
-		    *reinterpret_cast<short*>(worldState + 0x10) < 4) {
+		if (((worldState->m_mainState != 0) || bytes[0x12] != 0) &&
+		    worldState->m_mainState < 4) {
 			if (Game.m_gameWork.m_chaliceElement != *reinterpret_cast<int*>(bytes + 0x84)) {
 				SetCrystalCageAttr();
 			}
@@ -2170,26 +2170,26 @@ void CMenuPcs::InitSaveLoadMenu()
 {
 	float posX = FLOAT_803313dc;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
-	unsigned int* const worldStatePtr = reinterpret_cast<unsigned int*>(bytes + 0x82C);
+	WmWorldState* const worldState = MenuPcs.m_wmWorldState;
 	float posY = FLOAT_803313e8;
 	int zero = 0;
 
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x22) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x24) = zero;
-	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x08] = static_cast<unsigned char>(zero);
-	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x09] = static_cast<unsigned char>(zero);
-	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x0A] = static_cast<unsigned char>(zero);
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x0E) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x10) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x12) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x16) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x18) = zero;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x1A) = zero;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x04) = posY;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x00) = posX;
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x2E) = zero;
-	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x0B] = static_cast<unsigned char>(zero);
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x26) = zero;
+	worldState->m_frameCounter = zero;
+	worldState->m_titleState = zero;
+	worldState->m_worldReady = static_cast<unsigned char>(zero);
+	worldState->m_flag09 = static_cast<unsigned char>(zero);
+	worldState->m_flag0A = static_cast<unsigned char>(zero);
+	worldState->m_state0E = zero;
+	worldState->m_mainState = zero;
+	worldState->m_state12 = zero;
+	worldState->m_subState = zero;
+	worldState->m_delay = zero;
+	worldState->m_counter1A = zero;
+	worldState->m_posY = posY;
+	worldState->m_posX = posX;
+	worldState->m_mcResult = zero;
+	worldState->m_flag0B = static_cast<unsigned char>(zero);
+	worldState->m_cardChannel = zero;
 	*reinterpret_cast<short*>(bytes + 0x870) = zero;
 	bytes[0x86E] = static_cast<unsigned char>(zero);
 }

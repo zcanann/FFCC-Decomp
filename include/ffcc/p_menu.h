@@ -87,6 +87,36 @@ struct MenuWindowInfo
     short state;
 };
 
+struct WmWorldState
+{
+    float m_posX;
+    float m_posY;
+    unsigned char m_worldReady;
+    unsigned char m_flag09;
+    unsigned char m_flag0A;
+    unsigned char m_flag0B;
+    unsigned char m_modelFlagsInitialized;
+    unsigned char m_pad0D;
+    short m_state0E;
+    short m_mainState;
+    short m_state12;
+    short m_state14;
+    short m_subState;
+    short m_delay;
+    short m_counter1A;
+    short m_menuMode;
+    short m_nextMenuMode;
+    short m_changeRequest;
+    short m_frameCounter;
+    short m_titleState;
+    short m_cardChannel;
+    unsigned char m_pad28[0x2E - 0x28];
+    short m_mcResult;
+    unsigned char m_pad30[0x3E - 0x30];
+    short m_backupParams[4];
+    short m_pad46;
+};
+
 struct SingMenuState
 {
     char pad_00[0x0B];
@@ -712,7 +742,7 @@ public:
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;
         short* m_cmdState;
-        unsigned char* m_wmWorldState;
+        WmWorldState* m_wmWorldState;
         int m_bonusStatePtr;
     };
     union {
@@ -839,6 +869,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkCardChannel) == 0x889);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
+STATIC_ASSERT(sizeof(WmWorldState) == 0x48);
 STATIC_ASSERT(sizeof(SingMenuState) == 0x48);
 STATIC_ASSERT(offsetof(SingMenuState, initialized) == 0x0B);
 STATIC_ASSERT(offsetof(SingMenuState, closeRequested) == 0x0D);

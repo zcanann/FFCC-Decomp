@@ -395,6 +395,7 @@ struct WmCharaSelectEntry
 STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
 
 static const int kWmMenuPlayerCount = 8;
+static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
 static const int kWmFrameInfoBytes = 0x3C;
@@ -7922,7 +7923,7 @@ void CMenuPcs::DrawCharaName()
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
-	for (int i = 0; i < kWmCharaSelectCount; i++) {
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
@@ -8055,7 +8056,7 @@ void CMenuPcs::DrawCMLife()
 	}
 	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int readyMask = 0;
-	for (int i = 0; i < kWmCharaSelectCount; i++) {
+	for (int i = 0; i < kWmMenuControllerCount; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;

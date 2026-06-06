@@ -926,56 +926,56 @@ int CMenuPcs::EquipOpen()
 
 	iVar6 = 0;
 	menuState->frame = menuState->frame + 1;
-	uVar8 = (u32)*GetEquipList(this);
-	psVar7 = GetEquipList(this) + 4;
+	EquipOpenAnimList* list = GetEquipListStorage(this);
+	uVar8 = (u32)list->count;
+	EquipOpenAnim* entry = list->entries;
 	iVar11 = static_cast<int>(menuState->frame);
 	for (int i = 0; i < (int)uVar8; i++) {
-		dVar2 = DOUBLE_80332ed8;
-		if (*(int*)(psVar7 + 0x12) <= iVar11) {
-			if (*(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14) <= iVar11) {
+		if (entry->startFrame <= iVar11) {
+			if (entry->startFrame + entry->duration <= iVar11) {
 				iVar6++;
-				*(float*)(psVar7 + 8) = FLOAT_80332ee0;
+				entry->alpha = FLOAT_80332ee0;
 			} else {
-				*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
-				dVar20 = (double)*(int*)(psVar7 + 0x14);
-				*(float*)(psVar7 + 8) = (float)((DOUBLE_80332ec0 / dVar20) * (double)*(int*)(psVar7 + 0x10));
+				entry->step = entry->step + 1;
+				dVar20 = (double)entry->duration;
+				entry->alpha = (float)((DOUBLE_80332ec0 / dVar20) * (double)entry->step);
 			}
 		}
-		psVar7 += 0x20;
+		entry++;
 	}
 
 	fVar5 = FLOAT_80332ee0;
-	if (*GetEquipList(this) == iVar6) {
-		psVar7 = GetEquipList(this) + 4;
+	if (list->count == iVar6) {
+		entry = list->entries;
 		if (0 < (int)uVar8) {
 			uVar12 = uVar8 >> 3;
 			if (uVar12 != 0) {
 				do {
-					*reinterpret_cast<int*>(psVar7 + 0x12) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0x14) = 1;
-					*(float*)(psVar7 + 8) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0x32) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0x34) = 1;
-					*(float*)(psVar7 + 0x28) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0x52) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0x54) = 1;
-					*(float*)(psVar7 + 0x48) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0x72) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0x74) = 1;
-					*(float*)(psVar7 + 0x68) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0x92) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0x94) = 1;
-					*(float*)(psVar7 + 0x88) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0xb2) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0xb4) = 1;
-					*(float*)(psVar7 + 0xa8) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0xd2) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0xd4) = 1;
-					*(float*)(psVar7 + 200) = fVar5;
-					*reinterpret_cast<int*>(psVar7 + 0xf2) = 0;
-					*reinterpret_cast<int*>(psVar7 + 0xf4) = 1;
-					*(float*)(psVar7 + 0xe8) = fVar5;
-					psVar7 += 0x100;
+					entry[0].startFrame = 0;
+					entry[0].duration = 1;
+					entry[0].alpha = fVar5;
+					entry[1].startFrame = 0;
+					entry[1].duration = 1;
+					entry[1].alpha = fVar5;
+					entry[2].startFrame = 0;
+					entry[2].duration = 1;
+					entry[2].alpha = fVar5;
+					entry[3].startFrame = 0;
+					entry[3].duration = 1;
+					entry[3].alpha = fVar5;
+					entry[4].startFrame = 0;
+					entry[4].duration = 1;
+					entry[4].alpha = fVar5;
+					entry[5].startFrame = 0;
+					entry[5].duration = 1;
+					entry[5].alpha = fVar5;
+					entry[6].startFrame = 0;
+					entry[6].duration = 1;
+					entry[6].alpha = fVar5;
+					entry[7].startFrame = 0;
+					entry[7].duration = 1;
+					entry[7].alpha = fVar5;
+					entry += 8;
 					uVar12--;
 				} while (uVar12 != 0);
 				uVar8 &= 7;
@@ -985,10 +985,10 @@ int CMenuPcs::EquipOpen()
 			}
 
 			do {
-				*reinterpret_cast<int*>(psVar7 + 0x12) = 0;
-				*reinterpret_cast<int*>(psVar7 + 0x14) = 1;
-				*(float*)(psVar7 + 8) = fVar5;
-				psVar7 += 0x20;
+				entry->startFrame = 0;
+				entry->duration = 1;
+				entry->alpha = fVar5;
+				entry++;
 				uVar8--;
 			} while (uVar8 != 0);
 		}

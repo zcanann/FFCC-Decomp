@@ -715,7 +715,6 @@ public:
     union {
         MenuWindowInfo* m_menuWindowInfo;
         short* m_singWindowInfo;
-        int m_bonusAuxPtr;
     };
     union {
         int m_pad84C;
@@ -788,7 +787,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAuxPtr) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);

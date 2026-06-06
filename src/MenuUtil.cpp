@@ -268,9 +268,7 @@ static inline CTextureSet* GetMenuTextureSet(CMenuPcs* menu, int offset)
 
 static inline CTexture* GetTextureSetTexture(CTextureSet* set, int index)
 {
-	unsigned char* ptrArray = reinterpret_cast<unsigned char*>(set) + 8;
-	CTexture** textures = *reinterpret_cast<CTexture***>(ptrArray + 0x10);
-	return textures[index];
+	return set->GetTexture(index);
 }
 
 static inline void SetUv(Vec2d& uv, float u, float v)

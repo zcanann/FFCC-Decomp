@@ -1960,9 +1960,10 @@ void CMenuPcs::CmdDismantle(int selected)
 void CMenuPcs::DrawUniteList()
 {
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s16* const list = GetCmdList(this);
-	s16* const cmd = GetCmdState(this);
-	s16 selected = cmd[0x26 / 2];
+	CmdListStorage* const list = GetCmdListStorage(this);
+	CmdListEntry* const entries = list->entries;
+	CmdState* const cmd = GetCmdStateView(this);
+	s16 selected = cmd->selected;
 	const s16 foodCount = caravan->m_numCmdListSlots;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -1986,12 +1987,12 @@ void CMenuPcs::DrawUniteList()
 			continue;
 		}
 
-		s16* const entry = list + i * 0x20 + 4;
+		CmdListEntry* const entry = &entries[i];
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(entry + 8));
+		color.a = static_cast<u8>(FLOAT_80332acc * entry->alpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		s32 groupSize = 1;
@@ -2004,10 +2005,10 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		if (slotType > 0) {
-			selected = cmd[0x26 / 2];
+			selected = cmd->selected;
 			if ((i <= selected) && (selected < i + groupSize)) {
-				if ((cmd[0x12 / 2] == 3) && (i != selected)) {
-					cmd[0x26 / 2] = static_cast<s16>(i);
+				if ((cmd->phase == 3) && (i != selected)) {
+					cmd->selected = static_cast<s16>(i);
 				}
 				active = true;
 			}
@@ -2015,11 +2016,11 @@ void CMenuPcs::DrawUniteList()
 
 		SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
 		DrawRect(0,
-			static_cast<float>(entry[0] + 4),
-			static_cast<float>(entry[1]) - FLOAT_80332ad0,
-			static_cast<float>(entry[2]) - 8.0f,
+			static_cast<float>(entry->x + 4),
+			static_cast<float>(entry->y) - FLOAT_80332ad0,
+			static_cast<float>(entry->width) - 8.0f,
 			FLOAT_80332AD4,
-			static_cast<float>(entry[4]),
+			static_cast<float>(entry->u),
 			active ? FLOAT_80332AD4 : FLOAT_80332ab0,
 			FLOAT_80332a70,
 			FLOAT_80332a70,
@@ -2033,15 +2034,15 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(7);
 
-	const s16 topX = list[4];
+	const s16 topX = entries[0].x;
 	for (s32 i = 0; i < foodCount; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
 		if ((i <= 7) && (slotType == 0)) {
 			continue;
 		}
 
-		s16* const entry = list + i * 0x20 + 4;
-		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : *reinterpret_cast<float*>(entry + 8);
+		CmdListEntry* const entry = &entries[i];
+		const float alpha = (cmd->mode == 3) ? FLOAT_80332a70 : entry->alpha;
 
 		GXColor color;
 		color.r = 0xFF;
@@ -2064,25 +2065,25 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const float width = static_cast<float>(font->GetWidth(text));
-		float x = (static_cast<float>(entry[2]) - width) * static_cast<float>(DOUBLE_80332a60) + static_cast<float>(entry[0]);
-		if (topX != entry[0]) {
-			float diff = static_cast<float>(topX - entry[0]);
+		float x = (static_cast<float>(entry->width) - width) * static_cast<float>(DOUBLE_80332a60) + static_cast<float>(entry->x);
+		if (topX != entry->x) {
+			float diff = static_cast<float>(topX - entry->x);
 			if (diff < FLOAT_80332a70) {
 				diff = -diff;
 			}
 			const float t = diff * 0.125f;
-			const float target = static_cast<float>(entry[0] + entry[2] - 0x18) - width;
+			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
 			x = (target - x) * t + x;
 		}
 
 		font->SetPosX(x);
-		font->SetPosY(static_cast<float>(entry[1] + 3) - FLOAT_80332ae8);
+		font->SetPosY(static_cast<float>(entry->y + 3) - FLOAT_80332ae8);
 		font->Draw(text);
 	}
 
 	DrawInit();
 	s_unitePanelCount = 0;
-	s16* const unitePanels = list + list[1] * 0x20 + 4;
+	CmdListEntry* const unitePanels = &entries[list->listEnd];
 	for (s32 i = 0; i < 8; i++) {
 		if (i >= foodCount) {
 			break;
@@ -2110,18 +2111,18 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const s32 labelAnchor = (i == selected) ? i + 1 : i;
-		s16* const endEntry = list + (i + groupSize - 1) * 0x20 + 4;
-		s16* const anchorEntry = list + labelAnchor * 0x20 + 4;
-		s16* const startEntry = list + i * 0x20 + 4;
+		CmdListEntry* const endEntry = &entries[i + groupSize - 1];
+		CmdListEntry* const anchorEntry = &entries[labelAnchor];
+		CmdListEntry* const startEntry = &entries[i];
 		const bool active = (i <= selected) && (selected < i + groupSize);
-		const float panelX = static_cast<float>(topX * 2 - anchorEntry[0]);
-		const float panelY = (static_cast<float>(endEntry[2] + endEntry[3] - startEntry[2]) -
+		const float panelX = static_cast<float>(topX * 2 - anchorEntry->x);
+		const float panelY = (static_cast<float>(endEntry->width + endEntry->height - startEntry->width) -
 		                      FLOAT_80332ac8) * static_cast<float>(DOUBLE_80332a60) +
-		                     static_cast<float>(startEntry[1]);
+		                     static_cast<float>(startEntry->y);
 		const float panelTone = active ? FLOAT_80332ac8 : FLOAT_80332ab0;
 		float panelAlpha;
-		if (cmd[0x30 / 2] == 3) {
-			panelAlpha = *reinterpret_cast<float*>(startEntry + 8);
+		if (cmd->mode == 3) {
+			panelAlpha = startEntry->alpha;
 		} else {
 			panelAlpha = static_cast<float>(
 				fabs(static_cast<double>(panelX - static_cast<float>(topX))) * DOUBLE_80332AE0);
@@ -2134,14 +2135,14 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(FLOAT_80332acc * panelAlpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
-		s16* const panel = unitePanels + s_unitePanelCount * 0x20;
-		panel[0] = static_cast<s16>(panelX);
-		panel[1] = static_cast<s16>(panelY);
-		panel[2] = static_cast<s16>(FLOAT_80332AEC);
-		panel[3] = static_cast<s16>(FLOAT_80332ac8);
-		*reinterpret_cast<float*>(panel + 4) = FLOAT_80332ab0;
-		*reinterpret_cast<float*>(panel + 6) = panelTone;
-		*reinterpret_cast<float*>(panel + 8) = panelAlpha;
+		CmdListEntry* const panel = &unitePanels[s_unitePanelCount];
+		panel->x = static_cast<s16>(panelX);
+		panel->y = static_cast<s16>(panelY);
+		panel->width = static_cast<s16>(FLOAT_80332AEC);
+		panel->height = static_cast<s16>(FLOAT_80332ac8);
+		panel->u = FLOAT_80332ab0;
+		panel->v = panelTone;
+		panel->alpha = panelAlpha;
 		s_UniteTop[s_unitePanelCount] = i;
 		s_unitePanelCount++;
 
@@ -2165,8 +2166,8 @@ void CMenuPcs::DrawUniteList()
 	font->SetTlut(6);
 
 	for (s32 i = 0; i < s_unitePanelCount; i++) {
-		s16* const panel = unitePanels + i * 0x20;
-		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : *reinterpret_cast<float*>(panel + 8);
+		CmdListEntry* const panel = &unitePanels[i];
+		const float alpha = (cmd->mode == 3) ? FLOAT_80332a70 : panel->alpha;
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
@@ -2177,25 +2178,25 @@ void CMenuPcs::DrawUniteList()
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
 		const char* text = GetUniteListName(itemId);
 		const float width = static_cast<float>(font->GetWidth(text));
-		font->SetPosX((static_cast<float>(panel[2]) - width) *
+		font->SetPosX((static_cast<float>(panel->width) - width) *
 		                  static_cast<float>(DOUBLE_80332a60) +
-		              static_cast<float>(panel[0]));
-		font->SetPosY(((static_cast<float>(panel[3]) - static_cast<float>(DOUBLE_80332af8)) *
+		              static_cast<float>(panel->x));
+		font->SetPosY(((static_cast<float>(panel->height) - static_cast<float>(DOUBLE_80332af8)) *
 		                   static_cast<float>(DOUBLE_80332a60) +
-		               static_cast<float>(panel[1])) -
+		               static_cast<float>(panel->y)) -
 		              FLOAT_80332ae8 - static_cast<float>(DOUBLE_80332B00));
 		font->Draw(text);
 	}
 
 	DrawInit();
-	if ((cmd[0x30 / 2] == 0) &&
+	if ((cmd->mode == 0) &&
 	    (caravan->m_commandListExtra[selected] != 0)) {
 		int helpId = caravan->m_commandListExtra[selected];
 		if (helpId == 0x207 || helpId == 0x20B || helpId == 0x20F) {
 			helpId += 2;
 		}
 
-		const float alpha = *reinterpret_cast<float*>(reinterpret_cast<u8*>(list) + 0x18);
+		const float alpha = entries[0].alpha;
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;

@@ -167,6 +167,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     Vec zeroVec ATTRIBUTE_ALIGN(8);
     Vec pos ATTRIBUTE_ALIGN(8);
     Vec seg ATTRIBUTE_ALIGN(8);
+    Vec initialSeg ATTRIBUTE_ALIGN(8);
     float drawScale;
     float segDx;
     float segDy;
@@ -257,13 +258,13 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     segDx = nextBaseX - segBaseX;
     segDy = nextBaseY - segBaseY;
     segDz = nextBaseZ - segBaseZ;
-    seg.x = segDx;
-    seg.y = segDy;
-    seg.z = segDz;
+    initialSeg.x = segDx;
+    initialSeg.y = segDy;
+    initialSeg.z = segDz;
     zeroVec.x = zero;
     zeroVec.y = zero;
     zeroVec.z = zero;
-    segLen = PSVECDistance(&zeroVec, &seg);
+    segLen = PSVECDistance(&zeroVec, &initialSeg);
     segRemain = segLen;
     segCursor = kPppKeShpTail3XZero;
     life = work->m_shapeData;
@@ -355,6 +356,7 @@ update_step:
         return;
     }
 
+advance_segment:
     if (segRemain >= trailStep) {
         pos.x = segDx * (segCursor / segLen) + segBaseX;
         pos.y = segDy * (segCursor / segLen) + segBaseY;
@@ -367,7 +369,6 @@ update_step:
         goto draw_loop;
     }
 
-advance_segment:
     nextIndex++;
     if (nextIndex > 0x1b) {
         nextIndex = 0;
@@ -389,10 +390,13 @@ advance_segment:
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
+    zeroVec.x = zero;
+    zeroVec.y = zero;
+    zeroVec.z = zero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segCursor = trailLen;
     segRemain += segLen;
-    goto draw_loop;
+    goto advance_segment;
 }
 
 /*

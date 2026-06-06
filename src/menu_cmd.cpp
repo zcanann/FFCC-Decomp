@@ -404,178 +404,98 @@ void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
-	float fVar2;
-	float fVar3;
-	float fVar4;
-	u32 uVar5;
-	s16 sVar1;
-	s16 sVar6;
-	s16 sVar7;
-	s16* psVar8;
-	s16* psVar9;
-	int iVar10;
-	int iVar11;
-	int iVar12;
-	int iVar13;
-	u32 uVar14;
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
+	const s32 start = static_cast<s32>(list->count);
+	CmdListEntry* basePanel = &entries[start];
 
-	fVar4 = FLOAT_80332b38;
-	fVar3 = FLOAT_80332ad0;
-	fVar2 = FLOAT_80332a70;
-	iVar10 = (int)*GetCmdList(this);
-	psVar8 = GetCmdList(this) + iVar10 * 0x20 + 4;
-	psVar8[0xe] = 0;
-	psVar8[0xf] = 0x2e;
-	*psVar8 = 0xb8;
-	psVar8[1] = 0x28;
-	psVar8[2] = 0x78;
-	psVar8[3] = 0x108;
-	*(float*)(psVar8 + 4) = fVar4;
-	*(float*)(psVar8 + 6) = fVar3;
-	*(float*)(psVar8 + 10) = fVar2;
-	psVar8[0x12] = 0;
-	psVar8[0x13] = 5;
-	psVar8[0x14] = 0;
-	psVar8[0x15] = 5;
+	basePanel->tex = 0x2e;
+	basePanel->x = 0xb8;
+	basePanel->y = 0x28;
+	basePanel->width = 0x78;
+	basePanel->height = 0x108;
+	basePanel->u = FLOAT_80332b38;
+	basePanel->v = FLOAT_80332ad0;
+	basePanel->scale = FLOAT_80332a70;
+	basePanel->startFrame = 5;
+	basePanel->duration = 5;
 
-	iVar11 = 0x2f;
+	u32 tex = 0x2f;
 	if (GetCmdLayoutFlag(this) == 0) {
-		iVar11 = 0x46;
+		tex = 0x46;
 	}
 
-	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 1) * 0x40 + 8);
-	*(int*)(psVar8 + 0xe) = iVar11;
-	*psVar8 = 0xa0;
-	fVar3 = FLOAT_80332ab0;
-	psVar8[1] = 0xe;
-	fVar2 = FLOAT_80332a70;
-	psVar8[2] = 0x30;
-	psVar8[3] = 0x30;
-	*(float*)(psVar8 + 4) = fVar3;
-	*(float*)(psVar8 + 6) = fVar3;
-	*(float*)(psVar8 + 10) = fVar2;
-	*(int*)(psVar8 + 0x12) = 0;
-	*(int*)(psVar8 + 0x14) = 5;
+	CmdListEntry* leftIcon = &entries[start + 1];
+	leftIcon->tex = tex;
+	leftIcon->x = 0xa0;
+	leftIcon->y = 0xe;
+	leftIcon->width = 0x30;
+	leftIcon->height = 0x30;
+	leftIcon->u = FLOAT_80332ab0;
+	leftIcon->v = FLOAT_80332ab0;
+	leftIcon->scale = FLOAT_80332a70;
+	leftIcon->startFrame = 0;
+	leftIcon->duration = 5;
 
-	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 2) * 0x40 + 8);
-	*(int*)(psVar8 + 0xe) = iVar11;
-	psVar8[2] = 0x30;
-	fVar2 = FLOAT_80332ab0;
-	sVar7 = 0;
-	psVar8[3] = 0x30;
-	fVar3 = FLOAT_80332b3c;
-	*psVar8 = 0xa5;
-	iVar12 = iVar10 + 4;
-	psVar8[1] = (s16)(0x150 - psVar8[3]);
-	iVar13 = iVar12 * 0x40;
-	*(float*)(psVar8 + 4) = fVar2;
-	*(float*)(psVar8 + 6) = fVar2;
-	*(float*)(psVar8 + 10) = fVar3;
-	*(int*)(psVar8 + 0x12) = 0;
-	*(int*)(psVar8 + 0x14) = 5;
+	CmdListEntry* rightIcon = &entries[start + 2];
+	rightIcon->tex = tex;
+	rightIcon->width = 0x30;
+	rightIcon->height = 0x30;
+	rightIcon->x = 0xa5;
+	rightIcon->y = static_cast<s16>(0x150 - rightIcon->height);
+	rightIcon->u = FLOAT_80332ab0;
+	rightIcon->v = FLOAT_80332ab0;
+	rightIcon->scale = FLOAT_80332b3c;
+	rightIcon->startFrame = 0;
+	rightIcon->duration = 5;
 
-	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 3) * 0x40 + 8);
-	*(int*)(psVar8 + 0x16) = 2;
-	*(int*)(psVar8 + 0xe) = 0x2e;
-	*psVar8 = 0xa0;
-	psVar8[1] = 8;
-	psVar8[2] = 0x48;
-	psVar8[3] = 0x140;
-	*(float*)(psVar8 + 4) = fVar2;
-	*(float*)(psVar8 + 6) = fVar2;
-	*(int*)(psVar8 + 0x12) = 0;
-	*(int*)(psVar8 + 0x14) = 5;
+	CmdListEntry* choicePanel = &entries[start + 3];
+	choicePanel->flags = 2;
+	choicePanel->tex = 0x2e;
+	choicePanel->x = 0xa0;
+	choicePanel->y = 8;
+	choicePanel->width = 0x48;
+	choicePanel->height = 0x140;
+	choicePanel->u = FLOAT_80332ab0;
+	choicePanel->v = FLOAT_80332ab0;
+	choicePanel->startFrame = 0;
+	choicePanel->duration = 5;
 
-	psVar9 = GetCmdList(this) + *GetCmdList(this) * 0x20 + 4;
-	iVar10 = 4;
-	do {
-		psVar8 = (s16*)(GetCmdListBase(this) + iVar13 + 8);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
-		iVar12 += 2;
-		*psVar8 = *psVar9 + 0x24;
-		sVar1 = sVar7 + 0x20;
-		psVar8[1] = psVar9[1] + sVar7;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		psVar8[0x12] = 0;
-		psVar8[0x13] = 7;
-		psVar8[0x14] = 0;
-		psVar8[0x15] = 5;
+	s16 y = 0;
+	for (s32 i = 0; i < 4; i++) {
+		CmdListEntry* entry = &entries[start + 4 + i * 2];
+		entry->flags = 2;
+		entry->tex = 0x37;
+		entry->x = static_cast<s16>(basePanel->x + 0x24);
+		entry->y = static_cast<s16>(basePanel->y + y);
+		entry->width = 200;
+		entry->height = 0x28;
+		entry->u = FLOAT_80332ab0;
+		entry->v = FLOAT_80332ab0;
+		entry->startFrame = 7;
+		entry->duration = 5;
 
-		iVar11 = iVar13 + 0x48;
-		iVar13 += 0x80;
-		psVar8 = (s16*)(GetCmdListBase(this) + iVar11);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
-		*psVar8 = *psVar9 + 0x24;
-		sVar7 += 0x40;
-		psVar8[1] = psVar9[1] + sVar1;
-		psVar8[2] = 200;
-		psVar8[3] = 0x28;
-		*(float*)(psVar8 + 4) = fVar2;
-		*(float*)(psVar8 + 6) = fVar2;
-		psVar8[0x12] = 0;
-		psVar8[0x13] = 7;
-		psVar8[0x14] = 0;
-		fVar3 = FLOAT_80332ab0;
-		psVar8[0x15] = 5;
-		iVar10 -= 1;
-	} while (iVar10 != 0);
-	*(s16*)(GetCmdListBase(this) + 2) = (s16)iVar12;
+		entry = &entries[start + 5 + i * 2];
+		entry->flags = 2;
+		entry->tex = 0x37;
+		entry->x = static_cast<s16>(basePanel->x + 0x24);
+		entry->y = static_cast<s16>(basePanel->y + y + 0x20);
+		entry->width = 200;
+		entry->height = 0x28;
+		entry->u = FLOAT_80332ab0;
+		entry->v = FLOAT_80332ab0;
+		entry->startFrame = 7;
+		entry->duration = 5;
+		y += 0x40;
+	}
 
-	psVar8 = GetCmdList(this);
-	uVar5 = (u32)((int)psVar8[1] - (int)*psVar8);
-	psVar8 = psVar8 + *psVar8 * 0x20 + 4;
-	if ((int)uVar5 > 0) {
-		uVar14 = uVar5 >> 3;
-		if (uVar14 != 0) {
-			do {
-				psVar8[0x10] = 0;
-				psVar8[0x11] = 0;
-				*(float*)(psVar8 + 8) = fVar3;
-				psVar8[0x30] = 0;
-				psVar8[0x31] = 0;
-				*(float*)(psVar8 + 0x28) = fVar3;
-				psVar8[0x50] = 0;
-				psVar8[0x51] = 0;
-				*(float*)(psVar8 + 0x48) = fVar3;
-				psVar8[0x70] = 0;
-				psVar8[0x71] = 0;
-				*(float*)(psVar8 + 0x68) = fVar3;
-				psVar8[0x90] = 0;
-				psVar8[0x91] = 0;
-				*(float*)(psVar8 + 0x88) = fVar3;
-				psVar8[0xb0] = 0;
-				psVar8[0xb1] = 0;
-				*(float*)(psVar8 + 0xa8) = fVar3;
-				psVar8[0xd0] = 0;
-				psVar8[0xd1] = 0;
-				*(float*)(psVar8 + 200) = fVar3;
-				psVar8[0xf0] = 0;
-				psVar8[0xf1] = 0;
-				*(float*)(psVar8 + 0xe8) = fVar3;
-				psVar8 += 0x100;
-				uVar14 -= 1;
-			} while (uVar14 != 0);
-			uVar5 &= 7;
-			if (uVar5 == 0) {
-				return;
-			}
-		}
-		do {
-			psVar8[0x10] = 0;
-			psVar8[0x11] = 0;
-			*(float*)(psVar8 + 8) = fVar3;
-			psVar8 += 0x20;
-			uVar5 -= 1;
-		} while (uVar5 != 0);
+	list->listEnd = static_cast<s16>(start + 0xc);
+
+	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
+	CmdListEntry* entry = &entries[list->count];
+	for (u32 i = 0; i < count; i++) {
+		entry[i].timer = 0;
+		entry[i].alpha = FLOAT_80332ab0;
 	}
 }
 

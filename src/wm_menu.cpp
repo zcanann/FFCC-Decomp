@@ -4745,7 +4745,6 @@ void CMenuPcs::DrawTitleMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx m_cameraMatrix;
 	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
 	short state = typedWorldState->m_mainState;
 
 		if (state == 0 && typedWorldState->m_worldReady != 0) {
@@ -4946,29 +4945,25 @@ void CMenuPcs::DrawTitleMenu()
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
 
 		// Timer / state transitions
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		state = *reinterpret_cast<short*>(worldState + 0x10);
+		state = typedWorldState->m_mainState;
 		if (state > 1) {
-			*reinterpret_cast<short*>(worldState + 0x24) = *reinterpret_cast<short*>(worldState + 0x24) + 1;
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(worldState + 0x12) == 0 &&
-			    *reinterpret_cast<short*>(worldState + 0x24) > 4) {
-				*reinterpret_cast<char*>(worldState + 9) = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) + 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0x14;
+			typedWorldState->m_titleState++;
+			if (typedWorldState->m_state12 == 0 &&
+			    typedWorldState->m_titleState > 4) {
+				typedWorldState->m_flag09 = 1;
+				typedWorldState->m_state12++;
+				typedWorldState->m_titleState = 0x14;
 			}
 		}
 
 		// Fade out / transition to next state
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		state = *reinterpret_cast<short*>(worldState + 0x10);
+		state = typedWorldState->m_mainState;
 		if (state == 3 || (state == 1 && DAT_8032e8ac != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
-				fadeAlpha2 = (float)(*reinterpret_cast<short*>(worldState + 0x22) + 1);
+				fadeAlpha2 = (float)(typedWorldState->m_frameCounter + 1);
 			} else {
-				fadeAlpha2 = (float)*reinterpret_cast<short*>(worldState + 0x22);
+				fadeAlpha2 = (float)typedWorldState->m_frameCounter;
 			}
 			if (fadeAlpha2 > FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
 			SetAttrFmt((FMT)2);
@@ -4985,46 +4980,42 @@ void CMenuPcs::DrawTitleMenu()
 		}
 
 		// End state handling
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		state = *reinterpret_cast<short*>(worldState + 0x10);
-		if (state == 3 && *reinterpret_cast<short*>(worldState + 0x22) > 9) {
+		state = typedWorldState->m_mainState;
+		if (state == 3 && typedWorldState->m_frameCounter > 9) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
-			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) == 0) {
+			if (typedWorldState->m_state0E == 0) {
 				DAT_8032e8ac = 0;
 			} else {
 				DAT_8032e8ac = 1;
 				CFlatRuntime::CStack flatArgs2[3];
 				flatArgs2[0].m_word = 7;
-				flatArgs2[1].m_word =
-				    static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26));
+				flatArgs2[1].m_word = static_cast<int>(typedWorldState->m_cardChannel);
 				flatArgs2[2].m_word = 0;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 1;
+				typedWorldState->m_changeRequest = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-			*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 0;
+			typedWorldState->m_mainState = 0;
+			typedWorldState->m_frameCounter = 0;
+			typedWorldState->m_worldReady = 0;
 		} else if (state == 2) {
-			if (*reinterpret_cast<short*>(worldState + 0x18) != 0) {
-				*reinterpret_cast<short*>(worldState + 0x18) = *reinterpret_cast<short*>(worldState + 0x18) - 1;
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				if (*reinterpret_cast<short*>(worldState + 0x18) < 1) {
-					*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+			if (typedWorldState->m_delay != 0) {
+				typedWorldState->m_delay--;
+				if (typedWorldState->m_delay < 1) {
+					typedWorldState->m_mainState++;
+					typedWorldState->m_frameCounter = 0;
+					typedWorldState->m_titleState = 0;
 					CFlatRuntime::CStack flatArgs3[3];
 					flatArgs3[0].m_word = 9;
 					flatArgs3[1].m_word = 1;
 					flatArgs3[2].m_word = 0;
 					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
 				}
-			} else if (*reinterpret_cast<short*>(worldState + 0x22) > 0x991) {
-				*reinterpret_cast<short*>(worldState + 0x0E) = 0;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+			} else if (typedWorldState->m_frameCounter > 0x991) {
+				typedWorldState->m_state0E = 0;
+				typedWorldState->m_mainState++;
+				typedWorldState->m_frameCounter = 0;
+				typedWorldState->m_titleState = 0;
 				CFlatRuntime::CStack flatArgs4[3];
 				flatArgs4[0].m_word = 9;
 				flatArgs4[1].m_word = 1;
@@ -5033,16 +5024,14 @@ void CMenuPcs::DrawTitleMenu()
 			}
 		} else {
 			short threshold = 10;
-			*reinterpret_cast<short*>(worldState + 0x22) = *reinterpret_cast<short*>(worldState + 0x22) + 1;
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(worldState + 0x10) == 1) {
+			typedWorldState->m_frameCounter++;
+			if (typedWorldState->m_mainState == 1) {
 				threshold = 0x28;
 			}
-			if (*reinterpret_cast<short*>(worldState + 0x22) > threshold) {
-				*reinterpret_cast<short*>(worldState + 0x22) = 0;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
+			if (typedWorldState->m_frameCounter > threshold) {
+				typedWorldState->m_frameCounter = 0;
+				typedWorldState->m_titleState = 0;
+				typedWorldState->m_mainState++;
 			}
 		}
 	}

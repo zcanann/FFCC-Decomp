@@ -31,14 +31,6 @@ extern const char kAStarNewLine[4];
 
 #include "string.h"
 
-struct CAStarTempWork
-{
-	unsigned char m_visited[64];
-	unsigned char m_path[64];
-	int m_pathLength;
-	float m_cost;
-};
-
 struct CMapCylinderRaw
 {
 	Vec m_bottom;
@@ -48,11 +40,6 @@ struct CMapCylinderRaw
 	Vec m_boundsMax;
 	Vec m_boundsMin;
 };
-
-static inline CAStar::CATemp& AsCATemp(CAStarTempWork& temp)
-{
-	return *reinterpret_cast<CAStar::CATemp*>(&temp);
-}
 
 static inline float LoadFloat(const float& value)
 {
@@ -696,7 +683,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 			if (temp.m_visited[other0Index] == 0)
 			{
-				CAStarTempWork level1;
+				CATemp level1;
 				unsigned int* visited1 = reinterpret_cast<unsigned int*>(level1.m_visited);
 				unsigned int* path1 = reinterpret_cast<unsigned int*>(level1.m_path);
 
@@ -808,7 +795,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 							if (level1.m_visited[other1Index] == 0)
 							{
-								CAStarTempWork level2;
+								CATemp level2;
 								unsigned int* level2Visited = reinterpret_cast<unsigned int*>(level2.m_visited);
 								unsigned int* level2Path = reinterpret_cast<unsigned int*>(level2.m_path);
 
@@ -858,7 +845,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								{
 									if (level2.m_cost < m_bestPath.m_cost)
 									{
-										m_bestPath = AsCATemp(level2);
+										m_bestPath = level2;
 									}
 								}
 								else
@@ -874,7 +861,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 											if (level2.m_visited[nextGroup] == 0)
 											{
-												CATemp deeper(AsCATemp(level2));
+												CATemp deeper(level2);
 												deeper.m_cost += edge->CalcLength(m_portals[nextGroup]);
 												deeper.m_path[deeper.m_pathLength++] = static_cast<unsigned char>(idx2);
 												check(nextGroup, goalGroup, deeper);

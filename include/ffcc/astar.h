@@ -74,6 +74,10 @@ public:
 	CATemp m_bestPath;                      // 0x2420
 }; // Size 0x24a8
 
+typedef int CAStar_CAPos_size_mismatch[(sizeof(CAStar::CAPos) == 0x10) ? 1 : -1];
+typedef int CAStar_CATemp_size_mismatch[(sizeof(CAStar::CATemp) == 0x88) ? 1 : -1];
+typedef int CAStar_size_mismatch[(sizeof(CAStar) == 0x24A8) ? 1 : -1];
+
 extern CAStar AStar;
 
 #endif // _FFCC_ASTAR_H_

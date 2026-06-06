@@ -5165,7 +5165,6 @@ void CMenuPcs::DrawTitleMenu()
 void CMenuPcs::SetWorldParam(int code, int value)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char bVar6 = static_cast<unsigned char>(value);
 	unsigned short uVar5 = static_cast<unsigned short>(value);
 	unsigned char bVar1 = static_cast<unsigned char>(static_cast<unsigned int>(value) >> 24);
@@ -5206,7 +5205,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
 			bytes[0xD] = bVar6;
 		}
-		worldState->m_changeRequest = 2;
+		m_wmWorldState->m_changeRequest = 2;
 		break;
 	case 10:
 		bytes[0x10] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;

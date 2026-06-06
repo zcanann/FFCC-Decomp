@@ -264,7 +264,6 @@ CProcessTable CCameraPcs::m_table[7] = {
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
-extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 
 extern "C" {
@@ -1296,8 +1295,7 @@ void CCameraPcs::calcMap()
             hitCylinder.unk = FLOAT_8032fa8c;
             hitCylinder.center = PositionVec();
             hitCylinder.delta = moveDelta;
-            if (CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, &hitCylinder, &moveDelta, 0xFFFFFFFF) == 0) {
+            if (MapMng.CheckHitCylinder(reinterpret_cast<CMapCylinder*>(&hitCylinder), &moveDelta, 0xFFFFFFFF) == 0) {
                 PositionVec().x += moveDelta.x;
                 PositionVec().y += moveDelta.y;
                 PositionVec().z += moveDelta.z;

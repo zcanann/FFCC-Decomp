@@ -14,16 +14,7 @@ static FoodRank s_rank[8];
 
 extern "C" const float FLOAT_80333038 = 0.75f;
 extern "C" const float FLOAT_8033303C = 72.0f;
-static const float FLOAT_80333040 = 0.0f;
-static const float FLOAT_80333044 = 32.0f;
-static const float FLOAT_80333048 = 1.0f;
-static const double DOUBLE_80333050 = 1.0;
-static const float FLOAT_80333058 = 255.0f;
-static const float FLOAT_8033305C = 24.0f;
-static const double DOUBLE_80333060 = 0.5;
 static const char s_FavoRankFormat_80333068[] = "%d";
-static const float FLOAT_8033306C = 4.0f;
-static const float FLOAT_80333070 = 0.9f;
 extern "C" const float FLOAT_80333080;
 extern "C" const float FLOAT_80333084;
 
@@ -90,30 +81,30 @@ void CMenuPcs::FavoDraw()
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = entry->alpha * w;
-				if (fillW > LoadFloat(FLOAT_80333040)) {
+				if (fillW > 0.0f) {
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							int tileH = static_cast<int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > LoadFloat(FLOAT_80333044)) {
+							if (static_cast<float>(tileH) > 32.0f) {
 								tileH = 0x20;
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 							                 fillW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
-							                 LoadFloat(FLOAT_80333048), LoadFloat(FLOAT_80333040));
+							                 1.0f, 0.0f);
 							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v, colors,
-						                 entry->uvScale, LoadFloat(FLOAT_80333048), LoadFloat(FLOAT_80333040));
+						                 entry->uvScale, 1.0f, 0.0f);
 					}
 
 					u += fillW;
 					x += fillW * entry->uvScale;
 				}
 
-				if (fillW > LoadFloat(FLOAT_80333040) && fillW < static_cast<float>(entry->w)) {
+				if (fillW > 0.0f && fillW < static_cast<float>(entry->w)) {
 					colors[1].r = 0xFF;
 					colors[1].g = 0xFF;
 					colors[1].b = 0xFF;
@@ -123,23 +114,23 @@ void CMenuPcs::FavoDraw()
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
 					float remainW =
-					    static_cast<float>(LoadDouble(DOUBLE_80333050) / static_cast<double>(entry->duration)) * static_cast<float>(entry->w);
+					    static_cast<float>(1.0 / static_cast<double>(entry->duration)) * static_cast<float>(entry->w);
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
 							int tileH = static_cast<int>(end - static_cast<float>(yStep));
-							if (static_cast<float>(tileH) > LoadFloat(FLOAT_80333044)) {
+							if (static_cast<float>(tileH) > 32.0f) {
 								tileH = 0x20;
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 							                 remainW, static_cast<float>(tileH), u, v, colors, entry->uvScale,
-							                 LoadFloat(FLOAT_80333048), LoadFloat(FLOAT_80333040));
+							                 1.0f, 0.0f);
 							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-						                 colors, entry->uvScale, LoadFloat(FLOAT_80333048), LoadFloat(FLOAT_80333040));
+						                 colors, entry->uvScale, 1.0f, 0.0f);
 					}
 				}
 
@@ -150,9 +141,9 @@ void CMenuPcs::FavoDraw()
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(entry->alpha * LoadFloat(FLOAT_80333058));
+				color.a = static_cast<unsigned char>(entry->alpha * 255.0f);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, LoadFloat(FLOAT_80333040));
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, 0.0f);
 			}
 		}
 
@@ -174,7 +165,7 @@ void CMenuPcs::FavoDraw()
 	FavoEntry* drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
-		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - LoadFloat(FLOAT_8033305C)) * LoadDouble(DOUBLE_80333060) +
+		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - 24.0f) * 0.5 +
 		                            static_cast<float>(drawEntry->y));
 		DrawSingBar(barX, barY, rank->score, drawEntry->alpha);
 		rank++;
@@ -185,16 +176,16 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int iconX = drawEntry->x + drawEntry->w - 0x10;
-		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - LoadFloat(FLOAT_80333044)) * LoadDouble(DOUBLE_80333060) +
+		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - 32.0f) * 0.5 +
 		                             static_cast<float>(drawEntry->y));
-		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, LoadFloat(FLOAT_80333048));
+		DrawSingleIcon(static_cast<char>(rank->foodId) + 0x14, iconX, iconY, drawEntry->alpha, 1, 1.0f);
 		rank++;
 		drawEntry++;
 	}
 
 	CFont* rankFont = m_fonts[0];
 	rankFont->SetShadow(1);
-	rankFont->SetScale(LoadFloat(FLOAT_80333048));
+	rankFont->SetScale(1.0f);
 	rankFont->DrawInit();
 
 	char textBuf[0x10];
@@ -204,12 +195,12 @@ void CMenuPcs::FavoDraw()
 	for (int i = 0; i < 8; i++) {
 		rankFont->SetTlut(6);
 		rankFont->SetColor(
-		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(LoadFloat(FLOAT_80333058) * drawEntry->alpha)).color);
+		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
-		rankFont->SetMargin(LoadFloat(FLOAT_80333048));
+		rankFont->SetMargin(1.0f);
 		sprintf(textBuf, s_FavoRankFormat_80333068, static_cast<int>(rank->place));
 		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
-		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - LoadFloat(FLOAT_8033306C));
+		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - 4.0f);
 		rankFont->Draw(textBuf);
 		rankFont->SetShadow(0);
 		rank++;
@@ -218,8 +209,8 @@ void CMenuPcs::FavoDraw()
 
 	CFont* nameFont = m_fonts[4];
 	nameFont->SetShadow(0);
-	nameFont->SetScale(LoadFloat(FLOAT_80333070));
-	nameFont->SetMargin(LoadFloat(FLOAT_80333048));
+	nameFont->SetScale(0.9f);
+	nameFont->SetMargin(1.0f);
 	nameFont->DrawInit();
 	memset(textBuf, 0, sizeof(textBuf));
 
@@ -227,10 +218,10 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		nameFont->SetColor(
-		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(LoadFloat(FLOAT_80333058) * drawEntry->alpha)).color);
+		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
 		const char* name = Game.m_cFlatDataArr[1].TableStrings(0)[(static_cast<char>(rank->foodId) + 0x17D) * 5 + 4];
 		nameFont->SetPosX(static_cast<float>(drawEntry->x + 0x1C));
-		nameFont->SetPosY(static_cast<float>(drawEntry->y + 0xB) - LoadFloat(FLOAT_8033306C));
+		nameFont->SetPosY(static_cast<float>(drawEntry->y + 0xB) - 4.0f);
 		nameFont->Draw(const_cast<char*>(name));
 		rank++;
 		drawEntry++;
@@ -263,16 +254,16 @@ bool CMenuPcs::FavoClose()
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
 				finishedCount = finishedCount + 1;
-				entry->alpha = LoadFloat(FLOAT_80333040);
-				entry->dx = LoadFloat(FLOAT_80333040);
-				entry->dy = LoadFloat(FLOAT_80333040);
+				entry->alpha = 0.0f;
+				entry->dx = 0.0f;
+				entry->dy = 0.0f;
 			} else {
 				entry->step = entry->step + 1;
 				entry->alpha =
-				    (float)(LoadDouble(DOUBLE_80333050) - (LoadDouble(DOUBLE_80333050) / (double)entry->duration) * (double)entry->step);
+				    (float)(1.0 - (1.0 / (double)entry->duration) * (double)entry->step);
 				if ((entry->flags & 2) == 0) {
 					float step =
-					    (float)(LoadDouble(DOUBLE_80333050) - (LoadDouble(DOUBLE_80333050) / (double)entry->duration) * (double)entry->step);
+					    (float)(1.0 - (1.0 / (double)entry->duration) * (double)entry->step);
 					float dx = entry->targetX - (float)entry->x;
 					float dy = entry->targetY - (float)entry->y;
 					entry->dx = dx * step;
@@ -385,14 +376,14 @@ bool CMenuPcs::FavoOpen()
 		if (frame >= entry->startFrame) {
 			if (entry->startFrame + entry->duration <= frame) {
 				finishedCount = finishedCount + 1;
-				entry->alpha = LoadFloat(FLOAT_80333048);
-				entry->dx = LoadFloat(FLOAT_80333040);
-				entry->dy = LoadFloat(FLOAT_80333040);
+				entry->alpha = 1.0f;
+				entry->dx = 0.0f;
+				entry->dy = 0.0f;
 			} else {
 				entry->step = entry->step + 1;
-				entry->alpha = (float)((LoadDouble(DOUBLE_80333050) / (double)entry->duration) * (double)entry->step);
+				entry->alpha = (float)((1.0 / (double)entry->duration) * (double)entry->step);
 				if ((entry->flags & 2) == 0) {
-					float step = (float)((LoadDouble(DOUBLE_80333050) / (double)entry->duration) * (double)entry->step);
+					float step = (float)((1.0 / (double)entry->duration) * (double)entry->step);
 					float dx = entry->targetX - (float)entry->x;
 					float dy = entry->targetY - (float)entry->y;
 					entry->dx = dx * step;
@@ -472,7 +463,7 @@ void CMenuPcs::FavoInit0()
 	list = this->m_favoList;
 	entry = &list->entries[entryIndex++];
 	entry->flags = 2;
-	alpha = LoadFloat(FLOAT_80333048);
+	alpha = 1.0f;
 	entry->startFrame = 0;
 	entry->duration = 5;
 	list = this->m_favoList;
@@ -560,14 +551,14 @@ void CMenuPcs::FavoInit()
 	FavoEntry* entry = m_favoList->entries;
 	iVar16 = 8;
 	do {
-		entry[0].uvScale = LoadFloat(FLOAT_80333048);
-		entry[1].uvScale = LoadFloat(FLOAT_80333048);
-		entry[2].uvScale = LoadFloat(FLOAT_80333048);
-		entry[3].uvScale = LoadFloat(FLOAT_80333048);
-		entry[4].uvScale = LoadFloat(FLOAT_80333048);
-		entry[5].uvScale = LoadFloat(FLOAT_80333048);
-		entry[6].uvScale = LoadFloat(FLOAT_80333048);
-		entry[7].uvScale = LoadFloat(FLOAT_80333048);
+		entry[0].uvScale = 1.0f;
+		entry[1].uvScale = 1.0f;
+		entry[2].uvScale = 1.0f;
+		entry[3].uvScale = 1.0f;
+		entry[4].uvScale = 1.0f;
+		entry[5].uvScale = 1.0f;
+		entry[6].uvScale = 1.0f;
+		entry[7].uvScale = 1.0f;
 		entry += 8;
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
@@ -581,7 +572,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 0x28;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
-	fVar4 = LoadFloat(FLOAT_80333040);
+	fVar4 = 0.0f;
 	fVar5 = FLOAT_80333080;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
@@ -627,7 +618,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->h = 0x30;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
-	setupEntry->uvScale = LoadFloat(FLOAT_80333048);
+	setupEntry->uvScale = 1.0f;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 

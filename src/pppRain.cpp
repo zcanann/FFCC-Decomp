@@ -160,11 +160,9 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
  */
 void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
-    int i;
-    RainDrop* drop;
     VRain* work;
-    int randA;
-    int randB;
+    RainDrop* drop;
+    int i;
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -190,6 +188,8 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
             u16 lifeRange;
             int lifeJitter;
             int lifeRemainder;
+            int randA;
+            int randB;
 
             randA = rand();
             randB = rand();
@@ -249,6 +249,8 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
             u16 lifeRange;
             int lifeJitter;
             int lifeRemainder;
+            int randA;
+            int randB;
 
             randA = rand();
             randB = rand();

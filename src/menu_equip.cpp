@@ -14,25 +14,25 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-static const float FLOAT_80332eb8 = 0.0f;
-static const double DOUBLE_80332ec0 = 1.0;
-static const double DOUBLE_80332ec8 = 216.0;
-static const double DOUBLE_80332ed0 = 0.5;
-static const double DOUBLE_80332ed8 = 4503601774854144.0;
-static const float FLOAT_80332ee0 = 1.0f;
-static const float FLOAT_80332ee4 = 255.0f;
-static const float FLOAT_80332ee8 = 0.9f;
-static const float FLOAT_80332eec = 4.0f;
-static const float FLOAT_80332ef0 = 12.0f;
-static const float FLOAT_80332ef4 = 24.0f;
-static const float FLOAT_80332ef8 = 320.0f;
-static const float FLOAT_80332efc = 0.5f;
-static const float FLOAT_80332f00 = 352.0f;
-static const float FLOAT_80332F04 = 3.0f;
-static const double DOUBLE_80332F08 = 0.0;
-static const float FLOAT_80332f10 = 128.0f;
-static const float FLOAT_80332f14 = 8.0f;
-static const float FLOAT_80332f18 = 0.75f;
+static const float kEquipZero = 0.0f;
+static const double kEquipOneDouble = 1.0;
+static const double kEquipWindowCenterX = 216.0;
+static const double kEquipHalfDouble = 0.5;
+static const double kEquipIntToDoubleBias = 4503601774854144.0;
+static const float kEquipOne = 1.0f;
+static const float kEquipColorMax = 255.0f;
+static const float kEquipListFontScale = 0.9f;
+static const float kEquipTextYOffset = 4.0f;
+static const float kEquipMarkXOffset = 12.0f;
+static const float kEquipMarkHeight = 24.0f;
+static const float kEquipHelpCenterX = 320.0f;
+static const float kEquipHalf = 0.5f;
+static const float kEquipHelpY = 352.0f;
+static const float kEquipHelpScale = 3.0f;
+static const double kEquipZeroDouble = 0.0;
+static const float kEquipInitU = 128.0f;
+static const float kEquipInitV = 8.0f;
+static const float kEquipSmallScale = 0.75f;
 
 namespace {
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts[4]) == 0x108);
@@ -153,18 +153,18 @@ bool CMenuPcs::EquipClose0()
 	itemCount = (int)list->listEnd - (int)list->count;
 	EquipOpenAnim* item = &list->entries[list->count];
 	for (int i = 0; i < itemCount; i++) {
-		fVar1 = FLOAT_80332eb8;
+		fVar1 = kEquipZero;
 		if (timer >= item->startFrame) {
 			if (item->startFrame + item->duration <= timer) {
 				doneCount = doneCount + 1;
-				item->alpha = FLOAT_80332eb8;
-				item->dx = FLOAT_80332eb8;
-				item->dy = FLOAT_80332eb8;
+				item->alpha = kEquipZero;
+				item->dx = kEquipZero;
+				item->dy = kEquipZero;
 			} else {
 				item->step = item->step + 1;
-				dVar2 = DOUBLE_80332ec0;
+				dVar2 = kEquipOneDouble;
 				item->alpha =
-				    (float)-((DOUBLE_80332ec0 / (double)item->duration) * (double)item->step - DOUBLE_80332ec0);
+				    (float)-((kEquipOneDouble / (double)item->duration) * (double)item->step - kEquipOneDouble);
 				if ((item->flags & 2) == 0) {
 					fVar1 = (float)-((dVar2 / (double)item->duration) * (double)item->step - dVar2);
 					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
@@ -176,7 +176,7 @@ bool CMenuPcs::EquipClose0()
 	}
 
 	if (itemCount == doneCount) {
-		selected->x = (s16)(int)-(((double)selected->w - DOUBLE_80332ed8) * DOUBLE_80332ed0 - DOUBLE_80332ec8);
+		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
 		return true;
 	}
 
@@ -215,17 +215,17 @@ bool CMenuPcs::EquipOpen0()
 	EquipOpenAnim* item = &list->entries[list->count];
 
 	for (int i = 0; i < itemCount; i++) {
-		fVar1 = FLOAT_80332eb8;
+		fVar1 = kEquipZero;
 		if (timer >= item->startFrame) {
 			if (item->startFrame + item->duration <= timer) {
 				doneCount = doneCount + 1;
-				item->alpha = FLOAT_80332ee0;
-				item->dx = FLOAT_80332eb8;
-				item->dy = FLOAT_80332eb8;
+				item->alpha = kEquipOne;
+				item->dx = kEquipZero;
+				item->dy = kEquipZero;
 			} else {
 				item->step = item->step + 1;
-				dVar2 = DOUBLE_80332ec0;
-				item->alpha = (float)((DOUBLE_80332ec0 / (double)item->duration) * (double)item->step);
+				dVar2 = kEquipOneDouble;
+				item->alpha = (float)((kEquipOneDouble / (double)item->duration) * (double)item->step);
 				if ((item->flags & 2) == 0) {
 					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
 					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
@@ -426,10 +426,10 @@ void CMenuPcs::EquipDraw()
 
 	for (int i = 0; i < menuData->count; i++) {
 		if (item->tex >= 0) {
-			double x = (double)(float)((double)item->x - DOUBLE_80332ed8);
+			double x = (double)(float)((double)item->x - kEquipIntToDoubleBias);
 			double y = (double)item->u;
-			double w = (double)(float)((double)item->w - DOUBLE_80332ed8);
-			double h = (double)(float)((double)item->h - DOUBLE_80332ed8);
+			double w = (double)(float)((double)item->w - kEquipIntToDoubleBias);
+			double h = (double)(float)((double)item->h - kEquipIntToDoubleBias);
 			double sx = (double)item->v;
 			int tex = item->tex;
 
@@ -442,10 +442,10 @@ void CMenuPcs::EquipDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (u8)(FLOAT_80332ee4 * item->alpha);
+			color.a = (u8)(kEquipColorMax * item->alpha);
 			GXSetChanMatColor((GXChannelID)4, color);
 			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), static_cast<float>((double)(float)((double)item->y - DOUBLE_80332ed8)),
+			    0, static_cast<float>(x), static_cast<float>((double)(float)((double)item->y - kEquipIntToDoubleBias)),
 			    static_cast<float>(w), static_cast<float>(h), static_cast<float>(y), static_cast<float>(sx),
 			    item->scale, item->scale, 0.0f);
 		}
@@ -455,24 +455,24 @@ void CMenuPcs::EquipDraw()
 	item = menuData->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			int iconY = (int)((float)(item->y + 6) - FLOAT_80332ee0);
+			int iconY = (int)((float)(item->y + 6) - kEquipOne);
 			int iconX = item->x + item->w - 0x10;
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
-			DrawSingleIcon(itemIdx, iconX, iconY, item->alpha, 0, FLOAT_80332ee0);
+			DrawSingleIcon(itemIdx, iconX, iconY, item->alpha, 0, kEquipOne);
 		}
 		item++;
 	}
 
 	CFont* font = GetEquipFont(this);
-	font->SetMargin(FLOAT_80332ee0);
+	font->SetMargin(kEquipOne);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_80332ee8);
+	font->SetScale(kEquipListFontScale);
 	font->DrawInit();
 
 	item = menuData->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			u8 alpha = (u8)(FLOAT_80332ee4 * item->alpha);
+			u8 alpha = (u8)(kEquipColorMax * item->alpha);
 			CColor color(0xff, 0xff, 0xff, alpha);
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
@@ -480,10 +480,10 @@ void CMenuPcs::EquipDraw()
 			if ((mode == 0) && (i == static_cast<int>(menuState->selectedIndex))) {
 				helpItem = itemIdx;
 			}
-			double textX = (double)item->x + ((double)item->w - (double)font->GetWidth(str)) * DOUBLE_80332ed0;
+			double textX = (double)item->x + ((double)item->w - (double)font->GetWidth(str)) * kEquipHalfDouble;
 			double textY = (double)(item->y + 0xb);
 			font->SetPosX((float)textX);
-			font->SetPosY((float)(textY - (double)FLOAT_80332eec));
+			font->SetPosY((float)(textY - (double)kEquipTextYOffset));
 			font->Draw(str);
 		}
 		item++;
@@ -500,10 +500,10 @@ void CMenuPcs::EquipDraw()
 		for (int i = menuData->count; i < menuData->listEnd; i++) {
 			int tex = listItem->tex;
 			if (tex >= 0) {
-				double x = (double)(float)((double)listItem->x - DOUBLE_80332ed8);
-				double y = (double)(float)((double)listItem->y - DOUBLE_80332ed8);
-				double w = (double)(float)((double)listItem->w - DOUBLE_80332ed8);
-				double h = (double)(float)((double)listItem->h - DOUBLE_80332ed8);
+				double x = (double)(float)((double)listItem->x - kEquipIntToDoubleBias);
+				double y = (double)(float)((double)listItem->y - kEquipIntToDoubleBias);
+				double w = (double)(float)((double)listItem->w - kEquipIntToDoubleBias);
+				double h = (double)(float)((double)listItem->h - kEquipIntToDoubleBias);
 				double u = (double)listItem->u;
 				double v = (double)listItem->v;
 				double alpha = (double)listItem->alpha;
@@ -526,23 +526,23 @@ void CMenuPcs::EquipDraw()
 					color.a = 0xff;
 					GXSetChanMatColor((GXChannelID)4, color);
 					double fillWidth = (double)(float)(alpha * w);
-					if ((double)FLOAT_80332eb8 < fillWidth) {
+					if ((double)kEquipZero < fillWidth) {
 						MenuPcs.DrawRect(
 						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fillWidth),
 						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    FLOAT_80332ee0, FLOAT_80332ee0, 0.0f);
+						    kEquipOne, kEquipOne, 0.0f);
 						x = (double)(float)(x + fillWidth);
 						u = (double)(float)(u + fillWidth);
 					}
-					if (((double)FLOAT_80332eb8 < fillWidth) && (fillWidth < w)) {
+					if (((double)kEquipZero < fillWidth) && (fillWidth < w)) {
 						colors[1].a = 0;
 						colors[3].a = 0;
 						double fadeWidth =
-						    (double)((float)(DOUBLE_80332ec0 / (double)listItem->duration) * (float)listItem->w);
+						    (double)((float)(kEquipOneDouble / (double)listItem->duration) * (float)listItem->w);
 						MenuPcs.DrawRect(
 						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fadeWidth),
 						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    FLOAT_80332ee0, FLOAT_80332ee0, 0.0f);
+						    kEquipOne, kEquipOne, 0.0f);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else if (tex == 0x37) {
@@ -550,17 +550,17 @@ void CMenuPcs::EquipDraw()
 					if ((idx < 1) || (letterCount <= idx)) {
 						if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = DOUBLE_80332ed0 * alpha;
+							alpha = kEquipHalfDouble * alpha;
 						}
 					} else {
 						int equipped = EquipChk((int)letter[idx]);
 						if ((equipped == 0) && (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = DOUBLE_80332ed0 * alpha;
+							alpha = kEquipHalfDouble * alpha;
 						}
 						if (equipped != 0) {
-							int markX = (int)(x - (double)FLOAT_80332ef0);
-							int markY = (int)((h - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + y);
+							int markX = (int)(x - (double)kEquipMarkXOffset);
+							int markY = (int)((h - (double)kEquipMarkHeight) * kEquipHalfDouble + y);
 							DrawEquipMark(markX, markY, listItem->alpha);
 						}
 					}
@@ -576,7 +576,7 @@ void CMenuPcs::EquipDraw()
 					color.r = 0xff;
 					color.g = 0xff;
 					color.b = 0xff;
-					color.a = (u8)((double)FLOAT_80332ee4 * alpha);
+					color.a = (u8)((double)kEquipColorMax * alpha);
 					GXSetChanMatColor((GXChannelID)4, color);
 					MenuPcs.DrawRect(
 					    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h),
@@ -589,9 +589,9 @@ void CMenuPcs::EquipDraw()
 
 	if (mode == 1) {
 		font = GetEquipFont(this);
-		font->SetMargin(FLOAT_80332ee0);
+		font->SetMargin(kEquipOne);
 		font->SetShadow(0);
-		font->SetScale(FLOAT_80332ee8);
+		font->SetScale(kEquipListFontScale);
 		font->DrawInit();
 
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -606,7 +606,7 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* textItem = listStart;
 		for (int i = 0; (i < 8) && (i + menuState->scroll < letter[0]); i++) {
 			int idx = i + menuState->scroll;
-			CColor color(0xff, 0xff, 0xff, (u8)(FLOAT_80332ee4 * listStart->alpha));
+			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * listStart->alpha));
 			font->SetColor(color.color);
 
 			const char* str = 0;
@@ -623,7 +623,7 @@ void CMenuPcs::EquipDraw()
 			if (str != NULL) {
 				font->GetWidth(str);
 				font->SetPosX((float)(textItem->x + 0x1c));
-				font->SetPosY((float)(textItem->y + 0xb) - FLOAT_80332eec);
+				font->SetPosY((float)(textItem->y + 0xb) - kEquipTextYOffset);
 				font->Draw(str);
 			}
 			textItem++;
@@ -635,10 +635,10 @@ void CMenuPcs::EquipDraw()
 		for (int i = 0; (i < 8) && (i + menuState->scroll < letter[0]); i++) {
 			int idx = i + menuState->scroll;
 			if ((idx > 0) && (letter[idx] >= 0)) {
-				int iconY = (int)((float)(iconItem->y + 6) - FLOAT_80332ee0);
+				int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
 				int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
 				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
-				DrawSingleIcon(itemIdx, iconX, iconY, listStart->alpha, 0, FLOAT_80332ee0);
+				DrawSingleIcon(itemIdx, iconX, iconY, listStart->alpha, 0, kEquipOne);
 			}
 			iconItem++;
 		}
@@ -648,7 +648,7 @@ void CMenuPcs::EquipDraw()
 		EquipOpenAnim* listStart = &menuData->entries[menuData->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		double pos = CalcListPos(static_cast<int>(menuState->scroll), static_cast<int>(letter[0]), 0);
-		if (pos > (double)FLOAT_80332eb8) {
+		if (pos > (double)kEquipZero) {
 			DrawListPosMark(static_cast<float>(listStart->x), static_cast<float>(listStart->y), static_cast<float>(pos));
 		}
 	}
@@ -661,10 +661,10 @@ void CMenuPcs::EquipDraw()
 			EquipOpenAnim* listBase = &menuData->entries[menuData->count];
 			cursorItem = &listBase[menuState->subSelectedIndex];
 		}
-		int cursorX = (int)((double)cursorItem->y + ((double)(cursorItem->h - 0x20) * DOUBLE_80332ed0));
+		int cursorX = (int)((double)cursorItem->y + ((double)(cursorItem->h - 0x20) * kEquipHalfDouble));
 		int frame = (int)System.m_frameCounter;
 		int cursorY = (cursorItem->x - 0x14) + (frame & 7);
-		DrawCursor(cursorY, cursorX, FLOAT_80332ee0);
+		DrawCursor(cursorY, cursorX, kEquipOne);
 	}
 
 	if ((mode == 1) && (menuState->step == 1)) {
@@ -674,8 +674,8 @@ void CMenuPcs::EquipDraw()
 			if (EquipChk((int)letter[idx]) != 0) {
 				EquipOpenAnim* listBase = &menuData->entries[menuData->count];
 				EquipOpenAnim* markItem = &listBase[menuState->subSelectedIndex];
-				int markX = (int)((double)markItem->x - (double)FLOAT_80332ef0);
-				int markY = (int)(((double)markItem->h - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + (double)markItem->y);
+				int markX = (int)((double)markItem->x - (double)kEquipMarkXOffset);
+				int markY = (int)(((double)markItem->h - (double)kEquipMarkHeight) * kEquipHalfDouble + (double)markItem->y);
 				DrawEquipMark(markX, markY, markItem->alpha);
 			}
 		}
@@ -691,14 +691,14 @@ void CMenuPcs::EquipDraw()
 
 	int helpEntryIndex = (mode == 1) ? menuData->count : 0;
 	CColor helpColor(0xff, 0xff, 0xff,
-	                 static_cast<u8>(FLOAT_80332ee4 * menuData->entries[helpEntryIndex].alpha));
-	DrawHelpMessage(helpItem, m_fonts[0], 0, static_cast<int>(FLOAT_80332f00), helpColor.color, 10,
-	                FLOAT_80332ee0, FLOAT_80332f18);
+	                 static_cast<u8>(kEquipColorMax * menuData->entries[helpEntryIndex].alpha));
+	DrawHelpMessage(helpItem, m_fonts[0], 0, static_cast<int>(kEquipHelpY), helpColor.color, 10,
+	                kEquipOne, kEquipSmallScale);
 	if ((mode == 1) && (listIndex < 1)) {
 		CColor listHelpColor(
-		    0xff, 0xff, 0xff, static_cast<u8>(FLOAT_80332ee4 * menuData->entries[menuData->count].alpha));
-		DrawHelpMessage(0x265, m_fonts[0], 0, static_cast<int>(FLOAT_80332f00), listHelpColor.color, 10,
-		                FLOAT_80332ee0, FLOAT_80332f18);
+		    0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * menuData->entries[menuData->count].alpha));
+		DrawHelpMessage(0x265, m_fonts[0], 0, static_cast<int>(kEquipHelpY), listHelpColor.color, 10,
+		                kEquipOne, kEquipSmallScale);
 	}
 }
 
@@ -726,14 +726,14 @@ int CMenuPcs::EquipClose()
 		if (item->startFrame <= timer) {
 			if (item->startFrame + item->duration <= timer) {
 				doneCount++;
-				item->alpha = FLOAT_80332eb8;
+				item->alpha = kEquipZero;
 			} else {
 				item->step = item->step + 1;
-				item->alpha = (float)-((DOUBLE_80332ec0 / static_cast<double>(item->duration)) *
+				item->alpha = (float)-((kEquipOneDouble / static_cast<double>(item->duration)) *
 				                           static_cast<double>(item->step) -
-				                       DOUBLE_80332ec0);
-				if ((double)item->alpha < DOUBLE_80332F08) {
-					item->alpha = FLOAT_80332eb8;
+				                       kEquipOneDouble);
+				if ((double)item->alpha < kEquipZeroDouble) {
+					item->alpha = kEquipZero;
 				}
 			}
 		}
@@ -745,7 +745,7 @@ int CMenuPcs::EquipClose()
 		for (int i = 0; i < itemCount; i++) {
 			item->startFrame = 0;
 			item->duration = 1;
-			item->alpha = FLOAT_80332eb8;
+			item->alpha = kEquipZero;
 			item++;
 		}
 		return 1;
@@ -792,7 +792,7 @@ void CMenuPcs::EquipCtrl()
 		state = 0;
 	}
 
-	scale = FLOAT_80332ee0;
+	scale = kEquipOne;
 	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	if (state != 0) {
 		EquipOpenAnimList* list = GetEquipListStorage(this);
@@ -845,7 +845,7 @@ int CMenuPcs::EquipOpen()
 	if (menuState->initialized == '\0') {
 		EquipOpenAnimList* list = GetEquipListStorage(this);
 		memset(list, 0, sizeof(*list));
-		fVar5 = FLOAT_80332ee0;
+		fVar5 = kEquipOne;
 		EquipOpenAnim* entry = list->entries;
 		iVar11 = 8;
 		do {
@@ -857,10 +857,10 @@ int CMenuPcs::EquipOpen()
 			entry[5].scale = fVar5;
 			entry[6].scale = fVar5;
 			entry[7].scale = fVar5;
-			dVar4 = DOUBLE_80332ed8;
-			dVar3 = DOUBLE_80332ed0;
-			dVar2 = DOUBLE_80332ec8;
-			fVar1 = FLOAT_80332eb8;
+			dVar4 = kEquipIntToDoubleBias;
+			dVar3 = kEquipHalfDouble;
+			dVar2 = kEquipWindowCenterX;
+			fVar1 = kEquipZero;
 			entry += 8;
 			iVar11--;
 		} while (iVar11 != 0);
@@ -922,17 +922,17 @@ int CMenuPcs::EquipOpen()
 		if (entry->startFrame <= iVar11) {
 			if (entry->startFrame + entry->duration <= iVar11) {
 				iVar6++;
-				entry->alpha = FLOAT_80332ee0;
+				entry->alpha = kEquipOne;
 			} else {
 				entry->step = entry->step + 1;
 				dVar20 = (double)entry->duration;
-				entry->alpha = (float)((DOUBLE_80332ec0 / dVar20) * (double)entry->step);
+				entry->alpha = (float)((kEquipOneDouble / dVar20) * (double)entry->step);
 			}
 		}
 		entry++;
 	}
 
-	fVar5 = FLOAT_80332ee0;
+	fVar5 = kEquipOne;
 	if (list->count == iVar6) {
 		entry = list->entries;
 		if (0 < (int)uVar8) {
@@ -1010,10 +1010,10 @@ void CMenuPcs::EquipInit1()
 	EquipOpenAnim* psVar13;
 	unsigned int uVar15;
 
-	fVar5 = FLOAT_80332f14;
-	fVar4 = FLOAT_80332f10;
-	fVar3 = FLOAT_80332ee0;
-	fVar2 = FLOAT_80332eb8;
+	fVar5 = kEquipInitV;
+	fVar4 = kEquipInitU;
+	fVar3 = kEquipOne;
+	fVar2 = kEquipZero;
 	EquipOpenAnimList* list = GetEquipListStorage(this);
 	sVar7 = 0;
 	iVar8 = (int)list->count;
@@ -1025,7 +1025,7 @@ void CMenuPcs::EquipInit1()
 	psVar10->w = 0x78;
 	psVar10->h = 0x108;
 	psVar10->u = fVar4;
-	fVar4 = FLOAT_80332f18;
+	fVar4 = kEquipSmallScale;
 	psVar10->v = fVar5;
 	psVar10->scale = fVar3;
 	psVar10->startFrame = 5;
@@ -1094,7 +1094,7 @@ void CMenuPcs::EquipInit1()
 		psVar13[1].u = fVar2;
 		psVar13[1].v = fVar2;
 		psVar13[1].startFrame = 7;
-		fVar3 = FLOAT_80332eb8;
+		fVar3 = kEquipZero;
 		psVar13[1].duration = 5;
 		iVar8 = iVar8 - 1;
 	} while (iVar8 != 0);

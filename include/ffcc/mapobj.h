@@ -125,6 +125,7 @@ public:
         InitMapObjAtrColorKeyFrame(m_altColorKeyFrame);
         m_type = POINT_LIGHT;
         m_colorMode = 0;
+        m_useAltColor = 0;
         m_unknown20 = 0;
     }
 
@@ -169,7 +170,7 @@ public:
     void Init();
     CMapObj();
     ~CMapObj();
-    void ReadOtmObj(CChunkFile&);
+    int ReadOtmObj(CChunkFile&);
     void CalcMtx(float (*)[4], unsigned char);
     void SetShow_r(int);
     void SetShow(int);
@@ -204,7 +205,7 @@ public:
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
     unsigned char m_mapDataType; // 0x1D
-    unsigned char m_meshType;    // 0x1E
+    signed char m_meshType;      // 0x1E
     signed char m_octTreeIndex;      // 0x1F
     unsigned char m_unknown20;     // 0x20
     unsigned char m_useAmbientColor; // 0x21

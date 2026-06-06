@@ -63,6 +63,19 @@ struct CMapMngAsyncLoadState
     void* m_asyncHandles[16];
 };
 
+struct CMapShadowKeyInfo
+{
+    unsigned long m_key;              // 0x00
+    short m_frame;                    // 0x04
+    unsigned char m_unknown06;        // 0x06
+    unsigned char m_unknown07;        // 0x07
+    unsigned char m_pad08[8];         // 0x08
+    _GXColor m_primaryColor;          // 0x10
+    _GXColor m_secondaryColor;        // 0x14
+};
+
+typedef char CMapShadowKeyInfo_size_check[(sizeof(CMapShadowKeyInfo) == 0x18) ? 1 : -1];
+
 class CMapMng
 {
 public:
@@ -73,7 +86,7 @@ public:
     short m_mapHitCount;               // 0x0000A
     short m_mapObjCount;               // 0x0000C
     short m_mapMeshCount;              // 0x0000E
-    unsigned short m_unknown10;        // 0x00010
+    unsigned short m_shadowKeyInfoCount; // 0x00010
     unsigned char m_pad012[0x14 - 0x12];
     COctTree m_octTreeArray[16];       // 0x00014
     CMapHit m_mapHitArray[32];         // 0x004D4
@@ -87,7 +100,7 @@ public:
     CPtrArray<CMapAnimKeyDt*> m_mapAnimKeyDtArray;  // 0x21418
     CPtrArray<CMapShadow*> m_mapShadowArray;        // 0x21434
     CPtrArray<CMapLightHolder*> m_mapLightHolderArrays[2]; // 0x21450
-    unsigned char m_pad21488[0x214E8 - 0x21488];
+    CMapShadowKeyInfo m_shadowKeyInfos[4]; // 0x21488
     CMapIdGrp m_mapIdGrpArray[256];     // 0x214E8
     CMapObj* m_rootMapObj;             // 0x228E8
     Vec m_cameraPosition;              // 0x228EC

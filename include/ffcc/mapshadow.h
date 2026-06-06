@@ -23,13 +23,14 @@ public:
     void Calc();
     void Draw();
 
-    u8 _pad00[4];            // 0x00
+    int m_enabled;           // 0x00
     u16 m_materialIndex;     // 0x04
     u8 m_useFrustum;         // 0x06
     u8 m_materialMode;       // 0x07
     u8 m_shadowMaterialType;  // 0x08
     u8 m_yFilterMode;        // 0x09
-    u8 _pad0A[2];            // 0x0A
+    u8 m_unknown0A;          // 0x0A
+    u8 m_unknown0B;          // 0x0B
     CMapObj* m_modelA;       // 0x0C
     CMapObj* m_modelB;       // 0x10
     CMapObj* m_modelC;       // 0x14
@@ -38,7 +39,8 @@ public:
     Mtx m_shadowMtx;         // 0x78
     float m_shadowScale;     // 0xA8
     float m_frustumNear;     // 0xAC
-    u8 _padB0[8];            // 0xB0
+    float m_frustumFar;      // 0xB0
+    float m_targetBoundsScale; // 0xB4
     float m_scrollStepX;     // 0xB8
     float m_scrollStepY;     // 0xBC
     CBound m_targetBounds[2]; // 0xC0

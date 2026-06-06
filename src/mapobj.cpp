@@ -58,6 +58,11 @@ static inline Mtx& MapObjHitDrawMtx()
     return MapMng.m_viewMtx;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 }
 
 /*
@@ -320,7 +325,6 @@ inline CMapObjAtr::CMapObjAtr()
 inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
     m_type = CMapObjAtr::PLAY_STA;
-    m_playStaNo = 0;
 }
 
 /*
@@ -330,9 +334,8 @@ inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  */
 inline CMapObjAtrMime::CMapObjAtrMime()
 {
-    InitMapObjAtrColorKeyFrame(m_keyFrame);
     m_type = CMapObjAtr::MIME;
-    m_vertexLists = 0;
+    InitMapObjAtrColorKeyFrame(m_keyFrame);
 }
 
 /*
@@ -354,7 +357,7 @@ inline CMapObjAtrMeshName::CMapObjAtrMeshName()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
+int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
     enum {
         CHUNK_AMBI = 0x414D4249,
@@ -367,6 +370,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
         CHUNK_LDAT = 0x4C444154,
+        CHUNK_LSDW = 0x4C534457,
         CHUNK_MIME = 0x4D494D45,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
@@ -449,6 +453,9 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             break;
         }
+        case CHUNK_LSDW: {
+            break;
+        }
         case CHUNK_SDST: {
             if (chunk.m_version == 2) {
                 m_enableFullScreenShadow = chunkFile.Get1();
@@ -471,7 +478,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PIDX: {
             short parentIdx = static_cast<short>(chunkFile.Get2());
-            short meshOrHitIdx = static_cast<short>(chunkFile.Get2());
+            int meshOrHitIdx = static_cast<short>(chunkFile.Get2());
 
             m_meshType = chunkFile.Get1();
             m_mapDataType = chunkFile.Get1();
@@ -489,20 +496,19 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_baseDrawPriority = 0;
                 m_drawPriority = 0;
             } else if ((m_mapDataType == 2) || (m_mapDataType == 3)) {
-                if (meshOrHitIdx == -2) {
+                if (meshOrHitIdx != -2) {
+                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
+                } else {
                     CMapObjAtrMeshName* meshName =
                         new (MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
-                    strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
-                    m_mapData = 0;
-                } else {
-                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
+                    strncpy(meshName->m_name, name, 0x20);
                 }
             }
 
             if (((Game.m_currentSceneId == 4) || (Game.m_currentSceneId == 7)) &&
-                (static_cast<signed char>(m_meshType) > 7) && (static_cast<signed char>(m_meshType) < 10)) {
+                (m_meshType < 10) && (m_meshType >= 8)) {
                 m_transRateX = kMapObjZero;
                 m_transRateY = kMapObjOne;
                 m_transRateZ = kMapObjZero;
@@ -527,7 +533,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_localScaleZ = chunkFile.GetF4();
 
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
-                ((m_localScaleX != kMapObjZero) || (m_localScaleY != kMapObjZero) || (m_localScaleZ != kMapObjZero))) {
+                ((kMapObjZero != m_localScaleX) || (kMapObjZero != m_localScaleY) || (kMapObjZero != m_localScaleZ))) {
                 if (m_attribute == 0) {
                     System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0x0C));
                 } else {
@@ -578,7 +584,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
                     mime->m_keyFrame.ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
-                    mime->m_keyFrame.ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    mime->m_keyFrame.ReadFrame(chunkFile, mimeChunk.m_arg0);
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
@@ -651,22 +657,22 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         pointLight->m_altColor = pointLight->m_altColors[0];
                     } else switch (chunk.m_id) {
                     case CHUNK_CFRM:
-                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CJUN:
-                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CKEY:
-                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MFRM:
-                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MJUN:
-                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MKEY:
-                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        pointLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -743,22 +749,22 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         spotLight->m_altColor = spotLight->m_altColors[0];
                     } else switch (chunk.m_id) {
                     case CHUNK_CFRM:
-                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CJUN:
-                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_CKEY:
-                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_altColorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MFRM:
-                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadFrame(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MJUN:
-                        spotLight->m_colorKeyFrame.ReadJun(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadJun(chunkFile, chunk.m_arg0);
                         break;
                     case CHUNK_MKEY:
-                        spotLight->m_colorKeyFrame.ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
+                        spotLight->m_colorKeyFrame.ReadKey(chunkFile, chunk.m_arg0);
                         break;
                     }
                 }
@@ -805,6 +811,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
     }
     chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -1082,105 +1089,105 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
-    CMapObj* mapStart = MapObjArrayStart();
     CMapObj* head0 = 0;
-    CMapObj* search0 = mapStart;
-    CMapObj* search2Start = mapStart;
-    CMapObj* search3Start = mapStart;
-    CMapObj* search4Start = mapStart;
-    CMapObj* search5Start = mapStart;
-    CMapObj* search6Start = mapStart;
-    CMapObj* child;
-    CMapObj* cursor;
-    CMapObj* head;
+    CMapObj* head1;
+    CMapObj* head2;
+    CMapObj* head3;
+    CMapObj* head4;
+    CMapObj* head5;
+    CMapObj* head6;
+    CMapObj* head7;
+    CMapObj* head8;
+    CMapObj* search0 = MapObjArrayStart();
 
-    while ((child = MapMng.SearchChildMapObj(search0, this)) != 0) {
-        CMapObj* search1 = mapStart;
-        CMapObj* head1 = 0;
+    CMapObj* child0;
+    while ((child0 = MapMng.SearchChildMapObj(search0, this)) != 0) {
+        CMapObj* search1 = MapObjArrayStart();
+        head1 = 0;
 
-        child->m_next = head0;
-        CMapObj* child0 = child;
-        while ((child = MapMng.SearchChildMapObj(search1, child0)) != 0) {
-            CMapObj* head2 = 0;
+        child0->m_next = head0;
+        head0 = child0;
+        CMapObj* child1;
+        while ((child1 = MapMng.SearchChildMapObj(search1, child0)) != 0) {
+            head2 = 0;
 
-            child->m_next = head1;
-            CMapObj* child1 = child;
-            cursor = search2Start;
-            while ((child = MapMng.SearchChildMapObj(cursor, child1)) != 0) {
-                child->m_next = head2;
-                CMapObj* child2 = child;
-                cursor = search3Start;
-                head = 0;
-                while ((child = MapMng.SearchChildMapObj(cursor, child2)) != 0) {
-                    child->m_next = head;
-                    CMapObj* child3 = child;
-                    cursor = search4Start;
-                    head = 0;
-                    while ((child = MapMng.SearchChildMapObj(cursor, child3)) != 0) {
-                        child->m_next = head;
-                        CMapObj* child4 = child;
-                        cursor = search5Start;
-                        head = 0;
-                        while ((child = MapMng.SearchChildMapObj(cursor, child4)) != 0) {
-                            child->m_next = head;
-                            CMapObj* child5 = child;
-                            cursor = search6Start;
-                            head = 0;
-                            while ((child = MapMng.SearchChildMapObj(cursor, child5)) != 0) {
-                                child->m_next = head;
-                                CMapObj* child6 = child;
-                                cursor = mapStart;
-                                head = 0;
-                                while ((child = MapMng.SearchChildMapObj(cursor, child6)) != 0) {
-                                    child->m_next = head;
-                                    CMapObj* child7 = child;
-                                    cursor = mapStart;
-                                    head = 0;
-                                    while ((child = MapMng.SearchChildMapObj(cursor, child7)) != 0) {
-                                        child->m_next = head;
-                                        child->SetLink();
-                                        cursor = NextSlot(child);
-                                        head = child;
+            child1->m_next = head1;
+            head1 = child1;
+            CMapObj* cursor2 = MapObjArrayStart();
+            CMapObj* child2;
+            while ((child2 = MapMng.SearchChildMapObj(cursor2, child1)) != 0) {
+                child2->m_next = head2;
+                head2 = child2;
+                CMapObj* cursor3 = MapObjArrayStart();
+                head3 = 0;
+                CMapObj* child3;
+                while ((child3 = MapMng.SearchChildMapObj(cursor3, child2)) != 0) {
+                    child3->m_next = head3;
+                    head3 = child3;
+                    CMapObj* cursor4 = MapObjArrayStart();
+                    head4 = 0;
+                    CMapObj* child4;
+                    while ((child4 = MapMng.SearchChildMapObj(cursor4, child3)) != 0) {
+                        child4->m_next = head4;
+                        head4 = child4;
+                        CMapObj* cursor5 = MapObjArrayStart();
+                        head5 = 0;
+                        CMapObj* child5;
+                        while ((child5 = MapMng.SearchChildMapObj(cursor5, child4)) != 0) {
+                            child5->m_next = head5;
+                            head5 = child5;
+                            CMapObj* cursor6 = MapObjArrayStart();
+                            head6 = 0;
+                            CMapObj* child6;
+                            while ((child6 = MapMng.SearchChildMapObj(cursor6, child5)) != 0) {
+                                child6->m_next = head6;
+                                head6 = child6;
+                                CMapObj* cursor7 = MapObjArrayStart();
+                                head7 = 0;
+                                CMapObj* child7;
+                                while ((child7 = MapMng.SearchChildMapObj(cursor7, child6)) != 0) {
+                                    child7->m_next = head7;
+                                    head7 = child7;
+                                    CMapObj* cursor8 = MapObjArrayStart();
+                                    head8 = 0;
+                                    CMapObj* child8;
+                                    while ((child8 = MapMng.SearchChildMapObj(cursor8, child7)) != 0) {
+                                        child8->m_next = head8;
+                                        head8 = child8;
+                                        child8->SetLink();
+                                        cursor8 = NextSlot(child8);
                                     }
 
-                                    child7->m_child = head;
-                                    cursor = NextSlot(child7);
-                                    head = child7;
+                                    child7->m_child = head8;
+                                    cursor7 = NextSlot(child7);
                                 }
 
-                                child6->m_child = head;
-                                cursor = NextSlot(child6);
-                                head = child6;
+                                child6->m_child = head7;
+                                cursor6 = NextSlot(child6);
                             }
 
-                            child5->m_child = head;
-                            cursor = NextSlot(child5);
-                            head = child5;
+                            child5->m_child = head6;
+                            cursor5 = NextSlot(child5);
                         }
 
-                        child4->m_child = head;
-                        cursor = NextSlot(child4);
-                        head = child4;
+                        child4->m_child = head5;
+                        cursor4 = NextSlot(child4);
                     }
 
-                    child3->m_child = head;
-                    cursor = NextSlot(child3);
-                    head = child3;
+                    child3->m_child = head4;
+                    cursor3 = NextSlot(child3);
                 }
 
-                child2->m_child = head;
-                cursor = NextSlot(child2);
-                head2 = child2;
+                child2->m_child = head3;
+                cursor2 = NextSlot(child2);
             }
 
             child1->m_child = head2;
             search1 = NextSlot(child1);
-            head1 = child1;
         }
 
         child0->m_child = head1;
         search0 = NextSlot(child0);
-        head0 = child0;
     }
 
     m_child = head0;
@@ -1594,56 +1601,78 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float margin = kMapObjZero + localCylinder.m_radius;
+        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - margin;
-            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
+            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + marginX;
         } else {
-            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - margin;
-            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - marginX;
+            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
+        float marginY = LoadFloat(kMapObjZero);
+        marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - margin;
-            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
+            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
         } else {
-            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - margin;
-            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - marginY;
+            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
+        float marginZ = LoadFloat(kMapObjZero);
+        marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - margin;
-            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
+            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;
         } else {
-            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - margin;
-            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - marginZ;
+            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + marginZ;
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        bool hitBounds = false;
-        bool xyOverlap = false;
+        unsigned char hitBounds = 0;
+        unsigned char xyOverlap = 0;
         {
-            bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
-                ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
-                : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
+            int xOverlap = 0;
+            float positionMinX = mapHit->m_positionMin.x;
+            if (positionMinX < localCylinder.m_bound.m_min.x) {
+                xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
+            } else if (positionMinX > localCylinder.m_bound.m_min.x) {
+                xOverlap = positionMinX <= localCylinder.m_bound.m_max.x;
+            } else {
+                xOverlap = 1;
+            }
 
             if (xOverlap) {
-                bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
-                    ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
-                    : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
+                int yOverlap = 0;
+                float positionMinY = mapHit->m_positionMin.y;
+                if (positionMinY < localCylinder.m_bound.m_min.y) {
+                    yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
+                } else if (positionMinY > localCylinder.m_bound.m_min.y) {
+                    yOverlap = positionMinY <= localCylinder.m_bound.m_max.y;
+                } else {
+                    yOverlap = 1;
+                }
                 if (yOverlap) {
-                    xyOverlap = true;
+                    xyOverlap = 1;
                 }
             }
 
             if (xyOverlap) {
-                bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
-                    ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
-                    : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
+                int zOverlap = 0;
+                float positionMinZ = mapHit->m_positionMin.z;
+                if (positionMinZ < localCylinder.m_bound.m_min.z) {
+                    zOverlap = localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z;
+                } else if (positionMinZ > localCylinder.m_bound.m_min.z) {
+                    zOverlap = positionMinZ <= localCylinder.m_bound.m_max.z;
+                } else {
+                    zOverlap = 1;
+                }
 
                 if (zOverlap) {
-                    hitBounds = true;
+                    hitBounds = 1;
                 }
             }
         }
@@ -1681,56 +1710,78 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
         localCylinder.m_radius = cylinder->m_radius;
-        float margin = kMapObjZero + localCylinder.m_radius;
+        float marginX = LoadFloat(kMapObjZero) + localCylinder.m_radius;
 
         if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - margin;
-            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_bottom.x - marginX;
+            localCylinder.m_bound.m_max.x = localCylinder.m_top.x + marginX;
         } else {
-            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - margin;
-            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + margin;
+            localCylinder.m_bound.m_min.x = localCylinder.m_top.x - marginX;
+            localCylinder.m_bound.m_max.x = localCylinder.m_bottom.x + marginX;
         }
 
+        float marginY = LoadFloat(kMapObjZero);
+        marginY += localCylinder.m_radius;
         if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - margin;
-            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_bottom.y - marginY;
+            localCylinder.m_bound.m_max.y = localCylinder.m_top.y + marginY;
         } else {
-            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - margin;
-            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + margin;
+            localCylinder.m_bound.m_min.y = localCylinder.m_top.y - marginY;
+            localCylinder.m_bound.m_max.y = localCylinder.m_bottom.y + marginY;
         }
 
+        float marginZ = LoadFloat(kMapObjZero);
+        marginZ += localCylinder.m_radius;
         if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - margin;
-            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_bottom.z - marginZ;
+            localCylinder.m_bound.m_max.z = localCylinder.m_top.z + marginZ;
         } else {
-            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - margin;
-            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + margin;
+            localCylinder.m_bound.m_min.z = localCylinder.m_top.z - marginZ;
+            localCylinder.m_bound.m_max.z = localCylinder.m_bottom.z + marginZ;
         }
 
         CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-        bool hitBounds = false;
-        bool xyOverlap = false;
+        unsigned char hitBounds = 0;
+        unsigned char xyOverlap = 0;
         {
-            bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_bound.m_min.x
-                ? localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x
-                : mapHit->m_positionMin.x <= localCylinder.m_bound.m_max.x;
+            int xOverlap = 0;
+            float positionMinX = mapHit->m_positionMin.x;
+            if (positionMinX < localCylinder.m_bound.m_min.x) {
+                xOverlap = localCylinder.m_bound.m_min.x <= mapHit->m_positionMax.x;
+            } else if (positionMinX > localCylinder.m_bound.m_min.x) {
+                xOverlap = positionMinX <= localCylinder.m_bound.m_max.x;
+            } else {
+                xOverlap = 1;
+            }
 
             if (xOverlap) {
-                bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_bound.m_min.y
-                    ? localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y
-                    : mapHit->m_positionMin.y <= localCylinder.m_bound.m_max.y;
+                int yOverlap = 0;
+                float positionMinY = mapHit->m_positionMin.y;
+                if (positionMinY < localCylinder.m_bound.m_min.y) {
+                    yOverlap = localCylinder.m_bound.m_min.y <= mapHit->m_positionMax.y;
+                } else if (positionMinY > localCylinder.m_bound.m_min.y) {
+                    yOverlap = positionMinY <= localCylinder.m_bound.m_max.y;
+                } else {
+                    yOverlap = 1;
+                }
                 if (yOverlap) {
-                    xyOverlap = true;
+                    xyOverlap = 1;
                 }
             }
 
             if (xyOverlap) {
-                bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_bound.m_min.z
-                    ? localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z
-                    : mapHit->m_positionMin.z <= localCylinder.m_bound.m_max.z;
+                int zOverlap = 0;
+                float positionMinZ = mapHit->m_positionMin.z;
+                if (positionMinZ < localCylinder.m_bound.m_min.z) {
+                    zOverlap = localCylinder.m_bound.m_min.z <= mapHit->m_positionMax.z;
+                } else if (positionMinZ > localCylinder.m_bound.m_min.z) {
+                    zOverlap = positionMinZ <= localCylinder.m_bound.m_max.z;
+                } else {
+                    zOverlap = 1;
+                }
 
                 if (zOverlap) {
-                    hitBounds = true;
+                    hitBounds = 1;
                 }
             }
         }

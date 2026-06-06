@@ -2851,12 +2851,12 @@ void CMenuPcs::CalcLoadMenu()
 						uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
 					}
 					iVar10 = 0;
-					int iVar25 = *reinterpret_cast<int*>(bytes + 0x814) + 0x7930;
+					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;
 					int iVar23 = 0;
 					iVar14 = 0;
 					int pOff = 0;
 					do {
-						int iVar17 = *reinterpret_cast<int*>(bytes + 0x824) + iVar10;
+						int iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
 						if (worldState->m_menuMode == 8
 						    && m_cmakeWork != 0) {
 							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
@@ -2880,7 +2880,7 @@ void CMenuPcs::CalcLoadMenu()
 							if (uVar11 != 0) cost = uVar15b * 200 + 200;
 							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
 						}
-						iVar17 = *reinterpret_cast<int*>(bytes + 0x824) + iVar10;
+						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
 						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
 						int uVar22;
 						if (charaId < 0) {

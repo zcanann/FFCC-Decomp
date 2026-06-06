@@ -102,10 +102,14 @@ static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 	object->m_particleId = particleId;
 }
 
+static inline CFlatRuntime::CObject* FlatObjectRoot(CFlatRuntime2* runtime)
+{
+	return &runtime->m_objectSentinel;
+}
+
 static inline CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(runtime);
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
@@ -329,7 +333,7 @@ static inline CFlatRuntime::CObject*& ParticleWorkTrace(CFlatRuntime2* runtime)
 
 static inline CFlatRuntime::CObject* FlatObjectFirst(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x8F0);
+	return runtime->m_objectSentinel.m_next;
 }
 
 static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
@@ -809,8 +813,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 		CGPartyObj::CheckGameOver();
 		reinterpret_cast<CFlatRuntime*>(this)->Frame(arg0, mode);
 
-		CFlatRuntime::CObject* const root =
-			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+		CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
 			obj->Frame();
@@ -882,8 +885,7 @@ int CFlatRuntime2::Frame(int arg0, int mode)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	AStar.drawAStar();
 
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
 		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
 		obj->Draw();
@@ -958,8 +960,7 @@ int CFlatRuntime2::Load(char* fileName)
  */
 CGObject* CFlatRuntime2::FindGObjFirst()
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
@@ -991,8 +992,7 @@ CGObject* CFlatRuntime2::FindGObjFirst()
  */
 CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
 
 	while (object != root) {
@@ -1044,8 +1044,7 @@ void CFlatRuntime2::FindGBaseObjNext(CGBaseObj*)
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
@@ -1077,8 +1076,7 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
  */
 CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gQuadObj)->m_next;
 
 	while (object != root) {
@@ -1110,8 +1108,7 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
  */
 CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
@@ -1143,8 +1140,7 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
  */
 CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gMonObj)->m_next;
 
 	while (object != root) {
@@ -1176,8 +1172,7 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
  */
 CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = FlatObjectFirst(this)->m_next;
 
 	while (object != root) {
@@ -1209,8 +1204,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
  */
 CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 {
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gItemObj)->m_next;
 
 	while (object != root) {
@@ -1397,8 +1391,7 @@ void CFlatRuntime2::Draw()
 	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	font->SetColor(color);
 
-	CFlatRuntime::CObject* const root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* const root = FlatObjectRoot(this);
 	for (CGObject* object = reinterpret_cast<CGObject*>(
 			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5));
 		 object != 0;
@@ -1603,8 +1596,7 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
 	}
 
 	const float radiusSq = radius * radius;
-	CFlatRuntime::CObject* root =
-		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
+	CFlatRuntime::CObject* root = FlatObjectRoot(this);
 	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5);
 	int count = 0;
 

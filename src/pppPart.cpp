@@ -441,8 +441,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					}
 
-					owner->m_activeCount--;
-					if (owner->m_activeCount == 0)
+					if (--owner->m_activeCount == 0)
 					{
 						owner->m_pppPObjLink = 0;
 					}
@@ -816,8 +815,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 						stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					}
 
-					owner->m_activeCount--;
-					if (owner->m_activeCount == 0)
+					if (--owner->m_activeCount == 0)
 					{
 						owner->m_pppPObjLink = 0;
 					}
@@ -947,8 +945,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 		}
 
-		owner->m_activeCount--;
-		if (owner->m_activeCount == 0)
+		if (--owner->m_activeCount == 0)
 		{
 			owner->m_pppPObjLink = 0;
 		}
@@ -1624,8 +1621,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 							stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 						}
 
-						owner->m_activeCount--;
-						if (owner->m_activeCount == 0)
+						if (--owner->m_activeCount == 0)
 						{
 							owner->m_pppPObjLink = 0;
 						}
@@ -2111,8 +2107,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							}
 						}
 
-						owner->m_activeCount--;
-						if (owner->m_activeCount == 0)
+						if (--owner->m_activeCount == 0)
 						{
 							owner->m_pppPObjLink = 0;
 						}
@@ -2155,8 +2150,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					}
 				}
 
-				owner->m_activeCount--;
-				if (owner->m_activeCount == 0)
+				if (--owner->m_activeCount == 0)
 				{
 					owner->m_pppPObjLink = 0;
 				}

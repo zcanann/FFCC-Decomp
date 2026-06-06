@@ -6641,83 +6641,84 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const bubbleData = m_wm.m_bubbleData;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	Mtx m_cameraMatrix;
-	CFont* fontFC = m_fonts[1];
-	if (bytes[0x09] != 1) {
+	Mtx& cameraBackup = *reinterpret_cast<Mtx*>(bytes + 0x744);
+	CFont* const fontFC = m_fonts[1];
+	if (static_cast<signed char>(bytes[0x09]) != 1) {
 		return;
 	}
 
 	int texMode;
-	if (bytes[0x08] == 0 || bytes[0x08] == 2) {
+	if (static_cast<signed char>(bytes[0x08]) == 0 || static_cast<signed char>(bytes[0x08]) == 2) {
 		texMode = 0;
 	} else {
 		texMode = 8;
 	}
 
 	MenuPcs.SetAttrFmt((FMT)0);
-	unsigned int color = 0xFFFFFFFF;
-	GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&color);
+	GXColor matColor;
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = 0xFF;
+	GXSetChanMatColor(GX_COLOR0A0, matColor);
 	MenuPcs.SetTexture((TEX)0x18);
 
-	short* bubData = reinterpret_cast<short*>(bubbleData);
-	MenuPcs.DrawRect(0xFFFFFFFF, 
+	short* bubData = reinterpret_cast<short*>(m_wm.m_bubbleData);
+	MenuPcs.DrawRect(texMode,
 		(float)(int)bubData[0], (float)(int)bubData[1],
 		(float)(int)bubData[2], (float)(int)bubData[3],
 		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),
-		FLOAT_803313e8, FLOAT_803313e8, (float)texMode);
+		FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-	unsigned int uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x3F0) != 0) {
-		int bd = reinterpret_cast<int>(bubbleData);
-		MenuPcs.DrawRect(0xFFFFFFFF, 
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
+		MenuPcs.DrawRect(0,
 			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
-			FLOAT_803313e8, FLOAT_803313e8, 0);
+			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
-	uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned int uVar3 = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0 && (uVar3 & 0x1FF) != 0) {
-		if ((uVar3 & 0xF) == 0) {
-			int idx = 0;
-			int cnt = 5;
-			do {
-				if ((uVar3 & (0x10 << idx)) != 0) {
-					MenuPcs.SetTexture((TEX)(idx + 0x19));
-					int bd = reinterpret_cast<int>(bubbleData);
-					MenuPcs.DrawRect(0xFFFFFFFF, 
-						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
-						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
-						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
-						FLOAT_803313e8, FLOAT_803313e8, 0);
-					break;
-				}
-				idx++;
-				cnt--;
-			} while (cnt != 0);
-		} else {
-			int iVar9 = 0;
+		if ((uVar3 & 0xF) != 0) {
 			int iVar5 = 0;
+			int iVar9 = 0;
 			while (iVar5 < 4 && iVar9 < 2) {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar5)) != 0) {
 					MenuPcs.SetTexture((TEX)(iVar5 + 0x19));
 					short* psVar4;
 					if (iVar9 == 0) {
-						psVar4 = reinterpret_cast<short*>(bubbleData + 0x38);
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38);
 					} else {
-						psVar4 = reinterpret_cast<short*>(bubbleData + 0x54);
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x54);
 					}
-					MenuPcs.DrawRect(0xFFFFFFFF, 
+					MenuPcs.DrawRect(0,
 						(float)(int)psVar4[0], (float)(int)psVar4[1],
 						(float)(int)psVar4[2], (float)(int)psVar4[3],
 						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),
-						FLOAT_803313e8, FLOAT_803313e8, 0);
+						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					iVar9++;
 				}
 				iVar5++;
 			}
+		} else {
+			int idx = 0;
+			int cnt = 5;
+			do {
+				if ((uVar3 & (0x10 << idx)) != 0) {
+					MenuPcs.SetTexture((TEX)(idx + 0x19));
+					int bd = *reinterpret_cast<int*>(bytes + 0x818);
+					MenuPcs.DrawRect(0,
+						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
+						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
+						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
+						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+					break;
+				}
+				idx++;
+				cnt--;
+			} while (cnt != 0);
 		}
 	}
 
@@ -6725,34 +6726,50 @@ void CMenuPcs::DrawFukidashi()
 	char nameBuffer[68];
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+		const int language = Game.m_gameWork.m_languageId;
+		if (language == 2) {
+			strcpy(nameBuffer, Game.m_gameWork.m_townName);
+			strcat(nameBuffer, lbl_80210D10[language - 1], sizeof(nameBuffer));
+		} else {
+			strcpy(nameBuffer, lbl_80210D10[language - 1]);
+			strcat(nameBuffer, Game.m_gameWork.m_townName, sizeof(nameBuffer));
+		}
 	} else {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
+	}
+	if (nameBuffer[0] != 0) {
+		nameBuffer[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameBuffer[0])));
 	}
 
-	unsigned int textW = 0xD8;
+	int textW = 0xD8;
+	char tempBuf[64];
 	char secondLine[64];
 	secondLine[0] = 0;
-	CFont* font = m_fonts[1];
+	CFont* const font = m_fonts[1];
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textW = 0xA2;
 	}
-	fontFC->SetMargin(FLOAT_803313e8);
-	fontFC->SetShadow(0);
-	fontFC->SetScale(FLOAT_803313e8);
-	double nameWidth = (double)fontFC->GetWidth(nameBuffer);
-	bool twoLines = nameWidth > (double)(float)textW;
-	if (twoLines) {
-		char tempBuf[64];
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
+	double nameWidth = (double)font->GetWidth(nameBuffer);
+	int twoLines;
+	if (nameWidth > (double)(float)textW) {
+		twoLines = 1;
+	} else {
+		twoLines = 0;
+	}
+	if (twoLines != 0) {
 		strcpy(tempBuf, nameBuffer);
 		char* spacePos = strrchr(tempBuf, 0x20);
-		if (spacePos == NULL) {
-			secondLine[0] = 0;
-		} else {
+		if (spacePos != NULL) {
 			*spacePos = 0;
 			strcpy(secondLine, spacePos + 1);
+		} else {
+			secondLine[0] = 0;
 		}
 		strcpy(nameBuffer, tempBuf);
 	}
@@ -6763,43 +6780,46 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->DrawInit();
 	CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
 	fontFC->SetColor(whiteColor.color);
-	fontFC->SetPosX((float)*reinterpret_cast<short*>(bubbleData + 0x70));
-	fontFC->SetPosY((float)*reinterpret_cast<short*>(bubbleData + 0x72));
+	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
+	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
 	fontFC->Draw(nameBuffer);
 
-	if (twoLines) {
-		double w2 = (double)fontFC->GetWidth(secondLine);
-		fontFC->SetPosX((float)((double)FLOAT_80331704 - w2) * FLOAT_80331434 +
-		                (float)*reinterpret_cast<short*>(bubbleData));
-		fontFC->SetPosY((float)(*reinterpret_cast<short*>(bubbleData + 0x72) + 0x16));
+	if (twoLines != 0) {
+		strcpy(nameBuffer, "");
+		float w2 = fontFC->GetWidth(secondLine);
+		fontFC->SetPosX((FLOAT_80331704 - w2) * FLOAT_80331434 +
+		                (float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)));
+		fontFC->SetPosY((float)(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) + 0x16));
 		fontFC->Draw(secondLine);
 	}
 
 	DrawInit();
 
 	// 3D viewport rendering
-	bool viewportSetup = false;
-	if ((*reinterpret_cast<unsigned short*>(bytes + 0x1A) & 0x3F0) != 0) {
+	int viewportSetup = 0;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int viewOff = 0x1E0;
-		for (int slot = 6; slot < 0x11; slot++) {
-			int* piVar10 = reinterpret_cast<int*>(worldObj + viewOff);
+		int effOff = 0x1ED8;
+		for (int slot = 6; slot <= 0x10; slot++) {
+			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
 			if (*piVar10 != 0) {
-				if (!viewportSetup) {
+				if (viewportSetup == 0) {
 					Mtx44 projMtx;
 					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
+					PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
 					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, (Point3d*)&eye, (Vec*)&up, (Point3d*)(piVar10 + 4));
-					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4), (Vec*)&up, (Vec*)&eye);
+					PSMTXCopy(CameraPcs.m_cameraMatrix, cameraBackup);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
 					GXSetAlphaUpdate(0);
-					unsigned int clearColor = 0;
-					GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+					CColor clearColor(0, 0, 0, 0);
+					GXSetCopyClear(clearColor.color, 0xFFFFFF);
 					GXSetColorUpdate(1);
 					GXSetAlphaUpdate(1);
 
@@ -6810,25 +6830,40 @@ void CMenuPcs::DrawFukidashi()
 						(float)*reinterpret_cast<short*>((int)(piVar10 + 3) + 2),
 						FLOAT_803313dc, FLOAT_803313e8);
 					GXSetScissor(piVar10[0x10], piVar10[0x11], piVar10[0x12], piVar10[0x13]);
-					viewportSetup = true;
+					viewportSetup = 1;
 				}
 				Graphic.SetFog(1, 0);
-				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-				LightPcs.SetAmbient(lightTable.m_ambient);
-				LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-				for (int j = 0; j < lightTable.m_diffuseCount; j++) {
+				LightPcs.SetAmbient(gWmMenuLightTables[0].m_ambient);
+				LightPcs.SetNumDiffuse(gWmMenuLightTables[0].m_diffuseCount);
+				for (int j = 0; j < gWmMenuLightTables[0].m_diffuseCount; j++) {
 					LightPcs.SetDiffuse(
-						j, lightTable.m_diffuseColors[j],
-						&lightTable.m_diffuseDirs[j], 0);
+						j, gWmMenuLightTables[0].m_diffuseColors[j],
+						&gWmMenuLightTables[0].m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				m_wm.m_handles[slot]->Draw(5);
+				if (slot != 6) {
+					int* effData = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + effOff);
+					int a = effData[0];
+					int b = effData[2];
+					if (a >= 0 && b >= 0) {
+						PartPcs.DrawMenu(a);
+					}
+				}
 			}
 			viewOff += 0x50;
+			effOff += 0x524;
 		}
 	}
 
-	if (viewportSetup) {
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+	if (viewportSetup != 0) {
+		PSMTXCopy(cameraBackup, CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
+		Mtx44 screenCopy;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);
+		GXSetProjection(screenCopy, GX_PERSPECTIVE);
+		Graphic.SetViewport();
+		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
 }

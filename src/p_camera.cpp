@@ -79,9 +79,8 @@ extern const float FLOAT_8032fabc = 5.0f;
 extern const float FLOAT_8032fac0 = -10.0f;
 extern const float FLOAT_8032fac4 = 50.0f;
 extern const float FLOAT_8032fac8 = 0.0010000000474974513f;
-extern const char s_p_camera_cpp[] = "p_camera.cpp";
-extern const char sCameraInvalidFovFmt[0x40] =
-    "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92l\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81""B%f!!!!!!!!!!!!!!!!!!!!\n";
+extern const char s_p_camera_cpp[];
+extern const char sCameraInvalidFovFmt[0x40];
 unsigned char g_IsDbgDrawShadowPos;
 extern unsigned char g_map_draw_prof;
 

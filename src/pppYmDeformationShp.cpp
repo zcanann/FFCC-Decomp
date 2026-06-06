@@ -43,14 +43,9 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
-struct YmDeformationShpDataOffsets {
-	s32 _unused0;
-	s32 m_colorInfoOffset;
-	s32 m_stateOffset;
-};
-
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_stateOffset) == 0x8);
+STATIC_ASSERT(sizeof(YmDeformationShpDataOffsets) == 0xC);
 
 static inline YmDeformationShpDataOffsets* DeformationShpDataOffsets(_pppCtrlTable* ctrl)
 {
@@ -61,6 +56,12 @@ static inline VYmDeformationShp* DeformationShpState(pppYmDeformationShp* object
 {
 	return reinterpret_cast<VYmDeformationShp*>(
 		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_stateOffset);
+}
+
+static inline YmDeformationShpColorInfo* DeformationShpColorInfo(pppYmDeformationShp* object, _pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<YmDeformationShpColorInfo*>(
+		object->m_workArea + DeformationShpDataOffsets(ctrl)->m_colorInfoOffset);
 }
 
 static inline void setVertexUV(Vec2d* uvs, float left, float top, float right, float bottom)
@@ -151,17 +152,14 @@ inline void SetUpIndWarp(VYmDeformationShp* work)
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpStep* param_2, _pppCtrlTable* param_3)
 {
 	_pppPObject* object = pppYmDeformationShp_;
-	VYmDeformationShp* work = reinterpret_cast<VYmDeformationShp*>(
-		object->m_workArea + DeformationShpDataOffsets(param_3)->m_stateOffset);
+	VYmDeformationShp* work = DeformationShpState(pppYmDeformationShp_, param_3);
 	int textureIndex = 0;
 	Vec2d uvs[4];
 	Mtx rotMtx;
 	Vec vertices[4];
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
-		YmDeformationShpColorInfo* colorInfo =
-			reinterpret_cast<YmDeformationShpColorInfo*>(
-				object->m_workArea + DeformationShpDataOffsets(param_3)->m_colorInfoOffset);
+		YmDeformationShpColorInfo* colorInfo = DeformationShpColorInfo(pppYmDeformationShp_, param_3);
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
 		CTexture* texture =
 			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);

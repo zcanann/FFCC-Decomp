@@ -30,14 +30,9 @@ struct _pppEnvStYmDeformationMdl {
     CMapMesh** m_mapMeshPtr;
 };
 
-struct YmDeformationMdlDataOffsets {
-    s32 _unused0;
-    s32 m_colorInfoOffset;
-    s32 m_stateOffset;
-};
-
 STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_colorInfoOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmDeformationMdlDataOffsets, m_stateOffset) == 0x8);
+STATIC_ASSERT(sizeof(YmDeformationMdlDataOffsets) == 0xC);
 
 static inline YmDeformationMdlDataOffsets* DeformationMdlDataOffsets(_pppCtrlTable* ctrl)
 {

@@ -51,6 +51,12 @@ struct pppYmDeformationShpStep {
     u8 m_pad32[0xA];
 };
 
+struct YmDeformationShpDataOffsets {
+    s32 _unused0;
+    s32 m_colorInfoOffset;
+    s32 m_stateOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

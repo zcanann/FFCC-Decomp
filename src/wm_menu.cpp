@@ -97,7 +97,7 @@ inline CGObject::CGObject()
 }
 
 float FLOAT_8032ee18;
-int DAT_8032ee1c;
+unsigned char DAT_8032ee1c;
 unsigned char DAT_8032ee20;
 unsigned char uRam8032ee21;
 unsigned char DAT_8032ee24;

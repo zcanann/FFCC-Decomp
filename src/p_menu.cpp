@@ -279,13 +279,13 @@ void CMenuPcs::Init()
     } while (i != 0);
 
     m_shopMenu = 0;
-    self[0x87C] = 1;
-    self[0x888] = 0;
-    self[0x889] = 0;
-    self[0x88A] = 0;
-    *reinterpret_cast<u32*>(self + 0x884) = 0;
-    *reinterpret_cast<u32*>(self + 0x880) = 0;
-    *reinterpret_cast<u32*>(self + 0x88C) = 0;
+    m_pad87C = 1;
+    m_cmakeWorkActive = 0;
+    m_cmakeWorkCardChannel = 0;
+    m_pad88A = 0;
+    m_pad884 = 0;
+    m_pad880 = 0;
+    m_cmakeWork = 0;
 }
 
 /*

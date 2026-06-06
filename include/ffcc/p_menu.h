@@ -746,7 +746,16 @@ public:
     unsigned char m_pad873;
     int m_singleLifeTimer;
     CShopMenu* m_shopMenu;
-    unsigned char m_pad87C[0x8A0 - 0x87C];
+    unsigned char m_pad87C;
+    unsigned char m_pad87D[0x880 - 0x87D];
+    int m_pad880;
+    int m_pad884;
+    unsigned char m_cmakeWorkActive;
+    unsigned char m_cmakeWorkCardChannel;
+    unsigned char m_pad88A;
+    unsigned char m_pad88B;
+    unsigned char* m_cmakeWork;
+    unsigned char m_pad890[0x8A0 - 0x890];
 };
 
 extern CMenuPcs MenuPcs;
@@ -798,6 +807,9 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuPhase) == 0x866);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuCtrlResetFlag) == 0x872);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleLifeTimer) == 0x874);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkActive) == 0x888);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkCardChannel) == 0x889);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
 STATIC_ASSERT(sizeof(SingMenuState) == 0x48);

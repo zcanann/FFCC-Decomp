@@ -459,9 +459,7 @@ static inline short* GetWmWorldState(CMenuPcs* menu)
 
 static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
 {
-	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(menu)[0x888] == 1
-	                                            ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(menu) + 0x88C)
-	                                            : 0);
+	return menu->m_cmakeWorkActive == 1 ? menu->m_cmakeWork : 0;
 }
 
 static inline int GetWmMenuFade(short state, short frame)
@@ -2045,8 +2043,8 @@ void CMenuPcs::CalcMCardMenu()
 			mcCtrl.m_userBuffer = 0;
 			mcCtrl.m_createFlag = 0;
 			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
-			    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
-				mcCtrl.m_userBuffer = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x88C));
+			    && m_cmakeWork != 0) {
+				mcCtrl.m_userBuffer = m_cmakeWork;
 			} else {
 				mcCtrl.m_userBuffer = 0;
 			}
@@ -2313,8 +2311,8 @@ void CMenuPcs::CalcLoadMenu()
 		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
 		Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(iVar14 + 0x3A);
 		Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(iVar14 + 0x3C);
-		if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8 && bytes[0x889] != 0) {
-			mcCtrl.m_cardChannel = (int)bytes[0x889] - 1;
+		if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8 && m_cmakeWorkCardChannel != 0) {
+			mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 3;
 			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
 		}
@@ -2879,8 +2877,8 @@ void CMenuPcs::CalcLoadMenu()
 			mcCtrl.m_userBuffer = 0;
 			mcCtrl.m_createFlag = 0;
 			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
-			    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
-				mcCtrl.m_userBuffer = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x88C));
+			    && m_cmakeWork != 0) {
+				mcCtrl.m_userBuffer = m_cmakeWork;
 			} else {
 				mcCtrl.m_userBuffer = 0;
 			}
@@ -2927,8 +2925,8 @@ void CMenuPcs::CalcLoadMenu()
 					do {
 						int iVar17 = *reinterpret_cast<int*>(bytes + 0x824) + iVar10;
 						if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) == 8
-						    && *reinterpret_cast<int*>(bytes + 0x88C) != 0) {
-							int iVar6 = *reinterpret_cast<int*>(bytes + 0x88C) + iVar23 + 0x14D0;
+						    && m_cmakeWork != 0) {
+							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
 							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
 								*reinterpret_cast<int*>(iVar17 + 8) = -1;
 							} else {
@@ -8119,7 +8117,7 @@ void CMenuPcs::DrawCMLife()
 
 		unsigned short life = 0;
 		bool enabled = false;
-		if (worldState[0x1C / 2] == 8 && reinterpret_cast<unsigned char*>(this)[0x888] == 1 && cmakeWork != 0 &&
+		if (worldState[0x1C / 2] == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
 		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
 			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
 			enabled = true;
@@ -8191,7 +8189,7 @@ void CMenuPcs::DrawCMLife()
 			x += FLOAT_80331558;
 		}
 
-		if (reinterpret_cast<unsigned char*>(this)[0x888] == 1 && cmakeWork != 0) {
+		if (m_cmakeWorkActive == 1 && cmakeWork != 0) {
 			const unsigned char* const work = cmakeWork + slot * 0x9C0;
 			const char flagA = work[0x1D90];
 			const char flagB = work[0x1D91];
@@ -8838,7 +8836,7 @@ void CMenuPcs::ChgAllModel2()
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
-		    reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x88C) + pdtOffset + 0x14D0);
+		    m_cmakeWork + pdtOffset + 0x14D0;
 		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
 		unsigned int race;
 		unsigned int variant;

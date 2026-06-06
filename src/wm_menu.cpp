@@ -3757,17 +3757,18 @@ void CMenuPcs::DrawMCardMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	Mtx m_cameraMatrix;
 	McCtrl& mcCtrl = *GetMcCtrl();
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	short state = *reinterpret_cast<short*>(worldState + 0x10);
+	WmWorldState* const typedWorldState = m_wmWorldState;
+	int worldState = reinterpret_cast<int>(typedWorldState);
+	short state = typedWorldState->m_mainState;
 
 	if (state > 0 && state < 4) {
 		float alpha;
 		if (state == 1) {
-			alpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
+			alpha = (float)typedWorldState->m_frameCounter;
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
-			alpha = FLOAT_803313e8 - (float)*reinterpret_cast<short*>(worldState + 0x22);
+			alpha = FLOAT_803313e8 - (float)typedWorldState->m_frameCounter;
 		}
 		if (alpha > FLOAT_803314f0) {
 			SetAttrFmt((FMT)0);
@@ -3784,12 +3785,12 @@ void CMenuPcs::DrawMCardMenu()
 
 	DrawMCList();
 
-	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	state = *reinterpret_cast<short*>(worldState + 0x10);
-	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x16) > 0x10) {
+	worldState = reinterpret_cast<int>(typedWorldState);
+	state = typedWorldState->m_mainState;
+	if (state == 2 && typedWorldState->m_subState > 0x10) {
 		unsigned int saveIdx;
-		if (*reinterpret_cast<short*>(worldState + 0x16) == 0x11) {
-			saveIdx = (unsigned int)*reinterpret_cast<short*>(worldState + 0x26);
+		if (typedWorldState->m_subState == 0x11) {
+			saveIdx = (unsigned int)typedWorldState->m_cardChannel;
 		} else {
 			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
 		}
@@ -3851,10 +3852,10 @@ void CMenuPcs::DrawMCardMenu()
 	}
 
 	// State machine for MC operations
-	worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	state = *reinterpret_cast<short*>(worldState + 0x10);
-	short subState = *reinterpret_cast<short*>(worldState + 0x16);
-	if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
+	worldState = reinterpret_cast<int>(typedWorldState);
+	state = typedWorldState->m_mainState;
+	short subState = typedWorldState->m_subState;
+	if (state == 2 && typedWorldState->m_delay == 0) {
 		short winState;
 		switch ((int)subState) {
 		case 0:
@@ -4050,36 +4051,36 @@ void CMenuPcs::DrawMCardMenu()
 			}
 			break;
 		}
-		if ((int)subState != (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16)) {
-			*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
+		if ((int)subState != (int)typedWorldState->m_subState) {
+			typedWorldState->m_flag09 = 0;
+			typedWorldState->m_counter1A = 0;
+			typedWorldState->m_state0E = 0;
 		}
-	} else if (state == 2 && *reinterpret_cast<short*>(worldState + 0x18) != 0) {
-		*reinterpret_cast<short*>(worldState + 0x18) = *reinterpret_cast<short*>(worldState + 0x18) - 1;
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		if (*reinterpret_cast<short*>(worldState + 0x18) < 1) {
-			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-			Sound.PlaySe(0x31 - ((int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) >> 0x1F), 0x40, 0x7F, 0);
+	} else if (state == 2 && typedWorldState->m_delay != 0) {
+		typedWorldState->m_delay--;
+		worldState = reinterpret_cast<int>(typedWorldState);
+		if (typedWorldState->m_delay < 1) {
+			typedWorldState->m_mainState++;
+			typedWorldState->m_frameCounter = 0;
+			Sound.PlaySe(0x31 - (typedWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
 		}
 	} else {
-		*reinterpret_cast<short*>(worldState + 0x22) = *reinterpret_cast<short*>(worldState + 0x22) + 1;
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+		typedWorldState->m_frameCounter++;
+		worldState = reinterpret_cast<int>(typedWorldState);
 		short threshold = 10;
-		if (*reinterpret_cast<short*>(worldState + 0x10) == 3 && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+		if (typedWorldState->m_mainState == 3 && typedWorldState->m_subState != 0) {
 			threshold = 0x13;
 		}
-		if (*reinterpret_cast<short*>(worldState + 0x22) >= threshold) {
-			*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
-			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(worldState + 0x10) > 4) {
-				if (*reinterpret_cast<short*>(worldState + 0x1C) != 8) {
-					*reinterpret_cast<short*>(worldState + 0x20) = *reinterpret_cast<short*>(worldState + 0x1E);
+		if (typedWorldState->m_frameCounter >= threshold) {
+			typedWorldState->m_mainState++;
+			typedWorldState->m_frameCounter = 0;
+			worldState = reinterpret_cast<int>(typedWorldState);
+			if (typedWorldState->m_mainState > 4) {
+				if (typedWorldState->m_menuMode != 8) {
+					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
 				}
 				bytes[0x86E] = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1E) = 0;
+				typedWorldState->m_nextMenuMode = 0;
 			}
 		}
 	}

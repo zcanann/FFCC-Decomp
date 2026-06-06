@@ -177,7 +177,7 @@ void CMenuPcs::LetterInit()
 	       31)) &
 	    10;
 	*reinterpret_cast<int*>(anim + 0x70) = 10;
-	**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+	GetLetterAnimStorage(this)->count = 2;
 
 	*reinterpret_cast<s16*>(state + 0x22) = 0;
 	*reinterpret_cast<s16*>(state + 0x26) = 0;
@@ -210,7 +210,7 @@ void CMenuPcs::LetterInit0()
 	*reinterpret_cast<int*>(anim + 0x24) = 0;
 	*reinterpret_cast<int*>(anim + 0x2C) = 0;
 	*reinterpret_cast<int*>(anim + 0x30) = 10;
-	**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
+	GetLetterAnimStorage(this)->count = 1;
 
 	*reinterpret_cast<s16*>(state + 0x22) = 0;
 	*reinterpret_cast<s16*>(state + 0x26) = static_cast<s16>(s_BackUpCur[0]);
@@ -242,7 +242,7 @@ void CMenuPcs::LetterInit1()
 
 	memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 	fVar1 = FLOAT_803330f8;
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+	iVar4 = GetLetterAnimBase(this) + 8;
 	iVar5 = 8;
 	do {
 		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -257,7 +257,7 @@ void CMenuPcs::LetterInit1()
 		--iVar5;
 	} while (iVar5 != 0);
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = GetLetterAnimBase(this);
 	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x5F;
 	*reinterpret_cast<s16*>(iVar4 + 0xC) = 0x238;
 	*reinterpret_cast<s16*>(iVar4 + 0xE) = 0x178;
@@ -269,7 +269,7 @@ void CMenuPcs::LetterInit1()
 	*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = GetLetterAnimBase(this);
 	*reinterpret_cast<int*>(iVar4 + 0x64) = 0x3E;
 	*reinterpret_cast<s16*>(iVar4 + 0x4C) = 0xA8;
 	*reinterpret_cast<s16*>(iVar4 + 0x4E) = 0x60;
@@ -280,7 +280,7 @@ void CMenuPcs::LetterInit1()
 	*reinterpret_cast<int*>(iVar4 + 0x6C) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
 
-	**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+	GetLetterAnimStorage(this)->count = 2;
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 	*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
 }
@@ -502,7 +502,7 @@ bool CMenuPcs::LetterOpen()
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
 		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 		fVar1 = FLOAT_803330f8;
-		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+		iVar4 = GetLetterAnimBase(this) + 8;
 		iVar8 = 8;
 		do {
 			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -516,11 +516,11 @@ bool CMenuPcs::LetterOpen()
 			iVar4 += 0x200;
 			--iVar8;
 		} while (iVar8 != 0);
-		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		iVar4 = GetLetterAnimBase(this);
 		*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
 		*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
 		*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		iVar4 = GetLetterAnimBase(this);
 		*reinterpret_cast<int*>(iVar4 + 0x64) = 0;
 		*reinterpret_cast<unsigned int*>(iVar4 + 0x6C) =
 			~(((-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872))) |
@@ -528,14 +528,14 @@ bool CMenuPcs::LetterOpen()
 			   31)) &
 			10;
 		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
-		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+		GetLetterAnimStorage(this)->count = 2;
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 >= 0) {
 			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 			fVar1 = FLOAT_803330f8;
-			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+			iVar4 = GetLetterAnimBase(this) + 8;
 			iVar8 = 8;
 			do {
 				*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -549,11 +549,11 @@ bool CMenuPcs::LetterOpen()
 				iVar4 += 0x200;
 				--iVar8;
 			} while (iVar8 != 0);
-			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+			iVar4 = GetLetterAnimBase(this);
 			*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
 			*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
 			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
-			**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
+			GetLetterAnimStorage(this)->count = 1;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = static_cast<s16>(s_BackUpCur[0]);
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(s_BackUpCur[1]);
@@ -576,8 +576,8 @@ bool CMenuPcs::LetterOpen()
 	iVar6 = 0;
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) =
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) + 1;
-	iVar5 = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-	psVar7 = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	iVar5 = static_cast<int>(GetLetterAnimStorage(this)->count);
+	psVar7 = GetLetterPanelBase(this);
 	iVar8 = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22));
 	iVar4 = iVar5;
 	if (0 < iVar5) {
@@ -643,7 +643,7 @@ int CMenuPcs::LetterCtrl()
 		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
 		if (mode == 0) {
 			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 			done = 0;
@@ -682,7 +682,7 @@ int CMenuPcs::LetterCtrl()
 			}
 
 			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 			int messOpenDone = 0;
@@ -803,7 +803,7 @@ int CMenuPcs::LetterCtrl()
 		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
 		if (mode == 0) {
 			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 			done = 0;
@@ -892,8 +892,8 @@ int CMenuPcs::LetterCtrl()
 						*reinterpret_cast<int*>(anim + 0x30) = 10;
 						*reinterpret_cast<int*>(anim + 0x6C) = 0;
 						*reinterpret_cast<int*>(anim + 0x70) = 10;
-						int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-						s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+						int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+						s16* panel = GetLetterPanelBase(this);
 						for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 							*reinterpret_cast<int*>(panel + 0x10) = 0;
 							*reinterpret_cast<float*>(panel + 8) = resetAlpha;
@@ -922,8 +922,8 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<int*>(anim + 0x30) = 10;
 					*reinterpret_cast<int*>(anim + 0x6C) = 0;
 					*reinterpret_cast<int*>(anim + 0x70) = 10;
-					int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-					s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+					int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+					s16* panel = GetLetterPanelBase(this);
 					for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 						*reinterpret_cast<int*>(panel + 0x10) = 0;
 						*reinterpret_cast<float*>(panel + 8) = resetAlpha;
@@ -940,7 +940,7 @@ int CMenuPcs::LetterCtrl()
 		return 0;
 	}
 
-	int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	int anim = GetLetterAnimBase(this);
 	*reinterpret_cast<int*>(anim + 0x24) = 0;
 	if (s_Attach == 2) {
 		*reinterpret_cast<int*>(anim + 0x2C) = 10;
@@ -951,11 +951,11 @@ int CMenuPcs::LetterCtrl()
 	} else {
 		*reinterpret_cast<int*>(anim + 0x2C) = 0;
 		*reinterpret_cast<int*>(anim + 0x30) = 10;
-		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
+		GetLetterAnimStorage(this)->count = 1;
 	}
 
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-	s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+	s16* panel = GetLetterPanelBase(this);
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		*reinterpret_cast<int*>(panel + 0x10) = 0;
 		*reinterpret_cast<float*>(panel + 8) = f;
@@ -981,8 +981,8 @@ bool CMenuPcs::LetterClose()
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-	s16* entry = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+	s16* entry = GetLetterPanelBase(this);
 	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 
 	for (int i = 0; i < panelCount; ++i, entry += 0x20) {
@@ -1031,7 +1031,7 @@ void CMenuPcs::LetterLstOpen()
 	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 	s16* panel = GetLetterPanelBase(this);
 	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 	int done = 0;
@@ -1075,7 +1075,7 @@ void CMenuPcs::LetterLstClose()
 	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 	s16* panel = GetLetterPanelBase(this);
 	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 	int done = 0;
@@ -1128,7 +1128,7 @@ void CMenuPcs::LetterMessOpen()
 	}
 
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 	s16* panel = GetLetterPanelBase(this);
 	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 	int done = 0;
@@ -1187,7 +1187,7 @@ int CMenuPcs::LetterMessClose()
 
 	if (action < 1) {
 		*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-		int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+		int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
 		s16* panel = GetLetterPanelBase(this);
 		int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 		int done = 0;
@@ -1246,7 +1246,7 @@ int CMenuPcs::LetterMessClose()
 				       31)) &
 				    10;
 				*reinterpret_cast<int*>(anim + 0x70) = 10;
-				**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+				GetLetterAnimStorage(this)->count = 2;
 				*reinterpret_cast<s16*>(state + 0x22) = 0;
 				*reinterpret_cast<char*>(state + 0xB) = 1;
 			} else {
@@ -1687,7 +1687,7 @@ void CMenuPcs::LetterDraw()
  */
 void CMenuPcs::LetterListDraw()
 {
-	int menuDataBase = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	int menuDataBase = GetLetterAnimBase(this);
 
 	if ((s_OpenClose != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
 		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
@@ -1696,7 +1696,7 @@ void CMenuPcs::LetterListDraw()
 		DrawSingleHelpWim(anim);
 	}
 
-	if (**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) == 1) {
+	if (GetLetterAnimStorage(this)->count == 1) {
 		return;
 	}
 
@@ -1840,7 +1840,7 @@ void CMenuPcs::LetterMessDraw()
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
-	s16* animBase = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	s16* animBase = reinterpret_cast<s16*>(m_singleFadeState);
 
 	s16* panel = animBase + 4;
 	for (int i = 0; i < animBase[0]; ++i, panel += 0x20) {
@@ -2049,15 +2049,15 @@ int CMenuPcs::LetterCtrlCur()
 
 			*reinterpret_cast<u8*>(state + 8) = 0xFF;
 			*reinterpret_cast<s16*>(state + 0x12) = *reinterpret_cast<s16*>(state + 0x12) + 1;
-			int openAnim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+			int openAnim = GetLetterAnimBase(this);
 			*reinterpret_cast<int*>(openAnim + 0x2C) = 0;
 			*reinterpret_cast<int*>(openAnim + 0x30) = 10;
 			*reinterpret_cast<int*>(openAnim + 0x6C) = 0;
 			*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
 			float f = FLOAT_803330f8;
-			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-			s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+			int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+			s16* panel = GetLetterPanelBase(this);
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				*reinterpret_cast<int*>(panel + 0x10) = 0;
 				*reinterpret_cast<float*>(panel + 8) = f;
@@ -2364,7 +2364,7 @@ int CMenuPcs::LetterCtrlCur()
 	CMes::m_tempVar[2] = letter->TempVar(2);
 	CMes::m_tempVar[3] = letter->TempVar(3);
 
-	int openAnim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	int openAnim = GetLetterAnimBase(this);
 	*reinterpret_cast<int*>(openAnim + 0x24) = 0;
 	*reinterpret_cast<int*>(openAnim + 0x2C) = 10;
 	*reinterpret_cast<int*>(openAnim + 0x30) = 10;
@@ -2373,8 +2373,8 @@ int CMenuPcs::LetterCtrlCur()
 	*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
 	float f = FLOAT_803330f8;
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-	s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
+	s16* panel = GetLetterPanelBase(this);
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		*reinterpret_cast<int*>(panel + 0x10) = 0;
 		*reinterpret_cast<float*>(panel + 8) = f;

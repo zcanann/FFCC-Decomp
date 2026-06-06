@@ -9984,8 +9984,8 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_8033158C);
 				fontF8->DrawInit();
-				unsigned int locationColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&locationColor);
+				CColor locationColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(locationColor.color);
 					fontF8->SetTlut(7);
 					char locationStr[64];
 					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);

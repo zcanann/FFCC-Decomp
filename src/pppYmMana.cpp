@@ -42,7 +42,7 @@ static const char s_ymManaShapeObj2[] = "obj2";
 extern const double DOUBLE_80330EB0 = 4503599627370496.0;
 extern const float FLOAT_80330eb8 = 0.99999f;
 static const char s_ymManaShapeObj[] = "obj";
-extern const float FLOAT_80330ec0 = 255.0f;
+extern const float FLOAT_80330ec0[2] = {255.0f, 0.0f};
 
 static inline float CameraWorldX()
 {
@@ -397,7 +397,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     }
 
     if (Game.m_currentMapId == 0x21) {
-        float alphaScale = FLOAT_80330ec0 * object->m_lookAtTimer;
+        float alphaScale = FLOAT_80330ec0[0] * object->m_lookAtTimer;
         int alpha = (int)alphaScale;
         mana->m_baseColor.r = 0xFF;
         mana->m_baseColor.g = 0xFF;

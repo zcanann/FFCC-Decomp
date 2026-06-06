@@ -551,7 +551,7 @@ void CMapPcs::calcViewer()
  * JP Address: TODO
  * JP Size: TODO
  */
-void mapInitDrawEnv()
+inline void mapInitDrawEnv()
 {
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);

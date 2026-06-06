@@ -137,7 +137,7 @@ void CRingMenu::DrawIcon()
 	if (partyObj == 0) {
 		return;
 	}
-	unsigned char weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags) + 1);
+	unsigned char weaponFlagsHi = partyObj->m_weaponNodeFlagBytes.m_flags1;
 	if (static_cast<signed char>(
 	        static_cast<int>((static_cast<unsigned int>(weaponFlagsHi) << 24) & 0xC0000000) >> 31) == 0) {
 		return;

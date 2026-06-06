@@ -169,9 +169,14 @@ public:
         signed char m_unk02 : 1;
         signed char m_attached : 1;
     };
+    struct WeaponNodeFlagBytes {
+        unsigned char m_flags0;
+        unsigned char m_flags1;
+    };
     union {
         unsigned short m_weaponNodeFlags; // 0x9A
         WeaponNodeFlagBits m_weaponNodeFlagBits;
+        WeaponNodeFlagBytes m_weaponNodeFlagBytes;
     };
     unsigned short m_shieldNodeFlags; // 0x9C
     unsigned short m_animStartFrame;  // 0x9E

@@ -1974,7 +1974,7 @@ found_entry:
  * JP Address: TODO
  * JP Size: TODO
  */
-_pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
+void CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 {
     if (se3dHandle < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));

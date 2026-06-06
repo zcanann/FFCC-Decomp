@@ -105,7 +105,7 @@ _pppMngSt* pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest)
 {
 	if (pppSest->m_soundEffectSlot >= 0 && pppSest->m_soundEffectHandle >= 0)
 	{
-		pppMngSt = Sound.FadeOutSe3D(pppSest->m_soundEffectHandle, pppSest->m_soundEffectFadeFrames);
+		Sound.FadeOutSe3D(pppSest->m_soundEffectHandle, pppSest->m_soundEffectFadeFrames);
 		pppSest->m_soundEffectHandle = -1;
 	}
 

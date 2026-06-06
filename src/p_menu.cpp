@@ -260,7 +260,17 @@ void CMenuPcs::Init()
     m_specialModeFlags[1] = 0;
     m_specialModeFlags[2] = 0;
     m_specialModeFlags[3] = 0;
-    memset(m_specialModeWork, 0, sizeof(m_specialModeWork));
+    m_specialModeWork[0] = 0;
+    m_specialModeWork[1] = 0;
+    m_specialModeWork[2] = 0;
+    m_specialModeWork[3] = 0;
+    m_specialModeWork[4] = 0;
+    m_specialModeWork[5] = 0;
+    m_specialModeWork[6] = 0;
+    m_specialModeWork[7] = 0;
+    m_specialModeWork[8] = 0;
+    m_specialModeWork[9] = 0;
+    m_specialModeWork[10] = 0;
 
     do {
         cardChannel[0x30] = 0;

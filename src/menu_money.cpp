@@ -40,11 +40,11 @@ inline void CMenuPcs::MoneySetPlace(int row)
 	int digitPlace = 10000000;
 	int digitIndex = 0;
 	int digitCount = 8;
-	bool started = false;
+	int started = 0;
 
 	do {
 		if ((!started) && (digitPlace <= gil)) {
-			started = true;
+			started = 1;
 		}
 		if (((started) || (digitPlace <= gil)) || (digitIndex == 7)) {
 			int digit = gil / digitPlace;

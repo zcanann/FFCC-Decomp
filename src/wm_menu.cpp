@@ -4362,25 +4362,20 @@ void CMenuPcs::DrawMoveMenu()
 		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-		Vec target;
-		Vec up;
 		GXColor clearColor;
 		clearColor.r = 0;
 		clearColor.g = 0;
 		clearColor.b = 0;
 		clearColor.a = 0;
 
-		target.x = FLOAT_803313dc;
-		target.y = FLOAT_803313dc;
-		target.z = FLOAT_803313dc;
-		up.x = FLOAT_803313dc;
-		up.y = FLOAT_803313e8;
-		up.z = FLOAT_803313dc;
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), &up, reinterpret_cast<Point3d*>(&target));
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), reinterpret_cast<Vec*>(&up),
+		    reinterpret_cast<Point3d*>(&target));
 		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);

@@ -495,7 +495,7 @@ extern "C" void CalcPolygonHeight(
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
     previousY = ppvMng->m_previousPosition.x;
-    zero = FLOAT_80330B2C;
+    zero = kPppYmMeltZero;
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 

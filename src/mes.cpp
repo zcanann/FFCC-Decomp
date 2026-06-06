@@ -33,7 +33,7 @@ static char sTag54Init;
 static inline int GetMesNibbleValue(const char* data)
 {
 	int low = (unsigned char)data[1] & 0x0F;
-	int high = (unsigned char)data[0];
+	int high = (unsigned char)data[0] & 0x0F;
 	return low | (high << 4);
 }
 

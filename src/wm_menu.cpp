@@ -7344,38 +7344,30 @@ void CMenuPcs::PCAnimCtrl()
 				animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 				animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 				animState[2] = 0;
-			} else if (isSelected != 0 &&
-			           worldState->m_menuMode != 8) {
-				if (animState[0] == 1 && animState[2] > 11999) {
-					animState[0] = 0;
-					animState[2] = 0;
-				} else if (animState[0] == 2 && animState[2] > 8999) {
-					animState[0] = 1;
-				} else if (animState[0] == 1 && animState[2] > 5999 && animState[2] < 9000) {
-					animState[0] = 2;
-				} else if (animState[0] == 0 && animState[2] >= 3000) {
-					animState[0] = 1;
-				} else {
-					if (frameEnd <= frame) {
-						if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
-							animState[0] = 0;
-							handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-							animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-							animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-							animState[2] = isSelected == 0 ? 0 : 0x834;
-						}
-						modelObj->SetFrame(FLOAT_803313dc);
-					} else {
-						modelObj->AddFrame(FLOAT_80331698);
-					}
-					animState[2]++;
 					continue;
 				}
-
-				handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-				animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-				animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+			if (isSelected == 0 || worldState->m_menuMode == 8) {
+				goto advanceFrame;
+			}
+			if (animState[0] == 1 && animState[2] > 11999) {
+				animState[0] = 0;
+				animState[2] = 0;
+			} else if (animState[0] == 2 && animState[2] > 8999) {
+				animState[0] = 1;
+			} else if (animState[0] == 1 && animState[2] > 5999 && animState[2] < 9000) {
+				animState[0] = 2;
 			} else {
+				if (animState[0] != 0 || animState[2] < 3000) {
+					goto advanceFrame;
+				}
+				animState[0] = 1;
+			}
+			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
+			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+			continue;
+
+advanceFrame:
 				if (frameEnd <= frame) {
 					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 						animState[0] = 0;
@@ -7389,7 +7381,6 @@ void CMenuPcs::PCAnimCtrl()
 					modelObj->AddFrame(FLOAT_80331698);
 				}
 				animState[2]++;
-			}
 		} else {
 			animState[0] = animState[1];
 			animState[1] = -1;

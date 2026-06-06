@@ -8611,36 +8611,55 @@ void CMenuPcs::CalcCharaSelect()
 void CMenuPcs::DrawCharaName()
 {
 	CFont* const font = GetWmFont(this);
-	unsigned char* const cmakeWork = m_cmakeWorkActive == 1 ? GetWmCmakeWork(this) : 0;
+	WmWorldState* const worldState = GetWmWorldState(this);
+	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	unsigned char nameBuf[0x20];
 
-	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
-	if (Game.m_gameWork.m_languageId == 3) {
+	const char** emptyText;
+	switch (Game.m_gameWork.m_languageId) {
+	case 2:
+		emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
+		break;
+	case 3:
 		emptyText = s_wmEmptyCreatingTextIt_8032E900;
-	} else if (Game.m_gameWork.m_languageId < 3) {
-		if (Game.m_gameWork.m_languageId != 0 && Game.m_gameWork.m_languageId != 1) {
-			emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
-		}
-	} else if (Game.m_gameWork.m_languageId == 5) {
-		emptyText = s_wmEmptyCreatingTextEs_8032E910;
-	} else if (Game.m_gameWork.m_languageId < 5) {
+		break;
+	case 4:
 		emptyText = s_wmEmptyCreatingTextFr_8032E908;
+		break;
+	case 5:
+		emptyText = s_wmEmptyCreatingTextEs_8032E910;
+		break;
+	default:
+		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
+		break;
 	}
 
+	union WmI2D {
+		struct {
+			unsigned int hi;
+			unsigned int lo;
+		} w;
+		double d;
+	};
 	float fade;
-	if (GetWmWorldState(this)->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(GetWmWorldState(this)->m_frameCounter) - DOUBLE_80331408));
-	} else if (GetWmWorldState(this)->m_mainState == 2) {
+	if (worldState->m_mainState == 1) {
+		WmI2D frameCvt;
+		frameCvt.w.hi = 0x43300000;
+		frameCvt.w.lo = static_cast<unsigned int>(worldState->m_frameCounter) ^ 0x80000000;
+		fade = static_cast<float>(DOUBLE_803314e8 * (frameCvt.d - DOUBLE_80331408));
+	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(GetWmWorldState(this)->m_frameCounter) - DOUBLE_80331408) -
-		                            DOUBLE_80331420));
+		WmI2D frameCvt;
+		frameCvt.w.hi = 0x43300000;
+		frameCvt.w.lo = static_cast<unsigned int>(worldState->m_frameCounter) ^ 0x80000000;
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (frameCvt.d - DOUBLE_80331408) - DOUBLE_80331420));
 	}
-	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
-	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		const WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+	for (int i = 0; i < 4; i++) {
+		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
 			activeMask |= bit;
@@ -8659,27 +8678,48 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-	GXSetChanMatColor(GX_COLOR0A0, shade.color);
+	const float alphaF = static_cast<float>(FLOAT_80331458 * fade);
+	GXColor shade;
+	shade.r = 0xFF;
+	shade.g = 0xFF;
+	shade.b = 0xFF;
+	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+	const float yBase1 = FLOAT_80331478;
+	const double xOffsetDefault =
+	    -(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678);
+	const float yExtra1 = FLOAT_80331684;
+	const double bias1 = DOUBLE_80331408;
+	WmI2D cvt;
+	int yCounter = 0;
+	int slotBase = 0;
 	for (int row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331684;
+		cvt.w.hi = 0x43300000;
+		cvt.w.lo = static_cast<unsigned int>(yCounter) ^ 0x80000000;
+		float y = (yBase1 + static_cast<float>(cvt.d - bias1)) + yExtra1;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
+		int caravanOffset = slotBase * 0xC30;
+		unsigned int xCounter = 0;
+		int slot = slotBase;
 		for (int col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
-				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
-				float scale = FLOAT_803313e8;
-				float xOffset = -(static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678));
+				const char* const text = reinterpret_cast<const char*>(
+				    Game.m_caravanWorkArr[0].m_name + caravanOffset);
+				cvt.w.hi = 0x43300000;
+				cvt.w.lo = xCounter ^ 0x80000000;
+				const float xBase = FLOAT_80331410 + static_cast<float>(cvt.d - bias1);
 				const float width = font->GetWidth(text);
+				float scale = FLOAT_803313e8;
+				double xOffset = xOffsetDefault;
 				if (static_cast<double>(FLOAT_80331680) < static_cast<double>(width) * DOUBLE_803313f8) {
 					scale = static_cast<float>((static_cast<double>(width) + DOUBLE_80331510) * DOUBLE_803313f8 /
 					                          static_cast<double>(FLOAT_80331680));
-					xOffset = FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
+					xOffset = static_cast<float>(FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510));
 				}
-				const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) + xOffset * static_cast<float>(DOUBLE_803313f8);
+				const float x = static_cast<float>(xOffset * DOUBLE_803313f8 + xBase);
 				MenuPcs.DrawRect(
 				    0, x, y, FLOAT_80331680, FLOAT_80331410,
 				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, 0.0f);
@@ -8688,7 +8728,12 @@ void CMenuPcs::DrawCharaName()
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, 0.0f);
 			}
+			caravanOffset += 0xC30;
+			xCounter += 0x90;
+			slot++;
 		}
+		yCounter += 0xB8;
+		slotBase += 4;
 	}
 
 	DrawInit();
@@ -8696,53 +8741,100 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	font->SetColor(shade.color);
+	CColor shadeColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alphaF)));
+	font->SetColor(shadeColor.color);
 
+	const float xBase2 = FLOAT_80331410;
+	const float xMax2 = FLOAT_8033155C;
+	const float yBase2 = FLOAT_80331478;
+	const float yExtra2 = FLOAT_80331688;
+	const float ySub2 = FLOAT_80331550;
+	const double k3f8_2 = DOUBLE_803313f8;
+	const double bias2 = DOUBLE_80331408;
+	int yCounter2 = 0;
+	int slotBase2 = 0;
 	for (int row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331688 - FLOAT_80331550;
+		cvt.w.hi = 0x43300000;
+		cvt.w.lo = static_cast<unsigned int>(yCounter2) ^ 0x80000000;
+		float y = (yBase2 + static_cast<float>(cvt.d - bias2)) + yExtra2;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
+		y = static_cast<float>(y - ySub2);
+		int cmakeOffset = slotBase2 * 0x9C0;
+		int caravanOffset = slotBase2 * 0xC30;
+		unsigned int xCounter2 = 0;
+		int slot = slotBase2;
 		for (int col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
-			bool restoreColor = false;
-			const char* text = 0;
+			int restoreColor = 0;
+			const short menuMode = worldState->m_menuMode;
+			unsigned char* const rawCmake = this->m_cmakeWork;
+			const char* text;
 
-			if (GetWmWorldState(this)->m_menuMode == 8 && cmakeWork != 0 &&
-			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
-			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
-			} else if ((pendingMask & (1u << slot)) == 0) {
-				text = emptyText[0];
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 7 : 8);
+			cvt.w.hi = 0x43300000;
+			cvt.w.lo = xCounter2 ^ 0x80000000;
+			const float xBase = xBase2 + static_cast<float>(cvt.d - bias2);
+
+			bool hasName;
+			if (menuMode == 8 && rawCmake != 0) {
+				hasName = *reinterpret_cast<unsigned int*>(rawCmake + cmakeOffset + 0x1A84) != 0;
 			} else {
-				text = emptyText[1];
-				font->SetTlut(0x10);
-				int textAlpha = alpha;
-				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
-				if (GetWmWorldState(this)->m_mainState == 2) {
-					textAlpha = static_cast<int>(FLOAT_80331458 *
-					                             static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
-					                                                  DOUBLE_80331420)));
-					restoreColor = true;
+				hasName = *reinterpret_cast<unsigned int*>(
+				              reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x1794) != 0;
+			}
+
+			if (hasName) {
+				if (menuMode == 8 && this->m_cmakeWorkActive == 1 && rawCmake != 0) {
+					memset(nameBuf, 0, 0x20);
+					memcpy(nameBuf, rawCmake + cmakeOffset + 0x15C0, 0x10);
+					text = reinterpret_cast<const char*>(nameBuf);
+				} else {
+					text = reinterpret_cast<const char*>(reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x17BA);
 				}
-				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha));
+				if ((activeMask & (1u << slot)) != 0) {
+					font->SetTlut(6);
+				} else {
+					font->SetTlut(8);
+				}
+			} else if ((pendingMask & (1u << slot)) == 0) {
+				if ((activeMask & (1u << slot)) != 0) {
+					font->SetTlut(7);
+				} else {
+					font->SetTlut(8);
+				}
+				text = emptyText[0];
+			} else {
+				font->SetTlut(0x10);
+				text = emptyText[1];
+				restoreColor = worldState->m_mainState == 2 ? 1 : 0;
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
+				float blinkFade = fade;
+				if (restoreColor) {
+					const int absPhase = phase < 0 ? -phase : phase;
+					cvt.w.hi = 0x43300000;
+					cvt.w.lo = static_cast<unsigned int>(absPhase) ^ 0x80000000;
+					blinkFade = static_cast<float>(-(DOUBLE_80331460 * (cvt.d - DOUBLE_80331408) - DOUBLE_80331420));
+				}
+				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade)));
 				font->SetColor(blinkColor.color);
 			}
 
-			const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) +
-			                (FLOAT_8033155C - font->GetWidth(text)) * static_cast<float>(DOUBLE_803313f8);
+			const float widthDiff = xMax2 - font->GetWidth(text);
+			const float x = static_cast<float>(widthDiff * k3f8_2 + xBase);
 			font->SetPosX(x);
 			font->SetPosY(y);
 			font->Draw(text);
 			if (restoreColor) {
-				CColor restore(0xFF, 0xFF, 0xFF, 0xFF);
-				font->SetColor(restore.color);
+				CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
+				font->SetColor(whiteColor.color);
 			}
+			cmakeOffset += 0x9C0;
+			caravanOffset += 0xC30;
+			xCounter2 += 0x90;
+			slot++;
 		}
+		yCounter2 += 0xB8;
+		slotBase2 += 4;
 	}
 
 	DrawInit();

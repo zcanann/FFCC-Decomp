@@ -676,6 +676,10 @@ public:
     {
         unsigned char m_pad744[0x774 - 0x744];
         CCharaPcs::CHandle* m_handles[0x28];
+        unsigned char* m_worldObjData;
+        unsigned char* m_bubbleData;
+        unsigned char* m_frameData;
+        unsigned char* m_frameInfo;
         unsigned char* m_charaModelData;
         unsigned char* m_charaSelectData;
     };
@@ -834,6 +838,12 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_bubbleData) == 0x818);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameData) == 0x81C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameInfo) == 0x820);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_charaModelData) == 0x824);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_charaSelectData) == 0x828);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);

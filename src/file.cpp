@@ -113,19 +113,19 @@ extern const char s_dvd_pctscft_param_cfd_801D6054[] = "dvd/%scft/param.cfd";
 extern const char s_dvd_pctscft_c_system_cfd_801D6068[] = "dvd/%scft/c_system.cfd";
 extern const char s_dvd_pctscft_mail_tbl_cfd_801D6080[] = "dvd/%scft/mail_tbl.cfd";
 extern const char s_dvd_pctscft_newbattle_cfd_801D6098[] = "dvd/%scft/newbattle.cfd";
-extern const char lbl_8032F648[];
-extern const char lbl_8032F64C[];
-extern const char lbl_8032F650[];
-extern const char lbl_8032F654[];
-extern const char lbl_8032F658[];
-extern const char lbl_8032F65C[];
+extern const char s_localLangDirJp[];
+extern const char s_localLangDirUk[];
+extern const char s_localLangDirGr[];
+extern const char s_localLangDirIt[];
+extern const char s_localLangDirFr[];
+extern const char s_localLangDirSp[];
 extern const char* const s_localLangDirs[] = {
-    lbl_8032F648,
-    lbl_8032F64C,
-    lbl_8032F650,
-    lbl_8032F654,
-    lbl_8032F658,
-    lbl_8032F65C,
+    s_localLangDirJp,
+    s_localLangDirUk,
+    s_localLangDirGr,
+    s_localLangDirIt,
+    s_localLangDirFr,
+    s_localLangDirSp,
 };
 
 const char* l_tError[4][6][3] = {

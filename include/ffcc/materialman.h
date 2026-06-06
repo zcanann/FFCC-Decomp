@@ -516,14 +516,10 @@ public:
     {
         return m_materials.GetSize();
     }
-#ifdef FFCC_MATERIALMAN_NO_INLINE_GET_MATERIAL
-    CMaterial* GetMaterial(long);
-#else
     CMaterial* GetMaterial(long index)
     {
         return m_materials[index];
     }
-#endif
 };
 
 extern CMaterialMan MaterialMan;

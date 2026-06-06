@@ -2204,6 +2204,7 @@ void CMenuPcs::InitSaveLoadMenu()
 void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	WmWorldState* const worldState = m_wmWorldState;
 	McCtrl& mcCtrl = *GetMcCtrl();
 	bytes[0x86E] = 0;
 
@@ -2220,8 +2221,7 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
 
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	if (*reinterpret_cast<char*>(worldState + 8) == 0) {
+	if (worldState->m_worldReady == 0) {
 		int frame = *reinterpret_cast<int*>(bytes + 0x820);
 		*reinterpret_cast<short*>(frame + 4) = 0x10;
 		float fVar5 = FLOAT_803313e8;
@@ -2258,27 +2258,26 @@ void CMenuPcs::CalcLoadMenu()
 		mcCtrl.m_saveIndex = 0;
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
-		iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
-		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
-		Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(iVar14 + 0x3A);
-		Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(iVar14 + 0x3C);
-		if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8 && m_cmakeWorkCardChannel != 0) {
+		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];
+		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
+		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
+		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
+		if (worldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
 			mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 3;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			worldState->m_subState = 3;
+			worldState->m_flag09 = 1;
 		}
-		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
-		*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 1;
+		worldState->m_flag0A = 0;
+		worldState->m_worldReady = 1;
 	}
 
-	int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-	short sVar8 = *reinterpret_cast<short*>(iVar14 + 0x10);
+	int iVar14;
+	short sVar8 = worldState->m_mainState;
 	unsigned int uVar15;
 	if (sVar8 == 0) {
-		uVar15 = (int)*reinterpret_cast<short*>(iVar14 + 0x22) - 10;
+		uVar15 = static_cast<int>(worldState->m_frameCounter) - 10;
 	} else if (sVar8 < 1 || sVar8 > 3) {
-		uVar15 = -(int)*reinterpret_cast<short*>(iVar14 + 0x22);
+		uVar15 = -static_cast<int>(worldState->m_frameCounter);
 	} else {
 		uVar15 = 0;
 	}
@@ -2315,12 +2314,12 @@ void CMenuPcs::CalcLoadMenu()
 	}
 
 	float fVar2 = FLOAT_803313e8;
-	iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-	if (*reinterpret_cast<short*>(iVar14 + 0x10) != 2) {
+	if (worldState->m_mainState != 2) {
 		return;
 	}
 
-	iVar10 = (int)*reinterpret_cast<short*>(iVar14 + 0x16);
+	iVar14 = reinterpret_cast<int>(worldState);
+	iVar10 = worldState->m_subState;
 	switch (iVar10) {
 	case 0:
 	case 2:
@@ -2917,26 +2916,26 @@ void CMenuPcs::CalcLoadMenu()
 						pOff += 4;
 						iVar10 += 0x34;
 					} while (iVar14 < 8);
-					if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) != 8) {
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x36) = (short)Game.m_gameWork.m_wmBackupParams[0];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3E) = (short)Game.m_gameWork.m_wmBackupParams[0];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x38) = (short)Game.m_gameWork.m_wmBackupParams[1];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x40) = (short)Game.m_gameWork.m_wmBackupParams[1];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3A) = (short)Game.m_gameWork.m_wmBackupParams[2];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x42) = (short)Game.m_gameWork.m_wmBackupParams[2];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x3C) = (short)Game.m_gameWork.m_wmBackupParams[3];
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x44) = (short)Game.m_gameWork.m_wmBackupParams[3];
+					if (worldState->m_menuMode != 8) {
+						worldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						worldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						worldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						worldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						worldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						worldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						worldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+						worldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
 					}
 				}
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				worldState->m_state0E = 1;
+				worldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			sVar8 = worldState->m_counter1A;
 			if (sVar8 != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				worldState->m_counter1A = sVar8 - 1;
+				if (worldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}

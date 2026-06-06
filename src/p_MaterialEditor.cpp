@@ -3,12 +3,10 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
-extern "C" {
 static const GXColor kMaterialEditorDefaultColorRgba = {0xFF, 0xFF, 0xFF, 0xFF};
 static const float kMaterialEditorControlMaxInit = 10000.0f;
 static const float kMaterialEditorControlMinInit = -10000.0f;
 static const char sMaterialEditorSpinnerText[5] = "|/-\\";
-}
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>

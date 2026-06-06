@@ -127,15 +127,11 @@ struct BonusSummaryData {
 
 STATIC_ASSERT(sizeof(BonusSummaryData) == 0xCC);
 
-#pragma force_active on
-extern "C" {
-BonusSummaryData* s_Rinfo = 0;
-unsigned char s_CntTop = 0;
-unsigned char s_ArtiTop = 0;
-unsigned char s_PlayerTop = 0;
-float* s_Base[1];
-}
-#pragma force_active reset
+static BonusSummaryData* s_Rinfo = 0;
+static unsigned char s_CntTop = 0;
+static unsigned char s_ArtiTop = 0;
+static unsigned char s_PlayerTop = 0;
+static float* s_Base[1];
 extern "C" const char sDrawBonusFmt[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };

@@ -198,8 +198,8 @@ struct BonusBoardEntryRaw {
 	int m_effectHandle;
 	short m_kind;
 	short m_state;
-	short m_width;
-	short m_height;
+	short m_centerX;
+	short m_centerY;
 	float m_posX;
 	float m_posY;
 	float m_depth;
@@ -209,15 +209,17 @@ struct BonusBoardEntryRaw {
 	float m_scaleX;
 	float m_scaleY;
 	float m_scaleZ;
-	int m_drawFlags;
-	int m_drawState;
+	float m_unk34;
+	float m_unk38;
+	float m_unk3c;
+	int m_screenX;
+	int m_screenY;
 	int m_screenWidth;
 	int m_screenHeight;
 };
 
 struct BonusBoardEntryList {
 	BonusBoardEntryRaw entries[0x18];
-	unsigned char pad_0660[0x120];
 };
 
 struct BonusEffectSlotBlock {
@@ -232,7 +234,7 @@ struct BonusEffectSlotList {
 STATIC_ASSERT(sizeof(BonusMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(BonusMenuAuxRaw) == 0xC);
 STATIC_ASSERT(sizeof(BonusBaseRaw) == 0x48);
-STATIC_ASSERT(sizeof(BonusBoardEntryRaw) == 0x44);
+STATIC_ASSERT(sizeof(BonusBoardEntryRaw) == 0x50);
 STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
 STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
@@ -256,27 +258,27 @@ static inline void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
 	}
 }
 
-static inline void InitBonusBoardEntry(unsigned char* entry)
+static inline void InitBonusBoardEntry(BonusBoardEntryRaw* entry)
 {
-	*reinterpret_cast<int*>(entry) = 0;
-	*reinterpret_cast<int*>(entry + 4) = 0;
-	*reinterpret_cast<short*>(entry + 8) = 0;
-	*reinterpret_cast<short*>(entry + 10) = 0;
-	*reinterpret_cast<short*>(entry + 12) = 0x280;
-	*reinterpret_cast<short*>(entry + 14) = 0x1C0;
-	*reinterpret_cast<float*>(entry + 0x10) = 0.0f;
-	*reinterpret_cast<float*>(entry + 0x14) = 0.0f;
-	*reinterpret_cast<float*>(entry + 0x18) = 1000.0f;
-	*reinterpret_cast<float*>(entry + 0x1C) = 0.0f;
-	*reinterpret_cast<float*>(entry + 0x20) = 0.0f;
-	*reinterpret_cast<float*>(entry + 0x24) = 0.0f;
-	*reinterpret_cast<float*>(entry + 0x28) = 1.0f;
-	*reinterpret_cast<float*>(entry + 0x2C) = 1.0f;
-	*reinterpret_cast<float*>(entry + 0x30) = 1.0f;
-	*reinterpret_cast<int*>(entry + 0x40) = 0;
-	*reinterpret_cast<int*>(entry + 0x44) = 0;
-	*reinterpret_cast<int*>(entry + 0x48) = 0x280;
-	*reinterpret_cast<int*>(entry + 0x4C) = 0x1C0;
+	entry->m_modelHandle = 0;
+	entry->m_effectHandle = 0;
+	entry->m_kind = 0;
+	entry->m_state = 0;
+	entry->m_centerX = 0x280;
+	entry->m_centerY = 0x1C0;
+	entry->m_posX = 0.0f;
+	entry->m_posY = 0.0f;
+	entry->m_depth = 1000.0f;
+	entry->m_rotX = 0.0f;
+	entry->m_rotY = 0.0f;
+	entry->m_rotZ = 0.0f;
+	entry->m_scaleX = 1.0f;
+	entry->m_scaleY = 1.0f;
+	entry->m_scaleZ = 1.0f;
+	entry->m_screenX = 0;
+	entry->m_screenY = 0;
+	entry->m_screenWidth = 0x280;
+	entry->m_screenHeight = 0x1C0;
 }
 
 static inline void ReleaseBonusRefObject(void* object)
@@ -3207,9 +3209,9 @@ void CMenuPcs::createBonus()
 	auxPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) BonusMenuAuxRaw);
 	this->m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-	unsigned char* boardEntries = reinterpret_cast<unsigned char*>(boardPtr);
+	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
-		InitBonusBoardEntry(boardEntries + i * 0x50);
+		InitBonusBoardEntry(&boardEntries->entries[i]);
 	}
 
 	if (s_Rinfo != 0) {

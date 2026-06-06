@@ -8196,70 +8196,71 @@ void CMenuPcs::WMSubMenuInit()
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+	WmWorldState* const typedWorldState = m_wmWorldState;
+	int worldState = reinterpret_cast<int>(typedWorldState);
 
-	if (*reinterpret_cast<short*>(worldState + 0x20) == 0) {
+	if (typedWorldState->m_changeRequest == 0) {
 		return;
 	}
 
-	int iVar14 = (int)*reinterpret_cast<short*>(worldState + 0x1C);
+	int iVar14 = typedWorldState->m_menuMode;
 	DAT_8032ee1c = 1;
 
-	short sVar2 = *reinterpret_cast<short*>(worldState + 0x20);
+	short sVar2 = typedWorldState->m_changeRequest;
 
 	if (sVar2 == 2) {
 		char cVar1 = bytes[0xD];
 		if (cVar1 == 1) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+			typedWorldState->m_menuMode = 0;
 		} else if (cVar1 == 2) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 5;
+			typedWorldState->m_menuMode = 5;
 		} else if (cVar1 == 3) {
 			DAT_8032ee1c = 1;
 			if (iVar14 == 6) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 0;
+				typedWorldState->m_changeRequest = 0;
 				return;
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
+			typedWorldState->m_menuMode = 6;
 		} else if (cVar1 == 4) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 4;
+			typedWorldState->m_menuMode = 4;
 		} else {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 1;
+			typedWorldState->m_menuMode = 1;
 		}
 	} else if (iVar14 == 0) {
 		if (sVar2 == 1) {
-			short sVar2b = *reinterpret_cast<short*>(worldState + 0x26);
+			short sVar2b = typedWorldState->m_cardChannel;
 			if (sVar2b == 0) {
-				*reinterpret_cast<short*>(worldState + 0x1C) = 3;
+				typedWorldState->m_menuMode = 3;
 			} else if (sVar2b == 1) {
-				*reinterpret_cast<short*>(worldState + 0x1C) = 1;
+				typedWorldState->m_menuMode = 1;
 				memset(m_wmWorldParams, 0, 0x10);
 			} else if (sVar2b == 2) {
-				*reinterpret_cast<short*>(worldState + 0x1C) = 8;
+				typedWorldState->m_menuMode = 8;
 			} else if (sVar2b == 3) {
-				*reinterpret_cast<short*>(worldState + 0x1C) = 7;
+				typedWorldState->m_menuMode = 7;
 			} else {
-				*reinterpret_cast<short*>(worldState + 0x1C) = 2;
+				typedWorldState->m_menuMode = 2;
 			}
 		} else {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 4;
+			typedWorldState->m_menuMode = 4;
 		}
 	} else if (iVar14 == 1) {
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 1;
+		typedWorldState->m_menuMode = 0;
+		typedWorldState->m_cardChannel = 1;
 	} else if (iVar14 == 8) {
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 2;
+		typedWorldState->m_menuMode = 0;
+		typedWorldState->m_cardChannel = 2;
 	} else if (iVar14 == 7) {
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 3;
+		typedWorldState->m_menuMode = 0;
+		typedWorldState->m_cardChannel = 3;
 	} else if (iVar14 == 2) {
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 4;
+		typedWorldState->m_menuMode = 0;
+		typedWorldState->m_cardChannel = 4;
 	} else if (iVar14 == 5) {
 		if (sVar2 == 1) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+			typedWorldState->m_menuMode = 0;
 			bytes[0xD] = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+			typedWorldState->m_cardChannel = 0;
 			CFlatRuntime::CStack stackA[3];
 			stackA[0].m_word = 1;
 			stackA[1].m_word = 1;
@@ -8267,7 +8268,7 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
 			DAT_8032ee1c = 1;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
+			typedWorldState->m_menuMode = 6;
 			CFlatRuntime::CStack stackB[3];
 			stackB[0].m_word = 1;
 			stackB[1].m_word = 0;
@@ -8275,52 +8276,52 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackB, 0);
 		}
 	} else if (iVar14 == 6) {
-		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		typedWorldState->m_menuMode = 0;
 	} else if (sVar2 == 1) {
-		if (*reinterpret_cast<short*>(worldState + 0x1C) < 8) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = *reinterpret_cast<short*>(worldState + 0x1C) + 1;
+		if (typedWorldState->m_menuMode < 8) {
+			typedWorldState->m_menuMode++;
 		} else {
 			bytes[0xD] = 0;
 		}
 	} else if (sVar2 == -1) {
-		short sVar2c = *reinterpret_cast<short*>(worldState + 0x1C);
+		short sVar2c = typedWorldState->m_menuMode;
 		if (sVar2c < 1) {
 			bytes[0xD] = 0;
 		} else if (sVar2c == 3) {
-			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+			typedWorldState->m_menuMode = 0;
+			typedWorldState->m_cardChannel = 0;
 		} else {
-			*reinterpret_cast<short*>(worldState + 0x1C) = sVar2c - 1;
+			typedWorldState->m_menuMode = sVar2c - 1;
 		}
 	}
 
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) != 0) {
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
+	if (typedWorldState->m_menuMode != 0) {
+		typedWorldState->m_cardChannel = 0;
 	}
 
 	float fVar6 = FLOAT_803315b0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
+	typedWorldState->m_frameCounter = 0;
 	float fVar5 = FLOAT_803313e8;
 	float fVar4 = FLOAT_803313dc;
 	double local_40 = (double)(long long)(int)fVar6;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
+	typedWorldState->m_titleState = 0;
 	double dVar16 = DOUBLE_803313f8;
 	double dVar15 = (double)FLOAT_80331430;
-	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 8) = 0;
-	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 0;
+	typedWorldState->m_worldReady = 0;
+	typedWorldState->m_flag09 = 0;
 	double local_38 = (double)(long long)(int)(float)(dVar15 * dVar16);
-	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x18) = 0;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0;
-	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x82C) + 4) = fVar5;
-	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x82C)) = fVar4;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = 0;
-	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xB) = 0;
-	*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xC) = 0;
+	typedWorldState->m_flag0A = 0;
+	typedWorldState->m_state0E = 0;
+	typedWorldState->m_mainState = 0;
+	typedWorldState->m_state12 = 0;
+	typedWorldState->m_subState = 0;
+	typedWorldState->m_delay = 0;
+	typedWorldState->m_counter1A = 0;
+	typedWorldState->m_posY = fVar5;
+	typedWorldState->m_posX = fVar4;
+	typedWorldState->m_mcResult = 0;
+	typedWorldState->m_flag0B = 0;
+	typedWorldState->m_modelFlagsInitialized = 0;
 
 	m_menuWindowInfo->x = (short)(int)fVar6;
 	m_menuWindowInfo->y = (short)(int)(float)(dVar15 * dVar16);

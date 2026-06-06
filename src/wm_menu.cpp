@@ -11412,8 +11412,7 @@ void McCtrl::Init()
 int McCtrl::LoadMcList()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -11703,8 +11702,7 @@ void McCtrl::SetBrokenFile(int isBroken)
 int McCtrl::SaveDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -11994,8 +11992,7 @@ int McCtrl::SaveDat()
 int McCtrl::LoadDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -12147,7 +12144,6 @@ int McCtrl::LoadDat()
 int McCtrl::Format(int unmountAfter)
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
 		return -1;
 	}
 
@@ -12819,8 +12815,7 @@ void McCtrl::ChkParty(char*)
 int McCtrl::EraseDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;

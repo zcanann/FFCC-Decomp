@@ -95,6 +95,11 @@ static inline CPad::PadInput& CameraDebugPadInput()
     return Pad.GetPadInputs()[(Pad.m_debugPadPort == 4) ? 4 : 0];
 }
 
+static inline CPad::PadInput& CameraShadowPadInput()
+{
+    return Pad.GetPadInputs()[(Pad.m_debugPadPort == 1) ? 0 : 1];
+}
+
 extern "C" {
 void create__10CCameraPcsFv(CCameraPcs*);
 void destroy__10CCameraPcsFv(CCameraPcs*);
@@ -1582,10 +1587,8 @@ void CCameraPcs::drawShadowBegin()
         float stickY = FLOAT_8032fa34;
 
         if (Pad.m_debugPadLock == 0) {
-            stickX = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
-                                               (((1 - Pad.m_debugPadPort | Pad.m_debugPadPort - 1) >> 0x1f) * -0x54));
-            stickY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
-                                               (((1 - Pad.m_debugPadPort | Pad.m_debugPadPort - 1) >> 0x1f) * -0x54));
+            stickX = CameraShadowPadInput().stickXF;
+            stickY = CameraShadowPadInput().stickYF;
         }
 
         m_fullScreenShadow.m_rotY += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;

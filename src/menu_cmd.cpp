@@ -636,75 +636,74 @@ void CMenuPcs::CmdInit2()
  */
 void CMenuPcs::CmdOpen()
 {
-	s16* cmd = GetCmdState(this);
+	CmdState* cmd = GetCmdStateView(this);
 
-	if (*reinterpret_cast<char*>(reinterpret_cast<u8*>(cmd) + 0x0b) == '\0') {
+	if (cmd->initialized == 0) {
 		CmdInit();
 	}
 
-	cmd = GetCmdState(this);
-	s16* list = GetCmdList(this);
+	cmd = GetCmdStateView(this);
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
 	s32 finishedCount = 0;
-	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
+	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
 
-	u32 count = static_cast<u32>(list[0]);
-	s16* entry = list + 4;
-	const s32 timer = static_cast<s32>(cmd[0x11]);
+	u32 count = static_cast<u32>(list->count);
+	CmdListEntry* entry = entries;
+	const s32 timer = static_cast<s32>(cmd->transitionTimer);
 	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {
-			if (*reinterpret_cast<s32*>(entry + 0x12) > timer) {
-				entry += 0x20;
-				continue;
-			}
-			if ((*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14)) <= timer) {
-				finishedCount += 1;
-				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
-				entry += 0x20;
-				continue;
-			}
-			s32 value = *reinterpret_cast<s32*>(entry + 0x10);
-			value += 1;
-			*reinterpret_cast<s32*>(entry + 0x10) = value;
-			*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
-			    (DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
-			    static_cast<double>(value));
-			entry += 0x20;
+		if (entry->startFrame > timer) {
+			entry++;
+			continue;
+		}
+		if ((entry->startFrame + entry->duration) <= timer) {
+			finishedCount += 1;
+			entry->alpha = FLOAT_80332a70;
+			entry++;
+			continue;
+		}
+		entry->timer++;
+		entry->alpha = static_cast<float>(
+		    (DOUBLE_80332a58 / static_cast<double>(entry->duration)) *
+		    static_cast<double>(entry->timer));
+		entry++;
 	}
 
 	bool done = false;
-	if (list[0] == finishedCount) {
+	if (list->count == finishedCount) {
 		float anim = FLOAT_80332a70;
-		entry = list + 4;
+		entry = entries;
 		if (static_cast<s32>(count) > 0) {
 			u32 batch = count >> 3;
 			if (batch != 0) {
 				do {
-					*reinterpret_cast<s32*>(entry + 0x12) = 0;
-					*reinterpret_cast<s32*>(entry + 0x14) = 1;
-					*reinterpret_cast<float*>(entry + 8) = anim;
-					*reinterpret_cast<s32*>(entry + 0x32) = 0;
-					*reinterpret_cast<s32*>(entry + 0x34) = 1;
-					*reinterpret_cast<float*>(entry + 0x28) = anim;
-					*reinterpret_cast<s32*>(entry + 0x52) = 0;
-					*reinterpret_cast<s32*>(entry + 0x54) = 1;
-					*reinterpret_cast<float*>(entry + 0x48) = anim;
-					*reinterpret_cast<s32*>(entry + 0x72) = 0;
-					*reinterpret_cast<s32*>(entry + 0x74) = 1;
-					*reinterpret_cast<float*>(entry + 0x68) = anim;
-					*reinterpret_cast<s32*>(entry + 0x92) = 0;
-					*reinterpret_cast<s32*>(entry + 0x94) = 1;
-					*reinterpret_cast<float*>(entry + 0x88) = anim;
-					*reinterpret_cast<s32*>(entry + 0xb2) = 0;
-					*reinterpret_cast<s32*>(entry + 0xb4) = 1;
-					*reinterpret_cast<float*>(entry + 0xa8) = anim;
-					*reinterpret_cast<s32*>(entry + 0xd2) = 0;
-					*reinterpret_cast<s32*>(entry + 0xd4) = 1;
-					*reinterpret_cast<float*>(entry + 200) = anim;
-					*reinterpret_cast<s32*>(entry + 0xf2) = 0;
-					*reinterpret_cast<s32*>(entry + 0xf4) = 1;
-					*reinterpret_cast<float*>(entry + 0xe8) = anim;
-					entry += 0x100;
+					entry[0].startFrame = 0;
+					entry[0].duration = 1;
+					entry[0].alpha = anim;
+					entry[1].startFrame = 0;
+					entry[1].duration = 1;
+					entry[1].alpha = anim;
+					entry[2].startFrame = 0;
+					entry[2].duration = 1;
+					entry[2].alpha = anim;
+					entry[3].startFrame = 0;
+					entry[3].duration = 1;
+					entry[3].alpha = anim;
+					entry[4].startFrame = 0;
+					entry[4].duration = 1;
+					entry[4].alpha = anim;
+					entry[5].startFrame = 0;
+					entry[5].duration = 1;
+					entry[5].alpha = anim;
+					entry[6].startFrame = 0;
+					entry[6].duration = 1;
+					entry[6].alpha = anim;
+					entry[7].startFrame = 0;
+					entry[7].duration = 1;
+					entry[7].alpha = anim;
+					entry += 8;
 					batch -= 1;
 				} while (batch != 0);
 				count &= 7;
@@ -715,10 +714,10 @@ void CMenuPcs::CmdOpen()
 
 			if (done == false) {
 				do {
-					*reinterpret_cast<s32*>(entry + 0x12) = 0;
-					*reinterpret_cast<s32*>(entry + 0x14) = 1;
-					*reinterpret_cast<float*>(entry + 8) = anim;
-					entry += 0x20;
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = anim;
+					entry++;
 					count -= 1;
 				} while (count != 0);
 			}
@@ -885,91 +884,74 @@ int CMenuPcs::CmdCtrl()
 int CMenuPcs::CmdClose()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s32 cmd = GetCmdStateBase(this);
-	if (*reinterpret_cast<u8*>(cmd + 8) == 0) {
+	CmdState* cmd = GetCmdStateView(this);
+	if (cmd->transitionFlag == 0) {
 		if (UniteCloseAnim(-1) != 0) {
-			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
-			*reinterpret_cast<u8*>(cmd + 8) = 1;
+			cmd->transitionTimer = 0;
+			cmd->transitionFlag = 1;
 		}
 		return 0;
 	}
 
 	s32 doneCount = 0;
-	*reinterpret_cast<s16*>(cmd + 0x22) = *reinterpret_cast<s16*>(cmd + 0x22) + 1;
+	cmd->transitionTimer = cmd->transitionTimer + 1;
 
-	s16* list = GetCmdList(this);
-	u32 count = static_cast<u32>(list[0]);
-	s16* entry = list + 4;
-	s32 closeTimer = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22));
+	CmdListStorage* list = GetCmdListStorage(this);
+	u32 count = static_cast<u32>(list->count);
+	CmdListEntry* entry = list->entries;
+	s32 closeTimer = static_cast<s32>(cmd->transitionTimer);
 	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (*reinterpret_cast<s32*>(entry + 0x12) <= closeTimer) {
-			if (closeTimer >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+		if (entry->startFrame <= closeTimer) {
+			if (closeTimer >= (entry->startFrame + entry->duration)) {
 				doneCount = doneCount + 1;
-				*reinterpret_cast<float*>(entry + 8) = 0.0f;
+				entry->alpha = 0.0f;
 			} else {
-				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-				*reinterpret_cast<float*>(entry + 8) =
-				    static_cast<float>(
-				        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
-				              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
-				          1.0));
-				if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
-					*reinterpret_cast<float*>(entry + 8) = 0.0f;
+				entry->timer++;
+				entry->alpha = static_cast<float>(
+				    -((1.0 / static_cast<double>(entry->duration)) *
+				          static_cast<double>(entry->timer) -
+				      1.0));
+				if (static_cast<double>(entry->alpha) < 0.0) {
+					entry->alpha = 0.0f;
 				}
 			}
 		}
-		entry = entry + 0x20;
+		entry++;
 	}
 
-	if (list[0] == doneCount) {
-		entry = list + 4;
+	if (list->count == doneCount) {
+		entry = list->entries;
 		if (count != 0) {
 			u32 blockCount = count >> 3;
 			if (blockCount != 0) {
 				do {
-					entry[0x12] = 0;
-					entry[0x13] = 0;
-					entry[0x14] = 0;
-					entry[0x15] = 1;
-					*reinterpret_cast<float*>(entry + 8) = 0.0f;
-					entry[0x32] = 0;
-					entry[0x33] = 0;
-					entry[0x34] = 0;
-					entry[0x35] = 1;
-					*reinterpret_cast<float*>(entry + 0x28) = 0.0f;
-					entry[0x52] = 0;
-					entry[0x53] = 0;
-					entry[0x54] = 0;
-					entry[0x55] = 1;
-					*reinterpret_cast<float*>(entry + 0x48) = 0.0f;
-					entry[0x72] = 0;
-					entry[0x73] = 0;
-					entry[0x74] = 0;
-					entry[0x75] = 1;
-					*reinterpret_cast<float*>(entry + 0x68) = 0.0f;
-					entry[0x92] = 0;
-					entry[0x93] = 0;
-					entry[0x94] = 0;
-					entry[0x95] = 1;
-					*reinterpret_cast<float*>(entry + 0x88) = 0.0f;
-					entry[0xb2] = 0;
-					entry[0xb3] = 0;
-					entry[0xb4] = 0;
-					entry[0xb5] = 1;
-					*reinterpret_cast<float*>(entry + 0xa8) = 0.0f;
-					entry[0xd2] = 0;
-					entry[0xd3] = 0;
-					entry[0xd4] = 0;
-					entry[0xd5] = 1;
-					*reinterpret_cast<float*>(entry + 200) = 0.0f;
-					entry[0xf2] = 0;
-					entry[0xf3] = 0;
-					entry[0xf4] = 0;
-					entry[0xf5] = 1;
-					*reinterpret_cast<float*>(entry + 0xe8) = 0.0f;
-					entry = entry + 0x100;
+					entry[0].startFrame = 0;
+					entry[0].duration = 1;
+					entry[0].alpha = 0.0f;
+					entry[1].startFrame = 0;
+					entry[1].duration = 1;
+					entry[1].alpha = 0.0f;
+					entry[2].startFrame = 0;
+					entry[2].duration = 1;
+					entry[2].alpha = 0.0f;
+					entry[3].startFrame = 0;
+					entry[3].duration = 1;
+					entry[3].alpha = 0.0f;
+					entry[4].startFrame = 0;
+					entry[4].duration = 1;
+					entry[4].alpha = 0.0f;
+					entry[5].startFrame = 0;
+					entry[5].duration = 1;
+					entry[5].alpha = 0.0f;
+					entry[6].startFrame = 0;
+					entry[6].duration = 1;
+					entry[6].alpha = 0.0f;
+					entry[7].startFrame = 0;
+					entry[7].duration = 1;
+					entry[7].alpha = 0.0f;
+					entry += 8;
 					blockCount = blockCount - 1;
 				} while (blockCount != 0);
 				count = count & 7;
@@ -978,12 +960,10 @@ int CMenuPcs::CmdClose()
 				}
 			}
 			do {
-				entry[0x12] = 0;
-				entry[0x13] = 0;
-				entry[0x14] = 0;
-				entry[0x15] = 1;
-				*reinterpret_cast<float*>(entry + 8) = 0.0f;
-				entry = entry + 0x20;
+				entry->startFrame = 0;
+				entry->duration = 1;
+				entry->alpha = 0.0f;
+				entry++;
 				count = count - 1;
 			} while (count != 0);
 		}

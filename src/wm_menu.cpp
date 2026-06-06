@@ -7940,7 +7940,7 @@ void CMenuPcs::DrawCharaName()
 	CFont* const font = GetWmFont(this);
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
+	unsigned char* const cmakeWork = m_cmakeWorkActive == 1 ? GetWmCmakeWork(this) : 0;
 
 	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 	if (Game.m_gameWork.m_languageId == 3) {

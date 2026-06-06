@@ -576,9 +576,7 @@ char* g_strGooutMes[] = {
 
 struct CMenuPcsGoOutLayout
 {
-    unsigned char unk0[0x20];
-    McCtrl m_mcCtrl;
-    unsigned char unkAfterMcCtrl[0x826];
+    unsigned char unk0[0x86E];
     unsigned char m_loadFinished;
     unsigned char unk86F;
     signed short m_loadResult;
@@ -1295,7 +1293,7 @@ void CGoOutMenu::Destroy()
 void CGoOutMenu::SetGoOutMode(unsigned char mode)
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
+    McCtrl& mcCtrl = *MenuPcs.GetMcCtrl();
 
 	m_goOutMode = mode;
 	switch(m_goOutMode) {
@@ -1568,7 +1566,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
+    McCtrl& mcCtrl = *MenuPcs.GetMcCtrl();
     unsigned short input;
     unsigned char next;
     int selResult = -1;
@@ -2781,7 +2779,7 @@ void CGoOutMenu::Draw()
 void CGoOutMenu::InitMemCardProc()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
+    McCtrl& mcCtrl = *MenuPcs.GetMcCtrl();
 
     mcCtrl.m_saveIndex = static_cast<unsigned char>(m_saveIndex);
     mcCtrl.m_cardChannel = static_cast<unsigned char>(m_cardChannel);

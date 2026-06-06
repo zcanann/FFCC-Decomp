@@ -57,6 +57,11 @@ static inline YmMegaBirthShpTail3DataOffsets* GetYmMegaBirthShpTail3DataOffsets(
 void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 8008ca98
@@ -851,8 +856,8 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     float initVal;
 
     pppUnitMatrix(*work);
-    initVal = kPppYmMegaBirthShpTail3Zero;
-    work[1].value[0][2] = kPppYmMegaBirthShpTail3Zero;
+    initVal = LoadFloat(kPppYmMegaBirthShpTail3Zero);
+    work[1].value[0][2] = initVal;
     work[1].value[0][1] = initVal;
     work[1].value[0][0] = initVal;
     *reinterpret_cast<u32*>(&work[1].value[0][3]) = 0;

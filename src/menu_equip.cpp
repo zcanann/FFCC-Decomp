@@ -46,6 +46,7 @@ STATIC_ASSERT(offsetof(EquipMenuState, cursorMove) == 0x1E);
 STATIC_ASSERT(offsetof(EquipMenuState, frame) == 0x22);
 STATIC_ASSERT(offsetof(EquipMenuState, selectedIndex) == 0x26);
 STATIC_ASSERT(offsetof(EquipMenuState, subSelectedIndex) == 0x28);
+STATIC_ASSERT(offsetof(EquipMenuState, emptySlotHelpState) == 0x2C);
 STATIC_ASSERT(offsetof(EquipMenuState, mode) == 0x30);
 STATIC_ASSERT(offsetof(EquipMenuState, prevMode) == 0x32);
 STATIC_ASSERT(offsetof(EquipMenuState, scroll) == 0x34);
@@ -684,7 +685,7 @@ void CMenuPcs::EquipDraw()
 	if ((mode == 1) && (listIndex < 1)) {
 		helpItem = -1;
 	}
-	if (((mode == 0) && (*(s16*)(reinterpret_cast<char*>(menuState) + 0x2C) == 0)) && (helpItem < 0)) {
+	if (((mode == 0) && (menuState->emptySlotHelpState == 0)) && (helpItem < 0)) {
 		helpItem = 0x267;
 	}
 

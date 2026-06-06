@@ -304,7 +304,7 @@ static inline unsigned short GetMenuPress()
  */
 float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 	float width;
 	const float& scaleY = kOptionAnimMax;
 	const float& halfWidth = kMenuCenteringHalfWidth;
@@ -339,7 +339,7 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 #pragma dont_inline on
 void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -365,7 +365,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 #pragma dont_inline on
 void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -1047,7 +1047,7 @@ void CMenuPcs::CalcOptionMenu()
  */
 void CMenuPcs::DrawOptionMenu()
 {
-	CFont* font = menuFont;
+	CFont* font = m_fonts[0];
 	int languageBase = (Game.m_gameWork.m_languageId - 1) * 20;
 	_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	Vec2d uv0;

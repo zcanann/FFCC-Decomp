@@ -175,6 +175,7 @@ public:
     float CalcCenteringPos2(char*, float, float);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
+    void DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
     void DrawEquipMark(int, int, float);
     char* GetMenuStr(int);
@@ -509,6 +510,7 @@ public:
     int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();
+    void BindMcObj(int);
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22();
@@ -529,7 +531,8 @@ public:
     unsigned char m_pad19[0x20 - 0x19];
     McCtrlData m_mcCtrl;
     BattleHudState m_battleHud;
-    unsigned char m_pad70[0x80 - 0x70];
+    int m_manaWaterTimerA;
+    unsigned char m_pad74[0x80 - 0x74];
     unsigned char m_effectTimer;
     unsigned char m_pad81[0x84 - 0x81];
     int m_crystalElem;
@@ -615,6 +618,7 @@ extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
+STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionIndex) == 0x8E);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionOpenAnim) == 0x98);

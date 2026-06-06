@@ -2428,7 +2428,6 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		break;
 	case 3:
-		MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
 		break;
 	case 4:

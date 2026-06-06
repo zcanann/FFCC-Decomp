@@ -4469,9 +4469,12 @@ void CMenuPcs::DrawLoadMenu()
 	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
 	if (uAlpha > 0xFF) uAlpha = 0xFF;
 
-	// Header text
 	if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
-		// DrawFont2 call omitted - extern not available
+		char* text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 8];
+		_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha & 0xFF)).color;
+		const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+		DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+		          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 	}
 
 	DrawMCList();

@@ -40,11 +40,7 @@ struct VertexApLcState
     u16 countdown;
 };
 
-struct VertexApLcDataOffsets
-{
-    s32 m_stateOffset;
-};
-
+STATIC_ASSERT(sizeof(VertexApLcDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(VertexApLcDataOffsets, m_stateOffset) == 0x0);
 
 static inline VertexApLcDataOffsets* GetVertexApLcDataOffsets(_pppCtrlTable* ctrl)

@@ -1,10 +1,16 @@
 #ifndef _PPP_VERTEXAP_H_
 #define _PPP_VERTEXAP_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObject;
 struct _pppCtrlTable;
 class PVertexAp;
 struct Vec;
+
+struct VertexApDataOffsets {
+    s32 m_stateOffset;
+};
 
 void apea(_pppPObject*, PVertexAp*, Vec*);
 

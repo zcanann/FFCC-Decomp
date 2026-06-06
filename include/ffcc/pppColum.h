@@ -1,6 +1,7 @@
 #ifndef _FFCC_PPPCOLUM_H_
 #define _FFCC_PPPCOLUM_H_
 
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
@@ -13,6 +14,30 @@ struct pppColumDataOffsets {
     s32 _unused1;
     s32 m_positionWorkOffset;
     s32 m_frameWorkOffset;
+};
+
+struct pppColumValue {
+    f32 m_scaleStep;
+    f32 m_positionScale;
+    u8 m_colorR;
+    u8 m_colorG;
+    u8 m_colorB;
+    u8 _padB;
+};
+
+struct pppColumFrameWork {
+    s16 m_shapeA;
+    s16 m_shapeB;
+    s16 m_shapeC;
+    s16 _pad6;
+    pppColumValue* m_values;
+};
+
+struct pppColumPositionWork {
+    u8 _pad0[0x10];
+    Vec m_position;
+    u8 _pad1[0x16];
+    u8 m_alpha;
 };
 
 struct pppColumStep {

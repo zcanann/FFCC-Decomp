@@ -10,6 +10,18 @@ namespace Mc
 {
 class SaveDat
 {
+public:
+    char m_maker[4];
+    char m_title[4];
+    char m_machine[4];
+    char m_version[4];
+    char m_region;
+    unsigned char m_rotateKey;
+    unsigned char m_flags;
+    unsigned char m_pad_13[0x18 - 0x13];
+    u32 m_random;
+    u32 m_crc;
+    unsigned char m_body[0x8BD0 - 0x20];
 };
 }
 

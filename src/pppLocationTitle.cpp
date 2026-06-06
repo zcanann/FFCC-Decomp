@@ -9,32 +9,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-struct LocationTitleWork {
-    void* m_particles;
-    u16 m_count;
-    u16 m_pad;
-    float m_cur;
-    float m_vel;
-    float m_acc;
-};
-
-struct LOCATION_POLYGON {
-    Vec m_pos;
-    GXColor m_color;
-    float m_frame;
-    s16 m_shapeUnk;
-    s16 m_shapeA;
-    s16 m_shapeB;
-    s16 m_pad;
-};
-
-typedef LOCATION_POLYGON LocationTitleParticle;
-
-struct LocationTitleColorBlock {
-    u8 m_pad[8];
-    GXColor m_color;
-};
-
 STATIC_ASSERT(sizeof(LocationTitleWork) == 0x14);
 STATIC_ASSERT(offsetof(LocationTitleWork, m_particles) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitleWork, m_count) == 0x04);
@@ -57,6 +31,19 @@ static inline LocationTitleDataOffsets* GetLocationTitleDataOffsets(pppLocationT
     return reinterpret_cast<LocationTitleDataOffsets*>(offsets->m_serializedDataOffsets);
 }
 
+static inline LocationTitleWork* GetLocationTitleWork(pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets)
+{
+    return reinterpret_cast<LocationTitleWork*>(
+        locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_workOffset);
+}
+
+static inline LocationTitleColorBlock* GetLocationTitleColorBlock(
+    pppLocationTitle* locationTitle, pppLocationTitleOffsets* offsets)
+{
+    return reinterpret_cast<LocationTitleColorBlock*>(
+        locationTitle->m_workArea + GetLocationTitleDataOffsets(offsets)->m_colorOffset);
+}
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -66,7 +53,7 @@ static inline LocationTitleDataOffsets* GetLocationTitleDataOffsets(pppLocationT
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
+static inline void copyPolygonData(LocationTitleParticle* dst, LocationTitleParticle* src)
 {
     pppCopyVector(dst->m_pos, src->m_pos);
     memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));
@@ -89,7 +76,6 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
 void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleStep* param_2, pppLocationTitleOffsets* param_3)
 {
     int dataValIndex;
-    int serializedOffset;
     LocationTitleWork* work;
     int graphFrame;
     LocationTitleParticle* particle;
@@ -98,15 +84,14 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     int fadeDivisor;
 
     dataValIndex = param_2->m_dataValIndex;
-    serializedOffset = GetLocationTitleDataOffsets(param_3)->m_workOffset;
-    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + serializedOffset);
+    work = GetLocationTitleWork(pppLocationTitle, param_3);
 
     if (dataValIndex == 0xFFFF) {
         return;
     }
 
     fadeDivisor = -1;
-    particles = (LocationTitleParticle*)work->m_particles;
+    particles = work->m_particles;
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
@@ -170,9 +155,6 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     Vec* interpRead;
     int startIndex;
     LocationTitleParticle* dst;
-    int serializedOffset;
-    int colorOffset;
-    LocationTitleDataOffsets* serializedOffsets;
     LocationTitleWork* work;
     LocationTitleColorBlock* colorData;
     int graphFrame;
@@ -192,11 +174,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
         return;
     }
 
-    serializedOffsets = GetLocationTitleDataOffsets(param_3);
-    serializedOffset = serializedOffsets->m_workOffset;
-    colorOffset = serializedOffsets->m_colorOffset;
-    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + serializedOffset);
-    colorData = (LocationTitleColorBlock*)(pppLocationTitle->m_workArea + colorOffset);
+    work = GetLocationTitleWork(pppLocationTitle, param_3);
+    colorData = GetLocationTitleColorBlock(pppLocationTitle, param_3);
     rand();
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -214,11 +193,11 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
     }
 
     if (work->m_particles == NULL) {
-        work->m_particles = pppMemAlloc(
+        work->m_particles = static_cast<LocationTitleParticle*>(pppMemAlloc(
             param_2->m_maxCount * sizeof(LocationTitleParticle), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppLocationTitle_cpp), 0x6d);
+            const_cast<char*>(s_pppLocationTitle_cpp), 0x6d));
         zero = 0.0f;
-        particle = (LocationTitleParticle*)work->m_particles;
+        particle = work->m_particles;
 
         for (int i = 0; i < param_2->m_maxCount; i++) {
             particle->m_pos.x = zero;
@@ -237,7 +216,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
         }
     }
 
-    particles = (LocationTitleParticle*)work->m_particles;
+    particles = work->m_particles;
 
     if (work->m_count + 1 < param_2->m_maxCount) {
         graphFrame = pppLocationTitle->m_graphId / 0x1000;
@@ -312,15 +291,11 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleS
  */
 void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleOffsets* param_2)
 {
-    int serializedOffset;
-    CMemory::CStage** stagePtr;
+    LocationTitleWork* work = GetLocationTitleWork(pppLocationTitle, param_2);
 
-    serializedOffset = GetLocationTitleDataOffsets(param_2)->m_workOffset;
-    stagePtr = (CMemory::CStage**)(pppLocationTitle->m_workArea + serializedOffset);
-
-    if (*stagePtr != NULL) {
-        pppHeapUseRate(*stagePtr);
-        *stagePtr = 0;
+    if (work->m_particles != NULL) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particles));
+        work->m_particles = 0;
     }
 }
 
@@ -339,7 +314,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTi
     f32 value;
 
     value = 0.0f;
-    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + GetLocationTitleDataOffsets(param_2)->m_workOffset);
+    work = GetLocationTitleWork(pppLocationTitle, param_2);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_acc = value;

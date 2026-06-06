@@ -18,46 +18,18 @@ static inline int GetGraphFrameFromId(s32 graphId)
     return (int)graphId / 0x1000;
 }
 
-struct LocationTitle2Particle;
-
-struct LocationTitle2Work {
-    LocationTitle2Particle* m_particles;
-    u16 m_count;
-    u16 m_pad;
-    float m_cur;
-    float m_vel;
-    float m_acc;
-};
-
-struct LocationTitle2Particle {
-    Vec m_pos;
-    GXColor m_color;
-    float m_scaleX;
-    float m_scaleY;
-    float m_scaleZ;
-    u16 m_frame;
-    s16 m_pad0;
-    s16 m_pad1;
-    s16 m_shape;
-};
-
-struct LOCATION_POLYGON {
-    Vec m_pos;
-    GXColor m_color;
-    float m_scaleX;
-    float m_scaleY;
-    float m_scaleZ;
-    u16 m_frame;
-    s16 m_pad0;
-    s16 m_pad1;
-    s16 m_shape;
-};
-
-struct LocationTitle2ColorBlock {
-    u8 m_pad[8];
-    GXColor m_color;
-};
-
+STATIC_ASSERT(sizeof(LocationTitle2Work) == 0x14);
+STATIC_ASSERT(offsetof(LocationTitle2Work, m_particles) == 0x00);
+STATIC_ASSERT(offsetof(LocationTitle2Work, m_count) == 0x04);
+STATIC_ASSERT(offsetof(LocationTitle2Work, m_cur) == 0x08);
+STATIC_ASSERT(offsetof(LocationTitle2Work, m_vel) == 0x0C);
+STATIC_ASSERT(offsetof(LocationTitle2Work, m_acc) == 0x10);
+STATIC_ASSERT(sizeof(LocationTitle2Particle) == 0x24);
+STATIC_ASSERT(offsetof(LocationTitle2Particle, m_color) == 0x0C);
+STATIC_ASSERT(offsetof(LocationTitle2Particle, m_scaleX) == 0x10);
+STATIC_ASSERT(offsetof(LocationTitle2Particle, m_frame) == 0x1C);
+STATIC_ASSERT(offsetof(LocationTitle2Particle, m_shape) == 0x22);
+STATIC_ASSERT(offsetof(LocationTitle2ColorBlock, m_color) == 0x08);
 STATIC_ASSERT(sizeof(LocationTitle2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
@@ -92,7 +64,7 @@ static inline LocationTitle2ColorBlock* GetLocationTitle2ColorBlock(
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
+static inline void copyPolygonData(LocationTitle2Particle* dst, LocationTitle2Particle* src)
 {
     pppCopyVector(dst->m_pos, src->m_pos);
     memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));

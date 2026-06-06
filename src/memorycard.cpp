@@ -182,6 +182,12 @@ enum {
     kMemoryCardSaveLetterOffset = 0x104,
 };
 
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_region) == 0x10);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_rotateKey) == 0x11);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_random) == 0x18);
+STATIC_ASSERT(offsetof(Mc::SaveDat, m_crc) == 0x1C);
+STATIC_ASSERT(sizeof(Mc::SaveDat) == 0x8BD0);
+
 static inline CChara* GetCharaGlobal()
 {
     return &Chara;
@@ -221,10 +227,36 @@ static inline u32 CalcSaveCrc(u8* data)
     return ~crc;
 }
 
+static inline Mc::SaveDat* GetSaveDat(char* saveBuffer)
+{
+    return reinterpret_cast<Mc::SaveDat*>(saveBuffer);
+}
+
+static inline Mc::SaveDat* GetSaveDat(u8* saveBuffer)
+{
+    return reinterpret_cast<Mc::SaveDat*>(saveBuffer);
+}
+
+static inline const Mc::SaveDat* GetSaveDat(const char* saveBuffer)
+{
+    return reinterpret_cast<const Mc::SaveDat*>(saveBuffer);
+}
+
+static inline const Mc::SaveDat* GetSaveDat(const u8* saveBuffer)
+{
+    return reinterpret_cast<const Mc::SaveDat*>(saveBuffer);
+}
+
+static inline u32* GetSaveEncodedWords(Mc::SaveDat* save)
+{
+    return &save->m_random;
+}
+
 static inline void EncodeSaveData(char* saveBuffer)
 {
-    const int rotAmount = reinterpret_cast<u8*>(saveBuffer)[0x11] % 0x20;
-    u32* ptr = reinterpret_cast<u32*>(saveBuffer + 0x18);
+    Mc::SaveDat* const save = GetSaveDat(saveBuffer);
+    const int rotAmount = save->m_rotateKey % 0x20;
+    u32* ptr = GetSaveEncodedWords(save);
 
     for (int count = 0; count < 0x5B6; count++)
     {
@@ -336,23 +368,23 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
     int count;
     unsigned char* ptr;
     unsigned int crc;
-    unsigned char* data = (unsigned char*)saveData;
+    Mc::SaveDat* save = saveData;
 
-    if (data == nullptr)
+    if (save == nullptr)
     {
-        data = (unsigned char*)m_saveBuffer;
+        save = GetSaveDat(m_saveBuffer);
     }
 
     crc = 0xFFFFFFFF;
     count = 0x1C;
-    ptr = data;
+    ptr = reinterpret_cast<unsigned char*>(save);
     while (--count >= 0)
     {
         crc = (crc << 8) ^ s_CrcTable[(crc >> 24) ^ *ptr];
         ptr += 1;
     }
 
-    ptr = data + 0x20;
+    ptr = reinterpret_cast<unsigned char*>(save->m_body);
     count = 0x8BB0;
     while (--count >= 0)
     {
@@ -379,24 +411,24 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
     int count;
     unsigned char* ptr;
     unsigned char* ptr2;
-    unsigned char* data = (unsigned char*)saveData;
+    Mc::SaveDat* save = saveData;
 
-    if (data == nullptr)
+    if (save == nullptr)
     {
-        data = (unsigned char*)m_saveBuffer;
-	}
+        save = GetSaveDat(m_saveBuffer);
+    }
 
-    if (data == nullptr)
+    if (save == nullptr)
     {
         crcData = (unsigned char*)m_saveBuffer;
     }
     else
     {
-        crcData = data;
+        crcData = reinterpret_cast<unsigned char*>(save);
     }
 
-	ptr = crcData;
-	crc = 0xFFFFFFFF;
+    ptr = crcData;
+    crc = 0xFFFFFFFF;
     count = 0x1C;
     while (--count >= 0)
     {
@@ -412,7 +444,7 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
         ptr2++;
     }
 
-    return (unsigned int)__cntlzw((~crc) - *(unsigned int*)(data + 0x1C)) >> 5;
+    return (unsigned int)__cntlzw((~crc) - save->m_crc) >> 5;
 }
 
 /*
@@ -579,11 +611,11 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
         *reinterpret_cast<u16*>(dstCharData + 0x6C2) = 0x0C;
     }
 
-    *reinterpret_cast<u32*>(srcSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
-    *reinterpret_cast<u32*>(srcSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(srcSaveData));
+    GetSaveDat(srcSaveData)->m_random = Math.Rand(0x7FFFFFFF);
+    GetSaveDat(srcSaveData)->m_crc = CalcCrc(GetSaveDat(srcSaveData));
 
-    *reinterpret_cast<u32*>(dstSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
-    *reinterpret_cast<u32*>(dstSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(dstSaveData));
+    GetSaveDat(dstSaveData)->m_random = Math.Rand(0x7FFFFFFF);
+    GetSaveDat(dstSaveData)->m_crc = CalcCrc(GetSaveDat(dstSaveData));
 }
 
 /*
@@ -597,8 +629,9 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
  */
 void CMemoryCardMan::DecodeData()
 {
-    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
-    const int rotAmount = 0x20 - (reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20);
+    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
+    u32* ptr = GetSaveEncodedWords(save);
+    const int rotAmount = 0x20 - (save->m_rotateKey % 0x20);
 
     for (int count = 0; count < 0x5B6; count++)
     {
@@ -631,8 +664,9 @@ void CMemoryCardMan::DecodeData()
  */
 void CMemoryCardMan::EncodeData()
 {
-    const int rotAmount = reinterpret_cast<unsigned char*>(m_saveBuffer)[0x11] % 0x20;
-    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
+    Mc::SaveDat* const save = GetSaveDat(m_saveBuffer);
+    const int rotAmount = save->m_rotateKey % 0x20;
+    u32* ptr = GetSaveEncodedWords(save);
 
     for (int count = 0; count < 0x5B6; count++)
     {
@@ -1245,8 +1279,9 @@ int CMemoryCardMan::DummySave()
 void CMemoryCardMan::SetLoadData()
 {
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
-    if (memcmp(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
+    if (memcmp(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1254,7 +1289,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
+    if (memcmp(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1262,7 +1297,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
+    if (memcmp(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1270,7 +1305,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (memcmp(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
+    if (memcmp(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1278,7 +1313,7 @@ void CMemoryCardMan::SetLoadData()
         }
         return;
     }
-    if (save[0x10] != 'E')
+    if (saveDat->m_region != 'E')
     {
         if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1494,18 +1529,19 @@ void CMemoryCardMan::MakeSaveData()
     memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    Mc::SaveDat* saveDat = GetSaveDat(m_saveBuffer);
 
     const u64 now = OSGetTime();
     memcpy(save + 0x8AD0, &now, sizeof(now));
 
-    memcpy(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
-    memcpy(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
-    memcpy(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
-    memcpy(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
-    save[0x10] = 'E';
-    *reinterpret_cast<u32*>(save + 0x18) = Math.Rand(0x7FFFFFFF);
-    save[0x11] = static_cast<u8>(Math.Rand(0xFF));
-    save[0x12] = 0;
+    memcpy(saveDat->m_maker, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER));
+    memcpy(saveDat->m_title, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE));
+    memcpy(saveDat->m_machine, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE));
+    memcpy(saveDat->m_version, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION));
+    saveDat->m_region = 'E';
+    saveDat->m_random = Math.Rand(0x7FFFFFFF);
+    saveDat->m_rotateKey = static_cast<u8>(Math.Rand(0xFF));
+    saveDat->m_flags = 0;
 
     CGame::CGameWork* gameWork = &Game.m_gameWork;
     CCaravanWork* caravanWorkArr = Game.m_caravanWorkArr;
@@ -1694,7 +1730,7 @@ void CMemoryCardMan::MakeSaveData()
 
     Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
     GetCharaGlobal()->SaveFurTexBuffer(reinterpret_cast<unsigned short*>(save + 0x6AD0));
-    *reinterpret_cast<u32*>(save + 0x1C) = CalcSaveCrc(reinterpret_cast<u8*>(m_saveBuffer));
+    saveDat->m_crc = CalcSaveCrc(reinterpret_cast<u8*>(m_saveBuffer));
     EncodeSaveData(m_saveBuffer);
 }
 

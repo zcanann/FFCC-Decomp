@@ -159,7 +159,25 @@ public:
     unsigned char m_randSeedHi;       // 0x97
     unsigned char m_lastMapIdHit;     // 0x98
     unsigned char m_lastMapIdExtra;   // 0x99
-    unsigned short m_weaponNodeFlags; // 0x9A
+    struct WeaponNodeFlagBits {
+        signed char m_prg : 1;
+        signed char m_unk40 : 1;
+        signed char m_unk20 : 1;
+        signed char m_unk10 : 1;
+        signed char m_control3 : 1;
+        signed char m_unk04 : 1;
+        signed char m_unk02 : 1;
+        signed char m_attached : 1;
+    };
+    struct WeaponNodeFlagBytes {
+        unsigned char m_flags0;
+        unsigned char m_flags1;
+    };
+    union {
+        unsigned short m_weaponNodeFlags; // 0x9A
+        WeaponNodeFlagBits m_weaponNodeFlagBits;
+        WeaponNodeFlagBytes m_weaponNodeFlagBytes;
+    };
     unsigned short m_shieldNodeFlags; // 0x9C
     unsigned short m_animStartFrame;  // 0x9E
     unsigned short m_animEndFrame;    // 0xA0

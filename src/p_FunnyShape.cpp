@@ -40,11 +40,6 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
-struct CFunnyShapeViewerState {
-    GXColor m_colors[4];
-    Vec m_positions[3];
-};
-
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
     return &self->m_usbStreamData;
@@ -67,7 +62,7 @@ static inline CPtrArray<_GXTexObj*>* TextureObjects(CFunnyShapePcs* self)
 
 static inline CFunnyShapeViewerState* ViewerState(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CFunnyShapeViewerState*>(self->m_viewerState);
+    return &self->m_viewerState;
 }
 
 static inline float LoadFloat(const float& value)

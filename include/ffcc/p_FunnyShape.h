@@ -9,7 +9,15 @@
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+
 struct _GXTexObj;
+
+struct CFunnyShapeViewerState {
+    GXColor m_colors[4];
+    Vec m_positions[3];
+};
 
 class CFunnyShapePcs : public CProcess
 {
@@ -32,7 +40,7 @@ public:
     void USBDataCallback(CUSBPcs::CDataHeader*);
 
     CMemory::CStage* m_viewerStage;        // 0x04
-    u8 m_viewerState[0x34];                // 0x08
+    CFunnyShapeViewerState m_viewerState;  // 0x08
     CUSBStreamData m_usbStreamData;        // 0x3C
     CFunnyShape m_funnyShape;              // 0x50
     FS_DISPLAY_STATUS m_displayPending;    // 0x6178

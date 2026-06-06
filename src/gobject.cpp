@@ -55,6 +55,12 @@ struct GObjectSRT {
     Vec m_scale;
 };
 
+STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlags) == 0x9A);
+STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBits) == 0x9A);
+STATIC_ASSERT(offsetof(CGObject, m_weaponNodeFlagBytes) == 0x9A);
+STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBits) == 1);
+STATIC_ASSERT(sizeof(CGObject::WeaponNodeFlagBytes) == 2);
+
 static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
 {
     return *reinterpret_cast<CModelAnimState*>(model);
@@ -255,8 +261,8 @@ void CGObject::onCreate()
     m_shieldModelHandle = 0;
 
     m_animStateMisc = 0xFF;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0x7F;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xBF) | 0x40;
+    m_weaponNodeFlagBytes.m_flags1 &= 0x7F;
+    m_weaponNodeFlagBytes.m_flags1 = (m_weaponNodeFlagBytes.m_flags1 & 0xBF) | 0x40;
 
     m_moveBaseSpeed = sDefaultMoveBaseSpeed;
     m_currentAnimSlot = -1;
@@ -271,10 +277,10 @@ void CGObject::onCreate()
     m_nearColRadius = sJumpLift;
     m_bgColMask = 0;
 
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
-    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xEF) | 0x10;
-    *((u8*)&m_weaponNodeFlags) &= 0xF7;
-    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xFB) | 4;
+    m_weaponNodeFlagBytes.m_flags1 &= 0xDF;
+    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+    m_weaponNodeFlagBytes.m_flags0 &= 0xF7;
+    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xFB) | 4;
 
     m_objectFlags = 1;
     m_displayFlags = 3;
@@ -289,9 +295,9 @@ void CGObject::onCreate()
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
     m_bgHitMask = -1;
-    *((u8*)&m_weaponNodeFlags) &= 0xFE;
-    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags) &= 0xBF;
+    m_weaponNodeFlagBytes.m_flags0 &= 0xFE;
+    m_weaponNodeFlagBytes.m_flags0 = (m_weaponNodeFlagBytes.m_flags0 & 0xDF) | 0x20;
+    m_weaponNodeFlagBytes.m_flags0 &= 0xBF;
     m_animSlotSel = -1;
     m_turnSpeed = 0.0f;
     m_pushParamA = 0;
@@ -359,7 +365,7 @@ void CGObject::onCreate()
     m_shieldAttachNodeIndex = -1;
     m_lastMapIdHit = 0;
     m_lastMapIdExtra = 0;
-    *((u8*)&m_weaponNodeFlags) &= 0x7F;
+    m_weaponNodeFlagBytes.m_flags0 &= 0x7F;
     m_extraMoveVec.x = 0.0f;
     m_extraMoveVec.y = 0.0f;
     m_extraMoveVec.z = 0.0f;
@@ -1382,8 +1388,8 @@ void CGObject::update()
 {
     const unsigned int miniGameFlags = MiniGamePcs.m_flags;
     const unsigned int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(miniGameFlags & 0x8000)) >> 5) & 0xFF;
-    unsigned char& weaponFlagsLo = *reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
-    unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
+    unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
+    unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
     unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
     const float lastBgAttr = m_lastBgAttr;
@@ -2076,13 +2082,7 @@ void CGObject::onDraw()
  */
 void CGObject::Detach()
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
-    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
-
-    if (weaponNodeFlags->m_attached != 0) {
+    if (m_weaponNodeFlagBits.m_attached != 0) {
         CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
 
         m_worldPosition.x = node->m_mtx[0][3];
@@ -2095,7 +2095,7 @@ void CGObject::Detach()
         m_rotBaseY = rotY;
     }
 
-    weaponNodeFlags->m_attached = false;
+    m_weaponNodeFlagBits.m_attached = false;
 }
 
 /*
@@ -2109,10 +2109,6 @@ void CGObject::Detach()
  */
 void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
 
@@ -2123,7 +2119,7 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
     if (hasModel) {
         int nodeIndex = handle->m_model->SearchNode(nodeName);
         if (nodeIndex >= 0) {
-            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
+            m_weaponNodeFlagBits.m_attached = true;
 
             m_attachOwner = owner;
             m_attachNode = nodeIndex;
@@ -2244,7 +2240,7 @@ void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnF
     const float cosY1 = static_cast<float>(cos(rotY));
     const float cosX = static_cast<float>(cos(rotX));
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    u8* const weaponFlagsHi = &m_weaponNodeFlagBytes.m_flags1;
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
@@ -2392,8 +2388,8 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
     const signed char useFacingFlag = static_cast<signed char>(useFacing);
     const signed char flagAValue = static_cast<signed char>(flagA);
     const signed char flagBValue = static_cast<signed char>(flagB);
-    u8* const weaponFlagsLo = reinterpret_cast<u8*>(&m_weaponNodeFlags);
-    u8* const weaponFlagsHi = weaponFlagsLo + 1;
+    u8* const weaponFlagsLo = &m_weaponNodeFlagBytes.m_flags0;
+    u8* const weaponFlagsHi = &m_weaponNodeFlagBytes.m_flags1;
 
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 4, 27, 27));
@@ -2417,8 +2413,8 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
  */
 void CGObject::CancelMove(int moveType)
 {
-    *((u8*)&m_weaponNodeFlags + 1) =
-        static_cast<u8>(__rlwimi(*((u8*)&m_weaponNodeFlags + 1), 0, 5, 26, 26));
+    m_weaponNodeFlagBytes.m_flags1 =
+        static_cast<u8>(__rlwimi(m_weaponNodeFlagBytes.m_flags1, 0, 5, 26, 26));
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);

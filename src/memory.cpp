@@ -67,12 +67,12 @@ extern const char sMemoryClassName[] = "CMemory";
 extern const char sAmemCacheSeparator[3] = "\n\n";
 extern const char sMemoryNoNameStopwatchName[8] = "no name";
 extern const char sEmptyAllocSourceName[4] = "";
-extern const char* s_amemCacheTypeNames_801E8470[] = {
+extern const char* amem_typeName[] = {
     sAmemCacheTypeTexture,
     sAmemCacheTypeModel,
     sAmemCacheTypePdt,
 };
-extern const char* s_amemCacheStateNames_8032E410[2] = {
+extern const char* amem_stateName[2] = {
     sAmemCacheStateUse,
     sAmemCacheStateNoUse,
 };
@@ -89,6 +89,7 @@ extern const char sHeapWalkerSlashLine[] = "//\n";
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
 static int s_RefCnt0Compare;
+static int s_MaxRefCnt0Compare;
 
 STATIC_ASSERT(sizeof(CMemory::CStage) == 0x12C);
 STATIC_ASSERT(sizeof(CMemory::CStage::CBlock) == 0x40);
@@ -189,12 +190,12 @@ static inline const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int 
 
 static inline const char* cacheStateName(const CAmemCache& entry)
 {
-    return s_amemCacheStateNames_8032E410[entry.m_inUse == 0];
+    return amem_stateName[entry.m_inUse == 0];
 }
 
 static inline const char* cacheTypeName(const CAmemCache& entry)
 {
-    return s_amemCacheTypeNames_801E8470[entry.m_type];
+    return amem_typeName[entry.m_type];
 }
 
 static inline bool stageHasUnfreedBlocks(CMemory::CStage* stage)
@@ -1563,9 +1564,14 @@ void CAmemCacheSet::DestroyCache(int index)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::RefCnt0Up(int)
+void CAmemCacheSet::RefCnt0Up(int index)
 {
-	// TODO
+    CAmemCache& entry = cacheEntryAt(this, index);
+    entry.m_refCnt0++;
+    s_RefCnt0Compare++;
+    if (s_MaxRefCnt0Compare < s_RefCnt0Compare) {
+        s_MaxRefCnt0Compare = s_RefCnt0Compare;
+    }
 }
 
 /*
@@ -2092,7 +2098,12 @@ int CAmemCacheSet::AmemGetFreeSize()
  */
 void CAmemCacheSet::RefCnt0Clear()
 {
-	// TODO
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
+        entry.m_refCnt0 = entry.m_refCount;
+    }
+
+    s_RefCnt0Compare = 0;
 }
 
 /*
@@ -2163,7 +2174,22 @@ void CAmemCacheSet::AssertCache()
  */
 void CAmemCacheSet::DumpCache()
 {
-	// TODO
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
+    }
+
+    for (int i = 0; i < m_cacheCount; i++) {
+        CAmemCache& entry = cacheEntryAt(this, i);
+        if (((entry.m_inUse != 0) || (entry.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+            System.Printf(
+                const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
+                cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
+        }
+    }
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
+        System.Printf(const_cast<char*>(sAmemCacheSeparator));
+    }
 }
 
 /*

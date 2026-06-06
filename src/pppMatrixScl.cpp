@@ -3,11 +3,7 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
-struct MatrixSclDataOffsets {
-    s32 m_translationOffset;
-    s32 m_scaleOffset;
-};
-
+STATIC_ASSERT(sizeof(MatrixSclDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(MatrixSclDataOffsets, m_translationOffset) == 0x0);
 STATIC_ASSERT(offsetof(MatrixSclDataOffsets, m_scaleOffset) == 0x4);
 

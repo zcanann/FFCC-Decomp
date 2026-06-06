@@ -10015,8 +10015,8 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_803313e8);
 				fontF8->DrawInit();
-				unsigned int noDataColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&noDataColor);
+				CColor noDataColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(noDataColor.color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId = static_cast<unsigned int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;

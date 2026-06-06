@@ -109,7 +109,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
 {
     KeShpTail2XWork* work;
     pppShapeSt* shape;
-    long* shapeEntry;
+    tagOAN3_SHAPE* shapeEntry;
     s32 count;
     float alphaMul;
     float zero;
@@ -195,7 +195,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XStep* step, _p
     work = GetKeShpTail2XWork(&obj->m_object, param_3);
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[dataValIndex];
     pppShapeAnimData* shapeAnim = static_cast<pppShapeAnimData*>(shape->m_animData);
-    shapeEntry = (long*)((u8*)shapeAnim + shapeAnim->m_frames[work->m_shapePrevFrame].m_shapeOffset);
+    shapeEntry = pppShapeFrame(shapeAnim, work->m_shapePrevFrame);
 
     pppCopyMatrix(localBase, obj->m_object.m_localMatrix);
     pppUnitMatrix(drawMtx);
@@ -271,7 +271,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), ppvEnv->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(shapeEntry, ppvEnv->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;

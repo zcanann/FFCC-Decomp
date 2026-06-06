@@ -286,7 +286,7 @@ static inline CMemory::CStage* GetBonusAllocStage(CMenuPcs* menu)
 
 static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 {
-	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
+	return menu->m_wm.m_handles;
 }
 
 static inline MenuBoardEntry* GetBonusBoardEntries(CMenuPcs* menu)
@@ -2365,7 +2365,7 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 0.0f;
+				handle->m_model->m_lightAlpha = 0.0f;
 			}
 		}
 
@@ -3191,7 +3191,7 @@ void CMenuPcs::createBonus()
 			entry.m_partySlot = i;
 			entry.m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
+			entry.m_partyHandle->m_model->m_lightAlpha = 0.0f;
 			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
 			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
 			if (entry.m_foodValue > 100) {

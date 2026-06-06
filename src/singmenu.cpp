@@ -990,7 +990,7 @@ void CMenuPcs::SingMenuInit()
 
     m_stageF4 = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<u8*>(&Graphic) + 8);
     memset(&m_singleMenuTextureLoadIndex, 0, 8);
-    *reinterpret_cast<void**>(self + 0x774) = 0;
+    m_wm.m_handles[0] = 0;
 
     CMemory::CStage* stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -998,9 +998,9 @@ void CMenuPcs::SingMenuInit()
     }
 
     CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
-    *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
+    m_wm.m_handles[0] = handle;
 
-    CCharaPcs::CHandle** handlePtr = reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
+    CCharaPcs::CHandle** handlePtr = &m_wm.m_handles[0];
     (*handlePtr)->Add();
     CCaravanWork* caravanWork = SingleCaravanWork();
     int modelNo = GetModelNo(
@@ -1149,9 +1149,9 @@ void CMenuPcs::drawSingleMenu()
 
             freeTexture(5, 2, 0x2D, 0x33);
 
-            if (*reinterpret_cast<void**>(self + 0x774) != 0) {
-                delete *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
-                *reinterpret_cast<void**>(self + 0x774) = 0;
+            if (m_wm.m_handles[0] != 0) {
+                delete m_wm.m_handles[0];
+                m_wm.m_handles[0] = 0;
             }
 
             if (m_bonus.m_bonusBoardPtr != 0) {
@@ -1447,7 +1447,7 @@ post_texture_load:
 void CMenuPcs::SingCalcChara(float frameStep)
 {
     u8* self = reinterpret_cast<u8*>(this);
-    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
@@ -1464,8 +1464,7 @@ void CMenuPcs::SingCalcChara(float frameStep)
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
-    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
-    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
     model->SetMatrix(scaleMtx);
     model->CalcMatrix();
     model->CalcSkin();
@@ -1574,8 +1573,8 @@ void CMenuPcs::DrawSingleStat(float alpha)
     DrawInit();
     SetProjection(0);
     SetLight(1);
-    *reinterpret_cast<float*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168) + 0x9C) = alpha;
-    (*reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774))->Draw(5);
+    m_wm.m_handles[0]->m_model->m_lightAlpha = alpha;
+    m_wm.m_handles[0]->Draw(5);
     RestoreProjection();
 
     DrawInit();
@@ -1765,7 +1764,7 @@ void CMenuPcs::SingleCalcFadeIn()
         } while (count != 0);
     }
 
-    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    CChara::CModel* model = m_wm.m_handles[0]->m_model;
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
         model->SetFrame(FLOAT_8033294c);
@@ -1781,8 +1780,7 @@ void CMenuPcs::SingleCalcFadeIn()
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
-    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
-    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
     model->SetMatrix(scaleMtx);
     model->CalcMatrix();
     model->CalcSkin();
@@ -1871,7 +1869,7 @@ void CMenuPcs::SingleCalcFadeOut()
         }
     }
 
-    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    CChara::CModel* model = m_wm.m_handles[0]->m_model;
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
         model->SetFrame(FLOAT_8033294c);
@@ -1887,8 +1885,7 @@ void CMenuPcs::SingleCalcFadeOut()
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
-    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
-    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
     model->SetMatrix(scaleMtx);
     model->CalcMatrix();
     model->CalcSkin();
@@ -1943,7 +1940,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     unsigned short result = 0;
-    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    CChara::CModel* model = m_wm.m_handles[0]->m_model;
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
         model->SetFrame(FLOAT_8033294c);
@@ -1959,8 +1956,7 @@ void CMenuPcs::SingleCalcCtrl()
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
-    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
-    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
     model->SetMatrix(scaleMtx);
     model->CalcMatrix();
     model->CalcSkin();

@@ -431,22 +431,22 @@ void CMenuPcs::ItemDraw()
     listFont->SetScale(LoadFloat(FLOAT_80332e84));
     listFont->DrawInit();
 
-    s16* listStart = reinterpret_cast<s16*>(itemList->anims);
+    MenuItemOpenAnim* listStart = itemList->anims;
     int listCount = itemList->count;
-    for (int i = 0; i < listCount; i++, listStart += 0x20) {
-        if (*(int*)(listStart + 0xE) == 0x37) {
+    for (int i = 0; i < listCount; i++, listStart++) {
+        if (listStart->tex == 0x37) {
             break;
         }
     }
 
-    s16* textEntry = listStart;
-    for (int i = 0; i < 8; i++, textEntry += 0x20) {
+    MenuItemOpenAnim* textEntry = listStart;
+    for (int i = 0; i < 8; i++, textEntry++) {
         int menuIndex = i + itemState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
         }
 
-        CColor textColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(FLOAT_80332e80) * *(float*)(listStart + 8)));
+        CColor textColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(FLOAT_80332e80) * listStart->alpha));
         listFont->SetColor(textColor.color);
 
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
@@ -462,16 +462,16 @@ void CMenuPcs::ItemDraw()
             }
 
             listFont->GetWidth(text);
-            listFont->SetPosX((float)(textEntry[0] + 0x1C));
-            listFont->SetPosY((float)(textEntry[1] + 0xB) - LoadFloat(FLOAT_80332e88));
+            listFont->SetPosX((float)(textEntry->x + 0x1C));
+            listFont->SetPosY((float)(textEntry->y + 0xB) - LoadFloat(FLOAT_80332e88));
             listFont->Draw(text);
         }
     }
 
     DrawInit();
 
-    s16* iconEntry = listStart;
-    for (int i = 0; i < 8; i++, iconEntry += 0x20) {
+    MenuItemOpenAnim* iconEntry = listStart;
+    for (int i = 0; i < 8; i++, iconEntry++) {
         int menuIndex = i + itemState->scroll;
         if (menuIndex > 0x3F) {
             menuIndex -= 0x40;
@@ -479,9 +479,9 @@ void CMenuPcs::ItemDraw()
 
         s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
-            int iconY = (int)((float)(iconEntry[1] + 6) - LoadFloat(FLOAT_80332e64));
-            int iconX = (int)(float)(iconEntry[0] + iconEntry[2] - 0x10);
-            DrawSingleIcon(itemId, iconX, iconY, *(float*)(listStart + 8), 0, LoadFloat(FLOAT_80332e60));
+            int iconY = (int)((float)(iconEntry->y + 6) - LoadFloat(FLOAT_80332e64));
+            int iconX = (int)(float)(iconEntry->x + iconEntry->w - 0x10);
+            DrawSingleIcon(itemId, iconX, iconY, listStart->alpha, 0, LoadFloat(FLOAT_80332e60));
         }
     }
 
@@ -499,23 +499,23 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    s16* cursorEntry = listStart;
+    MenuItemOpenAnim* cursorEntry = listStart;
     if ((mode == 0 && listState == 1) || (mode != 0 && itemState->optionFrame == 1)) {
         float cursorX;
         float cursorY;
 
         if (mode == 0) {
-            cursorEntry = reinterpret_cast<s16*>(itemList->anims);
+            cursorEntry = itemList->anims;
             int cursorCount = itemList->count;
-            for (int i = 0; i < cursorCount; i++, cursorEntry += 0x20) {
-                if (*(int*)(cursorEntry + 0xE) == 0x37) {
+            for (int i = 0; i < cursorCount; i++, cursorEntry++) {
+                if (cursorEntry->tex == 0x37) {
                     break;
                 }
             }
 
-            cursorEntry += itemState->selectedIndex * 0x20;
-            cursorX = (float)(cursorEntry[0] - 0x14);
-            cursorY = (float)((float)(cursorEntry[3] - 0x20) * (float)LoadDouble(DOUBLE_80332e78) + (float)cursorEntry[1]);
+            cursorEntry += itemState->selectedIndex;
+            cursorX = (float)(cursorEntry->x - 0x14);
+            cursorY = (float)((float)(cursorEntry->h - 0x20) * (float)LoadDouble(DOUBLE_80332e78) + (float)cursorEntry->y);
         } else {
             MenuWindowInfo* window = this->m_menuWindowInfo;
             cursorX = (float)window->x;
@@ -532,7 +532,7 @@ void CMenuPcs::ItemDraw()
     DrawSingLife();
 
     CFont* helpFont = this->m_fonts[0];
-    CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(FLOAT_80332e80) * *(float*)(cursorEntry + 8)));
+    CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(LoadFloat(FLOAT_80332e80) * cursorEntry->alpha));
     if (!foundSelected) {
         selectedItemId = -1;
     }

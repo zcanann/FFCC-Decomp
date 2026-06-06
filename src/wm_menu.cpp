@@ -3970,7 +3970,7 @@ void CMenuPcs::DrawMCardMenu()
 		case 0x14:
 		case 0x15:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				int msgId = 0;
 				int msgParam = 0;
@@ -3998,7 +3998,7 @@ void CMenuPcs::DrawMCardMenu()
 		case 8:
 		case 0x0B:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				int ymsgId = (subState == 8) ? 4 : 5;
 				DrawMcWinMess(ymsgId, 0);
@@ -4029,7 +4029,7 @@ void CMenuPcs::DrawMCardMenu()
 			break;
 		case 0x0C:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
 			}
@@ -4050,7 +4050,7 @@ void CMenuPcs::DrawMCardMenu()
 			break;
 		case 0x0D:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(7, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
@@ -4077,7 +4077,7 @@ void CMenuPcs::DrawMCardMenu()
 			break;
 		case 0x12:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(9, 0);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {

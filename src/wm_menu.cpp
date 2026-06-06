@@ -446,9 +446,14 @@ static inline int* GetWmCharaAnimState(CMenuPcs* menu)
 	return menu->m_wmCharaAnimState;
 }
 
-static inline short* GetWmWorldState(CMenuPcs* menu)
+static inline WmWorldState* GetWmWorldState(CMenuPcs* menu)
 {
-	return reinterpret_cast<short*>(menu->m_wmWorldState);
+	return menu->m_wmWorldState;
+}
+
+static inline short* GetWmWorldStateWords(CMenuPcs* menu)
+{
+	return reinterpret_cast<short*>(GetWmWorldState(menu));
 }
 
 static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
@@ -7341,7 +7346,7 @@ void CMenuPcs::DrawChara()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	short* const worldState = GetWmWorldState(this);
+	short* const worldState = GetWmWorldStateWords(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
@@ -7439,7 +7444,7 @@ void CMenuPcs::CalcCharaSelect()
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const modelData = GetWmCharaModelData(this);
 	int* const animState = GetWmCharaAnimState(this);
-	short* const worldState = GetWmWorldState(this);
+	short* const worldState = GetWmWorldStateWords(this);
 
 	unsigned short padTrig[4];
 	unsigned short padRepeat[4];
@@ -7903,7 +7908,7 @@ void CMenuPcs::CalcCharaSelect()
 void CMenuPcs::DrawCharaName()
 {
 	CFont* const font = GetWmFont(this);
-	short* const worldState = GetWmWorldState(this);
+	short* const worldState = GetWmWorldStateWords(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
@@ -8042,17 +8047,17 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
-	short* const worldState = GetWmWorldState(this);
+	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
 	float fade;
-	if (worldState[0x10 / 2] == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState[0x22 / 2]) - DOUBLE_80331408));
-	} else if (worldState[0x10 / 2] == 2) {
+	if (worldState->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState[0x22 / 2]) - DOUBLE_80331408) -
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
 		                            DOUBLE_80331420));
 	}
 	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
@@ -8069,7 +8074,7 @@ void CMenuPcs::DrawCMLife()
 
 		unsigned short life = 0;
 		bool enabled = false;
-		if (worldState[0x1C / 2] == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
+		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
 		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
 			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
 			enabled = true;

@@ -425,14 +425,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_baseDrawPriority = priority;
             break;
         }
-        case CHUNK_AMBI: {
-            m_ambientColor.r = chunkFile.Get1();
-            m_ambientColor.g = chunkFile.Get1();
-            m_ambientColor.b = chunkFile.Get1();
-            m_ambientColor.a = chunkFile.Get1();
-            m_useAmbientColor = 1;
-            break;
-        }
         case CHUNK_GEOM: {
             m_zBufferOffset = chunkFile.GetF4();
             m_bumpTexMatrixMode = chunkFile.Get1();
@@ -700,6 +692,14 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_unknown2E = chunkFile.Get1();
             }
             m_attribute = spotLightAttr;
+            break;
+        }
+        case CHUNK_AMBI: {
+            m_ambientColor.r = chunkFile.Get1();
+            m_ambientColor.g = chunkFile.Get1();
+            m_ambientColor.b = chunkFile.Get1();
+            m_ambientColor.a = chunkFile.Get1();
+            m_useAmbientColor = 1;
             break;
         }
         case CHUNK_ANIM: {

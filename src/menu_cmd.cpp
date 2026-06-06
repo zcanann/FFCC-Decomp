@@ -2005,7 +2005,7 @@ void CMenuPcs::CmdUnite(int selected, int comboIndex)
 	const int recipe = combo[comboIndex][0];
 	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
 		combo[comboIndex][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
-	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26) = static_cast<s16>(combo[comboIndex][1]);
+	GetCmdStateView(this)->selected = static_cast<s16>(combo[comboIndex][1]);
 }
 
 /*

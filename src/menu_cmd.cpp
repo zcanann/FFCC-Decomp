@@ -2292,8 +2292,8 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		return 1;
 	}
 
-	int listBase = GetCmdListBase(this);
-	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
+	CmdListEntry* entries = GetCmdListEntries(this);
+	float baseX = static_cast<float>(entries[0].x);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (topIdx > 0) {
@@ -2301,19 +2301,15 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		int k = 3;
 		do {
 			int idx = i + s_UniteTop[topIdx];
-			int entryBase = GetCmdListBase(this);
-			int entryOffset = idx * 0x40 + 8;
+			CmdListEntry* entry = &entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
 
-			*reinterpret_cast<s16*>(entryBase + entryOffset) =
-			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) +
-			                     DOUBLE_80332ab8);
-			if (fabs(static_cast<double>(
-			        static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) - baseX)) >
+			entry->x = static_cast<s16>(static_cast<double>(entry->x) + DOUBLE_80332ab8);
+			if (fabs(static_cast<double>(static_cast<float>(entry->x) - baseX)) >
 			    DOUBLE_80332ac0) {
-				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(FLOAT_80332ac8 + baseX);
+				entry->x = static_cast<s16>(FLOAT_80332ac8 + baseX);
 				return 1;
 			}
 
@@ -2329,19 +2325,15 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			int k = 3;
 			do {
 				int idx = j + *top;
-				int entryBase = GetCmdListBase(this);
-				int entryOffset = idx * 0x40 + 8;
+				CmdListEntry* entry = &entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
 
-				*reinterpret_cast<s16*>(entryBase + entryOffset) =
-				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) +
-				                     DOUBLE_80332ab8);
-				if (fabs(static_cast<double>(
-				        static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) - baseX)) >
+				entry->x = static_cast<s16>(static_cast<double>(entry->x) + DOUBLE_80332ab8);
+				if (fabs(static_cast<double>(static_cast<float>(entry->x) - baseX)) >
 				    DOUBLE_80332ac0) {
-					*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(targetX);
+					entry->x = static_cast<s16>(targetX);
 					if (j == 0) {
 						finished++;
 					}
@@ -2375,26 +2367,23 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		return 1;
 	}
 
-	int listBase = GetCmdListBase(this);
-	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
+	CmdListEntry* entries = GetCmdListEntries(this);
+	float baseX = static_cast<float>(entries[0].x);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (topIdx >= 0) {
 		int finished = 0;
 		for (int i = 0; i < 3; i++) {
 			int idx = i + s_UniteTop[topIdx];
-			int entryOffset = idx * 0x40 + 8;
+			CmdListEntry* entry = &entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 				break;
 			}
 
-			int entryBase = GetCmdListBase(this);
-			*reinterpret_cast<s16*>(entryBase + entryOffset) =
-			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
-			                     DOUBLE_80332ab8);
-			if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
+			entry->x = static_cast<s16>(static_cast<double>(entry->x) - DOUBLE_80332ab8);
+			if (static_cast<float>(entry->x) <= baseX) {
 				finished = 1;
-				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
+				entry->x = static_cast<s16>(baseX);
 			}
 		}
 		if (finished != 0) {
@@ -2406,17 +2395,14 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		for (int i = 0; i < s_unitePanelCount; i++) {
 			for (int j = 0; j < 3; j++) {
 				int idx = j + *top;
-				int entryOffset = idx * 0x40 + 8;
+				CmdListEntry* entry = &entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
 					break;
 				}
 
-				int entryBase = GetCmdListBase(this);
-				*reinterpret_cast<s16*>(entryBase + entryOffset) =
-				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
-				                     DOUBLE_80332ab8);
-				if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
-					*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
+				entry->x = static_cast<s16>(static_cast<double>(entry->x) - DOUBLE_80332ab8);
+				if (static_cast<float>(entry->x) <= baseX) {
+					entry->x = static_cast<s16>(baseX);
 					if (j == 0) {
 						finished++;
 					}

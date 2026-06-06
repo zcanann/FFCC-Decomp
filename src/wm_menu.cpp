@@ -8007,8 +8007,6 @@ void CMenuPcs::CalcCharaSelect()
 void CMenuPcs::DrawCharaName()
 {
 	CFont* const font = GetWmFont(this);
-	WmWorldState* const worldState = GetWmWorldState(this);
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const cmakeWork = m_cmakeWorkActive == 1 ? GetWmCmakeWork(this) : 0;
 
 	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
@@ -8025,12 +8023,12 @@ void CMenuPcs::DrawCharaName()
 	}
 
 	float fade;
-	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
-	} else if (worldState->m_mainState == 2) {
+	if (GetWmWorldState(this)->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(GetWmWorldState(this)->m_frameCounter) - DOUBLE_80331408));
+	} else if (GetWmWorldState(this)->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(GetWmWorldState(this)->m_frameCounter) - DOUBLE_80331408) -
 		                            DOUBLE_80331420));
 	}
 	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
@@ -8038,7 +8036,7 @@ void CMenuPcs::DrawCharaName()
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
 	for (int i = 0; i < kWmMenuControllerCount; i++) {
-		const WmCharaSelectEntry& entry = selectEntries[i];
+		const WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
 			activeMask |= bit;
@@ -8106,7 +8104,7 @@ void CMenuPcs::DrawCharaName()
 			bool restoreColor = false;
 			const char* text = 0;
 
-			if (worldState->m_menuMode == 8 && cmakeWork != 0 &&
+			if (GetWmWorldState(this)->m_menuMode == 8 && cmakeWork != 0 &&
 			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
 				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
 				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
@@ -8121,7 +8119,7 @@ void CMenuPcs::DrawCharaName()
 				font->SetTlut(0x10);
 				int textAlpha = alpha;
 				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
-				if (worldState->m_mainState == 2) {
+				if (GetWmWorldState(this)->m_mainState == 2) {
 					textAlpha = static_cast<int>(FLOAT_80331458 *
 					                             static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
 					                                                  DOUBLE_80331420)));

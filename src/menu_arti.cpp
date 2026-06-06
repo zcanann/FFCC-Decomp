@@ -222,6 +222,7 @@ void CMenuPcs::ArtiDraw()
 
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	ArtiState* state = GetArtiState(this);
+	short drawState = state->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
 	int drawIndex = 0;
 	float helpWidth;
@@ -362,7 +363,7 @@ void CMenuPcs::ArtiDraw()
 		iconEntry++;
 	}
 
-	if (state->state == 1) {
+	if (drawState == 1) {
 		ArtiOpenAnim* firstEntry = GetArtiOpenAnimList(this)->entries;
 		float mark = static_cast<float>(CalcListPos(state->scrollOffset, 0x49, 0));
 		if (mark > 0.0f) {
@@ -370,7 +371,7 @@ void CMenuPcs::ArtiDraw()
 		}
 	}
 
-	if (state->state == 1) {
+	if (drawState == 1) {
 		ArtiOpenAnim* cursorBase = GetArtiOpenAnimList(this)->entries;
 		int cursorCount = GetArtiOpenAnimList(this)->count;
 		for (int i = 0; i < cursorCount; i++) {

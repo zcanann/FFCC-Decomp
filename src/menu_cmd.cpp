@@ -192,7 +192,8 @@ struct CmdState {
 	unsigned char pad_0009[0x0B - 0x09];
 	u8 initialized;
 	u8 unitePanelInitialized;
-	unsigned char pad_000D[0x12 - 0x0D];
+	unsigned char pad_000D[0x10 - 0x0D];
+	s16 animState;
 	s16 phase;
 	s16 uniteState;
 	unsigned char pad_0016[0x22 - 0x16];
@@ -226,6 +227,7 @@ STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
 STATIC_ASSERT(offsetof(CmdState, transitionFlag) == 0x08);
 STATIC_ASSERT(offsetof(CmdState, initialized) == 0x0B);
 STATIC_ASSERT(offsetof(CmdState, unitePanelInitialized) == 0x0C);
+STATIC_ASSERT(offsetof(CmdState, animState) == 0x10);
 STATIC_ASSERT(offsetof(CmdState, phase) == 0x12);
 STATIC_ASSERT(offsetof(CmdState, uniteState) == 0x14);
 STATIC_ASSERT(offsetof(CmdState, transitionTimer) == 0x22);
@@ -921,9 +923,9 @@ void CMenuPcs::CmdDraw()
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	s32 caravanIter = caravanWork;
-	s16* entry = drawList + 4;
+	CmdListEntry* entry = entries;
 	const s16 cmdMode = cmd->mode;
-	const s16 animState = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x10);
+	const s16 animState = cmd->animState;
 	s32 i;
 	s32 helpId = -1;
 	bool hasItemHelp = false;
@@ -931,13 +933,13 @@ void CMenuPcs::CmdDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (i = 0; i < drawList[0]; i++) {
-		const s32 tex = *reinterpret_cast<s32*>(entry + 0xE);
+	for (i = 0; i < cmdList->count; i++) {
+		const s32 tex = entry->tex;
 		if (tex >= 0) {
-			const float x = static_cast<float>(entry[0]);
-			float y = static_cast<float>(entry[1]);
-			const float w = static_cast<float>(entry[2]);
-			float h = static_cast<float>(entry[3]);
+			const float x = static_cast<float>(entry->x);
+			float y = static_cast<float>(entry->y);
+			const float w = static_cast<float>(entry->width);
+			float h = static_cast<float>(entry->height);
 			float t = FLOAT_80332ad0;
 
 			if ((i > 7) || (*reinterpret_cast<s16*>(caravanIter + 0x214) == 0)) {
@@ -947,7 +949,7 @@ void CMenuPcs::CmdDraw()
 					t += h;
 				}
 				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
-				    (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
+				    (i == cmd->selected)) {
 					t = FLOAT_80332b10;
 					y -= FLOAT_80332ad0;
 					h += FLOAT_80332ad0;
@@ -957,16 +959,15 @@ void CMenuPcs::CmdDraw()
 				boxColor.r = 0xFF;
 				boxColor.g = 0xFF;
 				boxColor.b = 0xFF;
-				boxColor.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(entry + 8));
+				boxColor.a = static_cast<u8>(FLOAT_80332acc * entry->alpha);
 				GXSetChanMatColor(GX_COLOR0A0, boxColor);
 
 				DrawRect(
-				    0, x, y, w, h, *reinterpret_cast<float*>(entry + 4), t,
-				    *reinterpret_cast<float*>(entry + 10), *reinterpret_cast<float*>(entry + 10), 0.0f);
+				    0, x, y, w, h, entry->u, t, entry->scale, entry->scale, 0.0f);
 			}
 		}
 		caravanIter += 2;
-		entry += 0x20;
+		entry++;
 	}
 
 	CFont* nameFont = m_fonts[4];
@@ -975,10 +976,10 @@ void CMenuPcs::CmdDraw()
 	nameFont->SetScale(FLOAT_80332ad8);
 	nameFont->DrawInit();
 
-	entry = drawList + 4;
+	entry = entries;
 	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
 		if ((i > 7) || (caravan->m_commandListExtra[i] == 0)) {
-			float alpha = *reinterpret_cast<float*>(entry + 8);
+			float alpha = entry->alpha;
 			if (cmdMode == 3) {
 				alpha = FLOAT_80332a70;
 			}
@@ -996,39 +997,39 @@ void CMenuPcs::CmdDraw()
 			} else {
 				const s16 cmdId = caravan->m_commandListInventorySlotRef[i];
 				if (cmdId < 0) {
-					entry += 0x20;
+					entry++;
 					continue;
 				}
 				const s16 skillId = caravan->m_inventoryItems[cmdId];
 				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 				text = flatText[skillId * 5 + 4];
-				if ((cmdMode == 0) && (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
+				if ((cmdMode == 0) && (i == cmd->selected)) {
 					hasItemHelp = true;
 					helpId = skillId;
 				}
 			}
 
 			const float textW = static_cast<float>(nameFont->GetWidth(text));
-			const float px = static_cast<float>(entry[0]) + ((static_cast<float>(entry[2]) - textW) * 0.5f);
-			const float py = static_cast<float>(entry[1] + 3) - FLOAT_80332ae8;
+			const float px = static_cast<float>(entry->x) + ((static_cast<float>(entry->width) - textW) * 0.5f);
+			const float py = static_cast<float>(entry->y + 3) - FLOAT_80332ae8;
 			nameFont->SetPosX(px);
 			nameFont->SetPosY(py);
 			nameFont->Draw(text);
 		}
-		entry += 0x20;
+		entry++;
 	}
 
 	DrawInit();
 	DrawUniteList();
 
-	entry = drawList + 4;
+	entry = entries;
 	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
 		if ((i > 1) && (caravan->m_commandListInventorySlotRef[i] >= 0)) {
 			DrawSingleIcon(
 			    caravan->m_inventoryItems[caravan->m_commandListInventorySlotRef[i]],
-			    entry[0] + entry[2] - 0x10, entry[1] - 2, *reinterpret_cast<float*>(entry + 8), 0, 0.0f);
+			    entry->x + entry->width - 0x10, entry->y - 2, entry->alpha, 0, 0.0f);
 		}
-		entry += 0x20;
+		entry++;
 	}
 
 	if (cmdMode == 2) {

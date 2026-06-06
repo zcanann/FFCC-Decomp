@@ -3,8 +3,8 @@
 
 class CManager {
 public:
-    virtual void Init();
-    virtual void Quit();
+    virtual void Init() = 0;
+    virtual void Quit() = 0;
 };
 
 #endif // _FFCC_MANAGER_H

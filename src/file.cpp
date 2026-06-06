@@ -167,32 +167,6 @@ CFile File;
 
 /*
  * --INFO--
- * PAL Address: 0x80012BA4
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CManager::Init()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80012BA8
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CManager::Quit()
-{
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

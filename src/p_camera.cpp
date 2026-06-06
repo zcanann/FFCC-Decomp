@@ -36,49 +36,53 @@ static const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
 static const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
 static const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
-extern float FLOAT_8032fa30;
-extern float FLOAT_8032fa34;
-extern float FLOAT_8032fa38;
 extern float FLOAT_8032fa18;
 extern float FLOAT_8032fa1c;
 extern float FLOAT_8032fa20;
-extern float FLOAT_8032fa40;
-extern float FLOAT_8032fa44;
-extern float FLOAT_8032fa48;
-extern float FLOAT_8032fa4c;
-extern float FLOAT_8032fa50;
-extern float FLOAT_8032fa54;
-extern float FLOAT_8032fa5c;
-extern float FLOAT_8032fa58;
-extern float FLOAT_8032fabc;
-extern float FLOAT_8032fa60;
-extern float FLOAT_8032fa64;
-extern float FLOAT_8032fa68;
-extern float FLOAT_8032fa6c;
-extern float FLOAT_8032fa70;
-extern float FLOAT_8032fa74;
-extern float FLOAT_8032fa80;
-extern float FLOAT_8032fa84;
-extern float FLOAT_8032fa88;
-extern float FLOAT_8032fa90;
-extern float FLOAT_8032fa8c;
-extern float FLOAT_8032fa94;
-extern float FLOAT_8032fa98;
-extern float FLOAT_8032fa9c;
-extern float FLOAT_8032faa0;
-extern float FLOAT_8032fa3c;
-extern float FLOAT_8032fac8;
-extern float FLOAT_8032fac0;
-extern float FLOAT_8032fac4;
-extern float FLOAT_8032faa4;
-extern float FLOAT_8032faa8;
-extern float FLOAT_8032faac;
-extern float FLOAT_8032fab0;
-extern float FLOAT_8032fab4;
-extern float FLOAT_8032fab8;
-extern double DOUBLE_8032fa28;
-extern char s_p_camera_cpp[];
-extern char sCameraInvalidFovFmt[];
+extern const double DOUBLE_8032fa28 = 4503601774854144.0;
+extern const float FLOAT_8032fa30 = 33.3f;
+extern const float FLOAT_8032fa34 = 0.0f;
+extern const float FLOAT_8032fa38 = -1.0f;
+extern const float FLOAT_8032fa3c = 1.3333333730697632f;
+extern const float FLOAT_8032fa40 = 0.125f;
+extern const float FLOAT_8032fa44 = 3000.0f;
+extern const float FLOAT_8032fa48 = 0.2f;
+extern const float FLOAT_8032fa4c = 2.0f;
+extern const float FLOAT_8032fa50 = -30.0f;
+extern const float FLOAT_8032fa54 = 375.0f;
+extern const float FLOAT_8032fa58 = 1.5f;
+extern const float FLOAT_8032fa5c = 240.0f;
+extern const float FLOAT_8032fa60 = -238.0f;
+extern const float FLOAT_8032fa64 = 242.0f;
+extern const float FLOAT_8032fa68 = 238.0f;
+extern const float FLOAT_8032fa6c = 16.0f;
+extern const float FLOAT_8032fa70 = 0.01745329238474369f;
+extern const float FLOAT_8032fa74 = 4.0f;
+extern const float kCameraBoundsMinInitial = 10000000000.0f;
+extern const float kCameraBoundsMaxInitial = -10000000000.0f;
+extern const float FLOAT_8032fa80 = 1000.0f;
+extern const float FLOAT_8032fa84 = 0.25f;
+extern const float FLOAT_8032fa88 = 100.0f;
+extern const float FLOAT_8032fa8c = 10.0f;
+extern const float FLOAT_8032fa90 = 476.0f;
+extern const float FLOAT_8032fa94 = 0.6568732261657715f;
+extern const float FLOAT_8032fa98 = 0.6334134340286255f;
+extern const float FLOAT_8032fa9c = 30.0f;
+extern const float FLOAT_8032faa0 = -400.0f;
+extern const float FLOAT_8032faa4 = 0.7853981852531433f;
+extern const float FLOAT_8032faa8 = 0.33329999446868896f;
+extern const float FLOAT_8032faac = -4.0f;
+extern const float FLOAT_8032fab0 = 0.6108652353286743f;
+extern const float FLOAT_8032fab4 = 25.0f;
+extern const float FLOAT_8032fab8 = 10000.0f;
+extern const float FLOAT_8032fabc = 5.0f;
+extern const float FLOAT_8032fac0 = -10.0f;
+extern const float FLOAT_8032fac4 = 50.0f;
+extern const float FLOAT_8032fac8 = 0.0010000000474974513f;
+extern const char s_p_camera_cpp[] = "p_camera.cpp";
+extern const char sCameraInvalidFovFmt[0x40] =
+    "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92l\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81""B%f!!!!!!!!!!!!!!!!!!!!\n";
+unsigned char g_IsDbgDrawShadowPos;
 extern unsigned char g_map_draw_prof;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -611,23 +615,27 @@ void CCameraPcs::CalcQuake()
     u32 randZ = static_cast<u32>(rand());
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
 
+    float jitterAmount;
     if (((randX & 1) ^ signX) == signX) {
-        jitter.x = Math.RandF(m_quake.m_jitterAmplitude.x);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
-        jitter.x = -Math.RandF(m_quake.m_jitterAmplitude.x);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
+    jitter.x = jitterAmount;
 
     if (((randY & 1) ^ signY) == signY) {
-        jitter.y = Math.RandF(m_quake.m_jitterAmplitude.y);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
-        jitter.y = -Math.RandF(m_quake.m_jitterAmplitude.y);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
+    jitter.y = jitterAmount;
 
     if (((randZ & 1) ^ signZ) == signZ) {
-        jitter.z = Math.RandF(m_quake.m_jitterAmplitude.z);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
-        jitter.z = -Math.RandF(m_quake.m_jitterAmplitude.z);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.z);
     }
+    jitter.z = jitterAmount;
 
     if (m_quake.m_mode == 2) {
         PSVECAdd(&offset, &jitter, &offset);
@@ -715,27 +723,37 @@ void CCameraPcs::calc()
 
     if (m_isAbsolute == 0) {
         float stickH = FLOAT_8032fa34;
-        float stickV = FLOAT_8032fa34;
-        float triggerL = FLOAT_8032fa34;
-        float triggerR = FLOAT_8032fa34;
-        float moveInOut = FLOAT_8032fa34;
-
-        if (!useDebugPad) {
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             stickH = *reinterpret_cast<float*>(pad + 0x44);
+        }
+        m_yaw += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
+
+        float stickV = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             stickV = *reinterpret_cast<float*>(pad + 0x48);
+        }
+        m_pitch += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
+
+        float triggerL = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             triggerL = *reinterpret_cast<float*>(pad + 0x36);
+        }
+        m_distance += FLOAT_8032fabc * triggerL;
+
+        float triggerR = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             triggerR = *reinterpret_cast<float*>(pad + 0x28);
+        }
+
+        float moveInOut = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             moveInOut = *reinterpret_cast<float*>(pad + 0x40);
         }
-
-        m_yaw += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
-        m_pitch += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
-        m_distance += FLOAT_8032fabc * triggerL;
 
         const double rotY = static_cast<double>(m_pitch);
         const double rotX = static_cast<double>(m_yaw);
@@ -765,7 +783,7 @@ void CCameraPcs::calc()
 
     float fov = m_fov;
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(sCameraInvalidFovFmt, fov);
+        System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(m_screenMatrix, fov, FLOAT_8032fa3c, m_nearZ, m_farZ);
@@ -780,11 +798,9 @@ void CCameraPcs::calc()
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(m_worldMapMatrix, worldMapMtx);
         if (m_worldMapEffect.m_duration != 0 && m_worldMapEffect.m_timer != 0) {
-            const double t = static_cast<double>(FLOAT_8032fa18 * (
-                FLOAT_8032fa1c - (static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(m_worldMapEffect.m_timer))) - DOUBLE_8032fa28) /
-                static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(m_worldMapEffect.m_duration))) - DOUBLE_8032fa28))));
+            const double t = static_cast<double>(FLOAT_8032fa18 *
+                (FLOAT_8032fa1c - static_cast<float>(m_worldMapEffect.m_timer) /
+                static_cast<float>(m_worldMapEffect.m_duration)));
             const double f = static_cast<double>(FLOAT_8032fa20 * (FLOAT_8032fa1c + static_cast<float>(cos(t))));
 
             PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotX) * f));
@@ -830,7 +846,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = m_fov;
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(sCameraInvalidFovFmt, fov);
+        System.Printf(const_cast<char*>(sCameraInvalidFovFmt), fov);
         fov = FLOAT_8032fab4;
     }
 
@@ -1355,11 +1371,11 @@ void CCameraPcs::createFullShadow()
 
     m_fullScreenShadow.m_shadowTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    m_fullScreenShadow.m_shadowTexture = new (stage, s_p_camera_cpp, 0x3A5) u8[rampTexSize];
+    m_fullScreenShadow.m_shadowTexture = new (stage, const_cast<char*>(s_p_camera_cpp), 0x3A5) u8[rampTexSize];
 
     m_fullScreenShadow.m_rampTexture = 0;
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    rampTex = new (stage, s_p_camera_cpp, 0x361) u8[rampTexSize];
+    rampTex = new (stage, const_cast<char*>(s_p_camera_cpp), 0x361) u8[rampTexSize];
     m_fullScreenShadow.m_rampTexture = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {

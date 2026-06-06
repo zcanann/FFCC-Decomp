@@ -77,6 +77,16 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct MenuWindowInfo
+{
+    short x;
+    short y;
+    short width;
+    short height;
+    short frame;
+    short state;
+};
+
 struct SingMenuState
 {
     char pad_00[0x0B];
@@ -703,6 +713,7 @@ public:
     };
     unsigned char m_pad844[0x848 - 0x844];
     union {
+        MenuWindowInfo* m_menuWindowInfo;
         short* m_singWindowInfo;
         int m_bonusAuxPtr;
     };
@@ -747,6 +758,7 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
+STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
@@ -774,6 +786,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAuxPtr) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);

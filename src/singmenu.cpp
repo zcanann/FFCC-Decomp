@@ -40,12 +40,6 @@ extern char* gSingMenuAttrTableEs[];
 typedef signed short s16;
 typedef unsigned char u8;
 
-struct SingleMenuWindowRaw
-{
-    u8 bytes[0x0C];
-};
-
-STATIC_ASSERT(sizeof(SingleMenuWindowRaw) == 0x0C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
@@ -1077,8 +1071,8 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    m_singWindowInfo = reinterpret_cast<s16*>(new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw);
-    memset(m_singWindowInfo, 0, sizeof(SingleMenuWindowRaw));
+    m_menuWindowInfo = new (stage, s_singmenu_cpp, 0x60D) MenuWindowInfo;
+    memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
     m_singleMenuPhase = 0;
     if (gSingMenuForcedSelection >= 0) {

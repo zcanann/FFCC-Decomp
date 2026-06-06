@@ -160,6 +160,16 @@ static inline CmakeMenuState* CmakeVillageState(CMenuPcs* menu)
     return static_cast<CmakeMenuState*>(CmakeVillageWork(menu));
 }
 
+static inline MenuWindowInfo* CmakeWindowInfo(CMenuPcs* menu)
+{
+    return menu->m_menuWindowInfo;
+}
+
+static inline short& CmakeMcState(CMenuPcs* menu)
+{
+    return CmakeWindowInfo(menu)->state;
+}
+
 static inline unsigned char* MenuPcsRaw()
 {
     return reinterpret_cast<unsigned char*>(&MenuPcs);
@@ -345,7 +355,7 @@ static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, flo
 
 static inline void DrawCmakeMcOverlay(CMenuPcs* menu, int messageId)
 {
-    int mcState = *reinterpret_cast<short*>(MenuS32(menu, 0x848) + 10);
+    int mcState = CmakeMcState(menu);
 
     menu->DrawInit();
     if (mcState == 3) {
@@ -588,7 +598,7 @@ void CMenuPcs::CalcSingCMake()
         cmakeState->m_initialized = 1;
         cmakeState->m_selectionInitialized = 0;
         gCmakePreviousStep = -1;
-        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        CmakeMcState(this) = 3;
     }
 
     short& frame = cmakeState->m_frame;
@@ -1006,7 +1016,7 @@ void CMenuPcs::DrawSingCMake()
     if (mode < 2) {
         mode = static_cast<short>(mode + 1);
         frame = 0;
-        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        CmakeMcState(this) = 3;
         return;
     }
 
@@ -1032,7 +1042,7 @@ void CMenuPcs::DrawSingCMake()
 
     cmakeState->m_selectionInitialized = 0;
     frame = 0;
-    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+    CmakeMcState(this) = 3;
 }
 
 /*
@@ -1668,7 +1678,7 @@ void CMenuPcs::CmakeCtrl()
             frame = 0;
             resultFlag = 0;
             state->m_selectionInitialized = 0;
-            *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+            CmakeMcState(this) = 3;
         } else if (mode == 2) {
             MenuS16(this, 0x86A) = 999;
             state->m_resultValue = -1;
@@ -1681,7 +1691,7 @@ void CMenuPcs::CmakeCtrl()
         mode = static_cast<short>(mode + 1);
         frame = 0;
         resultFlag = 0;
-        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        CmakeMcState(this) = 3;
         return;
     }
 
@@ -1708,7 +1718,7 @@ void CMenuPcs::CmakeCtrl()
     state->m_selectionInitialized = 0;
     frame = 0;
     resultFlag = 0;
-    *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+    CmakeMcState(this) = 3;
 }
 
 /*
@@ -1776,14 +1786,13 @@ int CMenuPcs::CmakeNameCtrl()
 {
     int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    int mcWork = MenuS32(this, 0x848);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& select = cmakeState->m_select;
     short& row = cmakeState->m_row;
     short& table = cmakeState->m_table;
     unsigned short down;
     unsigned short repeat;
-    short& mcState = *reinterpret_cast<short*>(mcWork + 10);
+    short& mcState = CmakeMcState(this);
     char* name = GetCmakeNameBuffer();
 
     bool padBusy = false;
@@ -2126,9 +2135,9 @@ void CMenuPcs::CmakeNameDraw()
             (static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x28))) > 4),
         alpha);
 
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
+    if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);
-        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
+        if (CmakeMcState(this) == 1) {
             DrawMcWinMess(0x14, 0);
         }
     }
@@ -2342,12 +2351,11 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 {
     int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    int mcWork = MenuS32(this, 0x848);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& tribe = cmakeState->m_select;
     short& crest = cmakeState->m_row;
     short selectField = cmakeState->m_fieldSelect;
-    short& mcState = *reinterpret_cast<short*>(mcWork + 10);
+    short& mcState = CmakeMcState(this);
     unsigned short down;
     unsigned short repeat;
 
@@ -2607,9 +2615,9 @@ void CMenuPcs::CmakeTribeDraw()
         }
     }
 
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
+    if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);
-        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
+        if (CmakeMcState(this) == 1) {
             DrawMcWinMess(0x15, 0);
         }
     }
@@ -2647,12 +2655,11 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 {
     int state = MenuS32(this, 0x82C);
     CmakeMenuState* cmakeState = CmakeState(this);
-    int mcWork = MenuS32(this, 0x848);
     short& job = cmakeState->m_select;
     unsigned short down;
     unsigned short repeat;
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& mcState = *reinterpret_cast<short*>(mcWork + 10);
+    short& mcState = CmakeMcState(this);
 
     bool padBusy = false;
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -2887,9 +2894,9 @@ void CMenuPcs::CmakeJobDraw()
             cursorY, alpha);
     }
 
-    if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
+    if (CmakeMcState(this) != 3) {
         DrawMcWin(-1, 0);
-        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
+        if (CmakeMcState(this) == 1) {
             DrawMcWinMess(0x16, 0);
         }
     }

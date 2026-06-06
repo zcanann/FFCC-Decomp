@@ -163,9 +163,9 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         return;
     }
 
-    work->m_wait -= step->m_texAnm.m_waitStep;
-    work->m_tilesU = step->m_texAnm.m_tilesU;
-    work->m_tilesV = step->m_texAnm.m_tilesV;
+    work->m_wait -= *(s32*)step->m_payload;
+    work->m_tilesU = *(u32*)(step->m_payload + 4);
+    work->m_tilesV = *(u32*)(step->m_payload + 8);
 
     if ((s32)work->m_wait > 0) {
         return;
@@ -188,21 +188,21 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     for (i = 0; i < (s32)(u16)mapMesh->m_uvCount; i++) {
         uv = (f32)mapMesh->m_uvPairs[i].m_u;
         mapMesh->m_uvPairs[i].m_u = (s16)(uv + perU);
-        if ((work->m_frame % step->m_texAnm.m_tilesU) == 0) {
-            mapMesh->m_uvPairs[i].m_u = (s16)(-((perU * (f32)step->m_texAnm.m_tilesU) -
+        if ((work->m_frame % *(u32*)(step->m_payload + 4)) == 0) {
+            mapMesh->m_uvPairs[i].m_u = (s16)(-((perU * (f32)*(u32*)(step->m_payload + 4)) -
                                                 (f32)mapMesh->m_uvPairs[i].m_u));
             uv = (f32)mapMesh->m_uvPairs[i].m_v;
             mapMesh->m_uvPairs[i].m_v = (s16)(uv + perV);
         }
-        if (work->m_frame >= (u32)(step->m_texAnm.m_tilesU * step->m_texAnm.m_tilesV)) {
-            mapMesh->m_uvPairs[i].m_v = (s16)(-((perV * (f32)step->m_texAnm.m_tilesV) -
+        if (work->m_frame >= (u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8))) {
+            mapMesh->m_uvPairs[i].m_v = (s16)(-((perV * (f32)*(u32*)(step->m_payload + 8)) -
                                                 (f32)mapMesh->m_uvPairs[i].m_v));
         }
     }
 
     DCFlushRange(mapMesh->m_uvPairs, (mapMesh->m_uvCount & 0xFFFF) << 2);
 
-    if (work->m_frame >= (u32)(step->m_texAnm.m_tilesU * step->m_texAnm.m_tilesV)) {
+    if (work->m_frame >= (u32)(*(s32*)(step->m_payload + 4) * *(s32*)(step->m_payload + 8))) {
         work->m_frame = 0;
     }
 }

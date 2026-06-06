@@ -6638,10 +6638,6 @@ void CMenuPcs::DrawWMFrame()
 	WmWorldState* const worldState = m_wmWorldState;
 	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 
-	float rotation = worldState->m_posX * FLOAT_803314bc;
-	Mtx rotMtx;
-	PSMTXRotRad(rotMtx, 'z', rotation);
-
 	short sVar = worldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
@@ -6662,6 +6658,8 @@ void CMenuPcs::DrawWMFrame()
 	} else {
 		alpha = FLOAT_80331458;
 	}
+	Mtx rotMtx;
+	PSMTXRotRad(rotMtx, 'z', worldState->m_posX * FLOAT_803314bc);
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alpha))};
@@ -6688,6 +6686,12 @@ void CMenuPcs::DrawWMFrame()
 		SetAttrFmt((FMT)0);
 		SetTexture((TEX)0x17);
 		int gaugeAlpha = *reinterpret_cast<int*>(wmFrame + 4);
+		GXColor gaugeColor = {
+		    0xFF, 0xFF, 0xFF,
+		    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 *
+		                                                (static_cast<double>(static_cast<float>(gaugeAlpha)) /
+		                                                 DOUBLE_803316e8)))};
+		GXSetChanMatColor(static_cast<GXChannelID>(4), gaugeColor);
 		DrawRect(0xFFFFFFFF, 
 			(float)*reinterpret_cast<short*>(wmFrame + 0x98),
 			(float)*reinterpret_cast<short*>(wmFrame + 0x9A),
@@ -6697,7 +6701,7 @@ void CMenuPcs::DrawWMFrame()
 			FLOAT_803313dc,
 			FLOAT_803313e8,
 			FLOAT_803313e8,
-			gaugeAlpha);
+			0);
 
 		if (sVar < 3) {
 			const unsigned int language = Game.m_gameWork.m_languageId;

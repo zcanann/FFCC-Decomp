@@ -6,6 +6,12 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct DrawMdlTsDataOffsets {
+    s32 m_colorWorkOffset;
+    s32 _unused04;
+    s32 m_texCoordOffset;
+};
+
 struct PDrawMdlTs {
     s32 m_graphId;             // 0x00
     u32 m_modelIndex;          // 0x04

@@ -1,13 +1,19 @@
 #ifndef _PPP_SCALE_H_
 #define _PPP_SCALE_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct PppScaleDataOffsets {
+    s32 m_scaleOffset;
+};
+
 struct PppScaleInput {
-    int m_graphId;
-    int m_padding;
-    float m_scale[3];
+    s32 m_graphId;
+    s32 m_padding;
+    f32 m_scale[3];
 };
 
 #ifdef __cplusplus

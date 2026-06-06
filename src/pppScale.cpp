@@ -5,11 +5,7 @@
 
 const float kPppScaleZero = 0.0f;
 
-struct PppScaleDataOffsets
-{
-	s32 m_scaleOffset;
-};
-
+STATIC_ASSERT(sizeof(PppScaleDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppScaleDataOffsets, m_scaleOffset) == 0x0);
 
 static inline PppScaleDataOffsets* GetPppScaleDataOffsets(_pppCtrlTable* ctrlTable)

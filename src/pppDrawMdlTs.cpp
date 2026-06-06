@@ -18,12 +18,7 @@ STATIC_ASSERT(offsetof(PDrawMdlTs, m_texCoordAdd) == 0x14);
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_drawA) == 0x2C);
 STATIC_ASSERT(offsetof(_pppColorWork, result) == 0x08);
 
-struct DrawMdlTsDataOffsets {
-    s32 m_colorWorkOffset;
-    s32 _unused04;
-    s32 m_texCoordOffset;
-};
-
+STATIC_ASSERT(sizeof(DrawMdlTsDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_colorWorkOffset) == 0x0);
 STATIC_ASSERT(offsetof(DrawMdlTsDataOffsets, m_texCoordOffset) == 0x8);
 

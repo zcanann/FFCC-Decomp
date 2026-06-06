@@ -3,6 +3,12 @@
 
 #include "ffcc/pppPart.h"
 
+struct pppYmDrawMdlTexAnmDataOffsets {
+    s32 m_colorBlockOffset;
+    s32 _unused04;
+    s32 m_workOffset;
+};
+
 struct pppYmDrawMdlTexAnmStep {
     s32 m_graphId;
     s32 m_dataValIndex;

@@ -634,6 +634,21 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
+    struct BonusStorage
+    {
+        unsigned char m_pad744[0x814 - 0x744];
+        int m_bonusBoardPtr;
+        unsigned char m_pad818[0x82C - 0x818];
+    };
+
+    struct WmStorage
+    {
+        unsigned char m_pad744[0x774 - 0x744];
+        CCharaPcs::CHandle* m_handles[0x28];
+        unsigned char* m_charaModelData;
+        unsigned char* m_charaSelectData;
+    };
+
     unsigned char m_pad04[0x14 - 0x04];
     unsigned char m_mcRequestLocked;
     unsigned char m_pad15[0x18 - 0x15];
@@ -682,9 +697,10 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    unsigned char m_pad744[0x814 - 0x744];
-    int m_bonusBoardPtr;
-    unsigned char m_pad818[0x82C - 0x818];
+    union {
+        BonusStorage m_bonus;
+        WmStorage m_wm;
+    };
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
@@ -711,7 +727,10 @@ public:
         EffectInfo* m_effectWork;
         int m_bonusListPtr;
     };
-    unsigned char m_pad844[0x848 - 0x844];
+    union {
+        unsigned char m_pad844[0x848 - 0x844];
+        int* m_wmCharaAnimState;
+    };
     MenuWindowInfo* m_menuWindowInfo;
     union {
         int m_pad84C;
@@ -777,7 +796,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_optionRowAnim) == 0xA0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusBoardPtr) == 0x814);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
@@ -791,6 +811,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);

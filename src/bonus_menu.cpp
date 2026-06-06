@@ -291,7 +291,7 @@ static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 
 static inline MenuBoardEntry* GetBonusBoardEntries(CMenuPcs* menu)
 {
-	return reinterpret_cast<MenuBoardEntry*>(menu->m_bonusBoardPtr);
+	return reinterpret_cast<MenuBoardEntry*>(menu->m_bonus.m_bonusBoardPtr);
 }
 
 static inline void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
@@ -3095,10 +3095,10 @@ void CMenuPcs::destroyBonus()
 		s_Base[0] = 0;
 	}
 
-	ptr = this->m_bonusBoardPtr;
+	ptr = this->m_bonus.m_bonusBoardPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		this->m_bonusBoardPtr = 0;
+		this->m_bonus.m_bonusBoardPtr = 0;
 	}
 
 	MenuWindowInfo* window = this->m_menuWindowInfo;
@@ -3126,7 +3126,7 @@ void CMenuPcs::createBonus()
 	int animPtr = this->m_bonusAnimPtr;
 	int listPtr = this->m_bonusListPtr;
 	MenuWindowInfo* window = this->m_menuWindowInfo;
-	int boardPtr = this->m_bonusBoardPtr;
+	int boardPtr = this->m_bonus.m_bonusBoardPtr;
 
 	Pad.m_stickDigitalThreshold = 0x28;
 	for (int i = 0; i < 4; i++) {
@@ -3164,7 +3164,7 @@ void CMenuPcs::createBonus()
 	this->m_bonusAnimPtr = animPtr;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	boardPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
-	this->m_bonusBoardPtr = boardPtr;
+	this->m_bonus.m_bonusBoardPtr = boardPtr;
 	window = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
 	this->m_menuWindowInfo = window;
 	memset(window, 0, sizeof(MenuWindowInfo));

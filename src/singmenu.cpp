@@ -902,7 +902,7 @@ void CMenuPcs::createSingleMenu()
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
             loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
-            m_bonusBoardPtr = 0;
+            m_bonus.m_bonusBoardPtr = 0;
             m_singleFadeState = 0;
             m_singMenuState = 0;
             m_menuWindowInfo = 0;
@@ -945,10 +945,10 @@ void CMenuPcs::destroySingleMenu()
     m_singleMenuStageActive = 0;
     gSingMenuForcedSelection = -1;
 
-    void* ptr = reinterpret_cast<void*>(m_bonusBoardPtr);
+    void* ptr = reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr);
     if (ptr != 0) {
         delete[] static_cast<u8*>(ptr);
-        m_bonusBoardPtr = 0;
+        m_bonus.m_bonusBoardPtr = 0;
     }
 
     ptr = m_singleFadeState;
@@ -1016,9 +1016,9 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    m_bonusBoardPtr = reinterpret_cast<int>(new (stage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
+    m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (stage, s_singmenu_cpp, 0x5DD) u8[sizeof(MenuBoardEntry)]);
 
-    MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonusBoardPtr);
+    MenuBoardEntry* boardEntry = reinterpret_cast<MenuBoardEntry*>(m_bonus.m_bonusBoardPtr);
     boardEntry->m_rotZ = FLOAT_8033294c;
     boardEntry->m_rotY = FLOAT_8033294c;
     boardEntry->m_rotX = FLOAT_8033294c;
@@ -1154,9 +1154,9 @@ void CMenuPcs::drawSingleMenu()
                 *reinterpret_cast<void**>(self + 0x774) = 0;
             }
 
-            if (m_bonusBoardPtr != 0) {
-                delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonusBoardPtr));
-                m_bonusBoardPtr = 0;
+            if (m_bonus.m_bonusBoardPtr != 0) {
+                delete[] static_cast<u8*>(reinterpret_cast<void*>(m_bonus.m_bonusBoardPtr));
+                m_bonus.m_bonusBoardPtr = 0;
             }
 
             if (m_singMenuState != 0) {

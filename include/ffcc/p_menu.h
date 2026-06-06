@@ -566,7 +566,8 @@ public:
     int m_crystalElem;
     short m_crystalPart;
     short m_crystalAttr;
-    unsigned char m_pad8C[0x8E - 0x8C];
+    unsigned char m_bonusAlpha;
+    unsigned char m_bonusCursorFlag;
     signed char m_optionIndex;
     signed char m_gameInitMode;
     signed char m_stereoMode;
@@ -599,7 +600,9 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    unsigned char m_pad744[0x82C - 0x744];
+    unsigned char m_pad744[0x814 - 0x744];
+    int m_bonusBoardPtr;
+    unsigned char m_pad818[0x82C - 0x818];
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
@@ -610,6 +613,7 @@ public:
         CompaMenuState* m_compaMenuState;
         TmpArtiState* m_tmpArtiState;
         short* m_cmdState;
+        int m_bonusStatePtr;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -617,10 +621,19 @@ public:
         unsigned char* m_wmCharaState;
     };
     void* m_pad83C;
-    EffectInfo* m_effectWork;
+    union {
+        EffectInfo* m_effectWork;
+        int m_bonusListPtr;
+    };
     unsigned char m_pad844[0x848 - 0x844];
-    short* m_singWindowInfo;
-    int m_pad84C;
+    union {
+        short* m_singWindowInfo;
+        int m_bonusAuxPtr;
+    };
+    union {
+        int m_pad84C;
+        int m_bonusAnimPtr;
+    };
     union {
         ArtiOpenAnimList* m_artiList;
         EquipOpenAnimList* m_equipList;
@@ -657,11 +670,14 @@ STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionIndex) == 0x8E);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAlpha) == 0x8C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusCursorFlag) == 0x8D);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionOpenAnim) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionRowAnim) == 0xA0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusBoardPtr) == 0x814);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
@@ -669,9 +685,13 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAuxPtr) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);

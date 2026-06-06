@@ -529,9 +529,9 @@ void CMenuPcs::WmInit()
 	m_wmCharaState = 0;
 	m_wmWorldParams = 0;
 	m_effectWork = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
+	m_wmWorkBuffer = 0;
 	FLOAT_8032ee18 = initValue;
-	bytes[0x858] = 0;
+	m_wmThpActive = 0;
 	bytes[0x86E] = 0;
 	memset(bytes + 4, 0, 0x1C);
 	bytes[0xD] = 0;
@@ -581,7 +581,7 @@ void CMenuPcs::ChkNumItemAll()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int total = 0;
 
-	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	unsigned char* const list = m_wmWorkBuffer;
 	if (list != 0) {
 		for (int i = 0; i < kMcListCount; i++) {
 			unsigned char* const entry = list + i * kMcListEntrySize;
@@ -1044,20 +1044,20 @@ void CMenuPcs::destroyWorld()
 		m_menuWindowInfo = 0;
 	}
 
-	if (bytes[0x858] != 0) {
+	if (m_wmThpActive != 0) {
 		THPSimpleAudioStop();
 		THPSimpleLoadStop();
 		THPSimpleClose();
 		THPSimpleQuit();
-		bool bVar1 = reinterpret_cast<void**>(bytes + 0x854)[0] != 0;
+		bool bVar1 = m_wmWorkBuffer != 0;
 		if (bVar1) {
 			if (bVar1) {
-				Memory.Free(reinterpret_cast<void**>(bytes + 0x854)[0]);
-				reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
+				Memory.Free(m_wmWorkBuffer);
+				m_wmWorkBuffer = 0;
 			}
-			reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
+			m_wmWorkBuffer = 0;
 		}
-		bytes[0x858] = 0;
+		m_wmThpActive = 0;
 	}
 
 	PartMng.pppDestroyAll();
@@ -3042,7 +3042,7 @@ void CMenuPcs::CalcTitleMenu()
 			*reinterpret_cast<short*>(worldState + 0x26) = 0;
 			worldState[8] = 1;
 			worldState[9] = 1;
-			bytes[0x858] = 0;
+			m_wmThpActive = 0;
 			if (DAT_8032ee1c == 1) {
 				int createParam[0x1B];
 				unsigned char* param = reinterpret_cast<unsigned char*>(createParam);
@@ -3091,9 +3091,9 @@ void CMenuPcs::CalcTitleMenu()
 			THPSimpleInit(1);
 			THPSimpleOpen(DAT_8032EE34);
 			int thpMemory = THPSimpleCalcNeedMemory();
-			*reinterpret_cast<void**>(bytes + 0x854) =
-			    Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_wm_menu_cpp), 0xABA, 0);
-			THPSimpleSetBuffer(*reinterpret_cast<unsigned char**>(bytes + 0x854));
+			m_wmWorkBuffer =
+			    static_cast<unsigned char*>(Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_wm_menu_cpp), 0xABA, 0));
+			THPSimpleSetBuffer(m_wmWorkBuffer);
 			THPSimplePreLoad(0);
 			THPSimpleAudioStart();
 			int createParam[0x1B];
@@ -3130,7 +3130,7 @@ void CMenuPcs::CalcTitleMenu()
 			*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
 			*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
 			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
-			bytes[0x858] = 1;
+			m_wmThpActive = 1;
 		}
 
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 0) {
@@ -3139,11 +3139,11 @@ void CMenuPcs::CalcTitleMenu()
 				THPSimpleLoadStop();
 				THPSimpleClose();
 				THPSimpleQuit();
-				if (*reinterpret_cast<int*>(bytes + 0x854) != 0) {
-					Memory.Free(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
-					*reinterpret_cast<int*>(bytes + 0x854) = 0;
+				if (m_wmWorkBuffer != 0) {
+					Memory.Free(m_wmWorkBuffer);
+					m_wmWorkBuffer = 0;
 				}
-				bytes[0x858] = 0;
+				m_wmThpActive = 0;
 				*reinterpret_cast<short*>(worldState + 0x24) = 0;
 				*reinterpret_cast<short*>(worldState + 0x0E) = -1;
 			} else if (THPSimpleDecode(0) == 0) {
@@ -4784,7 +4784,7 @@ void CMenuPcs::DrawTitleMenu()
 	short state = *reinterpret_cast<short*>(worldState + 0x10);
 
 		if (state == 0 && *reinterpret_cast<char*>(worldState + 8) != 0) {
-			if (bytes[0x858] != 0) {
+			if (m_wmThpActive != 0) {
 				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
 			}
 		short sVarE = *reinterpret_cast<short*>(worldState + 0x0E);
@@ -4794,11 +4794,11 @@ void CMenuPcs::DrawTitleMenu()
 				THPSimpleLoadStop();
 				THPSimpleClose();
 				THPSimpleQuit();
-				if (*reinterpret_cast<int*>(bytes + 0x854) != 0) {
-					Memory.Free(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
-					*reinterpret_cast<int*>(bytes + 0x854) = 0;
+				if (m_wmWorkBuffer != 0) {
+					Memory.Free(m_wmWorkBuffer);
+					m_wmWorkBuffer = 0;
 				}
-				bytes[0x858] = 0;
+				m_wmThpActive = 0;
 			}
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) =
 			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
@@ -8646,7 +8646,7 @@ void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const modelData = m_wm.m_charaModelData;
-	unsigned char* const mcList = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	unsigned char* const mcList = m_wmWorkBuffer;
 	int partyCount = 0;
 
 	if (modelData != 0) {
@@ -9469,7 +9469,7 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 void CMenuPcs::ChkMcDataCnt()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	unsigned char* const list = m_wmWorkBuffer;
 	int count = 0;
 
 	if (list == 0) {
@@ -10205,7 +10205,7 @@ void CMenuPcs::DrawMcObj()
 void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	unsigned char* const list = m_wmWorkBuffer;
 	if (list == 0 || info == 0 || index < 0 || index >= kMcListCount) {
 		return;
 	}
@@ -10240,7 +10240,7 @@ void McListInfo::operator= (const McListInfo& src)
 void CMenuPcs::ClrMcList()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	unsigned char* const list = m_wmWorkBuffer;
 	if (list != 0) {
 		memset(list, 0, kMcListEntrySize * kMcListCount);
 	}
@@ -11549,8 +11549,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 	entry[0x41] = hasData;
 	entry[0x42] = hasError;
 	entry[0x43] = 0;
-	unsigned char* const menuBytes = reinterpret_cast<unsigned char*>(&MenuPcs);
-	unsigned char* const dst = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(menuBytes + 0x854)[0]) + slot * kMcListEntrySize;
+	unsigned char* const dst = MenuPcs.m_wmWorkBuffer + slot * kMcListEntrySize;
 	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
 	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
 	dstWords[0] = entryWords[0];

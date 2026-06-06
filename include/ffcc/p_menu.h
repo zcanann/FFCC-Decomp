@@ -749,7 +749,8 @@ public:
         short* m_cmdList;
         SingleFadeState* m_singleFadeState;
     };
-    unsigned char m_pad854[0x859 - 0x854];
+    unsigned char* m_wmWorkBuffer;
+    unsigned char m_wmThpActive;
     unsigned char m_singleMenuStageActive;
     unsigned char m_singleMenuInitialized;
     unsigned char m_pad85B[0x85C - 0x85B];
@@ -825,6 +826,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleFadeState) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorkBuffer) == 0x854);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmThpActive) == 0x858);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuMode) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuPhase) == 0x866);

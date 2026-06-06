@@ -206,6 +206,7 @@ struct CmdState {
 	unsigned char pad_002E[0x30 - 0x2E];
 	s16 mode;
 	s16 prevMode;
+	s16 scrollTop;
 };
 
 STATIC_ASSERT(offsetof(CmdListEntry, u) == 0x08);
@@ -237,6 +238,7 @@ STATIC_ASSERT(offsetof(CmdState, choice) == 0x2A);
 STATIC_ASSERT(offsetof(CmdState, uniteSelected) == 0x2C);
 STATIC_ASSERT(offsetof(CmdState, mode) == 0x30);
 STATIC_ASSERT(offsetof(CmdState, prevMode) == 0x32);
+STATIC_ASSERT(offsetof(CmdState, scrollTop) == 0x34);
 
 static inline s16* GetCmdState(CMenuPcs* menu)
 {
@@ -1079,17 +1081,17 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 	}
 
-	if ((cmdMode == 1) && (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x12) == 1)) {
+	if ((cmdMode == 1) && (cmd->phase == 1)) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const float mark = CalcListPos(cmdState[0x1A], letter[0], 1);
-		s16* listPos = drawList + drawList[0] * 0x20 + 4;
+		const float mark = CalcListPos(cmd->scrollTop, letter[0], 1);
+		CmdListEntry* listPos = &entries[cmdList->count];
 		if (mark > FLOAT_80332ab0) {
-			DrawListPosMark(static_cast<float>(listPos[0]), static_cast<float>(listPos[1]), mark);
+			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
 		}
 	}
 
 	if (((cmdMode == 0) && (animState == 1)) ||
-	    ((cmdMode != 0) && (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x12) == 1))) {
+	    ((cmdMode != 0) && (cmd->phase == 1))) {
 		float cursorX = FLOAT_80332a70;
 		float cursorY = FLOAT_80332a70;
 		CmdListEntry* cursorEntry = entries;
@@ -1120,22 +1122,22 @@ void CMenuPcs::CmdDraw()
 		} else if (cmdMode == 1) {
 			const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 			s32 idx = 0;
-			s16* scan = drawList + drawList[0] * 0x20 + 4;
+			CmdListEntry* scan = &entries[cmdList->count];
 			while (idx < 8) {
-				if (*reinterpret_cast<s32*>(scan + 0xE) == 0x37) {
+				if (scan->tex == 0x37) {
 					break;
 				}
-				scan += 0x20;
+				scan++;
 				idx++;
 			}
-			const s32 cur = cmdState[0x14] + cmdState[0x1A];
+			const s32 cur = cmd->itemSelected + cmd->scrollTop;
 			s32 wrapped = cur;
 			if (letter[0] <= cur) {
 				wrapped -= letter[0];
 			}
-			scan += wrapped * 0x20;
-			cursorX = static_cast<float>(scan[0] - 0x14);
-			cursorY = static_cast<float>(scan[1]);
+			scan += wrapped;
+			cursorX = static_cast<float>(scan->x - 0x14);
+			cursorY = static_cast<float>(scan->y);
 		} else {
 			CmdListEntry* panel = &entries[cmdList->listEnd + 3];
 			const s32 choices = (DOUBLE_80332a58 == static_cast<double>(panel->scale)) ? 2 : 3;
@@ -1155,12 +1157,12 @@ void CMenuPcs::CmdDraw()
 		helpId = -1;
 	}
 	if ((cmdMode == 0) && (helpId == -1) &&
-	    (caravan->m_commandListExtra[*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26)] == 0)) {
+	    (caravan->m_commandListExtra[cmd->selected] == 0)) {
 		helpId = 0x266;
 	}
 	if (cmdMode == 1) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		s32 idx = cmdState[0x14] + cmdState[0x1A];
+		s32 idx = cmd->itemSelected + cmd->scrollTop;
 		if (letter[0] <= idx) {
 			idx -= letter[0];
 		}

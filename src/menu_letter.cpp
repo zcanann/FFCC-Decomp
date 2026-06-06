@@ -281,8 +281,8 @@ void CMenuPcs::LetterInit1()
 	*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
 
 	GetLetterAnimStorage(this)->count = 2;
-	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
-	*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
+	m_singMenuState->frame = 0;
+	m_singMenuState->initialized = 1;
 }
 
 /*
@@ -499,7 +499,7 @@ bool CMenuPcs::LetterOpen()
 	s16* psVar7;
 
 	s_OpenClose = 1;
-	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
+	if (m_singMenuState->initialized == '\0') {
 		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 		fVar1 = FLOAT_803330f8;
 		iVar4 = GetLetterAnimBase(this) + 8;
@@ -529,8 +529,8 @@ bool CMenuPcs::LetterOpen()
 			10;
 		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
 		GetLetterAnimStorage(this)->count = 2;
-		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
-		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
+		m_singMenuState->frame = 0;
+		m_singMenuState->initialized = 1;
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 >= 0) {
 			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
@@ -554,15 +554,15 @@ bool CMenuPcs::LetterOpen()
 			*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
 			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
 			GetLetterAnimStorage(this)->count = 1;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = static_cast<s16>(s_BackUpCur[0]);
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(s_BackUpCur[1]);
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = static_cast<s16>(s_BackUpTopPos);
+			m_singMenuState->frame = 0;
+			m_singMenuState->selectedIndex = static_cast<s16>(s_BackUpCur[0]);
+			m_singMenuState->scrollIndex = static_cast<s16>(s_BackUpCur[1]);
+			m_singMenuState->topIndex = static_cast<s16>(s_BackUpTopPos);
 			s_SelLetter = static_cast<s16>(s_BackUpCur[0] + s_BackUpTopPos);
 		} else {
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = 0;
+			m_singMenuState->selectedIndex = 0;
+			m_singMenuState->scrollIndex = 0;
+			m_singMenuState->topIndex = 0;
 			s_AttachItem = 0;
 			s_AttachMode = 0;
 			s_Attach = 2;
@@ -574,11 +574,11 @@ bool CMenuPcs::LetterOpen()
 		SetSingWinScl(FLOAT_803330f8);
 	}
 	iVar6 = 0;
-	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) =
-		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) + 1;
+	m_singMenuState->frame =
+		m_singMenuState->frame + 1;
 	iVar5 = static_cast<int>(GetLetterAnimStorage(this)->count);
 	psVar7 = GetLetterPanelBase(this);
-	iVar8 = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22));
+	iVar8 = static_cast<int>(m_singMenuState->frame);
 	iVar4 = iVar5;
 	if (0 < iVar5) {
 		do {
@@ -611,10 +611,10 @@ bool CMenuPcs::LetterOpen()
 	if (iVar5 == iVar6) {
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 1;
+			m_singMenuState->procState = 1;
 		} else {
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) = 1;
+			m_singMenuState->procState = 0;
+			m_singMenuState->uniteState = 1;
 			LetterInit1();
 		}
 	}
@@ -634,7 +634,7 @@ int CMenuPcs::LetterCtrl()
 {
 	int done = 0;
 	int ret = 0;
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x32) = *reinterpret_cast<s16*>(state + 0x30);
 	s_OpenClose = 0;
 
@@ -978,7 +978,7 @@ bool CMenuPcs::LetterClose()
 	s_OpenClose = 1;
 	int finished = 0;
 
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 
 	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
@@ -1366,7 +1366,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 {
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	unsigned char languageId = Game.m_gameWork.m_languageId;
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		char lines[8][0x80];
@@ -1538,7 +1538,7 @@ bool CMenuPcs::LetterConfirmOpen()
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 	unsigned char languageId = Game.m_gameWork.m_languageId;
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		char lines[8][0x80];
@@ -1669,7 +1669,7 @@ void CMenuPcs::LetterConfirmClose()
  */
 void CMenuPcs::LetterDraw()
 {
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) == 0) {
+	if (m_singMenuState->uniteState == 0) {
 		LetterListDraw();
 	} else {
 		LetterMessDraw();
@@ -1724,7 +1724,7 @@ void CMenuPcs::LetterListDraw()
 	font->SetColor(textColor.color);
 
 	CCaravanWork* caravanWork = GetLetterCaravanWork();
-	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));
+	const int topRow = static_cast<int>(m_singMenuState->topIndex);
 
 	int y = 0x60;
 	for (int row = 0; row < 9; ++row) {
@@ -1758,7 +1758,7 @@ void CMenuPcs::LetterListDraw()
 
 	DrawInit();
 
-	unsigned char pageMark = (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) != 0) ? 1 : 0;
+	unsigned char pageMark = (m_singMenuState->topIndex != 0) ? 1 : 0;
 	if (topRow + 9 < caravanWork->m_letterCount) {
 		pageMark = static_cast<unsigned char>(pageMark | 2);
 	}
@@ -1816,7 +1816,7 @@ void CMenuPcs::LetterListDraw()
 		iconY += 0x20;
 	}
 
-	const int cursorState = *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26);
+	const int cursorState = m_singMenuState->selectedIndex;
 	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(System.m_frameCounter & 7));
 	const int cursorY = cursorState * 0x20 + 0x60;
 	DrawCursor(cursorX, cursorY, FLOAT_803330f8);
@@ -1838,7 +1838,7 @@ void CMenuPcs::LetterMessDraw()
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
 	CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
 	s16* animBase = reinterpret_cast<s16*>(m_singleFadeState);
 
@@ -2007,7 +2007,7 @@ int CMenuPcs::LetterCtrlCur()
 	}
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	int state = GetLetterStateBase(this);
 	int menuMode = *reinterpret_cast<s16*>(state + 0x30);
 	if (menuMode != 0) {
 		if (menuMode == 1) {

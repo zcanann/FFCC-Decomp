@@ -196,14 +196,24 @@ public:
 
 private:
     OSSemaphore accessSemaphores[4];  // 0x0000
-    unsigned char _pad30[0x2ACC];     // 0x0030
+    unsigned char _pad30[0x2AC4];     // 0x0030
+    unsigned char m_mapItemCount;     // 0x2AF4
+    unsigned char _pad2AF5[0x3];      // 0x2AF5
+    int m_scrInitEnd;                 // 0x2AF8
     unsigned char m_letterDatFlg;     // 0x2AFC
     unsigned char _pad2AFD[0x3];      // 0x2AFD
     GbaQueueMapObjWork m_mapObjWork;  // 0x2B00
     unsigned char m_makeMapObjFlg;    // 0x2C88
     unsigned char m_letterFlags;      // 0x2C89
     unsigned char m_compatibilityFlg[4]; // 0x2C8A
-    unsigned char _pad2C8E[0x24];     // 0x2C8E
+    unsigned short m_sendMask;        // 0x2C8E
+    unsigned char _pad2C90[0x6];      // 0x2C90
+    signed char m_maskSendState[4];   // 0x2C96
+    unsigned char _pad2C9A[0x2];      // 0x2C9A
+    unsigned int m_pendingMoney[4];   // 0x2C9C
+    unsigned char m_moneyState[4];    // 0x2CAC
+    unsigned char m_moneyFlags;       // 0x2CB0
+    unsigned char m_favoriteFlags;    // 0x2CB1
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
     unsigned char m_radarType[4];     // 0x2D32
     unsigned char m_artifactFlags;    // 0x2D36
@@ -213,7 +223,7 @@ private:
     unsigned char m_sellFlg;          // 0x2D3A
     unsigned char m_buyFlg;           // 0x2D3B
     unsigned char m_mkSmithFlg;       // 0x2D3C
-    unsigned char _pad2D3D;           // 0x2D3D
+    unsigned char m_resetFlags;       // 0x2D3D
     unsigned char m_strengthFlags;    // 0x2D3E
     unsigned char m_artiDatFlags;     // 0x2D3F
     unsigned char m_radarTypeFlags;   // 0x2D40

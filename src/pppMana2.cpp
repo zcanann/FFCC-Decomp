@@ -1526,22 +1526,22 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     CChara::CMesh::CRefData* meshData = model->m_meshes[partIndex].m_data;
     const char* shape = meshData->m_name;
     CChara::CMesh::CDisplayList* displayList = &meshData->m_displayLists[dlIndex];
-    bool draw = false;
+    int draw = 0;
 
     if (type == 2) {
         if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj3) == 0) {
-            draw = true;
+            draw = 1;
         }
     } else if (type < 2) {
         if (type == 0) {
             if (strcmp(shape, s_manaShapeObj) == 0) {
-                draw = true;
+                draw = 1;
             }
         } else if (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj5) == 0) {
-            draw = true;
+            draw = 1;
         }
     } else if (type < 4 && (strcmp(shape, s_manaShapeObj) == 0 || strcmp(shape, s_manaShapeObj1) == 0)) {
-        draw = true;
+        draw = 1;
     }
 
     int waterCmp = strcmp(shape, s_manaShapeObj4);
@@ -1578,27 +1578,29 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         GXSetCullMode((GXCullMode)1);
     }
 
-    if (draw) {
-        if (strcmp(shape, s_manaShapeObj) != 0) {
-            PSMTXCopy(mtx, mana2->m_reflectionMtx);
-            if (mana2->m_paraboloidReady != 0) {
-                mana2->m_runtimeColor.r = meshData->m_colors[0];
-                mana2->m_runtimeColor.g = meshData->m_colors[1];
-                mana2->m_runtimeColor.b = meshData->m_colors[2];
-                mana2->m_runtimeColor.a = 0x80;
-                DCFlushRange(&mana2->m_runtimeColor, 4);
-                GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
-                GXSetArray((GXAttr)0xD, mana2->m_meshTexCoords, 4);
-                MaterialMan.SetManaReflectionEnv(mana2->m_meshReflectionVec, mana2->m_baseParaboloidTexObjs, 0x2ACE0F);
-                GXSetCullMode((GXCullMode)1);
-                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-                GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
-            }
-        } else {
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    if (!draw) {
+        return;
+    }
+
+    if (strcmp(shape, s_manaShapeObj) != 0) {
+        PSMTXCopy(mtx, mana2->m_reflectionMtx);
+        if (mana2->m_paraboloidReady != 0) {
+            mana2->m_runtimeColor.r = meshData->m_colors[0];
+            mana2->m_runtimeColor.g = meshData->m_colors[1];
+            mana2->m_runtimeColor.b = meshData->m_colors[2];
+            mana2->m_runtimeColor.a = 0x80;
+            DCFlushRange(&mana2->m_runtimeColor, 4);
+            GXSetArray((GXAttr)0xB, mana2->m_meshColors, 4);
+            GXSetArray((GXAttr)0xD, mana2->m_meshTexCoords, 4);
+            MaterialMan.SetManaReflectionEnv(mana2->m_meshReflectionVec, mana2->m_baseParaboloidTexObjs, 0x2ACE0F);
+            GXSetCullMode((GXCullMode)1);
+            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
             MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
-            GXCallDisplayList(displayList->m_data, displayList->m_size);
+            GXCallDisplayList(mana2->m_displayListCopies[dlIndex], displayList->m_size);
         }
+    } else {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+        MaterialMan.SetMaterial(model->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
+        GXCallDisplayList(displayList->m_data, displayList->m_size);
     }
 }

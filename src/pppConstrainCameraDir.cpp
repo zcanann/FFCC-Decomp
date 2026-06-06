@@ -22,11 +22,7 @@ extern const float kConstrainCameraDirZero;
 
 STATIC_ASSERT(offsetof(pppConstrainCameraDir, m_workArea) == 0x80);
 
-struct ConstrainCameraDirDataOffsets
-{
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(ConstrainCameraDirDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(ConstrainCameraDirDataOffsets, m_workOffset) == 0x0);
 
 static inline ConstrainCameraDirDataOffsets* GetConstrainCameraDirDataOffsets(_pppCtrlTable* ctrl)

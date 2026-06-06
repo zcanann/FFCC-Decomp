@@ -10,6 +10,12 @@ struct CharaBreakDisplayListPair;
 
 typedef _pppPObject pppCharaBreak;
 
+struct CharaBreakDataOffsets {
+    s32 m_colorWorkOffset;
+    s32 _unused1;
+    s32 m_workOffset;
+};
+
 struct POLYGON_DATA {
     u8 m_enabled;
     u8 m_alpha;

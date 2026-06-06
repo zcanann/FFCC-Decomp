@@ -93,12 +93,7 @@ static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, in
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
-struct CharaBreakDataOffsets {
-    s32 m_colorWorkOffset;
-    s32 _unused1;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(CharaBreakDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_colorWorkOffset) == 0x0);
 STATIC_ASSERT(offsetof(CharaBreakDataOffsets, m_workOffset) == 0x8);
 

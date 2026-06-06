@@ -12,11 +12,7 @@ typedef CChara::CMesh::CDisplayList EraseCharaPartsDisplayList;
 typedef CChara::CMesh::CRefData EraseCharaPartsMeshData;
 typedef CChara::CMesh EraseCharaPartsMesh;
 
-struct EraseCharaPartsDataOffsets {
-    s32 m_sourceColorOffset;
-    s32 m_callbackColorOffset;
-};
-
+STATIC_ASSERT(sizeof(EraseCharaPartsDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_sourceColorOffset) == 0x0);
 STATIC_ASSERT(offsetof(EraseCharaPartsDataOffsets, m_callbackColorOffset) == 0x4);
 

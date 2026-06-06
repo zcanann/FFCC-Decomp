@@ -194,28 +194,28 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const float rx3 = RotateShapeX(entry, 0x2C, 0x2E, drawAngle);
             const float ry3 = RotateShapeY(entry, 0x2C, 0x2E, drawAngle);
 
-            if (rx0 < minX) {
+            if (minX > rx0) {
                 minX = rx0;
             }
-            if (rx1 < minX) {
+            if (minX > rx1) {
                 minX = rx1;
             }
-            if (rx2 < minX) {
+            if (minX > rx2) {
                 minX = rx2;
             }
-            if (rx3 < minX) {
+            if (minX > rx3) {
                 minX = rx3;
             }
-            if (ry0 < minY) {
+            if (minY > ry0) {
                 minY = ry0;
             }
-            if (ry1 < minY) {
+            if (minY > ry1) {
                 minY = ry1;
             }
-            if (ry2 < minY) {
+            if (minY > ry2) {
                 minY = ry2;
             }
-            if (ry3 < minY) {
+            if (minY > ry3) {
                 minY = ry3;
             }
 

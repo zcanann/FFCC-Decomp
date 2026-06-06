@@ -29,6 +29,17 @@ static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 typedef pppLaserWorkBase pppYmLaserWork;
 typedef pppLaserColorBlock pppYmLaserColorData;
 
+struct pppYmLaserCylinder {
+	Vec m_bottom;
+	Vec m_top;
+	Vec m_axis;
+	float m_radius;
+	CMapCylinderBound m_bound;
+};
+
+STATIC_ASSERT(sizeof(pppYmLaserCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(offsetof(pppYmLaserCylinder, m_bound) == offsetof(CMapCylinder, m_bound));
+
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_workOffset) == 0x8);
 
@@ -68,7 +79,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	pppYmLaserWork* work = GetYmLaserWork(laser, data);
 	pppYmLaserColorData* colorData = GetYmLaserColorData(laser, data);
 	s32 dataValIndex = step->m_dataValIndex;
-	u32 count;
+	s32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;
@@ -323,7 +334,7 @@ static const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
 extern const f32 FLOAT_80330df8 = 2.0f;
 extern const f32 FLOAT_80330dfc = 0.5f;
 extern const f32 FLOAT_80330e00 = 0.25f;
-static const f64 DOUBLE_80330E08 = 4503601774854144.0;
+extern const f64 DOUBLE_80330E08 = 4503601774854144.0;
 
 /*
  * --INFO--
@@ -405,12 +416,18 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		pppSubVector(localA, work->m_points[i], work->m_origin);
 		PSVECScale(&localA, &localA, YmLaserConst(FLOAT_80330de4));
 
-		CMapCylinder cyl(YmLaserConst(FLOAT_80330de8), YmLaserConst(FLOAT_80330dec));
+		pppYmLaserCylinder cyl;
+		cyl.m_bound.m_max.x = YmLaserConst(FLOAT_80330de8);
+		cyl.m_bound.m_max.y = YmLaserConst(FLOAT_80330de8);
+		cyl.m_bound.m_max.z = YmLaserConst(FLOAT_80330de8);
+		cyl.m_bound.m_min.x = YmLaserConst(FLOAT_80330dec);
+		cyl.m_bound.m_min.y = YmLaserConst(FLOAT_80330dec);
+		cyl.m_bound.m_min.z = YmLaserConst(FLOAT_80330dec);
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne_80330DC0;
 
-		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

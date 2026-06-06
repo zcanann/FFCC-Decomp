@@ -1879,7 +1879,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -5: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2012,7 +2012,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0B: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonDown(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2024,7 +2024,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0C: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -3225,7 +3225,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float angle = static_cast<float>(object->m_localBase[2]);
         Vec normal = {sinf(angle), 0.0f, cosf(angle)};
         Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
-        Mtx& reflectMtx = *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(this) + 0x12b4);
+        Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(reflectMtx, &point, &normal);
         runtime->push(object, 0);
         outResult = 0;
@@ -4104,8 +4104,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0xF0: {
         runtime->push(
             object,
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + *object->m_localBase * 8) &
-                static_cast<unsigned int>(1ULL << object->m_localBase[1]));
+            m_spawnBits[*object->m_localBase].m_hi & static_cast<unsigned int>(1ULL << object->m_localBase[1]));
         outResult = 0;
         return 1;
     }

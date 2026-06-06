@@ -185,7 +185,7 @@ public:
 	u32 m_debugFlags;               // 0x129C
 	u32 m_eventFlags;               // 0x12A0
 	u32 m_eventMask;                // 0x12A4
-	u8 m_pad_12A8_12AC[0x4];        // 0x12A8
+	u32 m_padInputDisableMask;      // 0x12A8
 	u32 m_centerState;              // 0x12AC
 	float m_centerDistanceScale;    // 0x12B0
 	Mtx m_centerMatrix;             // 0x12B4
@@ -228,6 +228,7 @@ public:
 STATIC_ASSERT(sizeof(CFlatRuntime2) == 0x10440);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugFlags) == 0x129C);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_eventFlags) == 0x12A0);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_padInputDisableMask) == 0x12A8);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_centerState) == 0x12AC);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_centerMatrix) == 0x12B4);
 STATIC_ASSERT(offsetof(CFlatRuntime2, m_gameFlags) == 0x12E4);

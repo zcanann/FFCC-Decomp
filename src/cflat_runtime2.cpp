@@ -2442,7 +2442,7 @@ void CFlatRuntime2::resetChangeScript()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	*reinterpret_cast<u32*>(m_pad_10404_10408) = 0;
-	*reinterpret_cast<u32*>(m_pad_12A8_12AC) = 0;
+	m_padInputDisableMask = 0;
 	m_centerState = 0;
 	*reinterpret_cast<u32*>(runtime + 0x1BF4) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x2708) = 0;

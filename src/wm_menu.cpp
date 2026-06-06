@@ -8139,30 +8139,25 @@ void CMenuPcs::DrawCMLife()
 			x += FLOAT_80331558;
 		}
 
+		char statusFlagA;
+		char statusFlagB;
 		if (m_cmakeWorkActive == 1 && cmakeWork != 0) {
 			const unsigned char* const work = cmakeWork + slot * 0x9C0;
-			const char flagA = work[0x1D90];
-			const char flagB = work[0x1D91];
-			if (flagA != 0 || flagB != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			}
+			statusFlagA = work[0x1D90];
+			statusFlagB = work[0x1D91];
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                caravanWork.m_shopBusyFlag != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			}
+			statusFlagA = caravanWork.m_shopBusyFlag;
+			statusFlagB = caravanWork.m_caravanLocalFlags;
+		}
+		if (statusFlagA != 0 || statusFlagB != 0) {
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+			MenuPcs.DrawRect(
+			    0, xBase + static_cast<float>(DOUBLE_80331670),
+			                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
+			                                FLOAT_80331440, FLOAT_803313dc,
+			                                statusFlagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
+			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}
 }

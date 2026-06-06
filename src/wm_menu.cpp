@@ -10584,20 +10584,20 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	float v0;
 	float v1;
 
-	if ((flags & 8) == 0) {
-		u0 = tx + halfTexel;
-		u1 = (tx + w) - halfTexel;
-	} else {
+	if ((flags & 8) != 0) {
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
+	} else {
+		u0 = tx + halfTexel;
+		u1 = (tx + w) - halfTexel;
 	}
 
-	if ((flags & 4) == 0) {
-		v0 = ty + halfTexel;
-		v1 = (ty + h) - halfTexel;
-	} else {
+	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
 		v0 = (ty + h) - halfTexel;
+	} else {
+		v0 = ty + halfTexel;
+		v1 = (ty + h) - halfTexel;
 	}
 
 	if ((flags & 1) != 0) {

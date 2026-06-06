@@ -723,7 +723,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         chunkFile.GetF4();
                         spotLight->m_falloff = chunkFile.GetF4();
                         unsigned short targetIndex = chunkFile.Get2();
-                        spotLight->m_target = MapObjArrayStart() + targetIndex;
+                        spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
                         spotLight->m_colorMode = chunkFile.Get1();
                         spotLight->m_useAltColor = chunkFile.Get1();
                         spotLight->m_angle = chunkFile.GetF4();
@@ -796,7 +796,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 chunkFile.GetF4();
                 spotLight->m_falloff = chunkFile.GetF4();
                 unsigned short targetIndex = chunkFile.Get2();
-                spotLight->m_target = MapObjArrayStart() + targetIndex;
+                spotLight->m_target = MapMng.m_mapObjArray + targetIndex;
                 spotLight->m_colorMode = chunkFile.Get1();
                 spotLight->m_useAltColor = chunkFile.Get1();
                 spotLight->m_angle = chunkFile.GetF4();

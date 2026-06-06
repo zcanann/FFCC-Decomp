@@ -321,20 +321,20 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_shopState = 1;
 
 	value = (int)m_id - 100;
-	value = (value / 200) + (value >> 31);
-	m_tribeId = (short)value - (short)(value >> 31);
+	m_tribeId = value / 200;
 
 	value = (int)m_id - 100;
-	value = (value / 100) + (value >> 31);
-	m_genderFlag = ((short)value - (short)(value >> 31)) & 1;
+	m_genderFlag = (value / 100) & 1;
 
 	clearCaravanWork();
 	m_bonusCondition = 0;
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	CGame::CBossArtifactStage* bossArtifacts =
-		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-	m_artifactRelated[3] = bossArtifacts->m_entries[8].m_values[1];
-	m_artifactRelated[4] = bossArtifacts->m_entries[8].m_values[2];
+	m_artifactRelated[3] = Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
+								.m_entries[8]
+								.m_values[1];
+	m_artifactRelated[4] = Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex]
+								.m_entries[8]
+								.m_values[2];
 }
 
 /*
@@ -350,11 +350,12 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 {
 	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	CGame::CBossArtifactStage* bossArtifacts =
-		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
-	CGame::CBossArtifactEntry* entry = &bossArtifacts->m_entries[bonusCondition + 8];
-	m_artifactRelated[3] = entry->m_values[1];
-	m_artifactRelated[4] = entry->m_values[2];
+	m_artifactRelated[3] =
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
+			.m_values[1];
+	m_artifactRelated[4] =
+		Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex].m_entries[bonusCondition + 8]
+			.m_values[2];
 }
 
 /*

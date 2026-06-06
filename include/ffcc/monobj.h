@@ -256,7 +256,7 @@ public:
     void moveFrameFuncLastBoss();
 
     void teleport(int, int, int, int, int, int, int, int, int, Vec*, int&, Vec&);
-    void suikomiSub(CGObject*, float);
+    inline void suikomiSub(CGObject*, float);
     void suikomi(int, float);
     int tgtFuncGigasLoad(int);
 

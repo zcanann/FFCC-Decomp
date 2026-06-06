@@ -1274,9 +1274,8 @@ void CGItemObj::onFrame()
 			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
 			putParticle((soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
-			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), FLOAT_80331bb8, FLOAT_80331bb8,
-			             zero);
+			             CVector(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();
 		}

@@ -34,11 +34,12 @@ struct pppYmLaserCylinder {
 	Vec m_top;
 	Vec m_axis;
 	float m_radius;
-	CMapCylinderBound m_bound;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
 };
 
 STATIC_ASSERT(sizeof(pppYmLaserCylinder) == sizeof(CMapCylinder));
-STATIC_ASSERT(offsetof(pppYmLaserCylinder, m_bound) == offsetof(CMapCylinder, m_bound));
+STATIC_ASSERT(offsetof(pppYmLaserCylinder, m_boundsMin) == offsetof(CMapCylinder, m_bound));
 
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_workOffset) == 0x8);
@@ -79,7 +80,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	pppYmLaserWork* work = GetYmLaserWork(laser, data);
 	pppYmLaserColorData* colorData = GetYmLaserColorData(laser, data);
 	s32 dataValIndex = step->m_dataValIndex;
-	s32 count;
+	u32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;
@@ -417,12 +418,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		PSVECScale(&localA, &localA, YmLaserConst(FLOAT_80330de4));
 
 		pppYmLaserCylinder cyl;
-		cyl.m_bound.m_max.x = YmLaserConst(FLOAT_80330de8);
-		cyl.m_bound.m_max.y = YmLaserConst(FLOAT_80330de8);
-		cyl.m_bound.m_max.z = YmLaserConst(FLOAT_80330de8);
-		cyl.m_bound.m_min.x = YmLaserConst(FLOAT_80330dec);
-		cyl.m_bound.m_min.y = YmLaserConst(FLOAT_80330dec);
-		cyl.m_bound.m_min.z = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMin.x = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMin.y = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMin.z = YmLaserConst(FLOAT_80330de8);
+		cyl.m_boundsMax.x = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMax.y = YmLaserConst(FLOAT_80330dec);
+		cyl.m_boundsMax.z = YmLaserConst(FLOAT_80330dec);
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
 		cyl.m_radius = kPppYmLaserOne_80330DC0;

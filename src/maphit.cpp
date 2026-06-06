@@ -605,6 +605,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
         }
 
+        if (g_hit_lpface->m_edgeFlags == 0) {
+            return 0;
+        }
+
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];

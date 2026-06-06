@@ -19,9 +19,11 @@ CPad Pad;
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 static const char s_CPad[] = "CPad";
-static const float FLOAT_8032f820 = 0.0f;
-static const float FLOAT_8032f824 = 0.0078125f;
-static const float FLOAT_8032f828 = 255.0f;
+extern const float FLOAT_8032f820 = 0.0f;
+extern const float FLOAT_8032f824 = 0.0078125f;
+extern const float FLOAT_8032f828 = 255.0f;
+extern const double DOUBLE_8032f830 = 4503601774854144.0;
+extern const double DOUBLE_8032f838 = 4503599627370496.0;
 static const char s_pad_cpp[] = { 'p', 'a', 'd', '.', 'c', 'p', 'p', 0 };
 static const char s_rb[] = { 'r', 'b', 0 };
 static const char s_replay_dat[] = "/replay.dat";

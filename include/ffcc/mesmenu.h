@@ -23,6 +23,7 @@ public:
     void Open(char*, int, int, int, int, int, int);
     void CloseRequest(int);
     void SetPos(float, float);
+    int IsUse();
     void SetBattleIndex(int index)
     {
         m_menuIndex = index;

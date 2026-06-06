@@ -1099,10 +1099,10 @@ void CGraphicPcs::ReqScreenCapture()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+int CMesMenu::IsUse()
 {
     unsigned char result = 0;
-    if (reinterpret_cast<CMesMenu*>(mesMenu)->IsActiveMessage()) {
+    if (m_active != 0 && m_state <= 1 && m_mes.GetWait() != 4) {
         result = 1;
     }
 
@@ -2833,7 +2833,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             outResult = 0;
             return 1;
         }
-        if (IsUse__8CMesMenuFv(mesMenu) == 0) {
+        if (mesMenu->IsUse() == 0) {
             runtime->push(object, 0);
             outResult = 0;
             return 1;

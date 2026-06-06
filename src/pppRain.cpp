@@ -160,9 +160,9 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
  */
 void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
-    int i;
-    RainDrop* drop;
     VRain* work;
+    RainDrop* drop;
+    int i;
     int randA;
     int randB;
     if (ppvUserStopPartF != 0) {
@@ -171,14 +171,12 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 
     work = GetRainWork(pppRain, param_3);
     if (work->drops == 0) {
-        RainDrop* dropData;
-
         work->drops = (RainDrop*)pppMemAlloc(
             param_2->m_dataValIndex * sizeof(RainDrop),
             ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppRain_cpp),
             0x7f);
-        dropData = work->drops;
+        drop = work->drops;
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {
             float minX;
             float maxX;
@@ -198,29 +196,29 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
             minX = param_2->m_minX;
             maxX = param_2->m_maxX;
             zRange = param_2->m_maxZ - param_2->m_minZ;
-            dropData->posX = unitA * (maxX - minX) + minX;
-            dropData->posY = param_2->m_maxY;
-            dropData->posZ = unitB * zRange + param_2->m_minZ;
-            dropData->dirX = -param_2->m_initWOrk;
-            dropData->dirY = param_2->m_driftY;
-            dropData->dirZ = -param_2->m_arg3;
-            PSVECNormalize((Vec*)&dropData->dirX, (Vec*)&dropData->dirX);
+            drop->posX = unitA * (maxX - minX) + minX;
+            drop->posY = param_2->m_maxY;
+            drop->posZ = unitB * zRange + param_2->m_minZ;
+            drop->dirX = -param_2->m_initWOrk;
+            drop->dirY = param_2->m_driftY;
+            drop->dirZ = -param_2->m_arg3;
+            PSVECNormalize((Vec*)&drop->dirX, (Vec*)&drop->dirX);
 
             lengthDelta = unitA * param_2->m_lengthRand;
-            dropData->length = param_2->m_lengthBase;
+            drop->length = param_2->m_lengthBase;
             lengthDelta = (randA % 2 == 0) ? lengthDelta : -lengthDelta;
-            dropData->length += lengthDelta;
+            drop->length += lengthDelta;
 
             lifeRange = param_2->m_lifeRange;
             lifeBase = param_2->m_lifeBase;
             lifeRemainder = randA % lifeRange;
-            dropData->life = lifeBase;
+            drop->life = lifeBase;
             lifeJitter = -lifeRemainder;
             if (randA % 2 == 0) {
                 lifeJitter = lifeRemainder;
             }
-            dropData->life = (s16)(dropData->life + lifeJitter);
-            dropData++;
+            drop->life = (s16)(drop->life + lifeJitter);
+            drop++;
         }
     }
 

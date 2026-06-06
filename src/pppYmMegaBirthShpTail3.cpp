@@ -35,7 +35,7 @@ struct VYmMegaBirthShpTail3
     unsigned short m_pathIndex;
 };
 
-static pppFMATRIX g_matUnit;
+pppFMATRIX g_matUnit3;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
@@ -868,7 +868,7 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;
     *(u16*)work[2].value[2] = (u16)rand();
-    pppUnitMatrix(g_matUnit);
+    pppUnitMatrix(g_matUnit3);
     memset(work[1].value + 2, 0, 8);
     memset(work[1].value[2] + 2, 0, 8);
     memset(work + 2, 0, 8);

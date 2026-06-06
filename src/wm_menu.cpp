@@ -4243,18 +4243,18 @@ void CMenuPcs::DrawCMakeMenu()
 void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState == 0) {
 		return;
 	}
 
-	const short state = worldState[0x10 / sizeof(short)];
+	const short state = worldState->m_mainState;
 	if (((state == 0) && bytes[0x12] == 0) || state >= 4) {
 		return;
 	}
 
 	DrawFukidashi();
-	const short step = worldState[0x22 / sizeof(short)];
+	const short step = worldState->m_frameCounter;
 	float moveAlpha;
 	if (state == 1) {
 		moveAlpha = static_cast<float>((static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
@@ -4273,7 +4273,7 @@ void CMenuPcs::DrawMoveMenu()
 	}
 	DrawWMFrame();
 
-	if (worldState[0x10 / sizeof(short)] > 0 && worldState[0x10 / sizeof(short)] < 3) {
+	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
 		unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
 		Mtx savedCamera;
@@ -4346,32 +4346,32 @@ void CMenuPcs::DrawMoveMenu()
 		DrawInit();
 	}
 
-	if (worldState[0x10 / sizeof(short)] != 2 || bytes[0x13] != 0) {
-		worldState[0x22 / sizeof(short)]++;
+	if (worldState->m_mainState != 2 || bytes[0x13] != 0) {
+		worldState->m_frameCounter++;
 	}
 
-	if (worldState[0x10 / sizeof(short)] == 0 ||
-	    (worldState[0x10 / sizeof(short)] == 2 && bytes[0x13] != 0)) {
-		if (static_cast<double>(*reinterpret_cast<float*>(worldState)) <= DOUBLE_803314f0) {
-			worldState[0x10 / sizeof(short)]++;
+	if (worldState->m_mainState == 0 ||
+	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
+		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
+			worldState->m_mainState++;
 			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 4) = 0;
 			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 8) = 0;
-			worldState[0x22 / sizeof(short)] = 0;
+			worldState->m_frameCounter = 0;
 		}
-	} else if (worldState[0x10 / sizeof(short)] == 1 && worldState[0x22 / sizeof(short)] > 9) {
-		worldState[0x10 / sizeof(short)]++;
-		worldState[0x22 / sizeof(short)] = 0;
+	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter > 9) {
+		worldState->m_mainState++;
+		worldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];
 		stackData[0].m_word = 3;
 		stackData[1].m_word = 0;
 		stackData[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-	} else if (worldState[0x10 / sizeof(short)] == 2 && worldState[0x22 / sizeof(short)] > 9) {
-		worldState[0x10 / sizeof(short)]++;
-		worldState[0x22 / sizeof(short)] = 0;
-	} else if (worldState[0x10 / sizeof(short)] == 3 && worldState[0x22 / sizeof(short)] > 9) {
-		worldState[0x10 / sizeof(short)]++;
-		worldState[0x22 / sizeof(short)] = 0;
+	} else if (worldState->m_mainState == 2 && worldState->m_frameCounter > 9) {
+		worldState->m_mainState++;
+		worldState->m_frameCounter = 0;
+	} else if (worldState->m_mainState == 3 && worldState->m_frameCounter > 9) {
+		worldState->m_mainState++;
+		worldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];
 		stackData[0].m_word = 4;
 		stackData[1].m_word = 0;

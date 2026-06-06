@@ -90,7 +90,13 @@ public:
     struct CBossArtifactStage
     {
         unsigned short m_bonusConditions[16];    // 0x00
-        CBossArtifactEntry m_entries[40];        // 0x20
+        union {
+            CBossArtifactEntry m_entries[40];    // 0x20
+            struct {
+                CBossArtifactEntry m_prefixEntries[8]; // 0x20
+                CBossArtifactEntry m_bonusEntries[32]; // 0x60
+            } m_entryView;
+        };
         unsigned short m_rankThresholds[4];      // 0x160
     }; // Size 0x168
 

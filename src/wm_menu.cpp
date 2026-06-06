@@ -3908,7 +3908,7 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				int msgId = 0;
 				int msgParam = 0;
-				short ss = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+				short ss = typedWorldState->m_subState;
 				if (ss == 5) msgId = 1;
 				else if (ss == 6) msgId = 2;
 				else if (ss == 7) msgId = 3;
@@ -3922,11 +3922,10 @@ void CMenuPcs::DrawMCardMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-				if (*reinterpret_cast<short*>(worldState + 0x0E) < 0) {
-					*reinterpret_cast<short*>(worldState + 0x16) = 3;
+				if (typedWorldState->m_state0E < 0) {
+					typedWorldState->m_subState = 3;
 				} else {
-					*reinterpret_cast<short*>(worldState + 0x16) = 2;
+					typedWorldState->m_subState = 2;
 				}
 			}
 			break;

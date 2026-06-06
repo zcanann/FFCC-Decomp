@@ -65,7 +65,7 @@ extern const char s_bonus16_80331E60[] = "bonus16";
 extern const char s_bonus17_80331E68[] = "bonus17";
 extern const char s_bonus18_80331E70[] = "bonus18";
 
-extern "C" char* PTR_s_bonus[] = {
+char* PTR_s_bonus[] = {
     const_cast<char*>(s_bonus_80331DE0),
     0,
     0,
@@ -77,7 +77,7 @@ extern "C" char* PTR_s_bonus[] = {
     0,
 };
 
-extern "C" CMenuPcs::CTmp s_bonusTextureTable[] = {
+CMenuPcs::CTmp s_bonusTextureTable[] = {
     {2, const_cast<char*>(s_bonus1_80331DE8)},
     {2, const_cast<char*>(s_bonus2_80331DF0)},
     {2, const_cast<char*>(s_bonus3_80331DF8)},

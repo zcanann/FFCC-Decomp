@@ -98,5 +98,7 @@ public:
 };
 
 extern CPartPcs PartPcs;
+extern "C" unsigned char g_IsDrawHeapSize;
+extern char g_MsgFlashy[0x36];
 
 #endif

@@ -24,7 +24,6 @@ extern "C" float FLOAT_803301d0;
 extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
-extern "C" CLightPcs::CBumpLight* gCharaPartWorkPtr;
 extern const char s_CChara_80330220[];
 
 inline void* operator new(unsigned long, void* ptr)

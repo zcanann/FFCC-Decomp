@@ -5,6 +5,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/p_map.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
@@ -14,9 +15,6 @@
 #include <string.h>
 
 CDbgMenuPcs DbgMenuPcs;
-
-extern unsigned char g_IsDrawHeapSize;
-extern unsigned char g_map_draw_prof;
 
 struct DbgMenuDef {
     const char* text;

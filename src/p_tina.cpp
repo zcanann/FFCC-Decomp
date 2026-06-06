@@ -9,7 +9,6 @@
 #include "ffcc/p_usb.h"
 #include "ffcc/stopwatch.h"
 extern "C" {
-extern int gPppHeapUseRateWords[3];
 extern const char sDebugSpinnerText[5];
 extern const float kPppHeapUseRateDivisor;
 }
@@ -37,7 +36,6 @@ extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
 
-extern char g_MsgFlashy[];
 extern const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,

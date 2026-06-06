@@ -451,7 +451,7 @@ extern "C" char* PTR_s_world2[] = {
     0,
     0,
 };
-extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
+CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
     {8, lbl_803331F8},
     {8, lbl_80333200},
     {8, lbl_80333208},

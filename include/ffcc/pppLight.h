@@ -6,6 +6,10 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct PppLightDataOffsets {
+	s32 m_workOffset;
+};
+
 struct PppLightStep {
 	s32 m_sourceId;
 	u8 m_pad04[0x4];

@@ -3,15 +3,13 @@
 
 #include <Dolphin/os.h>
 
-class GbaPInfo;
-class GbaCMakeInfo;
+struct GbaPInfo;
+struct GbaCMakeInfo;
 class HitEInfo;
 
 struct GbaPInfo
 {
     unsigned char m_data[0x370];
-
-    GbaPInfo &operator=(const GbaPInfo&);
 };
 
 struct GbaCMakeInfo
@@ -26,14 +24,30 @@ struct GbaCMakeInfo
     unsigned char m_favoriteLead[2];
     unsigned char m_favorite[4];
     unsigned char m_jobType;
-
-    GbaCMakeInfo &operator=(const GbaCMakeInfo&);
 };
 
 struct GbaQueueHitInfo
 {
     short m_enemyId;
     short m_enemyType;
+};
+
+struct GbaQueueMapObjEntry
+{
+    unsigned char m_type;
+    unsigned char _pad01[3];
+    short m_x;
+    short m_y;
+    short m_z;
+    short m_radius;
+};
+
+struct GbaQueueMapObjWork
+{
+    unsigned char m_count;
+    unsigned char _pad01[3];
+    unsigned int m_drawFlags;
+    GbaQueueMapObjEntry m_entries[32];
 };
 
 class GbaQueue
@@ -178,20 +192,52 @@ public:
 
 private:
     OSSemaphore accessSemaphores[4];  // 0x0000
-    unsigned char _pad30[0x2C59];    // 0x0030
+    unsigned char _pad30[0x414];      // 0x0030
+    int m_stageNo;                    // 0x0444
+    int m_mapNo;                      // 0x0448
+    unsigned char m_stageFlags;       // 0x044C
+    unsigned char _pad44D[0x26A7];    // 0x044D
+    unsigned char m_mapItemCount;     // 0x2AF4
+    unsigned char _pad2AF5[0x3];      // 0x2AF5
+    int m_scrInitEnd;                 // 0x2AF8
+    unsigned char m_letterDatFlg;     // 0x2AFC
+    unsigned char _pad2AFD[0x3];      // 0x2AFD
+    GbaQueueMapObjWork m_mapObjWork;  // 0x2B00
+    unsigned char m_makeMapObjFlg;    // 0x2C88
     unsigned char m_letterFlags;      // 0x2C89
-    unsigned char _pad2C8A[0x28];     // 0x2C8A
+    unsigned char m_compatibilityFlg[4]; // 0x2C8A
+    unsigned short m_sendMask;        // 0x2C8E
+    unsigned char _pad2C90[0x6];      // 0x2C90
+    signed char m_maskSendState[4];   // 0x2C96
+    unsigned char _pad2C9A[0x2];      // 0x2C9A
+    unsigned int m_pendingMoney[4];   // 0x2C9C
+    unsigned char m_moneyState[4];    // 0x2CAC
+    unsigned char m_moneyFlags;       // 0x2CB0
+    unsigned char m_favoriteFlags;    // 0x2CB1
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
-    unsigned char _pad2D32[0x6];      // 0x2D32
+    unsigned char m_radarType[4];     // 0x2D32
+    unsigned char m_artifactFlags;    // 0x2D36
+    unsigned char m_chgUseItemFlags;  // 0x2D37
     unsigned char m_shopFlags;        // 0x2D38
     unsigned char m_shopStatusFlags;  // 0x2D39
-    unsigned char _pad2D3A[0x0A];     // 0x2D3A
+    unsigned char m_sellFlg;          // 0x2D3A
+    unsigned char m_buyFlg;           // 0x2D3B
+    unsigned char m_mkSmithFlg;       // 0x2D3C
+    unsigned char m_resetFlags;       // 0x2D3D
+    unsigned char m_strengthFlags;    // 0x2D3E
+    unsigned char m_artiDatFlags;     // 0x2D3F
+    unsigned char m_radarTypeFlags;   // 0x2D40
+    unsigned char m_radarMode;        // 0x2D41
+    unsigned char m_chgRadarMode;     // 0x2D42
+    unsigned char _pad2D43;           // 0x2D43
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55
     char m_singleMode;                // 0x2D56
     char m_controllerMode;            // 0x2D57
-    unsigned char _pad2D58[0x3];      // 0x2D58
+    unsigned char _pad2D58;           // 0x2D58
+    unsigned char m_prevOutOfShoukiFlags; // 0x2D59
+    unsigned char m_outOfShoukiFlags;     // 0x2D5A
     char m_pauseMode;                 // 0x2D5B
     unsigned char m_spModeBits;       // 0x2D5C
     unsigned char m_spModeFlags;      // 0x2D5D

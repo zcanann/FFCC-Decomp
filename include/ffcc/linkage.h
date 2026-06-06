@@ -3,8 +3,8 @@
 
 #include "global.h"
 #include "dolphin/mtx.h"
+#include "ffcc/cflat_runtime2.h"
 
-class CFlatRuntime2;
 extern CFlatRuntime2 CFlat;
 class CChara;
 extern CChara Chara;
@@ -48,7 +48,6 @@ class CAmemCacheSet;
 extern CAmemCacheSet ppvAmemCacheSet;
 extern u32 CFlatFlags;
 extern CFlatRuntime2& gCFlatRuntime2;
-class CFlatRuntime;
 class CChara;
 extern CChara& gChara;
 
@@ -80,9 +79,14 @@ static inline u8* CFlatBytes()
     return reinterpret_cast<u8*>(&CFlat);
 }
 
+static inline CFlatRuntime2& CFlatRuntime2Storage()
+{
+    return CFlat;
+}
+
 static inline u32& CFlatRuntimeDebugFlags()
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x129C);
+    return CFlatRuntime2Storage().m_debugFlags;
 }
 
 static inline CFlatRuntime& gCFlatRuntime()
@@ -90,24 +94,19 @@ static inline CFlatRuntime& gCFlatRuntime()
     return *reinterpret_cast<CFlatRuntime*>(&CFlat);
 }
 
-static inline CFlatRuntime2& CFlatRuntime2Storage()
-{
-    return CFlat;
-}
-
 static inline int& CFlatPermanentVarCount()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x4);
+    return gCFlatRuntime().m_permanentVarCount;
 }
 
 static inline unsigned char*& CFlatPermanentVarDefs()
 {
-    return *reinterpret_cast<unsigned char**>(CFlatBytes() + 0x8);
+    return gCFlatRuntime().m_permanentVarDefs;
 }
 
 static inline unsigned char*& CFlatPermanentVarValues()
 {
-    return *reinterpret_cast<unsigned char**>(CFlatBytes() + 0xC);
+    return gCFlatRuntime().m_permanentVarValues;
 }
 
 static inline u8& CFlatPermanentVarFlagByte(int offset)
@@ -122,17 +121,17 @@ static inline u32& CFlatPermanentVarWord(int offset)
 
 static inline float& CFlatPerformanceTotalTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x48);
+    return gCFlatRuntime().m_performanceTotalTime;
 }
 
 static inline u32& CFlatEventFlags()
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x12A0);
+    return CFlatRuntime2Storage().m_eventFlags;
 }
 
 static inline u32& CFlatEventMask()
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x12A4);
+    return CFlatRuntime2Storage().m_eventMask;
 }
 
 static inline u32 CFlatEnabledEventFlags()
@@ -142,102 +141,102 @@ static inline u32 CFlatEnabledEventFlags()
 
 static inline u8& CFlatEventFlagsByte()
 {
-    return CFlatBytes()[0x12A0];
+    return reinterpret_cast<u8*>(&CFlatRuntime2Storage().m_eventFlags)[0];
 }
 
 static inline u32& CFlatCenterState()
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x12AC);
+    return CFlatRuntime2Storage().m_centerState;
 }
 
 static inline float& CFlatCenterDistanceScale()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x12B0);
+    return CFlatRuntime2Storage().m_centerDistanceScale;
 }
 
 static inline Mtx& CFlatCenterMatrix()
 {
-    return *reinterpret_cast<Mtx*>(CFlatBytes() + 0x12B4);
+    return CFlatRuntime2Storage().m_centerMatrix;
 }
 
 static inline u8& CFlatGameFlags()
 {
-    return CFlatBytes()[0x12E4];
+    return CFlatRuntime2Storage().m_gameFlags;
 }
 
 static inline int& CFlatBossState()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x12E8);
+    return CFlatRuntime2Storage().m_bossState;
 }
 
 static inline int& CFlatBossSubState()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x12EC);
+    return CFlatRuntime2Storage().m_bossSubState;
 }
 
 static inline u32& CFlatSpawnBitLo(int index)
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x12F0 + index * 8);
+    return CFlatRuntime2Storage().m_spawnBits[index].m_lo;
 }
 
 static inline u32& CFlatSpawnBitHi(int index)
 {
-    return *reinterpret_cast<u32*>(CFlatBytes() + 0x12F4 + index * 8);
+    return CFlatRuntime2Storage().m_spawnBits[index].m_hi;
 }
 
 static inline int& CFlatItemCarryMode()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x12AC);
+    return reinterpret_cast<int&>(CFlatRuntime2Storage().m_centerState);
 }
 
 static inline int& CFlatLetterEventEnabled()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x10408);
+    return CFlatRuntime2Storage().m_letterEventEnabled;
 }
 
 static inline int& CFlatSaveSceneEnabled()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x10418);
+    return CFlatRuntime2Storage().m_saveSceneEnabled;
 }
 
 static inline int& CFlatPartyTraceParticleSlot(int port)
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x1041C + port * sizeof(int));
+    return CFlatRuntime2Storage().m_partyTraceParticleSlot[port];
 }
 
 static inline int& CFlatItemTraceParticleSlot()
 {
-    return *reinterpret_cast<int*>(CFlatBytes() + 0x1042C);
+    return CFlatRuntime2Storage().m_itemTraceParticleSlot;
 }
 
 static inline Vec& CFlatParticleWorkPosition()
 {
-    return *reinterpret_cast<Vec*>(CFlatBytes() + 0x1740);
+    return CFlatRuntime2Storage().m_particleWorkPos;
 }
 
 static inline float& CFlatMoveTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x1338);
+    return CFlatRuntime2Storage().m_moveTime;
 }
 
 static inline float& CFlatBgCollisionTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x133C);
+    return CFlatRuntime2Storage().m_bgCollisionTime;
 }
 
 static inline float& CFlatObjectCollisionTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x1340);
+    return CFlatRuntime2Storage().m_objectCollisionTime;
 }
 
 static inline float& CFlatUpdateTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x1344);
+    return CFlatRuntime2Storage().m_updateTime;
 }
 
 static inline float& CFlatHitTime()
 {
-    return *reinterpret_cast<float*>(CFlatBytes() + 0x1348);
+    return CFlatRuntime2Storage().m_hitTime;
 }
 
 #endif // _FFCC_LINKAGE_H_

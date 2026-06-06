@@ -9,6 +9,12 @@ struct _pppPObject;
 typedef _pppPObject pppRain;
 typedef _pppCtrlTable RAIN_DATA;
 
+struct RainDataOffsets {
+    s32 _unused0;
+    s32 m_colorDataOffset;
+    s32 m_workOffset;
+};
+
 struct PRain {
     s32 m_graphId;
     u16 m_dataValIndex;

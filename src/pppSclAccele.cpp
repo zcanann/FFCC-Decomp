@@ -5,11 +5,7 @@
 
 const float kPppSclAcceleZero = 0.0f;
 
-struct PppSclAcceleDataOffsets {
-    s32 m_scaleOffset;
-    s32 m_accelOffset;
-};
-
+STATIC_ASSERT(sizeof(PppSclAcceleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(PppSclAcceleDataOffsets, m_scaleOffset) == 0x0);
 STATIC_ASSERT(offsetof(PppSclAcceleDataOffsets, m_accelOffset) == 0x4);
 

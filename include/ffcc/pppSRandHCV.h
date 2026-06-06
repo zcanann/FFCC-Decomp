@@ -6,6 +6,10 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct SRandHCVDataOffsets {
+    s32 m_stateOffset;
+};
+
 struct SRandHCVParams {
     s32 targetId;
     s32 sourceOffset;

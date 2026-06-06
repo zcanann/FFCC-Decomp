@@ -21,10 +21,7 @@ struct pppScaleLoopAutoWork {
     float m_delta;
 };
 
-struct pppScaleLoopAutoDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(pppScaleLoopAutoDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(pppScaleLoopAutoDataOffsets, m_workOffset) == 0x0);
 
 static inline pppScaleLoopAutoDataOffsets* GetScaleLoopAutoDataOffsets(_pppCtrlTable* ctrl)

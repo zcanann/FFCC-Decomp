@@ -14,10 +14,7 @@ struct pppPObjPointWork {
     Vec* m_source;     // 0x10
 };
 
-struct PObjPointDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(PObjPointDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PObjPointDataOffsets, m_workOffset) == 0x0);
 
 static inline PObjPointDataOffsets* GetPObjPointDataOffsets(_pppCtrlTable* ctrlTable)

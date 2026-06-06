@@ -6,6 +6,10 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct YmMoveParabolaDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppYmMoveParabolaStep {
     s32 m_graphId;
     f32 m_dataValIndex;

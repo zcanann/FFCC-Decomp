@@ -10,10 +10,7 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct ConstrainCameraDir2DataOffsets {
-    s32 m_valueOffset;
-};
-
+STATIC_ASSERT(sizeof(ConstrainCameraDir2DataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(ConstrainCameraDir2DataOffsets, m_valueOffset) == 0x0);
 
 static inline ConstrainCameraDir2DataOffsets* GetConstrainCameraDir2DataOffsets(_pppCtrlTable* ctrl)

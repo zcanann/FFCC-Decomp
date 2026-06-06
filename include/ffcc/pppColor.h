@@ -7,6 +7,11 @@
 
 struct _pppPObject;
 struct _pppCtrlTable;
+
+struct PppColorDataOffsets {
+    s32 m_workOffset;
+};
+
 struct _pppColor
 {
     unsigned char r;  // 0x0

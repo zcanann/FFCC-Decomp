@@ -6,6 +6,11 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct PppSclAcceleDataOffsets {
+    s32 m_scaleOffset;
+    s32 m_accelOffset;
+};
+
 struct PppSclAcceleStep {
     s32 m_graphId;
     s32 m_pad;

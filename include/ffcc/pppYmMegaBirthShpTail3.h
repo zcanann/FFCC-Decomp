@@ -16,8 +16,8 @@ struct PYmMegaBirthShpTail3
     float m_sizeStart;
     float m_sizeVal;
     float m_speedRandRange;
-    float field_0x58;
-    Vec m_speedScale;
+    float m_speedScaleX;
+    Vec m_speedScaleYZ;
     unsigned char m_randType;
     unsigned char m_enableParticleColor;
     unsigned char m_pad0x6a[0x6C - 0x6A];
@@ -26,10 +26,17 @@ struct PYmMegaBirthShpTail3
     unsigned char m_wmatCopyMode;
 };
 
+struct YmMegaBirthShpTail3DataOffsets
+{
+    s32 m_unusedOffset;
+    s32 m_colorOffset;
+    s32 m_workOffset;
+};
+
 struct pppYmMegaBirthShpTail3Offsets
 {
     u8 m_pad_0x0[0xc];
-    s32* m_serializedDataOffsets;
+    YmMegaBirthShpTail3DataOffsets* m_serializedDataOffsets;
 };
 
 #ifdef __cplusplus

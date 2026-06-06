@@ -235,7 +235,7 @@ void CFlatRuntime::clear()
 		                              : static_cast<void*>(freeNodes + (baseIndex + 3) * 0x10);
 	}
 
-	memset(m_performanceBlock, 0, sizeof(m_performanceBlock));
+	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
 }
 
 /*
@@ -2464,7 +2464,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
  */
 void CFlatRuntime::ResetPerformance()
 {
-	memset(m_performanceBlock, 0, sizeof(m_performanceBlock));
+	memset(&m_performanceTotalTime, 0, sizeof(m_performanceTotalTime) + sizeof(m_performanceBlock));
 }
 
 /*

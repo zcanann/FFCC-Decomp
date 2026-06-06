@@ -7,10 +7,7 @@
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/ppp_default_buffer.h"
 
-struct RandIntDataOffsets {
-    s32 m_valueOffset;
-};
-
+STATIC_ASSERT(sizeof(RandIntDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(RandIntDataOffsets, m_valueOffset) == 0x0);
 
 static inline RandIntDataOffsets* GetRandIntDataOffsets(_pppCtrlTable* ctrl)

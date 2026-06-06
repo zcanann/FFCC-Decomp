@@ -1,10 +1,16 @@
 #ifndef _PPP_KELNS_H_
 #define _PPP_KELNS_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObjLink;
 struct _pppPObject;
 struct _pppCtrlTable;
 struct pppNoStep;
+
+struct KeLnsDataOffsets {
+	s32 m_workOffset;
+};
 
 #ifdef __cplusplus
 extern "C" {

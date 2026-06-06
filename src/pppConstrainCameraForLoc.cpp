@@ -15,12 +15,7 @@ struct pppConstrainCameraForLocWork {
     _pppPObject* m_owner;
 };
 
-struct pppConstrainCameraForLocDataOffsets {
-    s32 _unused0;
-    s32 _unused1;
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(pppConstrainCameraForLocDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(pppConstrainCameraForLocDataOffsets, m_workOffset) == 0x8);
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }

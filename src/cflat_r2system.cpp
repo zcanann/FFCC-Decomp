@@ -196,7 +196,7 @@ struct CFlatPathCache
 
 static inline CFlatPathCache* PathCache(CFlatRuntime2* self)
 {
-    return reinterpret_cast<CFlatPathCache*>(reinterpret_cast<u8*>(self) + 0x17D4);
+    return reinterpret_cast<CFlatPathCache*>(self->m_pad_1770_1BDC + 0x64);
 }
 
 static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
@@ -247,9 +247,9 @@ static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
     return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x96C);
 }
 
-static inline unsigned int& RuntimeDebugFlags(CFlatRuntime2* self)
+static inline u32& RuntimeDebugFlags(CFlatRuntime2* self)
 {
-    return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x129C);
+    return self->m_debugFlags;
 }
 
 static inline const unsigned short* GetGameCFlatSystemRows()
@@ -1788,8 +1788,10 @@ int CLine<64>::IsInner(Vec* position, float margin)
     return 0;
 }
 
-extern "C" void CalcBound__9CLine(CLine<64>* line)
+void CLine<64>::CalcBound()
 {
+    CLine<64>* line = this;
+
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
@@ -1860,14 +1862,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (CameraPcs.IsAbsolute() != 0) {
             const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
             CVector refPosition(localFloats[0], localFloats[1], localFloats[2]);
-            if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
+            if (m_cameraScriptTargetMode == 0) {
                 CameraPcs.SetRefPosition(refPosition);
             } else {
                 CharaPcs.m_overlapTargetPos = refPosition;
             }
 
             CVector position(localFloats[3], localFloats[4], localFloats[5]);
-            if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
+            if (m_cameraScriptTargetMode == 0) {
                 CameraPcs.SetPosition(position);
             } else {
                 CharaPcs.m_overlapEyePos = position;
@@ -1879,7 +1881,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -5: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2012,7 +2014,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0B: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonDown(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2024,7 +2026,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x0C: {
         unsigned short buttons = 0;
-        if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
+        if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2241,27 +2243,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     case -0x1E:
         if (*object->m_localBase < 0x10) {
-            const int lineOffset = *object->m_localBase * 0xB14;
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset) = 0;
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + lineOffset) = object->m_localBase[1];
+            CLine<64>& line = m_debugLines[*object->m_localBase];
+            line.pointCount = 0;
+            line.m_mask = object->m_localBase[1];
         }
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x1F:
         if (*object->m_localBase < 0x10) {
-            const int lineOffset = *object->m_localBase * 0xB14;
-            unsigned int* pointCount = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1BF4 + lineOffset);
-            if (*pointCount < 0x40) {
-                const unsigned int pointOffset = *pointCount * 0xC + lineOffset;
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C0C + pointOffset) =
-                    object->m_localBase[1];
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C10 + pointOffset) =
-                    object->m_localBase[2];
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C14 + pointOffset) =
-                    object->m_localBase[3];
-                *pointCount = *pointCount + 1;
-                CalcBound__9CLine(reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + lineOffset));
+            CLine<64>& line = m_debugLines[*object->m_localBase];
+            if (line.pointCount < 0x40) {
+                const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+                Vec& point = line.points[line.pointCount];
+                point.x = localFloats[1];
+                point.y = localFloats[2];
+                point.z = localFloats[3];
+                line.pointCount++;
+                line.CalcBound();
             }
         }
         runtime->push(object, 0);
@@ -2314,29 +2313,27 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float bestLineDistance = 0.0f;
 
         for (unsigned int i = 0; i < 0x10; i++) {
-            CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + i * 0xB14);
-            const unsigned int lineMask = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(line) + 0x2C);
-            if (line->pointCount == 0 || (lineMask & mask) == 0 || line->IsInner(&target, margin) == 0) {
+            CLine<64>& line = m_debugLines[i];
+            if (line.pointCount == 0 || (line.m_mask & mask) == 0 || line.IsInner(&target, margin) == 0) {
                 continue;
             }
 
             unsigned long segment = 0;
             float segmentRatio = 0.0f;
             float nearestDistance = 0.0f;
-            if (line->Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
+            if (line.Calc((Vec*)0, &nearestDistance, &segment, &segmentRatio, &target, margin) != 0 &&
                 nearestDistance < bestDistance) {
                 found = 1;
                 bestLine = i;
                 bestDistance = nearestDistance;
-                bestLineDistance = line->segments[segment].length * segmentRatio + line->segments[segment].startLength;
+                bestLineDistance = line.segments[segment].length * segmentRatio + line.segments[segment].startLength;
             }
         }
 
         if (found != 0) {
             *reinterpret_cast<unsigned int*>(object->m_localBase[5]) = bestLine;
             *reinterpret_cast<float*>(object->m_localBase[6]) = bestLineDistance;
-            *reinterpret_cast<unsigned int*>(object->m_localBase[7]) =
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x26EC + bestLine * 0xB14);
+            *reinterpret_cast<float*>(object->m_localBase[7]) = m_debugLines[bestLine].totalLength;
         }
 
         runtime->push(object, found);
@@ -2346,7 +2343,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x23: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec position = {0.0f, 0.0f, 0.0f};
 
         if (line->pointCount > 0) {
@@ -2376,7 +2373,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x24: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         const float distance = localFloats[1];
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         Vec direction = {0.0f, 0.0f, 0.0f};
 
         if (line->pointCount > 1) {
@@ -2415,7 +2412,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             localFloats[2],
             localFloats[3],
         };
-        CLine<64>* line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(this) + 0x1BDC + *object->m_localBase * 0xB14);
+        CLine<64>* line = &m_debugLines[*object->m_localBase];
         unsigned long segment = 0;
         float segmentRatio = 0.0f;
         float distance = 0.0f;
@@ -2430,8 +2427,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x26:
-        runtime->push(
-            object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x26EC + *object->m_localBase * 0xB14));
+        runtime->push(object, *reinterpret_cast<int*>(&m_debugLines[*object->m_localBase].totalLength));
         outResult = 0;
         return 1;
     case -0x27: {
@@ -2478,8 +2474,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x28:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1C08 + *object->m_localBase * 0xB14) =
-            *object->m_localBase;
+        m_debugLines[*object->m_localBase].m_mask = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2745,7 +2740,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         } else {
             char* message;
             if ((localBase[3] & 0x80) == 0) {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(reinterpret_cast<u8*>(this) + 0xCF20, localBase[7]));
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, localBase[7]));
             } else {
                 message = GetNumSysMes__5CGameFv(&Game, localBase[7]);
             }
@@ -2801,8 +2796,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x4A:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A0) =
-            static_cast<unsigned int>(*object->m_localBase);
+        m_eventFlags = static_cast<unsigned int>(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2884,7 +2878,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (fileHandle != 0) {
             fileHandle->Read();
             fileHandle->SyncCompleted();
-            reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Create(File.GetBuffer());
+            m_flatData.Create(File.GetBuffer());
             fileHandle->Close();
         }
         runtime->push(object, 0);
@@ -2913,31 +2907,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x54: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
-        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        runtime->push(object, m_debugDataBuffer[index]);
         outResult = 0;
         return 1;
     }
     case -0x55: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
-        runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        runtime->push(object, m_debugDataBuffer[index]);
         outResult = 0;
         return 1;
     }
     case -0x56: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        m_debugDataBuffer[index] = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x57: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
+        int index = m_debugDataIndex;
+        m_debugDataIndex = index + 1;
+        m_debugDataBuffer[index] = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2945,7 +2939,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x58: {
         char filename[0x80];
         sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
-        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2953,13 +2947,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x59: {
         char filename[0x80];
         sprintf(filename, s_cflatDebugFileFmt, *object->m_localBase);
-        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(this) + 0xE400, 0x2000);
+        MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x5A:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = 0;
+        m_debugDataIndex = 0;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3029,7 +3023,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -100:
         this->initAllFinished();
-        *reinterpret_cast<u8*>(reinterpret_cast<u8*>(this) + 0x10404) = 1;
+        m_initAllFinishedFlag = 1;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3226,7 +3220,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float angle = static_cast<float>(object->m_localBase[2]);
         Vec normal = {sinf(angle), 0.0f, cosf(angle)};
         Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
-        Mtx& reflectMtx = *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(this) + 0x12b4);
+        Mtx& reflectMtx = m_centerMatrix;
         PSMTXReflect(reflectMtx, &point, &normal);
         runtime->push(object, 0);
         outResult = 0;
@@ -3402,26 +3396,25 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x96:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12AC) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12B0) = object->m_localBase[1];
+        m_centerState = *object->m_localBase;
+        *reinterpret_cast<int*>(&m_centerDistanceScale) = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x97: {
         unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
-        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134C + (slot * 0x14)) =
-            static_cast<char>(object->m_localBase[1]);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1350 + (slot * 0x14)) = object->m_localBase[2];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1354 + (slot * 0x14)) = object->m_localBase[3];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1358 + (slot * 0x14)) = object->m_localBase[4];
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x135C + (slot * 0x14)) = object->m_localBase[5];
+        CMapObjectInfo& mapObject = m_mapObjectInfo[slot];
+        mapObject.m_type = static_cast<char>(object->m_localBase[1]);
+        mapObject.m_x = *reinterpret_cast<float*>(object->m_localBase + 2);
+        mapObject.m_y = *reinterpret_cast<float*>(object->m_localBase + 3);
+        mapObject.m_z = *reinterpret_cast<float*>(object->m_localBase + 4);
+        mapObject.m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x98:
-        *reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x134D + (*object->m_localBase * 0x14)) =
-            static_cast<char>(object->m_localBase[1]);
+        m_mapObjectInfo[*object->m_localBase].m_drawFlag = static_cast<char>(object->m_localBase[1]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3647,7 +3640,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xBA:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) = *object->m_localBase;
+        m_cameraScriptTargetMode = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3865,14 +3858,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xD2: {
-        char* savedNextScript = reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + 0x15CC);
         if (*object->m_localBase == 0) {
             CGame::CNextScript nextScript;
             nextScript.m_flags = 0;
-            strcpy(nextScript.m_name, savedNextScript);
+            strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
         } else {
-            memset(savedNextScript, 0, 0x100);
+            memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
         }
         runtime->push(object, 0);
         outResult = 0;
@@ -4105,8 +4097,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0xF0: {
         runtime->push(
             object,
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + *object->m_localBase * 8) &
-                static_cast<unsigned int>(1ULL << object->m_localBase[1]));
+            m_spawnBits[*object->m_localBase].m_hi & static_cast<unsigned int>(1ULL << object->m_localBase[1]));
         outResult = 0;
         return 1;
     }

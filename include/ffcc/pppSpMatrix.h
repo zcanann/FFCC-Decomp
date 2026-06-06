@@ -1,9 +1,15 @@
 #ifndef _PPP_SPMATRIX_H_
 #define _PPP_SPMATRIX_H_
 
+#include <dolphin/types.h>
+
 struct _pppCtrlTable;
 struct _pppPObject;
 struct pppNoStep;
+
+struct SpMatrixDataOffsets {
+    s32 m_matrixOffset;
+};
 
 #ifdef __cplusplus
 extern "C" {

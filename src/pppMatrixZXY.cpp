@@ -3,12 +3,7 @@
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include <dolphin/mtx.h>
 
-struct MatrixZXYDataOffsets {
-    s32 m_translationOffset;
-    s32 m_angleOffset;
-    s32 m_scaleOffset;
-};
-
+STATIC_ASSERT(sizeof(MatrixZXYDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(MatrixZXYDataOffsets, m_translationOffset) == 0x0);
 STATIC_ASSERT(offsetof(MatrixZXYDataOffsets, m_angleOffset) == 0x4);
 STATIC_ASSERT(offsetof(MatrixZXYDataOffsets, m_scaleOffset) == 0x8);

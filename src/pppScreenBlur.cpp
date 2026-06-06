@@ -5,11 +5,7 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct ScreenBlurDataOffsets {
-    s32 m_valueOffset;
-    s32 m_activeOffset;
-};
-
+STATIC_ASSERT(sizeof(ScreenBlurDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_valueOffset) == 0x0);
 STATIC_ASSERT(offsetof(ScreenBlurDataOffsets, m_activeOffset) == 0x4);
 

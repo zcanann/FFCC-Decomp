@@ -3,11 +3,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 
-struct KeDMatDataOffsets {
-    s32 _unused0;
-    s32 m_targetMatrixOffset;
-};
-
+STATIC_ASSERT(sizeof(KeDMatDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(KeDMatDataOffsets, m_targetMatrixOffset) == 0x4);
 
 static inline KeDMatDataOffsets* GetKeDMatDataOffsets(_pppCtrlTable* ctrlTable)

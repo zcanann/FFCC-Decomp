@@ -3,10 +3,7 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-struct MatrixLocDataOffsets {
-    s32 m_translationOffset;
-};
-
+STATIC_ASSERT(sizeof(MatrixLocDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(MatrixLocDataOffsets, m_translationOffset) == 0x0);
 
 static inline MatrixLocDataOffsets* GetMatrixLocDataOffsets(_pppCtrlTable* ctrl)

@@ -6,6 +6,10 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct pppScaleLoopAutoDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppScaleLoopAutoStep {
     s32 m_index;
     u8 _pad0x04[4];

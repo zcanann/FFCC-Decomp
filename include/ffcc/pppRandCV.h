@@ -6,6 +6,10 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct RandCVDataOffsets {
+    s32 m_valueOffset;
+};
+
 struct RandCVParams {
     s32 index;
     s32 colorOffset;

@@ -7,10 +7,7 @@ extern "C" {
 const float kPppKeLnsZero = 0.0f;
 }
 
-struct KeLnsDataOffsets {
-	s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(KeLnsDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(KeLnsDataOffsets, m_workOffset) == 0x0);
 
 static inline KeLnsDataOffsets* GetKeLnsDataOffsets(_pppCtrlTable* ctrlTable)

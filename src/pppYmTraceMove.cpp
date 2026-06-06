@@ -18,10 +18,7 @@ struct pppYmTraceMoveWork {
     f32 m_acceleration;
 };
 
-struct YmTraceMoveDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmTraceMoveDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmTraceMoveDataOffsets, m_workOffset) == 0x0);
 
 static inline YmTraceMoveDataOffsets* GetYmTraceMoveDataOffsets(_pppCtrlTable* ctrl)

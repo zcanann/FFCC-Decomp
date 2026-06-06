@@ -7,10 +7,7 @@
 #include "ffcc/ppp_default_buffer.h"
 #include "ffcc/ppp_linkage.h"
 
-struct SRandDownCVDataOffsets {
-    s32 m_stateOffset;
-};
-
+STATIC_ASSERT(sizeof(SRandDownCVDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(SRandDownCVDataOffsets, m_stateOffset) == 0x0);
 
 static inline SRandDownCVDataOffsets* GetSRandDownCVDataOffsets(_pppCtrlTable* ctrl)

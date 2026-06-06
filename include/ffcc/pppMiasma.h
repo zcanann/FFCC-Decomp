@@ -8,6 +8,13 @@ struct _pppPObject;
 
 typedef _pppPObject pppMiasma;
 
+struct MiasmaDataOffsets {
+    s32 _unused0;
+    s32 m_colorWorkOffset;
+    s32 m_frameWorkOffset;
+    s32 m_radiusWorkOffset;
+};
+
 struct pppMiasmaFrameStep {
     s32 m_graphId;
     u8 m_pad_0x4[0x14];

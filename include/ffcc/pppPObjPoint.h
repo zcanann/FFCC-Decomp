@@ -6,6 +6,10 @@
 struct _pppPObject;
 struct _pppCtrlTable;
 
+struct PObjPointDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppPObjPointStep {
     s32 m_graphId;
     u32 m_createProgramIndex;

@@ -20,10 +20,7 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
-struct pppYmMoveCircleDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(pppYmMoveCircleDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(pppYmMoveCircleDataOffsets, m_workOffset) == 0x0);
 
 static inline Vec* MoveCirclePreviousPosition(_pppMngSt* mng)

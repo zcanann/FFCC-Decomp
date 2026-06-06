@@ -11,10 +11,7 @@ STATIC_ASSERT(offsetof(PDrawMdl, m_texScale) == 0x10);
 STATIC_ASSERT(offsetof(PDrawMdl, m_drawA) == 0x14);
 STATIC_ASSERT(offsetof(_pppColorWork, result) == 0x08);
 
-struct DrawMdlDataOffsets {
-    s32 m_colorWorkOffset;
-};
-
+STATIC_ASSERT(sizeof(DrawMdlDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(DrawMdlDataOffsets, m_colorWorkOffset) == 0x0);
 
 static inline DrawMdlDataOffsets* PppDrawMdlDataOffsets(_pppCtrlTable* ctrl)

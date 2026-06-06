@@ -26,17 +26,12 @@ struct LensFlareWork {
 	f32 m_dot;
 };
 
-struct LensFlareDataOffsets {
-	s32 _unused0;
-	s32 m_colorWorkOffset;
-	s32 m_workOffset;
-};
-
 STATIC_ASSERT(offsetof(LensFlareWork, m_projectedX) == 0x10);
 STATIC_ASSERT(offsetof(LensFlareWork, m_viewPosition) == 0x20);
 STATIC_ASSERT(offsetof(LensFlareWork, m_shapeFrame1) == 0x2E);
 STATIC_ASSERT(offsetof(LensFlareWork, m_alpha) == 0x32);
 STATIC_ASSERT(offsetof(LensFlareWork, m_dot) == 0x34);
+STATIC_ASSERT(sizeof(LensFlareDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_colorWorkOffset) == 0x4);
 STATIC_ASSERT(offsetof(LensFlareDataOffsets, m_workOffset) == 0x8);
 

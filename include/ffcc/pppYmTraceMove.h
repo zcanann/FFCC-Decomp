@@ -6,6 +6,10 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct YmTraceMoveDataOffsets {
+    s32 m_workOffset;
+};
+
 struct pppYmTraceMoveStep {
     s32 m_graphId;
     f32 m_dataValIndex;

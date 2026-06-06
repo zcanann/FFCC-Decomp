@@ -8,6 +8,13 @@ struct _pppPObject;
 
 typedef _pppPObject pppColum;
 
+struct pppColumDataOffsets {
+    s32 _unused0;
+    s32 _unused1;
+    s32 m_positionWorkOffset;
+    s32 m_frameWorkOffset;
+};
+
 struct pppColumStep {
     u32 m_unk0;            // 0x00
     s32 m_dataValIndex;    // 0x04

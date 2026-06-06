@@ -4,10 +4,7 @@
 #include "types.h"
 #include "ffcc/ppp_linkage.h"
 
-struct PppColorDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(PppColorDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppColorDataOffsets, m_workOffset) == 0x0);
 
 static inline PppColorDataOffsets* GetPppColorDataOffsets(_pppCtrlTable* ctrl)

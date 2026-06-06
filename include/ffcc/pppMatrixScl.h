@@ -9,6 +9,11 @@ struct _pppCtrlTable;
 struct _pppPObject;
 struct pppNoStep;
 
+struct MatrixSclDataOffsets {
+    s32 m_translationOffset;
+    s32 m_scaleOffset;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif

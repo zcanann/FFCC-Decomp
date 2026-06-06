@@ -6,10 +6,7 @@
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
-struct YmLookOnDataOffsets {
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmLookOnDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmLookOnDataOffsets, m_workOffset) == 0x0);
 
 static inline YmLookOnDataOffsets* GetYmLookOnDataOffsets(_pppCtrlTable* ctrl)

@@ -300,6 +300,13 @@ STATIC_ASSERT(offsetof(CCameraPcs, m_viewer) == 0x448);
 STATIC_ASSERT(sizeof(CCameraPcs::ViewerState) == 0x24);
 STATIC_ASSERT(offsetof(CCameraPcs, m_viewerOverride) == 0x46C);
 STATIC_ASSERT(offsetof(CCameraPcs, m_mapRotX) == 0x470);
+STATIC_ASSERT(offsetof(CCameraPcs, m_worldMapEffect) == 0x47C);
+STATIC_ASSERT(offsetof(CCameraPcs::WorldMapEffectState, m_duration) == 0x02);
+STATIC_ASSERT(offsetof(CCameraPcs::WorldMapEffectState, m_timer) == 0x04);
+STATIC_ASSERT(offsetof(CCameraPcs::WorldMapEffectState, m_rotX) == 0x08);
+STATIC_ASSERT(offsetof(CCameraPcs::WorldMapEffectState, m_rotY) == 0x0C);
+STATIC_ASSERT(offsetof(CCameraPcs::WorldMapEffectState, m_scale) == 0x10);
+STATIC_ASSERT(sizeof(CCameraPcs::WorldMapEffectState) == 0x14);
 STATIC_ASSERT(offsetof(CCameraPcs, m_quake) == 0x490);
 STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_state) == 0x04);
 STATIC_ASSERT(offsetof(CCameraPcs::QuakeState, m_positionAmplitude) == 0x14);
@@ -454,7 +461,6 @@ void CCameraPcs::onScriptChanging(char*)
  */
 void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
     PSMTXCopy(mathMtx, m_worldMapMatrix);
@@ -473,8 +479,8 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
         m_isAbsolute = 1;
     }
 
-    memset(self + 0x47C, 0, 0x14);
-    *reinterpret_cast<float*>(self + 0x48C) = FLOAT_8032fa1c;
+    memset(&m_worldMapEffect, 0, sizeof(m_worldMapEffect));
+    m_worldMapEffect.m_scale = FLOAT_8032fa1c;
 }
 
 /*
@@ -689,7 +695,6 @@ void CCameraPcs::CalcQuake()
  */
 void CCameraPcs::calc()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* pad = reinterpret_cast<unsigned char*>(&Pad);
     Mtx worldMapMtx;
     Mtx tempMtx;
@@ -774,27 +779,27 @@ void CCameraPcs::calc()
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(m_worldMapMatrix, worldMapMtx);
-        if (*reinterpret_cast<short*>(self + 0x47E) != 0 && *reinterpret_cast<short*>(self + 0x480) != 0) {
+        if (m_worldMapEffect.m_duration != 0 && m_worldMapEffect.m_timer != 0) {
             const double t = static_cast<double>(FLOAT_8032fa18 * (
                 FLOAT_8032fa1c - (static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(*reinterpret_cast<short*>(self + 0x480)))) - DOUBLE_8032fa28) /
+                static_cast<unsigned short>(m_worldMapEffect.m_timer))) - DOUBLE_8032fa28) /
                 static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(*reinterpret_cast<short*>(self + 0x47E)))) - DOUBLE_8032fa28))));
+                static_cast<unsigned short>(m_worldMapEffect.m_duration))) - DOUBLE_8032fa28))));
             const double f = static_cast<double>(FLOAT_8032fa20 * (FLOAT_8032fa1c + static_cast<float>(cos(t))));
 
-            PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(*reinterpret_cast<float*>(self + 0x484)) * f));
+            PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotX) * f));
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
-            PSMTXRotRad(tempMtx, 'y', static_cast<float>(static_cast<double>(*reinterpret_cast<float*>(self + 0x488)) * f));
+            PSMTXRotRad(tempMtx, 'y', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotY) * f));
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
             const float scale = -static_cast<float>(
-                static_cast<double>(*reinterpret_cast<float*>(self + 0x48C)) * (static_cast<double>(FLOAT_8032fa1c) - f) -
-                static_cast<double>(FLOAT_8032fa1c + *reinterpret_cast<float*>(self + 0x48C)));
+                static_cast<double>(m_worldMapEffect.m_scale) * (static_cast<double>(FLOAT_8032fa1c) - f) -
+                static_cast<double>(FLOAT_8032fa1c + m_worldMapEffect.m_scale));
             PSMTXScale(tempMtx, scale, scale, scale);
             PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
 
-            if (static_cast<int>(static_cast<unsigned int>(self[0x47C]) << 0x18) >= 0) {
-                *reinterpret_cast<short*>(self + 0x480) -= 1;
+            if (static_cast<int>(static_cast<unsigned int>(m_worldMapEffect.m_flags) << 0x18) >= 0) {
+                m_worldMapEffect.m_timer -= 1;
             }
         }
         PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);

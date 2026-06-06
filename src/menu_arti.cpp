@@ -9,7 +9,6 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-typedef signed short s16;
 typedef unsigned char u8;
 
 static const float FLOAT_80332fa8 = 0.0f;
@@ -71,19 +70,9 @@ STATIC_ASSERT(sizeof(ArtiOpenAnim) == 0x40);
 STATIC_ASSERT(offsetof(ArtiOpenAnimList, entries) == 8);
 STATIC_ASSERT(sizeof(ArtiOpenAnimList) == 0x1008);
 
-static inline ArtiState* GetArtiStateStruct(CMenuPcs* menu)
+static inline ArtiState* GetArtiState(CMenuPcs* menu)
 {
 	return menu->m_artiState;
-}
-
-static inline s16* GetArtiState(CMenuPcs* menu)
-{
-	return reinterpret_cast<s16*>(menu->m_artiState);
-}
-
-static inline s16* GetArtiList(CMenuPcs* menu)
-{
-	return reinterpret_cast<s16*>(menu->m_artiList);
 }
 
 static inline ArtiOpenAnimList* GetArtiOpenAnimList(CMenuPcs* menu)
@@ -93,17 +82,7 @@ static inline ArtiOpenAnimList* GetArtiOpenAnimList(CMenuPcs* menu)
 
 static inline ArtiOpenAnim* GetArtiOpenAnim(CMenuPcs* menu, int index)
 {
-	return reinterpret_cast<ArtiOpenAnim*>((unsigned char*)GetArtiList(menu) + 8 + index * sizeof(ArtiOpenAnim));
-}
-
-static inline int GetArtiStateBase(CMenuPcs* menu)
-{
-	return reinterpret_cast<int>(GetArtiState(menu));
-}
-
-static inline int GetArtiListBase(CMenuPcs* menu)
-{
-	return reinterpret_cast<int>(GetArtiList(menu));
+	return &GetArtiOpenAnimList(menu)->entries[index];
 }
 
 static inline CFont* GetArtiListFont(CMenuPcs* menu)
@@ -143,8 +122,6 @@ int CMenuPcs::ArtiCtrlCur()
 	bool bVar2;
 	u16 uVar4;
 	int uVar3;
-	int iVar5;
-	int iVar6;
 	int padLock;
 	int selection;
 
@@ -177,28 +154,26 @@ int CMenuPcs::ArtiCtrlCur()
 		return 0;
 	}
 
-	iVar5 = GetArtiStateBase(this);
-	selection = *(short*)(iVar5 + 0x30);
+	ArtiState* state = GetArtiState(this);
+	selection = state->currentSelection;
 	if ((uVar4 & 8) != 0) {
-		iVar6 = iVar5 + selection * 2;
-		sVar1 = *(short*)(iVar6 + 0x26);
+		sVar1 = state->selections[selection];
 		if (sVar1 != 0) {
-			*(short*)(iVar6 + 0x26) = sVar1 + -1;
+			state->selections[selection] = sVar1 + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if (*(short*)(iVar5 + 0x34) != 0) {
-			*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
+		} else if (state->scrollOffset != 0) {
+			state->scrollOffset = state->scrollOffset + -1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		}
 	} else if ((uVar4 & 4) != 0) {
-		iVar6 = iVar5 + selection * 2;
-		sVar1 = *(short*)(iVar6 + 0x26);
+		sVar1 = state->selections[selection];
 		if (sVar1 < 7) {
-			*(short*)(iVar6 + 0x26) = sVar1 + 1;
+			state->selections[selection] = sVar1 + 1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
-			*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
+		} else if ((int)state->scrollOffset + (int)sVar1 < 0x48) {
+			state->scrollOffset = state->scrollOffset + 1;
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -207,19 +182,19 @@ int CMenuPcs::ArtiCtrlCur()
 
 	if ((uVar4 & 0xc) == 0) {
 		if ((uVar3 & 0x20) != 0) {
-			*(short*)(GetArtiStateBase(this) + 0x1e) = 1;
+			state->moveDirection = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x40) != 0) {
-			*(short*)(GetArtiStateBase(this) + 0x1e) = -1;
+			state->moveDirection = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x100) != 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else if ((uVar3 & 0x200) != 0) {
-			*(char*)(GetArtiStateBase(this) + 0xd) = 1;
+			state->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			return 1;
 		}
@@ -246,20 +221,20 @@ void CMenuPcs::ArtiDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	short state = *(short*)(GetArtiStateBase(this) + 0x10);
-	short* entry = (short*)(GetArtiListBase(this) + 8);
+	ArtiState* state = GetArtiState(this);
+	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
 	int drawIndex = 0;
 	float helpWidth;
 
-	for (int i = 0; i < *GetArtiList(this); i++) {
-		int tex = *(int*)(entry + 0xe);
+	for (int i = 0; i < GetArtiOpenAnimList(this)->count; i++) {
+		int tex = entry->tex;
 		if (tex >= 0) {
-			float x = (float)entry[0];
-			float y = (float)entry[1];
-			float w = (float)entry[2];
-			float h = (float)entry[3];
-			float u = *(float*)(entry + 4);
-			float v = *(float*)(entry + 6);
+			float x = (float)entry->x;
+			float y = (float)entry->y;
+			float w = (float)entry->w;
+			float h = (float)entry->h;
+			float u = entry->u;
+			float v = entry->v;
 			helpWidth = w;
 
 			if (i == 0) {
@@ -292,26 +267,26 @@ void CMenuPcs::ArtiDraw()
 					u += fillW;
 				}
 
-				if (fillW > 0.0f && fillW < (float)entry[2]) {
+				if (fillW > 0.0f && fillW < (float)entry->w) {
 					colors[0].a = 0;
 					colors[1].a = 0;
 					colors[2].a = 0;
 					colors[3].a = 0;
-					float remainW = (float)(DOUBLE_80332fb0 / (double)*(int*)(entry + 0x14)) * (float)entry[2];
+					float remainW = (float)(DOUBLE_80332fb0 / (double)entry->duration) * (float)entry->w;
 					MenuPcs.DrawRect(0, x, y, remainW, h, u, v, colors, FLOAT_80332fac, FLOAT_80332fac, 0.0f);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
-				float itemAlpha = *(float*)(entry + 8);
+				float itemAlpha = entry->alpha;
 				if (tex == 0x37) {
-					short itemCount = caravanWork->m_artifacts[drawIndex + *(short*)(GetArtiStateBase(this) + 0x34)];
+					short itemCount = caravanWork->m_artifacts[drawIndex + state->scrollOffset];
 					if (itemCount < 1) {
 						tex = 0x34;
 						itemAlpha = (float)(DOUBLE_80332fb8 * (double)itemAlpha);
 					}
 
-					if (tex == 0x37 && drawIndex == *(short*)(GetArtiStateBase(this) + 0x26)) {
+					if (tex == 0x37 && drawIndex == state->selections[0]) {
 						v += h;
 					}
 					drawIndex++;
@@ -324,11 +299,11 @@ void CMenuPcs::ArtiDraw()
 				color.b = 0xFF;
 				color.a = (u8)(FLOAT_80332fc0 * itemAlpha);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				float uvScale = *(float*)(entry + 10);
+				float uvScale = entry->scale;
 				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
 			}
 		}
-		entry += 0x20;
+		entry++;
 	}
 
 	CFont* listFont = GetArtiListFont(this);
@@ -337,82 +312,82 @@ void CMenuPcs::ArtiDraw()
 	listFont->SetScale(FLOAT_80332fc4);
 	listFont->DrawInit();
 
-	short* listStart = (short*)(GetArtiListBase(this) + 8);
-	int listCount = *GetArtiList(this);
+	ArtiOpenAnim* listStart = GetArtiOpenAnimList(this)->entries;
+	int listCount = GetArtiOpenAnimList(this)->count;
 	for (int i = 0; i < listCount; i++) {
-		if (*(int*)(listStart + 0xe) == 0x37) {
+		if (listStart->tex == 0x37) {
 			break;
 		}
-		listStart += 0x20;
+		listStart++;
 	}
 
-	short* textEntry = listStart;
+	ArtiOpenAnim* textEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(FLOAT_80332fc0 * *(float*)(textEntry + 8));
+		u8 alpha = (u8)(FLOAT_80332fc0 * textEntry->alpha);
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 
-		int menuIndex = i + *(short*)(GetArtiStateBase(this) + 0x34);
+		int menuIndex = i + state->scrollOffset;
 		short itemCount = caravanWork->m_artifacts[menuIndex];
 		const char* text;
 		if (itemCount < 1) {
 			text = GetMenuStr(0x14);
 		} else {
 			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
-			if (menuIndex == (int)*(short*)(GetArtiStateBase(this) + 0x26) + (int)*(short*)(GetArtiStateBase(this) + 0x34)) {
+			if (menuIndex == (int)state->selections[0] + (int)state->scrollOffset) {
 				hasSelectedArtifact = 1;
 				selectedArtifactId = itemCount;
 			}
 		}
 
 		listFont->GetWidth(text);
-		float posX = (float)(textEntry[0] + 0x1c);
-		float posY = (float)(textEntry[1] + 0xb);
+		float posX = (float)(textEntry->x + 0x1c);
+		float posY = (float)(textEntry->y + 0xb);
 		listFont->SetPosX(posX);
 		listFont->SetPosY(posY - FLOAT_80332fc8);
 		listFont->Draw(text);
-		textEntry += 0x20;
+		textEntry++;
 	}
 
 	DrawInit();
 
-	short* iconEntry = listStart;
+	ArtiOpenAnim* iconEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		short itemCount = caravanWork->m_artifacts[i + *(short*)(GetArtiStateBase(this) + 0x34)];
+		short itemCount = caravanWork->m_artifacts[i + state->scrollOffset];
 		if (itemCount > 0) {
-			int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332fac);
-			int iconX = (int)((float)(iconEntry[0] + iconEntry[2] - 0x10));
-			DrawSingleIcon(itemCount, iconX, iconY, *(float*)(iconEntry + 8), 0, 0.0f);
+			int iconY = (int)((float)(iconEntry->y + 6) - FLOAT_80332fac);
+			int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
+			DrawSingleIcon(itemCount, iconX, iconY, iconEntry->alpha, 0, 0.0f);
 		}
-		iconEntry += 0x20;
+		iconEntry++;
 	}
 
-	if (state == 1) {
-		int menuData = GetArtiListBase(this);
-		float mark = static_cast<float>(CalcListPos(*(short*)(GetArtiStateBase(this) + 0x34), 0x49, 0));
+	if (state->state == 1) {
+		ArtiOpenAnim* firstEntry = GetArtiOpenAnimList(this)->entries;
+		float mark = static_cast<float>(CalcListPos(state->scrollOffset, 0x49, 0));
 		if (mark > 0.0f) {
-			DrawListPosMark((float)*(short*)(menuData + 8), (float)*(short*)(menuData + 10), mark);
+			DrawListPosMark((float)firstEntry->x, (float)firstEntry->y, mark);
 		}
 	}
 
-	if (state == 1) {
-		short* cursorBase = (short*)(GetArtiListBase(this) + 8);
-		int cursorCount = *GetArtiList(this);
+	if (state->state == 1) {
+		ArtiOpenAnim* cursorBase = GetArtiOpenAnimList(this)->entries;
+		int cursorCount = GetArtiOpenAnimList(this)->count;
 		for (int i = 0; i < cursorCount; i++) {
-			if (*(int*)(cursorBase + 0xe) == 0x37) {
+			if (cursorBase->tex == 0x37) {
 				break;
 			}
-			cursorBase += 0x20;
+			cursorBase++;
 		}
 
-		cursorBase += *(short*)(GetArtiStateBase(this) + 0x26) * 0x20;
-		int cursorY = (int)(float)((double)(cursorBase[3] - 0x20) * DOUBLE_80332fb8 + (double)cursorBase[1]);
-		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)((int)System.m_frameCounter % 8));
+		cursorBase += state->selections[0];
+		int cursorY = (int)(float)((double)(cursorBase->h - 0x20) * DOUBLE_80332fb8 + (double)cursorBase->y);
+		int cursorX = (int)((float)(cursorBase->x - 0x14) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, FLOAT_80332fac);
 	}
 
 	CFont* helpFont = GetArtiHelpFont(this);
-	u8 helpAlpha = (u8)(FLOAT_80332fc0 * *(float*)(GetArtiListBase(this) + 0x18));
+	u8 helpAlpha = (u8)(FLOAT_80332fc0 * GetArtiOpenAnimList(this)->entries[0].alpha);
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;
 	}
@@ -449,12 +424,13 @@ int CMenuPcs::ArtiClose()
 	int frame;
 	int finished;
 
-	GetArtiState(this)[0x11]++;
+	ArtiState* state = GetArtiState(this);
+	state->frame++;
 	finished = 0;
 
-	count = GetArtiList(this)[0];
-	anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
-	frame = GetArtiState(this)[0x11];
+	count = GetArtiOpenAnimList(this)->count;
+	anim = GetArtiOpenAnimList(this)->entries;
+	frame = state->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
@@ -497,7 +473,7 @@ int CMenuPcs::ArtiClose()
  */
 int CMenuPcs::ArtiCtrl()
 {
-	ArtiState* state = GetArtiStateStruct(this);
+	ArtiState* state = GetArtiState(this);
 	int result;
 
 	state->prevSelection = state->currentSelection;
@@ -524,15 +500,16 @@ int CMenuPcs::ArtiOpen()
 	int finished;
 	int frame;
 
-	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
+	ArtiState* state = GetArtiState(this);
+	if (state->initialized == '\0') {
 		ArtiInit();
 	}
 
-	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
+	state->frame = state->frame + 1;
 	finished = 0;
-	count = *GetArtiList(this);
-	ArtiOpenAnim* entry = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
-	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);
+	count = GetArtiOpenAnimList(this)->count;
+	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
+	frame = (int)state->frame;
 
 	for (int i = 0; i < count; i++, entry++) {
 		float zero = FLOAT_80332fa8;
@@ -771,10 +748,10 @@ void CMenuPcs::ArtiInit()
 
 	list = GetArtiOpenAnimList(this);
 	yOffset = 0;
-	int listOffset = 0x100;
+	int listIndex = 4;
 	int loopCount = 4;
 	do {
-		entry = reinterpret_cast<ArtiOpenAnim*>(reinterpret_cast<unsigned char*>(GetArtiOpenAnimList(this)) + listOffset + 8);
+		entry = &list->entries[listIndex];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		count = count + 2;
@@ -788,9 +765,8 @@ void CMenuPcs::ArtiInit()
 		entry->startFrame = 7;
 		entry->duration = 5;
 
-		int secondOffset = listOffset + 0x48;
-		listOffset = listOffset + 0x80;
-		entry = reinterpret_cast<ArtiOpenAnim*>(reinterpret_cast<unsigned char*>(GetArtiOpenAnimList(this)) + secondOffset);
+		entry = &list->entries[listIndex + 1];
+		listIndex = listIndex + 2;
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = list->entries[0].x + 0x24;
@@ -806,6 +782,6 @@ void CMenuPcs::ArtiInit()
 	} while (loopCount != 0);
 
 	GetArtiOpenAnimList(this)->count = count;
-	GetArtiStateStruct(this)->selections[0] = 0;
-	GetArtiStateStruct(this)->initialized = 1;
+	GetArtiState(this)->selections[0] = 0;
+	GetArtiState(this)->initialized = 1;
 }

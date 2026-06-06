@@ -64,7 +64,7 @@ static inline EquipMenuState* GetEquipMenuState(CMenuPcs* menu)
 
 static inline s16& GetEquipModeSelected(EquipMenuState* state, int mode)
 {
-	return *reinterpret_cast<s16*>(reinterpret_cast<char*>(state) + mode * 2 + 0x26);
+	return (&state->selectedIndex)[mode];
 }
 
 static inline s16* GetEquipList(CMenuPcs* menu)
@@ -87,7 +87,7 @@ static inline int GetEquipListBase(CMenuPcs* menu)
 	return reinterpret_cast<int>(GetEquipList(menu));
 }
 
-static inline void* GetEquipFont(CMenuPcs* menu)
+static inline CFont* GetEquipFont(CMenuPcs* menu)
 {
 	return menu->m_fonts[4];
 }
@@ -486,7 +486,7 @@ void CMenuPcs::EquipDraw()
 		item += 0x20;
 	}
 
-	CFont* font = (CFont*)GetEquipFont(this);
+	CFont* font = GetEquipFont(this);
 	font->SetMargin(FLOAT_80332ee0);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_80332ee8);
@@ -612,7 +612,7 @@ void CMenuPcs::EquipDraw()
 	}
 
 	if (mode == 1) {
-		font = (CFont*)GetEquipFont(this);
+		font = GetEquipFont(this);
 		font->SetMargin(FLOAT_80332ee0);
 		font->SetShadow(0);
 		font->SetScale(FLOAT_80332ee8);

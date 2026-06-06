@@ -30,6 +30,7 @@ struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
 struct CmakeMenuState;
+struct GoOutMenuState;
 
 struct MenuBoardEntry
 {
@@ -85,6 +86,37 @@ struct MenuWindowInfo
     short height;
     short frame;
     short state;
+};
+
+struct WmWorldState
+{
+    float m_posX;
+    float m_posY;
+    unsigned char m_worldReady;
+    unsigned char m_flag09;
+    unsigned char m_flag0A;
+    unsigned char m_flag0B;
+    unsigned char m_modelFlagsInitialized;
+    unsigned char m_pad0D;
+    short m_state0E;
+    short m_mainState;
+    short m_state12;
+    short m_state14;
+    short m_subState;
+    short m_delay;
+    short m_counter1A;
+    short m_menuMode;
+    short m_nextMenuMode;
+    short m_changeRequest;
+    short m_frameCounter;
+    short m_titleState;
+    short m_cardChannel;
+    unsigned char m_pad28[0x2E - 0x28];
+    short m_mcResult;
+    unsigned char m_pad30[0x36 - 0x30];
+    short m_originalBackupParams[4];
+    short m_backupParams[4];
+    short m_pad46;
 };
 
 struct SingMenuState
@@ -155,6 +187,13 @@ public:
     {
         short m_itemNo[3];
         short m_count[3];
+    };
+    struct GoOutResetFields
+    {
+        unsigned char m_resetFlag;
+        unsigned char m_unknown879;
+        unsigned char m_unknown87A;
+        unsigned char m_unknown87B;
     };
     struct Sprt
     {
@@ -634,6 +673,25 @@ public:
     void AlphaAdd();
     void GetFontWorld();
 
+    struct BonusStorage
+    {
+        unsigned char m_pad744[0x814 - 0x744];
+        int m_bonusBoardPtr;
+        unsigned char m_pad818[0x82C - 0x818];
+    };
+
+    struct WmStorage
+    {
+        unsigned char m_pad744[0x774 - 0x744];
+        CCharaPcs::CHandle* m_handles[0x28];
+        unsigned char* m_worldObjData;
+        unsigned char* m_bubbleData;
+        unsigned char* m_frameData;
+        unsigned char* m_frameInfo;
+        unsigned char* m_charaModelData;
+        unsigned char* m_charaSelectData;
+    };
+
     unsigned char m_pad04[0x14 - 0x04];
     unsigned char m_mcRequestLocked;
     unsigned char m_pad15[0x18 - 0x15];
@@ -643,8 +701,7 @@ public:
     BattleHudState m_battleHud;
     int m_manaWaterTimerA;
     unsigned char m_pad74[0x80 - 0x74];
-    unsigned char m_effectTimer;
-    unsigned char m_pad81[0x84 - 0x81];
+    int m_effectTimer;
     int m_crystalElem;
     short m_crystalPart;
     short m_crystalAttr;
@@ -670,7 +727,9 @@ public:
     int m_specialModeEdit;
     signed char m_specialModeCursor;
     signed char m_specialModeFlags[4];
-    unsigned char m_padB9[0xEC - 0xB9];
+    unsigned char m_padB9[0xBC - 0xB9];
+    int m_specialModeWork[11];
+    unsigned char m_padE8[0xEC - 0xE8];
     CMemory::CStage* m_menuStage;
     CMemory::CStage* m_stageF0;
     CMemory::CStage* m_stageF4;
@@ -682,9 +741,10 @@ public:
     unsigned char m_pad330[0x340 - 0x330];
     unsigned char m_externalFontTlut[0x740 - 0x340];
     int m_mode;
-    unsigned char m_pad744[0x814 - 0x744];
-    int m_bonusBoardPtr;
-    unsigned char m_pad818[0x82C - 0x818];
+    union {
+        BonusStorage m_bonus;
+        WmStorage m_wm;
+    };
     union {
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
@@ -696,6 +756,8 @@ public:
         TmpArtiState* m_tmpArtiState;
         CmakeMenuState* m_cmakeState;
         short* m_cmdState;
+        WmWorldState* m_wmWorldState;
+        GoOutMenuState* m_goOutState;
         int m_bonusStatePtr;
     };
     union {
@@ -706,17 +768,16 @@ public:
         EffectEntry* m_effectEntries;
         unsigned char* m_wmCharaState;
     };
-    void* m_pad83C;
+    unsigned char* m_wmWorldParams;
     union {
         EffectInfo* m_effectWork;
         int m_bonusListPtr;
     };
-    unsigned char m_pad844[0x848 - 0x844];
     union {
-        MenuWindowInfo* m_menuWindowInfo;
-        short* m_singWindowInfo;
-        int m_bonusAuxPtr;
+        unsigned char m_pad844[0x848 - 0x844];
+        int* m_wmCharaAnimState;
     };
+    MenuWindowInfo* m_menuWindowInfo;
     union {
         int m_pad84C;
         int m_bonusAnimPtr;
@@ -733,7 +794,8 @@ public:
         short* m_cmdList;
         SingleFadeState* m_singleFadeState;
     };
-    unsigned char m_pad854[0x859 - 0x854];
+    unsigned char* m_wmWorkBuffer;
+    unsigned char m_wmThpActive;
     unsigned char m_singleMenuStageActive;
     unsigned char m_singleMenuInitialized;
     unsigned char m_pad85B[0x85C - 0x85B];
@@ -745,12 +807,55 @@ public:
         short m_singleMenuMode;
     };
     short m_singleMenuPhase;
-    unsigned char m_pad868[0x872 - 0x868];
+    short m_singleCmakeMode;
+    short m_singleCmakeSlot;
+    short m_menuResultCode;
+    union {
+        unsigned char m_textureLocIndex;
+        unsigned char m_goOutLoadFinished;
+    };
+    unsigned char m_pad86F;
+    union {
+        short m_wmTransitionCode;
+        signed short m_goOutLoadResult;
+    };
     unsigned char m_singleMenuCtrlResetFlag;
     unsigned char m_pad873;
     int m_singleLifeTimer;
-    CShopMenu* m_shopMenu;
-    unsigned char m_pad87C[0x8A0 - 0x87C];
+    union {
+        CShopMenu* m_shopMenu;
+        GoOutResetFields m_goOutReset;
+    };
+    union {
+        unsigned char m_pad87C;
+        Mc::SaveDat* m_goOutTransferSaveData;
+    };
+    union {
+        int m_pad880;
+        void* m_goOutTransferWork;
+    };
+    int m_pad884;
+    union {
+        unsigned char m_cmakeWorkActive;
+        unsigned char m_goOutUnknown888;
+    };
+    union {
+        unsigned char m_cmakeWorkCardChannel;
+        unsigned char m_goOutSaveLoadMode;
+    };
+    union {
+        unsigned char m_pad88A;
+        unsigned char m_goOutUnknown88A;
+    };
+    union {
+        unsigned char m_pad88B;
+        unsigned char m_goOutUnknown88B;
+    };
+    union {
+        unsigned char* m_cmakeWork;
+        void* m_goOutTransferWorkActive;
+    };
+    unsigned char m_pad890[0x8A0 - 0x890];
 };
 
 extern CMenuPcs MenuPcs;
@@ -758,12 +863,15 @@ extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(MenuBoardEntry) == 0x50);
+STATIC_ASSERT(sizeof(CMenuPcs::BattleHudState) == 0x28);
 STATIC_ASSERT(sizeof(MenuWindowInfo) == 0x0C);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
 STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_mcCtrl) == 0x20);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);
+STATIC_ASSERT(offsetof(CMenuPcs, m_battleHud) == 0x48);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionIndex) == 0x8E);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAlpha) == 0x8C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusCursorFlag) == 0x8D);
@@ -771,8 +879,16 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_optionOpenAnim) == 0x98);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionRowAnim) == 0xA0);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
+STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeWork) == 0xBC);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusBoardPtr) == 0x814);
+STATIC_ASSERT(offsetof(CMenuPcs, m_bonus) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm) == 0x744);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_worldObjData) == 0x814);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_bubbleData) == 0x818);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameData) == 0x81C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_frameInfo) == 0x820);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_charaModelData) == 0x824);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wm.m_charaSelectData) == 0x828);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
@@ -781,14 +897,16 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusStatePtr) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeVillageWork) == 0x830);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorldParams) == 0x83C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusListPtr) == 0x840);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaAnimState) == 0x844);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
-STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAuxPtr) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_bonusAnimPtr) == 0x84C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
@@ -798,14 +916,38 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleFadeState) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmWorkBuffer) == 0x854);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmThpActive) == 0x858);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuMode) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuPhase) == 0x866);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleCmakeMode) == 0x868);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleCmakeSlot) == 0x86A);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuResultCode) == 0x86C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_textureLocIndex) == 0x86E);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutLoadFinished) == 0x86E);
+STATIC_ASSERT(offsetof(CMenuPcs, m_wmTransitionCode) == 0x870);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutLoadResult) == 0x870);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuCtrlResetFlag) == 0x872);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleLifeTimer) == 0x874);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset) == 0x878);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset.m_resetFlag) == 0x878);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferSaveData) == 0x87C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWork) == 0x880);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkActive) == 0x888);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown888) == 0x888);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkCardChannel) == 0x889);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutSaveLoadMode) == 0x889);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown88A) == 0x88A);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown88B) == 0x88B);
+STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWork) == 0x88C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWorkActive) == 0x88C);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
+STATIC_ASSERT(sizeof(WmWorldState) == 0x48);
+STATIC_ASSERT(offsetof(WmWorldState, m_originalBackupParams) == 0x36);
+STATIC_ASSERT(offsetof(WmWorldState, m_backupParams) == 0x3E);
 STATIC_ASSERT(sizeof(SingMenuState) == 0x48);
 STATIC_ASSERT(offsetof(SingMenuState, initialized) == 0x0B);
 STATIC_ASSERT(offsetof(SingMenuState, closeRequested) == 0x0D);

@@ -231,7 +231,7 @@ void CMenuPcs::Init()
     memset(self + 0x04, 0, 0x1C);
 
     m_singleMenuStageActive = 0;
-    *reinterpret_cast<u16*>(self + 0x86C) = 0;
+    m_menuResultCode = 0;
     m_cmakeVillageWork = 0;
     m_artiList = 0;
     m_battleStateFlag = 0;
@@ -260,17 +260,7 @@ void CMenuPcs::Init()
     m_specialModeFlags[1] = 0;
     m_specialModeFlags[2] = 0;
     m_specialModeFlags[3] = 0;
-    *reinterpret_cast<u32*>(self + 0xBC) = 0;
-    *reinterpret_cast<u32*>(self + 0xC0) = 0;
-    *reinterpret_cast<u32*>(self + 0xC4) = 0;
-    *reinterpret_cast<u32*>(self + 0xC8) = 0;
-    *reinterpret_cast<u32*>(self + 0xCC) = 0;
-    *reinterpret_cast<u32*>(self + 0xD0) = 0;
-    *reinterpret_cast<u32*>(self + 0xD4) = 0;
-    *reinterpret_cast<u32*>(self + 0xD8) = 0;
-    *reinterpret_cast<u32*>(self + 0xDC) = 0;
-    *reinterpret_cast<u32*>(self + 0xE0) = 0;
-    *reinterpret_cast<u32*>(self + 0xE4) = 0;
+    memset(m_specialModeWork, 0, sizeof(m_specialModeWork));
 
     do {
         cardChannel[0x30] = 0;
@@ -279,13 +269,13 @@ void CMenuPcs::Init()
     } while (i != 0);
 
     m_shopMenu = 0;
-    self[0x87C] = 1;
-    self[0x888] = 0;
-    self[0x889] = 0;
-    self[0x88A] = 0;
-    *reinterpret_cast<u32*>(self + 0x884) = 0;
-    *reinterpret_cast<u32*>(self + 0x880) = 0;
-    *reinterpret_cast<u32*>(self + 0x88C) = 0;
+    m_pad87C = 1;
+    m_cmakeWorkActive = 0;
+    m_cmakeWorkCardChannel = 0;
+    m_pad88A = 0;
+    m_pad884 = 0;
+    m_pad880 = 0;
+    m_cmakeWork = 0;
 }
 
 /*
@@ -1116,7 +1106,7 @@ void CMenuPcs::onScriptChanging(char* script)
         }
     }
 
-    memset(self + 0x48, 0, 0x28);
+    memset(&m_battleHud, 0, sizeof(m_battleHud));
     ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[2]));
     ReleaseRefSlot(reinterpret_cast<void**>(&m_fonts[3]));
 }

@@ -185,10 +185,6 @@ struct BonusMenuStateRaw {
 	unsigned char bytes[0x48];
 };
 
-struct BonusMenuAuxRaw {
-	unsigned char bytes[0xC];
-};
-
 struct BonusBaseRaw {
 	float values[18];
 };
@@ -207,7 +203,6 @@ struct BonusEffectSlotList {
 };
 
 STATIC_ASSERT(sizeof(BonusMenuStateRaw) == 0x48);
-STATIC_ASSERT(sizeof(BonusMenuAuxRaw) == 0xC);
 STATIC_ASSERT(sizeof(BonusBaseRaw) == 0x48);
 STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
@@ -291,12 +286,12 @@ static inline CMemory::CStage* GetBonusAllocStage(CMenuPcs* menu)
 
 static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 {
-	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
+	return menu->m_wm.m_handles;
 }
 
 static inline MenuBoardEntry* GetBonusBoardEntries(CMenuPcs* menu)
 {
-	return reinterpret_cast<MenuBoardEntry*>(menu->m_bonusBoardPtr);
+	return reinterpret_cast<MenuBoardEntry*>(menu->m_bonus.m_bonusBoardPtr);
 }
 
 static inline void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
@@ -446,19 +441,19 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 
 static inline void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 {
-	int auxPtr = menu->m_bonusAuxPtr;
+	MenuWindowInfo* window = menu->m_menuWindowInfo;
 
 	menu->DrawInit();
-	if (*(short*)(auxPtr + 10) == 3) {
+	if (window->state == 3) {
 		return;
 	}
 
 	menu->DrawMcWin(-1, 1);
-	if (*(short*)(auxPtr + 10) == 1) {
+	if (window->state == 1) {
 		menu->DrawMcWinMess(0x18, 1);
 		menu->DrawInit();
 		int cursorX = menu->GetYesNoXPos((int)*(short*)(statePtr + 0x28));
-		float cursorY = (float)(*(short*)(auxPtr + 2) + *(short*)(auxPtr + 6) - 0x3e);
+		float cursorY = (float)(window->y + window->height - 0x3e);
 		menu->DrawCursor(cursorX, (int)cursorY, 1.0f);
 	}
 }
@@ -1075,7 +1070,7 @@ void CMenuPcs::CalcSelectWait()
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
-		*(short*)(this->m_bonusAuxPtr + 10) = 3;
+		this->m_menuWindowInfo->state = 3;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
 			BonusSpriteFlags(&sprites[i]) = 3;
@@ -1105,13 +1100,13 @@ void CMenuPcs::CalcSelectWait()
 
 	int statePtr = this->m_bonusStatePtr;
 	int animPtr = this->m_bonusAnimPtr;
-	int auxPtr = this->m_bonusAuxPtr;
+	MenuWindowInfo* window = this->m_menuWindowInfo;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	short& promptMode = *(short*)(auxPtr + 10);
+	short& promptMode = window->state;
 	short& currentPartyIndex = *(short*)(statePtr + 0xe);
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
@@ -1207,7 +1202,7 @@ void CMenuPcs::CalcSelectWait()
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	} else if (promptMode == 2) {
-		if (*(short*)(auxPtr + 8) == 1 && confirmSel == 0) {
+		if (window->frame == 1 && confirmSel == 0) {
 			delay = 10;
 			*(unsigned char*)(statePtr + 8) = 0xff;
 		}
@@ -2370,7 +2365,7 @@ void CMenuPcs::CalcResultCountAnim()
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 0.0f;
+				handle->m_model->m_lightAlpha = 0.0f;
 			}
 		}
 
@@ -3100,16 +3095,16 @@ void CMenuPcs::destroyBonus()
 		s_Base[0] = 0;
 	}
 
-	ptr = this->m_bonusBoardPtr;
+	ptr = this->m_bonus.m_bonusBoardPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		this->m_bonusBoardPtr = 0;
+		this->m_bonus.m_bonusBoardPtr = 0;
 	}
 
-	ptr = this->m_bonusAuxPtr;
-	if (ptr != 0) {
-		delete (BonusMenuAuxRaw*)ptr;
-		this->m_bonusAuxPtr = 0;
+	MenuWindowInfo* window = this->m_menuWindowInfo;
+	if (window != 0) {
+		delete window;
+		this->m_menuWindowInfo = 0;
 	}
 
 	freeTexture(2, 1, 0x16, 0x12);
@@ -3130,8 +3125,8 @@ void CMenuPcs::createBonus()
 	int statePtr = this->m_bonusStatePtr;
 	int animPtr = this->m_bonusAnimPtr;
 	int listPtr = this->m_bonusListPtr;
-	int auxPtr = this->m_bonusAuxPtr;
-	int boardPtr = this->m_bonusBoardPtr;
+	MenuWindowInfo* window = this->m_menuWindowInfo;
+	int boardPtr = this->m_bonus.m_bonusBoardPtr;
 
 	Pad.m_stickDigitalThreshold = 0x28;
 	for (int i = 0; i < 4; i++) {
@@ -3169,10 +3164,10 @@ void CMenuPcs::createBonus()
 	this->m_bonusAnimPtr = animPtr;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	boardPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
-	this->m_bonusBoardPtr = boardPtr;
-	auxPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) BonusMenuAuxRaw);
-	this->m_bonusAuxPtr = auxPtr;
-	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
+	this->m_bonus.m_bonusBoardPtr = boardPtr;
+	window = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
+	this->m_menuWindowInfo = window;
+	memset(window, 0, sizeof(MenuWindowInfo));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
 		InitBonusBoardEntry(&boardEntries->entries[i]);
@@ -3196,7 +3191,7 @@ void CMenuPcs::createBonus()
 			entry.m_partySlot = i;
 			entry.m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
+			entry.m_partyHandle->m_model->m_lightAlpha = 0.0f;
 			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
 			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
 			if (entry.m_foodValue > 100) {
@@ -3381,7 +3376,7 @@ void CMenuPcs::createBonus()
 			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->SortBeforeReturnWorldMap();
 		}
 	}
-	*(short*)(this->m_bonusAuxPtr + 10) = 3;
+	this->m_menuWindowInfo->state = 3;
 	s_CntTop = 0;
 	s_ArtiTop = 0;
 	s_PlayerTop = 0;

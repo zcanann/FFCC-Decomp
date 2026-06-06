@@ -28,82 +28,9 @@ extern const float FLOAT_80330B30 = 0.0f;
 u32 g_ymMelt;
 }
 
-struct YmMeltMapCylinder {
-    Vec m_bottom;
-    Vec m_top;
-    Vec m_axis;
-    float m_radius;
-    Vec m_boundsMin;
-    Vec m_boundsMax;
-};
-
-struct YmMeltVertex
-{
-    Vec m_position;
-    union {
-        _GXColor m_gxColor;
-        u32 m_rawColor;
-        float m_colorValue;
-        u8 m_bytes[4];
-    } m_color;
-};
-
-struct YmMeltWork {
-    YmMeltVertex* m_vertexData;
-    s16 m_phaseOffset;
-    s16 m_shapeCurrentFrame;
-    s16 m_shapeDrawFrame;
-    s16 m_shapeFrameTime;
-    f32 m_phase;
-    f32 m_phaseVelocity;
-    f32 m_phaseAccel;
-};
-
-struct YmMeltColorWork {
-    u8 _pad0[8];
-    union {
-        pppCVECTOR m_color;
-        float m_colorValue;
-    };
-};
-
-struct VERTEX_DATA
-{
-    u8 _pad0[0xA];
-    u16 m_gridSize;
-    f32 m_stepValue;
-    u8 _pad10[0x10];
-    float m_heightBias;
-    float m_collisionYOffset;
-    float m_maxDropDistance;
-    u8 _pad2C[2];
-    u8 m_hideWhenNoGround;
-};
-
-struct YmMeltCtrl {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s16 m_shapeFrameStep;
-    u16 m_gridSize;
-    f32 m_stepValue;
-    u8 m_blendMode;
-    u8 _pad11;
-    s16 m_phasePeriod;
-    union {
-        u8 m_payload[0x20];
-        struct Payload {
-            f32 m_phaseDelta;
-            f32 m_phaseVelocityDelta;
-            f32 m_phaseAccelDelta;
-            u8 m_pad0C[0x0C];
-            u8 m_drawEnvColor0;
-            u8 m_drawEnvColor1;
-            u8 m_pad1A[0x06];
-        } m_melt;
-    };
-};
-
 STATIC_ASSERT(sizeof(YmMeltVertex) == 0x10);
+STATIC_ASSERT(offsetof(YmMeltVertex, m_position) == 0x00);
+STATIC_ASSERT(offsetof(YmMeltVertex, m_color) == 0x0C);
 STATIC_ASSERT(offsetof(YmMeltWork, m_vertexData) == 0x00);
 STATIC_ASSERT(offsetof(YmMeltWork, m_phaseOffset) == 0x04);
 STATIC_ASSERT(offsetof(YmMeltWork, m_shapeCurrentFrame) == 0x06);
@@ -116,7 +43,16 @@ STATIC_ASSERT(sizeof(YmMeltWork) == 0x18);
 STATIC_ASSERT(offsetof(YmMeltColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(YmMeltColorWork) == 0x0C);
 STATIC_ASSERT(sizeof(Vec2d) == 0x08);
-STATIC_ASSERT(sizeof(YmMeltMapCylinder) == sizeof(CMapCylinder));
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_gridSize) == 0x0A);
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_stepValue) == 0x0C);
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_heightBias) == 0x20);
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_collisionYOffset) == 0x24);
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_maxDropDistance) == 0x28);
+STATIC_ASSERT(offsetof(YmMeltVertexSetup, m_hideWhenNoGround) == 0x2E);
+STATIC_ASSERT(offsetof(CMapCylinder, m_bottom) == 0x00);
+STATIC_ASSERT(offsetof(CMapCylinder, m_axis) == 0x18);
+STATIC_ASSERT(offsetof(CMapCylinder, m_radius) == 0x24);
+STATIC_ASSERT(offsetof(CMapCylinder, m_bound) == 0x28);
 STATIC_ASSERT(sizeof(YmMeltDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmMeltDataOffsets, m_colorWorkOffset) == 0x4);
@@ -485,7 +421,6 @@ extern "C" void CalcPolygonHeight(
     Vec rayDirection;
     Vec worldBase;
     YmMeltVertex* vertex;
-    YmMeltMapCylinder cylinder;
     u8* colorBytes = (u8*)color;
 
     pointCount = vertexData->m_gridSize + 1;
@@ -509,19 +444,14 @@ extern "C" void CalcPolygonHeight(
         rayDirection.z = zero;
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 
-        cylinder.m_boundsMin.z = LoadFloat(FLOAT_80330b14);
-        cylinder.m_boundsMin.y = LoadFloat(FLOAT_80330b14);
-        cylinder.m_boundsMin.x = LoadFloat(FLOAT_80330b14);
-        cylinder.m_boundsMax.z = FLOAT_80330b18[0];
-        cylinder.m_boundsMax.y = FLOAT_80330b18[0];
-        cylinder.m_boundsMax.x = FLOAT_80330b18[0];
+        CMapCylinder cylinder(LoadFloat(FLOAT_80330b14), FLOAT_80330b18[0]);
         cylinder.m_bottom = vertex->m_position;
         cylinder.m_axis.x = rayDirection.x;
         cylinder.m_axis.y = rayDirection.y;
         cylinder.m_axis.z = rayDirection.z;
         cylinder.m_radius = zero;
 
-        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), &rayDirection, 0xFFFFFFFF) != 0) {
+        if (MapMng.CheckHitCylinderNear(&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
             MapMng.m_hitMapObj->CalcHitPosition(&vertex->m_position);
             if ((previousY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
                 vertex->m_position.y = previousY;

@@ -1193,14 +1193,15 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	}
 
 	int particleIndex = hitParam->m_particleIndex;
+	int classId = hitParam->m_classId;
 	CGPrgObj* sourceObj;
-	if (hitParam->m_classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(static_cast<int>(hitParam->m_classId)));
+	if (classId != 0) {
+		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(classId));
 	} else {
 		sourceObj = 0;
 	}
 
-	int sourceCid = sourceObj->GetCID();
+	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		onDamage(sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}

@@ -2215,7 +2215,7 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 
 	for (_pppPObjLink* obj = pppMngSt->m_pppPObjLinkHead.m_next; obj != 0; obj = obj->m_next)
 	{
-		((u8*)obj)[0x7C] = 0;
+		((_pppPObject*)obj)->m_field7C = 0;
 	}
 }
 
@@ -2274,7 +2274,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 			{
 				break;
 			}
-			((u8*)pObject)[0x7C] = 0;
+			pObject->m_field7C = 0;
 		}
 		pDataValOffset += sizeof(_pppPDataVal);
 	}

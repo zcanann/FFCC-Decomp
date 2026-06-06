@@ -399,18 +399,6 @@ static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSele
 static const int kWmFrameInfoBytes = 0x3C;
 static const int kWmMenuCharaStateBytes = 0x120;
 
-struct WmMenuWindowState
-{
-	short x;
-	short y;
-	short w;
-	short h;
-	short frame;
-	short state;
-};
-
-STATIC_ASSERT(sizeof(WmMenuWindowState) == 0x0C);
-
 struct GbaCMakeInfoRaw
 {
 	unsigned char m_active;        // 0x00
@@ -779,9 +767,8 @@ void CMenuPcs::loadData()
 	    operator new[](0xA0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25A);
 	memset(reinterpret_cast<void**>(bytes + 0x844)[0], 0, 0xA0);
 
-	reinterpret_cast<void**>(bytes + 0x848)[0] =
-	    operator new(sizeof(WmMenuWindowState), m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E);
-	memset(reinterpret_cast<void**>(bytes + 0x848)[0], 0, sizeof(WmMenuWindowState));
+	m_menuWindowInfo = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E) MenuWindowInfo;
+	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
 	InitFrameInfo();
 	InitCharaInfo();
@@ -1100,9 +1087,9 @@ void CMenuPcs::destroyWorld()
 			m_effectWork = 0;
 		}
 	}
-	if (reinterpret_cast<void**>(bytes + 0x848)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x848)[0]);
-		reinterpret_cast<void**>(bytes + 0x848)[0] = 0;
+	if (m_menuWindowInfo != 0) {
+		delete m_menuWindowInfo;
+		m_menuWindowInfo = 0;
 	}
 
 	if (bytes[0x858] != 0) {
@@ -7656,14 +7643,14 @@ void CMenuPcs::CalcCharaSelect()
 			}
 			winWidth = static_cast<short>((winWidth + 2) * 0x16 + 0x40);
 			const short winHeight = static_cast<short>(*winMess) * 0x1E + 0x40;
-			WmMenuWindowState* const win = reinterpret_cast<WmMenuWindowState*>(*reinterpret_cast<int*>(bytes + 0x848));
+			MenuWindowInfo* const win = m_menuWindowInfo;
 			win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - winWidth) *
 			                                             static_cast<float>(DOUBLE_803313f8)));
 			win->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
 			                                                                  static_cast<float>(winHeight))) *
 			                                             DOUBLE_803313f8));
-			win->w = winWidth;
-			win->h = winHeight;
+			win->width = winWidth;
+			win->height = winHeight;
 			win->frame = 0;
 			win->state = 3;
 			win->state = 0;

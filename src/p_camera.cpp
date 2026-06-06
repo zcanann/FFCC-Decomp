@@ -611,23 +611,27 @@ void CCameraPcs::CalcQuake()
     u32 randZ = static_cast<u32>(rand());
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
 
+    float jitterAmount;
     if (((randX & 1) ^ signX) == signX) {
-        jitter.x = Math.RandF(m_quake.m_jitterAmplitude.x);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.x);
     } else {
-        jitter.x = -Math.RandF(m_quake.m_jitterAmplitude.x);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.x);
     }
+    jitter.x = jitterAmount;
 
     if (((randY & 1) ^ signY) == signY) {
-        jitter.y = Math.RandF(m_quake.m_jitterAmplitude.y);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.y);
     } else {
-        jitter.y = -Math.RandF(m_quake.m_jitterAmplitude.y);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.y);
     }
+    jitter.y = jitterAmount;
 
     if (((randZ & 1) ^ signZ) == signZ) {
-        jitter.z = Math.RandF(m_quake.m_jitterAmplitude.z);
+        jitterAmount = Math.RandF(m_quake.m_jitterAmplitude.z);
     } else {
-        jitter.z = -Math.RandF(m_quake.m_jitterAmplitude.z);
+        jitterAmount = -Math.RandF(m_quake.m_jitterAmplitude.z);
     }
+    jitter.z = jitterAmount;
 
     if (m_quake.m_mode == 2) {
         PSVECAdd(&offset, &jitter, &offset);
@@ -715,27 +719,37 @@ void CCameraPcs::calc()
 
     if (m_isAbsolute == 0) {
         float stickH = FLOAT_8032fa34;
-        float stickV = FLOAT_8032fa34;
-        float triggerL = FLOAT_8032fa34;
-        float triggerR = FLOAT_8032fa34;
-        float moveInOut = FLOAT_8032fa34;
-
-        if (!useDebugPad) {
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             stickH = *reinterpret_cast<float*>(pad + 0x44);
+        }
+        m_yaw += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
+
+        float stickV = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             stickV = *reinterpret_cast<float*>(pad + 0x48);
+        }
+        m_pitch += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
+
+        float triggerL = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             triggerL = *reinterpret_cast<float*>(pad + 0x36);
+        }
+        m_distance += FLOAT_8032fabc * triggerL;
+
+        float triggerR = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             triggerR = *reinterpret_cast<float*>(pad + 0x28);
+        }
+
+        float moveInOut = FLOAT_8032fa34;
+        if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
             moveInOut = *reinterpret_cast<float*>(pad + 0x40);
         }
-
-        m_yaw += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
-        m_pitch += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
-        m_distance += FLOAT_8032fabc * triggerL;
 
         const double rotY = static_cast<double>(m_pitch);
         const double rotX = static_cast<double>(m_yaw);
@@ -780,11 +794,9 @@ void CCameraPcs::calc()
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(m_worldMapMatrix, worldMapMtx);
         if (m_worldMapEffect.m_duration != 0 && m_worldMapEffect.m_timer != 0) {
-            const double t = static_cast<double>(FLOAT_8032fa18 * (
-                FLOAT_8032fa1c - (static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(m_worldMapEffect.m_timer))) - DOUBLE_8032fa28) /
-                static_cast<float>(static_cast<double>((0x4330000000000000ULL |
-                static_cast<unsigned short>(m_worldMapEffect.m_duration))) - DOUBLE_8032fa28))));
+            const double t = static_cast<double>(FLOAT_8032fa18 *
+                (FLOAT_8032fa1c - static_cast<float>(m_worldMapEffect.m_timer) /
+                static_cast<float>(m_worldMapEffect.m_duration)));
             const double f = static_cast<double>(FLOAT_8032fa20 * (FLOAT_8032fa1c + static_cast<float>(cos(t))));
 
             PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(m_worldMapEffect.m_rotX) * f));

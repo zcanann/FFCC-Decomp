@@ -6326,7 +6326,7 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	int wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	if (sVar3 == 2 && bytes[0x13] != 0) {
 		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
 		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
@@ -6352,30 +6352,30 @@ void CMenuPcs::CalcWMFrame()
 		}
 	}
 LAB_calc:
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x98) = 0x68;
+	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9A) = 0x14;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9C) = 200;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9E) = 0x28;
-	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0xA0) = fVar1;
+	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;
+	*reinterpret_cast<short*>(wmFrame + 0x9C) = 200;
+	*reinterpret_cast<short*>(wmFrame + 0x9E) = 0x28;
+	*reinterpret_cast<float*>(wmFrame + 0xA0) = fVar1;
 
 	if ((bytes[0x0A] & 1) == 0) {
-		wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
 		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
 	} else {
-		wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x05];
 		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
 	}
 
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x98) =
-	    (short)(10 - *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 4)) * 2 + 0x68;
+	*reinterpret_cast<short*>(wmFrame + 0x98) =
+	    (short)(10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
 	     (worldState->m_mainState == 2 && bytes[0x13] != 0))
-	    && *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) > 9) {
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 8) = 0;
+	    && *reinterpret_cast<int*>(wmFrame + 8) > 9) {
+		*reinterpret_cast<int*>(wmFrame + 8) = 0;
 		bytes[0x0A] = bytes[0x0A] & 0xFD;
 	}
 
@@ -6397,7 +6397,7 @@ LAB_calc:
 		uVar14 = 3;
 	}
 
-	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	*reinterpret_cast<float*>(wmFrame + 200) = FLOAT_803313e8;
 	*reinterpret_cast<float*>(wmFrame + 0xE4) = fVar1;
 
@@ -6447,7 +6447,7 @@ LAB_calc:
 		}
 	}
 
-	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	if ((bytes[0x0A] & 2) == 0 &&
 	    (worldState->m_mainState != 2 || bytes[0x13] == 0)) {
 		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(wmFrame + 8);
@@ -6579,7 +6579,7 @@ void CMenuPcs::DrawWMFrame()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	int wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
+	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 
 	float rotation = worldState->m_posX * FLOAT_803314bc;
 	Mtx rotMtx;

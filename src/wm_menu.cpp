@@ -5491,7 +5491,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	float t = value / FLOAT_803314c0;
 	float* keys = fcv.keys;
 
-	if (keys[keyCount * 4 - 4] <= t) {
+	if (t >= keys[keyCount * 4 - 4]) {
 		return static_cast<double>(keys[keyCount * 4 - 3]);
 	}
 
@@ -5501,7 +5501,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 		return static_cast<double>(FLOAT_803313dc);
 	}
 
-	while (*cur < t) {
+	while (t > *cur) {
 		cur = cur + 4;
 		idx = idx + 1;
 		keyCount = keyCount - 1;

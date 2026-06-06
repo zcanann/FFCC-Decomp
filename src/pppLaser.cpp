@@ -263,12 +263,12 @@ extern "C" void pppFrameLaser(pppLaser *pppLaser, pppLaserStep *param_2, _pppCtr
         PSVECScale(&localA, &localA, LaserConst(kPppLaserAxisScale));
 
         pppLaserCylinder cyl;
-        cyl.m_bound.m_max.x = LaserConst(kPppLaserBoundsMax);
-        cyl.m_bound.m_max.y = LaserConst(kPppLaserBoundsMax);
-        cyl.m_bound.m_max.z = LaserConst(kPppLaserBoundsMax);
-        cyl.m_bound.m_min.x = LaserConst(kPppLaserBoundsMin);
-        cyl.m_bound.m_min.y = LaserConst(kPppLaserBoundsMin);
-        cyl.m_bound.m_min.z = LaserConst(kPppLaserBoundsMin);
+        cyl.m_bound.m_min.x = LaserConst(kPppLaserBoundsMax);
+        cyl.m_bound.m_min.y = LaserConst(kPppLaserBoundsMax);
+        cyl.m_bound.m_min.z = LaserConst(kPppLaserBoundsMax);
+        cyl.m_bound.m_max.x = LaserConst(kPppLaserBoundsMin);
+        cyl.m_bound.m_max.y = LaserConst(kPppLaserBoundsMin);
+        cyl.m_bound.m_max.z = LaserConst(kPppLaserBoundsMin);
         cyl.m_bottom = work->m_origin;
         cyl.m_axis = localA;
         cyl.m_radius = LaserConst(kPppLaserZero);

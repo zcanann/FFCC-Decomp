@@ -407,10 +407,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
-        case CHUNK_GBID: {
-            m_groupId = chunkFile.Get2();
-            break;
-        }
         case CHUNK_EFID: {
             m_effectId = chunkFile.Get2();
             break;
@@ -804,6 +800,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 pointLight->m_colorMode = chunkFile.Get1();
             }
             m_attribute = pointLightAttr;
+            break;
+        }
+        case CHUNK_GBID: {
+            m_groupId = chunkFile.Get2();
             break;
         }
         case CHUNK_PSTA: {

@@ -69,17 +69,17 @@ bool CGQuadObj::isInner(Vec* vec)
 	u32 count = m_vertexCount;
 	if ((((count != 0) && (m_bboxMinX <= vec->x)) && (m_bboxMinZ <= vec->z)) && ((m_bboxMaxX >= vec->x) && (m_bboxMaxZ >= vec->z))) {
 		if ((m_yBase <= vec->y) && ((m_yBase + m_yHeight) >= vec->y)) {
-			QuadVertex* vertex = m_vertices;
+			CGQuadObj* current = this;
 			int i = 0;
 			for (; i < (int)count; i++) {
-				float z0 = vertex->z;
-				float x0 = vertex->x;
+				float z0 = current->m_vertices[0].z;
+				float x0 = current->m_vertices[0].x;
 				int quotient = (i + 1) / (int)count;
 				int next = (i + 1) - quotient * (int)count;
 				if (((m_vertices[next].x - x0) * (vec->z - z0) - (m_vertices[next].z - z0) * (vec->x - x0)) < 0.0f) {
 					break;
 				}
-				vertex++;
+				current = reinterpret_cast<CGQuadObj*>(reinterpret_cast<char*>(current) + sizeof(QuadVertex));
 			}
 
 			if (i == (int)count) {

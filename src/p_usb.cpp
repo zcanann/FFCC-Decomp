@@ -11,6 +11,12 @@ char s_usbReadPollInitialized;
 
 static const char sUsbPcsClassName[] = "CUSBPcs";
 
+typedef int CUSBDataHeader_size_mismatch[(sizeof(CUSBPcs::CDataHeader) == 0x40) ? 1 : -1];
+typedef int CUSBDataHeader_payload_size_offset_mismatch
+    [(((u32)&((CUSBPcs::CDataHeader*)0)->m_payloadSize) == 0x20) ? 1 : -1];
+typedef int CUSBDataHeader_packet_code_offset_mismatch
+    [(((u32)&((CUSBPcs::CDataHeader*)0)->m_packetCode) == 0x24) ? 1 : -1];
+
 extern "C" {
 void create__7CUSBPcsFv(CUSBPcs*);
 void destroy__7CUSBPcsFv(CUSBPcs*);
@@ -77,7 +83,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     unsigned int count;
     int result;
     int connected;
-    unsigned int* dstBuffer;
+    unsigned char* packetStorage;
+    unsigned char* dstStorage;
+    CDataHeader* packet;
+    CDataHeader* dstBuffer;
     CMemory::CStage* stage;
     unsigned int value;
 
@@ -85,17 +94,16 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     value = (count + 0x5F) & ~0x1F;
     stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    void* packet = new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value];
-    unsigned int* header = (unsigned int*)packet;
-    header[1] = value;
-    *header = 4;
-    unsigned int* ptr = header;
-    ptr[9] = Swap32((unsigned int)code);
-    ptr[10] = Swap32((unsigned int)elemCount);
-    ptr[12] = Swap32(count);
-    ptr[11] = Swap32(0);
-    ptr[8] = Swap32(count);
-    memcpy(ptr + 0x10, src, count);
+    packetStorage = new (stage, const_cast<char*>(s_p_usb_cpp), 0x1ca) unsigned char[value];
+    packet = reinterpret_cast<CDataHeader*>(packetStorage);
+    packet->m_packetType = 4;
+    packet->m_packetSize = value;
+    packet->m_payloadSize = Swap32(count);
+    packet->m_packetCode = Swap32((unsigned int)code);
+    packet->m_elementCount = Swap32((unsigned int)elemCount);
+    packet->m_reserved2C = Swap32(0);
+    packet->m_dataSize = Swap32(count);
+    memcpy(packet + 1, src, count);
 
     connected = USB.IsConnected();
     if (connected == 0) {
@@ -103,30 +111,31 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     } else {
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-        dstBuffer = reinterpret_cast<unsigned int*>(new (stage, const_cast<char*>(s_p_usb_cpp), 0x19e)
-                                                        unsigned char[(ptr[1] + 0x1F) & ~0x1F]);
-        memcpy(dstBuffer, ptr, (ptr[1] + 0x1F) & ~0x1F);
+        dstStorage = new (stage, const_cast<char*>(s_p_usb_cpp), 0x19e)
+            unsigned char[(packet->m_packetSize + 0x1F) & ~0x1F];
+        dstBuffer = reinterpret_cast<CDataHeader*>(dstStorage);
+        memcpy(dstBuffer, packet, (packet->m_packetSize + 0x1F) & ~0x1F);
 
-        dstBuffer[0] = Swap32(ptr[0]);
-        dstBuffer[1] = Swap32(ptr[1]);
+        dstBuffer->m_packetType = Swap32(packet->m_packetType);
+        dstBuffer->m_packetSize = Swap32(packet->m_packetSize);
 
-        DCFlushRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
-        DCInvalidateRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
+        DCFlushRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
+        DCInvalidateRange(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F);
 
-        if (USB.Write(dstBuffer, (ptr[1] + 0x1F) & ~0x1F) == 0) {
-            delete[] dstBuffer;
+        if (USB.Write(dstBuffer, (packet->m_packetSize + 0x1F) & ~0x1F) == 0) {
+            delete[] dstStorage;
             result = 0;
         } else if (USB.SendMessage(0, (MCCChannel)9) == 0) {
-            delete[] dstBuffer;
+            delete[] dstStorage;
             result = 0;
         } else {
-            delete[] dstBuffer;
+            delete[] dstStorage;
             result = 1;
         }
     }
 
-    if (ptr != (unsigned int*)nullptr) {
-        delete[] ptr;
+    if (packet != (CDataHeader*)nullptr) {
+        delete[] packetStorage;
     }
     return result;
 }

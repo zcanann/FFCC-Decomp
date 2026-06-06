@@ -14,7 +14,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
 static const float FLOAT_80332eb8 = 0.0f;
 static const double DOUBLE_80332ec0 = 1.0;
 static const double DOUBLE_80332ec8 = 216.0;
@@ -713,9 +712,18 @@ void CMenuPcs::EquipDraw()
 	if (((mode == 0) && (*(s16*)(reinterpret_cast<char*>(menuState) + 0x2C) == 0)) && (helpItem < 0)) {
 		helpItem = 0x267;
 	}
-	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, helpItem);
+
+	int helpEntryIndex = (mode == 1) ? menuData[0] : 0;
+	CColor helpColor(0xff, 0xff, 0xff,
+	                 static_cast<u8>(FLOAT_80332ee4 * *reinterpret_cast<float*>(menuData + helpEntryIndex * 0x20 + 0xC)));
+	DrawHelpMessage(helpItem, m_fonts[0], 0, static_cast<int>(FLOAT_80332f00), helpColor.color, 10,
+	                FLOAT_80332ee0, FLOAT_80332f18);
 	if ((mode == 1) && (listIndex < 1)) {
-		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, 0x265);
+		CColor listHelpColor(
+		    0xff, 0xff, 0xff,
+		    static_cast<u8>(FLOAT_80332ee4 * *reinterpret_cast<float*>(menuData + menuData[0] * 0x20 + 0xC)));
+		DrawHelpMessage(0x265, m_fonts[0], 0, static_cast<int>(FLOAT_80332f00), listHelpColor.color, 10,
+		                FLOAT_80332ee0, FLOAT_80332f18);
 	}
 }
 

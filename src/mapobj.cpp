@@ -407,10 +407,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
-        case CHUNK_BOBJ: {
-            m_bumpObjId = chunkFile.Get2();
-            break;
-        }
         case CHUNK_GBID: {
             m_groupId = chunkFile.Get2();
             break;
@@ -727,6 +723,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 animRun->m_animId = 0;
             }
             MapMng.GetMapAnimRunArray().Add(animRun);
+            break;
+        }
+        case CHUNK_BOBJ: {
+            m_bumpObjId = chunkFile.Get2();
             break;
         }
         case CHUNK_PLIT: {

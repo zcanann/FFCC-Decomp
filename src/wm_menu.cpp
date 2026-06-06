@@ -448,8 +448,7 @@ static inline int* GetWmCharaAnimState(CMenuPcs* menu)
 
 static inline short* GetWmWorldState(CMenuPcs* menu)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
-	return reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	return reinterpret_cast<short*>(menu->m_wmWorldState);
 }
 
 static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
@@ -526,7 +525,7 @@ void CMenuPcs::WmInit()
 	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
 	m_wm.m_charaModelData = 0;
 	m_wm.m_charaSelectData = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] = 0;
+	m_wmWorldState = 0;
 	m_wmCharaState = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
 	m_effectWork = 0;
@@ -695,9 +694,9 @@ void CMenuPcs::loadData()
 	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x243));
 	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
 
-	reinterpret_cast<void**>(bytes + 0x82C)[0] =
-	    operator new(0x48, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246);
-	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
+	m_wmWorldState =
+	    static_cast<unsigned char*>(operator new(0x48, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
+	memset(m_wmWorldState, 0, 0x48);
 
 	m_wmCharaState =
 	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
@@ -941,7 +940,7 @@ void CMenuPcs::InitCSelCurPos()
 	gWmMenuCursorY[0] = static_cast<char>(0xFF);
 	gWmMenuCursorY[1] = static_cast<char>(0xFF);
 
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldState = m_wmWorldState;
 	if (worldState != 0) {
 		*reinterpret_cast<short*>(worldState + 0x26) = 0;
 	}
@@ -1021,9 +1020,9 @@ void CMenuPcs::destroyWorld()
 		delete[] m_wmCharaAnimState;
 		m_wmCharaAnimState = 0;
 	}
-	if (reinterpret_cast<void**>(bytes + 0x82C)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x82C)[0]);
-		reinterpret_cast<void**>(bytes + 0x82C)[0] = 0;
+	if (m_wmWorldState != 0) {
+		delete[] m_wmWorldState;
+		m_wmWorldState = 0;
 	}
 	if (m_wmCharaState != 0) {
 		delete[] m_wmCharaState;
@@ -1085,7 +1084,7 @@ void CMenuPcs::destroyWorld()
 void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldState = m_wmWorldState;
 	unsigned char* const worldParams = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x83C)[0]);
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
@@ -1228,7 +1227,7 @@ void CMenuPcs::calcWorld()
 void CMenuPcs::CalcMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldState = m_wmWorldState;
 	if (worldState == 0) {
 		return;
 	}
@@ -1262,7 +1261,7 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldState = m_wmWorldState;
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;

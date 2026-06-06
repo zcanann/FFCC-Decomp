@@ -40,6 +40,7 @@ extern float ppvChrScl[3];
 extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
+extern char g_StrTmp[0x400];
 extern "C" const double DOUBLE_8032FE08 = 0.0;
 extern "C" const float FLOAT_8032FE10 = 32768.0f;
 extern "C" const float FLOAT_8032FE14 = 180.0f;
@@ -3478,7 +3479,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
 
-    char path[256];
+    char* path = g_StrTmp;
     sprintf(path, lbl_8032FE38, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
@@ -3552,7 +3553,7 @@ void CPartMng::pppLoadPmd(CChunkFile&)
  */
 void CPartMng::pppLoadPmd(const char* baseName)
 {
-    char path[256];
+    char* path = g_StrTmp;
     unsigned long fileSize = 0;
 
     sprintf(path, lbl_8032FE30, baseName);
@@ -3666,7 +3667,7 @@ void CPartMng::pppLoadPan(CChunkFile&)
  */
 void CPartMng::pppLoadPan(const char* baseName)
 {
-    char path[256];
+    char* path = g_StrTmp;
     unsigned long fileSize = 0;
 
     sprintf(path, lbl_8032FE28, baseName);

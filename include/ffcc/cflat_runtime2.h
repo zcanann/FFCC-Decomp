@@ -27,6 +27,12 @@ extern u32 CFlatFlags;
 class CFlatRuntime2 : public CFlatRuntime
 {
 public:
+	struct CSpawnBits
+	{
+		u32 m_lo;
+		u32 m_hi;
+	};
+
 	class CParticleWork
 	{
 	public:
@@ -166,16 +172,69 @@ private:
 	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 
-	u8 m_pad_129C_16CC[0x430];
+public:
+	u32 m_debugFlags;               // 0x129C
+	u32 m_eventFlags;               // 0x12A0
+	u32 m_eventMask;                // 0x12A4
+	u8 m_pad_12A8_12AC[0x4];        // 0x12A8
+	u32 m_centerState;              // 0x12AC
+	float m_centerDistanceScale;    // 0x12B0
+	Mtx m_centerMatrix;             // 0x12B4
+	u8 m_gameFlags;                 // 0x12E4
+	u8 m_pad_12E5_12E8[0x3];        // 0x12E5
+	int m_bossState;                // 0x12E8
+	int m_bossSubState;             // 0x12EC
+	CSpawnBits m_spawnBits[9];      // 0x12F0
+	float m_moveTime;               // 0x1338
+	float m_bgCollisionTime;        // 0x133C
+	float m_objectCollisionTime;    // 0x1340
+	float m_updateTime;             // 0x1344
+	float m_hitTime;                // 0x1348
+	u8 m_pad_134C_16CC[0x380];      // 0x134C
 	CParticleWork m_particleWork;
-	u8 m_pad_1738_1BDC[0x4A4];
+	int m_particleWorkNoHi;         // 0x1738
+	u32 m_particleWorkNoLo;         // 0x173C
+	Vec m_particleWorkPos;          // 0x1740
+	float m_particleWorkPosVecBase; // 0x174C
+	float m_particleWorkPosAngle;   // 0x1750
+	float m_particleWorkPosPad;     // 0x1754
+	Vec m_particleWorkScale;        // 0x1758
+	Vec m_particleWorkTarget;       // 0x1764
+	u8 m_pad_1770_1BDC[0x46C];      // 0x1770
 	CLine<64> m_debugLines[16];
 	u8 m_pad_CD1C_CF20[0x204];
 	CFlatData m_flatData;
-	u8 m_pad_E3F4_10440[0x204C];
+	u8 m_pad_E3F4_10400[0x200C];
+	int m_unknown10400;             // 0x10400
+	u8 m_pad_10404_10408[0x4];      // 0x10404
+	int m_letterEventEnabled;       // 0x10408
+	u8 m_pad_1040C_10418[0xC];      // 0x1040C
+	int m_saveSceneEnabled;         // 0x10418
+	int m_partyTraceParticleSlot[4]; // 0x1041C
+	int m_itemTraceParticleSlot;    // 0x1042C
+	u8 m_pad_10430_10440[0x10];     // 0x10430
 };
 
 STATIC_ASSERT(sizeof(CFlatRuntime2) == 0x10440);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugFlags) == 0x129C);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_eventFlags) == 0x12A0);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_centerState) == 0x12AC);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_centerMatrix) == 0x12B4);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_gameFlags) == 0x12E4);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_spawnBits) == 0x12F0);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_moveTime) == 0x1338);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWork) == 0x16CC);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkNoHi) == 0x1738);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkPos) == 0x1740);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkScale) == 0x1758);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_particleWorkTarget) == 0x1764);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_debugLines) == 0x1BDC);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_flatData) == 0xCF20);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_unknown10400) == 0x10400);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_letterEventEnabled) == 0x10408);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_saveSceneEnabled) == 0x10418);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_partyTraceParticleSlot) == 0x1041C);
+STATIC_ASSERT(offsetof(CFlatRuntime2, m_itemTraceParticleSlot) == 0x1042C);
 
 extern CFlatRuntime2& gCFlatRuntime2;
 extern CFlatRuntime2 CFlat;

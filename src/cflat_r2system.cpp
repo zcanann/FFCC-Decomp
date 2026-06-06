@@ -196,7 +196,7 @@ struct CFlatPathCache
 
 static inline CFlatPathCache* PathCache(CFlatRuntime2* self)
 {
-    return reinterpret_cast<CFlatPathCache*>(reinterpret_cast<u8*>(self) + 0x17D4);
+    return reinterpret_cast<CFlatPathCache*>(self->m_pad_1770_1BDC + 0x64);
 }
 
 static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
@@ -247,9 +247,9 @@ static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
     return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x96C);
 }
 
-static inline unsigned int& RuntimeDebugFlags(CFlatRuntime2* self)
+static inline u32& RuntimeDebugFlags(CFlatRuntime2* self)
 {
-    return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x129C);
+    return self->m_debugFlags;
 }
 
 static inline const unsigned short* GetGameCFlatSystemRows()
@@ -2745,7 +2745,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         } else {
             char* message;
             if ((localBase[3] & 0x80) == 0) {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(reinterpret_cast<u8*>(this) + 0xCF20, localBase[7]));
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, localBase[7]));
             } else {
                 message = GetNumSysMes__5CGameFv(&Game, localBase[7]);
             }
@@ -2801,8 +2801,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x4A:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A0) =
-            static_cast<unsigned int>(*object->m_localBase);
+        m_eventFlags = static_cast<unsigned int>(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -2884,7 +2883,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         if (fileHandle != 0) {
             fileHandle->Read();
             fileHandle->SyncCompleted();
-            reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Create(File.GetBuffer());
+            m_flatData.Create(File.GetBuffer());
             fileHandle->Close();
         }
         runtime->push(object, 0);
@@ -2913,30 +2912,30 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x54: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        int index = m_unknown10400;
+        m_unknown10400 = index + 1;
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
         outResult = 0;
         return 1;
     }
     case -0x55: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        int index = m_unknown10400;
+        m_unknown10400 = index + 1;
         runtime->push(object, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4));
         outResult = 0;
         return 1;
     }
     case -0x56: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        int index = m_unknown10400;
+        m_unknown10400 = index + 1;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     }
     case -0x57: {
-        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400);
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = index + 1;
+        int index = m_unknown10400;
+        m_unknown10400 = index + 1;
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0xE400 + index * 4) = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
@@ -2959,7 +2958,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x5A:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10400) = 0;
+        m_unknown10400 = 0;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3402,8 +3401,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x96:
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12AC) = *object->m_localBase;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12B0) = object->m_localBase[1];
+        m_centerState = *object->m_localBase;
+        *reinterpret_cast<int*>(&m_centerDistanceScale) = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;

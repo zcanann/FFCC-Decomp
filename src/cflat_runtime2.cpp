@@ -199,7 +199,7 @@ static inline u8* MiniGamePcsRaw()
 
 static inline u32& RuntimeDebugFlags(u8* runtime)
 {
-	return *reinterpret_cast<u32*>(runtime + 0x129C);
+	return reinterpret_cast<CFlatRuntime2*>(runtime)->m_debugFlags;
 }
 
 static inline int& DebugDrawCCCount(u8* runtime)
@@ -214,12 +214,12 @@ static inline CFlatDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 
 static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
 {
-	return reinterpret_cast<CFlatLayerResource*>(reinterpret_cast<u8*>(runtime) + 0x1770);
+	return reinterpret_cast<CFlatLayerResource*>(runtime->m_pad_1770_1BDC);
 }
 
 static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<CFlatRuntime2::CParticleWork*>(reinterpret_cast<u8*>(runtime) + 0x16CC);
+	return runtime->m_particleWork;
 }
 
 static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
@@ -234,22 +234,22 @@ static inline float* &ParticleWorkScalePtr(CFlatRuntime2* runtime)
 
 static inline float& ParticleWorkScaleX(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1758);
+	return runtime->m_particleWorkScale.x;
 }
 
 static inline float* ParticleWorkScaleValues(CFlatRuntime2* runtime)
 {
-	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1758);
+	return reinterpret_cast<float*>(&runtime->m_particleWorkScale);
 }
 
 static inline float& ParticleWorkScaleY(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x175C);
+	return runtime->m_particleWorkScale.y;
 }
 
 static inline float& ParticleWorkScaleZ(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1760);
+	return runtime->m_particleWorkScale.z;
 }
 
 static inline float* &ParticleWorkTargetPtr(CFlatRuntime2* runtime)
@@ -259,17 +259,17 @@ static inline float* &ParticleWorkTargetPtr(CFlatRuntime2* runtime)
 
 static inline float& ParticleWorkTargetX(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1764);
+	return runtime->m_particleWorkTarget.x;
 }
 
 static inline float& ParticleWorkTargetY(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1768);
+	return runtime->m_particleWorkTarget.y;
 }
 
 static inline float& ParticleWorkTargetZ(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x176C);
+	return runtime->m_particleWorkTarget.z;
 }
 
 static inline float*& ParticleWorkPosPtr(CFlatRuntime2* runtime)
@@ -284,37 +284,37 @@ static inline float*& ParticleWorkPosVecPtr(CFlatRuntime2* runtime)
 
 static inline float& ParticleWorkPosX(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
+	return runtime->m_particleWorkPos.x;
 }
 
 static inline float* ParticleWorkPosValues(CFlatRuntime2* runtime)
 {
-	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
+	return reinterpret_cast<float*>(&runtime->m_particleWorkPos);
 }
 
 static inline float& ParticleWorkPosY(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1744);
+	return runtime->m_particleWorkPos.y;
 }
 
 static inline float& ParticleWorkPosZ(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1748);
+	return runtime->m_particleWorkPos.z;
 }
 
 static inline float& ParticleWorkPosAngle(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1750);
+	return runtime->m_particleWorkPosAngle;
 }
 
 static inline float& ParticleWorkPosVecBase(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
+	return runtime->m_particleWorkPosVecBase;
 }
 
 static inline float* ParticleWorkPosVecValues(CFlatRuntime2* runtime)
 {
-	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
+	return &runtime->m_particleWorkPosVecBase;
 }
 
 static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
@@ -374,12 +374,12 @@ static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
 
 static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1738);
+	return runtime->m_particleWorkNoHi;
 }
 
-static inline unsigned int& ParticleWorkNoLo(CFlatRuntime2* runtime)
+static inline u32& ParticleWorkNoLo(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x173C);
+	return runtime->m_particleWorkNoLo;
 }
 
 static inline u32 Swap32(u32 value)
@@ -420,18 +420,18 @@ CFlatRuntime2::CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
+	m_saveSceneEnabled = 0;
 	RuntimeDebugFlags(runtime) = 0;
-	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
-	*reinterpret_cast<int*>(runtime + 0x12A4) = -1;
-	runtime[0x12E4] = (runtime[0x12E4] & 0xFB) | 4;
-	*reinterpret_cast<int*>(runtime + 0x10400) = 0;
-	*reinterpret_cast<int*>(runtime + 0x10408) = 0;
+	m_eventFlags = 0;
+	m_eventMask = -1;
+	m_gameFlags = (m_gameFlags & 0xFB) | 4;
+	m_unknown10400 = 0;
+	m_letterEventEnabled = 0;
 	memset(runtime + 0x15CC, 0, 0x100);
 	memset(LayerResources(this), 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
 
 	resetChangeScript();
-	memset(runtime + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
+	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_objBase);
 	for (int i = 0; i < 0x28; i++) {
@@ -1243,7 +1243,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 void CFlatRuntime2::Destroy()
 {
 	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
-	reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Destroy();
+	m_flatData.Destroy();
 
 	CFlatLayerResource* layer = LayerResources(this);
 	int zero = 0;
@@ -1372,7 +1372,8 @@ void CFlatRuntime2::Calc()
 	}
 
 	DebugDrawCCCount(runtime) = 0;
-	memset(runtime + 0x1338, 0, 0x14);
+	memset(&m_moveTime, 0, sizeof(m_moveTime) + sizeof(m_bgCollisionTime) + sizeof(m_objectCollisionTime) +
+		sizeof(m_updateTime) + sizeof(m_hitTime));
 }
 
 /*
@@ -1955,27 +1956,26 @@ void CFlatRuntime2::drawLayer(
  */
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
 	ParticleWork(this) = CParticleWork();
 
 	ParticleWork(this).m_enable = 1;
-	*reinterpret_cast<int*>(runtime + 0x1738) = workNo >> 8;
+	m_particleWorkNoHi = workNo >> 8;
 	ParticleWork(this).m_arg = 0;
-	*reinterpret_cast<unsigned int*>(runtime + 0x173C) = static_cast<unsigned int>(workNo) & 0xFF;
-	*reinterpret_cast<float*>(runtime + 0x1740) = pos.x;
-	*reinterpret_cast<float*>(runtime + 0x1744) = pos.y;
-	*reinterpret_cast<float*>(runtime + 0x1748) = pos.z;
-	*reinterpret_cast<float*>(runtime + 0x1750) = 0.0f;
+	m_particleWorkNoLo = static_cast<unsigned int>(workNo) & 0xFF;
+	m_particleWorkPos.x = pos.x;
+	m_particleWorkPos.y = pos.y;
+	m_particleWorkPos.z = pos.z;
+	m_particleWorkPosAngle = 0.0f;
 	ParticleWorkPosPtr(this) = ParticleWorkPosValues(this);
 	ParticleWorkPosVecPtr(this) = ParticleWorkPosVecValues(this);
-	*reinterpret_cast<float*>(runtime + 0x1760) = scale;
-	*reinterpret_cast<float*>(runtime + 0x175C) = scale;
-	*reinterpret_cast<float*>(runtime + 0x1758) = scale;
+	m_particleWorkScale.z = scale;
+	m_particleWorkScale.y = scale;
+	m_particleWorkScale.x = scale;
 	ParticleWorkScalePtr(this) = ParticleWorkScaleValues(this);
 
 	PartMng.pppCreate(
-		*reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
-		reinterpret_cast<PPPCREATEPARAM*>(runtime + 0x16CC), 1);
+		m_particleWorkNoHi, m_particleWorkNoLo,
+		reinterpret_cast<PPPCREATEPARAM*>(&m_particleWork), 1);
 }
 
 /*
@@ -1991,7 +1991,7 @@ int CFlatRuntime2::PutParticleWork()
 {
 	return PartMng.pppCreate(
 		ParticleWorkNoHi(this), ParticleWorkNoLo(this),
-		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
+		reinterpret_cast<PPPCREATEPARAM*>(&m_particleWork), 1);
 }
 
 /*
@@ -2055,11 +2055,10 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
  */
 void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
 	ParticleWorkTargetX(this) = vec.x;
 	ParticleWorkTargetY(this) = vec.y;
 	ParticleWorkTargetZ(this) = vec.z;
-	*reinterpret_cast<float**>(runtime + 0x16D8) = reinterpret_cast<float*>(runtime + 0x1764);
+	ParticleWorkTargetPtr(this) = reinterpret_cast<float*>(&m_particleWorkTarget);
 }
 
 /*
@@ -2069,22 +2068,18 @@ void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
  */
 void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
-	float* target = reinterpret_cast<float*>(runtime + 0x1764);
+	float* target = reinterpret_cast<float*>(&m_particleWorkTarget);
 	float cosAngle2 = static_cast<float>(cos(angle2));
 	float sinAngle1 = static_cast<float>(sin(angle1));
-	*reinterpret_cast<float*>(runtime + 0x1764) =
-		sinAngle1 * cosAngle2 + *reinterpret_cast<float*>(runtime + 0x1740);
+	m_particleWorkTarget.x = sinAngle1 * cosAngle2 + m_particleWorkPos.x;
 
 	float sinAngle2 = static_cast<float>(sin(angle2));
-	*reinterpret_cast<float*>(runtime + 0x1768) =
-		*reinterpret_cast<float*>(runtime + 0x1744) + sinAngle2;
+	m_particleWorkTarget.y = m_particleWorkPos.y + sinAngle2;
 
 	cosAngle2 = static_cast<float>(cos(angle2));
 	float cosAngle1 = static_cast<float>(cos(angle1));
-	*reinterpret_cast<float*>(runtime + 0x176C) =
-		cosAngle1 * cosAngle2 + *reinterpret_cast<float*>(runtime + 0x1748);
-	*reinterpret_cast<float**>(runtime + 0x16D8) = target;
+	m_particleWorkTarget.z = cosAngle1 * cosAngle2 + m_particleWorkPos.z;
+	ParticleWorkTargetPtr(this) = target;
 }
 
 /*
@@ -2098,11 +2093,10 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
  */
 void CFlatRuntime2::SetParticleWorkScale(float scale)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
 	ParticleWorkScaleZ(this) = scale;
 	ParticleWorkScaleY(this) = scale;
 	ParticleWorkScaleX(this) = scale;
-	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
+	ParticleWorkScalePtr(this) = reinterpret_cast<float*>(&m_particleWorkScale);
 }
 
 /*
@@ -2291,20 +2285,19 @@ void CFlatRuntime2::reqFinished(int reqNo, CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 {
-	u8* runtime = reinterpret_cast<u8*>(this);
 	const u8 value8 = static_cast<u8>(controlValue);
 
 	switch (controlNo) {
 	case 0:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0x7F) | ((value8 & 1) << 7));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0x7F) | ((value8 & 1) << 7));
 		break;
 
 	case 2:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xF7) | ((value8 & 1) << 3));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0xF7) | ((value8 & 1) << 3));
 		break;
 
 	case 3:
-		*reinterpret_cast<unsigned int*>(runtime + 0x12E8) = static_cast<unsigned int>(controlValue);
+		m_bossState = controlValue;
 		break;
 
 	case 4:
@@ -2312,7 +2305,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 5:
-		*reinterpret_cast<unsigned int*>(runtime + 0x12EC) = static_cast<unsigned int>(controlValue);
+		m_bossSubState = controlValue;
 		break;
 
 	case 6:
@@ -2340,20 +2333,20 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 		break;
 
 	case 0xA:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xEF) | ((value8 & 1) << 4));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0xEF) | ((value8 & 1) << 4));
 		break;
 
 	case 0xB:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xDF) | ((value8 & 1) << 5));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0xDF) | ((value8 & 1) << 5));
 		break;
 
 	case 0xE:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFD) | ((value8 & 1) << 1));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFD) | ((value8 & 1) << 1));
 		gChara.ChangeMogMode(controlValue);
 		break;
 
 	case 0x12:
-		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFE) | (value8 & 1));
+		m_gameFlags = static_cast<u8>((m_gameFlags & 0xFE) | (value8 & 1));
 		break;
 
 	case 0x13: {
@@ -2437,7 +2430,7 @@ int CFlatRuntime2::GetSysControl(int controlNo)
 void CFlatRuntime2::resetSpawnBit(int spawnBit)
 {
 	if (spawnBit == -1) {
-		memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
+		memset(m_spawnBits, 0, sizeof(m_spawnBits));
 		return;
 	}
 
@@ -2446,9 +2439,8 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
 	}
 
 	if (spawnBit <= 8) {
-		spawnBit <<= 3;
-		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + spawnBit + 0x12F4) = 0;
-		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + spawnBit + 0x12F0) = 0;
+		m_spawnBits[spawnBit].m_hi = 0;
+		m_spawnBits[spawnBit].m_lo = 0;
 	}
 }
 
@@ -2465,9 +2457,9 @@ void CFlatRuntime2::resetChangeScript()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	*reinterpret_cast<u32*>(runtime + 0x10404) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x12A8) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x12AC) = 0;
+	*reinterpret_cast<u32*>(m_pad_10404_10408) = 0;
+	*reinterpret_cast<u32*>(m_pad_12A8_12AC) = 0;
+	m_centerState = 0;
 	*reinterpret_cast<u32*>(runtime + 0x1BF4) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x2708) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x321C) = 0;
@@ -2525,19 +2517,19 @@ void CFlatRuntime2::resetChangeScript()
 		count--;
 	} while (count != 0);
 
-	*reinterpret_cast<u32*>(runtime + 0x1040C) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x10410) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x10414) = 0;
-	runtime[0x12E4] = (runtime[0x12E4] & 0x7F) | 0x80;
-	runtime[0x12E4] &= 0xDF;
-	runtime[0x12E4] &= 0xEF;
-	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
-	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
-	memset(&CFlatPartyTraceParticleSlot(0), 0, sizeof(int) * 5);
+	*reinterpret_cast<u32*>(m_pad_1040C_10418) = 0;
+	*reinterpret_cast<u32*>(m_pad_1040C_10418 + 4) = 0;
+	*reinterpret_cast<u32*>(m_pad_1040C_10418 + 8) = 0;
+	m_gameFlags = (m_gameFlags & 0x7F) | 0x80;
+	m_gameFlags &= 0xDF;
+	m_gameFlags &= 0xEF;
+	m_bossState = 0;
+	m_bossSubState = 0;
+	memset(m_partyTraceParticleSlot, 0, sizeof(m_partyTraceParticleSlot) + sizeof(m_itemTraceParticleSlot));
 	memset(CGMonObj::m_boss, 0, sizeof(CGMonObj::m_boss));
-	runtime[0x12E4] &= 0xFD;
-	runtime[0x12E4] &= 0xF7;
-	runtime[0x12E4] &= 0xFE;
+	m_gameFlags &= 0xFD;
+	m_gameFlags &= 0xF7;
+	m_gameFlags &= 0xFE;
 	Pad.m_stickDigitalThreshold = 1;
 	GraphicPcs.m_screenFade[1].m_mode = 0;
 	CameraPcs.m_shadowAuto = 1;
@@ -2556,5 +2548,5 @@ void CFlatRuntime2::resetChangeScript()
 void CFlatRuntime2::ResetNewGame()
 {
 	resetChangeScript();
-	memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
+	memset(m_spawnBits, 0, sizeof(m_spawnBits));
 }

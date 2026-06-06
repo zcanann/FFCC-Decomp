@@ -152,6 +152,29 @@ static const char s_charaMergeDupFmt[] = "CCharaPcs duplicate merge %d\n";
 static const char s_charaMergeOpenFmt[] = "CCharaPcs missing merge %d\n";
 static const char s_charaMergeDoneFmt[] = "CCharaPcs LoadMergeFile %d 0x%x\n";
 static const char s_charaFreeMergeFmt[] = "CCharaPcs.FreeMergeFile: 0x%08x\n";
+static const char s_charaAmemAnimCompactStart[] =
+    "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
+    "\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x8a\x4a\x8e\x6e\x81\x42"
+    "\x0a";
+static const char s_charaAmemAnimCompactAllocFailed[] =
+    "\x1b\x5b\x33\x31\x6d\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83"
+    "\x78\x81\x5b\x83\x57\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x82"
+    "\xcc\x82\xbd\x82\xdf\x82\xcc\x83\x65\x83\x93\x83\x7c\x83\x89\x83\x8a\x83"
+    "\x6f\x83\x62\x83\x74\x83\x40\x82\xaa\x8a\x6d\x95\xdb\x82\xc5\x82\xab\x82"
+    "\xdc\x82\xb9\x82\xf1\x81\x42\x0a\x1b\x5b\x30\x6d";
+static const char s_charaAmemAnimCompactCountFmt[] =
+    "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
+    "\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x82\xb5\x82\xe6\x82\xa4"
+    "\x82\xc6\x82\xb5\x82\xc4\x82\xa2\x82\xe9\x83\x41\x83\x6a\x83\x81\x5b\x83"
+    "\x56\x83\x87\x83\x93\x82\xcc\x91\x8d\x90\x94\x82\xcd\x25\x64\x82\xc5\x82"
+    "\xb7\x81\x42\x0a";
+static const char s_charaAmemAnimCompactWritebackFmt[] =
+    "\x8f\x91\x82\xab\x96\xdf\x82\xb5\x20\x25\x64\x8c\xc2\x20\x25\x78\x20\x2d"
+    "\x20\x25\x78\x0a";
+static const char s_charaAmemAnimCompactDoneFmt[] =
+    "\x61\x6d\x65\x6d\x20\x61\x6e\x69\x6d\x20\x83\x4b\x83\x78\x81\x5b\x83\x57"
+    "\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x8f\x49\x97\xb9\x81\x42"
+    "\x6e\x65\x77\x20\x73\x69\x7a\x65\x20\x3d\x25\x64\x62\x79\x74\x65\x0a";
 static const char s_charaAmemCompactFailed[] =
     "\x83\x4b\x83\x78\x81\x5b\x83\x57\x83\x52\x83\x8c\x83\x4e\x83\x56\x83\x87"
     "\x83\x93\x82\xc9\x8e\xb8\x94\x73\x82\xb5\x82\xbd\x82\xcc\x82\xc5\x81\x41"
@@ -830,63 +853,67 @@ complete:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80079B40
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CCharaPcs::correctLoadAnimAmem()
 {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+        System.Printf(const_cast<char*>(s_charaAmemAnimCompactStart));
+    }
+
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
         Memory._Alloc(0x80000, m_viewerAnimStage, const_cast<char*>(s_p_chara_cpp), 0x162, 1));
     if (tempBuffer == 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
+            System.Printf(const_cast<char*>(s_charaAmemAnimCompactAllocFailed));
+        }
         return -1;
     }
 
     int loadAnimCount = LoadAnimArray(this)->GetSize();
+    int validAnimCount = 0;
     int maxEnd = 0;
     for (int i = 0; i < loadAnimCount; i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-        if (loadAnim == 0) {
-            continue;
-        }
-
         CChara::CAnim* anim = loadAnim->m_anim;
-        if (anim == 0) {
-            continue;
-        }
-
         const int animEnd = anim->m_bankAddress + static_cast<int>(anim->m_bankSize);
         if (maxEnd < animEnd) {
             maxEnd = animEnd;
         }
+        validAnimCount++;
+    }
+
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+        System.Printf(const_cast<char*>(s_charaAmemAnimCompactCountFmt), validAnimCount);
     }
 
     int compactedSize = 0;
     int scanOffset = 0;
-    while (scanOffset < maxEnd) {
+    do {
+        int chunkLoadCount = 0;
         int chunkSize = 0;
         int nextOffset = scanOffset;
+        const unsigned int scanEnd = static_cast<unsigned int>(scanOffset + 0x80000);
 
         for (int i = 0; i < loadAnimCount; i++) {
             CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
-            if (loadAnim == 0) {
-                continue;
-            }
-
             CChara::CAnim* anim = loadAnim->m_anim;
-            if (anim == 0) {
-                continue;
-            }
-
             const unsigned int animOffset = static_cast<unsigned int>(anim->m_bankAddress);
             const int animSize = static_cast<int>(anim->m_bankSize);
             const unsigned int animEnd = animOffset + static_cast<unsigned int>(animSize);
-            if (animOffset < static_cast<unsigned int>(scanOffset) || animEnd >= static_cast<unsigned int>(scanOffset + 0x80000)) {
+            if (animOffset < static_cast<unsigned int>(scanOffset) || animEnd >= scanEnd) {
                 continue;
             }
 
             if (nextOffset < static_cast<int>(animEnd)) {
                 nextOffset = static_cast<int>(animEnd);
             }
+            chunkLoadCount++;
 
             Memory.CopyFromAMemorySync(
                 tempBuffer + chunkSize,
@@ -897,17 +924,25 @@ int CCharaPcs::correctLoadAnimAmem()
             chunkSize += animSize;
         }
 
-        if (chunkSize != 0) {
+        if (chunkLoadCount != 0) {
+            const int writeBase = m_amemStage->m_heapTop + compactedSize;
             Memory.CopyToAMemorySync(
-                tempBuffer, reinterpret_cast<void*>(m_amemStage->m_heapTop + compactedSize),
+                tempBuffer, reinterpret_cast<void*>(writeBase),
                 static_cast<unsigned long>(chunkSize));
+            if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+                System.Printf(
+                    const_cast<char*>(s_charaAmemAnimCompactWritebackFmt), chunkLoadCount, writeBase, writeBase + chunkSize);
+            }
         }
 
         compactedSize += chunkSize;
         scanOffset = nextOffset;
-    }
+    } while (scanOffset < maxEnd);
 
-    operator delete(tempBuffer);
+    delete tempBuffer;
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+        System.Printf(const_cast<char*>(s_charaAmemAnimCompactDoneFmt), compactedSize);
+    }
     return compactedSize;
 }
 

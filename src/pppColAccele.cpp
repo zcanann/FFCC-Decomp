@@ -3,12 +3,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-struct pppColAcceleDataOffsets
-{
-    s32 m_colorOffset;
-    s32 m_accelerationOffset;
-};
-
+STATIC_ASSERT(sizeof(pppColAcceleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_colorOffset) == 0x0);
 STATIC_ASSERT(offsetof(pppColAcceleDataOffsets, m_accelerationOffset) == 0x4);
 

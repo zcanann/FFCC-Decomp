@@ -6,6 +6,11 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct pppColMoveDataOffsets {
+    s32 m_sourceMoveOffset;
+    s32 m_accumulatedMoveOffset;
+};
+
 struct pppColMoveVec4S {
     s16 x;
     s16 y;

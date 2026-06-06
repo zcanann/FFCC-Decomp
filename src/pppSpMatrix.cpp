@@ -3,11 +3,7 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-struct SpMatrixDataOffsets
-{
-    s32 m_matrixOffset;
-};
-
+STATIC_ASSERT(sizeof(SpMatrixDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(SpMatrixDataOffsets, m_matrixOffset) == 0x0);
 
 static inline SpMatrixDataOffsets* GetSpMatrixDataOffsets(_pppCtrlTable* ctrl)

@@ -1,8 +1,15 @@
 #ifndef _FFCC_PPPCOLACCELE_H_
 #define _FFCC_PPPCOLACCELE_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObject;
 struct _pppCtrlTable;
+
+struct pppColAcceleDataOffsets {
+    s32 m_colorOffset;
+    s32 m_accelerationOffset;
+};
 
 struct pppColorDelta
 {

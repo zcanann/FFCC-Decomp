@@ -3,12 +3,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/ppp_linkage.h"
 
-struct pppColMoveDataOffsets
-{
-    s32 m_sourceMoveOffset;
-    s32 m_accumulatedMoveOffset;
-};
-
+STATIC_ASSERT(sizeof(pppColMoveDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(pppColMoveDataOffsets, m_sourceMoveOffset) == 0x0);
 STATIC_ASSERT(offsetof(pppColMoveDataOffsets, m_accumulatedMoveOffset) == 0x4);
 

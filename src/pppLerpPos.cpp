@@ -9,10 +9,7 @@
 
 STATIC_ASSERT(offsetof(pppLerpPosStep, m_dataValIndex) == 0x4);
 
-struct LerpPosDataOffsets {
-    s32 m_historyOffset;
-};
-
+STATIC_ASSERT(sizeof(LerpPosDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(LerpPosDataOffsets, m_historyOffset) == 0x0);
 
 static inline LerpPosDataOffsets* GetLerpPosDataOffsets(_pppCtrlTable* ctrl)

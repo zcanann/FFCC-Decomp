@@ -8910,12 +8910,16 @@ void CMenuPcs::SetAnim(int anim)
  */
 void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	unsigned char alpha = static_cast<unsigned char>(static_cast<int>(static_cast<double>(FLOAT_80331458) * static_cast<double>(scale)));
-	GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = alpha;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0));
-	DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
+	MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80331410, FLOAT_80331410, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*

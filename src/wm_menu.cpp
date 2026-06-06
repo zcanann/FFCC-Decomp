@@ -2559,19 +2559,19 @@ void CMenuPcs::CalcLoadMenu()
 	case 8:
 	case 0xB:
 	case 0x19: {
-		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
+		if (worldState->m_flag09 == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 8) {
-				*reinterpret_cast<short*>(iVar14 + 0x26) = 0;
+				worldState->m_cardChannel = 0;
 				uVar19 = 4;
 			} else if (iVar10 == 0x19) {
 				uVar22 = 1;
 				uVar19 = 0x19;
-				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+				worldState->m_cardChannel = 1;
 			} else {
 				uVar19 = 5;
-				*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
+				worldState->m_cardChannel = 1;
 			}
 			CFont* pFont = *reinterpret_cast<CFont**>(bytes + 0xF8);
 			pFont->SetMargin(FLOAT_803313e8);
@@ -2604,64 +2604,61 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
+			worldState->m_flag09 = 1;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(iVar14 + 0x1A) == 0) {
-				if (*reinterpret_cast<short*>(iVar14 + 0x16) == 0x19) {
-					*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 0x5A;
+			if (worldState->m_counter1A == 0) {
+				if (worldState->m_subState == 0x19) {
+					worldState->m_state0E = 1;
+					worldState->m_counter1A = 0x5A;
 					break;
 				}
 				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
-				iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-				if (*reinterpret_cast<short*>(iVar14 + 0x2E) == 0) {
+				worldState->m_mcResult = (short)chkRes;
+				if (worldState->m_mcResult == 0) {
 					if ((uVar7 & 3) == 0) {
 						if ((uVar4 & 0x100) == 0) {
 							if ((uVar4 & 0x200) != 0) {
-								*reinterpret_cast<short*>(iVar14 + 0x26) = 1;
-								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = -1;
-								*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+								worldState->m_cardChannel = 1;
+								worldState->m_state0E = -1;
+								worldState->m_counter1A = 10;
 								Sound.PlaySe(3, 0x40, 0x7F, 0);
 							}
 						} else {
-							if (*reinterpret_cast<short*>(iVar14 + 0x26) == 0) {
-								*reinterpret_cast<short*>(iVar14 + 0xE) = 1;
+							if (worldState->m_cardChannel == 0) {
+								worldState->m_state0E = 1;
 							} else {
-								*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
+								worldState->m_state0E = -1;
 							}
-							*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+							worldState->m_counter1A = 10;
 							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
 					} else {
-						*reinterpret_cast<unsigned short*>(iVar14 + 0x26) = *reinterpret_cast<unsigned short*>(iVar14 + 0x26) ^ 1;
+						worldState->m_cardChannel ^= 1;
 						Sound.PlaySe(1, 0x40, 0x7F, 0);
 					}
 				} else {
-					*reinterpret_cast<short*>(iVar14 + 0xE) = -1;
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+					worldState->m_state0E = -1;
+					worldState->m_counter1A = 10;
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) != 0) {
-			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x19) {
+		    && worldState->m_counter1A != 0) {
+			if (worldState->m_subState == 0x19) {
 				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = (short)chkRes;
+				worldState->m_mcResult = (short)chkRes;
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) =
-			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) - 1;
-			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+			worldState->m_counter1A--;
+			if (worldState->m_counter1A == 0) {
 				m_menuWindowInfo->state = 2;
 			}
 		}
 		break;
 	}
 	case 0xC: {
-		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
-			*reinterpret_cast<unsigned char*>(iVar14 + 9) = 1;
+		if (worldState->m_flag09 == 0) {
+			worldState->m_flag09 = 1;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			mcCtrl.m_previousState = 0;
 			mcCtrl.m_state = 0;
@@ -2671,12 +2668,11 @@ void CMenuPcs::CalcLoadMenu()
 			mcCtrl.m_createFlag = 0;
 		}
 		if (m_menuWindowInfo->state == 1
-		    && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+		    && worldState->m_counter1A == 0) {
 			short listRes = (short)mcCtrl.LoadMcList();
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x2E) = listRes;
-			iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
-			if (*reinterpret_cast<short*>(iVar14 + 0x2E) != 0) {
-				if (*reinterpret_cast<short*>(iVar14 + 0x1C) == 8) {
+			worldState->m_mcResult = listRes;
+			if (worldState->m_mcResult != 0) {
+				if (worldState->m_menuMode == 8) {
 					int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
 					int iVar23 = 0;
 					int cnt = 4;
@@ -2690,7 +2686,7 @@ void CMenuPcs::CalcLoadMenu()
 						cnt--;
 					} while (cnt != 0);
 					if (iVar23 == 0) {
-						*reinterpret_cast<short*>(iVar14 + 0x2E) = (short)0xFC19;
+						worldState->m_mcResult = (short)0xFC19;
 					}
 				}
 				int calTimes[40];
@@ -2743,29 +2739,29 @@ void CMenuPcs::CalcLoadMenu()
 				} while (cnt2 != 0);
 				if (bestIdx < 0) bestIdx = 0;
 
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)bestIdx;
+				worldState->m_cardChannel = (short)bestIdx;
 				iVar10 = 0;
 				iVar14 = 0;
 				int cnt3 = 4;
 				do {
 					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
 						mcCtrl.m_saveIndex = iVar10;
-						*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = (short)iVar10;
+						worldState->m_cardChannel = (short)iVar10;
 						break;
 					}
 					iVar14 += 0x48;
 					iVar10++;
 					cnt3--;
 				} while (cnt3 != 0);
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0xE) = 1;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = 10;
+				worldState->m_state0E = 1;
+				worldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A);
+			sVar8 = worldState->m_counter1A;
 			if (sVar8 != 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) = sVar8 - 1;
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1A) == 0) {
+				worldState->m_counter1A = sVar8 - 1;
+				if (worldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}

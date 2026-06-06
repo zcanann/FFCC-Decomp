@@ -430,4 +430,4 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerCtrl* param_2)
 }
 
 extern const f64 kPppParHitSphZero = 0.0;
-static const char s_common_80330708[8] = "common";
+extern const char s_common_80330708[8] = "common";

@@ -222,7 +222,7 @@ void CMenuPcs::ArtiDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	ArtiState* state = GetArtiState(this);
+	short artiState = m_artiState->state;
 	ArtiOpenAnim* entry = GetArtiOpenAnimList(this)->entries;
 	int drawIndex = 0;
 	float helpWidth;
@@ -261,7 +261,7 @@ void CMenuPcs::ArtiDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = *(float*)(entry + 8) * w;
+				float fillW = entry->alpha * w;
 				if (fillW > 0.0f) {
 					MenuPcs.DrawRect(0, x, y, fillW, h, u, v, colors, FLOAT_80332fac, FLOAT_80332fac, 0.0f);
 					x += fillW;
@@ -281,13 +281,13 @@ void CMenuPcs::ArtiDraw()
 			} else {
 				float itemAlpha = entry->alpha;
 				if (tex == 0x37) {
-					short itemCount = caravanWork->m_artifacts[drawIndex + state->scrollOffset];
+					short itemCount = caravanWork->m_artifacts[drawIndex + m_artiState->scrollOffset];
 					if (itemCount < 1) {
 						tex = 0x34;
 						itemAlpha = (float)(DOUBLE_80332fb8 * (double)itemAlpha);
 					}
 
-					if (tex == 0x37 && drawIndex == state->selections[0]) {
+					if (tex == 0x37 && drawIndex == m_artiState->selections[0]) {
 						v += h;
 					}
 					drawIndex++;
@@ -328,14 +328,14 @@ void CMenuPcs::ArtiDraw()
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 
-		int menuIndex = i + state->scrollOffset;
+		int menuIndex = i + m_artiState->scrollOffset;
 		short itemCount = caravanWork->m_artifacts[menuIndex];
 		const char* text;
 		if (itemCount < 1) {
 			text = GetMenuStr(0x14);
 		} else {
 			text = Game.m_cFlatDataArr[1].TableStrings(0)[itemCount * 5 + 4];
-			if (menuIndex == (int)state->selections[0] + (int)state->scrollOffset) {
+			if (menuIndex == (int)m_artiState->selections[0] + (int)m_artiState->scrollOffset) {
 				hasSelectedArtifact = 1;
 				selectedArtifactId = itemCount;
 			}
@@ -354,7 +354,7 @@ void CMenuPcs::ArtiDraw()
 
 	ArtiOpenAnim* iconEntry = listStart;
 	for (int i = 0; i < 8; i++) {
-		short itemCount = caravanWork->m_artifacts[i + state->scrollOffset];
+		short itemCount = caravanWork->m_artifacts[i + m_artiState->scrollOffset];
 		if (itemCount > 0) {
 			int iconY = (int)((float)(iconEntry->y + 6) - FLOAT_80332fac);
 			int iconX = (int)((float)(iconEntry->x + iconEntry->w - 0x10));
@@ -363,15 +363,15 @@ void CMenuPcs::ArtiDraw()
 		iconEntry++;
 	}
 
-	if (state->state == 1) {
+	if (artiState == 1) {
 		ArtiOpenAnim* firstEntry = GetArtiOpenAnimList(this)->entries;
-		float mark = static_cast<float>(CalcListPos(state->scrollOffset, 0x49, 0));
+		float mark = static_cast<float>(CalcListPos(m_artiState->scrollOffset, 0x49, 0));
 		if (mark > 0.0f) {
 			DrawListPosMark((float)firstEntry->x, (float)firstEntry->y, mark);
 		}
 	}
 
-	if (state->state == 1) {
+	if (artiState == 1) {
 		ArtiOpenAnim* cursorBase = GetArtiOpenAnimList(this)->entries;
 		int cursorCount = GetArtiOpenAnimList(this)->count;
 		for (int i = 0; i < cursorCount; i++) {
@@ -381,7 +381,7 @@ void CMenuPcs::ArtiDraw()
 			cursorBase++;
 		}
 
-		cursorBase += state->selections[0];
+		cursorBase += m_artiState->selections[0];
 		int cursorY = (int)(float)((double)(cursorBase->h - 0x20) * DOUBLE_80332fb8 + (double)cursorBase->y);
 		int cursorX = (int)((float)(cursorBase->x - 0x14) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, FLOAT_80332fac);

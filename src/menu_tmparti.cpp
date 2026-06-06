@@ -125,49 +125,13 @@ inline int CMenuPcs::TmpArtiCtrlCur()
 inline void CMenuPcs::TmpArtiInit0()
 {
     TmpArtiEntry* entry = GetTmpArtiEntries(this);
-    unsigned int count = GetTmpArtiList(this)->count;
     float alpha = FLOAT_80332f30;
 
-    if ((int)count > 0) {
-        unsigned int blockCount = count >> 3;
-        for (; blockCount != 0; blockCount--) {
-            entry[0].startFrame = 0;
-            entry[0].duration = 1;
-            entry[0].alpha = alpha;
-            entry[1].startFrame = 0;
-            entry[1].duration = 1;
-            entry[1].alpha = alpha;
-            entry[2].startFrame = 0;
-            entry[2].duration = 1;
-            entry[2].alpha = alpha;
-            entry[3].startFrame = 0;
-            entry[3].duration = 1;
-            entry[3].alpha = alpha;
-            entry[4].startFrame = 0;
-            entry[4].duration = 1;
-            entry[4].alpha = alpha;
-            entry[5].startFrame = 0;
-            entry[5].duration = 1;
-            entry[5].alpha = alpha;
-            entry[6].startFrame = 0;
-            entry[6].duration = 1;
-            entry[6].alpha = alpha;
-            entry[7].startFrame = 0;
-            entry[7].duration = 1;
-            entry[7].alpha = alpha;
-            entry += 8;
-        }
-
-        count &= 7;
-        if (count != 0) {
-            do {
-                entry->startFrame = 0;
-                entry->duration = 1;
-                entry->alpha = alpha;
-                entry++;
-                count--;
-            } while (count != 0);
-        }
+    for (int count = GetTmpArtiList(this)->count; count > 0; count--) {
+        entry->startFrame = 0;
+        entry->duration = 1;
+        entry->alpha = alpha;
+        entry++;
     }
 }
 
@@ -364,46 +328,11 @@ unsigned int CMenuPcs::TmpArtiClose()
 	if (this->m_tmpArtiList->count == completedItems) {
 		zero = FLOAT_80332f2c;
 		entry = this->m_tmpArtiList->entries;
-		count = itemCount;
-		if ((int)count > 0) {
-			itemCount = count >> 3;
-			for (; itemCount != 0; itemCount--) {
-				entry[0].startFrame = 0;
-				entry[0].duration = 1;
-				entry[0].alpha = zero;
-				entry[1].startFrame = 0;
-				entry[1].duration = 1;
-				entry[1].alpha = zero;
-				entry[2].startFrame = 0;
-				entry[2].duration = 1;
-				entry[2].alpha = zero;
-				entry[3].startFrame = 0;
-				entry[3].duration = 1;
-				entry[3].alpha = zero;
-				entry[4].startFrame = 0;
-				entry[4].duration = 1;
-				entry[4].alpha = zero;
-				entry[5].startFrame = 0;
-				entry[5].duration = 1;
-				entry[5].alpha = zero;
-				entry[6].startFrame = 0;
-				entry[6].duration = 1;
-				entry[6].alpha = zero;
-				entry[7].startFrame = 0;
-				entry[7].duration = 1;
-				entry[7].alpha = zero;
-				entry += 8;
-			}
-			count &= 7;
-			if (count != 0) {
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = zero;
-					entry++;
-					count--;
-				} while (count != 0);
-			}
+		for (count = itemCount; count > 0; count--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = zero;
+			entry++;
 		}
 		result = 1;
 	}

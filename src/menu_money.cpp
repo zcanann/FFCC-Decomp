@@ -563,7 +563,7 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->u = 0.0f;
 		firstAnim->v = 0.0f;
 		firstAnim->uvScale = 1.0f;
-		firstAnim->flags = 0;
+		firstAnim->startFrame = 0;
 		firstAnim->duration = 10;
 		this->m_moneyPanel->count = 1;
 

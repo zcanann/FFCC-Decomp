@@ -3787,7 +3787,7 @@ void CMenuPcs::DrawMCardMenu()
 
 		// 3D character viewports (4 slots)
 		for (int i = 0; i < 4; i++) {
-			int viewOff = *reinterpret_cast<int*>(bytes + 0x814) + (i * 0x50 + 0x550);
+			int viewOff = reinterpret_cast<int>(m_wm.m_worldObjData) + (i * 0x50 + 0x550);
 			int* piVar12 = reinterpret_cast<int*>(viewOff);
 			if (*piVar12 != 0) {
 				Mtx44 projMtx;
@@ -4328,8 +4328,8 @@ void CMenuPcs::DrawMoveMenu()
 	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
 		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
 			worldState->m_mainState++;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 4) = 0;
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 8) = 0;
+			*reinterpret_cast<int*>(m_wm.m_frameData + 4) = 0;
+			*reinterpret_cast<int*>(m_wm.m_frameData + 8) = 0;
 			worldState->m_frameCounter = 0;
 		}
 	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter > 9) {
@@ -4428,7 +4428,7 @@ void CMenuPcs::DrawLoadMenu()
 
 		// 3D character model viewports
 		for (int i = 0; i < 4; i++) {
-			int viewOff = *reinterpret_cast<int*>(bytes + 0x814) + (i * 0x50 + 0x550);
+			int viewOff = reinterpret_cast<int>(m_wm.m_worldObjData) + (i * 0x50 + 0x550);
 			int* piVar13 = reinterpret_cast<int*>(viewOff);
 			if (*piVar13 != 0) {
 				Mtx44 projMtx;
@@ -9526,7 +9526,7 @@ LAB_draw:
 	                      static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;

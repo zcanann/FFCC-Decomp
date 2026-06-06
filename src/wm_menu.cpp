@@ -6789,9 +6789,9 @@ void CMenuPcs::DrawWMFrame()
 				}
 				unsigned char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
+				SetAttrFmt((FMT)0);
 				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
 				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-				SetAttrFmt((FMT)0);
 				SetTexture((TEX)0x34);
 				DrawRect(0xFFFFFFFF,
 				         (float)*reinterpret_cast<short*>(off) +

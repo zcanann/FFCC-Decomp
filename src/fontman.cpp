@@ -717,34 +717,34 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    CFont* font = this;
+                    unsigned short** glyphBucket = m_glyphBuckets;
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 32; i++) {
-                        font->m_glyphBuckets[0] = bucket;
+                        glyphBucket[0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[1] = bucket;
+                        glyphBucket[1] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[2] = bucket;
+                        glyphBucket[2] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[3] = bucket;
+                        glyphBucket[3] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[4] = bucket;
+                        glyphBucket[4] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[5] = bucket;
+                        glyphBucket[5] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[6] = bucket;
+                        glyphBucket[6] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[7] = bucket;
+                        glyphBucket[7] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font = reinterpret_cast<CFont*>(&font->margin);
+                        glyphBucket += 8;
                     }
                     break;
                 case 'TXTR':

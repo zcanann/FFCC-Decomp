@@ -613,22 +613,23 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             int nextIndex = quadIndex + 1;
             int lowerIndex = quadIndex + 0x11;
             int lowerNextIndex = quadIndex + 0x12;
-            int nextNextIndex = quadIndex + 2;
-            int lowerNextNextIndex = quadIndex + 0x13;
 
             param_4[indexOffset++] = quadIndex;
             param_4[indexOffset++] = nextIndex;
             param_4[indexOffset++] = lowerNextIndex;
             param_4[indexOffset++] = lowerNextIndex;
             param_4[indexOffset++] = lowerIndex;
+            param_4[indexOffset++] = quadIndex++;
+            nextIndex = quadIndex + 1;
+            lowerIndex = quadIndex + 0x11;
+            lowerNextIndex = quadIndex + 0x12;
+
             param_4[indexOffset++] = quadIndex;
             param_4[indexOffset++] = nextIndex;
-            param_4[indexOffset++] = nextNextIndex;
-            param_4[indexOffset++] = lowerNextNextIndex;
-            param_4[indexOffset++] = lowerNextNextIndex;
             param_4[indexOffset++] = lowerNextIndex;
-            param_4[indexOffset++] = nextIndex;
-            quadIndex = quadIndex + 2;
+            param_4[indexOffset++] = lowerNextIndex;
+            param_4[indexOffset++] = lowerIndex;
+            param_4[indexOffset++] = quadIndex++;
         }
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;

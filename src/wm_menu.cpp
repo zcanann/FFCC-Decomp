@@ -8684,6 +8684,7 @@ void CMenuPcs::ChgAllModel2()
 		unsigned int variant;
 		unsigned int index;
 		int modelId;
+		int loadMode;
 
 		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
 			race = 0xFFFFFFFF;
@@ -8699,16 +8700,19 @@ void CMenuPcs::ChgAllModel2()
 		modelData = m_wm.m_charaModelData + modelOffset;
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
+			loadMode = 3;
+			modelId = 0x43;
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
+			loadMode = 0;
+			modelId += index;
 		}
 
+		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 		handleData += 4;
 		modelOffset += 0x34;
 		pdtOffset += 0x9C0;

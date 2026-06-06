@@ -8319,13 +8319,16 @@ void CMenuPcs::WMChgMenu()
 
 	int iVar8 = 0;
 	m_wmTransitionCode = 0;
+	unsigned char* const worldObjData = m_wm.m_worldObjData;
+	unsigned char* const charaModelData = m_wm.m_charaModelData;
+	unsigned char* const charaSelectData = m_wm.m_charaSelectData;
 
 	sVar2 = typedWorldState->m_menuMode;
 	if (sVar2 == 4) {
 		typedWorldState->m_posX = FLOAT_80331440;
 	} else if (sVar2 < 4) {
 		if (sVar2 == 0) {
-			int iVar11 = *reinterpret_cast<int*>(bytes + 0x814) + 0xA00;
+			int iVar11 = reinterpret_cast<int>(worldObjData) + 0xA00;
 			int count = 4;
 			do {
 				const int paramIndex = iVar8 / 2;
@@ -8356,11 +8359,11 @@ void CMenuPcs::WMChgMenu()
 			int iVar11 = 0;
 			double dVar16b = (double)FLOAT_80331664;
 			int iVar12 = 0;
-			int iVar13 = *reinterpret_cast<int*>(bytes + 0x814) + 0xA00;
+			int iVar13 = reinterpret_cast<int>(worldObjData) + 0xA00;
 			do {
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x824) + iVar8 + 0xC) = 1;
+				*reinterpret_cast<unsigned char*>(charaModelData + iVar8 + 0xC) = 1;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
-				int selectData = *reinterpret_cast<int*>(bytes + 0x828) + iVar11;
+				int selectData = reinterpret_cast<int>(charaSelectData) + iVar11;
 				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
 				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[iVar12];
 				if (handle->IsModelLoaded(1)) {
@@ -8403,24 +8406,24 @@ void CMenuPcs::WMChgMenu()
 			int iVar11 = 0;
 			int iVar12 = 2;
 			do {
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xC) = 0;
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xB) = 0;
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 10) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
 				short sv = typedWorldState->m_backupParams[iVar11 / 2];
 				if (sv < 0) {
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)0xFFFF;
+					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = sv;
+					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = sv;
 					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
 				}
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1C) = 0;
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1B) = 0;
-				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1A) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
+				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
 				sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
 				if (sv < 0) {
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = (short)0xFFFF;
+					*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = sv;
+					*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = sv;
 					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
 				}
 				iVar8 = iVar8 + 0x20;
@@ -8431,7 +8434,7 @@ void CMenuPcs::WMChgMenu()
 			iVar8 = 0;
 			iVar11 = 4;
 			do {
-				if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) < 0) {
+				if (*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) < 0) {
 					int iVar12b = 0;
 					unsigned int uVar10 = (unsigned int)(char)bVar7;
 					if ((uVar10 & 1) != 0) { iVar12b = 1;
@@ -8443,10 +8446,10 @@ void CMenuPcs::WMChgMenu()
 					if ((uVar10 & 0x40) != 0) { iVar12b = 7;
 					if ((uVar10 & 0x80) != 0) { iVar12b = 8;
 					}}}}}}}}
-					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)iVar12b;
+					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)iVar12b;
 					bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
 				}
-				int iVar12c = *reinterpret_cast<int*>(bytes + 0x828) + iVar8;
+				int iVar12c = reinterpret_cast<int>(charaSelectData) + iVar8;
 				iVar8 = iVar8 + 0x10;
 				*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
 				iVar11 = iVar11 - 1;
@@ -8460,7 +8463,7 @@ void CMenuPcs::WMChgMenu()
 		break;
 	case 3: {
 		if (typedWorldState->m_menuMode == 4) {
-			int selectBase = *reinterpret_cast<int*>(bytes + 0x828);
+			int selectBase = reinterpret_cast<int>(charaSelectData);
 			if (*reinterpret_cast<char*>(selectBase + 10) == 0) {
 				Game.m_gameWork.m_wmBackupParams[0] = -1;
 			} else {
@@ -8504,24 +8507,24 @@ void CMenuPcs::WMChgMenu()
 		int iVar11 = 0;
 		int iVar12 = 2;
 		do {
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xC) = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0xB) = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 10) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
 			short sv = typedWorldState->m_backupParams[iVar11 / 2];
 			if (sv < 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)0xFFFF;
+				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = sv;
+				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = sv;
 				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
 			}
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1C) = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1B) = 0;
-			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x1A) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
+			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
 			sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
 			if (sv < 0) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = (short)0xFFFF;
+				*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 0x14) = sv;
+				*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = sv;
 				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
 			}
 			iVar8 = iVar8 + 0x20;
@@ -8532,7 +8535,7 @@ void CMenuPcs::WMChgMenu()
 		iVar8 = 0;
 		iVar11 = 4;
 		do {
-			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) < 0) {
+			if (*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) < 0) {
 				int iVar12b = 0;
 				unsigned int uVar10 = (unsigned int)(char)bVar7;
 				if ((uVar10 & 1) != 0) { iVar12b = 1;
@@ -8544,10 +8547,10 @@ void CMenuPcs::WMChgMenu()
 				if ((uVar10 & 0x40) != 0) { iVar12b = 7;
 				if ((uVar10 & 0x80) != 0) { iVar12b = 8;
 				}}}}}}}}
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x828) + iVar8 + 4) = (short)iVar12b;
+				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)iVar12b;
 				bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
 			}
-			int iVar12c = *reinterpret_cast<int*>(bytes + 0x828) + iVar8;
+			int iVar12c = reinterpret_cast<int>(charaSelectData) + iVar8;
 			iVar8 = iVar8 + 0x10;
 			*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
 			iVar11 = iVar11 - 1;

@@ -49,6 +49,7 @@ STATIC_ASSERT(offsetof(ArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(ArtiState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(ArtiState, state) == 0x10);
 STATIC_ASSERT(offsetof(ArtiState, moveDirection) == 0x1E);
+STATIC_ASSERT(offsetof(ArtiState, optionCloseReady) == 0x20);
 STATIC_ASSERT(offsetof(ArtiState, frame) == 0x22);
 STATIC_ASSERT(offsetof(ArtiState, selections) == 0x26);
 STATIC_ASSERT(offsetof(ArtiState, currentSelection) == 0x30);

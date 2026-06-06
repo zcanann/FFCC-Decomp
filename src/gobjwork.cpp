@@ -331,10 +331,10 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	clearCaravanWork();
 	m_bonusCondition = 0;
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	m_artifactRelated[3] = *(unsigned short*)(Game.m_bossArtifactBase +
-											  (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 0x62);
-	m_artifactRelated[4] = *(unsigned short*)(Game.m_bossArtifactBase +
-											  (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 100);
+	CGame::CBossArtifactStage* bossArtifacts =
+		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
+	m_artifactRelated[3] = bossArtifacts->m_entries[8].m_values[1];
+	m_artifactRelated[4] = bossArtifacts->m_entries[8].m_values[2];
 }
 
 /*
@@ -350,14 +350,11 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 {
 	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
 	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
-	m_artifactRelated[3] =
-		*(unsigned short*)(Game.m_bossArtifactBase +
-						   (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
-						   (bonusCondition * 8) + 0x62);
-	m_artifactRelated[4] =
-		*(unsigned short*)(Game.m_bossArtifactBase +
-						   (Game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
-						   (bonusCondition * 8) + 100);
+	CGame::CBossArtifactStage* bossArtifacts =
+		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
+	CGame::CBossArtifactEntry* entry = &bossArtifacts->m_entries[bonusCondition + 8];
+	m_artifactRelated[3] = entry->m_values[1];
+	m_artifactRelated[4] = entry->m_values[2];
 }
 
 /*
@@ -2806,9 +2803,9 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	if ((*reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) == 1) &&
 		(Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-		unsigned int bossArtifact = Game.m_bossArtifactBase;
-		bossArtifact += Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
-		unsigned short artifactScale = *(unsigned short*)(bossArtifact + 0x60);
+		CGame::CBossArtifactStage* bossArtifacts =
+			&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
+		unsigned short artifactScale = bossArtifacts->m_entries[8].m_values[0];
 		m_maxHp = (unsigned short)((float)m_maxHp *
 								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}

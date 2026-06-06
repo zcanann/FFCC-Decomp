@@ -27,6 +27,17 @@ class CCharaPcs : public CProcess
 public:
     class CLoadPdt;
 
+    struct CCameraFrame
+    {
+        union Value
+        {
+            int m_int;
+            float m_float;
+        };
+
+        Value m_values[8]; // 0x00
+    }; // Size 0x20
+
     class CHandle
     {
     public:
@@ -209,7 +220,7 @@ public:
     void destroyViewer();
 
     int m_cameraFrameCount[4];                // 0x004
-    void* m_cameraData[4];                    // 0x014
+    CCameraFrame* m_cameraData[4];            // 0x014
     int m_overlapEnabled;                     // 0x024
     u32 m_overlapAlpha;                       // 0x028
     Vec m_overlapEyePos;                      // 0x02C

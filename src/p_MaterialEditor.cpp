@@ -135,11 +135,11 @@ void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count,
  */
 void CMaterialEditorPcs::drawViewer()
 {
-    static int color;
+    static char initialized;
 
-    if (*reinterpret_cast<char*>(&color) == 0) {
+    if (initialized == 0) {
         q = const_cast<char*>(sMaterialEditorSpinnerText);
-        *reinterpret_cast<char*>(&color) = 1;
+        initialized = 1;
     }
 
     static int pFan = 0;

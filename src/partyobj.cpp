@@ -2112,9 +2112,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
-			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =
-			    m_comboCenter;
-			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+			caravanWork->m_targetCursorPosA = m_comboCenter;
+			hitObj->GetHitFaceNormal(&caravanWork->m_targetCursorPosB);
 		}
 		m_comboTarget = m_comboCenter;
 	}
@@ -2357,9 +2357,9 @@ void CGPartyObj::checkTargetParticle()
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
 			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
-				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-				*reinterpret_cast<Vec*>(work + 0xBAC) = *targetPos;
-				getMapHitObject()->GetHitFaceNormal(reinterpret_cast<Vec*>(work + 0xBB8));
+				CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+				work->m_targetCursorPosA = *targetPos;
+				getMapHitObject()->GetHitFaceNormal(&work->m_targetCursorPosB);
 			}
 		}
 
@@ -2423,12 +2423,12 @@ void CGPartyObj::moveCenterTargetParticle()
 		hitObj->CalcHitPosition(&hitPos);
 		hitObj->GetHitFaceNormal(&hitNormal);
 
-		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		*reinterpret_cast<Vec*>(work + 0xBB8) = hitNormal;
+		CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+		work->m_targetCursorPosB = hitNormal;
 	}
 
-	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	*reinterpret_cast<Vec*>(work + 0xBAC) = hitPos;
+	CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
+	work->m_targetCursorPosA = hitPos;
 }
 
 /*
@@ -2797,9 +2797,10 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	unsigned int subValue = 0;
 	unsigned short currentAdd = *reinterpret_cast<unsigned short*>(script + 0xBCA);
 	unsigned short currentSub = *reinterpret_cast<unsigned short*>(script + 0xBCC);
-	int stageEntry = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168 + bonusSlot * 8;
-	unsigned int stageAdd = *reinterpret_cast<unsigned short*>(stageEntry + 0x66);
-	unsigned int stageSub = *reinterpret_cast<unsigned short*>(stageEntry + 0x68);
+	CGame::CBossArtifactStage* bossArtifacts =
+		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
+	unsigned int stageAdd = bossArtifacts->m_entries[bonusSlot + 8].m_values[3];
+	unsigned int stageSub = bossArtifacts->m_entries[bonusSlot + 9].m_values[0];
 
 	if (kind == 0) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC8);
@@ -3398,7 +3399,8 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 	int chosenBonus[5];
 	int chosenCount = 0;
-	int stageBase = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
+	CGame::CBossArtifactStage* bossArtifacts =
+		&Game.m_bossArtifactBase[Game.m_gameWork.m_bossArtifactStageIndex];
 
 	for (int slot = 0; slot < 4; slot++) {
 		CGPartyObj* party = Game.m_partyObjArr[slot];
@@ -3445,7 +3447,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			chosenBonus[chosenCount] = bonusIndex;
 			chosenCount++;
 
-			int bonus = *reinterpret_cast<unsigned short*>(stageBase + bonusIndex * 2);
+			int bonus = bossArtifacts->m_bonusConditions[bonusIndex];
 			caravanWork->SetBonusCondition(bonus);
 			if ((unsigned int)System.m_execParam > 2) {
 				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex, bonus);

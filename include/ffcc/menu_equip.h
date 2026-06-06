@@ -19,7 +19,9 @@ struct EquipMenuState
     unsigned char pad_24[2];
     short selectedIndex;
     short subSelectedIndex;
-    unsigned char pad_2A[6];
+    unsigned char pad_2A[2];
+    short emptySlotHelpState;
+    unsigned char pad_2E[2];
     short mode;
     short prevMode;
     short scroll;

@@ -816,7 +816,7 @@ void CMenuPcs::CalcOptionMenu()
 			return;
 		}
 
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_artiState) + 0x20) = 1;
+		m_artiState->optionCloseReady = 1;
 		m_optionIndex = 0;
 		m_optionMenuState = 0;
 		m_optionOpenAnim = kOptionAnimMin;

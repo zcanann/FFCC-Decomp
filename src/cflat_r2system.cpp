@@ -3455,16 +3455,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             return 1;
         }
 
-        int cameraData = reinterpret_cast<int>(CharaPcs.m_cameraData[cameraSlot]) + cameraFrame * 0x20;
-        *reinterpret_cast<int*>(object->m_localBase[2]) = *reinterpret_cast<int*>(cameraData + 0x0);
-        *reinterpret_cast<float*>(object->m_localBase[3]) = -*reinterpret_cast<float*>(cameraData + 0x4);
-        *reinterpret_cast<float*>(object->m_localBase[4]) = -*reinterpret_cast<float*>(cameraData + 0x8);
-        *reinterpret_cast<int*>(object->m_localBase[5]) = *reinterpret_cast<int*>(cameraData + 0xC);
-        *reinterpret_cast<float*>(object->m_localBase[6]) = -*reinterpret_cast<float*>(cameraData + 0x10);
-        *reinterpret_cast<float*>(object->m_localBase[7]) = -*reinterpret_cast<float*>(cameraData + 0x14);
-        *reinterpret_cast<int*>(object->m_localBase[8]) = *reinterpret_cast<int*>(cameraData + 0x18);
+        CCharaPcs::CCameraFrame* cameraData = &CharaPcs.m_cameraData[cameraSlot][cameraFrame];
+        *reinterpret_cast<int*>(object->m_localBase[2]) = cameraData->m_values[0].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[3]) = -cameraData->m_values[1].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[4]) = -cameraData->m_values[2].m_float;
+        *reinterpret_cast<int*>(object->m_localBase[5]) = cameraData->m_values[3].m_int;
+        *reinterpret_cast<float*>(object->m_localBase[6]) = -cameraData->m_values[4].m_float;
+        *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraData->m_values[5].m_float;
+        *reinterpret_cast<int*>(object->m_localBase[8]) = cameraData->m_values[6].m_int;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -(FLOAT_80330b54 * *reinterpret_cast<float*>(cameraData + 0x1C)) / FLOAT_80330b64;
+            -(FLOAT_80330b54 * cameraData->m_values[7].m_float) / FLOAT_80330b64;
         runtime->push(object, 1);
         outResult = 0;
         return 1;

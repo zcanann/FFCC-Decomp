@@ -239,6 +239,7 @@ STATIC_ASSERT(sizeof(CCharaPcs::CLoadModel) == 0x28);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadAnim) == 0x30);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadTexture) == 0x2C);
 STATIC_ASSERT(sizeof(CCharaPcs::CLoadPdt) == 0x20);
+STATIC_ASSERT(sizeof(CCharaPcs::CCameraFrame) == 0x20);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraFrameCount) == 0x04);
 STATIC_ASSERT(offsetof(CCharaPcs, m_cameraData) == 0x14);
 STATIC_ASSERT(offsetof(CCharaPcs, m_overlapEyePos) == 0x2C);
@@ -795,7 +796,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     for (int i = 0; i < 4; i++) {
         m_cameraFrameCount[i] = 0;
         if (m_cameraData[i] != 0) {
-            delete[] static_cast<u8*>(m_cameraData[i]);
+            delete[] m_cameraData[i];
             m_cameraData[i] = 0;
         }
     }
@@ -1593,10 +1594,10 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     char path[0x104];
     CChunkFile::CChunk chunk;
 
-    void*& cameraBuffer = m_cameraData[index];
+    CCameraFrame*& cameraBuffer = m_cameraData[index];
 
     if (cameraBuffer != 0) {
-        delete[] static_cast<u8*>(cameraBuffer);
+        delete[] cameraBuffer;
         cameraBuffer = 0;
     }
 
@@ -1617,12 +1618,12 @@ void CCharaPcs::LoadCam(int index, char* fileName)
 
         m_cameraFrameCount[index] = static_cast<int>(chunk.m_arg0);
 
-        cameraBuffer =
-            new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4) u8[static_cast<unsigned long>(m_cameraFrameCount[index] << 5)];
+        cameraBuffer = new (m_viewerAnimStage, s_p_chara_cpp, 0x4D4)
+            CCameraFrame[static_cast<unsigned long>(m_cameraFrameCount[index])];
 
-        float* values = reinterpret_cast<float*>(cameraBuffer);
+        CCameraFrame::Value* values = reinterpret_cast<CCameraFrame::Value*>(cameraBuffer);
         for (int i = 0; i < m_cameraFrameCount[index] * 8; i++) {
-            values[i] = chunkFile.GetF4();
+            values[i].m_float = chunkFile.GetF4();
         }
     }
 

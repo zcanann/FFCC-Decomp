@@ -305,8 +305,8 @@ int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
 extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
-static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
-static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
+static const char s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
+static const char s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
 static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
 static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
@@ -7464,7 +7464,7 @@ void CMenuPcs::CalcCharaSelect()
 					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
-							System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), i,
+							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
 						modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
@@ -8629,7 +8629,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	unsigned char* const selectData = m_wm.m_charaSelectData;
 	selectData[channel * 0x10 + 0xC] = 1;
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), channel,
+		System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), channel,
 		              (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
 	}
 }
@@ -8647,15 +8647,69 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = m_wm.m_charaSelectData;
-	unsigned char* const modelData = m_wm.m_charaModelData;
 
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
 	if ((unsigned int)System.m_execParam > 2) {
-		System.Printf(const_cast<char*>(s_ClrCMakeFlg___chan____d_cur____d_801dc390), channel, current);
+		System.Printf(const_cast<char*>(s_ClrCMakeFlg_chan_pctd_cur_pctd_801DC390), channel, current);
 	}
-	modelData[current * 0x34 + 0xC] = 0;
+	m_wm.m_charaModelData[current * 0x34 + 0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800eeb9c
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::ChgAllModel2()
+{
+	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* handleData = bytes;
+	int modelOffset = 0;
+	int pdtOffset = 0;
+
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+		unsigned char* pdtData =
+		    m_cmakeWork + pdtOffset + 0x14D0;
+		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
+		unsigned int race;
+		unsigned int variant;
+		unsigned int index;
+		int modelId;
+
+		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+		} else {
+			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
+			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
+			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		}
+
+		modelData = m_wm.m_charaModelData + modelOffset;
+		if ((int)race < 0) {
+			modelData[0xC] = 0;
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
+		} else {
+			modelId = race * 200 + 100;
+			if (variant != 0) {
+				modelId += 100;
+			}
+			modelData[0xC] = 1;
+			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
+		}
+
+		handleData += 4;
+		modelOffset += 0x34;
+		pdtOffset += 0x9C0;
+	}
 }
 
 /*
@@ -8714,61 +8768,6 @@ void CMenuPcs::ChgAllModel()
 		gameData += 0xC30;
 		handleData += 4;
 		modelOffset += 0x34;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800eeb9c
- * PAL Size: 232b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMenuPcs::ChgAllModel2()
-{
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* handleData = bytes;
-	int modelOffset = 0;
-	int pdtOffset = 0;
-
-	for (int i = 0; i < kWmMenuPlayerCount; i++) {
-		unsigned char* pdtData =
-		    m_cmakeWork + pdtOffset + 0x14D0;
-		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
-		unsigned int race;
-		unsigned int variant;
-		unsigned int index;
-		int modelId;
-
-		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
-			race = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			index = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
-		} else {
-			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
-			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
-			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
-		}
-
-		modelData = m_wm.m_charaModelData + modelOffset;
-		if ((int)race < 0) {
-			modelData[0xC] = 0;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
-		} else {
-			modelId = race * 200 + 100;
-			if (variant != 0) {
-				modelId += 100;
-			}
-			modelData[0xC] = 1;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
-		}
-
-		handleData += 4;
-		modelOffset += 0x34;
-		pdtOffset += 0x9C0;
 	}
 }
 

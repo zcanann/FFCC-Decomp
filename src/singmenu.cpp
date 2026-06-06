@@ -2366,17 +2366,16 @@ double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
     float span;
 
     if (mode != 0) {
-        span = static_cast<float>(static_cast<double>(listSize - 1));
+        span = static_cast<float>(listSize - 1);
     } else {
-        span = static_cast<float>(static_cast<double>(listSize - 8));
+        span = static_cast<float>(listSize - 8);
     }
 
     if ((span <= FLOAT_8033294c) || (listSize <= 8)) {
         return FLOAT_8033299c;
     }
 
-    return (FLOAT_803329a0 * (static_cast<float>(static_cast<double>(listPos)) / span)) +
-           FLOAT_8033292c;
+    return (FLOAT_803329a0 * (static_cast<float>(listPos) / span)) + FLOAT_8033292c;
 }
 
 /*

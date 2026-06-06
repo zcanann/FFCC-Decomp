@@ -81,19 +81,17 @@ static const char s_UnnamedItem_801D9FF0[] = {
  */
 void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
-
 	m_baseDataIndex = baseDataIndex;
-	m_id = romData[0] + idOffset;
-	m_param1 = romData[1];
-	m_param2 = romData[2];
-	m_maxHp = romData[3];
-	m_strength = romData[4];
-	m_magic = romData[5];
-	m_defense = romData[6];
-	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
+	m_id = romWork->m_id + idOffset;
+	m_param1 = romWork->m_param1;
+	m_param2 = romWork->m_param2;
+	m_maxHp = romWork->m_maxHp;
+	m_strength = romWork->m_strength;
+	m_magic = romWork->m_magic;
+	m_defense = romWork->m_defense;
+	m_romWork = romWork;
 
-	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -273,7 +271,7 @@ void CCaravanWork::LoadFinished()
 
 	CGame* game = &Game;
 	m_baseDataIndex = (m_id / 100) - 1;
-	m_romWorkPtr = reinterpret_cast<unsigned short*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
+	m_romWork = reinterpret_cast<CRomWork*>(game->unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 }
 
 /*
@@ -287,19 +285,18 @@ void CCaravanWork::LoadFinished()
  */
 void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 	int value = 0;
 
 	m_baseDataIndex = baseDataIndex;
-	m_id = romData[0] + idOffset;
-	m_param1 = romData[1];
-	m_param2 = romData[2];
-	m_maxHp = romData[3];
-	m_strength = romData[4];
-	m_magic = romData[5];
-	m_defense = romData[6];
-	m_romWorkPtr = romData + 8;
-	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	m_id = romWork->m_id + idOffset;
+	m_param1 = romWork->m_param1;
+	m_param2 = romWork->m_param2;
+	m_maxHp = romWork->m_maxHp;
+	m_strength = romWork->m_strength;
+	m_magic = romWork->m_magic;
+	m_defense = romWork->m_defense;
+	m_romWork = romWork;
+	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -1673,20 +1670,20 @@ void CCaravanWork::SafeDeleteTempItem()
  */
 void CCaravanWork::CalcStatus()
 {
-	unsigned short* baseData = (unsigned short*)(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 
-	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
-	unsigned short stat = baseData[4];
+	unsigned short stat = baseData->m_strength;
 	m_strength = stat;
 	m_baseStrength = stat;
-	stat = baseData[5];
+	stat = baseData->m_magic;
 	m_magic = stat;
 	m_baseMagic = stat;
-	stat = baseData[6];
+	stat = baseData->m_defense;
 	m_defense = stat;
 	m_baseDefense = stat;
-	m_maxHp = baseData[3];
+	m_maxHp = baseData->m_maxHp;
 
 	m_equipEffectFlags = 0;
 	m_numCmdListSlots = m_baseCmdListSlots;
@@ -2635,7 +2632,7 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
 	unsigned short* artifactDataBase = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2]);
-	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
 	int hpMax = 0;
 	int artifactIndex = 0;
 	int count = 0x32;
@@ -2681,7 +2678,7 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 		count--;
 	}
 
-	hpMax += baseData[3];
+	hpMax += baseData->m_maxHp;
 	if (hpMax >= 0x10) {
 		return 0x10;
 	}
@@ -2722,21 +2719,20 @@ CMonWork::~CMonWork()
  */
 void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 {
-	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 	int stageRank;
 	int memberCount;
 
 	m_baseDataIndex = baseDataIndex;
-	m_id = romData[0];
-	m_param1 = romData[1];
-	m_param2 = romData[2];
-	m_maxHp = romData[3];
-	m_strength = romData[4];
-	m_magic = romData[5];
-	m_defense = romData[6];
-	m_romWorkPtr = romData + 8;
+	m_id = romWork->m_id;
+	m_param1 = romWork->m_param1;
+	m_param2 = romWork->m_param2;
+	m_maxHp = romWork->m_maxHp;
+	m_strength = romWork->m_strength;
+	m_magic = romWork->m_magic;
+	m_defense = romWork->m_defense;
+	m_romWork = romWork;
 
-	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
@@ -2756,8 +2752,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	m_statusValues[15] = 0xFFFF;
 	m_hp = m_maxHp;
 
-	memcpy(unk_0xac, romData + 0x56, 8);
-	memcpy(unk_0xb4, romData + 0x5A, 0x1C);
+	memcpy(unk_0xac, romWork->MonsterParams0(), 8);
+	memcpy(unk_0xb4, romWork->MonsterParams1(), 0x1C);
 	memset(unk_0xd0, 0, sizeof(unk_0xd0));
 	memset(unk_0xf0, 0, sizeof(unk_0xf0));
 
@@ -2825,13 +2821,13 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
  */
 void CMonWork::CalcStatus()
 {
-	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
 
-	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memcpy(RomStatusBlock(), m_romWork->ElementResistances(), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
-	m_strength = baseData[4];
-	m_magic = baseData[5];
-	m_defense = baseData[6];
+	m_strength = baseData->m_strength;
+	m_magic = baseData->m_magic;
+	m_defense = baseData->m_defense;
 
 	int stageRank;
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {

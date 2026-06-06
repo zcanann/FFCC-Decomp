@@ -4,7 +4,36 @@
 #include "global.h"
 #include "dolphin/mtx.h"
 
-class CRomWork;
+struct CRomWork
+{
+    enum
+    {
+        DataHalfwordCount = (0x1D0 - 0x10) / sizeof(unsigned short),
+        ElementResistanceOffset = 0x6F,
+        MonsterParams0Offset = 0x4E,
+        MonsterParams1Offset = 0x52,
+    };
+
+    unsigned short m_id;
+    unsigned short m_param1;
+    unsigned short m_param2;
+    unsigned short m_maxHp;
+    unsigned short m_strength;
+    unsigned short m_magic;
+    unsigned short m_defense;
+    unsigned short m_reserved0E;
+    unsigned short m_data[DataHalfwordCount];
+
+    unsigned short* Data() { return m_data; }
+    const unsigned short* Data() const { return m_data; }
+    unsigned short* ElementResistances() { return m_data + ElementResistanceOffset; }
+    const unsigned short* ElementResistances() const { return m_data + ElementResistanceOffset; }
+    unsigned short* MonsterParams0() { return m_data + MonsterParams0Offset; }
+    unsigned short* MonsterParams1() { return m_data + MonsterParams1Offset; }
+};
+
+STATIC_ASSERT(sizeof(CRomWork) == 0x1D0);
+STATIC_ASSERT(offsetof(CRomWork, m_data) == 0x10);
 struct CRomLetterWork
 {
     unsigned short Word(int index) const { return reinterpret_cast<const unsigned short*>(this)[index]; }
@@ -31,6 +60,11 @@ struct CRomLetterWork
 class CGObjWork
 {
 public:
+    enum
+    {
+        RomStatusBlockHalfwordCount = 11,
+    };
+
     CGObjWork()
     {
         m_objType = -1;
@@ -55,13 +89,15 @@ public:
     unsigned short m_strength;              // 0x001E
     unsigned short m_magic;                 // 0x0020
     unsigned short m_defense;               // 0x0022
-    unsigned short* m_romWorkPtr;           // 0x0024
+    CRomWork* m_romWork;                    // 0x0024
+    unsigned short* RomStatusBlock() { return m_elementResistances; }
     unsigned short m_elementResistances[8]; // 0x0028 physical, fire, freeze, stun, slow, stop, gravity, holy
     unsigned short m_statusTimers[42];      // 0x0038
     unsigned short m_statusValues[16];      // 0x008C-0xAB
 }; // Size: 0xAC
 
 STATIC_ASSERT(sizeof(CGObjWork) == 0xAC);
+STATIC_ASSERT(offsetof(CGObjWork, m_statusTimers) == 0x38);
 
 class CMonWork : public CGObjWork
 {

@@ -132,7 +132,7 @@ int CMenuPcs::ChkEquipActive(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::EquipClose0()
+int CMenuPcs::EquipClose0()
 {
 	float fVar1;
 	double dVar2;
@@ -192,7 +192,7 @@ bool CMenuPcs::EquipClose0()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::EquipOpen0()
+int CMenuPcs::EquipOpen0()
 {
 	float fVar1;
 	double dVar2;
@@ -768,26 +768,24 @@ void CMenuPcs::EquipCtrl()
 	CCaravanWork* caravanWork;
 	float scale;
 	int state;
-	EquipMenuState* menuState;
 	int index;
 	u32 equipCount;
 
 	state = 0;
-	menuState = GetEquipMenuState(this);
-	menuState->prevMode = menuState->mode;
-	mode = static_cast<int>(menuState->mode);
-	if ((mode == 0) || ((mode != 0) && (menuState->step == 1))) {
+	GetEquipMenuState(this)->prevMode = GetEquipMenuState(this)->mode;
+	mode = static_cast<int>(GetEquipMenuState(this)->mode);
+	if ((mode == 0) || ((mode != 0) && (GetEquipMenuState(this)->step == 1))) {
 		state = EquipCtrlCur();
-	} else if ((mode == 1) && (menuState->step == 0)) {
+	} else if ((mode == 1) && (GetEquipMenuState(this)->step == 0)) {
 		state = EquipOpen0();
 		if (state != 0) {
 			state = 0;
-			menuState->step = menuState->step + 1;
+			GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
 		}
-	} else if ((mode == 1) && ((menuState->step == 2) && (state = EquipClose0(), state != 0))) {
-		menuState->step = 0;
-		menuState->mode = 0;
-		menuState->frame = 0;
+	} else if ((mode == 1) && ((GetEquipMenuState(this)->step == 2) && (state = EquipClose0(), state != 0))) {
+		GetEquipMenuState(this)->step = 0;
+		GetEquipMenuState(this)->mode = 0;
+		GetEquipMenuState(this)->frame = 0;
 		CmdInit1();
 		state = 0;
 	}
@@ -804,16 +802,11 @@ void CMenuPcs::EquipCtrl()
 		}
 
 		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
-		index = 0;
-		if (static_cast<int>(equipCount - 1) >= 0) {
-			entry = &list->entries[equipCount - 1];
-			do {
-				entry->startFrame = index;
-				entry->duration = 3;
-				index = index + 1;
-				entry--;
-				equipCount = equipCount - 1;
-			} while (equipCount != 0);
+		entry = &list->entries[equipCount - 1];
+		for (index = 0; index < static_cast<int>(equipCount); index++) {
+			entry->startFrame = index;
+			entry->duration = 3;
+			entry--;
 		}
 	}
 }

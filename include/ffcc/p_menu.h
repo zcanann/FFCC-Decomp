@@ -460,8 +460,8 @@ public:
     int EquipClose();
     void EquipDraw();
     int EquipCtrlCur();
-    bool EquipOpen0();
-    bool EquipClose0();
+    int EquipOpen0();
+    int EquipClose0();
     int ChkEquipActive(int);
     int ChkEquipPossible(int);
     int GetEquipType(int);

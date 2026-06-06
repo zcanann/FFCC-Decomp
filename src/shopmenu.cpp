@@ -30,7 +30,6 @@ void SetTlut__5CFontFi(CFont*, int);
 void DrawInit__5CFontFv(CFont*);
 float GetWidth__5CFontFPc(CFont*, const char*);
 void Draw__5CFontFPc(CFont*, const char*);
-void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 }
 
@@ -151,11 +150,6 @@ enum ShopMenuTextIndex {
 static inline char* ShopMenuMes(int languageIndex, int textIndex)
 {
     return g_strShopMenuMes[languageIndex * 0x15 + textIndex];
-}
-
-static inline void* MenuPcsVoid()
-{
-    return &MenuPcs;
 }
 
 static inline unsigned char* MenuPcsRaw()
@@ -1097,7 +1091,7 @@ void CShopMenu::DrawItemInfo0()
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawInit();
     if (itemNo > 0) {
-        DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), itemNo, 0x40, 100, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+        MenuPcs.DrawSingleIcon(itemNo, 0x40, 100, FLOAT_80332d28, 0, FLOAT_80332d28);
     }
 
     CFont* font = GetShopMenuInfoPanelFont();
@@ -1398,8 +1392,7 @@ void CShopMenu::DrawItemList()
             SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
             Draw__5CFontFPc(font, reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
             MenuPcs.DrawInit();
-            DrawSingleIcon__8CMenuPcsFiiifif(
-                MenuPcsVoid(), itemNo, frameX + 0x54, y - 0x18, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+            MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }
 
         ++itemIndex;
@@ -1729,7 +1722,7 @@ void CShopMenu::DrawSoubi()
     int resultItem = m_resultItem;
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     MenuPcs.DrawInit();
-    DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+    MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -1807,7 +1800,7 @@ void CShopMenu::DrawMake()
 
     drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
     MenuPcs.DrawInit();
-    DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x32, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+    MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
 
     CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);

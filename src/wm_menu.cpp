@@ -3922,6 +3922,17 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+				const float cursorY = static_cast<float>(static_cast<int>(m_menuWindowInfo->y) +
+				                                          static_cast<int>(m_menuWindowInfo->height) - 0x3E);
+				const float cursorX = static_cast<float>(GetSlotABXPos(static_cast<int>(typedWorldState->m_cardChannel)));
+				SetAttrFmt((FMT)0);
+				unsigned int cursorColor = 0xFFFFFFFF;
+				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+				SetTexture((TEX)0);
+				DrawRect(0xFFFFFFFF, cursorX, cursorY,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				if (typedWorldState->m_state0E < 0) {
@@ -4573,6 +4584,17 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+				const float cursorY = static_cast<float>(static_cast<int>(m_menuWindowInfo->y) +
+				                                          static_cast<int>(m_menuWindowInfo->height) - 0x3E);
+				const float cursorX = static_cast<float>(GetSlotABXPos(static_cast<int>(typedWorldState->m_cardChannel)));
+				SetAttrFmt((FMT)0);
+				unsigned int cursorColor = 0xFFFFFFFF;
+				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+				SetTexture((TEX)0);
+				DrawRect(0xFFFFFFFF, cursorX, cursorY,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 0);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
 				if (typedWorldState->m_state0E < 0) {

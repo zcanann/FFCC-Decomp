@@ -423,9 +423,9 @@ unsigned int CMenuPcs::TmpArtiClose()
 int CMenuPcs::TmpArtiCtrl()
 {
 	int hasInput;
-	unsigned int uVar5;
+	int itemCount;
 	int iVar7;
-	unsigned int uVar9;
+	int blockCount;
 
 	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	hasInput = TmpArtiCtrlCur();
@@ -441,13 +441,13 @@ int CMenuPcs::TmpArtiCtrl()
 			entry++;
 		}
 
-		uVar5 = static_cast<unsigned int>(caravanWork->m_numCmdListSlots);
+		itemCount = caravanWork->m_numCmdListSlots;
 		iVar7 = 0;
 		TmpArtiEntry* entries = GetTmpArtiEntries(this);
-		int setupIndex = uVar5 - 1;
-		if (-1 < (int)(uVar5 - 1)) {
-			uVar9 = uVar5 >> 3;
-			if (uVar9 != 0) {
+		int setupIndex = itemCount - 1;
+		if (setupIndex > -1) {
+			blockCount = itemCount >> 3;
+			if (blockCount != 0) {
 				do {
 					TmpArtiEntry* setupEntry = entries + setupIndex;
 					setupEntry[0].startFrame = iVar7++;
@@ -467,10 +467,10 @@ int CMenuPcs::TmpArtiCtrl()
 					setupEntry[-7].startFrame = iVar7++;
 					setupEntry[-7].duration = 3;
 					setupIndex -= 8;
-					uVar9 = uVar9 - 1;
-				} while (uVar9 != 0);
-				uVar5 = uVar5 & 7;
-				if (uVar5 == 0) {
+					blockCount = blockCount - 1;
+				} while (blockCount != 0);
+				itemCount = itemCount & 7;
+				if (itemCount == 0) {
 					return hasInput;
 				}
 			}
@@ -479,8 +479,8 @@ int CMenuPcs::TmpArtiCtrl()
 				iVar7 = iVar7 + 1;
 				entries[setupIndex].duration = 3;
 				setupIndex--;
-				uVar5 = uVar5 - 1;
-			} while (uVar5 != 0);
+				itemCount = itemCount - 1;
+			} while (itemCount != 0);
 		}
 	}
 

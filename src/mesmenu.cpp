@@ -285,7 +285,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
 
-    unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+    CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
     if (scriptFood == 0) {
         return;
     }
@@ -312,7 +312,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     float pulseScale = FLOAT_8033091c;
     float pulseMul = FLOAT_80330920;
 
-    for (unsigned int i = 0; i < (*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
+    for (unsigned int i = 0; i < (scriptFood->m_maxHp >> 1); i++) {
         int heartValue = m_heartValue - valueOffset;
         float timer = (float)(unsigned int)m_heartGrowTimers[i];
         float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
@@ -345,7 +345,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 fillAmount = heartValue;
             }
 
-            float u = (float)((*(unsigned short*)(scriptFood + 0x42) != 0) * 0x18);
+            float u = (float)((scriptFood->m_statusTimers[5] != 0) * 0x18);
             float v = (float)((0x0C - fillAmount) * 0x18);
             MenuPcs.DrawRect(
                 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse,
@@ -368,12 +368,12 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
  */
 void CMesMenu::CalcHeart()
 {
-    unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
+    CCaravanWork* scriptFood = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[m_menuIndex]);
     if (scriptFood == 0) {
         return;
     }
 
-    unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
+    unsigned int foodCount = static_cast<unsigned int>(scriptFood->m_hp);
     int targetValue = (int)(foodCount * 6);
     if (m_heartTarget < targetValue) {
         m_heartTarget += targetValue - m_heartTarget;
@@ -407,35 +407,30 @@ void CMesMenu::CalcHeart()
         }
     }
 
-    int* growTimer = m_heartGrowTimers;
-    int* dropTimer = m_heartDropTimers;
-    for (int i = 0; i < 2; i++) {
-        unsigned int value = growTimer[0] - 1;
-        growTimer[0] = value & ~((int)value >> 0x1F);
+    for (int i = 0; i < 8; i += 4) {
+        unsigned int value = m_heartGrowTimers[i] - 1;
+        m_heartGrowTimers[i] = value & ~((int)value >> 0x1F);
 
-        value = dropTimer[0] - 1;
-        dropTimer[0] = value & ~((int)value >> 0x1F);
+        value = m_heartDropTimers[i] - 1;
+        m_heartDropTimers[i] = value & ~((int)value >> 0x1F);
 
-        value = growTimer[1] - 1;
-        growTimer[1] = value & ~((int)value >> 0x1F);
+        value = m_heartGrowTimers[i + 1] - 1;
+        m_heartGrowTimers[i + 1] = value & ~((int)value >> 0x1F);
 
-        value = dropTimer[1] - 1;
-        dropTimer[1] = value & ~((int)value >> 0x1F);
+        value = m_heartDropTimers[i + 1] - 1;
+        m_heartDropTimers[i + 1] = value & ~((int)value >> 0x1F);
 
-        value = growTimer[2] - 1;
-        growTimer[2] = value & ~((int)value >> 0x1F);
+        value = m_heartGrowTimers[i + 2] - 1;
+        m_heartGrowTimers[i + 2] = value & ~((int)value >> 0x1F);
 
-        value = dropTimer[2] - 1;
-        dropTimer[2] = value & ~((int)value >> 0x1F);
+        value = m_heartDropTimers[i + 2] - 1;
+        m_heartDropTimers[i + 2] = value & ~((int)value >> 0x1F);
 
-        value = growTimer[3] - 1;
-        growTimer[3] = value & ~((int)value >> 0x1F);
+        value = m_heartGrowTimers[i + 3] - 1;
+        m_heartGrowTimers[i + 3] = value & ~((int)value >> 0x1F);
 
-        value = dropTimer[3] - 1;
-        dropTimer[3] = value & ~((int)value >> 0x1F);
-
-        growTimer += 4;
-        dropTimer += 4;
+        value = m_heartDropTimers[i + 3] - 1;
+        m_heartDropTimers[i + 3] = value & ~((int)value >> 0x1F);
     }
 
     unsigned int value = m_foodShakeTimer - 1;

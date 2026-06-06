@@ -120,10 +120,10 @@ static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
  */
 extern "C" void pppRenderLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
-    int graphFrame;
     int graphId;
-    pppShapeSt* shape;
     LocationTitle2Particle* particle;
+    pppShapeSt* shape;
+    int graphFrame;
     LocationTitle2Work* work;
 
     work = GetLocationTitle2Work(locationTitle, unkC);
@@ -241,6 +241,25 @@ static const char s_locationNodeName[] = "loc";
  */
 extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
+    LocationTitle2Particle* particles;
+    CGObject* owner;
+    CCharaPcs::CHandle* handle;
+    CChara::CModel* model;
+    int nodeIndex;
+    CChara::CNode* node;
+    float zOffset;
+    u32 frameIndex;
+    int i;
+    Vec stepDir;
+    Vec scaled;
+    Vec interp[21];
+    Vec* startPos;
+    Vec* interpRead;
+    Vec* interpWrite;
+    LocationTitle2Particle* dst;
+    int startIndex;
+    int inserted;
+    float stepScale;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
 
@@ -266,14 +285,6 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
     }
 
     if (work->m_particles == 0) {
-        LocationTitle2Particle* particles;
-        CGObject* owner;
-        CCharaPcs::CHandle* handle;
-        CChara::CModel* model;
-        int nodeIndex;
-        CChara::CNode* node;
-        float zOffset;
-
         work->m_particles = static_cast<LocationTitle2Particle*>(pppMemAlloc(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), ppvEnv->m_stagePtr, const_cast<char*>(s_LocationTitle2_cpp),
             0x70));
@@ -295,7 +306,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
         node = model->m_nodes + nodeIndex;
         zOffset = 1.0f;
 
-        for (u32 frameIndex = 0; frameIndex < model->m_anim->m_frameCount; frameIndex++) {
+        for (frameIndex = 0; frameIndex < model->m_anim->m_frameCount; frameIndex++) {
             Mtx nodeMtx;
 
             node->CalcBind(model);
@@ -326,17 +337,6 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
             }
 
             if (work->m_count > 1) {
-                Vec stepDir;
-                Vec scaled;
-                Vec interp[21];
-                Vec* startPos;
-                Vec* interpRead;
-                Vec* interpWrite;
-                LocationTitle2Particle* dst;
-                int startIndex;
-                int inserted;
-                float stepScale;
-
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
@@ -345,7 +345,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
                 interpRead = interp;
                 interpWrite = interpRead;
 
-                for (int i = 0; i < unkB->m_stepCount; i++) {
+                for (i = 0; i < unkB->m_stepCount; i++) {
                     float t = stepScale * (float)(i + 1);
 
                     PSVECScale(&stepDir, &scaled, t);
@@ -366,7 +366,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
 
                 pppCopyVector(particles[startIndex + 1 + inserted].m_pos, startPos[3]);
 
-                for (int i = 0; i < inserted; i++) {
+                for (i = 0; i < inserted; i++) {
                     dst = &particles[startIndex + (i + 1)];
                     interpRead->z += zOffset;
                     pppCopyVector(dst->m_pos, *interpRead);

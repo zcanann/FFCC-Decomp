@@ -17,15 +17,17 @@ extern const float kCharaAnimZero;
 extern const float kCharaAnimDegToRad;
 extern const float kCharaAnimNegativeOne;
 extern const float kCharaAnimFullTurnDegrees;
-static const float kYmBreathHalfCircleDegrees = 180.0f;
-static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-static const double DOUBLE_80330CA0 = 4503599627370496.0;
-static const float kYmBreathSpreadScale = 2.0f;
-static const double kYmBreathHalfChance = 0.5;
 extern const char s_CardGameCode_80330CB8[] = "FFCC";
 extern const char s_CardMakerCode_80330CC0[] = "GDS";
 extern const char s_CardMachineCode_80330CC4[] = "GC";
 extern const char s_CardVersion_80330CC8[] = "1.00";
+extern const double kYmBreathSignedDoubleMagic = 4503601774854144.0;
+extern const float kYmBreathZero = 0.0f;
+extern const float kYmBreathHalfCircleDegrees = 180.0f;
+extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
+extern const double DOUBLE_80330CA0 = 4503599627370496.0;
+extern const float kYmBreathSpreadScale = 2.0f;
+extern const double kYmBreathHalfChance = 0.5;
 
 static inline float LoadFloat(const float& value)
 {
@@ -632,7 +634,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                                   particleData->m_shapeFrame2, particleData->m_shapeFrame0,
                                   params->m_shapeFrameArg);
             } else {
-                float zero = 0.0f;
+                float zero = kYmBreathZero;
 
                 groupCursor = vYmBreath->m_groups;
                 foundGroup = -1;
@@ -730,13 +732,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         for (j = 0; j < (int)params->m_groupCount; j++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 groupData->speed = params->m_groupSpeed;
-                unitVelocity.x = 0.0f;
-                unitVelocity.y = 0.0f;
+                unitVelocity.x = kYmBreathZero;
+                unitVelocity.y = kYmBreathZero;
                 unitVelocity.z = kCharaAnimNegativeOne;
                 pppCopyVector(groupData->direction, unitVelocity);
-                groupData->position.z = 0.0f;
-                groupData->position.y = 0.0f;
-                groupData->position.x = 0.0f;
+                groupData->position.z = kYmBreathZero;
+                groupData->position.y = kYmBreathZero;
+                groupData->position.x = kYmBreathZero;
                 PSMTXCopy(ppvMng->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
@@ -814,7 +816,7 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
 
     particle->m_scale += params->m_scaleAccel;
     if (params->m_disableScaleClamp == 0) {
-        float zero = 0.0f;
+        float zero = kYmBreathZero;
         if ((zero < params->m_scaleClampStart) && (params->m_scaleAccel < zero)) {
             if (particle->m_scale < zero) {
                 particle->m_scale = zero;

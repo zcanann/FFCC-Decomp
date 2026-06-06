@@ -636,8 +636,8 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
-		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
+		int bestScriptObjectPos = 0x00989680;
 
 		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
 			 itemObj != 0;

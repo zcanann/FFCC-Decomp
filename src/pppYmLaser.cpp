@@ -16,9 +16,11 @@
 
 #include <string.h>
 
-static const f32 kPppYmLaserOne = 0.0f;
-static const f32 FLOAT_80330DC4 = 1.0f;
-static const f32 FLOAT_80330DC8 = 2.0f;
+extern "C" {
+extern const f32 kPppYmLaserOne_80330DC0;
+extern const f32 FLOAT_80330DC4;
+extern const f32 FLOAT_80330DC8;
+}
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
@@ -97,7 +99,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	pppSetBlendMode(step->m_laser.m_blendMode);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	pppSetDrawEnv(
-		&colorData->m_color, &laser->m_localMatrix, YmLaserConst(kPppYmLaserOne), step->m_laser.m_drawEnvColor1,
+		&colorData->m_color, &laser->m_localMatrix, YmLaserConst(kPppYmLaserOne_80330DC0), step->m_laser.m_drawEnvColor1,
 		step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(1);
@@ -124,30 +126,30 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-	GXPosition3f32(negHalfWidth, YmLaserConst(kPppYmLaserOne), YmLaserConst(kPppYmLaserOne));
+	GXPosition3f32(negHalfWidth, YmLaserConst(kPppYmLaserOne_80330DC0), YmLaserConst(kPppYmLaserOne_80330DC0));
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne), YmLaserConst(kPppYmLaserOne));
-	GXPosition3f32(negHalfWidth, YmLaserConst(kPppYmLaserOne), length);
+	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne_80330DC0), YmLaserConst(kPppYmLaserOne_80330DC0));
+	GXPosition3f32(negHalfWidth, YmLaserConst(kPppYmLaserOne_80330DC0), length);
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne), work->m_length);
-	GXPosition3f32(halfWidth, YmLaserConst(kPppYmLaserOne), YmLaserConst(kPppYmLaserOne));
+	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne_80330DC0), work->m_length);
+	GXPosition3f32(halfWidth, YmLaserConst(kPppYmLaserOne_80330DC0), YmLaserConst(kPppYmLaserOne_80330DC0));
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), YmLaserConst(kPppYmLaserOne));
-	GXPosition3f32(halfWidth, YmLaserConst(kPppYmLaserOne), length);
+	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), YmLaserConst(kPppYmLaserOne_80330DC0));
+	GXPosition3f32(halfWidth, YmLaserConst(kPppYmLaserOne_80330DC0), length);
 	GXColor1u32(*(u32*)&color);
 	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), work->m_length);
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-	GXPosition3f32(YmLaserConst(kPppYmLaserOne), negHalfWidth, YmLaserConst(kPppYmLaserOne));
+	GXPosition3f32(YmLaserConst(kPppYmLaserOne_80330DC0), negHalfWidth, YmLaserConst(kPppYmLaserOne_80330DC0));
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne), YmLaserConst(kPppYmLaserOne));
-	GXPosition3f32(YmLaserConst(kPppYmLaserOne), negHalfWidth, length);
+	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne_80330DC0), YmLaserConst(kPppYmLaserOne_80330DC0));
+	GXPosition3f32(YmLaserConst(kPppYmLaserOne_80330DC0), negHalfWidth, length);
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne), work->m_length);
-	GXPosition3f32(YmLaserConst(kPppYmLaserOne), halfWidth, YmLaserConst(kPppYmLaserOne));
+	GXTexCoord2f32(YmLaserConst(kPppYmLaserOne_80330DC0), work->m_length);
+	GXPosition3f32(YmLaserConst(kPppYmLaserOne_80330DC0), halfWidth, YmLaserConst(kPppYmLaserOne_80330DC0));
 	GXColor1u32(*(u32*)&color);
-	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), YmLaserConst(kPppYmLaserOne));
-	GXPosition3f32(YmLaserConst(kPppYmLaserOne), halfWidth, length);
+	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), YmLaserConst(kPppYmLaserOne_80330DC0));
+	GXPosition3f32(YmLaserConst(kPppYmLaserOne_80330DC0), halfWidth, length);
 	GXColor1u32(*(u32*)&color);
 	GXTexCoord2f32(YmLaserConst(FLOAT_80330DC4), work->m_length);
 
@@ -157,7 +159,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
 		shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
 		shapeMtx[2][2] = shapeMtx[0][0];
-		if (YmLaserConst(kPppYmLaserOne) != work->m_shapeRotation) {
+		if (YmLaserConst(kPppYmLaserOne_80330DC0) != work->m_shapeRotation) {
 			PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
 			PSMTXConcat(shapeMtx, rotateMtx, shapeMtx);
 		}
@@ -206,7 +208,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 
 			GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
 			GXColor1u32(*(u32*)&trailStartColor);
-			GXTexCoord2f32(u0, YmLaserConst(kPppYmLaserOne));
+			GXTexCoord2f32(u0, YmLaserConst(kPppYmLaserOne_80330DC0));
 
 			_GXColor trailEndColor;
 			trailEndColor.r = trailColorR;
@@ -215,7 +217,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
 			GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
 			GXColor1u32(*(u32*)&trailEndColor);
-			GXTexCoord2f32(u1, YmLaserConst(kPppYmLaserOne));
+			GXTexCoord2f32(u1, YmLaserConst(kPppYmLaserOne_80330DC0));
 		}
 
 		if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
@@ -262,8 +264,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
 				float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
-				debugSource.x = YmLaserConst(kPppYmLaserOne);
-				debugSource.y = YmLaserConst(kPppYmLaserOne);
+				debugSource.x = YmLaserConst(kPppYmLaserOne_80330DC0);
+				debugSource.y = YmLaserConst(kPppYmLaserOne_80330DC0);
 				debugSource.z = YmLaserConst(FLOAT_80330DC4);
 				color.r = 0xFF;
 				color.g = 0xFF;
@@ -289,9 +291,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			color.b = 0xFF;
 			color.a = 0xFF;
 			for (i = 0; (int)i < (int)(u32)step->m_laser.m_pointCount; i++) {
-				if ((work->m_points[i].x == YmLaserConst(kPppYmLaserOne)) &&
-					(work->m_points[i].y == YmLaserConst(kPppYmLaserOne)) &&
-					(work->m_points[i].z == YmLaserConst(kPppYmLaserOne))) {
+				if ((work->m_points[i].x == YmLaserConst(kPppYmLaserOne_80330DC0)) &&
+					(work->m_points[i].y == YmLaserConst(kPppYmLaserOne_80330DC0)) &&
+					(work->m_points[i].z == YmLaserConst(kPppYmLaserOne_80330DC0))) {
 					continue;
 				}
 				PSMTXScale(pointMtx, YmLaserConst(FLOAT_80330DC8), YmLaserConst(FLOAT_80330DC8),
@@ -373,8 +375,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 			pppCopyVector(work->m_points[j + 1], work->m_points[j]);
 		}
 
-		localB.x = kPppYmLaserOne;
-		localB.y = kPppYmLaserOne;
+		localB.x = kPppYmLaserOne_80330DC0;
+		localB.y = kPppYmLaserOne_80330DC0;
 		localB.z = work->m_length;
 
 		if (i == 0) {
@@ -406,7 +408,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		CMapCylinder cyl(YmLaserConst(FLOAT_80330de8), YmLaserConst(FLOAT_80330dec));
 		cyl.m_bottom = work->m_origin;
 		cyl.m_axis = localA;
-		cyl.m_radius = kPppYmLaserOne;
+		cyl.m_radius = kPppYmLaserOne_80330DC0;
 
 		int check = MapMng.CheckHitCylinderNear(&cyl, &localA, 0xffffffff);
 		int hit = 0;
@@ -421,8 +423,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 		}
 
 		if (i == 0) {
-			localB.x = kPppYmLaserOne;
-			localB.y = kPppYmLaserOne;
+			localB.x = kPppYmLaserOne_80330DC0;
+			localB.y = kPppYmLaserOne_80330DC0;
 			localB.z = work->m_length;
 			PSMTXMultVec(tempMtx, &localB, &work->m_points[i]);
 		}
@@ -507,7 +509,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
  */
 extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 one = kPppYmLaserOne;
+	f32 one = kPppYmLaserOne_80330DC0;
 	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 
 	work->m_graphValue3 = one;
@@ -533,7 +535,7 @@ extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable
  */
 extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	f32 one = kPppYmLaserOne;
+	f32 one = kPppYmLaserOne_80330DC0;
 	f32 randArg = FLOAT_80330df0[0];
 	pppYmLaserWork* work = GetYmLaserWork(laser, ctrlTable);
 

@@ -5405,8 +5405,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
  */
 void CMenuPcs::SetProjection(int mode)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	if (worldObj == 0) {
 		return;
 	}
@@ -5507,7 +5506,7 @@ void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
 
 	const short state = worldState->m_mainState;
@@ -6832,9 +6831,8 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
  */
 void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 	float alpha = baseAlpha;
 
 	if (alpha <= 0.0f) {
@@ -6889,9 +6887,8 @@ void CMenuPcs::DrawMainMenuBase(float baseAlpha)
  */
 void CMenuPcs::CalcCharaBase()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	if (worldState == 0 || worldObj == 0) {
 		return;
 	}
@@ -6964,11 +6961,10 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned char* modelData = m_wm.m_charaModelData;
-	int* charaWork = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0] + 0xA00);
+	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
 	unsigned int selectedMask = 0;
 
 	if (charaSelect[0x0D] == 1) {
@@ -7283,7 +7279,7 @@ void CMenuPcs::GetAnimNo(int animNo, int)
 void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	WmWorldState* const worldState = GetWmWorldState(this);
 
@@ -9011,7 +9007,7 @@ void CMenuPcs::CalcMainMenuSub()
 			}
 		}
 
-		unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+		unsigned char* const worldObj = m_wm.m_worldObjData;
 		Mtx baseMtx;
 		Mtx rotMtx;
 		Mtx workMtx;
@@ -9200,7 +9196,7 @@ void CMenuPcs::ChkSelectParty()
 void CMenuPcs::DrawMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	WmWorldState* const worldState = m_wmWorldState;
 	if (worldObj == 0 || worldState == 0) {
 		return;
@@ -9951,7 +9947,7 @@ void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 void CMenuPcs::CalcMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	unsigned int* charaState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
 	unsigned int animCounter = 0;
 
@@ -10094,7 +10090,7 @@ void CMenuPcs::CalcMcObj()
 void CMenuPcs::DrawMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	WmWorldState* const worldState = m_wmWorldState;
 	float alpha = FLOAT_803313e8;
 

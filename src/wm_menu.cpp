@@ -10692,31 +10692,30 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
-	MenuWindowInfo* const win = m_menuWindowInfo;
 
-	if (state >= 0 && win->state != state) {
-		win->state = state;
+	if (state >= 0 && m_menuWindowInfo->state != state) {
+		m_menuWindowInfo->state = state;
 	}
 
-	if (win->state == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		return;
 	}
 
-	const float centerX = static_cast<float>(win->x) + static_cast<float>(static_cast<double>(win->width) * DOUBLE_803313f8);
-	const float centerY = static_cast<float>(win->y) + static_cast<float>(static_cast<double>(win->height) * DOUBLE_803313f8);
+	const float centerX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * DOUBLE_803313f8);
+	const float centerY = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * DOUBLE_803313f8);
 
 	float sx;
 	float sy;
 	float sw;
 	float sh;
-	if (win->state == 1) {
-		sx = static_cast<float>(win->x);
-		sy = static_cast<float>(win->y);
-		sw = static_cast<float>(win->width);
-		sh = static_cast<float>(win->height);
+	if (m_menuWindowInfo->state == 1) {
+		sx = static_cast<float>(m_menuWindowInfo->x);
+		sy = static_cast<float>(m_menuWindowInfo->y);
+		sw = static_cast<float>(m_menuWindowInfo->width);
+		sh = static_cast<float>(m_menuWindowInfo->height);
 	} else {
-		const float xAdd = (((centerX - static_cast<float>(win->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
-		const float yAdd = (((centerY - static_cast<float>(win->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
+		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
+		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
 		sx = (centerX - FLOAT_80331410) - xAdd;
 		sy = (centerY - FLOAT_80331410) - yAdd;
 		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
@@ -10802,21 +10801,21 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(fillTex));
 	MenuPcs.DrawRect(0xFFFFFFFF, innerX, innerY, innerWidth, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
 
-	if (win->state == 0) {
-		win->frame++;
-		if (win->frame > 5) {
-			win->frame = 6;
-			win->state = 1;
+	if (m_menuWindowInfo->state == 0) {
+		m_menuWindowInfo->frame++;
+		if (m_menuWindowInfo->frame > 5) {
+			m_menuWindowInfo->frame = 6;
+			m_menuWindowInfo->state = 1;
 		}
-	} else if (win->state == 1) {
-		if (win->frame != 6) {
-			win->frame = 6;
+	} else if (m_menuWindowInfo->state == 1) {
+		if (m_menuWindowInfo->frame != 6) {
+			m_menuWindowInfo->frame = 6;
 		}
-	} else if (win->state == 2) {
-		win->frame--;
-		if (win->frame < 1) {
-			win->frame = 0;
-			win->state = 3;
+	} else if (m_menuWindowInfo->state == 2) {
+		m_menuWindowInfo->frame--;
+		if (m_menuWindowInfo->frame < 1) {
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
 		}
 	}
 }

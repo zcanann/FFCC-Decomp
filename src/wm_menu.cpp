@@ -3581,14 +3581,18 @@ void CMenuPcs::DrawMainMenu()
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
-	if (frame != 0) {
-		unsigned char* const entry = frame + 4;
-		DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
-		         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
-		         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
-		         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
-		         static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
-	}
+	int frameIndex = 0;
+	int frameOffset = 0;
+	do {
+		if ((1u & (1 << frameIndex)) != 0) {
+			short* entry = reinterpret_cast<short*>(frame + frameOffset + 4);
+			DrawRect(0xFFFFFFFF, static_cast<float>(entry[0]), static_cast<float>(entry[1]), static_cast<float>(entry[2]),
+			         static_cast<float>(entry[3]), *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
+			         FLOAT_803313e8, FLOAT_803313e8, *reinterpret_cast<float*>(entry + 0x0C));
+		}
+		frameIndex++;
+		frameOffset += 0x1C;
+	} while (frameIndex < 2);
 
 	if (state > 0 && state < 4) {
 		float tileAlpha;
@@ -3618,6 +3622,7 @@ void CMenuPcs::DrawMainMenu()
 	}
 
 	DrawMainMenuSub();
+	PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 	unsigned int clearColor = 0;
 	GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
 	Mtx44 projectionMtx;

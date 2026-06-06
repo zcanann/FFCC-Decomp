@@ -760,18 +760,19 @@ void CMenuPcs::InitFrameInfo()
  */
 void CMenuPcs::InitFrame0Info()
 {
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+	float one = FLOAT_803313e8;
+	float zero = FLOAT_803313dc;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
+	*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
+	*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
+	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
+
 	unsigned char* frame = m_wm.m_frameInfo;
-
-	*reinterpret_cast<unsigned short*>(frame + 4) = 0x10;
-	*reinterpret_cast<unsigned short*>(frame + 6) = 0x10;
-	*reinterpret_cast<unsigned short*>(frame + 8) = 0xE8;
-	*reinterpret_cast<unsigned short*>(frame + 0xA) = 0x168;
-	*reinterpret_cast<float*>(frame + 0xC) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(frame + 0x10) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(frame + 0x14) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(frame + 0x18) = FLOAT_803313e8;
-	*reinterpret_cast<unsigned int*>(frame + 0x1C) = 0;
-
 	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
 	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
 	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
@@ -782,8 +783,9 @@ void CMenuPcs::InitFrame0Info()
 	*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
 	*reinterpret_cast<unsigned int*>(frame + 0x38) = *reinterpret_cast<unsigned int*>(frame + 0x1C);
 
+	frame = m_wm.m_frameInfo;
 	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<unsigned int*>(frame + 0x38) = 8;
+	*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
 }
 
 /*

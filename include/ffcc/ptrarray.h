@@ -15,6 +15,7 @@
 #define FFCC_PTRARRAY_FILE "collection_ptrarray.h"
 #endif
 
+#ifndef _FFCC_PTRARRAY_DECL_H_
 template <class T>
 class CPtrArray
 {
@@ -45,6 +46,7 @@ private:
     CMemory::CStage* m_stage;
     int m_growCapacity;
 };
+#endif
 
 template <class T>
 CPtrArray<T>::CPtrArray()

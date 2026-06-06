@@ -923,7 +923,7 @@ void CGame::loadCfd()
     unk_flat3_field_1C_0xc7d8 = (unsigned int)m_cFlatDataArr[3].Data(1).m_data;
     unk_flat3_count_0xc7d4 = m_cFlatDataArr[3].Data(1).m_size / 0x1A;
     unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].Data(2).m_data;
-    m_bossArtifactBase = (unsigned int)m_cFlatDataArr[3].Data(3).m_data;
+    m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].Data(3).m_data);
 }
 
 /*
@@ -1232,14 +1232,13 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     u16 thresholds[4];
     memset(thresholds, 0, 8);
 
-    u32 bossArtifactBase = Game.m_bossArtifactBase;
     int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
+    CBossArtifactStage* stageArtifacts = &Game.m_bossArtifactBase[stageIndex];
     int artifactRank = 3;
-    int stageOffset = Game.m_bossArtifactBase + stageIndex * 0x168;
 
-    thresholds[1] = *(u16*)(stageOffset + 0x162);
-    thresholds[2] = *(u16*)(stageOffset + 0x164);
-    thresholds[3] = *(u16*)(stageOffset + 0x166);
+    thresholds[1] = stageArtifacts->m_rankThresholds[1];
+    thresholds[2] = stageArtifacts->m_rankThresholds[2];
+    thresholds[3] = stageArtifacts->m_rankThresholds[3];
 
     if (((scaledAmount < (s16)thresholds[3]) && (artifactRank = 2, scaledAmount < (s16)thresholds[2])) &&
         (artifactRank = 1, scaledAmount < (s16)thresholds[1])) {
@@ -1250,7 +1249,7 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     int divisor = artifactRank + 1;
     int quotient = scaledAmount / divisor;
     stageBase += scaledAmount - quotient * divisor;
-    return bossArtifactBase + stageIndex * 0x168 + 0x20 + stageBase * 8;
+    return reinterpret_cast<int>(&stageArtifacts->m_entries[stageBase]);
 }
 
 /*

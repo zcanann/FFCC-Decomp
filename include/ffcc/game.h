@@ -82,6 +82,18 @@ public:
         unsigned int m_mcSerial1;                        // 0x13E4
     }; // Size 0x13E8
 
+    struct CBossArtifactEntry
+    {
+        unsigned short m_values[4]; // 0x00
+    }; // Size 0x08
+
+    struct CBossArtifactStage
+    {
+        unsigned short m_bonusConditions[16];    // 0x00
+        CBossArtifactEntry m_entries[40];        // 0x20
+        unsigned short m_rankThresholds[4];      // 0x160
+    }; // Size 0x168
+
 public:
     CGame();
     ~CGame();
@@ -157,7 +169,7 @@ public:
     unsigned int unk_flat3_field_1C_0xc7d8; // 0xC7D8
     unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC
     unsigned int unk_flat3_field_30_0xc7e0; // 0xC7E0
-    unsigned int m_bossArtifactBase;        // 0xC7E4
+    CBossArtifactStage* m_bossArtifactBase; // 0xC7E4
     unsigned int m_currentMapId;            // 0xC7E8
     unsigned int m_currentMapVariantId;     // 0xC7EC
     int m_currentSceneId;                   // 0xC7F0
@@ -187,6 +199,11 @@ public:
 }; // Size 0x11F88
 
 STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
+STATIC_ASSERT(sizeof(CGame::CBossArtifactEntry) == 0x08);
+STATIC_ASSERT(sizeof(CGame::CBossArtifactStage) == 0x168);
+STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_entries) == 0x20);
+STATIC_ASSERT(offsetof(CGame::CBossArtifactStage, m_rankThresholds) == 0x160);
+STATIC_ASSERT(offsetof(CGame, m_bossArtifactBase) == 0xC7E4);
 STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 
 extern CGame Game;

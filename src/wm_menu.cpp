@@ -2110,14 +2110,14 @@ void CMenuPcs::CalcMCardMenu()
 void CMenuPcs::CalcCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState == 0) {
 		return;
 	}
 
 	CalcCharaBase();
 	CalcCharaSelect();
-	if (*reinterpret_cast<short*>(worldState + 0x10) > 0 && *reinterpret_cast<short*>(worldState + 0x10) < 4) {
+	if (worldState->m_mainState > 0 && worldState->m_mainState < 4) {
 		CalcChara();
 	}
 	CalcWMFrame();
@@ -2126,7 +2126,7 @@ void CMenuPcs::CalcCMakeMenu()
 	if (gWmMenuWorkA != 0) {
 		ChkSelectParty();
 	}
-	if (static_cast<signed char>(bytes[0x17]) != 0 || *reinterpret_cast<short*>(worldState + 0x26) != 0) {
+	if (static_cast<signed char>(bytes[0x17]) != 0 || worldState->m_cardChannel != 0) {
 		CalcMainMenuSub();
 	}
 }
@@ -2142,8 +2142,7 @@ void CMenuPcs::CalcCMakeMenu()
  */
 void CMenuPcs::CalcMoveMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	if (worldState == 0) {
 		return;
 	}
@@ -2152,7 +2151,7 @@ void CMenuPcs::CalcMoveMenu()
 	CalcWMFrame();
 	CalcFukidashi();
 	CalcCharaBase();
-	if (*reinterpret_cast<short*>(worldState + 0x10) > 0 && *reinterpret_cast<short*>(worldState + 0x10) < 4) {
+	if (worldState->m_mainState > 0 && worldState->m_mainState < 4) {
 		CalcPitcher();
 	}
 }

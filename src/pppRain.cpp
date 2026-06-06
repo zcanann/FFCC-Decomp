@@ -160,9 +160,9 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
  */
 void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
-    int i;
-    RainDrop* drop;
     VRain* work;
+    RainDrop* drop;
+    int i;
     int randA;
     int randB;
     if (ppvUserStopPartF != 0) {

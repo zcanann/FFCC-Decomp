@@ -1139,9 +1139,9 @@ MatrixMode3:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1195,9 +1195,9 @@ MatrixMode5:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1241,9 +1241,9 @@ MatrixMode6:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1290,9 +1290,9 @@ MatrixMode7:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {

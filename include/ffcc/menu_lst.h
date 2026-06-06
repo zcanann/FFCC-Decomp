@@ -1,9 +1,9 @@
 #ifndef _FFCC_MENU_LST_H_
 #define _FFCC_MENU_LST_H_
 
-#include <dolphin/gx.h>
+#include "ffcc/p_menu.h"
 
-class CFont;
+#include <dolphin/gx.h>
 
 struct MenuLstState
 {
@@ -45,46 +45,5 @@ struct MenuLstList
     int pad_04;
     MenuLstEntry entries[64];
 };
-
-class CMenuPcs
-{
-public:
-    enum FMT
-    {
-        TODO_FMT
-    };
-
-    enum TEX
-    {
-        TODO_TEX
-    };
-
-    void DrawInit();
-    void SetAttrFmt(FMT);
-    void SetTexture(TEX);
-    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
-    void DrawCursor(int, int, float);
-    void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
-    char* GetMenuStr(int);
-
-    void MLstInit();
-    void MLstInit1();
-    int MLstOpen();
-    int MLstCtrl();
-    int MLstClose();
-    void MLstDraw();
-    void MLstCtrlCur();
-
-    char pad_00[0xF8];
-    CFont* helpFont;
-    char pad_fc[0x0C];
-    CFont* listFont;
-    char pad_10c[0x720];
-    MenuLstState* lstState;
-    char pad_830[0x20];
-    MenuLstList* lstData;
-};
-
-extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_MENU_LST_H_

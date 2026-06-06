@@ -24,6 +24,8 @@ struct EquipMenuState;
 struct EquipOpenAnimList;
 struct MoneyMenuState;
 struct MoneyMenuAnimList;
+struct MenuLstState;
+struct MenuLstList;
 
 struct McListInfo
 {
@@ -326,6 +328,13 @@ public:
     void MoneyDraw();
     int MoneyCtrlCur();
     inline void MoneySetPlace(int);
+    void MLstInit();
+    void MLstInit1();
+    int MLstOpen();
+    int MLstCtrl();
+    int MLstClose();
+    void MLstDraw();
+    void MLstCtrlCur();
     void CmdInit1();
     void CmdInit2();
     char* GetAttrStr(int);
@@ -471,6 +480,7 @@ public:
         ArtiState* m_artiState;
         EquipMenuState* m_equipState;
         MoneyMenuState* m_moneyState;
+        MenuLstState* m_menuLstState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -486,6 +496,7 @@ public:
         ArtiOpenAnimList* m_artiList;
         EquipOpenAnimList* m_equipList;
         MoneyMenuAnimList* m_moneyPanel;
+        MenuLstList* m_menuLstList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -511,9 +522,11 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_optionColumnAnim) == 0xA8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_specialModeFlags) == 0xB5);
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

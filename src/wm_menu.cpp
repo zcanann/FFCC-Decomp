@@ -8821,7 +8821,7 @@ void CMenuPcs::ChgAllModel2()
 		    m_cmakeWork + pdtOffset + 0x14D0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 		int loadMode;
@@ -8879,16 +8879,11 @@ void CMenuPcs::ChgAllModel()
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 
-		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
-			race = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
-			index = 0xFFFFFFFF;
-		} else {
+		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
 			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
@@ -8897,20 +8892,29 @@ void CMenuPcs::ChgAllModel()
 				modelId += 100;
 			}
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
+		} else {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
 		}
 
 		modelData = m_wm.m_charaModelData + modelOffset;
-		if ((int)race < 0) {
-			modelData[0xC] = 0;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
-		} else {
+		int loadMode;
+		if ((int)race >= 0) {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
+			loadMode = 0;
+			modelId += index;
+		} else {
+			modelData[0xC] = 0;
+			loadMode = 3;
+			modelId = 0x43;
 		}
+		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 
 		gameData += 0xC30;
 		handleData += 4;

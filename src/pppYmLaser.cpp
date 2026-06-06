@@ -327,10 +327,10 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	}
 }
 
-static const f32 FLOAT_80330de0 = -1.0f;
-static const f32 FLOAT_80330de4 = 1.2f;
-static const f32 FLOAT_80330de8 = 10000000000.0f;
-static const f32 FLOAT_80330dec = -10000000000.0f;
+extern "C" const f32 FLOAT_80330de0 = -1.0f;
+extern "C" const f32 FLOAT_80330de4 = 1.2f;
+extern "C" const f32 FLOAT_80330de8 = 10000000000.0f;
+extern "C" const f32 FLOAT_80330dec = -10000000000.0f;
 static const f32 FLOAT_80330df0[2] = {6.2831855f, 0.0f};
 extern const f32 FLOAT_80330df8 = 2.0f;
 extern const f32 FLOAT_80330dfc = 0.5f;

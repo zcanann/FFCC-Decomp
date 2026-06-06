@@ -271,22 +271,22 @@ void GbaQueue::Init()
 	obj[0x2C96] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
 	obj[0x2CAC] = 0;
-	obj[0x2C8A] = 0;
+	m_compatibilityFlg[0] = 0;
 	obj[0x2D32] = 1;
 	obj[0x2C97] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA0) = 0;
 	obj[0x2CAD] = 0;
-	obj[0x2C8B] = 0;
+	m_compatibilityFlg[1] = 0;
 	obj[0x2D33] = 1;
 	obj[0x2C98] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA4) = 0;
 	obj[0x2CAE] = 0;
-	obj[0x2C8C] = 0;
+	m_compatibilityFlg[2] = 0;
 	obj[0x2D34] = 1;
 	obj[0x2C99] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA8) = 0;
 	obj[0x2CAF] = 0;
-	obj[0x2C8D] = 0;
+	m_compatibilityFlg[3] = 0;
 	obj[0x2D35] = 1;
 }
 
@@ -1515,10 +1515,10 @@ void GbaQueue::LoadPlayerStat()
 		int j;
 
 		if (memcmp(obj + oldBase + 0x18, obj + newBase + 0x18, 8) != 0) {
-			obj[0x2C8A] = static_cast<char>(obj[0x2C8A] | (1 << i));
+			m_compatibilityFlg[0] = static_cast<unsigned char>(m_compatibilityFlg[0] | (1 << i));
 		}
 		if (*reinterpret_cast<int*>(obj + oldBase + 0x24) != *reinterpret_cast<int*>(obj + newBase + 0x24)) {
-			obj[0x2C8B] = static_cast<char>(obj[0x2C8B] | (1 << i));
+			m_compatibilityFlg[1] = static_cast<unsigned char>(m_compatibilityFlg[1] | (1 << i));
 		}
 
 		for (j = 0; j < 8; j++) {
@@ -1538,7 +1538,7 @@ void GbaQueue::LoadPlayerStat()
 		}
 		if (*reinterpret_cast<unsigned short*>(obj + oldBase + 0x14) !=
 		    *reinterpret_cast<unsigned short*>(obj + newBase + 0x14)) {
-			obj[0x2C8C] = static_cast<char>(obj[0x2C8C] | (1 << i));
+			m_compatibilityFlg[2] = static_cast<unsigned char>(m_compatibilityFlg[2] | (1 << i));
 		}
 
 		if (obj[oldBase + 0xD3] != obj[newBase + 0xD3]) {

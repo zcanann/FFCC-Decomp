@@ -101,10 +101,7 @@ inline int CMenuPcs::TmpArtiCtrlCur()
 
     if ((buttonDown & 0x100) != 0) {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
-        return 0;
-    }
-
-    if ((buttonDown & 0x200) != 0) {
+    } else if ((buttonDown & 0x200) != 0) {
         m_tmpArtiState->closeRequested = 1;
         Sound.PlaySe(3, 0x40, 0x7f, 0);
         return 1;

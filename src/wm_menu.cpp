@@ -3308,9 +3308,8 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
  */
 int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frameState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frameState = m_wm.m_frameInfo;
 
 	if (worldState->m_mainState >= 5) {
 		return -1;
@@ -3537,7 +3536,7 @@ void CMenuPcs::DrawMainMenu()
 	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
 		unsigned char* const entry = frame + 4;
 		DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
@@ -3644,7 +3643,7 @@ void CMenuPcs::DrawDiaryMenu()
 		handle->m_model->m_lightAlpha = FLOAT_803313e8;
 	}
 	if (handle != 0) {
-		unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+		unsigned char* const worldObj = m_wm.m_worldObjData;
 		Mtx44 projectionMtx;
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
@@ -4093,7 +4092,7 @@ void CMenuPcs::DrawCMakeMenu()
 	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
 		for (int i = 0; i < 2; i++) {
 			unsigned char* const entry = frame + 4 + i * 0x1C;
@@ -4249,7 +4248,7 @@ void CMenuPcs::DrawMoveMenu()
 	DrawWMFrame();
 
 	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
-		unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+		unsigned char* const worldObj = m_wm.m_worldObjData;
 		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
 		Mtx savedCamera;
 		Mtx lookAtMtx;
@@ -6759,15 +6758,14 @@ void CMenuPcs::DrawWMFrame()
  */
 void CMenuPcs::CalcWMFrame0(int param)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 
 	reinterpret_cast<short*>(frame + 4)[0] = 0x10;
-	int iVar1 = *reinterpret_cast<int*>(bytes + 0x820);
+	int iVar1 = reinterpret_cast<int>(frame);
 	reinterpret_cast<short*>(iVar1 + 0x20)[0] = static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(iVar1 + 8)) + static_cast<int>(*reinterpret_cast<short*>(iVar1 + 4)))));
 
 	if (param < 0) {
-		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 8)) + static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4)));
+		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) + static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
 		if (param > -11) {
 			unsigned int sign = static_cast<unsigned int>(param) >> 31;
 			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
@@ -6782,8 +6780,8 @@ void CMenuPcs::CalcWMFrame0(int param)
 			float t_clamped = static_cast<float>(static_cast<int>(absParam));
 			offset = dVar4 * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316d4)));
 		}
-		reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 4))) - offset));
-		reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x20))) + offset));
+		reinterpret_cast<short*>(frame + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 4))) - offset));
+		reinterpret_cast<short*>(frame + 0x20)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
 	}
 }
 
@@ -6798,7 +6796,7 @@ void CMenuPcs::CalcWMFrame0(int param)
  */
 void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const frame = m_wm.m_frameInfo;
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -6812,7 +6810,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 	int offset = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
-			short* psVar1 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x820) + offset + 4);
+			short* psVar1 = reinterpret_cast<short*>(frame + offset + 4);
 			DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),

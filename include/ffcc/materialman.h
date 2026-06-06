@@ -253,10 +253,6 @@ public:
     }
     void SetChangeTexReflectionState(unsigned int tevBit, unsigned int stdTevBit)
     {
-        m_curEnvTevBit = tevBit;
-        m_stdTexMapId = 0;
-        m_stdTexMtx = 0x1E;
-        m_stdTexCoordId = 0;
         m_activeEnvTevBit = 0xFFFFFFFF;
         m_vtxDescMode = 0xFF;
         m_texMapIdCur = 0;
@@ -267,6 +263,10 @@ public:
         m_shadowMaterialCount = 0;
         m_shadowTextureCount = 0;
         m_shadowKColorMask = 0;
+        m_curEnvTevBit = tevBit;
+        m_stdTexMapId = 0;
+        m_stdTexMtx = 0x1E;
+        m_stdTexCoordId = 0;
         m_curEnvTevBit = stdTevBit;
         m_stdTexMapId = 0;
         m_stdTexMtx = 0x1E;

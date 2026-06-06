@@ -875,7 +875,7 @@ void CMenuPcs::createSingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    *reinterpret_cast<s16*>(self + 0x866) = 0;
+    m_singleMenuPhase = 0;
     gSingMenuAsyncLoadCompleted = 0;
     if (Game.m_gameWork.m_menuStageMode == 0) {
         if (m_singleMenuStageActive != 0) {
@@ -1080,14 +1080,14 @@ void CMenuPcs::SingMenuInit()
     m_singWindowInfo = reinterpret_cast<s16*>(new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw);
     memset(m_singWindowInfo, 0, sizeof(SingleMenuWindowRaw));
 
-    *reinterpret_cast<s16*>(self + 0x866) = 0;
+    m_singleMenuPhase = 0;
     if (gSingMenuForcedSelection >= 0) {
-        *reinterpret_cast<s16*>(self + 0x864) = 8;
+        m_singleMenuMode = 8;
         gSingMenuForcedSelection = -1;
     }
     FLOAT_8032ea78 = FLOAT_803329b8;
-    *reinterpret_cast<int*>(self + 0x874) = -1;
-    *(self + 0x872) = 1;
+    m_singleLifeTimer = -1;
+    m_singleMenuCtrlResetFlag = 1;
     m_singleMenuInitialized = 1;
 }
 
@@ -1183,7 +1183,7 @@ void CMenuPcs::drawSingleMenu()
             m_stageF4->heapWalker(-1, 0, 0xFFFFFFFF);
             Graphic.CreateTempBuffer();
             m_stageF4 = 0;
-            self[0x872] = 0;
+            m_singleMenuCtrlResetFlag = 0;
             Joybus.SetCtrlMode(0, 0);
         }
 
@@ -1191,7 +1191,7 @@ void CMenuPcs::drawSingleMenu()
             return;
         }
 
-        s16 mode = *reinterpret_cast<s16*>(self + 0x866);
+        s16 mode = m_singleMenuPhase;
         if (mode == 1) {
             SingleDrawCtrl();
             return;
@@ -1201,7 +1201,7 @@ void CMenuPcs::drawSingleMenu()
             SingleFadeState* fadeState = m_singleFadeState;
             SingleFadeEntry* entry = fadeState->entries;
             for (int i = 0; i < fadeState->count; i++) {
-                if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
+                if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
                         DrawInit();
@@ -1258,7 +1258,7 @@ void CMenuPcs::drawSingleMenu()
             SingleFadeState* fadeState = m_singleFadeState;
             SingleFadeEntry* entry = fadeState->entries;
             for (int i = 0; i < fadeState->count; i++) {
-                if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
+                if ((i == 0) || (m_singleMenuMode != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
                         DrawInit();
@@ -1407,7 +1407,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
 
 post_texture_load:
     if (m_singleFadeState->done != 0) {
-        *reinterpret_cast<s16*>(self + 0x866) = *reinterpret_cast<s16*>(self + 0x866) + 1;
+        m_singleMenuPhase = m_singleMenuPhase + 1;
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 0;
         m_singMenuState->initialized = 0;
@@ -1432,7 +1432,7 @@ post_texture_load:
     }
 
     if (gSingMenuHasScriptFoodBase == 0) {
-        s16 state = *reinterpret_cast<s16*>(self + 0x866);
+        s16 state = m_singleMenuPhase;
         if (state == 1) {
             SingleCalcCtrl();
         } else if (state < 1) {
@@ -1733,7 +1733,7 @@ void CMenuPcs::SingleCalcFadeIn()
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
         memset(fadeState, 0, sizeof(SingleFadeState));
 
-        int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
+        int phase = (m_singleMenuMode == 8) ? 10 : 0;
         fadeState->entries[0].startFrame = 0;
         fadeState->entries[0].duration = 10;
         fadeState->entries[1].startFrame = phase;
@@ -1811,7 +1811,7 @@ void CMenuPcs::SingleDrawFadeIn()
     }
 
     DrawSingleBase(fadeState->entries[0].alpha);
-    if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x864) == 8) {
+    if (m_singleMenuMode == 8) {
         return;
     }
 
@@ -1838,7 +1838,7 @@ void CMenuPcs::SingleCalcFadeOut()
         Sound.PlaySe(0xF, 0x40, 0x7F, 0);
         memset(fadeState, 0, sizeof(SingleFadeState));
 
-        fadeState->entries[0].startFrame = (*reinterpret_cast<s16*>(self + 0x864) == 8) * 10;
+        fadeState->entries[0].startFrame = (m_singleMenuMode == 8) * 10;
         fadeState->entries[0].duration = 10;
         fadeState->entries[1].startFrame = 0;
         fadeState->entries[1].duration = 10;
@@ -1917,7 +1917,7 @@ void CMenuPcs::SingleDrawFadeOut()
     }
 
     DrawSingleBase(fadeState->entries[0].alpha);
-    if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x864) == 8) {
+    if (m_singleMenuMode == 8) {
         return;
     }
 
@@ -1944,8 +1944,8 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     SingMenuState* state = m_singMenuState;
-    if ((self[0x872] != 0) && (state->stepState != 0)) {
-        self[0x872] = 0;
+    if ((m_singleMenuCtrlResetFlag != 0) && (state->stepState != 0)) {
+        m_singleMenuCtrlResetFlag = 0;
     }
 
     unsigned short result = 0;
@@ -1971,7 +1971,7 @@ void CMenuPcs::SingleCalcCtrl()
     model->CalcMatrix();
     model->CalcSkin();
 
-    s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+    s16 mode = m_singleMenuMode;
     s16 proc = state->stepState;
     switch (mode) {
     case 0:
@@ -1985,10 +1985,10 @@ void CMenuPcs::SingleCalcCtrl()
         break;
     case 1:
         result = (proc == 0) ? ItemOpen() : ((proc == 1) ? ItemCtrl() : ItemClose());
-        if (*reinterpret_cast<int*>(self + 0x874) >= 0) {
-            ++(*reinterpret_cast<int*>(self + 0x874));
-            if (*reinterpret_cast<int*>(self + 0x874) > 0x31) {
-                *reinterpret_cast<int*>(self + 0x874) = -1;
+        if (m_singleLifeTimer >= 0) {
+            ++m_singleLifeTimer;
+            if (m_singleLifeTimer > 0x31) {
+                m_singleLifeTimer = -1;
             }
         }
         break;
@@ -2093,7 +2093,7 @@ void CMenuPcs::SingleDrawCtrl()
                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
     }
 
-    if (*reinterpret_cast<s16*>(self + 0x864) != 8) {
+    if (m_singleMenuMode != 8) {
         DrawInit();
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2111,7 +2111,7 @@ void CMenuPcs::SingleDrawCtrl()
         return;
     }
 
-    switch (*reinterpret_cast<s16*>(self + 0x864)) {
+    switch (m_singleMenuMode) {
     case 0:
         CmdDraw();
         break;
@@ -2159,33 +2159,33 @@ void CMenuPcs::SingleDrawCtrl()
 
     s16 previousMode = 0;
     if (state->closeRequested != 0) {
-        s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+        s16 mode = m_singleMenuMode;
         if (mode == 9) {
             m_singleFadeState->done = 1;
         } else {
-            *reinterpret_cast<s16*>(self + 0x864) = 9;
+            m_singleMenuMode = 9;
             previousMode = mode;
         }
     } else {
-        s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+        s16 mode = m_singleMenuMode;
         if (mode == 9) {
-            *reinterpret_cast<s16*>(self + 0x864) = state->selectedIndex;
+            m_singleMenuMode = state->selectedIndex;
         } else if ((mode == 8) && (gSingMenuForcedSelection >= 0)) {
-            *reinterpret_cast<s16*>(self + 0x864) = static_cast<s16>(gSingMenuForcedSelection);
+            m_singleMenuMode = static_cast<s16>(gSingMenuForcedSelection);
         } else if ((mode == 8) || (gSingMenuForcedSelection < 0)) {
             if (state->cursorMove < 1) {
-                --(*reinterpret_cast<s16*>(self + 0x864));
-                if (*reinterpret_cast<s16*>(self + 0x864) < 0) {
-                    *reinterpret_cast<s16*>(self + 0x864) = 8;
+                --m_singleMenuMode;
+                if (m_singleMenuMode < 0) {
+                    m_singleMenuMode = 8;
                 }
             } else {
-                ++(*reinterpret_cast<s16*>(self + 0x864));
-                if (*reinterpret_cast<s16*>(self + 0x864) > 8) {
-                    *reinterpret_cast<s16*>(self + 0x864) = 0;
+                ++m_singleMenuMode;
+                if (m_singleMenuMode > 8) {
+                    m_singleMenuMode = 0;
                 }
             }
         } else {
-            *reinterpret_cast<s16*>(self + 0x864) = 8;
+            m_singleMenuMode = 8;
         }
     }
 
@@ -3199,7 +3199,7 @@ int CMenuPcs::SingGetLetterAttachflg()
  */
 void CMenuPcs::CalcSingLife()
 {
-    int* lifeTimer = reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    int* lifeTimer = &m_singleLifeTimer;
     if (*lifeTimer >= 0) {
         ++(*lifeTimer);
         if (*lifeTimer > 0x31) {
@@ -3220,7 +3220,7 @@ void CMenuPcs::CalcSingLife()
 void CMenuPcs::DrawSingLife()
 {
     const CCaravanWork* const caravanWork = SingleCaravanWork();
-    int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    int lifeTimer = m_singleLifeTimer;
     if (lifeTimer < 0) {
         return;
     }
@@ -3261,12 +3261,11 @@ void CMenuPcs::DrawSingLife()
  */
 void CMenuPcs::SingLifeInit(int timer)
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    if ((*reinterpret_cast<int*>(self + 0x874) > 0) && (timer == 0)) {
-        *reinterpret_cast<int*>(self + 0x874) = 10;
+    if ((m_singleLifeTimer > 0) && (timer == 0)) {
+        m_singleLifeTimer = 10;
         return;
     }
-    *reinterpret_cast<int*>(self + 0x874) = timer;
+    m_singleLifeTimer = timer;
 }
 
 /*

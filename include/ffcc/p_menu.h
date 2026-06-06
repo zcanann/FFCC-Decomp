@@ -699,8 +699,13 @@ public:
     union {
         unsigned short m_battleStateFlag;
         short m_cmdLayoutFlag;
+        short m_singleMenuMode;
     };
-    unsigned char m_pad866[0x878 - 0x866];
+    short m_singleMenuPhase;
+    unsigned char m_pad868[0x872 - 0x868];
+    unsigned char m_singleMenuCtrlResetFlag;
+    unsigned char m_pad873;
+    int m_singleLifeTimer;
     CShopMenu* m_shopMenu;
     unsigned char m_pad87C[0x8A0 - 0x87C];
 };
@@ -746,6 +751,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleFadeState) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuMode) == 0x864);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuPhase) == 0x866);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuCtrlResetFlag) == 0x872);
+STATIC_ASSERT(offsetof(CMenuPcs, m_singleLifeTimer) == 0x874);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);

@@ -742,8 +742,7 @@ void CMenuPcs::loadData()
  */
 void CMenuPcs::InitFrameInfo()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
 		memset(frame, 0, 0x3C);
 	}
@@ -761,20 +760,18 @@ void CMenuPcs::InitFrameInfo()
  */
 void CMenuPcs::InitFrame0Info()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned int* const framePtr = reinterpret_cast<unsigned int*>(bytes + 0x820);
+	unsigned char* frame = m_wm.m_frameInfo;
 
-	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 4) = 0x10;
-	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 6) = 0x10;
-	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 8) = 0xE8;
-	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0xA) = 0x168;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0xC) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x10) = FLOAT_803313dc;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x14) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x18) = FLOAT_803313e8;
-	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x1C) = 0;
+	*reinterpret_cast<unsigned short*>(frame + 4) = 0x10;
+	*reinterpret_cast<unsigned short*>(frame + 6) = 0x10;
+	*reinterpret_cast<unsigned short*>(frame + 8) = 0xE8;
+	*reinterpret_cast<unsigned short*>(frame + 0xA) = 0x168;
+	*reinterpret_cast<float*>(frame + 0xC) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(frame + 0x10) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(frame + 0x14) = FLOAT_803313e8;
+	*reinterpret_cast<float*>(frame + 0x18) = FLOAT_803313e8;
+	*reinterpret_cast<unsigned int*>(frame + 0x1C) = 0;
 
-	unsigned char* frame = reinterpret_cast<unsigned char*>(framePtr[0]);
 	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
 	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
 	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
@@ -785,9 +782,8 @@ void CMenuPcs::InitFrame0Info()
 	*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
 	*reinterpret_cast<unsigned int*>(frame + 0x38) = *reinterpret_cast<unsigned int*>(frame + 0x1C);
 
-	frame = reinterpret_cast<unsigned char*>(framePtr[0]);
 	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x38) = 8;
+	*reinterpret_cast<unsigned int*>(frame + 0x38) = 8;
 }
 
 /*

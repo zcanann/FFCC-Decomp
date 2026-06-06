@@ -93,10 +93,10 @@ struct WmWorldState
     float m_posX;
     float m_posY;
     char m_worldReady;
-    unsigned char m_flag09;
-    unsigned char m_flag0A;
-    unsigned char m_flag0B;
-    unsigned char m_modelFlagsInitialized;
+    char m_flag09;
+    char m_flag0A;
+    char m_flag0B;
+    char m_modelFlagsInitialized;
     unsigned char m_pad0D;
     short m_state0E;
     short m_mainState;

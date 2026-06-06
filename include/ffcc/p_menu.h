@@ -438,6 +438,7 @@ public:
     void DrawMcWin(short, short);
     void DrawMcWinMess(int, int);
     void GetWinSize(int, short*, short*, int);
+    int GetSlotABXPos(int);
     const char* GetMcStr(int);
     const char* const* GetMcWinMessBuff(int);
     int GetWinMess(int);

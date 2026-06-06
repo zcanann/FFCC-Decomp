@@ -1507,7 +1507,7 @@ void CMenuPcs::CalcMCardMenu()
 	if ((int)uVar15 < 0) {
 		double dVar22;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 > -11) {
+		if ((int)uVar15 >= -10) {
 			unsigned int absOff;
 			if ((int)uVar15 < 0) {
 				absOff = -(int)uVar15;
@@ -2323,7 +2323,7 @@ void CMenuPcs::CalcLoadMenu()
 	if ((int)uVar15 < 0) {
 		double dVar26;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 > -11) {
+		if ((int)uVar15 >= -10) {
 			unsigned int absOff;
 			if ((int)uVar15 < 0) {
 				absOff = -(int)uVar15;
@@ -10923,7 +10923,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				text++;
 			}
 			const int textWidth = font->GetWidth(text);
-			if (maxWidth < textWidth) {
+			if (textWidth > maxWidth) {
 				maxWidth = textWidth;
 			}
 		}

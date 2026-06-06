@@ -446,7 +446,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (parentIdx == -1) {
                 m_parent = 0;
             } else {
-                m_parent = MapObjArrayStart() + parentIdx;
+                m_parent = MapMng.m_mapObjArray + parentIdx;
             }
 
             if (meshOrHitIdx == -1) {

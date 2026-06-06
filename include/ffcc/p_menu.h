@@ -29,7 +29,6 @@ struct MenuLstState;
 struct MenuLstList;
 struct ItemMenuState;
 struct ItemMenuAnimList;
-struct SingMenuState;
 struct SingleFadeEntry
 {
     char pad_00[0x10];
@@ -48,6 +47,31 @@ struct SingleFadeState
     short active;
     short done;
     SingleFadeEntry entries[64];
+};
+
+struct SingMenuState
+{
+    char pad_00[0x0B];
+    char initialized;
+    char pad_0C;
+    char closeRequested;
+    char pad_0E[0x10 - 0x0E];
+    short stepState;
+    short procState;
+    short subState;
+    char pad_16[0x1E - 0x16];
+    short cursorMove;
+    char pad_20[0x22 - 0x20];
+    short frame;
+    char pad_24[0x26 - 0x24];
+    short selectedIndex;
+    short scrollIndex;
+    char pad_2A[0x2E - 0x2A];
+    short result;
+    short uniteState;
+    char pad_32[0x34 - 0x32];
+    short topIndex;
+    char pad_36[0x48 - 0x36];
 };
 
 struct FavoListStorage;
@@ -725,5 +749,15 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_cmdLayoutFlag) == 0x864);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
 STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
 STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
+STATIC_ASSERT(sizeof(SingMenuState) == 0x48);
+STATIC_ASSERT(offsetof(SingMenuState, initialized) == 0x0B);
+STATIC_ASSERT(offsetof(SingMenuState, closeRequested) == 0x0D);
+STATIC_ASSERT(offsetof(SingMenuState, stepState) == 0x10);
+STATIC_ASSERT(offsetof(SingMenuState, cursorMove) == 0x1E);
+STATIC_ASSERT(offsetof(SingMenuState, frame) == 0x22);
+STATIC_ASSERT(offsetof(SingMenuState, selectedIndex) == 0x26);
+STATIC_ASSERT(offsetof(SingMenuState, result) == 0x2E);
+STATIC_ASSERT(offsetof(SingMenuState, uniteState) == 0x30);
+STATIC_ASSERT(offsetof(SingMenuState, topIndex) == 0x34);
 
 #endif // _FFCC_P_MENU_H_

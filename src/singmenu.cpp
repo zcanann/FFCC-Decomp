@@ -40,17 +40,11 @@ extern char* gSingMenuAttrTableEs[];
 typedef signed short s16;
 typedef unsigned char u8;
 
-struct SingleMenuStateRaw
-{
-    u8 bytes[0x48];
-};
-
 struct SingleMenuWindowRaw
 {
     u8 bytes[0x0C];
 };
 
-STATIC_ASSERT(sizeof(SingleMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(SingleMenuWindowRaw) == 0x0C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuStageActive) == 0x859);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
@@ -916,7 +910,7 @@ void CMenuPcs::createSingleMenu()
             loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             m_singleFadeState = 0;
-            *reinterpret_cast<int*>(self + 0x82C) = 0;
+            m_singMenuState = 0;
             m_singWindowInfo = 0;
             m_shopMenu = 0;
         }
@@ -969,10 +963,10 @@ void CMenuPcs::destroySingleMenu()
         m_singleFadeState = 0;
     }
 
-    ptr = *reinterpret_cast<void**>(self + 0x82C);
+    ptr = m_singMenuState;
     if (ptr != 0) {
         delete static_cast<u8*>(ptr);
-        *reinterpret_cast<void**>(self + 0x82C) = 0;
+        m_singMenuState = 0;
     }
 
     ptr = m_singWindowInfo;
@@ -1076,8 +1070,8 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = m_stageF4;
     }
-    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) SingleMenuStateRaw;
-    memset(*reinterpret_cast<void**>(self + 0x82C), 0, sizeof(SingleMenuStateRaw));
+    m_singMenuState = new (stage, s_singmenu_cpp, 0x609) SingMenuState;
+    memset(m_singMenuState, 0, sizeof(SingMenuState));
 
     stage = m_menuStage;
     if (Game.m_gameWork.m_menuStageMode != 0) {
@@ -1171,9 +1165,9 @@ void CMenuPcs::drawSingleMenu()
                 *reinterpret_cast<void**>(self + 0x814) = 0;
             }
 
-            if (*reinterpret_cast<void**>(self + 0x82C) != 0) {
-                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x82C));
-                *reinterpret_cast<void**>(self + 0x82C) = 0;
+            if (m_singMenuState != 0) {
+                delete[] reinterpret_cast<u8*>(m_singMenuState);
+                m_singMenuState = 0;
             }
 
             if (m_singleFadeState != 0) {
@@ -1416,10 +1410,10 @@ post_texture_load:
         *reinterpret_cast<s16*>(self + 0x866) = *reinterpret_cast<s16*>(self + 0x866) + 1;
         m_singleFadeState->done = 0;
         m_singleFadeState->active = 0;
-        *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xB) = 0;
-        *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xD) = 0;
-        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x10) = 0;
-        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = 0;
+        m_singMenuState->initialized = 0;
+        m_singMenuState->closeRequested = 0;
+        m_singMenuState->stepState = 0;
+        m_singMenuState->frame = 0;
     }
 
     char menuKind = SingleCaravanWork()->m_shopRequestState;
@@ -1755,11 +1749,11 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     int completed = 0;
-    *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = *(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22) + 1;
+    m_singMenuState->frame = m_singMenuState->frame + 1;
 
     int count = static_cast<int>(fadeState->count);
     SingleFadeEntry* entry = fadeState->entries;
-    int frame = (int)*(short*)(*reinterpret_cast<int*>(self + 0x82C) + 0x22);
+    int frame = static_cast<int>(m_singMenuState->frame);
     if (0 < count) {
         do {
             if (entry->startFrame <= frame) {
@@ -1859,11 +1853,11 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     int completed = 0;
-    int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
-    ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
+    SingMenuState* state = m_singMenuState;
+    ++state->frame;
 
     int totalEntries = static_cast<int>(fadeState->count);
-    int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
+    int frame = static_cast<int>(state->frame);
     for (int i = 0; i < totalEntries; i++) {
         SingleFadeEntry* entry = &fadeState->entries[i];
         int start = entry->startFrame;
@@ -1949,8 +1943,8 @@ void CMenuPcs::SingleCalcCtrl()
         return;
     }
 
-    int statePtr = *reinterpret_cast<int*>(self + 0x82C);
-    if ((self[0x872] != 0) && (*reinterpret_cast<s16*>(statePtr + 0x10) != 0)) {
+    SingMenuState* state = m_singMenuState;
+    if ((self[0x872] != 0) && (state->stepState != 0)) {
         self[0x872] = 0;
     }
 
@@ -1978,7 +1972,7 @@ void CMenuPcs::SingleCalcCtrl()
     model->CalcSkin();
 
     s16 mode = *reinterpret_cast<s16*>(self + 0x864);
-    s16 proc = *reinterpret_cast<s16*>(statePtr + 0x10);
+    s16 proc = state->stepState;
     switch (mode) {
     case 0:
         if (proc == 0) {
@@ -2043,7 +2037,7 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
-    *reinterpret_cast<unsigned short*>(statePtr + 0x2E) = result;
+    state->result = result;
 
     bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
     unsigned short press;
@@ -2150,21 +2144,21 @@ void CMenuPcs::SingleDrawCtrl()
         break;
     }
 
-    int statePtr = *reinterpret_cast<int*>(self + 0x82C);
-    if (*reinterpret_cast<s16*>(statePtr + 0x2E) == 0) {
+    SingMenuState* state = m_singMenuState;
+    if (state->result == 0) {
         return;
     }
 
-    if (*reinterpret_cast<s16*>(statePtr + 0x10) < 2) {
-        ++(*reinterpret_cast<s16*>(statePtr + 0x10));
-        *reinterpret_cast<s16*>(statePtr + 0x22) = 0;
-        *reinterpret_cast<u8*>(statePtr + 0xB) = 0;
-        *reinterpret_cast<s16*>(statePtr + 0x2E) = 0;
+    if (state->stepState < 2) {
+        ++state->stepState;
+        state->frame = 0;
+        state->initialized = 0;
+        state->result = 0;
         return;
     }
 
     s16 previousMode = 0;
-    if (*reinterpret_cast<char*>(statePtr + 0xD) != 0) {
+    if (state->closeRequested != 0) {
         s16 mode = *reinterpret_cast<s16*>(self + 0x864);
         if (mode == 9) {
             m_singleFadeState->done = 1;
@@ -2175,11 +2169,11 @@ void CMenuPcs::SingleDrawCtrl()
     } else {
         s16 mode = *reinterpret_cast<s16*>(self + 0x864);
         if (mode == 9) {
-            *reinterpret_cast<s16*>(self + 0x864) = *reinterpret_cast<s16*>(statePtr + 0x26);
+            *reinterpret_cast<s16*>(self + 0x864) = state->selectedIndex;
         } else if ((mode == 8) && (gSingMenuForcedSelection >= 0)) {
             *reinterpret_cast<s16*>(self + 0x864) = static_cast<s16>(gSingMenuForcedSelection);
         } else if ((mode == 8) || (gSingMenuForcedSelection < 0)) {
-            if (*reinterpret_cast<s16*>(statePtr + 0x1E) < 1) {
+            if (state->cursorMove < 1) {
                 --(*reinterpret_cast<s16*>(self + 0x864));
                 if (*reinterpret_cast<s16*>(self + 0x864) < 0) {
                     *reinterpret_cast<s16*>(self + 0x864) = 8;
@@ -2195,9 +2189,9 @@ void CMenuPcs::SingleDrawCtrl()
         }
     }
 
-    memset(reinterpret_cast<void*>(statePtr), 0, sizeof(SingleMenuStateRaw));
+    memset(state, 0, sizeof(SingMenuState));
     FLOAT_8032ea78 = FLOAT_803329b8;
-    *reinterpret_cast<s16*>(statePtr + 0x26) = previousMode;
+    state->selectedIndex = previousMode;
 }
 
 /*

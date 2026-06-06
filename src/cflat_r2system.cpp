@@ -1788,8 +1788,10 @@ int CLine<64>::IsInner(Vec* position, float margin)
     return 0;
 }
 
-extern "C" void CalcBound__9CLine(CLine<64>* line)
+void CLine<64>::CalcBound()
 {
+    CLine<64>* line = this;
+
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
@@ -2258,7 +2260,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 point.y = localFloats[2];
                 point.z = localFloats[3];
                 line.pointCount++;
-                CalcBound__9CLine(&line);
+                line.CalcBound();
             }
         }
         runtime->push(object, 0);

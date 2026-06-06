@@ -1139,9 +1139,9 @@ MatrixMode3:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1154,17 +1154,16 @@ MatrixMode3:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1196,9 +1195,9 @@ MatrixMode5:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1211,17 +1210,16 @@ MatrixMode5:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1243,9 +1241,9 @@ MatrixMode6:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1258,17 +1256,16 @@ MatrixMode6:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -1293,9 +1290,9 @@ MatrixMode7:
 	}
 
 	if (pppMngSt->m_ownerFacing == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		u8 ownerWeaponFlagsHi = *reinterpret_cast<u8*>(&pppMngSt->m_owner->m_weaponNodeFlags);
 		pppMngSt->m_ownerFacing = static_cast<u8>(
-		    static_cast<int>((static_cast<u32>(ownerBytes[0x9A]) << 25) & 0xC0000000) >> 31);
+		    static_cast<int>((static_cast<u32>(ownerWeaponFlagsHi) << 25) & 0xC0000000) >> 31);
 	}
 
 	if (pppMngSt->m_ownerFlagsInitialized == 0) {
@@ -1308,17 +1305,16 @@ MatrixMode7:
 	}
 
 	if (pppMngSt->m_nodeScaleInitialized == 0) {
-		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-		u8* ownerData = *reinterpret_cast<u8**>(ownerBytes + 0xF8);
+		CCharaPcs::CHandle* ownerHandle = pppMngSt->m_owner->m_charaModelHandle;
 		u8 hasModelScale = 0;
-		if (ownerData != 0 && *reinterpret_cast<u8**>(ownerData + 0x168) != 0) {
+		if (ownerHandle != 0 && ownerHandle->m_model != 0) {
 			hasModelScale = 1;
 		}
 		float ownerScale;
 		if (hasModelScale != 0) {
-			ownerScale = *reinterpret_cast<float*>(*reinterpret_cast<u8**>(ownerData + 0x168) + 0x9C);
+			ownerScale = ownerHandle->m_model->m_lightAlpha;
 		} else {
-			ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+			ownerScale = pppMngSt->m_owner->m_lookAtTimer;
 		}
 		pppMngSt->m_ownerScale = ownerScale;
 		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
@@ -2219,7 +2215,7 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 
 	for (_pppPObjLink* obj = pppMngSt->m_pppPObjLinkHead.m_next; obj != 0; obj = obj->m_next)
 	{
-		((u8*)obj)[0x7C] = 0;
+		((_pppPObject*)obj)->m_field7C = 0;
 	}
 }
 
@@ -2278,7 +2274,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 			{
 				break;
 			}
-			((u8*)pObject)[0x7C] = 0;
+			pObject->m_field7C = 0;
 		}
 		pDataValOffset += sizeof(_pppPDataVal);
 	}
@@ -2415,7 +2411,7 @@ void pppClearDrawEnv()
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
 	if (DOUBLE_8032fdf0 != (double)depth) {
-		float sortDepth = *(float*)((u8*)ppvMng + 0x114);
+		float sortDepth = ppvMng->m_sortDepth;
 		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
 	}
 

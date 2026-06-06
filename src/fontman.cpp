@@ -39,9 +39,25 @@ struct CFontRenderFlagBits
 	signed char pad : 3;
 };
 
+struct CFontGlyphEntry
+{
+	u16 m_textureIndex;
+	u8 m_codeHigh;
+	u8 m_left;
+	u8 m_width;
+	u8 m_shadowLeft;
+	u8 m_shadowWidth;
+	u8 m_pad;
+};
+
 inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
 {
 	return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
+
+static inline CFontGlyphEntry* FirstGlyph(unsigned short* bucket)
+{
+	return reinterpret_cast<CFontGlyphEntry*>(bucket + 1);
 }
 
 static inline float LoadFloat(const float& value)
@@ -62,12 +78,12 @@ static inline float LoadFloat(const float& value)
 float CFont::GetWidth(unsigned short ch)
 {
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	unsigned short* glyph = glyphBucket + 1;
+	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
 	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
-			glyph += 4;
+		if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
+			glyph++;
 		} else {
 			goto found_glyph;
 		}
@@ -104,10 +120,10 @@ found_fallback:
 
 find_fallback:
 	glyphBucket = m_glyphBuckets[63];
-	unsigned short* fallbackGlyph = glyphBucket + 1;
+	CFontGlyphEntry* fallbackGlyph = FirstGlyph(glyphBucket);
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) != 0) {
-			fallbackGlyph += 4;
+		if (static_cast<unsigned int>(fallbackGlyph->m_codeHigh) != 0) {
+			fallbackGlyph++;
 		} else {
 			goto found_fallback_glyph;
 		}
@@ -141,13 +157,13 @@ float CFont::GetWidth(char* text)
 
 	while (hasChar != 0) {
 		unsigned short* currentBucket = m_glyphBuckets[ch & 0xFF];
-		unsigned short* glyph = currentBucket + 1;
+		CFontGlyphEntry* glyph = FirstGlyph(currentBucket);
 		int count = static_cast<int>(*currentBucket);
 		float charWidth;
 
 		for (; count > 0; count--) {
-			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
-				glyph += 4;
+			if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
+				glyph++;
 			} else {
 				goto found_glyph;
 			}
@@ -182,11 +198,11 @@ use_glyph:
 
 find_fallback:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
-		unsigned short* fallbackGlyph = glyphBucket + 1;
+		CFontGlyphEntry* fallbackGlyph = FirstGlyph(glyphBucket);
 		count = static_cast<int>(*glyphBucket);
 		for (; count > 0; count--) {
-			if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != 0) {
-				fallbackGlyph += 4;
+			if (fallbackGlyph->m_codeHigh != 0) {
+				fallbackGlyph++;
 			} else {
 				goto use_fallback_glyph;
 			}
@@ -228,12 +244,12 @@ read_char:
 void CFont::Draw(unsigned short ch)
 {
 	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	unsigned short* glyph = glyphBucket + 1;
+	CFontGlyphEntry* glyph = FirstGlyph(glyphBucket);
 	int count = static_cast<int>(*glyphBucket);
 
 	for (; count > 0; count--) {
-		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
-			glyph += 4;
+		if (static_cast<unsigned int>(glyph->m_codeHigh) != ((ch >> 8) & 0xFF)) {
+			glyph++;
 		} else {
 			goto found_glyph;
 		}
@@ -241,13 +257,13 @@ void CFont::Draw(unsigned short ch)
 	glyph = 0;
 
 found_glyph:
-	unsigned short* drawGlyph = glyph;
+	CFontGlyphEntry* drawGlyph = glyph;
 	if (glyph == 0) {
 		unsigned short* glyphBucket = m_glyphBuckets[63];
-		glyph = glyphBucket + 1;
+		glyph = FirstGlyph(glyphBucket);
 		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != 0) {
-				glyph += 4;
+			if (static_cast<unsigned int>(glyph->m_codeHigh) != 0) {
+				glyph++;
 			} else {
 				goto found_fallback;
 			}
@@ -273,14 +289,14 @@ found_fallback:
 	float v0;
 
 	if (renderFlagBits.fixedWidth == 0) {
-		glyphIndex = static_cast<int>(*drawGlyph);
+		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
 		drawWidth = static_cast<int>(glyphInfo[1]);
 		u0 = static_cast<float>((static_cast<int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns)) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	} else {
 		drawWidth = static_cast<int>(m_glyphWidth);
-		glyphIndex = static_cast<int>(*drawGlyph);
+		glyphIndex = static_cast<int>(drawGlyph->m_textureIndex);
 		row = glyphIndex / m_glyphColumns;
 		u0 = static_cast<float>(drawWidth * (glyphIndex - row * m_glyphColumns) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
@@ -701,34 +717,34 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    CFont* font = this;
+                    unsigned short** glyphBucket = m_glyphBuckets;
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 32; i++) {
-                        font->m_glyphBuckets[0] = bucket;
+                        glyphBucket[0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[1] = bucket;
+                        glyphBucket[1] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[2] = bucket;
+                        glyphBucket[2] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[3] = bucket;
+                        glyphBucket[3] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[4] = bucket;
+                        glyphBucket[4] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[5] = bucket;
+                        glyphBucket[5] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[6] = bucket;
+                        glyphBucket[6] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font->m_glyphBuckets[7] = bucket;
+                        glyphBucket[7] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        font = reinterpret_cast<CFont*>(&font->margin);
+                        glyphBucket += 8;
                     }
                     break;
                 case 'TXTR':

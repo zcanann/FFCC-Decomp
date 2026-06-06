@@ -31,6 +31,11 @@ struct ChangeTexWork {
     float m_cachedValue;
 };
 
+struct ChangeTexColorBlock {
+    u8 m_pad0[8];
+    pppCVECTOR m_color;
+};
+
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
@@ -80,6 +85,12 @@ static inline ChangeTexWork* GetChangeTexWork(pppChangeTex* changeTex, _pppCtrlT
 	return reinterpret_cast<ChangeTexWork*>(changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_workOffset);
 }
 
+static inline ChangeTexColorBlock* GetChangeTexColorBlock(pppChangeTex* changeTex, _pppCtrlTable* data)
+{
+	return reinterpret_cast<ChangeTexColorBlock*>(
+	    changeTex->m_workArea + GetChangeTexDataOffsets(data)->m_colorBlockOffset);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8013ef94
@@ -118,9 +129,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		return;
 	}
 
-	int colorOffset = GetChangeTexDataOffsets(data)->m_colorBlockOffset;
 	ChangeTexWork* work = GetChangeTexWork(changeTex, data);
-	u8* colorData = changeTex->m_workArea + colorOffset;
+	ChangeTexColorBlock* colorBlock = GetChangeTexColorBlock(changeTex, data);
 	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 
@@ -218,7 +228,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 	work->m_cachedValue = currentValue;
 
 	double alphaBase =
-	    (double)(LoadFloat(kPppChangeTexAlphaScale) * ((float)colorData[0xB] / LoadFloat(kPppChangeTexAlphaScale)));
+	    (double)(LoadFloat(kPppChangeTexAlphaScale) *
+	             ((float)colorBlock->m_color.rgba[3] / LoadFloat(kPppChangeTexAlphaScale)));
 
 	meshList = ChangeTexMeshes(model0);
 	for (unsigned int meshIdx = 0; meshIdx < model0->m_data->m_meshCount; meshIdx++) {

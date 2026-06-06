@@ -88,7 +88,7 @@ static inline unsigned char* ModelBytes(CChara::CModel* model)
 
 static inline unsigned char* ModelNodes(CChara::CModel* model)
 {
-    return *reinterpret_cast<unsigned char**>(ModelBytes(model) + 0xA8);
+    return reinterpret_cast<unsigned char*>(model->m_nodes);
 }
 
 static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
@@ -98,32 +98,32 @@ static inline MtxPtr ModelNodeMtx(CChara::CModel* model, int nodeIndex)
 
 static inline float& ModelLightAlpha(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0x9C);
+    return model->m_lightAlpha;
 }
 
 static inline CChara::CAnim*& ModelAnim(CChara::CModel* model)
 {
-    return *reinterpret_cast<CChara::CAnim**>(ModelBytes(model) + 0xD0);
+    return model->m_anim;
 }
 
 static inline float& ModelTime(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB4);
+    return model->m_curFrame;
 }
 
 static inline float& ModelAnimStart(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xBC);
+    return model->m_animStart;
 }
 
 static inline float& ModelAnimEnd(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xC0);
+    return model->m_animEnd;
 }
 
 static inline unsigned char& ModelFlagsA0(CChara::CModel* model)
 {
-    return *reinterpret_cast<unsigned char*>(ModelBytes(model) + 0xA0);
+    return model->m_flagsA0;
 }
 
 static inline float& ModelChestAmp(CChara::CModel* model)

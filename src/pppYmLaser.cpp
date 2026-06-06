@@ -45,6 +45,11 @@ static inline pppYmLaserWork* GetYmLaserWork(pppYmLaser* laser, _pppCtrlTable* c
 	return reinterpret_cast<pppYmLaserWork*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_workOffset);
 }
 
+static inline pppYmLaserColorData* GetYmLaserColorData(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
+{
+	return reinterpret_cast<pppYmLaserColorData*>(laser->m_workArea + GetYmLaserDataOffsets(ctrlTable)->m_colorBlockOffset);
+}
+
 STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
 
 /*
@@ -58,10 +63,8 @@ STATIC_ASSERT(offsetof(pppYmLaser, m_workArea) == 0x80);
  */
 extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlTable* data)
 {
-	pppLaserDataOffsets* serializedDataOffsets = GetYmLaserDataOffsets(data);
 	pppYmLaserWork* work = GetYmLaserWork(laser, data);
-	int colorOffset = serializedDataOffsets->m_colorBlockOffset;
-	pppYmLaserColorData* colorData = (pppYmLaserColorData*)(laser->m_workArea + colorOffset);
+	pppYmLaserColorData* colorData = GetYmLaserColorData(laser, data);
 	s32 dataValIndex = step->m_dataValIndex;
 	u32 count;
 	s32 i;

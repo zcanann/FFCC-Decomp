@@ -65,6 +65,11 @@ static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
     return reinterpret_cast<VRain*>(rain->m_workArea + GetRainDataOffsets(data)->m_workOffset);
 }
 
+static inline RainColorData* GetRainColorData(pppRain* rain, RAIN_DATA* data)
+{
+    return reinterpret_cast<RainColorData*>(rain->m_workArea + GetRainDataOffsets(data)->m_colorDataOffset);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800dd424
@@ -77,8 +82,6 @@ static inline VRain* GetRainWork(pppRain* rain, RAIN_DATA* data)
 void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 {
     int i;
-    RainDataOffsets* offsets;
-    int colorOffset;
     RainColorData* colorData;
     VRain* work;
     RainDrop* drop;
@@ -89,10 +92,8 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
     float baseZ;
     Vec segment;
 
-    offsets = GetRainDataOffsets(param_3);
-    colorOffset = offsets->m_colorDataOffset;
-    work = reinterpret_cast<VRain*>(pppRain->m_workArea + offsets->m_workOffset);
-    colorData = reinterpret_cast<RainColorData*>(pppRain->m_workArea + colorOffset);
+    work = GetRainWork(pppRain, param_3);
+    colorData = GetRainColorData(pppRain, param_3);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -168,7 +169,7 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
         return;
     }
 
-    work = reinterpret_cast<VRain*>(pppRain->m_workArea + GetRainDataOffsets(param_3)->m_workOffset);
+    work = GetRainWork(pppRain, param_3);
     if (work->drops == 0) {
         RainDrop* dropData;
 

@@ -93,6 +93,18 @@ public:
         short m_endDuration;
     };
 
+    struct WorldMapEffectState
+    {
+        unsigned char m_flags;
+        unsigned char m_pad01;
+        short m_duration;
+        short m_timer;
+        unsigned char m_pad06[2];
+        float m_rotX;
+        float m_rotY;
+        float m_scale;
+    };
+
     CCameraPcs()
     {
         m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
@@ -259,7 +271,7 @@ public:
     float m_mapRotX; // 0x470
     float m_mapRotY; // 0x474
     float m_mapRotZ; // 0x478
-    u8 _pad47C[0x490 - 0x47C];
+    WorldMapEffectState m_worldMapEffect; // 0x47C
     QuakeState m_quake; // 0x490
 };
 

@@ -418,7 +418,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* step,
 
     work = GetKeShpTail3XWork(obj, param_3);
 
-    if ((obj->m_object.m_graphId == 0) && (((u8*)&obj->m_object)[offsetof(_pppPObject, m_pad7D)] != 0)) {
+    if ((obj->m_object.m_graphId == 0) && (obj->m_object.m_field7D != 0)) {
         work->m_initialized = 1;
 
         if (step->m_worldSpaceMode == 0) {

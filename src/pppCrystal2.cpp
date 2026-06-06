@@ -66,6 +66,11 @@ static inline Crystal2Work* GetCrystal2Work(pppCrystal2* crystal, _pppCtrlTable*
     return reinterpret_cast<Crystal2Work*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_workOffset);
 }
 
+static inline pppCrystal2ColorBlock* GetCrystal2ColorBlock(pppCrystal2* crystal, _pppCtrlTable* ctrl)
+{
+    return reinterpret_cast<pppCrystal2ColorBlock*>(crystal->m_workArea + GetCrystal2DataOffsets(ctrl)->m_colorBlockOffset);
+}
+
 union Crystal2FloatBits {
     float value;
     u32 bits;
@@ -122,11 +127,9 @@ static inline float Crystal2SqrtPositive(float value)
  */
 void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* param_2, _pppCtrlTable* param_3)
 {
-    Crystal2DataOffsets* serializedDataOffsets = GetCrystal2DataOffsets(param_3);
     s32 dataValIndex = param_2->m_dataValIndex;
     Crystal2Work* work = GetCrystal2Work(pppCrystal2, param_3);
-    pppCrystal2ColorBlock* colorBlock =
-        reinterpret_cast<pppCrystal2ColorBlock*>(pppCrystal2->m_workArea + serializedDataOffsets->m_colorBlockOffset);
+    pppCrystal2ColorBlock* colorBlock = GetCrystal2ColorBlock(pppCrystal2, param_3);
     pppModelSt* model;
     CTexture* sourceTex;
     _GXTexObj backTexObj;

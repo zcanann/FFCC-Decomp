@@ -304,12 +304,10 @@ void pppFrameConformBGNormal(pppConformBGNormal* pppConformBGNormal, pppConformB
  */
 void pppConstructConformBGNormal(pppConformBGNormal* conformBG, struct _pppCtrlTable* param2)
 {
-    int* serializedDataOffsets;
     ConformBgNormalState* state;
     f32 scale;
 
-    serializedDataOffsets = param2->m_serializedDataOffsets;
-    state = (ConformBgNormalState*)(conformBG->m_workArea + *serializedDataOffsets);
+    state = (ConformBgNormalState*)(conformBG->m_workArea + GetConformBgNormalDataOffsets(param2)->m_stateOffset);
     scale = kPppConformBgNormalZero;
     state->m_normal.z = scale;
     state->m_normal.y = scale;

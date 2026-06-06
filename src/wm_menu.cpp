@@ -5268,13 +5268,14 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	case 0x17: {
 		unsigned int clz = __cntlzw(static_cast<unsigned int>(value));
-		unsigned char* camBytes = reinterpret_cast<unsigned char*>(&CameraPcs);
-		camBytes[0x47C] = static_cast<unsigned char>(static_cast<int>(static_cast<signed char>(clz >> 5)) << 7) | (camBytes[0x47C] & 0x7F);
-		*reinterpret_cast<unsigned short*>(camBytes + 0x480) = 0x4B;
-		*reinterpret_cast<unsigned short*>(camBytes + 0x47E) = 0x4B;
-		*reinterpret_cast<float*>(camBytes + 0x484) = FLOAT_80331618;
-		*reinterpret_cast<float*>(camBytes + 0x488) = FLOAT_80331760;
-		*reinterpret_cast<float*>(camBytes + 0x48C) = FLOAT_80331764;
+		CameraPcs.m_worldMapEffect.m_flags =
+		    static_cast<unsigned char>(static_cast<int>(static_cast<signed char>(clz >> 5)) << 7) |
+		    (CameraPcs.m_worldMapEffect.m_flags & 0x7F);
+		CameraPcs.m_worldMapEffect.m_timer = 0x4B;
+		CameraPcs.m_worldMapEffect.m_duration = 0x4B;
+		CameraPcs.m_worldMapEffect.m_rotX = FLOAT_80331618;
+		CameraPcs.m_worldMapEffect.m_rotY = FLOAT_80331760;
+		CameraPcs.m_worldMapEffect.m_scale = FLOAT_80331764;
 		break;
 	}
 	case 0x18:

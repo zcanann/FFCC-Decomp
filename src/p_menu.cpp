@@ -217,10 +217,7 @@ CMenuPcs::~CMenuPcs()
  */
 void CMenuPcs::Init()
 {
-    u8* self = reinterpret_cast<u8*>(this);
     f32 one;
-    int i;
-    int* cardChannel;
 
     m_menuStage = 0;
     m_stageF0 = 0;
@@ -228,7 +225,7 @@ void CMenuPcs::Init()
     memset(m_fonts, 0, sizeof(m_fonts));
     memset(m_textureSets, 0, sizeof(m_textureSets));
     memset(m_textures, 0, sizeof(m_textures));
-    memset(self + 0x04, 0, 0x1C);
+    memset(reinterpret_cast<u8*>(this) + 0x04, 0, 0x1C);
 
     m_singleMenuStageActive = 0;
     m_menuResultCode = 0;
@@ -241,8 +238,6 @@ void CMenuPcs::Init()
 
     m_optionIndex = 0;
     one = LoadFloat(kMenuInitOne);
-    i = 1;
-    cardChannel = reinterpret_cast<int*>(self + 0x28);
     m_gameInitMode = 0;
     m_stereoMode = 0;
     m_bgmVolume = 6;
@@ -260,13 +255,10 @@ void CMenuPcs::Init()
     m_specialModeFlags[1] = 0;
     m_specialModeFlags[2] = 0;
     m_specialModeFlags[3] = 0;
-    memset(m_specialModeWork, 0, sizeof(m_specialModeWork));
-
-    do {
-        cardChannel[0x30] = 0;
-        cardChannel = cardChannel + 1;
-        i = i + -1;
-    } while (i != 0);
+    m_specialModeWorkHead = 0;
+    for (int workIndex = 0; workIndex < 11; workIndex++) {
+        m_specialModeWork[workIndex] = 0;
+    }
 
     m_shopMenu = 0;
     m_pad87C = 1;

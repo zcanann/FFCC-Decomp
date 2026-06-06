@@ -8838,7 +8838,7 @@ void CMenuPcs::SetMakeChara(int slot)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = m_wm.m_charaSelectData;
 	unsigned char* const modelData = m_wm.m_charaModelData;
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 
 	if (slot < 0) {
 		slot = 0;
@@ -8867,7 +8867,7 @@ void CMenuPcs::SetMakeChara(int slot)
 	}
 
 	if (worldState != 0) {
-		*reinterpret_cast<short*>(worldState + 0x26) = static_cast<short>(slot);
+		worldState->m_cardChannel = static_cast<short>(slot);
 	}
 
 	gWmMenuWorkA = slot;
@@ -8985,23 +8985,23 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
 void CMenuPcs::CalcMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const world = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const world = m_wmWorldState;
 	const unsigned short btn = static_cast<unsigned short>(GetButtonDown(0));
-	const short state = reinterpret_cast<short*>(world + 0x10)[0];
+	const short state = world->m_mainState;
 
-	if (((state > 0) && (state < 4)) || reinterpret_cast<short*>(world + 0x26)[0] == 1) {
-		if (state == 2 && reinterpret_cast<short*>(world + 0x18)[0] == 0) {
+	if (((state > 0) && (state < 4)) || world->m_cardChannel == 1) {
+		if (state == 2 && world->m_delay == 0) {
 			if ((btn & 1) != 0) {
 				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
 				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
 					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
 				}
-				*reinterpret_cast<short*>(world + 0x22) = 0xE;
-				if (*reinterpret_cast<short*>(world + 0x26) < 4) {
-					(*reinterpret_cast<short*>(world + 0x26))++;
+				world->m_frameCounter = 0xE;
+				if (world->m_cardChannel < 4) {
+					world->m_cardChannel++;
 				} else {
-					*reinterpret_cast<short*>(world + 0x26) = 0;
+					world->m_cardChannel = 0;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
@@ -9010,11 +9010,11 @@ void CMenuPcs::CalcMainMenuSub()
 					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
 				}
-				*reinterpret_cast<short*>(world + 0x22) = 0xE;
-				if (*reinterpret_cast<short*>(world + 0x26) < 1) {
-					*reinterpret_cast<short*>(world + 0x26) = 4;
+				world->m_frameCounter = 0xE;
+				if (world->m_cardChannel < 1) {
+					world->m_cardChannel = 4;
 				} else {
-					(*reinterpret_cast<short*>(world + 0x26))--;
+					world->m_cardChannel--;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
@@ -9030,15 +9030,15 @@ void CMenuPcs::CalcMainMenuSub()
 				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
 			}
 
-			if (*reinterpret_cast<short*>(world + 0x22) > 0) {
-				(*reinterpret_cast<short*>(world + 0x22))--;
+			if (world->m_frameCounter > 0) {
+				world->m_frameCounter--;
 			}
 
-			if (*reinterpret_cast<short*>(world + 0x22) == 0 && (btn & 3) == 0) {
+			if (world->m_frameCounter == 0 && (btn & 3) == 0) {
 				if ((btn & 0x100) != 0) {
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
-					*reinterpret_cast<short*>(world + 0x18) = 0x14;
-					*reinterpret_cast<short*>(world + 0x1E) = 1;
+					world->m_delay = 0x14;
+					world->m_nextMenuMode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
@@ -9047,15 +9047,15 @@ void CMenuPcs::CalcMainMenuSub()
 						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 							break;
 						}
-						if (*reinterpret_cast<short*>(world + 0x3E + i * 2) >= 0) {
+						if (world->m_backupParams[i] >= 0) {
 							valid++;
 						}
 					}
 					if (valid == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {
-						*reinterpret_cast<short*>(world + 0x18) = 1;
-						*reinterpret_cast<short*>(world + 0x1E) = -1;
+						world->m_delay = 1;
+						world->m_nextMenuMode = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -9075,7 +9075,7 @@ void CMenuPcs::CalcMainMenuSub()
 		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
-		float t = static_cast<float>(*reinterpret_cast<short*>(world + 0x24)) / FLOAT_803314c0;
+		float t = static_cast<float>(world->m_titleState) / FLOAT_803314c0;
 		float selectedRotY;
 		float selectedRotZ;
 		float selectedYOffset;
@@ -9084,22 +9084,22 @@ void CMenuPcs::CalcMainMenuSub()
 		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
 
 		float openScale = FLOAT_803313dc;
-		if (*reinterpret_cast<short*>(world + 0x1E) != -1) {
-			t = static_cast<float>(0x14 - *reinterpret_cast<short*>(world + 0x18)) / FLOAT_803314c0;
+		if (world->m_nextMenuMode != -1) {
+			t = static_cast<float>(0x14 - world->m_delay) / FLOAT_803314c0;
 			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
 		}
 
-		if (state == 2 && *reinterpret_cast<short*>(world + 0x18) == 0) {
-			(*reinterpret_cast<short*>(world + 0x24))++;
-			if (*reinterpret_cast<short*>(world + 0x24) > 99) {
-				*reinterpret_cast<short*>(world + 0x24) = 0;
+		if (state == 2 && world->m_delay == 0) {
+			world->m_titleState++;
+			if (world->m_titleState > 99) {
+				world->m_titleState = 0;
 			}
 		} else {
-			*reinterpret_cast<short*>(world + 0x24) = 0;
+			world->m_titleState = 0;
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const short curState = *reinterpret_cast<short*>(world + 0x10);
+			const short curState = world->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
@@ -9135,12 +9135,12 @@ void CMenuPcs::CalcMainMenuSub()
 				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
 				PSMTXConcat(rotMtx, scaleMtx, modelMtx);
 			} else if (i == 1) {
-				if (*reinterpret_cast<short*>(world + 0x1E) == -1 || *reinterpret_cast<short*>(world + 0x26) != 1 ||
-				    *reinterpret_cast<short*>(world + 0x10) == 2) {
+				if (world->m_nextMenuMode == -1 || world->m_cardChannel != 1 ||
+				    world->m_mainState == 2) {
 					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
 				} else {
-					unsigned int frame = 0x13 - (*reinterpret_cast<short*>(world + 0x22) +
-					                              *reinterpret_cast<short*>(world + 0x10) * 10);
+					unsigned int frame = 0x13 - (world->m_frameCounter +
+					                              world->m_mainState * 10);
 					if (static_cast<int>(frame) < 0) {
 						frame = 0;
 					}
@@ -9154,7 +9154,7 @@ void CMenuPcs::CalcMainMenuSub()
 				PSMTXRotRad(modelMtx, 'x', FLOAT_80331614);
 			}
 
-			if (*reinterpret_cast<short*>(world + 0x26) == i) {
+			if (world->m_cardChannel == i) {
 				PSMTXRotRad(rotMtx, 'z', FLOAT_803314bc * selectedRotZ);
 				PSMTXRotRad(scaleMtx, 'y', FLOAT_803314bc * selectedRotY);
 				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
@@ -9172,13 +9172,13 @@ void CMenuPcs::CalcMainMenuSub()
 			} else if (i == 1) {
 				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331620, FLOAT_803313dc, FLOAT_803313dc);
 			}
-			if (*reinterpret_cast<short*>(world + 0x26) == i) {
+			if (world->m_cardChannel == i) {
 				modelMtx[1][3] = static_cast<float>(static_cast<double>(modelMtx[1][3]) +
 				                                    static_cast<double>(selectedYOffset));
 			}
 
-			if (*reinterpret_cast<short*>(world + 0x1E) != -1 && *reinterpret_cast<short*>(world + 0x26) == i &&
-			    *reinterpret_cast<short*>(world + 0x18) != 0) {
+			if (world->m_nextMenuMode != -1 && world->m_cardChannel == i &&
+			    world->m_delay != 0) {
 				PSMTXScale(scaleMtx, openScale, openScale, openScale);
 				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
 			}
@@ -9187,17 +9187,17 @@ void CMenuPcs::CalcMainMenuSub()
 			if (handle != 0 && handle->m_model != 0) {
 				if (curState == 1) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(*reinterpret_cast<short*>(world + 0x22)));
+					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter));
 				} else if (curState == 2) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
 				} else if (curState == 3) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(*reinterpret_cast<short*>(world + 0x22)) -
+					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter) -
 					                         DOUBLE_80331420));
 				} else {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313dc;
 				}
-				if (*reinterpret_cast<short*>(world + 0x1E) != -1 && *reinterpret_cast<short*>(world + 0x26) == 1 &&
+				if (world->m_nextMenuMode != -1 && world->m_cardChannel == 1 &&
 				    i == 1) {
 					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
 				}
@@ -9496,23 +9496,22 @@ void CMenuPcs::DrawMCList()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = *reinterpret_cast<CFont**>(bytes + 0xF8);
-	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-	short state = *reinterpret_cast<short*>(worldState + 0x10);
+	WmWorldState* const worldState = m_wmWorldState;
+	short state = worldState->m_mainState;
 
-	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
 		unsigned int slotIdx = 0;
 		int iVar16 = 0;
 		do {
-			int ws = *reinterpret_cast<int*>(bytes + 0x82C);
 			float yPos = FLOAT_803314d8;
 			float alpha = FLOAT_803313e8;
-			short sub = *reinterpret_cast<short*>(ws + 0x16);
-			if (sub == 1 || *reinterpret_cast<short*>(ws + 0x10) == 3) {
+			short sub = worldState->m_subState;
+			if (sub == 1 || worldState->m_mainState == 3) {
 				int animFrames;
-				if (*reinterpret_cast<short*>(ws + 0x10) == 2) {
-					animFrames = (int)*reinterpret_cast<short*>(ws + 0x22) - iVar16;
+				if (worldState->m_mainState == 2) {
+					animFrames = (int)worldState->m_frameCounter - iVar16;
 				} else {
-					animFrames = 10 - ((int)*reinterpret_cast<short*>(ws + 0x22) + (3 - (int)slotIdx) * -3);
+					animFrames = 10 - ((int)worldState->m_frameCounter + (3 - (int)slotIdx) * -3);
 					}
 					if (animFrames >= 0) {
 						if (animFrames < 11) {
@@ -9564,16 +9563,16 @@ LAB_draw:
 	}
 
 	float frameAlpha;
-	state = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10);
+	state = worldState->m_mainState;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 *
-		                                (static_cast<double>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22)) -
+		                                (static_cast<double>(worldState->m_frameCounter) -
 		                                 DOUBLE_80331408));
 	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
 	} else {
 		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 *
-		                                  (static_cast<double>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22)) -
+		                                  (static_cast<double>(worldState->m_frameCounter) -
 		                                   DOUBLE_80331408) -
 		                                  DOUBLE_80331420));
 	}
@@ -9599,9 +9598,9 @@ LAB_draw:
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-	short separatorSub = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
-	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2) {
+	    worldState->m_mainState == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			DrawRect(0xFFFFFFFF, FLOAT_803314d8,
@@ -9613,8 +9612,8 @@ LAB_draw:
 		}
 	}
 
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 0x10 &&
-	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) < 3) {
+	if (worldState->m_subState > 0x10 &&
+	    worldState->m_mainState < 3) {
 		unsigned char* const mcData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			unsigned char* const slotData = mcData + slot * kMcListEntrySize;
@@ -9844,20 +9843,19 @@ LAB_draw:
 	}
 
 	// Draw text info for each save slot
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 0x10 &&
-	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) < 3) {
+	if (worldState->m_subState > 0x10 &&
+	    worldState->m_mainState < 3) {
 		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);
 		for (int slot = 0; slot < 4; slot++) {
-			int ws2 = *reinterpret_cast<int*>(bytes + 0x82C);
 			float alpha2 = FLOAT_803313e8;
 			float yPos2 = FLOAT_803314d8;
-			short sub2 = *reinterpret_cast<short*>(ws2 + 0x16);
-			if (sub2 == 1 || *reinterpret_cast<short*>(ws2 + 0x10) == 3) {
+			short sub2 = worldState->m_subState;
+			if (sub2 == 1 || worldState->m_mainState == 3) {
 				int af2;
-				if (*reinterpret_cast<short*>(ws2 + 0x10) == 2) {
-					af2 = (int)*reinterpret_cast<short*>(ws2 + 0x22) - slot * 3;
+				if (worldState->m_mainState == 2) {
+					af2 = (int)worldState->m_frameCounter - slot * 3;
 				} else {
-					af2 = 10 - ((int)*reinterpret_cast<short*>(ws2 + 0x22) + (3 - slot) * -3);
+					af2 = 10 - ((int)worldState->m_frameCounter + (3 - slot) * -3);
 				}
 				if (af2 < 0) continue;
 				if (af2 < 11) {
@@ -9934,8 +9932,8 @@ LAB_draw:
 			}
 		}
 	}
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x11) {
-		short mode = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
+	if (worldState->m_subState == 0x11) {
+		short mode = worldState->m_menuMode;
 		int msgId = -1;
 		if (mode == 5) {
 			msgId = 2;
@@ -9964,7 +9962,7 @@ LAB_draw:
 void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	float alpha = baseAlpha;
 
 	if (alpha <= 0.0f) {
@@ -9972,11 +9970,11 @@ void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 	}
 
 	if (worldState != 0) {
-		const short state = *reinterpret_cast<short*>(worldState + 0x10);
+		const short state = worldState->m_mainState;
 		if (state == 0) {
-			alpha *= static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+			alpha *= static_cast<float>(worldState->m_frameCounter) * 0.1f;
 		} else if (state >= 3) {
-			alpha *= 1.0f - static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+			alpha *= 1.0f - static_cast<float>(worldState->m_frameCounter) * 0.1f;
 		}
 	}
 	if (alpha < 0.0f) {
@@ -10148,15 +10146,15 @@ void CMenuPcs::DrawMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	float alpha = FLOAT_803313e8;
 
 	if (worldState != 0) {
-		const short state = *reinterpret_cast<short*>(worldState + 0x10);
+		const short state = worldState->m_mainState;
 		if (state == 1) {
-			alpha = static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+			alpha = static_cast<float>(worldState->m_frameCounter) * 0.1f;
 		} else if (state >= 3) {
-			alpha = 1.0f - static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+			alpha = 1.0f - static_cast<float>(worldState->m_frameCounter) * 0.1f;
 		}
 	}
 	if (alpha < 0.0f) {
@@ -10166,7 +10164,7 @@ void CMenuPcs::DrawMcObj()
 	}
 
 	CalcMcObj();
-	if (worldObj != 0 && worldState != 0 && *reinterpret_cast<short*>(worldState + 0x16) != 0) {
+	if (worldObj != 0 && worldState != 0 && worldState->m_subState != 0) {
 		const GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
 		for (int i = 0; i < 4; i++) {
 			unsigned char* const panel = worldObj + 0x550 + i * 0x50;
@@ -10353,13 +10351,13 @@ void CMenuPcs::DrawPageMark()
 	int x;
 	int y;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 	float alpha = FLOAT_803313e8;
 	float cursorScale = FLOAT_803313e8;
 
 	if (worldState != 0) {
-		const short state = *reinterpret_cast<short*>(worldState + 0x10);
-		const short step = *reinterpret_cast<short*>(worldState + 0x22);
+		const short state = worldState->m_mainState;
+		const short step = worldState->m_frameCounter;
 		if (state == 0) {
 			alpha = static_cast<float>(step) * 0.1f;
 		} else if (state >= 3) {

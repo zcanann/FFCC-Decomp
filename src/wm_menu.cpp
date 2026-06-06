@@ -3011,8 +3011,7 @@ void CMenuPcs::CalcLoadMenu()
  */
 void CMenuPcs::CalcTitleMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmWorldState* const worldState = m_wmWorldState;
 
 	if (lbl_8032EE38[0] == 0) {
 		lbl_8032EE38[0] = 1;
@@ -3033,14 +3032,14 @@ void CMenuPcs::CalcTitleMenu()
 	const unsigned short repeat = GetButtonRepeat(0);
 
 	if (worldState != 0) {
-		if (worldState[8] == 0) {
-			*reinterpret_cast<short*>(worldState + 0x18) = 0;
-			*reinterpret_cast<short*>(worldState + 0x24) = 0;
-			*reinterpret_cast<short*>(worldState + 0x0E) = -1;
-			*reinterpret_cast<short*>(worldState + 0x12) = 0;
-			*reinterpret_cast<short*>(worldState + 0x26) = 0;
-			worldState[8] = 1;
-			worldState[9] = 1;
+		if (worldState->m_worldReady == 0) {
+			worldState->m_delay = 0;
+			worldState->m_titleState = 0;
+			worldState->m_state0E = -1;
+			worldState->m_state12 = 0;
+			worldState->m_cardChannel = 0;
+			worldState->m_worldReady = 1;
+			worldState->m_flag09 = 1;
 			m_wmThpActive = 0;
 			if (DAT_8032ee1c == 1) {
 				int createParam[0x1B];
@@ -3073,7 +3072,7 @@ void CMenuPcs::CalcTitleMenu()
 				CGObject* titleObject = &titleEffect->m_object;
 				titleEffect->m_slotNo = 0x17;
 				titleObject->Create();
-				titleObject->m_charaModelHandle = *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7D0);
+				titleObject->m_charaModelHandle = m_wm.m_handles[23];
 				*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
 				*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
 				titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
@@ -3082,7 +3081,7 @@ void CMenuPcs::CalcTitleMenu()
 				flatArgs[1].m_word = 0;
 				flatArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
-				*reinterpret_cast<short*>(worldState + 0x26) = 0;
+				worldState->m_cardChannel = 0;
 				DAT_8032ee1c = 0;
 				return;
 			}
@@ -3125,14 +3124,14 @@ void CMenuPcs::CalcTitleMenu()
 			CGObject* titleObject = &titleEffect->m_object;
 			titleEffect->m_slotNo = 0x17;
 			titleObject->Create();
-			titleObject->m_charaModelHandle = *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7D0);
+			titleObject->m_charaModelHandle = m_wm.m_handles[23];
 			*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
 			*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
 			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
 			m_wmThpActive = 1;
 		}
 
-		if (*reinterpret_cast<short*>(worldState + 0x10) == 0) {
+		if (worldState->m_mainState == 0) {
 			if ((down & 0x1000) != 0) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -3143,48 +3142,47 @@ void CMenuPcs::CalcTitleMenu()
 					m_wmWorkBuffer = 0;
 				}
 				m_wmThpActive = 0;
-				*reinterpret_cast<short*>(worldState + 0x24) = 0;
-				*reinterpret_cast<short*>(worldState + 0x0E) = -1;
+				worldState->m_titleState = 0;
+				worldState->m_state0E = -1;
 			} else if (THPSimpleDecode(0) == 0) {
-				*reinterpret_cast<short*>(worldState + 0x22) =
-				    static_cast<short>(*reinterpret_cast<short*>(worldState + 0x22) + 1);
+				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
 			}
 		}
 
-		if (*reinterpret_cast<short*>(worldState + 0x10) == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
+		if (worldState->m_mainState == 2 && worldState->m_delay == 0) {
 			if ((repeat & 0xC) != 0) {
-				*reinterpret_cast<unsigned short*>(worldState + 0x26) ^= 1;
-				*reinterpret_cast<short*>(worldState + 0x24) = 0;
-				*reinterpret_cast<short*>(worldState + 0x12) = 0;
-				worldState[9] = 0;
+				worldState->m_cardChannel ^= 1;
+				worldState->m_titleState = 0;
+				worldState->m_state12 = 0;
+				worldState->m_flag09 = 0;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if ((down & 0x100) != 0) {
-				if (*reinterpret_cast<short*>(worldState + 0x26) == 0) {
+				if (worldState->m_cardChannel == 0) {
 					DAT_8032ee2c = 0xFFFFFFFF;
 					DAT_8032ee28 = 0xFFFFFFFF;
 					DAT_8032ee20 = 0xFF;
 					uRam8032ee21 = 0xFF;
 					Game.InitNewGame();
 				}
-				*reinterpret_cast<short*>(worldState + 0x18) = 0x14;
-				*reinterpret_cast<short*>(worldState + 0x0E) = 1;
+				worldState->m_delay = 0x14;
+				worldState->m_state0E = 1;
 				Sound.PlaySe(0x0B, 0x40, 0x7F, 0);
 			} else if ((down & 0x200) != 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 
 			if (repeat == 0) {
-				*reinterpret_cast<short*>(worldState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(worldState + 0x22) + 1);
+				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
 			} else {
-				*reinterpret_cast<short*>(worldState + 0x22) = 0;
+				worldState->m_frameCounter = 0;
 			}
-		} else if (*reinterpret_cast<short*>(worldState + 0x10) < 2) {
+		} else if (worldState->m_mainState < 2) {
 			if (MemoryCardMan.McChkConnect(0) == 0) {
-				*reinterpret_cast<short*>(worldState + 0x26) = 1;
+				worldState->m_cardChannel = 1;
 			} else if (MemoryCardMan.McChkConnect(1) == 0) {
-				*reinterpret_cast<short*>(worldState + 0x26) = 1;
+				worldState->m_cardChannel = 1;
 			} else {
-				*reinterpret_cast<short*>(worldState + 0x26) = 0;
+				worldState->m_cardChannel = 0;
 			}
 		}
 	}

@@ -113,8 +113,7 @@ void CMenuPcs::MLstDraw()
 
 	item = this->m_menuLstList->entries;
 	for (int i = 0; i < this->m_menuLstList->count; i++) {
-		CColor color(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha));
-		font->SetColor(color.color);
+		font->SetColor(CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha)).color);
 
 		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
@@ -144,7 +143,6 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	int helpMessageId = this->m_menuLstState->cursor + 0x25c;
 	CFont* helpFont = this->m_fonts[0];
-	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha));
 	float helpX = FLOAT_803333F8;
 	float helpY = 352.0f;
 	DrawHelpMessage(
@@ -152,7 +150,7 @@ void CMenuPcs::MLstDraw()
 		helpFont,
 		(int)helpX,
 		(int)helpY,
-		helpColor.color,
+		CColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->m_menuLstList->entries[0].alpha)).color,
 		0x0a,
 		FLOAT_803333F0,
 		3.0f);

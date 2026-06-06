@@ -1998,8 +1998,9 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				                           InsertShadow_level);
 			}
 
+			COctNode* childIter = child;
 			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = child->m_children[0];
+				COctNode* grandChild = childIter->m_children[0];
 				if (grandChild == 0) {
 					break;
 				}
@@ -2013,16 +2014,17 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 						                           InsertShadow_level);
 					}
 
+					COctNode* grandChildIter = grandChild;
 					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = grandChild->m_children[0];
+						COctNode* greatGrandChild = grandChildIter->m_children[0];
 						if (greatGrandChild == 0) {
 							break;
 						}
 						CheckHitCylinderNear_r(greatGrandChild);
-						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+						grandChildIter = reinterpret_cast<COctNode*>(Ptr(grandChildIter, 4));
 					}
 				}
-				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+				childIter = reinterpret_cast<COctNode*>(Ptr(childIter, 4));
 			}
 		}
 		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));

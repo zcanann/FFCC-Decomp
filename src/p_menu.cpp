@@ -1094,7 +1094,8 @@ void CMenuPcs::onScriptChanging(char* script)
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    if (m_mode == 0) {
+    switch (m_mode) {
+    case 0:
         for (int i = 0; i < 4; i++) {
             CMenu* menu = m_battleRingMenus[i];
             menu->ScriptChanging(script);
@@ -1104,6 +1105,7 @@ void CMenuPcs::onScriptChanging(char* script)
             CMenu* menu = m_battleMesMenus[i];
             menu->ScriptChanging(script);
         }
+        break;
     }
 
     memset(&m_battleHud, 0, sizeof(m_battleHud));

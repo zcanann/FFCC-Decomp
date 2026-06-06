@@ -3873,10 +3873,10 @@ void CMenuPcs::DrawMCardMenu()
 				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
 
-				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), &up, &target);
+				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), (Vec*)&up, (Point3d*)&target);
 				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -4546,10 +4546,10 @@ void CMenuPcs::DrawLoadMenu()
 				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
 
-				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(piVar13 + 4), &up, &target);
+				C_MTXLookAt(lookAtMtx, (Vec*)(piVar13 + 4), (Vec*)&up, (Point3d*)&target);
 				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -6298,10 +6298,10 @@ void CMenuPcs::DrawFukidashi()
 					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
 
-					Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-					Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, &eye, &up, (Vec*)(piVar10 + 4));
+					C_MTXLookAt(lookAtMtx, (Point3d*)&eye, (Vec*)&up, (Point3d*)(piVar10 + 4));
 					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);

@@ -5,6 +5,7 @@
 #include "ffcc/goout.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_camera.h"
@@ -10970,12 +10971,15 @@ void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, uns
 {
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(2));
 
-	unsigned int packed = (static_cast<unsigned int>(r) << 24) | (static_cast<unsigned int>(g) << 16) | (static_cast<unsigned int>(b) << 8) | static_cast<unsigned int>(a);
-	GXColor color = *reinterpret_cast<GXColor*>(&packed);
+	GXColor color;
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	color.a = a;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(-1));
-	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(-1));
+	_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);

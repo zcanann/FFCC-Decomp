@@ -41,18 +41,12 @@ struct pppColumPositionWork {
     u8 m_alpha;
 };
 
-struct pppColumDataOffsets {
-    s32 _unused0;
-    s32 _unused1;
-    s32 m_positionWorkOffset;
-    s32 m_frameWorkOffset;
-};
-
 STATIC_ASSERT(sizeof(pppColumValue) == 0x0C);
 STATIC_ASSERT(offsetof(pppColumFrameWork, m_values) == 0x08);
 STATIC_ASSERT(sizeof(pppColumFrameWork) == 0x0C);
 STATIC_ASSERT(offsetof(pppColumPositionWork, m_position) == 0x10);
 STATIC_ASSERT(offsetof(pppColumPositionWork, m_alpha) == 0x32);
+STATIC_ASSERT(sizeof(pppColumDataOffsets) == 0x10);
 STATIC_ASSERT(offsetof(pppColumDataOffsets, m_positionWorkOffset) == 0x08);
 STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 

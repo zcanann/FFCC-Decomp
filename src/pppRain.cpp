@@ -39,12 +39,6 @@ struct VRain {
     f32 accelZ;
 };
 
-struct RainDataOffsets {
-    s32 _unused0;
-    s32 m_colorDataOffset;
-    s32 m_workOffset;
-};
-
 STATIC_ASSERT(offsetof(VRain, drops) == 0x0);
 STATIC_ASSERT(offsetof(VRain, moveY) == 0x4);
 STATIC_ASSERT(offsetof(VRain, accelY) == 0x8);
@@ -52,6 +46,7 @@ STATIC_ASSERT(offsetof(VRain, accelZ) == 0xC);
 STATIC_ASSERT(sizeof(VRain) == 0x10);
 STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
 STATIC_ASSERT(sizeof(RainDrop) == 0x20);
+STATIC_ASSERT(sizeof(RainDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RainDataOffsets, m_colorDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(RainDataOffsets, m_workOffset) == 0x8);
 

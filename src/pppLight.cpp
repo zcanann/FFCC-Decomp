@@ -50,10 +50,6 @@ struct PppLightMngProgramInfo {
 	pppLightTarget* programInfoTable;
 };
 
-struct PppLightDataOffsets {
-	s32 m_workOffset;
-};
-
 STATIC_ASSERT(offsetof(PppLightWork, attenFalloffAccel) == 0x20);
 STATIC_ASSERT(offsetof(PppLightWork, attenRadiusAccel) == 0x2C);
 STATIC_ASSERT(offsetof(PppLightWork, spotScaleAccel) == 0x38);
@@ -63,6 +59,7 @@ STATIC_ASSERT(offsetof(PppLightStep, m_attenFalloff) == 0x20);
 STATIC_ASSERT(offsetof(PppLightStep, m_targetIndex) == 0x44);
 STATIC_ASSERT(offsetof(PppLightStep, m_specularScale) == 0x4C);
 STATIC_ASSERT(offsetof(PppLightStep, m_type) == 0x58);
+STATIC_ASSERT(sizeof(PppLightDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(PppLightDataOffsets, m_workOffset) == 0x0);
 
 static inline PppLightDataOffsets* GetPppLightDataOffsets(_pppCtrlTable* ctrlTable)

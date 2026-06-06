@@ -1,6 +1,8 @@
 #ifndef _FFCC_LOCATIONTITLE2_H_
 #define _FFCC_LOCATIONTITLE2_H_
 
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 struct _pppCtrlTable;
@@ -12,6 +14,32 @@ typedef _pppCtrlTable pppLocationTitle2Offsets;
 struct LocationTitle2DataOffsets {
     s32 m_workOffset;
     s32 m_colorOffset;
+};
+
+struct LocationTitle2Particle {
+    Vec m_pos;
+    GXColor m_color;
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
+    u16 m_frame;
+    s16 m_pad0;
+    s16 m_pad1;
+    s16 m_shape;
+};
+
+struct LocationTitle2Work {
+    LocationTitle2Particle* m_particles;
+    u16 m_count;
+    u16 m_pad;
+    float m_cur;
+    float m_vel;
+    float m_acc;
+};
+
+struct LocationTitle2ColorBlock {
+    u8 m_pad[8];
+    GXColor m_color;
 };
 
 struct pppLocationTitle2Step {

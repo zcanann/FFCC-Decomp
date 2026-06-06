@@ -18,36 +18,6 @@ static inline int GetGraphFrameFromId(s32 graphId)
     return (int)graphId / 0x1000;
 }
 
-struct LOCATION_POLYGON;
-
-struct LocationTitle2Work {
-    LOCATION_POLYGON* m_particles;
-    u16 m_count;
-    u16 m_pad;
-    float m_cur;
-    float m_vel;
-    float m_acc;
-};
-
-struct LOCATION_POLYGON {
-    Vec m_pos;
-    GXColor m_color;
-    float m_scaleX;
-    float m_scaleY;
-    float m_scaleZ;
-    u16 m_frame;
-    s16 m_pad0;
-    s16 m_pad1;
-    s16 m_shape;
-};
-
-typedef LOCATION_POLYGON LocationTitle2Particle;
-
-struct LocationTitle2ColorBlock {
-    u8 m_pad[8];
-    GXColor m_color;
-};
-
 STATIC_ASSERT(sizeof(LocationTitle2Work) == 0x14);
 STATIC_ASSERT(offsetof(LocationTitle2Work, m_particles) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2Work, m_count) == 0x04);
@@ -94,7 +64,7 @@ static inline LocationTitle2ColorBlock* GetLocationTitle2ColorBlock(
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void copyPolygonData(LOCATION_POLYGON* dst, LOCATION_POLYGON* src)
+static inline void copyPolygonData(LocationTitle2Particle* dst, LocationTitle2Particle* src)
 {
     pppCopyVector(dst->m_pos, src->m_pos);
     memcpy(&dst->m_color, &src->m_color, sizeof(GXColor));

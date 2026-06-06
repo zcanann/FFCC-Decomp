@@ -466,7 +466,7 @@ static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
 
 static inline CFont* GetShopMenuInfoPanelFont()
 {
-    return MenuPcs.m_infoPanelFont;
+    return MenuPcs.m_fonts[0];
 }
 
 static void DrawShopMenuCenteredText(CFont* font, const char* text, float centerX, float y)
@@ -897,7 +897,7 @@ void CShopMenu::Destroy()
 {
     PartPcs.ReleasePdt(m_pdtSlot);
     if (MenuPcs.m_shopMenu == this) {
-        MenuPcs.m_shopMenu = nullptr;
+        MenuPcs.m_shopMenu = 0;
     }
 }
 
@@ -931,7 +931,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     memset(helpText, 0, 0x200);
     MakeAgbString__4CMesFPcPcii(helpText, const_cast<char*>(sourceText), 0, 1);
 
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
@@ -1231,7 +1231,7 @@ void CShopMenu::DrawItemInfo0()
  */
 void CShopMenu::DrawBuySellInfo()
 {
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font = MenuPcs.m_fonts[0];
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int selected = m_selectedIndex;
     int listType = m_listType;
@@ -1400,7 +1400,7 @@ void CShopMenu::DrawItemList()
         }
 
         if (itemNo > 0) {
-            CFont* font = MenuPcs.m_labelFont;
+            CFont* font = MenuPcs.m_fonts[4];
             SetMargin__5CFontFf(FLOAT_80332d28, font);
             SetShadow__5CFontFi(font, 0);
             SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -1618,7 +1618,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0xE);
         drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0xF);
-        CFont* font = MenuPcs.m_labelFont;
+        CFont* font = MenuPcs.m_fonts[4];
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 0);
         SetScaleX__5CFontFf(FLOAT_80332d2c, font);
@@ -1745,7 +1745,7 @@ void CShopMenu::DrawSoubi()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -1774,7 +1774,7 @@ void CShopMenu::DrawSoubi()
     drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    CFont* labelFont = MenuPcs.m_labelFont;
+    CFont* labelFont = MenuPcs.m_fonts[4];
     SetMargin__5CFontFf(FLOAT_80332d28, labelFont);
     SetShadow__5CFontFi(labelFont, 0);
     SetScaleX__5CFontFf(FLOAT_80332d2c, labelFont);
@@ -1824,7 +1824,7 @@ void CShopMenu::DrawMake()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x32, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -1882,7 +1882,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuAmount(
         font, currentMoney, FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18, (makeGil <= currentMoney) ? 0x14 : 2);
 
-    CFont* labelFont = MenuPcs.m_labelFont;
+    CFont* labelFont = MenuPcs.m_fonts[4];
     SetupShopMenuLabelFont(labelFont, &white);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE), FLOAT_80332e28, FLOAT_80332e24);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY), FLOAT_80332d68, FLOAT_80332e2c);
@@ -1997,7 +1997,7 @@ void CShopMenu::DrawSmith0()
     DrawItemList();
     DrawItemHelp(m_selectedIndex, 0x140, 0x172);
 
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font = MenuPcs.m_fonts[0];
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);
@@ -2060,7 +2060,7 @@ void CShopMenu::DrawShop0()
             8, highlight, s_currentShopMenuTopMenuEntry->x - 0x30, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0,
             FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0x20);
-        font = MenuPcs.m_infoPanelFont;
+        font = MenuPcs.m_fonts[0];
     }
 
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -2512,7 +2512,7 @@ void CShopMenu::Calc()
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
                 operator delete(MenuPcs.m_shopMenu);
-                MenuPcs.m_shopMenu = nullptr;
+                MenuPcs.m_shopMenu = 0;
                 return;
             }
         }
@@ -2603,7 +2603,7 @@ void CShopMenu::Calc()
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
                 operator delete(MenuPcs.m_shopMenu);
-                MenuPcs.m_shopMenu = nullptr;
+                MenuPcs.m_shopMenu = 0;
                 return;
             }
             this->SetMode(m_nextMode);
@@ -2687,7 +2687,6 @@ void CShopMenu::Calc()
  */
 void CMenuPcs::CreateSmithMenu()
 {
-    unsigned char* menuPcs = reinterpret_cast<unsigned char*>(this);
     void* stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xF4);
@@ -2695,8 +2694,8 @@ void CMenuPcs::CreateSmithMenu()
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp, 0x2E9));
-    *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
-    shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
+    m_shopMenu = shopMenu;
+    shopMenu = m_shopMenu;
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     shopMenu->m_unk00 = nullptr;
@@ -2724,7 +2723,6 @@ void CMenuPcs::CreateSmithMenu()
  */
 void CMenuPcs::CreateShopMenu()
 {
-    unsigned char* menuPcs = reinterpret_cast<unsigned char*>(this);
     void* stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<void**>(MenuPcsRaw() + 0xF4);
@@ -2732,8 +2730,8 @@ void CMenuPcs::CreateShopMenu()
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
         operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp, 0x2E2));
-    *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
-    shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
+    m_shopMenu = shopMenu;
+    shopMenu = m_shopMenu;
 
     Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     shopMenu->m_unk00 = nullptr;

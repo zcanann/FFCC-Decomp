@@ -18,6 +18,7 @@ class CTextureSet;
 class CPad;
 class CRingMenu;
 class CMesMenu;
+class CShopMenu;
 struct ArtiState;
 struct ArtiOpenAnimList;
 struct EquipMenuState;
@@ -67,6 +68,11 @@ public:
     {
         int m_textureSetIndex;
         char* m_textureName;
+    };
+    struct MaterialInfo
+    {
+        short m_itemNo[3];
+        short m_count[3];
     };
     struct Sprt
     {
@@ -223,6 +229,10 @@ public:
     void createWorld();
     void createSingleMenu();
     void destroySingleMenu();
+    void SingMenuInit();
+    void CreateShopMenu();
+    void CreateSmithMenu();
+    void SingMenuEnd();
     void destroyVillageMenu();
     void ChkNumItemAll();
     void loadData();
@@ -233,6 +243,7 @@ public:
     void InitCSelCurPos();
     void destroyWorld();
     void calcWorld();
+    void calcSingleMenu();
     void calcVillageMenu();
     void CalcMainMenu();
     void CalcDiaryMenu();
@@ -250,6 +261,7 @@ public:
     void SetMenuCharaAnim(int, int);
     unsigned int IsMenuCharaAnimIdle(int);
     void drawWorld();
+    void drawSingleMenu();
     void drawVillageMenu();
     void DrawMainMenu();
     void DrawDiaryMenu();
@@ -281,6 +293,7 @@ public:
     void SetProjection(int);
     void RestoreProjection();
     void DrawObj(int);
+    void loadTextureAsync(char**, int, int, CTmp*, int, int, int);
     void CalcPitcher();
     void CalcFukidashi();
     void SetCrystalCageAttr();
@@ -429,19 +442,33 @@ public:
     void ChgModel(int, int, int, int);
     void SetAnim(int);
     void DrawCursor(int, int, float);
+    void SingCalcChara(float);
+    void DrawSingleBase(float);
     void DrawSingleCrescent(float, float);
     void DrawSingleStat(float);
     void DrawSingleHelpWim(float);
+    void SingleCalcFadeIn();
+    void SingleDrawFadeIn();
+    void SingleCalcFadeOut();
+    void SingleDrawFadeOut();
+    void SingleCalcCtrl();
+    void SingleDrawCtrl();
     void DrawShadowFont(CFont*, char*, float, float, int, int);
+    void DrawNoShadowFont(CFont*, char*, float, float, int, int);
     void DrawSingWin(short);
     void DrawSingWinMess(int, int, int);
     int SingWinMessHeight();
     void GetSingWinSize(int, short*, short*, int);
     void SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*);
     void SetSingWinScl(float);
+    float GetSingWinScl();
     void SetSingWinInfo(int, int, int, int);
     void SingSetLetterAttachflg(int);
     int SingGetLetterAttachflg();
+    int GetSmithItem(int);
+    void GetRecipeMaterial(int, MaterialInfo*);
+    void GetRaceStr(int, char*);
+    void CalcSingLife();
     void LetterSetAttachItem(unsigned int, int);
     void LetterInit();
     void LetterInit0();
@@ -470,6 +497,7 @@ public:
     int LetterCtrlCur();
     void LetterLstBaseDraw(float);
     void DrawSingBar(int, int, int, float);
+    void SingLifeResetWait();
     void FavoInit();
     void FavoInit0();
     bool FavoOpen();
@@ -609,7 +637,9 @@ public:
     int m_singleMenuTextureLoadIndex;
     int m_singleMenuTextureLoadState;
     unsigned short m_battleStateFlag;
-    unsigned char m_pad866[0x8A0 - 0x866];
+    unsigned char m_pad866[0x878 - 0x866];
+    CShopMenu* m_shopMenu;
+    unsigned char m_pad87C[0x8A0 - 0x87C];
 };
 
 extern CMenuPcs MenuPcs;
@@ -618,6 +648,7 @@ extern int sMenuTextureInfoTable[];
 
 STATIC_ASSERT(sizeof(CMenuPcs::EffectInfo) == 0x524);
 STATIC_ASSERT(sizeof(CMenuPcs::EffectEntry) == 0x48);
+STATIC_ASSERT(sizeof(CMenuPcs::MaterialInfo) == 0x0C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_manaWaterTimerA) == 0x70);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectTimer) == 0x80);
 STATIC_ASSERT(offsetof(CMenuPcs, m_optionIndex) == 0x8E);
@@ -641,5 +672,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_tmpArtiList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
 
 #endif // _FFCC_P_MENU_H_

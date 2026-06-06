@@ -13,6 +13,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
+#include "ffcc/shopmenu.h"
 #include "ffcc/sound.h"
 extern "C" {
 extern u8 gSingMenuItemIconByType[];
@@ -38,13 +39,6 @@ extern char* gSingMenuAttrTableEs[];
 
 typedef signed short s16;
 typedef unsigned char u8;
-
-class CShopMenu
-{
-public:
-    void Calc();
-    void Draw();
-};
 
 struct SingleFadeEntry
 {
@@ -915,12 +909,12 @@ void CMenuPcs::createSingleMenu()
         if (m_singleMenuStageActive != 0) {
             *reinterpret_cast<int*>(self + 0xF0) = 0;
 
-            CFont* font = m_labelFont;
+            CFont* font = m_fonts[4];
             if (font != 0) {
                 if (font->DecRef() == 0) {
                     delete font;
                 }
-                m_labelFont = 0;
+                m_fonts[4] = 0;
             }
 
             m_singleMenuStageActive = 0;
@@ -946,7 +940,7 @@ void CMenuPcs::createSingleMenu()
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
             *reinterpret_cast<int*>(self + 0x848) = 0;
-            *reinterpret_cast<void**>(self + 0x878) = 0;
+            m_shopMenu = 0;
         }
     }
 }
@@ -969,12 +963,12 @@ void CMenuPcs::destroySingleMenu()
         gSingMenuAsyncFileHandle = 0;
     }
 
-    CFont* font = m_labelFont;
+    CFont* font = m_fonts[4];
     if (font != 0) {
         if (font->DecRef() == 0) {
             delete font;
         }
-        m_labelFont = 0;
+        m_fonts[4] = 0;
     }
 
     freeTexture(4, 1, 0x20, 0xD);
@@ -1171,11 +1165,11 @@ void CMenuPcs::drawSingleMenu()
 
         u8 menuType = SingleCaravanWork()->m_shopRequestState;
         if (menuType == 1) {
-            if (*reinterpret_cast<void**>(self + 0x878) != 0) {
-                reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
+            if (m_shopMenu != 0) {
+                m_shopMenu->Draw();
             }
-        } else if ((menuType == 2) && (*reinterpret_cast<void**>(self + 0x878) != 0)) {
-            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
+        } else if ((menuType == 2) && (m_shopMenu != 0)) {
+            m_shopMenu->Draw();
         }
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
@@ -1453,16 +1447,16 @@ post_texture_load:
 
     char menuKind = SingleCaravanWork()->m_shopRequestState;
     if (menuKind == 1) {
-        if (*reinterpret_cast<void**>(self + 0x878) == 0) {
+        if (m_shopMenu == 0) {
             CreateShopMenu();
         } else {
-            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
+            m_shopMenu->Calc();
         }
     } else if (menuKind == 2) {
-        if (*reinterpret_cast<void**>(self + 0x878) == 0) {
+        if (m_shopMenu == 0) {
             CreateSmithMenu();
         } else {
-            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
+            m_shopMenu->Calc();
         }
     }
 

@@ -1303,7 +1303,6 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;
@@ -1338,15 +1337,15 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
-	switch (worldState->m_menuMode) {
+	switch (m_wmWorldState->m_menuMode) {
 	case 0:
-		if (worldState->m_mainState <= 4) {
-			const short state = worldState->m_mainState;
+		if (m_wmWorldState->m_mainState <= 4) {
+			const short state = m_wmWorldState->m_mainState;
 			int frameStep = 0;
 			if (state == 0) {
-				frameStep = worldState->m_frameCounter - 10;
+				frameStep = m_wmWorldState->m_frameCounter - 10;
 			} else if (state < 1 || state > 3) {
-				frameStep = -worldState->m_frameCounter;
+				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWmFrame0Inline(this, frameStep);
 		}
@@ -1360,7 +1359,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	case 3:
 		if (m_singleCmakeMode == 0) {
-			if (worldState->m_modelFlagsInitialized == 0) {
+			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
 				unsigned char* const modelData = m_wm.m_charaModelData;
 				modelData[0x0C] = 1;
 				modelData[0x40] = 1;
@@ -1370,19 +1369,19 @@ void CMenuPcs::CalcDiaryMenu()
 				modelData[0x110] = 1;
 				modelData[0x144] = 1;
 				modelData[0x178] = 1;
-				worldState->m_modelFlagsInitialized = 1;
+				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
-			if (worldState->m_mainState <= 4) {
+			if (m_wmWorldState->m_mainState <= 4) {
 				CalcCharaSelect();
-				const short state = worldState->m_mainState;
+				const short state = m_wmWorldState->m_mainState;
 				int frameStep = 0;
 				if (state == 0) {
-					frameStep = worldState->m_frameCounter - 10;
+					frameStep = m_wmWorldState->m_frameCounter - 10;
 				} else if (state < 1 || state > 3) {
-					frameStep = -worldState->m_frameCounter;
+					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWmFrame0Inline(this, frameStep);
-				const short animState = worldState->m_mainState;
+				const short animState = m_wmWorldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();
 				}
@@ -1392,8 +1391,8 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		if (((worldState->m_mainState != 0) || bytes[0x12] != 0) &&
-		    worldState->m_mainState < 4) {
+		if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+		    m_wmWorldState->m_mainState < 4) {
 			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 				SetCrystalCageAttr();
 			}
@@ -3220,10 +3219,9 @@ void CMenuPcs::CalcTitleMenu()
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	WmWorldState* const worldState = m_wmWorldState;
 	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
@@ -3274,7 +3272,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		down = GetButtonDown(0);
 	}
 
-	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
+	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
 		return;
 	}
 
@@ -3711,7 +3709,6 @@ void CMenuPcs::DrawMainMenu()
 void CMenuPcs::DrawDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
 	if (handle != 0 && handle->m_model != 0) {
@@ -3754,17 +3751,17 @@ void CMenuPcs::DrawDiaryMenu()
 		DrawInit();
 	}
 
-	const short state = worldState->m_mainState;
+	const short state = m_wmWorldState->m_mainState;
 	if (state > 0 && state < 4) {
 		float alpha;
 		if (state == 1) {
 			alpha = static_cast<float>(DOUBLE_803314e8 *
-			                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+			                           (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
 			alpha = static_cast<float>(-(DOUBLE_803314e8 *
-			                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+			                             (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) -
 			                             DOUBLE_80331420));
 		}
 		DrawDiaryBase(0, alpha);
@@ -4165,10 +4162,9 @@ void CMenuPcs::DrawMCardMenu()
 void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
-	const short state = worldState->m_mainState;
-	const short step = worldState->m_frameCounter;
+	const short state = m_wmWorldState->m_mainState;
+	const short step = m_wmWorldState->m_frameCounter;
 	float frameAlpha;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
@@ -4225,7 +4221,7 @@ void CMenuPcs::DrawCMakeMenu()
 		DrawCharaName();
 		DrawCMLife();
 
-		if (worldState->m_menuMode == 3) {
+		if (m_wmWorldState->m_menuMode == 3) {
 			short winState = m_menuWindowInfo->state;
 			if (winState != 3) {
 				DrawMcWin(-1, 0);
@@ -4258,14 +4254,14 @@ void CMenuPcs::DrawCMakeMenu()
 		_GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)};
 		char* text = 0;
 		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
-		if (worldState->m_menuMode == 3) {
+		if (m_wmWorldState->m_menuMode == 3) {
 			char* textList[3];
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
 			textList[0] = lbl_80210750[languageIndex + 5];
 			textList[1] = lbl_80210750[languageIndex + 6];
 			textList[2] = lbl_80210750[languageIndex + 7];
 			text = textList[textIndex - (textIndex >> 31)];
-		} else if (worldState->m_menuMode == 8) {
+		} else if (m_wmWorldState->m_menuMode == 8) {
 			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
 				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
 					text = lbl_80210750[languageIndex + 10];
@@ -4285,23 +4281,23 @@ void CMenuPcs::DrawCMakeMenu()
 		}
 	}
 
-	if (worldState->m_mainState == 2) {
-		if (worldState->m_delay != 0) {
-			worldState->m_delay--;
-			if (worldState->m_delay < 1) {
-				worldState->m_mainState++;
-				worldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31 - (worldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
+	if (m_wmWorldState->m_mainState == 2) {
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+			if (m_wmWorldState->m_delay < 1) {
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				Sound.PlaySe(0x31 - (m_wmWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
 			}
 		}
 	} else {
-		worldState->m_frameCounter++;
-		if (worldState->m_frameCounter > 9) {
-			worldState->m_mainState++;
-			worldState->m_frameCounter = 0;
-			if (worldState->m_mainState > 4) {
-				worldState->m_changeRequest = worldState->m_nextMenuMode;
-				worldState->m_nextMenuMode = 0;
+		m_wmWorldState->m_frameCounter++;
+		if (m_wmWorldState->m_frameCounter > 9) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState > 4) {
+				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
 	}
@@ -7334,7 +7330,6 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned int selectedMask = 0;
 
@@ -7370,7 +7365,7 @@ void CMenuPcs::PCAnimCtrl()
 			const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
 			const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
 			if (isSelected == 0 &&
-			    worldState->m_menuMode != 8 &&
+			    m_wmWorldState->m_menuMode != 8 &&
 			    animState[0] == 0 && animState[2] > 2999) {
 				animState[0] = 4;
 				handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
@@ -7379,7 +7374,7 @@ void CMenuPcs::PCAnimCtrl()
 				animState[2] = 0;
 					continue;
 				}
-			if (isSelected == 0 || worldState->m_menuMode == 8) {
+			if (isSelected == 0 || m_wmWorldState->m_menuMode == 8) {
 				goto advanceFrame;
 			}
 			if (animState[0] == 1 && animState[2] > 11999) {

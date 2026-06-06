@@ -58,69 +58,69 @@ static const char s_CCharaPcs_GAME[] = "CCharaPcs GAME";
 static const char s_CCharaPcs_VIEWER[] = "CCharaPcs VIEWER";
 static const char s_CCharaPcs_PART[] = "CCharaPcs PART";
 
-static unsigned int s_charaTableDescCreate[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDestroy[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static unsigned int s_charaTableDescCalc[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDrawBefore[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDrawShadow[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDraw[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDrawOverlap[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawOverlap__9CCharaPcsFv)};
-static unsigned int s_charaTableDescCalcAfter[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static unsigned int s_charaTableDescCreateViewer[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDestroyViewer[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__9CCharaPcsFv)};
-static unsigned int s_charaTableDescCalcViewer[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__9CCharaPcsFv)};
-static unsigned int s_charaTableDescDrawViewer[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__9CCharaPcsFv)};
-static unsigned int s_charaTableDescViewerCalcAfter[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
-static unsigned int s_charaTableDescPartCreate[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
-static unsigned int s_charaTableDescPartDestroy[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
-static unsigned int s_charaTableDescPartCalc[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
-static unsigned int s_charaTableDescPartDraw[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
-static unsigned int s_charaTableDescPartCalcAfter[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDrawBefore = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDrawShadow = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDrawOverlap = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawOverlap__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescCreateViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDestroyViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescCalcViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescDrawViewer = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescViewerCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescPartCreate = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescPartDestroy = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescPartCalc = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescPartDraw = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CCharaPcsFv)};
+static CProcessTableCallback s_charaTableDescPartCalcAfter = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcAfter__9CCharaPcsFv)};
 
 CProcessTable PTR_s_CCharaPcs_GAME_[3] = {
     {
         const_cast<char*>(s_CCharaPcs_GAME),
         {
-            s_charaTableDescCreate[0], s_charaTableDescCreate[1], s_charaTableDescCreate[2],
-            s_charaTableDescDestroy[0], s_charaTableDescDestroy[1], s_charaTableDescDestroy[2],
-            s_charaTableDescCalc[0], s_charaTableDescCalc[1], s_charaTableDescCalc[2],
+            s_charaTableDescCreate.m_thisOffset, s_charaTableDescCreate.m_virtualOffset, s_charaTableDescCreate.m_function,
+            s_charaTableDescDestroy.m_thisOffset, s_charaTableDescDestroy.m_virtualOffset, s_charaTableDescDestroy.m_function,
+            s_charaTableDescCalc.m_thisOffset, s_charaTableDescCalc.m_virtualOffset, s_charaTableDescCalc.m_function,
             0x1F, 0,
-            s_charaTableDescDrawBefore[0], s_charaTableDescDrawBefore[1], s_charaTableDescDrawBefore[2],
+            s_charaTableDescDrawBefore.m_thisOffset, s_charaTableDescDrawBefore.m_virtualOffset, s_charaTableDescDrawBefore.m_function,
             0x36, 1,
-            s_charaTableDescDrawShadow[0], s_charaTableDescDrawShadow[1], s_charaTableDescDrawShadow[2],
+            s_charaTableDescDrawShadow.m_thisOffset, s_charaTableDescDrawShadow.m_virtualOffset, s_charaTableDescDrawShadow.m_function,
             0x30, 1,
-            s_charaTableDescDraw[0], s_charaTableDescDraw[1], s_charaTableDescDraw[2],
+            s_charaTableDescDraw.m_thisOffset, s_charaTableDescDraw.m_virtualOffset, s_charaTableDescDraw.m_function,
             0x3B, 1,
-            s_charaTableDescDrawOverlap[0], s_charaTableDescDrawOverlap[1], s_charaTableDescDrawOverlap[2],
+            s_charaTableDescDrawOverlap.m_thisOffset, s_charaTableDescDrawOverlap.m_virtualOffset, s_charaTableDescDrawOverlap.m_function,
             0x46, 1,
-            s_charaTableDescCalcAfter[0], s_charaTableDescCalcAfter[1], s_charaTableDescCalcAfter[2],
+            s_charaTableDescCalcAfter.m_thisOffset, s_charaTableDescCalcAfter.m_virtualOffset, s_charaTableDescCalcAfter.m_function,
             0x4D, 8,
         },
     },
     {
         const_cast<char*>(s_CCharaPcs_VIEWER),
         {
-            s_charaTableDescCreateViewer[0], s_charaTableDescCreateViewer[1], s_charaTableDescCreateViewer[2],
-            s_charaTableDescDestroyViewer[0], s_charaTableDescDestroyViewer[1], s_charaTableDescDestroyViewer[2],
-            s_charaTableDescCalcViewer[0], s_charaTableDescCalcViewer[1], s_charaTableDescCalcViewer[2],
+            s_charaTableDescCreateViewer.m_thisOffset, s_charaTableDescCreateViewer.m_virtualOffset, s_charaTableDescCreateViewer.m_function,
+            s_charaTableDescDestroyViewer.m_thisOffset, s_charaTableDescDestroyViewer.m_virtualOffset, s_charaTableDescDestroyViewer.m_function,
+            s_charaTableDescCalcViewer.m_thisOffset, s_charaTableDescCalcViewer.m_virtualOffset, s_charaTableDescCalcViewer.m_function,
             0x1F, 0,
-            s_charaTableDescDrawViewer[0], s_charaTableDescDrawViewer[1], s_charaTableDescDrawViewer[2],
+            s_charaTableDescDrawViewer.m_thisOffset, s_charaTableDescDrawViewer.m_virtualOffset, s_charaTableDescDrawViewer.m_function,
             0x3B, 1,
-            s_charaTableDescViewerCalcAfter[0], s_charaTableDescViewerCalcAfter[1],
-            s_charaTableDescViewerCalcAfter[2],
+            s_charaTableDescViewerCalcAfter.m_thisOffset, s_charaTableDescViewerCalcAfter.m_virtualOffset,
+            s_charaTableDescViewerCalcAfter.m_function,
             0x4D, 0,
         },
     },
     {
         const_cast<char*>(s_CCharaPcs_PART),
         {
-            s_charaTableDescPartCreate[0], s_charaTableDescPartCreate[1], s_charaTableDescPartCreate[2],
-            s_charaTableDescPartDestroy[0], s_charaTableDescPartDestroy[1], s_charaTableDescPartDestroy[2],
-            s_charaTableDescPartCalc[0], s_charaTableDescPartCalc[1], s_charaTableDescPartCalc[2],
+            s_charaTableDescPartCreate.m_thisOffset, s_charaTableDescPartCreate.m_virtualOffset, s_charaTableDescPartCreate.m_function,
+            s_charaTableDescPartDestroy.m_thisOffset, s_charaTableDescPartDestroy.m_virtualOffset, s_charaTableDescPartDestroy.m_function,
+            s_charaTableDescPartCalc.m_thisOffset, s_charaTableDescPartCalc.m_virtualOffset, s_charaTableDescPartCalc.m_function,
             0x1F, 0,
-            s_charaTableDescPartDraw[0], s_charaTableDescPartDraw[1], s_charaTableDescPartDraw[2],
+            s_charaTableDescPartDraw.m_thisOffset, s_charaTableDescPartDraw.m_virtualOffset, s_charaTableDescPartDraw.m_function,
             0x3B, 1,
-            s_charaTableDescPartCalcAfter[0], s_charaTableDescPartCalcAfter[1], s_charaTableDescPartCalcAfter[2],
+            s_charaTableDescPartCalcAfter.m_thisOffset, s_charaTableDescPartCalcAfter.m_virtualOffset, s_charaTableDescPartCalcAfter.m_function,
             0x4D, 0,
         },
     },

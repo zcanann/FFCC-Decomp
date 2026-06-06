@@ -501,6 +501,12 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             break;
         }
+        case CHUNK_TRNS: {
+            m_transRateX = chunkFile.GetF4();
+            m_transRateY = chunkFile.GetF4();
+            m_transRateZ = chunkFile.GetF4();
+            break;
+        }
         case CHUNK_SDST: {
             if (chunk.m_version == 2) {
                 m_enableFullScreenShadow = chunkFile.Get1();
@@ -519,12 +525,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 m_enableFullScreenShadow = chunkFile.Get1();
                 m_shadowTarget = -1;
             }
-            break;
-        }
-        case CHUNK_TRNS: {
-            m_transRateX = chunkFile.GetF4();
-            m_transRateY = chunkFile.GetF4();
-            m_transRateZ = chunkFile.GetF4();
             break;
         }
         case CHUNK_TFRM: {

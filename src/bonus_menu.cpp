@@ -320,6 +320,11 @@ static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
 }
 
+static inline BonusBoardEntryRaw* GetBonusBoardEntries(CMenuPcs* menu)
+{
+	return reinterpret_cast<BonusBoardEntryRaw*>(menu->m_bonusBoardPtr);
+}
+
 static inline void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
 	sprite->x = x;
@@ -992,14 +997,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 	}
 
-	int boardPtr = this->m_bonusBoardPtr;
-	int entryOffset = 0;
+	BonusBoardEntryRaw* boardEntries = GetBonusBoardEntries(this);
 	for (int i = 0; i < activePartyCount; i++) {
+		BonusBoardEntryRaw& entry = boardEntries[i];
 		BonusAnimSprite* sprite = &sprites[4 + i];
 		int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX)) - 320.0);
 		int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 240.0);
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+		entry.m_centerX = (short)centerX;
+		entry.m_centerY = (short)centerY;
 
 		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
 		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
@@ -1009,11 +1014,10 @@ void CMenuPcs::CalcSelectCloseAnim()
 		if ((double)screenY < 0.0) {
 			screenY = 0;
 		}
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = screenX;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = screenY;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
-		entryOffset += 0x50;
+		entry.m_screenX = screenX;
+		entry.m_screenY = screenY;
+		entry.m_screenWidth = 0x48;
+		entry.m_screenHeight = 0x58;
 	}
 
 	Mtx scaleMtx;
@@ -1671,14 +1675,14 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 	}
 
-	int boardPtr = this->m_bonusBoardPtr;
-	int entryOffset = 0;
+	BonusBoardEntryRaw* boardEntries = GetBonusBoardEntries(this);
 	for (int i = 0; i < activePartyCount; i++) {
+		BonusBoardEntryRaw& entry = boardEntries[i];
 		BonusAnimSprite* sprite = &sprites[4 + i];
 		int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX)) - 320.0);
 		int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 240.0);
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+		entry.m_centerX = (short)centerX;
+		entry.m_centerY = (short)centerY;
 
 		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
 		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
@@ -1688,11 +1692,10 @@ void CMenuPcs::CalcSelectOpenAnim()
 		if ((double)screenY < 0.0) {
 			screenY = 0;
 		}
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = screenX;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = screenY;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
-		entryOffset += 0x50;
+		entry.m_screenX = screenX;
+		entry.m_screenY = screenY;
+		entry.m_screenWidth = 0x48;
+		entry.m_screenHeight = 0x58;
 	}
 
 	Mtx scaleMtx;
@@ -2123,9 +2126,9 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 	}
 
-	int boardPtr = this->m_bonusBoardPtr;
-	int entryOffset = 0;
+	BonusBoardEntryRaw* boardEntries = GetBonusBoardEntries(this);
 	for (int i = 0; i < activePartyCount; i++) {
+		BonusBoardEntryRaw& entry = boardEntries[i];
 		BonusAnimSprite* sprite = &sprites[iconBase + i];
 		float x = (float)sprite->x + sprite->motionX;
 		float y = (float)sprite->y + sprite->motionY;
@@ -2133,19 +2136,18 @@ void CMenuPcs::CalcResultCloseAnim()
 		int screenY = (int)(y - 8.0f);
 		int centerX = (int)((double)(float)(24.0f + (float)sprite->w * 0.5f + x) - 320.0);
 		int centerY = (int)((double)(float)((float)sprite->h * 0.5f + y) - 224.0);
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
-		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+		entry.m_centerX = (short)centerX;
+		entry.m_centerY = (short)centerY;
 		if (screenX < 0) {
 			screenX = 0;
 		}
 		if (screenY < 0) {
 			screenY = 0;
 		}
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = screenX;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = screenY;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
-		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
-		entryOffset += 0x50;
+		entry.m_screenX = screenX;
+		entry.m_screenY = screenY;
+		entry.m_screenWidth = 0x48;
+		entry.m_screenHeight = 0x58;
 	}
 
 	Mtx scaleMtx;
@@ -2839,49 +2841,40 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
-		int boardPtr = this->m_bonusBoardPtr;
-		int entryOffset = 0;
+		BonusBoardEntryRaw* boardEntries = GetBonusBoardEntries(this);
 		for (int i = 0; i < activePartyCount; i++) {
+			BonusBoardEntryRaw& entry = boardEntries[i];
 			BonusAnimSprite* sprite = &sprites[iconBase + i];
-			int centerXOffset = entryOffset + 8;
-			int centerYOffset = entryOffset + 10;
-			int screenXOffset = entryOffset + 0x40;
-			int screenYOffset = entryOffset + 0x44;
-			int widthOffset = entryOffset + 0x48;
-			int heightOffset = entryOffset + 0x4C;
 			int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + 24.0f)) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
-			entryOffset += 0x50;
-			*reinterpret_cast<short*>(boardPtr + centerXOffset) = (short)centerX;
-			*reinterpret_cast<short*>(boardPtr + centerYOffset) = (short)centerY;
-			*reinterpret_cast<int*>(boardPtr + screenXOffset) = sprite->x + 0xC;
-			*reinterpret_cast<int*>(boardPtr + screenYOffset) = sprite->y - 8;
-			*reinterpret_cast<int*>(boardPtr + widthOffset) = 0x48;
-			*reinterpret_cast<int*>(boardPtr + heightOffset) = 0x58;
+			entry.m_centerX = (short)centerX;
+			entry.m_centerY = (short)centerY;
+			entry.m_screenX = sprite->x + 0xC;
+			entry.m_screenY = sprite->y - 8;
+			entry.m_screenWidth = 0x48;
+			entry.m_screenHeight = 0x58;
 		}
 
-		entryOffset = activePartyCount * 0x50;
 		for (int i = 0; i < activePartyCount; i++) {
+			BonusBoardEntryRaw& entry = boardEntries[activePartyCount + i];
 			BonusAnimSprite* sprite = &sprites[countTop + i];
 			int extent = sprite->w * 3 + 0x20;
 			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = sprite->x - 0x10;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = sprite->y - 0x10;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = extent;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = extent;
-			entryOffset += 0x50;
+			entry.m_centerX = (short)centerX;
+			entry.m_centerY = (short)centerY;
+			entry.m_screenX = sprite->x - 0x10;
+			entry.m_screenY = sprite->y - 0x10;
+			entry.m_screenWidth = extent;
+			entry.m_screenHeight = extent;
 		}
 
-		entryOffset = activePartyCount * 0xA0;
 		for (int i = 0; i < activePartyCount; i++) {
+			BonusBoardEntryRaw& entry = boardEntries[activePartyCount * 2 + i];
 			BonusAnimSprite* sprite = &sprites[frameBase + i];
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = 0;
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
-			entryOffset += 0x50;
+			entry.m_centerX = 0;
+			entry.m_centerY = (short)centerY;
 		}
 
 		for (int i = 0; i < 0x18; i++) {

@@ -7400,6 +7400,7 @@ void CMenuPcs::DrawChara()
 		if (handle->m_charaKind == 3) {
 			DrawInit();
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+			SetProjection(i + 0x20);
 			SetTexture(static_cast<CMenuPcs::TEX>(0x32));
 			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha = FLOAT_803313e8;

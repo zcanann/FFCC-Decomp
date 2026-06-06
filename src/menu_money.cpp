@@ -65,7 +65,7 @@ inline void CMenuPcs::MoneySetPlace(int row)
 
 STATIC_ASSERT(offsetof(CMenuPcs, m_fonts) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
+STATIC_ASSERT(offsetof(CMenuPcs, m_menuWindowInfo) == 0x848);
 STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(MoneyMenuState, messageMask) == 0x9);
 STATIC_ASSERT(offsetof(MoneyMenuState, initialized) == 0xB);
@@ -242,7 +242,7 @@ int CMenuPcs::MoneyCtrlCur()
 					}
 					GetSingWinSize(1, &winW, &winH, 0);
 					SetSingWinInfo(0xF0, 0xD0, winW, winH);
-					this->m_singWindowInfo[5] = 0;
+					this->m_menuWindowInfo->state = 0;
 					state->optionState = 0;
 					state->mode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -288,12 +288,12 @@ int CMenuPcs::MoneyCtrlCur()
 						MoneySetPlace(0);
 						MoneySetPlace(1);
 					}
-					this->m_singWindowInfo[5] = 2;
+					this->m_menuWindowInfo->state = 2;
 					state->optionState = state->optionState + 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				}
 			} else if ((press & 0x200) != 0) {
-				this->m_singWindowInfo[5] = 2;
+				this->m_menuWindowInfo->state = 2;
 				state->optionState = state->optionState + 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
@@ -413,12 +413,12 @@ void CMenuPcs::MoneyDraw()
 	}
 
 	if ((mode != 0) && (this->m_moneyState->optionState == 1)) {
-		s16* singWindow = this->m_singWindowInfo;
-		float cursorY = (float)(singWindow[1] + 0x20);
+		MenuWindowInfo* window = this->m_menuWindowInfo;
+		float cursorY = (float)(window->y + 0x20);
 		cursorY += (float)(this->m_moneyState->selections[1] * SingWinMessHeight());
 
 		int anim = (int)System.m_frameCounter % 8;
-		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, 1.0f);
+		DrawCursor((int)((float)window->x + (float)anim), (int)cursorY, 1.0f);
 	}
 }
 
@@ -501,11 +501,11 @@ int CMenuPcs::MoneyCtrl()
 	if ((mode == 0) || ((mode != 0) && (state->optionState == 1))) {
 		result = MoneyCtrlCur();
 	} else if ((mode == 1) && ((int)state->optionState == 0)) {
-		if (this->m_singWindowInfo[5] == 1) {
+		if (this->m_menuWindowInfo->state == 1) {
 			result = 0;
 			state->optionState = state->optionState + 1;
 		}
-	} else if (((mode == 1) && (state->optionState == 2)) && (this->m_singWindowInfo[5] == 3)) {
+	} else if (((mode == 1) && (state->optionState == 2)) && (this->m_menuWindowInfo->state == 3)) {
 		result = 0;
 		state->optionState = 0;
 		this->m_moneyState->mode = 0;

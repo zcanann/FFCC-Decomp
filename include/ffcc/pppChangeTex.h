@@ -2,11 +2,39 @@
 #define _FFCC_PPPCHANGETEX_H_
 
 #include "ffcc/pppChangeTexCommon.h"
+#include "ffcc/pppPart.h"
+
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 struct _pppCtrlTable;
 struct _pppPObject;
+class CGObject;
+class CTexture;
 
 typedef _pppPObject pppChangeTex;
+
+struct ChangeTexWork {
+    float m_value0;
+    float m_value1;
+    float m_value2;
+    GXColor** m_meshColorArrays;
+    ChangeTexDisplayListCopy*** m_displayListArrays;
+    int _pad14;
+    CGObject* m_charaObj;
+    CTexture* m_texture;
+    int _pad20;
+    void* m_context;
+    Vec m_bboxMin;
+    int _pad34;
+    Vec m_bboxMax;
+    float m_cachedValue;
+};
+
+struct ChangeTexColorBlock {
+    u8 m_pad0[8];
+    pppCVECTOR m_color;
+};
 
 #ifdef __cplusplus
 extern "C" {

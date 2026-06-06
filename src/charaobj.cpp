@@ -28,10 +28,8 @@ extern "C" char lbl_801DC8D8[];
 extern "C" char lbl_801DC8EC[];
 extern "C" char lbl_801DC940[];
 
-extern "C" {
-Vec* l_pHitCross = 0;
-int l_idxAttackCol = 0;
-}
+static Vec* l_pHitCross = 0;
+static int l_idxAttackCol = 0;
 int gCGCharaObjCreateSerial = 0;
 char gCGCharaObjCreateSerialInit = 0;
 extern "C" {

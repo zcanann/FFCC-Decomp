@@ -90,7 +90,7 @@ public:
     int SetSe3DGroup(int, int);
     void StopSe3DGroup(int);
     void StopSe3D(int);
-    _pppMngSt* FadeOutSe3D(int, int);
+    void FadeOutSe3D(int, int);
     int ChangeSe3DPos(int, Vec*);
     void ChangeSe3DPitch(int, int, int);
     void Clear3DLine(int);

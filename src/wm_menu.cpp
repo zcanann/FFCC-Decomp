@@ -539,7 +539,7 @@ void CMenuPcs::WmInit()
 	float initValue = FLOAT_803313dc;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
+	m_bonusBoardPtr = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
@@ -716,11 +716,10 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774)[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	reinterpret_cast<void**>(bytes + 0x814)[0] =
-	    operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214);
-	memset(reinterpret_cast<void**>(bytes + 0x814)[0], 0, 0xC80);
+	m_bonusBoardPtr = reinterpret_cast<int>(operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214));
+	memset(reinterpret_cast<void*>(m_bonusBoardPtr), 0, 0xC80);
 	for (int i = 0; i < 0x28; i++) {
-		unsigned char* const entry = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]) + i * 0x50;
+		unsigned char* const entry = reinterpret_cast<unsigned char*>(m_bonusBoardPtr) + i * 0x50;
 		*reinterpret_cast<short*>(entry + 0x0C) = 0;
 		*reinterpret_cast<short*>(entry + 0x0E) = 0;
 		*reinterpret_cast<short*>(entry + 0x10) = 0x280;
@@ -1054,9 +1053,9 @@ void CMenuPcs::destroyWorld()
 		}
 	}
 
-	if (reinterpret_cast<void**>(bytes + 0x814)[0] != 0) {
-		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]);
-		reinterpret_cast<void**>(bytes + 0x814)[0] = 0;
+	if (m_bonusBoardPtr != 0) {
+		delete[] reinterpret_cast<unsigned char*>(m_bonusBoardPtr);
+		m_bonusBoardPtr = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x818)[0] != 0) {
 		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x818)[0]);

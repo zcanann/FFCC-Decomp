@@ -24,13 +24,21 @@ struct GbaQueueFlagView
 {
 	unsigned char _pad0[0x2AFC];
 	unsigned char m_letterDatFlg;
-	unsigned char _pad2AFD[0x18D];
+	unsigned char _pad2AFD[0x18B];
+	unsigned char m_makeMapObjFlg;
+	unsigned char _pad2C89;
 	unsigned char m_compatibilityFlg[4];
 	unsigned char _pad2C8E[0xAC];
 	unsigned char m_sellFlg;
 	unsigned char m_buyFlg;
 	unsigned char m_mkSmithFlg;
 };
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_letterDatFlg) == 0x2AFC);
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_makeMapObjFlg) == 0x2C88);
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_compatibilityFlg) == 0x2C8A);
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_sellFlg) == 0x2D3A);
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_buyFlg) == 0x2D3B);
+STATIC_ASSERT(offsetof(GbaQueueFlagView, m_mkSmithFlg) == 0x2D3C);
 
 struct GbaQueuePlayerDataView
 {
@@ -273,8 +281,9 @@ void GbaQueue::Init()
 	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
 	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
 
-	obj[0x2AFC] = 0;
-	obj[0x2C88] = 0;
+	GbaQueueFlagView* flags = GetFlagView(this);
+	flags->m_letterDatFlg = 0;
+	flags->m_makeMapObjFlg = 0;
 	m_letterFlags = 0;
 	obj[0x2D38] = 0;
 	obj[0x2D39] = 0;
@@ -371,7 +380,7 @@ void GbaQueue::LoadAll()
 	prevMenuStageMode = static_cast<unsigned char>(m_singleMode);
 	m_singleMode = static_cast<char>(Game.m_gameWork.m_menuStageMode != 0);
 	if (prevMenuStageMode != static_cast<unsigned char>(m_singleMode)) {
-		obj[0x2C88] = 0xF;
+		GetFlagView(this)->m_makeMapObjFlg = 0xF;
 	}
 
 	spModeBits = static_cast<unsigned char>(Game.m_gameWork.m_spModeFlags[0] != 0);
@@ -1140,7 +1149,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     obj[0x2D39] = 0;
     m_startBonusFlags = 0;
     *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
-    obj[0x2C88] = 0;
+    GetFlagView(this)->m_makeMapObjFlg = 0;
     memset(GetMapObjWorkView(this), 0, sizeof(GbaQueueMapObjWorkView));
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
@@ -2788,7 +2797,7 @@ int GbaQueue::GetMapObj(unsigned char* outData)
 		workEntry++;
 	}
 
-	reinterpret_cast<char*>(this)[0x2C88] = 1;
+	GetFlagView(this)->m_makeMapObjFlg = 1;
 	return outSize;
 }
 

@@ -8278,7 +8278,7 @@ void CMenuPcs::WMChgMenu()
 	m_menuWindowInfo->state = 3;
 	m_textureLocIndex = 0;
 
-	int frame = *reinterpret_cast<int*>(bytes + 0x820);
+	int frame = reinterpret_cast<int>(m_wm.m_frameInfo);
 	*reinterpret_cast<short*>(frame + 4) = 0x10;
 	*reinterpret_cast<short*>(frame + 6) = 0x10;
 	*reinterpret_cast<short*>(frame + 8) = 0xE8;
@@ -8289,7 +8289,6 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<float*>(frame + 0x18) = fVar5;
 	*reinterpret_cast<int*>(frame + 0x1C) = 0;
 
-	frame = *reinterpret_cast<int*>(bytes + 0x820);
 	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
 	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
 	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
@@ -8300,9 +8299,8 @@ void CMenuPcs::WMChgMenu()
 	*reinterpret_cast<int*>(frame + 0x34) = *reinterpret_cast<int*>(frame + 0x18);
 	*reinterpret_cast<int*>(frame + 0x38) = *reinterpret_cast<int*>(frame + 0x1C);
 
-	frame = *reinterpret_cast<int*>(bytes + 0x820);
 	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x820) + 0x38) = 8;
+	*reinterpret_cast<int*>(frame + 0x38) = 8;
 
 	if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
 	    && *reinterpret_cast<short*>(bytes + 0x86A) >= 0

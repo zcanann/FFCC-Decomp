@@ -1690,11 +1690,11 @@ void CMenuPcs::GetCmdItem()
  */
 void CMenuPcs::ChkCmdActive(int itemIndex)
 {
-	s16* menuState = GetCmdState(this);
-	*reinterpret_cast<u8*>(menuState + 4) = 0;
+	CmdState* const cmd = GetCmdStateView(this);
+	cmd->commandResult = 0;
 
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	const s16 selected = menuState[0x13];
+	const s16 selected = cmd->selected;
 	int active = 0;
 
 	if (itemIndex == 0) {
@@ -1710,7 +1710,7 @@ void CMenuPcs::ChkCmdActive(int itemIndex)
 		}
 	}
 
-	*reinterpret_cast<u8*>(menuState + 4) = static_cast<u8>(active != 0);
+	cmd->commandResult = static_cast<s8>(active != 0);
 }
 
 /*
@@ -1722,7 +1722,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s16* const cmd = GetCmdState(this);
+	CmdState* const cmd = GetCmdStateView(this);
 
 	int candidates[10];
 	int itemKinds[11];
@@ -1742,7 +1742,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	const s16 selectedState = caravan->m_commandListExtra[selected];
 	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState);
 
-	if ((cmd[0x18] == 1) && (cmd[0x09] == 2)) {
+	if ((cmd->mode == 1) && (cmd->phase == 2)) {
 		if (selectedState < 0) {
 			selected--;
 		}

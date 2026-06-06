@@ -2,7 +2,9 @@
 #define _FFCC_CFLAT_RUNTIME2_H_
 
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/cflat_data.h"
 #include "ffcc/gobject.h"
+#include "ffcc/line.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 
@@ -163,7 +165,17 @@ private:
 	virtual int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	virtual CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	virtual void onSetSystemVal(int, CFlatRuntime::CStack*, int);
+
+	u8 m_pad_129C_16CC[0x430];
+	CParticleWork m_particleWork;
+	u8 m_pad_1738_1BDC[0x4A4];
+	CLine<64> m_debugLines[16];
+	u8 m_pad_CD1C_CF20[0x204];
+	CFlatData m_flatData;
+	u8 m_pad_E3F4_10440[0x204C];
 };
+
+STATIC_ASSERT(sizeof(CFlatRuntime2) == 0x10440);
 
 extern CFlatRuntime2& gCFlatRuntime2;
 extern CFlatRuntime2 CFlat;

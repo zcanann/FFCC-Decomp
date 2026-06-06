@@ -804,16 +804,14 @@ void CMenuPcs::EquipCtrl()
 		}
 
 		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
-		index = 0;
-		if (static_cast<int>(equipCount - 1) >= 0) {
-			entry = &list->entries[equipCount - 1];
-			do {
-				entry->startFrame = index;
-				entry->duration = 3;
-				index = index + 1;
-				entry--;
-				equipCount = equipCount - 1;
-			} while (equipCount != 0);
+		if (equipCount == 0) {
+			return;
+		}
+
+		for (int i = static_cast<int>(equipCount) - 1, index = 0; i >= 0; i--, index++) {
+			entry = &list->entries[i];
+			entry->startFrame = index;
+			entry->duration = 3;
 		}
 	}
 }

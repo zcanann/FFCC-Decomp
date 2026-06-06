@@ -7785,19 +7785,18 @@ void CMenuPcs::CalcCharaSelect()
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
-			if ((padRepeat[i] & 0x0002) != 0) {
-				if (entry.m_confirmed == 0) {
-					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
-					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
-				}
-			}
 			if ((padRepeat[i] & 0x0001) != 0) {
 				if (entry.m_confirmed == 0) {
 					currentSlot = (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) ? currentSlot - 1
 					                                                             : currentSlot + 3;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				}
+			} else if ((padRepeat[i] & 0x0002) != 0) {
+				if (entry.m_confirmed == 0) {
+					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
+					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				} else {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);

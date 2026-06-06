@@ -12038,44 +12038,7 @@ int McCtrl::ChkEmpty(int param_2)
 
 	int state = m_state;
 
-	if (state == 2)
-	{
-		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
-
-		if (m_lastResult < 0)
-		{
-			if (m_lastResult == -4)
-			{
-				if (param_2 != 0)
-				{
-					MemoryCardMan.McUnmount(m_cardChannel);
-					m_state = -1;
-					return -6;
-				}
-
-				m_state = 3;
-			}
-			else
-			{
-				if (m_lastResult == -5)
-				{
-					MemoryCardMan.McUnmount(m_cardChannel);
-					m_state = -1;
-					return -5;
-				}
-
-				MemoryCardMan.McUnmount(m_cardChannel);
-				m_state = -1;
-			}
-		}
-		else
-		{
-			MemoryCardMan.McClose();
-			MemoryCardMan.McUnmount(m_cardChannel);
-			m_state = 4;
-		}
-	}
-	else if (state < 2)
+	if (state < 2)
 	{
 		if (state == 0)
 		{
@@ -12124,6 +12087,43 @@ int McCtrl::ChkEmpty(int param_2)
 			}
 		}
 	}
+	else if (state == 2)
+	{
+		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
+
+		if (m_lastResult < 0)
+		{
+			if (m_lastResult == -4)
+			{
+				if (param_2 != 0)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -6;
+				}
+
+				m_state = 3;
+			}
+			else
+			{
+				if (m_lastResult == -5)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -5;
+				}
+
+				MemoryCardMan.McUnmount(m_cardChannel);
+				m_state = -1;
+			}
+		}
+		else
+		{
+			MemoryCardMan.McClose();
+			MemoryCardMan.McUnmount(m_cardChannel);
+			m_state = 4;
+		}
+	}
 	else if (state != 4 && state < 4)
 	{
 		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
@@ -12157,18 +12157,20 @@ int McCtrl::ChkEmpty(int param_2)
 		}
 	}
 
+	int result;
 	if (m_state == -1)
 	{
-		return -1;
+		result = -1;
 	}
 	else if (m_state == 4)
 	{
-		return 1;
+		result = 1;
 	}
 	else
 	{
-		return 0;
+		result = 0;
 	}
+	return result;
 }
 
 /*

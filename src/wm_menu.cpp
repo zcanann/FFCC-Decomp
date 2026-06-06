@@ -6710,9 +6710,9 @@ void CMenuPcs::DrawWMFrame()
 			GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			SetTexture((TEX)0x21);
-			float yearY = FLOAT_803316F4;
-			if (language == 5) {
-				yearY = FLOAT_803316F8;
+			float yearY = FLOAT_803316F8;
+			if (language != 5) {
+				yearY = FLOAT_803316F4;
 			}
 			DrawRect(0xFFFFFFFF, 
 				FLOAT_803316F0, yearY,

@@ -205,13 +205,21 @@ private:
     unsigned char m_compatibilityFlg[4]; // 0x2C8A
     unsigned char _pad2C8E[0x24];     // 0x2C8E
     GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
-    unsigned char _pad2D32[0x6];      // 0x2D32
+    unsigned char m_radarType[4];     // 0x2D32
+    unsigned char m_artifactFlags;    // 0x2D36
+    unsigned char m_chgUseItemFlags;  // 0x2D37
     unsigned char m_shopFlags;        // 0x2D38
     unsigned char m_shopStatusFlags;  // 0x2D39
     unsigned char m_sellFlg;          // 0x2D3A
     unsigned char m_buyFlg;           // 0x2D3B
     unsigned char m_mkSmithFlg;       // 0x2D3C
-    unsigned char _pad2D3D[0x7];      // 0x2D3D
+    unsigned char _pad2D3D;           // 0x2D3D
+    unsigned char m_strengthFlags;    // 0x2D3E
+    unsigned char m_artiDatFlags;     // 0x2D3F
+    unsigned char m_radarTypeFlags;   // 0x2D40
+    unsigned char m_radarMode;        // 0x2D41
+    unsigned char m_chgRadarMode;     // 0x2D42
+    unsigned char _pad2D43;           // 0x2D43
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54
     unsigned char m_chgScouFlags;     // 0x2D55

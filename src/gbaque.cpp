@@ -244,16 +244,16 @@ void GbaQueue::Init()
 	m_buyFlg = 0;
 	m_mkSmithFlg = 0;
 	obj[0x2D3D] = 0;
-	obj[0x2D37] = 0;
+	m_chgUseItemFlags = 0;
 	obj[0x2CB1] = 0;
 	obj[0x2CB0] = 0;
-	obj[0x2D36] = 0;
-	obj[0x2D3E] = 0;
-	obj[0x2D3F] = 0;
+	m_artifactFlags = 0;
+	m_strengthFlags = 0;
+	m_artiDatFlags = 0;
 	obj[0x2AF4] = 0;
-	obj[0x2D40] = 0;
-	obj[0x2D41] = 0xF;
-	obj[0x2D42] = 0;
+	m_radarTypeFlags = 0;
+	m_radarMode = 0xF;
+	m_chgRadarMode = 0;
 	m_chgHitFlags = 0;
 	m_chgScouFlags = 0;
 	m_singleMode = 0;
@@ -272,22 +272,22 @@ void GbaQueue::Init()
 	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
 	obj[0x2CAC] = 0;
 	m_compatibilityFlg[0] = 0;
-	obj[0x2D32] = 1;
+	m_radarType[0] = 1;
 	obj[0x2C97] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA0) = 0;
 	obj[0x2CAD] = 0;
 	m_compatibilityFlg[1] = 0;
-	obj[0x2D33] = 1;
+	m_radarType[1] = 1;
 	obj[0x2C98] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA4) = 0;
 	obj[0x2CAE] = 0;
 	m_compatibilityFlg[2] = 0;
-	obj[0x2D34] = 1;
+	m_radarType[2] = 1;
 	obj[0x2C99] = static_cast<char>(0xFF);
 	*reinterpret_cast<unsigned int*>(obj + 0x2CA8) = 0;
 	obj[0x2CAF] = 0;
 	m_compatibilityFlg[3] = 0;
-	obj[0x2D35] = 1;
+	m_radarType[3] = 1;
 }
 
 /*
@@ -1107,7 +1107,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
         obj[0x44C] = 0xF;
-        obj[0x2D37] = 0xF;
+        m_chgUseItemFlags = 0xF;
     }
 
     *reinterpret_cast<int*>(obj + 0x444) = stageId;
@@ -1128,7 +1128,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (loadWaitIndex < 4);
 
         obj[0x44C] = 0xF;
-        obj[0x2D37] = 0xF;
+        m_chgUseItemFlags = 0xF;
 
         int loadSignalIndex = 0;
         do {
@@ -1236,26 +1236,26 @@ void GbaQueue::SetRadarType()
 		validMemberCount++;
 	}
 
-	obj[0x2D32] = 1;
+	m_radarType[0] = 1;
 	activeMask = 0;
 	if ((Game.m_scriptFoodBase[0] != 0) &&
 	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->m_shopState != 0)) {
 		activeMask = 1;
 	}
 
-	obj[0x2D33] = 1;
+	m_radarType[1] = 1;
 	if ((Game.m_scriptFoodBase[1] != 0) &&
 	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[1])->m_shopState != 0)) {
 		activeMask |= 2;
 	}
 
-	obj[0x2D34] = 1;
+	m_radarType[2] = 1;
 	if ((Game.m_scriptFoodBase[2] != 0) &&
 	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[2])->m_shopState != 0)) {
 		activeMask |= 4;
 	}
 
-	obj[0x2D35] = 1;
+	m_radarType[3] = 1;
 	if ((Game.m_scriptFoodBase[3] != 0) &&
 	    (reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[3])->m_shopState != 0)) {
 		activeMask |= 8;
@@ -1276,7 +1276,7 @@ void GbaQueue::SetRadarType()
 			}
 
 			OSWaitSemaphore(accessSemaphores + slot);
-			obj[0x2D32 + slot] = static_cast<char>(assignedType);
+			m_radarType[slot] = static_cast<unsigned char>(assignedType);
 			OSSignalSemaphore(accessSemaphores + slot);
 
 			activeMask &= static_cast<unsigned int>(~(1 << slot));
@@ -1287,28 +1287,28 @@ void GbaQueue::SetRadarType()
 
 	if (m_singleMode != 0) {
 		const unsigned char radarType = Game.m_gameWork.m_mogScoreRadarType;
-		obj[0x2D32] = static_cast<char>(radarType);
-		obj[0x2D33] = static_cast<char>(radarType);
-		obj[0x2D34] = static_cast<char>(radarType);
-		obj[0x2D35] = static_cast<char>(radarType);
+		m_radarType[0] = radarType;
+		m_radarType[1] = radarType;
+		m_radarType[2] = radarType;
+		m_radarType[3] = radarType;
 	}
 
 	obj[0x2D30] = 1;
 	if (Game.m_gameWork.m_bossArtifactStageIndex > 0xE) {
-		obj[0x2D32] = 0;
-		obj[0x2D33] = 0;
-		obj[0x2D34] = 0;
-		obj[0x2D35] = 0;
+		m_radarType[0] = 0;
+		m_radarType[1] = 0;
+		m_radarType[2] = 0;
+		m_radarType[3] = 0;
 	}
 
 	for (i = 0; i < 4; i++) {
 		const unsigned char mask = static_cast<unsigned char>(1 << i);
-		const unsigned char oldMode = static_cast<unsigned char>(obj[0x2D41]);
+		const unsigned char oldMode = m_radarMode;
 
 		OSWaitSemaphore(accessSemaphores + i);
-		obj[0x2D41] = static_cast<char>((oldMode & ~mask) | mask);
-		if (oldMode != static_cast<unsigned char>(obj[0x2D41])) {
-			obj[0x2D42] = static_cast<char>(static_cast<unsigned char>(obj[0x2D42]) | mask);
+		m_radarMode = static_cast<unsigned char>((oldMode & ~mask) | mask);
+		if (oldMode != m_radarMode) {
+			m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode | mask);
 		}
 		OSSignalSemaphore(accessSemaphores + i);
 	}
@@ -1543,9 +1543,9 @@ void GbaQueue::LoadPlayerStat()
 
 		if (obj[oldBase + 0xD3] != obj[newBase + 0xD3]) {
 			const int shift = i << 1;
-			obj[0x2D41] = static_cast<char>(obj[0x2D41] | (1 << shift));
+			m_radarMode = static_cast<unsigned char>(m_radarMode | (1 << shift));
 			if ((static_cast<int>(obj[newBase + 0xD3]) - static_cast<int>(obj[oldBase + 0xD3])) != 1) {
-				obj[0x2D41] = static_cast<char>(obj[0x2D41] | (2 << shift));
+				m_radarMode = static_cast<unsigned char>(m_radarMode | (2 << shift));
 			}
 		}
 	}
@@ -1823,7 +1823,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
     prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
-    radarMode = obj[channel + 0x2D32];
+    radarMode = m_radarType[channel];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
         *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
@@ -1931,7 +1931,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 			localEntry[0] = 0;
 		}
 
-		if (localEntry[2] == 0 || obj[channel + 0x2D32] != 3) {
+		if (localEntry[2] == 0 || m_radarType[channel] != 3) {
 			localEntry[0] = 0;
 		}
 
@@ -4162,11 +4162,10 @@ unsigned char GbaQueue::GetBonus(int channel)
  */
 unsigned int GbaQueue::GetArtifactFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<int>(static_cast<char>(obj[0x2D36])) & (1 << channel);
+	value = static_cast<int>(static_cast<char>(m_artifactFlags)) & (1 << channel);
 	value = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
@@ -4183,9 +4182,8 @@ unsigned int GbaQueue::GetArtifactFlg(int channel)
  */
 void GbaQueue::ClrArtifactFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D36] = static_cast<char>(static_cast<unsigned char>(obj[0x2D36]) & ~(1U << channel));
+	m_artifactFlags = static_cast<unsigned char>(m_artifactFlags & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -4237,12 +4235,11 @@ int GbaQueue::GetUseItemFlg(int channel)
  */
 unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	int value;
 	unsigned int result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<int>(static_cast<char>(obj[0x2D37])) & (1 << channel);
+	value = static_cast<int>(static_cast<char>(m_chgUseItemFlags)) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	result = static_cast<unsigned int>(-result | result) >> 31;
@@ -4256,9 +4253,8 @@ unsigned int GbaQueue::GetChgUseItemFlg(int channel)
  */
 void GbaQueue::ClrChgUseItemFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D37] = static_cast<char>(static_cast<unsigned char>(obj[0x2D37]) & ~(1U << channel));
+	m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -4269,9 +4265,8 @@ void GbaQueue::ClrChgUseItemFlg(int channel)
  */
 void GbaQueue::SetChgUseItemFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D37] = static_cast<char>(static_cast<unsigned char>(obj[0x2D37]) | (1U << channel));
+	m_chgUseItemFlags = static_cast<unsigned char>(m_chgUseItemFlags | (1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -4282,11 +4277,10 @@ void GbaQueue::SetChgUseItemFlg(int channel)
  */
 unsigned int GbaQueue::GetStrengthFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	int value;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<int>(static_cast<char>(obj[0x2D3E])) & (1 << channel);
+	value = static_cast<int>(static_cast<char>(m_strengthFlags)) & (1 << channel);
 	value = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	return static_cast<unsigned int>(value);
@@ -4299,9 +4293,8 @@ unsigned int GbaQueue::GetStrengthFlg(int channel)
  */
 void GbaQueue::ClrStrengthFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D3E] = static_cast<char>(static_cast<unsigned char>(obj[0x2D3E]) & ~(1U << channel));
+	m_strengthFlags = static_cast<unsigned char>(m_strengthFlags & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -4332,12 +4325,11 @@ void GbaQueue::GetStrengthData(int channel, unsigned char* strengthData)
  */
 unsigned int GbaQueue::GetArtiDatFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	int value;
 	unsigned int result;
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	value = static_cast<int>(static_cast<char>(obj[0x2D3F])) & (1 << channel);
+	value = static_cast<int>(static_cast<char>(m_artiDatFlags)) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
 	result = static_cast<unsigned int>(-result | result) >> 31;
@@ -4351,9 +4343,8 @@ unsigned int GbaQueue::GetArtiDatFlg(int channel)
  */
 void GbaQueue::ClrArtiDatFlg(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D3F] = static_cast<char>(static_cast<unsigned char>(obj[0x2D3F]) & ~(1U << channel));
+	m_artiDatFlags = static_cast<unsigned char>(m_artiDatFlags & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 	Joybus.SetLetterSize(channel, 0);
 }
@@ -4402,8 +4393,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	delete[] agbStringScratch;
 	delete[] itemNameScratch;
 
-	reinterpret_cast<char*>(this)[0x2D3F] =
-		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D3F]) | (1 << channel));
+	m_artiDatFlags = static_cast<unsigned char>(m_artiDatFlags | (1 << channel));
 	Joybus.SetLetterSize(channel, 0xC);
 	return 0xC;
 }
@@ -4445,12 +4435,11 @@ int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
  */
 char GbaQueue::GetRadarType(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * 0xC);
+	OSSemaphore* semaphore = accessSemaphores + channel;
 	int radarType;
 
 	OSWaitSemaphore(semaphore);
-	radarType = obj[channel + 0x2D32];
+	radarType = m_radarType[channel];
 	OSSignalSemaphore(semaphore);
 
 	return static_cast<signed char>(radarType);
@@ -4467,7 +4456,7 @@ char GbaQueue::GetRadarType(int channel)
  */
 void GbaQueue::ClrRadarTypeFlg()
 {
-	*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x2D40) = 0;
+	m_radarTypeFlags = 0;
 }
 
 /*
@@ -4477,9 +4466,8 @@ void GbaQueue::ClrRadarTypeFlg()
  */
 unsigned int GbaQueue::GetRadarMode(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	int radarMode = obj[0x2D41];
+	int radarMode = m_radarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
 	unsigned int value = radarMode & (1 << channel);
 	return (-value | value) >> 31;
@@ -4496,16 +4484,14 @@ unsigned int GbaQueue::GetRadarMode(int channel)
  */
 void GbaQueue::SetRadarMode(int channel, int mode)
 {
-	char* obj = reinterpret_cast<char*>(this);
-
 	OSWaitSemaphore(accessSemaphores + channel);
-	int radarMode = obj[0x2D41];
+	int radarMode = m_radarMode;
 	int mask = 1 << channel;
 	int newRadarMode = radarMode & ~mask;
 	newRadarMode |= (mode & 1) << channel;
-	obj[0x2D41] = newRadarMode;
-	if (radarMode != obj[0x2D41]) {
-		obj[0x2D42] = obj[0x2D42] | mask;
+	m_radarMode = static_cast<unsigned char>(newRadarMode);
+	if (radarMode != m_radarMode) {
+		m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode | mask);
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 }
@@ -4517,9 +4503,8 @@ void GbaQueue::SetRadarMode(int channel, int mode)
  */
 unsigned int GbaQueue::GetChgRadarMode(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	int radarMode = obj[0x2D42];
+	int radarMode = m_chgRadarMode;
 	OSSignalSemaphore(accessSemaphores + channel);
 	unsigned int value = radarMode & (1 << channel);
 	return (-value | value) >> 31;
@@ -4532,9 +4517,8 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
  */
 void GbaQueue::ClrChgRadarMode(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
 	OSWaitSemaphore(accessSemaphores + channel);
-	obj[0x2D42] = static_cast<char>(static_cast<unsigned char>(obj[0x2D42]) & ~(1U << channel));
+	m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

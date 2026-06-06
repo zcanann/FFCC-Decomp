@@ -30,6 +30,8 @@ struct ItemMenuState;
 struct ItemMenuAnimList;
 struct SingMenuState;
 struct FavoListStorage;
+struct CompaMenuState;
+struct CompaOpenAnimList;
 
 struct McListInfo
 {
@@ -409,6 +411,12 @@ public:
     unsigned int FavoCtrl();
     bool FavoClose();
     void FavoDraw();
+    void CompaInit();
+    void CompaInit0();
+    bool CompaOpen();
+    void CompaCtrl();
+    bool CompaClose();
+    void CompaDraw();
     void CalcMainMenuSub();
     void ChkSelectParty();
     void DrawMainMenuSub();
@@ -503,6 +511,7 @@ public:
         MenuLstState* m_menuLstState;
         ItemMenuState* m_itemMenuState;
         SingMenuState* m_singMenuState;
+        CompaMenuState* m_compaMenuState;
     };
     unsigned char m_pad830[0x838 - 0x830];
     union {
@@ -521,6 +530,7 @@ public:
         MenuLstList* m_menuLstList;
         ItemMenuAnimList* m_itemList;
         FavoListStorage* m_favoList;
+        CompaOpenAnimList* m_compaList;
     };
     unsigned char m_pad854[0x859 - 0x854];
     unsigned char m_singleMenuStageActive;
@@ -549,6 +559,7 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_moneyState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singMenuState) == 0x82C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_compaMenuState) == 0x82C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_wmCharaState) == 0x838);
 STATIC_ASSERT(offsetof(CMenuPcs, m_effectWork) == 0x840);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singWindowInfo) == 0x848);
@@ -556,5 +567,6 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_moneyPanel) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_menuLstList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_itemList) == 0x850);
 STATIC_ASSERT(offsetof(CMenuPcs, m_favoList) == 0x850);
+STATIC_ASSERT(offsetof(CMenuPcs, m_compaList) == 0x850);
 
 #endif // _FFCC_P_MENU_H_

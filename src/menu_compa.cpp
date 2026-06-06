@@ -65,7 +65,7 @@ void CMenuPcs::CompaDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CompaOpenAnimList* compaList = this->compaList;
+	CompaOpenAnimList* compaList = this->m_compaList;
 	CompaOpenAnim* entry = compaList->entries;
 	int count = compaList->count;
 	for (int i = 0; i < count; i++) {
@@ -248,7 +248,7 @@ void CMenuPcs::CompaDraw()
 		memberIndex = drawIndex + 1;
 	}
 
-	CFont* font = listFont;
+	CFont* font = m_fonts[4];
 	font->SetMargin(FLOAT_80333000);
 	font->SetShadow(0);
 	font->SetScaleX(FLOAT_8033301C);
@@ -287,7 +287,7 @@ void CMenuPcs::CompaDraw()
 		memberIndex = drawIndex + 1;
 	}
 
-	font = listFont;
+	font = m_fonts[4];
 	font->SetMargin(FLOAT_80333000);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_80333024);
@@ -319,10 +319,10 @@ bool CMenuPcs::CompaClose()
     int frame;
 
     finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = this->compaList->count;
-    entry = this->compaList->entries;
-    frame = this->compaMenuState->frame;
+    this->m_compaMenuState->frame = this->m_compaMenuState->frame + 1;
+    count = this->m_compaList->count;
+    entry = this->m_compaList->entries;
+    frame = this->m_compaMenuState->frame;
     for (int i = 0; i < count; i++) {
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
@@ -415,11 +415,11 @@ activeHold:
 	if (hold == 0) {
 		doReset = 0;
 	} else if ((press & 0x20) != 0) {
-		this->compaMenuState->cursorMove = 1;
+		this->m_compaMenuState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = 1;
 	} else if ((press & 0x40) != 0) {
-		this->compaMenuState->cursorMove = -1;
+		this->m_compaMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = 1;
 	} else {
@@ -427,7 +427,7 @@ activeHold:
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 			goto noReset;
 		} else if ((press & 0x200) != 0) {
-			this->compaMenuState->closeRequested = 1;
+			this->m_compaMenuState->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			doReset = 1;
 		} else {
@@ -437,28 +437,28 @@ noReset:
 	}
 
 	if (doReset != 0) {
-		CompaOpenAnimList* compaList = this->compaList;
+		CompaOpenAnimList* compaList = this->m_compaList;
 		int entryIndex = 0;
 		CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->startFrame = 2;
 		setupEntry->duration = 5;
-		compaList = this->compaList;
+		compaList = this->m_compaList;
 		setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->startFrame = 2;
 		setupEntry->duration = 5;
-		compaList = this->compaList;
+		compaList = this->m_compaList;
 		setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->startFrame = 2;
 		setupEntry->duration = 5;
-		compaList = this->compaList;
+		compaList = this->m_compaList;
 		setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-		compaList = this->compaList;
+		compaList = this->m_compaList;
 		setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->startFrame = 7;
 		setupEntry->duration = 5;
-		compaList = this->compaList;
+		compaList = this->m_compaList;
 		setupEntry = &compaList->entries[entryIndex++];
 		setupEntry->flags = 2;
 		setupEntry->startFrame = 7;
@@ -486,28 +486,28 @@ noReset:
  */
 inline void CMenuPcs::CompaInit0()
 {
-	CompaOpenAnimList* compaList = this->compaList;
+	CompaOpenAnimList* compaList = this->m_compaList;
 	int entryIndex = 0;
 	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->startFrame = 2;
 	setupEntry->duration = 5;
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->startFrame = 7;
 	setupEntry->duration = 5;
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->startFrame = 7;
@@ -539,15 +539,15 @@ bool CMenuPcs::CompaOpen()
     int count;
     int frame;
 
-    if (this->compaMenuState->initialized == '\0') {
+    if (this->m_compaMenuState->initialized == '\0') {
         CompaInit();
     }
 
     finishedCount = 0;
-    this->compaMenuState->frame = this->compaMenuState->frame + 1;
-    count = this->compaList->count;
-    entry = this->compaList->entries;
-    frame = this->compaMenuState->frame;
+    this->m_compaMenuState->frame = this->m_compaMenuState->frame + 1;
+    count = this->m_compaList->count;
+    entry = this->m_compaList->entries;
+    frame = this->m_compaMenuState->frame;
     for (int i = 0; i < count; i++) {
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
@@ -587,9 +587,9 @@ bool CMenuPcs::CompaOpen()
  */
 void CMenuPcs::CompaInit()
 {
-	memset(this->compaList, 0, sizeof(*this->compaList));
+	memset(this->m_compaList, 0, sizeof(*this->m_compaList));
 
-	CompaOpenAnim* entry = this->compaList->entries;
+	CompaOpenAnim* entry = this->m_compaList->entries;
 	float one = LoadFloat(FLOAT_80333000);
 	int count = 8;
 	do {
@@ -604,7 +604,7 @@ void CMenuPcs::CompaInit()
 		entry += 8;
 	} while (--count != 0);
 
-	CompaOpenAnimList* compaList = this->compaList;
+	CompaOpenAnimList* compaList = this->m_compaList;
 	int entryIndex = 0;
 	CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x52;
@@ -619,7 +619,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x51;
 	setupEntry->x = 0x28;
@@ -632,7 +632,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x52;
 	setupEntry->x = 0x28;
@@ -645,7 +645,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 5;
 	setupEntry->duration = 5;
 
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x5e;
 	setupEntry->x = 0x10;
@@ -658,7 +658,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->tex = 0x5e;
 	setupEntry->x = 0x15;
@@ -671,7 +671,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	compaList = this->compaList;
+	compaList = this->m_compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
 	setupEntry->tex = 0x2e;
@@ -684,7 +684,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
-	this->compaList->count = 6;
-	this->compaMenuState->selectedIndex = 0;
-	this->compaMenuState->initialized = 1;
+	this->m_compaList->count = 6;
+	this->m_compaMenuState->selectedIndex = 0;
+	this->m_compaMenuState->initialized = 1;
 }

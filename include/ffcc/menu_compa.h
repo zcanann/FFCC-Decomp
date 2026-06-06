@@ -1,9 +1,7 @@
 #ifndef _FFCC_MENU_COMPA_H_
 #define _FFCC_MENU_COMPA_H_
 
-#include <dolphin/gx.h>
-
-class CFont;
+#include "ffcc/p_menu.h"
 
 struct CompaOpenAnim
 {
@@ -48,44 +46,5 @@ struct CompaMenuState
     char pad_24[0x2];
     short selectedIndex;
 };
-
-class CMenuPcs
-{
-public:
-    enum FMT
-    {
-        TODO_FMT
-    };
-
-    enum TEX
-    {
-        TODO_TEX
-    };
-
-    void DrawInit();
-    void SetAttrFmt(FMT);
-    void SetTexture(TEX);
-    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
-    void DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float);
-    void DrawSingleIcon(int, int, int, float, int, float);
-
-    void CompaInit();
-    void CompaInit0();
-    bool CompaOpen();
-    void CompaCtrl();
-    bool CompaClose();
-    void CompaDraw();
-    char* GetMenuStr(int);
-    char* GetJobStr(int);
-
-    char pad_00[0x108];
-    CFont* listFont;
-    char pad_10c[0x720];
-    CompaMenuState* compaMenuState;
-    char pad_830[0x20];
-    CompaOpenAnimList* compaList;
-};
-
-extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_MENU_COMPA_H_

@@ -4908,10 +4908,10 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetProjection(projMtx, GX_PERSPECTIVE);
 
 		Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_80331768 };
-		Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-		Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, &up, &target);
+		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Point3d*)&target);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);

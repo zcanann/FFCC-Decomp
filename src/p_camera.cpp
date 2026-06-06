@@ -264,7 +264,6 @@ CProcessTable CCameraPcs::m_table[7] = {
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
-extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -1301,7 +1300,7 @@ void CCameraPcs::calcMap()
                 PositionVec().z += moveDelta.z;
                 break;
             }
-            CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &moveDelta);
+            MapMng.m_hitMapObj->CalcHitSlide(&moveDelta, FLOAT_8032fa4c);
         }
     }
 

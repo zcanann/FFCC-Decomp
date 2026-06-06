@@ -29,7 +29,6 @@ public:
 class CDbgMenuPcs;
 extern CDbgMenuPcs DbgMenuPcs;
 
-extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern const char lbl_801DCA48[];
 extern const char lbl_801DCCB0[];
 extern const char lbl_801DCD78[];
@@ -2336,7 +2335,7 @@ void CGPartyObj::checkTargetParticle()
 				move.y = 0.0f;
 				move.z = 0.0f;
 			} else {
-				CalcHitSlide__7CMapObjFP3Vecf(getMapHitObject(), &move);
+				getMapHitObject()->CalcHitSlide(&move, FLOAT_80331A98);
 			}
 		}
 

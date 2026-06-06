@@ -172,13 +172,13 @@ void _InitGxFunc()
 		swapMode[iVar11 * 2] = -1;
 	}
 
-	*(int*)&s_GXSetTevSwapModeTable_Reg[0] = -1;
-	*(int*)&s_GXSetTevSwapModeTable_Reg[1] = -1;
-	*(int*)&s_GXSetTevSwapModeTable_Reg[2] = -1;
-	*(int*)&s_GXSetTevSwapModeTable_Reg[3] = -1;
-	*(int*)&s_GXSetAlphaCompare_Reg = -1;
+	s_GXSetTevSwapModeTable_Reg[0].red = static_cast<_GXTevColorChan>(-1);
+	s_GXSetTevSwapModeTable_Reg[1].red = static_cast<_GXTevColorChan>(-1);
+	s_GXSetTevSwapModeTable_Reg[2].red = static_cast<_GXTevColorChan>(-1);
+	s_GXSetTevSwapModeTable_Reg[3].red = static_cast<_GXTevColorChan>(-1);
+	s_GXSetAlphaCompare_Reg.comp0 = static_cast<_GXCompare>(-1);
 	s_GXSetNumTevStages_nStages = 0xFFFF;
-	*(int*)&s_GXSetBlendMode_Reg = -1;
+	s_GXSetBlendMode_Reg.mode = static_cast<_GXBlendMode>(-1);
 }
 
 /*

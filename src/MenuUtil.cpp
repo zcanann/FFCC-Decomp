@@ -3,6 +3,7 @@
 #include "ffcc/game.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/memory.h"
+#include "ffcc/menu_arti.h"
 #include "ffcc/mes.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -551,9 +552,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 			font->Draw(scratch);
 
-			if ((m_battleStateFlag == 2) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_artiState) + 0x30) == 1)) {
-				int menuState = reinterpret_cast<int>(m_artiState);
+			if ((m_battleStateFlag == 2) && (m_artiState->currentSelection == 1)) {
 				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 				if ((effectFlags & 0x1000) == 0) {
@@ -575,8 +574,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					int equipmentSlot = caravanWork->m_equipment[currentItem];
 					currentItem = (equipmentSlot >= 0) ? caravanWork->m_inventoryItems[equipmentSlot] : -1;
 
-					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-					                                              static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34)))) != 0) {
+					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(m_artiState->selections[1]) +
+					                                              static_cast<int>(m_artiState->scrollOffset))) != 0) {
 						int currentItemBase = Game.unkCFlatData0[2] + currentItem * 0x48;
 						unsigned int currentValue;
 						if (currentItem == -1) {

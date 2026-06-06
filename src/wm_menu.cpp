@@ -7341,73 +7341,85 @@ void CMenuPcs::PCAnimCtrl()
 	int* animState = m_wmCharaAnimState;
 	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		const int blendMode = -1 - (handle->m_currentAnimIndex >> 31);
+		const int blendMode = (static_cast<unsigned int>(handle->m_currentAnimIndex) >> 31) - 1;
 
-		CChara::CModel* const modelObj = handle->m_model;
-		unsigned char* const model = reinterpret_cast<unsigned char*>(modelObj);
+		unsigned char* const model = reinterpret_cast<unsigned char*>(handle->m_model);
 		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0xB0)[0] == 0 || handle->m_charaKind == 3) {
 			continue;
 		}
 
-		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
-		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-		const int baseAnim = (static_cast<int>(handle->m_charaNo / 100) - 1) * 6;
+		reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
 
-		if (animState[1] < 0) {
-			const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
-			const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
-			if (isSelected == 0 &&
-			    m_wmWorldState->m_menuMode != 8 &&
-			    animState[0] == 0 && animState[2] > 2999) {
-				animState[0] = 4;
-				handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-				animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-				animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-				animState[2] = 0;
-					continue;
-				}
-			if (isSelected == 0 || m_wmWorldState->m_menuMode == 8) {
-				goto advanceFrame;
-			}
-			if (animState[0] == 1 && animState[2] > 11999) {
+		if (animState[1] >= 0) {
+			animState[0] = animState[1];
+			animState[1] = -1;
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
+			animState[2] = 0;
+			continue;
+		}
+
+		const int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
+		const float frame = reinterpret_cast<float*>(animState)[3];
+		const float frameEnd = reinterpret_cast<float*>(animState)[4];
+		if (isSelected == 0 &&
+		    m_wmWorldState->m_menuMode != 8 &&
+		    animState[0] == 0 && animState[2] >= 3000) {
+			animState[0] = 4;
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
+			animState[2] = 0;
+		} else if (isSelected != 0 &&
+		           m_wmWorldState->m_menuMode != 8) {
+			if (animState[0] == 1 && animState[2] >= 12000) {
 				animState[0] = 0;
 				animState[2] = 0;
-			} else if (animState[0] == 2 && animState[2] > 8999) {
+			} else if (animState[0] == 2 && animState[2] >= 9000) {
 				animState[0] = 1;
-			} else if (animState[0] == 1 && animState[2] > 5999 && animState[2] < 9000) {
+			} else if (animState[0] == 1 && animState[2] >= 6000 && animState[2] < 9000) {
 				animState[0] = 2;
-			} else {
-				if (animState[0] != 0 || animState[2] < 3000) {
-					goto advanceFrame;
-				}
+			} else if (animState[0] == 0 && animState[2] >= 3000) {
 				animState[0] = 1;
-			}
-			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-			continue;
-
-advanceFrame:
+			} else {
 				if (frameEnd <= frame) {
 					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 						animState[0] = 0;
-						handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-						animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-						animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+						handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+						reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+						reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 						animState[2] = isSelected == 0 ? 0 : 0x834;
 					}
-					modelObj->SetFrame(FLOAT_803313dc);
+					handle->m_model->SetFrame(FLOAT_803313dc);
 				} else {
-					modelObj->AddFrame(FLOAT_80331698);
+					handle->m_model->AddFrame(FLOAT_80331698);
 				}
 				animState[2]++;
+				continue;
+			}
+
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 		} else {
-			animState[0] = animState[1];
-			animState[1] = -1;
-			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-			animState[2] = 0;
+			if (frameEnd <= frame) {
+				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
+					animState[0] = 0;
+					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+					reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+					reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
+					if (isSelected == 0) {
+						animState[2] = 0;
+					} else {
+						animState[2] = 0x834;
+					}
+				}
+				handle->m_model->SetFrame(FLOAT_803313dc);
+			} else {
+				handle->m_model->AddFrame(FLOAT_80331698);
+			}
+			animState[2]++;
 		}
 	}
 }

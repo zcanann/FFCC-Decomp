@@ -3662,10 +3662,10 @@ void CMenuPcs::DrawMainMenu()
 			} else {
 				textAlpha = 0xFF;
 			}
-			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
 			char* const text = messages[worldState->m_cardChannel];
 			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor.color, 7, text,
 			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}

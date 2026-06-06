@@ -15,7 +15,7 @@ static const char s_mapmesh_cpp[] = "mapmesh.cpp";
 static const float FLOAT_8032F930 = 10000000000.0f;
 static const float FLOAT_8032F934 = -10000000000.0f;
 
-CMemory::CStage* g_pStage;
+static CMemory::CStage* g_pStage;
 
 namespace {
 static inline void AddMeshDataBase(void*& ptr, void* base)

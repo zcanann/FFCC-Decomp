@@ -26,8 +26,6 @@ static unsigned long clear_flag_mask = 0;
 UMapHitDrawMode s_bitMask;
 static unsigned long octtree_draw_node_ct = 0;
 
-extern unsigned long g_pStage;
-
 static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
     "===============================================\n\n";
@@ -975,9 +973,9 @@ void InsertLight_r(COctNode* node)
 	}
 
 	if (node->m_meshCount != 0) {
-		unsigned long byteOffset = (g_pStage >> 3) & 0x1ffffffc;
+		unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
 		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&node->m_lightFlags, byteOffset));
-		*bits |= 1UL << (g_pStage & 0x1f);
+		*bits |= 1UL << (s_light_no & 0x1f);
 	}
 
 	COctNode* nodeIter = node;
@@ -1035,9 +1033,9 @@ void InsertLight_r(COctNode* node)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				unsigned long byteOffset = (g_pStage >> 3) & 0x1ffffffc;
+				unsigned long byteOffset = (s_light_no >> 3) & 0x1ffffffc;
 				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
-				bits[0x44 / sizeof(unsigned long)] |= 1UL << (g_pStage & 0x1f);
+				bits[0x44 / sizeof(unsigned long)] |= 1UL << (s_light_no & 0x1f);
 			}
 
 			COctNode* childIter = child;
@@ -1049,7 +1047,7 @@ void InsertLight_r(COctNode* node)
 
 				if (grandChild->GetBound()->CheckCross(s_bound) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(&grandChild->m_lightFlags, g_pStage);
+						setbit32(&grandChild->m_lightFlags, s_light_no);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1090,7 +1088,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 		return;
 	}
 
-	g_pStage = bitIndex;
+	s_light_no = bitIndex;
 	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 

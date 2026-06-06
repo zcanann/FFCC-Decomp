@@ -3346,10 +3346,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
  */
 int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frameState = m_wm.m_frameInfo;
-
-	if (worldState->m_mainState >= 5) {
+	if (m_wmWorldState->m_mainState > 4) {
 		return -1;
 	}
 
@@ -3357,52 +3354,55 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcGoOutCharaSelect(slot);
 	}
 
-	const short menuAnim = worldState->m_mainState;
-	int offset = 0;
+	const short menuAnim = m_wmWorldState->m_mainState;
+	int offset;
 	if (menuAnim == 0) {
-		offset = static_cast<int>(worldState->m_frameCounter) - 10;
-	} else if (menuAnim < 1 || menuAnim > 3) {
-		offset = -static_cast<int>(worldState->m_frameCounter);
+		offset = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
+	} else if (menuAnim > 0 && menuAnim < 4) {
+		offset = 0;
+	} else {
+		offset = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(frameState + 4) = 0x10;
-	*reinterpret_cast<short*>(frameState + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4))));
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<double>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
 
 	if (offset < 0) {
-		float shift = static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-		if (offset > -11) {
+		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+		if (offset >= -10) {
+			shift = static_cast<float>(static_cast<double>(shift) * (DOUBLE_803314e8 * static_cast<double>(offset < 0 ? -offset : offset)));
 			int absOffset = offset < 0 ? -offset : offset;
-			shift = shift * static_cast<float>(DOUBLE_803314e8 * static_cast<double>(absOffset));
+			if (absOffset < 0) {
+				absOffset = 0;
+			}
 			if (absOffset > 10) {
 				absOffset = 10;
 			}
 			const float t = static_cast<float>(absOffset);
-			shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_803316d4));
+			shift *= static_cast<float>(sin(FLOAT_803314bc * (t * FLOAT_803316d4)));
 		}
 
-		*reinterpret_cast<short*>(frameState + 4) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 4)) - shift);
-		*reinterpret_cast<short*>(frameState + 0x20) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)) - shift);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)) + shift);
 	}
 
-	if (menuAnim > 0 && menuAnim < 4) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		CalcChara();
 	}
 
-	unsigned char* const selectState = m_wm.m_charaSelectData;
-	unsigned char* const animState = reinterpret_cast<unsigned char*>(m_wmCharaAnimState);
-	if (selectState[0x0E] != 0) {
+	if (m_wm.m_charaSelectData[0x0E] != 0) {
 		return -2;
 	}
 
-	const int cursor = static_cast<int>(*reinterpret_cast<short*>(selectState + 4));
-	if (selectState[0x0A] == 0 || (*reinterpret_cast<int*>(animState + cursor * 0x14) == 3 && slot != 0)) {
-		return -1;
+	if (m_wm.m_charaSelectData[0x0A] != 0 &&
+	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + *reinterpret_cast<short*>(m_wm.m_charaSelectData + 4) * 0x14) != 3 || slot == 0)) {
+		return static_cast<int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 4));
 	}
 
-	return cursor;
+	return -1;
 }
 
 /*

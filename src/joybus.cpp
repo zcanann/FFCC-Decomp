@@ -117,9 +117,9 @@ static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
 extern char s_pctd_Error_send_type_error_pct02x_801DA350[];
 
 namespace JoyBusConst {
-char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
-char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
-char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+static char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
+static char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
+static char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
 const unsigned int CTRL_GBA = 0x10;
 const unsigned int JOY_CODE_MASK = 0x1;
 }

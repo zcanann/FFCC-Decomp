@@ -1790,48 +1790,43 @@ int CLine<64>::IsInner(Vec* position, float margin)
 
 void CLine<64>::CalcBound()
 {
-    CLine<64>* line = this;
+    min.x = kLineBoundsInitMin;
+    min.y = kLineBoundsInitMin;
+    min.z = kLineBoundsInitMin;
+    max.x = kLineBoundsInitMax;
+    max.y = kLineBoundsInitMax;
+    max.z = kLineBoundsInitMax;
+    totalLength = kLineSegmentMinT;
 
-    line->min.x = kLineBoundsInitMin;
-    line->min.y = kLineBoundsInitMin;
-    line->min.z = kLineBoundsInitMin;
-    line->max.x = kLineBoundsInitMax;
-    line->max.y = kLineBoundsInitMax;
-    line->max.z = kLineBoundsInitMax;
-    line->totalLength = kLineSegmentMinT;
-
-    Vec* point = line->points;
-    CLineSegment* segment = line->segments;
-    for (unsigned int i = 0; i < line->pointCount; i++, point++, segment++) {
-
-        if (point->x < line->min.x) {
-            line->min.x = point->x;
+    for (u32 i = 0; i < pointCount; i++) {
+        if (points[i].x < min.x) {
+            min.x = points[i].x;
         }
-        if (point->y < line->min.y) {
-            line->min.y = point->y;
+        if (points[i].y < min.y) {
+            min.y = points[i].y;
         }
-        if (point->z < line->min.z) {
-            line->min.z = point->z;
+        if (points[i].z < min.z) {
+            min.z = points[i].z;
         }
 
-        if (point->x > line->max.x) {
-            line->max.x = point->x;
+        if (points[i].x > max.x) {
+            max.x = points[i].x;
         }
-        if (point->y > line->max.y) {
-            line->max.y = point->y;
+        if (points[i].y > max.y) {
+            max.y = points[i].y;
         }
-        if (point->z > line->max.z) {
-            line->max.z = point->z;
+        if (points[i].z > max.z) {
+            max.z = points[i].z;
         }
 
         if (i != 0) {
-            CLineSegment* prevSegment = segment - 1;
-            PSVECSubtract(point, point - 1, &prevSegment->delta);
-            prevSegment->length = PSVECMag(&prevSegment->delta);
-            prevSegment->startLength = line->totalLength;
-            line->totalLength += prevSegment->length;
-            if (prevSegment->length != kLineSegmentMinT) {
-                PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
+            u32 prevIndex = i - 1;
+            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
+            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
+            segments[prevIndex].startLength = totalLength;
+            totalLength += segments[prevIndex].length;
+            if (segments[prevIndex].length != kLineSegmentMinT) {
+                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
             }
         }
     }

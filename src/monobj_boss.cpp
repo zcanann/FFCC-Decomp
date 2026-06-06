@@ -1431,9 +1431,12 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			*reinterpret_cast<Vec*>(SoundBuffer + 0x4F0) = attackVec;
 
 			CVector objectPos(object->m_worldPosition);
-			Vec delta;
-			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), &delta);
-			float distance = PSVECDistance(&delta, &object->m_worldPosition);
+			CVector delta;
+			PSVECSubtract(&attackVec, reinterpret_cast<Vec*>(&objectPos), reinterpret_cast<Vec*>(&delta));
+			attackVec.x = delta.x;
+			attackVec.y = delta.y;
+			attackVec.z = delta.z;
+			float distance = PSVECDistance(&attackVec, &object->m_worldPosition);
 			float cappedDistance = FLOAT_80331d88;
 			if (distance < FLOAT_80331d88) {
 				cappedDistance = distance;
@@ -1441,7 +1444,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
 			m_moveWork.m_flags = 0x2114;
-			m_moveWork.m_targetPos = delta;
+			m_moveWork.m_targetPos = attackVec;
 			m_moveWork.m_speed = FLOAT_80331d58;
 			m_moveWork.m_limitFrame = static_cast<int>(cappedDistance * FLOAT_80331d30);
 			m_moveWork.m_changeStat = 0x67;
@@ -2722,7 +2725,7 @@ void CGMonObj::teleport(
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::suikomiSub(CGObject*, float)
+inline void CGMonObj::suikomiSub(CGObject*, float)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char* target = reinterpret_cast<unsigned char*>(Game.unk_flat3_0xc7d0);

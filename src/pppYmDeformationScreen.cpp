@@ -18,12 +18,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct _pppEnvStYmDeformationScreen {
-	void* m_stagePtr;
-	CMaterialSet* m_materialSetPtr;
-	CMapMesh** m_mapMeshPtr;
-};
-
 STATIC_ASSERT(sizeof(YmDeformationScreenDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmDeformationScreenDataOffsets, m_workOffset) == 0x8);
 

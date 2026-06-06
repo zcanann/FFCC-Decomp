@@ -37,12 +37,6 @@ struct YmDeformationShpColorInfo {
 
 int RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 
-struct _pppEnvStYmDeformationShp {
-	void* m_stagePtr;
-	CMaterialSet* m_materialSetPtr;
-	CMapMesh** m_mapMeshPtr;
-};
-
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_colorInfoOffset) == 0x4);
 STATIC_ASSERT(offsetof(YmDeformationShpDataOffsets, m_stateOffset) == 0x8);
 STATIC_ASSERT(sizeof(YmDeformationShpDataOffsets) == 0xC);
@@ -290,7 +284,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo = DeformationShpColorInfo(pppYmDeformationShp_, param_3);
-		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
+		_pppEnvSt* env = ppvEnv;
 		CTexture* texture =
 			env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex);
 

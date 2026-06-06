@@ -7443,8 +7443,6 @@ void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
@@ -7459,7 +7457,7 @@ void CMenuPcs::DrawChara()
 
 		unsigned int selectedMask = 0;
 		for (int chan = 0; chan < 4; chan++) {
-			WmCharaSelectEntry& entry = selectEntries[chan];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[chan];
 			if (entry.m_connected == 1 && entry.m_currentSlot >= 0 && entry.m_currentSlot == i) {
 				selectedMask |= 1u << chan;
 			}
@@ -7473,7 +7471,7 @@ void CMenuPcs::DrawChara()
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha = FLOAT_803313e8;
-			if (worldState->m_mainState != 2 && handle->m_model != 0) {
+			if (GetWmWorldState(this)->m_mainState != 2 && handle->m_model != 0) {
 				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
 			}
 			const float colorScale = static_cast<float>(selectedMask != 0 ? DOUBLE_80331420 : DOUBLE_80331448);
@@ -7498,7 +7496,7 @@ void CMenuPcs::DrawChara()
 		} else {
 			handle->Draw(5);
 		}
-		if (worldState->m_mainState == 2 && selectedMask != 0) {
+		if (GetWmWorldState(this)->m_mainState == 2 && selectedMask != 0) {
 			for (int chan = 3; chan >= 0; chan--) {
 				if ((selectedMask & (1u << chan)) != 0) {
 					PartPcs.DrawMenuIdx(m_effectWork[chan + 32].m_partNo);

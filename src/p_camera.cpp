@@ -998,19 +998,19 @@ void CCameraPcs::createChara()
     float fVar1;
     float fVar7;
 
-    fVar2 = FLOAT_8032fa34;
+    fVar2 = 0.0f;
     m_viewerOverride = 0;
-    fVar1 = FLOAT_8032fa1c;
+    fVar1 = 1.0f;
     m_viewer.m_position.z = fVar2;
-    fVar6 = FLOAT_8032fac0;
+    fVar6 = -10.0f;
     m_viewer.m_position.y = fVar2;
-    fVar7 = FLOAT_8032fac4;
+    fVar7 = 50.0f;
     m_viewer.m_position.x = fVar2;
-    fVar4 = FLOAT_8032fab4;
+    fVar4 = 25.0f;
     m_viewer.m_distance = fVar2;
-    fVar3 = FLOAT_8032fa8c;
+    fVar3 = 10.0f;
     m_viewer.m_rotY = fVar2;
-    fVar5 = FLOAT_8032fab8;
+    fVar5 = 10000.0f;
     m_viewer.m_rotX = fVar2;
     m_viewer.m_scale.z = fVar1;
     m_viewer.m_scale.y = fVar1;
@@ -1062,40 +1062,49 @@ void CCameraPcs::calcChara()
             padButtons = 0;
         }
 
+        stick = FLOAT_8032fa34;
         if ((padButtons & 4) != 0) {
-            m_viewer.m_position.y += FLOAT_8032fa20;
+            stick = FLOAT_8032fa20;
         }
-        if ((padButtons & 8) != 0) {
-            m_viewer.m_position.y -= FLOAT_8032fa20;
-        }
+        m_viewer.m_position.y += stick;
 
+        float rotSpeed = FLOAT_8032fa48;
+        stick = FLOAT_8032fa34;
+        if ((padButtons & 8) != 0) {
+            stick = FLOAT_8032fa20;
+        }
+        m_viewer.m_position.y -= stick;
+
+        float rotSpeed2 = FLOAT_8032fa48;
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                               ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
-        m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
+        m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
+        float zoomSpeed = FLOAT_8032fabc;
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                               ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
-        m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
+        m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
+        float zoomSpeed2 = FLOAT_8032fabc;
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                               ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
-        m_viewer.m_distance = -((FLOAT_8032fabc * stick) - m_viewer.m_distance);
+        m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
         stick = FLOAT_8032fa34;
         if (Pad.m_debugPadLock == 0) {
             stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                               ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
         }
-        m_viewer.m_distance = FLOAT_8032fabc * stick + m_viewer.m_distance;
+        m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
     } else {
         m_viewerOverride = 0;
     }
@@ -1935,11 +1944,11 @@ void CCameraPcs::createMaterialEditor()
     float fVar3;
     float fVar1;
     float fVar2;
-    fVar2 = FLOAT_8032fa34;
+    fVar2 = 0.0f;
     m_viewerOverride = 0;
-    fVar1 = FLOAT_8032fa1c;
+    fVar1 = 1.0f;
     m_viewer.m_position.z = fVar2;
-    fVar3 = FLOAT_8032fa50;
+    fVar3 = -30.0f;
     m_viewer.m_position.y = fVar2;
     m_viewer.m_position.x = fVar2;
     m_viewer.m_distance = fVar2;
@@ -1993,40 +2002,49 @@ void CCameraPcs::calcMaterialEditor()
         padButtons = 0;
     }
 
+    stick = FLOAT_8032fa34;
     if ((padButtons & 8) != 0) {
-        m_viewer.m_position.y += FLOAT_8032fa20;
+        stick = FLOAT_8032fa20;
     }
-    if ((padButtons & 4) != 0) {
-        m_viewer.m_position.y -= FLOAT_8032fa20;
-    }
+    m_viewer.m_position.y += stick;
 
+    float rotSpeed = FLOAT_8032fa48;
+    stick = FLOAT_8032fa34;
+    if ((padButtons & 4) != 0) {
+        stick = FLOAT_8032fa20;
+    }
+    m_viewer.m_position.y -= stick;
+
+    float rotSpeed2 = FLOAT_8032fa48;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
+    m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
+    float zoomSpeed = FLOAT_8032fa4c;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
+    m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
+    float zoomSpeed2 = FLOAT_8032fa4c;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
+    m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
+    m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);
@@ -2057,11 +2075,11 @@ void CCameraPcs::createFunnyShape()
     float fVar3;
     float fVar1;
     float fVar2;
-    fVar2 = FLOAT_8032fa34;
+    fVar2 = 0.0f;
     m_viewerOverride = 0;
-    fVar1 = FLOAT_8032fa1c;
+    fVar1 = 1.0f;
     m_viewer.m_position.z = fVar2;
-    fVar3 = FLOAT_8032fa50;
+    fVar3 = -30.0f;
     m_viewer.m_position.y = fVar2;
     m_viewer.m_position.x = fVar2;
     m_viewer.m_distance = fVar2;
@@ -2115,40 +2133,49 @@ void CCameraPcs::calcFunnyShape()
         padButtons = 0;
     }
 
+    stick = FLOAT_8032fa34;
     if ((padButtons & 8) != 0) {
-        m_viewer.m_position.y += FLOAT_8032fa20;
+        stick = FLOAT_8032fa20;
     }
-    if ((padButtons & 4) != 0) {
-        m_viewer.m_position.y -= FLOAT_8032fa20;
-    }
+    m_viewer.m_position.y += stick;
 
+    float rotSpeed = FLOAT_8032fa48;
+    stick = FLOAT_8032fa34;
+    if ((padButtons & 4) != 0) {
+        stick = FLOAT_8032fa20;
+    }
+    m_viewer.m_position.y -= stick;
+
+    float rotSpeed2 = FLOAT_8032fa48;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_rotY = FLOAT_8032fa48 * stick + m_viewer.m_rotY;
+    m_viewer.m_rotY = rotSpeed * stick + m_viewer.m_rotY;
 
+    float zoomSpeed = FLOAT_8032fa4c;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_rotX = -((FLOAT_8032fa48 * stick) - m_viewer.m_rotX);
+    m_viewer.m_rotX = -((rotSpeed2 * stick) - m_viewer.m_rotX);
 
+    float zoomSpeed2 = FLOAT_8032fa4c;
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_distance = -((FLOAT_8032fa4c * stick) - m_viewer.m_distance);
+    m_viewer.m_distance = -((zoomSpeed * stick) - m_viewer.m_distance);
 
     stick = FLOAT_8032fa34;
     if (Pad.m_debugPadLock == 0) {
         stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
                                           ((~((int)~(Pad.m_debugPadPort - 4 | 4 - Pad.m_debugPadPort) >> 0x1f) & 4U) * 0x54));
     }
-    m_viewer.m_distance = FLOAT_8032fa4c * stick + m_viewer.m_distance;
+    m_viewer.m_distance = zoomSpeed2 * stick + m_viewer.m_distance;
 
     PSMTXTrans(mtxA, m_viewer.m_position.x, m_viewer.m_position.y, m_viewer.m_position.z);
     PSMTXRotRad(mtxB, 'y', m_viewer.m_rotY);

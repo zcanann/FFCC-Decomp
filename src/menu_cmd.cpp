@@ -365,7 +365,7 @@ void CMenuPcs::CmdInit()
 		iVar8--;
 	} while (iVar8 != 0);
 
-	*GetCmdList(this) = 8;
+	GetCmdListStorage(this)->count = 8;
 	CmdInit1();
 	GetCmdItem();
 	CmdState* cmd = GetCmdStateView(this);
@@ -923,14 +923,10 @@ int CMenuPcs::CmdClose()
 void CMenuPcs::CmdDraw()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s16* cmdState = GetCmdState(this);
-	s16* drawList = GetCmdList(this);
 	CmdState* cmd = GetCmdStateView(this);
 	CmdListStorage* cmdList = GetCmdListStorage(this);
 	CmdListEntry* entries = cmdList->entries;
-	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s32 caravanIter = caravanWork;
 	CmdListEntry* entry = entries;
 	const s16 cmdMode = cmd->mode;
 	const s16 animState = cmd->animState;
@@ -950,10 +946,10 @@ void CMenuPcs::CmdDraw()
 			float h = static_cast<float>(entry->height);
 			float t = FLOAT_80332ad0;
 
-			if ((i > 7) || (*reinterpret_cast<s16*>(caravanIter + 0x214) == 0)) {
+			if ((i > 7) || (caravan->m_commandListExtra[i] == 0)) {
 				SetTexture(static_cast<CMenuPcs::TEX>(tex));
-				if ((*reinterpret_cast<s16*>(caravanIter + 0x204) > 1) &&
-				    (*reinterpret_cast<s16*>(caravanIter + 0x204) == -1)) {
+				if ((caravan->m_commandListInventorySlotRef[i] > 1) &&
+				    (caravan->m_commandListInventorySlotRef[i] == -1)) {
 					t += h;
 				}
 				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
@@ -974,7 +970,6 @@ void CMenuPcs::CmdDraw()
 				    0, x, y, w, h, entry->u, t, entry->scale, entry->scale, 0.0f);
 			}
 		}
-		caravanIter += 2;
 		entry++;
 	}
 

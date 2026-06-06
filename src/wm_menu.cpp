@@ -1866,8 +1866,8 @@ void CMenuPcs::CalcMCardMenu()
 				int cnt = 4;
 				int iVar13 = 0;
 				do {
-					if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar13 + 0x42) == 0
-					    && *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar13 + 8) > 0) {
+					if (*reinterpret_cast<char*>(m_wmCharaState + iVar13 + 0x42) == 0
+					    && *reinterpret_cast<int*>(m_wmCharaState + iVar13 + 8) > 0) {
 						iVar21++;
 					}
 					iVar13 += 0x48;
@@ -1879,7 +1879,7 @@ void CMenuPcs::CalcMCardMenu()
 			}
 			if ((char)uRam8032ee21 < 0 || (int)DAT_8032ee20 != mcCtrl.m_cardChannel) {
 			LAB_saveIdx:
-				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				uVar15 = 0;
 				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(unk838 + 8) > 0) {
 					uVar15 = 1;
@@ -1918,7 +1918,7 @@ void CMenuPcs::CalcMCardMenu()
 			iVar14 = 0;
 			int iVar21 = 4;
 			do {
-				if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(bytes + 0x838) + iVar14 + 0x42) != 0) {
+				if (*reinterpret_cast<char*>(m_wmCharaState + iVar14 + 0x42) != 0) {
 					mcCtrl.m_saveIndex = iVar12;
 					worldState->m_cardChannel = (short)iVar12;
 					break;
@@ -2024,7 +2024,7 @@ void CMenuPcs::CalcMCardMenu()
 					DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
 					uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
 				}
-				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				*reinterpret_cast<int*>(unk838 + mcCtrl.m_saveIndex * 0x48 + 8) = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8);
 			}
 			worldState->m_state0E = 1;
@@ -2671,7 +2671,7 @@ void CMenuPcs::CalcLoadMenu()
 			worldState->m_mcResult = listRes;
 			if (worldState->m_mcResult != 0) {
 				if (worldState->m_menuMode == 8) {
-					int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
 					int cnt = 4;
 					int off = 0;
@@ -2688,7 +2688,7 @@ void CMenuPcs::CalcLoadMenu()
 					}
 				}
 				int calTimes[40];
-				int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+				int unk838 = reinterpret_cast<int>(m_wmCharaState);
 				iVar10 = 0;
 				iVar14 = 0;
 				int* piVar20 = calTimes;
@@ -2951,7 +2951,7 @@ void CMenuPcs::CalcLoadMenu()
 				if ((uVar4 & 0x100) != 0) {
 					sVar8 = worldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
-						int unk838 = *reinterpret_cast<int*>(bytes + 0x838);
+						int unk838 = reinterpret_cast<int>(m_wmCharaState);
 						iVar14 = (int)worldState->m_cardChannel;
 						if (*reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x41) == 0
 						    || *reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x42) != 0) {
@@ -9563,7 +9563,7 @@ LAB_draw:
 
 	if (worldState->m_subState > 0x10 &&
 	    worldState->m_mainState < 3) {
-		unsigned char* const mcData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
+		unsigned char* const mcData = m_wmCharaState;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			unsigned char* const slotData = mcData + slot * kMcListEntrySize;
 			const float slotY = FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490;
@@ -9794,7 +9794,7 @@ LAB_draw:
 	// Draw text info for each save slot
 	if (worldState->m_subState > 0x10 &&
 	    worldState->m_mainState < 3) {
-		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);
+		unsigned int* mcData = reinterpret_cast<unsigned int*>(m_wmCharaState);
 		for (int slot = 0; slot < 4; slot++) {
 			float alpha2 = FLOAT_803313e8;
 			float yPos2 = FLOAT_803314d8;
@@ -9952,7 +9952,7 @@ void CMenuPcs::CalcMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 	unsigned int animCounter = 0;
 
 	for (int i = 0; i < 4; i++) {
@@ -10852,7 +10852,7 @@ float CMenuPcs::GetMaxAnimWait()
 void CMenuPcs::BindMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(bytes + 0x838);
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 
 	for (int i = 0; i < 4; i++) {
 		EffectInfo* const effectA = &m_effectWork[i + 0x11];

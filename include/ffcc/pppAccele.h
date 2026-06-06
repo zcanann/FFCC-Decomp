@@ -6,6 +6,11 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
+struct PppAcceleDataOffsets {
+    s32 m_valueOffset;
+    s32 m_accelOffset;
+};
+
 struct pppAcceleStep {
     s32 m_graphId;
     s32 m_field_04;

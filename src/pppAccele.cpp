@@ -6,11 +6,7 @@ extern "C" {
 const float kPppAcceleZero = 0.0f;
 }
 
-struct PppAcceleDataOffsets {
-	s32 m_valueOffset;
-	s32 m_accelOffset;
-};
-
+STATIC_ASSERT(sizeof(PppAcceleDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(PppAcceleDataOffsets, m_valueOffset) == 0x0);
 STATIC_ASSERT(offsetof(PppAcceleDataOffsets, m_accelOffset) == 0x4);
 

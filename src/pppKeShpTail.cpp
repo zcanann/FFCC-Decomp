@@ -14,14 +14,11 @@ struct KeShpTailWork {
     Vec m_posHistory[31];
 };
 
-struct KeShpTailDataOffsets {
-    s32 m_workOffset;
-};
-
 STATIC_ASSERT(sizeof(KeShpTailWork) == 0x17C);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_count) == 0x00);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_head) == 0x01);
 STATIC_ASSERT(offsetof(KeShpTailWork, m_posHistory) == 0x08);
+STATIC_ASSERT(sizeof(KeShpTailDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(KeShpTailDataOffsets, m_workOffset) == 0x0);
 
 static inline KeShpTailDataOffsets* GetKeShpTailDataOffsets(_pppCtrlTable* ctrlTable)

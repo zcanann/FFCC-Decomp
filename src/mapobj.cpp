@@ -555,25 +555,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_calcMtxPending = 1;
             break;
         }
-        case CHUNK_ANIM: {
-            CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
-                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
-            if (animRun != 0) {
-                animRun->m_currentFrame = -1;
-            }
-            animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
-            animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
-            animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
-            animRun->m_triggerFrame = static_cast<int>(chunkFile.Get4());
-            animRun->m_loop = chunkFile.Get1();
-            if (chunk.m_version == 1) {
-                animRun->m_animId = chunkFile.Get1();
-            } else {
-                animRun->m_animId = 0;
-            }
-            MapMng.GetMapAnimRunArray().Add(animRun);
-            break;
-        }
         case CHUNK_MIME: {
             if (m_attribute != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
@@ -622,6 +603,25 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             }
             chunkFile.PopChunk();
             m_attribute = mimeAttr;
+            break;
+        }
+        case CHUNK_ANIM: {
+            CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
+                operator new(sizeof(CMapAnimRun), MapMng.m_stage, const_cast<char*>(s_mapobj_cpp_801D70C0), 0x21E));
+            if (animRun != 0) {
+                animRun->m_currentFrame = -1;
+            }
+            animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
+            animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_triggerFrame = static_cast<int>(chunkFile.Get4());
+            animRun->m_loop = chunkFile.Get1();
+            if (chunk.m_version == 1) {
+                animRun->m_animId = chunkFile.Get1();
+            } else {
+                animRun->m_animId = 0;
+            }
+            MapMng.GetMapAnimRunArray().Add(animRun);
             break;
         }
         case CHUNK_SLIT: {

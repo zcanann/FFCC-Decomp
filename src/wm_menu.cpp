@@ -5569,12 +5569,13 @@ void CMenuPcs::CalcPitcher()
 void CMenuPcs::CalcFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	float fVar1 = FLOAT_803313dc;
 	if (bytes[0x09] != 1) {
 		return;
 	}
 
-	int bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+	int bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 	*reinterpret_cast<short*>(bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
 	*reinterpret_cast<short*>(bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
 	*reinterpret_cast<short*>(bubbleData + 4) = 0xF0;
@@ -5589,7 +5590,7 @@ void CMenuPcs::CalcFukidashi()
 	fVar1 = FLOAT_80331708;
 	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
-		bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
 		float fVar2 = FLOAT_803313dc;
 		*reinterpret_cast<short*>(bubbleData + 0x22) = 0x48;
@@ -5614,14 +5615,14 @@ void CMenuPcs::CalcFukidashi()
 	fVar1 = FLOAT_803313dc;
 	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x1FF) != 0) {
-		bubbleData = *reinterpret_cast<int*>(bytes + 0x818);
+		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;
 		*reinterpret_cast<short*>(bubbleData + 0x3E) = 0x20;
 		*reinterpret_cast<float*>(bubbleData + 0x40) = fVar1;
 		*reinterpret_cast<float*>(bubbleData + 0x44) = fVar1;
 
 		// Copy first icon rect to second
-		int iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+		int iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(iVar9 + 0x54) = *reinterpret_cast<short*>(iVar9 + 0x38);
 		*reinterpret_cast<short*>(iVar9 + 0x56) = *reinterpret_cast<short*>(iVar9 + 0x3A);
 		*reinterpret_cast<short*>(iVar9 + 0x58) = *reinterpret_cast<short*>(iVar9 + 0x3C);
@@ -5632,21 +5633,21 @@ void CMenuPcs::CalcFukidashi()
 		*reinterpret_cast<int*>(iVar9 + 0x68) = *reinterpret_cast<int*>(iVar9 + 0x4C);
 		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
 
-		iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+		iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
 		short sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
 		if ((uVar3 & 0xF) == 0) {
 			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38) = sVar15 + 8;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
-			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
-			    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) + 0x14;
+			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15 + 8;
+			*reinterpret_cast<short*>(iVar9 + 0x3A) =
+			    *reinterpret_cast<short*>(iVar9 + 0x1E);
+			*reinterpret_cast<short*>(iVar9 + 0x3A) =
+			    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
 		} else {
 			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
 			int cnt = 0;
 			int iter = 4;
 			int iVar11 = 0;
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38) = sVar15;
+			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15;
 			do {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar11)) != 0) {
 					cnt++;
@@ -5655,14 +5656,14 @@ void CMenuPcs::CalcFukidashi()
 				iter--;
 			} while (iter != 0);
 			if (cnt == 1) {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) + 0x14;
+				*reinterpret_cast<short*>(iVar9 + 0x3A) =
+				    *reinterpret_cast<short*>(iVar9 + 0x1E);
+				*reinterpret_cast<short*>(iVar9 + 0x3A) =
+				    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
 			} else {
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x3A) =
-				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x1E);
-				iVar9 = *reinterpret_cast<int*>(bytes + 0x818);
+				*reinterpret_cast<short*>(iVar9 + 0x3A) =
+				    *reinterpret_cast<short*>(iVar9 + 0x1E);
+				iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
 				*reinterpret_cast<short*>(iVar9 + 0x56) =
 				    *reinterpret_cast<short*>(iVar9 + 0x1E) + *reinterpret_cast<short*>(iVar9 + 0x22) - 0x20;
 			}
@@ -5707,20 +5708,21 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Set text position
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) =
-	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 2) + sVar15 - 4;
+	bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
+	*reinterpret_cast<short*>(bubbleData + 0x72) =
+	    *reinterpret_cast<short*>(bubbleData + 2) + sVar15 - 4;
 
 	// Setup model viewport slots
 	int iVar11 = 6;
 	int iVar9 = 0x1E0;
-	short sVar22 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)) - 0x28;
-	short sVarY = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 2) - 0x0E;
+	short sVar22 = *reinterpret_cast<short*>(bubbleData) - 0x28;
+	short sVarY = *reinterpret_cast<short*>(bubbleData + 2) - 0x0E;
 	int iVar13 = 2;
 	do {
-		int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + iVar9);
+		int* puVar20 = reinterpret_cast<int*>(worldObj + iVar9);
 		// Initialize 5 viewport slots per iteration
 		for (int k = 0; k < 5; k++) {
-			int* slot = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + iVar9 + k * 0x50);
+			int* slot = reinterpret_cast<int*>(worldObj + iVar9 + k * 0x50);
 			slot[0] = 0;
 			*reinterpret_cast<short*>(slot + 2) = sVar22;
 			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
@@ -5740,7 +5742,7 @@ void CMenuPcs::CalcFukidashi()
 	int fillOff = iVar11 * 0x50;
 	if (iVar11 < 0x11) {
 		do {
-			int* slot = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + fillOff);
+			int* slot = reinterpret_cast<int*>(worldObj + fillOff);
 			fillOff += 0x50;
 			slot[0] = 0;
 			*reinterpret_cast<short*>(slot + 2) = sVar22;
@@ -5772,7 +5774,7 @@ void CMenuPcs::CalcFukidashi()
 			modelIdx = 6;
 		}
 
-		int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + modelIdx * 0x50);
+		int* puVar20 = reinterpret_cast<int*>(worldObj + modelIdx * 0x50);
 		puVar20[0] = 1;
 		*reinterpret_cast<float*>(puVar20 + 7) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 8) = fVar1;
@@ -5891,7 +5893,7 @@ void CMenuPcs::CalcFukidashi()
 		int slotIdx = 0;
 		for (int padIdx = 0; padIdx < 4; padIdx++) {
 			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
-				int* puVar20 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + (padIdx + 8) * 0x50);
+				int* puVar20 = reinterpret_cast<int*>(worldObj + (padIdx + 8) * 0x50);
 				puVar20[0] = 1;
 				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
 				if (slotIdx == 0) {
@@ -6025,6 +6027,8 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const bubbleData = m_wm.m_bubbleData;
+	unsigned char* const worldObj = m_wm.m_worldObjData;
 	Mtx m_cameraMatrix;
 	CFont* fontFC = *reinterpret_cast<CFont**>(bytes + 0xFC);
 	if (bytes[0x09] != 1) {
@@ -6043,7 +6047,7 @@ void CMenuPcs::DrawFukidashi()
 	GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&color);
 	SetTexture((TEX)0x18);
 
-	short* bubData = *reinterpret_cast<short**>(bytes + 0x818);
+	short* bubData = reinterpret_cast<short*>(bubbleData);
 	DrawRect(0xFFFFFFFF, 
 		(float)(int)bubData[0], (float)(int)bubData[1],
 		(float)(int)bubData[2], (float)(int)bubData[3],
@@ -6052,7 +6056,7 @@ void CMenuPcs::DrawFukidashi()
 
 	unsigned int uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
-		int bd = *reinterpret_cast<int*>(bytes + 0x818);
+		int bd = reinterpret_cast<int>(bubbleData);
 		DrawRect(0xFFFFFFFF, 
 			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
@@ -6068,7 +6072,7 @@ void CMenuPcs::DrawFukidashi()
 			do {
 				if ((uVar3 & (0x10 << idx)) != 0) {
 					SetTexture((TEX)(idx + 0x19));
-					int bd = *reinterpret_cast<int*>(bytes + 0x818);
+					int bd = reinterpret_cast<int>(bubbleData);
 					DrawRect(0xFFFFFFFF, 
 						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
 						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
@@ -6087,9 +6091,9 @@ void CMenuPcs::DrawFukidashi()
 					SetTexture((TEX)(iVar5 + 0x19));
 					short* psVar4;
 					if (iVar9 == 0) {
-						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38);
+						psVar4 = reinterpret_cast<short*>(bubbleData + 0x38);
 					} else {
-						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x54);
+						psVar4 = reinterpret_cast<short*>(bubbleData + 0x54);
 					}
 					DrawRect(0xFFFFFFFF, 
 						(float)(int)psVar4[0], (float)(int)psVar4[1],
@@ -6145,15 +6149,15 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->DrawInit();
 	unsigned int whiteColor = 0xFFFFFFFF;
 	fontFC->SetColor(*(_GXColor*)&whiteColor);
-	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
-	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
+	fontFC->SetPosX((float)*reinterpret_cast<short*>(bubbleData + 0x70));
+	fontFC->SetPosY((float)*reinterpret_cast<short*>(bubbleData + 0x72));
 	fontFC->Draw(nameBuffer);
 
 	if (twoLines) {
 		double w2 = (double)fontFC->GetWidth(secondLine);
 		fontFC->SetPosX((float)((double)FLOAT_80331704 - w2) * FLOAT_80331434 +
-		                (float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)));
-		fontFC->SetPosY((float)(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) + 0x16));
+		                (float)*reinterpret_cast<short*>(bubbleData));
+		fontFC->SetPosY((float)(*reinterpret_cast<short*>(bubbleData + 0x72) + 0x16));
 		fontFC->Draw(secondLine);
 	}
 
@@ -6164,7 +6168,7 @@ void CMenuPcs::DrawFukidashi()
 	if ((*reinterpret_cast<unsigned short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int viewOff = 0x1E0;
 		for (int slot = 6; slot < 0x11; slot++) {
-			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
+			int* piVar10 = reinterpret_cast<int*>(worldObj + viewOff);
 			if (*piVar10 != 0) {
 				if (!viewportSetup) {
 					Mtx44 projMtx;

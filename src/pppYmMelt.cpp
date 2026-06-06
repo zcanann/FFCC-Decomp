@@ -13,8 +13,8 @@
 #include "dolphin/os/OSCache.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
-extern const float kPppYmMeltZero;
-extern const float FLOAT_80330af4;
+extern const float kPppYmMeltZero_80330AF0;
+extern const float FLOAT_80330af4_80330AF4;
 extern const float FLOAT_80330b08 = 0.5f;
 extern const float FLOAT_80330b0c = 0.017453292f;
 extern const float FLOAT_80330b10 = -2000.0f;
@@ -25,7 +25,7 @@ extern const u32 DAT_80330b24 = 0x00000010;
 extern const u32 DAT_80330B28 = 0x0000003f;
 extern const float FLOAT_80330B2C = 0.0f;
 extern const float FLOAT_80330B30 = 0.0f;
-u32 g_ymMelt;
+extern const u32 g_ymMelt;
 }
 
 struct YmMeltMapCylinder {
@@ -185,7 +185,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     shape = ppvEnv->m_resourceTables.m_shapeTablePtr[ctrl->m_dataValIndex];
 
-    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero,
+    pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero_80330AF0,
                   ctrl->m_melt.m_drawEnvColor1, ctrl->m_melt.m_drawEnvColor0, ctrl->m_blendMode, 2, 1, 1, 0);
     pppSetBlendMode(ctrl->m_blendMode);
 
@@ -216,7 +216,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         SetUpPaletteEnv(texture);
     }
 
-    phaseLerp = FLOAT_80330af4 - work->m_phase;
+    phaseLerp = FLOAT_80330af4_80330AF4 - work->m_phase;
     drawColor = g_ymMelt;
     drawColorBytes = reinterpret_cast<u8*>(&drawColor);
     drawColorBytes[0] = colorWork->m_color.rgba[0];
@@ -263,7 +263,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             vtx3.y += worldY;
             vtx2.y += worldY;
 
-            if (FLOAT_80330af4 != work->m_phase) {
+            if (FLOAT_80330af4_80330AF4 != work->m_phase) {
                 vtx0.x += (worldX - vtx0.x) * phaseLerp;
                 vtx0.z += (worldZ - vtx0.z) * phaseLerp;
                 vtx1.x += (worldX - vtx1.x) * phaseLerp;
@@ -378,7 +378,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
             rowVertex = vertex;
             for (x = -halfWidth; x <= halfWidth; x += step) {
                 rowVertex->m_position.x = x;
-                rowVertex->m_position.y = kPppYmMeltZero;
+                rowVertex->m_position.y = kPppYmMeltZero_80330AF0;
                 rowVertex->m_position.z = z;
 
                 if (phaseWork != 0) {
@@ -439,7 +439,7 @@ void pppDestructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
  */
 void pppConstructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    f32 value = kPppYmMeltZero;
+    f32 value = kPppYmMeltZero_80330AF0;
     YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
 
     work->m_vertexData = 0;
@@ -478,7 +478,7 @@ extern "C" void CalcPolygonHeight(
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
     previousY = ppvMng->m_previousPosition.x;
-    zero = FLOAT_80330B2C;
+    zero = kPppYmMeltZero_80330AF0;
     for (i = 0; i < pointCount; i++) {
         vertex = &vertexBuffer[i];
 

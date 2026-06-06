@@ -425,12 +425,6 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             m_baseDrawPriority = priority;
             break;
         }
-        case CHUNK_GEOM: {
-            m_zBufferOffset = chunkFile.GetF4();
-            m_bumpTexMatrixMode = chunkFile.Get1();
-            m_disableZWrite = chunkFile.Get1();
-            break;
-        }
         case CHUNK_LTST: {
             if (chunk.m_version == 1) {
                 m_lightSetIndex = static_cast<int>(chunkFile.Get4());
@@ -692,6 +686,12 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 spotLight->m_unknown2E = chunkFile.Get1();
             }
             m_attribute = spotLightAttr;
+            break;
+        }
+        case CHUNK_GEOM: {
+            m_zBufferOffset = chunkFile.GetF4();
+            m_bumpTexMatrixMode = chunkFile.Get1();
+            m_disableZWrite = chunkFile.Get1();
             break;
         }
         case CHUNK_AMBI: {

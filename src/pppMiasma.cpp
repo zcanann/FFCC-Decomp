@@ -46,13 +46,7 @@ STATIC_ASSERT(sizeof(MiasmaFrameWork) == 0x18);
 STATIC_ASSERT(offsetof(MiasmaColorWork, m_color) == 0x08);
 STATIC_ASSERT(sizeof(MiasmaRadiusWork) == 0x04);
 
-struct MiasmaDataOffsets {
-    s32 _unused0;
-    s32 m_colorWorkOffset;
-    s32 m_frameWorkOffset;
-    s32 m_radiusWorkOffset;
-};
-
+STATIC_ASSERT(sizeof(MiasmaDataOffsets) == 0x10);
 STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_colorWorkOffset) == 0x4);
 STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_frameWorkOffset) == 0x8);
 STATIC_ASSERT(offsetof(MiasmaDataOffsets, m_radiusWorkOffset) == 0xC);

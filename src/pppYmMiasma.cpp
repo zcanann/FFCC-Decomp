@@ -65,11 +65,7 @@ void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*);
 inline void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*);
 
-struct YmMiasmaDataOffsets {
-    s32 _unused0[2];
-    s32 m_workOffset;
-};
-
+STATIC_ASSERT(sizeof(YmMiasmaDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(YmMiasmaDataOffsets, m_workOffset) == 0x8);
 
 static inline YmMiasmaDataOffsets* GetYmMiasmaDataOffsets(_pppCtrlTable* ctrl)

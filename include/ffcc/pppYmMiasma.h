@@ -10,6 +10,11 @@ struct PARTICLE_DATA;
 
 typedef _pppPObject pppYmMiasma;
 
+struct YmMiasmaDataOffsets {
+    s32 _unused0[2];
+    s32 m_workOffset;
+};
+
 struct VYmMiasma {
     PARTICLE_DATA* m_particles;
     float m_speedDecay;

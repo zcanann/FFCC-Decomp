@@ -30,6 +30,11 @@ extern const char s_CRef_8032FAE8[];
 extern const float FLOAT_8032faf0;
 extern const float FLOAT_8032faf4;
 
+enum {
+    kTextureC8TlutEntries = 0x100,
+    kTextureC4TlutEntries = 0x10
+};
+
 static inline CTexture* NewTexture(CMemory::CStage* textureStage, char* file, int line)
 {
     void* memory = Memory._Alloc(sizeof(CTexture), textureStage, file, line, 0);
@@ -37,6 +42,17 @@ static inline CTexture* NewTexture(CMemory::CStage* textureStage, char* file, in
         return 0;
     }
     return ::new (memory) CTexture;
+}
+
+static inline int TextureTlutEntryCount(unsigned int format)
+{
+    if (format == GX_TF_C8) {
+        return kTextureC8TlutEntries;
+    }
+    if (format == GX_TF_C4) {
+        return kTextureC4TlutEntries;
+    }
+    return 0;
 }
 
 /*
@@ -296,15 +312,7 @@ CTextureSet::CTextureSet()
  */
 void CTexture::FlushExternalTlut(void* tlutData)
 {
-    int numEntries;
-
-    if (m_format == 9) {
-        numEntries = 0x100;
-    } else if (m_format == 8) {
-        numEntries = 0x10;
-    } else {
-        numEntries = 0;
-    }
+    int numEntries = TextureTlutEntryCount(m_format);
     DCFlushRange(tlutData, numEntries << 2);
 }
 
@@ -319,15 +327,7 @@ void CTexture::FlushExternalTlut(void* tlutData)
  */
 void CTexture::FlushTlut()
 {
-    int numEntries;
-
-    if (m_format == 9) {
-        numEntries = 0x100;
-    } else if (m_format == 8) {
-        numEntries = 0x10;
-    } else {
-        numEntries = 0;
-    }
+    int numEntries = TextureTlutEntryCount(m_format);
     DCFlushRange(m_tlutData, numEntries << 2);
 }
 
@@ -342,15 +342,7 @@ void CTexture::FlushTlut()
  */
 inline void CTexture::FlushExternalTlut(void* tlutData, int format)
 {
-    int numEntries;
-
-    if (format == 9) {
-        numEntries = 0x100;
-    } else if (format == 8) {
-        numEntries = 0x10;
-    } else {
-        numEntries = 0;
-    }
+    int numEntries = TextureTlutEntryCount(format);
     DCFlushRange(tlutData, numEntries << 2);
 }
 
@@ -412,15 +404,7 @@ inline _GXColor CTexture::GetExternalTlutColor(void* tlutData, int tlutOffset, i
 void CTexture::SetTlutColor(int index, _GXColor color)
 {
     unsigned char* packedColor = reinterpret_cast<unsigned char*>(&color);
-    int offset;
-
-    if (m_format == 9) {
-        offset = 0x100;
-    } else if (m_format == 8) {
-        offset = 0x10;
-    } else {
-        offset = 0;
-    }
+    int offset = TextureTlutEntryCount(m_format);
 
     u32 packed;
     unsigned char* packedBytes = reinterpret_cast<unsigned char*>(&packed);
@@ -446,14 +430,7 @@ void CTexture::SetTlutColor(int index, _GXColor color)
 _GXColor CTexture::GetTlutColor(int index)
 {
     unsigned int format = static_cast<unsigned int>(m_format);
-    int offset;
-    if (format == 9) {
-        offset = 0x100;
-    } else if (format == 8) {
-        offset = 0x10;
-    } else {
-        offset = 0;
-    }
+    int offset = TextureTlutEntryCount(format);
 
     unsigned short* tlut = reinterpret_cast<unsigned short*>(m_tlutData);
     _GXColor color;
@@ -478,7 +455,7 @@ _GXColor CTexture::GetTlutColor(int index)
  */
 inline void CTexture::CopyTlut(_GXColor* colors)
 {
-    int numEntries = (m_format == 9) ? 0x100 : 0x10;
+    int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
 
     for (int i = 0; i < numEntries; i++) {
         colors[i] = GetTlutColor(i);
@@ -500,12 +477,9 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
         tlutData = m_tlutData;
     }
 
-    int numEntries = (static_cast<unsigned int>(m_format) == 9) ? 0x100 : 0x10;
+    int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
     GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
-
-    numEntries = (static_cast<unsigned int>(m_format) == 9) ? 0x100 : 0x10;
-    int offset = (static_cast<unsigned int>(m_format) == 9) ? 0x100 : 0x10;
-    GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + offset * 2, GX_TL_IA8, numEntries);
+    GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + numEntries * 2, GX_TL_IA8, numEntries);
 
     if (loadToGX != 0) {
         GXLoadTlut(&m_tlutObj0, GX_TLUT0);
@@ -561,17 +535,16 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 
             unsigned int format = m_format;
             void* tlutData;
-            if ((format == 9) || (format == 8)) {
+            if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
                 tlutData = m_tlutData;
                 if (tlutData != 0) {
-                    GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8,
-                                  m_format == 9 ? 0x100 : 0x10);
-                    GXInitTlutObj(&m_tlutObj1,
-                                  static_cast<u8*>(tlutData) + (m_format == 9 ? 0x100 : 0x10) * 2,
-                                  GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
+                    int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+                    GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
+                    GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + numEntries * 2,
+                                  GX_TL_IA8, numEntries);
                 }
             } else {
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
@@ -727,17 +700,16 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
     format = m_format;
     void* tlutData;
-    if ((format == 9) || (format == 8)) {
+    if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         tlutData = m_tlutData;
         if (m_tlutData != 0) {
-            GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8,
-                          m_format == 9 ? 0x100 : 0x10);
-            GXInitTlutObj(&m_tlutObj1,
-                          static_cast<u8*>(tlutData) + (m_format == 9 ? 0x100 : 0x10) * 2,
-                          GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
+            int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+            GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
+            GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + numEntries * 2,
+                          GX_TL_IA8, numEntries);
         }
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
@@ -764,16 +736,16 @@ void CTexture::InitTexObj()
 {
     unsigned int format = m_format;
     void* tlutData;
-    if ((format == 9) || (format == 8)) {
+    if ((format == GX_TF_C8) || (format == GX_TF_C4)) {
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
         tlutData = m_tlutData;
         if (tlutData != 0) {
-            GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
-            GXInitTlutObj(&m_tlutObj1,
-                          static_cast<u8*>(tlutData) + (m_format == 9 ? 0x100 : 0x10) * 2,
-                          GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
+            int numEntries = (m_format == GX_TF_C8) ? kTextureC8TlutEntries : kTextureC4TlutEntries;
+            GXInitTlutObj(&m_tlutObj0, tlutData, GX_TL_IA8, numEntries);
+            GXInitTlutObj(&m_tlutObj1, static_cast<u8*>(tlutData) + numEntries * 2,
+                          GX_TL_IA8, numEntries);
         }
     } else {
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
@@ -873,7 +845,7 @@ int CTextureMan::SetTextureTev(CTexture* texture)
         return 1;
     }
 
-    usePalette = (texture->m_format == 9) || (texture->m_format == 8);
+    usePalette = (texture->m_format == GX_TF_C8) || (texture->m_format == GX_TF_C4);
     if (usePalette) {
         GXColor tevColor2;
         GXColor tevColor1;
@@ -943,7 +915,7 @@ int CTextureMan::SetTextureTev(CTexture* texture)
  */
 int CTextureMan::SetTexture(_GXTexMapID texMapId, CTexture* texture)
 {
-    int usePalette = (texture->m_format == 9) || (texture->m_format == 8);
+    int usePalette = (texture->m_format == GX_TF_C8) || (texture->m_format == GX_TF_C4);
 
     if (usePalette) {
         GXInitTexObjTlut(&texture->m_texObj, GX_TLUT0);

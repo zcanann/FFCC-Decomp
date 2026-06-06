@@ -4499,7 +4499,8 @@ unsigned int GbaQueue::GetChgRadarMode(int channel)
 void GbaQueue::ClrChgRadarMode(int channel)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	m_chgRadarMode = static_cast<unsigned char>(m_chgRadarMode & ~(1U << channel));
+	unsigned char radarMode = m_chgRadarMode;
+	m_chgRadarMode = static_cast<char>(radarMode & ~(1U << channel));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

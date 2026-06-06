@@ -227,8 +227,8 @@ private:
     unsigned char m_strengthFlags;    // 0x2D3E
     unsigned char m_artiDatFlags;     // 0x2D3F
     unsigned char m_radarTypeFlags;   // 0x2D40
-    unsigned char m_radarMode;        // 0x2D41
-    unsigned char m_chgRadarMode;     // 0x2D42
+    char m_radarMode;                 // 0x2D41
+    char m_chgRadarMode;              // 0x2D42
     unsigned char _pad2D43;           // 0x2D43
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54

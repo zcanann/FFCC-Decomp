@@ -8477,29 +8477,36 @@ void CMenuPcs::DrawCharaName()
 
 	const int lang = Game.m_gameWork.m_languageId;
 	const char** emptyText;
-	if (lang == 3) {
-		emptyText = s_wmEmptyCreatingTextIt_8032E900;
-	} else if (lang < 3) {
-		if (lang != 1 && lang != 0) {
-			emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
-		} else {
-			emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
+	do {
+		if (lang == 3) {
+			emptyText = s_wmEmptyCreatingTextIt_8032E900;
+			break;
 		}
-	} else if (lang == 5) {
-		emptyText = s_wmEmptyCreatingTextEs_8032E910;
-	} else if (lang < 5) {
-		emptyText = s_wmEmptyCreatingTextFr_8032E908;
-	} else {
+		if (lang < 3) {
+			if (lang != 1 && lang != 0) {
+				emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
+				break;
+			}
+		} else {
+			if (lang == 5) {
+				emptyText = s_wmEmptyCreatingTextEs_8032E910;
+				break;
+			}
+			if (lang < 5) {
+				emptyText = s_wmEmptyCreatingTextFr_8032E908;
+				break;
+			}
+		}
 		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
-	}
+	} while (0);
 
 	float fade;
-	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
-	} else if (worldState->m_mainState == 2) {
+	if (m_wmWorldState->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
+	} else if (m_wmWorldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
+		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 	}
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;

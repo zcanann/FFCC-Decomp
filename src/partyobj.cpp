@@ -3256,7 +3256,7 @@ void CGPartyObj::statPut()
 			break;
 		case 0x1B:
 			anim = 9;
-			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				anim = 0x28;
 			}
 			seNo = 0x24;
@@ -3277,7 +3277,7 @@ void CGPartyObj::statPut()
 			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x24, 1);
-			} else if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0, 0);
 				SetAnimSlot(1, 1);
 			} else {
@@ -3285,7 +3285,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x30, 1);
 			}
 		} else if (CFlatCenterState() == 0) {
-			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
 			} else {

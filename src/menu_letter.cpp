@@ -1015,13 +1015,14 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	if (panelCount == finished && SingGetLetterAttachflg() >= 0) {
+	bool allFinished = panelCount == finished;
+	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		s_BackUpCur[0] = *reinterpret_cast<s16*>(state + 0x26);
 		s_BackUpTopPos = s_SelLetter - s_BackUpCur[0];
 		s_BackUpCur[1] = *reinterpret_cast<s16*>(state + 0x28);
 	}
 
-	return panelCount == finished;
+	return allFinished;
 }
 
 /*

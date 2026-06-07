@@ -586,7 +586,7 @@ bool CMenuPcs::LetterOpen()
 	if (0 < iVar5) {
 		do {
 			fVar1 = FLOAT_803330bc;
-			if (*reinterpret_cast<int*>(psVar7 + 0x12) <= iVar8) {
+			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
 				if (iVar8 < *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
 					*reinterpret_cast<int*>(psVar7 + 0x10) = *reinterpret_cast<int*>(psVar7 + 0x10) + 1;
 					*reinterpret_cast<float*>(psVar7 + 8) =
@@ -611,7 +611,8 @@ bool CMenuPcs::LetterOpen()
 			iVar4 = iVar4 + -1;
 		} while (iVar4 != 0);
 	}
-	if (iVar5 == iVar6) {
+	bool allFinished = iVar5 == iVar6;
+	if (allFinished) {
 		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
 			m_singMenuState->procState = 1;
@@ -621,7 +622,7 @@ bool CMenuPcs::LetterOpen()
 			LetterInit1();
 		}
 	}
-	return iVar5 == iVar6;
+	return allFinished;
 }
 
 /*

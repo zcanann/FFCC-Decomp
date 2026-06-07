@@ -1101,9 +1101,6 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				ModelDynCount(this) = 0;
 				ModelDynParams(this) =
 				    static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
-				if (ModelDynParams(this) == 0) {
-					continue;
-				}
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
@@ -1130,32 +1127,28 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				}
 				chunkFile.PopChunk();
 			} else if (chunk.m_id == CharaFourCC('N', 'S', 'E', 'T')) {
-				int currentNode = -1;
 				chunkFile.PushChunk();
+				u32 currentNode = 0;
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
 						char* name = chunkFile.GetString();
 						CNode* searchNode = ModelNodes(this);
-						bool found = false;
-						for (u32 i = 0; i < ModelNodeCount(this); i++, searchNode++) {
+						for (currentNode = 0; currentNode < ModelNodeCount(this); currentNode++, searchNode++) {
 							if (strcmp(NodeRefName(searchNode), name) == 0) {
-								currentNode = static_cast<int>(i);
-								found = true;
-								break;
+								goto nextNsetChunk;
 							}
 						}
-						if (!found) {
-							currentNode = -1;
-						}
+						currentNode = 0xFFFFFFFF;
 					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
-							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M') && currentNode >= 0) {
+							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
 								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<u8>(chunkFile.Get4());
 							}
 						}
 						chunkFile.PopChunk();
 					}
+				nextNsetChunk:;
 				}
 				chunkFile.PopChunk();
 			}

@@ -2355,15 +2355,15 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		}
 
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
-			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x9A) &&
+			if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x9A &&
 			    static_cast<CGMonObj*>(this)->m_actionBranch == 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x24) -= delta;
 				delta = 0;
 			}
-			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x88)) {
+			if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x88) {
 				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) -= delta;
 			}
-			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x70) &&
+			if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x70 &&
 			    static_cast<int>(hpValue + delta) < 1) {
 				delta = -(static_cast<int>(hpValue) - 1);
 			}

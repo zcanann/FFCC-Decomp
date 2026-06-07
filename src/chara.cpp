@@ -1963,8 +1963,8 @@ int CChara::CModel::SearchNodeSk(char* name)
 			u32 i = 0;
 			CNode* node = ModelNodes(this);
 			for (; i < ModelNodeCount(this); i++) {
-				int len = strlen(NodeRefName(node));
-				if ((len - 3) > 0 && strcmp(NodeRefName(node) + (len - 3), name) == 0) {
+				int tail = strlen(NodeRefName(node)) - 3;
+				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
 					return (int)i;
 				}
 				node++;
@@ -1973,8 +1973,8 @@ int CChara::CModel::SearchNodeSk(char* name)
 			u32 i = 0;
 			CNode* node = ModelNodes(this);
 			for (; i < ModelNodeCount(this); i++) {
-				int len = strlen(NodeRefName(node));
-				if ((len - 5) > 0 && strcmp(NodeRefName(node) + (len - 5), name) == 0) {
+				int tail = strlen(NodeRefName(node)) - 5;
+				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
 					return (int)i;
 				}
 				node++;

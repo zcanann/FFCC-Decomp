@@ -2027,14 +2027,15 @@ next_player:
                 do
                 {
                     unsigned int word = *reinterpret_cast<unsigned int*>(txBase + 0x1368);
+                    unsigned int masked = word & 0xFFFF00;
                     if ((word & 0x8000) != 0)
                     {
-                        PadCodeProc(j, static_cast<unsigned short>((word & 0xFF00) | ((int)((word & 0xFFFF00) >> 8) >> 8)));
+                        PadCodeProc(j, static_cast<unsigned short>((word & 0xFF00) | ((int)(masked >> 8) >> 8)));
                     }
                     unsigned int crc = 0;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
-                        *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (word & 0xFFFF00);
+                        *reinterpret_cast<unsigned int*>(txBase + 0x1378) | masked;
                     crc = MiniGameCrc8(*reinterpret_cast<unsigned int*>(txBase + 0x1378));
                     j++;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =

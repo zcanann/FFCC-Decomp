@@ -766,9 +766,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	float height = (float)sprite->h;
 
 	int partyIndex = 0;
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		if ((int)*(short*)(this->m_bonusStatePtr + 0xe) == s_Rinfo->m_party[i].m_rank) {
-			partyIndex = i;
+	for (; partyIndex < s_Rinfo->m_partyCount; partyIndex++) {
+		if ((int)*(short*)(this->m_bonusStatePtr + 0xe) == s_Rinfo->m_party[partyIndex].m_rank) {
 			break;
 		}
 	}

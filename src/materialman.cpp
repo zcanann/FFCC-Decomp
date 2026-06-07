@@ -3005,7 +3005,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
  */
 void CMaterialSet::Calc()
 {
-    unsigned long materialIndex = 0;
+    register long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];

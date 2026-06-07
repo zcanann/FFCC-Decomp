@@ -1572,13 +1572,14 @@ void CGPartyObj::shouki()
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (FLOAT_80331b00 * Game.unkFloat_0xca10 < chaliceDist || (CFlatGameFlags() & 0x10) != 0) {
+	if (FLOAT_80331b00 * Game.unkFloat_0xca10 < chaliceDist ||
+	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) != 0) {
 		if (m_unk688 != 2) {
 			deletePSlotBit(0x200);
-			gCFlatRuntime2.ResetParticleWork(1, m_particleSlots[9]);
-			gCFlatRuntime2.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
-			gCFlatRuntime2.SetParticleWorkBind(this);
-			gCFlatRuntime2.PutParticleWork();
+			CFlat.ResetParticleWork(1, m_particleSlots[9]);
+			CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+			CFlat.SetParticleWorkBind(this);
+			CFlat.PutParticleWork();
 		}
 		m_unk688 = 2;
 	} else {
@@ -1588,11 +1589,11 @@ void CGPartyObj::shouki()
 		} else {
 			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
 				playSe3D(0x1E, 0x32, 0x96, 0, 0);
-				gCFlatRuntime2.ResetParticleWork(2, 0);
-				gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
-				gCFlatRuntime2.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
-				gCFlatRuntime2.SetParticleWorkBind(this);
-				gCFlatRuntime2.PutParticleWork();
+				CFlat.ResetParticleWork(2, 0);
+				CFlat.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
+				CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+				CFlat.SetParticleWorkBind(this);
+				CFlat.PutParticleWork();
 			}
 			m_unk688 = 1;
 		}

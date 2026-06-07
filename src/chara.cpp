@@ -3108,7 +3108,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 			s_charaMeshWorkOverflowSeen = 1;
 		}
 
-		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, 1 < static_cast<u32>(System.m_execParam))) {
+		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, 2 <= static_cast<u32>(System.m_execParam))) {
 			System.Printf(const_cast<char*>(s_charaMeshWorkOverflow));
 		}
 		return;

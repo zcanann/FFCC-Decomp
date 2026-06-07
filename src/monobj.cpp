@@ -2653,45 +2653,55 @@ void CGMonObj::initFinishedFuncDefault()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* scriptBase = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
 
 	// Script value is authored in centi-units.
 	object->m_hitNormal.x = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
 
-	unsigned short animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
-	if (animPoint != 0xFFFF) {
+	CCharaPcs::CHandle* handle = object->m_charaModelHandle;
+	if (handle != NULL) {
+		CChara::CModel* model = handle->m_model;
+		if (model != NULL) {
+			int nodeIdx = model->SearchNode(const_cast<char*>(s_monObjHeadNode));
+			if (nodeIdx >= 0) {
+				m_bind = reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_model->m_nodes + nodeIdx);
+			}
+		}
+	}
+
+	short animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != -1) {
 		object->AddAnimPoint(1, animPoint, 0xB);
 	}
 
-	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
-	if (animPoint != 0xFFFF) {
+	animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != -1) {
 		object->AddAnimPoint(1, animPoint, 0xA);
 	}
 
 	m_forcedAction = -1;
-	for (int attackBase = 0, slotBase = 0; slotBase < 8; attackBase += 4, slotBase += 8) {
-		unsigned int attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD0);
+	for (int attackBase = 0, slotBase = 0; slotBase < 0x10; attackBase += 4, slotBase += 8) {
+		unsigned int attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD0);
 		if ((attackId != 0xFFFF) &&
 			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
 			m_forcedAction = attackBase;
 			break;
 		}
 
-		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD2);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD2);
 		if ((attackId != 0xFFFF) &&
 			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
 			m_forcedAction = attackBase + 1;
 			break;
 		}
 
-		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD4);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD4);
 		if ((attackId != 0xFFFF) &&
 			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
 			m_forcedAction = attackBase + 2;
 			break;
 		}
 
-		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD6);
+		attackId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + slotBase + 0xD6);
 		if ((attackId != 0xFFFF) &&
 			(*reinterpret_cast<short*>(Game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
 			m_forcedAction = attackBase + 3;

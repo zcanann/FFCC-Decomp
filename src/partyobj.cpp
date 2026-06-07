@@ -4106,7 +4106,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 	PartyObjOverlay& party = PartyData(this);
 
 	if (party.flags.flag04) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
 		}
 		party.flags.flag04 = 0;

@@ -3098,12 +3098,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x65: {
-        CColor shadeColor(
-            static_cast<u8>(object->m_localBase[1]),
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            0xFF);
-        CharaPcs.SetMapShadeColor(*object->m_localBase, shadeColor);
+        CharaPcs.SetMapShadeColor(
+            *object->m_localBase,
+            CColor(
+                static_cast<u8>(object->m_localBase[1]),
+                static_cast<u8>(object->m_localBase[2]),
+                static_cast<u8>(object->m_localBase[3]),
+                0xFF));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3698,12 +3699,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             localFloats[4],
             localFloats[5],
             localFloats[6]);
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[1]),
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
-            0xFF,
-        };
+            0xFF);
         MapMng.SetMapObjWorldMapLightID(*object->m_localBase, color, position);
         this->push(object, 0);
         outResult = 0;

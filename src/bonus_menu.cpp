@@ -3382,7 +3382,7 @@ void CMenuPcs::createBonus()
 				totalValueClamped = 0;
 			} else {
 				totalValueClamped = 999;
-				if (rawTotal < 1000) {
+				if (rawTotal <= 999) {
 					totalValueClamped = rawTotal;
 				}
 			}

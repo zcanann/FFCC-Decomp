@@ -2899,7 +2899,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		unsigned short actionType;
-		if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+		if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 			actionType = actionFlags & 3;
 		} else {
 			actionType = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118);
@@ -2950,7 +2950,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
 				(FLOAT_80331A30 < fabsf(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
-				if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 					forceAction = monObj->m_forcedAction ==
 						*reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
 				} else {
@@ -2960,13 +2960,13 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 			if (forceAction || (Math.Rand(100) <= chance)) {
 				selectedAction = actionIndex;
-				if ((*reinterpret_cast<short*>(baseScript + 0x10C) == 1) || forceAction) {
+				if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) || forceAction) {
 					break;
 				}
 			}
 		} else {
 			unsigned int groupIndex;
-			if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
+			if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
 				groupIndex = (actionFlags >> 2) & 7;
 			} else {
 				groupIndex = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A);
@@ -3046,7 +3046,7 @@ void CGMonObj::statAround()
 				return;
 			}
 			if (nextAction == -1) {
-				if (*reinterpret_cast<short*>(script + 0x10C) != 1) {
+				if (*reinterpret_cast<unsigned short*>(script + 0x10C) != 1) {
 					if (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
 						monObj->m_chaseTimer) {
 						monObj->m_chaseState = 3;
@@ -3102,7 +3102,7 @@ void CGMonObj::statAround()
 				return;
 			}
 
-			if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
+			if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
 				actionState = nextAction;
 				if (nextAction < 100) {
 					short aiState = monObj->m_aiState;
@@ -3316,7 +3316,7 @@ void CGMonObj::statWatch()
 		if ((*reinterpret_cast<short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
 			float noticeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
 			if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) < noticeRange) {
-				if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
+				if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
 					chaseState = 5;
 					chaseTimer = 0;
 					monObj->m_chaseDirty = 1;
@@ -3335,7 +3335,7 @@ void CGMonObj::statWatch()
 	}
 
 	if (prgObj->m_lastStateId == 0x21) {
-		if ((*reinterpret_cast<short*>(script + 0x10C) == 1) &&
+		if ((*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) &&
 			(((monObj->m_moveWork.m_stateFlags & 1) != 0) ||
 			 (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC)) <=
 			  monObj->m_moveWork.m_frame))) {

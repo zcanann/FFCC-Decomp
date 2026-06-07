@@ -1006,14 +1006,14 @@ void CGPartyObj::onFramePreCalc()
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
 		if (party.carryObject == nullptr &&
-		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		} else {
 			float speedScale = FLOAT_80331a54;
-			if (Game.m_gameWork.m_menuStageMode == 0) {
+			if (CFlatCenterState() == 0) {
 				speedScale = FLOAT_80331b08;
 			}
-			m_moveBaseSpeed = FLOAT_80331b04 * speedScale;
+			m_moveBaseSpeed = static_cast<float>(static_cast<int>(FLOAT_80331b04 * speedScale));
 		}
 		m_moveBaseSpeed *= m_extraMoveVec.z;
 	}

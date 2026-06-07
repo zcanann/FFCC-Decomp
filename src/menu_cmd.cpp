@@ -300,7 +300,7 @@ static inline s16 GetUniteRecipeCount(int recipe)
  */
 bool IsMagicArti(int itemId)
 {
-	return (0xde < itemId) && (itemId < 0xe4);
+	return (0xdf <= itemId) && (itemId < 0xe4);
 }
 
 /*
@@ -1629,7 +1629,7 @@ void CMenuPcs::GetCmdItem()
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if ((itemType != 1) ||
-			    (GetItemIcon(caravanWork->m_inventoryItems[i]) == (caravanWork->m_tribeId & 3))) {
+			    ((caravanWork->m_tribeId & 3) == GetItemIcon(caravanWork->m_inventoryItems[i]))) {
 				write++;
 				*write = static_cast<s16>(i);
 				count++;
@@ -2219,9 +2219,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if (topIdx > 0) {
-		int i = 0;
-		int k = 3;
-		do {
+		for (int i = 0; i < 3; i++) {
 			int idx = i + s_UniteTop[topIdx];
 			CmdListEntry* entry = &entries[idx];
 			if ((i != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
@@ -2234,18 +2232,13 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 				entry->x = static_cast<s16>(FLOAT_80332ac8 + baseX);
 				return 1;
 			}
-
-			i++;
-			k--;
-		} while (k != 0);
+		}
 	} else {
 		int finished = 0;
 		float targetX = FLOAT_80332ac8 + baseX;
 		s32* top = s_UniteTop;
 		for (int i = 0; i < s_unitePanelCount; i++) {
-			int j = 0;
-			int k = 3;
-			do {
+			for (int j = 0; j < 3; j++) {
 				int idx = j + *top;
 				CmdListEntry* entry = &entries[idx];
 				if ((j != 0) && (caravanWork->m_commandListExtra[idx] != -1)) {
@@ -2260,10 +2253,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 						finished++;
 					}
 				}
-
-				j++;
-				k--;
-			} while (k != 0);
+			}
 			top++;
 		}
 		if (finished == s_unitePanelCount) {

@@ -797,8 +797,8 @@ public:
     };
     unsigned char* m_wmWorkBuffer;
     unsigned char m_wmThpActive;
-    unsigned char m_singleMenuStageActive;
-    unsigned char m_singleMenuInitialized;
+    signed char m_singleMenuStageActive;
+    signed char m_singleMenuInitialized;
     unsigned char m_pad85B[0x85C - 0x85B];
     int m_singleMenuTextureLoadIndex;
     int m_singleMenuTextureLoadState;
@@ -820,7 +820,7 @@ public:
         short m_wmTransitionCode;
         signed short m_goOutLoadResult;
     };
-    unsigned char m_singleMenuCtrlResetFlag;
+    signed char m_singleMenuCtrlResetFlag;
     unsigned char m_pad873;
     int m_singleLifeTimer;
     CShopMenu* m_shopMenu;

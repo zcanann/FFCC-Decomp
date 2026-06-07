@@ -64,6 +64,15 @@ extern "C" const float FLOAT_80333160 = 64.0f;
 extern "C" const float FLOAT_80333164 = 352.0f;
 extern "C" const float FLOAT_80333168 = 536.0f;
 
+static const char s_fmt_pcts_pcts[] = "%s%s";
+static const char s_fmt_pcts_pcts_pcts[] = "%s%s%s";
+static const char s_fmt_pcts_sp_pcts_dot[] = "%s %s.";
+static const char s_fmt_pcts_sp_pcts_pcts[] = "%s %s%s";
+static const char s_fmt_pctd_sp_pcts[] = "%d %s";
+static const char s_fmt_two_spaces[] = "  ";
+static const char s_fmt_pctd_sp_pcts_pcts[] = "%d %s%s";
+static const char s_fmt_pcts_pcts_q[] = "%s%s?";
+
 static short s_SelLetter = 0;
 static unsigned char s_OpenClose = 0;
 static unsigned char s_ReplyMax = 0;
@@ -788,7 +797,7 @@ int CMenuPcs::LetterCtrl()
 				if (letter->AttachmentIsGil()) {
 					s16 gil = static_cast<int>(letter->AttachmentValue()) * 100;
 					if (Game.m_gameWork.m_languageId == 2) {
-						sprintf(info, "%d %s%s",
+						sprintf(info, s_fmt_pctd_sp_pcts_pcts,
 						        gil,
 						        GetMenuStr(4),
 						        GetMenuStr(0x22));
@@ -808,7 +817,7 @@ int CMenuPcs::LetterCtrl()
 						        GetMenuStr(0x24),
 						        GetMenuStr(0x22));
 					} else {
-						sprintf(info, "%s%s?", GetMenuStr(0x22), value);
+						sprintf(info, s_fmt_pcts_pcts_q, GetMenuStr(0x22), value);
 					}
 				}
 				strcpy(left, "  ");
@@ -1587,43 +1596,43 @@ bool CMenuPcs::LetterConfirmOpen()
 		switch (languageId) {
 		case 3: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
+			sprintf(lines[0], s_fmt_pcts_pcts, GetMenuStr(0x26), title);
 			break;
 		}
 		case 2: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
+			sprintf(lines[0], s_fmt_pcts_pcts, title, GetMenuStr(0x26));
 			break;
 		}
 		case 5: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
+			sprintf(lines[0], s_fmt_pcts_sp_pcts_dot, GetMenuStr(0x26), title);
 			break;
 		}
 		case 4: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
+			sprintf(lines[0], s_fmt_pcts_pcts_pcts, GetMenuStr(0x26), title, GetMenuStr(0x25));
 			break;
 		}
 		case 0:
 		case 1:
 		default: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-			sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
+			sprintf(lines[0], s_fmt_pcts_sp_pcts_pcts, GetMenuStr(0x25), title, GetMenuStr(0x26));
 			break;
 		}
 		}
 
 		switch (languageId) {
 		case 3:
-			sprintf(lines[1], "%s%s%s%s",
+			sprintf(lines[1], s_pctspctspctspcts,
 			        GetMenuStr(0x25),
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24));
 			break;
 		case 2:
-			sprintf(lines[1], "%s%s%s%s",
+			sprintf(lines[1], s_letterItemInfoFmt,
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24),
@@ -1632,7 +1641,7 @@ bool CMenuPcs::LetterConfirmOpen()
 		case 0:
 		case 1:
 		default:
-			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
+			sprintf(lines[1], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 			break;
 		}
 
@@ -1640,11 +1649,11 @@ bool CMenuPcs::LetterConfirmOpen()
 		if (s_Attach != 2) {
 			if (languageId == 2) {
 				if (s_Attach == 0) {
-					sprintf(lines[2], "%s%s%s", GetMenuStr(0x23),
+					sprintf(lines[2], s_fmt_pcts_pcts_pcts, GetMenuStr(0x23),
 					        GetLetterItemName(s_AttachItem * 5 + 4),
 					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
-					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
+					sprintf(lines[2], s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}
 				strcat(lines[2], GetMenuStr(0x28));
 			} else {
@@ -1653,16 +1662,16 @@ bool CMenuPcs::LetterConfirmOpen()
 					strcat(lines[2], Game.m_cFlatDataArr[1].TableStrings(0)[s_AttachItem * 5 + 4]);
 				} else if (s_Attach == 1) {
 					int offs = strlen(lines[2]);
-					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
+					sprintf(lines[2] + offs, s_fmt_pctd_sp_pcts, s_AttachItem, GetMenuStr(4));
 				}
 			}
 			lineCount = 3;
 		}
 
 		strcat(lines[lineCount], GetMenuStr(0x21));
-		strcpy(lines[lineCount + 1], "");
+		strcpy(lines[lineCount + 1], s_fmt_two_spaces);
 		strcat(lines[lineCount + 1], GetMenuStr(1));
-		strcpy(lines[lineCount + 2], "");
+		strcpy(lines[lineCount + 2], s_fmt_two_spaces);
 		strcat(lines[lineCount + 2], GetMenuStr(2));
 
 		SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);

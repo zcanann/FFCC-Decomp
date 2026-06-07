@@ -2056,11 +2056,7 @@ void CMenuPcs::DrawUniteList()
 		const float width = static_cast<float>(font->GetWidth(text));
 		float x = static_cast<float>((static_cast<float>(entry->width) - width) * DOUBLE_80332a60 + static_cast<float>(entry->x));
 		if (topX != entry->x) {
-			float diff = static_cast<float>(topX - entry->x);
-			if (diff < FLOAT_80332a70) {
-				diff = -diff;
-			}
-			const float t = diff * 0.125f;
+			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) * 0.125);
 			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
 			x = (target - x) * t + x;
 		}

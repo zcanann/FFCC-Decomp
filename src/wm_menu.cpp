@@ -1658,10 +1658,9 @@ void CMenuPcs::calcWorld()
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
 	CChara::CModel* const model = handle->m_model;
-	unsigned char* const modelBytes = reinterpret_cast<unsigned char*>(model);
-	const float animEnd = reinterpret_cast<float*>(modelBytes + 0xC0)[0];
-	const float animTime = reinterpret_cast<float*>(modelBytes + 0xB4)[0];
 	const short animState = m_wmWorldState->m_mainState;
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 
 	if (animState == 1) {
 		if (animEnd <= animTime) {
@@ -1733,35 +1732,42 @@ void CMenuPcs::calcWorld()
 			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
-		if (m_wmWorldState->m_delay == 0) {
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+		} else {
 			m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
 			m_wmWorldState->m_nextMenuMode = 0;
-		} else {
-			m_wmWorldState->m_delay--;
 		}
 	}
 
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	worldObj[0x50] = 1;
 	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
+	const float fVar1 = FLOAT_803313dc;
 	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
+	float fVar3 = FLOAT_80331598;
 	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
+	const float fVar4 = FLOAT_803315d4;
 	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
-	reinterpret_cast<float*>(worldObj + 0x60)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x64)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x68)[0] = FLOAT_80331598;
-	reinterpret_cast<float*>(worldObj + 0x6C)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x70)[0] = FLOAT_803317e0;
-	reinterpret_cast<float*>(worldObj + 0x74)[0] = FLOAT_803317e4;
-	reinterpret_cast<float*>(worldObj + 0x78)[0] = FLOAT_803317e8;
-	reinterpret_cast<float*>(worldObj + 0x7C)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x80)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x84)[0] = FLOAT_803315d4;
-	reinterpret_cast<float*>(worldObj + 0x88)[0] = FLOAT_803315d4;
-	reinterpret_cast<float*>(worldObj + 0x8C)[0] = FLOAT_803315d4;
+	const float fVar5 = FLOAT_803317e0;
+	reinterpret_cast<float*>(worldObj + 0x60)[0] = fVar1;
+	const float fVar6 = FLOAT_803317e4;
+	reinterpret_cast<float*>(worldObj + 0x64)[0] = fVar1;
+	const float fVar7 = FLOAT_803317e8;
+	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
+	fVar3 = FLOAT_803314bc;
+	worldObj[0x50] = 1;
+	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x6C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x70)[0] = fVar5;
+	reinterpret_cast<float*>(worldObj + 0x74)[0] = fVar6;
+	reinterpret_cast<float*>(worldObj + 0x78)[0] = fVar7;
+	reinterpret_cast<float*>(worldObj + 0x7C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x80)[0] = fVar1;
 
 	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', FLOAT_803314bc * reinterpret_cast<float*>(worldObj + 0x78)[0]);
+	PSMTXRotRad(matrix, 'x', fVar3 * reinterpret_cast<float*>(worldObj + 0x78)[0]);
 	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
 	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
 	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];

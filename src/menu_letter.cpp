@@ -877,10 +877,7 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28) = static_cast<s16>(s_ReplyPos);
 				} else {
-					if (s_Attach == 2) {
-						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
-						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
-					} else {
+					if (s_Attach != 2) {
 						if (s_Attach == 0) {
 							SingSetLetterAttachflg(1);
 						} else {
@@ -902,6 +899,9 @@ int CMenuPcs::LetterCtrl()
 							*reinterpret_cast<float*>(panel + 8) = resetAlpha;
 						}
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22) = 0;
+					} else {
+						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
+						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					}
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
 				}

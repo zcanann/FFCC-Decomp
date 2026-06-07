@@ -1851,25 +1851,24 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 {
 	(void)parent;
 	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + static_cast<char>(NodeDynParamIndex(node)) * 0x24);
-	MtxPtr nodeMtx = NodeWorldMtx(node);
 
 	Vec forward;
 	{
-		CVector tmp(nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]);
+		CVector tmp(NodeWorldMtx(node)[0][0], NodeWorldMtx(node)[1][0], NodeWorldMtx(node)[2][0]);
 		forward.x = tmp.x;
 		forward.y = tmp.y;
 		forward.z = tmp.z;
 	}
 	Vec right;
 	{
-		CVector tmp(nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]);
+		CVector tmp(NodeWorldMtx(node)[0][1], NodeWorldMtx(node)[1][1], NodeWorldMtx(node)[2][1]);
 		right.x = tmp.x;
 		right.y = tmp.y;
 		right.z = tmp.z;
 	}
 	Vec up;
 	{
-		CVector tmp(nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]);
+		CVector tmp(NodeWorldMtx(node)[0][2], NodeWorldMtx(node)[1][2], NodeWorldMtx(node)[2][2]);
 		up.x = tmp.x;
 		up.y = tmp.y;
 		up.z = tmp.z;
@@ -1877,7 +1876,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	reinterpret_cast<CVector&>(forward).Normalize();
 	Vec origin;
 	{
-		CVector tmp(nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]);
+		CVector tmp(NodeWorldMtx(node)[0][3], NodeWorldMtx(node)[1][3], NodeWorldMtx(node)[2][3]);
 		origin.x = tmp.x;
 		origin.y = tmp.y;
 		origin.z = tmp.z;
@@ -2014,7 +2013,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		Mtx axisBase;
 		Mtx combined;
 		PSMTXRotAxisRad(rotate, &axis, rotateAngle);
-		PSMTXCopy(nodeMtx, base);
+		PSMTXCopy(NodeWorldMtx(node), base);
 		PSMTXCopy(rotate, axisBase);
 		base[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;
 		base[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
@@ -2023,15 +2022,15 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		axisBase[1][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).y;
 		axisBase[2][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).z;
 		PSMTXConcat(axisBase, base, combined);
-		nodeMtx[0][0] = combined[0][0];
-		nodeMtx[1][0] = combined[1][0];
-		nodeMtx[2][0] = combined[2][0];
-		nodeMtx[0][1] = combined[0][1];
-		nodeMtx[1][1] = combined[1][1];
-		nodeMtx[2][1] = combined[2][1];
-		nodeMtx[0][2] = combined[0][2];
-		nodeMtx[1][2] = combined[1][2];
-		nodeMtx[2][2] = combined[2][2];
+		NodeWorldMtx(node)[0][0] = combined[0][0];
+		NodeWorldMtx(node)[1][0] = combined[1][0];
+		NodeWorldMtx(node)[2][0] = combined[2][0];
+		NodeWorldMtx(node)[0][1] = combined[0][1];
+		NodeWorldMtx(node)[1][1] = combined[1][1];
+		NodeWorldMtx(node)[2][1] = combined[2][1];
+		NodeWorldMtx(node)[0][2] = combined[0][2];
+		NodeWorldMtx(node)[1][2] = combined[1][2];
+		NodeWorldMtx(node)[2][2] = combined[2][2];
 	}
 
 	{

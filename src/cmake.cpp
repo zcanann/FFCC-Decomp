@@ -3707,6 +3707,16 @@ void CMenuPcs::DrawSingCMake()
             x += span;
         }
 
+        if (CmakeState(this)->m_resultFlag != 0 && CmakeState(this)->m_mode == 0) {
+            CmakeState(this)->m_step = CmakeState(this)->m_step + 1;
+            CmakeState(this)->m_frame = 0;
+            CmakeState(this)->m_resultFlag = 0;
+            CmakeState(this)->m_selectionInitialized = 0;
+        } else if (CmakeState(this)->m_resultFlag != 0 && CmakeState(this)->m_mode == 2) {
+            m_singleCmakeSlot = 999;
+            CmakeState(this)->m_resultValue = -1;
+        }
+
         break;
     }
     case 1:

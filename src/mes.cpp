@@ -199,10 +199,9 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	int branchMode = 0;
 
 	const unsigned char* next;
-	while (in[0] != 0)
+	unsigned char c;
+	while ((c = in[0]) != 0)
 	{
-		unsigned char c = in[0];
-
 		if (c != 0xFF)
 		{
 			if (branchMode != 2)

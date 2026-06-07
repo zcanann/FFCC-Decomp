@@ -208,6 +208,11 @@ static inline u8& ModelFlags10C(CChara::CModel* model)
 	return model->m_flags10C;
 }
 
+static inline s8 ModelFlag10C_80(CChara::CModel* model)
+{
+	return model->m_flags10CBits.m_flag10C_80;
+}
+
 static inline Vec& ModelDynJitter(CChara::CModel* model)
 {
 	return reinterpret_cast<Vec&>(model->m_dynJitter);
@@ -1873,7 +1878,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		target.z = tmp.z;
 	}
 
-	if (static_cast<s8>(ModelFlags10C(this)) < 0) {
+	if (ModelFlag10C_80(this)) {
 		NodeDynPosition(node).x = target.x;
 		NodeDynPosition(node).y = target.y;
 		NodeDynPosition(node).z = target.z;

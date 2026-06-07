@@ -316,9 +316,9 @@ public:
 			u8 m_flags10C;
 			struct
 			{
-				u8 m_flag10C_80 : 1;
-				u8 m_flag10C_40 : 1;
-				u8 m_flag10C_lo : 6;
+				s8 m_flag10C_80 : 1;
+				s8 m_flag10C_40 : 1;
+				s8 m_flag10C_lo : 6;
 			} m_flags10CBits;
 		};
 		u8 _pad10D[3];

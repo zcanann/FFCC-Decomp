@@ -1628,8 +1628,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int frame = (int)*(short*)(statePtr + 0x22);
 	int doneCount = 0;
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int flags = BonusSpriteFlags(sprite);
 
 		if ((flags & 1) != 0) {

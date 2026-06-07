@@ -1521,8 +1521,7 @@ void CChara::CModel::calcMatrix()
 				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
 			}
 		} else {
-			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
-			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
+			if (parentNode == 0 || NodeAnimNode0(parentNode) == 0 || !AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
 					float baseScale;
 					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301bc) {

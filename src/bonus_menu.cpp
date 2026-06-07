@@ -2878,12 +2878,12 @@ void CMenuPcs::CalcResultOpenAnim()
 			continue;
 		}
 
-		if (frame < sprite->startFrame + sprite->duration) {
-			sprite->timer++;
-			sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
-		} else {
+		if (sprite->startFrame + sprite->duration <= frame) {
 			sprite->alpha = 1.0f;
 			doneCount++;
+		} else {
+			sprite->timer++;
+			sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
 		}
 
 		if (sprite->kind == 0x17 && sprite->timer == 1) {

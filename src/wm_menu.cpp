@@ -969,12 +969,7 @@ void CMenuPcs::destroyWorld()
 		puVar5 = puVar5 + 4;
 	} while (iVar4 < 6);
 
-	{
-		void** piVar2 = reinterpret_cast<void**>(&m_fonts[1]);
-		if (*piVar2 != 0) {
-			releaseRefCounted(piVar2);
-		}
-	}
+	releaseRefCounted(reinterpret_cast<void**>(&m_fonts[1]));
 
 	if (m_wm.m_frameData != 0) {
 		delete[] m_wm.m_frameData;

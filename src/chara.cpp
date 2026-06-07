@@ -2833,16 +2833,16 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			m_data->m_skins =
 			    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
 
-			unsigned int skinIndex = 0;
+			unsigned int skinOffset = 0;
 			chunk.PushChunk();
 			while (chunk.GetNextChunk(chunkInfo)) {
 				switch (chunkInfo.m_id) {
-				case 0x4E4F4445:
-					if (m_data->m_skins != 0 && skinIndex < m_data->m_skinCount) {
-						*reinterpret_cast<u32*>(reinterpret_cast<u8*>(m_data->m_skins) + skinIndex * 0x64 + 0x60) = chunk.Get4();
-					}
-					skinIndex++;
+				case 0x4E4F4445: {
+					u8* skinEntry = reinterpret_cast<u8*>(m_data->m_skins) + skinOffset;
+					skinOffset += 0x64;
+					*reinterpret_cast<u32*>(skinEntry + 0x60) = chunk.Get4();
 					break;
+				}
 				case 0x4F4E4520:
 					m_data->m_oneWeightCountOrSize = chunkInfo.m_size;
 					m_data->m_oneWeightData =
@@ -2877,28 +2877,25 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			m_data->m_displayLists = reinterpret_cast<CCharaDisplayListRaw*>(
 			    new (stage, const_cast<char*>(s_chara_cpp), 0x820) CChara::CMesh::CDisplayList[m_data->m_displayListCount]);
 
-			u32 displayIndex = 0;
+			CCharaDisplayListRaw* displayList = m_data->m_displayLists;
 			chunk.PushChunk();
 			while (chunk.GetNextChunk(chunkInfo)) {
-				if (chunkInfo.m_id != 0x444C5354 || m_data->m_displayLists == 0 ||
-				    displayIndex >= m_data->m_displayListCount) {
+				if (chunkInfo.m_id != 0x444C5354) {
 					continue;
 				}
 
-				CCharaDisplayListRaw& displayList = m_data->m_displayLists[displayIndex++];
-				displayList.m_material = chunk.Get2();
-				displayList.m_size = static_cast<s32>(chunkInfo.m_arg0);
+				displayList->m_material = chunk.Get2();
+				displayList->m_size = static_cast<s32>(chunkInfo.m_arg0);
 				chunk.Align(0x20);
-				if (displayList.m_size > 0) {
-					const unsigned int allocSize = (displayList.m_size + 0x1F) & ~0x1FU;
-					displayList.m_data =
+				if (displayList->m_size != 0) {
+					const unsigned int allocSize = (displayList->m_size + 0x1F) & ~0x1FU;
+					displayList->m_data =
 					    Memory._Alloc(allocSize, stage, const_cast<char*>(s_chara_cpp), 0x830, 0);
-					if (displayList.m_data != 0) {
-						chunk.Get(displayList.m_data, displayList.m_size);
-						DCFlushRange(displayList.m_data, displayList.m_size);
-					}
+					chunk.Get(displayList->m_data, displayList->m_size);
+					DCFlushRange(displayList->m_data, displayList->m_size);
 				}
 				chunk.Align(0x20);
+				displayList++;
 			}
 			chunk.PopChunk();
 			break;

@@ -1160,9 +1160,9 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	int allFinished = 0;
+	bool allFinished = false;
 	if (panelCount == finished) {
-		allFinished = 1;
+		allFinished = true;
 	}
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		int state2 = GetLetterStateBase(this);

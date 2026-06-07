@@ -264,7 +264,7 @@ static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
     }
 
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    int gilValue = caravanWork->m_shopParam *
+    unsigned int gilValue = caravanWork->m_shopParam *
                    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
     gilValue = gilValue / 100 + (gilValue >> 0x1F);
     return gilValue - (gilValue >> 0x1F);

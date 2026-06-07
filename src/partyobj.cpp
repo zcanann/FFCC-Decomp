@@ -1072,7 +1072,7 @@ void CGPartyObj::command()
 	int ringCommand = -1;
 	int ringCommandArg = -1;
 
-	if (static_cast<signed char>(party.partyFlags) >= 0) {
+	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0) {
 
 	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    ((party.commandMode & 1) != 0) &&

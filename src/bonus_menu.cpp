@@ -18,7 +18,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern char s_menuSubfontPathFmt[];
+extern char lbl_801DD5D4[];
 extern const double kPppCrystal2RefractionScale;
 extern const float FLOAT_80331EAC;
 extern const float FLOAT_80331EB0;
@@ -3276,7 +3276,7 @@ void CMenuPcs::createBonus()
 	}
 
 	loadTexture(PTR_s_bonus, 2, 1, s_bonusTextureTable, 0x16, 0x12, 0);
-	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
+	sprintf(fontPath, lbl_801DD5D4, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
 	s_Rinfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;

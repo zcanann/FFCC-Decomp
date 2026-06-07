@@ -10936,8 +10936,10 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
  */
 void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-    m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - x) * 0.5f));
-    m_menuWindowInfo->y = static_cast<short>(static_cast<int>((FLOAT_80331430 - static_cast<float>(y)) * 0.5f));
+    const double cy = static_cast<double>(FLOAT_80331430 - static_cast<float>(y)) * DOUBLE_803313f8;
+    m_menuWindowInfo->x = static_cast<short>(
+        static_cast<int>(static_cast<double>(static_cast<float>(0x280 - x)) * DOUBLE_803313f8));
+    m_menuWindowInfo->y = static_cast<short>(static_cast<int>(cy));
     m_menuWindowInfo->width = static_cast<short>(x);
     m_menuWindowInfo->height = static_cast<short>(y);
     m_menuWindowInfo->frame = 0;

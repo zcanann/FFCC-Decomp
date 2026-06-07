@@ -2428,15 +2428,17 @@ void CMenuPcs::CalcResultCountAnim()
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		for (int i = 0; i < activePartyCount; i++) {
-			int rank = s_Rinfo->m_party[i].m_rank;
-			short y = (short)(0x28 + i * 0x60);
+		short y = 0x28;
+		int partyByteOff = 0;
+		for (int i = 0; i < activePartyCount; i++, partyByteOff += sizeof(BonusPartySummary)) {
+			int rank = *(int*)((int)s_Rinfo + partyByteOff + 0x34);
 			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
 			sprite->kind = 0x19;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
 			sprite->w = 0x38;
+			y += 0x60;
 			sprite->h = 0x28;
 			sprite->mulX = (float)(rank * sprite->w);
 			sprite->mulY = 0.0f;
@@ -2487,9 +2489,9 @@ void CMenuPcs::CalcResultCountAnim()
 				int elapsed = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
 				if (elapsed < sprite->duration) {
-					float progress = 1.0f - ((float)elapsed / (float)sprite->duration);
-					sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-					sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+					double progress = 1.0 - (double)((float)elapsed / (float)sprite->duration);
+					sprite->motionX = (float)((double)(sprite->targetX - (float)sprite->x) * progress);
+					sprite->motionY = (float)((double)(sprite->targetY - (float)sprite->y) * progress);
 				} else {
 					sprite->motionX = 0.0f;
 					sprite->motionY = 0.0f;

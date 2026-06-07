@@ -2204,14 +2204,13 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
         *editorObj = static_cast<CGObject*>(
-            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
+            operator new(0x518, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
         if (*editorObj != 0) {
             (*editorObj)->Create();
 
             CCharaPcs::CHandle* handle =
-                new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
+                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
             (*editorObj)->m_charaModelHandle = handle;
             if (handle != 0) {
                 handle->Add();

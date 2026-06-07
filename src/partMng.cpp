@@ -2231,8 +2231,6 @@ void CPartMng::pppEditPartCalc()
 
     char* self = reinterpret_cast<char*>(this);
     unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
-    CGObject* editorObj = *reinterpret_cast<CGObject**>(usbEdit + 0x1C);
-    _pppMngSt* mng = m_pppMng;
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (ppvSysGoPartF != 0) {
@@ -2258,6 +2256,7 @@ void CPartMng::pppEditPartCalc()
         usbEdit[0x1A] = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3a9);
+        _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < kPppMngCount; i++) {
             if (mng->m_baseTime != -0x1000) {
                 _pppAllFreePObject(mng);
@@ -2289,7 +2288,7 @@ void CPartMng::pppEditPartCalc()
         loopCount = kPppMngCount;
     }
 
-    mng = m_pppMng;
+    _pppMngSt* mng = m_pppMng;
     for (int i = 0; i < loopCount; i++) {
         int baseTime = mng->m_baseTime;
         ppvMng = mng;
@@ -2502,7 +2501,7 @@ void CPartMng::pppEditDraw()
                     drawPass = 7;
                 }
 
-                PSMTXInverse(ppvCameraMatrix0, invCamera);
+                PSMTXInverse(ppvCameraMatrix, invCamera);
                 cameraPos.x = invCamera[0][3];
                 cameraPos.y = invCamera[1][3];
                 cameraPos.z = invCamera[2][3];
@@ -2533,12 +2532,12 @@ void CPartMng::pppEditDraw()
                                 min.x = partPos.x - cullRadius;
                                 min.y = partPos.y;
                                 min.z = partPos.z - cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) != 0);
                             }
                         }
 
                         if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                             *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
 
                             ppvMng = reinterpret_cast<_pppMngSt*>(mng);
@@ -2561,7 +2560,7 @@ void CPartMng::pppEditDraw()
                     partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
                     partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
                     partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
                     *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
                     ppvDrawMng.AddPrimOt(0x3ff, reinterpret_cast<_pppMngSt*>(mng));
                     if (*reinterpret_cast<unsigned char*>(mng + kStopAtLifeEndOffset) != 0

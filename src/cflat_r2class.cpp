@@ -892,9 +892,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x15:
-			*reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) =
-			    static_cast<u8>((static_cast<signed char>(object->m_localBase[0]) << 4) & 0x10) |
-			    (*reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) & 0xEF);
+			engineObject->m_weaponNodeFlagBits.m_unk10 = static_cast<signed char>(object->m_localBase[0]);
 			engineObject->m_groundHitOffset.z = FLOAT_80330BC8;
 			engineObject->m_groundHitOffset.y = FLOAT_80330BC8;
 			engineObject->m_groundHitOffset.x = FLOAT_80330BC8;

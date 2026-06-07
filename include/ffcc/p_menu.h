@@ -603,7 +603,6 @@ public:
     void LetterLstOpen();
     void LetterLstClose();
     void LetterMessOpen();
-    int LetterMessClose();
     void LetterItemWinOpen();
     void LetterItemWinClose();
     bool LetterReplyWinOpen();

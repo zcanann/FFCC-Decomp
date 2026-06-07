@@ -344,12 +344,15 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 			object->m_rotTargetY = targetRot;
 		} else {
 			float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
-			if (delta < -rotLimit) {
-				delta = -rotLimit;
-			} else if (rotLimit < delta) {
-				delta = rotLimit;
+			float clamped = -rotLimit;
+			if (!(delta < clamped)) {
+				if (rotLimit < delta) {
+					clamped = rotLimit;
+				} else {
+					clamped = delta;
+				}
 			}
-			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + delta;
+			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
 		}
 	}
 }

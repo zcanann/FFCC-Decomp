@@ -823,6 +823,8 @@ void SePause(int seId, int pause)
  */
 static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
+	RedTrackDATA* track = 0;
+
 	if (c_RedEntry.SearchWaveBase(musicHead->m_waveNo) == 0) {
 		return (RedTrackDATA*)-1;
 	}
@@ -850,7 +852,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_masterVolumeDelta = 0;
 	}
 
-	RedTrackDATA* track = (RedTrackDATA*)RedNew(RedMusicHeadGetTrackArenaSize(musicHead));
+	track = (RedTrackDATA*)RedNew(RedMusicHeadGetTrackArenaSize(musicHead));
 	if (track == 0) {
 		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -875,9 +877,13 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC, (int)musicHead->m_reverbDepth);
 	if (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) != 0) {
 		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
-		    (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) + 1) << REDSOUND_REVERB_DEPTH_BYTE_SHIFT);
+		    RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) + 1);
 		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
-		    (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) - 1) << REDSOUND_FIXED_SHIFT);
+		    RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) << REDSOUND_REVERB_DEPTH_BYTE_SHIFT);
+		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
+		    RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) - 1);
+		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
+		    RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) << REDSOUND_FIXED_SHIFT);
 	}
 	RedReverbDepthSetStep(REDSOUND_REVERB_DEPTH_MUSIC, 0);
 	RedReverbDepthSetCount(REDSOUND_REVERB_DEPTH_MUSIC, 0);
@@ -886,6 +892,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedMusicTrackBlock* musicTrackBlock = RedMusicGetTrackBlocks(musicHead);
 	int remainingTrackCount = musicHead->m_trackCount;
 	char musicTrackNo = 0;
+	track = music->m_tracks;
 	do {
 		int musicTrackBlockSize = RedMusicTrackBlockGetSize(musicTrackBlock);
 		track->m_trackNo = musicTrackNo - 1;

@@ -1681,31 +1681,31 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 		Mtx localMtx;
 		bool nextReuseAnimNode0Srt = false;
+		SRTView cachedParentScaleSrt = parentScaleSrt;
 
 		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
 			PSMTXCopy(ref->m_localMtx, localMtx);
 		} else {
-			SRTView cachedParentScaleSrt = parentScaleSrt;
 			Mtx animMtx;
-			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
-			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
-				if (parentNode == 0) {
-					float baseScale = ModelBaseScale(this);
-					if (baseScale != FLOAT_803301BC) {
-						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
-					} else {
-						PSMTXIdentity(localMtx);
-					}
-				} else {
-					PSMTXIdentity(localMtx);
-				}
-			} else {
-				parentAnimNode0->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
+			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
+			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
+				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
 				nextReuseAnimNode0Srt = true;
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.z);
+			} else {
+				if (parentNode == 0) {
+					float baseScale = ModelBaseScale(this);
+					if (baseScale == FLOAT_803301BC) {
+						PSMTXIdentity(localMtx);
+					} else {
+						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+					}
+				} else {
+					PSMTXIdentity(localMtx);
+				}
 			}
 
 			if (ref->m_usesParentLenX != 0) {

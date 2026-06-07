@@ -1245,8 +1245,8 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         }
 
         if ((tevBit & 0x200) != 0) {
-            GXColor tevColor2;
             GXColor tevColor3;
+            GXColor tevColor2;
             tevColor2.r = 0xFF;
             tevColor2.g = 0xFF;
             tevColor2.b = 0;
@@ -1472,8 +1472,8 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     GXSetTevDirect(GX_TEVSTAGE0);
 
     if ((tevBit & 0x200) != 0) {
-        GXColor tevColor2;
         GXColor tevColor3;
+        GXColor tevColor2;
         tevColor2.r = 0xFF;
         tevColor2.g = 0xFF;
         tevColor2.b = 0;

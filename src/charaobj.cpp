@@ -880,11 +880,7 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 2:
-			if (m_subState == 1) {
-				if (m_subFrame == 0) {
-					reqAnim(m_unk554, 1, 0);
-				}
-			} else if (m_subState < 1) {
+			if (m_subState < 1) {
 				if (m_subState >= 0) {
 					if (m_subFrame == 0) {
 						reqAnim(m_attackAnimId, 0, 0);
@@ -898,6 +894,10 @@ void CGCharaObj::onFrameStat()
 						}
 						return;
 					}
+				}
+			} else if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(m_unk554, 1, 0);
 				}
 			} else if (m_subState < 3) {
 				if (m_subFrame == 0) {

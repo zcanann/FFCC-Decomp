@@ -3611,7 +3611,6 @@ void CMenuPcs::CmakeVillageClose()
 void CMenuPcs::CmakeVillageDraw()
 {
     CmakeMenuState* villageWork = CmakeVillageState(this);
-    short mode = villageWork->m_mode;
     int frame = static_cast<int>(villageWork->m_frame) - 1;
     float alpha;
 
@@ -3619,9 +3618,9 @@ void CMenuPcs::CmakeVillageDraw()
         frame = 0;
     }
 
-    if (mode == 0) {
+    if (villageWork->m_mode == 0) {
         alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
-    } else if (mode == 1) {
+    } else if (villageWork->m_mode == 1) {
         alpha = FLOAT_80333258;
     } else {
         alpha = static_cast<float>(-(DOUBLE_80333268 * static_cast<double>(frame) - DOUBLE_80333270));
@@ -3660,7 +3659,7 @@ void CMenuPcs::CmakeVillageDraw()
         0, static_cast<float>(DOUBLE_803333b8), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, FLOAT_80333254);
 
-    if (mode == 1 && villageWork->m_row < 5) {
+    if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
         short row = villageWork->m_row;
         unsigned int cursorX = static_cast<unsigned int>(
             FLOAT_803332c0 * static_cast<float>(villageWork->m_select) + 0xE5);
@@ -3696,7 +3695,7 @@ void CMenuPcs::CmakeVillageDraw()
     GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
 
     DrawInit();
-    if (mode == 1 && villageWork->m_row < 5) {
+    if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
         int wobble = System.m_frameCounter & 7;
         DrawCursor(
             static_cast<int>(FLOAT_803332c8 + villageWork->m_select * FLOAT_803332c0) + wobble,

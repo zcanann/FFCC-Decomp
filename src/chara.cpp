@@ -796,18 +796,50 @@ CChara::CModel::CRefData::~CRefData()
  */
 CChara::CModel::CModel()
 {
-	memset(this, 0, 0x124);
-	PSMTXIdentity((float(*)[4])((u8*)this + 0x14));
-	m_furStep = 0.0f;
-	m_furLenScale = 1.0f;
-	*(u8*)((u8*)this + 0x10C) = (*(u8*)((u8*)this + 0x10C) & 0x7F) | 0x80;
-	*(u8*)((u8*)this + 0xA0) &= 0x7F;
-	*(u8*)((u8*)this + 0xA0) &= 0xBF;
-	*(u8*)((u8*)this + 0xA0) = (*(u8*)((u8*)this + 0xA0) & 0xDF) | 0x20;
-	*(u8*)((u8*)this + 0x10C) &= 0xBF;
+	m_data = 0;
+	m_texSet = 0;
+	m_anim = 0;
+	m_texAnimSet = 0;
+	m_nodes = 0;
+	m_meshes = 0;
+
+	PSMTXIdentity(m_matrix);
+
+	m_furStep = 0.2f;
+	m_furLenScale = 3.0f;
+	m_curFrame = 0.0f;
+	m_time = 0.0f;
+	m_dynJitter.x = 0.0f;
+	m_dynJitter.y = 0.0f;
+	m_dynJitter.z = 0.0f;
+	m_blendCur = 0;
+	m_blendMax = 0;
+	m_meshVisibleMask = 0xFFFFFFFF;
+	m_animStart = 0.0f;
+	m_animEnd = 0.0f;
+	m_chestAmp = 0.0f;
+	m_chestTilt = 0.0f;
+	m_lightAlpha = 1.0f;
+	m_callbackContext = 0;
+	m_callbackParam = 0;
+	m_beforeCalcMatrixCallback = 0;
+	m_afterMeshDrawCallback = 0;
+	m_beforeMeshLockEnvCallback = 0;
+	m_beforeDrawShadowLockEnvCallback = 0;
+	m_drawMeshDLCallback = 0;
+	m_drawShadowMeshDLCallback = 0;
+	m_afterDrawMeshCallback = 0;
+	m_afterDrawModelCallback = 0;
+
+	m_flags10C = (m_flags10C & 0x7F) | 0x80;
+	m_flagsA0 &= 0x7F;
+	m_flagsA0 &= 0xBF;
+	m_flagsA0 = (m_flagsA0 & 0xDF) | 0x20;
+	m_flags10C &= 0xBF;
+
 	m_furTarget = 1.0f;
 	m_furCur = 1.0f;
-	*(u8*)((u8*)this + 0xA1) = 0;
+	m_attachMode = 0;
 	m_twistAngle = 0.0f;
 }
 

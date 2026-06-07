@@ -164,7 +164,7 @@ public:
 		u8 _padBD[3];
 	};
 
-	class CModel
+	class CModel : public CRef
 	{
 	public:
 		typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
@@ -241,7 +241,6 @@ public:
 		}
 
 	public:
-		u8 _pad0[0x8];
 		Mtx m_matrix;
 		Mtx m_worldBaseMtx;
 		Mtx m_drawMtx;

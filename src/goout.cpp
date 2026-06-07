@@ -2491,18 +2491,21 @@ void CGoOutMenu::Calc()
 
     if (m_messageCloseMode == 0) {
         mode = m_mainMode;
-        if (mode == 2) {
+        switch (mode) {
+        case 2:
             CalcGoOut();
-        } else if (mode < 2) {
-            if (mode == 0) {
-                if (m_messageWindowOpen != 0) {
-                    input = GetGoOutInputMask();
-                    if ((input & 0x100) != 0) {
-                        Sound.PlaySe(2, 0x40, 0x7f, 0);
-                        SetMainMode(m_nextMainMode);
-                    }
+            break;
+        case 0:
+            if (m_messageWindowOpen != 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    SetMainMode(m_nextMainMode);
                 }
-            } else if (mode >= 0 && m_messageWindowOpen != 0) {
+            }
+            break;
+        case 1:
+            if (m_messageWindowOpen != 0) {
                 input = GetGoOutInputMask();
                 if ((input & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7f, 0);
@@ -2618,8 +2621,10 @@ void CGoOutMenu::Calc()
                     }
                 }
             }
-        } else if (mode < 4) {
+            break;
+        case 3:
             CalcDel();
+            break;
         }
 
         m_modeFrame = m_modeFrame + 1;

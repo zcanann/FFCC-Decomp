@@ -93,7 +93,7 @@ private:
     unsigned char m_messageWindowOpen;
     unsigned char m_cursorChoice;
     unsigned char m_drawCursor;
-    char m_messageCloseMode;
+    unsigned char m_messageCloseMode;
     unsigned char m_cursorMode;
     short m_cursorListY0;
     short m_cursorListY1;

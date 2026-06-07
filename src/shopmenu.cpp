@@ -341,13 +341,14 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
 }
 
 
-static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
+static void SetupShopMenuInfoFont(CFont* font)
 {
     font->DrawInit();
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    font->SetColor(*color);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
 }
 
 static void SetupShopMenuUnitFont(CFont* font)
@@ -1165,7 +1166,7 @@ void CShopMenu::DrawItemInfo0()
         MenuPcs.DrawNoShadowFont(font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
         MenuPcs.DrawInit();
 
-        SetupShopMenuInfoFont(font, &white.color);
+        SetupShopMenuInfoFont(font);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         font->DrawInit();
         DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
@@ -1189,8 +1190,7 @@ void CShopMenu::DrawBuySellInfo()
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int listType = m_listType;
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetupShopMenuInfoFont(font, &white);
+    SetupShopMenuInfoFont(font);
 
     char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
     float priceWidth = font->GetWidth(priceText);

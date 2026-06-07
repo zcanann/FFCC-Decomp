@@ -44,6 +44,8 @@ extern const float FLOAT_8033198C;
 extern const float FLOAT_80331990;
 extern const float FLOAT_80331994;
 extern const float FLOAT_80331998;
+extern const float FLOAT_8033199C;
+extern const float FLOAT_803319A0;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -2797,16 +2799,25 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		} else if (effectId < 0x479) {
 			if (effectId < 0x46F) {
 				if (effectId > 0x46C) {
-					if (effectArg0 == 2 && m_stateFrame > 0xF) {
-						Vec randomPos;
-						randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
-						randomPos.y = m_worldPosition.y + 1.0f;
-						randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
-						CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
-						CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
-						CFlatRuntime2Storage().PutParticleWork();
+					if (effectArg0 == 2) {
+						if (m_stateFrame > 0xF) {
+							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
+							float rand0 = Math.RandFPM(FLOAT_80331998);
+							float rand1 = Math.RandFPM(FLOAT_80331998);
+							CVector randomOffset(rand1, FLOAT_80331988, rand0);
+							CVector randomBase(FLOAT_80331988, FLOAT_8033199C, FLOAT_803319A0);
+							CVector randomResult;
+							PSVECAdd(reinterpret_cast<Vec*>(&randomBase), reinterpret_cast<Vec*>(&randomOffset), reinterpret_cast<Vec*>(&randomResult));
+							Vec randomPos;
+							randomPos.x = randomResult.x;
+							randomPos.y = randomResult.y;
+							randomPos.z = randomResult.z;
+							CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
+							CFlatRuntime2Storage().PutParticleWork();
+						}
 						emittedCustom = true;
-					} else if (effectArg0 == 3) {
+					}
+					if (effectArg0 == 3) {
 						for (int i = 0x0D; i < 0x1D; i++) {
 							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 							CFlatRuntime2Storage().PutParticleWork();

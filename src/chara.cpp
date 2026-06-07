@@ -712,6 +712,7 @@ void CChara::FlipDBuffer()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 {
 	asm {
@@ -720,6 +721,7 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 		mtspr GQR7, r6
 	}
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1410,23 +1412,14 @@ void CChara::CModel::CalcSkin()
 	CMesh* mesh = ModelMeshes(this);
 	u32 posQuant = ModelPosQuant(this);
 	u32 normQuant = ModelNormQuant(this);
-	u16 meshCount = ModelMeshCount(this);
-	u32 i = 0;
 
-	register u32 posGqr = (posQuant << 24) | 0x70000 | (posQuant << 8) | 7;
-	register u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;
-	register u32 weightGqr = 0x0C070C07;
+	u32 posGqr = (posQuant << 24) | 0x70000 | (posQuant << 8) | 7;
+	u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;
+	Chara.gqrInit(posGqr, normGqr, 0x0C070C07);
 
-	asm {
-		mtspr GQR5, posGqr
-		mtspr GQR6, normGqr
-		mtspr GQR7, weightGqr
-	}
-
-	while (i < meshCount) {
+	for (u32 i = 0; i < ModelMeshCount(this); i++) {
 		mesh->Calc(this);
 		mesh++;
-		i++;
 	}
 }
 

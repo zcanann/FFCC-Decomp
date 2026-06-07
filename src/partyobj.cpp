@@ -18,6 +18,8 @@
 #include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
+#include "ffcc/monobj.h"
+#include "ffcc/mesmenu.h"
 
 #include <math.h>
 #include "ffcc/fontman.h"
@@ -4457,7 +4459,7 @@ void CGPartyObj::ghostPartyMog()
 	gpmCol();
 	gpmMove();
 
-	int stageMode = 0;
+	unsigned int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
 	case 4:
 	case 8:
@@ -4476,48 +4478,146 @@ void CGPartyObj::ghostPartyMog()
 		break;
 	}
 
-	float frameRatio = (float)(Game.m_gameWork.m_frameCounter % 100) / 100.0f;
-	float pressureScale = 1.0f;
+	float ramp = static_cast<float>(CharaGhostValue(0x2054)) / FLOAT_80331A50;
+	float scale;
 	if (stageMode == 2) {
-		pressureScale = 0.5f + (frameRatio * 0.5f);
-	} else if (stageMode == 1) {
-		pressureScale = 0.5f + ((1.0f - frameRatio) * 0.5f);
-	}
-
-	int targetPressure = (int)(100.0f * pressureScale);
-	float leaderDist = m_targetDist;
-	if (leaderDist > Game.unkFloat_0xca10) {
-		sGhostPartyWork.mood = 1;
-		sGhostPartyWork.pressure += 2;
+		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
 	} else {
-		sGhostPartyWork.mood = 0;
-		sGhostPartyWork.pressure -= 1;
+		scale = FLOAT_80331a54;
+		if (stageMode < 2 && stageMode != 0) {
+			scale = FLOAT_80331A58 * (FLOAT_80331a54 - ramp) + FLOAT_80331A58;
+		}
+	}
+	unsigned int distFar = static_cast<unsigned int>(FLOAT_80331A5C * scale);
+
+	unsigned char* mboss = CGMonObj::m_boss;
+	int& bossState = *reinterpret_cast<int*>(mboss + 0x88);
+
+	if (DOUBLE_80331A90 < static_cast<double>(m_partyDistance[0])) {
+		bossState = 1;
+	} else {
+		bool exceeded;
+		if (CharaGhostValue(0x2048) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x04)) &&
+		    CharaGhostValue(0x204C) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x08)) &&
+		    CharaGhostValue(0x2050) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x0C))) {
+			exceeded = false;
+		} else {
+			exceeded = true;
+		}
+
+		if (exceeded && static_cast<signed char>(mboss[0x6C] << 4) >= 0) {
+			mboss[0x6C] = (mboss[0x6C] & 0xEF) | 0x10;
+			bossState = 2;
+			putParticle(299, 0, this, FLOAT_80331a54, 0);
+		} else if (static_cast<signed char>(mboss[0x6C] << 3) < 0 ||
+		           static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18)) < 10) {
+			bool settled = static_cast<signed char>(mboss[0x6C] << 4) >= 0;
+			if (settled) {
+				unsigned int innerMode;
+				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+				case 4:
+				case 8:
+				case 9:
+				case 0x0B:
+				case 0x0C:
+				case 0x0D:
+					innerMode = 2;
+					break;
+				case 6:
+				case 10:
+					innerMode = 1;
+					break;
+				default:
+					innerMode = 0;
+					break;
+				}
+				float innerScale;
+				if (innerMode == 2) {
+					innerScale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+				} else {
+					innerScale = FLOAT_80331a54;
+					if (innerMode < 2 && innerMode != 0) {
+						innerScale = FLOAT_80331A58 * (FLOAT_80331a54 - ramp) + FLOAT_80331A58;
+					}
+				}
+				if (static_cast<int>(FLOAT_80331A5C * innerScale) <= static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18))) {
+					mboss[0x6C] = (mboss[0x6C] & 0xFB) | 4;
+					bossState = 3;
+					goto messageMenu;
+				}
+			}
+			if (!settled || *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C) < 0x97) {
+				bossState = 0;
+				*reinterpret_cast<int*>(CGPartyObj::m_ghostWork) = 0;
+			} else {
+				bossState = 8;
+			}
+		} else {
+			unsigned int moodMode;
+			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+			case 4:
+			case 8:
+			case 9:
+			case 0x0B:
+			case 0x0C:
+			case 0x0D:
+				moodMode = 2;
+				break;
+			case 6:
+			case 10:
+				moodMode = 1;
+				break;
+			default:
+				moodMode = 0;
+				break;
+			}
+			if (moodMode == 1) {
+				if (CharaGhostValue(0x2054) < 0x32) {
+					bossState = 5;
+				} else if (CharaGhostValue(0x2054) > 0x5E) {
+					bossState = 4;
+				}
+			} else if (moodMode != 0 && moodMode < 3 && CharaGhostValue(0x2054) < 0x32) {
+				bossState = 6;
+			}
+			mboss[0x6C] = (mboss[0x6C] & 0xF7) | 8;
+		}
 	}
 
-	if (sGhostPartyWork.pressure < 0) {
-		sGhostPartyWork.pressure = 0;
-	} else if (sGhostPartyWork.pressure > (targetPressure + 100)) {
-		sGhostPartyWork.pressure = targetPressure + 100;
+messageMenu:
+	if (static_cast<signed char>(leader->m_weaponNodeFlags >> 8) < 0 &&
+	    bossState != 0 &&
+	    bossState != *reinterpret_cast<int*>(CGPartyObj::m_ghostWork)) {
+		CMesMenu* mesMenu = MenuPcs.GetMesMenu(5);
+		bool busy = false;
+		if (mesMenu->IsActiveMessage()) {
+			busy = true;
+		}
+		if (!busy) {
+			*reinterpret_cast<int*>(CGPartyObj::m_ghostWork) = bossState;
+			mesMenu->Open(Game.m_cFlatDataArr[1].Message(bossState - 1), 0x260, 0x20, 0x8E20, 0, 0x65, 0x8B);
+		}
 	}
 
-	if (sGhostPartyWork.auraParticle != 0 && sGhostPartyWork.pressure < targetPressure / 2) {
+	unsigned int auraSlot = 0;
+	int gauge = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x18);
+	if (static_cast<int>(distFar * 3) / 3 < gauge) {
+		auraSlot = 0xF;
+	} else if (static_cast<int>(distFar << 1) / 3 < gauge) {
+		auraSlot = 0xE;
+	} else if (static_cast<int>(distFar) / 3 < gauge) {
+		auraSlot = 0xD;
+	}
+
+	unsigned int prevSlot = *reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x6C);
+	if (prevSlot != auraSlot) {
 		endPSlotBit(0x400);
-		sGhostPartyWork.auraParticle = 0;
-	} else if (sGhostPartyWork.auraParticle == 0 && sGhostPartyWork.pressure > targetPressure) {
-		putParticle(0x20D, 0, this, 0.0f, 0);
-		sGhostPartyWork.auraParticle = 1;
+		prevSlot = auraSlot;
+		if (auraSlot != 0) {
+			putParticle(auraSlot | 0x200, m_particleSlots[10], this, FLOAT_80331a54, 0);
+		}
 	}
-
-	if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
-	    leader->m_subState == 1 &&
-	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0 &&
-	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) == 0) {
-		sGhostPartyWork.thresholdA++;
-		sGhostPartyWork.thresholdB = 0;
-	} else {
-		sGhostPartyWork.thresholdA = 0;
-		sGhostPartyWork.thresholdB++;
-	}
+	*reinterpret_cast<unsigned int*>(CGPartyObj::m_ghostWork + 0x6C) = prevSlot;
 }
 
 /*

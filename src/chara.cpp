@@ -3112,7 +3112,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 			s_charaMeshWorkOverflowSeen = 1;
 		}
 
-		if ((s_charaMeshWorkWarnArmed != 0) && (System.m_execParam > 1)) {
+		if ((s_charaMeshWorkWarnArmed != 0) && (static_cast<u32>(System.m_execParam) > 1)) {
 			s_charaMeshWorkWarnArmed = 0;
 			System.Printf(const_cast<char*>(s_charaMeshWorkOverflow));
 		}
@@ -3127,7 +3127,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 	float* skinData = reinterpret_cast<float*>(meshRef->m_skins);
 	for (u32 i = 0; i < meshRef->m_skinCount; i++) {
-		int nodeIndex = static_cast<int>(reinterpret_cast<float(*)[4]>(skinData + 0x18)[0][0]);
+		int nodeIndex = reinterpret_cast<int*>(skinData + 0x18)[0];
 		PSMTXConcat(
 		    ModelNodes(model)[nodeIndex].m_mtx,
 		    reinterpret_cast<float(*)[4]>(skinData + 0x0C),

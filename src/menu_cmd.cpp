@@ -2333,15 +2333,14 @@ unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CmdState* cmd = GetCmdStateView(this);
 	CmdListStorage* list = GetCmdListStorage(this);
 	CmdListEntry* entries = list->entries;
 
-	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	const s32 selected = static_cast<s32>(cmd->selected);
+	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
 	const f32 t = static_cast<f32>(
-		-((DOUBLE_80332a90 * static_cast<f64>(cmd->transitionTimer)) - DOUBLE_80332a58)
+		-((DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - DOUBLE_80332a58)
 	);
 	entries[selected].alpha = t;
 
@@ -2364,13 +2363,13 @@ unsigned int CMenuPcs::CmdOpen1()
 	CmdListEntry* const animEntry = &entries[list->listEnd + 3];
 	CmdListEntry* const baseEntry = &entries[list->listEnd + slot];
 
-	if (cmd->unitePanelInitialized == 0) {
+	if (GetCmdStateView(this)->unitePanelInitialized == 0) {
 		const s32 endX = static_cast<s32>(static_cast<f64>(baseEntry->x + baseEntry->width) - DOUBLE_80332a98);
 		animEntry->x = static_cast<s16>(endX);
 
 		if (chainCount == 2) {
 			int combo[5][2];
-			chainCount = ChkUnite(static_cast<int>(cmd->selected), combo);
+			chainCount = ChkUnite(static_cast<int>(GetCmdStateView(this)->selected), combo);
 		} else {
 			chainCount = 0;
 		}
@@ -2390,13 +2389,13 @@ unsigned int CMenuPcs::CmdOpen1()
 		animEntry->u = FLOAT_80332ab0;
 		animEntry->v = FLOAT_80332ab0;
 		animEntry->tex = 0x39;
-		cmd->unitePanelInitialized = 1;
+		GetCmdStateView(this)->unitePanelInitialized = 1;
 	}
 
-	animEntry->alpha = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(cmd->transitionTimer));
-	u32 done = static_cast<u32>(static_cast<f64>(cmd->transitionTimer) >= DOUBLE_80332a78);
+	animEntry->alpha = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
+	u32 done = static_cast<u32>(static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= DOUBLE_80332a78);
 	if (done != 0) {
-		cmd->choice = 0;
+		GetCmdStateView(this)->choice = 0;
 	}
 
 	return done;

@@ -3404,11 +3404,11 @@ int CMenuPcs::GetItemType(int itemId, int useRawItemId)
     if (itemId <= 0x17C) {
         return 6;
     }
-    if (0x188 < itemId) {
-        if (400 < itemId) {
-            return 9;
-        }
+    if (itemId <= 0x188) {
+        return 7;
+    }
+    if (itemId <= 0x190) {
         return 8;
     }
-    return 7;
+    return 9;
 }

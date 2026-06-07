@@ -344,7 +344,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 
 	if (targetPartyIndex >= 0) {
 		float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
-		if (rotLimit > 3.1415927f) {
+		if (rotLimit > FLOAT_80331A48) {
 			object->m_rotTargetY = targetRot;
 		} else {
 			float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));

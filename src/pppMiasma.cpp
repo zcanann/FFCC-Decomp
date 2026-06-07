@@ -12,11 +12,11 @@
 
 extern const float kPppAlignmentScaleScreenWidth;
 extern const float kPppAlignmentScaleScreenHalfHeight;
-static const float FLOAT_80331930 = -1000.0f;
-static const float FLOAT_80331934 = 1200.0f;
-static const float FLOAT_80331938 = 10.0f;
-static const float FLOAT_8033193c = 0.0f;
-static const float FLOAT_80331940 = 1.0f;
+static const float kPppMiasmaMinRadius = -1000.0f;
+static const float kPppMiasmaDefaultRadius = 1200.0f;
+static const float kPppMiasmaCameraInsidePadding = 10.0f;
+static const float kPppMiasmaZero = 0.0f;
+static const float kPppMiasmaOne = 1.0f;
 
 union PackedMiasmaColor {
     GXColor color;
@@ -113,7 +113,7 @@ static inline void _GXSetTevAlphaOp(int stage, int op, int bias, int scale, int 
 
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
-    const float& minRadius = FLOAT_80331930;
+    const float& minRadius = kPppMiasmaMinRadius;
     float radius = minRadius;
 
     for (u16 i = 0; i < count; i++) {
@@ -313,7 +313,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         cameraPos.x = CameraPcs.m_positionX;
         cameraPos.y = CameraPcs.m_positionY;
         cameraPos.z = CameraPcs.m_positionZ;
-        const float& defaultRadius = FLOAT_80331934;
+        const float& defaultRadius = kPppMiasmaDefaultRadius;
         maxRadius = defaultRadius;
     }
 
@@ -322,7 +322,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    const float& cameraInsidePadding = FLOAT_80331938;
+    const float& cameraInsidePadding = kPppMiasmaCameraInsidePadding;
     if ((cameraInsidePadding + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         isCameraInside = 1;
     }
@@ -351,11 +351,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
-        gUtil.RenderColorQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+        gUtil.RenderColorQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
                               kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
-            &drawColor, &pppMiasma->m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
+            &drawColor, &pppMiasma->m_drawMatrix, kPppMiasmaZero, 0, 0, 1, 0, 1, 1, 1);
 
         _GXSetTevOrder(0, 0xFF, 0xFF, 4);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -382,7 +382,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         GXSetNumTexGens(0);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         GXSetProjection(screenMtx, GX_PERSPECTIVE);
-        PSMTXScale(firstScaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
+        PSMTXScale(firstScaleMtx, kPppMiasmaOne, kPppMiasmaOne, kPppMiasmaOne);
         PSMTXConcat(firstScaleMtx, pppMiasma->m_localMatrix.value, firstLocalMtx);
         PSMTXConcat(ppvWorldMatrix, firstLocalMtx, pppMiasma->m_drawMatrix.value);
         GXLoadPosMtxImm(pppMiasma->m_drawMatrix.value, 0);
@@ -435,7 +435,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
-            gUtil.RenderColorQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+            gUtil.RenderColorQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
                                   kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX16);
@@ -459,7 +459,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             GXSetCullMode(GX_CULL_FRONT);
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-            radius = FLOAT_80331940 - param_2->m_stepValue;
+            radius = kPppMiasmaOne - param_2->m_stepValue;
             PSMTXScale(secondScaleMtx, radius, radius, radius);
             PSMTXConcat(secondScaleMtx, pppMiasma->m_localMatrix.value, secondLocalMtx);
             PSMTXConcat(ppvWorldMatrix, secondLocalMtx, pppMiasma->m_drawMatrix.value);
@@ -499,7 +499,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+        gUtil.RenderTextureQuad(kPppMiasmaZero, yPos, kPppAlignmentScaleScreenWidth,
                                 kPppAlignmentScaleScreenHalfHeight, &backI4Tex, 0, 0,
                                 0, (GXBlendFactor)4, (GXBlendFactor)5);
         gUtil.BeginQuadEnv();
@@ -577,12 +577,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             _GXSetTevAlphaOp(4, 0, 0, 0, 1, 0);
             GXSetNumTevStages(5);
 
-            quadA.x = FLOAT_8033193c;
+            quadA.x = kPppMiasmaZero;
             quadA.y = yPos;
-            quadA.z = FLOAT_8033193c;
+            quadA.z = kPppMiasmaZero;
             quadB.x = kPppAlignmentScaleScreenWidth;
             quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
-            quadB.z = FLOAT_8033193c;
+            quadB.z = kPppMiasmaZero;
 
             pppInitBlendMode();
             pppSetBlendMode(0);
@@ -688,12 +688,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
             GXSetNumTevStages(tevStageCount);
             GXSetNumTexGens(texGenCount);
-            quadA.x = FLOAT_8033193c;
+            quadA.x = kPppMiasmaZero;
             quadA.y = yPos;
-            quadA.z = FLOAT_8033193c;
+            quadA.z = kPppMiasmaZero;
             quadB.x = kPppAlignmentScaleScreenWidth;
             quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
-            quadB.z = FLOAT_8033193c;
+            quadB.z = kPppMiasmaZero;
             gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }
 

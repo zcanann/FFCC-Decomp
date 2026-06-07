@@ -147,5 +147,5 @@ extern const float gPppParMoveMatrixZero = 0.0f;
 extern const float gPppParMoveMatrixOne = 1.0f;
 extern const float kPppYmTraceMoveZero = 0.0f;
 extern const float kPppYmTraceMoveOne = 1.0f;
-extern const float FLOAT_80330e48 = -1.5707964f;
-extern const float FLOAT_80330e4c = 0.0f;
+extern const float kPppYmMoveParabolaNegHalfPi = -1.5707964f;
+extern const float kPppYmMoveParabolaZero = 0.0f;

@@ -3636,7 +3636,9 @@ void CGMonObj::statWatch()
 			return;
 		}
 
-		if (targetMode < 10) {
+		if (targetMode >= 10) {
+			selectedTarget = (monObj->*monObj->m_funcs->target)(targetMode);
+		} else {
 			// Pass 1: count valid party members.
 			int validCount = 0;
 			for (int slot = 0; slot < 4; slot++) {
@@ -3711,8 +3713,6 @@ void CGMonObj::statWatch()
 				result = accum;
 			}
 			selectedTarget = result;
-		} else if (monObj->m_funcs->target != 0) {
-			selectedTarget = (monObj->*monObj->m_funcs->target)(targetMode);
 		}
 
 		if (selectedTarget < 0) {

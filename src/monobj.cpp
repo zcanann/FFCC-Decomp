@@ -249,7 +249,7 @@ void CGMonObj::undeadOff()
 	*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
 
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
-	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) >> 31);
+	int weaponMode = static_cast<int>(static_cast<unsigned int>(weaponFlags) << 24) >> 31;
 	unsigned int isUndead =
 		(static_cast<unsigned int>(
 			 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
@@ -295,7 +295,7 @@ void CGMonObj::undeadOn()
 
 	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 	void* classId = object->m_scriptHandle[4];
-	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
+	int weaponMode = static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}

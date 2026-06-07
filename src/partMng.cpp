@@ -2238,17 +2238,22 @@ void CPartMng::pppEditPartCalc()
     _pppMngSt* mng = m_pppMng;
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
-    OSStopStopwatch(&g_par_calc_prof);
-    if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
-        CChara::CModel* model = editorObj->m_charaModelHandle->m_model;
-        model->CalcMatrix();
-        model->CalcSkin();
-        model->SetFrame(*reinterpret_cast<float*>(self + 0x23564));
-        if (gPppCalcDisabled == 0) {
+    if (ppvSysGoPartF != 0) {
+        ppvSysGoPartF = 0;
+        ppvSysStopPartF = 0;
+    }
+
+    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Stop();
+    if (*reinterpret_cast<CGObject**>(self + 0x80c) != 0) {
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcMatrix();
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcSkin();
+        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->SetFrame(
+            *reinterpret_cast<float*>(self + 0x23564));
+        if (ppvUserStopPartF == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
     }
-    OSStartStopwatch(&g_par_calc_prof);
+    reinterpret_cast<CStopWatch&>(g_par_calc_prof).Start();
 
     if (usbEdit[0x18] != 0) {
         usbEdit[0x18] = 0;

@@ -60,11 +60,11 @@ CProcessTable CMaterialEditorPcs::m_table = {
         1,
     },
 };
-static const double DOUBLE_8032FCC0 = 1.0;
-static const float FLOAT_8032FCC8 = 1.0f;
-static const double DOUBLE_8032FCD0 = 4503601774854144.0;
-static const float FLOAT_8032FCD8 = 0.0f;
-static const float FLOAT_8032FCDC = -1.0f;
+static const double kMaterialEditorOneF64 = 1.0;
+static const float kMaterialEditorOneF = 1.0f;
+static const double kMaterialEditorS16ToDoubleBias = 4503601774854144.0;
+static const float kMaterialEditorZeroF = 0.0f;
+static const float kMaterialEditorNegativeOneF = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {
@@ -85,7 +85,7 @@ static inline double S16ToDouble(s16 value)
 
     conv.words[0] = 0x43300000;
     conv.words[1] = static_cast<unsigned int>(value ^ 0x80000000U);
-    return conv.value - DOUBLE_8032FCD0;
+    return conv.value - kMaterialEditorS16ToDoubleBias;
 }
 
 /*
@@ -241,30 +241,30 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(LoadDouble(DOUBLE_8032FCC0) / S16ToDouble(textureHeader[2]));
-                    float scaleV = static_cast<float>(LoadDouble(DOUBLE_8032FCC0) / S16ToDouble(textureHeader[3]));
+                    float scaleU = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[2]));
+                    float scaleV = static_cast<float>(LoadDouble(kMaterialEditorOneF64) / S16ToDouble(textureHeader[3]));
 
                     if (polygon->u0 < 0) {
                         polygon->texCoord[0][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + LoadFloat(FLOAT_8032FCC8);
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + LoadFloat(kMaterialEditorOneF);
                     } else {
                         polygon->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u0));
                     }
                     if (polygon->u1 < 0) {
                         polygon->texCoord[1][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + LoadFloat(FLOAT_8032FCC8);
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + LoadFloat(kMaterialEditorOneF);
                     } else {
                         polygon->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u1));
                     }
                     if (polygon->u2 < 0) {
                         polygon->texCoord[2][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + LoadFloat(FLOAT_8032FCC8);
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + LoadFloat(kMaterialEditorOneF);
                     } else {
                         polygon->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u2));
                     }
                     if (polygon->u3 < 0) {
                         polygon->texCoord[3][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + LoadFloat(FLOAT_8032FCC8);
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + LoadFloat(kMaterialEditorOneF);
                     } else {
                         polygon->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u3));
                     }
@@ -282,10 +282,10 @@ void CMaterialEditorPcs::drawViewer()
                         polygon->v3 = -polygon->v3;
                     }
 
-                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - LoadFloat(FLOAT_8032FCC8));
-                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - LoadFloat(FLOAT_8032FCC8));
-                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - LoadFloat(FLOAT_8032FCC8));
-                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - LoadFloat(FLOAT_8032FCC8));
+                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - LoadFloat(kMaterialEditorOneF));
+                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - LoadFloat(kMaterialEditorOneF));
+                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - LoadFloat(kMaterialEditorOneF));
+                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - LoadFloat(kMaterialEditorOneF));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {
@@ -424,8 +424,8 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    one = LoadFloat(FLOAT_8032FCC8);
-    rotationValue = LoadFloat(FLOAT_8032FCD8);
+    one = LoadFloat(kMaterialEditorOneF);
+    rotationValue = LoadFloat(kMaterialEditorZeroF);
     srt.transZ = rotationValue;
     srt.transY = rotationValue;
     srt.transX = rotationValue;
@@ -465,11 +465,11 @@ void CMaterialEditorPcs::calcViewer()
     m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
 
     PSMTXIdentity(scaleMatrix);
-    scaleMatrix[1][1] = FLOAT_8032FCDC;
+    scaleMatrix[1][1] = kMaterialEditorNegativeOneF;
     PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
 
     PSMTXIdentity(scaleMatrix);
-    scaleMatrix[2][2] = FLOAT_8032FCDC;
+    scaleMatrix[2][2] = kMaterialEditorNegativeOneF;
     PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
 
     PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
@@ -569,7 +569,7 @@ void CMaterialEditorPcs::createViewer()
     m_displayTextureEnabled = 0;
     memset(&m_usbTransform, 0, sizeof(m_usbTransform));
 
-    fVar1 = LoadFloat(FLOAT_8032FCC8);
+    fVar1 = LoadFloat(kMaterialEditorOneF);
     m_usbTransform.m_modelMatrix[3][3] = fVar1;
     m_usbTransform.m_modelMatrix[2][2] = fVar1;
     m_usbTransform.m_modelMatrix[1][1] = fVar1;
@@ -635,9 +635,9 @@ void CMaterialEditorPcs::Init()
     m_viewerLightColors[0].b = 0x7f;
     m_viewerLightColors[0].a = 0xff;
 
-    float zero = LoadFloat(FLOAT_8032FCD8);
-    float minusOne = LoadFloat(FLOAT_8032FCDC);
-    float one = LoadFloat(FLOAT_8032FCC8);
+    float zero = LoadFloat(kMaterialEditorZeroF);
+    float minusOne = LoadFloat(kMaterialEditorNegativeOneF);
+    float one = LoadFloat(kMaterialEditorOneF);
 
     for (int i = 0; i < 3; i++) {
         u8 shade = (i == 0) ? 0x3f : 0;

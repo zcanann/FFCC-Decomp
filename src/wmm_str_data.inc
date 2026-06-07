@@ -1,6 +1,6 @@
 // Generated from PAL main.dol wmm_str pointer tables.
 extern const char s_The_data_is_corrupt_801E3838[];
-extern const char s_WmmEmptyEn_80333680[];
+extern const char sWmmEmptyEn[];
 extern const char s_Select_game_data_to_load_801E3850[];
 extern const char s_Select_save_location_801E386C[];
 extern const char s_Der_Spielstand_ist_fehlerhaft_801E3884[];
@@ -8,18 +8,18 @@ extern const char s_Kein_Spielstand_vorhanden_801E38A4[];
 extern const char lbl_801E38C0[];
 extern const char lbl_801E38E0[];
 extern const char s_I_dati_sono_danneggiati_801E3904[];
-extern const char s_WmmEmptyIt_80333688[];
+extern const char sWmmEmptyIt[];
 extern const char s_Seleziona_i_dati_da_caricare_801E3920[];
 extern const char s_Seleziona_l_area_di_salvataggio_801E3940[];
 extern const char lbl_801E3964[];
-extern const char s_WmmEmptyFr_80333690[];
+extern const char sWmmEmptyFr[];
 extern const char lbl_801E3980[];
 extern const char lbl_801E39A4[];
 extern const char lbl_801E39D8[];
-extern const char s_WmmEmptyEs_80333698[];
+extern const char sWmmEmptyEs[];
 extern const char s_Selecciona_los_datos_que_deseas_cargar_801E39F4[];
 extern const char s_Selecciona_el_sitio_donde_deseas_guardar_801E3A1C[];
-extern const char lbl_803336A0[];
+extern const char sWmmBlankText[];
 extern const char s_Select_Memory_Card_Slot_801E3A48[];
 extern const char s_Slot_A_Slot_B_801E3A64[];
 extern const char s_No_Memory_Card_801E3A78[];
@@ -78,7 +78,7 @@ extern const char s_Die_Memory_Card_in_Steckplatz_A_ist_801E3FEC[];
 extern const char lbl_801E4010[];
 extern const char s_Die_Memory_Card_in_Steckplatz_A_801E403C[];
 extern const char s_ist_fehlerhaft_und_muss_formatiert_801E4060[];
-extern const char lbl_803336A4[];
+extern const char sWmmWerdenText[];
 extern const char s_Formatieren_801E4084[];
 extern const char s_Ja_Nein_801E4094[];
 extern const char s_Die_Memory_Card_in_Steckplatz_A_wird_formatiert_801E40A4[];
@@ -320,7 +320,7 @@ extern const char s_Cannot_erase_Save_Data_801E6080[];
 extern const char lbl_801E6098[];
 extern const char lbl_801E60C0[];
 extern const char s_werden_Bitte_die_Gruppe_neu_formieren_801E60E8[];
-extern const char lbl_803336AC[];
+extern const char sWmmAuswahlText[];
 extern const char s_beenden_801E6110[];
 extern const char s_Information_in_Datenblock_1_801E611C[];
 extern const char lbl_801E6138[];
@@ -365,43 +365,43 @@ extern const char lbl_801E658C[];
 extern const char s_Datos_eliminados_801E65AC[];
 extern const char s_No_es_posible_eliminar_los_datos_801E65C0[];
 
-const char* PTR_s_The_data_is_corrupt_[] = {
+const char* s_McStr_en[] = {
     (char*)s_The_data_is_corrupt_801E3838,
-    (char*)s_WmmEmptyEn_80333680,
+    (char*)sWmmEmptyEn,
     (char*)s_Select_game_data_to_load_801E3850,
     (char*)s_Select_save_location_801E386C,
 };
 
-const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[] = {
+const char* s_McStr_de[] = {
     (char*)s_Der_Spielstand_ist_fehlerhaft_801E3884,
     (char*)s_Kein_Spielstand_vorhanden_801E38A4,
     (char*)lbl_801E38C0,
     (char*)lbl_801E38E0,
 };
 
-const char* PTR_s_I_dati_sono_danneggiati_[] = {
+const char* s_McStr_it[] = {
     (char*)s_I_dati_sono_danneggiati_801E3904,
-    (char*)s_WmmEmptyIt_80333688,
+    (char*)sWmmEmptyIt,
     (char*)s_Seleziona_i_dati_da_caricare_801E3920,
     (char*)s_Seleziona_l_area_di_salvataggio_801E3940,
 };
 
 const char* s_McStr_es[] = {
     (char*)lbl_801E3964,
-    (char*)s_WmmEmptyFr_80333690,
+    (char*)sWmmEmptyFr,
     (char*)lbl_801E3980,
     (char*)lbl_801E39A4,
 };
 
 const char* s_McStr_fr[] = {
     (char*)lbl_801E39D8,
-    (char*)s_WmmEmptyEs_80333698,
+    (char*)sWmmEmptyEs,
     (char*)s_Selecciona_los_datos_que_deseas_cargar_801E39F4,
     (char*)s_Selecciona_el_sitio_donde_deseas_guardar_801E3A1C,
 };
 
 const char* s_McWinMessGroup0_en[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_Select_Memory_Card_Slot_801E3A48,
     (char*)s_Slot_A_Slot_B_801E3A64,
     (char*)s_No_Memory_Card_801E3A78,
@@ -456,14 +456,14 @@ const char* s_McWinMessGroup0_en[] = {
     (char*)s_Cannot_use_this_name_801E3EB0,
     (char*)s_That_appearance_is_already_taken_801E3EC8,
     (char*)s_That_trade_is_already_taken_801E3EEC,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
 };
 
 const char* s_McWinMessGroup0_de[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)lbl_801E3F0C,
     (char*)s_Steckplatz_A_Steckplatz_B_801E3F28,
     (char*)s_Es_befindet_sich_keine_801E3F48,
@@ -474,7 +474,7 @@ const char* s_McWinMessGroup0_de[] = {
     (char*)lbl_801E4010,
     (char*)s_Die_Memory_Card_in_Steckplatz_A_801E403C,
     (char*)s_ist_fehlerhaft_und_muss_formatiert_801E4060,
-    (char*)lbl_803336A4,
+    (char*)sWmmWerdenText,
     (char*)s_Formatieren_801E4084,
     (char*)s_Ja_Nein_801E4094,
     (char*)s_Die_Memory_Card_in_Steckplatz_A_wird_formatiert_801E40A4,
@@ -518,14 +518,14 @@ const char* s_McWinMessGroup0_de[] = {
     (char*)s_Bereits_vergeben_801E45A4,
     (char*)s_Bereits_vergeben_801E45A4,
     (char*)s_Bereits_vergeben_801E45A4,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
 };
 
 const char* s_McWinMessGroup0_it[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_Seleziona_lo_slot_della_Memory_Card_Scheda_Memoria_801E45B8,
     (char*)s_Slot_A_Slot_B_801E3A64,
     (char*)lbl_801E45F0,
@@ -580,14 +580,14 @@ const char* s_McWinMessGroup0_it[] = {
     (char*)s_Non_puoi_usare_questo_nome_801E4AEC,
     (char*)lbl_801E4B08,
     (char*)lbl_801E4B28,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
 };
 
 const char* s_McWinMessGroup0_es[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)lbl_801E4B48,
     (char*)s_Slot_A_Slot_B_801E3A64,
     (char*)lbl_801E4B80,
@@ -642,14 +642,14 @@ const char* s_McWinMessGroup0_es[] = {
     (char*)lbl_801E5160,
     (char*)lbl_801E5178,
     (char*)lbl_801E5198,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
 };
 
 const char* s_McWinMessGroup0_fr[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_Selecciona_una_Ranura_de_Memory_Card_tarjeta_de_memoria_801E51B4,
     (char*)s_Ranura_A_Ranura_B_801E51F0,
     (char*)s_No_se_ha_detectado_ninguna_801E5208,
@@ -704,10 +704,10 @@ const char* s_McWinMessGroup0_fr[] = {
     (char*)s_No_es_posible_usar_este_nombre_801E5808,
     (char*)lbl_801E5828,
     (char*)lbl_801E5844,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
+    (char*)sWmmBlankText,
 };
 
 const char* s_McWinMessGroup2_en[] = {
@@ -881,7 +881,7 @@ const char* s_McWinMessGroup2_fr[] = {
 };
 
 const char* s_McWinMessGroup1_en[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_A_party_cannot_consist_entirely_801E5F60,
     (char*)s_of_guest_characters_Please_801E5F80,
     (char*)s_select_another_character_801E5F9C,
@@ -899,11 +899,11 @@ const char* s_McWinMessGroup1_en[] = {
 };
 
 const char* s_McWinMessGroup1_de[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)lbl_801E6098,
     (char*)lbl_801E60C0,
     (char*)s_werden_Bitte_die_Gruppe_neu_formieren_801E60E8,
-    (char*)lbl_803336AC,
+    (char*)sWmmAuswahlText,
     (char*)s_beenden_801E6110,
     (char*)s_Ja_Nein_801E4094,
     (char*)s_Information_in_Datenblock_1_801E611C,
@@ -917,7 +917,7 @@ const char* s_McWinMessGroup1_de[] = {
 };
 
 const char* s_McWinMessGroup1_it[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_Impossibile_avere_un_gruppo_formato_801E61B8,
     (char*)s_solo_da_personaggi_ospite_Seleziona_801E61DC,
     (char*)s_un_altro_personaggio_801E6204,
@@ -935,7 +935,7 @@ const char* s_McWinMessGroup1_it[] = {
 };
 
 const char* s_McWinMessGroup1_es[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)lbl_801E6320,
     (char*)lbl_801E6348,
     (char*)lbl_801E6368,
@@ -953,7 +953,7 @@ const char* s_McWinMessGroup1_es[] = {
 };
 
 const char* s_McWinMessGroup1_fr[] = {
-    (char*)lbl_803336A0,
+    (char*)sWmmBlankText,
     (char*)s_Un_grupo_no_puede_estar_formado_exclusivamente_801E6464,
     (char*)s_por_personajes_invitados_Por_favor_801E6494,
     (char*)s_escoge_otro_personaje_801E64B8,

@@ -9,12 +9,12 @@ extern const char sWmmSlotB[];
 extern const char sWmmSteckplatzB[];
 extern const char sWmmRanuraB[];
 
-extern const float FLOAT_803336CC;
-extern const double DOUBLE_803336D0;
+extern const float kWmmWindowTextScale = 1.0f;
+extern const double kWmmCenteringHalf = 0.5;
 
-extern const char* PTR_s_The_data_is_corrupt_[];
-extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[];
-extern const char* PTR_s_I_dati_sono_danneggiati_[];
+extern const char* s_McStr_en[];
+extern const char* s_McStr_de[];
+extern const char* s_McStr_it[];
 extern const char* s_McStr_es[];
 extern const char* s_McStr_fr[];
 extern const char* s_McWinMessGroup0_en[];
@@ -129,16 +129,16 @@ int CMenuPcs::GetSlotABXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(FLOAT_803336CC);
+    font->SetMargin(kWmmWindowTextScale);
     font->SetShadow(0);
-    font->SetScale(FLOAT_803336CC);
+    font->SetScale(kWmmWindowTextScale);
     font->SetTlut(0x23);
 
     const int slotAWidth = (int)font->GetWidth((char*)(slotAText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - slotAWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);
+    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
     if (right != 0) {
         const int slotBWidth = (int)font->GetWidth((char*)s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
@@ -181,15 +181,15 @@ int CMenuPcs::GetYesNoXPos(int right)
     }
 
     font = m_fonts[0];
-    font->SetMargin(FLOAT_803336CC);
+    font->SetMargin(kWmmWindowTextScale);
     font->SetShadow(0);
-    font->SetScale(FLOAT_803336CC);
+    font->SetScale(kWmmWindowTextScale);
 
     const int yesWidth = (int)font->GetWidth((char*)(yesText + 1));
     MenuWindowInfo* windowInfo = m_menuWindowInfo;
     double centeredWidth = (double)(windowInfo->width - yesWidth);
     double windowLeft = (double)windowInfo->x;
-    int x = (int)(centeredWidth * DOUBLE_803336D0 + windowLeft);
+    int x = (int)(centeredWidth * kWmmCenteringHalf + windowLeft);
     if (right != 0) {
         const int noWidth = (int)font->GetWidth((char*)s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;
@@ -306,16 +306,16 @@ const char* CMenuPcs::GetMcStr(int index)
 
     switch (languageId) {
     case 2:
-        return PTR_s_Der_Spielstand_ist_fehlerhaft_[index];
+        return s_McStr_de[index];
     case 3:
-        return PTR_s_I_dati_sono_danneggiati_[index];
+        return s_McStr_it[index];
     case 4:
         return s_McStr_es[index];
     case 5:
         return s_McStr_fr[index];
     case 1:
     default:
-        return PTR_s_The_data_is_corrupt_[index];
+        return s_McStr_en[index];
     }
 }
 

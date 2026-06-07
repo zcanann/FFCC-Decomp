@@ -32,17 +32,17 @@ static inline RyjMegaBirthModelDataOffsets* GetRyjMegaBirthModelDataOffsets(_ppp
     return reinterpret_cast<RyjMegaBirthModelDataOffsets*>(ctrlTable->m_serializedDataOffsets);
 }
 
-extern const float FLOAT_803304a8 = 0.017453292f;
-extern const double DOUBLE_803304b0 = 4503601774854144.0;
-extern const double DOUBLE_803304B8 = 4503599627370496.0;
-extern const float FLOAT_803304c0 = 2.0f;
-extern const float FLOAT_803304c4 = 180.0f;
-extern const float FLOAT_803304c8 = 1.0f;
-extern const float FLOAT_803304CC = 0.7f;
-extern const float FLOAT_803304D0 = 0.5f;
-extern const double DOUBLE_803304D8 = 1.0;
-extern const double DOUBLE_803304E0 = 0.5;
-extern const float FLOAT_803304E8[2] = { -1.0f, 0.0f };
+extern const float kPppRyjMegaBirthModelDegToRad = 0.017453292f;
+extern const double kPppRyjMegaBirthModelSignedIntBias = 4503601774854144.0;
+extern const double kPppRyjMegaBirthModelUnsignedIntBias = 4503599627370496.0;
+extern const float kPppRyjMegaBirthModelTwoF = 2.0f;
+extern const float kPppRyjMegaBirthModelDegrees180 = 180.0f;
+extern const float kPppRyjMegaBirthModelOneF = 1.0f;
+extern const float kPppRyjMegaBirthModelSpeedFalloff = 0.7f;
+extern const float kPppRyjMegaBirthModelHalfF = 0.5f;
+extern const double kPppRyjMegaBirthModelOneF64 = 1.0;
+extern const double kPppRyjMegaBirthModelHalfF64 = 0.5;
+extern const float kPppRyjMegaBirthModelNegOneZeroPair[2] = { -1.0f, 0.0f };
 extern const float kPppRyjMegaBirthModelZeroPair[2] = { 0.0f, 0.0f };
 extern const float kPppRyjMegaBirthModelZero = 0.0f;
 
@@ -116,17 +116,17 @@ static inline u8* u8_at(void* base, s32 off)
 
 static inline float MegaBirthSpeedFalloff()
 {
-    return FLOAT_803304CC;
+    return kPppRyjMegaBirthModelSpeedFalloff;
 }
 
 static inline float MegaBirthHalf()
 {
-    return FLOAT_803304D0;
+    return kPppRyjMegaBirthModelHalfF;
 }
 
 static inline double MegaBirthHalfDouble()
 {
-    return DOUBLE_803304E0;
+    return kPppRyjMegaBirthModelHalfF64;
 }
 
 static inline unsigned char clamp_u8_int(int value)
@@ -181,11 +181,11 @@ static inline float calc_mesh_sample_t(u8 mode)
     case 2:
         return Math.RandF() * Math.RandF() * Math.RandF();
     case 3:
-        return (float)(DOUBLE_803304D8 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
+        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
     case 4:
         return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
     case 5:
-        return (float)(DOUBLE_803304D8 - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+        return (float)(kPppRyjMegaBirthModelOneF64 - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
     default:
         return Math.RandF();
     }
@@ -416,7 +416,7 @@ void birth(
     u8* payload = (u8*)params;
     float spread = (float)params->m_spread;
     float halfSpread = spread;
-    float randomRange = FLOAT_803304c0 * spread;
+    float randomRange = kPppRyjMegaBirthModelTwoF * spread;
 
     memset(particleData, 0, 0xA0);
     if (particleWMat != NULL) {
@@ -437,9 +437,9 @@ void birth(
         baseDirection.x = params->m_baseDirection.x;
         baseDirection.y = params->m_baseDirection.y;
         baseDirection.z = params->m_baseDirection.z;
-        angles.x = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
-        angles.y = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
-        angles.z = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
+        angles.x = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
+        angles.y = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
+        angles.z = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / kPppRyjMegaBirthModelDegrees180;
 
         if ((params->m_spawnMode == 2) || (params->m_spawnMode == 3)) {
             angles.x = kPppRyjMegaBirthSharedZero;
@@ -480,7 +480,7 @@ void birth(
 
         worldUp.x = kPppRyjMegaBirthSharedZero;
         worldUp.y = kPppRyjMegaBirthSharedZero;
-        worldUp.z = FLOAT_803304c8;
+        worldUp.z = kPppRyjMegaBirthModelOneF;
         pppOuterProduct(right, direction, worldUp);
         pppNormalize(right, right);
         pppOuterProduct(up, right, direction);
@@ -706,14 +706,14 @@ join_position:
 
             if (((params->m_rotationRandomFlags & 1) != 0) && ((params->m_rotationRandomFlags & 2) != 0)) {
                 if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * kPppRyjMegaBirthModelNegOneZeroPair[0];
                 }
             } else if ((params->m_rotationRandomFlags & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * kPppRyjMegaBirthModelNegOneZeroPair[0];
             }
         } else {
             *f32_at(particleData, 0x74) = *(float*)(payload + 0xC0) * Math.RandF();
@@ -725,15 +725,15 @@ join_position:
                 float* value = f32_at(particleData, 0x74);
                 do {
                     if (MegaBirthHalfDouble() < (double)Math.RandF()) {
-                        *value = *value * FLOAT_803304E8[0];
+                        *value = *value * kPppRyjMegaBirthModelNegOneZeroPair[0];
                     }
                     value++;
                     count--;
                 } while (count != 0);
             } else if ((params->m_rotationRandomFlags & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * kPppRyjMegaBirthModelNegOneZeroPair[0];
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * kPppRyjMegaBirthModelNegOneZeroPair[0];
             }
         }
 
@@ -754,7 +754,7 @@ join_position:
     *f32_at(particleData, 0x84) = params->m_acceleration;
     if (params->m_directionVelocityRandom != kPppRyjMegaBirthSharedZero) {
         *f32_at(particleData, 0x80) +=
-            FLOAT_803304c0 * params->m_directionVelocityRandom * Math.RandF() -
+            kPppRyjMegaBirthModelTwoF * params->m_directionVelocityRandom * Math.RandF() -
             params->m_directionVelocityRandom;
     }
 
@@ -1170,7 +1170,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
         pppFMATRIX rot;
 
-        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)*s32_at(particleData, 0x40));
+        PSMTXRotRad(rot.value, 'z', kPppRyjMegaBirthModelDegToRad * (float)*s32_at(particleData, 0x40));
         pppMulMatrix(pObject->m_drawMatrix, rot, pObject->m_drawMatrix);
 
         pObject->m_drawMatrix.value[0][3] = endPos.x;

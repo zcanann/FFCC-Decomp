@@ -9,7 +9,7 @@
 struct _pppCtrlTable;
 struct _pppPObject;
 
-struct pppYmTracerStep {
+struct PYmTracer {
     s32 m_graphId;
     s32 m_dataValIndex;
     u32 m_initWOrk;
@@ -31,6 +31,7 @@ struct pppYmTracerStep {
     };
 };
 
+typedef PYmTracer pppYmTracerStep;
 typedef _pppCtrlTable pppYmTracerCtrl;
 typedef _pppPObject pppYmTracer;
 
@@ -39,7 +40,7 @@ struct YmTracerDataOffsets {
     s32 m_colorOffset;
 };
 
-struct YmTracerPolygon {
+struct TRACE_POLYGON {
     Vec from;
     f32 _pad0;
     Vec to;
@@ -60,7 +61,7 @@ struct YmTracerWork {
     f32 _pad1c;
     f32* initWork;
     f32* arg3Work;
-    YmTracerPolygon* entries;
+    TRACE_POLYGON* entries;
     u16 count;
     u16 _pad2e;
 };

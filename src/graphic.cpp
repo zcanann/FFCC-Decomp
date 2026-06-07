@@ -2,7 +2,6 @@
 #include "global.h"
 #include "ffcc/graphic_symbols.h"
 #include "ffcc/gxfunc.h"
-#include "ffcc/render_buffers.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -130,7 +129,7 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    char* graphicInitData = const_cast<char*>(graphicInitData_801D6290);
+    char* graphicInitData = const_cast<char*>(sGraphicInitData);
     char* graphicFileName = graphicInitData + kGraphicInitSource;
 
     m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
@@ -1052,7 +1051,7 @@ void CGraphic::makeSphere()
     float vertices[126];
 
     int vertexCount = 0;
-    vertices[0] = FLOAT_8032F6D0;
+    vertices[0] = kGraphicSphereNegativeX;
     vertices[1] = kGraphicZeroF;
     vertices[2] = kGraphicZeroF;
 
@@ -1060,12 +1059,12 @@ void CGraphic::makeSphere()
     float* vertex = &vertices[vertexCount * 3];
 
     for (int ring = 0; ring < 5; ring++) {
-        float pitch = (FLOAT_8032F6E0 * (float)(ring + 1)) / FLOAT_8032F700;
-        float x = FLOAT_8032F6D0 * (float)cos(pitch);
-        float radius = FLOAT_8032F6D0 * (float)sin(pitch);
+        float pitch = (kGraphicSpherePi * (float)(ring + 1)) / kGraphicSphereRingDivisor;
+        float x = kGraphicSphereNegativeX * (float)cos(pitch);
+        float radius = kGraphicSphereNegativeX * (float)sin(pitch);
 
         for (int seg = 0; seg < 8; seg++) {
-            float yaw = FLOAT_8032F704 * (float)seg;
+            float yaw = kGraphicSphereSegmentAngle * (float)seg;
             int vertexIndex = vertexCount * 3;
             vertex[0] = x;
             vertex[1] = radius * (float)sin(yaw);
@@ -1677,8 +1676,9 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	GetBackBufferRect2(gRenderScratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
+	CreateSmallBackTexture(m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
+	GetBackBufferRect2(m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();
 
@@ -1878,8 +1878,8 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMin.x = 0.0f;
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
-    quadMax.x = FLOAT_8032F6F0;
-    quadMax.y = FLOAT_8032F6F4;
+    quadMax.x = kGraphicSmallBackTextureWidth;
+    quadMax.y = kGraphicSmallBackTextureHeight;
     quadMax.z = 0.0f;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 

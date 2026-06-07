@@ -10,11 +10,11 @@
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h>
 
-extern "C" const float FLOAT_80331BD0 = 1.0f;
-extern "C" const float FLOAT_80331BD4 = 0.0f;
-extern "C" const float FLOAT_80331BD8 = 3.1415927f;
-extern "C" const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern "C" const float FLOAT_80331BE8 = -1.0f;
+extern "C" const float kPrgObjOne = 1.0f;
+extern "C" const float kPrgObjZero = 0.0f;
+extern "C" const float kPrgObjPi = 3.1415927f;
+extern "C" const double kPrgObjIntToDoubleBias = 4503601774854144.0;
+extern "C" const float kPrgObjMinusOne = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {
@@ -218,13 +218,13 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	if ((FLOAT_80331BD4 == deltaX) || (FLOAT_80331BD4 == deltaZ)) {
-		targetRot = LoadFloat(FLOAT_80331BD4);
+	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {
+		targetRot = LoadFloat(kPrgObjZero);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
-	const float* pi = &FLOAT_80331BD8;
+	const float* pi = &kPrgObjPi;
 	Math.DstRot(m_rotBaseY, *pi + targetRot);
 }
 
@@ -249,8 +249,8 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	if ((FLOAT_80331BD4 == deltaX) || (FLOAT_80331BD4 == deltaZ)) {
-		targetRot = LoadFloat(FLOAT_80331BD4);
+	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {
+		targetRot = LoadFloat(kPrgObjZero);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -278,8 +278,8 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
-	if ((FLOAT_80331BD4 == deltaX) || (FLOAT_80331BD4 == deltaZ)) {
-		targetRot = LoadFloat(FLOAT_80331BD4);
+	if ((kPrgObjZero == deltaX) || (kPrgObjZero == deltaZ)) {
+		targetRot = LoadFloat(kPrgObjZero);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -359,7 +359,7 @@ void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, 
  */
 void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
-	const float* zero = &FLOAT_80331BD4;
+	const float* zero = &kPrgObjZero;
 
 	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
 	CFlatRuntime2Storage().SetParticleWorkScale(scale);
@@ -551,14 +551,14 @@ void CGPrgObj::onFrame()
 		if (m_animFlagBits.bits.m_animRequested != 0) {
 			if (m_reqAnimId == -1) {
 				if (static_cast<int>(m_currentAnimSlot) >= 0) {
-					m_lastBgAttr = LoadFloat(FLOAT_80331BD0);
+					m_lastBgAttr = LoadFloat(kPrgObjOne);
 					CancelAnim(0);
 				}
 			} else if (m_animFlagBits.bits.m_animDirect != 0) {
-				m_lastBgAttr = LoadFloat(FLOAT_80331BE8);
+				m_lastBgAttr = LoadFloat(kPrgObjMinusOne);
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			} else {
-				m_lastBgAttr = LoadFloat(FLOAT_80331BD0);
+				m_lastBgAttr = LoadFloat(kPrgObjOne);
 				PlayAnim(m_reqAnimId, m_animFlagBits.bits.m_animLoop, 0, -1, -1, 0);
 			}
 

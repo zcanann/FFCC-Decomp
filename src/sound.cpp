@@ -20,26 +20,26 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern char s_CSound_80330cf8[] = "CSound";
+extern char sSoundStageName[] = "CSound";
 extern const char sSoundManagerClassName[] = "CManager";
-extern const float FLOAT_80330ce8 = 127.0f;
+extern const float kSoundVolumeRange = 127.0f;
 extern const float kLineSegmentMinT = 0.0f;
 extern const float kLineSegmentMaxT = 1.0f;
-extern const float FLOAT_80330cf4 = 5.0f;
-extern const float FLOAT_80330cf8 = 3.0f;
-extern const float FLOAT_80330cfc = 2.5f;
-extern const float FLOAT_80330d00 = 100.0f;
-extern const double DOUBLE_80330d08 = 4503599627370496.0;
+extern const float kSoundBossDistanceScale = 5.0f;
+extern const float kSoundOptionDistanceScale = 3.0f;
+extern const float kSoundMap33PanDivisor = 2.5f;
+extern const float kSoundLineDebugScale = 100.0f;
+extern const double kSoundU32ToDoubleBias = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
-extern const double DOUBLE_80330d18 = 0.5;
+extern const double kLineBoundsHalf = 0.5;
 extern const float kVectorFive;
-extern const char s_soundNoFreeWaveWarn_801DB0BC[] =
+extern const char sSoundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-extern const char s_soundNoFreeSeGroupWarn_801DB0E4[] =
+extern const char sSoundNoFreeSeGroupWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-extern const char s_dvd_sound_stream_strpct04d_str_801DB110[] = "dvd/sound/stream/str%04d.str";
+extern const char sSoundStreamPathFmt[] = "dvd/sound/stream/str%04d.str";
 extern const char s_soundMinusOneFmt[] =
     "Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n";
 extern const char s_soundLineTableFullFmt[] =
@@ -334,7 +334,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    m_stage = Memory.CreateStage(0xA4000, s_CSound_80330cf8, 0);
+    m_stage = Memory.CreateStage(0xA4000, sSoundStageName, 0);
 
     m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2E) u8[0x80000];
     m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2F) u8[0x20000];
@@ -1740,7 +1740,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
                 outVolume = 0x7F;
             } else {
                 fVar3 = se3D->m_nearDistance;
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
+                outVolume = 0x7F - (int)(kSoundVolumeRange * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             }
 
             iVar4 = (int)nearestPoint.x;
@@ -1766,10 +1766,10 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             switch (Game.m_gameWork.m_bossArtifactStageIndex) {
             case 8:
             case 0xE:
-                fVar1 = FLOAT_80330cf4;
+                fVar1 = kSoundBossDistanceScale;
                 break;
             default:
-                fVar1 = FLOAT_80330cf8;
+                fVar1 = kSoundOptionDistanceScale;
                 break;
             }
         }
@@ -1786,14 +1786,14 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             if (fVar3 < nearScaled) {
                 outVolume = 0x7F;
             } else {
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+                outVolume = 0x7F - (int)(kSoundVolumeRange * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
             }
         } else {
             outVolume = 0;
         }
 
         if (Game.m_currentMapId == 0x21) {
-            iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
+            iVar4 = (int)(nearestPoint.x / kSoundMap33PanDivisor);
             if (iVar4 < -0x38) {
                 iVar5 = -0x38;
             } else {
@@ -2232,7 +2232,7 @@ void CSound::LoadStream(int streamID)
         sound.m_streamPlaying = 0;
 
         char streamPath[252];
-        sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, streamID);
+        sprintf(streamPath, sSoundStreamPathFmt, streamID);
         sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
         if (sound.m_streamFile != 0) {
             CFile::CHandle* streamFile = sound.m_streamFile;
@@ -2265,7 +2265,7 @@ void CSound::PlayStreamASync()
 {
     char streamPath[252];
     CSoundLayout& sound = SoundData(this);
-    sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, sound.m_streamWaveID);
+    sprintf(streamPath, sSoundStreamPathFmt, sound.m_streamWaveID);
 
     sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
     if (sound.m_streamFile == 0) {
@@ -2411,7 +2411,7 @@ void CSound::AddNoFreeSeGroup(int group)
         return;
     }
 
-    System.Printf(const_cast<char*>(s_soundNoFreeSeGroupWarn_801DB0E4));
+    System.Printf(const_cast<char*>(sSoundNoFreeSeGroupWarn));
 }
 
 /*
@@ -2436,7 +2436,7 @@ void CSound::AddNoFreeWave(int wave)
         return;
     }
 
-    System.Printf(const_cast<char*>(s_soundNoFreeWaveWarn_801DB0BC));
+    System.Printf(const_cast<char*>(sSoundNoFreeWaveWarn));
 }
 
 /*

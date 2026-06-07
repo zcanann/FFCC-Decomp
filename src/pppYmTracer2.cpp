@@ -14,8 +14,8 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const float FLOAT_80331840;
-extern const float FLOAT_80331844;
+extern const float kYmTracer2UvMin;
+extern const float kYmTracer2UvMax;
 
 static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
@@ -98,7 +98,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
         pppSetDrawEnv(
             &colorData->color, reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
-            FLOAT_80331840,
+            kYmTracer2UvMin,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
         gUtil.SetVtxFmt_POS_CLR_TEX();
@@ -127,7 +127,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                 _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
             }
 
-            uvStep = FLOAT_80331844 / (f32)work->visibleCount;
+            uvStep = kYmTracer2UvMax / (f32)work->visibleCount;
             GXSetCullMode(GX_CULL_NONE);
 
             if (work->visibleCount > 1) {
@@ -144,11 +144,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
 
-                    if (alphaScale < FLOAT_80331840) {
-                        alphaScale = FLOAT_80331840;
+                    if (alphaScale < kYmTracer2UvMin) {
+                        alphaScale = kYmTracer2UvMin;
                     }
-                    if (alphaScale > FLOAT_80331844) {
-                        alphaScale = FLOAT_80331844;
+                    if (alphaScale > kYmTracer2UvMax) {
+                        alphaScale = kYmTracer2UvMax;
                     }
 
                     colorTop = g_pppYmTracer2_1;
@@ -164,19 +164,19 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _
 
                     GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, FLOAT_80331844);
+                    GXTexCoord2f32(uTop, kYmTracer2UvMax);
 
                     GXPosition3f32(current->pos.x, current->pos.y, current->pos.z);
                     GXColor1u32(*(u32*)&colorTop);
-                    GXTexCoord2f32(uTop, FLOAT_80331840);
+                    GXTexCoord2f32(uTop, kYmTracer2UvMin);
 
                     GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, FLOAT_80331844);
+                    GXTexCoord2f32(uBottom, kYmTracer2UvMax);
 
                     GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
                     GXColor1u32(*(u32*)&colorBottom);
-                    GXTexCoord2f32(uBottom, FLOAT_80331840);
+                    GXTexCoord2f32(uBottom, kYmTracer2UvMin);
                     i++;
                     current++;
                 }
@@ -235,7 +235,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2Step* param_2, _p
             (u32)param_2->m_tracer.m_entryCount * sizeof(YmTracer2Polygon), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
-        fVar2 = FLOAT_80331840;
+        fVar2 = kYmTracer2UvMin;
         entry = work->entries;
         for (iVar8 = 0; iVar8 < (s32)(u32)param_2->m_tracer.m_entryCount; iVar8++) {
             entry->active = 0;
@@ -372,7 +372,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
  */
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
 {
-    float fVar1 = FLOAT_80331840;
+    float fVar1 = kYmTracer2UvMin;
     YmTracer2Work* work = (YmTracer2Work*)(pppYmTracer2->m_workArea + GetYmTracer2DataOffsets(param_2)->m_workOffset);
 
     work->entries = 0;
@@ -394,5 +394,5 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, _pppCtrlTable* param_2)
     work->pad32 = 0;
 }
 
-extern const float FLOAT_80331864 = 0.0f;
+extern const float kYmTracer2Zero = 0.0f;
 extern const char sTHPMagic[4] = "THP";

@@ -15,11 +15,11 @@
 #include "ffcc/ppp_linkage.h"
 
 static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
-extern const float kPppYmChangeTexRampStart = 2.0f;
-extern const float kPppYmChangeTexRampScale = 0.5f;
-extern const float kPppYmChangeTexRampStep = 0.25f;
-extern const double kPppYmChangeTexIntToDoubleBias = 4503601774854144.0;
-extern const float kPppYmChangeTexInitZero = 0.0f;
+static const float kPppYmChangeTexRampStart = 2.0f;
+static const float kPppYmChangeTexRampScale = 0.5f;
+static const float kPppYmChangeTexRampStep = 0.25f;
+static const double kPppYmChangeTexIntToDoubleBias = 4503601774854144.0;
+static const float kPppYmChangeTexInitZero = 0.0f;
 
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);

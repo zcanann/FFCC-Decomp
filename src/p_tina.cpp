@@ -17,7 +17,7 @@ extern const float kPppHeapUseRateDivisor;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" const char s_no_name_8032fdcc[];
+extern "C" const char sNoNameProfileLabel[];
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 extern "C" void create__8CPartPcsFv(CPartPcs*);
@@ -36,7 +36,7 @@ extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
 
-extern const char s_p_tina_rodata_801d7ee0[] = {
+extern const char sTinaGbaResourceStrings[] = {
     (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
     (char)0x5F, (char)0x63, (char)0x6C, (char)0x69, (char)0x2E, (char)0x62, (char)0x69, (char)0x6E,
@@ -48,22 +48,22 @@ extern const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
-extern const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs(GAME)";
-extern const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs(PART_VIEWER)";
-extern const char s_CPartPcs_801d7f54[] = "CPartPcs";
+extern const char sPartPcsGameTableName[] = "CPartPcs(GAME)";
+extern const char sPartPcsViewerTableName[] = "CPartPcs(PART_VIEWER)";
+extern const char sPartPcsClassName[] = "CPartPcs";
 extern const char sPartPcsManagerClassName[] = "CManager";
 extern const char sPartPcsProcessClassName[] = "CProcess";
-extern const char s_dvd_tina_stage_03d_mirura_801d7f78[] = "dvd/tina/stage%03d/mirura";
-extern const char s_dvd_tina_stage_03d_title_801d7f94[] = "dvd/tina/stage%03d/title";
-extern const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
-extern const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
-extern const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
-extern const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
+extern const char sMiruraPdtPathFmt[] = "dvd/tina/stage%03d/mirura";
+extern const char sLocationTitlePdtPathFmt[] = "dvd/tina/stage%03d/title";
+extern const char sMenuPdtPathFmt[] = "dvd/%smenu/%s";
+extern const char sMonsterPdtPathFmt[] = "dvd/tina/mon/m%03d";
+extern const char sMonsterVariantPdtPathFmt[] = "dvd/tina/mon/m%03d_%c";
+extern const char sFieldPdtPathFmt[] = "dvd/tina/stage%03d/fp%03d";
 static const char s_p_tina_cpp[] = "p_tina.cpp";
-extern const char s_tina_title_fmt_801d8014[0x0C] = "Tina [%c]";
-extern const char s_tina_calc_fmt_801d8020[0x18] = "clc=%.3f%%  max=%.3f%%";
-extern const char s_tina_draw_fmt_801d8038[0x18] = "drw=%.3f%%  max=%.3f%%";
-extern const char s_tina_heap_fmt_801d8050[0x18] = "hpm=%.3f%%  max=%.3f%%";
+extern const char sPartPcsTitleFmt[0x0C] = "Tina [%c]";
+extern const char sPartPcsCalcProfileFmt[0x18] = "clc=%.3f%%  max=%.3f%%";
+extern const char sPartPcsDrawProfileFmt[0x18] = "drw=%.3f%%  max=%.3f%%";
+extern const char sPartPcsHeapProfileFmt[0x18] = "hpm=%.3f%%  max=%.3f%%";
 extern const char sTinaParticleAMemFreeFmt[] = {
     (char)0x0A, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
@@ -87,15 +87,15 @@ extern const char sTinaParticleAMemFreeFmt[] = {
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x0A, (char)0x0A, (char)0x00,
 };
-extern const char s_CPartPcs_dat_801d810c[0x10] = "CPartPcs.dat";
-extern const char s_CPartPcs_amem_801d811c[0x10] = "CPartPcs.amem";
-extern const char s_dvd_tina_chobit_801d812c[] = "dvd/tina/chobit";
-extern const char s_dvd_tina_chobit_0_801d813c[0x14] = "dvd/tina/chobit_0";
-extern const char s_dvd_tina_chobit_1_801d8150[0x14] = "dvd/tina/chobit_1";
-extern const char s_dvd_tina_chobit_2_801d8164[0x14] = "dvd/tina/chobit_2";
-extern const char s_dvd_tina_chobit_3_801d8178[0x14] = "dvd/tina/chobit_3";
-extern const char s_dvd_tina_chobit_4_801d818c[0x14] = "dvd/tina/chobit_4";
-extern const char s_tina_prio_time_fmt_801d81a0[0x34] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
+extern const char sPartPcsDataStageName[0x10] = "CPartPcs.dat";
+extern const char sPartPcsAmemStageName[0x10] = "CPartPcs.amem";
+extern const char sChobitBasePath[] = "dvd/tina/chobit";
+extern const char sChobit0Path[0x14] = "dvd/tina/chobit_0";
+extern const char sChobit1Path[0x14] = "dvd/tina/chobit_1";
+extern const char sChobit2Path[0x14] = "dvd/tina/chobit_2";
+extern const char sChobit3Path[0x14] = "dvd/tina/chobit_3";
+extern const char sChobit4Path[0x14] = "dvd/tina/chobit_4";
+extern const char sPartPcsPrioTimeFmt[0x34] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
 extern const char sTinaDeleteNoticeMsg[] = {
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
@@ -114,67 +114,86 @@ inline CPartPcs::CPartPcs()
 }
 
 CPartPcs PartPcs;
-CProcessTableCallback CPartPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
-CProcessTableCallback CPartPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCreate = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDestroy = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalcInit = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalc = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescCalcDead = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescClearOt = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawShadow = {0, 0xFFFFFFFF,
+                                                           reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawCharaBefore = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDraw = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
+static CProcessTableCallback s_partTableDescDrawAfter = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCreate = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDestroy = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalcInit = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalc = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescCalcDead = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescClearOt = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDrawShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDraw = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
+static CProcessTableCallback s_partViewerTableDescDrawAfter = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
 CProcessTable CPartPcs::m_table[2] = {
     {
-        const_cast<char*>(s_CPartPcs_GAME_801D7F2C),
+        const_cast<char*>(sPartPcsGameTableName),
         {
-            m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
-            m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
-            m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
+            s_partTableDescCreate.m_thisOffset, s_partTableDescCreate.m_virtualOffset, s_partTableDescCreate.m_function,
+            s_partTableDescDestroy.m_thisOffset, s_partTableDescDestroy.m_virtualOffset, s_partTableDescDestroy.m_function,
+            s_partTableDescCalcInit.m_thisOffset, s_partTableDescCalcInit.m_virtualOffset, s_partTableDescCalcInit.m_function,
             0x15, 0,
-            m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
+            s_partTableDescCalc.m_thisOffset, s_partTableDescCalc.m_virtualOffset, s_partTableDescCalc.m_function,
             0x1D, 0,
-            m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
+            s_partTableDescCalcDead.m_thisOffset, s_partTableDescCalcDead.m_virtualOffset, s_partTableDescCalcDead.m_function,
             0x28, 0,
-            m_table_desc5.m_thisOffset, m_table_desc5.m_virtualOffset, m_table_desc5.m_function,
+            s_partTableDescClearOt.m_thisOffset, s_partTableDescClearOt.m_virtualOffset, s_partTableDescClearOt.m_function,
             0x2C, 1,
-            m_table_desc6.m_thisOffset, m_table_desc6.m_virtualOffset, m_table_desc6.m_function,
+            s_partTableDescDrawShadow.m_thisOffset, s_partTableDescDrawShadow.m_virtualOffset, s_partTableDescDrawShadow.m_function,
             0x31, 1,
-            m_table_desc7.m_thisOffset, m_table_desc7.m_virtualOffset, m_table_desc7.m_function,
+            s_partTableDescDrawCharaBefore.m_thisOffset, s_partTableDescDrawCharaBefore.m_virtualOffset, s_partTableDescDrawCharaBefore.m_function,
             0x38, 1,
-            m_table_desc8.m_thisOffset, m_table_desc8.m_virtualOffset, m_table_desc8.m_function,
+            s_partTableDescDraw.m_thisOffset, s_partTableDescDraw.m_virtualOffset, s_partTableDescDraw.m_function,
             0x3E, 1,
-            m_table_desc9.m_thisOffset, m_table_desc9.m_virtualOffset, m_table_desc9.m_function,
+            s_partTableDescDrawAfter.m_thisOffset, s_partTableDescDrawAfter.m_virtualOffset, s_partTableDescDrawAfter.m_function,
             0x40, 1,
         },
     },
     {
-        const_cast<char*>(s_CPartPcs_PART_VIEWER_801D7F3C),
+        const_cast<char*>(sPartPcsViewerTableName),
         {
-            m_table_desc10.m_thisOffset, m_table_desc10.m_virtualOffset, m_table_desc10.m_function,
-            m_table_desc11.m_thisOffset, m_table_desc11.m_virtualOffset, m_table_desc11.m_function,
-            m_table_desc12.m_thisOffset, m_table_desc12.m_virtualOffset, m_table_desc12.m_function,
+            s_partViewerTableDescCreate.m_thisOffset, s_partViewerTableDescCreate.m_virtualOffset, s_partViewerTableDescCreate.m_function,
+            s_partViewerTableDescDestroy.m_thisOffset, s_partViewerTableDescDestroy.m_virtualOffset, s_partViewerTableDescDestroy.m_function,
+            s_partViewerTableDescCalcInit.m_thisOffset, s_partViewerTableDescCalcInit.m_virtualOffset, s_partViewerTableDescCalcInit.m_function,
             0x15, 0,
-            m_table_desc13.m_thisOffset, m_table_desc13.m_virtualOffset, m_table_desc13.m_function,
+            s_partViewerTableDescCalc.m_thisOffset, s_partViewerTableDescCalc.m_virtualOffset, s_partViewerTableDescCalc.m_function,
             0x1D, 0,
-            m_table_desc14.m_thisOffset, m_table_desc14.m_virtualOffset, m_table_desc14.m_function,
+            s_partViewerTableDescCalcDead.m_thisOffset, s_partViewerTableDescCalcDead.m_virtualOffset, s_partViewerTableDescCalcDead.m_function,
             0x28, 0,
-            m_table_desc15.m_thisOffset, m_table_desc15.m_virtualOffset, m_table_desc15.m_function,
+            s_partViewerTableDescClearOt.m_thisOffset, s_partViewerTableDescClearOt.m_virtualOffset, s_partViewerTableDescClearOt.m_function,
             0x2C, 1,
-            m_table_desc16.m_thisOffset, m_table_desc16.m_virtualOffset, m_table_desc16.m_function,
+            s_partViewerTableDescDrawShadow.m_thisOffset, s_partViewerTableDescDrawShadow.m_virtualOffset, s_partViewerTableDescDrawShadow.m_function,
             0x31, 1,
-            m_table_desc17.m_thisOffset, m_table_desc17.m_virtualOffset, m_table_desc17.m_function,
+            s_partViewerTableDescDraw.m_thisOffset, s_partViewerTableDescDraw.m_virtualOffset, s_partViewerTableDescDraw.m_function,
             0x3E, 1,
-            m_table_desc18.m_thisOffset, m_table_desc18.m_virtualOffset, m_table_desc18.m_function,
+            s_partViewerTableDescDrawAfter.m_thisOffset, s_partViewerTableDescDrawAfter.m_virtualOffset, s_partViewerTableDescDrawAfter.m_function,
             0x40, 1,
         },
     },
@@ -199,8 +218,8 @@ signed char s_debugSpinnerFrameCounterPad2;
 
 static const int kPppFieldParticleNoAutoCreate = -0x1000;
 
-CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
-CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
+CProfile g_par_calc_prof(const_cast<char*>(sNoNameProfileLabel));
+CProfile g_par_draw_prof(const_cast<char*>(sNoNameProfileLabel));
 
 /*
  * --INFO--
@@ -232,7 +251,7 @@ void CPartPcs::StartMiruraEvent()
     char path[1024];
     CGame* game = &Game;
 
-    sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
+    sprintf(path, sMiruraPdtPathFmt, game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
         m_usbStreamState.m_miruraEventActive = 1;
@@ -269,7 +288,7 @@ void CPartPcs::StartLocationTitle()
     char path[1024];
     CGame* game = &Game;
 
-    sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
+    sprintf(path, sLocationTitlePdtPathFmt, game->m_currentMapId);
     loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
     if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
         m_usbStreamState.m_blockOnFrame = 1;
@@ -306,7 +325,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     CMemory::CStage* stage;
     char path[0x100];
 
-    sprintf(path, s_dvd__smenu__s_801d7fb0, Game.GetLangString(), fileName);
+    sprintf(path, sMenuPdtPathFmt, Game.GetLangString(), fileName);
 
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = MenuPcs.m_stageF4;
@@ -360,9 +379,9 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
     char path[256];
 
     if (variant == 0) {
-        sprintf(path, s_dvd_tina_mon_m_03d_801d7fc0, monsterId);
+        sprintf(path, sMonsterPdtPathFmt, monsterId);
     } else {
-        sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
+        sprintf(path, sMonsterVariantPdtPathFmt, monsterId, variant + 0x61);
     }
 
     PartMng.m_partAMemBase = 0;
@@ -456,7 +475,7 @@ void LoadFieldPdt0(int mapId, int floorId)
 
     PartPcs.m_usbStreamState.m_fieldLoadReq = 1;
 
-    sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
+    sprintf(path, sFieldPdtPathFmt, mapId, floorId);
     pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
         pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
@@ -514,16 +533,14 @@ unsigned int CPartPcs::IsLoadPartCompleted()
  */
 void CPartPcs::drawAfterViewer()
 {
-	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3f1);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3f1);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
 	Graphic.SetFog(1, 0);
 	pppInitDrawEnv(0);
 	PartMng.pppEditPartDrawAfter();
 	reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-	Graphic._WaitDrawDone(stringBase + 0x128, 0x3fb);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x3fb);
 	reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
@@ -539,20 +556,20 @@ void CPartPcs::drawAfterViewer()
 
 	s_debugSpinnerFrameCounter++;
 	Graphic.Printf(
-		stringBase + 0x134, sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
+		const_cast<char*>(sPartPcsTitleFmt), sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
 	Graphic.Printf(
-		stringBase + 0x140,
+		const_cast<char*>(sPartPcsCalcProfileFmt),
 		(double)g_par_calc_prof.m_lastTime,
 		(double)g_par_calc_prof.m_maxTime);
 	Graphic.Printf(
-		stringBase + 0x158,
+		const_cast<char*>(sPartPcsDrawProfileFmt),
 		(double)g_par_draw_prof.m_lastTime,
 		(double)g_par_draw_prof.m_maxTime);
 	Graphic.Printf(
-		stringBase + 0x170,
+		const_cast<char*>(sPartPcsHeapProfileFmt),
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
 }
@@ -603,7 +620,7 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 }
 
 extern "C" {
-const char s_no_name_8032fdcc[] = "no name";
+const char sNoNameProfileLabel[] = "no name";
 }
 
 /*
@@ -1006,7 +1023,6 @@ void CPartPcs::destroy()
 void CPartPcs::createViewer()
 {
     CUSBStreamDataState* usb = &m_usbStreamState;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     CMemory::CStage* stage;
 
     USBPcs.IsBigAlloc(1);
@@ -1017,20 +1033,20 @@ void CPartPcs::createViewer()
     usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
+        stage = Memory.CreateStage(0x400000, const_cast<char*>(sPartPcsAmemStageName), 2);
         usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
-        stringBase + 0x74,
+        const_cast<char*>(sPartPcsClassName),
         PartPcs.m_usbStreamState.m_stageLoad,
         PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
@@ -1058,8 +1074,6 @@ void CPartPcs::createViewer()
 void CPartPcs::createLoad()
 {
     CPartMng* state = &PartMng;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
-
     state->m_partAMemBase = 0;
     state->m_partAMemCursor = 0;
     state->m_partLoadCacheParam = 0;
@@ -1067,14 +1081,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    PartMng.pppLoadPtx(stringBase + 0x24C, 1, 1, 0, 0);
-    PartMng.pppLoadPmd(stringBase + 0x24C);
-    PartMng.pppLoadPan(stringBase + 0x24C);
-    PartMng.pppLoadPdt(stringBase + 0x25C, 1, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
-    PartMng.pppLoadPdt(stringBase + 0x2AC, 5, 1, 0, 0);
+    PartMng.pppLoadPtx(const_cast<char*>(sChobitBasePath), 1, 1, 0, 0);
+    PartMng.pppLoadPmd(const_cast<char*>(sChobitBasePath));
+    PartMng.pppLoadPan(const_cast<char*>(sChobitBasePath));
+    PartMng.pppLoadPdt(const_cast<char*>(sChobit0Path), 1, 1, 0, 0);
+    PartMng.pppLoadPdt(const_cast<char*>(sChobit1Path), 2, 1, 0, 0);
+    PartMng.pppLoadPdt(const_cast<char*>(sChobit2Path), 3, 1, 0, 0);
+    PartMng.pppLoadPdt(const_cast<char*>(sChobit3Path), 4, 1, 0, 0);
+    PartMng.pppLoadPdt(const_cast<char*>(sChobit4Path), 5, 1, 0, 0);
     ppvAmemCacheSet.AmemSetLock();
 }
 
@@ -1090,7 +1104,6 @@ void CPartPcs::createLoad()
 void CPartPcs::create()
 {
     CUSBStreamDataState* usb = &m_usbStreamState;
-    char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
     CMemory::CStage* stage;
 
     usb->m_freePtr = 0;
@@ -1100,20 +1113,20 @@ void CPartPcs::create()
     usb->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
         usb->m_stageAmem = 0;
     } else {
-        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, const_cast<char*>(sPartPcsDataStageName), 0);
         usb->m_stageLoad = stage;
         usb->m_stageDefault = stage;
-        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
+        stage = Memory.CreateStage(0x400000, const_cast<char*>(sPartPcsAmemStageName), 2);
         usb->m_stageAmem = stage;
     }
 
     ppvAmemCacheSet.Init(
-        stringBase + 0x74,
+        const_cast<char*>(sPartPcsClassName),
         PartPcs.m_usbStreamState.m_stageLoad,
         PartPcs.m_usbStreamState.m_stageAmem,
         0x400,
@@ -1159,7 +1172,6 @@ unsigned char pppAmemDeletePmng(unsigned long)
  */
 unsigned int pppFreeMngStPrioForData()
 {
-	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
 	_pppMngSt* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
 	_pppMngSt* currentMngSt = ppvMng;
@@ -1223,7 +1235,7 @@ unsigned int pppFreeMngStPrioForData()
 	if ((unsigned int)System.m_execParam >= 3) {
 		char* pdtName = PartMng.m_pdtSlots[selectedMngSt->m_kind].m_name;
 		System.Printf(
-			stringBase + 0x2C0,
+			const_cast<char*>(sPartPcsPrioTimeFmt),
 			(unsigned int)selectedMngSt->m_prioTime,
 			(unsigned int)selectedMngSt->m_prio,
 			(int)selectedMngSt->m_kind,
@@ -1231,13 +1243,13 @@ unsigned int pppFreeMngStPrioForData()
 			pdtName);
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
-		System.Printf(stringBase + 0x2F4);
+		System.Printf(const_cast<char*>(sTinaDeleteNoticeMsg));
 	}
 	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(g_MsgFlashy);
 	}
 
-	Graphic._WaitDrawDone(stringBase + 0x128, 0xfc);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0xfc);
 	_pppAllFreePObject(reinterpret_cast<_pppMngSt*>(selectedMngSt));
 	return 1;
 }

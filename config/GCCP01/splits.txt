@@ -239,7 +239,7 @@ materialman.cpp:
 	.bss        start:0x80268C70 end:0x80268E8C
 	.sdata      start:0x8032E568 end:0x8032E598
 	.sbss       start:0x8032ECE8 end:0x8032ED00
-	.sdata2     start:0x8032FB18 end:0x8032FB28
+	.sdata2     start:0x8032FAF8 end:0x8032FB28
 
 ref.cpp:
 	extab       start:0x80006754 end:0x8000675C
@@ -904,7 +904,6 @@ pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
 	extabindex  start:0x8000DC54 end:0x8000DC60
 	.text       start:0x80087EF0 end:0x800880F0
-	.sdata2     start:0x80330500 end:0x80330504
 
 pppKeShpTail.cpp:
 	extab       start:0x80007A08 end:0x80007A10
@@ -915,13 +914,12 @@ pppKeZCrctShp.cpp:
 	extab       start:0x80007A10 end:0x80007A18
 	extabindex  start:0x8000DC6C end:0x8000DC78
 	.text       start:0x8008821C end:0x80088698
-	.sdata2     start:0x80330504 end:0x80330508
 
 pppKeShpTail2X.cpp:
 	extab       start:0x80007A18 end:0x80007A38
 	extabindex  start:0x8000DC78 end:0x8000DCA8
 	.text       start:0x80088698 end:0x8008922C
-	.sdata2     start:0x80330508 end:0x80330520
+	.sdata2     start:0x80330500 end:0x80330520
 
 pppKeShpTail3X.cpp:
 	extab       start:0x80007A38 end:0x80007A50
@@ -1113,7 +1111,7 @@ pppYmMelt.cpp:
 	extabindex  start:0x8000E4C4 end:0x8000E4F4
 	.text       start:0x800A538C end:0x800A5FCC
 	.rodata     start:0x801DA048 end:0x801DA058
-	.sdata2     start:0x80330B08 end:0x80330B34
+	.sdata2     start:0x80330AF0 end:0x80330B34
 	.sbss2      start:0x80333DE0 end:0x80333DE4
 
 pppYmCallBack.cpp:
@@ -1665,8 +1663,8 @@ pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84
 	extabindex  start:0x80010DBC end:0x80010E10
 	.text       start:0x8013F9D0 end:0x80141204
-	.rodata     start:0x801DD690 end:0x801DD6A8
-	.sdata2     start:0x80332068 end:0x80332078
+	.rodata     start:0x801DD678 end:0x801DD6A8
+	.sdata2     start:0x80332048 end:0x80332080
 
 pppCallBackDistance.cpp:
 	extab       start:0x80009B84 end:0x80009B94
@@ -1849,14 +1847,14 @@ MenuUtil.cpp:
 	.text       start:0x8017683C end:0x8017AF14
 	.rodata     start:0x801E3058 end:0x801E3838
 	.data       start:0x80215A48 end:0x80215BD8
-	.sdata2     start:0x80333460 end:0x803336D8
+	.sdata2     start:0x80333460 end:0x80333680
 
 wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC
 	extabindex  start:0x8001177C end:0x80011794
 	.text       start:0x8017AF14 end:0x8017B494
 	.data       start:0x80215BD8 end:0x80216758
-	.sdata2     start:0x803336D8 end:0x803336E0
+	.sdata2     start:0x80333680 end:0x803336E0
 
 base/PPCArch.c:
 	.text       start:0x8017B494 end:0x8017B5A8

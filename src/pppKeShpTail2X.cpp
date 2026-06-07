@@ -4,9 +4,9 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern const float kPppKeShpTail2XZero;
-extern const float kPppKeShpTail2XAlphaScale;
-const float kPppKeShpTail2XHalf = 0.5f;
+extern const float kPppKeShpTail2XZero = 0.0f;
+extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
+extern const float kPppKeShpTail2XHalf = 0.5f;
 }
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

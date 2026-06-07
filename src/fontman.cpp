@@ -13,14 +13,14 @@ unsigned char g_tFont22[0x10D40] = {
 #include <dolphin/mtx.h>
 
 extern const float kFontZero = 0.0f;
-extern const double DOUBLE_803306C0 = 4503601774854144.0;
+extern const double kFontUnsignedIntToDoubleBias = 4503601774854144.0;
 extern const float kFontOne = 1.0f;
-extern const double DOUBLE_803306D0 = 4503599627370496.0;
+extern const double kFontSignedIntToDoubleBias = 4503599627370496.0;
 extern const float kFontOrthoHeight = 448.0f;
 extern const float kFontOrthoWidth = 640.0f;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
-static const char s_CFontMan_801D9CC4[] = "CFontMan";
+static const char sFontManClassName[] = "CFontMan";
 
 CFontMan FontMan;
 
@@ -874,7 +874,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan_801D9CC4), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(sFontManClassName), 0);
 	m_stage = stage;
 
 	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;

@@ -21,8 +21,8 @@
 
 extern const char sCFlatRuntime2SetClassSystemValWarn[];
 extern const char sCFlatRuntime2AnimStateWarn[];
-extern const float FLOAT_80330BC8;
-extern const float FLOAT_80330BCC;
+extern const float kCFlatRuntime2Zero;
+extern const float kCFlatRuntime2SystemValScale;
 
 extern "C" const double kCharaViewerColorCenterBias = 4503601774854144.0;
 extern "C" const float kCharaViewerZero = 0.0f;
@@ -519,17 +519,17 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					break;
 					case -0x1A: {
 						int value = 0;
-						*reinterpret_cast<float*>(&stack[-1].m_word) = FLOAT_80330BC8;
+						*reinterpret_cast<float*>(&stack[-1].m_word) = kCFlatRuntime2Zero;
 						if (setMode == 0) {
 							value = static_cast<int>(static_cast<float>(stack->m_word));
 						} else if (setMode < 0) {
 							if (setMode > -2) {
-								value = static_cast<int>(FLOAT_80330BC8 - static_cast<float>(stack->m_word));
+								value = static_cast<int>(kCFlatRuntime2Zero - static_cast<float>(stack->m_word));
 							}
 						} else if (setMode < 2) {
-							value = static_cast<int>(FLOAT_80330BC8 + static_cast<float>(stack->m_word));
+							value = static_cast<int>(kCFlatRuntime2Zero + static_cast<float>(stack->m_word));
 						}
-						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(FLOAT_80330BCC * static_cast<float>(value)));
+						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(kCFlatRuntime2SystemValScale * static_cast<float>(value)));
 						break;
 					}
 				case -0x1B:
@@ -892,9 +892,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x15:
 			engineObject->m_weaponNodeFlagBits.m_unk10 = static_cast<signed char>(object->m_localBase[0]);
-			engineObject->m_groundHitOffset.z = FLOAT_80330BC8;
-			engineObject->m_groundHitOffset.y = FLOAT_80330BC8;
-			engineObject->m_groundHitOffset.x = FLOAT_80330BC8;
+			engineObject->m_groundHitOffset.z = kCFlatRuntime2Zero;
+			engineObject->m_groundHitOffset.y = kCFlatRuntime2Zero;
+			engineObject->m_groundHitOffset.x = kCFlatRuntime2Zero;
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -990,7 +990,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
 			hitMove.x = static_cast<float>(sin(params[2])) * params[3];
-			hitMove.y = FLOAT_80330BC8;
+			hitMove.y = kCFlatRuntime2Zero;
 			hitMove.z = static_cast<float>(cos(params[2])) * params[3];
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[4], object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, params[4], 1, 0);
@@ -1059,9 +1059,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(angle)) * distance;
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(angle)) * distance;
-			hitMove.x = FLOAT_80330BC8;
+			hitMove.x = kCFlatRuntime2Zero;
 			hitMove.y = -height;
-			hitMove.z = FLOAT_80330BC8;
+			hitMove.z = kCFlatRuntime2Zero;
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, radius, object->m_localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, radius, 1, 0);
 			if (hit != 0) {

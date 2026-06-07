@@ -43,68 +43,68 @@ extern "C" const char s_MenuOptionMusicDe[] = "Musik";
 extern "C" const char s_MenuOptionOnDe[] = "AN";
 extern "C" const char s_MenuOptionOffDe[] = "AUS";
 extern "C" const char s_MenuOptionStereoDe[] = "STEREO";
-extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
-extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";
-extern "C" const char s_MenuOptionForza_803334B8[] = "Forza";
-extern "C" const char s_MenuOptionDifesa_803334C0[] = "Difesa";
-extern "C" const char s_MenuOptionSonoro_803334C8[] = "Sonoro";
-extern "C" const char s_MenuOptionMusica_803334D0[] = "Musica";
-extern "C" const char s_MenuOptionMonoIt_803334D8[] = "Mono";
-extern "C" const char s_MenuOptionContr_803334E0[] = "Contr.";
-extern "C" const char s_MenuOptionNorm_803334E8[] = "Norm.";
-extern "C" const float FLOAT_80333614 = 196.0f;
-extern "C" const float FLOAT_80333618 = 168.0f;
-extern "C" const float FLOAT_8033361C = 24.0f;
-extern "C" const float FLOAT_80333620 = 20.0f;
-extern "C" const float FLOAT_80333624 = 16.0f;
-extern "C" const float FLOAT_80333628 = 564.0f;
-extern "C" const float FLOAT_8033362C = 0.07692308f;
-extern "C" const float FLOAT_80333630 = 6.923077f;
-extern "C" const float FLOAT_80333634 = 4.0f;
-extern "C" const unsigned int DOUBLE_80333638[2] = {0x43300000, 0x00000000};
-extern "C" const unsigned int DOUBLE_80333640[2] = {0x43300000, 0x80000000};
-extern "C" const float FLOAT_80333608 = 190.0f;
-extern "C" const float FLOAT_8033360C = 587.0f;
-extern "C" const float FLOAT_80333610 = 372.0f;
+extern "C" const char s_MenuOptionMonoUpper[] = "MONO";
+extern "C" const char s_MenuOptionNormalIt[] = "Normal";
+extern "C" const char s_MenuOptionForza[] = "Forza";
+extern "C" const char s_MenuOptionDifesa[] = "Difesa";
+extern "C" const char s_MenuOptionSonoro[] = "Sonoro";
+extern "C" const char s_MenuOptionMusicaIt[] = "Musica";
+extern "C" const char s_MenuOptionMonoIt[] = "Mono";
+extern "C" const char s_MenuOptionContr[] = "Contr.";
+extern "C" const char s_MenuOptionNorm[] = "Norm.";
+extern "C" const float kOptionMeterAnchor196 = 196.0f;
+extern "C" const float kOptionMeterLabelY = 168.0f;
+extern "C" const float kOptionSmallIconSize = 24.0f;
+extern "C" const float kOptionUiTwenty = 20.0f;
+extern "C" const float kOptionMeterSegmentSize = 16.0f;
+extern "C" const float kOptionMeterMaxLabelRight = 564.0f;
+extern "C" const float kOptionSpecialRowFrameStep = 0.07692308f;
+extern "C" const float kOptionSpecialRowAngleStep = 6.923077f;
+extern "C" const float kOptionModeTextYOffset = 4.0f;
+extern "C" const unsigned int kMenuUtilUnsignedIntToDoubleBiasBits[2] = {0x43300000, 0x00000000};
+extern "C" const unsigned int kMenuUtilSignedIntToDoubleBiasBits[2] = {0x43300000, 0x80000000};
+extern "C" const float kOptionMeterArrowY = 190.0f;
+extern "C" const float kOptionMeterRightArrowX = 587.0f;
+extern "C" const float kOptionMeterBarBaseX = 372.0f;
 extern "C" const float kOptionOpenAnimStep = 0.04f;
 extern "C" const float kOptionColumnAnimStep = 0.2f;
 extern "C" const float kOptionVolumeScale = 10.583333f;
-extern "C" const float FLOAT_80333654 = 25.0f;
-extern const float FLOAT_80333548 = 0.88f;
-extern const float FLOAT_80333550 = 255.0f;
-extern const float FLOAT_80333554 = 224.0f;
-extern const float FLOAT_8033355C = 14.0f;
-extern const float FLOAT_80333560 = 640.0f;
-extern const float FLOAT_80333564 = 336.0f;
-extern const float FLOAT_80333568 = 88.0f;
-extern const float FLOAT_80333570 = 32.0f;
-extern const float FLOAT_80333574 = 64.0f;
-extern const float FLOAT_80333578 = 0.8f;
-extern const float FLOAT_8033357C = 56.0f;
-extern const float FLOAT_80333580 = -4.0f;
-extern const float FLOAT_80333584 = 384.0f;
-extern const float FLOAT_80333588 = 40.0f;
-extern const float FLOAT_80333590 = 387.0f;
-extern const float FLOAT_80333594 = 0.017453292f;
-extern const float FLOAT_8033359C = 11.25f;
-extern const float FLOAT_803335A0 = 2.0f;
-extern const float FLOAT_803335A4 = 185.0f;
-extern const float FLOAT_803335A8 = 472.0f;
-extern const float FLOAT_803335AC = 96.0f;
-extern const float FLOAT_803335B0 = 120.0f;
-extern const float FLOAT_803335B4 = 48.0f;
-extern const double DOUBLE_803335B8 = 0.8;
-extern const double DOUBLE_803335C0 = 1.0;
-extern const double DOUBLE_803335C8 = 368.0;
-extern const double DOUBLE_803335D0 = 0.5;
-extern const double DOUBLE_803335D8 = 464.0;
-extern const float FLOAT_803335E0 = 112.0f;
-extern const double DOUBLE_803335E8 = 360.0;
-extern const double DOUBLE_803335F0 = 472.0;
-extern const float FLOAT_803335F8 = 348.0f;
-extern const float FLOAT_803335FC = 192.0f;
-extern const float FLOAT_80333600 = 556.0f;
-extern const float FLOAT_80333604 = 184.0f;
+extern "C" const float kHelpMessageLineStep = 25.0f;
+extern const float kOptionMenuFontScale = 0.88f;
+extern const float kOptionMenuAlphaMax = 255.0f;
+extern const float kOptionBannerCenterY = 224.0f;
+extern const float kOptionBannerYOffset = 14.0f;
+extern const float kOptionScreenWidth = 640.0f;
+extern const float kOptionPanelLeft = 336.0f;
+extern const float kOptionPanelTop = 88.0f;
+extern const float kOptionCursorSize = 32.0f;
+extern const float kOptionMarkerLeft = 64.0f;
+extern const float kOptionListTextScaleX = 0.8f;
+extern const float kOptionRowLeft = 56.0f;
+extern const float kOptionTextYOffset = -4.0f;
+extern const float kOptionHelpBarTop = 384.0f;
+extern const float kOptionLargeIconSize = 40.0f;
+extern const float kOptionHelpTextY = 387.0f;
+extern const float kOptionDegToRad = 0.017453292f;
+extern const float kOptionRowAngleStep = 11.25f;
+extern const float kOptionTextNudge = 2.0f;
+extern const float kOptionSelectorTextY = 185.0f;
+extern const float kOptionIconWaveTargetX = 472.0f;
+extern const float kOptionGameInitTextOffset = 96.0f;
+extern const float kOptionSelectorWidth = 120.0f;
+extern const float kOptionSelectorHeight = 48.0f;
+extern const double kOptionAltLanguageTextScale = 0.8;
+extern const double kOptionDefaultTextScale = 1.0;
+extern const double kOptionSelectorBaseX64 = 368.0;
+extern const double kOptionHalf64 = 0.5;
+extern const double kOptionSelectorRightX64 = 464.0;
+extern const float kOptionStereoTextOffset = 112.0f;
+extern const double kOptionStereoSelectorX64 = 360.0;
+extern const double kOptionIconWaveTargetX64 = 472.0;
+extern const float kOptionIconWaveOriginX = 348.0f;
+extern const float kOptionLeftIconBaseY = 192.0f;
+extern const float kOptionRightIconBaseX = 556.0f;
+extern const float kOptionRightIconBaseY = 184.0f;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -113,75 +113,75 @@ extern const char sMenuUtilSpaceText[] = " ";
 extern const char sMenuUtilValueSuffixFormat[] = " %d";
 extern const char sMenuUtilSignedDeltaFormat[] = " %+d";
 extern const char sMenuUtilAttrBonusFormat[] = " %s";
-extern "C" const char s_Force_803334F0[] = "Force";
-extern "C" const char s_Musique_803334F8[] = "Musique";
-extern "C" const char s_Active_80333500[8] = "Activ\351";
-extern "C" const char s_Stereo_80333508[8] = "St\351r\351o";
-extern "C" const char s_Fuerza_80333510[] = "Fuerza";
-extern "C" const char s_Defensa_80333518[] = "Defensa";
-extern "C" const char s_Musica_80333520[8] = "M\372sica";
-extern "C" const char s_Apagado_80333528[] = "Apagado";
-extern "C" const char s_MenuOptionEstereo_80333530[8] = "Est\351reo";
-extern "C" const char s_MenuOptionMinEs_80333538[8] = "M\355n.";
-extern "C" const char s_MenuOptionMaxEs_80333540[8] = "M\341x.";
-static const char s_Strength_801E30A4[] = "Strength:";
-static const char s_Defence_801E30B0[] = "Defence:";
-static const char s_Position_Markers_801E30BC[] = "Position Markers";
-static const char s_Sound_Mode_801E30D0[] = "Sound Mode";
-static const char s_Sound_Effects_801E30DC[] = "Sound Effects";
-static const char s_GBA_Colour_Balance_801E30EC[] = "GBA Colour Balance";
-static const char s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100[] = "Show or hide position marker under each character's feet.";
-static const char s_Select_stereo_or_monaural_sound_801E313C[] = "Select stereo or monaural sound.";
-static const char s_Adjust_volume_of_background_music_801E3160[] = "Adjust volume of background music.";
-static const char s_Adjust_volume_of_sound_effects_801E3184[] = "Adjust volume of sound effects.";
-static const char s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4[] = "Adjust colour balance of Game Boy Advance.";
-static const char s_Monaural_801E31D0[] = "Monaural";
-static const char s_Enhanced_801E31DC[] = "Enhanced";
-static const char s_Standard_801E31E8[] = "Standard";
-static const char s_Erkennungskreisel_801E31F4[] = "Erkennungskreisel";
-static const char s_Tonausgabe_801E3208[] = "Tonausgabe";
-static const char s_MenuOptionSoundEffectsDe_801E3214[] = "Ger\344uscheffekte";
-static const char s_Farbeinstellung_801E3224[] = "Farbeinstellung";
-static const char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234[] = "Erkennungskreisel des Charakters AN/AUS schalten.";
-static const char s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268[] = "Tonausgabe auf Stereo oder Mono schalten.";
-static const char s_Lautstaerke_der_Musik_aendern_801E3294[] = "Lautst\344rke der Musik \344ndern.";
-static const char s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4[] = "Lautst\344rke der Ger\344uscheffekte \344ndern.";
-static const char s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC[] = "Farbeinstellung des Game Boy Advance \344ndern.";
-static const char s_Erweitert_801E330C[] = "Erweitert";
-static const char s_Indicatori_di_posizione_801E3318[] = "Indicatori di posizione";
-static const char s_Effetti_sonori_801E3330[] = "Effetti sonori";
-static const char s_Bilanc_colore_GBA_801E3340[] = "Bilanc. colore GBA";
-static const char s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354[] = "Attiva o disattiva l'indicatore ai piedi dei personaggi.";
-static const char s_Scegli_tra_sonoro_mono_o_stereo_801E3390[] = "Scegli tra sonoro mono o stereo.";
-static const char s_Regola_il_volume_della_musica_801E33B4[] = "Regola il volume della musica";
-static const char s_Regola_il_volume_degli_effetti_sonori_801E33D4[] = "Regola il volume degli effetti sonori";
-static const char s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC[] = "Regola il colore sul Game Boy Advance.";
-static const char s_ResistanceFr_801E3424[] = "R\351sistance";
-static const char s_Sceau_de_position_801E3430[] = "Sceau de position";
-static const char s_Signal_sonore_801E3444[] = "Signal sonore";
-static const char s_Effets_sonores_801E3454[] = "Effets sonores";
-static const char s_Affichage_du_GBA_801E3464[] = "Affichage du GBA";
-static const char s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478[] = "Affichage du sceau de position aux pieds des personnages";
-static const char s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4[] = "Choisissez le signal sonore st\351r\351o ou mono";
-static const char s_Reglez_le_volume_de_la_musique_801E34E0[] = "R\351glez le volume de la musique";
-static const char s_Reglez_le_volume_des_effets_sonores_801E3500[] = "R\351glez le volume des effets sonores";
-static const char s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524[] = "R\351glez le contraste des couleurs du Game Boy Advance";
-static const char s_MenuOptionDesactive_801E355C[] = "D\351sactiv\351";
-static const char s_MenuOptionAmeliore_801E3568[] = "Am\351lior\351";
-static const char s_Aro_de_posicion_801E3574[] = "Aro de posici\363n";
-static const char s_Tipo_de_sonido_801E3584[] = "Tipo de sonido";
-static const char s_Efectos_de_sonido_801E3594[] = "Efectos de sonido";
-static const char s_Color_de_la_GBA_801E35A8[] = "Color de la GBA";
-static const char s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8[] = "Se\361ala la posici\363n bajo los pies de cada personaje.";
-static const char s_Selecciona_sonido_estereo_o_monoaural_801E35EC[] = "Selecciona sonido est\351reo o monoaural.";
-static const char s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614[] = "Ajusta el volumen de la m\372sica de fondo.";
-static const char s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640[] = "Ajusta el volumen de los efectos de sonido.";
-static const char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[] = "Ajusta el balance del color de la Game Boy Advance.";
-static const char s_Encendido_801E36A0[] = "Encendido";
-static const char s_Monoaural_801E36AC[] = "Monoaural";
-static const char s_Mejorado_801E36B8[] = "Mejorado";
+extern "C" const char s_MenuOptionForceFr[] = "Force";
+extern "C" const char s_MenuOptionMusiqueFr[] = "Musique";
+extern "C" const char s_MenuOptionActiveFr[8] = "Activ\351";
+extern "C" const char s_MenuOptionStereoFr[8] = "St\351r\351o";
+extern "C" const char s_MenuOptionFuerzaEs[] = "Fuerza";
+extern "C" const char s_MenuOptionDefensaEs[] = "Defensa";
+extern "C" const char s_MenuOptionMusicaEs[8] = "M\372sica";
+extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
+extern "C" const char s_MenuOptionEstereoEs[8] = "Est\351reo";
+extern "C" const char s_MenuOptionMinEs[8] = "M\355n.";
+extern "C" const char s_MenuOptionMaxEs[8] = "M\341x.";
+static const char s_Strength[] = "Strength:";
+static const char s_Defence[] = "Defence:";
+static const char s_Position_Markers[] = "Position Markers";
+static const char s_Sound_Mode[] = "Sound Mode";
+static const char s_Sound_Effects[] = "Sound Effects";
+static const char s_GBA_Colour_Balance[] = "GBA Colour Balance";
+static const char s_Show_or_hide_position_marker_under_each_character_s_feet[] = "Show or hide position marker under each character's feet.";
+static const char s_Select_stereo_or_monaural_sound[] = "Select stereo or monaural sound.";
+static const char s_Adjust_volume_of_background_music[] = "Adjust volume of background music.";
+static const char s_Adjust_volume_of_sound_effects[] = "Adjust volume of sound effects.";
+static const char s_Adjust_colour_balance_of_Game_Boy_Advance[] = "Adjust colour balance of Game Boy Advance.";
+static const char s_Monaural[] = "Monaural";
+static const char s_Enhanced[] = "Enhanced";
+static const char s_Standard[] = "Standard";
+static const char s_Erkennungskreisel[] = "Erkennungskreisel";
+static const char s_Tonausgabe[] = "Tonausgabe";
+static const char s_MenuOptionSoundEffectsDe[] = "Ger\344uscheffekte";
+static const char s_Farbeinstellung[] = "Farbeinstellung";
+static const char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten[] = "Erkennungskreisel des Charakters AN/AUS schalten.";
+static const char s_Tonausgabe_auf_Stereo_oder_Mono_schalten[] = "Tonausgabe auf Stereo oder Mono schalten.";
+static const char s_Lautstaerke_der_Musik_aendern[] = "Lautst\344rke der Musik \344ndern.";
+static const char s_Lautstaerke_der_Geraeuscheffekte_aendern[] = "Lautst\344rke der Ger\344uscheffekte \344ndern.";
+static const char s_Farbeinstellung_des_Game_Boy_Advance_aendern[] = "Farbeinstellung des Game Boy Advance \344ndern.";
+static const char s_Erweitert[] = "Erweitert";
+static const char s_Indicatori_di_posizione[] = "Indicatori di posizione";
+static const char s_Effetti_sonori[] = "Effetti sonori";
+static const char s_Bilanc_colore_GBA[] = "Bilanc. colore GBA";
+static const char s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi[] = "Attiva o disattiva l'indicatore ai piedi dei personaggi.";
+static const char s_Scegli_tra_sonoro_mono_o_stereo[] = "Scegli tra sonoro mono o stereo.";
+static const char s_Regola_il_volume_della_musica[] = "Regola il volume della musica";
+static const char s_Regola_il_volume_degli_effetti_sonori[] = "Regola il volume degli effetti sonori";
+static const char s_Regola_il_colore_sul_Game_Boy_Advance[] = "Regola il colore sul Game Boy Advance.";
+static const char s_ResistanceFr[] = "R\351sistance";
+static const char s_Sceau_de_position[] = "Sceau de position";
+static const char s_Signal_sonore[] = "Signal sonore";
+static const char s_Effets_sonores[] = "Effets sonores";
+static const char s_Affichage_du_GBA[] = "Affichage du GBA";
+static const char s_Affichage_du_sceau_de_position_aux_pieds_des_personnages[] = "Affichage du sceau de position aux pieds des personnages";
+static const char s_Choisissez_le_signal_sonore_stereo_ou_mono[] = "Choisissez le signal sonore st\351r\351o ou mono";
+static const char s_Reglez_le_volume_de_la_musique[] = "R\351glez le volume de la musique";
+static const char s_Reglez_le_volume_des_effets_sonores[] = "R\351glez le volume des effets sonores";
+static const char s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance[] = "R\351glez le contraste des couleurs du Game Boy Advance";
+static const char s_MenuOptionDesactiveFr[] = "D\351sactiv\351";
+static const char s_MenuOptionAmelioreFr[] = "Am\351lior\351";
+static const char s_Aro_de_posicion[] = "Aro de posici\363n";
+static const char s_Tipo_de_sonido[] = "Tipo de sonido";
+static const char s_Efectos_de_sonido[] = "Efectos de sonido";
+static const char s_Color_de_la_GBA[] = "Color de la GBA";
+static const char s_Senala_la_posicion_bajo_los_pies_de_cada_personaje[] = "Se\361ala la posici\363n bajo los pies de cada personaje.";
+static const char s_Selecciona_sonido_estereo_o_monoaural[] = "Selecciona sonido est\351reo o monoaural.";
+static const char s_Ajusta_el_volumen_de_la_musica_de_fondo[] = "Ajusta el volumen de la m\372sica de fondo.";
+static const char s_Ajusta_el_volumen_de_los_efectos_de_sonido[] = "Ajusta el volumen de los efectos de sonido.";
+static const char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance[] = "Ajusta el balance del color de la Game Boy Advance.";
+static const char s_Encendido[] = "Encendido";
+static const char s_Monoaural[] = "Monoaural";
+static const char s_Mejorado[] = "Mejorado";
 
-static const MenuOptionEstandarData s_MenuOptionEstandar_801E36C4 = {
+static const MenuOptionEstandarData s_MenuOptionEstandarEs = {
 	"Est\341ndar",
 	{ 0x160, 0x14E, 0x142, 0x13E, 0x160, 0x154, 0x146 },
 	{
@@ -210,59 +210,59 @@ extern const char s_MenuOptionMusicDe[];
 extern const char s_MenuOptionOnDe[];
 extern const char s_MenuOptionOffDe[];
 extern const char s_MenuOptionStereoDe[];
-extern const char s_MenuOptionMonoUpper_803334A8[];
-extern const char s_MenuOptionNormalIt_803334B0[];
-extern const char s_MenuOptionForza_803334B8[];
-extern const char s_MenuOptionDifesa_803334C0[];
-extern const char s_MenuOptionSonoro_803334C8[];
-extern const char s_MenuOptionMusica_803334D0[];
-extern const char s_MenuOptionMonoIt_803334D8[];
-extern const char s_MenuOptionContr_803334E0[];
-extern const char s_MenuOptionNorm_803334E8[];
-extern const char s_Force_803334F0[];
-extern const char s_Musique_803334F8[];
-extern const char s_Active_80333500[];
-extern const char s_Stereo_80333508[];
-extern const char s_Fuerza_80333510[];
-extern const char s_Defensa_80333518[];
-extern const char s_Musica_80333520[];
-extern const char s_Apagado_80333528[];
-extern const char s_MenuOptionEstereo_80333530[];
-extern const char s_MenuOptionMinEs_80333538[];
-extern const char s_MenuOptionMaxEs_80333540[];
+extern const char s_MenuOptionMonoUpper[];
+extern const char s_MenuOptionNormalIt[];
+extern const char s_MenuOptionForza[];
+extern const char s_MenuOptionDifesa[];
+extern const char s_MenuOptionSonoro[];
+extern const char s_MenuOptionMusicaIt[];
+extern const char s_MenuOptionMonoIt[];
+extern const char s_MenuOptionContr[];
+extern const char s_MenuOptionNorm[];
+extern const char s_MenuOptionForceFr[];
+extern const char s_MenuOptionMusiqueFr[];
+extern const char s_MenuOptionActiveFr[];
+extern const char s_MenuOptionStereoFr[];
+extern const char s_MenuOptionFuerzaEs[];
+extern const char s_MenuOptionDefensaEs[];
+extern const char s_MenuOptionMusicaEs[];
+extern const char s_MenuOptionApagadoEs[];
+extern const char s_MenuOptionEstereoEs[];
+extern const char s_MenuOptionMinEs[];
+extern const char s_MenuOptionMaxEs[];
 char* g_strMenuUtilMes[] = {
-	const_cast<char*>(s_Strength_801E30A4), const_cast<char*>(s_Defence_801E30B0), const_cast<char*>(s_Position_Markers_801E30BC), const_cast<char*>(s_Sound_Mode_801E30D0),
-	const_cast<char*>(s_MenuOptionMusic), const_cast<char*>(s_Sound_Effects_801E30DC), const_cast<char*>(s_GBA_Colour_Balance_801E30EC),
-	const_cast<char*>(s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100),
-	const_cast<char*>(s_Select_stereo_or_monaural_sound_801E313C), const_cast<char*>(s_Adjust_volume_of_background_music_801E3160),
-	const_cast<char*>(s_Adjust_volume_of_sound_effects_801E3184), const_cast<char*>(s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4),
-	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_Monaural_801E31D0),
-	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Enhanced_801E31DC), const_cast<char*>(s_Standard_801E31E8),
-	const_cast<char*>(s_MenuOptionStrengthDe), const_cast<char*>(s_MenuOptionDefenceDe), const_cast<char*>(s_Erkennungskreisel_801E31F4), const_cast<char*>(s_Tonausgabe_801E3208),
-	const_cast<char*>(s_MenuOptionMusicDe), const_cast<char*>(s_MenuOptionSoundEffectsDe_801E3214), const_cast<char*>(s_Farbeinstellung_801E3224),
-	const_cast<char*>(s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234),
-	const_cast<char*>(s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268), const_cast<char*>(s_Lautstaerke_der_Musik_aendern_801E3294), const_cast<char*>(s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4),
-	const_cast<char*>(s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC), const_cast<char*>(s_MenuOptionOnDe), const_cast<char*>(s_MenuOptionOffDe), const_cast<char*>(s_MenuOptionStereoDe), const_cast<char*>(s_MenuOptionMonoUpper_803334A8),
-	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Erweitert_801E330C), const_cast<char*>(s_MenuOptionNormalIt_803334B0),
-	const_cast<char*>(s_MenuOptionForza_803334B8), const_cast<char*>(s_MenuOptionDifesa_803334C0), const_cast<char*>(s_Indicatori_di_posizione_801E3318), const_cast<char*>(s_MenuOptionSonoro_803334C8),
-	const_cast<char*>(s_MenuOptionMusica_803334D0), const_cast<char*>(s_Effetti_sonori_801E3330), const_cast<char*>(s_Bilanc_colore_GBA_801E3340),
-	const_cast<char*>(s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354),
-	const_cast<char*>(s_Scegli_tra_sonoro_mono_o_stereo_801E3390), const_cast<char*>(s_Regola_il_volume_della_musica_801E33B4),
-	const_cast<char*>(s_Regola_il_volume_degli_effetti_sonori_801E33D4), const_cast<char*>(s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC),
-	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_MenuOptionMonoIt_803334D8), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
-	const_cast<char*>(s_MenuOptionContr_803334E0), const_cast<char*>(s_MenuOptionNorm_803334E8),
-	const_cast<char*>(s_Force_803334F0), const_cast<char*>(s_ResistanceFr_801E3424), const_cast<char*>(s_Sceau_de_position_801E3430), const_cast<char*>(s_Signal_sonore_801E3444),
-	const_cast<char*>(s_Musique_803334F8), const_cast<char*>(s_Effets_sonores_801E3454), const_cast<char*>(s_Affichage_du_GBA_801E3464),
-	const_cast<char*>(s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478),
-	const_cast<char*>(s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4), const_cast<char*>(s_Reglez_le_volume_de_la_musique_801E34E0), const_cast<char*>(s_Reglez_le_volume_des_effets_sonores_801E3500), const_cast<char*>(s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524), const_cast<char*>(s_Active_80333500),
-	const_cast<char*>(s_MenuOptionDesactive_801E355C), const_cast<char*>(s_Stereo_80333508), const_cast<char*>(s_MenuOptionMonoIt_803334D8), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
-	const_cast<char*>(s_MenuOptionAmeliore_801E3568), const_cast<char*>(s_Standard_801E31E8),
-	const_cast<char*>(s_Fuerza_80333510), const_cast<char*>(s_Defensa_80333518), const_cast<char*>(s_Aro_de_posicion_801E3574), const_cast<char*>(s_Tipo_de_sonido_801E3584),
-	const_cast<char*>(s_Musica_80333520), const_cast<char*>(s_Efectos_de_sonido_801E3594), const_cast<char*>(s_Color_de_la_GBA_801E35A8),
-	const_cast<char*>(s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8), const_cast<char*>(s_Selecciona_sonido_estereo_o_monoaural_801E35EC), const_cast<char*>(s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614), const_cast<char*>(s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640),
-	const_cast<char*>(s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C), const_cast<char*>(s_Encendido_801E36A0),
-	const_cast<char*>(s_Apagado_80333528), const_cast<char*>(s_MenuOptionEstereo_80333530), const_cast<char*>(s_Monoaural_801E36AC), const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
-	const_cast<char*>(s_Mejorado_801E36B8), const_cast<char*>(s_MenuOptionEstandar_801E36C4.m_text),
+	const_cast<char*>(s_Strength), const_cast<char*>(s_Defence), const_cast<char*>(s_Position_Markers), const_cast<char*>(s_Sound_Mode),
+	const_cast<char*>(s_MenuOptionMusic), const_cast<char*>(s_Sound_Effects), const_cast<char*>(s_GBA_Colour_Balance),
+	const_cast<char*>(s_Show_or_hide_position_marker_under_each_character_s_feet),
+	const_cast<char*>(s_Select_stereo_or_monaural_sound), const_cast<char*>(s_Adjust_volume_of_background_music),
+	const_cast<char*>(s_Adjust_volume_of_sound_effects), const_cast<char*>(s_Adjust_colour_balance_of_Game_Boy_Advance),
+	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_Monaural),
+	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Enhanced), const_cast<char*>(s_Standard),
+	const_cast<char*>(s_MenuOptionStrengthDe), const_cast<char*>(s_MenuOptionDefenceDe), const_cast<char*>(s_Erkennungskreisel), const_cast<char*>(s_Tonausgabe),
+	const_cast<char*>(s_MenuOptionMusicDe), const_cast<char*>(s_MenuOptionSoundEffectsDe), const_cast<char*>(s_Farbeinstellung),
+	const_cast<char*>(s_Erkennungskreisel_des_Charakters_AN_AUS_schalten),
+	const_cast<char*>(s_Tonausgabe_auf_Stereo_oder_Mono_schalten), const_cast<char*>(s_Lautstaerke_der_Musik_aendern), const_cast<char*>(s_Lautstaerke_der_Geraeuscheffekte_aendern),
+	const_cast<char*>(s_Farbeinstellung_des_Game_Boy_Advance_aendern), const_cast<char*>(s_MenuOptionOnDe), const_cast<char*>(s_MenuOptionOffDe), const_cast<char*>(s_MenuOptionStereoDe), const_cast<char*>(s_MenuOptionMonoUpper),
+	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), const_cast<char*>(s_Erweitert), const_cast<char*>(s_MenuOptionNormalIt),
+	const_cast<char*>(s_MenuOptionForza), const_cast<char*>(s_MenuOptionDifesa), const_cast<char*>(s_Indicatori_di_posizione), const_cast<char*>(s_MenuOptionSonoro),
+	const_cast<char*>(s_MenuOptionMusicaIt), const_cast<char*>(s_Effetti_sonori), const_cast<char*>(s_Bilanc_colore_GBA),
+	const_cast<char*>(s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi),
+	const_cast<char*>(s_Scegli_tra_sonoro_mono_o_stereo), const_cast<char*>(s_Regola_il_volume_della_musica),
+	const_cast<char*>(s_Regola_il_volume_degli_effetti_sonori), const_cast<char*>(s_Regola_il_colore_sul_Game_Boy_Advance),
+	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
+	const_cast<char*>(s_MenuOptionContr), const_cast<char*>(s_MenuOptionNorm),
+	const_cast<char*>(s_MenuOptionForceFr), const_cast<char*>(s_ResistanceFr), const_cast<char*>(s_Sceau_de_position), const_cast<char*>(s_Signal_sonore),
+	const_cast<char*>(s_MenuOptionMusiqueFr), const_cast<char*>(s_Effets_sonores), const_cast<char*>(s_Affichage_du_GBA),
+	const_cast<char*>(s_Affichage_du_sceau_de_position_aux_pieds_des_personnages),
+	const_cast<char*>(s_Choisissez_le_signal_sonore_stereo_ou_mono), const_cast<char*>(s_Reglez_le_volume_de_la_musique), const_cast<char*>(s_Reglez_le_volume_des_effets_sonores), const_cast<char*>(s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance), const_cast<char*>(s_MenuOptionActiveFr),
+	const_cast<char*>(s_MenuOptionDesactiveFr), const_cast<char*>(s_MenuOptionStereoFr), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
+	const_cast<char*>(s_MenuOptionAmelioreFr), const_cast<char*>(s_Standard),
+	const_cast<char*>(s_MenuOptionFuerzaEs), const_cast<char*>(s_MenuOptionDefensaEs), const_cast<char*>(s_Aro_de_posicion), const_cast<char*>(s_Tipo_de_sonido),
+	const_cast<char*>(s_MenuOptionMusicaEs), const_cast<char*>(s_Efectos_de_sonido), const_cast<char*>(s_Color_de_la_GBA),
+	const_cast<char*>(s_Senala_la_posicion_bajo_los_pies_de_cada_personaje), const_cast<char*>(s_Selecciona_sonido_estereo_o_monoaural), const_cast<char*>(s_Ajusta_el_volumen_de_la_musica_de_fondo), const_cast<char*>(s_Ajusta_el_volumen_de_los_efectos_de_sonido),
+	const_cast<char*>(s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance), const_cast<char*>(s_Encendido),
+	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereoEs), const_cast<char*>(s_Monoaural), const_cast<char*>(s_MenuOptionMinEs), const_cast<char*>(s_MenuOptionMaxEs),
+	const_cast<char*>(s_Mejorado), const_cast<char*>(s_MenuOptionEstandarEs.m_text),
 };
 
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
@@ -416,7 +416,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const int* lineBaseData = s_MenuOptionEstandar_801E36C4.m_helpLineBaseY;
+	const int* lineBaseData = s_MenuOptionEstandarEs.m_helpLineBaseY;
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];
@@ -426,18 +426,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	int drawPrefix = 1;
 	int firstLine = 500;
 	int maxWidth = -1;
-	float lineStep = FLOAT_80333654;
+	float lineStep = kHelpMessageLineStep;
 	const char* suffix = 0;
 	char itemName[260];
 	char scratch[0x100];
 
-	font->SetMargin(FLOAT_803335A0);
+	font->SetMargin(kOptionTextNudge);
 	font->SetShadow(1);
 	font->SetScale(margin);
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);
-	font->SetScale(FLOAT_80333548);
+	font->SetScale(kOptionMenuFontScale);
 
 	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;
@@ -489,7 +489,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 	}
 	if (drawPrefix + 3 == 4) {
-		lineStep = FLOAT_80333620;
+		lineStep = kOptionUiTwenty;
 	}
 
 	int rangeKind;
@@ -508,7 +508,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u32 baseY = lineBaseY[baseIndex];
 		int y = baseY;
 		if (drawPrefix != 0) {
-			font->SetPosX(FLOAT_8033357C);
+			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -539,7 +539,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		strcpy(scratch, sMenuUtilEmptyText);
 	}
 
-	font->SetPosX(FLOAT_8033357C);
+	font->SetPosX(kOptionRowLeft);
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
@@ -548,7 +548,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
 				font->SetTlut(4);
 				font->Draw(scratch);
-				int valueX = static_cast<int>(FLOAT_8033357C + (FLOAT_803335A0 + font->GetWidth(scratch)));
+				int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
 				font->SetPosX(static_cast<float>(valueX));
 				font->SetTlut(9);
 
@@ -573,7 +573,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcat(scratch, sMenuUtilSpaceText);
 			font->Draw(scratch);
 
-			int valueX = static_cast<int>(FLOAT_8033357C + (FLOAT_803335A0 + font->GetWidth(scratch)));
+			int valueX = static_cast<int>(kOptionRowLeft + (kOptionTextNudge + font->GetWidth(scratch)));
 			font->SetTlut(1);
 			font->SetPosX(static_cast<float>(valueX));
 			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
@@ -612,7 +612,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						}
 
 						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-						int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335A0 + font->GetWidth(scratch)));
+						int deltaX = static_cast<int>(static_cast<float>(valueX) + (kOptionTextNudge + font->GetWidth(scratch)));
 						font->SetPosX(static_cast<float>(deltaX));
 						if (delta >= 0) {
 							font->SetTlut(9);
@@ -672,7 +672,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		int y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
-			font->SetPosX(FLOAT_8033357C);
+			font->SetPosX(kOptionRowLeft);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
@@ -1071,7 +1071,7 @@ void CMenuPcs::CalcOptionMenu()
  */
 void CMenuPcs::DrawOptionMenu()
 {
-	const f32* layoutBase = s_MenuOptionEstandar_801E36C4.m_layout;
+	const f32* layoutBase = s_MenuOptionEstandarEs.m_layout;
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
 	char** langStrings = &g_strMenuUtilMes[langRow * 20];
@@ -1079,13 +1079,13 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv0;
 	Vec2d uv1;
 
-	font->SetScale(FLOAT_80333548);
+	font->SetScale(kOptionMenuFontScale);
 	font->SetMargin(kOptionAnimMin);
 
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim));
+	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionOpenAnim));
 
 	char* optionText[5] = {
 	    langStrings[2],
@@ -1109,28 +1109,28 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(bannerHeight),
 	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.RenderTextureQuad(kOptionAnimMin,
-	                        -(bannerHeight * kMenuCenteringHalfWidth - FLOAT_80333554) - FLOAT_8033355C,
-	                        FLOAT_80333560, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        -(bannerHeight * kMenuCenteringHalfWidth - kOptionBannerCenterY) - kOptionBannerYOffset,
+	                        kOptionScreenWidth, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* panel = GetMenuTexture(this, 0xE8);
 	float panelWidth = static_cast<float>(panel->m_width);
 	float panelHeight = static_cast<float>(panel->m_height);
-	float panelRight = FLOAT_80333564 + panelWidth;
-	float panelBottom = FLOAT_80333568 + panelHeight;
-	gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333568, panelWidth, panelHeight, panel, 0, 0, &color,
+	float panelRight = kOptionPanelLeft + panelWidth;
+	float panelBottom = kOptionPanelTop + panelHeight;
+	gUtil.RenderTextureQuad(kOptionPanelLeft, kOptionPanelTop, panelWidth, panelHeight, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = kOptionAnimMin;
 	uv0.y = kOptionAnimMax;
 	uv1.x = kOptionAnimMax;
 	uv1.y = kOptionAnimMin;
-	gUtil.RenderTextureQuad(FLOAT_80333564, panelBottom, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(kOptionPanelLeft, panelBottom, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = kOptionAnimMax;
 	uv0.y = kOptionAnimMin;
 	uv1.x = kOptionAnimMin;
 	uv1.y = kOptionAnimMax;
-	gUtil.RenderTextureQuad(panelRight, FLOAT_80333568, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
+	gUtil.RenderTextureQuad(panelRight, kOptionPanelTop, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = kOptionAnimMax;
 	uv0.y = kOptionAnimMax;
@@ -1147,16 +1147,16 @@ void CMenuPcs::DrawOptionMenu()
 	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(cursorWidth),
 	             static_cast<unsigned int>(cursorHeight));
 	gUtil.RenderTextureQuad(static_cast<float>((System.m_frameCounter & 7) + 0x1C),
-	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), FLOAT_80333570,
-	                        FLOAT_80333570, cursor, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), kOptionCursorSize,
+	                        kOptionCursorSize, cursor, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = GetMenuTexture(this, 0xC8);
-	gUtil.RenderTextureQuad(FLOAT_80333574, static_cast<float>(m_optionIndex * 0x28 + 0x70),
+	gUtil.RenderTextureQuad(kOptionMarkerLeft, static_cast<float>(m_optionIndex * 0x28 + 0x70),
 	                        static_cast<float>(marker->m_width), static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-	font->SetScaleX(FLOAT_80333578);
+	font->SetScaleX(kOptionListTextScaleX);
 	char** option = optionText;
 	int rowY = 0x70;
 	unsigned int selectedY = 0x73;
@@ -1169,38 +1169,38 @@ void CMenuPcs::DrawOptionMenu()
 		uv0.y = kOptionAnimMin;
 		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
 		uv1.y = kOptionAnimMax;
-		gUtil.RenderTextureQuad(FLOAT_8033357C, static_cast<float>(rowY),
+		gUtil.RenderTextureQuad(kOptionRowLeft, static_cast<float>(rowY),
 		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, GetMenuTexture(this, 0xC0), &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (i == m_optionIndex) {
-			DrawFont(0x5E, static_cast<int>(FLOAT_80333580 + static_cast<float>(selectedY)), color, 0x16,
+			DrawFont(0x5E, static_cast<int>(kOptionTextYOffset + static_cast<float>(selectedY)), color, 0x16,
 			         *option, kOptionAnimMax, kOptionAnimMax);
 		} else {
-			DrawFont(0x60, static_cast<int>(FLOAT_80333580 + static_cast<float>(normalY)), color, 6,
+			DrawFont(0x60, static_cast<int>(kOptionTextYOffset + static_cast<float>(normalY)), color, 6,
 			         *option, kOptionAnimMax, kOptionAnimMax);
 		}
 	}
 
 	font->SetScaleX(kOptionAnimMax);
-	gUtil.RenderTextureQuad(kOptionAnimMin, FLOAT_80333584, FLOAT_80333560, FLOAT_80333588,
+	gUtil.RenderTextureQuad(kOptionAnimMin, kOptionHelpBarTop, kOptionScreenWidth, kOptionLargeIconSize,
 	                        GetMenuTexture(this, 0x208), 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	font->SetShadow(1);
 	font->SetMargin(kOptionAnimMax);
-	font->SetScaleX(FLOAT_80333578);
+	font->SetScaleX(kOptionListTextScaleX);
 	font->SetScaleY(kOptionAnimMax);
 	char* help = helpText[m_optionIndex];
 	DrawFont2(static_cast<int>(-(font->GetWidth(help) * kMenuCenteringHalfWidth -
 	                            kMenuCenteringOffset)),
-	          static_cast<int>(FLOAT_80333590), color, 7, help, FLOAT_80333578,
+	          static_cast<int>(kOptionHelpTextY), color, 7, help, kOptionListTextScaleX,
 	          kOptionAnimMax, kOptionAnimMax);
 
 	int rowAnimStep = static_cast<int>(m_optionRowAnim / kOptionRowAnimStep);
-	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionRowAnim));
-	float rowAngle = static_cast<float>(rowAnimStep) * FLOAT_8033359C;
-	float rowSin = static_cast<float>(sin(static_cast<double>(FLOAT_80333594 * FLOAT_803335A0 * rowAngle)));
-	float rowCos = static_cast<float>(cos(static_cast<double>(FLOAT_80333594 * rowAngle)));
+	color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionRowAnim));
+	float rowAngle = static_cast<float>(rowAnimStep) * kOptionRowAngleStep;
+	float rowSin = static_cast<float>(sin(static_cast<double>(kOptionDegToRad * kOptionTextNudge * rowAngle)));
+	float rowCos = static_cast<float>(cos(static_cast<double>(kOptionDegToRad * rowAngle)));
 
 	switch (m_optionIndex) {
 	case 0: {
@@ -1218,7 +1218,7 @@ void CMenuPcs::DrawOptionMenu()
 		float leftX = row[0];
 		float rightX = row[2];
 		float selectorX = row[4];
-		float secondOffset = FLOAT_803335AC;
+		float secondOffset = kOptionGameInitTextOffset;
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
@@ -1231,15 +1231,15 @@ void CMenuPcs::DrawOptionMenu()
 		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
 		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), row[5],
-		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
+		                        kOptionSelectorWidth, kOptionSelectorHeight, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
-		                           DOUBLE_803335B8 : DOUBLE_803335C0;
+		                           kOptionAltLanguageTextScale : kOptionDefaultTextScale;
 		float scale = static_cast<float>(optionScale);
 
 		if (!secondValue) {
@@ -1247,31 +1247,31 @@ void CMenuPcs::DrawOptionMenu()
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(firstScale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(firstText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335C8)),
-			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(firstText)) *
+			                           kOptionHalf64 + kOptionSelectorBaseX64)),
+			          static_cast<int>(kOptionSelectorTextY - kOptionTextNudge), color, 0x17, firstText, firstScale,
 			          kOptionAnimMax, kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(secondText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335D8)),
-			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(secondText)) *
+			                           kOptionHalf64 + kOptionSelectorRightX64)),
+			          static_cast<int>(kOptionSelectorTextY), color, 6, secondText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 		} else {
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(firstText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335C8)),
-			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(firstText)) *
+			                           kOptionHalf64 + kOptionSelectorBaseX64)),
+			          static_cast<int>(kOptionSelectorTextY), color, 6, firstText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(secondText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335D8)),
-			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(secondText)) *
+			                           kOptionHalf64 + kOptionSelectorRightX64)),
+			          static_cast<int>(kOptionSelectorTextY - kOptionTextNudge), color, 0x17, secondText, scale,
 			          kOptionAnimMax, kOptionAnimMax);
 		}
 		break;
@@ -1291,7 +1291,7 @@ void CMenuPcs::DrawOptionMenu()
 		float leftX = row[0];
 		float rightX = row[2];
 		float selectorX = row[4];
-		float secondOffset = FLOAT_803335E0;
+		float secondOffset = kOptionStereoTextOffset;
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
@@ -1304,15 +1304,15 @@ void CMenuPcs::DrawOptionMenu()
 		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
 		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), row[5],
-		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
+		                        kOptionSelectorWidth, kOptionSelectorHeight, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
-		                           DOUBLE_803335B8 : DOUBLE_803335C0;
+		                           kOptionAltLanguageTextScale : kOptionDefaultTextScale;
 		float scale = static_cast<float>(optionScale);
 
 		if (!secondValue) {
@@ -1320,31 +1320,31 @@ void CMenuPcs::DrawOptionMenu()
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(firstScale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(firstText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335E8)),
-			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(firstText)) *
+			                           kOptionHalf64 + kOptionStereoSelectorX64)),
+			          static_cast<int>(kOptionSelectorTextY - kOptionTextNudge), color, 0x17, firstText, firstScale,
 			          kOptionAnimMax, kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(secondText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335F0)),
-			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(secondText)) *
+			                           kOptionHalf64 + kOptionIconWaveTargetX64)),
+			          static_cast<int>(kOptionSelectorTextY), color, 6, secondText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 		} else {
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(firstText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335E8)),
-			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(firstText)) *
+			                           kOptionHalf64 + kOptionStereoSelectorX64)),
+			          static_cast<int>(kOptionSelectorTextY), color, 6, firstText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>(static_cast<float>((FLOAT_803335B0 - font->GetWidth(secondText)) *
-			                           DOUBLE_803335D0 + DOUBLE_803335F0)),
-			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
+			DrawFont2(static_cast<int>(static_cast<float>((kOptionSelectorWidth - font->GetWidth(secondText)) *
+			                           kOptionHalf64 + kOptionIconWaveTargetX64)),
+			          static_cast<int>(kOptionSelectorTextY - kOptionTextNudge), color, 0x17, secondText, scale,
 			          kOptionAnimMax, kOptionAnimMax);
 		}
 		break;
@@ -1353,25 +1353,25 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
-		float iconWave = FLOAT_80333620 * rowSin;
+		float iconWave = kOptionUiTwenty * rowSin;
 		float leftIconX =
-		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
+		    static_cast<float>(static_cast<int>((kOptionIconWaveTargetX - kOptionIconWaveOriginX) * rowCos + kOptionIconWaveOriginX));
 		float rightIconX = static_cast<float>(static_cast<int>(
-		    -(((FLOAT_8033361C + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
-		float leftIconY = FLOAT_803335FC - iconWave;
-		float rightIconY = FLOAT_80333604 + iconWave;
+		    -(((kOptionSmallIconSize + kOptionRightIconBaseX) - kOptionIconWaveTargetX) * rowCos - kOptionRightIconBaseX)));
+		float leftIconY = kOptionLeftIconBaseY - iconWave;
+		float rightIconY = kOptionRightIconBaseY + iconWave;
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(leftIconX, leftIconY, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(leftIconX, leftIconY, kOptionSmallIconSize, kOptionSmallIconSize, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x28, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(rightIconX, rightIconY, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(rightIconX, rightIconY, kOptionLargeIconSize, kOptionLargeIconSize, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		if (m_leftHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x58, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x70, meterWidth, meterHeight);
@@ -1379,7 +1379,7 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x58, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x70, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(kOptionPanelLeft, kOptionMeterArrowY, kOptionMeterSegmentSize, kOptionSmallIconSize, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (m_rightHintTimer != 0) {
@@ -1389,27 +1389,27 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x5C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x7C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(kOptionMeterRightArrowX, kOptionMeterArrowY, kOptionSmallIconSize, kOptionCursorSize, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x40, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			float barX = FLOAT_80333610 + static_cast<float>(x);
-			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+			float barX = kOptionMeterBarBaseX + static_cast<float>(x);
+			gUtil.RenderTextureQuad(barX, kOptionMeterAnchor196, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
-				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+				gUtil.RenderTextureQuad(barX, kOptionMeterAnchor196, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
 
-		float minTextX = FLOAT_80333614;
-		float volumeTextY = FLOAT_80333618;
+		float minTextX = kOptionMeterAnchor196;
+		float volumeTextY = kOptionMeterLabelY;
 		char* maxText = langStrings[17];
 		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
 		         langStrings[16], kOptionAnimMax, kOptionAnimMax);
-		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
+		float maxX = kOptionMeterMaxLabelRight - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
 		break;
@@ -1418,25 +1418,25 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
 		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
-		float iconWave = FLOAT_80333620 * rowSin;
+		float iconWave = kOptionUiTwenty * rowSin;
 		float leftIconX =
-		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
+		    static_cast<float>(static_cast<int>((kOptionIconWaveTargetX - kOptionIconWaveOriginX) * rowCos + kOptionIconWaveOriginX));
 		float rightIconX = static_cast<float>(static_cast<int>(
-		    -(((FLOAT_8033361C + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
-		float leftIconY = FLOAT_803335FC + iconWave;
-		float rightIconY = FLOAT_80333604 - iconWave;
+		    -(((kOptionSmallIconSize + kOptionRightIconBaseX) - kOptionIconWaveTargetX) * rowCos - kOptionRightIconBaseX)));
+		float leftIconY = kOptionLeftIconBaseY + iconWave;
+		float rightIconY = kOptionRightIconBaseY - iconWave;
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(leftIconX, leftIconY, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(leftIconX, leftIconY, kOptionSmallIconSize, kOptionSmallIconSize, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x28, 0, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x50, 0x28, meterWidth, meterHeight);
-		gUtil.RenderTextureQuad(rightIconX, rightIconY, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(rightIconX, rightIconY, kOptionLargeIconSize, kOptionLargeIconSize, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		if (m_leftHintTimer != 0) {
 			gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x40, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x28, 0x58, meterWidth, meterHeight);
@@ -1444,7 +1444,7 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0, 0x40, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x10, 0x58, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333608, FLOAT_80333624, FLOAT_8033361C, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(kOptionPanelLeft, kOptionMeterArrowY, kOptionMeterSegmentSize, kOptionSmallIconSize, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (m_rightHintTimer != 0) {
@@ -1454,42 +1454,42 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.CalcUV(uv0.x, uv0.y, 0x48, 0x3C, meterWidth, meterHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x5C, meterWidth, meterHeight);
 		}
-		gUtil.RenderTextureQuad(FLOAT_8033360C, FLOAT_80333608, FLOAT_8033361C, FLOAT_80333570, meterTexture, &uv0,
+		gUtil.RenderTextureQuad(kOptionMeterRightArrowX, kOptionMeterArrowY, kOptionSmallIconSize, kOptionCursorSize, meterTexture, &uv0,
 		                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x30, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
 		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			float barX = FLOAT_80333610 + static_cast<float>(x);
-			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+			float barX = kOptionMeterBarBaseX + static_cast<float>(x);
+			gUtil.RenderTextureQuad(barX, kOptionMeterAnchor196, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_seVolume)) {
-				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
+				gUtil.RenderTextureQuad(barX, kOptionMeterAnchor196, kOptionMeterSegmentSize, kOptionMeterSegmentSize, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
 
-		float minTextX = FLOAT_80333614;
-		float volumeTextY = FLOAT_80333618;
+		float minTextX = kOptionMeterAnchor196;
+		float volumeTextY = kOptionMeterLabelY;
 		char* maxText = langStrings[17];
 		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
 		         langStrings[16], kOptionAnimMax, kOptionAnimMax);
-		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
+		float maxX = kOptionMeterMaxLabelRight - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
 		break;
 	}
 	case 4: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
-		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		color.a = static_cast<unsigned char>(static_cast<int>(kOptionMenuAlphaMax * m_optionColumnAnim));
 		unsigned int rowAnimFrame;
-		if (static_cast<double>(m_optionRowAnim) >= DOUBLE_803335C0) {
+		if (static_cast<double>(m_optionRowAnim) >= kOptionDefaultTextScale) {
 			rowAnimFrame = 0xD;
 		} else {
-			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / FLOAT_8033362C));
+			rowAnimFrame = static_cast<unsigned int>(static_cast<int>(m_optionRowAnim / kOptionSpecialRowFrameStep));
 		}
 		const float specialRowCos = static_cast<float>(
-			cos(static_cast<double>(FLOAT_80333594 * static_cast<float>(rowAnimFrame) * FLOAT_80333630)));
+			cos(static_cast<double>(kOptionDegToRad * static_cast<float>(rowAnimFrame) * kOptionSpecialRowAngleStep)));
 
 		int y = 0;
 		unsigned int uvY = 0;
@@ -1501,31 +1501,31 @@ void CMenuPcs::DrawOptionMenu()
 				unsigned int cursorHeight = static_cast<unsigned int>(static_cast<float>(cursorPanel->m_height));
 				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth - 0x30, 0, cursorWidth, cursorHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, 0x28, cursorWidth, cursorHeight);
-				gUtil.RenderTextureQuad(326.0f, 128.0f + static_cast<float>(y), 48.0f, FLOAT_80333588,
+				gUtil.RenderTextureQuad(326.0f, 128.0f + static_cast<float>(y), 48.0f, kOptionLargeIconSize,
 				                        cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 				gUtil.CalcUV(uv0.x, uv0.y, 0, 0x30, cursorWidth, cursorHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, cursorHeight, cursorWidth, cursorHeight);
 				gUtil.RenderTextureQuad(300.0f, 160.0f + static_cast<float>(y),
-				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
+				                        static_cast<float>(cursorWidth), kOptionMeterSegmentSize, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth, 0x30, cursorWidth, cursorHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0, cursorHeight, cursorWidth, cursorHeight);
 				gUtil.RenderTextureQuad(300.0f + static_cast<float>(cursorWidth), 160.0f + static_cast<float>(y),
-				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
+				                        static_cast<float>(cursorWidth), kOptionMeterSegmentSize, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 			unsigned int modeWidth = static_cast<unsigned int>(static_cast<float>(modePanel->m_width));
 			unsigned int modeHeight = static_cast<unsigned int>(static_cast<float>(modePanel->m_height));
-			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - FLOAT_803335B4),
+			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - kOptionSelectorHeight),
 			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);
 			const float modeX = static_cast<float>(
 				static_cast<int>((static_cast<float>(modeU) - 330.0f) * specialRowCos + 330.0f));
-			gUtil.RenderTextureQuad(modeX, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
+			gUtil.RenderTextureQuad(modeX, 138.0f + static_cast<float>(y), kOptionLargeIconSize, kOptionSmallIconSize,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 			char* modeText = langStrings[19];
@@ -1539,26 +1539,26 @@ void CMenuPcs::DrawOptionMenu()
 				textPanelWidth = 120.0f;
 				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modeWidth, modeHeight);
-				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
+				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, kOptionCursorSize,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 				font->SetMargin(kOptionAnimMax);
 				font->SetShadow(1);
 				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
-				                                         DOUBLE_803335D0),
-				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
+				                                         kOptionHalf64),
+				         static_cast<int>(textY + kOptionTextYOffset + kOptionModeTextYOffset + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
 			} else {
 				font->SetMargin(kOptionAnimMax);
 				font->SetShadow(1);
 				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
-				                                         DOUBLE_803335D0),
-				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
+				                                         kOptionHalf64),
+				         static_cast<int>(textY + kOptionTextYOffset + kOptionModeTextYOffset + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
 				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, uvY + 0x20, modeWidth, modeHeight);
-				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
+				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, kOptionCursorSize,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 		}

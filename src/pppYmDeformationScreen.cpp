@@ -1,7 +1,6 @@
 #include "ffcc/pppYmDeformationScreen.h"
 #include "global.h"
 #include "ffcc/graphic.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"

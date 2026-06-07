@@ -46,6 +46,8 @@ STATIC_ASSERT(offsetof(VRain, accelZ) == 0xC);
 STATIC_ASSERT(sizeof(VRain) == 0x10);
 STATIC_ASSERT(offsetof(RainColorData, color) == 0x8);
 STATIC_ASSERT(sizeof(RainDrop) == 0x20);
+STATIC_ASSERT(sizeof(RAIN_DATA) == 0x10);
+STATIC_ASSERT(offsetof(RAIN_DATA, m_serializedDataOffsets) == 0xC);
 STATIC_ASSERT(sizeof(RainDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RainDataOffsets, m_colorDataOffset) == 0x4);
 STATIC_ASSERT(offsetof(RainDataOffsets, m_workOffset) == 0x8);
@@ -348,7 +350,7 @@ void pppConstructRain(pppRain* pppRain, RAIN_DATA* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
+void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
 {
     work->accelY += work->accelZ;
     work->moveY += work->accelY;
@@ -365,7 +367,7 @@ inline void UpdateRain(VRain* work, PRain* rain, RAIN_DATA*)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
+void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
 {
     RainDrop* drop;
 

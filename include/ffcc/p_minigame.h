@@ -25,9 +25,6 @@ void _MngThreadMain(void*);
 class CMiniGamePcs : public CProcess
 {
 public:
-    static CProcessTableCallback m_table_desc0;
-    static CProcessTableCallback m_table_desc1;
-    static CProcessTableCallback m_table_desc2;
     static CProcessTable m_table;
 
     CMiniGamePcs() {}

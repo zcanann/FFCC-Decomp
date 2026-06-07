@@ -29,15 +29,16 @@ inline void* operator new(unsigned long, void* p)
 
 extern const float kTextureOne;
 extern const float kTextureZero;
-extern const float kMaterialShadowScale;
-extern const float kMaterialShadowBoundsRadius;
-extern const float kMaterialNearestDistanceInit;
-extern const float kMaterialMaxDistance;
-extern const float kMaterialProjectionWidthScale;
-extern const float kMaterialProjectionHeightScale;
-extern const float kMaterialProjectionCenter;
-extern const float kMaterialProjectionDepthScale;
 extern const float kMaterialWarpCoeff;
+
+extern const float kMaterialShadowScale = 5.0f;
+extern const float kMaterialShadowBoundsRadius = -100000000.0f;
+extern const float kMaterialNearestDistanceInit = 100000000000000000000.0f;
+extern const float kMaterialMaxDistance = 20000000000000.0f;
+extern const float kMaterialProjectionWidthScale = 320.0f;
+extern const float kMaterialProjectionHeightScale = 224.0f;
+extern const float kMaterialProjectionCenter = -0.5f;
+extern const float kMaterialProjectionDepthScale = -1.0f;
 
 static const char s_CMaterialSet[] = "CMaterialSet";
 namespace {

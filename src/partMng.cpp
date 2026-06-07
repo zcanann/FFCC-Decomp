@@ -41,40 +41,40 @@ extern Mtx ppvUnitMatrix;
 extern Vec ppvZeroVector;
 }
 extern char g_StrTmp[0x400];
-extern "C" const double DOUBLE_8032FE08 = 0.0;
-extern "C" const float FLOAT_8032FE10 = 32768.0f;
-extern "C" const float FLOAT_8032FE14 = 180.0f;
-extern "C" const float FLOAT_8032fe18 = 1.0f;
-extern "C" const char lbl_8032FE1C[4] = "";
-extern "C" const char lbl_8032FE20[] = "%s.pdt";
-extern "C" const char lbl_8032FE28[] = "%s.pan";
-extern "C" const char lbl_8032FE30[] = "%s.pmd";
-extern "C" const char lbl_8032FE38[] = "%s.ptx";
-extern "C" const double DOUBLE_8032FE40 = -1.0;
-extern "C" const float FLOAT_8032FE48 = -100000000.0f;
-extern "C" const float FLOAT_8032fe4c = 25.0f;
-extern "C" const float FLOAT_8032fe50 = 1.3333334f;
-extern "C" const float FLOAT_8032fe54 = 10.0f;
-extern "C" const float FLOAT_8032fe58 = 10000.0f;
-extern "C" const float FLOAT_8032fe5c = 0.0f;
-extern "C" const float FLOAT_8032fe60 = 448.0f;
-extern "C" const float FLOAT_8032fe64 = 640.0f;
-extern "C" const float FLOAT_8032fe68 = -100.0f;
-extern "C" const float FLOAT_8032FE6C = 3.4028235e38f;
-extern "C" const float FLOAT_8032FE70 = 100.0f;
-extern "C" const float FLOAT_8032FE74 = 224.0f;
-extern "C" const float FLOAT_8032FE78 = 16777216.0f;
-extern "C" const float FLOAT_8032FE7C = 320.0f;
-extern "C" const double DOUBLE_8032fe80 = 4503601774854144.0;
-extern "C" const char lbl_8032FE88[] = "\n\n\n";
-extern "C" const float FLOAT_8032fe8c = 33.3f;
-extern "C" const float FLOAT_8032fe90 = 0.93333334f;
-extern "C" const float FLOAT_8032fe94 = 0.125f;
-extern "C" const float FLOAT_8032fe98 = 200.0f;
-extern "C" const float FLOAT_8032fe9c = 400.0f;
-extern "C" const float FLOAT_8032fea0 = 300.0f;
-extern "C" const float FLOAT_8032fea4 = 600.0f;
-extern "C" const float FLOAT_8032fea8 = 800.0f;
+extern "C" const double kPartMngZeroDouble = 0.0;
+extern "C" const float kPartMngAngleHalfUnit = 32768.0f;
+extern "C" const float kPartMngHalfTurnDegrees = 180.0f;
+extern "C" const float kPartMngOne = 1.0f;
+extern "C" const char sPartMngEmptyString[4] = "";
+extern "C" const char sPdtPathFmt[] = "%s.pdt";
+extern "C" const char sPanPathFmt[] = "%s.pan";
+extern "C" const char sPmdPathFmt[] = "%s.pmd";
+extern "C" const char sPtxPathFmt[] = "%s.ptx";
+extern "C" const double kPartMngMinusOneDouble = -1.0;
+extern "C" const float kPartMngFrustumCullLimit = -100000000.0f;
+extern "C" const float kPartMngPppFovY = 25.0f;
+extern "C" const float kPartMngPppAspect = 1.3333334f;
+extern "C" const float kPartMngPppNear = 10.0f;
+extern "C" const float kPartMngPppFar = 10000.0f;
+extern "C" const float kPartMngZero = 0.0f;
+extern "C" const float kPartMngOrthoHeight = 448.0f;
+extern "C" const float kPartMngOrthoWidth = 640.0f;
+extern "C" const float kPartMngOrthoFar = -100.0f;
+extern "C" const float kPartMngCullRadiusSqMax = 3.4028235e38f;
+extern "C" const float kPartMngCullRadius = 100.0f;
+extern "C" const float kPartMngScreenHalfHeight = 224.0f;
+extern "C" const float kPartMngDepthUnit = 16777216.0f;
+extern "C" const float kPartMngScreenHalfWidth = 320.0f;
+extern "C" const double kPartMngS32ToDoubleBias = 4503601774854144.0;
+extern "C" const char sPartMngTripleNewline[] = "\n\n\n";
+extern "C" const float kPartMngScreenFovY = 33.3f;
+extern "C" const float kPartMngScreenAspect = 0.93333334f;
+extern "C" const float kPartMngScreenNear = 0.125f;
+extern "C" const float kPartMngEnvBoxMinX = 200.0f;
+extern "C" const float kPartMngEnvBoxMaxXz = 400.0f;
+extern "C" const float kPartMngEnvBoxMinY = 300.0f;
+extern "C" const float kPartMngEnvBoxMaxY = 600.0f;
+extern "C" const float kPartMngEnvBoxMaxZ = 800.0f;
 extern "C" {
 extern int ppvSysStopPartF;
 extern int ppvSysGoPartF;
@@ -90,19 +90,19 @@ int gPppCalcDisabled = 0;
 CPartMng PartMng;
 static PPPCREATEPARAM g_dcp;
 static const char s_partMng_cpp[] = "partMng.cpp";
-static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
+static const char sPppCreateLogFmt[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
-static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
+static const char sPppFreeDataMngAllocError[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
 static const char s_ReadPdtLogFormat[] = "ReadPdt fn=%s\n";
 static const char s_CanNotReadFormat[] = "CAN NOT READ %s !!!!!!\n";
 static const char s_ReadPanLogFormat[] = "ReadPan fn=%s\n";
 static const char s_ReadPmdLogFormat[] = "ReadPmd fn=%s\n";
 static const char s_ReadPtxLogFormat[] = "ReadPtx fn=%s\n";
-static const char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code=0x%x!!!\n";
-static const char s__________________________________801d8358[] = "----------------------------------\n";
-static const char s_prioTime__d_prio__d_heapSize__d_p_801d8454[] =
+static const char sPartMngChecksumErrorFmt[] = "CheckSum ERROR code=0x%x!!!\n";
+static const char sPartMngDumpSeparator[] = "----------------------------------\n";
+static const char sPartMngDumpEntryFmt[] =
     "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
-static const char s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0[] =
+static const char sPartMngHeapSummaryFmt[] =
     "HEAP TOTAL=%dKbyte  USE=%dKbyte  FREE=%dKbyte\n";
 
 enum PppChunkId {
@@ -252,7 +252,7 @@ void CPartMng::Create()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     _pppEnvSt* env = &m_pppEnvSt;
 
-    C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe8c, FLOAT_8032fe90, FLOAT_8032fe94, FLOAT_8032fe58);
+    C_MTXPerspective(ppvScreenMatrix, kPartMngScreenFovY, kPartMngScreenAspect, kPartMngScreenNear, kPartMngPppFar);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
     memset(self + 0x235a8, 0, 0x108);
@@ -271,9 +271,9 @@ void CPartMng::Create()
     ppvEnv = env;
 
     PSMTXIdentity(ppvUnitMatrix);
-    ppvZeroVector.x = FLOAT_8032fe5c;
-    ppvZeroVector.y = FLOAT_8032fe5c;
-    ppvZeroVector.z = FLOAT_8032fe5c;
+    ppvZeroVector.x = kPartMngZero;
+    ppvZeroVector.y = kPartMngZero;
+    ppvZeroVector.z = kPartMngZero;
 
     gPppInConstructor = 0;
     gPppInSubFrameCalc = 0;
@@ -319,18 +319,18 @@ void CPartMng::Create()
         *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
     }
 
-    env->m_envParam = FLOAT_8032fe5c;
+    env->m_envParam = kPartMngZero;
     env->m_mngStCount = 0x10;
     env->m_isEditMode = 1;
 
     memset(self + 0x10, 0, 0x108);
 
-    env->m_boxMinX = FLOAT_8032fe98;
-    env->m_boxMaxX = FLOAT_8032fe9c;
-    env->m_boxMinY = FLOAT_8032fea0;
-    env->m_boxMaxY = FLOAT_8032fea4;
-    env->m_boxMinZ = FLOAT_8032fe9c;
-    env->m_boxMaxZ = FLOAT_8032fea8;
+    env->m_boxMinX = kPartMngEnvBoxMinX;
+    env->m_boxMaxX = kPartMngEnvBoxMaxXz;
+    env->m_boxMinY = kPartMngEnvBoxMinY;
+    env->m_boxMaxY = kPartMngEnvBoxMaxY;
+    env->m_boxMinZ = kPartMngEnvBoxMaxXz;
+    env->m_boxMaxZ = kPartMngEnvBoxMaxZ;
 }
 
 /*
@@ -472,7 +472,7 @@ void CPartMng::pppDumpMngSt()
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (System.m_execParam != 0) {
-        System.Printf(const_cast<char*>(s__________________________________801d8358));
+        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
@@ -483,7 +483,7 @@ void CPartMng::pppDumpMngSt()
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
             System.Printf(
-                const_cast<char*>(s_prioTime__d_prio__d_heapSize__d_p_801d8454), mng->m_prioTime,
+                const_cast<char*>(sPartMngDumpEntryFmt), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
                 pdtSlots[kind].m_name);
         }
@@ -495,10 +495,10 @@ void CPartMng::pppDumpMngSt()
 
     if (System.m_execParam != 0) {
         System.Printf(
-            const_cast<char*>(s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0),
+            const_cast<char*>(sPartMngHeapSummaryFmt),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        System.Printf(const_cast<char*>(s__________________________________801d8358));
+        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 }
 
@@ -765,8 +765,8 @@ void CPartMng::drawCursor()
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
 
     Mtx44 orthoProjection;
-    C_MTXOrtho(orthoProjection, FLOAT_8032fe5c, FLOAT_8032fe60, FLOAT_8032fe5c, FLOAT_8032fe64, FLOAT_8032fe5c,
-               FLOAT_8032fe68);
+    C_MTXOrtho(orthoProjection, kPartMngZero, kPartMngOrthoHeight, kPartMngZero, kPartMngOrthoWidth, kPartMngZero,
+               kPartMngOrthoFar);
     GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
 
     Mtx identity;
@@ -794,14 +794,14 @@ void CPartMng::drawCursor()
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xd6), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x140), (float)(cursorY + 0xea), kPartMngZero);
 
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xd6), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x13f), (float)(cursorY + 0xea), kPartMngZero);
 
     _GXColor yellow;
     yellow.r = 0x00;
@@ -811,26 +811,26 @@ void CPartMng::drawCursor()
     GXSetChanAmbColor((GXChannelID)4, yellow);
     GXSetChanMatColor((GXChannelID)4, yellow);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x12c), (float)(cursorY + 0xe0), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x154), (float)(cursorY + 0xe0), kPartMngZero);
 
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xd7), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x141), (float)(cursorY + 0xeb), kPartMngZero);
 
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xd7), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x142), (float)(cursorY + 0xeb), kPartMngZero);
 
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), FLOAT_8032fe5c);
-    GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), FLOAT_8032fe5c);
+    GXPosition3f32((float)(cursorX + 0x12d), (float)(cursorY + 0xe1), kPartMngZero);
+    GXPosition3f32((float)(cursorX + 0x155), (float)(cursorY + 0xe1), kPartMngZero);
 
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
@@ -851,8 +851,8 @@ void CPartMng::render3Dcursor()
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
 
     Mtx44 orthoProjection;
-    C_MTXOrtho(orthoProjection, FLOAT_8032fe5c, FLOAT_8032fe60, FLOAT_8032fe5c, FLOAT_8032fe64, FLOAT_8032fe5c,
-               FLOAT_8032fe68);
+    C_MTXOrtho(orthoProjection, kPartMngZero, kPartMngOrthoHeight, kPartMngZero, kPartMngOrthoWidth, kPartMngZero,
+               kPartMngOrthoFar);
     GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
 
     Mtx identity;
@@ -887,8 +887,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorX);
     GXSetChanMatColor((GXChannelID)4, colorX);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x - FLOAT_8032FE70, y, z);
-    GXPosition3f32(x + FLOAT_8032FE70, y, z);
+    GXPosition3f32(x - kPartMngCullRadius, y, z);
+    GXPosition3f32(x + kPartMngCullRadius, y, z);
 
     _GXColor colorY;
     colorY.r = 0x80;
@@ -898,8 +898,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorY);
     GXSetChanMatColor((GXChannelID)4, colorY);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y - FLOAT_8032FE70, z);
-    GXPosition3f32(x, y + FLOAT_8032FE70, z);
+    GXPosition3f32(x, y - kPartMngCullRadius, z);
+    GXPosition3f32(x, y + kPartMngCullRadius, z);
 
     _GXColor colorZ;
     colorZ.r = 0xff;
@@ -909,8 +909,8 @@ void CPartMng::render3Dcursor()
     GXSetChanAmbColor((GXChannelID)4, colorZ);
     GXSetChanMatColor((GXChannelID)4, colorZ);
     GXBegin(GX_LINES, GX_VTXFMT5, 2);
-    GXPosition3f32(x, y, z - FLOAT_8032FE70);
-    GXPosition3f32(x, y, z + FLOAT_8032FE70);
+    GXPosition3f32(x, y, z - kPartMngCullRadius);
+    GXPosition3f32(x, y, z + kPartMngCullRadius);
 }
 
 /*
@@ -952,9 +952,9 @@ void CPartMng::pppGet2Dpos()
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
-                        / ((float)((double)(zAtPixel - 0xFFFFFF) / FLOAT_8032FE78) + ppvScreenMatrix0[2][2]);
-            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / FLOAT_8032FE7C)) / ppvScreenMatrix0[0][0]);
-            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / FLOAT_8032FE74)) / ppvScreenMatrix0[1][1]);
+                        / ((float)((double)(zAtPixel - 0xFFFFFF) / kPartMngDepthUnit) + ppvScreenMatrix0[2][2]);
+            viewPos.x = viewPos.z * (((float)((double)raw->cursorX / kPartMngScreenHalfWidth)) / ppvScreenMatrix0[0][0]);
+            viewPos.y = viewPos.z * ((-(float)((double)raw->cursorY / kPartMngScreenHalfHeight)) / ppvScreenMatrix0[1][1]);
             viewPos.z = -viewPos.z;
 
             PSMTXInverse(ppvCameraMatrix0, invCamera);
@@ -1118,10 +1118,10 @@ void CPartMng::SetFp()
         mng->m_scale.x = recvBuff[8];
         mng->m_scale.y = recvBuff[9];
         mng->m_scale.z = recvBuff[0x0A];
-        mng->m_ownerScale = FLOAT_8032fe18;
-        mng->m_scaleFactor = FLOAT_8032fe18;
-        mng->m_userFloat1 = FLOAT_8032fe18;
-        mng->m_userFloat0 = FLOAT_8032fe18;
+        mng->m_ownerScale = kPartMngOne;
+        mng->m_scaleFactor = kPartMngOne;
+        mng->m_userFloat1 = kPartMngOne;
+        mng->m_userFloat0 = kPartMngOne;
         mng->m_useOwnerScaleSign = 0;
         mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpBytes + 0x45);
         mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpBytes + 0x46);
@@ -1468,7 +1468,7 @@ void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
     }
 
     if (static_cast<unsigned int>(checkSum) != *reinterpret_cast<unsigned int*>(packet)) {
-        Graphic.Printf(const_cast<char*>(s_CheckSum_ERROR_code_0x_x____801d82f0), code);
+        Graphic.Printf(const_cast<char*>(sPartMngChecksumErrorFmt), code);
         Graphic.DrawDebugString();
     }
 }
@@ -1667,10 +1667,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
         *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
 
-        m_pppMng[0].m_ownerScale = FLOAT_8032fe18;
-        m_pppMng[0].m_scaleFactor = FLOAT_8032fe18;
-        m_pppMng[0].m_userFloat1 = FLOAT_8032fe18;
-        m_pppMng[0].m_userFloat0 = FLOAT_8032fe18;
+        m_pppMng[0].m_ownerScale = kPartMngOne;
+        m_pppMng[0].m_scaleFactor = kPartMngOne;
+        m_pppMng[0].m_userFloat1 = kPartMngOne;
+        m_pppMng[0].m_userFloat0 = kPartMngOne;
         m_pppMng[0].m_useOwnerScaleSign = 0;
         m_pppMng[0].m_matrixMode = 0;
 
@@ -1713,9 +1713,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
         *reinterpret_cast<int*>(self + kEditDrawModeOffset) = *reinterpret_cast<int*>(payload + 0x134);
 
-        ppvChrScl[2] = FLOAT_8032fe18;
-        ppvChrScl[1] = FLOAT_8032fe18;
-        ppvChrScl[0] = FLOAT_8032fe18;
+        ppvChrScl[2] = kPartMngOne;
+        ppvChrScl[1] = kPartMngOne;
+        ppvChrScl[0] = kPartMngOne;
 
         _pppMngSt* mng = m_pppMng;
         for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
@@ -1916,12 +1916,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
         *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x2C) = 0;
         m_pppMng[0].m_baseTime = 0;
-        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x34) = FLOAT_8032FE6C;
-        m_pppMng[0].m_cullRadiusSq = FLOAT_8032FE6C;
-        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x3C) = FLOAT_8032FE70;
-        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x38) = FLOAT_8032FE70;
-        m_pppMng[0].m_cullYOffset = FLOAT_8032FE70;
-        m_pppMng[0].m_cullRadius = FLOAT_8032FE70;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x34) = kPartMngCullRadiusSqMax;
+        m_pppMng[0].m_cullRadiusSq = kPartMngCullRadiusSqMax;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x3C) = kPartMngCullRadius;
+        *reinterpret_cast<float*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x38) = kPartMngCullRadius;
+        m_pppMng[0].m_cullYOffset = kPartMngCullRadius;
+        m_pppMng[0].m_cullRadius = kPartMngCullRadius;
         *reinterpret_cast<int*>(*reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + 0x30) = 0;
         *reinterpret_cast<int*>(self + kEditCountOffset) = 1;
         *reinterpret_cast<int*>(self + kPdtCountOffset) = 1;
@@ -1997,7 +1997,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
-        m_pppEnvSt.m_envParam = FLOAT_8032fe5c;
+        m_pppEnvSt.m_envParam = kPartMngZero;
         m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
         *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
             *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
@@ -2124,7 +2124,7 @@ void CPartMng::pppEditBeforeCalc()
         *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
 
         PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
-        C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
+        C_MTXPerspective(ppvScreenMatrix, kPartMngPppFovY, kPartMngPppAspect, kPartMngPppNear, kPartMngPppFar);
         ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
         ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
         ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
@@ -2155,7 +2155,7 @@ void CPartMng::pppEditBeforeCalc()
             fogColor.b = 0;
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+            Graphic.SetFogParam(kPartMngZero, kPartMngZero);
         }
 
         ppvSysGoPartF = 1;
@@ -2170,7 +2170,7 @@ void CPartMng::pppEditBeforeCalc()
         *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
 
         PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
-        C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
+        C_MTXPerspective(ppvScreenMatrix, kPartMngPppFovY, kPartMngPppAspect, kPartMngPppNear, kPartMngPppFar);
         ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
         ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
         ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
@@ -2201,7 +2201,7 @@ void CPartMng::pppEditBeforeCalc()
             fogColor.b = 0;
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+            Graphic.SetFogParam(kPartMngZero, kPartMngZero);
         }
 
         ppvSysGoPartF = 1;
@@ -2319,7 +2319,7 @@ void CPartMng::pppEditPartCalc()
         (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->SetFrame(
             *reinterpret_cast<float*>(self + 0x23564));
         if (ppvUserStopPartF == 0) {
-            *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
+            *reinterpret_cast<float*>(self + 0x23564) += kPartMngOne;
         }
     }
     reinterpret_cast<CStopWatch&>(g_par_calc_prof).Start();
@@ -2491,7 +2491,7 @@ void CPartMng::pppEditDrawShadow()
                     bound.m_max.y = partPos.y + mng->m_cullYOffset;
                     bound.m_max.z = partPos.z + radius;
                     if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
-                            cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                            cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                         goto drawPart;
                     }
                 }
@@ -2590,7 +2590,7 @@ void CPartMng::pppEditDraw()
                             bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
                             bound.m_max.z = partPos.z + radius;                                            \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
-                                    cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {                    \
+                                    cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \
                             }                                                                              \
                         }                                                                                  \
@@ -2704,7 +2704,7 @@ void CPartMng::pppEditPartDrawAfter()
                             bound.m_max.y = partPos.y + mng->m_cullYOffset;                                \
                             bound.m_max.z = partPos.z + radius;                                            \
                             if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(                           \
-                                    cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {                    \
+                                    cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {                    \
                                 goto drawPart##drawPass;                                                   \
                             }                                                                              \
                         }                                                                                  \
@@ -2977,7 +2977,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
                 bound.m_max.y = partPos.y + mng->m_cullYOffset;
                 bound.m_max.z = partPos.z + radius;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
-                        cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                        cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }
             }
@@ -3092,7 +3092,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
         bound.m_max.y = partPos.y + mng->m_cullYOffset;
         bound.m_max.z = partPos.z + radius;
         if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
-                cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
             goto drawPart;
         }
     }
@@ -3185,7 +3185,7 @@ checkCull:
         bound.m_max.x = partPos.x + radius;
         bound.m_max.y = partPos.y + mng->m_cullYOffset;
         bound.m_max.z = partPos.z + radius;
-        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
             goto drawPart;
         }
     }
@@ -3261,7 +3261,7 @@ void CPartMng::pppDraw()
                     bound.m_max.x = partPos.x + radius;
                     bound.m_max.y = partPos.y + mng->m_cullYOffset;
                     bound.m_max.z = partPos.z + radius;
-                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, FLOAT_8032FE48) == 0) {
+                    if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) == 0) {
                         goto nextPart;
                     }
                     goto drawPart;
@@ -3337,7 +3337,7 @@ void CPartMng::pppPartDrawAfter()
                 bound.m_max.y = partPos.y + mng->m_cullYOffset;
                 bound.m_max.z = partPos.z + radius;
                 if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(
-                        cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+                        cameraPos, ppvCameraMatrix, kPartMngFrustumCullLimit) != 0) {
                     goto drawPart;
                 }
             }
@@ -3522,7 +3522,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* path = g_StrTmp;
-    sprintf(path, lbl_8032FE38, baseName);
+    sprintf(path, sPtxPathFmt, baseName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
@@ -3607,7 +3607,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
     char* path = g_StrTmp;
     unsigned long fileSize;
 
-    sprintf(path, lbl_8032FE30, baseName);
+    sprintf(path, sPmdPathFmt, baseName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPmdLogFormat), path);
     }
@@ -3725,7 +3725,7 @@ void CPartMng::pppLoadPan(const char* baseName)
     char* path = g_StrTmp;
     unsigned long fileSize;
 
-    sprintf(path, lbl_8032FE28, baseName);
+    sprintf(path, sPanPathFmt, baseName);
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
@@ -3822,7 +3822,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* pdtPath = g_StrTmp;
-    sprintf(pdtPath, lbl_8032FE20, baseName);
+    sprintf(pdtPath, sPdtPathFmt, baseName);
     PppPdtSlot* pdtSlot = &m_pdtSlots[pdtSlotIndex];
     strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
 
@@ -4012,7 +4012,7 @@ int CPartMng::pppGetFreeDataMng()
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC));
+            System.Printf(const_cast<char*>(sPppFreeDataMngAllocError));
         }
         OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, "");
         return -1;
@@ -4040,8 +4040,8 @@ PPPCREATEPARAM* CPartMng::pppGetDefaultCreateParam()
     g_dcp.m_paramB = 0;
     g_dcp.m_objectHitMask = 0;
     g_dcp.m_cylinderAttribute = 0;
-    g_dcp.m_paramC = FLOAT_8032fe18;
-    g_dcp.m_paramD = FLOAT_8032fe18;
+    g_dcp.m_paramC = kPartMngOne;
+    g_dcp.m_paramD = kPartMngOne;
     *reinterpret_cast<unsigned char*>(&g_dcp.m_owner) = 0;
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
@@ -4155,7 +4155,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + freeIdx * 0x158);
     if (System.m_execParam != 0) {
-        System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
+        System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }
 
@@ -4295,10 +4295,10 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         mng->m_scale.z = createParam->m_scalePtr->z * scaleZ;
     }
 
-    mng->m_ownerScale = FLOAT_8032fe18;
-    mng->m_scaleFactor = FLOAT_8032fe18;
-    mng->m_userFloat0 = FLOAT_8032fe18;
-    mng->m_userFloat1 = FLOAT_8032fe18;
+    mng->m_ownerScale = kPartMngOne;
+    mng->m_scaleFactor = kPartMngOne;
+    mng->m_userFloat0 = kPartMngOne;
+    mng->m_userFloat1 = kPartMngOne;
     mng->m_useOwnerScaleSign = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_owner = 0;
     reinterpret_cast<_pppMngSt*>(mng)->m_lookTarget = createParam->m_lookTargetPtr;

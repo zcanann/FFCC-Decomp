@@ -1,6 +1,6 @@
 #include "ffcc/usb.h"
 
-static const char s_CManager_801D6F90[] = "CManager";
+static const char sUsbManagerClassName[] = "CManager";
 
 #include "ffcc/system.h"
 

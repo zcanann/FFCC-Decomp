@@ -158,12 +158,6 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
-    static CProcessTableCallback m_table_desc0;
-    static CProcessTableCallback m_table_desc1;
-    static CProcessTableCallback m_table_desc2;
-    static CProcessTableCallback m_table_desc3;
-    static CProcessTableCallback m_table_desc4;
-    static CProcessTableCallback m_table_desc5;
     static CProcessTable m_table;
 
     struct BattleHudState

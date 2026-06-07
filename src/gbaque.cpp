@@ -137,7 +137,7 @@ static inline unsigned int SwapU32Value(unsigned int value)
 }
 
 extern "C" const char s_gbaque_cpp[] = "gbaque.cpp";
-static const char s_pcts_pctd_Error_memory_allocation_error_801DB37C[] = "%s(%d): Error: memory allocation error\n";
+static const char sGbaQueueMemoryAllocationErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 static const char s_compatibility_data_error[] = "compatibility data error!!\n";
 static const char s_cmake_favorite_crc_error[] = "%s(%d): Error:CMakeFavorite() crc error!!\n";
 static const char s_cmake_name_crc_error[] = "%s(%d): Error:ChkCMakeName() crc error!!\n";
@@ -2206,7 +2206,7 @@ char* npcNameBuf =
 	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[kGbaQueueLetterNpcNameBytes];
 	if (npcNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7A9);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7A9);
 		}
 		return -1;
 	}
@@ -2216,7 +2216,7 @@ char* subjectNameBuf =
 	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[kGbaQueueLetterSubjectNameBytes];
 	if (subjectNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7B3);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7B3);
 		}
 		return -1;
 	}
@@ -2226,7 +2226,7 @@ unsigned int* letterEntryBuf =
 	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[kGbaQueueLetterEntryAllocWords];
 	if (letterEntryBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7BD);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x7BD);
 		}
 		return -1;
 	}
@@ -2378,7 +2378,7 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x85B);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x85B);
         }
         return -1;
     }
@@ -2387,7 +2387,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x864);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0x864);
         }
         return -1;
     }
@@ -3660,7 +3660,7 @@ int GbaQueue::MakeBuyData(int channel, char* outData)
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD7B);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD7B);
 		}
 		return -1;
 	}
@@ -3669,7 +3669,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD84);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xD84);
 		}
 		return -1;
 	}
@@ -3754,7 +3754,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xDD7);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return -1;
 	}
@@ -3763,7 +3763,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDDE) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xDE0);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xDE0);
 		}
 		return -1;
 	}
@@ -3859,7 +3859,7 @@ int GbaQueue::MakeSmithData(int channel, char* outData)
 		unsigned char[0x40];
 	if (smithIndices == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xE43);
+System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp), 0xE43);
 		}
 		return -1;
 	}
@@ -4344,7 +4344,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x100F) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp),
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp),
 			              0x1011);
 		}
 		return -1;
@@ -4354,7 +4354,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x1017) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp),
+			System.Printf(const_cast<char*>(sGbaQueueMemoryAllocationErrorFmt), const_cast<char*>(s_gbaque_cpp),
 			              0x1019);
 		}
 		return -1;

@@ -11,30 +11,6 @@ struct Vec;
 class CMapPcs : public CProcess
 {
 public:
-    static CProcessTableCallback m_table_desc0;
-    static CProcessTableCallback m_table_desc1;
-    static CProcessTableCallback m_table_desc2;
-    static CProcessTableCallback m_table_desc3;
-    static CProcessTableCallback m_table_desc4;
-    static CProcessTableCallback m_table_desc5;
-    static CProcessTableCallback m_table_desc6;
-    static CProcessTableCallback m_table_desc7;
-    static CProcessTableCallback m_table_desc8;
-    static CProcessTableCallback m_table_desc9;
-    static CProcessTableCallback m_table_desc10;
-    static CProcessTableCallback m_table_desc11;
-    static CProcessTableCallback m_table_desc12;
-    static CProcessTableCallback m_table_desc13;
-    static CProcessTableCallback m_table_desc14;
-    static CProcessTableCallback m_table_desc15;
-    static CProcessTableCallback m_table_desc16;
-    static CProcessTableCallback m_table_desc17;
-    static CProcessTableCallback m_table_desc18;
-    static CProcessTableCallback m_table_desc19;
-    static CProcessTableCallback m_table_desc20;
-    static CProcessTableCallback m_table_desc21;
-    static CProcessTableCallback m_table_desc22;
-    static CProcessTableCallback m_table_desc23;
     static CProcessTable m_table[3];
 
     CMapPcs();

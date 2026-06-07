@@ -42,8 +42,8 @@ STATIC_ASSERT(offsetof(CRomLetterWork, m_linkValueConditions) == 0x1C);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_compareRules) == 0x1E);
 STATIC_ASSERT(offsetof(CRomLetterWork, m_eventRules) == 0x2E);
 
-extern char s_WorldMapSortFmts_801D9EC8[];
-static const char s_NoWorldReturnItem_801D9F64[] = {
+extern char sWorldMapSortFormatBlock[];
+static const char sNoWorldReturnItemWarning[] = {
 	(char)0x83, (char)0x8F, (char)0x81, (char)0x5B, (char)0x83, (char)0x8B, (char)0x83, (char)0x68,
 	(char)0x82, (char)0xC9, (char)0x8C, (char)0x4A, (char)0x82, (char)0xE8, (char)0x89, (char)0x7A,
 	(char)0x82, (char)0xB9, (char)0x82, (char)0xC8, (char)0x82, (char)0xA2, (char)0x83, (char)0x41,
@@ -51,7 +51,7 @@ static const char s_NoWorldReturnItem_801D9F64[] = {
 	(char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5, (char)0x82, (char)0xDC,
 	(char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, 0x00, 0x00, 0x00
 };
-static const char s_TempArtifactIndex_801D9F94[] = {
+static const char sTempArtifactIndexWarning[] = {
 	(char)0x83, (char)0x65, (char)0x83, (char)0x93, (char)0x83, (char)0x7C, (char)0x83, (char)0x89,
 	(char)0x83, (char)0x8A, (char)0x83, (char)0x41, (char)0x81, (char)0x5B, (char)0x83, (char)0x65,
 	(char)0x83, (char)0x42, (char)0x83, (char)0x74, (char)0x83, (char)0x40, (char)0x83, (char)0x4E,
@@ -65,7 +65,7 @@ static const char s_TempArtifactIndex_801D9F94[] = {
 	(char)0x82, (char)0xB5, (char)0x82, (char)0xDC, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD,
 	(char)0x81, (char)0x42, (char)0x0A, 0x00
 };
-static const char s_UnnamedItem_801D9FF0[] = {
+static const char sUnnamedItemName[] = {
 	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
 	(char)0x82, (char)0xC8, (char)0x82, (char)0xB5, (char)0x81, (char)0x6A, 0x00, 0x00
 };
@@ -141,7 +141,7 @@ CCaravanWork::CCaravanWork()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)m_name, const_cast<char*>(s_UnnamedItem_801D9FF0));
+	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -227,7 +227,7 @@ void CCaravanWork::LoadInit()
 	unk_0x3ac = 0;
 	m_objType = 0;
 	m_joybusCaravanId = -1;
-	sprintf((char*)m_name, const_cast<char*>(s_UnnamedItem_801D9FF0));
+	sprintf((char*)m_name, const_cast<char*>(sUnnamedItemName));
 	m_letterMeta[0] = 0xFFFF;
 	m_letterMeta[1] = 0xFFFF;
 	m_letterMeta[2] = 0xFFFF;
@@ -1563,7 +1563,7 @@ void CCaravanWork::SafeDeleteTempItem()
 	int artifactIndex = 0;
 
 	if ((unsigned int)System.m_execParam >= 3U) {
-		System.Printf(const_cast<char*>(s_NoWorldReturnItem_801D9F64));
+		System.Printf(const_cast<char*>(sNoWorldReturnItemWarning));
 	}
 
 	short* artifact = reinterpret_cast<short*>(m_artifacts);
@@ -1609,7 +1609,7 @@ void CCaravanWork::SafeDeleteTempItem()
 		if (*commandSlot >= 0) {
 			*commandSlot = -1;
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(s_TempArtifactIndex_801D9F94), slotIndex);
+				System.Printf(const_cast<char*>(sTempArtifactIndexWarning), slotIndex);
 			}
 		}
 	}
@@ -2457,7 +2457,7 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int weaponIdx)
  */
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
-	char* fmtBase = s_WorldMapSortFmts_801D9EC8;
+	char* fmtBase = sWorldMapSortFormatBlock;
 
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 

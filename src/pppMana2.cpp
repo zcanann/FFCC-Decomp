@@ -1,6 +1,5 @@
 #include "ffcc/pppMana2.h"
 #include "ffcc/graphic.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
@@ -34,7 +33,7 @@ STATIC_ASSERT(offsetof(pppMana2Step, m_envTextureId1) == 0x28);
 STATIC_ASSERT(offsetof(pppMana2Step, m_waterScale) == 0x30);
 STATIC_ASSERT(offsetof(pppMana2Step, m_rippleLevel) == 0x38);
 
-static const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
+static const char sRenderMana2Message[] = "Render Mana2!!";
 static const char s_pppMana2_cpp[] = "pppMana2.cpp";
 
 struct Mana2SetupBlock
@@ -46,27 +45,27 @@ struct Mana2SetupBlock
 STATIC_ASSERT(sizeof(Mana2DataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_setupOffset) == 0x4);
 STATIC_ASSERT(offsetof(Mana2DataOffsets, m_workOffset) == 0x8);
-extern const float FLOAT_80331898 = 0.0f;
-extern const float FLOAT_8033189c = -1.0f;
-extern const float FLOAT_803318a0 = 1.0f;
-extern const float FLOAT_803318a4 = 0.5f;
-extern const float FLOAT_803318A8 = 0.0625f;
-extern const double DOUBLE_803318B0 = 4503601774854144.0;
-extern const float FLOAT_803318b8 = 2.0f;
-extern const float FLOAT_803318bc = 0.25f;
-extern const float FLOAT_803318c0 = 0.75f;
-extern const float FLOAT_803318c4 = 5.0f;
-extern const float FLOAT_803318c8 = 128.0f;
-extern const float FLOAT_803318cc = 90.0f;
-extern const float FLOAT_803318d0 = 10000.0f;
+extern const float kMana2Zero = 0.0f;
+extern const float kMana2NegativeOne = -1.0f;
+extern const float kMana2One = 1.0f;
+extern const float kMana2Half = 0.5f;
+extern const float kMana2MeshUvStep = 0.0625f;
+extern const double kMana2SignedIntBias = 4503601774854144.0;
+extern const float kMana2Two = 2.0f;
+extern const float kMana2Quarter = 0.25f;
+extern const float kMana2ThreeQuarter = 0.75f;
+extern const float kMana2ParaboloidCenterYOffset = 5.0f;
+extern const float kMana2ParaboloidTexSize = 128.0f;
+extern const float kMana2ParaboloidFov = 90.0f;
+extern const float kMana2ParaboloidFar = 10000.0f;
 static const char s_manaShapeObj5[] = "obj5";
 static const char s_manaShapeObj3[] = "obj3";
 static const char s_manaShapeObj1[] = "obj1";
 static const char s_manaShapeObj4[] = "obj4";
 static const char s_manaShapeObj2[] = "obj2";
-extern const float FLOAT_803318fc = 0.99999f;
+extern const float kMana2StepSlopeLimit = 0.99999f;
 static const char s_manaShapeObj[] = "obj";
-extern const float FLOAT_80331904 = -1.5707964f;
+extern const float kMana2WaterRotZRad = -1.5707964f;
 extern const float kPppConformBgNormalZero = 0.0f;
 extern const float kPppConformBgNormalOne = 1.0f;
 
@@ -185,9 +184,9 @@ static void CalcWaterReflectionVector(
         cameraPos.z = CameraWorldZ();
     }
 
-    transformedCameraPos.x = LoadFloat(FLOAT_80331898);
-    transformedCameraPos.y = LoadFloat(FLOAT_80331898);
-    transformedCameraPos.z = LoadFloat(FLOAT_80331898);
+    transformedCameraPos.x = LoadFloat(kMana2Zero);
+    transformedCameraPos.y = LoadFloat(kMana2Zero);
+    transformedCameraPos.z = LoadFloat(kMana2Zero);
 
     PSMTXCopy(matrix, matrixNoTranslate);
     objPos.x = matrixNoTranslate[0][3];
@@ -199,12 +198,12 @@ static void CalcWaterReflectionVector(
     PSMTXInverse(matrixNoTranslate, inverseMtx);
 
     PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, LoadFloat(FLOAT_8033189c));
+    PSVECScale(&cameraPos, &cameraPos, LoadFloat(kMana2NegativeOne));
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-    zero = LoadFloat(FLOAT_80331898);
+    zero = LoadFloat(kMana2Zero);
     positionIt = positions;
-    half = LoadFloat(FLOAT_803318a4);
+    half = LoadFloat(kMana2Half);
     reflectionIt = reflectionVec;
     normalIt = normals;
     colorBytes = (unsigned char*)color;
@@ -224,7 +223,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            denomBase = LoadFloat(FLOAT_803318a0);
+            denomBase = LoadFloat(kMana2One);
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
@@ -234,7 +233,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            denomBase = LoadFloat(FLOAT_803318a0);
+            denomBase = LoadFloat(kMana2One);
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
@@ -476,8 +475,8 @@ static int UpdateWaterMesh(VMana2* mana2)
     int row = 1;
     int rowBase = 0x11;
     do {
-        currentScale = FLOAT_80331898;
-        neighborScale = FLOAT_803318a4;
+        currentScale = kMana2Zero;
+        neighborScale = kMana2Half;
         int index = rowBase + 1;
         for (int col = 1; col < 0x10; col += 5, index += 5) {
             int above0 = index - 0x11;
@@ -569,11 +568,11 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     int colCount;
     int pairCount;
 
-    normalY = LoadFloat(FLOAT_803318a0);
-    zero = LoadFloat(FLOAT_80331898);
+    normalY = LoadFloat(kMana2One);
+    zero = LoadFloat(kMana2Zero);
     rowCount = 0;
-    uvStep = LoadFloat(FLOAT_803318A8);
-    radius = param_5 * LoadFloat(FLOAT_803318a4);
+    uvStep = LoadFloat(kMana2MeshUvStep);
+    radius = param_5 * LoadFloat(kMana2Half);
     for (z = radius; -radius <= z; z -= param_5 * uvStep) {
         colCount = 0;
         positions = reinterpret_cast<float*>(param_1);
@@ -703,14 +702,14 @@ void CalcReflectionVector2(
     matrix[2][3] = worldPos.z;
 
     PSMTXCopy(matrix, nodeRotMtx);
-    nodeRotMtx[0][3] = LoadFloat(FLOAT_80331898);
-    nodeRotMtx[1][3] = LoadFloat(FLOAT_80331898);
-    nodeRotMtx[2][3] = LoadFloat(FLOAT_80331898);
+    nodeRotMtx[0][3] = LoadFloat(kMana2Zero);
+    nodeRotMtx[1][3] = LoadFloat(kMana2Zero);
+    nodeRotMtx[2][3] = LoadFloat(kMana2Zero);
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
 
-    const float half = LoadFloat(FLOAT_803318a4);
+    const float half = LoadFloat(kMana2Half);
 
     dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
@@ -772,61 +771,61 @@ void CalcReflectionVector2(
 
             switch (axis) {
             case 0:
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.x;
-                if (outVec->x >= LoadFloat(FLOAT_80331898)) {
+                invAxis = LoadFloat(kMana2Two) * reflected.x;
+                if (outVec->x >= LoadFloat(kMana2Zero)) {
                     clr[0] = (u8)(clr[0] + 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
-                    uv.x = uv.x + LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x + LoadFloat(kMana2Quarter);
+                    uv.y = uv.y + LoadFloat(kMana2Quarter);
                 } else {
                     clr[0] = (u8)(clr[0] - 0x7F);
                     uv.x = half - reflected.z / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
-                    uv.x = uv.x + LoadFloat(FLOAT_803318c0);
-                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x + LoadFloat(kMana2ThreeQuarter);
+                    uv.y = uv.y + LoadFloat(kMana2Quarter);
                 }
                 break;
             case 1:
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
-                if (outVec->y >= LoadFloat(FLOAT_80331898)) {
+                invAxis = LoadFloat(kMana2Two) * reflected.y;
+                if (outVec->y >= LoadFloat(kMana2Zero)) {
                     clr[1] = (u8)(clr[1] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
                     uv.x = uv.x + half;
                 } else {
                     clr[1] = (u8)(clr[1] - 0x7F);
                     uv.x = half - reflected.x / invAxis;
                     uv.y = half + reflected.z / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
-                    uv.x = uv.x + LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.x = uv.x + LoadFloat(kMana2Quarter);
                     uv.y = uv.y + half;
                 }
                 break;
             case 2:
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.z;
-                if (outVec->z >= LoadFloat(FLOAT_80331898)) {
+                invAxis = LoadFloat(kMana2Two) * reflected.z;
+                if (outVec->z >= LoadFloat(kMana2Zero)) {
                     clr[2] = (u8)(clr[2] + 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half - reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y + LoadFloat(kMana2Quarter);
                 } else {
                     clr[2] = (u8)(clr[2] - 0x7F);
                     uv.x = half + reflected.x / invAxis;
                     uv.y = half + reflected.y / invAxis;
-                    uv.x = uv.x * LoadFloat(FLOAT_803318bc);
-                    uv.y = uv.y * LoadFloat(FLOAT_803318bc);
+                    uv.x = uv.x * LoadFloat(kMana2Quarter);
+                    uv.y = uv.y * LoadFloat(kMana2Quarter);
                     uv.x = uv.x + half;
-                    uv.y = uv.y + LoadFloat(FLOAT_803318bc);
+                    uv.y = uv.y + LoadFloat(kMana2Quarter);
                 }
                 break;
             }
@@ -896,15 +895,15 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
-        centerPos.z = LoadFloat(FLOAT_80331898);
-        centerPos.y = LoadFloat(FLOAT_80331898);
-        centerPos.x = LoadFloat(FLOAT_80331898);
+        centerPos.z = LoadFloat(kMana2Zero);
+        centerPos.y = LoadFloat(kMana2Zero);
+        centerPos.x = LoadFloat(kMana2Zero);
     } else {
         centerPos.x = gObject->m_worldPosition.x;
         centerPos.y = gObject->m_worldPosition.y;
         centerPos.z = gObject->m_worldPosition.z;
     }
-    centerPos.y = LoadFloat(FLOAT_803318c4) + centerPos.y;
+    centerPos.y = LoadFloat(kMana2ParaboloidCenterYOffset) + centerPos.y;
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
     GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
@@ -913,45 +912,45 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     if (step->m_rippleLevel != 0) {
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
                                    (_GXTexFmt)0x16, 1);
-        GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                      LoadFloat(FLOAT_803318c8), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318a0));
-        C_MTXPerspective(projectionMtx, LoadFloat(FLOAT_803318cc), LoadFloat(FLOAT_803318a0),
-                         LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
+        GXSetViewport(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
+                      LoadFloat(kMana2ParaboloidTexSize), LoadFloat(kMana2Zero), LoadFloat(kMana2One));
+        C_MTXPerspective(projectionMtx, LoadFloat(kMana2ParaboloidFov), LoadFloat(kMana2One),
+                         LoadFloat(kMana2One), LoadFloat(kMana2ParaboloidFar));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;
             cameraPos.z = centerPos.z;
-            cameraUp.y = LoadFloat(FLOAT_803318a0);
-            cameraUp.z = LoadFloat(FLOAT_80331898);
+            cameraUp.y = LoadFloat(kMana2One);
+            cameraUp.z = LoadFloat(kMana2Zero);
 
             if (i == 3) {
-                cameraPos.y = centerPos.y - LoadFloat(FLOAT_803318a0);
-                cameraUp.y = LoadFloat(FLOAT_80331898);
-                cameraUp.z = LoadFloat(FLOAT_803318a0);
+                cameraPos.y = centerPos.y - LoadFloat(kMana2One);
+                cameraUp.y = LoadFloat(kMana2Zero);
+                cameraUp.z = LoadFloat(kMana2One);
             } else if (i < 3) {
                 if (i == 1) {
-                    cameraPos.x = centerPos.x - LoadFloat(FLOAT_803318a0);
+                    cameraPos.x = centerPos.x - LoadFloat(kMana2One);
                 } else if (i < 1) {
-                    cameraPos.x = centerPos.x + LoadFloat(FLOAT_803318a0);
+                    cameraPos.x = centerPos.x + LoadFloat(kMana2One);
                 } else {
-                    cameraPos.y = centerPos.y + LoadFloat(FLOAT_803318a0);
-                    cameraUp.y = LoadFloat(FLOAT_80331898);
-                    cameraUp.z = LoadFloat(FLOAT_8033189c);
+                    cameraPos.y = centerPos.y + LoadFloat(kMana2One);
+                    cameraUp.y = LoadFloat(kMana2Zero);
+                    cameraUp.z = LoadFloat(kMana2NegativeOne);
                 }
             } else if (i == 5) {
-                cameraPos.z = centerPos.z - LoadFloat(FLOAT_803318a0);
+                cameraPos.z = centerPos.z - LoadFloat(kMana2One);
             } else if (i < 5) {
-                cameraPos.z = centerPos.z + LoadFloat(FLOAT_803318a0);
+                cameraPos.z = centerPos.z + LoadFloat(kMana2One);
             }
 
-            cameraUp.x = LoadFloat(FLOAT_80331898);
+            cameraUp.x = LoadFloat(kMana2Zero);
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                                    LoadFloat(FLOAT_803318c8), baseParaboloidTexObjs, 0, 0, 0,
+            gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
+                                    LoadFloat(kMana2ParaboloidTexSize), baseParaboloidTexObjs, 0, 0, 0,
                                     (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs++;
         }
@@ -974,12 +973,12 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
         GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
 
-        quadMin.x = LoadFloat(FLOAT_80331898);
-        quadMin.y = LoadFloat(FLOAT_80331898);
-        quadMin.z = LoadFloat(FLOAT_80331898);
-        quadMax.x = LoadFloat(FLOAT_803318c8);
-        quadMax.y = LoadFloat(FLOAT_803318c8);
-        quadMax.z = LoadFloat(FLOAT_80331898);
+        quadMin.x = LoadFloat(kMana2Zero);
+        quadMin.y = LoadFloat(kMana2Zero);
+        quadMin.z = LoadFloat(kMana2Zero);
+        quadMax.x = LoadFloat(kMana2ParaboloidTexSize);
+        quadMax.y = LoadFloat(kMana2ParaboloidTexSize);
+        quadMax.z = LoadFloat(kMana2Zero);
         quadColor.r = 0xFF;
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
@@ -990,8 +989,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
-        gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                                LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
+        gUtil.RenderTextureQuad(LoadFloat(kMana2Zero), LoadFloat(kMana2Zero), LoadFloat(kMana2ParaboloidTexSize),
+                                LoadFloat(kMana2ParaboloidTexSize), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
                                 (_GXBlendFactor)5);
         work->m_paraboloidReady = 1;
     }
@@ -1041,7 +1040,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
  */
 void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
 {
-    Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
+    Graphic.Printf(const_cast<char*>(sRenderMana2Message));
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
     GXSetNumChans(1);
@@ -1172,7 +1171,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
                         static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
                                                       const_cast<char*>(s_pppMana2_cpp), 0x232));
                     Vec* reflectionVec = mana2Work->m_meshReflectionVec;
-                    float zero = FLOAT_80331898;
+                    float zero = kMana2Zero;
                     for (vertexIndex = 0; vertexIndex < meshData->m_vertexCount; vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
@@ -1238,7 +1237,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* param_2, _pppCtrlTable* par
 
                 float* waterHeightA = mana2Work->m_waterHeightA;
                 float* waterHeightB = mana2Work->m_waterHeightB;
-                float zero = FLOAT_80331898;
+                float zero = kMana2Zero;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
@@ -1453,7 +1452,7 @@ void pppConstructMana2(pppMana2* pppMana2, _pppCtrlTable* param_2)
 
     work = GetMana2Work(pppMana2, param_2);
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
+    gObject->m_stepSlopeLimit = LoadFloat(kMana2StepSlopeLimit);
 
     handle = GetCharaHandlePtr(gObject, 0);
     GetCharaModelPtr(handle);
@@ -1547,17 +1546,17 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         Vec offset;
 
         PSMTXCopy(CameraMatrix(), cameraMtx);
-        PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
+        PSMTXRotRad(rotMtx, 'z', LoadFloat(kMana2WaterRotZRad));
         float x = mtx[0][3];
         float y = mtx[1][3];
         float z = mtx[2][3];
-        mtx[0][3] = LoadFloat(FLOAT_80331898);
-        mtx[1][3] = LoadFloat(FLOAT_80331898);
-        mtx[2][3] = LoadFloat(FLOAT_80331898);
+        mtx[0][3] = LoadFloat(kMana2Zero);
+        mtx[1][3] = LoadFloat(kMana2Zero);
+        mtx[2][3] = LoadFloat(kMana2Zero);
         PSMTXConcat(mtx, rotMtx, mtx);
 
-        offset.z = LoadFloat(FLOAT_80331898);
-        offset.x = LoadFloat(FLOAT_80331898);
+        offset.z = LoadFloat(kMana2Zero);
+        offset.x = LoadFloat(kMana2Zero);
         offset.y = stepData->m_waterScale;
         PSMTXMultVec(mtx, &offset, &offset);
 

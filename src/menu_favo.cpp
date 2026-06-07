@@ -12,11 +12,11 @@ typedef signed short s16;
 
 static FoodRank s_rank[8];
 
-extern "C" const float FLOAT_80333038 = 0.75f;
-extern "C" const float FLOAT_8033303C = 72.0f;
-static const char s_FavoRankFormat_80333068[] = "%d";
-extern "C" const float FLOAT_80333080;
-extern "C" const float FLOAT_80333084;
+extern "C" const float kCompaFoodIconUvScale = 0.75f;
+extern "C" const float kCompaFrameU = 72.0f;
+static const char sFavoRankFormat[] = "%d";
+extern "C" const float kFavoWideTextureWidth;
+extern "C" const float kFavoIconUvScale;
 
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
@@ -198,7 +198,7 @@ void CMenuPcs::FavoDraw()
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * drawEntry->alpha)).color);
 		rankFont->renderFlags = (rankFont->renderFlags & 0xEF) | 0x10;
 		rankFont->SetMargin(1.0f);
-		sprintf(textBuf, s_FavoRankFormat_80333068, static_cast<int>(rank->place));
+		sprintf(textBuf, sFavoRankFormat, static_cast<int>(rank->place));
 		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
 		rankFont->SetPosY(static_cast<float>(drawEntry->y + 0xA) - 4.0f);
 		rankFont->Draw(textBuf);
@@ -573,7 +573,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
 	fVar4 = 0.0f;
-	fVar5 = FLOAT_80333080;
+	fVar5 = kFavoWideTextureWidth;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
 	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
@@ -607,7 +607,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	sVar9 = 0;
-	fVar7 = FLOAT_80333084;
+	fVar7 = kFavoIconUvScale;
 	sVar11 = 6;
 	list = this->m_favoList;
 	setupEntry = &list->entries[entryIndex++];

@@ -57,19 +57,19 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 }
 
 extern float kCFlatPadStickZero;
-extern float FLOAT_80330b74;
-extern float FLOAT_80330b54;
-extern float FLOAT_80330b64;
-extern const float FLOAT_80330B34;
+extern float kCFlatAlphaMax;
+extern float kCFlatPi;
+extern float kCFlatDegrees180;
+extern const float kCFlatOneF;
 extern const float FLOAT_80330B38;
-extern float FLOAT_80330B3C;
+extern float kCFlatHalfF;
 extern const float FLOAT_80330B40;
 extern const float FLOAT_80330B44;
 extern const float FLOAT_80330B48;
 extern const float FLOAT_80330B4C;
-extern float FLOAT_80330B50;
-extern float FLOAT_80330B54;
-extern float FLOAT_80330B58;
+extern float kCFlatHalfPi;
+extern float kCFlatPi;
+extern float kCFlatThreeHalfPi;
 
 
 static inline int RemapPadSlot(CPad* pad, int padIndex)
@@ -1238,7 +1238,7 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     Vec scaledA;
     Vec scaledB;
 
-    PSVECScale(a, &scaledA, FLOAT_80330B34 - t);
+    PSVECScale(a, &scaledA, kCFlatOneF - t);
     PSVECScale(b, &scaledB, t);
     PSVECAdd(&scaledA, &scaledB, out);
 }
@@ -2070,7 +2070,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
             const float scaled = t * static_cast<float>(segmentCount);
             const int baseIndex = (mode & 1) + static_cast<int>(scaled);
-            const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
+            const float segmentT = std::fmodf(scaled, kCFlatOneF);
 
             CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
             CVector startPhantom1 = CVector(m_pathPoints[0].m_position) - delta;
@@ -2127,16 +2127,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             Vec c0;
 
             PSVECScale(p0, &result, FLOAT_80330B38);
-            VECMultAdd(&result, p1, &result, FLOAT_80330B3C);
+            VECMultAdd(&result, p1, &result, kCFlatHalfF);
             VECMultAdd(&result, p2, &result, FLOAT_80330B40);
             VECMultAdd(&result, p3, &result, FLOAT_80330B44);
 
-            PSVECScale(p0, &c2, FLOAT_80330B3C);
+            PSVECScale(p0, &c2, kCFlatHalfF);
             VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
-            VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
+            VECMultAdd(&c2, p2, &c2, kCFlatHalfF);
 
             PSVECScale(p0, &c1, FLOAT_80330B40);
-            VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
+            VECMultAdd(&c1, p2, &c1, kCFlatHalfF);
 
             PSVECScale(p0, &c0, FLOAT_80330B44);
             VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
@@ -2155,14 +2155,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         } else {
             switch (mode & 3) {
             case 3:
-                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
-                      FLOAT_80330B34);
+                t = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * t + kCFlatHalfPi))) -
+                      kCFlatOneF);
                 break;
             case 1:
-                t = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                t = kCFlatOneF + std::sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
                 break;
             case 2:
-                t = std::sinf(FLOAT_80330B50 * t);
+                t = std::sinf(kCFlatHalfPi * t);
                 break;
             default:
                 break;
@@ -2186,7 +2186,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
                     Vec result;
                     CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-                        scaleA, scaleB, scaleC, segmentT, FLOAT_80330B34, &Math, reinterpret_cast<float*>(&result),
+                        scaleA, scaleB, scaleC, segmentT, kCFlatOneF, &Math, reinterpret_cast<float*>(&result),
                         &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
                         &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
                     *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
@@ -2768,14 +2768,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         switch (*localBase & 3) {
         case 3:
-            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
-                      FLOAT_80330B34);
+            alpha = -((kCFlatHalfF * (kCFlatOneF + std::sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
+                      kCFlatOneF);
             break;
         case 1:
-            alpha = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
+            alpha = kCFlatOneF + std::sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
             break;
         case 2:
-            alpha = std::sinf(FLOAT_80330B50 * alpha);
+            alpha = std::sinf(kCFlatHalfPi * alpha);
             break;
         default:
             break;
@@ -3028,7 +3028,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x60: {
-        const int alpha = static_cast<int>(FLOAT_80330b74 * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
+        const int alpha = static_cast<int>(kCFlatAlphaMax * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
         const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
         GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
@@ -3452,7 +3452,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraData->m_values[5].m_float;
         *reinterpret_cast<int*>(object->m_localBase[8]) = cameraData->m_values[6].m_int;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -(FLOAT_80330b54 * cameraData->m_values[7].m_float) / FLOAT_80330b64;
+            -(kCFlatPi * cameraData->m_values[7].m_float) / kCFlatDegrees180;
         this->push(object, 1);
         outResult = 0;
         break;

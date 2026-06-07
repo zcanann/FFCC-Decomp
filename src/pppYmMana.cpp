@@ -1,6 +1,5 @@
 #include "ffcc/pppYmMana.h"
 #include "ffcc/graphic.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
@@ -990,7 +989,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8,
+                               0);
 
     gObject = mana->m_object;
     if (gObject == NULL) {
@@ -1087,7 +1087,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, captureTexObjs, 0, 0, 0x80, 0x80,
+            Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, captureTexObjs, 0, 0, 0x80, 0x80,
                                        depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
             sourceTexObjs++;

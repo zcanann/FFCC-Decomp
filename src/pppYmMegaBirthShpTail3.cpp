@@ -141,11 +141,11 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 u16 particleShapeFrame = *(u16*)(particle + 0x1C);
                 const u16 shapeFrameStep = shapeAnim->m_frames[0].m_duration;
                 const s16 shapeFrameCount = shapeAnim->m_frameCount;
-                double drawX, drawY, drawZ;
-                double camX, camY, camZ;
-                double startX, startY, startZ;
-                double segLenD;
-                double spacingAccum = (double)*(float*)(payload + 0x98);
+                float drawX, drawY, drawZ;
+                float camX, camY, camZ;
+                float startX, startY, startZ;
+                float segLenD;
+                float spacingAccum = *(float*)(payload + 0x98);
 
                 if (trailReadIndex == trailMaxIndex) {
                     trailNextIndex = 0;
@@ -153,19 +153,19 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
                 {
                     Vec* p = &history[trailReadIndex];
-                    drawX = (double)p->x;
-                    drawY = (double)p->y;
-                    drawZ = (double)p->z;
+                    drawX = p->x;
+                    drawY = p->y;
+                    drawZ = p->z;
                 }
                 {
                     Vec* p = &history[trailNextIndex];
-                    camX = (double)p->x;
-                    camY = (double)p->y;
-                    camZ = (double)p->z;
+                    camX = p->x;
+                    camY = p->y;
+                    camZ = p->z;
                 }
-                segVec.x = (float)(camX - drawX);
-                segVec.y = (float)(camY - drawY);
-                segVec.z = (float)(camZ - drawZ);
+                segVec.x = camX - drawX;
+                segVec.y = camY - drawY;
+                segVec.z = camZ - drawZ;
                 zeroVec.z = kPppYmMegaBirthShpTail3Zero;
                 zeroVec.y = kPppYmMegaBirthShpTail3Zero;
                 zeroVec.x = kPppYmMegaBirthShpTail3Zero;
@@ -173,8 +173,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 startY = drawY;
                 startX = drawX;
                 segLen = PSVECDistance(&zeroVec, &segVec);
-                segLenD = (double)segLen;
-                double segProgress = segLenD;
+                segLenD = segLen;
+                float segProgress = segLenD;
 
                 if (payload[0x9E] == 0) {
                     continue;
@@ -207,9 +207,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             pppMulMatrix(drawMtx, rotMtx, tmpMtx);
                         }
 
-                        trailPos.x = (float)drawX;
-                        trailPos.y = (float)drawY;
-                        trailPos.z = (float)drawZ;
+                        trailPos.x = drawX;
+                        trailPos.y = drawY;
+                        trailPos.z = drawZ;
                         if (payload[0xA5] == 0) {
                             PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
                         } else if (payload[0xA5] == 1) {
@@ -248,7 +248,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         break;
                     }
 
-                    while (segProgress < (double)*(float*)(payload + 0x98)) {
+                    while (segProgress < *(float*)(payload + 0x98)) {
                         bool wrap = (trailNextIndex == trailMaxIndex);
                         trailNextIndex++;
                         if (wrap) {
@@ -260,18 +260,18 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
                         {
                             Vec* p = &history[trailNextIndex];
-                            spacingAccum = (double)(float)(spacingAccum - segLenD);
-                            double newY = (double)p->y;
-                            double newZ = (double)p->z;
-                            double newX = (double)p->x;
-                            segVec.y = (float)(newY - camY);
-                            segVec.z = (float)(newZ - camZ);
-                            segVec.x = (float)(newX - camX);
+                            spacingAccum = spacingAccum - segLenD;
+                            float newY = p->y;
+                            float newZ = p->z;
+                            float newX = p->x;
+                            segVec.y = newY - camY;
+                            segVec.z = newZ - camZ;
+                            segVec.x = newX - camX;
                             zeroVec.z = kPppYmMegaBirthShpTail3Zero;
                             zeroVec.y = kPppYmMegaBirthShpTail3Zero;
                             zeroVec.x = kPppYmMegaBirthShpTail3Zero;
                             segLen = PSVECDistance(&zeroVec, &segVec);
-                            segLenD = (double)segLen;
+                            segLenD = segLen;
                             startZ = camZ;
                             startY = camY;
                             startX = camX;
@@ -279,16 +279,16 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             camY = newY;
                             camX = newX;
                         }
-                        segProgress = (double)(float)(segProgress + segLenD);
+                        segProgress = segProgress + segLenD;
                     }
 
                     {
-                        double t = (double)(float)(spacingAccum / segLenD);
-                        drawX = (double)(float)((double)(float)((double)segVec.x * t) + startX);
-                        drawY = (double)(float)((double)(float)((double)segVec.y * t) + startY);
-                        drawZ = (double)(float)((double)(float)((double)segVec.z * t) + startZ);
-                        spacingAccum = (double)(float)(spacingAccum + (double)*(float*)(payload + 0x98));
-                        segProgress = (double)(float)(segProgress - (double)*(float*)(payload + 0x98));
+                        float t = spacingAccum / segLenD;
+                        drawX = segVec.x * t + startX;
+                        drawY = segVec.y * t + startY;
+                        drawZ = segVec.z * t + startZ;
+                        spacingAccum = spacingAccum + *(float*)(payload + 0x98);
+                        segProgress = segProgress - *(float*)(payload + 0x98);
                     }
                 }
                 next_particle:;

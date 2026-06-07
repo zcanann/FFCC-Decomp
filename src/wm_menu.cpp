@@ -5476,7 +5476,7 @@ void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	if (m_wmWorldState->m_mainState == 0 || m_wmWorldState->m_mainState >= 3) {
+	if (m_wmWorldState->m_mainState == 0 || m_wmWorldState->m_mainState > 2) {
 		return;
 	}
 

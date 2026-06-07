@@ -2659,8 +2659,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	unsigned short particleFlags = 0;
 	unsigned int particleNo = effectId;
 	int seNo = 0;
-	bool emittedCustom = false;
-	bool hasParticle = false;
+	int emittedCustom = 0;
+	int hasParticle = 0;
 
 	if (particleBank != 0xFFFFFFFF) {
 		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
@@ -2681,7 +2681,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
 			}
-			hasParticle = true;
+			hasParticle = 1;
 		}
 	}
 
@@ -2774,7 +2774,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				CFlatParticleWorkPosition().z = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
-				emittedCustom = true;
+				emittedCustom = 1;
 			}
 		} else if (effectId < 0x410) {
 			if (effectId == 0x3B4) {
@@ -2784,14 +2784,14 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 					}
 					CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
 					CFlatRuntime2Storage().PutParticleWork();
-					emittedCustom = true;
+					emittedCustom = 1;
 				}
 			} else if (effectId == 0x409 && effectArg0 == 3) {
 				for (int i = 3; i < 9; i++) {
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
-				emittedCustom = true;
+				emittedCustom = 1;
 			}
 		} else if (effectId < 0x479) {
 			if (effectId < 0x46F) {
@@ -2812,14 +2812,14 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 							CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
 							CFlatRuntime2Storage().PutParticleWork();
 						}
-						emittedCustom = true;
+						emittedCustom = 1;
 					}
 					if (effectArg0 == 3) {
 						for (int i = 0x0D; i < 0x1D; i++) {
 							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 							CFlatRuntime2Storage().PutParticleWork();
 						}
-						emittedCustom = true;
+						emittedCustom = 1;
 					}
 				}
 			} else if (effectId > 0x472 && effectArg0 == 3) {
@@ -2827,7 +2827,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
-				emittedCustom = true;
+				emittedCustom = 1;
 			}
 		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
 			Mtx rotMtx;
@@ -2843,7 +2843,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
 			}
-			emittedCustom = true;
+			emittedCustom = 1;
 		}
 
 		if (seNo != 0) {

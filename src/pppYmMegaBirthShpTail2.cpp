@@ -105,11 +105,11 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
         if (*(u16*)(particle + 0x22) != 0) {
             const u16 frameCountRaw = *(u16*)(step + 0x84);
             pppFMATRIX drawMtx;
-            Vec drawPos;
-            Vec nextPos;
+            Vec trailPos;
             Vec cameraPos;
             Vec managerPos;
             Vec zeroVec;
+            Vec segVec;
             GXColor amb;
             const u16 shapeFrameIndex = *(u16*)(particle + 0x20);
             pppShapeAnimFrame* shapeFrame = &shapeAnim->m_frames[shapeFrameIndex];
@@ -144,10 +144,11 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             }
             const float spacing = *(float*)(step + 0x80);
             Vec* history = (Vec*)(particle + 0x40);
-            Vec segVec;
             float segLen;
             float segProgress = 0.0f;
             float segRemaining;
+            float drawX, drawY, drawZ;
+            float camX, camY, camZ;
             u16 frameCount = frameCountRaw;
 
             if (trailReadIndex == trailMaxIndex) {
@@ -155,11 +156,21 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             }
 
             pppUnitMatrix(drawMtx);
-            drawPos = history[trailReadIndex];
-            nextPos = history[trailNextIndex];
-            segVec.x = nextPos.x - drawPos.x;
-            segVec.y = nextPos.y - drawPos.y;
-            segVec.z = nextPos.z - drawPos.z;
+            {
+                Vec* p = &history[trailReadIndex];
+                drawX = p->x;
+                drawY = p->y;
+                drawZ = p->z;
+            }
+            {
+                Vec* p = &history[trailNextIndex];
+                camX = p->x;
+                camY = p->y;
+                camZ = p->z;
+            }
+            segVec.x = camX - drawX;
+            segVec.y = camY - drawY;
+            segVec.z = camZ - drawZ;
             zeroVec.x = 0.0f;
             zeroVec.y = 0.0f;
             zeroVec.z = 0.0f;
@@ -167,9 +178,11 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             segRemaining = segLen;
 
             while (frameCount != 0) {
-                Vec trailPos = drawPos;
-                Vec testPos = history[trailNextIndex];
-                bool canDraw = (testPos.x != 0.0f) || (testPos.y != 0.0f) || (testPos.z != 0.0f);
+                Vec* testPos = &history[trailNextIndex];
+                bool canDraw = (testPos->x != 0.0f) || (testPos->y != 0.0f) || (testPos->z != 0.0f);
+                trailPos.x = drawX;
+                trailPos.y = drawY;
+                trailPos.z = drawZ;
                 if ((step[0x86] != 0) && canDraw) {
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
@@ -221,12 +234,19 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                         break;
                     }
 
-                    drawPos = nextPos;
+                    drawX = camX;
+                    drawY = camY;
+                    drawZ = camZ;
                     segProgress -= segLen;
-                    nextPos = history[trailNextIndex];
-                    segVec.x = nextPos.x - drawPos.x;
-                    segVec.y = nextPos.y - drawPos.y;
-                    segVec.z = nextPos.z - drawPos.z;
+                    {
+                        Vec* p = &history[trailNextIndex];
+                        camX = p->x;
+                        camY = p->y;
+                        camZ = p->z;
+                    }
+                    segVec.x = camX - drawX;
+                    segVec.y = camY - drawY;
+                    segVec.z = camZ - drawZ;
                     innerZero.x = 0.0f;
                     innerZero.y = 0.0f;
                     innerZero.z = 0.0f;
@@ -238,12 +258,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 }
                 {
                     const float t = segProgress / segLen;
-                    const float baseX = drawPos.x;
-                    const float baseY = drawPos.y;
-                    const float baseZ = drawPos.z;
-                    drawPos.x = baseX + segVec.x * t;
-                    drawPos.y = baseY + segVec.y * t;
-                    drawPos.z = baseZ + segVec.z * t;
+                    drawX = drawX + segVec.x * t;
+                    drawY = drawY + segVec.y * t;
+                    drawZ = drawZ + segVec.z * t;
                 }
                 segProgress += spacing;
                 segRemaining -= spacing;

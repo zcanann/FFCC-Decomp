@@ -375,6 +375,7 @@ extern "C" const char* PTR_s_Spitzschopf[];
 extern "C" const char* PTR_s_Ciuffo_ribelle[];
 extern "C" const char* PTR_s_Remolino[];
 extern "C" {
+extern char s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0[];
 extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
@@ -2876,23 +2877,20 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
 int CMenuPcs::GetEquipType(int itemNo)
 {
     u16 flags = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
-    int equipType = 0;
+    int equipType;
 
-    if ((flags & 0x100) == 0) {
-        if ((flags & 0x400) == 0) {
-            if ((flags & 0xA00) == 0) {
-                if ((flags & 0x3000) == 0) {
-                    if (System.m_execParam != 0) {
-                        System.Printf((char*)"%s(%d): item = %d m_equip = %08x", s_singmenu_cpp, 0xD3D, itemNo, flags);
-                    }
-                } else {
-                    equipType = 3;
-                }
-            } else {
-                equipType = 2;
-            }
-        } else {
-            equipType = 1;
+    if (flags & 0x100) {
+        equipType = 0;
+    } else if (flags & 0x400) {
+        equipType = 1;
+    } else if (flags & 0xA00) {
+        equipType = 2;
+    } else if (flags & 0x3000) {
+        equipType = 3;
+    } else {
+        equipType = 0;
+        if (static_cast<unsigned int>(System.m_execParam) >= 1) {
+            System.Printf(s_pcts_pctd_item_pctd_m_equip_pct08x_801DE8B0, s_singmenu_cpp, 0xD3D, itemNo, flags);
         }
     }
 

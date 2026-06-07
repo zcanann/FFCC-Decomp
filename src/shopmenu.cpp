@@ -2050,7 +2050,7 @@ void CShopMenu::DrawShop0()
     font->SetScale(FLOAT_80332d28);
 
     entry = s_shopMenuTopMenuEntries;
-    for (int i = 0; i < 3; i++, entry++) {
+    for (unsigned int i = 0; i < 3; i++, entry++) {
         s_currentShopMenuTopMenuEntry = entry;
         Graphic.SetDrawDoneDebugData(0x23);
         font->DrawInit();
@@ -2530,14 +2530,14 @@ void CShopMenu::SelectItemIdx()
         m_figureMode = 0;
         m_yesNo = 0;
 
-        unsigned int listType = m_listType;
+        int listType = m_listType;
         if (listType == 0) {
             if (m_selectedIndex != -1) {
                 canSelect = getItemNo(m_selectedIndex) >= 1;
             }
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                if (m_quantity <= (0x40 - static_cast<short>(caravanWork->m_inventoryItemCount))) {
+                if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {

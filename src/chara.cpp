@@ -1855,8 +1855,8 @@ void CChara::CModel::SetMatrix(float (*mtx) [4])
  */
 int CChara::CModel::SearchNode(char* name)
 {
-	u32 index = 0;
 	CNode* node = ModelNodes(this);
+	u32 index = 0;
 
 	while (index < ModelNodeCount(this)) {
 		if (strcmp(NodeRefName(node), name) == 0) {
@@ -1882,21 +1882,21 @@ int CChara::CModel::SearchNodeSk(char* name)
 {
 	if (*name == '_') {
 		if (name[1] == 's' && name[2] == 'k') {
+			u32 i = 0;
 			CNode* node = ModelNodes(this);
-			for (u32 i = 0; i < ModelNodeCount(this); i++) {
-				char* nodeName = NodeRefName(node);
-				int len = strlen(nodeName);
-				if ((len - 3) > 0 && strcmp(nodeName + len - 3, name) == 0) {
+			for (; i < ModelNodeCount(this); i++) {
+				int len = strlen(NodeRefName(node));
+				if ((len - 3) > 0 && strcmp(NodeRefName(node) + (len - 3), name) == 0) {
 					return (int)i;
 				}
 				node++;
 			}
 		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
+			u32 i = 0;
 			CNode* node = ModelNodes(this);
-			for (u32 i = 0; i < ModelNodeCount(this); i++) {
-				char* nodeName = NodeRefName(node);
-				int len = strlen(nodeName);
-				if ((len - 5) > 0 && strcmp(nodeName + len - 5, name) == 0) {
+			for (; i < ModelNodeCount(this); i++) {
+				int len = strlen(NodeRefName(node));
+				if ((len - 5) > 0 && strcmp(NodeRefName(node) + (len - 5), name) == 0) {
 					return (int)i;
 				}
 				node++;

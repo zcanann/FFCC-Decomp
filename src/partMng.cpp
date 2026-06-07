@@ -1653,8 +1653,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_matrixMode = 0;
 
         _pppMngSt* mng = m_pppMng;
-        int mngCount = *reinterpret_cast<int*>(self + 0x4);
-        for (int i = 0; i < mngCount; i++) {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
             mng++;
         }
@@ -1697,8 +1696,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         ppvChrScl[0] = FLOAT_8032fe18;
 
         _pppMngSt* mng = m_pppMng;
-        int mngCount = *reinterpret_cast<int*>(self + 0x4);
-        for (int i = 0; i < mngCount; i++) {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
             *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
             mng++;
         }

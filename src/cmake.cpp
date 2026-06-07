@@ -1237,8 +1237,8 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->DrawInit();
 
     int textColor = static_cast<int>(static_cast<double>(255.0f) * textAlpha);
-    GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor)};
-    labelFont->SetColor(color);
+    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    labelFont->SetColor(color.color);
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
@@ -1258,7 +1258,7 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color);
+    valueFont->SetColor(color.color);
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {

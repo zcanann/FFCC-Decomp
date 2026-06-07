@@ -6777,17 +6777,17 @@ void CMenuPcs::CalcWMFrame0(int param)
 		unsigned char* const frame = m_wm.m_frameInfo;
 		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) + static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
 		if (param >= -10) {
-			unsigned int sign = static_cast<unsigned int>(param) >> 31;
-			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
-			float t_unclamped = static_cast<float>(static_cast<int>(absParam));
+			int sign = param >> 31;
+			int absParam = (sign ^ param) - sign;
+			float t_unclamped = static_cast<float>(absParam);
 			float dVar4 = offset * 0.1f * t_unclamped;
-			if (static_cast<int>(absParam) < 0) {
+			if (absParam < 0) {
 				absParam = 0;
 			}
-			if (static_cast<int>(absParam) > 10) {
+			if (absParam > 10) {
 				absParam = 10;
 			}
-			float t_clamped = static_cast<float>(static_cast<int>(absParam));
+			float t_clamped = static_cast<float>(absParam);
 			offset = dVar4 * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * t_clamped * FLOAT_803316d4)));
 		}
 		reinterpret_cast<short*>(frame + 4)[0] = static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 4))) - offset));

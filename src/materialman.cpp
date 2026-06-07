@@ -128,7 +128,7 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 struct ShadowCandidate
 {
     CMapShadow* shadow;
-    int distance;
+    float distance;
     int index;
 };
 
@@ -1840,7 +1840,7 @@ void CMaterialMan::SetPosition(
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite->shadow = shadow;
-                candidateWrite->distance = static_cast<int>(PSVECSquareMag(&delta));
+                candidateWrite->distance = PSVECSquareMag(&delta);
                 candidateWrite->index = i;
                 candidateWrite++;
                 candidateCount++;
@@ -1851,7 +1851,7 @@ void CMaterialMan::SetPosition(
         float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
-            float candidateDist = static_cast<float>(candidateRead->distance);
+            float candidateDist = candidateRead->distance;
             if (candidateDist < nearestDist) {
                 nearest = candidateRead;
                 nearestDist = candidateDist;
@@ -1860,7 +1860,7 @@ void CMaterialMan::SetPosition(
         }
 
         if (nearest != 0) {
-            nearest->distance = static_cast<int>(kMaterialMaxDistance);
+            nearest->distance = kMaterialMaxDistance;
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
@@ -1966,7 +1966,7 @@ int CMaterialMan::GetCharaShadow(
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite->shadow = shadow;
-            candidateWrite->distance = static_cast<int>(PSVECSquareMag(&delta));
+            candidateWrite->distance = PSVECSquareMag(&delta);
             candidateWrite->index = i;
             candidateWrite++;
             candidateCount++;
@@ -1977,7 +1977,7 @@ int CMaterialMan::GetCharaShadow(
     float nearestDist = kMaterialNearestDistanceInit;
     ShadowCandidate* candidateRead = shadowCandidates;
     for (int i = 0; i < candidateCount; i++) {
-        float candidateDist = static_cast<float>(candidateRead->distance);
+        float candidateDist = candidateRead->distance;
         if (candidateDist < nearestDist) {
             nearest = candidateRead;
             nearestDist = candidateDist;
@@ -1986,7 +1986,7 @@ int CMaterialMan::GetCharaShadow(
     }
 
     if ((nearest != 0) && (outputCount < maxShadows)) {
-        nearest->distance = static_cast<int>(kMaterialMaxDistance);
+        nearest->distance = kMaterialMaxDistance;
         CMapShadow* nearestShadow = nearest->shadow;
         materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
         shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;

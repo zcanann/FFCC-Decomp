@@ -694,7 +694,7 @@ void CMenuPcs::CmdOpen()
 int CMenuPcs::CmdCtrl()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	u32 actionHandled = 0;
+	s32 actionHandled = 0;
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	caravanWork->CalcStatus();

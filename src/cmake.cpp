@@ -2138,12 +2138,6 @@ void CMenuPcs::CmakeTribeClose()
  */
 unsigned short CMenuPcs::CmakeTribeCtrl()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& resultDir = cmakeState->m_resultDir;
-    short& tribe = cmakeState->m_select;
-    short& crest = cmakeState->m_row;
-    short& selectField = cmakeState->m_fieldSelect;
-    short& mcState = CmakeMcState(this);
     short down;
     unsigned short repeat;
 
@@ -2175,14 +2169,15 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         return 0;
     }
 
-    if (mcState != 3) {
-        if (mcState == 1 && (down & 0x300) != 0) {
+    if (CmakeMcState(this) != 3) {
+        if (CmakeMcState(this) == 1 && (down & 0x300) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
-            mcState = 2;
+            CmakeMcState(this) = 2;
         }
         return 0;
     } else {
-        short& currentValue = CmakeStateSelectField(cmakeState, selectField);
+        CmakeMenuState* cmakeState = CmakeState(this);
+        short& currentValue = CmakeStateSelectField(cmakeState, cmakeState->m_fieldSelect);
 
         if ((repeat & 0x8) != 0) {
             if (currentValue == 0) {
@@ -2203,19 +2198,19 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         if ((repeat & 0xC) == 0) {
             if ((down & 0x200) != 0) {
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
-                if (selectField == 0) {
-                    resultDir = -1;
+                if (CmakeState(this)->m_fieldSelect == 0) {
+                    CmakeState(this)->m_resultDir = -1;
                     return 1;
                 }
 
-                selectField = static_cast<short>(selectField - 1);
+                CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect - 1);
                 return 0;
             }
 
             if ((down & 0x100) != 0) {
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
-                if (selectField == 0) {
-                    selectField = static_cast<short>(selectField + 1);
+                if (CmakeState(this)->m_fieldSelect == 0) {
+                    CmakeState(this)->m_fieldSelect = static_cast<short>(CmakeState(this)->m_fieldSelect + 1);
                     return 0;
                 }
 
@@ -2240,13 +2235,13 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 }
 
                 if (duplicateSlot > 7) {
-                    s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
-                    s_CmakeInfo.m_hair = static_cast<signed char>(crest);
+                    s_CmakeInfo.m_tribe = static_cast<signed char>(CmakeState(this)->m_select);
+                    s_CmakeInfo.m_hair = static_cast<signed char>(CmakeState(this)->m_row);
                     ChgModel(static_cast<int>(CmakeSlot(this)),
                              static_cast<int>(s_CmakeInfo.m_tribe),
                              static_cast<int>(s_CmakeInfo.m_hair),
                              static_cast<int>(s_CmakeInfo.m_gender));
-                    resultDir = 1;
+                    CmakeState(this)->m_resultDir = 1;
                     return 1;
                 }
 
@@ -2255,7 +2250,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 short winY = 0;
                 GetWinSize(0x15, &winX, &winY, 0);
                 SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
-                mcState = 0;
+                CmakeMcState(this) = 0;
             }
         }
 

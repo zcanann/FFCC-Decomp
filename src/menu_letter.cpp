@@ -1734,10 +1734,12 @@ void CMenuPcs::LetterListDraw()
 		const unsigned int letterWord = letter->Word0();
 
 		int tlut;
-		if (letter->IsOpened()) {
-			tlut = letter->IsReplySent() ? 8 : 0;
-		} else {
+		if (!letter->IsOpened()) {
 			tlut = 9;
+		} else if (letter->IsReplySent()) {
+			tlut = 8;
+		} else {
+			tlut = 0;
 		}
 
 		font->SetTlut(tlut);

@@ -4890,11 +4890,16 @@ void CGPartyObj::gpmMove()
 
 	int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	default:
 	case 0:
 	case 1:
 	case 2:
 	case 3:
 		stageMode = 0;
+		break;
+	case 6:
+	case 10:
+		stageMode = 1;
 		break;
 	case 4:
 	case 8:
@@ -4903,13 +4908,6 @@ void CGPartyObj::gpmMove()
 	case 0x0C:
 	case 0x0D:
 		stageMode = 2;
-		break;
-	case 6:
-	case 10:
-		stageMode = 1;
-		break;
-	default:
-		stageMode = 0;
 		break;
 	}
 

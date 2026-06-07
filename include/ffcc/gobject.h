@@ -173,10 +173,25 @@ public:
         unsigned char m_flags0;
         unsigned char m_flags1;
     };
+    struct WeaponNodeFlagBits1 {
+        signed char m_shield : 1;
+        signed char m_menuReady : 1;
+        signed char m_bit20 : 1;
+        signed char m_bit10 : 1;
+        signed char m_bit08 : 1;
+        signed char m_bit04 : 1;
+        signed char m_bit02 : 1;
+        signed char m_bit01 : 1;
+    };
+    struct WeaponNodeFlagAll {
+        unsigned char m_flags0;
+        WeaponNodeFlagBits1 m_bits1;
+    };
     union {
         unsigned short m_weaponNodeFlags; // 0x9A
         WeaponNodeFlagBits m_weaponNodeFlagBits;
         WeaponNodeFlagBytes m_weaponNodeFlagBytes;
+        WeaponNodeFlagAll m_weaponNodeFlagAll;
     };
     unsigned short m_shieldNodeFlags; // 0x9C
     unsigned short m_animStartFrame;  // 0x9E

@@ -107,7 +107,20 @@ public:
 	int m_castFrameStart;
 	int m_castFrameEnd;
 	int m_castFrameCurrent;
-	int m_unk63C;
+	struct Unk63CBits {
+		signed char m_bit80 : 1;
+		signed char m_bit40 : 1;
+		signed char m_bit20 : 1;
+		signed char m_bit10 : 1;
+		signed char m_bit08 : 1;
+		signed char m_bit04 : 1;
+		signed char m_bit02 : 1;
+		signed char m_bit01 : 1;
+	};
+	union {
+		int m_unk63C;
+		Unk63CBits m_unk63CBits;
+	};
 	IgnoreHitSlot m_ignoreHit[4];
 	int m_comboFrame;
 	int m_comboFramePrev;

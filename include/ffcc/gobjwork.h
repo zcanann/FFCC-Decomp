@@ -304,8 +304,8 @@ public:
     int m_tempStatBuffTimer;                    // 0x0BD0
     int m_tempStatBuffId;                       // 0x0BD4
     char m_equipEffectParams[8];                // 0x0BD8
-    unsigned char m_shopRequestState;           // 0x0BE0
-    s8 m_shopRequestFlags;                       // 0x0BE1
+    signed char m_shopRequestState;             // 0x0BE0
+    unsigned char m_shopRequestFlags;           // 0x0BE1
     short m_shopParam;                          // 0x0BE2
     short m_shopListCount;                      // 0x0BE4
     short m_shopList[16];                       // 0x0BE6

@@ -2394,7 +2394,6 @@ void CRedDriver::Init()
     RedDriverSyncState& sync = RedDriverSync();
     RedSeBlockHEAD* volatile* seBlockSlots = RedSeBlockDataGetBegin();
     RedTrackDATA* seTracks;
-    RedDmaRequest* dmaQueue;
     unsigned int* muteMask;
     int* editorVoiceSlots;
     int bufferSize;
@@ -2497,12 +2496,11 @@ void CRedDriver::Init()
     RedStreamDataSetBegin((RedStreamDATA*)RedNew(REDSOUND_STREAM_ALLOC_SIZE));
     memset(RedStreamDataGetBegin(), 0, REDSOUND_STREAM_BUFFER_SIZE);
     RedDmaModeSet(REDSOUND_DMA_MODE_NORMAL);
-    dmaQueue = sync.m_DmaControl;
-    memset(dmaQueue, 0, REDSOUND_DMA_CONTROL_SIZE);
-    RedDmaQueueNowSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, dmaQueue);
-    RedDmaQueueOldSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, dmaQueue);
-    RedDmaQueueNowSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, dmaQueue + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
-    RedDmaQueueOldSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, dmaQueue + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
+    memset(sync.m_DmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
+    RedDmaQueueNowSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, sync.m_DmaControl);
+    RedDmaQueueOldSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, sync.m_DmaControl);
+    RedDmaQueueNowSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, sync.m_DmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
+    RedDmaQueueOldSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, sync.m_DmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
     RedMasterTimeSet(0);
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);

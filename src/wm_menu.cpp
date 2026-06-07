@@ -10740,11 +10740,10 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
-	const int count = *reinterpret_cast<const int*>(winMess);
 	int maxWidth = 0;
 
-	const unsigned char* entry = winMess + 4;
-	for (int i = 0; i < count; i++) {
+	const unsigned char* entry = winMess;
+	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
 		const short msgId = *reinterpret_cast<const short*>(entry + 4);
 		const char* text = msgTable[msgId];
 		if (text != 0) {
@@ -10752,11 +10751,11 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				text++;
 			}
 			const int textWidth = font->GetWidth(text);
-			if (maxWidth < textWidth) {
+			if (textWidth > maxWidth) {
 				maxWidth = textWidth;
 			}
 		}
-		entry += 8;
+		entry += 2;
 	}
 
 	int cols = maxWidth / 0x16;
@@ -10768,7 +10767,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 		*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
 	}
 	if (h != 0) {
-		*h = static_cast<short>(count * 0x1E + 0x40);
+		*h = static_cast<short>(*reinterpret_cast<const int*>(winMess) * 0x1E + 0x40);
 	}
 }
 

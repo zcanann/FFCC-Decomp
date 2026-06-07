@@ -1785,7 +1785,11 @@ unsigned int CMenuPcs::CmdOpen0()
 		entry++;
 	}
 
-	return static_cast<unsigned int>(entryCount == doneCount);
+	unsigned int done = 0;
+	if (entryCount == doneCount) {
+		done = 1;
+	}
+	return done;
 }
 
 /*

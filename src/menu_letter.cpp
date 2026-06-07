@@ -985,8 +985,8 @@ bool CMenuPcs::LetterClose()
 	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
 
 	int panelCount = static_cast<int>(GetLetterAnimStorage(this)->count);
-	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
 	s16* entry = GetLetterPanelBase(this);
+	int frame = static_cast<int>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x22));
 
 	for (int i = 0; i < panelCount; ++i, entry += 0x20) {
 		float f = FLOAT_803330bc;

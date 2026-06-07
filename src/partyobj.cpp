@@ -476,8 +476,8 @@ void CGPartyObj::onCancelStat(int state)
 
 	switch (m_lastStateId) {
 	case 2:
-		party.partyFlags &= 0xBF;
-		party.partyFlags &= 0xDF;
+		party.flags.flag40 = 0;
+		party.flags.flag20 = 0;
 		endPSlotBit(0x10);
 		endPSlotBit(0x100);
 		break;
@@ -488,9 +488,11 @@ void CGPartyObj::onCancelStat(int state)
 		if (state == 0x22) {
 			break;
 		}
-		if (((party.partyFlags & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
-			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
-			party.partyFlags &= 0xFB;
+		if (party.flags.flag04) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
+			}
+			party.flags.flag04 = 0;
 		}
 		enableDamageCol(1);
 		{
@@ -520,11 +522,11 @@ void CGPartyObj::onCancelStat(int state)
 			}
 		}
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			m_alpha = 1.0f;
+			m_alpha = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
 			endPSlotBit(0x10000);
-			m_alpha = 0.5f;
+			m_alpha = FLOAT_80331a54;
 			m_bgColMask |= 0x1000E;
 		}
 		break;
@@ -598,9 +600,11 @@ void CGPartyObj::onCancelStat(int state)
 		enableDamageCol(1);
 		break;
 	case 0x22:
-		if (((party.partyFlags & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
-			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
-			party.partyFlags &= 0xFB;
+		if (party.flags.flag04) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
+			}
+			party.flags.flag04 = 0;
 		}
 		enableDamageCol(1);
 		{
@@ -630,11 +634,11 @@ void CGPartyObj::onCancelStat(int state)
 			}
 		}
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			m_alpha = 1.0f;
+			m_alpha = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
 			endPSlotBit(0x10000);
-			m_alpha = 0.5f;
+			m_alpha = FLOAT_80331a54;
 			m_bgColMask |= 0x1000E;
 		}
 		break;

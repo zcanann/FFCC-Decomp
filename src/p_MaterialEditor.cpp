@@ -28,30 +28,34 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-CProcessTableCallback CMaterialEditorPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
-CProcessTableCallback CMaterialEditorPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
-CProcessTableCallback CMaterialEditorPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
-CProcessTableCallback CMaterialEditorPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorTableDescCreateViewer = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorTableDescDestroyViewer = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorTableDescCalcViewer = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+static CProcessTableCallback s_materialEditorTableDescDrawViewer = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
 static char* q;
 
 CProcessTable CMaterialEditorPcs::m_table = {
     const_cast<char*>(s_CMaterialEditorPcsViewer),
     {
-        m_table_desc0.m_thisOffset,
-        m_table_desc0.m_virtualOffset,
-        m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset,
-        m_table_desc1.m_virtualOffset,
-        m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset,
-        m_table_desc2.m_virtualOffset,
-        m_table_desc2.m_function,
+        s_materialEditorTableDescCreateViewer.m_thisOffset,
+        s_materialEditorTableDescCreateViewer.m_virtualOffset,
+        s_materialEditorTableDescCreateViewer.m_function,
+        s_materialEditorTableDescDestroyViewer.m_thisOffset,
+        s_materialEditorTableDescDestroyViewer.m_virtualOffset,
+        s_materialEditorTableDescDestroyViewer.m_function,
+        s_materialEditorTableDescCalcViewer.m_thisOffset,
+        s_materialEditorTableDescCalcViewer.m_virtualOffset,
+        s_materialEditorTableDescCalcViewer.m_function,
         0x20,
         0,
-        m_table_desc3.m_thisOffset,
-        m_table_desc3.m_virtualOffset,
-        m_table_desc3.m_function,
+        s_materialEditorTableDescDrawViewer.m_thisOffset,
+        s_materialEditorTableDescDrawViewer.m_virtualOffset,
+        s_materialEditorTableDescDrawViewer.m_function,
         0x41,
         1,
     },

@@ -3239,7 +3239,7 @@ void CGMonObj::statWatch()
 		}
 
 		unsigned char* aiScript = script;
-		short aiState = monObj->m_aiState;
+		int aiState = monObj->m_aiState;
 		if (aiState != 0) {
 			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 				(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;

@@ -1696,7 +1696,6 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CmdState* const cmd = GetCmdStateView(this);
 
 	int candidates[10];
 	int itemKinds[11];
@@ -1714,7 +1713,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	const s16 selectedState = caravan->m_commandListExtra[selected];
 	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState);
 
-	if ((cmd->mode == 1) && (cmd->phase == 2)) {
+	if ((GetCmdStateView(this)->mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		if (selectedState < 0) {
 			selected--;
 		}

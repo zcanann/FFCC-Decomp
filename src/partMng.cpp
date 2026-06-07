@@ -2282,11 +2282,11 @@ void CPartMng::pppEditPartCalc()
         }
     }
 
-    if (ppvSysStopPartF != 0 || pdtSlots[0].m_pppDataHead == 0) {
+    if (ppvSysStopPartF != 0 || *reinterpret_cast<long**>(self + 0x5dc) == 0) {
         return;
     }
 
-    int editDrawMode = *reinterpret_cast<int*>(self + 0x23570);
+    int editDrawMode = *reinterpret_cast<int*>(self + 0x174);
     int loopCount = *reinterpret_cast<int*>(self + 0x2355C);
     if (loopCount > kPppMngCount) {
         loopCount = kPppMngCount;
@@ -2490,8 +2490,8 @@ void CPartMng::pppEditDraw()
     Vec cameraDelta;
     Vec viewPos;
 
-    if (m_pdtSlots[0].m_pppDataHead != 0) {
-        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
+    if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
+        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
             for (int passIndex = 0; passIndex < 4; passIndex++) {
                 unsigned char drawPass = 0;
                 if (passIndex == 0) {
@@ -2604,8 +2604,8 @@ void CPartMng::pppEditPartDrawAfter()
 
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
-        if (m_pdtSlots[0].m_pppDataHead != 0
-            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
+        if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0
+            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
             {
                 Mtx invCamera;
                 Vec cameraPos;

@@ -668,6 +668,10 @@ void CGMonObj::onCancelStat(int state)
 	(this->*m_funcs->cancelStat)();
 
 	switch (*reinterpret_cast<int*>(mon + 0x520)) {
+	case 0x1D:
+		object->CancelMove(1);
+		break;
+
 	case 0x16:
 		m_unk6B9 = 0;
 		object->SetAnimSlot(0, 0);
@@ -684,24 +688,20 @@ void CGMonObj::onCancelStat(int state)
 		object->SetAnimSlot(0x2B, 6);
 		break;
 
-	case 0x18:
-		m_actionBranch = 1;
-		object->SetAnimSlot(0, 0);
-		object->SetAnimSlot(4, 4);
-		object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
-		object->m_objectFlags &= 0xFFFFFFEF;
-		break;
-
-	case 0x1D:
-		object->CancelMove(1);
-		break;
-
 	case 0x21:
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		if ((m_moveWork.m_stateFlags & 2) == 0) {
 			(this->*m_funcs->moveCancel)();
 		}
+		break;
+
+	case 0x18:
+		m_actionBranch = 1;
+		object->SetAnimSlot(0, 0);
+		object->SetAnimSlot(4, 4);
+		object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
+		object->m_objectFlags &= 0xFFFFFFEF;
 		break;
 	}
 

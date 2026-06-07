@@ -4127,7 +4127,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     int freeIdx = -1;
     for (int i = 0; i < 0x180; i++) {
-        unsigned char* mngBytes = self + 0x1D4 + i * 0x158;
+        unsigned char* mngBytes = self + 0x2A18 + i * 0x158;
         if (*reinterpret_cast<int*>(mngBytes + 0x14) == -0x1000) {
             freeIdx = i;
             break;
@@ -4137,7 +4137,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         return -1;
     }
 
-    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
+    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x2A18 + freeIdx * 0x158);
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);

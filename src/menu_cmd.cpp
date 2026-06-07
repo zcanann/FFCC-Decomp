@@ -434,7 +434,7 @@ void CMenuPcs::CmdInit1()
 	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
 	CmdListEntry* entry;
 
-	entry = &GetCmdListStorage(this)->entries[idx];
+	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = 0x2e;
 	entry->x = 0xb8;
 	entry->y = 0x28;
@@ -445,9 +445,8 @@ void CMenuPcs::CmdInit1()
 	entry->scale = FLOAT_80332a70;
 	entry->startFrame = 5;
 	entry->duration = 5;
-	idx++;
 
-	entry = &GetCmdListStorage(this)->entries[idx];
+	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entry->x = 0xa0;
 	entry->y = 0xe;
@@ -458,9 +457,8 @@ void CMenuPcs::CmdInit1()
 	entry->scale = FLOAT_80332a70;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	idx++;
 
-	entry = &GetCmdListStorage(this)->entries[idx];
+	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entry->width = 0x30;
 	entry->height = 0x30;
@@ -471,9 +469,8 @@ void CMenuPcs::CmdInit1()
 	entry->scale = FLOAT_80332b3c;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	idx++;
 
-	entry = &GetCmdListStorage(this)->entries[idx];
+	entry = &GetCmdListStorage(this)->entries[idx++];
 	entry->flags = 2;
 	entry->tex = 0x2e;
 	entry->x = 0xa0;
@@ -484,12 +481,11 @@ void CMenuPcs::CmdInit1()
 	entry->v = FLOAT_80332ab0;
 	entry->startFrame = 0;
 	entry->duration = 5;
-	idx++;
 
 	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s16 y = 0;
 	for (s32 i = 0; i < 4; i++) {
-		entry = &GetCmdListStorage(this)->entries[idx];
+		entry = &GetCmdListStorage(this)->entries[idx++];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
@@ -500,10 +496,9 @@ void CMenuPcs::CmdInit1()
 		entry->v = FLOAT_80332ab0;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		idx++;
 		y += 0x20;
 
-		entry = &GetCmdListStorage(this)->entries[idx];
+		entry = &GetCmdListStorage(this)->entries[idx++];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
@@ -514,7 +509,6 @@ void CMenuPcs::CmdInit1()
 		entry->v = FLOAT_80332ab0;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		idx++;
 		y += 0x20;
 	}
 
@@ -545,37 +539,32 @@ void CMenuPcs::CmdInit2()
 	s32 i = GetCmdListStorage(this)->count;
 	CmdListEntry* entry;
 
-	entry = &GetCmdListStorage(this)->entries[i];
+	entry = &GetCmdListStorage(this)->entries[i++];
 	entry->tex = 0x2e;
 	entry->startFrame = 2;
 	entry->duration = 5;
-	i++;
 
-	entry = &GetCmdListStorage(this)->entries[i];
+	entry = &GetCmdListStorage(this)->entries[i++];
 	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	i++;
-	entry = &GetCmdListStorage(this)->entries[i];
+	entry = &GetCmdListStorage(this)->entries[i++];
 	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	i++;
 
-	entry = &GetCmdListStorage(this)->entries[i];
+	entry = &GetCmdListStorage(this)->entries[i++];
 	entry->flags = 2;
 	entry->tex = 0x2e;
 	entry->startFrame = 7;
 	entry->duration = 5;
-	i++;
 
 	for (s32 j = 0; j < 8; j++) {
-		entry = &GetCmdListStorage(this)->entries[i];
+		entry = &GetCmdListStorage(this)->entries[i++];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->startFrame = 0;
 		entry->duration = 5;
-		i++;
 	}
 
 	CmdListStorage* list = GetCmdListStorage(this);

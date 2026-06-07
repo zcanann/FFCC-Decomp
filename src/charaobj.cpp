@@ -1364,24 +1364,45 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	if (m_lastStateId == 8 && m_subState == 1 &&
-	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
-	    CharaObjCanFrontGuard(this, sourceObj)) {
-		playSe3D(0x1D, 0x32, 0x96, 0, 0);
-		putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
-		if (CharaObjIsPlayerCid(sourceObj->GetCID())) {
-			sourceObj->changeStat(0x13, 0, 0);
-		}
-		if ((GetCID() & 0x6D) == 0x6D) {
-			changeSubStat(2);
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) == 0) {
-				effectResult = 0;
-			} else {
-				damageClamp = 1;
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0)) {
+		CVector selfPos(m_worldPosition);
+		CVector sourcePos(sourceObj->m_worldPosition);
+		CVector deltaVec;
+		PSVECSubtract(reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&deltaVec));
+		Vec frontDelta;
+		frontDelta.x = deltaVec.x;
+		frontDelta.y = deltaVec.y;
+		frontDelta.z = deltaVec.z;
+		float frontMag = PSVECMag(&frontDelta);
+		if (FLOAT_80331988 < frontMag) {
+			CVector scaledVec;
+			PSVECScale(&frontDelta, reinterpret_cast<Vec*>(&scaledVec), kOneF32 / frontMag);
+			frontDelta.x = scaledVec.x;
+			frontDelta.y = scaledVec.y;
+			frontDelta.z = scaledVec.z;
+			CVector facing;
+			facing.x = sinf(m_rotBaseY);
+			facing.y = FLOAT_80331988;
+			facing.z = cosf(m_rotBaseY);
+			if (FLOAT_80331988 < PSVECDotProduct(&frontDelta, reinterpret_cast<Vec*>(&facing))) {
+				playSe3D(0x1D, 0x32, 0x96, 0, 0);
+				putParticle(0x200, 0, hitPos, FLOAT_803319AC * m_attackColRadius, 0);
+				if ((sourceObj->GetCID() & 0x6D) == 0x6D) {
+					sourceObj->changeStat(0x13, 0, 0);
+				}
+				if ((GetCID() & 0x6D) == 0x6D) {
+					changeSubStat(2);
+					if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) == 0) {
+						effectResult = 0;
+					} else {
+						damageClamp = 1;
+					}
+				} else {
+					effectResult = 0;
+				}
+				allowEffect = 0;
 			}
-		} else {
-			effectResult = 0;
 		}
-		allowEffect = 0;
 	}
 
 	if (m_lastStateId == 6 &&

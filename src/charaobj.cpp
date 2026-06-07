@@ -720,7 +720,7 @@ void CGCharaObj::onFramePreCalc()
 
 	m_pushScale = 1.0f;
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (*reinterpret_cast<short*>(script + 0x4E) != 0) {
+	if (*reinterpret_cast<unsigned short*>(script + 0x4E) != 0) {
 		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + kOneF32;
 	}
 	if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
@@ -747,9 +747,9 @@ void CGCharaObj::onFramePreCalc()
 			break;
 	}
 
-	if (*reinterpret_cast<short*>(script + 0x3E) != 0 ||
-	    *reinterpret_cast<short*>(script + 0x50) != 0 ||
-	    *reinterpret_cast<short*>(script + 0x44) != 0) {
+	if (*reinterpret_cast<unsigned short*>(script + 0x3E) != 0 ||
+	    *reinterpret_cast<unsigned short*>(script + 0x50) != 0 ||
+	    *reinterpret_cast<unsigned short*>(script + 0x44) != 0) {
 		push += 0x19;
 	}
 

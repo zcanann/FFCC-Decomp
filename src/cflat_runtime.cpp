@@ -1116,31 +1116,22 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
 	if (reqFlagIndex >= 0) {
 		unsigned int reqFlags = static_cast<unsigned int>(*reinterpret_cast<u16*>(targetObject + 0x34));
-		int bitBase = 0x1F;
 		int scanCount = 4;
-		int highestBit;
+		int highestBit = 0x1F;
 
 		do {
-			highestBit = bitBase;
-			if ((((((reqFlags & 0x80000000) != 0)
-			       || ((highestBit = bitBase - 1), (reqFlags & 0x40000000) != 0))
-			      || ((highestBit = bitBase - 2), (reqFlags & 0x20000000) != 0))
-			     || (((highestBit = bitBase - 3), (reqFlags & 0x10000000) != 0)
-			         || ((highestBit = bitBase - 4), (reqFlags & 0x08000000) != 0)))
-			    || (((highestBit = bitBase - 5), (reqFlags & 0x04000000) != 0)
-			        || (((highestBit = bitBase - 6), (reqFlags & 0x02000000) != 0)
-			            || ((highestBit = bitBase - 7), (reqFlags & 0x01000000) != 0)))) {
-				break;
+			for (int bit = 0; bit < 8; bit++) {
+				if ((reqFlags & 0x80000000) != 0) {
+					goto foundBit;
+				}
+				reqFlags <<= 1;
+				highestBit--;
 			}
-
-			reqFlags <<= 8;
-			bitBase -= 8;
 			scanCount--;
 		} while (scanCount != 0);
 
-		if (scanCount == 0) {
-			highestBit = -1;
-		}
+		highestBit = -1;
+	foundBit:
 
 		if (reqFlagIndex <= highestBit) {
 			return 0;

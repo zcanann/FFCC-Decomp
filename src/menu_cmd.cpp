@@ -1022,7 +1022,7 @@ void CMenuPcs::CmdDraw()
 					entry++;
 					continue;
 				}
-				const s16 skillId = caravan->m_inventoryItems[cmdId];
+				const u16 skillId = caravan->m_inventoryItems[cmdId];
 				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 				text = flatText[skillId * 5 + 4];
 				if ((cmdMode == 0) && (i == GetCmdStateView(this)->selected)) {
@@ -1433,7 +1433,7 @@ void CMenuPcs::CmdDraw()
 
 	DrawHelpMessage(
 	    helpId, m_fonts[0], 0, static_cast<s32>(-FLOAT_80332b28),
-	    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * helpAlpha)).color, 0,
+	    CColor(0xFF, 0xFF, 0xFF, static_cast<s8>(FLOAT_80332acc * helpAlpha)).color, 0,
 	    FLOAT_80332a88, FLOAT_80332b08);
 }
 

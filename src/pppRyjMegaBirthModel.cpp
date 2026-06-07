@@ -594,8 +594,7 @@ void birth(
     }
 
     if (params->m_speed != kPppRyjMegaBirthSharedZero) {
-        u8 speedMode = params->m_speedMode;
-        float speedScalar = calc_direction_speed(params->m_speed, speedMode);
+        float speedScalar = calc_direction_speed(params->m_speed, params->m_speedMode);
         Vec direction;
         Vec position;
 

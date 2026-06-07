@@ -1642,6 +1642,11 @@ void CShopMenu::DrawShopBase()
  */
 void CShopMenu::Draw()
 {
+    if (m_unk00 == 0) {
+        m_unk00 = reinterpret_cast<void*>(1);
+        return;
+    }
+
     Graphic.SetDrawDoneDebugData(0x46);
     ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[m_pdtSlot].m_envFields);
 

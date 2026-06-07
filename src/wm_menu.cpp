@@ -12391,6 +12391,9 @@ int McCtrl::ChkNowData()
 			}
 		}
 		break;
+
+	case 7:
+		break;
 	}
 
 	int result;

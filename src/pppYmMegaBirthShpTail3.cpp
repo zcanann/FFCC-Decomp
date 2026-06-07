@@ -629,8 +629,11 @@ scalar:
                 break;
             }
             case 3:
-                scale = -(FLOAT_803305D0 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF()) - pYmMegaBirthShpTail3->m_speedRandRange);
+            {
+                float srr = pYmMegaBirthShpTail3->m_speedRandRange;
+                scale = srr - FLOAT_803305D0 * (srr * Math.RandF() * Math.RandF());
                 break;
+            }
             case 4:
             {
                 float rand1 = Math.RandF();
@@ -640,8 +643,9 @@ scalar:
             }
             case 5:
             {
+                float srr = pYmMegaBirthShpTail3->m_speedRandRange;
                 float rand1 = Math.RandF();
-                scale = -(FLOAT_803305D4 * (rand1 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF())) - pYmMegaBirthShpTail3->m_speedRandRange);
+                scale = srr - FLOAT_803305D4 * (rand1 * (srr * Math.RandF() * Math.RandF()));
                 break;
             }
             }

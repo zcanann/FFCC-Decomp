@@ -921,7 +921,7 @@ void CFlatRuntime::searchFunc(int, int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind, int systemIndex, int argCount,
+int CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind, int systemIndex, int argCount,
                               CFlatRuntime::CStack* args, CFlatRuntime::CStack* outArg)
 {
 	if (objectParam == 0) {
@@ -930,7 +930,7 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 
 	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);
 	if (object->m_flagBits.m_deleteFlag != 0) {
-		return;
+		return 1;
 	}
 
 	u8* func = 0;
@@ -956,7 +956,7 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 	}
 
 	if ((func == 0) || (*reinterpret_cast<int*>(func + 0x30) == 0)) {
-		return;
+		return 0;
 	}
 
 	int copiedArgs = 0;
@@ -1057,9 +1057,11 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 	objectFrame(object);
 	object->m_sp--;
 
+	const unsigned int result = *object->m_sp;
 	if (outArg != 0) {
-		outArg->m_word = *object->m_sp;
+		outArg->m_word = result;
 	}
+	return 1;
 }
 
 /*

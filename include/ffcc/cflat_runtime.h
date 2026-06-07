@@ -145,7 +145,7 @@ public:
 	int getTopBit(unsigned int);
 	void searchFunc(int, int, int);
 
-	void SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
+	int SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 
 	int request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*);
 	void callSetup(CFlatRuntime::CObject*, CFlatRuntime::CFunc*, int);

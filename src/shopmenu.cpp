@@ -1712,7 +1712,7 @@ void CShopMenu::DrawSoubi()
 {
     DrawSoubiBase();
 
-    int resultItem = m_resultItem;
+    unsigned int resultItem = m_resultItem;
     drawShapeSeq(0xF, 0, 0xA8, 0x5A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     MenuPcs.DrawInit();
     MenuPcs.DrawSingleIcon(resultItem, 0x40, 0x42, FLOAT_80332d28, 0, FLOAT_80332d28);
@@ -1767,7 +1767,7 @@ void CShopMenu::DrawSoubi()
     labelFont->Draw(cancelText);
     MenuPcs.DrawInit();
 
-    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, 1.0f);
+    MenuPcs.DrawCursor(static_cast<unsigned int>(cancelTextX) - 0x24, m_yesNo * 0x18 + 0x13C, 1.0f);
 }
 /*
  * --INFO--
@@ -2171,7 +2171,7 @@ void CShopMenu::SelectYesNo()
         return;
     }
 
-    int yesNo = m_yesNo;
+    unsigned int yesNo = m_yesNo;
     if (yesNo == 1) {
         if (m_listType == 0) {
             Sound.PlaySe(3, 0x40, 0x7F, 0);
@@ -2196,7 +2196,7 @@ void CShopMenu::SelectYesNo()
         CCaravanWork* caravanWork;
         while ((quantity < m_quantity) &&
                (caravanWork = m_caravanWork,
-                static_cast<unsigned short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
+                static_cast<short>(caravanWork->m_inventoryItemCount + 1) < 0x41)) {
             int gilValue;
             if (m_listType == 0) {
                 if (itemId < 1) {
@@ -2369,10 +2369,10 @@ void CShopMenu::SelectFigure()
         if (figureMode == 1) {
             m_quantity += 10;
             CCaravanWork* caravanWork = m_caravanWork;
-            if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
+            if (m_quantity <= (0x40 - static_cast<short>(caravanWork->m_inventoryItemCount))) {
                 int totalGil = 0;
                 if (m_selectedIndex != -1) {
-                    int itemId = getItemNo(m_selectedIndex);
+                    unsigned int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {
                         if (itemId < 1) {
@@ -2513,14 +2513,14 @@ void CShopMenu::SelectItemIdx()
         m_figureMode = 0;
         m_yesNo = 0;
 
-        int listType = m_listType;
+        unsigned int listType = m_listType;
         if (listType == 0) {
             if (m_selectedIndex != -1) {
                 canSelect = m_caravanWork->m_shopList[m_selectedIndex] >= 1;
             }
             if (canSelect) {
                 CCaravanWork* caravanWork = m_caravanWork;
-                if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
+                if (m_quantity <= (0x40 - static_cast<short>(caravanWork->m_inventoryItemCount))) {
                     int itemId = getItemNo(m_selectedIndex);
                     int unitGil;
                     if (m_listType == 0) {

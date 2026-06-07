@@ -2042,8 +2042,7 @@ void CPartMng::pppEditBeforeCalc()
     CGObject** editorObj = reinterpret_cast<CGObject**>(self + 0x80c);
 
     switch (*lastEnvCmd) {
-    case 1:
-    case 2: {
+    case 1: {
         // Camera matrix handed over from editor uses opposite handedness on these axes.
         *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
         *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
@@ -2067,27 +2066,70 @@ void CPartMng::pppEditBeforeCalc()
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        unsigned char useFog = *reinterpret_cast<unsigned char*>(self + 0x15c);
-        _GXColor fogColor;
-        fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
-        fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
-        fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        fogColor.a = 0;
-
-        if (useFog != 0) {
-            Graphic.SetFogColor(fogColor);
-            if (*lastEnvCmd == 1) {
-                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x160), *reinterpret_cast<float*>(self + 0x164));
-            } else {
-                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x164), *reinterpret_cast<float*>(self + 0x160));
-            }
-        } else {
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
+        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) == 0) {
+            _GXColor fogColor;
             fogColor.r = 0;
             fogColor.g = 0;
             fogColor.b = 0;
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+        } else {
+            _GXColor fogColor;
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(fogNear, fogFar);
+        }
+
+        ppvSysGoPartF = 1;
+        break;
+    }
+    case 2: {
+        *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
+        *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
+        *reinterpret_cast<float*>(self + 0x44) = -*reinterpret_cast<float*>(self + 0x44);
+        *reinterpret_cast<float*>(self + 0x54) = -*reinterpret_cast<float*>(self + 0x54);
+        *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
+        *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
+
+        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
+        C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
+        ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
+        ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
+        ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
+        PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
+        PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
+
+        _GXColor clearColor;
+        clearColor.r = *reinterpret_cast<unsigned char*>(self + 0x158);
+        clearColor.g = *reinterpret_cast<unsigned char*>(self + 0x159);
+        clearColor.b = *reinterpret_cast<unsigned char*>(self + 0x15a);
+        clearColor.a = 0xFF;
+        GXSetCopyClear(clearColor, 0x00FFFFFF);
+
+        float fogFar = *reinterpret_cast<float*>(self + 0x164);
+        float fogNear = *reinterpret_cast<float*>(self + 0x160);
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) == 0) {
+            _GXColor fogColor;
+            fogColor.r = 0;
+            fogColor.g = 0;
+            fogColor.b = 0;
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+        } else {
+            _GXColor fogColor;
+            fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
+            fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+            fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(fogNear, fogFar);
         }
 
         ppvSysGoPartF = 1;

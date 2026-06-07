@@ -3518,16 +3518,20 @@ void CMenuPcs::DrawMainMenu()
 	float frameAlpha;
 	if (m_wmWorldState->m_mainState == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
-	} else if (m_wmWorldState->m_mainState < 1 || m_wmWorldState->m_mainState > 3) {
+	} else if (m_wmWorldState->m_mainState <= 0 || m_wmWorldState->m_mainState >= 4) {
 		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
 	} else {
 		frameAlpha = FLOAT_803313e8;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor;
+	frameColor.r = 0xFF;
+	frameColor.g = 0xFF;
+	frameColor.b = 0xFF;
+	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
 	if (frame != 0) {
 		unsigned char* const entry = frame + 4;

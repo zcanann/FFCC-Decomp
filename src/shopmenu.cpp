@@ -959,7 +959,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     }
 
     int itemData = Game.unkCFlatData0[2] + itemNo * 0x48;
-    short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
+    short statValue = *reinterpret_cast<short*>(itemData + 6);
     int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
     char textBuffer[256];
 
@@ -971,7 +971,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     MenuPcs.DrawNoShadowFont(font, textBuffer, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    int valueRightX = x + 0x108;
+    unsigned int valueRightX = x + 0x108;
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
     font->SetColor(white.color);
@@ -3069,14 +3069,14 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
 
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
-        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+        static_cast<int>(*reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* displayList = reinterpret_cast<unsigned char*>(shape);
-    int shapeCount = *reinterpret_cast<short*>(displayList + 2);
+    int shapeCount = *reinterpret_cast<unsigned short*>(displayList + 2);
     for (int i = 0; i < shapeCount; i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;

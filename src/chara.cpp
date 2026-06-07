@@ -980,29 +980,21 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			switch (chunk.m_id) {
-			case 0x494E464F:
+			if (chunk.m_id == 0x494E464F) {
 				ref->m_baseScale = chunkFile.GetF4();
-				m_furStep = chunkFile.GetF4();
 				m_furLenScale = chunkFile.GetF4();
-				break;
-
-			case 0x5155414E:
+				m_furStep = chunkFile.GetF4();
+			} else if (chunk.m_id == 0x5155414E) {
 				ref->m_posQuant = chunkFile.Get4();
 				ref->m_normQuant = chunkFile.Get4();
-				break;
-
-			case 0x4D534554: {
+			} else if (chunk.m_id == 0x4D534554) {
 				CMaterialSet* materialSet =
 				    new(stage, const_cast<char*>("src/chara.cpp"), 0x132) CMaterialSet();
 				ref->m_materialSet = materialSet;
 				if (materialSet != 0) {
 					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
 				}
-				break;
-			}
-
-			case 0x54415354:
+			} else if (chunk.m_id == 0x54415354) {
 				if (chunk.m_arg0 != 0) {
 					CTexAnimSet* texAnimSet = new CTexAnimSet();
 					m_texAnimSet = texAnimSet;
@@ -1010,9 +1002,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 						texAnimSet->Create(chunkFile, stage);
 					}
 				}
-				break;
-
-			case 0x4E534554: {
+			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;
 				ref->m_nodeCount = 0;
 				if (nodeCapacity != 0) {
@@ -1032,10 +1022,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					}
 				}
 				chunkFile.PopChunk();
-				break;
-			}
-
-			case 0x4D535354: {
+			} else if (chunk.m_id == 0x4D535354) {
 				const u32 meshCapacity = chunk.m_arg0;
 				ref->m_meshCount = 0;
 				if (meshCapacity != 0) {
@@ -1055,16 +1042,12 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					}
 				}
 				chunkFile.PopChunk();
-				break;
-			}
-
-			case 0x42414E4B:
+			} else if (chunk.m_id == 0x42414E4B) {
 				if (chunk.m_size != 0) {
 					void* bank = new u8[chunk.m_size];
 					*(void**)((u8*)ref + 0x14) = bank;
 					chunkFile.Get(bank, chunk.m_size);
 				}
-				break;
 			}
 		}
 		chunkFile.PopChunk();

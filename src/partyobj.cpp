@@ -2510,16 +2510,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		CVector startPos;
 		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
 
-		CMapCylinder hitCylinder;
+		CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		hitCylinder.m_bottom.x = startPos.x;
 		hitCylinder.m_bottom.y = startPos.y;
 		hitCylinder.m_bottom.z = startPos.z;
-		hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-		hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
-		hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
-		hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
-		hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
-		hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
 		hitCylinder.m_axis = rayDir;
 		hitCylinder.m_radius = radius;
 
@@ -2538,16 +2532,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
 		}
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder;
+		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom = m_comboCenter;
 		floorCylinder.m_axis = *reinterpret_cast<Vec*>(&down);
 		floorCylinder.m_radius = FLOAT_80331a78;
-		floorCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_min.y = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_min.z = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_max.x = FLOAT_80331aa0;
-		floorCylinder.m_bound.m_max.y = FLOAT_80331aa0;
-		floorCylinder.m_bound.m_max.z = FLOAT_80331aa0;
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&m_comboCenter);
@@ -2796,13 +2784,7 @@ void CGPartyObj::checkTargetParticle()
 			bottom.y = bottomResult.y;
 			bottom.z = bottomResult.z;
 
-			CMapCylinder hitCylinder;
-			hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-			hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
-			hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
-			hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
-			hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
-			hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
+			CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 			hitCylinder.m_bottom = bottom;
 			hitCylinder.m_top = move;
 			hitCylinder.m_radius = radius;
@@ -2831,13 +2813,7 @@ void CGPartyObj::checkTargetParticle()
 		PSVECAdd(&centerPlusUp, &move, targetPos);
 
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
-		CMapCylinder floorCylinder;
-		floorCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_min.y = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_min.z = FLOAT_80331a9c;
-		floorCylinder.m_bound.m_max.x = FLOAT_80331aa0;
-		floorCylinder.m_bound.m_max.y = FLOAT_80331aa0;
-		floorCylinder.m_bound.m_max.z = FLOAT_80331aa0;
+		CMapCylinder floorCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 		floorCylinder.m_bottom.x = targetPos->x;
 		floorCylinder.m_bottom.y = targetPos->y;
 		floorCylinder.m_bottom.z = targetPos->z;
@@ -2922,13 +2898,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	CVector bottomResult;
 	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), reinterpret_cast<Vec*>(&bottomResult));
 
-	CMapCylinder hitCylinder;
-	hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-	hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
-	hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
-	hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
-	hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
-	hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
+	CMapCylinder hitCylinder(FLOAT_80331a9c, FLOAT_80331aa0);
 	hitCylinder.m_bottom.x = bottomResult.x;
 	hitCylinder.m_bottom.y = bottomResult.y;
 	hitCylinder.m_bottom.z = bottomResult.z;

@@ -814,7 +814,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		baseWords = *reinterpret_cast<int*>(scanNode + 8);
 	}
 	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(*reinterpret_cast<int*>(scanNode + 0xC) + baseWords));
-	freeNode[3] = reinterpret_cast<void*>(classLocalCount + 0x60);
+	freeNode[3] = reinterpret_cast<void*>(requiredWords);
 
 	object->m_freeListNode = freeNode;
 	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x0C) + (reinterpret_cast<s32>(freeNode[2]) * 4));

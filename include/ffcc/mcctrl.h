@@ -23,7 +23,7 @@ public:
     ~McCtrl();
 
     void Init();
-    void LoadMcList();
+    int LoadMcList();
     void SetListDat(int, int);
     void SetBrokenFile(int);
     void SaveDat();

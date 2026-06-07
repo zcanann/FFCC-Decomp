@@ -1860,7 +1860,7 @@ void CMenuPcs::CalcMCardMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && worldState->m_counter1A == 0) {
-			mcCtrl.LoadMcList();
+			mcCtrl.m_lastResult = mcCtrl.LoadMcList();
 			short listRes = (short)mcCtrl.m_lastResult;
 			worldState->m_mcResult = listRes;
 			if (worldState->m_mcResult == 0) break;
@@ -2670,7 +2670,7 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && worldState->m_counter1A == 0) {
-			mcCtrl.LoadMcList();
+			mcCtrl.m_lastResult = mcCtrl.LoadMcList();
 			short listRes = (short)mcCtrl.m_lastResult;
 			worldState->m_mcResult = listRes;
 			if (worldState->m_mcResult != 0) {
@@ -11232,18 +11232,17 @@ void McCtrl::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::LoadMcList()
+int McCtrl::LoadMcList()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
 
 	switch (m_state) {
 	case 0:
-		MenuPcs.ClrMcList();
+		memset(MenuPcs.m_wmCharaState, 0, kMcListEntrySize * kMcListCount);
 		MemoryCardMan.McMount(m_cardChannel);
 		m_lastResult = MemoryCardMan.GetResult();
 		m_state = 1;
@@ -11260,12 +11259,10 @@ void McCtrl::LoadMcList()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -11289,11 +11286,9 @@ void McCtrl::LoadMcList()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
-				m_lastResult = -3;
-				return;
+				return -3;
 			}
 			m_state = 4;
 		}
@@ -11312,8 +11307,7 @@ void McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
@@ -11347,8 +11341,7 @@ void McCtrl::LoadMcList()
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
 		m_serialHi = serialHi;
 		m_serialLo = serialLo;
@@ -11367,8 +11360,7 @@ void McCtrl::LoadMcList()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
@@ -11396,13 +11388,15 @@ void McCtrl::LoadMcList()
 		break;
 	}
 
+	int result;
 	if (m_state == -1) {
-		m_lastResult = -1;
+		result = -1;
 	} else if (m_state == 7) {
-		m_lastResult = 1;
+		result = 1;
 	} else {
-		m_lastResult = 0;
+		result = 0;
 	}
+	return result;
 }
 
 /*

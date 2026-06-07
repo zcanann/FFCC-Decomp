@@ -559,7 +559,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
 {
     u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
     u8* particleBytes = (u8*)particleData;
-    s8 mode = (s8)paramBytes[0x18];
     float spread = (float)paramBytes[0x19];
     float spreadRange = FLOAT_803305C8 * spread;
 
@@ -571,7 +570,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if (mode >= 0 && mode < 8) {
+    if ((s8)paramBytes[0x18] >= 0 && (s8)paramBytes[0x18] < 8) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
@@ -584,7 +583,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_803305CC);
         angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_803305CC);
         angles[3] = 0;
-        if ((mode == 2) || (mode == 3)) {
+        if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
             angles[0] = 0;
             angles[1] = 0;
             angles[2] = 0;
@@ -600,8 +599,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if (mode < 6) {
-        if (mode > 3) {
+    if ((s8)paramBytes[0x18] < 6) {
+        if ((s8)paramBytes[0x18] > 3) {
         float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
         if (speedRandRange == kPppYmMegaBirthShpTail3Zero) {
             goto done;
@@ -670,7 +669,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScaleYZ.y;
         goto done;
         }
-    } else if (mode < 10) {
+    } else if ((s8)paramBytes[0x18] < 10) {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
@@ -729,7 +728,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                 particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail3->m_speedScaleYZ.x;
                 particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail3->m_speedScaleYZ.y;
 
-                if ((mode == 8) || (mode == 9)) {
+                if ((paramBytes[0x18] == 8) || (paramBytes[0x18] == 9)) {
                     Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
                     pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
                 }

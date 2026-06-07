@@ -1511,10 +1511,10 @@ void CChara::CModel::calcMatrix()
 				}
 			} else if (NodeRuntimeFlag80(node)) {
 				float baseScale;
-				if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301BC) {
-					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
-				} else {
+				if (parentNode != 0 || (baseScale = ModelBaseScale(this)) == FLOAT_803301BC) {
 					PSMTXIdentity(localMtx);
+				} else {
+					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 				}
 			}
 
@@ -1538,12 +1538,7 @@ void CChara::CModel::calcMatrix()
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 
-			if (NodeAnimNode0(node) == 0) {
-				float* runtimeScale = NodeRuntimeScale(node);
-				runtimeScale[2] = FLOAT_803301b0;
-				runtimeScale[1] = FLOAT_803301b0;
-				runtimeScale[0] = FLOAT_803301b0;
-			} else {
+			if (NodeAnimNode0(node) != 0) {
 				Mtx animMtx;
 				NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				u16 nodeIndex = NodeRefIndex(node);
@@ -1573,6 +1568,11 @@ void CChara::CModel::calcMatrix()
 				runtimeScale[0] = srt.m_scale.x;
 				runtimeScale[1] = srt.m_scale.y;
 				runtimeScale[2] = srt.m_scale.z;
+			} else {
+				float* runtimeScale = NodeRuntimeScale(node);
+				runtimeScale[2] = FLOAT_803301b0;
+				runtimeScale[1] = FLOAT_803301b0;
+				runtimeScale[0] = FLOAT_803301b0;
 			}
 		}
 

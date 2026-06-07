@@ -2395,7 +2395,6 @@ void CMenuPcs::CalcResultCountAnim()
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		s_CntTop = (unsigned char)countTop;
 		for (int i = 0; i < activePartyCount; i++) {
 			int rank = s_Rinfo->m_party[i].m_rank;
 			short y = (short)(0x28 + i * 0x60);

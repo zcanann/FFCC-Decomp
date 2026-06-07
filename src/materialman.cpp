@@ -1028,8 +1028,8 @@ void CMaterialMan::SetUnderWaterTex()
         return;
     }
 
-    Mtx matrixB;
     Mtx44 screenMtx;
+    Mtx matrixB;
     Mtx matrixA;
     PSMTXIdentity(matrixA);
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

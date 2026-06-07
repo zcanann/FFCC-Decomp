@@ -911,7 +911,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x19: {
 			CGQuadObj* quad = reinterpret_cast<CGQuadObj*>(engineObject);
-			if (object->m_localBase[0] == 1) {
+			if (static_cast<int>(object->m_localBase[0]) == 1) {
 				quad->Reset(reinterpret_cast<float*>(object->m_localBase)[1], reinterpret_cast<float*>(object->m_localBase)[2]);
 			}
 			quad->Add(reinterpret_cast<float*>(object->m_localBase)[3], reinterpret_cast<float*>(object->m_localBase)[4]);
@@ -1208,15 +1208,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x4F: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
-			unsigned int mode = object->m_localBase[0];
+			int mode = static_cast<int>(object->m_localBase[0]);
 			int slot = -1;
 			if (mode != 2) {
 				int itemId = static_cast<unsigned short>(object->m_localBase[1]);
-				if (static_cast<int>(mode) < 2) {
-					if (static_cast<int>(mode) > 0) {
+				if (mode < 2) {
+					if (mode > 0) {
 						caravanWork->AddItem(itemId, &slot);
 					}
-				} else if (static_cast<int>(mode) < 4) {
+				} else if (mode < 4) {
 					caravanWork->AddComList(itemId, &slot);
 				}
 			}
@@ -1415,14 +1415,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x77: {
 			CCaravanWork* caravanWork = ScriptCaravan(engineObject);
-			unsigned int mode = object->m_localBase[0];
+			int mode = static_cast<int>(object->m_localBase[0]);
 			int index = static_cast<int>(object->m_localBase[1]);
 			if (mode != 2) {
-				if (static_cast<int>(mode) < 2) {
-					if (static_cast<int>(mode) > 0) {
+				if (mode < 2) {
+					if (mode > 0) {
 						caravanWork->DeleteItemIdx(index, 1);
 					}
-				} else if (static_cast<int>(mode) < 4) {
+				} else if (mode < 4) {
 					caravanWork->DeleteCmdList(index, 1);
 				}
 			}

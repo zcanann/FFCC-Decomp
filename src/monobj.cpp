@@ -28,6 +28,7 @@ u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
+extern float FLOAT_803319C4;
 extern "C" const float FLOAT_803319C8 = 0.0000001f;
 extern "C" const float FLOAT_803319CC = 0.01f;
 extern "C" const double DOUBLE_803319D0 = 0.000009999999747378752;
@@ -908,22 +909,25 @@ void CGMonObj::seKiduki()
  */
 void CGMonObj::onFrameStat()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-#define state (prgObj->m_lastStateId)
+#define prgObj (reinterpret_cast<CGPrgObj*>(this))
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
+#define SET_DRAW_FLAG() do { struct B63C { unsigned char hi : 1; unsigned char lo : 7; }; \
+		reinterpret_cast<B63C*>(mon + 0x63C)->hi = 1; } while (0)
 
-	switch (state) {
+	switch (*reinterpret_cast<int*>(mon + 0x520)) {
 	case 3:
 	case 0x11:
 	case 0x1E:
 		if (*reinterpret_cast<unsigned short*>(object->m_scriptHandle + 7) != 0) {
 			int targetPartyIndex = m_targetPartyIndex;
-			bool hasValidTarget = false;
-			if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
-				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-				hasValidTarget = (target != NULL) &&
-					(*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(target)->m_scriptHandle + 7) != 0);
+			int hasValidTarget;
+			if ((targetPartyIndex < 0) ||
+				((targetPartyIndex >= 0) &&
+				 (*reinterpret_cast<unsigned short*>(reinterpret_cast<CGObject*>(Game.m_partyObjArr[targetPartyIndex])->m_scriptHandle + 7) == 0))) {
+				hasValidTarget = 0;
+			} else {
+				hasValidTarget = 1;
 			}
 			if (!hasValidTarget) {
 				m_targetPartyIndex = -1;
@@ -935,39 +939,52 @@ void CGMonObj::onFrameStat()
 
 	(this->*m_funcs->frameStat)();
 
-	switch (state) {
+	switch (*reinterpret_cast<int*>(mon + 0x520)) {
 	case 0:
-		if (m_aliveFrames > 0x2C) {
-			mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
+		if (m_aliveFrames >= 0x2D) {
+			SET_DRAW_FLAG();
 		}
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(-1, 0, 0);
 		}
 		break;
 
+
 	case 3: {
-		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
+		SET_DRAW_FLAG();
 		if ((prgObj->m_stateFrame == 0) && (object->CancelAnim(1), m_unk6B8 == 0)) {
-			unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-			short soundId = static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
-				static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x190)) * 1000 + Math.Rand(3);
-			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
+			void** scriptHandle = object->m_scriptHandle;
+			int rand = Math.Rand(3);
+			unsigned char* script9 = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+			prgObj->playSe3D(
+				static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
+				static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(script9 + 0x190)) * 1000 + rand,
+				0x32, 0x96, 0, (Vec*)0);
 			m_unk6B8 = 1;
 		}
 
-		short targetPartyIndex = m_targetPartyIndex;
-		if ((targetPartyIndex < 0) || (targetPartyIndex >= 4)) {
+		int targetPartyIndex = m_targetPartyIndex;
+		if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
+			CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+			Vec src = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+			Vec delta;
+			PSVECSubtract(&src, &object->m_worldPosition, &delta);
+			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
+		} else {
 			prgObj->changeStat(0, 0, 0);
-			break;
 		}
+		break;
+	}
 
-		CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-		if (target == NULL) {
-			prgObj->changeStat(0, 0, 0);
-			break;
+
+	case 0x1C: {
+		SET_DRAW_FLAG();
+		if (prgObj->m_stateFrame == 0) {
+			object->CancelAnim(1);
 		}
-
-		Vec delta = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+		Vec delta = m_homePosition;
 		PSVECSubtract(&delta, &object->m_worldPosition, &delta);
 		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
 			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
@@ -975,43 +992,163 @@ void CGMonObj::onFrameStat()
 		break;
 	}
 
-	case 0x10:
-		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
-		if (prgObj->m_stateFrame == 0) {
-			prgObj->reqAnim(-1, 0, 0);
-		}
-		if (Math.Rand(0x32) == 0) {
-			object->m_rotTargetY += (Math.Rand(2) == 0) ? 0.2f : -0.2f;
-		}
-		break;
 
 	case 0x11: {
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(-1, 0, 0);
 		}
 
-		int targetPartyIndex = m_targetPartyIndex;
-		if ((targetPartyIndex >= 0) && (targetPartyIndex < 4)) {
-			unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-			float targetDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
-			float dist = *reinterpret_cast<float*>(mon + 0x5D0 + targetPartyIndex * 4);
-			if ((prgObj->m_stateFrame == 0) && (targetDist < dist)) {
-				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
-				if (target != NULL) {
-					Vec delta = reinterpret_cast<CGObject*>(target)->m_worldPosition;
-					PSVECSubtract(&delta, &object->m_worldPosition, &delta);
-					float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-						(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xD4)) + 0.8f);
-					object->moveVector(&delta, speedScale, 1);
+		short aiState = m_aiState;
+		unsigned char* aiData;
+		if (aiState == 0) {
+			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		} else {
+			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+		}
+		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		float range = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE));
+
+		if (*reinterpret_cast<short*>(aiData + 0x10A) == 2) {
+			if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+				if (prgObj->m_subState == 0) {
+					unsigned int chaseFlag = 0;
+					unsigned char* aiData2 = script9;
+					if (aiState != 0) {
+						aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) * 0x1D0 + 0x10;
+					}
+					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
+						chaseFlag = 0x8000;
+					}
+					CGPartyObj* target = Game.m_partyObjArr[m_targetPartyIndex];
+					if (m_moveWork.m_mode != 4) {
+						memset(&m_moveWork, 0, 0x34);
+						m_moveWork.m_flags = 0x855;
+						if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFE) & 4) != 0) {
+							m_moveWork.m_flags |= 0x400;
+						}
+						unsigned char* aiData3;
+						if (m_aiState == 0) {
+							aiData3 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+						} else {
+							aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+								(m_aiState + *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+						}
+						if ((*reinterpret_cast<unsigned short*>(aiData3 + 0x102) & 0x80) != 0) {
+							m_moveWork.m_flags |= 0x20000;
+						}
+						m_moveWork.m_flags |= chaseFlag;
+						m_moveWork.m_flags = m_moveWork.m_flags;
+						m_moveWork.m_mode = 4;
+						m_moveWork.m_range =
+							static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
+						m_moveWork.m_limitFrame =
+							*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6);
+					}
+					m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(target);
+					moveFrame();
+					if (((m_moveWork.m_stateFlags & 1) != 0) ||
+						(static_cast<int>(static_cast<unsigned int>(object->m_stateFlags0) << 25) < 0)) {
+						prgObj->reqAnim(-1, 0, 0);
+						if (-1 < m_targetPartyIndex) {
+							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+						}
+						prgObj->m_subState = 1;
+					}
+				}
+			} else {
+				if ((prgObj->m_stateFrame == 0) &&
+					(*reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4) < range)) {
+					prgObj->m_subState = 1;
+				}
+				if (prgObj->m_subState == 1) {
+					unsigned char* script9b = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+					unsigned int limit = *reinterpret_cast<unsigned short*>(script9b + 0x1B6);
+					if (static_cast<int>(prgObj->m_stateFrame) <= static_cast<int>(limit)) {
+						if ((static_cast<int>(static_cast<unsigned int>(object->m_stateFlags0) << 25) < 0) ||
+							(static_cast<unsigned int>(prgObj->m_stateFrame) == limit) ||
+							(range <= *reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4))) {
+							prgObj->m_subState = 0;
+							object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+						} else {
+							float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+								(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(script9b + 0xD4)) + 0.8f);
+							Vec delta = reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition;
+							PSVECSubtract(&delta, &object->m_worldPosition, &delta);
+							object->moveVector(&delta, speedScale, 1);
+						}
+					}
 				}
 			}
 		}
-
-		if (m_attackDelay <= prgObj->m_stateFrame) {
+		if (m_attackDelay <= static_cast<int>(prgObj->m_stateFrame)) {
 			prgObj->changeStat(0, 0, 0);
 		}
 		break;
 	}
+
+
+	case 0x10:
+		SET_DRAW_FLAG();
+		if (prgObj->m_stateFrame == 0) {
+			prgObj->reqAnim(-1, 0, 0);
+		}
+		if (Math.Rand(0x32) == 0) {
+			if (Math.Rand(2) == 0) {
+				object->m_rotTargetY += 0.2f;
+			} else {
+				object->m_rotTargetY -= 0.2f;
+			}
+		}
+		break;
+
+
+	case 0x1D:
+		SET_DRAW_FLAG();
+		if (prgObj->m_subState == 1) {
+			if (Math.Rand(100) == 0) {
+				prgObj->changeSubStat(0);
+			}
+		} else if ((prgObj->m_subState < 1) && (-1 < prgObj->m_subState)) {
+			if (prgObj->m_subFrame == 0) {
+				void** scriptHandle = object->m_scriptHandle;
+				int rand = Math.Rand(0x50);
+				float randF = Math.RandF();
+				float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+					(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xD4)) + 0.8f);
+				object->moveVectorRot(FLOAT_803319FC * (FLOAT_803319C4 * randF), 0.0f, FLOAT_80331A00 * speedScale, rand + 10);
+			} else {
+				unsigned char weaponFlags1 = object->m_weaponNodeFlagBytes.m_flags1;
+				if ((static_cast<int>((static_cast<unsigned int>(weaponFlags1) << 26) | (static_cast<unsigned int>(weaponFlags1) >> 6)) >= 0) ||
+					(static_cast<int>(static_cast<unsigned int>(object->m_stateFlags0) << 25) < 0)) {
+					object->CancelMove(1);
+					prgObj->changeSubStat(1);
+				}
+			}
+		}
+		break;
+
+
+	case 0x1E: {
+		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+		Vec delta = reinterpret_cast<CGObject*>(Game.m_partyObjArr[m_targetPartyIndex])->m_worldPosition;
+		PSVECSubtract(&delta, &object->m_worldPosition, &delta);
+		object->moveVector(&delta, speedScale, 1);
+
+		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		if ((static_cast<unsigned int>(prgObj->m_stateFrame) == *reinterpret_cast<unsigned short*>(script9 + 0x1B6)) ||
+			(static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCE)) <= *reinterpret_cast<float*>(mon + 0x5D0 + m_targetPartyIndex * 4)) ||
+			(static_cast<int>(static_cast<unsigned int>(object->m_stateFlags0) << 25) < 0)) {
+			prgObj->changeStat(0, 0, 0);
+			if (-1 < m_targetPartyIndex) {
+				object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+			}
+		}
+		break;
+	}
+
 
 	case 0x16:
 		if (prgObj->m_stateFrame == 0) {
@@ -1022,12 +1159,179 @@ void CGMonObj::onFrameStat()
 		}
 		break;
 
+
 	case 0x17:
 		if (prgObj->m_stateFrame == 0) {
 			prgObj->reqAnim(0x2D, 0, 0);
 		} else if (prgObj->isLoopAnim() != 0) {
 			m_unk6B9 = 1;
 			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+
+
+	case 0x32: {
+		if (prgObj->m_stateFrame == 0) {
+			void* classId = object->m_scriptHandle[4];
+			int anim;
+			unsigned int soundId;
+			if ((reinterpret_cast<unsigned int>(classId) - 0x10 < 3) || (classId == reinterpret_cast<void*>(0x5E))) {
+				anim = 0xF;
+				soundId = 0x2EF1;
+			} else {
+				anim = 0xD;
+				soundId = 0xCB37;
+			}
+			*reinterpret_cast<float*>(mon + 0x694) = FLOAT_803319C0;
+			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_groundHitOffset.z = 0.0f;
+			object->m_groundHitOffset.y = 0.0f;
+			object->m_groundHitOffset.x = 0.0f;
+			object->m_bgColMask |= 0x11;
+			object->m_displayFlags |= 1;
+			*reinterpret_cast<float*>(mon + 0x6F8) = object->unk_0x168;
+			*reinterpret_cast<float*>(mon + 0x6FC) = object->unk_0x16C;
+			*reinterpret_cast<float*>(mon + 0x700) = object->unk_0x170;
+			object->m_worldPosition.x = *reinterpret_cast<float*>(mon + 0x6F8);
+			object->m_worldPosition.y = *reinterpret_cast<float*>(mon + 0x6FC);
+			object->m_worldPosition.z = *reinterpret_cast<float*>(mon + 0x700);
+			prgObj->reqAnim(anim, 0, 0);
+			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
+			if (anim == 0xF) {
+				if (classId == reinterpret_cast<void*>(0x5E)) {
+					int dataNo = object->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((dataNo << 8) | 8, 0, object, FLOAT_803319C0, 0);
+				} else {
+					int dataNo = object->m_charaModelHandle->GetPdtSlot();
+					prgObj->putParticle((dataNo << 8) | 7, 0, object, FLOAT_803319C0, 0);
+				}
+			} else {
+				int dataNo = object->m_charaModelHandle->GetPdtSlot();
+				prgObj->putParticle((dataNo << 8) | 2, 2, object, FLOAT_803319C0, 0);
+			}
+		}
+		if (prgObj->isLoopAnim() != 0) {
+			prgObj->changeStat(0, 0, 0);
+			object->m_bgColMask |= 0xD0002;
+			enableDamageCol(1);
+			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+		}
+		break;
+	}
+
+
+	case 0x33: {
+		if (prgObj->m_stateFrame == 0) {
+			void* classId = object->m_scriptHandle[4];
+			*reinterpret_cast<float*>(mon + 0x694) = FLOAT_803319C0;
+			unsigned int clz = __cntlzw(0x3C - reinterpret_cast<int>(classId));
+			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_groundHitOffset.z = 0.0f;
+			object->m_groundHitOffset.y = 0.0f;
+			object->m_groundHitOffset.x = 0.0f;
+			object->m_bgColMask |= 0x11;
+			object->m_displayFlags |= 1;
+			prgObj->reqAnim(0xD, 0, 0);
+			prgObj->playSe3D((clz >> 5) + 0x7936, 0x32, 0x96, 0, (Vec*)0);
+			int dataNo = object->m_charaModelHandle->GetPdtSlot();
+			prgObj->putParticle((dataNo << 8) | 4, 0, object, FLOAT_803319C0, 0);
+		}
+		if (prgObj->isLoopAnim() != 0) {
+			prgObj->changeStat(0, 0, 0);
+			object->m_bgColMask |= 0xD0002;
+			enableDamageCol(1);
+			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+		}
+		break;
+	}
+
+
+	case 0x34: {
+		if (prgObj->m_stateFrame == 0) {
+			unsigned int particleBase;
+			unsigned int soundId;
+			if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x39)) {
+				particleBase = 4;
+				soundId = 0xC36E;
+			} else {
+				particleBase = 5;
+				soundId = 0xB3D1;
+			}
+			object->m_weaponNodeFlagBytes.m_flags0 = (object->m_weaponNodeFlagBytes.m_flags0 & 0xEF) | 0x10;
+			object->m_groundHitOffset.z = 0.0f;
+			object->m_groundHitOffset.y = 0.0f;
+			object->m_groundHitOffset.x = 0.0f;
+			object->m_bgColMask |= 0x11;
+			object->m_displayFlags |= 1;
+			prgObj->reqAnim(0xB, 0, 0);
+			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
+			int dataNo = object->m_charaModelHandle->GetPdtSlot();
+			prgObj->putParticle(particleBase | (dataNo << 8), 0, object, FLOAT_803319C0, 0);
+		}
+		if (prgObj->isLoopAnim() != 0) {
+			prgObj->changeStat(0, 0, 0);
+			object->m_bgColMask |= 0xD0002;
+			enableDamageCol(1);
+			object->m_displayFlags |= 1;
+			*reinterpret_cast<int*>(mon + 0x6B0) = 1;
+			object->SetAnimSlot(0, 0);
+			if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x39)) {
+				object->SetAnimSlot(1, 1);
+				object->SetAnimSlot(4, 4);
+				object->SetAnimSlot(6, 6);
+			}
+		}
+		break;
+	}
+
+
+	case 0x35:
+		if (prgObj->m_stateFrame == 0) {
+			*reinterpret_cast<float*>(mon + 0x694) = FLOAT_803319C0;
+			object->m_displayFlags |= 1;
+			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
+				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
+			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, 0x14);
+		}
+		if (prgObj->m_stateFrame == 0x10) {
+			object->m_bgColMask |= 0xD0002;
+			prgObj->changeStat(0, 0, 0);
+		}
+		break;
+
+
+	case 0x36:
+		if (prgObj->m_subState != 0) {
+			if (prgObj->m_subState == 1) {
+				if (prgObj->m_subFrame == 0) {
+					prgObj->reqAnim(0x10, 0, 0);
+				} else if (prgObj->isLoopAnim() != 0) {
+					prgObj->changeStat(0, 0, 0);
+				}
+			}
+			break;
+		}
+		if (prgObj->m_subFrame == 0) {
+			int dataNo = object->m_charaModelHandle->GetPdtSlot();
+			prgObj->putParticle((dataNo << 8) | 4, 0, object, FLOAT_803319C0, 0);
+			prgObj->reqAnim(0xF, 1, 0);
+			unsigned int soundId = 0;
+			void* classId = object->m_scriptHandle[4];
+			if (classId == reinterpret_cast<void*>(0xA7)) {
+				soundId = 0x12130;
+			} else if (reinterpret_cast<int>(classId) < 0xA7) {
+				if (classId == reinterpret_cast<void*>(0x9C)) {
+					soundId = 0x12130;
+				}
+			} else if (classId == reinterpret_cast<void*>(0xA9)) {
+				soundId = 0x1213A;
+			} else if (reinterpret_cast<int>(classId) < 0xA9) {
+				soundId = 0x12126;
+			}
+			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
+		}
+		if (prgObj->m_subFrame == 0x32) {
+			prgObj->changeSubStat(1);
 		}
 		break;
 
@@ -1045,62 +1349,19 @@ void CGMonObj::onFrameStat()
 		}
 		break;
 
-	case 0x1C: {
-		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
-		if (prgObj->m_stateFrame == 0) {
-			object->CancelAnim(1);
-		}
-		Vec delta = m_homePosition;
-		PSVECSubtract(&delta, &object->m_worldPosition, &delta);
-		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
-		object->MoveVector(&delta, speedScale, 1, 1, 0, 1);
-		break;
-	}
-
-	case 0x1D:
-		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
-		if ((prgObj->m_subState == 1) && (Math.Rand(100) == 0)) {
-			prgObj->changeSubStat(0);
-		} else if ((prgObj->m_subState == 0) && (prgObj->m_subFrame == 0)) {
-			float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-				(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
-			object->moveVectorRot(object->m_rotBaseY, 0.0f, speedScale, Math.Rand(0x50) + 10);
-		}
-		break;
-
-	case 0x1E: {
-		int targetPartyIndex = m_targetPartyIndex;
-		if ((targetPartyIndex < 0) || (targetPartyIndex >= 4) || (Game.m_partyObjArr[targetPartyIndex] == NULL)) {
-			prgObj->changeStat(0, 0, 0);
-			break;
-		}
-
-		Vec delta = reinterpret_cast<CGObject*>(Game.m_partyObjArr[targetPartyIndex])->m_worldPosition;
-		PSVECSubtract(&delta, &object->m_worldPosition, &delta);
-		float speedScale = *reinterpret_cast<float*>(mon + 0x690) *
-			(0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xD4)) + 0.8f);
-		object->moveVector(&delta, speedScale, 1);
-
-		float targetDist = static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCE));
-		float dist = *reinterpret_cast<float*>(mon + 0x5D0 + targetPartyIndex * 4);
-		if ((prgObj->m_stateFrame >= static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B6))) ||
-			(targetDist <= dist) ||
-			(static_cast<int>(static_cast<unsigned int>(object->m_stateFlags0) << 25) < 0)) {
-			prgObj->changeStat(0, 0, 0);
-			object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[targetPartyIndex]));
-		}
-		break;
-	}
 
 	case 0x21:
-		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
+		SET_DRAW_FLAG();
 		moveFrame();
 		break;
+
 	}
 
 	CGCharaObj::onFrameStat();
-#undef state
+#undef prgObj
+#undef object
+#undef mon
+#undef SET_DRAW_FLAG
 }
 
 /*

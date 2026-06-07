@@ -768,11 +768,12 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
  */
 void CMaterialMan::addtev_lightmap(long index)
 {
-    unsigned char indexByte = static_cast<unsigned char>(index);
-
-    if ((m_shadowKColorMask & (1 << indexByte)) != 0) {
+    if ((m_shadowKColorMask & (1 << index)) != 0) {
         GXColor kcolor;
-        *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
+        kcolor.r = 0;
+        kcolor.g = 0;
+        kcolor.b = 0;
+        kcolor.a = m_shadowKColorIds[index];
         GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
 
         GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
@@ -841,11 +842,12 @@ void CMaterialMan::addtev_lightmap(long index)
  */
 void CMaterialMan::addtev_shadow(long index)
 {
-    unsigned char indexByte = static_cast<unsigned char>(index);
-
-    if ((m_shadowKColorMask & (1 << indexByte)) != 0) {
+    if ((m_shadowKColorMask & (1 << index)) != 0) {
         GXColor kcolor;
-        *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
+        kcolor.r = 0;
+        kcolor.g = 0;
+        kcolor.b = 0;
+        kcolor.a = m_shadowKColorIds[index];
         GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
 
         GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));

@@ -1119,12 +1119,6 @@ void CGMonObj::onStatMagic()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	switch (prgObj->m_subState) {
-	case 1:
-		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
-			prgObj->changeSubStat(2);
-		}
-		return;
-
 	case 0:
 		if (prgObj->m_subFrame == 0) {
 			int targetPartyIndex = m_targetPartyIndex;
@@ -1148,6 +1142,12 @@ void CGMonObj::onStatMagic()
 				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
 			CGCharaObj::putParticleFromItem(
 				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+		}
+		return;
+
+	case 1:
+		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
+			prgObj->changeSubStat(2);
 		}
 		return;
 	}

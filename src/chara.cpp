@@ -2351,11 +2351,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 {
 	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
-		if (currentAnim == 0) {
-			blendMode = 0;
-		} else if (AnimInterpCount(currentAnim) == 0 || AnimBank(currentAnim) == 0) {
-			blendMode = 4;
-		} else {
+		if (currentAnim != 0 && AnimInterpCount(currentAnim) != 0 && AnimBank(currentAnim) != 0) {
 			blendMode = 4;
 
 			u8 interpCount = AnimInterpCount(currentAnim);
@@ -2370,6 +2366,8 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 					break;
 				}
 			}
+		} else {
+			blendMode = (currentAnim == 0) ? 0 : 4;
 		}
 	}
 

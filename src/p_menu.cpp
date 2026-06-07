@@ -171,10 +171,10 @@ CProcessTable CMenuPcs::m_table = {
     },
 };
 
-extern const char s_common_80330708[];
+extern const char sYmTracerCommonName[];
 extern const char s_pppParHitSphWin[];
-const char* PTR_s_common[] = {
-    s_common_80330708, s_pppParHitSphWin,
+const char* sMenuCommonTextureNames[] = {
+    sYmTracerCommonName, s_pppParHitSphWin,
 };
 
 extern const char* sMenuTextureRegionNameTable[];
@@ -366,7 +366,7 @@ void CMenuPcs::create()
     loadFont(0, fontPath, 0, 0);
 
     for (int i = 0; i < 2; i++) {
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), PTR_s_common[i]);
+        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), sMenuCommonTextureNames[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {

@@ -1010,6 +1010,235 @@ void CMenuPcs::CmdDraw()
 		entry++;
 	}
 
+	if (GetCmdStateView(this)->prevMode != 0) {
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		CmdListStorage* const list = GetCmdListStorage(this);
+		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+		const s32 itemCount = letterBuf[0];
+		CmdListEntry* row = &list->entries[list->count];
+		s32 specialRow = 0;
+		for (s32 idx = list->count; idx < list->listEnd; idx++) {
+			const s32 tex = row->tex;
+			if (tex >= 0) {
+				float rowX = static_cast<float>(row->x);
+				float rowY = static_cast<float>(row->y);
+				float rowW = static_cast<float>(row->width);
+				const float rowH = static_cast<float>(row->height);
+				float rowU = row->u;
+				float rowV = row->v;
+
+				if (idx == list->count) {
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+
+					GXColor colors[4];
+					colors[0].r = 0xFF;
+					colors[0].g = 0xFF;
+					colors[0].b = 0xFF;
+					colors[0].a = 0xFF;
+					colors[1].r = 0xFF;
+					colors[1].g = 0xFF;
+					colors[1].b = 0xFF;
+					colors[1].a = 0xFF;
+					colors[2].r = 0xFF;
+					colors[2].g = 0xFF;
+					colors[2].b = 0xFF;
+					colors[2].a = 0xFF;
+					colors[3].r = 0xFF;
+					colors[3].g = 0xFF;
+					colors[3].b = 0xFF;
+					colors[3].a = 0xFF;
+					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
+
+					const float fill = row->alpha * rowW;
+					if (fill > FLOAT_80332ab0) {
+						MenuPcs.DrawRect(0, rowX, rowY, fill, rowH, rowU, rowV, colors,
+						    FLOAT_80332a70, FLOAT_80332a70, 0.0f);
+						rowX += fill;
+						rowU += fill;
+					}
+					if ((fill > FLOAT_80332ab0) && (fill < rowW)) {
+						colors[1].a = 0;
+						colors[3].a = 0;
+						const float frac = static_cast<float>(
+						    DOUBLE_80332a58 / static_cast<double>(row->duration));
+						const float gradW = frac * rowW;
+						MenuPcs.DrawRect(0, rowX, rowY, gradW, rowH, rowU, rowV, colors,
+						    FLOAT_80332a70, FLOAT_80332a70, 0.0f);
+					}
+
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+				} else {
+					float rowAlpha = row->alpha;
+					s32 rowTex = tex;
+					if (tex == 0x37) {
+						s32 sel = specialRow + GetCmdStateView(this)->scrollTop;
+						if ((itemCount >= 8) && (sel >= itemCount)) {
+							sel -= itemCount;
+						}
+
+						if (sel < 2) {
+							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+							const CCaravanWork* const caravan2 =
+							    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+							u32 canUse;
+							if ((sel < 0) || (sel >= canBuf[0])) {
+								canUse = 0;
+							} else if (sel == 0) {
+								canUse = static_cast<u32>(
+								    caravan2->m_commandListInventorySlotRef[GetCmdStateView(this)->selected] >= 0);
+							} else if (sel == 1) {
+								int combo[2][2];
+								canUse = static_cast<u32>(
+								    ChkUnite(GetCmdStateView(this)->selected, combo) > 0);
+							} else {
+								canUse = static_cast<u32>(EquipChk(static_cast<int>(canBuf[sel - 1])) != 0);
+							}
+
+							if (canUse == 0) {
+								rowTex = 0x34;
+								rowAlpha = static_cast<float>(DOUBLE_80332a60) * row->alpha;
+							}
+						} else {
+							s32 itemIdx = sel - 2;
+							if ((itemCount >= 8) && (itemIdx >= itemCount)) {
+								itemIdx -= itemCount;
+							}
+
+							bool equippable = true;
+							if (itemIdx + 2 < itemCount) {
+								equippable = EquipChk(static_cast<int>(letterBuf[itemIdx + 1])) != 0;
+							}
+
+							if (equippable) {
+								if (itemIdx + 2 < itemCount) {
+									const float markX = rowX - FLOAT_80332b14;
+									const float markY = (rowH - FLOAT_80332b18) *
+									                        static_cast<float>(DOUBLE_80332a60) +
+									                    rowY;
+									DrawEquipMark(static_cast<s32>(markX), static_cast<s32>(markY),
+									    row->alpha);
+								}
+								rowTex = 0x34;
+								rowAlpha = static_cast<float>(DOUBLE_80332a60) * row->alpha;
+							}
+						}
+
+						if ((rowTex == 0x37) &&
+						    (specialRow == GetCmdStateView(this)->itemSelected)) {
+							rowV += rowH;
+						}
+						specialRow++;
+					}
+
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(rowTex));
+
+					GXColor rowColor;
+					rowColor.r = 0xFF;
+					rowColor.g = 0xFF;
+					rowColor.b = 0xFF;
+					rowColor.a = static_cast<u8>(FLOAT_80332acc * rowAlpha);
+					GXSetChanMatColor(GX_COLOR0A0, rowColor);
+
+					MenuPcs.DrawRect(0, rowX, rowY, rowW, rowH, rowU, rowV, row->scale,
+					    row->scale, 0.0f);
+				}
+			}
+			row++;
+		}
+	}
+
+	if (cmdMode == 1) {
+		CFont* listFont = m_fonts[0];
+		listFont->SetMargin(FLOAT_80332a70);
+		listFont->SetShadow(0);
+		listFont->SetScale(FLOAT_80332ad8);
+		listFont->DrawInit();
+
+		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+		const s32 itemCount = letterBuf[0];
+		CmdListStorage* const list = GetCmdListStorage(this);
+		CmdListEntry* scan = &list->entries[list->count];
+		for (s32 idx = list->count; idx < list->listEnd; idx++) {
+			if (scan->tex == 0x37) {
+				break;
+			}
+			scan++;
+		}
+
+		CmdListEntry* textRow = scan;
+		for (s32 row = 0; row < 8; row++) {
+			if ((itemCount <= 8) && (row + GetCmdStateView(this)->scrollTop >= itemCount)) {
+				break;
+			}
+
+			s32 displayIdx = row + GetCmdStateView(this)->scrollTop;
+			if (displayIdx >= itemCount) {
+				displayIdx -= itemCount;
+			}
+
+			const float alpha = textRow->alpha;
+			listFont->SetColor(
+			    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color);
+
+			const char* text;
+			if (displayIdx < 2) {
+				text = GetMenuStr(displayIdx + 0x0B);
+			} else if (displayIdx >= itemCount) {
+				textRow++;
+				continue;
+			} else {
+				const s16 slot = letterBuf[displayIdx - 1];
+				const s16 skillId = caravan->m_inventoryItems[slot];
+				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
+				text = flatText[skillId * 5 + 4];
+
+				s32 selDisp = GetCmdStateView(this)->itemSelected + GetCmdStateView(this)->scrollTop;
+				if (selDisp >= itemCount) {
+					selDisp -= itemCount;
+				}
+				if (displayIdx == selDisp) {
+					helpId = skillId;
+					hasItemHelp = true;
+				}
+			}
+
+			const float width = static_cast<float>(listFont->GetWidth(text));
+			listFont->SetPosX(
+			    static_cast<float>(textRow->x + 0x1C) +
+			    ((static_cast<float>(textRow->width) - width) * static_cast<float>(DOUBLE_80332a60)));
+			listFont->SetPosY(static_cast<float>(textRow->y + 3) - FLOAT_80332ae8);
+			listFont->Draw(text);
+
+			textRow++;
+		}
+
+		DrawInit();
+
+		CmdListEntry* iconRow = scan;
+		for (s32 row = 0; row < 8; row++) {
+			if ((itemCount <= 8) && (row + GetCmdStateView(this)->scrollTop >= itemCount)) {
+				break;
+			}
+
+			s32 displayIdx = row + GetCmdStateView(this)->scrollTop;
+			if (displayIdx >= itemCount) {
+				displayIdx -= itemCount;
+			}
+
+			if (displayIdx >= 2) {
+				const s16 slot = letterBuf[displayIdx - 1];
+				DrawSingleIcon(
+				    caravan->m_inventoryItems[slot],
+				    static_cast<s32>(static_cast<float>(iconRow->x + iconRow->width - 0x10)),
+				    static_cast<s32>(static_cast<float>(iconRow->y + 6) - FLOAT_80332a70),
+				    iconRow->alpha, 0, 0.0f);
+			}
+
+			iconRow++;
+		}
+	}
+
 	if (cmdMode == 2) {
 		CmdListEntry* panel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 		SetTexture(static_cast<CMenuPcs::TEX>(panel->tex));

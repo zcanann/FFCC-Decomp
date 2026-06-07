@@ -11287,11 +11287,12 @@ int McCtrl::LoadMcList()
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
-			m_state = 5;
-		} else {
+		} else if (MemoryCardMan.IsBrokenFile()) {
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
+			if (closeResult != 0) {
+				m_lastResult = closeResult;
+				m_state = -1;
+			} else {
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				for (int i = 0; i < kMcListCount; i++) {
@@ -11301,25 +11302,25 @@ int McCtrl::LoadMcList()
 					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
 				}
 				m_state = 7;
-			} else {
-				m_lastResult = closeResult;
-				m_state = -1;
 			}
+		} else {
+			m_state = 5;
 		}
 		break;
 
 	case 5: {
 		unsigned int serialLo = 0;
 		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) == 0) {
+			m_serialHi = serialHi;
+			m_serialLo = serialLo;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11346,13 +11347,13 @@ int McCtrl::LoadMcList()
 					m_state = 5;
 				} else {
 					const int closeResult = MemoryCardMan.McClose();
-					if (closeResult == 0) {
+					if (closeResult != 0) {
+						m_lastResult = closeResult;
+						m_state = -1;
+					} else {
 						MemoryCardMan.McUnmount(m_cardChannel);
 						MemoryCardMan.DestroyMcBuff();
 						m_state = 7;
-					} else {
-						m_lastResult = closeResult;
-						m_state = -1;
 					}
 				}
 			}

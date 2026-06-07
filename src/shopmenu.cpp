@@ -976,7 +976,10 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     unsigned int valueRightX = x + 0x108;
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    font->SetColor(white.color);
+    {
+        CColor valueWhite(0xFF, 0xFF, 0xFF, 0xFF);
+        font->SetColor(valueWhite.color);
+    }
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80332d34);

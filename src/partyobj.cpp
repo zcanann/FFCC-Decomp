@@ -1040,9 +1040,10 @@ void CGPartyObj::onFramePostCalc()
 		shouki();
 	}
 
-	PartyData(this).carryTarget = (CGBaseObj*)0;
-	PartyData(this).secondaryTarget = (CGBaseObj*)0;
-	PartyData(this).targetSearchDistance = 1000000.0f;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<CGBaseObj**>(self + 0x6E4) = (CGBaseObj*)0;
+	*reinterpret_cast<CGBaseObj**>(self + 0x6E8) = (CGBaseObj*)0;
+	*reinterpret_cast<float*>(self + 0x6EC) = INFINITY;
 	CGCharaObj::onFramePostCalc();
 }
 

@@ -1818,12 +1818,8 @@ void CMenuPcs::CmakeJobClose()
  */
 unsigned short CMenuPcs::CmakeJobCtrl()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& job = cmakeState->m_select;
     unsigned short down;
     unsigned short repeat;
-    short& resultDir = cmakeState->m_resultDir;
-    short& mcState = CmakeMcState(this);
 
     bool padBusy = false;
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -1853,33 +1849,33 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         return 0;
     }
 
-    if (mcState != 3) {
-        if (mcState == 1 && (down & 0x300) != 0) {
+    if (CmakeMcState(this) != 3) {
+        if (CmakeMcState(this) == 1 && (down & 0x300) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
-            mcState = 2;
+            CmakeMcState(this) = 2;
         }
     } else {
         if ((repeat & 0x8) != 0) {
-            if ((job % 4) == 0) {
-                job = static_cast<short>(job + 3);
+            if ((CmakeState(this)->m_select % 4) == 0) {
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 3);
             } else {
-                job = static_cast<short>(job - 1);
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if ((job % 4) < 3) {
-                job = static_cast<short>(job + 1);
+            if ((CmakeState(this)->m_select % 4) < 3) {
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
             } else {
-                job = static_cast<short>(job - 3);
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 3);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0x3) != 0) {
-            if (job < 4) {
-                job = static_cast<short>(job + 4);
+            if (CmakeState(this)->m_select < 4) {
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 4);
             } else {
-                job = static_cast<short>(job - 4);
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 4);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
@@ -1919,8 +1915,8 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                 }
 
                 if (duplicateSlot > 7) {
-                    s_CmakeInfo.m_job = static_cast<signed char>(job);
-                    resultDir = 1;
+                    s_CmakeInfo.m_job = static_cast<signed char>(CmakeState(this)->m_select);
+                    CmakeState(this)->m_resultDir = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                     return 1;
                 } else {
@@ -1929,12 +1925,12 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                     GetWinSize(0x16, &winX, &winY, 0);
                     SetMcWinInfo((int)winX, (int)winY);
-                    mcState = 0;
+                    CmakeMcState(this) = 0;
                     return 0;
                 }
             } else if ((down & 0x200) != 0) {
                 ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
-                resultDir = -1;
+                CmakeState(this)->m_resultDir = -1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 return 1;
             }

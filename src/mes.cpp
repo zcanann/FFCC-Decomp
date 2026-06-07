@@ -869,17 +869,24 @@ int CMes::GetWait()
 void CMes::addString(char** text, int branchMode)
 {
 	int fontSel = mFontIndex;
-	CFont* font = MenuPcs.m_fonts[2];
-	if (fontSel != 2)
+	CFont* font;
+	if (fontSel == 2)
 	{
-		if (fontSel < 2)
+		font = MenuPcs.m_fonts[2];
+	}
+	else if (fontSel > 2)
+	{
+		if (fontSel >= 4)
 		{
-			font = MenuPcs.m_fonts[0];
 		}
-		else if (fontSel < 4)
+		else
 		{
 			font = MenuPcs.m_fonts[2];
 		}
+	}
+	else if (fontSel == 0)
+	{
+		font = MenuPcs.m_fonts[0];
 	}
 
 	font->SetShadow(mShadow);
@@ -945,6 +952,11 @@ void CMes::addString(char** text, int branchMode)
 			mWaitActive = 1;
 			goto advanceLine;
 		}
+		case 0x29:
+			mWaitFrames = 5;
+			running = false;
+			mWaitActive = 1;
+			goto advanceLine;
 		case 2:
 			mWaitFrames = 4;
 			running = false;
@@ -1030,72 +1042,6 @@ void CMes::addString(char** text, int branchMode)
 			mColor = oldColor;
 			break;
 		}
-		case 0x0A:
-		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
-			short value = (short)ReadTagS16(text);
-			mFlagVars[idx] = value;
-			if (branchMode == 0)
-			{
-				CFlag flag;
-				flag.m_index = idx;
-				flag.m_value = value;
-				flag.m_type = 2;
-				mFlagEntries[mFlagCount++] = flag;
-			}
-			break;
-		}
-		case 0x0B:
-		{
-			unsigned char idx = (unsigned char)ReadTagU8(text);
-			mFlagVars[idx] = mFlagVars[idx] + 1;
-			if (branchMode == 0)
-			{
-				CFlag flag;
-				flag.m_index = idx;
-				flag.m_type = 1;
-				mFlagEntries[mFlagCount++] = flag;
-			}
-			break;
-		}
-		case 0x0C:
-		case 0x0D:
-		case 0x0E:
-		case 0x0F:
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-			mColor = (int)uch - 0x0C;
-			break;
-		case 0x1A:
-			mScaleX = FLOAT_803308a0 * (float)ReadTagS16(text);
-			font->SetScaleX(mScaleX);
-			font->SetScaleY(mScaleY);
-			break;
-		case 0x1B:
-		{
-			flowMode = 2;
-			if ((mFlagVars[ReadTagS8(text)] & 1) == 0)
-			{
-				flowMode = 1;
-			}
-			break;
-		}
-		case 0x1C:
-		{
-			flowMode = 2;
-			if ((mFlagVars[ReadTagS8(text)] & 1) == 1)
-			{
-				flowMode = 1;
-			}
-			break;
-		}
 		case 0x1E:
 		case 0x1F:
 		case 0x2A:
@@ -1145,81 +1091,6 @@ void CMes::addString(char** text, int branchMode)
 			mColor = oldColor;
 			break;
 		}
-		case 0x20:
-		{
-			unsigned char vowel =
-			    (unsigned char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
-			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
-			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
-			{
-				flowMode = 1;
-			}
-			else
-			{
-				flowMode = 2;
-			}
-			break;
-		}
-		case 0x21:
-		{
-			char vowel = *FlatNameDirect(2, mFlagVars[ReadTagS8(text)]);
-			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
-			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
-			{
-				flowMode = 1;
-			}
-			else
-			{
-				flowMode = 2;
-			}
-			break;
-		}
-		case 0x22:
-		{
-			float x = (float)ReadTagS16(text);
-			float y = (float)ReadTagS16(text);
-			MenuPcs.m_battleMesMenus[m_playerIndex]->SetPos(x, y);
-			break;
-		}
-		case 0x24:
-			running = false;
-			mWaitFrames = 2;
-			goto advanceLine;
-		case 0x25:
-		{
-			int value = ReadTagS8(text);
-			if (mFontCount == 0)
-			{
-				if (value == 0x7F)
-				{
-					mAdvanceEnabled = 0;
-				}
-				else
-				{
-					mAdvanceStep = value;
-				}
-			}
-			else if (System.m_execParam != 0)
-			{
-				System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
-			}
-			break;
-		}
-		case 0x26:
-			mTextAlign = ReadTagS8(text);
-			break;
-		case 0x27:
-			mFadeFrames = ReadTagS8(text);
-			break;
-		case 0x28:
-			running = false;
-			mWaitFrames = 1;
-			goto advanceLine;
-		case 0x29:
-			mWaitFrames = 5;
-			running = false;
-			mWaitActive = 1;
-			goto advanceLine;
 		case 0x2B:
 		{
 			int oldColor = mColor;
@@ -1285,10 +1156,94 @@ void CMes::addString(char** text, int branchMode)
 			addString(&numberPtr, branchMode);
 			break;
 		}
+		case 0x0A:
+		{
+			unsigned char idx = (unsigned char)ReadTagU8(text);
+			short value = (short)ReadTagS16(text);
+			mFlagVars[idx] = value;
+			if (branchMode == 0)
+			{
+				CFlag flag;
+				flag.m_index = idx;
+				flag.m_value = value;
+				flag.m_type = 2;
+				mFlagEntries[mFlagCount++] = flag;
+			}
+			break;
+		}
+		case 0x0B:
+		{
+			unsigned char idx = (unsigned char)ReadTagU8(text);
+			mFlagVars[idx] = mFlagVars[idx] + 1;
+			if (branchMode == 0)
+			{
+				CFlag flag;
+				flag.m_index = idx;
+				flag.m_type = 1;
+				mFlagEntries[mFlagCount++] = flag;
+			}
+			break;
+		}
+		case 0x0C:
+		case 0x0D:
+		case 0x0E:
+		case 0x0F:
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+			mColor = (int)uch - 0x0C;
+			break;
+		case 0x24:
+			running = false;
+			mWaitFrames = 2;
+			goto advanceLine;
+		case 0x28:
+			running = false;
+			mWaitFrames = 1;
+			goto advanceLine;
+		case 0x26:
+			mTextAlign = ReadTagS8(text);
+			break;
+		case 0x27:
+			mFadeFrames = ReadTagS8(text);
+			break;
+		case 0x25:
+		{
+			int value = ReadTagS8(text);
+			if (mFontCount == 0)
+			{
+				if (value == 0x7F)
+				{
+					mAdvanceEnabled = 0;
+				}
+				else
+				{
+					mAdvanceStep = value;
+				}
+			}
+			else if (System.m_execParam != 0)
+			{
+				System.Printf(const_cast<char*>(s_mesTagUnknown), uch + 0xA0);
+			}
+			break;
+		}
 		case 0x31:
 			mCurrentX = (float)ReadTagS16(text);
 			mCurrentY = (float)ReadTagS16(text);
 			break;
+		case 0x22:
+		{
+			float x = (float)ReadTagS16(text);
+			float y = (float)ReadTagS16(text);
+			MenuPcs.m_battleMesMenus[m_playerIndex]->SetPos(x, y);
+			break;
+		}
 		case 0x32:
 			mColor = 9;
 			break;
@@ -1329,6 +1284,11 @@ void CMes::addString(char** text, int branchMode)
 			font->SetScaleY(mScaleY);
 			break;
 		}
+		case 0x1A:
+			mScaleX = FLOAT_803308a0 * (float)ReadTagS16(text);
+			font->SetScaleX(mScaleX);
+			font->SetScaleY(mScaleY);
+			break;
 		case 0x36:
 		{
 			unsigned char idx = (unsigned char)ReadTagU8(text);
@@ -1359,13 +1319,6 @@ void CMes::addString(char** text, int branchMode)
 			}
 			break;
 		}
-		case 0x42:
-			flowMode = 2;
-			if (mFlagVars[ReadTagS8(text)] == 1)
-			{
-				flowMode = 1;
-			}
-			break;
 		case 0x43:
 			flowMode = 2;
 			if (Game.m_gameWork.m_menuStageMode != 0)
@@ -1380,6 +1333,13 @@ void CMes::addString(char** text, int branchMode)
 				flowMode = 1;
 			}
 			break;
+		case 0x42:
+			flowMode = 2;
+			if (mFlagVars[ReadTagS8(text)] == 1)
+			{
+				flowMode = 1;
+			}
+			break;
 		case 0x45:
 			flowMode = 2;
 			if (Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_genderFlag == 0)
@@ -1387,6 +1347,35 @@ void CMes::addString(char** text, int branchMode)
 				flowMode = 1;
 			}
 			break;
+		case 0x20:
+		{
+			unsigned char vowel =
+			    (unsigned char)Game.m_caravanWorkArr[mFlagVars[ReadTagS8(text)]].m_name[0];
+			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
+			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
+			{
+				flowMode = 1;
+			}
+			else
+			{
+				flowMode = 2;
+			}
+			break;
+		}
+		case 0x21:
+		{
+			char vowel = *FlatNameDirect(2, mFlagVars[ReadTagS8(text)]);
+			if ((vowel == 'A') || (vowel == 'I') || (vowel == 'U') ||
+			    (vowel == 'E') || (vowel == 'O') || (vowel == 'Y'))
+			{
+				flowMode = 1;
+			}
+			else
+			{
+				flowMode = 2;
+			}
+			break;
+		}
 		case 0x46:
 			if (flowMode == 1)
 			{
@@ -1397,6 +1386,24 @@ void CMes::addString(char** text, int branchMode)
 				flowMode = 1;
 			}
 			break;
+		case 0x1B:
+		{
+			flowMode = 2;
+			if ((mFlagVars[ReadTagS8(text)] & 1) == 0)
+			{
+				flowMode = 1;
+			}
+			break;
+		}
+		case 0x1C:
+		{
+			flowMode = 2;
+			if ((mFlagVars[ReadTagS8(text)] & 1) == 1)
+			{
+				flowMode = 1;
+			}
+			break;
+		}
 		case 0x47:
 			flowMode = 0;
 			break;

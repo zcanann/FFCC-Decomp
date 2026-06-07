@@ -322,8 +322,8 @@ public:
 			} m_flags10CBits;
 		};
 		u8 _pad10D[3];
-		float m_furStep;
 		float m_furLenScale;
+		float m_furStep;
 		float m_furTarget;
 		float m_furCur;
 		float m_twistAngle;

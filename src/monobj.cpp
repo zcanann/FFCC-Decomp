@@ -3201,11 +3201,11 @@ void CGMonObj::statWatch()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
-	int& actionState = *reinterpret_cast<int*>(CGMonObj::m_aiWork + 4);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
 	int& chaseState = monObj->m_chaseState;
 	int& chaseTimer = monObj->m_chaseTimer;
-	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+#define actionState (*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4))
+#define script (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 
 	if (prgObj->m_lastStateId == 0) {
 		monObj->m_unk6BD = 0;
@@ -3335,6 +3335,8 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		}
 	}
+#undef script
+#undef actionState
 }
 
 /*

@@ -3305,12 +3305,16 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			if (((partyState == 1) || (partyState == 7)) &&
 				((float)__fabs(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)) > FLOAT_80331A30)) {
 				if (*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) {
-					forceAction = monObj->m_forcedAction ==
-						*reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
-				} else {
-					forceAction = monObj->m_forcedAction == actionIndex;
+					if (monObj->m_forcedAction != *reinterpret_cast<short*>(aiScript + actionOffset + 0x11E)) {
+						goto skipForce;
+					}
+				} else if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) ||
+					(monObj->m_forcedAction != actionIndex)) {
+					goto skipForce;
 				}
+				forceAction = true;
 			}
+		skipForce:
 
 			if (forceAction || (Math.Rand(100) <= chance)) {
 				selectedAction = actionIndex;
@@ -3338,7 +3342,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		int& groupCursor = monObj->m_unk6CC;
 		while (groupCount[groupCursor] == 0) {
 			groupCursor += 1;
-			if (7 < groupCursor) {
+			if (groupCursor >= 8) {
 				groupCursor = 0;
 			}
 		}

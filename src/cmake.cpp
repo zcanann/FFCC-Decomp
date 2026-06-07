@@ -801,7 +801,7 @@ void CMenuPcs::CmakeVillageDraw()
         48.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     if (villageWork->m_mode == 1 && villageWork->m_row < 5) {
-        short row = villageWork->m_row;
+        unsigned short row = villageWork->m_row;
         int cursorX = static_cast<int>(26.9f * static_cast<float>(villageWork->m_select)) + 0xE5;
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -855,7 +855,7 @@ void CMenuPcs::CmakeVillageDraw()
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
     DrawCmakeDecision((static_cast<int>(villageWork->m_row) >> 31) +
-        (static_cast<unsigned int>(static_cast<int>(villageWork->m_row)) > 4), alpha);
+        (static_cast<int>(villageWork->m_row) > 4), alpha);
 }
 
 /*

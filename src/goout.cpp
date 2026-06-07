@@ -1526,7 +1526,7 @@ void CGoOutMenu::CalcGoOut()
     int selResult = -1;
 
     if (m_watchCardDisconnect != 0 && m_modeFrame >= 0x14 && (m_modeFrame & 0xF) == 0) {
-        const int cardStatus = ((m_modeFrame & 0x10) == 0) ? MenuPcs.GetMcCtrl()->ChkConnect(1) : MenuPcs.GetMcCtrl()->ChkConnect(0);
+        const int cardStatus = MenuPcs.GetMcCtrl()->ChkConnect(((m_modeFrame & 0x10) == 0) ? 1 : 0);
         if (cardStatus != 1) {
             m_watchCardDisconnect = 0;
             m_returnGoOutMode = -1;

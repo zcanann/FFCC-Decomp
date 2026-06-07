@@ -428,22 +428,22 @@ static inline float ModelBaseScale(CChara::CModel* model)
 	return model->m_data->m_baseScale;
 }
 
-static inline u16& ModelHeadIndex(CChara::CModel* model)
+static inline s16& ModelHeadIndex(CChara::CModel* model)
 {
 	return model->m_data->m_headNodeIndex;
 }
 
-static inline u16& ModelChest3Index(CChara::CModel* model)
+static inline s16& ModelChest3Index(CChara::CModel* model)
 {
 	return model->m_data->m_chest3NodeIndex;
 }
 
-static inline u16& ModelChest2Index(CChara::CModel* model)
+static inline s16& ModelChest2Index(CChara::CModel* model)
 {
 	return model->m_data->m_chest2NodeIndex;
 }
 
-static inline u16& ModelChest1Index(CChara::CModel* model)
+static inline s16& ModelChest1Index(CChara::CModel* model)
 {
 	return model->m_data->m_chest1NodeIndex;
 }

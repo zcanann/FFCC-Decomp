@@ -25,10 +25,10 @@ struct CCharaModelData
     void* m_nodeRefData;
     void* m_meshRefData;
     void* m_bank;
-    u16 m_headNodeIndex;
-    u16 m_chest3NodeIndex;
-    u16 m_chest2NodeIndex;
-    u16 m_chest1NodeIndex;
+    s16 m_headNodeIndex;
+    s16 m_chest3NodeIndex;
+    s16 m_chest2NodeIndex;
+    s16 m_chest1NodeIndex;
     CMaterialSet* m_materialSet;
     float m_baseScale;
     u8 _pad2C[0x8];

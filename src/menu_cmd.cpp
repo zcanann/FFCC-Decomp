@@ -1437,30 +1437,16 @@ void CMenuPcs::CmdDraw()
  */
 unsigned int CMenuPcs::CmdCtrlCur()
 {
-	bool blocked = false;
 	unsigned int press;
 	s16 hold;
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		press = 0;
-	} else {
-		press = Pad.GetPadInputs()[0].buttonDown[0];
-	}
+	bool blocked = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+	press = blocked ? 0 : Pad.GetPadInputs()[0].buttonDown[0];
 
-	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
-		blocked = true;
-	}
-	if (blocked) {
-		hold = 0;
-	} else {
-		hold = Pad.GetPadInputs()[0].repeatButton;
-	}
+	blocked = (Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1);
+	hold = static_cast<s16>(blocked ? 0 : Pad.GetPadInputs()[0].repeatButton);
 
 	if (hold == 0) {
 		return 0;

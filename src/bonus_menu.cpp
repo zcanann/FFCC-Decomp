@@ -1338,7 +1338,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	float artiAlpha = 0.0f;
+	BonusAnimSprite* artiSprite = 0;
 	int modelIndex = 0;
 	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -1348,20 +1348,18 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		float alpha = sprite->alpha;
 		int kind = sprite->kind;
-		switch (kind) {
-		case -4:
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
-			artiAlpha = alpha;
-			lastKind = kind;
-			break;
-		case -3:
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
-			lastKind = kind;
-			break;
-		case -2:
-			{
+		if (kind >= 0 || kind != -1) {
+			if (kind == -3) {
+				DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, sprite->alpha);
+				lastKind = sprite->kind;
+			} else if (kind == -4) {
+				if (artiSprite == 0) {
+					artiSprite = sprite;
+				}
+				DrawArtiBase((CMenuPcs::Sprt2*)sprite, sprite->alpha);
+				lastKind = sprite->kind;
+			} else if (kind == -2) {
 				CCharaPcs::CHandle* handle = 0;
 				int projectionIndex = modelIndex;
 				if (modelIndex < activePartyCount) {
@@ -1376,8 +1374,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 					handle = GetBonusDisplayHandleSlots(this)[projectionIndex];
 					if (handle == 0) {
 						modelIndex++;
-						lastKind = kind;
-						break;
+						lastKind = -2;
+						continue;
 					}
 				}
 
@@ -1392,19 +1390,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(listPtr + projectionIndex * 0x524 + 4));
 				}
 				RestoreProjection();
-			}
-			modelIndex++;
-			lastKind = kind;
-			break;
-		case -1:
-			break;
-		default:
-			{
+				lastKind = sprite->kind;
+				modelIndex++;
+			} else {
 				if (lastKind < 0) {
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 				if (sprite->tex == 0x20) {
@@ -1417,14 +1410,12 @@ void CMenuPcs::DrawSelectOpenAnim()
 				if (sprite->tex == 0x20) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
-				lastKind = kind;
+				lastKind = sprite->kind;
 			}
-			break;
 		}
-
 	}
 
-	DrawBonusActiveMarks(this, statePtr, artiAlpha);
+	DrawBonusActiveMarks(this, statePtr, artiSprite->alpha);
 	DrawBonusPartyNames(this, header, sprites);
 	DrawBonusSelectedArtifactHelp(this, statePtr, header, sprites);
 	DrawBonusMcWinOverlay(this, statePtr);

@@ -19,17 +19,17 @@
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301B4;
 extern "C" float FLOAT_803301B8;
-extern "C" float FLOAT_803301bc;
-extern "C" float FLOAT_803301c8;
-extern "C" float FLOAT_803301cc;
-extern "C" float FLOAT_803301d0;
-extern "C" float FLOAT_803301d4;
-extern "C" float FLOAT_803301d8;
-extern "C" float FLOAT_803301dc;
-extern "C" float FLOAT_803301e0;
-extern "C" float FLOAT_803301e4;
-extern "C" float FLOAT_803301e8;
-extern "C" float FLOAT_803301f8;
+extern "C" float FLOAT_803301BC;
+extern "C" float FLOAT_803301C8;
+extern "C" float FLOAT_803301CC;
+extern "C" float FLOAT_803301D0;
+extern "C" float FLOAT_803301D4;
+extern "C" float FLOAT_803301D8;
+extern "C" float FLOAT_803301DC;
+extern "C" float FLOAT_803301E0;
+extern "C" float FLOAT_803301E4;
+extern "C" float FLOAT_803301E8;
+extern "C" float FLOAT_803301F8;
 extern const char s_CChara_80330220[];
 
 inline void* operator new(unsigned long, void* ptr)
@@ -1329,7 +1329,7 @@ void CChara::CModel::CalcMatrix()
 	float(*worldBaseMtx)[4] = (float(*)[4])((u8*)this + 0x38);
 	float(*drawMtx)[4] = (float(*)[4])((u8*)this + 0x68);
 	const float zero = FLOAT_803301b0;
-	const float one = FLOAT_803301bc;
+	const float one = FLOAT_803301BC;
 
 	worldBaseMtx[0][0] = localMtx[0][0];
 	worldBaseMtx[1][0] = localMtx[1][0];
@@ -1451,25 +1451,25 @@ void CChara::CModel::calcMatrix()
 	if (m_anim == 0) {
 		frame = FLOAT_803301b0;
 	} else {
-		float total = FLOAT_803301bc + (m_animEnd - m_animStart);
+		float total = FLOAT_803301BC + (m_animEnd - m_animStart);
 		if (((AnimFlags(m_anim) >> 6) & 1) == 0) {
 			if (m_time >= FLOAT_803301b0) {
 				frame = m_animStart + static_cast<float>(fmod(m_time, total));
 			} else {
-				frame = ((m_animStart + total) - FLOAT_803301bc) - static_cast<float>(fmod(-m_time, total));
+				frame = ((m_animStart + total) - FLOAT_803301BC) - static_cast<float>(fmod(-m_time, total));
 			}
 		} else if (m_time >= FLOAT_803301b0) {
-			float clamped = total - FLOAT_803301bc;
+			float clamped = total - FLOAT_803301BC;
 			if (m_time < clamped) {
 				clamped = m_time;
 			}
 			frame = m_animStart + clamped;
 		} else {
-			float clamped = total - FLOAT_803301bc;
+			float clamped = total - FLOAT_803301BC;
 			if (-m_time < clamped) {
 				clamped = -m_time;
 			}
-			frame = ((m_animStart + total) - FLOAT_803301bc) - clamped;
+			frame = ((m_animStart + total) - FLOAT_803301BC) - clamped;
 		}
 	}
 	m_curFrame = frame;
@@ -1479,7 +1479,7 @@ void CChara::CModel::calcMatrix()
 
 	CNode* nodes = ModelNodes(this);
 	u16 nodeCount = ModelNodeCount(this);
-	Vec twistAxisBase = {FLOAT_803301b0, FLOAT_803301bc, FLOAT_803301b0};
+	Vec twistAxisBase = {FLOAT_803301b0, FLOAT_803301BC, FLOAT_803301b0};
 	CNode* node = nodes;
 	for (u32 i = 0; i < nodeCount; i++, node++) {
 		CNode* parentNode;
@@ -1502,7 +1502,7 @@ void CChara::CModel::calcMatrix()
 			if (parentNode == 0 || NodeAnimNode0(parentNode) == 0 || !AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
 					float baseScale;
-					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301bc) {
+					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301BC) {
 						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 					} else {
 						PSMTXIdentity(localMtx);
@@ -1511,9 +1511,9 @@ void CChara::CModel::calcMatrix()
 			} else if ((NodeRuntimeFlags(node) & 0x80) != 0) {
 				float* parentScale = NodeRuntimeScale(parentNode);
 				PSMTXScale(localMtx,
-				           FLOAT_803301bc / parentScale[0],
-				           FLOAT_803301bc / parentScale[1],
-				           FLOAT_803301bc / parentScale[2]);
+				           FLOAT_803301BC / parentScale[0],
+				           FLOAT_803301BC / parentScale[1],
+				           FLOAT_803301BC / parentScale[2]);
 			}
 
 			if (NodeUsesParentLenX(node) != 0) {
@@ -1530,9 +1530,9 @@ void CChara::CModel::calcMatrix()
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 				PSMTXScale(animMtx,
-				           FLOAT_803301bc / srt.m_scale.x,
-				           FLOAT_803301bc / srt.m_scale.y,
-				           FLOAT_803301bc / srt.m_scale.z);
+				           FLOAT_803301BC / srt.m_scale.x,
+				           FLOAT_803301BC / srt.m_scale.y,
+				           FLOAT_803301BC / srt.m_scale.z);
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 
@@ -1549,11 +1549,11 @@ void CChara::CModel::calcMatrix()
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
 					if (nodeIndex == ModelChest3Index(this)) {
-						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301d0 - srt.m_rotation.y);
-						tiltScale = FLOAT_803301d0;
+						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt.m_rotation.y);
+						tiltScale = FLOAT_803301D0;
 					} else {
-						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301f8 + srt.m_rotation.x;
-						tiltScale = FLOAT_803301f8;
+						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt.m_rotation.x;
+						tiltScale = FLOAT_803301F8;
 					}
 					srt.m_rotation.z = ModelChestTilt(this) * tiltScale + srt.m_rotation.z;
 				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
@@ -1577,7 +1577,7 @@ void CChara::CModel::calcMatrix()
 		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
-			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) * (FLOAT_803301bc / static_cast<float>(blendMax)));
+			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
 			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
 			Vec targetScale;
 			Quaternion targetQuat;
@@ -1588,15 +1588,15 @@ void CChara::CModel::calcMatrix()
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
-			if (FLOAT_803301e4 <= targetScale.x) {
-				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301bc - alpha);
+			if (FLOAT_803301E4 <= targetScale.x) {
+				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
 			} else {
-				targetScale.y = FLOAT_803301e8;
-				targetScale.z = FLOAT_803301e8;
+				targetScale.y = FLOAT_803301E8;
+				targetScale.z = FLOAT_803301E8;
 			}
-			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301bc - alpha);
+			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
 			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, localMtx);
@@ -1693,7 +1693,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
 				if (parentNode == 0) {
 					float baseScale = ModelBaseScale(this);
-					if (baseScale != FLOAT_803301bc) {
+					if (baseScale != FLOAT_803301BC) {
 						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
 					} else {
 						PSMTXIdentity(localMtx);
@@ -1705,9 +1705,9 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				parentAnimNode0->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
 				nextReuseAnimNode0Srt = true;
 				PSMTXScale(localMtx,
-				           FLOAT_803301bc / parentScaleSrt.m_scale.x,
-				           FLOAT_803301bc / parentScaleSrt.m_scale.y,
-				           FLOAT_803301bc / parentScaleSrt.m_scale.z);
+				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
+				           FLOAT_803301BC / parentScaleSrt.m_scale.y,
+				           FLOAT_803301BC / parentScaleSrt.m_scale.z);
 			}
 
 			if (NodeUsesParentLenX(cur) != 0) {
@@ -1727,9 +1727,9 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 
-				float invX = (srt1.m_scale.x != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.x) : FLOAT_803301bc;
-				float invY = (srt1.m_scale.y != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.y) : FLOAT_803301bc;
-				float invZ = (srt1.m_scale.z != 0.0f) ? (FLOAT_803301bc / srt1.m_scale.z) : FLOAT_803301bc;
+				float invX = (srt1.m_scale.x != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.x) : FLOAT_803301BC;
+				float invY = (srt1.m_scale.y != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.y) : FLOAT_803301BC;
+				float invZ = (srt1.m_scale.z != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.z) : FLOAT_803301BC;
 				PSMTXScale(invScaleMtx, invX, invY, invZ);
 				PSMTXConcat(localMtx, invScaleMtx, localMtx);
 			}
@@ -1749,11 +1749,11 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
 					if (nodeIndex == ModelChest3Index(this)) {
-						srt0.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301d0 - srt0.m_rotation.y);
-						tiltScale = FLOAT_803301d0;
+						srt0.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt0.m_rotation.y);
+						tiltScale = FLOAT_803301D0;
 					} else {
-						srt0.m_rotation.x = ModelChestAmp(this) * FLOAT_803301f8 + srt0.m_rotation.x;
-						tiltScale = FLOAT_803301f8;
+						srt0.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt0.m_rotation.x;
+						tiltScale = FLOAT_803301F8;
 					}
 					srt0.m_rotation.z = ModelChestTilt(this) * tiltScale + srt0.m_rotation.z;
 				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
@@ -1772,7 +1772,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		u16 blendCur = ModelBlendCur(this);
 		if (blendCur != 0) {
 			u16 blendMax = ModelBlendMax(this);
-			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) * (FLOAT_803301bc / static_cast<float>(blendMax)));
+			float alpha = FLOAT_803301BC - (static_cast<float>(blendCur) * (FLOAT_803301BC / static_cast<float>(blendMax)));
 			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
 			Vec targetScale;
 			Quaternion targetQuat;
@@ -1783,15 +1783,15 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			Mtx scaleMtx;
 
 			Math.MTXGetScale(localMtx, &targetScale);
-			if (FLOAT_803301e4 <= targetScale.x) {
-				PSVECScale(&NodePreviousScale(cur), &positionScaleA, FLOAT_803301bc - alpha);
+			if (FLOAT_803301E4 <= targetScale.x) {
+				PSVECScale(&NodePreviousScale(cur), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
 			} else {
-				targetScale.y = FLOAT_803301e8;
-				targetScale.z = FLOAT_803301e8;
+				targetScale.y = FLOAT_803301E8;
+				targetScale.z = FLOAT_803301E8;
 			}
-			PSVECScale(&NodePreviousPosition(cur), &positionScaleA, FLOAT_803301bc - alpha);
+			PSVECScale(&NodePreviousPosition(cur), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
 			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, localMtx);
@@ -1884,7 +1884,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		return;
 	}
 
-	float randomScale = FLOAT_803301d0 * Math.RandF() + FLOAT_803301d0;
+	float randomScale = FLOAT_803301D0 * Math.RandF() + FLOAT_803301D0;
 	Vec windImpulse;
 	{
 		CVector tmp;
@@ -1952,10 +1952,10 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 				float dotSide = PSVECDotProduct(&right, &direction);
 				angle = atan2f(dotSide, dotForward);
 			}
-			float limit = FLOAT_803301d4 * dynParam[5];
-			if (angle <= limit || FLOAT_803301d4 * dynParam[7] <= angle) {
+			float limit = FLOAT_803301D4 * dynParam[5];
+			if (angle <= limit || FLOAT_803301D4 * dynParam[7] <= angle) {
 				if (limit < angle) {
-					limit = FLOAT_803301d4 * dynParam[7];
+					limit = FLOAT_803301D4 * dynParam[7];
 				}
 
 				Mtx rotate;
@@ -1971,9 +1971,9 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 	reinterpret_cast<CVector&>(direction).Normalize();
 	float align = PSVECDotProduct(&forward, &direction);
-	if (align <= FLOAT_803301d8) {
-		float rotateAngle = FLOAT_803301e0;
-		if (FLOAT_803301dc <= align) {
+	if (align <= FLOAT_803301D8) {
+		float rotateAngle = FLOAT_803301E0;
+		if (FLOAT_803301DC <= align) {
 			rotateAngle = acosf(align);
 		}
 
@@ -2181,7 +2181,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			position.x = ModelDrawMtx(this)[0][3];
 			position.y = ModelDrawMtx(this)[1][3];
 			position.z = ModelDrawMtx(this)[2][3];
-			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301c8, FLOAT_803301cc, meshMtx,
+			MaterialMan.SetPosition(static_cast<CMapShadow::TARGET>(0), &position, FLOAT_803301C8, FLOAT_803301CC, meshMtx,
 			                        static_cast<int>(static_cast<u32>(ModelFlagsA0(this)) << 24) >> 31);
 		}
 
@@ -2244,12 +2244,12 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
  */
 void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 {
-	if (FLOAT_803301bc != ModelLightAlpha(this)) {
+	if (FLOAT_803301BC != ModelLightAlpha(this)) {
 		return;
 	}
 
 	ModelMaterialSet(this)->SetTextureSet(m_texSet);
-	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
+	LightPcs.SetAmbientAlpha(FLOAT_803301BC);
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);

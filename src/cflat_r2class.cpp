@@ -1314,13 +1314,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x6A:
-		case -0x6C:
-		case -0x6D:
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x6E:
-			*reinterpret_cast<unsigned int*>(&engineObject->m_lastBgAttr) = object->m_localBase[0];
+		case -0x6C:
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x6D:
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1394,6 +1395,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x6E:
+			*reinterpret_cast<unsigned int*>(&engineObject->m_lastBgAttr) = object->m_localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x76:
 			PushValue(this, object, static_cast<int>(ScriptCaravan(engineObject)->m_evtState1));
 			outResult = 0;

@@ -925,7 +925,7 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
                               CFlatRuntime::CStack* args, CFlatRuntime::CStack* outArg)
 {
 	if (objectParam == 0) {
-		objectParam = getFreeObject(1);
+		objectParam = reinterpret_cast<CObject*>(intToClass(1));
 	}
 
 	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);

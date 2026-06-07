@@ -2237,9 +2237,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			}
 		} else if (systemIndex == -2) {
 			if (*reinterpret_cast<int*>(self + 0x1298) != 0) {
-				const u16* const strOffs = *reinterpret_cast<u16**>(self + 0x34);
-				char* const strBlob = *reinterpret_cast<char**>(self + 0x38);
-				char* format = strBlob + strOffs[*object->m_localBase];
+				char* format = m_strBlob + m_strOffsets[*object->m_localBase];
 
 				if (object->m_argCount == 1) {
 					System.Printf(format);
@@ -2313,7 +2311,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 										break;
 									}
 									case 's':
-										sprintf(rendered, spec, strBlob + strOffs[object->m_localBase[argIndex]]);
+										sprintf(rendered, spec, m_strBlob + m_strOffsets[object->m_localBase[argIndex]]);
 										scan = const_cast<char*>("");
 										break;
 									default:

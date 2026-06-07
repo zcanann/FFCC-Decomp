@@ -986,7 +986,7 @@ void CGCharaObj::onFrameStat()
 				reqAnim(6, 1, 0);
 
 				if ((GetCID() & 0x6D) == 0x6D) {
-					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) + 0x10,
+					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) + 0x10,
 					         0x32, 0x96, 0, 0);
 				}
 			}

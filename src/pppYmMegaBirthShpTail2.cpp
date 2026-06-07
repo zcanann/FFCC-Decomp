@@ -746,7 +746,7 @@ path:
                         float a = Math.RandF();
                         float b = Math.RandF();
                         float c = Math.RandF();
-                        sampleT = a * b * c * Math.RandF();
+                        sampleT = a * (b * (c * Math.RandF()));
                         break;
                     }
                     case 5: {
@@ -754,7 +754,7 @@ path:
                         float b = Math.RandF();
                         float c = Math.RandF();
                         float d = Math.RandF();
-                        sampleT = static_cast<float>(DOUBLE_80330598 - (a * b * c * d * Math.RandF()));
+                        sampleT = static_cast<float>(DOUBLE_80330598 - (a * (b * (c * (d * Math.RandF())))));
                         break;
                     }
                     }

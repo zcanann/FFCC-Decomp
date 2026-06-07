@@ -431,61 +431,65 @@ void CMenuPcs::CmdInit0()
  */
 void CMenuPcs::CmdInit1()
 {
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-	const s32 start = static_cast<s32>(list->count);
-	CmdListEntry* basePanel = &entries[start];
+	s32 idx = static_cast<s32>(GetCmdListStorage(this)->count);
+	CmdListEntry* entry;
 
-	basePanel->tex = 0x2e;
-	basePanel->x = 0xb8;
-	basePanel->y = 0x28;
-	basePanel->width = 0x78;
-	basePanel->height = 0x108;
-	basePanel->u = FLOAT_80332b38;
-	basePanel->v = FLOAT_80332ad0;
-	basePanel->scale = FLOAT_80332a70;
-	basePanel->startFrame = 5;
-	basePanel->duration = 5;
+	entry = &GetCmdListStorage(this)->entries[idx];
+	entry->tex = 0x2e;
+	entry->x = 0xb8;
+	entry->y = 0x28;
+	entry->width = 0x78;
+	entry->height = 0x108;
+	entry->u = FLOAT_80332b38;
+	entry->v = FLOAT_80332ad0;
+	entry->scale = FLOAT_80332a70;
+	entry->startFrame = 5;
+	entry->duration = 5;
+	idx++;
 
-	CmdListEntry* leftIcon = &entries[start + 1];
-	leftIcon->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
-	leftIcon->x = 0xa0;
-	leftIcon->y = 0xe;
-	leftIcon->width = 0x30;
-	leftIcon->height = 0x30;
-	leftIcon->u = FLOAT_80332ab0;
-	leftIcon->v = FLOAT_80332ab0;
-	leftIcon->scale = FLOAT_80332a70;
-	leftIcon->startFrame = 0;
-	leftIcon->duration = 5;
+	entry = &GetCmdListStorage(this)->entries[idx];
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->x = 0xa0;
+	entry->y = 0xe;
+	entry->width = 0x30;
+	entry->height = 0x30;
+	entry->u = FLOAT_80332ab0;
+	entry->v = FLOAT_80332ab0;
+	entry->scale = FLOAT_80332a70;
+	entry->startFrame = 0;
+	entry->duration = 5;
+	idx++;
 
-	CmdListEntry* rightIcon = &entries[start + 2];
-	rightIcon->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
-	rightIcon->width = 0x30;
-	rightIcon->height = 0x30;
-	rightIcon->x = 0xa5;
-	rightIcon->y = static_cast<s16>(0x150 - rightIcon->height);
-	rightIcon->u = FLOAT_80332ab0;
-	rightIcon->v = FLOAT_80332ab0;
-	rightIcon->scale = FLOAT_80332b3c;
-	rightIcon->startFrame = 0;
-	rightIcon->duration = 5;
+	entry = &GetCmdListStorage(this)->entries[idx];
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->width = 0x30;
+	entry->height = 0x30;
+	entry->x = 0xa5;
+	entry->y = static_cast<s16>(0x150 - entry->height);
+	entry->u = FLOAT_80332ab0;
+	entry->v = FLOAT_80332ab0;
+	entry->scale = FLOAT_80332b3c;
+	entry->startFrame = 0;
+	entry->duration = 5;
+	idx++;
 
-	CmdListEntry* choicePanel = &entries[start + 3];
-	choicePanel->flags = 2;
-	choicePanel->tex = 0x2e;
-	choicePanel->x = 0xa0;
-	choicePanel->y = 8;
-	choicePanel->width = 0x48;
-	choicePanel->height = 0x140;
-	choicePanel->u = FLOAT_80332ab0;
-	choicePanel->v = FLOAT_80332ab0;
-	choicePanel->startFrame = 0;
-	choicePanel->duration = 5;
+	entry = &GetCmdListStorage(this)->entries[idx];
+	entry->flags = 2;
+	entry->tex = 0x2e;
+	entry->x = 0xa0;
+	entry->y = 8;
+	entry->width = 0x48;
+	entry->height = 0x140;
+	entry->u = FLOAT_80332ab0;
+	entry->v = FLOAT_80332ab0;
+	entry->startFrame = 0;
+	entry->duration = 5;
+	idx++;
 
+	CmdListEntry* basePanel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
 	s16 y = 0;
 	for (s32 i = 0; i < 4; i++) {
-		CmdListEntry* entry = &entries[start + 4 + i * 2];
+		entry = &GetCmdListStorage(this)->entries[idx];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
@@ -496,28 +500,34 @@ void CMenuPcs::CmdInit1()
 		entry->v = FLOAT_80332ab0;
 		entry->startFrame = 7;
 		entry->duration = 5;
+		idx++;
+		y += 0x20;
 
-		entry = &entries[start + 5 + i * 2];
+		entry = &GetCmdListStorage(this)->entries[idx];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->x = static_cast<s16>(basePanel->x + 0x24);
-		entry->y = static_cast<s16>(basePanel->y + y + 0x20);
+		entry->y = static_cast<s16>(basePanel->y + y);
 		entry->width = 200;
 		entry->height = 0x28;
 		entry->u = FLOAT_80332ab0;
 		entry->v = FLOAT_80332ab0;
 		entry->startFrame = 7;
 		entry->duration = 5;
-		y += 0x40;
+		idx++;
+		y += 0x20;
 	}
 
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
+	const s32 start = static_cast<s32>(list->count);
 	list->listEnd = static_cast<s16>(start + 0xc);
 
 	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
-	CmdListEntry* entry = &entries[list->count];
-	for (u32 i = 0; i < count; i++) {
-		entry[i].timer = 0;
-		entry[i].alpha = FLOAT_80332ab0;
+	CmdListEntry* fillEntry = &entries[list->count];
+	for (u32 k = 0; k < count; k++) {
+		fillEntry[k].timer = 0;
+		fillEntry[k].alpha = FLOAT_80332ab0;
 	}
 }
 

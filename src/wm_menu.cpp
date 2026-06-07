@@ -1860,7 +1860,8 @@ void CMenuPcs::CalcMCardMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && worldState->m_counter1A == 0) {
-			short listRes = (short)mcCtrl.LoadMcList();
+			mcCtrl.LoadMcList();
+			short listRes = (short)mcCtrl.m_lastResult;
 			worldState->m_mcResult = listRes;
 			if (worldState->m_mcResult == 0) break;
 			if (worldState->m_menuMode == 8) {
@@ -2006,13 +2007,15 @@ void CMenuPcs::CalcMCardMenu()
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else if (iVar12 == 0x1A) {
-				worldState->m_mcResult = (short)mcCtrl.EraseDat();
+				mcCtrl.EraseDat();
+				worldState->m_mcResult = (short)mcCtrl.m_lastResult;
 				if (worldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
-				worldState->m_mcResult = (short)mcCtrl.SaveDat();
+				mcCtrl.SaveDat();
+				worldState->m_mcResult = (short)mcCtrl.m_lastResult;
 				if (worldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
@@ -2667,7 +2670,8 @@ void CMenuPcs::CalcLoadMenu()
 		}
 		if (m_menuWindowInfo->state == 1
 		    && worldState->m_counter1A == 0) {
-			short listRes = (short)mcCtrl.LoadMcList();
+			mcCtrl.LoadMcList();
+			short listRes = (short)mcCtrl.m_lastResult;
 			worldState->m_mcResult = listRes;
 			if (worldState->m_mcResult != 0) {
 				if (worldState->m_menuMode == 8) {
@@ -2830,14 +2834,16 @@ void CMenuPcs::CalcLoadMenu()
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else if (iVar10 == 0x1A) {
-				short erRes = (short)mcCtrl.EraseDat();
+				mcCtrl.EraseDat();
+				short erRes = (short)mcCtrl.m_lastResult;
 				worldState->m_mcResult = erRes;
 				if (worldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
-				short ldRes = (short)mcCtrl.LoadDat();
+				mcCtrl.LoadDat();
+				short ldRes = (short)mcCtrl.m_lastResult;
 				worldState->m_mcResult = ldRes;
 			}
 
@@ -11226,7 +11232,7 @@ void McCtrl::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-int McCtrl::LoadMcList()
+void McCtrl::LoadMcList()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -11517,7 +11523,7 @@ void McCtrl::SetBrokenFile(int isBroken)
  * JP Address: TODO
  * JP Size: TODO
  */
-int McCtrl::SaveDat()
+void McCtrl::SaveDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -11808,7 +11814,7 @@ int McCtrl::SaveDat()
  * JP Address: TODO
  * JP Size: TODO
  */
-int McCtrl::LoadDat()
+void McCtrl::LoadDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
@@ -12639,7 +12645,7 @@ void McCtrl::ChkParty(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-int McCtrl::EraseDat()
+void McCtrl::EraseDat()
 {
 	if (m_state < 0) {
 		m_lastResult = -1;

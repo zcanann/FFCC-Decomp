@@ -14,6 +14,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/itemobj.h"
@@ -26,8 +27,6 @@ class CAStar {
 public:
 	void addRealTime(CGPartyObj*);
 };
-class CDbgMenuPcs;
-extern CDbgMenuPcs DbgMenuPcs;
 
 extern const char lbl_801DCA48[];
 extern const char lbl_801DCCB0[];
@@ -1450,38 +1449,39 @@ void CGPartyObj::onFrameStat()
 
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
 	switch (m_lastStateId) {
 	case 0:
 		if (m_stateFrame == 0) {
 			if (party.flags.flag02) {
 				reqAnim(0x27, 0, 0);
-				party.partyFlags &= 0xFD;
+				party.flags.flag02 = 0;
 			} else {
 				reqAnim(-1, 0, 0);
 			}
 		}
 		if ((static_cast<signed char>(party.partyFlags) < 0) ||
 		    (*reinterpret_cast<short*>(script + 0x3E) != 0) ||
-		    (reinterpret_cast<short*>(m_scriptHandle)[0x14] != 0) ||
-		    (reinterpret_cast<short*>(m_scriptHandle)[0x11] != 0)) {
-			m_weaponNodeFlagBytes.m_flags1 &= 0xBF;
-			m_unk63C &= 0x7F;
+		    (*reinterpret_cast<short*>(script + 0x50) != 0) ||
+		    (*reinterpret_cast<short*>(script + 0x44) != 0)) {
+			m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
+			m_unk63CBits.m_bit80 = 0;
 		} else {
-			m_weaponNodeFlagBytes.m_flags1 = (m_weaponNodeFlagBytes.m_flags1 & 0xBF) | 0x40;
-			m_unk63C = (m_unk63C & 0x7F) | 0x80;
+			m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
+			m_unk63CBits.m_bit80 = 1;
 		}
-		if (((MiniGamePcs.m_flags & 8) != 0) ||
+		if (((DbgMenuPcs.GetDbgFlagsRaw() & 8) != 0) ||
 		    ((Game.unk_flat3_0xc7d0 != 0) &&
 		     (Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)) == 1) &&
-		     (static_cast<signed char>(m_unk63C) < 0) &&
+		     (static_cast<signed char>(self[0x63C]) < 0) &&
 		     (static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
 		     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
 		     (static_cast<signed char>(party.partyFlags) >= 0))) {
 			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
 			    (*reinterpret_cast<short*>(script + 0x3E) == 0) &&
-			    (reinterpret_cast<short*>(m_scriptHandle)[0x14] == 0) &&
-			    (reinterpret_cast<short*>(m_scriptHandle)[0x11] == 0) &&
+			    (*reinterpret_cast<short*>(script + 0x50) == 0) &&
+			    (*reinterpret_cast<short*>(script + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
 				PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition, &moveVec);

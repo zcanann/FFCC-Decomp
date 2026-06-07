@@ -27,7 +27,7 @@ struct PartyObjFlags {
     unsigned char flag10 : 1;
     signed char flag08 : 1;
     signed char flag04 : 1;
-    unsigned char flag02 : 1;
+    signed char flag02 : 1;
     unsigned char flag01 : 1;
 };
 

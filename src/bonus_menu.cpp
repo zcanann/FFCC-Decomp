@@ -1770,6 +1770,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					handle->Draw(5);
 					handle->m_flags = oldFlags;
 					RestoreProjection();
+					lastKind = sprite->kind;
 				}
 				modelIndex++;
 			} else {

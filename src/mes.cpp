@@ -1437,7 +1437,7 @@ void CMes::addString(char** text, int branchMode)
 			goto renderTag;
 		case 0x54:
 		{
-			char* src = sTag54Source;
+			char* src = (char*)s_mesEmpty;
 			addString(&src, branchMode);
 			break;
 		}

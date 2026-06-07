@@ -1530,19 +1530,19 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
         }
     } else {
         if ((tevBit & 0x800) != 0) {
-            if ((tevBit & 0x20) == 0) {
+            if ((tevBit & 0x20) != 0) {
+                m_texCoordIdCur = m_texCoordIdCur - 1;
+                _GXSetTevOrder(
+                    0,
+                    m_texScroll0TexCoord,
+                    m_texMapIdCurShadow,
+                    4);
+            } else {
                 GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                   GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(
                     0,
                     m_texCoordIdCurShadow,
-                    m_texMapIdCurShadow,
-                    4);
-            } else {
-                m_texCoordIdCur = m_texCoordIdCur - 1;
-                _GXSetTevOrder(
-                    0,
-                    m_texScroll0TexCoord,
                     m_texMapIdCurShadow,
                     4);
             }

@@ -25,10 +25,10 @@ struct CCharaModelData
     void* m_nodeRefData;
     void* m_meshRefData;
     void* m_bank;
-    u16 m_headNodeIndex;
-    u16 m_chest3NodeIndex;
-    u16 m_chest2NodeIndex;
-    u16 m_chest1NodeIndex;
+    s16 m_headNodeIndex;
+    s16 m_chest3NodeIndex;
+    s16 m_chest2NodeIndex;
+    s16 m_chest1NodeIndex;
     CMaterialSet* m_materialSet;
     float m_baseScale;
     u8 _pad2C[0x8];
@@ -55,6 +55,8 @@ public:
 		~CSkin();
 
 		void Create(CChunkFile&, CMemory::CStage*);
+
+		u8 _pad[0x64];
 	};
 
 	class CAnim : public CRef
@@ -140,7 +142,7 @@ public:
 			s8 m_displayIndex;              // 0x8D
 			u8 m_miscFlags;                 // 0x8E
 			u8 m_usesParentLenX;            // 0x8F
-			u8 m_dynParamIndex;             // 0x90
+			s8 m_dynParamIndex;             // 0x90
 			u8 _pad91[0x03];                // 0x91
 		};
 
@@ -160,11 +162,19 @@ public:
 		CAnimNode* m_animNode1;
 		CVector m_dynPosition;
 		CVector m_dynVel;
-		u8 m_flags;
+		union
+		{
+			u8 m_flags;
+			struct
+			{
+				s8 m_flag_80 : 1;
+				s8 m_flag_lo : 7;
+			} m_flagsBits;
+		};
 		u8 _padBD[3];
 	};
 
-	class CModel
+	class CModel : public CRef
 	{
 	public:
 		typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
@@ -181,6 +191,23 @@ public:
 		public:
 			CRefData();
 			~CRefData();
+
+			u32 m_nodeCount;            // 0x08
+			u32 m_meshCount;           // 0x0C
+			void* m_nodeRefData;       // 0x10
+			void* m_meshRefData;       // 0x14
+			void* m_bank;              // 0x18
+			u16 m_headNodeIndex;       // 0x1C
+			u16 m_chest3NodeIndex;     // 0x1E
+			u16 m_chest2NodeIndex;     // 0x20
+			u16 m_chest1NodeIndex;     // 0x22
+			CMaterialSet* m_materialSet; // 0x24
+			float m_baseScale;         // 0x28
+			u8 _pad2C[0x8];            // 0x2C
+			u32 m_posQuant;            // 0x34
+			u32 m_normQuant;           // 0x38
+			u32 m_dynCount;            // 0x3C
+			void* m_dynParams;         // 0x40
 		};
 
 		void Init();
@@ -241,21 +268,30 @@ public:
 		}
 
 	public:
-		u8 _pad0[0x8];
 		Mtx m_matrix;
 		Mtx m_worldBaseMtx;
 		Mtx m_drawMtx;
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
-		u8 m_flagsA0;
+		union
+		{
+			u8 m_flagsA0;
+			struct
+			{
+				u8 m_flagA0_80 : 1;
+				u8 m_flagA0_40 : 1;
+				u8 m_flagA0_20 : 1;
+				u8 m_flagA0_lo : 5;
+			} m_flagsA0Bits;
+		};
 		u8 m_attachMode;
 		u8 _padA2[0x2];
 		CCharaModelData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;
-		float m_curFrame;
 		float m_time;
+		float m_curFrame;
 		float m_animStart;
 		float m_animEnd;
 		CVector m_dynJitter;
@@ -275,10 +311,19 @@ public:
 		DrawMeshDLCallback m_drawShadowMeshDLCallback;
 		AfterDrawMeshCallback m_afterDrawMeshCallback;
 		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
-		u8 m_flags10C;
+		union
+		{
+			u8 m_flags10C;
+			struct
+			{
+				s8 m_flag10C_80 : 1;
+				s8 m_flag10C_40 : 1;
+				s8 m_flag10C_lo : 6;
+			} m_flags10CBits;
+		};
 		u8 _pad10D[3];
-		float m_furStep;
 		float m_furLenScale;
+		float m_furStep;
 		float m_furTarget;
 		float m_furCur;
 		float m_twistAngle;
@@ -309,7 +354,16 @@ public:
 			~CRefData();
 
 			char m_name[0x10];
-			u8 m_flags;
+			union
+			{
+				u8 m_flags;
+				struct
+				{
+					s8 m_flag_80 : 1;
+					s8 m_flag_40 : 1;
+					s8 m_flag_lo : 6;
+				} m_flagsBits;
+			};
 			u8 _pad11[3];
 			u32 m_vertexCount;
 			S16Vec* m_vertices;
@@ -360,6 +414,12 @@ public:
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
     u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
+    struct CDrawBuffer
+    {
+        u32 m_cursor;
+        u8* m_base;
+    };
+    CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemAnimSize() const { return m_amemAnimSize; }
     void ResetAmem(int) { m_amemSize = 0; }
@@ -400,12 +460,6 @@ public:
     MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
 private:
-    struct CDrawBuffer
-    {
-        u32 m_cursor;
-        u8* m_base;
-    };
-
     union CSharedState
     {
         MogFurState m_mogFur;

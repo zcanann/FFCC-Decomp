@@ -21,8 +21,11 @@
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
+#include "ffcc/vector.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/textureman.h"
+#include "ffcc/mesmenu.h"
+#include "ffcc/file.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -31,9 +34,11 @@
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include "ffcc/fontman.h"
 
 extern "C" char* strstr(const char*, const char*);
+extern "C" char* strcat(char*, const char*);
 extern "C" int DAT_801dc118[];
 extern "C" int DAT_801dc140;
 extern char lbl_80331208[];
@@ -63,8 +68,11 @@ int gWmModelYOffsetSplineCount = 9;
 float* gWmModelYOffsetSpline = gWmModelYOffsetSplinePoints;
 int gWmModelRotationSplineCount = 5;
 float* gWmModelRotationSpline = gWmModelRotationSplinePoints;
-int DAT_8032e8c0 = 5;
-float* DAT_8032e8c4 = lbl_802109B4;
+struct SplineTable {
+	int count;
+	float* data;
+};
+SplineTable s_YearTrns = {5, lbl_802109B4};
 int DAT_8032e8c8 = 3;
 float* DAT_8032e8cc = lbl_80210A04;
 int DAT_8032E8D0 = 4;
@@ -97,7 +105,7 @@ inline CGObject::CGObject()
 }
 
 float FLOAT_8032ee18;
-int DAT_8032ee1c;
+unsigned char DAT_8032ee1c;
 unsigned char DAT_8032ee20;
 unsigned char uRam8032ee21;
 unsigned char DAT_8032ee24;
@@ -135,6 +143,17 @@ extern double DOUBLE_80331530;
 extern float FLOAT_803315cc;
 extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
+extern float FLOAT_803317FC;
+extern double DOUBLE_803313F0;
+extern char lbl_80331800[];
+extern char lbl_80331808[];
+extern char lbl_80331810[];
+extern char lbl_80331818[];
+extern char lbl_80331820[];
+extern char lbl_80331828[];
+extern char lbl_80331830[];
+extern char lbl_80331838[];
+extern char lbl_801DB7F8[];
 extern float FLOAT_80331588;
 extern float FLOAT_80331590;
 extern float FLOAT_803315d4;
@@ -248,6 +267,8 @@ extern double DOUBLE_803314E8;
 extern double DOUBLE_80331498;
 extern double DOUBLE_80331510;
 extern double DOUBLE_80331580;
+extern double DOUBLE_803315A0;
+extern double DOUBLE_803315A8;
 extern double DOUBLE_803315C0;
 extern double DOUBLE_803315D8;
 extern double DOUBLE_803315F0;
@@ -279,10 +300,13 @@ extern double DOUBLE_80331788;
 extern double DOUBLE_80331790;
 extern double DOUBLE_80331798;
 extern double DOUBLE_803317A0;
+extern double DOUBLE_803317A8;
+extern double DOUBLE_803317B0;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
 extern double DOUBLE_803313f8;
+extern double DOUBLE_803313F8;
 extern double DOUBLE_80331408;
 extern double DOUBLE_803314e8;
 extern unsigned char s_wmWorldParamPrimaryDirtyMask;
@@ -395,6 +419,7 @@ struct WmCharaSelectEntry
 STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
 
 static const int kWmMenuPlayerCount = 8;
+static const int kWmMenuControllerCount = 4;
 static const int kWmCharaSelectCount = kWmMenuPlayerCount;
 static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
 static const int kWmFrameInfoBytes = 0x3C;
@@ -471,6 +496,41 @@ static inline int GetWmMenuFade(short state, short frame)
 static inline CFont* GetWmFont(CMenuPcs* menu)
 {
 	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
+}
+
+static inline void CalcWmFrame0Inline(CMenuPcs* menu, int param)
+{
+	unsigned char* const frame = menu->m_wm.m_frameInfo;
+
+	*reinterpret_cast<short*>(frame + 4) = 0x10;
+	int frameAddr = reinterpret_cast<int>(frame);
+	*reinterpret_cast<short*>(frameAddr + 0x20) =
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(
+	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 8)) +
+	                                            static_cast<int>(*reinterpret_cast<short*>(frameAddr + 4)))));
+
+	if (param < 0) {
+		float offset = static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 8)) +
+		                                  static_cast<int>(*reinterpret_cast<short*>(frame + 4)));
+		if (param > -11) {
+			unsigned int sign = static_cast<unsigned int>(param) >> 31;
+			unsigned int absParam = (sign ^ static_cast<unsigned int>(param)) - sign;
+			float tUnclamped = static_cast<float>(static_cast<int>(absParam));
+			float scaledOffset = offset * 0.1f * tUnclamped;
+			if (static_cast<int>(absParam) < 0) {
+				absParam = 0;
+			}
+			if (static_cast<int>(absParam) > 10) {
+				absParam = 10;
+			}
+			float tClamped = static_cast<float>(static_cast<int>(absParam));
+			offset = scaledOffset * static_cast<float>(sin(static_cast<double>(FLOAT_803314bc * tClamped * FLOAT_803316d4)));
+		}
+		*reinterpret_cast<short*>(frame + 4) =
+		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 4))) - offset));
+		*reinterpret_cast<short*>(frame + 0x20) =
+		    static_cast<short>(static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(frame + 0x20))) + offset));
+	}
 }
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
@@ -618,118 +678,620 @@ void CMenuPcs::ChkNumItemAll()
 void CMenuPcs::loadData()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	char* const rodataBase = lbl_801DB7F8;
+#define srcFile (rodataBase + 0xC20)
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
 	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
 
-	memset(m_wm.m_handles, 0, sizeof(m_wm.m_handles));
+	m_wm.m_handles[0x00] = 0;
+	m_wm.m_handles[0x01] = 0;
+	m_wm.m_handles[0x02] = 0;
+	m_wm.m_handles[0x03] = 0;
+	m_wm.m_handles[0x04] = 0;
+	m_wm.m_handles[0x05] = 0;
+	m_wm.m_handles[0x06] = 0;
+	m_wm.m_handles[0x07] = 0;
+	m_wm.m_handles[0x08] = 0;
+	m_wm.m_handles[0x09] = 0;
+	m_wm.m_handles[0x0A] = 0;
+	m_wm.m_handles[0x0B] = 0;
+	m_wm.m_handles[0x0C] = 0;
+	m_wm.m_handles[0x0D] = 0;
+	m_wm.m_handles[0x0E] = 0;
+	m_wm.m_handles[0x0F] = 0;
+	m_wm.m_handles[0x10] = 0;
+	m_wm.m_handles[0x11] = 0;
+	m_wm.m_handles[0x12] = 0;
+	m_wm.m_handles[0x13] = 0;
+	m_wm.m_handles[0x14] = 0;
+	m_wm.m_handles[0x15] = 0;
+	m_wm.m_handles[0x16] = 0;
+	m_wm.m_handles[0x17] = 0;
+	m_wm.m_handles[0x18] = 0;
+	m_wm.m_handles[0x19] = 0;
+	m_wm.m_handles[0x1A] = 0;
+	m_wm.m_handles[0x1B] = 0;
+	m_wm.m_handles[0x1C] = 0;
+	m_wm.m_handles[0x1D] = 0;
+	m_wm.m_handles[0x1E] = 0;
+	m_wm.m_handles[0x1F] = 0;
+	m_wm.m_handles[0x20] = 0;
+	m_wm.m_handles[0x21] = 0;
+	m_wm.m_handles[0x22] = 0;
+	m_wm.m_handles[0x23] = 0;
+	m_wm.m_handles[0x24] = 0;
+	m_wm.m_handles[0x25] = 0;
+	m_wm.m_handles[0x26] = 0;
+	m_wm.m_handles[0x27] = 0;
 
-	for (int i = 0; i < 0x28; i++) {
-		CCharaPcs::CHandle* handle = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
-		m_wm.m_handles[i] = handle;
-		handle->Add();
+	const short* charaNoTable = reinterpret_cast<const short*>(rodataBase + 0x970);
+	const short* const charaNoDefault = charaNoTable + 21;
+	for (int i = 0; i < 0x28; i++, charaNoTable++) {
+		m_wm.m_handles[i] = new (MenuPcs.m_menuStage, srcFile, 0x1F4) CCharaPcs::CHandle;
+		m_wm.m_handles[i]->Add();
 
 		int charaKind;
 		unsigned long charaNo;
 		if (i < 0x20) {
 			CharaPcs.m_charaAllocStage = 1;
 			charaKind = 3;
-			charaNo = s_wmLoadCharaModels[i];
+			charaNo = *charaNoTable;
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
 			CharaPcs.m_charaAllocStage = 0;
 			if (caravan.m_shopState != 0) {
 				charaKind = 0;
 				charaNo = caravan.m_tribeId * 200 + 100;
-				if (caravan.m_genderFlag != 0) {
+				unsigned short variant = caravan.m_appearanceVariant;
+				int gender = caravan.m_genderFlag;
+				if (gender != 0) {
 					charaNo += 100;
 				}
-				charaNo += caravan.m_appearanceVariant;
+				charaNo += variant;
 			} else {
 				charaKind = 3;
-				charaNo = s_wmLoadCharaModels[21];
+				charaNo = *charaNoDefault;
 			}
 		}
 
-		handle->LoadModel(charaKind, charaNo, 0, 0, -1, 0, 0);
-		handle->m_flags |= 0x141;
+		m_wm.m_handles[i]->LoadModel(charaKind, charaNo, 0, 0, -1, 0, 0);
+		m_wm.m_handles[i]->m_flags |= 0x141;
 	}
 	CharaPcs.m_charaAllocStage = 0;
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214));
-	memset(m_wm.m_worldObjData, 0, 0xC80);
-	for (int i = 0; i < 0x28; i++) {
-		unsigned char* const entry = m_wm.m_worldObjData + i * 0x50;
-		*reinterpret_cast<short*>(entry + 0x0C) = 0;
-		*reinterpret_cast<short*>(entry + 0x0E) = 0;
-		*reinterpret_cast<short*>(entry + 0x10) = 0x280;
-		*reinterpret_cast<short*>(entry + 0x12) = 0x1C0;
-		*reinterpret_cast<float*>(entry + 0x14) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(entry + 0x18) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(entry + 0x1C) = FLOAT_80331598;
-		*reinterpret_cast<unsigned int*>(entry + 0x40) = 0;
-		*reinterpret_cast<unsigned int*>(entry + 0x44) = 0;
-		*reinterpret_cast<unsigned int*>(entry + 0x48) = 0x280;
-		*reinterpret_cast<unsigned int*>(entry + 0x4C) = 0x1C0;
+	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, MenuPcs.m_menuStage, srcFile, 0x214));
+	{
+		const float bigF = FLOAT_80331598;
+		const float oneF = FLOAT_803313e8;
+		const float zeroF = FLOAT_803313dc;
+		for (int i = 0; i < 0x28; i++) {
+			unsigned char* const entry = m_wm.m_worldObjData + i * 0x50;
+			*reinterpret_cast<float*>(entry + 0x08) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x04) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x00) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x14) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x10) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x0C) = zeroF;
+			*reinterpret_cast<float*>(entry + 0x20) = oneF;
+			*reinterpret_cast<float*>(entry + 0x1C) = oneF;
+			*reinterpret_cast<float*>(entry + 0x18) = oneF;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x00) = 0;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x04) = 0;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x08) = 0;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0A) = 0;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0C) = 0x280;
+			*reinterpret_cast<short*>(m_wm.m_worldObjData + i * 0x50 + 0x0E) = 0x1C0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x10) = zeroF;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x14) = zeroF;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + i * 0x50 + 0x18) = bigF;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x40) = 0;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x44) = 0;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x48) = 0x280;
+			*reinterpret_cast<int*>(m_wm.m_worldObjData + i * 0x50 + 0x4C) = 0x1C0;
+		}
 	}
 
 	m_wm.m_bubbleData =
-	    static_cast<unsigned char*>(operator new(0x8C, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x227));
+	    static_cast<unsigned char*>(operator new(0x8C, MenuPcs.m_menuStage, srcFile, 0x227));
 	memset(m_wm.m_bubbleData, 0, 0x8C);
 
 	m_wm.m_frameData =
-	    static_cast<unsigned char*>(operator new(0xEC, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x22B));
+	    static_cast<unsigned char*>(operator new(0xEC, MenuPcs.m_menuStage, srcFile, 0x22B));
 	memset(m_wm.m_frameData, 0, 0xEC);
+	{
+		const float oneF = FLOAT_803313e8;
+		int frameSrc[20];
+		unsigned int* dst = reinterpret_cast<unsigned int*>(frameSrc) - 1;
+		unsigned int* src = reinterpret_cast<unsigned int*>(rodataBase + 0x9BC);
+		int n = 10;
+		do {
+			unsigned int* const lo = src + 1;
+			src += 2;
+			unsigned int hi = *src;
+			dst[1] = *lo;
+			dst += 2;
+			*dst = hi;
+			n--;
+		} while (n != 0);
+
+		int wordSrc[10];
+		wordSrc[0] = *reinterpret_cast<int*>(rodataBase + 0xA10);
+		wordSrc[1] = *reinterpret_cast<int*>(rodataBase + 0xA14);
+		wordSrc[2] = *reinterpret_cast<int*>(rodataBase + 0xA18);
+		wordSrc[3] = *reinterpret_cast<int*>(rodataBase + 0xA1C);
+		wordSrc[4] = *reinterpret_cast<int*>(rodataBase + 0xA20);
+		wordSrc[5] = *reinterpret_cast<int*>(rodataBase + 0xA24);
+		wordSrc[6] = *reinterpret_cast<int*>(rodataBase + 0xA28);
+		wordSrc[7] = *reinterpret_cast<int*>(rodataBase + 0xA2C);
+		wordSrc[8] = *reinterpret_cast<int*>(rodataBase + 0xA30);
+		wordSrc[9] = *reinterpret_cast<int*>(rodataBase + 0xA34);
+
+		int* tbl = frameSrc;
+		float* wsrc = reinterpret_cast<float*>(wordSrc);
+		for (int i = 0, count = 5; count != 0; count--, i += 0x1C) {
+			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0xC) = static_cast<short>(tbl[0]);
+			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0xE) = static_cast<short>(tbl[1]);
+			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0x10) = static_cast<short>(tbl[2]);
+			*reinterpret_cast<short*>(m_wm.m_frameData + i + 0x12) = static_cast<short>(tbl[3]);
+			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x14) = wsrc[0];
+			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x18) = wsrc[1];
+			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x1C) = oneF;
+			*reinterpret_cast<float*>(m_wm.m_frameData + i + 0x20) = oneF;
+			*reinterpret_cast<int*>(m_wm.m_frameData + i + 0x24) = 0;
+			tbl += 4;
+			wsrc += 2;
+		}
+	}
 
 	m_wm.m_frameInfo =
-	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x231));
+	    static_cast<unsigned char*>(operator new(kWmFrameInfoBytes, MenuPcs.m_menuStage, srcFile, 0x231));
 	memset(m_wm.m_frameInfo, 0, kWmFrameInfoBytes);
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x4) = 0x10;
+	{
+		const float oneF = FLOAT_803313e8;
+		const float zeroF = FLOAT_803313dc;
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x6) = 0x10;
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x8) = 0xE8;
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0xA) = 0x168;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zeroF;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zeroF;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = oneF;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = oneF;
+		*reinterpret_cast<int*>(m_wm.m_frameInfo + 0x1C) = 0;
+	}
+	{
+		unsigned char* const frame = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 0x4);
+		*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 0x6);
+		*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 0x8);
+		*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 0xA);
+		*reinterpret_cast<float*>(frame + 0x28) = *reinterpret_cast<float*>(frame + 0xC);
+		*reinterpret_cast<float*>(frame + 0x2C) = *reinterpret_cast<float*>(frame + 0x10);
+		*reinterpret_cast<float*>(frame + 0x30) = *reinterpret_cast<float*>(frame + 0x14);
+		*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
+		*reinterpret_cast<int*>(frame + 0x38) = *reinterpret_cast<int*>(frame + 0x1C);
+	}
+	{
+		unsigned char* const frame = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame + 0x20) = static_cast<short>(
+		    0x280 - (*reinterpret_cast<short*>(frame + 0x8) + *reinterpret_cast<short*>(frame + 0x4)));
+	}
+	*reinterpret_cast<int*>(m_wm.m_frameInfo + 0x38) = 8;
 
 	m_wm.m_charaModelData =
-	    static_cast<unsigned char*>(operator new[](0x1A0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x237));
-	memset(m_wm.m_charaModelData, 0, 0x1A0);
+	    static_cast<unsigned char*>(operator new[](0x1A0, MenuPcs.m_menuStage, srcFile, 0x237));
+	{
+		const float oneF = FLOAT_803313e8;
+		const float zeroF = FLOAT_803313dc;
+		for (int i = 0, count = 4; count != 0; count--, i += 0x68) {
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x00) = 0;
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x04) = 0;
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x08) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + i + 0x0C) = 0;
+			float* const a = reinterpret_cast<float*>(m_wm.m_charaModelData + i + 0x10);
+			a[2] = zeroF;
+			a[1] = zeroF;
+			a[0] = zeroF;
+			a[5] = zeroF;
+			a[4] = zeroF;
+			a[3] = zeroF;
+			a[8] = oneF;
+			a[7] = oneF;
+			a[6] = oneF;
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x34) = 0;
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x38) = 0;
+			*reinterpret_cast<int*>(m_wm.m_charaModelData + i + 0x3C) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + i + 0x40) = 0;
+			float* const b = reinterpret_cast<float*>(m_wm.m_charaModelData + i + 0x44);
+			b[2] = zeroF;
+			b[1] = zeroF;
+			b[0] = zeroF;
+			b[5] = zeroF;
+			b[4] = zeroF;
+			b[3] = zeroF;
+			b[8] = oneF;
+			b[7] = oneF;
+			b[6] = oneF;
+		}
+	}
+
+	InitCharaInfo();
 
 	m_wm.m_charaSelectData =
-	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x243));
-	memset(m_wm.m_charaSelectData, 0, kWmCharaSelectBytes);
+	    static_cast<unsigned char*>(operator new[](kWmCharaSelectBytes, MenuPcs.m_menuStage, srcFile, 0x243));
 
 	m_wmWorldState =
-	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246));
+	    static_cast<WmWorldState*>(operator new(sizeof(WmWorldState), MenuPcs.m_menuStage, srcFile, 0x246));
 	memset(m_wmWorldState, 0, sizeof(WmWorldState));
 
 	m_wmCharaState =
-	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A));
+	    static_cast<unsigned char*>(operator new[](kWmMenuCharaStateBytes, MenuPcs.m_menuStage, srcFile, 0x24A));
 	memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
 
 	m_wmWorldParams =
-	    static_cast<unsigned char*>(operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E));
+	    static_cast<unsigned char*>(operator new(0x10, MenuPcs.m_menuStage, srcFile, 0x24E));
 	memset(m_wmWorldParams, 0, 0x10);
 
-	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
-	memset(effectRaw, 0, 0xCDB0 + 0x10);
-	m_effectWork = reinterpret_cast<EffectInfo*>(effectRaw + 0x10);
-	for (int i = 0; i < 0x28; i++) {
-		EffectInfo* const effect = &m_effectWork[i];
-		effect->m_effectNo = -1;
-		effect->m_partNo = -1;
-		effect->m_slotNo = -1;
+	m_effectWork = new (MenuPcs.m_menuStage, srcFile, 0x252) EffectInfo[0x28];
+	{
+		for (int i = 0, count = 5; count != 0; count--, i += 0x2920) {
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x524) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x528) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x52C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA48) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA4C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA50) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF6C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF70) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF74) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1490) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1494) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1498) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19BC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1ED8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EDC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EE0) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x23FC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2400) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2404) = -1;
+		}
 	}
 
 	m_wmCharaAnimState =
-	    static_cast<int*>(operator new[](0xA0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25A));
+	    static_cast<int*>(operator new[](0xA0, MenuPcs.m_menuStage, srcFile, 0x25A));
 	memset(m_wmCharaAnimState, 0, 0xA0);
 
-	m_menuWindowInfo = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E) MenuWindowInfo;
+	m_menuWindowInfo = new (MenuPcs.m_menuStage, srcFile, 0x25E) MenuWindowInfo;
 	memset(m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 
-	InitFrameInfo();
-	InitCharaInfo();
-	InitCharaSelectInfo();
-	InitCSelCurPos();
-	WMSubMenuInit();
-	SetParty();
+	// Re-initialize the effect work entries.
+	{
+		for (int i = 0, count = 5; count != 0; count--, i += 0x2920) {
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x528) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x52C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x524) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA4C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA50) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA48) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF70) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF74) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF6C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1494) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1498) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1490) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19BC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EDC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EE0) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1ED8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2400) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2404) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x23FC) = -1;
+		}
+	}
+
+	bytes[0x86E] = 0;
+	bytes[0x858] = 0;
+	*reinterpret_cast<int*>(bytes + 0x854) = 0;
+	memset(m_wm.m_charaSelectData, 0, 0x80);
+
+	// Assign chara-select party slots from the backed-up world state.
+	{
+		signed char usedMask = 0;
+		for (int i = 0, j = 0, count = 2; count != 0; count--, i += 0x20, j += 4) {
+			m_wm.m_charaSelectData[i + 0x0C] = 0;
+			m_wm.m_charaSelectData[i + 0x0B] = 0;
+			m_wm.m_charaSelectData[i + 0x0A] = 0;
+			int slotA = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x3E);
+			if (slotA < 0) {
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = -1;
+			} else {
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(slotA);
+				usedMask = static_cast<signed char>(usedMask | (1 << slotA));
+			}
+			m_wm.m_charaSelectData[i + 0x1C] = 0;
+			m_wm.m_charaSelectData[i + 0x1B] = 0;
+			m_wm.m_charaSelectData[i + 0x1A] = 0;
+			int slotB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x40);
+			if (slotB < 0) {
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = -1;
+			} else {
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = static_cast<short>(slotB);
+				usedMask = static_cast<signed char>(usedMask | (1 << slotB));
+			}
+		}
+		for (int i = 0, count = 4; count != 0; count--, i += 0x10) {
+			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) < 0) {
+				int freeSlot = 0;
+				signed char mask = usedMask;
+				if ((mask & (1 << freeSlot)) != 0) {
+					freeSlot = 1;
+					if ((mask & (1 << freeSlot)) != 0) {
+						freeSlot = 2;
+						if ((mask & (1 << freeSlot)) != 0) {
+							freeSlot = 3;
+							if ((mask & (1 << freeSlot)) != 0) {
+								freeSlot = 4;
+								if ((mask & (1 << freeSlot)) != 0) {
+									freeSlot = 5;
+									if ((mask & (1 << freeSlot)) != 0) {
+										freeSlot = 6;
+										if ((mask & (1 << freeSlot)) != 0) {
+											freeSlot = 7;
+											if ((mask & (1 << freeSlot)) != 0) {
+												freeSlot = 8;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(freeSlot);
+				usedMask = static_cast<signed char>(usedMask | (1 << freeSlot));
+			}
+			unsigned char* const entry = m_wm.m_charaSelectData + i;
+			*reinterpret_cast<short*>(entry + 6) = *reinterpret_cast<short*>(entry + 4);
+		}
+	}
+
+	SetManaWaterEffect();
+	m_crystalPart = -1;
+	m_crystalAttr = -1;
+	SetCrystalCageAttr();
+
+	// Crystal cage effect (effect slot 7, effect no 9).
+	{
+		PPPCREATEPARAM titleParam;
+		titleParam.m_paramA = -1;
+		unsigned char* const effectBase = reinterpret_cast<unsigned char*>(m_effectWork);
+		*reinterpret_cast<int*>(effectBase + 0x23FC) = 9;
+		CGObject* const titleObject = reinterpret_cast<CGObject*>(effectBase + 0x2408);
+		*reinterpret_cast<int*>(effectBase + 0x2404) = 7;
+		titleObject->Create();
+		titleObject->m_charaModelHandle =
+		    *reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x790);
+		titleParam.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+		titleParam.m_lookTargetPtr = titleObject;
+		*reinterpret_cast<unsigned int*>(effectBase + 0x2400) =
+		    PartMng.pppCreate(0, 9, &titleParam, 1);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		PPPCREATEPARAM param;
+		param.m_paramA = -1;
+		unsigned int* effect =
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 8) * 0x524);
+		if (i + 8 == 5 && i + 5 < 0x13) {
+			effect += 0x149;
+		} else if (i + 8 >= 0x11 && i + 8 <= 0x14 && i + 5 > 0x19) {
+			effect += 0x149;
+		}
+		unsigned int effectNo = i + 5;
+		effect[0] = effectNo;
+		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
+		effect[2] = i + 8;
+		object->Create();
+		object->m_charaModelHandle = GetWmCharaHandles(this)[i + 8];
+		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_lookTargetPtr = object;
+		const int group = static_cast<int>(
+		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31);
+		effect[1] = PartMng.pppCreate(group, i + 5, &param, 1);
+	}
+
+	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
+		PPPCREATEPARAM param;
+		param.m_paramA = -1;
+		unsigned int* effect =
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0xC) * 0x524);
+		if (i + 0xC == 5 && static_cast<int>(i) < 0x13) {
+			effect += 0x149;
+		} else if (static_cast<int>(i + 0xC) >= 0x11 && static_cast<int>(i + 0xC) <= 0x14 &&
+		           static_cast<int>(i) > 0x19) {
+			effect += 0x149;
+		}
+		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
+		effect[0] = i;
+		effect[2] = i + 0xC;
+		object->Create();
+		object->m_charaModelHandle = GetWmCharaHandles(this)[i + 4];
+		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_lookTargetPtr = object;
+		const int group = static_cast<int>(
+		    (static_cast<int>((i ^ 100) >> 1) - ((i ^ 100) & i)) >> 31);
+		effect[1] = PartMng.pppCreate(group, i, &param, 1);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		PPPCREATEPARAM param;
+		param.m_paramA = -1;
+		unsigned int* effect =
+		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0x20) * 0x524);
+		if (i + 0x20 == 5 && i + 0xA < 0x13) {
+			effect += 0x149;
+		} else if (i + 0x20 >= 0x11 && i + 0x20 <= 0x14 && i + 0xA > 0x19) {
+			effect += 0x149;
+		}
+		unsigned int effectNo = i + 0xA;
+		effect[0] = effectNo;
+		CGObject* const object = reinterpret_cast<CGObject*>(effect + 3);
+		effect[2] = i + 0x20;
+		object->Create();
+		object->m_charaModelHandle = GetWmCharaHandles(this)[i];
+		param.m_paramB = reinterpret_cast<unsigned int>(object);
+		param.m_lookTargetPtr = object;
+		const int group = static_cast<int>(
+		    (static_cast<int>((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31);
+		effect[1] = PartMng.pppCreate(group, i + 0xA, &param, 1);
+		if (i == 0) {
+			PartPcs.GetParLocIdx(effect[1], s_RingOrgPos);
+		}
+	}
+
+	FLOAT_8032ee18 = FLOAT_803317FC;
+	for (int i = 0; i < 8; i++) {
+		const int modelNo = (i + 1) * 100;
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimStand, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimWalk, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimRun, 1, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimGlad, 3, 0, 0);
+		CharaPcs.LoadAnim(0, modelNo, s_wmCharaAnimSleep, 1, 0, 0);
+	}
+
+	{
+		int* animState = m_wmCharaAnimState;
+		for (int i = 0; i < 8; i++, animState += 5) {
+			CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+			if (handle->m_charaKind != 3) {
+				const unsigned int charaBase = static_cast<unsigned int>(handle->m_charaNo) / 100;
+				const int modelNo = charaBase * 100;
+				const int animBase = (charaBase - 1) * 6;
+				handle->LoadAnim(s_wmCharaAnimStand, animBase, 1, 0, modelNo, -1, 0);
+				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelNo, -1, 0);
+				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelNo, -1, 0);
+				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelNo, -1, 0);
+				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelNo, -1, 0);
+				GetWmCharaHandles(this)[i]->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelNo, -1, 0);
+				animState[0] = 0;
+				animState[1] = -1;
+				animState[2] = rand() % 250;
+				GetWmCharaHandles(this)[i]->SetAnim(animBase, -1, -1, 0, 0);
+				animState[3] = *reinterpret_cast<int*>(
+				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xB4);
+				animState[4] = *reinterpret_cast<int*>(
+				    reinterpret_cast<unsigned char*>(GetWmCharaHandles(this)[i]->m_model) + 0xC0);
+				float maxWait = static_cast<float>(
+				    static_cast<double>(*reinterpret_cast<unsigned short*>(
+				        reinterpret_cast<unsigned char*>(
+				            reinterpret_cast<int**>(GetWmCharaHandles(this)[i]->m_model)[(animBase + 6)])[10] + 0x10)) -
+				    DOUBLE_803313F0);
+				if (FLOAT_8032ee18 < maxWait) {
+					FLOAT_8032ee18 = maxWait;
+				}
+			}
+		}
+	}
+
+	CCharaPcs::CHandle* const windowHandle = m_wm.m_handles[1];
+	windowHandle->LoadAnim(lbl_80331800, 0, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331808, 1, 0, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331810, 2, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331818, 3, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331820, 4, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331828, 5, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331830, 6, 2, -1, -1, -1, 0);
+	m_wm.m_handles[1]->LoadAnim(lbl_80331838, 7, 0, -1, -1, -1, 0);
+	m_wm.m_handles[1]->SetAnim(0, -1, -1, -1, 0);
+
+	{
+		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
+		*reinterpret_cast<short*>(worldState + 0x1C) = 0;
+		*reinterpret_cast<short*>(worldState + 0x36) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+		*reinterpret_cast<short*>(worldState + 0x3E) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+		*reinterpret_cast<short*>(worldState + 0x38) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+		*reinterpret_cast<short*>(worldState + 0x40) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+		*reinterpret_cast<short*>(worldState + 0x3A) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+		*reinterpret_cast<short*>(worldState + 0x42) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+		*reinterpret_cast<short*>(worldState + 0x3C) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+		*reinterpret_cast<short*>(worldState + 0x44) = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+	}
+
+	char fontPath[128];
+	sprintf(fontPath, rodataBase + 0xC74, Game.GetLangString());
+	loadFont(0, fontPath, 1, -1);
+
+	bytes[0xD] = 0;
+	{
+		unsigned char* const worldState = reinterpret_cast<unsigned char*>(m_wmWorldState);
+		bytes[0x10] = 0;
+		bytes[0x12] = 0;
+		bytes[0x13] = 0;
+		*reinterpret_cast<short*>(worldState + 0x20) = 0;
+		*reinterpret_cast<short*>(worldState + 0x1E) = 0;
+		*reinterpret_cast<short*>(worldState + 0x18) = 0;
+	}
+	DAT_8032ee1c = 1;
+	DAT_8032e8ac = 1;
+
+	for (int i = 4; i < 6; i++) {
+		CMesMenu* mesMenu =
+		    new (MenuPcs.m_menuStage, srcFile, 0x2EA) CMesMenu;
+		*reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C) = mesMenu;
+		CMesMenu* const cur = *reinterpret_cast<CMesMenu**>(bytes + (i - 4) * 4 + 0x11C);
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x18) = i;
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(cur) + 0x1C) = i;
+		(*reinterpret_cast<void (***)(CMesMenu*)>(cur))[3](cur);
+	}
+
+	char optionPath[256];
+	sprintf(optionPath, rodataBase + 0xC8C, Game.GetLangString());
+	CFile::CHandle* const fileHandle = File.Open(optionPath, 0, CFile::PRI_LOW);
+	if (fileHandle != 0) {
+		File.Read(fileHandle);
+		File.SyncCompleted(fileHandle);
+		CTextureSet* texSet =
+		    new (MenuPcs.m_menuStage, srcFile, 0x300) CTextureSet;
+		*reinterpret_cast<CTextureSet**>(bytes + 0xBC) = texSet;
+		(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
+		    ->Create(File.m_readBuffer, m_menuStage, 0, 0, 0, 0);
+		File.Close(fileHandle);
+	}
+
+	{
+		unsigned char* dst = bytes;
+		for (unsigned int i = 0;
+		     i < static_cast<unsigned int>(
+		             reinterpret_cast<CTextureSet*>(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
+		                 ->m_textureArray.GetSize());
+		     i++, dst += 4) {
+			*reinterpret_cast<CTexture**>(dst + 0xC0) =
+			    reinterpret_cast<CTextureSet*>(*reinterpret_cast<CTextureSet**>(bytes + 0xBC))
+			        ->m_textureArray[i];
+		}
+	}
+
+	GetOptionData();
+	bytes[0x80] = 0;
+	float zeroF = FLOAT_803313dc;
+	*reinterpret_cast<float*>(bytes + 0x7C) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(bytes + 0x78) = zeroF;
+	*reinterpret_cast<short*>(bytes + 0x74) = 0;
+	g_pGoOutMenu = &g_GoOutMenu;
+#undef srcFile
 }
 
 /*
@@ -1082,43 +1644,41 @@ void CMenuPcs::destroyWorld()
 void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldParams = m_wmWorldParams;
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
-	if (worldState->m_worldReady == 0) {
+	if (m_wmWorldState->m_worldReady == 0) {
 		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
 		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-		worldState->m_worldReady = 1;
-		worldState->m_mainState = 1;
+		m_wmWorldState->m_worldReady = 1;
+		m_wmWorldState->m_mainState = 1;
 	}
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
 	CChara::CModel* const model = handle->m_model;
-	unsigned char* const modelBytes = reinterpret_cast<unsigned char*>(model);
-	const float animEnd = reinterpret_cast<float*>(modelBytes + 0xC0)[0];
-	const float animTime = reinterpret_cast<float*>(modelBytes + 0xB4)[0];
-	const short animState = worldState->m_mainState;
+	const short animState = m_wmWorldState->m_mainState;
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
+	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
 
 	if (animState == 1) {
 		if (animEnd <= animTime) {
-			if (worldState->m_frameCounter > 9) {
+			if (m_wmWorldState->m_frameCounter > 9) {
 				CFlatRuntime::CStack stackData[3];
-				stackData[0].m_word = 2;
-				stackData[1].m_word = 0;
-				stackData[2].m_word = 0;
 
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+				stackData[0].m_word = 2;
+				stackData[1].m_word = 0;
+				stackData[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-				worldState->m_mainState = 2;
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_mainState = 2;
+				m_wmWorldState->m_frameCounter = 0;
 			}
 		} else {
 			model->AddFrame(FLOAT_80331698);
-			worldState->m_frameCounter = 0;
+			m_wmWorldState->m_frameCounter = 0;
 		}
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
@@ -1131,14 +1691,23 @@ void CMenuPcs::calcWorld()
 				model->AddFrame(FLOAT_80331698);
 			}
 		} else {
-			if (nextAnim >= 1 && nextAnim <= 4) {
+			if (nextAnim == 1) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 2;
+			} else if (nextAnim == 2) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 3;
+			} else if (nextAnim == 3) {
+				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
+				nextAnim = 4;
+			} else if (nextAnim == 4) {
 				Sound.PlaySe(0x138C, 0x40, 0x7F, 0);
 				nextAnim++;
 			} else if (nextAnim == 5) {
 				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;
-				worldState->m_mainState = 3;
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_mainState = 3;
+				m_wmWorldState->m_frameCounter = 0;
 			}
 
 			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
@@ -1151,47 +1720,54 @@ void CMenuPcs::calcWorld()
 			}
 			bytes[0xE] = 0;
 		}
-	} else if (animState == 3 && worldState->m_frameCounter > 9) {
+	} else if (animState == 3 && m_wmWorldState->m_frameCounter > 9) {
 		if (animEnd <= animTime) {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-			worldState->m_delay = 10;
-			worldState->m_nextMenuMode = -1;
-			worldState->m_mainState = 4;
+			m_wmWorldState->m_delay = 10;
+			m_wmWorldState->m_nextMenuMode = -1;
+			m_wmWorldState->m_mainState = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		} else {
 			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
-		if (worldState->m_delay == 0) {
-			worldState->m_changeRequest = worldState->m_nextMenuMode;
-			worldState->m_nextMenuMode = 0;
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
 		} else {
-			worldState->m_delay--;
+			m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+			m_wmWorldState->m_nextMenuMode = 0;
 		}
 	}
 
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	worldObj[0x50] = 1;
 	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
+	const float fVar1 = FLOAT_803313dc;
 	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
+	float fVar3 = FLOAT_80331598;
 	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
+	const float fVar4 = FLOAT_803315d4;
 	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
-	reinterpret_cast<float*>(worldObj + 0x60)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x64)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x68)[0] = FLOAT_80331598;
-	reinterpret_cast<float*>(worldObj + 0x6C)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x70)[0] = FLOAT_803317e0;
-	reinterpret_cast<float*>(worldObj + 0x74)[0] = FLOAT_803317e4;
-	reinterpret_cast<float*>(worldObj + 0x78)[0] = FLOAT_803317e8;
-	reinterpret_cast<float*>(worldObj + 0x7C)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x80)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x84)[0] = FLOAT_803315d4;
-	reinterpret_cast<float*>(worldObj + 0x88)[0] = FLOAT_803315d4;
-	reinterpret_cast<float*>(worldObj + 0x8C)[0] = FLOAT_803315d4;
+	const float fVar5 = FLOAT_803317e0;
+	reinterpret_cast<float*>(worldObj + 0x60)[0] = fVar1;
+	const float fVar6 = FLOAT_803317e4;
+	reinterpret_cast<float*>(worldObj + 0x64)[0] = fVar1;
+	const float fVar7 = FLOAT_803317e8;
+	reinterpret_cast<float*>(worldObj + 0x68)[0] = fVar3;
+	fVar3 = FLOAT_803314bc;
+	worldObj[0x50] = 1;
+	reinterpret_cast<float*>(worldObj + 0x84)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x88)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x8C)[0] = fVar4;
+	reinterpret_cast<float*>(worldObj + 0x6C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x70)[0] = fVar5;
+	reinterpret_cast<float*>(worldObj + 0x74)[0] = fVar6;
+	reinterpret_cast<float*>(worldObj + 0x78)[0] = fVar7;
+	reinterpret_cast<float*>(worldObj + 0x7C)[0] = fVar1;
+	reinterpret_cast<float*>(worldObj + 0x80)[0] = fVar1;
 
 	Mtx matrix;
-	PSMTXRotRad(matrix, 'x', FLOAT_803314bc * reinterpret_cast<float*>(worldObj + 0x78)[0]);
+	PSMTXRotRad(matrix, 'x', fVar3 * reinterpret_cast<float*>(worldObj + 0x78)[0]);
 	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
 	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
 	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];
@@ -1202,14 +1778,14 @@ void CMenuPcs::calcWorld()
 	model->CalcMatrix();
 	model->CalcSkin();
 
-	const short updatedAnimState = worldState->m_mainState;
+	const short updatedAnimState = m_wmWorldState->m_mainState;
 
 	if (updatedAnimState == 1 && animTime >= animEnd) {
-		if (worldState->m_frameCounter < 10) {
-			worldState->m_frameCounter++;
+		if (m_wmWorldState->m_frameCounter < 10) {
+			m_wmWorldState->m_frameCounter++;
 		}
-	} else if (updatedAnimState == 3 && worldState->m_frameCounter < 10) {
-		worldState->m_frameCounter++;
+	} else if (updatedAnimState == 3 && m_wmWorldState->m_frameCounter < 10) {
+		m_wmWorldState->m_frameCounter++;
 	}
 }
 
@@ -1259,7 +1835,6 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;
@@ -1294,17 +1869,17 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
-	switch (worldState->m_menuMode) {
+	switch (m_wmWorldState->m_menuMode) {
 	case 0:
-		if (worldState->m_mainState <= 4) {
-			const short state = worldState->m_mainState;
+		if (m_wmWorldState->m_mainState <= 4) {
+			const short state = m_wmWorldState->m_mainState;
 			int frameStep = 0;
 			if (state == 0) {
-				frameStep = worldState->m_frameCounter - 10;
+				frameStep = m_wmWorldState->m_frameCounter - 10;
 			} else if (state < 1 || state > 3) {
-				frameStep = -worldState->m_frameCounter;
+				frameStep = -m_wmWorldState->m_frameCounter;
 			}
-			CalcWMFrame0(frameStep);
+			CalcWmFrame0Inline(this, frameStep);
 		}
 		CalcMainMenuSub();
 		break;
@@ -1316,7 +1891,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	case 3:
 		if (m_singleCmakeMode == 0) {
-			if (worldState->m_modelFlagsInitialized == 0) {
+			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
 				unsigned char* const modelData = m_wm.m_charaModelData;
 				modelData[0x0C] = 1;
 				modelData[0x40] = 1;
@@ -1326,19 +1901,19 @@ void CMenuPcs::CalcDiaryMenu()
 				modelData[0x110] = 1;
 				modelData[0x144] = 1;
 				modelData[0x178] = 1;
-				worldState->m_modelFlagsInitialized = 1;
+				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
-			if (worldState->m_mainState <= 4) {
+			if (m_wmWorldState->m_mainState <= 4) {
 				CalcCharaSelect();
-				const short state = worldState->m_mainState;
+				const short state = m_wmWorldState->m_mainState;
 				int frameStep = 0;
 				if (state == 0) {
-					frameStep = worldState->m_frameCounter - 10;
+					frameStep = m_wmWorldState->m_frameCounter - 10;
 				} else if (state < 1 || state > 3) {
-					frameStep = -worldState->m_frameCounter;
+					frameStep = -m_wmWorldState->m_frameCounter;
 				}
-				CalcWMFrame0(frameStep);
-				const short animState = worldState->m_mainState;
+				CalcWmFrame0Inline(this, frameStep);
+				const short animState = m_wmWorldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();
 				}
@@ -1348,8 +1923,8 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		if (((worldState->m_mainState != 0) || bytes[0x12] != 0) &&
-		    worldState->m_mainState < 4) {
+		if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+		    m_wmWorldState->m_mainState < 4) {
 			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 				SetCrystalCageAttr();
 			}
@@ -1402,8 +1977,6 @@ void CMenuPcs::CalcDiaryMenu()
 void CMenuPcs::CalcMCardMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	McCtrl& mcCtrl = *GetMcCtrl();
 
 	bool bVar1 = false;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
@@ -1413,92 +1986,89 @@ void CMenuPcs::CalcMCardMenu()
 	if (bVar1) {
 		uVar3 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-		uVar3 = Pad.GetPadInputs()[0].buttonDown[0];
+		unsigned int padIndex = 0;
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+		uVar3 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if (worldState->m_worldReady == 0) {
-		mcCtrl.m_previousState = 0;
-		mcCtrl.m_state = 0;
-		mcCtrl.m_lastResult = 0;
-		mcCtrl.m_iteration = 0;
-		mcCtrl.m_userBuffer = 0;
-		mcCtrl.m_createFlag = 0;
-		if ((char)DAT_8032ee20 < 0 || 1 < (char)DAT_8032ee20) {
-			mcCtrl.m_cardChannel = 0;
+	if ((signed char)m_wmWorldState->m_worldReady == 0) {
+		m_mcCtrl.m_previousState = 0;
+		m_mcCtrl.m_state = 0;
+		m_mcCtrl.m_lastResult = 0;
+		m_mcCtrl.m_iteration = 0;
+		m_mcCtrl.m_userBuffer = 0;
+		m_mcCtrl.m_createFlag = 0;
+		if (gWmMenuCursorX[0] >= 0 && gWmMenuCursorX[0] < 2) {
+			m_mcCtrl.m_cardChannel = (int)gWmMenuCursorX[0];
 		} else {
-			mcCtrl.m_cardChannel = (int)DAT_8032ee20;
+			m_mcCtrl.m_cardChannel = 0;
 		}
-		if ((char)uRam8032ee21 < 0 || 3 < (char)uRam8032ee21) {
-			mcCtrl.m_saveIndex = 0;
+		if (gWmMenuCursorX[1] >= 0 && gWmMenuCursorX[1] < 4) {
+			m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 		} else {
-			mcCtrl.m_saveIndex = (int)uRam8032ee21;
+			m_mcCtrl.m_saveIndex = 0;
 		}
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];
-		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
-		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
-		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
-		worldState->m_flag0A = 0;
-		worldState->m_worldReady = 1;
+		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
+		Game.m_gameWork.m_wmBackupParams[1] = m_wmWorldState->m_originalBackupParams[1];
+		Game.m_gameWork.m_wmBackupParams[2] = m_wmWorldState->m_originalBackupParams[2];
+		Game.m_gameWork.m_wmBackupParams[3] = m_wmWorldState->m_originalBackupParams[3];
+		m_wmWorldState->m_flag0A = 0;
+		m_wmWorldState->m_worldReady = 1;
 	}
 
 	int iVar14;
-	short sVar7 = worldState->m_mainState;
+	int iVar12;
+	short sVar7 = m_wmWorldState->m_mainState;
 	unsigned int uVar15;
 	if (sVar7 == 0) {
-		uVar15 = static_cast<int>(worldState->m_frameCounter) - 10;
-	} else if (sVar7 < 1 || sVar7 > 3) {
-		uVar15 = -static_cast<int>(worldState->m_frameCounter);
+		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
+	} else if (sVar7 <= 0 || sVar7 >= 4) {
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	} else {
 		uVar15 = 0;
 	}
 
-	unsigned char* const frame = m_wm.m_frameInfo;
-	*reinterpret_cast<short*>(frame + 4) = 0x10;
-	int iVar12 = reinterpret_cast<int>(frame);
-	int frameSum = (int)*reinterpret_cast<short*>(iVar12 + 8) + (int)*reinterpret_cast<short*>(iVar12 + 4);
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	int frameSum = (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4);
 	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
-	*reinterpret_cast<short*>(iVar12 + 0x20) = (short)iVar14;
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
 		double dVar22;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
-		if ((int)uVar15 > -11) {
-			unsigned int absOff;
-			if ((int)uVar15 < 0) {
-				absOff = -(int)uVar15;
-			} else {
-				absOff = uVar15;
-			}
+		float baseWidth = (float)((int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + (int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+		if ((int)uVar15 >= -10) {
+			int absSign = (int)uVar15 >> 0x1F;
+			int absRaw = ((int)uVar15 ^ absSign) - absSign;
+			float dVar23 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
+			unsigned int absOff = (unsigned int)absRaw;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
-			double dVar23 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
-			dVar22 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
-			dVar22 = (double)(float)(dVar23 * (double)(float)dVar22);
+			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
+			dVar22 = (double)(dVar23 * dVar28);
 		} else {
 			dVar22 = (double)baseWidth;
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar22);
-		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar22);
-		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) - (float)dVar22);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = (short)iVar14;
+		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) + (float)dVar22);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) = (short)iVar14;
 	}
 
 	float fVar2 = FLOAT_803313e8;
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
-	iVar14 = reinterpret_cast<int>(worldState);
-	iVar12 = worldState->m_subState;
+	iVar14 = reinterpret_cast<int>(m_wmWorldState);
+	iVar12 = m_wmWorldState->m_subState;
 	switch (iVar12) {
 	case 0:
 	case 2:
-		if (worldState->m_flag09 == 0) {
-			worldState->m_cardChannel = static_cast<short>(mcCtrl.m_cardChannel);
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_cardChannel = static_cast<short>(m_mcCtrl.m_cardChannel);
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
@@ -1512,17 +2082,16 @@ void CMenuPcs::CalcMCardMenu()
 				if (pcVar10 != 0) {
 					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
-			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
-			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
-			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			int iLines = iVar14 / 0x16;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
-			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar12;
 			m_menuWindowInfo->width = sVar7;
@@ -1531,106 +2100,45 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			worldState->m_flag09 = 1;
-			worldState->m_flag0A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_flag0A = 0;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
-				if ((uVar6 & 3) == 0) {
-					if ((uVar3 & 0x100) == 0) {
+			if (m_wmWorldState->m_counter1A == 0) {
+				if ((uVar6 & 3) != 0) {
+					m_wmWorldState->m_cardChannel ^= 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					if ((uVar3 & 0x100) != 0) {
+						m_wmWorldState->m_state0E = 1;
+						m_mcCtrl.m_cardChannel = m_wmWorldState->m_cardChannel;
+						if (m_wmWorldState->m_cardChannel == static_cast<signed char>(gWmMenuCursorX[0])) {
+							m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
+						}
+						m_wmWorldState->m_counter1A = 10;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					} else {
 						if ((uVar3 & 0x200) != 0) {
-							worldState->m_state0E = -1;
-							worldState->m_counter1A = 1;
+							m_wmWorldState->m_state0E = -1;
+							m_wmWorldState->m_counter1A = 1;
 							Sound.PlaySe(3, 0x40, 0x7F, 0);
 						}
-					} else {
-						worldState->m_state0E = 1;
-						mcCtrl.m_cardChannel = worldState->m_cardChannel;
-						if (worldState->m_cardChannel == static_cast<signed char>(DAT_8032ee20)) {
-							mcCtrl.m_saveIndex = (int)uRam8032ee21;
-						}
-						worldState->m_counter1A = 10;
-						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
-				} else {
-					worldState->m_cardChannel ^= 1;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = worldState->m_counter1A;
+			sVar7 = m_wmWorldState->m_counter1A;
 			if (sVar7 != 0) {
-				worldState->m_counter1A = sVar7 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar7 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
 		}
 		break;
 	case 3:
-		worldState->m_mcResult = static_cast<short>(MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel));
-		break;
-	case 4:
-		if (worldState->m_flag09 == 0) {
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess(6));
-			int* piVar18 = piVar4;
-			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
-				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
-				if (pcVar10 != 0) {
-					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar14 < iVar25) iVar14 = iVar25;
-				}
-				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
-			}
-			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
-			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
-			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
-			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
-			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar12;
-			m_menuWindowInfo->width = sVar7;
-			m_menuWindowInfo->height = sVar16;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
-			m_menuWindowInfo->state = 0;
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
-			worldState->m_flag09 = 1;
-		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
-			short chkResult = (short)mcCtrl.ChkEmpty(0);
-			worldState->m_mcResult = chkResult;
-			if (worldState->m_mcResult < 0) {
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = 0xFF;
-				worldState->m_state0E = -1;
-				worldState->m_counter1A = 10;
-			}
-		}
-		if (m_menuWindowInfo->state == 1) {
-			sVar7 = worldState->m_counter1A;
-			if (sVar7 != 0) {
-				worldState->m_counter1A = sVar7 - 1;
-				if (worldState->m_counter1A == 0) {
-					m_menuWindowInfo->state = 2;
-				}
-			}
-		}
+		m_wmWorldState->m_mcResult = static_cast<short>(MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel));
 		break;
 	case 5:
 	case 6:
@@ -1643,10 +2151,10 @@ void CMenuPcs::CalcMCardMenu()
 	case 0x15:
 	case 0x1B:
 	case 0x1C: {
-		if (worldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			bVar1 = true;
-			int uVar20 = 0;
 			int uVar17;
+			int uVar20 = 0;
 			if (iVar12 == 5) { uVar17 = 1; }
 			else if (iVar12 == 6) { uVar17 = 2; }
 			else if (iVar12 == 7) { uVar17 = 3; }
@@ -1671,17 +2179,16 @@ void CMenuPcs::CalcMCardMenu()
 				if (pcVar10 != 0) {
 					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
-			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
-			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
-			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			int iLines = iVar14 / 0x16;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
-			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar12;
 			m_menuWindowInfo->width = sVar7;
@@ -1689,44 +2196,46 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
-			worldState->m_counter1A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_counter1A = 0;
 			if (bVar1) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
-			sVar7 = worldState->m_subState;
+		    && m_wmWorldState->m_counter1A == 0) {
+			sVar7 = m_wmWorldState->m_subState;
 			if (sVar7 == 0xE || sVar7 == 0x15) {
-				worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				if (worldState->m_mcResult < 0) goto LAB_chk;
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				if (m_wmWorldState->m_mcResult < 0) goto LAB_chk;
 			} else if (sVar7 == 5) {
-				worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 			LAB_chk:
-				sVar7 = worldState->m_subState;
+				sVar7 = m_wmWorldState->m_subState;
 				short sVar16;
 				if (sVar7 == 5) { sVar16 = -1; }
 				else if (sVar7 == 6) { sVar16 = -3; }
 				else if (sVar7 == 7) { sVar16 = -4; }
 				else { sVar16 = 0; }
-				if (sVar7 == 7) {
-					short chk = worldState->m_mcResult;
-					if (chk != 0 && chk != sVar16 && chk != 1) {
-						worldState->m_state0E = -1;
-						worldState->m_counter1A = 1;
+				if (sVar7 != 7) {
+					if (m_wmWorldState->m_mcResult != sVar16 && m_wmWorldState->m_mcResult != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
-				} else if (worldState->m_mcResult != sVar16 && worldState->m_mcResult != 1) {
-					worldState->m_state0E = -1;
-					worldState->m_counter1A = 1;
-					break;
+				} else {
+					short chk = m_wmWorldState->m_mcResult;
+					if (chk != 0 && chk != sVar16 && chk != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
+						break;
+					}
 				}
 			}
 			if ((uVar3 & 0x300) != 0) {
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
-				if (worldState->m_subState == 0x15) {
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
+				if (m_wmWorldState->m_subState == 0x15) {
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else {
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
@@ -1734,36 +2243,96 @@ void CMenuPcs::CalcMCardMenu()
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = worldState->m_counter1A;
+			sVar7 = m_wmWorldState->m_counter1A;
 			if (sVar7 != 0) {
-				worldState->m_counter1A = sVar7 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar7 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
 		}
 		break;
 	}
+	case 4:
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			CFont* pFont = m_fonts[0];
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			const char* const* msgBuf = GetMcWinMessBuff(0);
+			iVar14 = 0;
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(6));
+			int* piVar18 = piVar4;
+			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
+				const char* pcVar10 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4)];
+				if (pcVar10 != 0) {
+					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
+					if (iVar25 > iVar14) iVar14 = iVar25;
+				}
+				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
+			}
+			int iLines = iVar14 / 0x16;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			sVar7 = (iLines + 2) * 0x16 + 0x40;
+			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
+			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			m_menuWindowInfo->x = (short)iVar14;
+			m_menuWindowInfo->y = (short)iVar12;
+			m_menuWindowInfo->width = sVar7;
+			m_menuWindowInfo->height = sVar16;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+			m_wmWorldState->m_flag09 = 1;
+		} else if (m_menuWindowInfo->state == 1
+		           && m_wmWorldState->m_counter1A == 0) {
+			short chkResult = (short)GetMcCtrl()->ChkEmpty(0);
+			m_wmWorldState->m_mcResult = chkResult;
+			if (m_wmWorldState->m_mcResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				m_wmWorldState->m_state0E = -1;
+				m_wmWorldState->m_counter1A = 10;
+			}
+		}
+		if (m_menuWindowInfo->state == 1) {
+			sVar7 = m_wmWorldState->m_counter1A;
+			if (sVar7 != 0) {
+				m_wmWorldState->m_counter1A = sVar7 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
+					m_menuWindowInfo->state = 2;
+				}
+			}
+		}
+		break;
 	case 8:
 	case 0xB:
 	case 0x12:
 	case 0x19: {
-		if (worldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			int uVar20 = 0;
 			int uVar17;
 			if (iVar12 == 8) {
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 				uVar17 = 4;
 			} else if (iVar12 == 0xB) {
 				uVar17 = 5;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else if (iVar12 == 0x19) {
 				uVar20 = 1;
 				uVar17 = 0x19;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else {
 				uVar17 = 0x12;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			}
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
@@ -1778,17 +2347,16 @@ void CMenuPcs::CalcMCardMenu()
 				if (pcVar10 != 0) {
 					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
-			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
-			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
-			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			int iLines = iVar14 / 0x16;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
-			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar12;
 			m_menuWindowInfo->width = sVar7;
@@ -1796,149 +2364,53 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
-				if (worldState->m_subState == 0x19) {
-					worldState->m_state0E = 1;
-					worldState->m_counter1A = 0x5A;
+			if (m_wmWorldState->m_counter1A == 0) {
+				if (m_wmWorldState->m_subState == 0x19) {
+					m_wmWorldState->m_state0E = 1;
+					m_wmWorldState->m_counter1A = 0x5A;
 					break;
 				}
-				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
-				if (worldState->m_mcResult == 0) {
-					if ((uVar6 & 3) == 0) {
-						if ((uVar3 & 0x100) == 0) {
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)chkRes;
+				if (m_wmWorldState->m_mcResult != 0) {
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 10;
+				} else {
+					if ((uVar6 & 3) != 0) {
+						m_wmWorldState->m_cardChannel ^= 1;
+						Sound.PlaySe(1, 0x40, 0x7F, 0);
+					} else {
+						if ((uVar3 & 0x100) != 0) {
+							if (m_wmWorldState->m_cardChannel == 0) {
+								m_wmWorldState->m_state0E = 1;
+							} else {
+								m_wmWorldState->m_state0E = -1;
+							}
+							m_wmWorldState->m_counter1A = 10;
+							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						} else {
 							if ((uVar3 & 0x200) != 0) {
-								worldState->m_cardChannel = 1;
-								worldState->m_state0E = -1;
-								worldState->m_counter1A = 10;
+								m_wmWorldState->m_cardChannel = 1;
+								m_wmWorldState->m_state0E = -1;
+								m_wmWorldState->m_counter1A = 10;
 								Sound.PlaySe(3, 0x40, 0x7F, 0);
 							}
-						} else {
-							if (worldState->m_cardChannel == 0) {
-								worldState->m_state0E = 1;
-							} else {
-								worldState->m_state0E = -1;
-							}
-							worldState->m_counter1A = 10;
-							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
-					} else {
-						worldState->m_cardChannel ^= 1;
-						Sound.PlaySe(1, 0x40, 0x7F, 0);
 					}
-				} else {
-					worldState->m_state0E = -1;
-					worldState->m_counter1A = 10;
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A != 0) {
-			if (worldState->m_subState == 0x19) {
-				worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
+		    && m_wmWorldState->m_counter1A != 0) {
+			if (m_wmWorldState->m_subState == 0x19) {
+				m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 			}
-			worldState->m_counter1A--;
-			if (worldState->m_counter1A == 0) {
+			m_wmWorldState->m_counter1A--;
+			if (m_wmWorldState->m_counter1A == 0) {
 				m_menuWindowInfo->state = 2;
-			}
-		}
-		break;
-	}
-	case 0xC: {
-		if (worldState->m_flag09 == 0) {
-			worldState->m_flag09 = 1;
-			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
-		}
-		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
-			short listRes = (short)mcCtrl.LoadMcList();
-			worldState->m_mcResult = listRes;
-			if (worldState->m_mcResult == 0) break;
-			if (worldState->m_menuMode == 8) {
-				int iVar21 = 0;
-				int cnt = 4;
-				int iVar13 = 0;
-				do {
-					if (*reinterpret_cast<char*>(m_wmCharaState + iVar13 + 0x42) == 0
-					    && *reinterpret_cast<int*>(m_wmCharaState + iVar13 + 8) > 0) {
-						iVar21++;
-					}
-					iVar13 += 0x48;
-					cnt--;
-				} while (cnt != 0);
-				if (iVar21 == 0) {
-					worldState->m_mcResult = (short)0xFC19;
-				}
-			}
-			if ((char)uRam8032ee21 < 0 || (int)DAT_8032ee20 != mcCtrl.m_cardChannel) {
-			LAB_saveIdx:
-				int unk838 = reinterpret_cast<int>(m_wmCharaState);
-				uVar15 = 0;
-				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(unk838 + 8) > 0) {
-					uVar15 = 1;
-					if (*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0) {
-						uVar15 = 2;
-						if (*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0) {
-							uVar15 = 3;
-							if (*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0) {
-								uVar15 = 4;
-							} else {
-								mcCtrl.m_saveIndex = 3;
-							}
-						} else {
-							mcCtrl.m_saveIndex = 2;
-						}
-					} else {
-						mcCtrl.m_saveIndex = 1;
-					}
-				} else {
-					mcCtrl.m_saveIndex = 0;
-				}
-				if (3 < uVar15) {
-					mcCtrl.m_saveIndex = 0;
-				}
-				worldState->m_cardChannel = (short)mcCtrl.m_saveIndex;
-			} else {
-				unsigned int uVar11 = mcCtrl.m_serialLo;
-				uVar15 = DAT_8032ee2c ^ mcCtrl.m_serialHi;
-				if (uVar15 != 0 || DAT_8032ee28 != (int)uVar11) goto LAB_saveIdx;
-				if (uVar15 == 0 && DAT_8032ee28 == (int)uVar11) {
-					mcCtrl.m_saveIndex = (int)uRam8032ee21;
-					worldState->m_cardChannel = (short)mcCtrl.m_saveIndex;
-				}
-			}
-			iVar12 = 0;
-			iVar14 = 0;
-			int iVar21 = 4;
-			do {
-				if (*reinterpret_cast<char*>(m_wmCharaState + iVar14 + 0x42) != 0) {
-					mcCtrl.m_saveIndex = iVar12;
-					worldState->m_cardChannel = (short)iVar12;
-					break;
-				}
-				iVar14 += 0x48;
-				iVar12++;
-				iVar21--;
-			} while (iVar21 != 0);
-			worldState->m_state0E = 1;
-			worldState->m_counter1A = 10;
-		}
-		if (m_menuWindowInfo->state == 1) {
-			sVar7 = worldState->m_counter1A;
-			if (sVar7 != 0) {
-				worldState->m_counter1A = sVar7 - 1;
-				if (worldState->m_counter1A == 0) {
-					m_menuWindowInfo->state = 2;
-				}
 			}
 		}
 		break;
@@ -1946,7 +2418,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0xD:
 	case 0x13:
 	case 0x1A: {
-		if (worldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			int uVar20 = 0;
 			int uVar17;
 			if (iVar12 == 0xD) { uVar17 = 7; }
@@ -1965,17 +2437,16 @@ void CMenuPcs::CalcMCardMenu()
 				if (pcVar10 != 0) {
 					if (*pcVar10 == '$') pcVar10 = pcVar10 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar10);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar18 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar18) + 2);
 			}
-			iVar12 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar7 = (short)iVar12 - (short)(iVar12 >> 0x1F);
-			if (iVar14 != (iVar12 - (iVar12 >> 0x1F)) * 0x16) sVar7 = sVar7 + 1;
-			sVar7 = (sVar7 + 2) * 0x16 + 0x40;
+			int iLines = iVar14 / 0x16;
+			if (iVar14 - iLines * 0x16 != 0) iLines = iLines + 1;
+			sVar7 = (iLines + 2) * 0x16 + 0x40;
 			short sVar16 = (short)*piVar4 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar7) * (float)DOUBLE_803313f8);
-			iVar12 = (int)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
+			iVar14 = (int)(float)((float)(0x280 - sVar7) * DOUBLE_803313f8);
+			iVar12 = (int)(float)((double)(FLOAT_80331430 - (float)sVar16) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar12;
 			m_menuWindowInfo->width = sVar7;
@@ -1983,60 +2454,156 @@ void CMenuPcs::CalcMCardMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
-			if (worldState->m_menuMode == 8
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+			if (m_wmWorldState->m_menuMode == 8
 			    && m_cmakeWork != 0) {
-				mcCtrl.m_userBuffer = m_cmakeWork;
+				m_mcCtrl.m_userBuffer = m_cmakeWork;
 			} else {
-				mcCtrl.m_userBuffer = 0;
+				m_mcCtrl.m_userBuffer = 0;
 			}
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
+		           && m_wmWorldState->m_counter1A == 0) {
 			if (iVar12 == 0xD) {
-				mcCtrl.Format(1);
-				worldState->m_mcResult = (short)mcCtrl.m_lastResult;
-				if (worldState->m_mcResult < 0) {
+				GetMcCtrl()->Format(1);
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else if (iVar12 == 0x1A) {
-				worldState->m_mcResult = (short)mcCtrl.EraseDat();
-				if (worldState->m_mcResult < 0) {
+				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->EraseDat();
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			} else {
-				worldState->m_mcResult = (short)mcCtrl.SaveDat();
-				if (worldState->m_mcResult < 0) {
+				m_wmWorldState->m_mcResult = (short)GetMcCtrl()->SaveDat();
+				if (m_wmWorldState->m_mcResult < 0) {
 					MemoryCardMan.m_opDoneFlag = 1;
 					MemoryCardMan.m_currentSlot = 0xFF;
 				}
 			}
-			if (worldState->m_mcResult == 0) break;
-			if (worldState->m_subState == 0x13) {
-				if (worldState->m_menuMode != 8) {
-					DAT_8032ee28 = mcCtrl.m_serialLo;
-					DAT_8032ee2c = mcCtrl.m_serialHi;
-					DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
-					uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
+			if (m_wmWorldState->m_mcResult == 0) break;
+			if (m_wmWorldState->m_subState == 0x13) {
+				if (m_wmWorldState->m_menuMode != 8) {
+					DAT_8032ee28 = m_mcCtrl.m_serialLo;
+					DAT_8032ee2c = m_mcCtrl.m_serialHi;
+					DAT_8032ee20 = (unsigned char)m_mcCtrl.m_cardChannel;
+					uRam8032ee21 = (unsigned char)m_mcCtrl.m_saveIndex;
 				}
 				int unk838 = reinterpret_cast<int>(m_wmCharaState);
-				*reinterpret_cast<int*>(unk838 + mcCtrl.m_saveIndex * 0x48 + 8) = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8);
+				*reinterpret_cast<int*>(unk838 + m_mcCtrl.m_saveIndex * 0x48 + 8) = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8);
 			}
-			worldState->m_state0E = 1;
-			worldState->m_counter1A = 10;
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar7 = worldState->m_counter1A;
+			sVar7 = m_wmWorldState->m_counter1A;
 			if (sVar7 != 0) {
-				worldState->m_counter1A = sVar7 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar7 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
+					m_menuWindowInfo->state = 2;
+				}
+			}
+		}
+		break;
+	}
+	case 0xC: {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_flag09 = 1;
+			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+		}
+		if (m_menuWindowInfo->state == 1
+		    && m_wmWorldState->m_counter1A == 0) {
+			short listRes = (short)GetMcCtrl()->LoadMcList();
+			m_wmWorldState->m_mcResult = listRes;
+			if (m_wmWorldState->m_mcResult == 0) {
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+				break;
+			}
+			if (m_wmWorldState->m_menuMode == 8) {
+				int iVar21 = 0;
+				int cnt = 4;
+				int iVar13 = 0;
+				do {
+					if (*reinterpret_cast<char*>(m_wmCharaState + iVar13 + 0x42) == 0
+					    && *reinterpret_cast<int*>(m_wmCharaState + iVar13 + 8) > 0) {
+						iVar21++;
+					}
+					iVar13 += 0x48;
+					cnt--;
+				} while (cnt != 0);
+				if (iVar21 == 0) {
+					m_wmWorldState->m_mcResult = (short)0xFC19;
+				}
+			}
+			if (gWmMenuCursorX[1] >= 0 && (int)gWmMenuCursorX[0] == m_mcCtrl.m_cardChannel) {
+				if ((gWmMenuWorkA ^ (int)m_mcCtrl.m_serialLo) | (gWmMenuWorkB ^ (int)m_mcCtrl.m_serialHi)) goto LAB_saveIdx;
+				m_mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
+				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+			} else {
+			LAB_saveIdx:
+				int unk838 = reinterpret_cast<int>(m_wmCharaState);
+				int sel = 0;
+				if (*reinterpret_cast<char*>(unk838 + 0x42) == 0 && *reinterpret_cast<int*>(unk838 + 8) > 0) {
+					sel = 1;
+					if (*reinterpret_cast<char*>(unk838 + 0x8A) == 0 && *reinterpret_cast<int*>(unk838 + 0x50) > 0) {
+						sel = 2;
+						if (*reinterpret_cast<char*>(unk838 + 0xD2) == 0 && *reinterpret_cast<int*>(unk838 + 0x98) > 0) {
+							sel = 3;
+							if (*reinterpret_cast<char*>(unk838 + 0x11A) == 0 && *reinterpret_cast<int*>(unk838 + 0xE0) > 0) {
+								sel = 4;
+							} else {
+								m_mcCtrl.m_saveIndex = sel;
+							}
+						} else {
+							m_mcCtrl.m_saveIndex = sel;
+						}
+					} else {
+						m_mcCtrl.m_saveIndex = sel;
+					}
+				} else {
+					m_mcCtrl.m_saveIndex = sel;
+				}
+				if (sel >= 4) {
+					m_mcCtrl.m_saveIndex = 0;
+				}
+				m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+			}
+			iVar12 = 0;
+			iVar14 = 0;
+			for (int iVar21 = 4; iVar21 != 0; iVar21--) {
+				if (*reinterpret_cast<char*>(reinterpret_cast<int>(m_wmCharaState) + iVar14 + 0x42) != 0) {
+					m_mcCtrl.m_saveIndex = iVar12;
+					m_wmWorldState->m_cardChannel = (short)iVar12;
+					break;
+				}
+				iVar14 += 0x48;
+				iVar12++;
+			}
+			m_wmWorldState->m_state0E = 1;
+			m_wmWorldState->m_counter1A = 10;
+		}
+		if (m_menuWindowInfo->state == 1) {
+			sVar7 = m_wmWorldState->m_counter1A;
+			if (sVar7 != 0) {
+				m_wmWorldState->m_counter1A = sVar7 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2044,38 +2611,38 @@ void CMenuPcs::CalcMCardMenu()
 		break;
 	}
 	case 0x11:
-		worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		if (worldState->m_mcResult == 0 && uVar6 != 0) {
-			if ((uVar6 & 8) == 0) {
+		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		if (m_wmWorldState->m_mcResult == 0 && uVar6 != 0) {
+			if ((uVar6 & 8) != 0) {
+				if (m_wmWorldState->m_cardChannel < 1) {
+					m_wmWorldState->m_cardChannel = 3;
+				} else {
+					m_wmWorldState->m_cardChannel--;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else {
 				if ((uVar6 & 4) != 0) {
-					if (worldState->m_cardChannel < 3) {
-						worldState->m_cardChannel++;
+					if (m_wmWorldState->m_cardChannel < 3) {
+						m_wmWorldState->m_cardChannel++;
 					} else {
-						worldState->m_cardChannel = 0;
+						m_wmWorldState->m_cardChannel = 0;
 					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
-			} else {
-				if (worldState->m_cardChannel < 1) {
-					worldState->m_cardChannel = 3;
-				} else {
-					worldState->m_cardChannel--;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 			if ((uVar6 & 0xC) == 0) {
 				if ((uVar3 & 0x100) != 0) {
-					sVar7 = worldState->m_state0E;
+					sVar7 = m_wmWorldState->m_state0E;
 					if (sVar7 != -1 && sVar7 != 1) {
-						mcCtrl.m_saveIndex = (int)worldState->m_cardChannel;
-						worldState->m_state0E = 1;
+						m_mcCtrl.m_saveIndex = (int)m_wmWorldState->m_cardChannel;
+						m_wmWorldState->m_state0E = 1;
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
 				}
 				if ((uVar3 & 0x200) != 0) {
-					sVar7 = worldState->m_state0E;
+					sVar7 = m_wmWorldState->m_state0E;
 					if (sVar7 != -1 && sVar7 != 1) {
-						worldState->m_state0E = -1;
+						m_wmWorldState->m_state0E = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -2084,7 +2651,7 @@ void CMenuPcs::CalcMCardMenu()
 		break;
 	}
 
-	if (worldState->m_subState != 0) {
+	if (m_wmWorldState->m_subState != 0) {
 		CalcMcObj();
 	}
 }
@@ -2195,7 +2762,6 @@ void CMenuPcs::CalcLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const worldState = m_wmWorldState;
-	McCtrl& mcCtrl = *GetMcCtrl();
 	m_textureLocIndex = 0;
 
 	bool bVar1 = false;
@@ -2206,94 +2772,92 @@ void CMenuPcs::CalcLoadMenu()
 	if (bVar1) {
 		uVar4 = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-		uVar4 = Pad.GetPadInputs()[0].buttonDown[0];
+		unsigned int padIndex = (Pad.m_debugPadPort == 0) ? 0 : 0;
+		uVar4 = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
 
-	if (worldState->m_worldReady == 0) {
-		int frame = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(frame + 4) = 0x10;
-		float fVar5 = FLOAT_803313e8;
-		float fVar4 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(frame + 6) = 0x10;
-		*reinterpret_cast<short*>(frame + 8) = 0xE8;
-		*reinterpret_cast<short*>(frame + 10) = 0x168;
-		*reinterpret_cast<float*>(frame + 0xC) = fVar4;
-		*reinterpret_cast<float*>(frame + 0x10) = fVar4;
-		*reinterpret_cast<float*>(frame + 0x14) = fVar5;
-		*reinterpret_cast<float*>(frame + 0x18) = fVar5;
-		*reinterpret_cast<int*>(frame + 0x1C) = 0;
-		int iVar14 = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(iVar14 + 0x20) = *reinterpret_cast<short*>(iVar14 + 4);
-		*reinterpret_cast<short*>(iVar14 + 0x22) = *reinterpret_cast<short*>(iVar14 + 6);
-		*reinterpret_cast<short*>(iVar14 + 0x24) = *reinterpret_cast<short*>(iVar14 + 8);
-		*reinterpret_cast<short*>(iVar14 + 0x26) = *reinterpret_cast<short*>(iVar14 + 10);
-		*reinterpret_cast<int*>(iVar14 + 0x28) = *reinterpret_cast<int*>(iVar14 + 0xC);
-		*reinterpret_cast<int*>(iVar14 + 0x2C) = *reinterpret_cast<int*>(iVar14 + 0x10);
-		*reinterpret_cast<int*>(iVar14 + 0x30) = *reinterpret_cast<int*>(iVar14 + 0x14);
-		*reinterpret_cast<int*>(iVar14 + 0x34) = *reinterpret_cast<int*>(iVar14 + 0x18);
-		*reinterpret_cast<int*>(iVar14 + 0x38) = *reinterpret_cast<int*>(iVar14 + 0x1C);
-		iVar14 = reinterpret_cast<int>(m_wm.m_frameInfo);
-		*reinterpret_cast<short*>(iVar14 + 0x20) = 0x280 - (*reinterpret_cast<short*>(iVar14 + 8) + *reinterpret_cast<short*>(iVar14 + 4));
-		*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = 8;
+	if (m_wmWorldState->m_worldReady == 0) {
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 4) = 0x10;
+		float one = FLOAT_803313e8;
+		float zero = FLOAT_803313dc;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 6) = 0x10;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 8) = 0xE8;
+		*reinterpret_cast<unsigned short*>(m_wm.m_frameInfo + 0xA) = 0x168;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0xC) = zero;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x10) = zero;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x14) = one;
+		*reinterpret_cast<float*>(m_wm.m_frameInfo + 0x18) = one;
+		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x1C) = 0;
 
-		mcCtrl.m_previousState = 0;
-		mcCtrl.m_state = 0;
-		mcCtrl.m_lastResult = 0;
-		mcCtrl.m_iteration = 0;
-		mcCtrl.m_userBuffer = 0;
-		mcCtrl.m_createFlag = 0;
-		mcCtrl.m_cardChannel = 0;
-		mcCtrl.m_saveIndex = 0;
+		unsigned char* frame0 = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame0 + 0x20) = *reinterpret_cast<short*>(frame0 + 4);
+		*reinterpret_cast<short*>(frame0 + 0x22) = *reinterpret_cast<short*>(frame0 + 6);
+		*reinterpret_cast<short*>(frame0 + 0x24) = *reinterpret_cast<short*>(frame0 + 8);
+		*reinterpret_cast<short*>(frame0 + 0x26) = *reinterpret_cast<short*>(frame0 + 0xA);
+		*reinterpret_cast<float*>(frame0 + 0x28) = *reinterpret_cast<float*>(frame0 + 0xC);
+		*reinterpret_cast<float*>(frame0 + 0x2C) = *reinterpret_cast<float*>(frame0 + 0x10);
+		*reinterpret_cast<float*>(frame0 + 0x30) = *reinterpret_cast<float*>(frame0 + 0x14);
+		*reinterpret_cast<float*>(frame0 + 0x34) = *reinterpret_cast<float*>(frame0 + 0x18);
+		*reinterpret_cast<unsigned int*>(frame0 + 0x38) = *reinterpret_cast<unsigned int*>(frame0 + 0x1C);
+
+		frame0 = m_wm.m_frameInfo;
+		*reinterpret_cast<short*>(frame0 + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame0 + 8) + *reinterpret_cast<short*>(frame0 + 4));
+		*reinterpret_cast<unsigned int*>(m_wm.m_frameInfo + 0x38) = 8;
+
+		m_mcCtrl.m_previousState = 0;
+		m_mcCtrl.m_state = 0;
+		m_mcCtrl.m_lastResult = 0;
+		m_mcCtrl.m_iteration = 0;
+		m_mcCtrl.m_userBuffer = 0;
+		m_mcCtrl.m_createFlag = 0;
+		m_mcCtrl.m_cardChannel = 0;
+		m_mcCtrl.m_saveIndex = 0;
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
-		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];
-		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
-		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
-		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
-		if (worldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
-			mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
-			worldState->m_subState = 3;
-			worldState->m_flag09 = 1;
+		Game.m_gameWork.m_wmBackupParams[0] = m_wmWorldState->m_originalBackupParams[0];
+		Game.m_gameWork.m_wmBackupParams[1] = m_wmWorldState->m_originalBackupParams[1];
+		Game.m_gameWork.m_wmBackupParams[2] = m_wmWorldState->m_originalBackupParams[2];
+		Game.m_gameWork.m_wmBackupParams[3] = m_wmWorldState->m_originalBackupParams[3];
+		if (m_wmWorldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
+			m_mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
+			m_wmWorldState->m_subState = 3;
+			m_wmWorldState->m_flag09 = 1;
 		}
-		worldState->m_flag0A = 0;
-		worldState->m_worldReady = 1;
+		m_wmWorldState->m_flag0A = 0;
+		m_wmWorldState->m_worldReady = 1;
 	}
 
 	int iVar14;
-	short sVar8 = worldState->m_mainState;
+	short sVar8 = m_wmWorldState->m_mainState;
 	unsigned int uVar15;
 	if (sVar8 == 0) {
-		uVar15 = static_cast<int>(worldState->m_frameCounter) - 10;
-	} else if (sVar8 < 1 || sVar8 > 3) {
-		uVar15 = -static_cast<int>(worldState->m_frameCounter);
-	} else {
+		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
+	} else if (sVar8 > 0 && sVar8 < 4) {
 		uVar15 = 0;
+	} else {
+		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	unsigned char* const frame = m_wm.m_frameInfo;
-	*reinterpret_cast<short*>(frame + 4) = 0x10;
-	int iVar10 = reinterpret_cast<int>(frame);
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	int iVar10 = reinterpret_cast<int>(m_wm.m_frameInfo);
 	int frameSum = (int)*reinterpret_cast<short*>(iVar10 + 8) + (int)*reinterpret_cast<short*>(iVar10 + 4);
 	iVar14 = (int)(FLOAT_803313e0 - (float)frameSum);
 	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
+		unsigned char* const frame = m_wm.m_frameInfo;
 		double dVar26;
 		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 > -11) {
-			unsigned int absOff;
-			if ((int)uVar15 < 0) {
-				absOff = -(int)uVar15;
-			} else {
-				absOff = uVar15;
-			}
+			int s15 = (int)uVar15 >> 31;
+			int absRaw = ((int)uVar15 ^ s15) - s15;
+			float dVar27 = (float)(baseWidth * (DOUBLE_803314E8 * (double)absRaw));
+			unsigned int absOff = (unsigned int)absRaw;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
-			double dVar27 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
-			dVar26 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
-			dVar26 = (double)(float)(dVar27 * (double)(float)dVar26);
+			float dVar28 = (float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
+			dVar26 = (double)(dVar27 * dVar28);
 		} else {
 			dVar26 = (double)baseWidth;
 		}
@@ -2305,17 +2869,17 @@ void CMenuPcs::CalcLoadMenu()
 	}
 
 	float fVar2 = FLOAT_803313e8;
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
 	iVar14 = reinterpret_cast<int>(worldState);
-	iVar10 = worldState->m_subState;
+	iVar10 = m_wmWorldState->m_subState;
 	switch (iVar10) {
 	case 0:
 	case 2:
-		if (worldState->m_flag09 == 0) {
-			worldState->m_cardChannel = (short)mcCtrl.m_cardChannel;
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_cardChannel;
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(fVar2);
 			pFont->SetShadow(0);
@@ -2329,17 +2893,16 @@ void CMenuPcs::CalcLoadMenu()
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
 			}
-			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
-			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
-			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
-			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -2348,104 +2911,43 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			worldState->m_flag09 = 1;
-			worldState->m_flag0A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_flag0A = 0;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
-				if ((uVar7 & 3) == 0) {
-					if ((uVar4 & 0x100) == 0) {
+			if (m_wmWorldState->m_counter1A == 0) {
+				if ((uVar7 & 3) != 0) {
+					m_wmWorldState->m_cardChannel ^= 1;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					if ((uVar4 & 0x100) != 0) {
+						m_wmWorldState->m_state0E = 1;
+						m_mcCtrl.m_cardChannel = (int)m_wmWorldState->m_cardChannel;
+						m_wmWorldState->m_counter1A = 10;
+						Sound.PlaySe(2, 0x40, 0x7F, 0);
+					} else {
 						if ((uVar4 & 0x200) != 0) {
-							worldState->m_state0E = -1;
-							worldState->m_counter1A = 1;
+							m_wmWorldState->m_state0E = -1;
+							m_wmWorldState->m_counter1A = 1;
 							Sound.PlaySe(3, 0x40, 0x7F, 0);
 						}
-					} else {
-						worldState->m_state0E = 1;
-						mcCtrl.m_cardChannel = (int)worldState->m_cardChannel;
-						worldState->m_counter1A = 10;
-						Sound.PlaySe(2, 0x40, 0x7F, 0);
 					}
-				} else {
-					worldState->m_cardChannel ^= 1;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
 		}
 		break;
 	case 3:
-		MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		worldState->m_mcResult = (short)MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		break;
-	case 4:
-		if (worldState->m_flag09 == 0) {
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(0);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar14 < iVar25) iVar14 = iVar25;
-				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
-			}
-			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
-			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
-			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
-			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
-			m_menuWindowInfo->state = 0;
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
-			worldState->m_flag09 = 1;
-		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
-			short chkResult = (short)mcCtrl.ChkEmpty(1);
-			worldState->m_mcResult = chkResult;
-			if (worldState->m_mcResult < 0) {
-				MemoryCardMan.m_opDoneFlag = 1;
-				MemoryCardMan.m_currentSlot = 0xFF;
-				worldState->m_state0E = -1;
-				worldState->m_counter1A = 10;
-			}
-		}
-		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
-			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
-					m_menuWindowInfo->state = 2;
-				}
-			}
-		}
+		MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		m_wmWorldState->m_mcResult = (short)MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
 		break;
 	case 5:
 	case 6:
@@ -2458,7 +2960,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0x18:
 	case 0x1B:
 	case 0x1C: {
-		if (worldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			bVar1 = true;
 			int uVar22 = 0;
 			int uVar19;
@@ -2489,17 +2991,16 @@ void CMenuPcs::CalcLoadMenu()
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
 			}
-			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
-			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
-			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
-			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -2507,69 +3008,129 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
-			worldState->m_counter1A = 0;
+			m_wmWorldState->m_flag09 = 1;
+			m_wmWorldState->m_counter1A = 0;
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
-			sVar8 = worldState->m_subState;
+		    && m_wmWorldState->m_counter1A == 0) {
+			sVar8 = m_wmWorldState->m_subState;
 			if (sVar8 == 0xE || sVar8 == 5) {
-				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
-				if (worldState->m_mcResult < 0) {
-					sVar8 = worldState->m_subState;
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)chkRes;
+				if (m_wmWorldState->m_mcResult < 0) {
+					sVar8 = m_wmWorldState->m_subState;
 					short sVar18;
 					if (sVar8 == 5) { sVar18 = -1; }
 					else if (sVar8 == 6) { sVar18 = -3; }
 					else if (sVar8 == 7) { sVar18 = -4; }
 					else { sVar18 = 0; }
 					if (sVar8 == 7) {
-						short chk = worldState->m_mcResult;
+						short chk = m_wmWorldState->m_mcResult;
 						if (chk != 0 && chk != sVar18 && chk != 1) {
-							worldState->m_state0E = -1;
-							worldState->m_counter1A = 1;
+							m_wmWorldState->m_state0E = -1;
+							m_wmWorldState->m_counter1A = 1;
 							break;
 						}
-					} else if (worldState->m_mcResult != sVar18 && worldState->m_mcResult != 1) {
-						worldState->m_state0E = -1;
-						worldState->m_counter1A = 1;
+					} else if (m_wmWorldState->m_mcResult != sVar18 && m_wmWorldState->m_mcResult != 1) {
+						m_wmWorldState->m_state0E = -1;
+						m_wmWorldState->m_counter1A = 1;
 						break;
 					}
 				}
 			}
 			if ((uVar4 & 0x300) != 0) {
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
 		}
 		break;
 	}
+	case 4:
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			CFont* pFont = m_fonts[0];
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			const char* const* msgBuf = GetMcWinMessBuff(0);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar25 > iVar14) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			m_menuWindowInfo->x = (short)iVar14;
+			m_menuWindowInfo->y = (short)iVar10;
+			m_menuWindowInfo->width = sVar8;
+			m_menuWindowInfo->height = sVar18;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+			m_wmWorldState->m_flag09 = 1;
+		} else if (m_menuWindowInfo->state == 1
+		           && m_wmWorldState->m_counter1A == 0) {
+			short chkResult = (short)GetMcCtrl()->ChkEmpty(1);
+			m_wmWorldState->m_mcResult = chkResult;
+			if (m_wmWorldState->m_mcResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				m_wmWorldState->m_state0E = -1;
+				m_wmWorldState->m_counter1A = 10;
+			}
+		}
+		if (m_menuWindowInfo->state == 1) {
+			sVar8 = m_wmWorldState->m_counter1A;
+			if (sVar8 != 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
+					m_menuWindowInfo->state = 2;
+				}
+			}
+		}
+		break;
 	case 8:
 	case 0xB:
 	case 0x19: {
-		if (worldState->m_flag09 == 0) {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
 			int uVar22 = 0;
 			int uVar19;
 			if (iVar10 == 8) {
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 				uVar19 = 4;
 			} else if (iVar10 == 0x19) {
 				uVar22 = 1;
 				uVar19 = 0x19;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			} else {
 				uVar19 = 5;
-				worldState->m_cardChannel = 1;
+				m_wmWorldState->m_cardChannel = 1;
 			}
 			CFont* pFont = m_fonts[0];
 			pFont->SetMargin(FLOAT_803313e8);
@@ -2584,17 +3145,16 @@ void CMenuPcs::CalcLoadMenu()
 				if (pcVar12 != 0) {
 					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
 					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar14 < iVar25) iVar14 = iVar25;
+					if (iVar25 > iVar14) iVar14 = iVar25;
 				}
 				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
 			}
-			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
-			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
-			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
-			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
 			m_menuWindowInfo->width = sVar8;
@@ -2602,75 +3162,234 @@ void CMenuPcs::CalcLoadMenu()
 			m_menuWindowInfo->frame = 0;
 			m_menuWindowInfo->state = 3;
 			m_menuWindowInfo->state = 0;
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_flag09 = 1;
 		}
 		if (m_menuWindowInfo->state == 1) {
-			if (worldState->m_counter1A == 0) {
-				if (worldState->m_subState == 0x19) {
-					worldState->m_state0E = 1;
-					worldState->m_counter1A = 0x5A;
+			if (m_wmWorldState->m_counter1A == 0) {
+				if (m_wmWorldState->m_subState == 0x19) {
+					m_wmWorldState->m_state0E = 1;
+					m_wmWorldState->m_counter1A = 0x5A;
 					break;
 				}
-				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
-				if (worldState->m_mcResult == 0) {
-					if ((uVar7 & 3) == 0) {
-						if ((uVar4 & 0x100) == 0) {
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)chkRes;
+				if (m_wmWorldState->m_mcResult != 0) {
+					m_wmWorldState->m_state0E = -1;
+					m_wmWorldState->m_counter1A = 10;
+				} else {
+					if ((uVar7 & 3) != 0) {
+						m_wmWorldState->m_cardChannel ^= 1;
+						Sound.PlaySe(1, 0x40, 0x7F, 0);
+					} else {
+						if ((uVar4 & 0x100) != 0) {
+							if (m_wmWorldState->m_cardChannel == 0) {
+								m_wmWorldState->m_state0E = 1;
+							} else {
+								m_wmWorldState->m_state0E = -1;
+							}
+							m_wmWorldState->m_counter1A = 10;
+							Sound.PlaySe(2, 0x40, 0x7F, 0);
+						} else {
 							if ((uVar4 & 0x200) != 0) {
-								worldState->m_cardChannel = 1;
-								worldState->m_state0E = -1;
-								worldState->m_counter1A = 10;
+								m_wmWorldState->m_cardChannel = 1;
+								m_wmWorldState->m_state0E = -1;
+								m_wmWorldState->m_counter1A = 10;
 								Sound.PlaySe(3, 0x40, 0x7F, 0);
 							}
-						} else {
-							if (worldState->m_cardChannel == 0) {
-								worldState->m_state0E = 1;
-							} else {
-								worldState->m_state0E = -1;
-							}
-							worldState->m_counter1A = 10;
-							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
-					} else {
-						worldState->m_cardChannel ^= 1;
-						Sound.PlaySe(1, 0x40, 0x7F, 0);
 					}
-				} else {
-					worldState->m_state0E = -1;
-					worldState->m_counter1A = 10;
 				}
 			}
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A != 0) {
-			if (worldState->m_subState == 0x19) {
-				int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-				worldState->m_mcResult = (short)chkRes;
+		    && m_wmWorldState->m_counter1A != 0) {
+			if (m_wmWorldState->m_subState == 0x19) {
+				int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+				m_wmWorldState->m_mcResult = (short)chkRes;
 			}
-			worldState->m_counter1A--;
-			if (worldState->m_counter1A == 0) {
+			m_wmWorldState->m_counter1A--;
+			if (m_wmWorldState->m_counter1A == 0) {
 				m_menuWindowInfo->state = 2;
 			}
 		}
 		break;
 	}
+	case 0xD:
+	case 0x16:
+	case 0x1A: {
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			int uVar22 = 0;
+			int uVar19;
+			if (iVar10 == 0xD) { uVar19 = 7; }
+			else if (iVar10 == 0x1A) { uVar19 = 0x1A; uVar22 = 1; }
+			else { uVar19 = 9; }
+			CFont* pFont = m_fonts[0];
+			pFont->SetMargin(FLOAT_803313e8);
+			pFont->SetShadow(0);
+			pFont->SetScale(FLOAT_803313e8);
+			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
+			iVar14 = 0;
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
+			int* piVar20 = piVar5;
+			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
+				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
+				if (pcVar12 != 0) {
+					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
+					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
+					if (iVar25 > iVar14) iVar14 = iVar25;
+				}
+				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
+			}
+			iVar10 = iVar14 / 0x16;
+			if (iVar14 % 0x16 != 0) iVar10 = iVar10 + 1;
+			sVar8 = (iVar10 + 2) * 0x16 + 0x40;
+			short sVar18 = *piVar5 * 0x1E + 0x40;
+			iVar14 = (int)(float)((double)(0x280 - sVar8) * DOUBLE_803313f8);
+			iVar10 = (int)(float)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
+			m_menuWindowInfo->x = (short)iVar14;
+			m_menuWindowInfo->y = (short)iVar10;
+			m_menuWindowInfo->width = sVar8;
+			m_menuWindowInfo->height = sVar18;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
+			if (m_wmWorldState->m_menuMode == 8
+			    && m_cmakeWork != 0) {
+				m_mcCtrl.m_userBuffer = m_cmakeWork;
+			} else {
+				m_mcCtrl.m_userBuffer = 0;
+			}
+			m_wmWorldState->m_flag09 = 1;
+		} else if (m_menuWindowInfo->state == 1
+		           && m_wmWorldState->m_counter1A == 0) {
+			iVar10 = (int)m_wmWorldState->m_subState;
+			if (iVar10 == 0xD) {
+				GetMcCtrl()->Format(1);
+				m_wmWorldState->m_mcResult = (short)m_mcCtrl.m_lastResult;
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else if (iVar10 == 0x1A) {
+				short erRes = (short)GetMcCtrl()->EraseDat();
+				m_wmWorldState->m_mcResult = erRes;
+				if (m_wmWorldState->m_mcResult < 0) {
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+				}
+			} else {
+				short ldRes = (short)GetMcCtrl()->LoadDat();
+				m_wmWorldState->m_mcResult = ldRes;
+			}
+
+			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_subState == 0x16) {
+					if (m_wmWorldState->m_menuMode != 8 && m_wmWorldState->m_mcResult == 1) {
+						gWmMenuWorkB = m_mcCtrl.m_serialHi;
+						gWmMenuWorkA = m_mcCtrl.m_serialLo;
+						gWmMenuCursorX[0] = (unsigned char)m_mcCtrl.m_cardChannel;
+						gWmMenuCursorX[1] = (unsigned char)m_mcCtrl.m_saveIndex;
+					} else {
+						gWmMenuCursorY[0] = (unsigned char)m_mcCtrl.m_cardChannel;
+						gWmMenuCursorY[1] = (unsigned char)m_mcCtrl.m_saveIndex;
+					}
+					iVar10 = 0;
+					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;
+					int iVar23 = 0;
+					iVar14 = 0;
+					int pOff = 0;
+					do {
+						int iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
+						if (m_wmWorldState->m_menuMode == 8
+						    && m_cmakeWork != 0) {
+							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
+							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
+								*reinterpret_cast<int*>(iVar17 + 8) = -1;
+							} else {
+								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
+								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
+								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
+								int cost = uVar15b * 200 + 100;
+								if (uVar11 != 0) cost = uVar15b * 200 + 200;
+								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+							}
+						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) == 0) {
+							*reinterpret_cast<int*>(iVar17 + 8) = -1;
+						} else {
+							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
+							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
+							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
+							int cost = uVar15b * 200 + 100;
+							if (uVar11 != 0) cost = uVar15b * 200 + 200;
+							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
+						}
+						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
+						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
+						int uVar22;
+						if (charaId < 0) {
+							uVar22 = 3;
+							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 0;
+							charaId = 0x43;
+						} else {
+							uVar22 = 0;
+							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 1;
+						}
+						GetWmCharaHandles(this)[iVar14]->LoadModelASync(uVar22, charaId, 0);
+						iVar14++;
+						iVar23 += 0x9C0;
+						iVar25 += 0xC30;
+						pOff += 4;
+						iVar10 += 0x34;
+					} while (iVar14 < 8);
+					if (m_wmWorldState->m_menuMode != 8) {
+						m_wmWorldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						m_wmWorldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
+						m_wmWorldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						m_wmWorldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
+						m_wmWorldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						m_wmWorldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
+						m_wmWorldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+						m_wmWorldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
+					}
+				}
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
+			}
+		}
+		if (m_menuWindowInfo->state == 1) {
+			sVar8 = m_wmWorldState->m_counter1A;
+			if (sVar8 != 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
+					m_menuWindowInfo->state = 2;
+				}
+			}
+		}
+		break;
+	}
 	case 0xC: {
-		if (worldState->m_flag09 == 0) {
-			worldState->m_flag09 = 1;
+		if ((signed char)m_wmWorldState->m_flag09 == 0) {
+			m_wmWorldState->m_flag09 = 1;
 			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
+			m_mcCtrl.m_previousState = 0;
+			m_mcCtrl.m_state = 0;
+			m_mcCtrl.m_lastResult = 0;
+			m_mcCtrl.m_iteration = 0;
+			m_mcCtrl.m_userBuffer = 0;
+			m_mcCtrl.m_createFlag = 0;
 		}
 		if (m_menuWindowInfo->state == 1
-		    && worldState->m_counter1A == 0) {
-			short listRes = (short)mcCtrl.LoadMcList();
-			worldState->m_mcResult = listRes;
-			if (worldState->m_mcResult != 0) {
-				if (worldState->m_menuMode == 8) {
+		    && m_wmWorldState->m_counter1A == 0) {
+			short listRes = (short)GetMcCtrl()->LoadMcList();
+			m_wmWorldState->m_mcResult = listRes;
+			if (m_wmWorldState->m_mcResult != 0) {
+				if (m_wmWorldState->m_menuMode == 8) {
 					int unk838 = reinterpret_cast<int>(m_wmCharaState);
 					int iVar23 = 0;
 					int cnt = 4;
@@ -2684,7 +3403,7 @@ void CMenuPcs::CalcLoadMenu()
 						cnt--;
 					} while (cnt != 0);
 					if (iVar23 == 0) {
-						worldState->m_mcResult = (short)0xFC19;
+						m_wmWorldState->m_mcResult = (short)0xFC19;
 					}
 				}
 				int calTimes[40];
@@ -2737,189 +3456,29 @@ void CMenuPcs::CalcLoadMenu()
 				} while (cnt2 != 0);
 				if (bestIdx < 0) bestIdx = 0;
 
-				worldState->m_cardChannel = (short)bestIdx;
+				m_wmWorldState->m_cardChannel = (short)bestIdx;
 				iVar10 = 0;
 				iVar14 = 0;
 				int cnt3 = 4;
 				do {
 					if (*reinterpret_cast<char*>(unk838 + iVar14 + 0x42) != 0) {
-						mcCtrl.m_saveIndex = iVar10;
-						worldState->m_cardChannel = (short)iVar10;
+						m_mcCtrl.m_saveIndex = iVar10;
+						m_wmWorldState->m_cardChannel = (short)iVar10;
 						break;
 					}
 					iVar14 += 0x48;
 					iVar10++;
 					cnt3--;
 				} while (cnt3 != 0);
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
+				m_wmWorldState->m_state0E = 1;
+				m_wmWorldState->m_counter1A = 10;
 			}
 		}
 		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
+			sVar8 = m_wmWorldState->m_counter1A;
 			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
-					m_menuWindowInfo->state = 2;
-				}
-			}
-		}
-		break;
-	}
-	case 0xD:
-	case 0x16:
-	case 0x1A: {
-		if (worldState->m_flag09 == 0) {
-			int uVar22 = 0;
-			int uVar19;
-			if (iVar10 == 0xD) { uVar19 = 7; }
-			else if (iVar10 == 0x1A) { uVar19 = 0x1A; uVar22 = 1; }
-			else { uVar19 = 9; }
-			CFont* pFont = m_fonts[0];
-			pFont->SetMargin(FLOAT_803313e8);
-			pFont->SetShadow(0);
-			pFont->SetScale(FLOAT_803313e8);
-			const char* const* msgBuf = GetMcWinMessBuff(uVar22);
-			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
-			int* piVar20 = piVar5;
-			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
-				const char* pcVar12 = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4)];
-				if (pcVar12 != 0) {
-					if (*pcVar12 == '$') pcVar12 = pcVar12 + 1;
-					int iVar25 = (int)(double)pFont->GetWidth(pcVar12);
-					if (iVar14 < iVar25) iVar14 = iVar25;
-				}
-				piVar20 = reinterpret_cast<int*>(reinterpret_cast<int>(piVar20) + 2);
-			}
-			iVar10 = iVar14 / 0x16 + (iVar14 >> 0x1F);
-			sVar8 = (short)iVar10 - (short)(iVar10 >> 0x1F);
-			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
-			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
-			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
-			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
-			m_menuWindowInfo->x = (short)iVar14;
-			m_menuWindowInfo->y = (short)iVar10;
-			m_menuWindowInfo->width = sVar8;
-			m_menuWindowInfo->height = sVar18;
-			m_menuWindowInfo->frame = 0;
-			m_menuWindowInfo->state = 3;
-			m_menuWindowInfo->state = 0;
-			mcCtrl.m_previousState = 0;
-			mcCtrl.m_state = 0;
-			mcCtrl.m_lastResult = 0;
-			mcCtrl.m_iteration = 0;
-			mcCtrl.m_userBuffer = 0;
-			mcCtrl.m_createFlag = 0;
-			if (worldState->m_menuMode == 8
-			    && m_cmakeWork != 0) {
-				mcCtrl.m_userBuffer = m_cmakeWork;
-			} else {
-				mcCtrl.m_userBuffer = 0;
-			}
-			worldState->m_flag09 = 1;
-		} else if (m_menuWindowInfo->state == 1
-		           && worldState->m_counter1A == 0) {
-			iVar10 = (int)worldState->m_subState;
-			if (iVar10 == 0xD) {
-				mcCtrl.Format(1);
-				worldState->m_mcResult = (short)mcCtrl.m_lastResult;
-				if (worldState->m_mcResult < 0) {
-					MemoryCardMan.m_opDoneFlag = 1;
-					MemoryCardMan.m_currentSlot = 0xFF;
-				}
-			} else if (iVar10 == 0x1A) {
-				short erRes = (short)mcCtrl.EraseDat();
-				worldState->m_mcResult = erRes;
-				if (worldState->m_mcResult < 0) {
-					MemoryCardMan.m_opDoneFlag = 1;
-					MemoryCardMan.m_currentSlot = 0xFF;
-				}
-			} else {
-				short ldRes = (short)mcCtrl.LoadDat();
-				worldState->m_mcResult = ldRes;
-			}
-
-			if (worldState->m_mcResult != 0) {
-				if (worldState->m_subState == 0x16) {
-					if (worldState->m_menuMode == 8 || worldState->m_mcResult != 1) {
-						DAT_8032ee24 = (unsigned char)mcCtrl.m_cardChannel;
-						uRam8032ee25 = (unsigned char)mcCtrl.m_saveIndex;
-					} else {
-						DAT_8032ee28 = mcCtrl.m_serialLo;
-						DAT_8032ee2c = mcCtrl.m_serialHi;
-						DAT_8032ee20 = (unsigned char)mcCtrl.m_cardChannel;
-						uRam8032ee21 = (unsigned char)mcCtrl.m_saveIndex;
-					}
-					iVar10 = 0;
-					int iVar25 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0x7930;
-					int iVar23 = 0;
-					iVar14 = 0;
-					int pOff = 0;
-					do {
-						int iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
-						if (worldState->m_menuMode == 8
-						    && m_cmakeWork != 0) {
-							int iVar6 = reinterpret_cast<int>(m_cmakeWork) + iVar23 + 0x14D0;
-							if (*reinterpret_cast<int*>(iVar6 + 0x5B4) == 0) {
-								*reinterpret_cast<int*>(iVar17 + 8) = -1;
-							} else {
-								unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x2E);
-								unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x30);
-								unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar6 + 0x32);
-								int cost = uVar15b * 200 + 100;
-								if (uVar11 != 0) cost = uVar15b * 200 + 200;
-								*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
-							}
-						} else if (*reinterpret_cast<int*>(iVar25 + 0x1794) == 0) {
-							*reinterpret_cast<int*>(iVar17 + 8) = -1;
-						} else {
-							unsigned int uVar15b = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D0);
-							unsigned int uVar11 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D2);
-							unsigned int uVar16 = (unsigned int)*reinterpret_cast<unsigned short*>(iVar25 + 0x17D4);
-							int cost = uVar15b * 200 + 100;
-							if (uVar11 != 0) cost = uVar15b * 200 + 200;
-							*reinterpret_cast<int*>(iVar17 + 8) = cost + uVar16;
-						}
-						iVar17 = reinterpret_cast<int>(m_wm.m_charaModelData) + iVar10;
-						int charaId = *reinterpret_cast<int*>(iVar17 + 8);
-						int uVar22;
-						if (charaId < 0) {
-							uVar22 = 3;
-							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 0;
-							charaId = 0x43;
-						} else {
-							uVar22 = 0;
-							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 1;
-						}
-						GetWmCharaHandles(this)[iVar14]->LoadModelASync(uVar22, charaId, 0);
-						iVar14++;
-						iVar23 += 0x9C0;
-						iVar25 += 0xC30;
-						pOff += 4;
-						iVar10 += 0x34;
-					} while (iVar14 < 8);
-					if (worldState->m_menuMode != 8) {
-						worldState->m_originalBackupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						worldState->m_backupParams[0] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[0]);
-						worldState->m_originalBackupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						worldState->m_backupParams[1] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[1]);
-						worldState->m_originalBackupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						worldState->m_backupParams[2] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[2]);
-						worldState->m_originalBackupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-						worldState->m_backupParams[3] = static_cast<short>(Game.m_gameWork.m_wmBackupParams[3]);
-					}
-				}
-				worldState->m_state0E = 1;
-				worldState->m_counter1A = 10;
-			}
-		}
-		if (m_menuWindowInfo->state == 1) {
-			sVar8 = worldState->m_counter1A;
-			if (sVar8 != 0) {
-				worldState->m_counter1A = sVar8 - 1;
-				if (worldState->m_counter1A == 0) {
+				m_wmWorldState->m_counter1A = sVar8 - 1;
+				if (m_wmWorldState->m_counter1A == 0) {
 					m_menuWindowInfo->state = 2;
 				}
 			}
@@ -2927,46 +3486,46 @@ void CMenuPcs::CalcLoadMenu()
 		break;
 	}
 	case 0x11: {
-		int chkRes = MemoryCardMan.McChkConnect(mcCtrl.m_cardChannel);
-		worldState->m_mcResult = (short)chkRes;
-		if (worldState->m_mcResult == 0 && uVar7 != 0) {
-			if ((uVar7 & 8) == 0) {
+		int chkRes = MemoryCardMan.McChkConnect(m_mcCtrl.m_cardChannel);
+		m_wmWorldState->m_mcResult = (short)chkRes;
+		if (m_wmWorldState->m_mcResult == 0 && uVar7 != 0) {
+			if ((uVar7 & 8) != 0) {
+				if (m_wmWorldState->m_cardChannel <= 0) {
+					m_wmWorldState->m_cardChannel = 3;
+				} else {
+					m_wmWorldState->m_cardChannel--;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			} else {
 				if ((uVar7 & 4) != 0) {
-					if (worldState->m_cardChannel < 3) {
-						worldState->m_cardChannel++;
+					if (m_wmWorldState->m_cardChannel >= 3) {
+						m_wmWorldState->m_cardChannel = 0;
 					} else {
-						worldState->m_cardChannel = 0;
+						m_wmWorldState->m_cardChannel++;
 					}
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
-			} else {
-				if (worldState->m_cardChannel < 1) {
-					worldState->m_cardChannel = 3;
-				} else {
-					worldState->m_cardChannel--;
-				}
-				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
 			if ((uVar7 & 0xC) == 0) {
 				if ((uVar4 & 0x100) != 0) {
-					sVar8 = worldState->m_state0E;
+					sVar8 = m_wmWorldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
 						int unk838 = reinterpret_cast<int>(m_wmCharaState);
-						iVar14 = (int)worldState->m_cardChannel;
+						iVar14 = (int)m_wmWorldState->m_cardChannel;
 						if (*reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x41) == 0
 						    || *reinterpret_cast<char*>(unk838 + iVar14 * 0x48 + 0x42) != 0) {
 							Sound.PlaySe(4, 0x40, 0x7F, 0);
 						} else {
-							mcCtrl.m_saveIndex = iVar14;
-							worldState->m_state0E = 1;
+							m_mcCtrl.m_saveIndex = iVar14;
+							m_wmWorldState->m_state0E = 1;
 							Sound.PlaySe(2, 0x40, 0x7F, 0);
 						}
 					}
 				}
 				if ((uVar4 & 0x200) != 0) {
-					sVar8 = worldState->m_state0E;
+					sVar8 = m_wmWorldState->m_state0E;
 					if (sVar8 != -1 && sVar8 != 1) {
-						worldState->m_state0E = -1;
+						m_wmWorldState->m_state0E = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -2976,7 +3535,7 @@ void CMenuPcs::CalcLoadMenu()
 	}
 	}
 
-	if (worldState->m_subState != 0) {
+	if (m_wmWorldState->m_subState != 0) {
 		CalcMcObj();
 	}
 }
@@ -2992,77 +3551,53 @@ void CMenuPcs::CalcLoadMenu()
  */
 void CMenuPcs::CalcTitleMenu()
 {
-	WmWorldState* const worldState = m_wmWorldState;
 
-	if (lbl_8032EE38[0] == 0) {
-		lbl_8032EE38[0] = 1;
+	if (static_cast<signed char>(lbl_8032EE38[0]) == 0) {
 		DAT_8032EE34 = const_cast<char*>(s_dvd_movie_ffcc_op_thp_801dc448);
+		lbl_8032EE38[0] = 1;
 	}
 
 	bool bVar1 = false;
 	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
 		bVar1 = true;
 	}
-	unsigned short down;
+	int down;
 	if (bVar1) {
 		down = 0;
 	} else {
-		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
-		down = Pad.GetPadInputs()[0].buttonDown[0];
+		int padIndex = 0;
+		padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort)) & 0x20) >> 5);
+		down = Pad.GetPadInputs()[padIndex].buttonDown[0];
 	}
+	down = static_cast<unsigned short>(down);
 	const unsigned short repeat = GetButtonRepeat(0);
 
-	if (worldState != 0) {
-		if (worldState->m_worldReady == 0) {
-			worldState->m_delay = 0;
-			worldState->m_titleState = 0;
-			worldState->m_state0E = -1;
-			worldState->m_state12 = 0;
-			worldState->m_cardChannel = 0;
-			worldState->m_worldReady = 1;
-			worldState->m_flag09 = 1;
-			m_wmThpActive = 0;
-			if (DAT_8032ee1c == 1) {
-				int createParam[0x1B];
-				unsigned char* param = reinterpret_cast<unsigned char*>(createParam);
-				*reinterpret_cast<int*>(param + 0x40) = -1;
-				*reinterpret_cast<int*>(param + 0x30) = -1;
-				param[0x34] = 0;
-				param[0x35] = 1;
-				*reinterpret_cast<int*>(param + 0x38) = 0;
-				param[0x36] = 0;
-				*reinterpret_cast<int*>(param + 0x3C) = 0x1E;
-				*reinterpret_cast<int*>(param + 0x44) = 0;
-				*reinterpret_cast<short*>(param + 0x48) = 0;
-				param[0x4A] = 0;
-				param[0x4B] = 0;
-				*reinterpret_cast<int*>(param + 0x00) = 0;
-				*reinterpret_cast<int*>(param + 0x04) = 0;
-				*reinterpret_cast<int*>(param + 0x08) = 0;
-				*reinterpret_cast<int*>(param + 0x0C) = 0;
-				*reinterpret_cast<int*>(param + 0x10) = 0;
-				*reinterpret_cast<int*>(param + 0x14) = 0;
-				*reinterpret_cast<int*>(param + 0x18) = 0;
-				*reinterpret_cast<int*>(param + 0x1C) = 0;
-				*reinterpret_cast<int*>(param + 0x20) = 0;
-				*reinterpret_cast<float*>(param + 0x24) = FLOAT_803313e8;
-				*reinterpret_cast<float*>(param + 0x28) = FLOAT_803313e8;
-				param[0x2C] = 0;
+	{
+		if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
+			if (static_cast<signed char>(DAT_8032ee1c) == 1) {
+				PPPCREATEPARAM param;
 				EffectInfo* titleEffect = &m_effectWork[23];
 				titleEffect->m_effectNo = 0x1F;
 				CGObject* titleObject = &titleEffect->m_object;
 				titleEffect->m_slotNo = 0x17;
 				titleObject->Create();
 				titleObject->m_charaModelHandle = m_wm.m_handles[23];
-				*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
-				*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
-				titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
+				param.m_lookTargetPtr = titleObject;
+				param.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+				titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, &param, 1);
+				m_wmWorldState->m_delay = 0;
+				m_wmWorldState->m_worldReady = 1;
+				m_wmWorldState->m_flag09 = 1;
+				m_wmThpActive = 0;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_state0E = -1;
+				m_wmWorldState->m_state12 = 0;
 				CFlatRuntime::CStack flatArgs[3];
 				flatArgs[0].m_word = 9;
 				flatArgs[1].m_word = 0;
 				flatArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
-				worldState->m_cardChannel = 0;
+				m_wmWorldState->m_cardChannel = 0;
 				DAT_8032ee1c = 0;
 				return;
 			}
@@ -3075,44 +3610,24 @@ void CMenuPcs::CalcTitleMenu()
 			THPSimpleSetBuffer(m_wmWorkBuffer);
 			THPSimplePreLoad(0);
 			THPSimpleAudioStart();
-			int createParam[0x1B];
-			unsigned char* param = reinterpret_cast<unsigned char*>(createParam);
-			*reinterpret_cast<int*>(param + 0x40) = -1;
-			*reinterpret_cast<int*>(param + 0x30) = -1;
-			param[0x34] = 0;
-			param[0x35] = 1;
-			*reinterpret_cast<int*>(param + 0x38) = 0;
-			param[0x36] = 0;
-			*reinterpret_cast<int*>(param + 0x3C) = 0x1E;
-			*reinterpret_cast<int*>(param + 0x44) = 0;
-			*reinterpret_cast<short*>(param + 0x48) = 0;
-			param[0x4A] = 0;
-			param[0x4B] = 0;
-			*reinterpret_cast<int*>(param + 0x00) = 0;
-			*reinterpret_cast<int*>(param + 0x04) = 0;
-			*reinterpret_cast<int*>(param + 0x08) = 0;
-			*reinterpret_cast<int*>(param + 0x0C) = 0;
-			*reinterpret_cast<int*>(param + 0x10) = 0;
-			*reinterpret_cast<int*>(param + 0x14) = 0;
-			*reinterpret_cast<int*>(param + 0x18) = 0;
-			*reinterpret_cast<int*>(param + 0x1C) = 0;
-			*reinterpret_cast<int*>(param + 0x20) = 0;
-			*reinterpret_cast<float*>(param + 0x24) = FLOAT_803313e8;
-			*reinterpret_cast<float*>(param + 0x28) = FLOAT_803313e8;
-			param[0x2C] = 0;
+			PPPCREATEPARAM param;
 			EffectInfo* titleEffect = &m_effectWork[23];
 			titleEffect->m_effectNo = 0x1F;
 			CGObject* titleObject = &titleEffect->m_object;
 			titleEffect->m_slotNo = 0x17;
 			titleObject->Create();
 			titleObject->m_charaModelHandle = m_wm.m_handles[23];
-			*reinterpret_cast<CGObject**>(param + 0x14) = titleObject;
-			*reinterpret_cast<CGObject**>(param + 0x18) = titleObject;
-			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, reinterpret_cast<PPPCREATEPARAM*>(param), 1);
+			param.m_lookTargetPtr = titleObject;
+			param.m_paramB = reinterpret_cast<unsigned int>(titleObject);
+			titleEffect->m_partNo = PartMng.pppCreate(0, 0x1F, &param, 1);
 			m_wmThpActive = 1;
+			m_wmWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_delay = 0;
+			m_wmWorldState->m_worldReady = 1;
+			m_wmWorldState->m_flag09 = 1;
 		}
 
-		if (worldState->m_mainState == 0) {
+		if (m_wmWorldState->m_mainState == 0) {
 			if ((down & 0x1000) != 0) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -3123,47 +3638,51 @@ void CMenuPcs::CalcTitleMenu()
 					m_wmWorkBuffer = 0;
 				}
 				m_wmThpActive = 0;
-				worldState->m_titleState = 0;
-				worldState->m_state0E = -1;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_state0E = -1;
 			} else if (THPSimpleDecode(0) == 0) {
-				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
+				m_wmWorldState->m_frameCounter = static_cast<short>(m_wmWorldState->m_frameCounter + 1);
 			}
 		}
 
-		if (worldState->m_mainState == 2 && worldState->m_delay == 0) {
+		if (m_wmWorldState->m_mainState != 2) {
+			if (m_wmWorldState->m_mainState < 2) {
+				if (MemoryCardMan.McChkConnect(0) == 0) {
+					m_wmWorldState->m_cardChannel = 1;
+				} else if (MemoryCardMan.McChkConnect(1) == 0) {
+					m_wmWorldState->m_cardChannel = 1;
+				} else {
+					m_wmWorldState->m_cardChannel = 0;
+				}
+			}
+		} else {
+			if (m_wmWorldState->m_delay == 0) {
 			if ((repeat & 0xC) != 0) {
-				worldState->m_cardChannel ^= 1;
-				worldState->m_titleState = 0;
-				worldState->m_state12 = 0;
-				worldState->m_flag09 = 0;
+				m_wmWorldState->m_cardChannel ^= 1;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_state12 = 0;
+				m_wmWorldState->m_flag09 = 0;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if ((down & 0x100) != 0) {
-				if (worldState->m_cardChannel == 0) {
-					DAT_8032ee2c = 0xFFFFFFFF;
-					DAT_8032ee28 = 0xFFFFFFFF;
-					DAT_8032ee20 = 0xFF;
-					uRam8032ee21 = 0xFF;
+				if (m_wmWorldState->m_cardChannel == 0) {
+					gWmMenuWorkB = -1;
+					gWmMenuWorkA = -1;
+					gWmMenuCursorX[0] = -1;
+					gWmMenuCursorX[1] = -1;
 					Game.InitNewGame();
 				}
-				worldState->m_delay = 0x14;
-				worldState->m_state0E = 1;
+				m_wmWorldState->m_delay = 0x14;
+				m_wmWorldState->m_state0E = 1;
 				Sound.PlaySe(0x0B, 0x40, 0x7F, 0);
 			} else if ((down & 0x200) != 0) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 
 			if (repeat == 0) {
-				worldState->m_frameCounter = static_cast<short>(worldState->m_frameCounter + 1);
+				m_wmWorldState->m_frameCounter = static_cast<short>(m_wmWorldState->m_frameCounter + 1);
 			} else {
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_frameCounter = 0;
 			}
-		} else if (worldState->m_mainState < 2) {
-			if (MemoryCardMan.McChkConnect(0) == 0) {
-				worldState->m_cardChannel = 1;
-			} else if (MemoryCardMan.McChkConnect(1) == 0) {
-				worldState->m_cardChannel = 1;
-			} else {
-				worldState->m_cardChannel = 0;
 			}
 		}
 	}
@@ -3180,28 +3699,68 @@ void CMenuPcs::CalcTitleMenu()
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
-
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
-	unsigned int validCount;
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
-	if (cmakeWork != 0) {
-		validCount = 0;
-		for (int i = 0; i < 8; i++) {
-			if (*reinterpret_cast<int*>(cmakeWork + i * 0x9C0 + 0x1A84) != 0) {
-				validCount++;
-			}
+	unsigned int validCount = 0;
+	if (m_cmakeWorkActive == 1) {
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84) != 0) {
+			validCount = 1;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2444) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2E04) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x37C4) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4184) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4B44) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5504) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5EC4) != 0) {
+			validCount++;
 		}
 	} else {
-		validCount = 0;
-		for (int i = 0; i < 8; i++) {
-			if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-				validCount++;
-			}
+		unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game);
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount = 1;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
 		}
 	}
 
@@ -3213,7 +3772,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	WmCharaSelectEntry& entry = selectState[0];
+	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 	if (loadedCount != validCount || entry.m_confirmed != 0) {
 		return;
 	}
@@ -3234,7 +3793,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		down = GetButtonDown(0);
 	}
 
-	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
+	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
 		return;
 	}
 
@@ -3274,13 +3833,15 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	if ((down & 0x200) != 0) {
-		entry._pad0E = 1;
-		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
-	} else if ((down & 0x100) != 0) {
+	if ((down & 0x100) == 0) {
+		if ((down & 0x200) != 0) {
+			entry._pad0E = 1;
+			Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+		}
+	} else {
 		int shopState;
-		if (cmakeWork != 0) {
-			shopState = *reinterpret_cast<int*>(cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			shopState = *reinterpret_cast<int*>(m_cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
 		} else {
 			shopState = Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState;
 		}
@@ -3291,7 +3852,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 			entry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {
-				GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 3;
+				GetWmCharaAnimState(this)[cursor * 5 + 1] = 3;
 			}
 		}
 	}
@@ -3308,10 +3869,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
  */
 int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const frameState = m_wm.m_frameInfo;
-
-	if (worldState->m_mainState >= 5) {
+	if (m_wmWorldState->m_mainState > 4) {
 		return -1;
 	}
 
@@ -3319,52 +3877,55 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 		CalcGoOutCharaSelect(slot);
 	}
 
-	const short menuAnim = worldState->m_mainState;
-	int offset = 0;
+	const short menuAnim = m_wmWorldState->m_mainState;
+	int offset;
 	if (menuAnim == 0) {
-		offset = static_cast<int>(worldState->m_frameCounter) - 10;
-	} else if (menuAnim < 1 || menuAnim > 3) {
-		offset = -static_cast<int>(worldState->m_frameCounter);
+		offset = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
+	} else if (menuAnim > 0 && menuAnim < 4) {
+		offset = 0;
+	} else {
+		offset = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	}
 
-	*reinterpret_cast<short*>(frameState + 4) = 0x10;
-	*reinterpret_cast<short*>(frameState + 0x20) =
-	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4))));
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) = 0x10;
+	*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(static_cast<double>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4)))));
 
 	if (offset < 0) {
-		float shift = static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-		if (offset > -11) {
+		float shift = static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 8) + *reinterpret_cast<short*>(m_wm.m_frameInfo + 4));
+		if (offset >= -10) {
+			shift = static_cast<float>(static_cast<double>(shift) * (DOUBLE_803314e8 * static_cast<double>(offset < 0 ? -offset : offset)));
 			int absOffset = offset < 0 ? -offset : offset;
-			shift = shift * static_cast<float>(DOUBLE_803314e8 * static_cast<double>(absOffset));
+			if (absOffset < 0) {
+				absOffset = 0;
+			}
 			if (absOffset > 10) {
 				absOffset = 10;
 			}
 			const float t = static_cast<float>(absOffset);
-			shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_803316d4));
+			shift *= static_cast<float>(sin(FLOAT_803314bc * (t * FLOAT_803316d4)));
 		}
 
-		*reinterpret_cast<short*>(frameState + 4) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 4)) - shift);
-		*reinterpret_cast<short*>(frameState + 0x20) =
-		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 4) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 4)) - shift);
+		*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(m_wm.m_frameInfo + 0x20)) + shift);
 	}
 
-	if (menuAnim > 0 && menuAnim < 4) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		CalcChara();
 	}
 
-	unsigned char* const selectState = m_wm.m_charaSelectData;
-	unsigned char* const animState = reinterpret_cast<unsigned char*>(m_wmCharaAnimState);
-	if (selectState[0x0E] != 0) {
+	if (m_wm.m_charaSelectData[0x0E] != 0) {
 		return -2;
 	}
 
-	const int cursor = static_cast<int>(*reinterpret_cast<short*>(selectState + 4));
-	if (selectState[0x0A] == 0 || (*reinterpret_cast<int*>(animState + cursor * 0x14) == 3 && slot != 0)) {
-		return -1;
+	if (m_wm.m_charaSelectData[0x0A] != 0 &&
+	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_wmCharaAnimState) + *reinterpret_cast<short*>(m_wm.m_charaSelectData + 4) * 0x14) != 3 || slot == 0)) {
+		return static_cast<int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 4));
 	}
 
-	return cursor;
+	return -1;
 }
 
 /*
@@ -3516,64 +4077,72 @@ void CMenuPcs::drawWorld()
 void CMenuPcs::DrawMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldState == 0) {
-		return;
-	}
+	GXColor matColor;
 
-	const short state = worldState->m_mainState;
-	const short step = worldState->m_frameCounter;
+	const short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
-	} else if (state < 1 || state > 3) {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
-	} else {
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
+	} else {
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
-	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = m_wm.m_frameInfo;
-	if (frame != 0) {
-		unsigned char* const entry = frame + 4;
-		DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
-		         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
-		         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
-		         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
-		         static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
-	}
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
+	GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	int bit = 0;
+	int offset = 0;
+	do {
+		if (((1 << bit) & 1) != 0) {
+			short* const entry = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
+			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(entry + 0xC), static_cast<float>(entry[0]),
+			                 static_cast<float>(entry[1]), static_cast<float>(entry[2]), static_cast<float>(entry[3]),
+			                 *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
+			                 FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		}
+		bit++;
+		offset += 0x1C;
+	} while (bit < 2);
 
-	if (state > 0 && state < 4) {
+	if (m_wmWorldState->m_mainState >= 1 && m_wmWorldState->m_mainState <= 3) {
+		const short tileState = m_wmWorldState->m_mainState;
 		float tileAlpha;
-		if (state == 1) {
-			tileAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
-		} else if (state == 2) {
+		if (tileState == 1) {
+			tileAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else if (tileState == 2) {
 			tileAlpha = FLOAT_803313e8;
 		} else {
-			tileAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+			tileAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * DOUBLE_803313f8);
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor tileColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)))};
-		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
-		SetTexture(static_cast<CMenuPcs::TEX>(0x33));
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)));
+		GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x33));
 		const float x = FLOAT_80331410;
-		float y = static_cast<float>(static_cast<double>(FLOAT_80331440) - static_cast<double>(x));
-		DrawRect(0xFFFFFFFF, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
-		         FLOAT_803313e8, 0.0f);
-		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_803316d0)), y,
-		         FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 8.0f);
-		y = static_cast<float>(static_cast<double>(y) + static_cast<double>(FLOAT_80331500));
-		DrawRect(0xFFFFFFFF, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
-		         FLOAT_803313e8, 4.0f);
-		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_803316d0)), y,
-		         FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 12.0f);
+		float y = FLOAT_80331440 - x;
+		MenuPcs.DrawRect(0, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		                 FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(8, x + FLOAT_803316d0, y,
+		                 FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		y = y + FLOAT_80331500;
+		MenuPcs.DrawRect(4, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		                 FLOAT_803313e8, FLOAT_803313dc);
+		MenuPcs.DrawRect(0xC, x + FLOAT_803316d0, y,
+		                 FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	DrawMainMenuSub();
+	PSMTXCopy(reinterpret_cast<float(*)[4]>(bytes + 0x744), CameraPcs.m_cameraMatrix);
 	unsigned int clearColor = 0;
 	GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
 	Mtx44 projectionMtx;
@@ -3583,42 +4152,66 @@ void CMenuPcs::DrawMainMenu()
 	GXSetScissor(0, 0, 0x280, 0x1C0);
 	DrawInit();
 
-	if (state > 0 && state < 4) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
+		const short helpState = m_wmWorldState->m_mainState;
 		float helpAlpha;
-		if (state == 1) {
-			helpAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
-		} else if (state == 2) {
+		if (helpState == 1) {
+			helpAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else if (helpState == 2) {
 			helpAlpha = FLOAT_803313e8;
 		} else {
-			helpAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+			helpAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 		if (static_cast<double>(helpAlpha) > DOUBLE_803314f0) {
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * helpAlpha))};
-			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-			SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-			DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
-			         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+			const double helpColorAlpha = static_cast<double>(FLOAT_80331458 * helpAlpha);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(helpColorAlpha));
+			GXSetChanMatColor(static_cast<GXChannelID>(4), matColor);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+			                 FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+
+			char* textList[5];
+			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+			textList[0] = lbl_80210750[languageIndex + 0];
+			textList[1] = lbl_80210750[languageIndex + 1];
+			textList[2] = lbl_80210750[languageIndex + 2];
+			textList[3] = lbl_80210750[languageIndex + 3];
+			textList[4] = lbl_80210750[languageIndex + 4];
+			unsigned int textAlpha;
+			if (helpAlpha > FLOAT_803313e8) {
+				textAlpha = 0xFF;
+			} else {
+				textAlpha = static_cast<unsigned int>(static_cast<int>(helpColorAlpha));
+			}
+			CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF));
+			char* const text = textList[m_wmWorldState->m_cardChannel];
+			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor.color, 7, text,
+			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}
 
-	if (worldState->m_mainState == 2) {
-		if (worldState->m_delay != 0) {
-			worldState->m_delay--;
-			if (worldState->m_delay < 1) {
-				worldState->m_mainState++;
-				worldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31, 0x40, 0x7F, 0);
+	if (m_wmWorldState->m_mainState != 2) {
+		m_wmWorldState->m_frameCounter++;
+		if (m_wmWorldState->m_frameCounter >= 10) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState >= 5) {
+				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
 	} else {
-		worldState->m_frameCounter++;
-		if (worldState->m_frameCounter > 9) {
-			worldState->m_mainState++;
-			worldState->m_frameCounter = 0;
-			if (worldState->m_mainState > 4) {
-				worldState->m_changeRequest = worldState->m_nextMenuMode;
-				worldState->m_nextMenuMode = 0;
+		if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+			if (m_wmWorldState->m_delay <= 0) {
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				Sound.PlaySe(0x31, 0x40, 0x7F, 0);
 			}
 		}
 	}
@@ -3636,30 +4229,25 @@ void CMenuPcs::DrawMainMenu()
 void CMenuPcs::DrawDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
-	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
-	if (handle != 0 && handle->m_model != 0) {
-		handle->m_model->m_lightAlpha = FLOAT_803313e8;
-	}
-	if (handle != 0) {
+	GetWmWorldHandles(this)[1]->m_model->m_lightAlpha = FLOAT_803313e8;
+	{
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 		Mtx44 projectionMtx;
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		Vec target = {FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc};
-		Vec up = {FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc};
 		Mtx lookAtMtx;
-		Mtx savedCamera;
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60), &up, &target);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Vec*>(worldObj + 0x60),
+		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+		            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		unsigned int clearColor = 0;
-		GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+		CColor clearColor(0, 0, 0, 0);
+		GXSetCopyClear(clearColor.color, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x58)),
@@ -3668,9 +4256,9 @@ void CMenuPcs::DrawDiaryMenu()
 		              static_cast<float>(*reinterpret_cast<short*>(worldObj + 0x5E)), FLOAT_803313dc, FLOAT_803313e8);
 		GXSetScissor(*reinterpret_cast<unsigned int*>(worldObj + 0x90), *reinterpret_cast<unsigned int*>(worldObj + 0x94),
 		             *reinterpret_cast<unsigned int*>(worldObj + 0x98), *reinterpret_cast<unsigned int*>(worldObj + 0x9C));
-		handle->Draw(5);
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+		GetWmWorldHandles(this)[1]->Draw(5);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
@@ -3678,17 +4266,15 @@ void CMenuPcs::DrawDiaryMenu()
 		DrawInit();
 	}
 
-	const short state = worldState->m_mainState;
-	if (state > 0 && state < 4) {
+	const int state = m_wmWorldState->m_mainState;
+	if (state >= 1 && state <= 3) {
 		float alpha;
 		if (state == 1) {
-			alpha = static_cast<float>(DOUBLE_803314e8 *
-			                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+			alpha = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
-			alpha = static_cast<float>(-(DOUBLE_803314e8 *
-			                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+			alpha = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 			                             DOUBLE_80331420));
 		}
 		DrawDiaryBase(0, alpha);
@@ -3697,31 +4283,29 @@ void CMenuPcs::DrawDiaryMenu()
 	DrawInit();
 
 	const int frame = static_cast<int>(System.m_frameCounter);
-	const int base = frame / 0x14 + (frame >> 31);
-	unsigned int phase = static_cast<unsigned int>((frame + (base - (base >> 31)) * -0x14) - 10);
-	const unsigned int sign = static_cast<int>(phase) >> 31;
-	phase = (phase ^ sign) - sign;
-	const float scale = static_cast<float>(DOUBLE_80331450 * (static_cast<double>(phase) - DOUBLE_80331408) + DOUBLE_80331448);
+	const int rem = (frame - frame / 0x14 * 0x14) - 10;
+	const int remSign = rem >> 31;
+	const int phase = (rem ^ remSign) - remSign;
+	const float scale = static_cast<float>(DOUBLE_80331450 * static_cast<double>(phase) + DOUBLE_80331448);
 	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
 	float y = FLOAT_80331444;
-	const unsigned int alpha =
-	    static_cast<unsigned int>(FLOAT_80331458 *
-	                              static_cast<float>(DOUBLE_80331460 * (static_cast<double>(phase) - DOUBLE_80331408) +
-	                                                 DOUBLE_803313f8));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(
+	    FLOAT_80331458 * static_cast<float>(DOUBLE_80331460 * static_cast<double>(phase) + DOUBLE_803313F8)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
-	x = static_cast<float>(-(static_cast<double>(FLOAT_80331468) * scale - static_cast<double>(FLOAT_80331468)) *
-	                       DOUBLE_803313f8 + static_cast<double>(x));
-	y = static_cast<float>(-(static_cast<double>(FLOAT_80331440) * scale - static_cast<double>(FLOAT_80331440)) *
-	                       DOUBLE_803313f8 + static_cast<double>(y));
+	x = static_cast<float>((FLOAT_80331468 - FLOAT_80331468 * scale) * DOUBLE_803313F8 + static_cast<double>(x));
+	y = static_cast<float>((FLOAT_80331440 - FLOAT_80331440 * scale) * DOUBLE_803313F8 + static_cast<double>(y));
 	if ((bytes[0xF] & 2) != 0) {
-		DrawRect(0xFFFFFFFF, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, 8.0f);
+		DrawRect(8, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
+	x = x + FLOAT_8033146c;
 	if ((bytes[0xF] & 1) != 0) {
-		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_8033146c)), y,
-		         FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
+		DrawRect(0, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
 }
 
@@ -3736,109 +4320,146 @@ void CMenuPcs::DrawDiaryMenu()
  */
 void CMenuPcs::DrawMCardMenu()
 {
+	extern double DOUBLE_803317d8;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx m_cameraMatrix;
-	McCtrl& mcCtrl = *GetMcCtrl();
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
-	short state = typedWorldState->m_mainState;
+	Mtx savedCamera;
+	Mtx44 projMtx;
+	Mtx44 screenMtx;
 
+	short state = m_wmWorldState->m_mainState;
 	if (state > 0 && state < 4) {
-		float alpha;
+		double alpha;
 		if (state == 1) {
-			alpha = (float)typedWorldState->m_frameCounter;
+			double raw;
+			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw)[1] = (int)m_wmWorldState->m_frameCounter ^ 0x80000000;
+			alpha = (double)(float)(DOUBLE_803314e8 * (raw - DOUBLE_80331408));
 		} else if (state == 2) {
-			alpha = FLOAT_803313e8;
+			alpha = (double)FLOAT_803313e8;
 		} else {
-			alpha = FLOAT_803313e8 - (float)typedWorldState->m_frameCounter;
+			double raw;
+			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw)[1] = (int)m_wmWorldState->m_frameCounter ^ 0x80000000;
+			alpha = (double)(float)-(DOUBLE_803314e8 * (raw - DOUBLE_80331408) - DOUBLE_80331420);
 		}
-		if (alpha > FLOAT_803314f0) {
-			SetAttrFmt((FMT)0);
-			unsigned int bgColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			bgColor = bgColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&bgColor);
-			SetTexture((TEX)0x1F);
-			DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+		if (alpha > DOUBLE_803314f0) {
+			MenuPcs.SetAttrFmt((FMT)0);
+			_GXColor bgColor;
+			bgColor.r = 0xFF;
+			bgColor.g = 0xFF;
+			bgColor.b = 0xFF;
+			bgColor.a = (unsigned char)(int)((double)FLOAT_80331458 * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, bgColor);
+			MenuPcs.SetTexture((TEX)0x1F);
+			MenuPcs.DrawRect(0, FLOAT_803313dc,
+			         (float)(DOUBLE_803314d0 - (double)FLOAT_80331440),
 			         FLOAT_803313e0, FLOAT_80331440,
 			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 
 	DrawMCList();
 
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	if (state == 2 && typedWorldState->m_subState > 0x10) {
+	if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_subState >= 0x11) {
+		float cursorY = (float)((double)FLOAT_803314d8 - DOUBLE_803317d8);
+		float cursorXbase = FLOAT_803314d8 + FLOAT_80331410;
 		unsigned int saveIdx;
-		if (typedWorldState->m_subState == 0x11) {
-			saveIdx = (unsigned int)typedWorldState->m_cardChannel;
+		if (m_wmWorldState->m_subState == 0x11) {
+			saveIdx = (unsigned int)m_wmWorldState->m_cardChannel;
 		} else {
-			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
+			saveIdx = (unsigned int)m_mcCtrl.m_saveIndex;
 		}
-		SetAttrFmt((FMT)0);
-		unsigned int cursorColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
-		SetTexture((TEX)0);
-		DrawRect(0xFFFFFFFF, FLOAT_803314d8, (float)(FLOAT_803314d8 + FLOAT_80331410 + (float)(saveIdx * 0x28)),
+		double rawIdx;
+		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
+		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
+		float cursorX = (float)(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + (double)cursorXbase);
+		MenuPcs.SetAttrFmt((FMT)0);
+		_GXColor cursorColor;
+		cursorColor.r = 0xFF;
+		cursorColor.g = 0xFF;
+		cursorColor.b = 0xFF;
+		cursorColor.a = 0xFF;
+		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+		MenuPcs.SetTexture((TEX)0);
+		MenuPcs.DrawRect(0, (float)(int)cursorY, (float)(int)cursorX,
 		         FLOAT_80331410, FLOAT_80331410,
 		         FLOAT_803313dc, FLOAT_803313dc,
-		         FLOAT_803313e8, FLOAT_803313e8, 0);
+		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		// 3D character viewports (4 slots)
-		for (int i = 0; i < 4; i++) {
-			int viewOff = reinterpret_cast<int>(m_wm.m_worldObjData) + (i * 0x50 + 0x550);
-			int* piVar12 = reinterpret_cast<int*>(viewOff);
+		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
+		int charaOff = 0;
+		unsigned int* serial = &m_mcCtrl.m_serialHi;
+		int viewBase = 0x550;
+		int i = 0;
+		do {
 			if (*piVar12 != 0) {
-				Mtx44 projMtx;
+				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
 				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
-
-				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
-				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), &up, &target);
-				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
-				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
+				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+				C_MTXLookAt(savedCamera, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
+				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+				PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
-				unsigned int clearColor = 0;
-				GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+				CColor clear(0, 0, 0, 0);
+				GXColor clearColor = *(_GXColor*)&clear;
+				GXSetCopyClear(clearColor, 0xFFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
 				GXSetViewport(
-					(float)*reinterpret_cast<short*>(piVar12 + 2),
-					(float)*reinterpret_cast<short*>((int)(piVar12 + 2) + 2),
-					(float)*reinterpret_cast<short*>(piVar12 + 3),
-					(float)*reinterpret_cast<short*>((int)(piVar12 + 3) + 2),
+					(float)*reinterpret_cast<short*>(slot + 8),
+					(float)*reinterpret_cast<short*>(slot + 0xa),
+					(float)*reinterpret_cast<short*>(slot + 0xc),
+					(float)*reinterpret_cast<short*>(slot + 0xe),
 					FLOAT_803313dc, FLOAT_803313e8);
-				GXSetScissor(piVar12[0x10], piVar12[0x11], piVar12[0x12], piVar12[0x13]);
+				GXSetScissor(*reinterpret_cast<int*>(slot + 0x40), *reinterpret_cast<int*>(slot + 0x44),
+				             *reinterpret_cast<int*>(slot + 0x48), *reinterpret_cast<int*>(slot + 0x4c));
 				Graphic.SetFog(1, 0);
-				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-				LightPcs.SetAmbient(lightTable.m_ambient);
-				LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-				for (int j = 0; j < lightTable.m_diffuseCount; j++) {
+				LightPcs.SetAmbient(gWmMenuLightTables[0].m_ambient);
+				LightPcs.SetNumDiffuse(gWmMenuLightTables[0].m_diffuseCount);
+				for (int j = 0; j < gWmMenuLightTables[0].m_diffuseCount; j++) {
 					LightPcs.SetDiffuse(
-						j, lightTable.m_diffuseColors[j],
-						&lightTable.m_diffuseDirs[j], 0);
+						j, gWmMenuLightTables[0].m_diffuseColors[j],
+						&gWmMenuLightTables[0].m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				reinterpret_cast<CCharaPcs::CHandle*>(serial[0x1dd])->Draw(5);
+				int partA = *reinterpret_cast<int*>(m_bonusListPtr + charaOff + 0x5768);
+				if (partA >= 0) {
+					PartPcs.DrawMenuIdx(partA);
+				}
+				int partB = *reinterpret_cast<int*>(m_bonusListPtr + charaOff + 0x6bf8);
+				if (partB >= 0) {
+					PartPcs.DrawMenuIdx(partB);
+				}
 			}
-		}
+			i++;
+			viewBase += 0x50;
+			serial++;
+			piVar12 += 0x14;
+			charaOff += 0x524;
+		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
+		PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+		GXSetProjection(screenMtx, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
 
 	// State machine for MC operations
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	short subState = typedWorldState->m_subState;
-	if (state == 2 && typedWorldState->m_delay == 0) {
+	state = m_wmWorldState->m_mainState;
+	if (state == 2 && m_wmWorldState->m_delay == 0) {
 		short winState;
+		short subState = m_wmWorldState->m_subState;
 		switch ((int)subState) {
 		case 0:
 		case 2:
@@ -3846,34 +4467,100 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
+				float rectX = (float)GetSlotABXPos((int)m_wmWorldState->m_cardChannel);
+				MenuPcs.SetAttrFmt((FMT)0);
+				_GXColor curColor;
+				curColor.r = 0xFF;
+				curColor.g = 0xFF;
+				curColor.b = 0xFF;
+				curColor.a = 0xFF;
+				GXSetChanMatColor(GX_COLOR0A0, curColor);
+				MenuPcs.SetTexture((TEX)0);
+				MenuPcs.DrawRect(0, (float)(int)rectX,
+				         (float)(int)rectY,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
+				if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 1;
-				} else if (subState == 2) {
-					typedWorldState->m_subState = 3;
+				} else if (m_wmWorldState->m_subState == 2) {
+					m_wmWorldState->m_subState = 3;
 				} else {
-					typedWorldState->m_subState = 1;
+					m_wmWorldState->m_subState = 1;
 				}
 			}
 			break;
 		case 1:
-			if (typedWorldState->m_frameCounter > 0x12) {
-				typedWorldState->m_subState = 3;
+			if (m_wmWorldState->m_frameCounter >= 0x13) {
+				m_wmWorldState->m_subState = 3;
 			}
-			typedWorldState->m_frameCounter++;
+			m_wmWorldState->m_frameCounter++;
 			break;
 		case 3:
-			if (typedWorldState->m_mcResult != 1) {
-				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-				short mcResult = typedWorldState->m_mcResult;
-				if (mcResult == -1) typedWorldState->m_subState = 5;
-				else if (mcResult == -2) typedWorldState->m_subState = 8;
-				else if (mcResult == -3) typedWorldState->m_subState = 6;
-				else if (mcResult == -4) typedWorldState->m_subState = 7;
-				else if (mcResult == 0) typedWorldState->m_subState = 4;
+			if (m_wmWorldState->m_mcResult != 1) {
+				memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+				short mcResult = m_wmWorldState->m_mcResult;
+				if (mcResult == -1) m_wmWorldState->m_subState = 5;
+				else if (mcResult == -2) m_wmWorldState->m_subState = 8;
+				else if (mcResult == -3) m_wmWorldState->m_subState = 6;
+				else if (mcResult == -4) m_wmWorldState->m_subState = 7;
+				else if (mcResult == 0) m_wmWorldState->m_subState = 4;
+			}
+			break;
+		case 5:
+		case 6:
+		case 7:
+		case 9:
+		case 10:
+		case 0x0E:
+		case 0x0F:
+		case 0x14:
+		case 0x15:
+		case 0x1B:
+		case 0x1C:
+			winState = m_menuWindowInfo->state;
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				int msgParam = 0;
+				int msgId;
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 5) msgId = 1;
+				else if (ss == 6) msgId = 2;
+				else if (ss == 7) msgId = 3;
+				else if (ss == 9) msgId = 10;
+				else if (ss == 10) msgId = 0xb;
+				else if (ss == 0x0E) msgId = 0xc;
+				else if (ss == 0x0F) msgId = 0xd;
+				else if (ss == 0x1C) { msgId = 0x1b; msgParam = 1; }
+				else if (ss == 0x1B) { msgId = 0x1c; msgParam = 1; }
+				else if (ss == 0x15) msgId = 0xe;
+				else msgId = 0xf;
+				DrawMcWinMess(msgId, msgParam);
+			}
+			if (winState == 2 && m_menuWindowInfo->state == 3) {
+				short ss = m_wmWorldState->m_subState;
+				if (m_wmWorldState->m_state0E < 0 || ss == 0x14 || ss == 0x1c || ss == 0x1b) {
+					m_wmWorldState->m_subState = 3;
+				} else if (ss == 0x0E) {
+					memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+					m_wmWorldState->m_subState = 0x11;
+					m_wmWorldState->m_cardChannel = 0;
+				} else if (ss == 0x15) {
+					m_wmWorldState->m_subState = 0x11;
+					m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+					if (m_wmWorldState->m_menuMode == 8) {
+						m_wmWorldState->m_nextMenuMode = -1;
+						m_wmWorldState->m_delay = 0xb;
+						m_wmTransitionCode = 3;
+					}
+				} else {
+					m_wmWorldState->m_subState = 2;
+				}
 			}
 			break;
 		case 4:
@@ -3881,180 +4568,213 @@ void CMenuPcs::DrawMCardMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(6, 0);
-			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short mcRes = typedWorldState->m_mcResult;
-				if (mcRes == -3) typedWorldState->m_subState = 8;
-				else if (mcRes == -4) typedWorldState->m_subState = 8;
-				else if (mcRes == -5) typedWorldState->m_subState = 7;
-				else if (mcRes == -6) typedWorldState->m_subState = 0x10;
-				else typedWorldState->m_subState = 10;
-			}
-			break;
-		case 5:
-		case 6:
-		case 7:
-		case 10:
-		case 0x0E:
-		case 0x0F:
-		case 0x10:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
-			if (winState == 1) {
-				int msgId = 0;
-				int msgParam = 0;
-				short ss = typedWorldState->m_subState;
-				if (ss == 5) msgId = 1;
-				else if (ss == 6) msgId = 2;
-				else if (ss == 7) msgId = 3;
-				else if (ss == 10) msgId = 0xB;
-				else if (ss == 0x0E) msgId = 0xC;
-				else if (ss == 0x0F) msgId = 0xD;
-				else if (ss == 0x13) msgId = 0x14;
-				else if (ss == 0x14) msgId = 0x15;
-				else if (ss == 0x15) msgId = 0x16;
-				else msgId = 0x13;
-				DrawMcWinMess(msgId, msgParam);
-			}
-			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 3;
-				} else {
-					typedWorldState->m_subState = 2;
+				short r = m_wmWorldState->m_mcResult;
+				if (r != 0 && r == 1) {
+					m_wmWorldState->m_subState = 0xc;
 				}
+			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
+				short mcRes = m_wmWorldState->m_mcResult;
+				if (mcRes == -2) m_wmWorldState->m_subState = 9;
+				else if (mcRes == -3) m_wmWorldState->m_subState = 8;
+				else if (mcRes == -4) m_wmWorldState->m_subState = 8;
+				else if (mcRes == -5) m_wmWorldState->m_subState = 7;
+				else m_wmWorldState->m_subState = 10;
 			}
 			break;
 		case 8:
 		case 0x0B:
+		case 0x12:
+		case 0x19:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
+			DrawMcWin(-1, 0);
 			if (winState == 1) {
-				int ymsgId = (subState == 8) ? 4 : 5;
-				DrawMcWinMess(ymsgId, 0);
-				SetAttrFmt((FMT)0);
-				unsigned int ynColor = 0xFFFFFFFF;
-				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&ynColor);
-				SetTexture((TEX)0);
-				DrawRect(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_80331410, FLOAT_80331410,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, 0);
+				int msgParam = 0;
+				int msgId;
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 8) msgId = 4;
+				else if (ss == 0x0B) msgId = 5;
+				else if (ss == 0x19) { msgId = 0x19; msgParam = 1; }
+				else msgId = 0x12;
+				DrawMcWinMess(msgId, msgParam);
+				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
+				float rectX = (float)GetYesNoXPos((int)m_wmWorldState->m_cardChannel);
+				if (m_wmWorldState->m_subState != 0x19) {
+					MenuPcs.SetAttrFmt((FMT)0);
+					_GXColor ynColor;
+					ynColor.r = 0xFF;
+					ynColor.g = 0xFF;
+					ynColor.b = 0xFF;
+					ynColor.a = 0xFF;
+					GXSetChanMatColor(GX_COLOR0A0, ynColor);
+					MenuPcs.SetTexture((TEX)0);
+					MenuPcs.DrawRect(0, (float)(int)rectX,
+					         (float)(int)rectY,
+					         FLOAT_80331410, FLOAT_80331410,
+					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+				} else {
+					short ss2 = m_wmWorldState->m_mcResult;
+					if (ss2 < 0) {
+						if (ss2 == -1) m_wmWorldState->m_subState = 5;
+						else if (ss2 == -2) m_wmWorldState->m_subState = 8;
+						else if (ss2 == -3) m_wmWorldState->m_subState = 6;
+						else m_wmWorldState->m_subState = 7;
+					}
+				}
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ynRes = typedWorldState->m_mcResult;
-				if (ynRes < 0) {
-					if (ynRes == -1) typedWorldState->m_subState = 5;
-					else if (ynRes == -2) typedWorldState->m_subState = 8;
-					else if (ynRes == -3) typedWorldState->m_subState = 6;
-					else typedWorldState->m_subState = 7;
-				} else if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
-				} else if (subState == 8) {
-					typedWorldState->m_subState = 0x0B;
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 0x12) {
+					if (m_wmWorldState->m_state0E < 0) {
+						m_wmWorldState->m_subState = 0x11;
+						m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+					} else {
+						m_wmWorldState->m_subState = 0x13;
+					}
 				} else {
-					typedWorldState->m_subState = 0x0D;
+					short ss2 = m_wmWorldState->m_mcResult;
+					if (ss2 < 0) {
+						if (ss2 == -1) m_wmWorldState->m_subState = 5;
+						else if (ss2 == -2) m_wmWorldState->m_subState = 8;
+						else if (ss2 == -3) m_wmWorldState->m_subState = 6;
+						else m_wmWorldState->m_subState = 7;
+					} else if (m_wmWorldState->m_state0E < 0) {
+						if (ss == 0x19) {
+							m_wmWorldState->m_subState = 0x11;
+							m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
+						} else {
+							m_wmWorldState->m_subState = 2;
+						}
+					} else if (ss == 8) {
+						m_wmWorldState->m_subState = 0xb;
+					} else if (ss == 0x19) {
+						m_wmWorldState->m_subState = 0x1a;
+					} else {
+						m_wmWorldState->m_subState = 0xd;
+					}
+				}
+			}
+			break;
+		case 0x0D:
+		case 0x13:
+		case 0x1A:
+			winState = m_menuWindowInfo->state;
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				int msgParam = 0;
+				int msgId;
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 0xd) msgId = 7;
+				else if (ss == 0x1A) { msgId = 0x1a; msgParam = 1; }
+				else msgId = 8;
+				DrawMcWinMess(msgId, msgParam);
+			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
+				short ss = m_wmWorldState->m_subState;
+				if (ss == 0xd) {
+					if (m_wmWorldState->m_mcResult == 1) {
+						m_wmWorldState->m_subState = 0xe;
+					} else if (m_wmWorldState->m_mcResult == -2) {
+						m_wmWorldState->m_subState = 7;
+					} else {
+						m_wmWorldState->m_subState = 0xf;
+					}
+				} else if (ss == 0x1a) {
+					if (m_wmWorldState->m_mcResult == 1) {
+						m_wmWorldState->m_subState = 0x1c;
+					} else if (m_wmWorldState->m_mcResult == -2) {
+						m_wmWorldState->m_subState = 7;
+					} else {
+						m_wmWorldState->m_subState = 0x1b;
+					}
+				} else if (m_wmWorldState->m_mcResult == 1) {
+					m_wmWorldState->m_flag0A = 1;
+					m_wmWorldState->m_subState = 0x15;
+					Sound.PlaySe(0x41, 0x40, 0x7F, 0);
+				} else if (m_wmWorldState->m_mcResult == -4) {
+					m_wmWorldState->m_subState = 7;
+				} else {
+					m_wmWorldState->m_subState = 0x14;
 				}
 			}
 			break;
 		case 0x0C:
 			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
-			if (winState == 1) {
-				DrawMcWinMess(6, 0);
-			}
-			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short cRes = typedWorldState->m_mcResult;
-				if (cRes == -1) typedWorldState->m_subState = 10;
-				else if (cRes == -2) typedWorldState->m_subState = 8;
-				else if (cRes == -3) typedWorldState->m_subState = 8;
-				else if (cRes == -4) typedWorldState->m_subState = 7;
+			DrawMcWin(-1, 0);
+			if (((winState != 1 ||
+			      (DrawMcWinMess(6, 0), m_wmWorldState->m_mcResult != 0)) && winState == 2) &&
+			    m_menuWindowInfo->state == 3) {
+				short cRes = m_wmWorldState->m_mcResult;
+				if (cRes == -1) m_wmWorldState->m_subState = 10;
+				else if (cRes == -2) m_wmWorldState->m_subState = 8;
+				else if (cRes == -3) m_wmWorldState->m_subState = 8;
+				else if (cRes == -4) m_wmWorldState->m_subState = 7;
 				else if (cRes == -999) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 2;
 				} else {
-					typedWorldState->m_subState = 0x11;
-				}
-			}
-			break;
-		case 0x0D:
-			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
-			if (winState == 1) {
-				DrawMcWinMess(7, 0);
-			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short dRes = typedWorldState->m_mcResult;
-				if (dRes == 1) {
-					typedWorldState->m_subState = 0x0E;
-				} else if (dRes == -2) {
-					typedWorldState->m_subState = 7;
-				} else {
-					typedWorldState->m_subState = 0x0F;
+					BindMcObj();
+					char* cs = reinterpret_cast<char*>(m_wmCharaState);
+					unsigned int idx = 0;
+					if (cs[0x42] == 0 && (idx = 1, cs[0x8a] == 0) &&
+					    (idx = 2, cs[0xd2] == 0) && (idx = 3, cs[0x11a] == 0)) {
+						idx = 4;
+					}
+					if (idx < 4) {
+						m_wmWorldState->m_subState = 0x19;
+					} else {
+						m_wmWorldState->m_subState = 0x11;
+					}
+					m_wmWorldState->m_cardChannel = (short)m_mcCtrl.m_saveIndex;
 				}
 			}
 			break;
 		case 0x11:
-			if (typedWorldState->m_mcResult < 0) {
-				typedWorldState->m_subState = 3;
-			} else if (typedWorldState->m_state0E != 0) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
+			if (m_wmWorldState->m_mcResult < 0) {
+				m_wmWorldState->m_subState = 3;
+			} else if (m_wmWorldState->m_state0E != 0) {
+				if (m_wmWorldState->m_state0E < 0) {
+					if (m_wmWorldState->m_flag0A == 0) {
+						m_wmWorldState->m_subState = 2;
+					} else {
+						m_wmWorldState->m_nextMenuMode = -1;
+						m_wmWorldState->m_delay = 10;
+					}
+				} else if (m_wmCharaState[m_mcCtrl.m_saveIndex * 0x48 + 0x41] == 0) {
+					m_wmWorldState->m_subState = 0x13;
 				} else {
-					typedWorldState->m_subState = 0x12;
-				}
-			}
-			break;
-		case 0x12:
-			winState = m_menuWindowInfo->state;
-			DrawMcWin(0, 0);
-			if (winState == 1) {
-				DrawMcWinMess(9, 0);
-			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short eRes = typedWorldState->m_mcResult;
-				if (eRes == 1) {
-					typedWorldState->m_subState = 0x13;
-					Sound.PlaySe(0x42, 0x40, 0x7F, 0);
-				} else if (eRes == -4) {
-					typedWorldState->m_subState = 7;
-				} else {
-					typedWorldState->m_subState = 0x14;
+					m_wmWorldState->m_subState = 0x12;
 				}
 			}
 			break;
 		}
-		if ((int)subState != (int)typedWorldState->m_subState) {
-			typedWorldState->m_flag09 = 0;
-			typedWorldState->m_counter1A = 0;
-			typedWorldState->m_state0E = 0;
+		if ((int)subState != (int)m_wmWorldState->m_subState) {
+			m_wmWorldState->m_flag09 = 0;
+			m_wmWorldState->m_counter1A = 0;
+			m_wmWorldState->m_state0E = 0;
 		}
-	} else if (state == 2 && typedWorldState->m_delay != 0) {
-		typedWorldState->m_delay--;
-		worldState = reinterpret_cast<int>(typedWorldState);
-		if (typedWorldState->m_delay < 1) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			Sound.PlaySe(0x31 - (typedWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
-		}
-	} else {
-		typedWorldState->m_frameCounter++;
-		worldState = reinterpret_cast<int>(typedWorldState);
-		short threshold = 10;
-		if (typedWorldState->m_mainState == 3 && typedWorldState->m_subState != 0) {
+	} else if (state != 2) {
+		m_wmWorldState->m_frameCounter++;
+		int threshold;
+		if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_subState != 0) {
 			threshold = 0x13;
+		} else {
+			threshold = 10;
 		}
-		if (typedWorldState->m_frameCounter >= threshold) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			worldState = reinterpret_cast<int>(typedWorldState);
-			if (typedWorldState->m_mainState > 4) {
-				if (typedWorldState->m_menuMode != 8) {
-					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
-				}
-				m_textureLocIndex = 1;
-				typedWorldState->m_nextMenuMode = 0;
+		if (m_wmWorldState->m_frameCounter >= threshold) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState >= 5) {
+				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
+		}
+	} else if (m_wmWorldState->m_delay != 0) {
+		m_wmWorldState->m_delay--;
+		if (m_wmWorldState->m_delay <= 0) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		}
 	}
 }
@@ -4071,47 +4791,52 @@ void CMenuPcs::DrawMCardMenu()
 void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
-	const short state = worldState->m_mainState;
-	const short step = worldState->m_frameCounter;
+	const short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (state == 1) {
-		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	} else if (state == 2) {
 		frameAlpha = FLOAT_80331434;
 	} else if (state == 3) {
-		frameAlpha = static_cast<float>(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) + DOUBLE_803313f8);
+		frameAlpha = static_cast<float>(DOUBLE_80331460 * static_cast<double>(m_wmWorldState->m_frameCounter) + DOUBLE_803313f8);
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor;
+	frameColor.r = 0xFF;
+	frameColor.g = 0xFF;
+	frameColor.b = 0xFF;
+	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	unsigned char* const frame = m_wm.m_frameInfo;
-	if (frame != 0) {
-		for (int i = 0; i < 2; i++) {
-			unsigned char* const entry = frame + 4 + i * 0x1C;
-			DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	int i = 0;
+	int byteOffset = i;
+	for (; i < 2; i++) {
+		if (((1 << i) & 3) != 0) {
+			unsigned char* const entry = m_wm.m_frameInfo + (byteOffset + 4);
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
 			         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
 			         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
+			         *reinterpret_cast<float*>(entry + 0x18));
 		}
+		byteOffset += 0x1C;
 	}
 
-	if (state > 0 && state < 4) {
+	const short contentState = m_wmWorldState->m_mainState;
+	if (contentState > 0 && contentState < 4) {
 		float contentAlpha;
-		if (state == 1) {
-			contentAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
-		} else if (state == 2) {
+		if (contentState == 1) {
+			contentAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+		} else if (contentState == 2) {
 			contentAlpha = FLOAT_803313e8;
 		} else {
-			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 		}
 
 		DrawCharaBase();
@@ -4127,7 +4852,7 @@ void CMenuPcs::DrawCMakeMenu()
 		DrawCharaName();
 		DrawCMLife();
 
-		if (worldState->m_menuMode == 3) {
+		if (m_wmWorldState->m_menuMode == 3) {
 			short winState = m_menuWindowInfo->state;
 			if (winState != 3) {
 				DrawMcWin(-1, 0);
@@ -4140,66 +4865,87 @@ void CMenuPcs::DrawCMakeMenu()
 			}
 		}
 
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * contentAlpha))};
-		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
-		DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
-		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-
-		unsigned int textAlpha;
-		if (contentAlpha <= FLOAT_803313e8) {
-			textAlpha = static_cast<unsigned int>(FLOAT_80331458 * contentAlpha);
-		} else {
+		int textAlpha;
+		if (contentAlpha > FLOAT_803313e8) {
 			textAlpha = 0xFF;
+		} else {
+			textAlpha = static_cast<int>(FLOAT_80331458 * contentAlpha);
 		}
-		_GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)};
-		char* text = 0;
-		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
-		if (worldState->m_menuMode == 3) {
-			char* textList[3];
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		GXColor helpColor;
+		helpColor.r = 0xFF;
+		helpColor.g = 0xFF;
+		helpColor.b = 0xFF;
+		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * contentAlpha));
+		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+		if (m_wmWorldState->m_menuMode == 3) {
+			const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
+			char* textList[3] = {lbl_80210750[5], lbl_80210750[6], lbl_80210750[7]};
 			textList[0] = lbl_80210750[languageIndex + 5];
 			textList[1] = lbl_80210750[languageIndex + 6];
 			textList[2] = lbl_80210750[languageIndex + 7];
-			text = textList[textIndex - (textIndex >> 31)];
-		} else if (worldState->m_menuMode == 8) {
-			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
-				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
-					text = lbl_80210750[languageIndex + 10];
-				}
-			} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 2) {
-				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0F) {
-					text = lbl_80210750[languageIndex + 9];
-				} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
-					text = lbl_80210750[languageIndex + 8];
-				}
-			}
-		}
-		if (text != 0) {
+			char* const text = textList[textIndex - (textIndex >> 31)];
+			_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
 			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
 			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
 			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+		} else if (m_wmWorldState->m_menuMode == 8) {
+			const int mainMode = *(reinterpret_cast<char*>(g_pGoOutMenu) + 0x2C);
+			switch (mainMode) {
+			case 2:
+				switch (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x18)) {
+				case 0x0E: {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 8];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+					break;
+				}
+				case 0x0F: {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 9];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+					break;
+				}
+				}
+				break;
+			case 3:
+				if (*(reinterpret_cast<char*>(g_pGoOutMenu) + 0x24) == 2) {
+					char* const text = lbl_80210750[(Game.m_gameWork.m_languageId - 1) * 0x0B + 10];
+					_GXColor textColor = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)).color;
+					const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+					MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+					                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+				}
+				break;
+			}
 		}
 	}
 
-	if (worldState->m_mainState == 2) {
-		if (worldState->m_delay != 0) {
-			worldState->m_delay--;
-			if (worldState->m_delay < 1) {
-				worldState->m_mainState++;
-				worldState->m_frameCounter = 0;
-				Sound.PlaySe(0x31 - (worldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
+	if (m_wmWorldState->m_mainState != 2) {
+		m_wmWorldState->m_frameCounter++;
+		if (m_wmWorldState->m_frameCounter > 9) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState > 4) {
+				m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
 		}
 	} else {
-		worldState->m_frameCounter++;
-		if (worldState->m_frameCounter > 9) {
-			worldState->m_mainState++;
-			worldState->m_frameCounter = 0;
-			if (worldState->m_mainState > 4) {
-				worldState->m_changeRequest = worldState->m_nextMenuMode;
-				worldState->m_nextMenuMode = 0;
+		if (m_wmWorldState->m_delay != 0) {
+			m_wmWorldState->m_delay--;
+			if (m_wmWorldState->m_delay < 1) {
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				Sound.PlaySe(0x31 + static_cast<int>(static_cast<unsigned int>(static_cast<int>(m_wmWorldState->m_nextMenuMode)) >> 31), 0x40, 0x7F, 0);
 			}
 		}
 	}
@@ -4238,11 +4984,15 @@ void CMenuPcs::DrawMoveMenu()
 		moveAlpha = FLOAT_803313e8;
 	}
 	if (state > 0 && state < 3) {
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha))};
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		GXColor helpColor;
+		helpColor.r = 0xFF;
+		helpColor.g = 0xFF;
+		helpColor.b = 0xFF;
+		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 	}
 	DrawWMFrame();
@@ -4253,21 +5003,20 @@ void CMenuPcs::DrawMoveMenu()
 		Mtx savedCamera;
 		Mtx lookAtMtx;
 		Mtx44 projectionMtx;
-		Vec target;
-		Vec up;
-		GXColor clearColor = {0, 0, 0, 0};
+		GXColor clearColor;
+		clearColor.r = 0;
+		clearColor.g = 0;
+		clearColor.b = 0;
+		clearColor.a = 0;
 
-		target.x = FLOAT_803313dc;
-		target.y = FLOAT_803313dc;
-		target.z = FLOAT_803313dc;
-		up.x = FLOAT_803313dc;
-		up.y = FLOAT_803313e8;
-		up.z = FLOAT_803313dc;
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), &up, reinterpret_cast<Point3d*>(&target));
+		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x1A0), reinterpret_cast<Vec*>(&up),
+		    reinterpret_cast<Point3d*>(&target));
 		PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
@@ -4365,96 +5114,126 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
+	extern double DOUBLE_803317D8;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx m_cameraMatrix;
 	McCtrl& mcCtrl = *GetMcCtrl();
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
-	if (typedWorldState->m_worldReady == 0) {
+	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		return;
 	}
 
-	short state = typedWorldState->m_mainState;
-	float alpha = FLOAT_803313e8;
+	short state = m_wmWorldState->m_mainState;
+	float alpha;
 	if (state > 0 && state < 4) {
 		if (state == 1) {
-			alpha = (float)typedWorldState->m_frameCounter;
-		} else if (state == 3) {
-			alpha = FLOAT_803313e8 - (float)typedWorldState->m_frameCounter;
+			double raw;
+			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
+			alpha = static_cast<float>(DOUBLE_803314E8 * (raw - DOUBLE_80331408));
+		} else if (state == 2) {
+			alpha = FLOAT_803313e8;
+		} else {
+			double raw;
+			reinterpret_cast<int*>(&raw)[0] = 0x43300000;
+			reinterpret_cast<int*>(&raw)[1] = static_cast<int>(m_wmWorldState->m_frameCounter) ^ 0x80000000;
+			alpha = static_cast<float>(-(DOUBLE_803314E8 * (raw - DOUBLE_80331408) - DOUBLE_80331420));
 		}
-		if (alpha > FLOAT_803314f0) {
-			SetAttrFmt((FMT)0);
-			unsigned int bgColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			bgColor = bgColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&bgColor);
-			SetTexture((TEX)0x1F);
-			DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+		if (static_cast<double>(alpha) > DOUBLE_803314f0) {
+			MenuPcs.SetAttrFmt((FMT)0);
+			_GXColor bgColor;
+			bgColor.r = 0xFF;
+			bgColor.g = 0xFF;
+			bgColor.b = 0xFF;
+			bgColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
+			GXSetChanMatColor(GX_COLOR0A0, bgColor);
+			MenuPcs.SetTexture((TEX)0x1F);
+			MenuPcs.DrawRect(0, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 			         FLOAT_803313e0, FLOAT_80331440,
 			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
-	if (alpha > FLOAT_803313e8) alpha = FLOAT_803313e8;
 
-	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
-	if (uAlpha > 0xFF) uAlpha = 0xFF;
+	unsigned int uAlpha;
+	if (alpha > FLOAT_803313e8) {
+		uAlpha = 0xFF;
+	} else {
+		uAlpha = static_cast<int>(FLOAT_80331458 * alpha);
+	}
 
 	// Header text
-	if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
-		// DrawFont2 call omitted - extern not available
+	if (*reinterpret_cast<char*>(reinterpret_cast<int>(g_pGoOutMenu) + 0x18) == 0x0E) {
+		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+		char* text = lbl_80210750[languageIndex + 8];
+		_GXColor color = CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(uAlpha)).color;
+		const int x = static_cast<int>(MenuPcs.CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+		MenuPcs.DrawFont2(x, static_cast<int>(FLOAT_803317D0), color, 7, text,
+		                  FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 	}
 
 	DrawMCList();
 
 	// Cursor / selection rendering
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	if (state == 2 && typedWorldState->m_subState > 0x10) {
+	state = m_wmWorldState->m_mainState;
+	if (state == 2 && m_wmWorldState->m_subState >= 0x11) {
+		float cursorY0 = static_cast<float>(static_cast<double>(FLOAT_803314d8) - DOUBLE_803317D8);
+		float cursorXbase = FLOAT_803314d8 + FLOAT_80331410;
 		unsigned int saveIdx;
-		if (typedWorldState->m_subState == 0x11) {
-			saveIdx = (unsigned int)typedWorldState->m_cardChannel;
+		if (m_wmWorldState->m_subState == 0x11) {
+			saveIdx = static_cast<unsigned int>(m_wmWorldState->m_cardChannel);
 		} else {
-			saveIdx = (unsigned int)mcCtrl.m_saveIndex;
+			saveIdx = static_cast<unsigned int>(mcCtrl.m_saveIndex);
 		}
-		SetAttrFmt((FMT)0);
-		unsigned int cursorColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
-		SetTexture((TEX)0);
-		DrawRect(0xFFFFFFFF, FLOAT_803314d8, (float)(FLOAT_803314d8 + FLOAT_80331410 + (float)(saveIdx * 0x28)),
+		double rawIdx;
+		reinterpret_cast<int*>(&rawIdx)[0] = 0x43300000;
+		reinterpret_cast<int*>(&rawIdx)[1] = saveIdx ^ 0x80000000;
+		float cursorY1 = static_cast<float>(DOUBLE_80331498 * (rawIdx - DOUBLE_80331408) + static_cast<double>(cursorXbase));
+		MenuPcs.SetAttrFmt((FMT)0);
+		_GXColor cursorColor;
+		cursorColor.r = 0xFF;
+		cursorColor.g = 0xFF;
+		cursorColor.b = 0xFF;
+		cursorColor.a = 0xFF;
+		GXSetChanMatColor(GX_COLOR0A0, cursorColor);
+		MenuPcs.SetTexture((TEX)0);
+		MenuPcs.DrawRect(0, (float)(int)cursorY0, (float)(int)cursorY1,
 		         FLOAT_80331410, FLOAT_80331410,
 		         FLOAT_803313dc, FLOAT_803313dc,
-		         FLOAT_803313e8, FLOAT_803313e8, 0);
+		         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		// 3D character model viewports
-		for (int i = 0; i < 4; i++) {
-			int viewOff = reinterpret_cast<int>(m_wm.m_worldObjData) + (i * 0x50 + 0x550);
-			int* piVar13 = reinterpret_cast<int*>(viewOff);
+		int* piVar13 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
+		int viewBase = 0x550;
+		int i = 0;
+		do {
 			if (*piVar13 != 0) {
+				int slot = reinterpret_cast<int>(m_wm.m_worldObjData) + viewBase;
 				Mtx44 projMtx;
 				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
+				PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-				Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-				Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(piVar13 + 4), &up, &target);
-				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 0x10), (Vec*)&up, (Vec*)&target);
+				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
-				unsigned int clearColor = 0;
-				GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+				CColor clearColor(0, 0, 0, 0);
+				GXSetCopyClear(clearColor.color, 0xFFFFFF);
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
 				GXSetViewport(
-					(float)*reinterpret_cast<short*>(piVar13 + 2),
-					(float)*reinterpret_cast<short*>((int)(piVar13 + 2) + 2),
-					(float)*reinterpret_cast<short*>(piVar13 + 3),
-					(float)*reinterpret_cast<short*>((int)(piVar13 + 3) + 2),
+					(float)*reinterpret_cast<short*>(slot + 8),
+					(float)*reinterpret_cast<short*>(slot + 0xa),
+					(float)*reinterpret_cast<short*>(slot + 0xc),
+					(float)*reinterpret_cast<short*>(slot + 0xe),
 					FLOAT_803313dc, FLOAT_803313e8);
-				GXSetScissor(piVar13[0x10], piVar13[0x11], piVar13[0x12], piVar13[0x13]);
+				GXSetScissor(*reinterpret_cast<int*>(slot + 0x40), *reinterpret_cast<int*>(slot + 0x44),
+				             *reinterpret_cast<int*>(slot + 0x48), *reinterpret_cast<int*>(slot + 0x4c));
 				Graphic.SetFog(1, 0);
 				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 				LightPcs.SetAmbient(lightTable.m_ambient);
@@ -4465,20 +5244,33 @@ void CMenuPcs::DrawLoadMenu()
 						&lightTable.m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				m_wm.m_handles[17 + i]->Draw(5);
+				if (m_effectWork[17 + i].m_partNo >= 0) {
+					PartPcs.DrawMenuIdx(m_effectWork[17 + i].m_partNo);
+				}
+				if (m_effectWork[21 + i].m_partNo >= 0) {
+					PartPcs.DrawMenuIdx(m_effectWork[21 + i].m_partNo);
+				}
 			}
-		}
+			piVar13 += 0x14;
+			viewBase += 0x50;
+			i++;
+		} while (i < 4);
 		DrawInit();
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
+		Mtx44 projMtx2;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
+		GXSetProjection(projMtx2, GX_PERSPECTIVE);
 		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
 
 	// State machine for MC operations
-	worldState = reinterpret_cast<int>(typedWorldState);
-	state = typedWorldState->m_mainState;
-	short subState = typedWorldState->m_subState;
-	if (state == 2 && typedWorldState->m_delay == 0) {
+	state = m_wmWorldState->m_mainState;
+	short subState = m_wmWorldState->m_subState;
+	if (state == 2 && m_wmWorldState->m_delay == 0) {
 		short winState;
 		switch ((int)subState) {
 		case 0:
@@ -4487,62 +5279,53 @@ void CMenuPcs::DrawLoadMenu()
 			DrawMcWin(-1, 0);
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
+				float slotY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
+				float slotX = (float)GetSlotABXPos(m_wmWorldState->m_cardChannel);
+				MenuPcs.SetAttrFmt((FMT)0);
+				_GXColor slotColor;
+				slotColor.r = 0xFF;
+				slotColor.g = 0xFF;
+				slotColor.b = 0xFF;
+				slotColor.a = 0xFF;
+				GXSetChanMatColor(GX_COLOR0A0, slotColor);
+				MenuPcs.SetTexture((TEX)0);
+				MenuPcs.DrawRect(0, (float)(int)slotX, (float)(int)slotY,
+				         FLOAT_80331410, FLOAT_80331410,
+				         FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
+				if (m_wmWorldState->m_state0E < 0) {
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 1;
-				} else if (subState == 2) {
-					typedWorldState->m_subState = 3;
+				} else if (m_wmWorldState->m_subState == 2) {
+					m_wmWorldState->m_subState = 3;
 				} else {
-					typedWorldState->m_subState = 1;
+					m_wmWorldState->m_subState = 1;
 				}
 			}
 			break;
 		case 1:
-			if (typedWorldState->m_frameCounter > 0x12) {
-				typedWorldState->m_subState = 3;
+			if (m_wmWorldState->m_frameCounter > 0x12) {
+				m_wmWorldState->m_subState = 3;
 			}
-			typedWorldState->m_frameCounter++;
+			m_wmWorldState->m_frameCounter++;
 			break;
 		case 3:
-			if (typedWorldState->m_mcResult != 1) {
+			if (m_wmWorldState->m_mcResult != 1) {
 				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
-				short mcResult = typedWorldState->m_mcResult;
+				short mcResult = m_wmWorldState->m_mcResult;
 				if (mcResult == -1) {
-					typedWorldState->m_subState = 5;
+					m_wmWorldState->m_subState = 5;
 				} else if (mcResult == -2) {
-					typedWorldState->m_subState = 8;
+					m_wmWorldState->m_subState = 8;
 				} else if (mcResult == -3) {
-					typedWorldState->m_subState = 6;
+					m_wmWorldState->m_subState = 6;
 				} else if (mcResult == -4) {
-					typedWorldState->m_subState = 7;
+					m_wmWorldState->m_subState = 7;
 				} else if (mcResult == 0) {
-					typedWorldState->m_subState = 4;
-				}
-			}
-			break;
-		case 4:
-			winState = m_menuWindowInfo->state;
-			DrawMcWin(-1, 0);
-			if (winState == 1) {
-				DrawMcWinMess(6, 0);
-				if (typedWorldState->m_mcResult == 1) {
-					typedWorldState->m_subState = 0xC;
-				}
-			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short mcRes2 = typedWorldState->m_mcResult;
-				if (mcRes2 == -3) {
-					typedWorldState->m_subState = 8;
-				} else if (mcRes2 == -4) {
-					typedWorldState->m_subState = 8;
-				} else if (mcRes2 == -5) {
-					typedWorldState->m_subState = 7;
-				} else if (mcRes2 == -6) {
-					typedWorldState->m_subState = 0x10;
-				} else {
-					typedWorldState->m_subState = 10;
+					m_wmWorldState->m_subState = 4;
 				}
 			}
 			break;
@@ -4562,7 +5345,7 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				int msgId = 0;
 				int msgParam = 0;
-				short ss = typedWorldState->m_subState;
+				short ss = m_wmWorldState->m_subState;
 				if (ss == 5) msgId = 1;
 				else if (ss == 6) msgId = 2;
 				else if (ss == 7) msgId = 3;
@@ -4577,15 +5360,44 @@ void CMenuPcs::DrawLoadMenu()
 				DrawMcWinMess(msgId, msgParam);
 			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				if (typedWorldState->m_state0E < 0 ||
-				    subState == 0x1C || subState == 0x1B || subState == 0x17) {
-					typedWorldState->m_subState = 3;
+				if (m_wmWorldState->m_state0E < 0 ||
+				    m_wmWorldState->m_subState == 0x1C || m_wmWorldState->m_subState == 0x1B ||
+				    m_wmWorldState->m_subState == 0x17) {
+					m_wmWorldState->m_subState = 3;
 				} else if (subState == 0x18) {
-					typedWorldState->m_nextMenuMode = 1;
-					typedWorldState->m_delay = 1;
+					m_wmWorldState->m_nextMenuMode = 1;
+					m_wmWorldState->m_delay = 1;
 					m_wmTransitionCode = 4;
+				} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
+					m_wmWorldState->m_nextMenuMode = 1;
+					m_wmWorldState->m_delay = 1;
+					m_wmTransitionCode = 2;
 				} else {
-					typedWorldState->m_subState = 2;
+					m_wmWorldState->m_subState = 2;
+				}
+			}
+			break;
+		case 4:
+			winState = m_menuWindowInfo->state;
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+				short cRes4 = m_wmWorldState->m_mcResult;
+				if (cRes4 != 0 && cRes4 == 1) {
+					m_wmWorldState->m_subState = 0xC;
+				}
+			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
+				short mcRes2 = m_wmWorldState->m_mcResult;
+				if (mcRes2 == -3) {
+					m_wmWorldState->m_subState = 8;
+				} else if (mcRes2 == -4) {
+					m_wmWorldState->m_subState = 8;
+				} else if (mcRes2 == -5) {
+					m_wmWorldState->m_subState = 7;
+				} else if (mcRes2 == -6) {
+					m_wmWorldState->m_subState = 0x10;
+				} else {
+					m_wmWorldState->m_subState = 10;
 				}
 			}
 			break;
@@ -4597,56 +5409,55 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				int ymsgId = 0;
 				int ymsgParam = 0;
-				short ys = typedWorldState->m_subState;
+				short ys = m_wmWorldState->m_subState;
 				if (ys == 8) ymsgId = 4;
 				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; }
 				else ymsgId = 5;
 				DrawMcWinMess(ymsgId, ymsgParam);
 
 				// Yes/No cursor
-				SetAttrFmt((FMT)0);
-				unsigned int ynColor = 0xFFFFFFFF;
-				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&ynColor);
-				SetTexture((TEX)0);
-				DrawRect(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_80331410, FLOAT_80331410,
-				         FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, 0);
-			}
-			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short ynResult = typedWorldState->m_mcResult;
-				if (ynResult < 0) {
-					if (ynResult == -1) typedWorldState->m_subState = 5;
-					else if (ynResult == -2) typedWorldState->m_subState = 8;
-					else if (ynResult == -3) typedWorldState->m_subState = 6;
-					else typedWorldState->m_subState = 7;
-				} else if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
-				} else if (subState == 8) {
-					typedWorldState->m_subState = 0x0B;
-				} else {
-					typedWorldState->m_subState = 0x0D;
+				float ynY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
+				float ynX = (float)GetYesNoXPos(m_wmWorldState->m_cardChannel);
+				if (m_wmWorldState->m_subState != 0x19) {
+					MenuPcs.SetAttrFmt((FMT)0);
+					_GXColor ynColor;
+					ynColor.r = 0xFF;
+					ynColor.g = 0xFF;
+					ynColor.b = 0xFF;
+					ynColor.a = 0xFF;
+					GXSetChanMatColor(GX_COLOR0A0, ynColor);
+					MenuPcs.SetTexture((TEX)0);
+					MenuPcs.DrawRect(0, (float)(int)ynX, (float)(int)ynY,
+					         FLOAT_80331410, FLOAT_80331410,
+					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 				}
 			}
-			break;
-		case 0x0C:
-			winState = m_menuWindowInfo->state;
-			DrawMcWin(-1, 0);
-			if (winState == 1) {
-				DrawMcWinMess(6, 0);
-			}
 			if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short cRes = typedWorldState->m_mcResult;
-				if (cRes == -1) typedWorldState->m_subState = 10;
-				else if (cRes == -2) typedWorldState->m_subState = 8;
-				else if (cRes == -3) typedWorldState->m_subState = 8;
-				else if (cRes == -4) typedWorldState->m_subState = 7;
-				else if (cRes == -999) {
-					typedWorldState->m_nextMenuMode = -1;
-					typedWorldState->m_delay = 1;
-					m_wmTransitionCode = 2;
+				short ynResult = m_wmWorldState->m_mcResult;
+				if (ynResult < 0) {
+					if (ynResult == -1) m_wmWorldState->m_subState = 5;
+					else if (ynResult == -2) m_wmWorldState->m_subState = 8;
+					else if (ynResult == -3) m_wmWorldState->m_subState = 6;
+					else m_wmWorldState->m_subState = 7;
+				} else if (m_wmWorldState->m_state0E < 0) {
+					if (m_wmWorldState->m_subState == 0x19) {
+						m_wmWorldState->m_subState = 0x11;
+						m_wmWorldState->m_cardChannel = (short)mcCtrl.m_saveIndex;
+					} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
+						m_wmWorldState->m_nextMenuMode = 1;
+						m_wmWorldState->m_delay = 1;
+						memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+						m_wmTransitionCode = 1;
+					} else {
+						m_wmWorldState->m_subState = 2;
+					}
+				} else if (m_wmWorldState->m_subState == 8) {
+					m_wmWorldState->m_subState = 0x0B;
+				} else if (m_wmWorldState->m_subState == 0x19) {
+					m_wmWorldState->m_subState = 0x1A;
 				} else {
-					typedWorldState->m_subState = 0x11;
+					m_wmWorldState->m_subState = 0x0D;
 				}
 			}
 			break;
@@ -4658,72 +5469,109 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				int dmsgId = 7;
 				int dmsgParam = 0;
-				short ds = typedWorldState->m_subState;
-				if (ds == 0x1A) { dmsgId = 0x1A; dmsgParam = 1; }
-				else if (ds == 0x16) dmsgId = 9;
+				short ds = m_wmWorldState->m_subState;
+				if (ds == 0x0D) dmsgId = 7;
+				else if (ds == 0x1A) { dmsgId = 0x1A; dmsgParam = 1; }
+				else dmsgId = 9;
 				DrawMcWinMess(dmsgId, dmsgParam);
 			} else if (winState == 2 && m_menuWindowInfo->state == 3) {
-				short dRes = typedWorldState->m_mcResult;
+				short dRes = m_wmWorldState->m_mcResult;
 				if (subState == 0x0D) {
-					if (dRes == 1) typedWorldState->m_subState = 0x0E;
-					else if (dRes == -2) typedWorldState->m_subState = 7;
-					else typedWorldState->m_subState = 0x0F;
+					if (dRes == 1) m_wmWorldState->m_subState = 0x0E;
+					else if (dRes == -2) m_wmWorldState->m_subState = 7;
+					else m_wmWorldState->m_subState = 0x0F;
 				} else if (subState == 0x1A) {
-					if (dRes == 1) typedWorldState->m_subState = 0x1C;
-					else if (dRes == -2) typedWorldState->m_subState = 7;
-					else typedWorldState->m_subState = 0x1B;
+					if (dRes == 1) m_wmWorldState->m_subState = 0x1C;
+					else if (dRes == -2) m_wmWorldState->m_subState = 7;
+					else m_wmWorldState->m_subState = 0x1B;
 				} else {
 					if (dRes == 1) {
-						typedWorldState->m_subState = 0x18;
+						m_wmWorldState->m_subState = 0x18;
 						Sound.PlaySe(0x42, 0x40, 0x7F, 0);
-					} else if (dRes == -4) typedWorldState->m_subState = 7;
-					else typedWorldState->m_subState = 0x17;
+					} else if (dRes == -4) m_wmWorldState->m_subState = 7;
+					else m_wmWorldState->m_subState = 0x17;
+				}
+			}
+			break;
+		case 0x0C:
+			winState = m_menuWindowInfo->state;
+			DrawMcWin(-1, 0);
+			if (winState == 1) {
+				DrawMcWinMess(6, 0);
+			}
+			if (winState == 2 && m_menuWindowInfo->state == 3) {
+				short cRes = m_wmWorldState->m_mcResult;
+				if (cRes == -1) m_wmWorldState->m_subState = 10;
+				else if (cRes == -2) m_wmWorldState->m_subState = 8;
+				else if (cRes == -3) m_wmWorldState->m_subState = 8;
+				else if (cRes == -4) m_wmWorldState->m_subState = 7;
+				else if (cRes == -999) {
+					m_wmWorldState->m_nextMenuMode = -1;
+					m_wmWorldState->m_delay = 1;
+					m_wmTransitionCode = 2;
+				} else {
+					BindMcObj();
+					char* cs = reinterpret_cast<char*>(m_wmCharaState);
+					int idx = 0;
+					if (cs[0x42] == 0 && (idx = 1, cs[0x8a] == 0) &&
+					    (idx = 2, cs[0xd2] == 0) && (idx = 3, cs[0x11a] == 0)) {
+						idx = 4;
+					}
+					if (idx < 4) {
+						m_wmWorldState->m_subState = 0x19;
+					} else {
+						m_wmWorldState->m_subState = 0x11;
+					}
 				}
 			}
 			break;
 		case 0x11:
-			if (typedWorldState->m_mcResult < 0) {
-				typedWorldState->m_subState = 3;
-			} else if (typedWorldState->m_state0E != 0) {
-				if (typedWorldState->m_state0E < 0) {
-					typedWorldState->m_subState = 2;
+			if (m_wmWorldState->m_mcResult < 0) {
+				m_wmWorldState->m_subState = 3;
+			} else if (m_wmWorldState->m_state0E != 0) {
+				if (m_wmWorldState->m_state0E >= 0) {
+					m_wmWorldState->m_subState = 0x16;
+				} else if (m_wmWorldState->m_menuMode == 8 && m_goOutSaveLoadMode != 0) {
+					m_wmWorldState->m_nextMenuMode = 1;
+					m_wmWorldState->m_delay = 1;
+					memset(m_wmCharaState, 0, kWmMenuCharaStateBytes);
+					m_wmTransitionCode = 1;
 				} else {
-					typedWorldState->m_subState = 0x16;
+					m_wmWorldState->m_subState = 2;
 				}
 			}
 			break;
 		}
-		if ((int)subState != (int)typedWorldState->m_subState) {
-			typedWorldState->m_flag09 = 0;
-			typedWorldState->m_counter1A = 0;
-			typedWorldState->m_state0E = 0;
+		if ((int)subState != (int)m_wmWorldState->m_subState) {
+			m_wmWorldState->m_flag09 = 0;
+			m_wmWorldState->m_counter1A = 0;
+			m_wmWorldState->m_state0E = 0;
 		}
-	} else if (state == 2 && typedWorldState->m_delay != 0) {
-		typedWorldState->m_delay--;
-		worldState = reinterpret_cast<int>(typedWorldState);
-		if (typedWorldState->m_delay < 1) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			Sound.PlaySe(0x31 - (typedWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
-		}
-	} else {
-		typedWorldState->m_frameCounter++;
-		worldState = reinterpret_cast<int>(typedWorldState);
-		short threshold = 10;
-		if (typedWorldState->m_mainState == 3 && typedWorldState->m_subState != 0) {
+	} else if (state != 2) {
+		m_wmWorldState->m_frameCounter++;
+		int threshold;
+		if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_subState != 0) {
 			threshold = 0x13;
+		} else {
+			threshold = 10;
 		}
-		if (typedWorldState->m_frameCounter >= threshold) {
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			worldState = reinterpret_cast<int>(typedWorldState);
-			if (typedWorldState->m_mainState > 4) {
-				if (typedWorldState->m_menuMode != 8) {
-					typedWorldState->m_changeRequest = typedWorldState->m_nextMenuMode;
+		if (m_wmWorldState->m_frameCounter >= threshold) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			if (m_wmWorldState->m_mainState >= 5) {
+				if (m_wmWorldState->m_menuMode != 8) {
+					m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
 				}
 				m_textureLocIndex = 1;
-				typedWorldState->m_nextMenuMode = 0;
+				m_wmWorldState->m_nextMenuMode = 0;
 			}
+		}
+	} else if (m_wmWorldState->m_delay != 0) {
+		m_wmWorldState->m_delay--;
+		if (m_wmWorldState->m_delay <= 0) {
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			Sound.PlaySe(0x31 + (int)((unsigned int)(int)m_wmWorldState->m_nextMenuMode >> 31), 0x40, 0x7F, 0);
 		}
 	}
 }
@@ -4740,16 +5588,15 @@ void CMenuPcs::DrawLoadMenu()
 void CMenuPcs::DrawTitleMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx m_cameraMatrix;
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	short state = typedWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
 
-		if (state == 0 && typedWorldState->m_worldReady != 0) {
-			if (m_wmThpActive != 0) {
-				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
+			if (static_cast<signed char>(m_wmThpActive) != 0) {
+				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)Graphic.m_renderMode, 0, 0, 0x280, 0x1C0);
+				Graphic._WaitDrawDone(const_cast<char*>(s_wm_menu_cpp), 0x12A2);
 			}
-		short sVarE = typedWorldState->m_state0E;
-		if (sVarE != 0 || typedWorldState->m_frameCounter > 0xB42) {
+		short sVarE = m_wmWorldState->m_state0E;
+		if (sVarE != 0 || m_wmWorldState->m_frameCounter >= 0xB43) {
 			if (sVarE != -1) {
 				THPSimpleAudioStop();
 				THPSimpleLoadStop();
@@ -4761,11 +5608,11 @@ void CMenuPcs::DrawTitleMenu()
 				}
 				m_wmThpActive = 0;
 			}
-			typedWorldState->m_mainState++;
-			typedWorldState->m_frameCounter = 0;
-			typedWorldState->m_titleState = 0;
-			typedWorldState->m_state0E = 0;
-			typedWorldState->m_state12 = 0;
+			m_wmWorldState->m_mainState++;
+			m_wmWorldState->m_frameCounter = 0;
+			m_wmWorldState->m_titleState = 0;
+			m_wmWorldState->m_state0E = 0;
+			m_wmWorldState->m_state12 = 0;
 			CFlatRuntime::CStack flatArgs[3];
 			flatArgs[0].m_word = 9;
 			flatArgs[1].m_word = 0;
@@ -4774,29 +5621,34 @@ void CMenuPcs::DrawTitleMenu()
 		}
 	} else {
 		// 3D viewport setup
+		GXColor matColor;
 		Mtx44 projMtx;
 		C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projMtx, GX_PERSPECTIVE);
+		PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-		Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_80331768 };
-		Vec target = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-		Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+		Vec eye;
+		eye.x = FLOAT_803313dc;
+		eye.y = FLOAT_803313dc;
+		eye.z = FLOAT_80331768;
+		CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
-		C_MTXLookAt(lookAtMtx, &eye, &up, &target);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Vec*)&target);
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		unsigned int clearColor = 0;
-		GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+		_GXColor clearGxColor = CColor(0, 0, 0, 0).color;
+		GXSetCopyClear(clearGxColor, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
 		              FLOAT_803313dc, FLOAT_803313e8);
 
 		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
 		Mtx44 projMtx2;
@@ -4807,18 +5659,19 @@ void CMenuPcs::DrawTitleMenu()
 		DrawInit();
 
 		// Fade-in overlay (state 1)
-			state = typedWorldState->m_mainState;
+			state = m_wmWorldState->m_mainState;
 			if (state == 1 && DAT_8032e8ac == 0) {
 				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
-				                                        (static_cast<double>(typedWorldState->m_frameCounter) -
-				                                         DOUBLE_80331408) -
+				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
 				SetAttrFmt((FMT)2);
-			unsigned int fadeColor = (unsigned int)(FLOAT_80331458 * fadeAlpha) & 0xFF;
-			fadeColor = fadeColor | (fadeColor << 8) | (fadeColor << 16) | (fadeColor << 24);
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor);
-			SetTexture((TEX)0xFFFFFFFF);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
@@ -4827,148 +5680,179 @@ void CMenuPcs::DrawTitleMenu()
 		}
 
 		// Menu items
-		SetAttrFmt((FMT)0);
-		SetTexture((TEX)0x43);
+		MenuPcs.SetAttrFmt((FMT)0);
+		MenuPcs.SetTexture((TEX)0x43);
 
-		state = typedWorldState->m_mainState;
-		if (state > 1) {
+		state = m_wmWorldState->m_mainState;
+		if (state >= 2) {
 			float fX = FLOAT_80331778 - FLOAT_80331414;
 			float fY = FLOAT_8033177c;
-			if (typedWorldState->m_cardChannel != 0) {
-				fY = FLOAT_8033177c + (float)(typedWorldState->m_cardChannel * 0x28 - 8);
+			if (m_wmWorldState->m_cardChannel != 0) {
+				fY = FLOAT_8033177c + (float)(m_wmWorldState->m_cardChannel * 0x28 - 8);
 			}
+			float fYRect = fY - FLOAT_80331780;
 			float alpha = FLOAT_803313e8;
-			if (state == 2 && typedWorldState->m_state12 == 0) {
-				int timer = (int)typedWorldState->m_titleState;
+			if (state == 2 && m_wmWorldState->m_state12 == 0) {
+				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(-(DOUBLE_80331790 *
 				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
 			}
-			unsigned int itemColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
-			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.DrawRect(0, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCALPHA, GX_LO_SET);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(1), static_cast<_GXLogicOp>(5));
+			state = m_wmWorldState->m_mainState;
 			float secondAlpha = alpha;
-			if (state == 2 && typedWorldState->m_state12 == 0) {
-				int timer = (int)typedWorldState->m_titleState;
+			fX = FLOAT_80331778 - FLOAT_80331414;
+			if (state == 2 && m_wmWorldState->m_state12 == 0) {
+				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(DOUBLE_80331790 *
 				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
-				                         static_cast<double>(FLOAT_80331778 - FLOAT_80331414));
-			} else if ((state == 2 && typedWorldState->m_delay == 0) ||
-			           (state == 3 && typedWorldState->m_state0E == 0)) {
-				int pulse = (int)typedWorldState->m_titleState % 0x28 - 0x14;
+				                         static_cast<double>(fX));
+			} else if ((state == 2 && m_wmWorldState->m_delay == 0) ||
+			           (state == 3 && m_wmWorldState->m_state0E == 0)) {
+				int pulse = (int)m_wmWorldState->m_titleState % 0x28 - 0x14;
 				if (pulse < 0) {
 					pulse = -pulse;
 				}
 				secondAlpha = static_cast<float>(-(DOUBLE_803317A0 * static_cast<double>(pulse) -
 				                                  DOUBLE_80331420));
+			} else {
+				secondAlpha = FLOAT_803313e8;
 			}
-			itemColor = (unsigned int)(FLOAT_80331458 * secondAlpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
-			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.DrawRect(0, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 		}
 
 		// Menu item labels (2 items: New Game, Continue)
-		SetAttrFmt((FMT)0);
-		unsigned int itemLabelColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemLabelColor);
+		MenuPcs.SetAttrFmt((FMT)0);
+		GXColor itemLabelColor = {0xFF, 0xFF, 0xFF, 0xFF};
+		GXSetChanMatColor(GX_COLOR0A0, itemLabelColor);
+		const float kColorScale = FLOAT_80331458;
+		const float kZero = FLOAT_803313dc;
 		unsigned int uVar7 = 0xFFFFFFF8;
 		unsigned int uVar6 = 0x70;
 		for (int i = 0; i < 2; i++) {
 			float labelAlpha = FLOAT_803313e8;
-			if (typedWorldState->m_mainState == 1) {
-				labelAlpha = (float)typedWorldState->m_frameCounter;
+			if (m_wmWorldState->m_mainState == 1) {
+				labelAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 			}
-			unsigned int labelColor = (unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF;
-			labelColor = labelColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&labelColor);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(kColorScale * labelAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
 
 			float yPos = FLOAT_8033177c;
 			if (i != 0) {
 				yPos = yPos + (float)((int)uVar7);
 			}
-			DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+			MenuPcs.DrawRect(0, FLOAT_80331778, yPos,
 			         FLOAT_80331568, FLOAT_80331440,
-			         FLOAT_803313dc, (float)((int)uVar6),
-			         FLOAT_803313e8, FLOAT_803313e8, 0);
+			         kZero, (float)((int)uVar6),
+			         FLOAT_803313e8, FLOAT_803313e8, kZero);
 
 			// Cursor on selected item
-			if (typedWorldState->m_flag09 == 0 &&
-			    i == typedWorldState->m_cardChannel) {
-				int timer = (int)typedWorldState->m_titleState;
-				float cursorAlpha = FLOAT_803313e8;
-				if (timer > 0) {
-					cursorAlpha = (float)(timer);
+			if (m_wmWorldState->m_flag09 == 0 &&
+			    i == m_wmWorldState->m_cardChannel) {
+				int timer = (int)m_wmWorldState->m_titleState;
+				float cursorScale = static_cast<float>(DOUBLE_803317A8 * static_cast<double>(timer) +
+				                                        static_cast<double>(FLOAT_803313e8));
+				int cursorAlpha = static_cast<int>(kColorScale *
+				                                   static_cast<float>(-(DOUBLE_803317B0 * static_cast<double>(timer) -
+				                                                        DOUBLE_80331420)));
+				matColor.r = 0xFF;
+				matColor.g = 0xFF;
+				matColor.b = 0xFF;
+				matColor.a = static_cast<unsigned char>(cursorAlpha);
+				GXSetChanMatColor(GX_COLOR0A0, matColor);
+				float cursorX = static_cast<float>((FLOAT_803313e0 - FLOAT_80331568 * cursorScale) * DOUBLE_803313f8);
+				float cursorY = FLOAT_8033177c - (FLOAT_80331440 * cursorScale - FLOAT_80331440);
+				if (i != 0) {
+					cursorY = cursorY + (float)((int)uVar7);
 				}
-				unsigned int cursorColor = (unsigned int)(FLOAT_80331458 * cursorAlpha) & 0xFF;
-				cursorColor = cursorColor | 0xFFFFFF00;
-				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
-				DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+				MenuPcs.DrawRect(0,
+				         cursorX,
+				         cursorY,
 				         FLOAT_80331568, FLOAT_80331440,
-				         FLOAT_803313dc, (float)((int)uVar6),
-				         FLOAT_803313e8, FLOAT_803313e8, 0);
+				         kZero, (float)((int)uVar6),
+				         cursorScale, cursorScale, kZero);
 			}
-			uVar6 += 0x28;
 			uVar7 += 0x28;
+			uVar6 += 0x28;
 		}
 
 		// Logo and copyright textures
-		SetAttrFmt((FMT)0);
-		unsigned int logoColor = 0xFFFFFFFF;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&logoColor);
-		SetTexture((TEX)0x42);
-		DrawRect(0xFFFFFFFF, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
-		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+		MenuPcs.SetAttrFmt((FMT)0);
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = 0xFF;
+		GXSetChanMatColor(GX_COLOR0A0, matColor);
+		MenuPcs.SetTexture((TEX)0x42);
+		MenuPcs.DrawRect(0, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-		SetTexture((TEX)0x44);
+		MenuPcs.SetTexture((TEX)0x44);
 		float copyrightAlpha = FLOAT_803313e8;
-		if (typedWorldState->m_mainState == 1) {
-			copyrightAlpha = (float)typedWorldState->m_frameCounter;
+		if (m_wmWorldState->m_mainState == 1) {
+			copyrightAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		}
-		unsigned int crColor = (unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF;
-		crColor = crColor | 0xFFFFFF00;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&crColor);
-		DrawRect(0xFFFFFFFF, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
-		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * copyrightAlpha));
+		GXSetChanMatColor(GX_COLOR0A0, matColor);
+		MenuPcs.DrawRect(0, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
+		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		// Timer / state transitions
-		state = typedWorldState->m_mainState;
-		if (state > 1) {
-			typedWorldState->m_titleState++;
-			if (typedWorldState->m_state12 == 0 &&
-			    typedWorldState->m_titleState > 4) {
-				typedWorldState->m_flag09 = 1;
-				typedWorldState->m_state12++;
-				typedWorldState->m_titleState = 0x14;
+		state = m_wmWorldState->m_mainState;
+		if (state >= 2) {
+			m_wmWorldState->m_titleState++;
+			if (m_wmWorldState->m_state12 == 0 &&
+			    m_wmWorldState->m_titleState >= 5) {
+				m_wmWorldState->m_flag09 = 1;
+				m_wmWorldState->m_state12++;
+				m_wmWorldState->m_titleState = 0x14;
 			}
 		}
 
 		// Fade out / transition to next state
-		state = typedWorldState->m_mainState;
+		state = m_wmWorldState->m_mainState;
 		if (state == 3 || (state == 1 && DAT_8032e8ac != 0)) {
 			float fadeAlpha2;
 			if (state == 3) {
-				fadeAlpha2 = (float)(typedWorldState->m_frameCounter + 1);
+				fadeAlpha2 = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter + 1));
 			} else {
-				fadeAlpha2 = (float)typedWorldState->m_frameCounter;
+				fadeAlpha2 = static_cast<float>(-(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter) -
+				                                 DOUBLE_80331420));
 			}
-			if (fadeAlpha2 > FLOAT_803313e8) fadeAlpha2 = FLOAT_803313e8;
+			if (FLOAT_803313e8 <= fadeAlpha2) fadeAlpha2 = FLOAT_803313e8;
 			SetAttrFmt((FMT)2);
-			unsigned int fadeColor2 = (unsigned int)(FLOAT_80331458 * fadeAlpha2) & 0xFF;
-			fadeColor2 = fadeColor2 | (fadeColor2 << 8) | (fadeColor2 << 16) | (fadeColor2 << 24);
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor2);
-			SetTexture((TEX)0xFFFFFFFF);
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			matColor.r = 0;
+			matColor.g = 0;
+			matColor.b = 0;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha2));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
+			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
@@ -4977,58 +5861,58 @@ void CMenuPcs::DrawTitleMenu()
 		}
 
 		// End state handling
-		state = typedWorldState->m_mainState;
-		if (state == 3 && typedWorldState->m_frameCounter > 9) {
+		state = m_wmWorldState->m_mainState;
+		if (state == 3 && m_wmWorldState->m_frameCounter >= 0xA) {
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
-			if (typedWorldState->m_state0E == 0) {
-				DAT_8032e8ac = 0;
-			} else {
+			if (m_wmWorldState->m_state0E != 0) {
 				DAT_8032e8ac = 1;
+				m_wmWorldState->m_changeRequest = 1;
 				CFlatRuntime::CStack flatArgs2[3];
 				flatArgs2[0].m_word = 7;
-				flatArgs2[1].m_word = static_cast<int>(typedWorldState->m_cardChannel);
+				flatArgs2[1].m_word = static_cast<int>(m_wmWorldState->m_cardChannel);
 				flatArgs2[2].m_word = 0;
-				typedWorldState->m_changeRequest = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
+			} else {
+				DAT_8032e8ac = 0;
 			}
-			typedWorldState->m_mainState = 0;
-			typedWorldState->m_frameCounter = 0;
-			typedWorldState->m_worldReady = 0;
-		} else if (state == 2) {
-			if (typedWorldState->m_delay != 0) {
-				typedWorldState->m_delay--;
-				if (typedWorldState->m_delay < 1) {
-					typedWorldState->m_mainState++;
-					typedWorldState->m_frameCounter = 0;
-					typedWorldState->m_titleState = 0;
+			m_wmWorldState->m_mainState = 0;
+			m_wmWorldState->m_frameCounter = 0;
+			m_wmWorldState->m_worldReady = 0;
+		} else if (state != 2) {
+			int threshold = 10;
+			m_wmWorldState->m_frameCounter++;
+			if (m_wmWorldState->m_mainState == 1) {
+				threshold = 0x28;
+			}
+			if (m_wmWorldState->m_frameCounter > threshold) {
+				m_wmWorldState->m_frameCounter = 0;
+				m_wmWorldState->m_titleState = 0;
+				m_wmWorldState->m_mainState++;
+			}
+		} else {
+			if (state == 2 && m_wmWorldState->m_delay != 0) {
+				m_wmWorldState->m_delay--;
+				if (m_wmWorldState->m_delay <= 0) {
+					m_wmWorldState->m_mainState++;
+					m_wmWorldState->m_frameCounter = 0;
+					m_wmWorldState->m_titleState = 0;
 					CFlatRuntime::CStack flatArgs3[3];
 					flatArgs3[0].m_word = 9;
 					flatArgs3[1].m_word = 1;
 					flatArgs3[2].m_word = 0;
 					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
 				}
-			} else if (typedWorldState->m_frameCounter > 0x991) {
-				typedWorldState->m_state0E = 0;
-				typedWorldState->m_mainState++;
-				typedWorldState->m_frameCounter = 0;
-				typedWorldState->m_titleState = 0;
+			} else if (m_wmWorldState->m_delay == 0 && m_wmWorldState->m_frameCounter >= 0x992) {
+				m_wmWorldState->m_state0E = 0;
+				m_wmWorldState->m_mainState++;
+				m_wmWorldState->m_frameCounter = 0;
+				m_wmWorldState->m_titleState = 0;
 				CFlatRuntime::CStack flatArgs4[3];
 				flatArgs4[0].m_word = 9;
 				flatArgs4[1].m_word = 1;
 				flatArgs4[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs4, 0);
-			}
-		} else {
-			short threshold = 10;
-			typedWorldState->m_frameCounter++;
-			if (typedWorldState->m_mainState == 1) {
-				threshold = 0x28;
-			}
-			if (typedWorldState->m_frameCounter > threshold) {
-				typedWorldState->m_frameCounter = 0;
-				typedWorldState->m_titleState = 0;
-				typedWorldState->m_mainState++;
 			}
 		}
 	}
@@ -5046,7 +5930,6 @@ void CMenuPcs::DrawTitleMenu()
 void CMenuPcs::SetWorldParam(int code, int value)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char bVar6 = static_cast<unsigned char>(value);
 	unsigned short uVar5 = static_cast<unsigned short>(value);
 	unsigned char bVar1 = static_cast<unsigned char>(static_cast<unsigned int>(value) >> 24);
@@ -5087,7 +5970,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
 			bytes[0xD] = bVar6;
 		}
-		worldState->m_changeRequest = 2;
+		m_wmWorldState->m_changeRequest = 2;
 		break;
 	case 10:
 		bytes[0x10] = static_cast<unsigned char>(static_cast<unsigned char>(static_cast<unsigned int>(-value) >> 24) | bVar1) >> 7;
@@ -5358,7 +6241,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 	float t = value / FLOAT_803314c0;
 	float* keys = fcv.keys;
 
-	if (keys[keyCount * 4 - 4] <= t) {
+	if (t >= keys[keyCount * 4 - 4]) {
 		return static_cast<double>(keys[keyCount * 4 - 3]);
 	}
 
@@ -5368,7 +6251,7 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
 		return static_cast<double>(FLOAT_803313dc);
 	}
 
-	while (*cur < t) {
+	while (t > *cur) {
 		cur = cur + 4;
 		idx = idx + 1;
 		keyCount = keyCount - 1;
@@ -5405,28 +6288,18 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
  */
 void CMenuPcs::SetProjection(int mode)
 {
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	if (worldObj == 0) {
-		return;
-	}
-
-	unsigned char* const slot = worldObj + mode * 0x50;
+	unsigned char* const slot = m_wm.m_worldObjData + mode * 0x50;
 	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 
-	Vec target;
-	target.x = FLOAT_803313dc;
-	target.y = FLOAT_803313dc;
-	target.z = FLOAT_803313dc;
-	Vec up;
-	up.x = FLOAT_803313dc;
-	up.y = FLOAT_803313e8;
-	up.z = FLOAT_803313dc;
+	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 	Mtx lookAtMtx;
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), reinterpret_cast<Vec*>(&up),
+	    reinterpret_cast<Point3d*>(&target));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
 	CharaPcs.InitEnv(5);
@@ -5573,85 +6446,72 @@ void CMenuPcs::CalcPitcher()
 void CMenuPcs::CalcFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	float fVar1 = FLOAT_803313dc;
-	if (bytes[0x09] != 1) {
+	if ((char)bytes[0x09] != 1) {
 		return;
 	}
+	float fVar1 = FLOAT_803313dc;
+#define WOBJ() reinterpret_cast<int>(m_wm.m_worldObjData)
 
-	int bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-	*reinterpret_cast<short*>(bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
-	*reinterpret_cast<short*>(bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
-	*reinterpret_cast<short*>(bubbleData + 4) = 0xF0;
-	*reinterpret_cast<short*>(bubbleData + 6) = 0xC4;
-	*reinterpret_cast<float*>(bubbleData + 0x0C) = fVar1;
-	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_803313dc;
+#define BUB() reinterpret_cast<int>(m_wm.m_bubbleData)
+	*reinterpret_cast<short*>(BUB()) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<short*>(BUB() + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
+	*reinterpret_cast<short*>(BUB() + 4) = 0xF0;
+	*reinterpret_cast<short*>(BUB() + 6) = 0xC4;
+	*reinterpret_cast<float*>(BUB() + 0x0C) = fVar1;
+	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_803313dc;
 	} else {
-		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_80331704;
+		*reinterpret_cast<float*>(BUB() + 8) = FLOAT_80331704;
 	}
 
 	fVar1 = FLOAT_80331708;
-	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x3F0) != 0) {
-		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+		*reinterpret_cast<short*>(BUB() + 0x20) = 0x50;
 		float fVar2 = FLOAT_803313dc;
-		*reinterpret_cast<short*>(bubbleData + 0x22) = 0x48;
-		*reinterpret_cast<float*>(bubbleData + 0x24) = fVar1;
-		*reinterpret_cast<float*>(bubbleData + 0x28) = fVar2;
-		*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 2) + 0x1C;
-		if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-			*reinterpret_cast<short*>(bubbleData + 0x1E) = *reinterpret_cast<short*>(bubbleData + 0x1E) + 0x10;
+		*reinterpret_cast<short*>(BUB() + 0x22) = 0x48;
+		*reinterpret_cast<float*>(BUB() + 0x24) = fVar1;
+		*reinterpret_cast<float*>(BUB() + 0x28) = fVar2;
+		*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 2) + 0x1C;
+		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+			*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 0x1E) + 0x10;
 		}
-		*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData);
-		if ((uVar3 & 0xF) == 0) {
-			if ((uVar3 & 0x200) == 0) {
-				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x38;
-			} else {
-				*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x50;
-			}
+		*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB());
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x20;
+		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
 		} else {
-			*reinterpret_cast<short*>(bubbleData + 0x1C) = *reinterpret_cast<short*>(bubbleData + 0x1C) + 0x20;
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
 		}
 	}
 
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x1FF) != 0) {
-		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;
-		*reinterpret_cast<short*>(bubbleData + 0x3E) = 0x20;
-		*reinterpret_cast<float*>(bubbleData + 0x40) = fVar1;
-		*reinterpret_cast<float*>(bubbleData + 0x44) = fVar1;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x1FF) != 0) {
+		*reinterpret_cast<short*>(BUB() + 0x3C) = 0x20;
+		*reinterpret_cast<short*>(BUB() + 0x3E) = 0x20;
+		*reinterpret_cast<float*>(BUB() + 0x40) = fVar1;
+		*reinterpret_cast<float*>(BUB() + 0x44) = fVar1;
 
 		// Copy first icon rect to second
-		int iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+		int iVar9 = BUB();
 		*reinterpret_cast<short*>(iVar9 + 0x54) = *reinterpret_cast<short*>(iVar9 + 0x38);
 		*reinterpret_cast<short*>(iVar9 + 0x56) = *reinterpret_cast<short*>(iVar9 + 0x3A);
 		*reinterpret_cast<short*>(iVar9 + 0x58) = *reinterpret_cast<short*>(iVar9 + 0x3C);
 		*reinterpret_cast<short*>(iVar9 + 0x5A) = *reinterpret_cast<short*>(iVar9 + 0x3E);
-		*reinterpret_cast<int*>(iVar9 + 0x5C) = *reinterpret_cast<int*>(iVar9 + 0x40);
-		*reinterpret_cast<int*>(iVar9 + 0x60) = *reinterpret_cast<int*>(iVar9 + 0x44);
-		*reinterpret_cast<int*>(iVar9 + 0x64) = *reinterpret_cast<int*>(iVar9 + 0x48);
-		*reinterpret_cast<int*>(iVar9 + 0x68) = *reinterpret_cast<int*>(iVar9 + 0x4C);
+		*reinterpret_cast<float*>(iVar9 + 0x5C) = *reinterpret_cast<float*>(iVar9 + 0x40);
+		*reinterpret_cast<float*>(iVar9 + 0x60) = *reinterpret_cast<float*>(iVar9 + 0x44);
+		*reinterpret_cast<float*>(iVar9 + 0x64) = *reinterpret_cast<float*>(iVar9 + 0x48);
+		*reinterpret_cast<float*>(iVar9 + 0x68) = *reinterpret_cast<float*>(iVar9 + 0x4C);
 		*reinterpret_cast<int*>(iVar9 + 0x6C) = *reinterpret_cast<int*>(iVar9 + 0x50);
 
-		iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+		iVar9 = BUB();
 		short sVar15 = *reinterpret_cast<short*>(iVar9 + 0x1C) + *reinterpret_cast<short*>(iVar9 + 0x20);
-		if ((uVar3 & 0xF) == 0) {
-			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
-			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15 + 8;
-			*reinterpret_cast<short*>(iVar9 + 0x3A) =
-			    *reinterpret_cast<short*>(iVar9 + 0x1E);
-			*reinterpret_cast<short*>(iVar9 + 0x3A) =
-			    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
-		} else {
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
 			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15;
 			int cnt = 0;
 			int iter = 4;
 			int iVar11 = 0;
-			*reinterpret_cast<short*>(iVar9 + 0x38) = sVar15;
+			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15;
 			do {
 				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar11)) != 0) {
 					cnt++;
@@ -5660,17 +6520,24 @@ void CMenuPcs::CalcFukidashi()
 				iter--;
 			} while (iter != 0);
 			if (cnt == 1) {
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x1E);
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x3A) + 0x14;
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x1E);
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
 			} else {
-				*reinterpret_cast<short*>(iVar9 + 0x3A) =
-				    *reinterpret_cast<short*>(iVar9 + 0x1E);
-				iVar9 = reinterpret_cast<int>(m_wm.m_bubbleData);
+				*reinterpret_cast<short*>(BUB() + 0x3A) =
+				    *reinterpret_cast<short*>(BUB() + 0x1E);
+				iVar9 = BUB();
 				*reinterpret_cast<short*>(iVar9 + 0x56) =
 				    *reinterpret_cast<short*>(iVar9 + 0x1E) + *reinterpret_cast<short*>(iVar9 + 0x22) - 0x20;
 			}
+		} else {
+			*reinterpret_cast<short*>(iVar9 + 0x54) = sVar15 + 8;
+			*reinterpret_cast<short*>(BUB() + 0x38) = sVar15 + 8;
+			*reinterpret_cast<short*>(BUB() + 0x3A) =
+			    *reinterpret_cast<short*>(BUB() + 0x1E);
+			*reinterpret_cast<short*>(BUB() + 0x3A) =
+			    *reinterpret_cast<short*>(BUB() + 0x3A) + 0x14;
 		}
 	}
 
@@ -5681,13 +6548,27 @@ void CMenuPcs::CalcFukidashi()
 	fontFC->SetScale(FLOAT_803313e8);
 
 	char nameBuffer[64];
+	char secondLine[64];
+	char tempBuf[64];
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
-		strcpy(nameBuffer, "");
+		char* const townName = Game.m_gameWork.m_townName;
+		int languageId = Game.m_gameWork.m_languageId;
+		strcpy(nameBuffer, townName);
+		if (languageId == 2) {
+			strcpy(nameBuffer, townName);
+			strcat(nameBuffer, lbl_80210D10[languageId - 1]);
+		} else {
+			strcpy(nameBuffer, lbl_80210D10[languageId - 1]);
+			strcat(nameBuffer, townName);
+		}
 	} else {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
+	}
+	if (nameBuffer[0] != '\0') {
+		nameBuffer[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameBuffer[0])));
 	}
 
 	unsigned int textWidth = 0xD8;
@@ -5699,72 +6580,135 @@ void CMenuPcs::CalcFukidashi()
 	font->SetShadow(0);
 	font->SetScale(FLOAT_803313e8);
 	double dVar23 = (double)font->GetWidth(nameBuffer);
+	if (dVar23 > static_cast<double>(static_cast<float>(static_cast<int>(textWidth)))) {
+		strcpy(tempBuf, nameBuffer);
+		char* spacePos = strrchr(tempBuf, 0x20);
+		if (spacePos != NULL) {
+			*spacePos = 0;
+			strcpy(secondLine, spacePos + 1);
+		} else {
+			secondLine[0] = 0;
+		}
+		strcpy(nameBuffer, tempBuf);
+	}
+	dVar23 = (double)fontFC->GetWidth(nameBuffer);
 
-	short sVar15 = 0x4C;
+	int sVar15 = 0x4C;
+	*reinterpret_cast<short*>(BUB() + 0x38) =
+	    static_cast<short>(static_cast<int>(
+	        static_cast<float>(static_cast<double>(FLOAT_80331704) - dVar23) * FLOAT_80331434 +
+	        static_cast<float>(static_cast<int>(*reinterpret_cast<short*>(BUB())))));
 	float fVar2 = FLOAT_803314a4;
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		sVar15 = 0x6C;
 	}
-	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+	if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
 		sVar15 = sVar15 + 0x10;
 	}
 
 	// Set text position
-	bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-	*reinterpret_cast<short*>(bubbleData + 0x72) =
-	    *reinterpret_cast<short*>(bubbleData + 2) + sVar15 - 4;
-
-	// Setup model viewport slots
 	int iVar11 = 6;
 	int iVar9 = 0x1E0;
-	short sVar22 = *reinterpret_cast<short*>(bubbleData) - 0x28;
-	short sVarY = *reinterpret_cast<short*>(bubbleData + 2) - 0x0E;
+	*reinterpret_cast<short*>(BUB() + 0x72) =
+	    *reinterpret_cast<short*>(BUB() + 2) + sVar15;
+	*reinterpret_cast<short*>(BUB() + 0x72) =
+	    *reinterpret_cast<short*>(BUB() + 0x72) - 4;
+
+	// Setup model viewport slots
+	short sVar15b = *reinterpret_cast<short*>(BUB()) - 0x28;
+	short sVar22 = *reinterpret_cast<short*>(BUB() + 2) - 0x0E;
 	int iVar13 = 2;
 	do {
-		int* puVar20 = reinterpret_cast<int*>(worldObj + iVar9);
-		// Initialize 5 viewport slots per iteration
-		for (int k = 0; k < 5; k++) {
-			int* slot = reinterpret_cast<int*>(worldObj + iVar9 + k * 0x50);
-			slot[0] = 0;
-			*reinterpret_cast<short*>(slot + 2) = sVar22;
-			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
-			*reinterpret_cast<short*>(slot + 3) = 0x140;
-			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
-			*reinterpret_cast<float*>(slot + 4) = fVar1;
-			*reinterpret_cast<float*>(slot + 5) = fVar1;
-			*reinterpret_cast<float*>(slot + 6) = fVar2;
-		}
+		int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar9);
+		int iVar19 = iVar9 + 0x50;
+		puVar20[0] = 0;
+		int iVar18 = iVar9 + 0xA0;
+		int iVar17 = iVar9 + 0xF0;
+		int iVar16 = iVar9 + 0x140;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
 		iVar9 = iVar9 + 400;
 		iVar11 = iVar11 + 5;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar19);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar18);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar17);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		puVar20 = reinterpret_cast<int*>(WOBJ() + iVar16);
+		puVar20[0] = 0;
+		*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+		*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+		*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+		*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+		*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+		*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+		fVar2 = FLOAT_803314a4;
+		fVar1 = FLOAT_803313dc;
 		iVar13--;
 	} while (iVar13 != 0);
 
 	// Fill remaining viewport slots
-	int remaining = 0x11 - iVar11;
-	int fillOff = iVar11 * 0x50;
-	if (iVar11 < 0x11) {
+	iVar9 = 0x11 - iVar11;
+	iVar13 = iVar11 * 0x50;
+	if (iVar11 <= 0x10) {
 		do {
-			int* slot = reinterpret_cast<int*>(worldObj + fillOff);
-			fillOff += 0x50;
-			slot[0] = 0;
-			*reinterpret_cast<short*>(slot + 2) = sVar22;
-			*reinterpret_cast<short*>((int)(slot + 2) + 2) = sVarY;
-			*reinterpret_cast<short*>(slot + 3) = 0x140;
-			*reinterpret_cast<short*>((int)(slot + 3) + 2) = 0xE0;
-			*reinterpret_cast<float*>(slot + 4) = fVar1;
-			*reinterpret_cast<float*>(slot + 5) = fVar1;
-			*reinterpret_cast<float*>(slot + 6) = fVar2;
-			remaining--;
-		} while (remaining != 0);
+			int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar13);
+			iVar13 += 0x50;
+			puVar20[0] = 0;
+			*reinterpret_cast<short*>(puVar20 + 2) = sVar15b;
+			*reinterpret_cast<short*>((int)(puVar20 + 2) + 2) = sVar22;
+			*reinterpret_cast<short*>(puVar20 + 3) = 0x140;
+			*reinterpret_cast<short*>((int)(puVar20 + 3) + 2) = 0xE0;
+			*reinterpret_cast<float*>(puVar20 + 4) = fVar1;
+			*reinterpret_cast<float*>(puVar20 + 5) = fVar1;
+			*reinterpret_cast<float*>(puVar20 + 6) = fVar2;
+			iVar9--;
+		} while (iVar9 != 0);
 	}
 
 	// Setup tribe/character model slot
+	fVar2 = FLOAT_8033170c;
+	fVar1 = FLOAT_803313dc;
 	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		int modelIdx;
-		if ((uVar3 & 0x200) == 0) {
+		if ((uVar3 & 0x200) != 0) {
+			if ((char)bytes[0x06] == 1) {
+				modelIdx = 7;
+			} else {
+				modelIdx = 6;
+			}
+		} else {
 			modelIdx = 0;
 			if ((uVar3 & 0x10) == 0) { modelIdx = 1;
 			if ((uVar3 & 0x20) == 0) { modelIdx = 2;
@@ -5772,25 +6716,39 @@ void CMenuPcs::CalcFukidashi()
 			if ((uVar3 & 0x80) == 0) { modelIdx = 4;
 			if ((uVar3 & 0x100) == 0) { modelIdx = 5; }}}}}
 			modelIdx = modelIdx + 0x0C;
-		} else if (bytes[0x06] == 1) {
-			modelIdx = 7;
-		} else {
-			modelIdx = 6;
 		}
 
-		int* puVar20 = reinterpret_cast<int*>(worldObj + modelIdx * 0x50);
+		int* puVar20 = reinterpret_cast<int*>(WOBJ() + modelIdx * 0x50);
 		puVar20[0] = 1;
 		*reinterpret_cast<float*>(puVar20 + 7) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 8) = fVar1;
 		*reinterpret_cast<float*>(puVar20 + 9) = fVar1;
-		*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_8033170c;
-		*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_8033170c;
-		*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_8033170c;
+		*reinterpret_cast<float*>(puVar20 + 0xD) = fVar2;
+		*reinterpret_cast<float*>(puVar20 + 0xE) = fVar2;
+		*reinterpret_cast<float*>(puVar20 + 0xF) = fVar2;
+		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+			*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
+		}
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331714;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+		} else {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331718;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331720);
+		}
 
 		// Spline evaluation for Y position
-		float t = (float)(puVar20[1]) / FLOAT_803314c0;
+		float t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 		float yResult = fVar1;
-		if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+		if (t >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+			yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+		} else {
 			int idx = 0;
 			float* pf = gWmModelYOffsetSpline;
 			int splineCnt = gWmModelYOffsetSplineCount;
@@ -5817,15 +6775,15 @@ void CMenuPcs::CalcFukidashi()
 					splineCnt--;
 				} while (splineCnt != 0);
 			}
-		} else {
-			yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yResult;
 
 		// Spline evaluation for rotation
 		float rotResult = FLOAT_803313dc;
-		t = (float)(puVar20[1]) / FLOAT_803314c0;
-		if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+		t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
+		if (t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+			rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+		} else {
 			int idx = 0;
 			float* pf = gWmModelRotationSpline;
 			int splineCnt = gWmModelRotationSplineCount;
@@ -5852,8 +6810,6 @@ void CMenuPcs::CalcFukidashi()
 					splineCnt--;
 				} while (splineCnt != 0);
 			}
-		} else {
-			rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotResult;
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
@@ -5876,8 +6832,8 @@ void CMenuPcs::CalcFukidashi()
 		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
-		if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
+		    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
 			puVar20[1] = 0;
 		}
 	}
@@ -5897,7 +6853,7 @@ void CMenuPcs::CalcFukidashi()
 		int slotIdx = 0;
 		for (int padIdx = 0; padIdx < 4; padIdx++) {
 			if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << padIdx)) != 0) {
-				int* puVar20 = reinterpret_cast<int*>(worldObj + (padIdx + 8) * 0x50);
+				int* puVar20 = reinterpret_cast<int*>(WOBJ() + (padIdx + 8) * 0x50);
 				puVar20[0] = 1;
 				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331728;
 				if (slotIdx == 0) {
@@ -5909,18 +6865,27 @@ void CMenuPcs::CalcFukidashi()
 				} else {
 					*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
 				}
-				if (bytes[0x08] == 2 || bytes[0x08] == 3) {
-					*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) - (float)DOUBLE_80331738;
+				if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
+					if (padIdx == 0 && playerCount == 1) {
+						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331730);
+					} else {
+						*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+						    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) - DOUBLE_80331738);
+					}
 				}
 				*reinterpret_cast<float*>(puVar20 + 9) = FLOAT_803313dc;
-				*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_80331740;
-				*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_80331740;
-				*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_80331740;
+				float f740 = FLOAT_80331740;
+				*reinterpret_cast<float*>(puVar20 + 0xD) = f740;
+				*reinterpret_cast<float*>(puVar20 + 0xE) = f740;
+				*reinterpret_cast<float*>(puVar20 + 0xF) = f740;
 
 				// Spline Y for player models
-				float t2 = (float)(puVar20[1]) / FLOAT_803314c0;
+				float t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 				float yRes2 = FLOAT_803313dc;
-				if (t2 < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+				if (t2 >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+					yRes2 = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+				} else {
 					int si = 0;
 					float* spf = gWmModelYOffsetSpline;
 					int sc = gWmModelYOffsetSplineCount;
@@ -5947,15 +6912,15 @@ void CMenuPcs::CalcFukidashi()
 							sc--;
 						} while (sc != 0);
 					}
-				} else {
-					yRes2 = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yRes2;
 
 				// Spline rotation for player models
 				float rotRes2 = FLOAT_803313dc;
-				t2 = (float)(puVar20[1]) / FLOAT_803314c0;
-				if (t2 < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+				t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
+				if (t2 >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+					rotRes2 = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+				} else {
 					int si = 0;
 					float* spf = gWmModelRotationSpline;
 					int sc = gWmModelRotationSplineCount;
@@ -5982,8 +6947,6 @@ void CMenuPcs::CalcFukidashi()
 							sc--;
 						} while (sc != 0);
 					}
-				} else {
-					rotRes2 = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotRes2;
 				if (playerCount == 1) {
@@ -6009,14 +6972,16 @@ void CMenuPcs::CalcFukidashi()
 				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
-				if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-				    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
+				if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
+				    static_cast<double>(static_cast<float>(static_cast<double>(puVar20[1])))) {
 					puVar20[1] = 0;
 				}
 				slotIdx++;
 			}
 		}
 	}
+#undef BUB
+#undef WOBJ
 }
 
 /*
@@ -6031,83 +6996,84 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const bubbleData = m_wm.m_bubbleData;
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	Mtx m_cameraMatrix;
-	CFont* fontFC = m_fonts[1];
-	if (bytes[0x09] != 1) {
+	Mtx& cameraBackup = *reinterpret_cast<Mtx*>(bytes + 0x744);
+	CFont* const fontFC = m_fonts[1];
+	if (static_cast<signed char>(bytes[0x09]) != 1) {
 		return;
 	}
 
 	int texMode;
-	if (bytes[0x08] == 0 || bytes[0x08] == 2) {
+	if (static_cast<signed char>(bytes[0x08]) == 0 || static_cast<signed char>(bytes[0x08]) == 2) {
 		texMode = 0;
 	} else {
 		texMode = 8;
 	}
 
-	SetAttrFmt((FMT)0);
-	unsigned int color = 0xFFFFFFFF;
-	GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&color);
-	SetTexture((TEX)0x18);
+	MenuPcs.SetAttrFmt((FMT)0);
+	GXColor matColor;
+	matColor.r = 0xFF;
+	matColor.g = 0xFF;
+	matColor.b = 0xFF;
+	matColor.a = 0xFF;
+	GXSetChanMatColor(GX_COLOR0A0, matColor);
+	MenuPcs.SetTexture((TEX)0x18);
 
-	short* bubData = reinterpret_cast<short*>(bubbleData);
-	DrawRect(0xFFFFFFFF, 
+	short* bubData = reinterpret_cast<short*>(m_wm.m_bubbleData);
+	MenuPcs.DrawRect(texMode,
 		(float)(int)bubData[0], (float)(int)bubData[1],
 		(float)(int)bubData[2], (float)(int)bubData[3],
 		*reinterpret_cast<float*>(bubData + 4), *reinterpret_cast<float*>(bubData + 6),
-		FLOAT_803313e8, FLOAT_803313e8, (float)texMode);
+		FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
-	unsigned int uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
-	if ((uVar3 & 0x3F0) != 0) {
-		int bd = reinterpret_cast<int>(bubbleData);
-		DrawRect(0xFFFFFFFF, 
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
+		int bd = reinterpret_cast<int>(m_wm.m_bubbleData);
+		MenuPcs.DrawRect(0,
 			(float)*reinterpret_cast<short*>(bd + 0x1C), (float)*reinterpret_cast<short*>(bd + 0x1E),
 			(float)*reinterpret_cast<short*>(bd + 0x20), (float)*reinterpret_cast<short*>(bd + 0x22),
 			*reinterpret_cast<float*>(bd + 0x24), *reinterpret_cast<float*>(bd + 0x28),
-			FLOAT_803313e8, FLOAT_803313e8, 0);
+			FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
-	uVar3 = (unsigned int)*reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned int uVar3 = (unsigned int)*reinterpret_cast<short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0 && (uVar3 & 0x1FF) != 0) {
-		if ((uVar3 & 0xF) == 0) {
+		if ((uVar3 & 0xF) != 0) {
+			int iVar5 = 0;
+			int iVar9 = 0;
+			while (iVar5 < 4 && iVar9 < 2) {
+				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar5)) != 0) {
+					MenuPcs.SetTexture((TEX)(iVar5 + 0x19));
+					short* psVar4;
+					if (iVar9 == 0) {
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x38);
+					} else {
+						psVar4 = reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x54);
+					}
+					MenuPcs.DrawRect(0,
+						(float)(int)psVar4[0], (float)(int)psVar4[1],
+						(float)(int)psVar4[2], (float)(int)psVar4[3],
+						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),
+						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+					iVar9++;
+				}
+				iVar5++;
+			}
+		} else {
 			int idx = 0;
 			int cnt = 5;
 			do {
 				if ((uVar3 & (0x10 << idx)) != 0) {
-					SetTexture((TEX)(idx + 0x19));
-					int bd = reinterpret_cast<int>(bubbleData);
-					DrawRect(0xFFFFFFFF, 
+					MenuPcs.SetTexture((TEX)(idx + 0x19));
+					int bd = *reinterpret_cast<int*>(bytes + 0x818);
+					MenuPcs.DrawRect(0,
 						(float)*reinterpret_cast<short*>(bd + 0x38), (float)*reinterpret_cast<short*>(bd + 0x3A),
 						(float)*reinterpret_cast<short*>(bd + 0x3C), (float)*reinterpret_cast<short*>(bd + 0x3E),
 						*reinterpret_cast<float*>(bd + 0x40), *reinterpret_cast<float*>(bd + 0x44),
-						FLOAT_803313e8, FLOAT_803313e8, 0);
+						FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					break;
 				}
 				idx++;
 				cnt--;
 			} while (cnt != 0);
-		} else {
-			int iVar9 = 0;
-			int iVar5 = 0;
-			while (iVar5 < 4 && iVar9 < 2) {
-				if (((int)*reinterpret_cast<short*>(bytes + 0x1A) & (1 << iVar5)) != 0) {
-					SetTexture((TEX)(iVar5 + 0x19));
-					short* psVar4;
-					if (iVar9 == 0) {
-						psVar4 = reinterpret_cast<short*>(bubbleData + 0x38);
-					} else {
-						psVar4 = reinterpret_cast<short*>(bubbleData + 0x54);
-					}
-					DrawRect(0xFFFFFFFF, 
-						(float)(int)psVar4[0], (float)(int)psVar4[1],
-						(float)(int)psVar4[2], (float)(int)psVar4[3],
-						*reinterpret_cast<float*>(psVar4 + 4), *reinterpret_cast<float*>(psVar4 + 6),
-						FLOAT_803313e8, FLOAT_803313e8, 0);
-					iVar9++;
-				}
-				iVar5++;
-			}
 		}
 	}
 
@@ -6115,34 +7081,50 @@ void CMenuPcs::DrawFukidashi()
 	char nameBuffer[68];
 	int fieldVal = (int)(char)bytes[0x07];
 	if (fieldVal == 0x0F) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_gameWork.m_townName);
+		const int language = Game.m_gameWork.m_languageId;
+		if (language == 2) {
+			strcpy(nameBuffer, Game.m_gameWork.m_townName);
+			strcat(nameBuffer, lbl_80210D10[language - 1], sizeof(nameBuffer));
+		} else {
+			strcpy(nameBuffer, lbl_80210D10[language - 1]);
+			strcat(nameBuffer, Game.m_gameWork.m_townName, sizeof(nameBuffer));
+		}
 	} else {
-		strcpy(nameBuffer, "");
+		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
+	}
+	if (nameBuffer[0] != 0) {
+		nameBuffer[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameBuffer[0])));
 	}
 
-	unsigned int textW = 0xD8;
+	int textW = 0xD8;
+	char tempBuf[64];
 	char secondLine[64];
 	secondLine[0] = 0;
-	CFont* font = m_fonts[1];
+	CFont* const font = m_fonts[1];
 	if (*reinterpret_cast<short*>(bytes + 0x1A) != 0) {
 		textW = 0xA2;
 	}
-	fontFC->SetMargin(FLOAT_803313e8);
-	fontFC->SetShadow(0);
-	fontFC->SetScale(FLOAT_803313e8);
-	double nameWidth = (double)fontFC->GetWidth(nameBuffer);
-	bool twoLines = nameWidth > (double)(float)textW;
-	if (twoLines) {
-		char tempBuf[64];
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_803313e8);
+	double nameWidth = (double)font->GetWidth(nameBuffer);
+	int twoLines;
+	if (nameWidth > (double)(float)textW) {
+		twoLines = 1;
+	} else {
+		twoLines = 0;
+	}
+	if (twoLines != 0) {
 		strcpy(tempBuf, nameBuffer);
 		char* spacePos = strrchr(tempBuf, 0x20);
-		if (spacePos == NULL) {
-			secondLine[0] = 0;
-		} else {
+		if (spacePos != NULL) {
 			*spacePos = 0;
 			strcpy(secondLine, spacePos + 1);
+		} else {
+			secondLine[0] = 0;
 		}
 		strcpy(nameBuffer, tempBuf);
 	}
@@ -6151,45 +7133,48 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
 	fontFC->DrawInit();
-	unsigned int whiteColor = 0xFFFFFFFF;
-	fontFC->SetColor(*(_GXColor*)&whiteColor);
-	fontFC->SetPosX((float)*reinterpret_cast<short*>(bubbleData + 0x70));
-	fontFC->SetPosY((float)*reinterpret_cast<short*>(bubbleData + 0x72));
+	CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
+	fontFC->SetColor(whiteColor.color);
+	fontFC->SetPosX((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x70));
+	fontFC->SetPosY((float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72));
 	fontFC->Draw(nameBuffer);
 
-	if (twoLines) {
-		double w2 = (double)fontFC->GetWidth(secondLine);
-		fontFC->SetPosX((float)((double)FLOAT_80331704 - w2) * FLOAT_80331434 +
-		                (float)*reinterpret_cast<short*>(bubbleData));
-		fontFC->SetPosY((float)(*reinterpret_cast<short*>(bubbleData + 0x72) + 0x16));
+	if (twoLines != 0) {
+		strcpy(nameBuffer, "");
+		float w2 = fontFC->GetWidth(secondLine);
+		fontFC->SetPosX((FLOAT_80331704 - w2) * FLOAT_80331434 +
+		                (float)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818)));
+		fontFC->SetPosY((float)(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x818) + 0x72) + 0x16));
 		fontFC->Draw(secondLine);
 	}
 
 	DrawInit();
 
 	// 3D viewport rendering
-	bool viewportSetup = false;
-	if ((*reinterpret_cast<unsigned short*>(bytes + 0x1A) & 0x3F0) != 0) {
+	int viewportSetup = 0;
+	if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x3F0) != 0) {
 		int viewOff = 0x1E0;
-		for (int slot = 6; slot < 0x11; slot++) {
-			int* piVar10 = reinterpret_cast<int*>(worldObj + viewOff);
+		int effOff = 0x1ED8;
+		for (int slot = 6; slot <= 0x10; slot++) {
+			int* piVar10 = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x814) + viewOff);
 			if (*piVar10 != 0) {
-				if (!viewportSetup) {
+				if (viewportSetup == 0) {
 					Mtx44 projMtx;
 					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
+					PSMTX44Copy(projMtx, CameraPcs.m_screenMatrix);
 
-					Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-					Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, &eye, &up, (Vec*)(piVar10 + 4));
-					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4), (Vec*)&up, (Vec*)&eye);
+					PSMTXCopy(CameraPcs.m_cameraMatrix, cameraBackup);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
 					GXSetAlphaUpdate(0);
-					unsigned int clearColor = 0;
-					GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+					CColor clearColor(0, 0, 0, 0);
+					GXSetCopyClear(clearColor.color, 0xFFFFFF);
 					GXSetColorUpdate(1);
 					GXSetAlphaUpdate(1);
 
@@ -6200,25 +7185,40 @@ void CMenuPcs::DrawFukidashi()
 						(float)*reinterpret_cast<short*>((int)(piVar10 + 3) + 2),
 						FLOAT_803313dc, FLOAT_803313e8);
 					GXSetScissor(piVar10[0x10], piVar10[0x11], piVar10[0x12], piVar10[0x13]);
-					viewportSetup = true;
+					viewportSetup = 1;
 				}
 				Graphic.SetFog(1, 0);
-				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
-				LightPcs.SetAmbient(lightTable.m_ambient);
-				LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
-				for (int j = 0; j < lightTable.m_diffuseCount; j++) {
+				LightPcs.SetAmbient(gWmMenuLightTables[0].m_ambient);
+				LightPcs.SetNumDiffuse(gWmMenuLightTables[0].m_diffuseCount);
+				for (int j = 0; j < gWmMenuLightTables[0].m_diffuseCount; j++) {
 					LightPcs.SetDiffuse(
-						j, lightTable.m_diffuseColors[j],
-						&lightTable.m_diffuseDirs[j], 0);
+						j, gWmMenuLightTables[0].m_diffuseColors[j],
+						&gWmMenuLightTables[0].m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				m_wm.m_handles[slot]->Draw(5);
+				if (slot != 6) {
+					int* effData = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + effOff);
+					int a = effData[0];
+					int b = effData[2];
+					if (a >= 0 && b >= 0) {
+						PartPcs.DrawMenu(a);
+					}
+				}
 			}
 			viewOff += 0x50;
+			effOff += 0x524;
 		}
 	}
 
-	if (viewportSetup) {
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+	if (viewportSetup != 0) {
+		PSMTXCopy(cameraBackup, CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
+		Mtx44 screenCopy;
+		PSMTX44Copy(CameraPcs.m_screenMatrix, screenCopy);
+		GXSetProjection(screenCopy, GX_PERSPECTIVE);
+		Graphic.SetViewport();
+		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
 }
@@ -6334,60 +7334,66 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
+	int wmFrame;
 	if (sVar3 == 2 && bytes[0x13] != 0) {
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
 			*reinterpret_cast<int*>(wmFrame + 4) = 0;
 		}
 	} else {
 		if ((bytes[0x0A] & 1) != 0) {
+			wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 			int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
 			if (iVar16 != 0) {
 				*reinterpret_cast<int*>(wmFrame + 4) = iVar16 - 1;
+				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 				if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
 					*reinterpret_cast<int*>(wmFrame + 4) = 0;
 				}
+				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 				if (*reinterpret_cast<int*>(wmFrame + 4) == 0) {
-					bytes[0x0A] = bytes[0x0A] & 0xFE;
+					bytes[0x0A] = bytes[0x0A] & ~1;
 				}
 				goto LAB_calc;
 			}
 		}
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
 		if (iVar16 < 10) {
 			*reinterpret_cast<int*>(wmFrame + 4) = iVar16 + 1;
 		}
 	}
 LAB_calc:
-	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x98) = 0x68;
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;
-	*reinterpret_cast<short*>(wmFrame + 0x9C) = 200;
-	*reinterpret_cast<short*>(wmFrame + 0x9E) = 0x28;
-	*reinterpret_cast<float*>(wmFrame + 0xA0) = fVar1;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9A) = 0x14;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9C) = 200;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9E) = 0x28;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA0) = fVar1;
 
-	if ((bytes[0x0A] & 1) == 0) {
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
-		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
+	if ((bytes[0x0A] & 1) != 0) {
+		int frameA = reinterpret_cast<int>(m_wm.m_frameData);
+		int yOff = (int)*reinterpret_cast<short*>(frameA + 0x9E) * (int)(char)bytes[0x05];
+		*reinterpret_cast<float*>(frameA + 0xA4) = (float)yOff;
 	} else {
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x05];
-		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
+		int frameA = reinterpret_cast<int>(m_wm.m_frameData);
+		int yOff = (int)*reinterpret_cast<short*>(frameA + 0x9E) * (int)(char)bytes[0x04];
+		*reinterpret_cast<float*>(frameA + 0xA4) = (float)yOff;
 	}
 
+	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	*reinterpret_cast<short*>(wmFrame + 0x98) =
-	    (short)(10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
+	    (10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
-	     (worldState->m_mainState == 2 && bytes[0x13] != 0))
-	    && *reinterpret_cast<int*>(wmFrame + 8) > 9) {
-		*reinterpret_cast<int*>(wmFrame + 8) = 0;
-		bytes[0x0A] = bytes[0x0A] & 0xFD;
+	     (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0))
+	    && *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) >= 10) {
+		*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) = 0;
+		bytes[0x0A] = bytes[0x0A] & ~2;
 	}
 
-	fVar1 = FLOAT_803313e8;
 	char cVar2;
 	if ((bytes[0x0A] & 2) != 0) {
 		cVar2 = (char)bytes[0x0B];
@@ -6400,27 +7406,32 @@ LAB_calc:
 		gWmMenuScriptValueCache = 100;
 	}
 
-	unsigned int uVar14 = 1 - ((int)(((int)(uVar13 ^ 9) >> 1) - ((uVar13 ^ 9) & uVar13)) >> 0x1F);
+	int uVar14 = ((unsigned int)(((int)(uVar13 ^ 9) >> 1) - (int)((uVar13 ^ 9) & uVar13)) >> 0x1F) + 1;
 	if ((int)uVar13 > 99) {
 		uVar14 = 3;
 	}
 
-	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-	*reinterpret_cast<float*>(wmFrame + 200) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(wmFrame + 0xE4) = fVar1;
+	float fE8 = FLOAT_803313e8;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 200) = fE8;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE4) = fE8;
 
+	const double dV12 = DOUBLE_80331540;
+	const double dV11 = DOUBLE_80331538;
+	const float fV4 = FLOAT_80331528;
+	const float fV1 = FLOAT_80331524;
+	const double dV10 = DOUBLE_80331490;
 	int iVar16 = DAT_801dc140;
 	if (uVar14 == 3) {
-		*reinterpret_cast<short*>(wmFrame + 0xB4) = (short)((0x2B - DAT_801dc140) / 2) + 0x2C;
-		*reinterpret_cast<short*>(wmFrame + 0xB6) = 0x43;
-		*reinterpret_cast<short*>(wmFrame + 0xB8) = (short)iVar16;
-		*reinterpret_cast<short*>(wmFrame + 0xBA) = 0x20;
-		*reinterpret_cast<float*>(wmFrame + 0xBC) = FLOAT_80331524;
-		*reinterpret_cast<float*>(wmFrame + 0xC0) = FLOAT_80331528;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB4) = (0x2B - DAT_801dc140) / 2 + 0x2C;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) = 0x43;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB8) = (short)iVar16;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBA) = 0x20;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBC) = fV1;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC0) = fV4;
 	} else {
 		int digits[4];
 		iVar16 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);
-		digits[0] = uVar13 + (iVar16 - (iVar16 >> 0x1F)) * -10;
+		digits[0] = uVar13 - (iVar16 - (iVar16 >> 0x1F)) * 10;
 		if (1 < uVar14) {
 			digits[1] = iVar16 - (iVar16 >> 0x1F);
 		}
@@ -6433,21 +7444,21 @@ LAB_calc:
 		int iVar15 = (0x2B - iVar16) / 2 + 0x2C;
 		int off = iVar19 * 0x1C;
 		int* piVar17 = digits + iVar19;
-		unsigned int cnt = uVar14;
+		int cnt = iVar19 + 1;
 		if (iVar19 >= 0) {
 			do {
 				int digit = *piVar17;
-				*reinterpret_cast<short*>(wmFrame + off + 0xB4) = (short)iVar15;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB4) = (short)iVar15;
 				int digitW = DAT_801dc118[digit];
 				piVar17--;
 				int iVar21 = digit / 5 + (digit >> 0x1F);
-				*reinterpret_cast<short*>(wmFrame + off + 0xB6) = 0x43;
-				*reinterpret_cast<short*>(wmFrame + off + 0xB8) = (short)digitW;
-				*reinterpret_cast<short*>(wmFrame + off + 0xBA) = 0x20;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB6) = 0x43;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB8) = (short)digitW;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBA) = 0x20;
 				int col = digit + (iVar21 - (iVar21 >> 0x1F)) * -5;
 				int row = iVar21 - (iVar21 >> 0x1F);
-				*reinterpret_cast<float*>(wmFrame + off + 0xBC) = (float)((double)col * DOUBLE_80331490);
-				*reinterpret_cast<float*>(wmFrame + off + 0xC0) = (float)((double)row * DOUBLE_80331540 + DOUBLE_80331538);
+				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBC) = (float)(dV10 * (double)(float)col);
+				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC0) = (float)(dV12 * (double)(float)row + dV11);
 				iVar15 = iVar15 + digitW;
 				off = off - 0x1C;
 				cnt--;
@@ -6455,96 +7466,105 @@ LAB_calc:
 		}
 	}
 
-	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-	if ((bytes[0x0A] & 2) == 0 &&
-	    (worldState->m_mainState != 2 || bytes[0x13] == 0)) {
-		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(wmFrame + 8);
-		float t = (float)(uVar) / FLOAT_803314c0;
+	if ((bytes[0x0A] & 2) != 0 ||
+	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
+		int i = 0;
+		int off = 0;
+		int cnt = uVar14;
+		const double dC0 = DOUBLE_80331408;
+		const double dE8 = DOUBLE_803316e8;
+		const double dF8 = DOUBLE_803313f8;
+		for (; cnt != 0; cnt--, i++, off += 0x1C) {
+			if (i != 0 && uVar14 != 2) {
+				break;
+			}
+			int base = reinterpret_cast<int>(m_wm.m_frameData);
+			float fVar1 = static_cast<float>(
+			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(base + 8))) / dE8);
+			*reinterpret_cast<float*>(base + off + 0xC4) = fVar1;
+			*reinterpret_cast<float*>(base + off + 200) =
+			    static_cast<float>(dF8 * static_cast<double>(fVar1) + dF8);
+
+			int entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+			float prodBA = static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) *
+			               *reinterpret_cast<float*>(entry + 200);
+			*reinterpret_cast<short*>(entry + 0xB6) =
+			    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB6) +
+			                       static_cast<int>(
+			                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) -
+			                           prodBA));
+
+			if (i == 0 && (uVar14 == 1 || uVar14 == 3)) {
+				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+				float prodB8a = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
+				               *reinterpret_cast<float*>(entry + 200);
+				*reinterpret_cast<short*>(entry + 0xB4) =
+				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
+				                       static_cast<int>(static_cast<float>(
+				                           (DOUBLE_80331420 +
+				                            static_cast<double>(
+				                                static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
+				                                prodB8a)) *
+				                           DOUBLE_803313f8)));
+			} else if (i != 0) {
+				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+				float prodB8b = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
+				               *reinterpret_cast<float*>(entry + 200);
+				*reinterpret_cast<short*>(entry + 0xB4) =
+				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
+				                       static_cast<int>(
+				                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
+				                           prodB8b));
+			}
+		}
+		int wmEnd = reinterpret_cast<int>(m_wm.m_frameData);
+		*reinterpret_cast<int*>(wmEnd + 8) = *reinterpret_cast<int*>(wmEnd + 8) + 1;
+	} else {
+		const double dE8 = DOUBLE_803316e8;
+		const double dC0 = DOUBLE_80331408;
+		const double dF8 = DOUBLE_803313f8;
+		const float fDc = FLOAT_803313dc;
+		int base = reinterpret_cast<int>(m_wm.m_frameData);
+		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(base + 8);
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <
-		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(DAT_8032e8c4[DAT_8032e8c0 * 4 - 4])) &&
-		    t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
-			int idx = 0;
-			float* pf = DAT_8032e8c4;
-			int cnt = DAT_8032e8c0;
-			float result = FLOAT_803313dc;
-			if (cnt > 0) {
-				do {
+		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(s_YearTrns.data[s_YearTrns.count * 4 - 4]))) {
+			float t = (float)(uVar) / FLOAT_803314c0;
+			float fVar5 = fDc;
+			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				float* pf = s_YearTrns.data;
+				int cnt = s_YearTrns.count;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
 					if (t <= *pf) {
 						if (idx == 0) {
-							result = DAT_8032e8c4[1];
+							fVar5 = s_YearTrns.data[1];
 						} else {
-							float* cur = DAT_8032e8c4 + idx * 4;
-							float* prev = DAT_8032e8c4 + (idx - 1) * 4;
+							float* cur = s_YearTrns.data + idx * 4;
+							float* prev = s_YearTrns.data + (idx - 1) * 4;
 							float dt = *cur - *prev;
 							float u = (t - *prev) / dt;
 							float u2 = u * u;
 							float u3 = u2 * u;
-							result = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
-							         prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
-					pf += 4;
-					idx++;
-					cnt--;
-				} while (cnt != 0);
+				}
+			} else {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
-			*reinterpret_cast<short*>(wmFrame + 0xD2) =
-			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xD2) + static_cast<short>(static_cast<int>(result)));
-			*reinterpret_cast<float*>(wmFrame + 0xE0) = result;
-		}
+			*reinterpret_cast<short*>(base + 0xD2) =
+			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
-		if (uVar14 == 2) {
-			uVar -= 5;
-		}
-		t = (float)(uVar) / FLOAT_803314c0;
-		if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
-			int idx = 0;
-			float* pf = DAT_8032e8c4;
-			int cnt = DAT_8032e8c0;
-			float result = FLOAT_803313dc;
-			if (cnt > 0) {
-				do {
+			float fVar1 = fDc;
+			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				float* pf = DAT_8032e8cc;
+				int cnt = DAT_8032e8c8;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
 					if (t <= *pf) {
 						if (idx == 0) {
-							result = DAT_8032e8c4[1];
-						} else {
-							float* cur = DAT_8032e8c4 + idx * 4;
-							float* prev = DAT_8032e8c4 + (idx - 1) * 4;
-							float dt = *cur - *prev;
-							float u = (t - *prev) / dt;
-							float u2 = u * u;
-							float u3 = u2 * u;
-							result = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
-							         prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-						}
-						break;
-					}
-					pf += 4;
-					idx++;
-					cnt--;
-				} while (cnt != 0);
-			}
-			*reinterpret_cast<short*>(wmFrame + 0xB6) =
-			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xB6) + static_cast<short>(static_cast<int>(result)));
-		} else {
-			*reinterpret_cast<short*>(wmFrame + 0xB6) =
-			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xB6) +
-			                       static_cast<short>(static_cast<int>(DAT_8032e8c4[DAT_8032e8c0 * 4 - 3])));
-		}
-
-		float alphaResult = FLOAT_803313dc;
-		if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
-			int idx = 0;
-			float* pf = DAT_8032e8cc;
-			int cnt = DAT_8032e8c8;
-			if (cnt > 0) {
-				do {
-					if (t <= *pf) {
-						if (idx == 0) {
-							alphaResult = DAT_8032e8cc[1];
+							fVar1 = DAT_8032e8cc[1];
 						} else {
 							float* cur = DAT_8032e8cc + idx * 4;
 							float* prev = DAT_8032e8cc + (idx - 1) * 4;
@@ -6552,25 +7572,80 @@ LAB_calc:
 							float u = (t - *prev) / dt;
 							float u2 = u * u;
 							float u3 = u2 * u;
-							alphaResult = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
-							              prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
-							              cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
-					pf += 4;
-					idx++;
-					cnt--;
-				} while (cnt != 0);
+				}
+			} else {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
 			}
-		} else {
-			alphaResult = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
-		}
-		*reinterpret_cast<float*>(wmFrame + 0xC4) = alphaResult;
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE0) = fVar1;
 
-		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
-	} else {
-		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
+			fVar1 = fDc;
+			if (uVar14 == 2) {
+				uVar -= 5;
+			}
+			t = (float)(uVar) / FLOAT_803314c0;
+			fVar5 = fDc;
+			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				float* pf = s_YearTrns.data;
+				int cnt = s_YearTrns.count;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar5 = s_YearTrns.data[1];
+						} else {
+							float* cur = s_YearTrns.data + idx * 4;
+							float* prev = s_YearTrns.data + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+						}
+						break;
+					}
+				}
+			} else {
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
+			}
+			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
+			    static_cast<short>(static_cast<int>(
+			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
+
+			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+				float* pf = DAT_8032e8cc;
+				int cnt = DAT_8032e8c8;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar1 = DAT_8032e8cc[1];
+						} else {
+							float* cur = DAT_8032e8cc + idx * 4;
+							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
+						}
+						break;
+					}
+				}
+			} else {
+				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+			}
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC4) = fVar1;
+			*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) =
+			    *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) + 1;
+		}
 	}
 }
 
@@ -6585,43 +7660,39 @@ LAB_calc:
  */
 void CMenuPcs::DrawWMFrame()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-
-	float rotation = worldState->m_posX * FLOAT_803314bc;
-	Mtx rotMtx;
-	PSMTXRotRad(rotMtx, 'z', rotation);
-
-	short sVar = worldState->m_mainState;
+	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
-		worldState->m_posX -= FLOAT_80331550;
-		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
-			worldState->m_posX = FLOAT_803313dc;
+		m_wmWorldState->m_posX -= FLOAT_80331550;
+		if (static_cast<double>(m_wmWorldState->m_posX) <= DOUBLE_803314f0) {
+			m_wmWorldState->m_posX = FLOAT_803313dc;
 		}
-		alpha = static_cast<float>(DOUBLE_803316d8 *
-		                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		alpha = static_cast<float>(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter));
 	} else if (sVar == 3) {
-		worldState->m_posX += FLOAT_80331550;
-		if (DOUBLE_803316e0 <= static_cast<double>(worldState->m_posX)) {
-			worldState->m_posX = FLOAT_80331440;
+		m_wmWorldState->m_posX += FLOAT_80331550;
+		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
+			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
-		alpha = static_cast<float>(-(DOUBLE_803316d8 *
-		                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		alpha = static_cast<float>(-(DOUBLE_803316d8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 		                             DOUBLE_80331508));
 	} else {
 		alpha = FLOAT_80331458;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	Mtx rotMtx;
+	PSMTXRotRad(rotMtx, 'z', m_wmWorldState->m_posX * FLOAT_803314bc);
+	rotMtx[0][3] = FLOAT_803315b0;
+	rotMtx[1][3] = FLOAT_803315b4;
+	rotMtx[2][3] = FLOAT_803313dc;
+
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alpha))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
-	for (int i = 0; i < 5; i++) {
-		int off = wmFrame + 0x0C + i * 0x1C;
-		DrawRect2(
+	for (int i = 0, fieldOff = 0x0C; i < 5; i++, fieldOff += 0x1C) {
+		int off = reinterpret_cast<int>(m_wm.m_frameData) + fieldOff;
+		MenuPcs.DrawRect2(
 			0,
 			static_cast<float>(*reinterpret_cast<short*>(off)) - FLOAT_803315b0,
 			static_cast<float>(*reinterpret_cast<short*>(off + 2)) - FLOAT_803315b4,
@@ -6634,54 +7705,70 @@ void CMenuPcs::DrawWMFrame()
 			rotMtx);
 	}
 
-	unsigned int uAlpha = static_cast<unsigned int>(alpha);
-	if (sVar != 0 && sVar < 4) {
-		SetAttrFmt((FMT)0);
-		SetTexture((TEX)0x17);
-		int gaugeAlpha = *reinterpret_cast<int*>(wmFrame + 4);
-		DrawRect(0xFFFFFFFF, 
-			(float)*reinterpret_cast<short*>(wmFrame + 0x98),
-			(float)*reinterpret_cast<short*>(wmFrame + 0x9A),
-			(float)*reinterpret_cast<short*>(wmFrame + 0x9C),
-			(float)*reinterpret_cast<short*>(wmFrame + 0x9E),
-			*reinterpret_cast<float*>(wmFrame + 0xA0),
-			FLOAT_803313dc,
+	short sVar2 = m_wmWorldState->m_mainState;
+	if (sVar2 != 0 && sVar2 <= 3) {
+		MenuPcs.SetTexture((TEX)0x17);
+		union {
+			double d;
+			struct {
+				unsigned int hi;
+				unsigned int lo;
+			} u;
+		} gaugeConv;
+		gaugeConv.u.hi = 0x43300000;
+		gaugeConv.u.lo = static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 4)) ^ 0x80000000;
+		unsigned char gaugeAlpha = static_cast<unsigned char>(static_cast<int>(
+		    DOUBLE_80331508 *
+		    ((gaugeConv.d - DOUBLE_80331408) /
+		     DOUBLE_803316e8)));
+		GXColor gaugeColor = {0xFF, 0xFF, 0xFF, gaugeAlpha};
+		GXSetChanMatColor(static_cast<GXChannelID>(4), gaugeColor);
+		MenuPcs.DrawRect(0,
+			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x98),
+			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9A),
+			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9C),
+			(float)*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0x9E),
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA0),
+			*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xA4),
 			FLOAT_803313e8,
 			FLOAT_803313e8,
-			gaugeAlpha);
+			0);
 
-		if (sVar < 3) {
-			const unsigned int language = Game.m_gameWork.m_languageId;
-			SetAttrFmt((FMT)0);
+		if (m_wmWorldState->m_mainState <= 2) {
+			const int language = Game.m_gameWork.m_languageId;
+			MenuPcs.SetAttrFmt((FMT)0);
 			GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-			SetTexture((TEX)0x21);
-			float yearY = FLOAT_803316F4;
-			if (language == 5) {
-				yearY = FLOAT_803316F8;
-			}
-			DrawRect(0xFFFFFFFF, 
+			MenuPcs.SetTexture((TEX)0x21);
+			float yearY = language != 5 ? FLOAT_803316F4 : FLOAT_803316F8;
+			MenuPcs.DrawRect(0,
 				FLOAT_803316F0, yearY,
 				FLOAT_80331440, FLOAT_80331558,
 				FLOAT_803313dc, FLOAT_803313dc,
 				FLOAT_803313e8, FLOAT_803313e8,
 				0);
 
-			int digitCnt = 1;
-			unsigned int lvl = (unsigned int)gWmMenuScriptValueCache;
-			if (lvl > 99) digitCnt = 3;
-			else if (lvl > 9) digitCnt = 2;
-			const int languageYOffset = language == 5 ? 0xE : 0;
+			MenuPcs.SetAttrFmt((FMT)0);
+			MenuPcs.SetTexture((TEX)0x17);
+
+			unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+			int dispValue =
+			    bytes[0xA] & 2
+			        ? *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xB])
+			        : *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0) + static_cast<signed char>(bytes[0xC]);
+			int digitCnt = (dispValue > 9) + 1;
+			if (dispValue > 99) {
+				digitCnt = 3;
+			}
+			const int languageYOffset = language != 5 ? 0 : 0xE;
 
 			if (digitCnt == 3) {
-				int off = wmFrame + 0xB4;
+				int off = reinterpret_cast<int>(m_wm.m_frameData) + 0xB4;
 				unsigned char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
 				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
 				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-				SetAttrFmt((FMT)0);
-				SetTexture((TEX)0x20);
-				DrawRect(0xFFFFFFFF, 
+				MenuPcs.DrawRect(0,
 					(float)*reinterpret_cast<short*>(off),
 					(float)(*reinterpret_cast<short*>(off + 2) + languageYOffset),
 					(float)*reinterpret_cast<short*>(off + 4),
@@ -6693,14 +7780,12 @@ void CMenuPcs::DrawWMFrame()
 					0);
 			} else {
 				for (int i = 0; i < (int)digitCnt; i++) {
-					int off = wmFrame + 0xB4 + i * 0x1C;
+					int off = reinterpret_cast<int>(m_wm.m_frameData) + 0xB4 + i * 0x1C;
 					unsigned char alphaU8 =
 					    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
 					GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
 					GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-					SetAttrFmt((FMT)0);
-					SetTexture((TEX)0x1F);
-					DrawRect(0xFFFFFFFF, 
+					MenuPcs.DrawRect(0,
 						(float)*reinterpret_cast<short*>(off),
 						(float)(*reinterpret_cast<short*>(off + 2) + languageYOffset),
 						(float)*reinterpret_cast<short*>(off + 4),
@@ -6714,18 +7799,21 @@ void CMenuPcs::DrawWMFrame()
 			}
 
 			if (digitCnt != 3 && language != 5) {
-				int off = wmFrame + 0xB4;
+				int off = reinterpret_cast<int>(m_wm.m_frameData) + 0xB4;
+				float suffixScale = *reinterpret_cast<float*>(off + 0x14);
 				float suffixU = FLOAT_803313dc;
+				float suffixX = static_cast<float>(*reinterpret_cast<short*>(off + 4)) * suffixScale +
+				                static_cast<float>(*reinterpret_cast<short*>(off));
 				float suffixY = static_cast<float>(*reinterpret_cast<short*>(off + 2));
 				if (language == 1) {
 					if (gWmMenuScriptValueCache / 10 == 1) {
 						suffixU = FLOAT_8033151c;
 					} else {
-						unsigned int digit = gWmMenuScriptValueCache % 10;
-						if (digit == 0 || digit > 3) {
-							suffixU = FLOAT_8033151c;
-						} else {
+						int digit = gWmMenuScriptValueCache % 10;
+						if (digit >= 1 && digit <= 3) {
 							suffixU = FLOAT_803314d8 * static_cast<float>(digit - 1);
+						} else {
+							suffixU = FLOAT_8033151c;
 						}
 					}
 				} else if (language == 4) {
@@ -6737,17 +7825,16 @@ void CMenuPcs::DrawWMFrame()
 				}
 				unsigned char alphaU8 =
 				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
+				MenuPcs.SetAttrFmt((FMT)0);
 				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
 				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-				SetAttrFmt((FMT)0);
-				SetTexture((TEX)0x34);
-				DrawRect(0xFFFFFFFF,
-				         (float)*reinterpret_cast<short*>(off) +
-				             (float)*reinterpret_cast<short*>(off + 4) * *reinterpret_cast<float*>(off + 0x14),
+				MenuPcs.SetTexture((TEX)0x34);
+				MenuPcs.DrawRect(0,
+				         suffixX,
 				         suffixY,
 				         FLOAT_80331410, FLOAT_803314d8,
 				         suffixU, FLOAT_803313dc,
-				         *reinterpret_cast<float*>(off + 0x14), *reinterpret_cast<float*>(off + 0x14),
+				         suffixScale, suffixScale,
 				         0);
 			}
 		}
@@ -6803,25 +7890,26 @@ void CMenuPcs::CalcWMFrame0(int param)
  */
 void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
-	unsigned char* const frame = m_wm.m_frameInfo;
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-	unsigned char alphaU8 = static_cast<unsigned char>(static_cast<int>(255.0 * static_cast<double>(alpha)));
-	GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	int i = 0;
 	int offset = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
-			short* psVar1 = reinterpret_cast<short*>(frame + offset + 4);
-			DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
+			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         1.0f, 1.0f, *reinterpret_cast<float*>(psVar1 + 0xC));
+			         FLOAT_803313e8, FLOAT_803313e8, *reinterpret_cast<float*>(psVar1 + 0xC));
 		}
 		i = i + 1;
 		offset = offset + 0x1C;
@@ -6862,15 +7950,15 @@ void CMenuPcs::DrawMainMenuBase(float baseAlpha)
 		alpha = 1.0f;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	if (frame != 0) {
 		for (int i = 0; i < 2; i++) {
 			unsigned char* const entry = frame + 4 + i * 0x1C;
-			DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
 			         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
 			         *reinterpret_cast<float*>(entry + 0x0C), 1.0f, 1.0f, static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
@@ -6931,7 +8019,7 @@ void CMenuPcs::DrawCharaBase()
 	WmWorldState* const worldState = m_wmWorldState;
 
 	const short state = worldState->m_mainState;
-	if (state <= 0) {
+	if (state == 0) {
 		return;
 	}
 
@@ -6944,16 +8032,20 @@ void CMenuPcs::DrawCharaBase()
 		alpha = static_cast<float>(1.0 - DOUBLE_803316C0 * static_cast<double>(worldState->m_frameCounter));
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)))};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
 	for (int row = 0; row < 2; row++) {
 		for (int col = 0; col < 4; col++) {
 			const float x = static_cast<float>(0x1C + col * 0x90);
 			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
-			DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
+			MenuPcs.DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 }
@@ -6969,23 +8061,20 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	unsigned char* const charaSelect = m_wm.m_charaSelectData;
-	unsigned char* modelData = m_wm.m_charaModelData;
 	int* charaWork = reinterpret_cast<int*>(m_wm.m_worldObjData + 0xA00);
 	unsigned int selectedMask = 0;
 
-	if (charaSelect[0x0D] == 1) {
-		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x04));
+	if (m_wm.m_charaSelectData[0x0D] == 1) {
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x04));
 	}
-	if (charaSelect[0x1D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x14));
+	if (m_wm.m_charaSelectData[0x1D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x14));
 	}
-	if (charaSelect[0x2D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x24));
+	if (m_wm.m_charaSelectData[0x2D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x24));
 	}
-	if (charaSelect[0x3D] == 1) {
-		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x34));
+	if (m_wm.m_charaSelectData[0x3D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(m_wm.m_charaSelectData + 0x34));
 	}
 
 	for (int slot = 0; slot < 8; slot++) {
@@ -6993,7 +8082,7 @@ void CMenuPcs::CalcChara()
 		int effectCount = 0;
 
 		for (int player = 0; player < 4; player++) {
-			unsigned char* const entry = charaSelect + player * 0x10;
+			unsigned char* const entry = m_wm.m_charaSelectData + player * 0x10;
 			const int currentSlot = *reinterpret_cast<short*>(entry + 0x04);
 			if ((entry[0x0D] == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
 				effectCount++;
@@ -7017,10 +8106,10 @@ void CMenuPcs::CalcChara()
 				if ((effectMask & (1u << player)) != 0) {
 					Vec loc;
 					loc.x = s_RingOrgPos.x;
-					loc.y = static_cast<float>((double)s_RingOrgPos.y + DOUBLE_80331420 + (double)offset);
+					loc.y = static_cast<float>((double)s_RingOrgPos.y + (DOUBLE_80331420 + (double)offset));
 					loc.z = s_RingOrgPos.z;
 					PartPcs.SetParLocIdx(m_effectWork[player + 32].m_partNo, loc);
-					offset = static_cast<float>((double)offset - (double)FLOAT_8033169C);
+					offset = offset - FLOAT_8033169C;
 				}
 			}
 		}
@@ -7028,14 +8117,15 @@ void CMenuPcs::CalcChara()
 
 	CalcCharaSelect();
 
-	int* animState = GetWmCharaAnimState(this);
-	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14, animState += 5, modelData += 0x34) {
+	int modelIndex = 0;
+	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14, modelIndex += 0x34) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (!handle->IsModelLoaded(1)) {
 			charaWork[0] = 0;
 			continue;
 		}
 
+		unsigned char* const modelData = m_wm.m_charaModelData + modelIndex;
 		if (modelData[0x0C] == 1) {
 			CCharaPcs::CHandle* const loadHandle = GetWmCharaHandles(this)[i];
 			reinterpret_cast<float*>(charaWork)[0x0B] = FLOAT_80331664;
@@ -7049,12 +8139,14 @@ void CMenuPcs::CalcChara()
 				loadHandle->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
 				loadHandle->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
 				loadHandle->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
-				animState[0] = 0;
-				animState[1] = -1;
-				animState[2] = rand() % 250;
-				loadHandle->SetAnim(baseAnim, -1, -1, -1 - (loadHandle->m_currentAnimIndex >> 31), 1);
-				animState[3] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xB4)[0];
-				animState[4] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xC0)[0];
+				GetWmCharaAnimState(this)[i * 5 + 0] = 0;
+				GetWmCharaAnimState(this)[i * 5 + 1] = -1;
+				GetWmCharaAnimState(this)[i * 5 + 2] = rand() % 250;
+				loadHandle->SetAnim(baseAnim, -1, -1, static_cast<int>(static_cast<unsigned int>(loadHandle->m_currentAnimIndex) >> 31) - 1, 1);
+				reinterpret_cast<float*>(GetWmCharaAnimState(this))[i * 5 + 3] =
+				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xB4)[0];
+				reinterpret_cast<float*>(GetWmCharaAnimState(this))[i * 5 + 4] =
+				    reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xC0)[0];
 			}
 			modelData[0x0C] = 0;
 		}
@@ -7067,16 +8159,7 @@ void CMenuPcs::CalcChara()
 		const float zero = FLOAT_803313dc;
 		CCharaPcs::CHandle* const charaHandle = GetWmCharaHandles(this)[i];
 		if (charaHandle->m_charaKind == 3) {
-			if ((selectedMask & (1u << i)) == 0) {
-				reinterpret_cast<float*>(charaWork)[7] = zero;
-				reinterpret_cast<float*>(charaWork)[8] = zero;
-				reinterpret_cast<float*>(charaWork)[9] = zero;
-				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-				reinterpret_cast<float*>(charaWork)[10] = zero;
-				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
-			} else {
+			if ((selectedMask & (1u << i)) != 0) {
 				reinterpret_cast<float*>(charaWork)[7] = zero;
 				scale = FLOAT_803316A8;
 				reinterpret_cast<float*>(charaWork)[8] = normalX;
@@ -7087,18 +8170,17 @@ void CMenuPcs::CalcChara()
 				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
 				reinterpret_cast<float*>(charaWork)[10] = normalX;
 				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
+			} else {
+				reinterpret_cast<float*>(charaWork)[7] = zero;
+				reinterpret_cast<float*>(charaWork)[8] = zero;
+				reinterpret_cast<float*>(charaWork)[9] = zero;
+				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+				reinterpret_cast<float*>(charaWork)[10] = zero;
+				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
 			}
-		} else if ((selectedMask & (1u << i)) == 0) {
-			reinterpret_cast<float*>(charaWork)[7] = zero;
-			scale = FLOAT_80331434;
-			reinterpret_cast<float*>(charaWork)[8] = zScale;
-			normalX = FLOAT_803315d0;
-			reinterpret_cast<float*>(charaWork)[9] = zero;
-			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
-			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
-			reinterpret_cast<float*>(charaWork)[10] = normalX;
-		} else {
+		} else if ((selectedMask & (1u << i)) != 0) {
 			reinterpret_cast<float*>(charaWork)[7] = zero;
 			scale = FLOAT_803316B4;
 			reinterpret_cast<float*>(charaWork)[8] = selectedX;
@@ -7108,22 +8190,41 @@ void CMenuPcs::CalcChara()
 			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
 			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
 			reinterpret_cast<float*>(charaWork)[10] = normalX;
+		} else {
+			reinterpret_cast<float*>(charaWork)[7] = zero;
+			scale = FLOAT_80331434;
+			reinterpret_cast<float*>(charaWork)[8] = zScale;
+			normalX = FLOAT_803315d0;
+			reinterpret_cast<float*>(charaWork)[9] = zero;
+			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+			reinterpret_cast<float*>(charaWork)[10] = normalX;
 		}
 
-		double alpha = (double)DOUBLE_803314e8 *
-		               ((double)worldState->m_frameCounter - DOUBLE_80331408);
-		if (DOUBLE_80331420 < alpha) {
+		WmWorldState* const ws = m_wmWorldState;
+		union {
+			double d;
+			struct {
+				unsigned int hi;
+				unsigned int lo;
+			} u;
+		} frameConv;
+		frameConv.u.hi = 0x43300000;
+		frameConv.u.lo = static_cast<unsigned int>(static_cast<int>(ws->m_frameCounter)) ^ 0x80000000;
+		double alpha = static_cast<double>(static_cast<float>(
+		    DOUBLE_803314e8 * (frameConv.d - DOUBLE_80331408)));
+		if (alpha > DOUBLE_80331420) {
 			alpha = (double)FLOAT_803313e8;
 		}
 
-		CChara::CModel* const model = charaHandle->m_model;
-		const short state = worldState->m_mainState;
+		const int state = ws->m_mainState;
 		if (state == 1) {
-			model->m_lightAlpha = static_cast<float>(alpha);
+			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = static_cast<float>(alpha);
 		} else if (state == 2) {
-			model->m_lightAlpha = FLOAT_803313e8;
+			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = FLOAT_803313e8;
 		} else {
-			model->m_lightAlpha = static_cast<float>(DOUBLE_80331420 - alpha);
+			GetWmCharaHandles(this)[i]->m_model->m_lightAlpha = static_cast<float>(DOUBLE_80331420 - alpha);
 		}
 
 		Mtx scaleMtx;
@@ -7138,9 +8239,9 @@ void CMenuPcs::CalcChara()
 		rotXMtx[1][3] = reinterpret_cast<float*>(charaWork)[8];
 		rotXMtx[2][3] = reinterpret_cast<float*>(charaWork)[9];
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
+		GetWmCharaHandles(this)[i]->m_model->SetMatrix(scaleMtx);
+		GetWmCharaHandles(this)[i]->m_model->CalcMatrix();
+		GetWmCharaHandles(this)[i]->m_model->CalcSkin();
 	}
 
 	PCAnimCtrl();
@@ -7157,7 +8258,6 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const charaSelect = m_wm.m_charaSelectData;
 	unsigned int selectedMask = 0;
 
@@ -7177,46 +8277,44 @@ void CMenuPcs::PCAnimCtrl()
 	int* animState = m_wmCharaAnimState;
 	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		const int blendMode = -1 - (handle->m_currentAnimIndex >> 31);
+		const int blendMode = (static_cast<unsigned int>(handle->m_currentAnimIndex) >> 31) - 1;
 
-		CChara::CModel* const modelObj = handle->m_model;
-		unsigned char* const model = reinterpret_cast<unsigned char*>(modelObj);
+		unsigned char* const model = reinterpret_cast<unsigned char*>(handle->m_model);
 		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0xB0)[0] == 0 || handle->m_charaKind == 3) {
 			continue;
 		}
 
-		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
-		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-		const int baseAnim = (static_cast<int>(handle->m_charaNo / 100) - 1) * 6;
+		reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(model + 0xB4)[0];
 
 		if (animState[1] >= 0) {
 			animState[0] = animState[1];
 			animState[1] = -1;
-			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 			animState[2] = 0;
 			continue;
 		}
 
-		const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
-		const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
+		const int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
+		const float frame = reinterpret_cast<float*>(animState)[3];
+		const float frameEnd = reinterpret_cast<float*>(animState)[4];
 		if (isSelected == 0 &&
-		    worldState->m_menuMode != 8 &&
-		    animState[0] == 0 && animState[2] > 2999) {
+		    m_wmWorldState->m_menuMode != 8 &&
+		    animState[0] == 0 && animState[2] >= 3000) {
 			animState[0] = 4;
-			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 			animState[2] = 0;
 		} else if (isSelected != 0 &&
-		           worldState->m_menuMode != 8) {
-			if (animState[0] == 1 && animState[2] > 11999) {
+		           m_wmWorldState->m_menuMode != 8) {
+			if (animState[0] == 1 && animState[2] >= 12000) {
 				animState[0] = 0;
 				animState[2] = 0;
-			} else if (animState[0] == 2 && animState[2] > 8999) {
+			} else if (animState[0] == 2 && animState[2] >= 9000) {
 				animState[0] = 1;
-			} else if (animState[0] == 1 && animState[2] > 5999 && animState[2] < 9000) {
+			} else if (animState[0] == 1 && animState[2] >= 6000 && animState[2] < 9000) {
 				animState[0] = 2;
 			} else if (animState[0] == 0 && animState[2] >= 3000) {
 				animState[0] = 1;
@@ -7224,34 +8322,38 @@ void CMenuPcs::PCAnimCtrl()
 				if (frameEnd <= frame) {
 					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 						animState[0] = 0;
-						handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-						animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-						animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+						handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+						reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+						reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 						animState[2] = isSelected == 0 ? 0 : 0x834;
 					}
-					modelObj->SetFrame(FLOAT_803313dc);
+					handle->m_model->SetFrame(FLOAT_803313dc);
 				} else {
-					modelObj->AddFrame(FLOAT_80331698);
+					handle->m_model->AddFrame(FLOAT_80331698);
 				}
 				animState[2]++;
 				continue;
 			}
 
-			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
+			handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+			reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+			reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
 		} else {
 			if (frameEnd <= frame) {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
-					handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
-					animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-					animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
-					animState[2] = isSelected == 0 ? 0 : 0x834;
+					handle->SetAnim((static_cast<int>(static_cast<unsigned int>(GetWmCharaHandles(this)[i]->m_charaNo) / 100) - 1) * 6 + animState[0], -1, -1, blendMode, 0);
+					reinterpret_cast<float*>(animState)[3] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB4)[0];
+					reinterpret_cast<float*>(animState)[4] = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xC0)[0];
+					if (isSelected == 0) {
+						animState[2] = 0;
+					} else {
+						animState[2] = 0x834;
+					}
 				}
-				modelObj->SetFrame(FLOAT_803313dc);
+				handle->m_model->SetFrame(FLOAT_803313dc);
 			} else {
-				modelObj->AddFrame(FLOAT_80331698);
+				handle->m_model->AddFrame(FLOAT_80331698);
 			}
 			animState[2]++;
 		}
@@ -7288,7 +8390,6 @@ void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	WmWorldState* const worldState = GetWmWorldState(this);
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
@@ -7297,31 +8398,101 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
+		int selectedMask = 0;
+		for (int chan = 0; chan < 4; chan++) {
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[chan];
+			const int slot = entry.m_currentSlot;
+			if (entry.m_connected == 1 && slot >= 0 && i == slot) {
+				selectedMask |= 1 << chan;
+			}
+		}
+
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (handle->m_charaKind != 3 && handle->m_currentAnimIndex < 0) {
 			continue;
 		}
 
-		unsigned int selectedMask = 0;
-		for (int chan = 0; chan < 4; chan++) {
-			WmCharaSelectEntry& entry = selectEntries[chan];
-			if (entry.m_connected == 1 && entry.m_currentSlot >= 0 && entry.m_currentSlot == i) {
-				selectedMask |= 1u << chan;
+		{
+			Mtx44 projectionMtx;
+			C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+			Mtx lookAtMtx;
+			C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
+			            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+			            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+			PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+			PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+			CharaPcs.InitEnv(5);
+			GXSetColorUpdate(0);
+			GXSetAlphaUpdate(0);
+			CColor clearColor(0, 0, 0, 0);
+			GXSetCopyClear(clearColor.color, 0x00FFFFFF);
+			GXSetColorUpdate(1);
+			GXSetAlphaUpdate(1);
+			GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
+			              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
+			              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
+			              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
+			              FLOAT_803313dc, FLOAT_803313e8);
+			GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
+			             *reinterpret_cast<unsigned int*>(view + 0x44),
+			             *reinterpret_cast<unsigned int*>(view + 0x48),
+			             *reinterpret_cast<unsigned int*>(view + 0x4C));
+			Graphic.SetFog(1, 0);
+			WmMenuLightTable& lightTable = gWmMenuLightTables[0];
+			LightPcs.SetAmbient(lightTable.m_ambient);
+			LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
+			for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+				LightPcs.SetDiffuse(lightIndex, lightTable.m_diffuseColors[lightIndex],
+				                    &lightTable.m_diffuseDirs[lightIndex], 0);
 			}
+			LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 		}
-
-		SetProjection(i + 0x20);
-		if (handle->m_charaKind == 3) {
+		if (handle->m_charaKind != 3) {
+			handle->Draw(5);
+		} else {
 			DrawInit();
-			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-			SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-			float alpha = FLOAT_803313e8;
-			if (worldState->m_mainState != 2 && handle->m_model != 0) {
+			GXSetZMode(GX_TRUE, static_cast<GXCompare>(7), GX_TRUE);
+			{
+				Mtx44 projectionMtx;
+				C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+				PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+				Mtx lookAtMtx;
+				C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10),
+				            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc)),
+				            reinterpret_cast<Vec*>(&CVector(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc)));
+				PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(bytes + 0x744));
+				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+				CharaPcs.InitEnv(5);
+				GXSetColorUpdate(0);
+				GXSetAlphaUpdate(0);
+				CColor clearColor(0, 0, 0, 0);
+				GXSetCopyClear(clearColor.color, 0x00FFFFFF);
+				GXSetColorUpdate(1);
+				GXSetAlphaUpdate(1);
+				GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)),
+				              static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
+				              static_cast<float>(*reinterpret_cast<short*>(view + 0xC)),
+				              static_cast<float>(*reinterpret_cast<short*>(view + 0xE)),
+				              FLOAT_803313dc, FLOAT_803313e8);
+				GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40),
+				             *reinterpret_cast<unsigned int*>(view + 0x44),
+				             *reinterpret_cast<unsigned int*>(view + 0x48),
+				             *reinterpret_cast<unsigned int*>(view + 0x4C));
+			}
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
+			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+			float alpha;
+			if (worldState->m_mainState == 2) {
+				alpha = FLOAT_803313e8;
+			} else {
 				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
 			}
+			const float rgbMul = FLOAT_80331458;
 			const float colorScale = static_cast<float>(selectedMask != 0 ? DOUBLE_80331420 : DOUBLE_80331448);
-			const unsigned char rgb = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * colorScale));
+			const unsigned char rgb = static_cast<unsigned char>(static_cast<int>(rgbMul * colorScale));
 			GXColor color = {
 			    rgb,
 			    rgb,
@@ -7336,15 +8507,13 @@ void CMenuPcs::DrawChara()
 				y *= FLOAT_803315d4;
 				scale *= FLOAT_803315d4;
 			}
-			DrawRect3d(0, x, y, FLOAT_80331694, FLOAT_80331578, FLOAT_80331520,
-			           FLOAT_803313dc, FLOAT_803313dc, scale, scale);
+			MenuPcs.DrawRect3d(0, x, y, FLOAT_80331694, FLOAT_80331578, FLOAT_80331520,
+			                   FLOAT_803313dc, FLOAT_803313dc, scale, scale);
 			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-		} else {
-			handle->Draw(5);
 		}
 		if (worldState->m_mainState == 2 && selectedMask != 0) {
 			for (int chan = 3; chan >= 0; chan--) {
-				if ((selectedMask & (1u << chan)) != 0) {
+				if ((selectedMask & (1 << chan)) != 0) {
 					PartPcs.DrawMenuIdx(m_effectWork[chan + 32].m_partNo);
 				}
 			}
@@ -7384,70 +8553,92 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const modelData = GetWmCharaModelData(this);
-	int* const animState = GetWmCharaAnimState(this);
-	WmWorldState* const worldState = GetWmWorldState(this);
 
 	unsigned short padTrig[4];
 	unsigned short padRepeat[4];
 
 	*reinterpret_cast<short*>(bytes + 0x74) = static_cast<short>(*reinterpret_cast<short*>(bytes + 0x74) + 1);
 	const unsigned int clz = __cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_menuStageMode));
-	if (static_cast<int>(((clz >> 5) + 2) * 0x4B) <= static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74))) {
+	if (static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74)) >= static_cast<int>(((clz >> 5) + 2) * 0x4B)) {
 		*reinterpret_cast<short*>(bytes + 0x74) = 0;
 	}
 
 	for (int i = 0; i < 4; i++) {
-		WmCharaSelectEntry& entry = selectEntries[i];
-		padTrig[i] = 0;
-		padRepeat[i] = 0;
+		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 
-		if ((i == 0) || (Game.m_gameWork.m_menuStageMode == 0)) {
-			entry.m_padType = Joybus.GetPadType(i);
-			if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
-			    (entry.m_padType == -0x78000000)) {
-				entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
+		if ((i != 0) && (Game.m_gameWork.m_menuStageMode != 0)) {
+			padTrig[i] = 0;
+			padRepeat[i] = 0;
+			entry.m_connected = 0;
+			continue;
+		}
+
+		entry.m_padType = Joybus.GetPadType(i);
+		if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
+		    (entry.m_padType == -0x78000000)) {
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				entry.m_connected = 1;
 			} else {
-				entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
-			}
-
-			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
-				bool noInput = false;
-				if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
-					noInput = true;
-				}
-				if (noInput) {
-					padRepeat[i] = 0;
-					padTrig[i] = 0;
-				} else {
-					const unsigned int padIndex = (Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i);
-					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
-					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
-				}
+				entry.m_connected = 0;
 			}
 		} else {
-			entry.m_connected = 0;
+			entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
+		}
+
+		if (entry.m_connected == 1 && entry.m_cmakePending == 0) {
+			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
+				padRepeat[i] = 0;
+			} else {
+				padRepeat[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].repeatButton;
+			}
+			if (Pad.m_debugPadLock != 0 || (i == 0 && Pad.m_debugPadPort != -1)) {
+				padTrig[i] = 0;
+			} else {
+				padTrig[i] = Pad.GetPadInputs()[(Pad.m_debugPadPort == i) ? 0 : static_cast<unsigned int>(i)].buttonDown[0];
+			}
+		} else {
+			padTrig[i] = 0;
+			padRepeat[i] = 0;
 		}
 	}
 
-	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
+	if (GetWmWorldState(this)->m_mainState != 2 || GetWmWorldState(this)->m_nextMenuMode != 0) {
 		return;
 	}
 
 	const short winState = m_menuWindowInfo->state;
-	if (winState == 3) {
+	if (winState != 3) {
+		unsigned short anyTrig = 0;
+		for (int i = 0; i < 4; i++) {
+			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
+		}
+		if (winState == 1 && (anyTrig & 0x0300) != 0) {
+			m_menuWindowInfo->state = 2;
+			for (int i = 0; i < 4; i++) {
+				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+				if (entry.m_confirmed != 0) {
+					GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 0;
+				}
+				entry.m_confirmed = 0;
+				entry.m_cmakePending = 0;
+				entry.m_cmakeReady = 0;
+			}
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
+		}
+		return;
+	}
+	{
 		unsigned int pendingMask = 0;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0 && selectEntries[i].m_currentSlot >= 0) {
-					pendingMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
+					pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 				}
 			}
 		}
 
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
 			}
@@ -7456,22 +8647,21 @@ void CMenuPcs::CalcCharaSelect()
 				GbaQue.ClrCmakeInfo(i);
 				if (entry.m_cmakeReady != 0) {
 					entry.m_cmakeReady = 0;
-				} else if ((entry.m_currentSlot >= 0) &&
-				           ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0)) {
+				} else if ((pendingMask & (1u << static_cast<unsigned int>(entry.m_currentSlot))) != 0) {
 					continue;
 				}
 
-				if (entry.m_currentSlot >= 0 &&
-				    Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
+				if (Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
 				    entry.m_cmakeReady == 0) {
-					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
+					CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
 							System.Printf(const_cast<char*>(s_SetCMakeEnd_chan_pctd_cur_pctd_801DC3B4), i,
 							              static_cast<int>(entry.m_currentSlot));
 						}
-						modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
-						handle->LoadModelASync(3, 0x43, 0);
+						const int loadSlot = static_cast<int>(entry.m_currentSlot);
+						GetWmCharaModelData(this)[loadSlot * 0x34 + 0x0C] = 0;
+						GetWmCharaHandles(this)[loadSlot]->LoadModelASync(3, 0x43, 0);
 					}
 				}
 			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
@@ -7481,8 +8671,8 @@ void CMenuPcs::CalcCharaSelect()
 
 		unsigned int confirmedSlotMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (selectEntries[i].m_confirmed != 0 && selectEntries[i].m_currentSlot >= 0) {
-				confirmedSlotMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
+				confirmedSlotMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 			}
 		}
 
@@ -7490,10 +8680,10 @@ void CMenuPcs::CalcCharaSelect()
 			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
 			    Game.m_caravanWorkArr[slot].m_shopState == 0) {
-				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[slot];
+				CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[slot];
 				if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
-					modelData[slot * 0x34 + 0x0C] = 0;
-					handle->LoadModelASync(3, 0x43, 0);
+					GetWmCharaModelData(this)[slot * 0x34 + 0x0C] = 0;
+					GetWmCharaHandles(this)[slot]->LoadModelASync(3, 0x43, 0);
 				}
 			}
 		}
@@ -7501,7 +8691,7 @@ void CMenuPcs::CalcCharaSelect()
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_connected != 0) {
 				connectedCount++;
 				if (entry.m_confirmed != 0 &&
@@ -7534,31 +8724,30 @@ void CMenuPcs::CalcCharaSelect()
 				msgIter = reinterpret_cast<int*>(reinterpret_cast<int>(msgIter) + 2);
 			}
 
-			int widthCells = maxWidth / 0x16 + (maxWidth >> 0x1F);
-			short winWidth = static_cast<short>(widthCells) - static_cast<short>(widthCells >> 0x1F);
-			if (maxWidth != (widthCells - (widthCells >> 0x1F)) * 0x16) {
+			int widthCells = maxWidth / 0x16;
+			int winWidth = widthCells - (widthCells >> 0x1F);
+			if (maxWidth != winWidth * 0x16) {
 				winWidth++;
 			}
-			winWidth = static_cast<short>((winWidth + 2) * 0x16 + 0x40);
-			const short winHeight = static_cast<short>(*winMess) * 0x1E + 0x40;
-			MenuWindowInfo* const win = m_menuWindowInfo;
-			win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - winWidth) *
-			                                             static_cast<float>(DOUBLE_803313f8)));
-			win->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
+			winWidth = (winWidth + 2) * 0x16 + 0x40;
+			const int winHeight = *winMess * 0x1E + 0x40;
+			m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(
+			    static_cast<double>(0x280 - winWidth) * DOUBLE_803313F8)));
+			m_menuWindowInfo->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
 			                                                                  static_cast<float>(winHeight))) *
 			                                             DOUBLE_803313f8));
-			win->width = winWidth;
-			win->height = winHeight;
-			win->frame = 0;
-			win->state = 3;
-			win->state = 0;
+			m_menuWindowInfo->width = winWidth;
+			m_menuWindowInfo->height = winHeight;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
 			return;
 		}
 
 		bool requestCancel = false;
 		bool requestFinalize = false;
 		for (int i = 3; i >= 0; i--) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_cmakeReady != 0) {
 				GbaCMakeInfoRaw info;
 				entry.m_confirmed = 1;
@@ -7574,7 +8763,7 @@ void CMenuPcs::CalcCharaSelect()
 				}
 				modelNo += appearance;
 
-				*reinterpret_cast<int*>(modelData + caravanSlot * 0x34 + 8) = modelNo;
+				*reinterpret_cast<int*>(GetWmCharaModelData(this) + caravanSlot * 0x34 + 8) = modelNo;
 
 				CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
 				caravanWork.LoadInit();
@@ -7588,27 +8777,15 @@ void CMenuPcs::CalcCharaSelect()
 				caravanWork.m_appearanceVariant = static_cast<unsigned short>(appearance);
 				caravanWork.m_genderFlag = static_cast<unsigned short>((info.m_charaType >> 7) != 0);
 				caravanWork.m_id = static_cast<unsigned short>(modelNo);
-				for (int favorite = 0; favorite < 8; favorite += 4) {
-					const unsigned char v0 = static_cast<unsigned char>(info.m_favoriteBits[favorite >> 1] & 0x0F);
-					unsigned char v1 = info.m_favoriteBits[(favorite + 1) >> 1];
-					if (((favorite + 1) & 1) != 0) {
-						v1 >>= 4;
+				for (int favorite = 0; favorite < 8; favorite++) {
+					unsigned char nibble = info.m_favoriteBits[favorite >> 1];
+					int v;
+					if ((favorite & 1) != 0) {
+						v = (nibble >> 4) & 0x0F;
+					} else {
+						v = nibble & 0x0F;
 					}
-					const unsigned char v2 =
-					    static_cast<unsigned char>(info.m_favoriteBits[(favorite + 2) >> 1] & 0x0F);
-					unsigned char v3 = info.m_favoriteBits[(favorite + 3) >> 1];
-					if (((favorite + 3) & 1) != 0) {
-						v3 >>= 4;
-					}
-
-					caravanWork.m_letterMeta[favorite + 0] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v0)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 1] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v1 & 0x0F)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 2] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v2)) * 10 - 5);
-					caravanWork.m_letterMeta[favorite + 3] =
-					    static_cast<unsigned short>((10 - static_cast<int>(v3 & 0x0F)) * 10 - 5);
+					caravanWork.m_letterMeta[favorite] = static_cast<unsigned short>((10 - v) * 10 - 5);
 				}
 
 				const int baseDataIndex =
@@ -7624,12 +8801,12 @@ void CMenuPcs::CalcCharaSelect()
 				stackArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-				QueueWmCharaAnimState(this, caravanSlot, 3);
+				GetWmCharaAnimState(this)[caravanSlot * 5 + 1] = 3;
 			}
 
 			if (entry.m_connected == 0) {
 				if (entry.m_confirmed != 0) {
-					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
+					GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 0;
 				}
 				entry.m_confirmed = 0;
 				entry.m_cmakePending = 0;
@@ -7645,29 +8822,28 @@ void CMenuPcs::CalcCharaSelect()
 			entry.m_disconnectTime = 0;
 			int currentSlot = static_cast<int>(entry.m_currentSlot);
 			if ((padRepeat[i] & 0x000C) != 0) {
-				if (entry.m_confirmed == 0) {
+				if (entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 					currentSlot = (currentSlot < 4) ? currentSlot + 4 : currentSlot - 4;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
-				}
-			}
-			if ((padRepeat[i] & 0x0002) != 0) {
-				if (entry.m_confirmed == 0) {
-					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
-					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
-					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
 			if ((padRepeat[i] & 0x0001) != 0) {
-				if (entry.m_confirmed == 0) {
+				if (entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 					currentSlot = (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) ? currentSlot - 1
 					                                                             : currentSlot + 3;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
+				}
+			} else if ((padRepeat[i] & 0x0002) != 0) {
+				if (entry.m_confirmed != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
+					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
+					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
 				}
 			}
 			entry.m_currentSlot = static_cast<short>(currentSlot);
@@ -7677,21 +8853,21 @@ void CMenuPcs::CalcCharaSelect()
 					if (Game.m_caravanWorkArr[currentSlot].m_shopBusyFlag != 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else if (entry.m_confirmed == 0) {
-						const int charaId = *reinterpret_cast<int*>(modelData + currentSlot * 0x34 + 8);
+						const int charaId = *reinterpret_cast<int*>(GetWmCharaModelData(this) + currentSlot * 0x34 + 8);
 						if (charaId < 0) {
 							if (Game.m_gameWork.m_menuStageMode == 0 &&
 							    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
 								Sound.PlaySe(4, 0x40, 0x7F, 0);
 							} else {
-								bool duplicatePending = false;
-								for (int other = 0; other < 4; other++) {
-									if (other != i && selectEntries[other].m_cmakePending != 0 &&
-									    selectEntries[other].m_currentSlot == currentSlot) {
-										duplicatePending = true;
+								int other;
+								for (other = 0; other < 4; other++) {
+									if (i != other && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
+									    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
+										Sound.PlaySe(4, 0x40, 0x7F, 0);
 										break;
 									}
 								}
-								if (!duplicatePending) {
+								if (other >= 4) {
 									if (Game.m_gameWork.m_menuStageMode == 0) {
 										GbaQue.InitCmakeInfo(i, currentSlot);
 										entry.m_cmakePending = 1;
@@ -7699,24 +8875,22 @@ void CMenuPcs::CalcCharaSelect()
 										m_singleCmakeSlot = static_cast<short>(currentSlot);
 									}
 									Sound.PlaySe(2, 0x40, 0x7F, 0);
-								} else {
-									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								}
 							}
 						} else {
-							bool duplicateConfirmed = false;
-							for (int other = 0; other < 4; other++) {
-								if (other != i && selectEntries[other].m_confirmed != 0 &&
-								    selectEntries[other].m_currentSlot == currentSlot) {
-									duplicateConfirmed = true;
+							int other;
+							for (other = 0; other < 4; other++) {
+								if (i != other && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
+								    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
 									break;
 								}
 							}
-							if (!duplicateConfirmed) {
+							if (other >= 4) {
 								if (Game.m_caravanWorkArr[currentSlot].m_caravanLocalFlags == 0) {
 									entry.m_confirmed = 1;
 									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-									QueueWmCharaAnimState(this, currentSlot, 3);
+									GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
 								} else if (Game.m_gameWork.m_menuStageMode == 0) {
 									if (connectedCount == locallyConfirmedCount + 1) {
 										Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -7724,13 +8898,11 @@ void CMenuPcs::CalcCharaSelect()
 										entry.m_confirmed = 1;
 										locallyConfirmedCount++;
 										Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-										QueueWmCharaAnimState(this, currentSlot, 3);
+										GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
 									}
 								} else {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								}
-							} else {
-								Sound.PlaySe(4, 0x40, 0x7F, 0);
 							}
 						}
 					} else {
@@ -7741,7 +8913,7 @@ void CMenuPcs::CalcCharaSelect()
 						requestCancel = true;
 					} else {
 						entry.m_confirmed = 0;
-						QueueWmCharaAnimState(this, currentSlot, 0);
+						GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 0;
 						Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 					}
 				} else if ((padTrig[i] & 0x1000) != 0) {
@@ -7751,90 +8923,76 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (requestCancel) {
-			bool anySelected = false;
+			int anySelected = 0;
 			for (int i = 0; i < 4; i++) {
-				if ((selectEntries[i].m_confirmed != 0) || (selectEntries[i].m_cmakePending != 0)) {
-					anySelected = true;
+				if ((GetWmCharaSelectEntries(this)[i].m_confirmed != 0) || (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0)) {
+					anySelected = 1;
 					break;
 				}
 			}
-			if (anySelected) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			} else {
-				worldState->m_nextMenuMode = -1;
-				worldState->m_delay = 10;
+			if (anySelected == 0) {
+				GetWmWorldState(this)->m_nextMenuMode = -1;
+				GetWmWorldState(this)->m_delay = 10;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 
 		if (requestFinalize) {
 			unsigned int activeCount = 0;
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_confirmed != 0) {
+				if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
 					activeCount++;
 				}
 			}
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0) {
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
 					activeCount = 0;
 					break;
 				}
 			}
-			if (activeCount <= static_cast<unsigned int>(locallyConfirmedCount)) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			} else {
+			if (activeCount > static_cast<unsigned int>(locallyConfirmedCount)) {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				worldState->m_nextMenuMode = 1;
-				worldState->m_delay = 10;
+				GetWmWorldState(this)->m_nextMenuMode = 1;
+				GetWmWorldState(this)->m_delay = 10;
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 
-		unsigned int finishedMask = 0;
-		unsigned int readyMask = 0;
+		int finishedMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (selectEntries[i].m_confirmed != 0) {
-				finishedMask |= 1u << i;
-			}
-			if (selectEntries[i].m_connected == 0 && selectEntries[i].m_disconnectTime < 0x1E) {
-				readyMask |= 1u << i;
+			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
+				finishedMask |= 1 << i;
 			}
 		}
-		if ((Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) &&
-		    finishedMask != 0 && finishedMask == readyMask) {
-			worldState->m_nextMenuMode = 1;
-			worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
+		if (Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) {
+			int readyMask = 0;
+			for (int i = 0; i < 4; i++) {
+				if (GetWmCharaSelectEntries(this)[i].m_connected == 0 && GetWmCharaSelectEntries(this)[i].m_disconnectTime < 0x1E) {
+					readyMask |= 1 << i;
+				}
+			}
+			if (finishedMask != 0 && finishedMask == readyMask) {
+				GetWmWorldState(this)->m_nextMenuMode = 1;
+				GetWmWorldState(this)->m_delay = static_cast<short>(FLOAT_8032ee18);
+			}
 		} else if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
-			worldState->m_nextMenuMode = 1;
-			worldState->m_delay = 10;
+			GetWmWorldState(this)->m_nextMenuMode = 1;
+			GetWmWorldState(this)->m_delay = 10;
 		}
 
-		if (worldState->m_nextMenuMode != 0) {
+		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
 			GbaQue.SetControllerMode(1);
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0) {
-					selectEntries[i].m_confirmed = 0;
-					selectEntries[i].m_cmakePending = 0;
-					selectEntries[i].m_cmakeReady = 0;
+				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+				if (entry.m_cmakePending != 0) {
+					entry.m_confirmed = 0;
+					entry.m_cmakePending = 0;
+					entry.m_cmakeReady = 0;
 				}
 			}
-		}
-	} else {
-		unsigned short anyTrig = 0;
-		for (int i = 0; i < 4; i++) {
-			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
-		}
-		if (winState == 1 && (anyTrig & 0x0300) != 0) {
-			m_menuWindowInfo->state = 2;
-			for (int i = 0; i < 4; i++) {
-				WmCharaSelectEntry& entry = selectEntries[i];
-				if (entry.m_confirmed != 0) {
-					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
-				}
-				entry.m_confirmed = 0;
-				entry.m_cmakePending = 0;
-				entry.m_cmakeReady = 0;
-			}
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
 		}
 	}
 }
@@ -7853,26 +9011,53 @@ void CMenuPcs::DrawCharaName()
 	CFont* const font = GetWmFont(this);
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
+	unsigned char nameBuf[0x20];
 
-	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
-	if (Game.m_gameWork.m_languageId == 3) {
+	const char** emptyText;
+	switch (Game.m_gameWork.m_languageId) {
+	case 2:
+		emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
+		break;
+	case 3:
 		emptyText = s_wmEmptyCreatingTextIt_8032E900;
-	} else if (Game.m_gameWork.m_languageId < 3) {
-		if (Game.m_gameWork.m_languageId != 0 && Game.m_gameWork.m_languageId != 1) {
-			emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
-		}
-	} else if (Game.m_gameWork.m_languageId == 5) {
-		emptyText = s_wmEmptyCreatingTextEs_8032E910;
-	} else if (Game.m_gameWork.m_languageId < 5) {
+		break;
+	case 4:
 		emptyText = s_wmEmptyCreatingTextFr_8032E908;
+		break;
+	case 5:
+		emptyText = s_wmEmptyCreatingTextEs_8032E910;
+		break;
+	case 1:
+	default:
+		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
+		break;
 	}
 
-	const int alpha = GetWmMenuFade(worldState->m_mainState, worldState->m_frameCounter);
+	union WmI2D {
+		struct {
+			unsigned int hi;
+			unsigned int lo;
+		} w;
+		double d;
+	};
+	float fade;
+	if (worldState->m_mainState == 1) {
+		WmI2D frameCvt;
+		frameCvt.w.hi = 0x43300000;
+		frameCvt.w.lo = static_cast<unsigned int>(worldState->m_frameCounter) ^ 0x80000000;
+		fade = static_cast<float>(DOUBLE_803314e8 * (frameCvt.d - DOUBLE_80331408));
+	} else if (worldState->m_mainState == 2) {
+		fade = FLOAT_803313e8;
+	} else {
+		WmI2D frameCvt;
+		frameCvt.w.hi = 0x43300000;
+		frameCvt.w.lo = static_cast<unsigned int>(worldState->m_frameCounter) ^ 0x80000000;
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (frameCvt.d - DOUBLE_80331408) - DOUBLE_80331420));
+	}
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
-	for (int i = 0; i < kWmCharaSelectCount; i++) {
+	for (int i = 0; i < 4; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
@@ -7892,36 +9077,62 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
-	GXSetChanMatColor(GX_COLOR0A0, shade.color);
+	const float alphaF = static_cast<float>(FLOAT_80331458 * fade);
+	GXColor shade;
+	shade.r = 0xFF;
+	shade.g = 0xFF;
+	shade.b = 0xFF;
+	shade.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+	GXSetChanMatColor(GX_COLOR0A0, shade);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
+	const float yBase1 = FLOAT_80331478;
+	const double xOffsetDefault =
+	    -(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678);
+	const float yExtra1 = FLOAT_80331684;
+	const double bias1 = DOUBLE_80331408;
+	WmI2D cvt;
+	int yCounter = 0;
+	int slotBase = 0;
 	for (int row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331684;
+		cvt.w.hi = 0x43300000;
+		cvt.w.lo = static_cast<unsigned int>(yCounter) ^ 0x80000000;
+		float y = (yBase1 + static_cast<float>(cvt.d - bias1)) + yExtra1;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
+		int caravanOffset = slotBase * 0xC30;
+		unsigned int xCounter = 0;
+		int slot = slotBase;
 		for (int col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
 			if ((confirmedMask & (1u << slot)) != 0) {
-				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
-				float scale = FLOAT_803313e8;
-				float xOffset = -(static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678));
+				const char* const text = reinterpret_cast<const char*>(
+				    Game.m_caravanWorkArr[0].m_name + caravanOffset);
+				cvt.w.hi = 0x43300000;
+				cvt.w.lo = xCounter ^ 0x80000000;
+				const float xBase = FLOAT_80331410 + static_cast<float>(cvt.d - bias1);
 				const float width = font->GetWidth(text);
-				if (static_cast<double>(FLOAT_80331680) < static_cast<double>(width) * DOUBLE_803313f8) {
-					scale = static_cast<float>((static_cast<double>(width) + DOUBLE_80331510) * DOUBLE_803313f8 /
-					                          static_cast<double>(FLOAT_80331680));
-					xOffset = FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
+				float scale = FLOAT_803313e8;
+				double xOffset = xOffsetDefault;
+				if (static_cast<double>(width) * DOUBLE_803313f8 > static_cast<double>(FLOAT_80331680)) {
+					const float widthPlus = static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
+					scale = static_cast<float>(widthPlus * DOUBLE_803313f8 / static_cast<double>(FLOAT_80331680));
+					xOffset = static_cast<float>(FLOAT_8033155C - widthPlus);
 				}
-				const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) + xOffset * static_cast<float>(DOUBLE_803313f8);
+				const float x = static_cast<float>(xOffset * DOUBLE_803313f8 + xBase);
 				MenuPcs.DrawRect(
 				    0, x, y, FLOAT_80331680, FLOAT_80331410,
-				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, 0.0f);
+				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.DrawRect(
 				    8, FLOAT_80331680 * scale + x, y,
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
-				                                scale, FLOAT_803313e8, 0.0f);
+				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
+			caravanOffset += 0xC30;
+			xCounter += 0x90;
+			slot++;
 		}
+		yCounter += 0xB8;
+		slotBase += 4;
 	}
 
 	DrawInit();
@@ -7929,51 +9140,98 @@ void CMenuPcs::DrawCharaName()
 	font->SetShadow(1);
 	font->SetScale(FLOAT_8033158C);
 	font->DrawInit();
-	font->SetColor(shade.color);
+	CColor shadeColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alphaF)));
+	font->SetColor(shadeColor.color);
 
+	const float xBase2 = FLOAT_80331410;
+	const float xMax2 = FLOAT_8033155C;
+	const float yBase2 = FLOAT_80331478;
+	const float yExtra2 = FLOAT_80331688;
+	const float ySub2 = FLOAT_80331550;
+	const double k3f8_2 = DOUBLE_803313f8;
+	const double bias2 = DOUBLE_80331408;
+	int yCounter2 = 0;
 	for (int row = 0; row < 2; row++) {
-		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331688 - FLOAT_80331550;
+		const int slotBase2 = row * 4;
+		cvt.w.hi = 0x43300000;
+		cvt.w.lo = static_cast<unsigned int>(yCounter2) ^ 0x80000000;
+		float y = (yBase2 + static_cast<float>(cvt.d - bias2)) + yExtra2;
 		if (row != 0) {
 			y += FLOAT_80331548;
 		}
+		y = static_cast<float>(y - ySub2);
+		int cmakeOffset = slotBase2 * 0x9C0;
+		int caravanOffset = slotBase2 * 0xC30;
+		unsigned int xCounter2 = 0;
+		int slot = slotBase2;
 		for (int col = 0; col < 4; col++) {
-			const int slot = row * 4 + col;
-			bool restoreColor = false;
-			const char* text = 0;
+			int restoreColor = 0;
+			const char* text;
 
-			if (worldState->m_menuMode == 8 && cmakeWork != 0 &&
-			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
-			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
-			} else if ((pendingMask & (1u << slot)) == 0) {
-				text = emptyText[0];
-				font->SetTlut((activeMask & (1u << slot)) != 0 ? 7 : 8);
+			cvt.w.hi = 0x43300000;
+			cvt.w.lo = xCounter2 ^ 0x80000000;
+			const float xBase = xBase2 + static_cast<float>(cvt.d - bias2);
+
+			const int menuMode = this->m_wmWorldState->m_menuMode;
+			bool hasName;
+			if (menuMode == 8 && this->m_cmakeWork != 0) {
+				hasName = *reinterpret_cast<unsigned int*>(this->m_cmakeWork + cmakeOffset + 0x1A84) != 0;
 			} else {
-				text = emptyText[1];
-				font->SetTlut(0x10);
-				if (worldState->m_mainState == 2) {
-					const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
-					const int blink = static_cast<int>(FLOAT_80331458 *
-					                                   static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
-					                                                        DOUBLE_80331420)));
-					CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(blink));
-					font->SetColor(blinkColor.color);
-					restoreColor = true;
-				}
+				hasName = *reinterpret_cast<unsigned int*>(
+				              reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x1794) != 0;
 			}
 
-			const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) +
-			                (FLOAT_8033155C - font->GetWidth(text)) * static_cast<float>(DOUBLE_803313f8);
+			if (hasName) {
+				if (menuMode == 8 && this->m_cmakeWorkActive == 1 && this->m_cmakeWork != 0) {
+					memset(nameBuf, 0, 0x20);
+					memcpy(nameBuf, this->m_cmakeWork + cmakeOffset + 0x15C0, 0x10);
+					text = reinterpret_cast<const char*>(nameBuf);
+				} else {
+					text = reinterpret_cast<const char*>(reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x17BA);
+				}
+				if ((activeMask & (1u << slot)) != 0) {
+					font->SetTlut(6);
+				} else {
+					font->SetTlut(8);
+				}
+			} else if ((pendingMask & (1u << slot)) != 0) {
+				font->SetTlut(0x10);
+				text = emptyText[1];
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
+				float blinkFade = fade;
+				if (this->m_wmWorldState->m_mainState == 2) {
+					const int absPhase = phase < 0 ? -phase : phase;
+					cvt.w.hi = 0x43300000;
+					cvt.w.lo = static_cast<unsigned int>(absPhase) ^ 0x80000000;
+					blinkFade = static_cast<float>(-(DOUBLE_80331460 * (cvt.d - DOUBLE_80331408) - DOUBLE_80331420));
+					restoreColor = 1;
+				}
+				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade)));
+				font->SetColor(blinkColor.color);
+			} else {
+				if ((activeMask & (1u << slot)) != 0) {
+					font->SetTlut(7);
+				} else {
+					font->SetTlut(8);
+				}
+				text = emptyText[0];
+			}
+
+			const float widthDiff = xMax2 - font->GetWidth(text);
+			const float x = static_cast<float>(widthDiff * k3f8_2 + xBase);
 			font->SetPosX(x);
 			font->SetPosY(y);
 			font->Draw(text);
 			if (restoreColor) {
-				font->SetColor(shade.color);
+				CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
+				font->SetColor(whiteColor.color);
 			}
+			cmakeOffset += 0x9C0;
+			caravanOffset += 0xC30;
+			xCounter2 += 0x90;
+			slot++;
 		}
+		yCounter2 += 0xB8;
 	}
 
 	DrawInit();
@@ -7992,57 +9250,56 @@ void CMenuPcs::DrawCMLife()
 {
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		fade = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter));
 	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		fade = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(worldState->m_frameCounter) -
 		                            DOUBLE_80331420));
 	}
-	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int readyMask = 0;
-	for (int i = 0; i < kWmCharaSelectCount; i++) {
+	for (int i = 0; i < 4; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;
 		}
 	}
+	const float alphaF = FLOAT_80331458 * fade;
 
 	for (int slot = 0; slot < 8; slot++) {
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
 
-		unsigned short life = 0;
-		bool enabled = false;
-		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
-		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
-			enabled = true;
+		int count;
+		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0 &&
+		    *reinterpret_cast<int*>(m_cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+			count = static_cast<int>(*reinterpret_cast<unsigned short*>(m_cmakeWork + slot * 0x9C0 + 0x14D6)) >> 1;
 		} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
-			life = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A);
-			enabled = true;
-		}
-
-		if (!enabled) {
+			count = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A)) >> 1;
+		} else {
 			continue;
 		}
-
-		const int count = static_cast<int>(life) >> 1;
-		float red = FLOAT_80331434;
-		float green = FLOAT_80331668;
+		float red;
+		float green;
+		float blue;
 		if ((readyMask & (1u << slot)) != 0) {
 			red = FLOAT_803313e8;
 			green = FLOAT_803313e8;
+			blue = FLOAT_803313e8;
+		} else {
+			red = FLOAT_80331434;
+			green = FLOAT_80331668;
+			blue = FLOAT_80331668;
 		}
 
-		CColor color(static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red)),
-		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
-		             static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green)),
-		             static_cast<unsigned char>(alpha));
-		GXSetChanMatColor(GX_COLOR0A0, color.color);
+		GXColor color;
+		color.r = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * red));
+		color.g = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * green));
+		color.b = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blue));
+		color.a = static_cast<unsigned char>(static_cast<int>(alphaF));
+		GXSetChanMatColor(GX_COLOR0A0, color);
 
 		const int row = slot / 4;
 		const int col = slot - row * 4;
@@ -8052,17 +9309,24 @@ void CMenuPcs::DrawCMLife()
 		}
 		const float xBase = FLOAT_80331410 + static_cast<float>(col * 0x90);
 		const float yBase = y + FLOAT_8033166C;
-		float x = xBase + static_cast<float>(0x90 - count * 0x10) * static_cast<float>(DOUBLE_803313f8);
-		float step = static_cast<float>(8 - count) * static_cast<float>(DOUBLE_803313f8);
+		float x = static_cast<float>(xBase + static_cast<double>(0x90 - count * 0x10) * DOUBLE_803313f8);
+		float step = static_cast<float>(static_cast<double>(8 - count) * DOUBLE_803313f8);
+
+		const float kSplineDiv = FLOAT_803314c0;
+		const float kZero = FLOAT_803313dc;
+		const float kRectSize = FLOAT_80331558;
+		const double kStepDelta = DOUBLE_80331420;
 
 		for (int i = 0; i < count; i++) {
-			float yAdd = FLOAT_803313dc;
-			const float t = step / FLOAT_803314c0;
-			if (t < gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
+			float yAdd = kZero;
+			const float t = step / kSplineDiv;
+			if (t >= gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
+				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
+			} else {
 				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
 					if (t <= gWmLifeYOffsetSpline[j * 4]) {
 						if (j == 0) {
-							yAdd = gWmLifeYOffsetSpline[1];
+							yAdd = gWmLifeYOffsetSpline[j * 4 + 1];
 						} else {
 							float* const cur = gWmLifeYOffsetSpline + j * 4;
 							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
@@ -8070,49 +9334,42 @@ void CMenuPcs::DrawCMLife()
 							const float u = (t - prev[0]) / width;
 							const float u2 = u * u;
 							const float u3 = u2 * u;
-							yAdd = width * (prev[3] * (u - (FLOAT_803314c8 * u2 - u3)) +
+							yAdd = width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) +
 							                cur[2] * (u3 - u2)) +
-							       prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-							       cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+							       (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
 						break;
 					}
 				}
-			} else {
-				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
 			}
 
 			MenuPcs.DrawRect(
-			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
-			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			step += static_cast<float>(DOUBLE_80331420);
-			x += FLOAT_80331558;
+			    0, x, yBase + yAdd, kRectSize, kRectSize,
+			                                kZero, kZero, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			step += static_cast<float>(kStepDelta);
+			x += kRectSize;
 		}
 
-		if (m_cmakeWorkActive == 1 && cmakeWork != 0) {
-			const unsigned char* const work = cmakeWork + slot * 0x9C0;
-			const char flagA = work[0x1D90];
-			const char flagB = work[0x1D91];
-			if (flagA != 0 || flagB != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			}
+		unsigned char flagA;
+		unsigned char flagB;
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
+			flagA = work[0x1D90];
+			flagB = work[0x1D91];
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
-			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				MenuPcs.DrawRect(
-				    0, xBase + static_cast<float>(DOUBLE_80331670),
-				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
-				                                FLOAT_80331440, FLOAT_803313dc,
-				                                caravanWork.m_shopBusyFlag != 0 ? FLOAT_803313dc : FLOAT_80331440,
-				                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
-			}
+			flagA = caravanWork.m_shopBusyFlag;
+			flagB = caravanWork.m_caravanLocalFlags;
+		}
+		if (flagA != 0 || flagB != 0) {
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+			MenuPcs.DrawRect(
+			    0, static_cast<float>(xBase + DOUBLE_80331670),
+			                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
+			                                FLOAT_80331440, FLOAT_803313dc,
+			                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
+			                                FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}
 }
@@ -8147,71 +9404,69 @@ void CMenuPcs::WMSubMenuInit()
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
 
-	if (typedWorldState->m_changeRequest == 0) {
+	if (m_wmWorldState->m_changeRequest == 0) {
 		return;
 	}
 
-	int iVar14 = typedWorldState->m_menuMode;
+	int iVar14 = m_wmWorldState->m_menuMode;
 	DAT_8032ee1c = 1;
 
-	short sVar2 = typedWorldState->m_changeRequest;
+	short sVar2 = m_wmWorldState->m_changeRequest;
 
 	if (sVar2 == 2) {
 		char cVar1 = bytes[0xD];
 		if (cVar1 == 1) {
-			typedWorldState->m_menuMode = 0;
+			m_wmWorldState->m_menuMode = 0;
 		} else if (cVar1 == 2) {
-			typedWorldState->m_menuMode = 5;
+			m_wmWorldState->m_menuMode = 5;
 		} else if (cVar1 == 3) {
 			DAT_8032ee1c = 1;
 			if (iVar14 == 6) {
-				typedWorldState->m_changeRequest = 0;
+				m_wmWorldState->m_changeRequest = 0;
 				return;
 			}
-			typedWorldState->m_menuMode = 6;
+			m_wmWorldState->m_menuMode = 6;
 		} else if (cVar1 == 4) {
-			typedWorldState->m_menuMode = 4;
+			m_wmWorldState->m_menuMode = 4;
 		} else {
-			typedWorldState->m_menuMode = 1;
+			m_wmWorldState->m_menuMode = 1;
 		}
 	} else if (iVar14 == 0) {
 		if (sVar2 == 1) {
-			short sVar2b = typedWorldState->m_cardChannel;
+			short sVar2b = m_wmWorldState->m_cardChannel;
 			if (sVar2b == 0) {
-				typedWorldState->m_menuMode = 3;
+				m_wmWorldState->m_menuMode = 3;
 			} else if (sVar2b == 1) {
-				typedWorldState->m_menuMode = 1;
+				m_wmWorldState->m_menuMode = 1;
 				memset(m_wmWorldParams, 0, 0x10);
 			} else if (sVar2b == 2) {
-				typedWorldState->m_menuMode = 8;
+				m_wmWorldState->m_menuMode = 8;
 			} else if (sVar2b == 3) {
-				typedWorldState->m_menuMode = 7;
+				m_wmWorldState->m_menuMode = 7;
 			} else {
-				typedWorldState->m_menuMode = 2;
+				m_wmWorldState->m_menuMode = 2;
 			}
 		} else {
-			typedWorldState->m_menuMode = 4;
+			m_wmWorldState->m_menuMode = 4;
 		}
 	} else if (iVar14 == 1) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 1;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 1;
 	} else if (iVar14 == 8) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 2;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 2;
 	} else if (iVar14 == 7) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 3;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 3;
 	} else if (iVar14 == 2) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 4;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 4;
 	} else if (iVar14 == 5) {
 		if (sVar2 == 1) {
-			typedWorldState->m_menuMode = 0;
+			m_wmWorldState->m_menuMode = 0;
 			bytes[0xD] = 0;
-			typedWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_cardChannel = 0;
 			CFlatRuntime::CStack stackA[3];
 			stackA[0].m_word = 1;
 			stackA[1].m_word = 1;
@@ -8219,7 +9474,7 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
 			DAT_8032ee1c = 1;
-			typedWorldState->m_menuMode = 6;
+			m_wmWorldState->m_menuMode = 6;
 			CFlatRuntime::CStack stackB[3];
 			stackB[0].m_word = 1;
 			stackB[1].m_word = 0;
@@ -8227,52 +9482,52 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackB, 0);
 		}
 	} else if (iVar14 == 6) {
-		typedWorldState->m_menuMode = 0;
+		m_wmWorldState->m_menuMode = 0;
 	} else if (sVar2 == 1) {
-		if (typedWorldState->m_menuMode < 8) {
-			typedWorldState->m_menuMode++;
-		} else {
+		if (m_wmWorldState->m_menuMode >= 8) {
 			bytes[0xD] = 0;
+		} else {
+			m_wmWorldState->m_menuMode++;
 		}
 	} else if (sVar2 == -1) {
-		short sVar2c = typedWorldState->m_menuMode;
-		if (sVar2c < 1) {
+		short sVar2c = m_wmWorldState->m_menuMode;
+		if (sVar2c <= 0) {
 			bytes[0xD] = 0;
 		} else if (sVar2c == 3) {
-			typedWorldState->m_menuMode = 0;
-			typedWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_menuMode = 0;
+			m_wmWorldState->m_cardChannel = 0;
 		} else {
-			typedWorldState->m_menuMode = sVar2c - 1;
+			m_wmWorldState->m_menuMode = sVar2c - 1;
 		}
 	}
 
-	if (typedWorldState->m_menuMode != 0) {
-		typedWorldState->m_cardChannel = 0;
+	if (m_wmWorldState->m_menuMode != 0) {
+		m_wmWorldState->m_cardChannel = 0;
 	}
 
 	float fVar6 = FLOAT_803315b0;
-	typedWorldState->m_frameCounter = 0;
+	m_wmWorldState->m_frameCounter = 0;
 	float fVar5 = FLOAT_803313e8;
 	float fVar4 = FLOAT_803313dc;
 	double local_40 = (double)(long long)(int)fVar6;
-	typedWorldState->m_titleState = 0;
+	m_wmWorldState->m_titleState = 0;
 	double dVar16 = DOUBLE_803313f8;
 	double dVar15 = (double)FLOAT_80331430;
-	typedWorldState->m_worldReady = 0;
-	typedWorldState->m_flag09 = 0;
+	m_wmWorldState->m_worldReady = 0;
+	m_wmWorldState->m_flag09 = 0;
 	double local_38 = (double)(long long)(int)(float)(dVar15 * dVar16);
-	typedWorldState->m_flag0A = 0;
-	typedWorldState->m_state0E = 0;
-	typedWorldState->m_mainState = 0;
-	typedWorldState->m_state12 = 0;
-	typedWorldState->m_subState = 0;
-	typedWorldState->m_delay = 0;
-	typedWorldState->m_counter1A = 0;
-	typedWorldState->m_posY = fVar5;
-	typedWorldState->m_posX = fVar4;
-	typedWorldState->m_mcResult = 0;
-	typedWorldState->m_flag0B = 0;
-	typedWorldState->m_modelFlagsInitialized = 0;
+	m_wmWorldState->m_flag0A = 0;
+	m_wmWorldState->m_state0E = 0;
+	m_wmWorldState->m_mainState = 0;
+	m_wmWorldState->m_state12 = 0;
+	m_wmWorldState->m_subState = 0;
+	m_wmWorldState->m_delay = 0;
+	m_wmWorldState->m_counter1A = 0;
+	m_wmWorldState->m_posY = fVar5;
+	m_wmWorldState->m_posX = fVar4;
+	m_wmWorldState->m_mcResult = 0;
+	m_wmWorldState->m_flag0B = 0;
+	m_wmWorldState->m_modelFlagsInitialized = 0;
 
 	m_menuWindowInfo->x = (short)(int)fVar6;
 	m_menuWindowInfo->y = (short)(int)(float)(dVar15 * dVar16);
@@ -8282,40 +9537,40 @@ void CMenuPcs::WMChgMenu()
 	m_menuWindowInfo->state = 3;
 	m_textureLocIndex = 0;
 
-	int frame = reinterpret_cast<int>(m_wm.m_frameInfo);
-	*reinterpret_cast<short*>(frame + 4) = 0x10;
-	*reinterpret_cast<short*>(frame + 6) = 0x10;
-	*reinterpret_cast<short*>(frame + 8) = 0xE8;
-	*reinterpret_cast<short*>(frame + 10) = 0x168;
-	*reinterpret_cast<float*>(frame + 0xC) = fVar4;
-	*reinterpret_cast<float*>(frame + 0x10) = fVar4;
-	*reinterpret_cast<float*>(frame + 0x14) = fVar5;
-	*reinterpret_cast<float*>(frame + 0x18) = fVar5;
-	*reinterpret_cast<int*>(frame + 0x1C) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4) = 0x10;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 6) = 0x10;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8) = 0xE8;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 10) = 0x168;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0xC) = fVar4;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x10) = fVar4;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x14) = fVar5;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x18) = fVar5;
+	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x1C) = 0;
 
-	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
-	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
-	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
-	*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 10);
-	*reinterpret_cast<int*>(frame + 0x28) = *reinterpret_cast<int*>(frame + 0xC);
-	*reinterpret_cast<int*>(frame + 0x2C) = *reinterpret_cast<int*>(frame + 0x10);
-	*reinterpret_cast<int*>(frame + 0x30) = *reinterpret_cast<int*>(frame + 0x14);
-	*reinterpret_cast<int*>(frame + 0x34) = *reinterpret_cast<int*>(frame + 0x18);
-	*reinterpret_cast<int*>(frame + 0x38) = *reinterpret_cast<int*>(frame + 0x1C);
+	int frameInfo = reinterpret_cast<int>(m_wm.m_frameInfo);
+	*reinterpret_cast<short*>(frameInfo + 0x20) = *reinterpret_cast<short*>(frameInfo + 4);
+	*reinterpret_cast<short*>(frameInfo + 0x22) = *reinterpret_cast<short*>(frameInfo + 6);
+	*reinterpret_cast<short*>(frameInfo + 0x24) = *reinterpret_cast<short*>(frameInfo + 8);
+	*reinterpret_cast<short*>(frameInfo + 0x26) = *reinterpret_cast<short*>(frameInfo + 10);
+	*reinterpret_cast<float*>(frameInfo + 0x28) = *reinterpret_cast<float*>(frameInfo + 0xC);
+	*reinterpret_cast<float*>(frameInfo + 0x2C) = *reinterpret_cast<float*>(frameInfo + 0x10);
+	*reinterpret_cast<float*>(frameInfo + 0x30) = *reinterpret_cast<float*>(frameInfo + 0x14);
+	*reinterpret_cast<float*>(frameInfo + 0x34) = *reinterpret_cast<float*>(frameInfo + 0x18);
+	*reinterpret_cast<int*>(frameInfo + 0x38) = *reinterpret_cast<int*>(frameInfo + 0x1C);
 
-	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
-	*reinterpret_cast<int*>(frame + 0x38) = 8;
+	*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x20) = 0x280 - (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 8) + *reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 4));
+	*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameInfo) + 0x38) = 8;
 
 	if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
 	    && m_singleCmakeSlot >= 0
 	    && m_singleCmakeSlot < 8) {
 		m_singleCmakeMode = 1;
-		typedWorldState->m_menuMode = 3;
+		m_wmWorldState->m_menuMode = 3;
 	} else if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
-	           && m_singleCmakeSlot > 7) {
+	           && m_singleCmakeSlot >= 8) {
 		m_singleCmakeMode = 0;
 		m_singleCmakeSlot = (short)0xFFFF;
-		typedWorldState->m_menuMode = 3;
+		m_wmWorldState->m_menuMode = 3;
 	} else {
 		m_singleCmakeMode = 0;
 		m_singleCmakeSlot = (short)0xFFFF;
@@ -8323,24 +9578,18 @@ void CMenuPcs::WMChgMenu()
 
 	int iVar8 = 0;
 	m_wmTransitionCode = 0;
-	unsigned char* const worldObjData = m_wm.m_worldObjData;
-	unsigned char* const charaModelData = m_wm.m_charaModelData;
-	unsigned char* const charaSelectData = m_wm.m_charaSelectData;
 
-	sVar2 = typedWorldState->m_menuMode;
-	if (sVar2 == 4) {
-		typedWorldState->m_posX = FLOAT_80331440;
-	} else if (sVar2 < 4) {
-		if (sVar2 == 0) {
-			int iVar11 = reinterpret_cast<int>(worldObjData) + 0xA00;
-			int count = 4;
-			do {
+	sVar2 = m_wmWorldState->m_menuMode;
+	switch (sVar2) {
+	case 0: {
+			int iVar11 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
+			for (int count = 0; count < 4; count++) {
 				const int paramIndex = iVar8 / 2;
-				if (Game.m_caravanWorkArr[typedWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
-					typedWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
+				if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
+					m_wmWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
 				}
-				if (Game.m_caravanWorkArr[typedWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
-					typedWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
+				if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
+					m_wmWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
 				}
 				int iVar13 = *reinterpret_cast<int*>(iVar11 + 0x20);
 				if (Game.m_caravanWorkArr[iVar13].m_shopState == 0) {
@@ -8353,29 +9602,29 @@ void CMenuPcs::WMChgMenu()
 				dVar16 = DOUBLE_803313f8;
 				iVar8 = iVar8 + 2;
 				iVar11 = iVar11 + 4;
-				count = count - 1;
-			} while (count != 0);
+			}
 
-			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)typedWorldState->m_cardChannel));
-			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)typedWorldState->m_cardChannel));
+			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)m_wmWorldState->m_cardChannel));
+			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)m_wmWorldState->m_cardChannel));
 			m_effectTimer = 0;
-		} else if (sVar2 > 0 && sVar2 > 2) {
+		break;
+	}
+	case 3: {
 			int iVar11 = 0;
 			double dVar16b = (double)FLOAT_80331664;
 			int iVar12 = 0;
-			int iVar13 = reinterpret_cast<int>(worldObjData) + 0xA00;
+			int iVar13 = reinterpret_cast<int>(m_wm.m_worldObjData) + 0xA00;
 			do {
-				*reinterpret_cast<unsigned char*>(charaModelData + iVar8 + 0xC) = 1;
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaModelData + iVar8 + 0xC) = 1;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
-				int selectData = reinterpret_cast<int>(charaSelectData) + iVar11;
+				int selectData = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar11;
 				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
-				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[iVar12];
-				if (handle->IsModelLoaded(1)) {
+				if (GetWmCharaHandles(this)[iVar12]->IsModelLoaded(1)) {
 					Mtx mtx;
 					PSMTXIdentity(mtx);
-					handle->m_model->SetMatrix(mtx);
-					handle->m_model->CalcMatrix();
-					handle->m_model->CalcSkin();
+					GetWmCharaHandles(this)[iVar12]->m_model->SetMatrix(mtx);
+					GetWmCharaHandles(this)[iVar12]->m_model->CalcMatrix();
+					GetWmCharaHandles(this)[iVar12]->m_model->CalcSkin();
 				}
 				iVar12 = iVar12 + 1;
 				iVar11 = iVar11 + 0x10;
@@ -8388,57 +9637,60 @@ void CMenuPcs::WMChgMenu()
 				GbaQue.ClrCmakeInfo(iVar8);
 				iVar8 = iVar8 + 1;
 			} while (iVar8 < 4);
-		}
-	} else if (sVar2 == 7) {
+		break;
+	}
+	case 4:
+		m_wmWorldState->m_posX = FLOAT_80331440;
+		break;
+	case 7:
 		GetOptionData();
+		break;
 	}
 
 	switch (iVar14) {
 	case 0: {
-		if (typedWorldState->m_menuMode == 4) {
-			Game.m_gameWork.m_wmBackupParams[0] = (int)typedWorldState->m_backupParams[0];
-			Game.m_gameWork.m_wmBackupParams[1] = (int)typedWorldState->m_backupParams[1];
-			Game.m_gameWork.m_wmBackupParams[2] = (int)typedWorldState->m_backupParams[2];
-			Game.m_gameWork.m_wmBackupParams[3] = (int)typedWorldState->m_backupParams[3];
+		if (m_wmWorldState->m_menuMode == 4) {
+			Game.m_gameWork.m_wmBackupParams[0] = (int)m_wmWorldState->m_backupParams[0];
+			Game.m_gameWork.m_wmBackupParams[1] = (int)m_wmWorldState->m_backupParams[1];
+			Game.m_gameWork.m_wmBackupParams[2] = (int)m_wmWorldState->m_backupParams[2];
+			Game.m_gameWork.m_wmBackupParams[3] = (int)m_wmWorldState->m_backupParams[3];
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
 			bytes[0x13] = 0;
 		} else {
 			memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
-			unsigned char bVar7 = 0;
+			char bVar7 = 0;
 			iVar8 = 0;
 			int iVar11 = 0;
-			int iVar12 = 2;
-			do {
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
-				short sv = typedWorldState->m_backupParams[iVar11 / 2];
+			for (int iVar12 = 0; iVar12 < 2; iVar12++) {
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
+				short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 				if (sv < 0) {
-					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = sv;
-					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = sv;
+					bVar7 = bVar7 | (1 << (int)sv);
 				}
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
-				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
-				sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1B) = 0;
+				*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1A) = 0;
+				sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
 				if (sv < 0) {
-					*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 				} else {
-					*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = sv;
-					bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = sv;
+					bVar7 = bVar7 | (1 << (int)sv);
 				}
 				iVar8 = iVar8 + 0x20;
 				iVar11 = iVar11 + 4;
-				iVar12 = iVar12 - 1;
-			} while (iVar12 != 0);
+			}
 
 			iVar8 = 0;
 			iVar11 = 4;
 			do {
-				if (*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) < 0) {
+				if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
 					int iVar12b = 0;
 					unsigned int uVar10 = (unsigned int)(char)bVar7;
 					if ((uVar10 & 1) != 0) { iVar12b = 1;
@@ -8450,10 +9702,10 @@ void CMenuPcs::WMChgMenu()
 					if ((uVar10 & 0x40) != 0) { iVar12b = 7;
 					if ((uVar10 & 0x80) != 0) { iVar12b = 8;
 					}}}}}}}}
-					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)iVar12b;
-					bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
+					*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
+					bVar7 = bVar7 | (1 << iVar12b);
 				}
-				int iVar12c = reinterpret_cast<int>(charaSelectData) + iVar8;
+				int iVar12c = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar8;
 				iVar8 = iVar8 + 0x10;
 				*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
 				iVar11 = iVar11 - 1;
@@ -8466,35 +9718,28 @@ void CMenuPcs::WMChgMenu()
 		bytes[0x11] = 0;
 		break;
 	case 3: {
-		if (typedWorldState->m_menuMode == 4) {
-			int selectBase = reinterpret_cast<int>(charaSelectData);
-			if (*reinterpret_cast<char*>(selectBase + 10) == 0) {
-				Game.m_gameWork.m_wmBackupParams[0] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(selectBase + 4);
-			}
-			typedWorldState->m_backupParams[0] = (short)Game.m_gameWork.m_wmBackupParams[0];
+		if (m_wmWorldState->m_menuMode == 4) {
+			int selectBase = reinterpret_cast<int>(m_wm.m_charaSelectData);
+			int* bp = Game.m_gameWork.m_wmBackupParams;
+			int v0 = (*reinterpret_cast<unsigned char*>(selectBase + 10) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 4) : -1;
+			*bp++ = v0;
+			m_wmWorldState->m_backupParams[0] = (short)v0;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x1A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[1] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(selectBase + 0x14);
-			}
-			typedWorldState->m_backupParams[1] = (short)Game.m_gameWork.m_wmBackupParams[1];
+			int v1 = (*reinterpret_cast<unsigned char*>(selectBase + 0x1A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x14) : -1;
+			*bp++ = v1;
+			m_wmWorldState->m_backupParams[1] = (short)v1;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x2A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[2] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(selectBase + 0x24);
-			}
-			typedWorldState->m_backupParams[2] = (short)Game.m_gameWork.m_wmBackupParams[2];
+			int v2 = (*reinterpret_cast<unsigned char*>(selectBase + 0x2A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x24) : -1;
+			*bp++ = v2;
+			m_wmWorldState->m_backupParams[2] = (short)v2;
 
-			if (*reinterpret_cast<char*>(selectBase + 0x3A) == 0) {
-				Game.m_gameWork.m_wmBackupParams[3] = -1;
-			} else {
-				Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(selectBase + 0x34);
-			}
-			typedWorldState->m_backupParams[3] = (short)Game.m_gameWork.m_wmBackupParams[3];
+			int v3 = (*reinterpret_cast<unsigned char*>(selectBase + 0x3A) != 0)
+			    ? (int)*reinterpret_cast<short*>(selectBase + 0x34) : -1;
+			*bp++ = v3;
+			m_wmWorldState->m_backupParams[3] = (short)v3;
 
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
@@ -8506,30 +9751,30 @@ void CMenuPcs::WMChgMenu()
 		Sound.PlaySe(0x31, 0x40, 0x7F, 0);
 		bytes[0x10] = 0;
 		memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
-		unsigned char bVar7 = 0;
+		char bVar7 = 0;
 		iVar8 = 0;
 		int iVar11 = 0;
 		int iVar12 = 2;
 		do {
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
-			short sv = typedWorldState->m_backupParams[iVar11 / 2];
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xC) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0xB) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 10) = 0;
+			short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 			if (sv < 0) {
-				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = sv;
-				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = sv;
+				bVar7 = bVar7 | (1 << (int)sv);
 			}
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
-			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
-			sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1C) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1B) = 0;
+			*reinterpret_cast<unsigned char*>(m_wm.m_charaSelectData + iVar8 + 0x1A) = 0;
+			sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
 			if (sv < 0) {
-				*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = sv;
-				bVar7 = bVar7 | (unsigned char)(1 << (int)sv);
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 0x14) = sv;
+				bVar7 = bVar7 | (1 << (int)sv);
 			}
 			iVar8 = iVar8 + 0x20;
 			iVar11 = iVar11 + 4;
@@ -8539,7 +9784,7 @@ void CMenuPcs::WMChgMenu()
 		iVar8 = 0;
 		iVar11 = 4;
 		do {
-			if (*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) < 0) {
+			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) < 0) {
 				int iVar12b = 0;
 				unsigned int uVar10 = (unsigned int)(char)bVar7;
 				if ((uVar10 & 1) != 0) { iVar12b = 1;
@@ -8551,30 +9796,32 @@ void CMenuPcs::WMChgMenu()
 				if ((uVar10 & 0x40) != 0) { iVar12b = 7;
 				if ((uVar10 & 0x80) != 0) { iVar12b = 8;
 				}}}}}}}}
-				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)iVar12b;
-				bVar7 = bVar7 | (unsigned char)(1 << iVar12b);
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + iVar8 + 4) = (short)iVar12b;
+				bVar7 = bVar7 | (1 << iVar12b);
 			}
-			int iVar12c = reinterpret_cast<int>(charaSelectData) + iVar8;
+			int iVar12c = reinterpret_cast<int>(m_wm.m_charaSelectData) + iVar8;
 			iVar8 = iVar8 + 0x10;
 			*reinterpret_cast<short*>(iVar12c + 6) = *reinterpret_cast<short*>(iVar12c + 4);
 			iVar11 = iVar11 - 1;
 		} while (iVar11 != 0);
 		break;
 	}
+	case 7:
+		break;
 	}
 
-	if (typedWorldState->m_changeRequest == 2
-	    && typedWorldState->m_menuMode == 4) {
+	if (m_wmWorldState->m_changeRequest == 2
+	    && m_wmWorldState->m_menuMode == 4) {
 		bytes[0x10] = 1;
 		bytes[0x12] = 0;
 		bytes[0x13] = 0;
 	}
 
-	typedWorldState->m_changeRequest = 0;
-	typedWorldState->m_nextMenuMode = 0;
-	typedWorldState->m_delay = 0;
+	m_wmWorldState->m_changeRequest = 0;
+	m_wmWorldState->m_nextMenuMode = 0;
+	m_wmWorldState->m_delay = 0;
 
-	sVar2 = typedWorldState->m_menuMode;
+	sVar2 = m_wmWorldState->m_menuMode;
 	if (sVar2 == 6) {
 		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 0;
 	} else if (iVar14 == 6 && sVar2 != 6) {
@@ -8680,28 +9927,24 @@ void CMenuPcs::ChgAllModel2()
 		    m_cmakeWork + pdtOffset + 0x14D0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 		int loadMode;
 
-		if (*reinterpret_cast<int*>(pdtData + 0x5B4) == 0) {
+		if (*reinterpret_cast<int*>(pdtData + 0x5B4) != 0) {
+			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
+			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
+			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
+		} else {
 			race = 0xFFFFFFFF;
 			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
 			index = 0xFFFFFFFF;
 			variant = 0xFFFFFFFF;
-		} else {
-			race = *reinterpret_cast<unsigned short*>(pdtData + 0x2E);
-			index = *reinterpret_cast<unsigned short*>(pdtData + 0x32);
-			variant = *reinterpret_cast<unsigned short*>(pdtData + 0x30);
 		}
 
 		modelData = m_wm.m_charaModelData + modelOffset;
-		if ((int)race < 0) {
-			modelData[0xC] = 0;
-			loadMode = 3;
-			modelId = 0x43;
-		} else {
+		if ((int)race >= 0) {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
@@ -8709,6 +9952,10 @@ void CMenuPcs::ChgAllModel2()
 			modelData[0xC] = 1;
 			loadMode = 0;
 			modelId += index;
+		} else {
+			modelData[0xC] = 0;
+			loadMode = 3;
+			modelId = 0x43;
 		}
 
 		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
@@ -8738,16 +9985,11 @@ void CMenuPcs::ChgAllModel()
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 
-		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
-			race = 0xFFFFFFFF;
-			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
-			variant = 0xFFFFFFFF;
-			index = 0xFFFFFFFF;
-		} else {
+		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			race = *reinterpret_cast<unsigned short*>(caravanData + 0x3E0);
 			variant = *reinterpret_cast<unsigned short*>(caravanData + 0x3E2);
 			index = *reinterpret_cast<unsigned short*>(caravanData + 0x3E4);
@@ -8756,20 +9998,29 @@ void CMenuPcs::ChgAllModel()
 				modelId += 100;
 			}
 			*reinterpret_cast<unsigned int*>(modelData + 8) = modelId + index;
+		} else {
+			race = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(modelData + 8) = 0xFFFFFFFF;
+			variant = 0xFFFFFFFF;
+			index = 0xFFFFFFFF;
 		}
 
 		modelData = m_wm.m_charaModelData + modelOffset;
-		if ((int)race < 0) {
-			modelData[0xC] = 0;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(3, 0x43, 0);
-		} else {
+		int loadMode;
+		if ((int)race >= 0) {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId += 100;
 			}
 			modelData[0xC] = 1;
-			reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(0, modelId + index, 0);
+			loadMode = 0;
+			modelId += index;
+		} else {
+			modelData[0xC] = 0;
+			loadMode = 3;
+			modelId = 0x43;
 		}
+		reinterpret_cast<CCharaPcs::CHandle**>(handleData + 0x7F4)[0]->LoadModelASync(loadMode, modelId, 0);
 
 		gameData += 0xC30;
 		handleData += 4;
@@ -8940,23 +10191,41 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
 void CMenuPcs::CalcMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const world = m_wmWorldState;
-	const unsigned short btn = static_cast<unsigned short>(GetButtonDown(0));
-	const short state = world->m_mainState;
+	int port = 0;
+	bool noInput = false;
+	u32 btnRaw;
+	if (Pad.m_debugPadLock == 0) {
+		if (port != 0) {
+			goto input_check_done;
+		}
+		if (Pad.m_debugPadPort == -1) {
+			goto input_check_done;
+		}
+	}
+	noInput = true;
+input_check_done:
+	if (noInput) {
+		btnRaw = 0;
+	} else {
+		u32 clamped = (Pad.m_debugPadPort == port) ? 0 : port;
+		btnRaw = Pad.GetPadInputs()[clamped].buttonDown[0];
+	}
+	const unsigned short btn = static_cast<unsigned short>(btnRaw);
+	const short state = m_wmWorldState->m_mainState;
 
-	if (((state > 0) && (state < 4)) || world->m_cardChannel == 1) {
-		if (state == 2 && world->m_delay == 0) {
+	if (((state > 0) && (state < 4)) || m_wmWorldState->m_cardChannel == 1) {
+		if (state == 2 && m_wmWorldState->m_delay == 0) {
 			if ((btn & 1) != 0) {
 				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
 				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
 					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
 				}
-				world->m_frameCounter = 0xE;
-				if (world->m_cardChannel < 4) {
-					world->m_cardChannel++;
+				m_wmWorldState->m_frameCounter = 0xE;
+				if (m_wmWorldState->m_cardChannel >= 4) {
+					m_wmWorldState->m_cardChannel = 0;
 				} else {
-					world->m_cardChannel = 0;
+					m_wmWorldState->m_cardChannel++;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			} else if ((btn & 2) != 0) {
@@ -8965,52 +10234,55 @@ void CMenuPcs::CalcMainMenuSub()
 					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
 					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
 				}
-				world->m_frameCounter = 0xE;
-				if (world->m_cardChannel < 1) {
-					world->m_cardChannel = 4;
+				m_wmWorldState->m_frameCounter = 0xE;
+				if (m_wmWorldState->m_cardChannel < 1) {
+					m_wmWorldState->m_cardChannel = 4;
 				} else {
-					world->m_cardChannel--;
+					m_wmWorldState->m_cardChannel--;
 				}
 				Sound.PlaySe(0x37, 0x40, 0x7F, 0);
 			}
 
 			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
 			const float selB = *reinterpret_cast<float*>(bytes + 0x7C);
-			const float lo = (selA < selB) ? selA : selB;
-			const float hi = (selA < selB) ? selB : selA;
-			const float delta = FLOAT_803315cc * (hi - lo);
-			if (selA < selB) {
-				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;
-			} else {
+			const float lo = (selB > selA) ? selA : selB;
+			const float hi = (selB > selA) ? selB : selA;
+			const float delta = FLOAT_803315cc * (lo - hi);
+			if (selB > selA) {
 				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
+			} else {
+				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;
 			}
 
-			if (world->m_frameCounter > 0) {
-				world->m_frameCounter--;
+			if (m_wmWorldState->m_frameCounter > 0) {
+				m_wmWorldState->m_frameCounter--;
 			}
 
-			if (world->m_frameCounter == 0 && (btn & 3) == 0) {
+			if (m_wmWorldState->m_frameCounter == 0 && (btn & 3) == 0) {
 				if ((btn & 0x100) != 0) {
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
-					world->m_delay = 0x14;
-					world->m_nextMenuMode = 1;
+					m_wmWorldState->m_delay = 0x14;
+					m_wmWorldState->m_nextMenuMode = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
-					for (int i = 0; i < 4; i++) {
-						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
+					const unsigned char stageMode = Game.m_gameWork.m_menuStageMode;
+					int i = 0;
+					do {
+						if (stageMode != 0 && i != 0) {
 							break;
 						}
-						if (world->m_backupParams[i] >= 0) {
+						if (m_wmWorldState->m_backupParams[i] >= 0) {
 							valid++;
 						}
-					}
+						i++;
+					} while (i < 4);
 					if (valid == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {
-						world->m_delay = 1;
-						world->m_nextMenuMode = -1;
+						m_wmWorldState->m_delay = 1;
+						m_wmWorldState->m_nextMenuMode = -1;
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
@@ -9030,7 +10302,7 @@ void CMenuPcs::CalcMainMenuSub()
 		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
 		PSMTXConcat(baseMtx, rotMtx, baseMtx);
 
-		float t = static_cast<float>(world->m_titleState) / FLOAT_803314c0;
+		float t = static_cast<float>(m_wmWorldState->m_titleState) / FLOAT_803314c0;
 		float selectedRotY;
 		float selectedRotZ;
 		float selectedYOffset;
@@ -9039,42 +10311,43 @@ void CMenuPcs::CalcMainMenuSub()
 		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
 
 		float openScale = FLOAT_803313dc;
-		if (world->m_nextMenuMode != -1) {
-			t = static_cast<float>(0x14 - world->m_delay) / FLOAT_803314c0;
+		if (m_wmWorldState->m_nextMenuMode != -1) {
+			t = static_cast<float>(0x14 - m_wmWorldState->m_delay) / FLOAT_803314c0;
 			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
 		}
 
-		if (state == 2 && world->m_delay == 0) {
-			world->m_titleState++;
-			if (world->m_titleState > 99) {
-				world->m_titleState = 0;
+		if (state == 2 && m_wmWorldState->m_delay == 0) {
+			m_wmWorldState->m_titleState++;
+			if (m_wmWorldState->m_titleState > 99) {
+				m_wmWorldState->m_titleState = 0;
 			}
 		} else {
-			world->m_titleState = 0;
+			m_wmWorldState->m_titleState = 0;
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const short curState = world->m_mainState;
+			const short curState = m_wmWorldState->m_mainState;
 			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
 				continue;
 			}
 
 			unsigned char* const panel = worldObj + i * 0x50;
-			panel[0] = 1;
+			*reinterpret_cast<int*>(panel) = 1;
+			unsigned int frame = 0;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
 				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
 			}
 
+			*reinterpret_cast<float*>(panel + 0x34) = modelScale;
+			*reinterpret_cast<float*>(panel + 0x38) = modelScale;
+			*reinterpret_cast<float*>(panel + 0x3C) = modelScale;
 			*reinterpret_cast<float*>(panel + 0x1C) = FLOAT_803313dc;
 			*reinterpret_cast<float*>(panel + 0x20) = FLOAT_803313dc;
 			*reinterpret_cast<float*>(panel + 0x24) = FLOAT_803315E0;
 			*reinterpret_cast<float*>(panel + 0x28) = FLOAT_803313dc;
 			*reinterpret_cast<float*>(panel + 0x2C) = FLOAT_803315E4 * static_cast<float>(i);
 			*reinterpret_cast<float*>(panel + 0x30) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(panel + 0x34) = modelScale;
-			*reinterpret_cast<float*>(panel + 0x38) = modelScale;
-			*reinterpret_cast<float*>(panel + 0x3C) = modelScale;
 
 			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * *reinterpret_cast<float*>(panel + 0x2C));
 			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &basePos);
@@ -9085,31 +10358,40 @@ void CMenuPcs::CalcMainMenuSub()
 			modelPos.z = workMtx[2][3];
 			PSMTXIdentity(modelMtx);
 
+			if (i == 1) {
+				const int ms = m_wmWorldState->m_mainState;
+				if (ms != 2) {
+					if (ms < 2) {
+						frame = 0x13 - (ms * 10 + m_wmWorldState->m_frameCounter);
+						if (static_cast<int>(frame) < 0) {
+							frame = 0;
+						}
+					} else {
+						frame = m_wmWorldState->m_frameCounter + (ms - 3) * 10;
+					}
+				}
+			}
+
 			if (i == 0) {
 				PSMTXRotRad(rotMtx, 'y', FLOAT_803315E8);
 				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
 				PSMTXConcat(rotMtx, scaleMtx, modelMtx);
 			} else if (i == 1) {
-				if (world->m_nextMenuMode == -1 || world->m_cardChannel != 1 ||
-				    world->m_mainState == 2) {
-					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
-				} else {
-					unsigned int frame = 0x13 - (world->m_frameCounter +
-					                              world->m_mainState * 10);
-					if (static_cast<int>(frame) < 0) {
-						frame = 0;
-					}
+				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
+				    m_wmWorldState->m_mainState != 2) {
+					float inner = static_cast<float>(DOUBLE_80331600 *
+					    (static_cast<double>(static_cast<float>(frame)) / DOUBLE_80331608));
 					float rot = static_cast<float>(
-					    DOUBLE_803315F0 *
-					    (DOUBLE_803315F8 + DOUBLE_80331600 *
-					                           (static_cast<double>(static_cast<float>(frame)) / DOUBLE_80331608)));
+					    DOUBLE_803315F0 * (DOUBLE_803315F8 + inner));
 					PSMTXRotRad(modelMtx, 'x', rot);
+				} else {
+					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
 				}
 			} else {
 				PSMTXRotRad(modelMtx, 'x', FLOAT_80331614);
 			}
 
-			if (world->m_cardChannel == i) {
+			if (m_wmWorldState->m_cardChannel == i) {
 				PSMTXRotRad(rotMtx, 'z', FLOAT_803314bc * selectedRotZ);
 				PSMTXRotRad(scaleMtx, 'y', FLOAT_803314bc * selectedRotY);
 				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
@@ -9127,38 +10409,56 @@ void CMenuPcs::CalcMainMenuSub()
 			} else if (i == 1) {
 				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331620, FLOAT_803313dc, FLOAT_803313dc);
 			}
-			if (world->m_cardChannel == i) {
-				modelMtx[1][3] = static_cast<float>(static_cast<double>(modelMtx[1][3]) +
-				                                    static_cast<double>(selectedYOffset));
+			if (m_wmWorldState->m_cardChannel == i) {
+				modelMtx[1][3] = modelMtx[1][3] + selectedYOffset;
 			}
 
-			if (world->m_nextMenuMode != -1 && world->m_cardChannel == i &&
-			    world->m_delay != 0) {
+			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
+			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
+				double u = static_cast<double>(frame) / DOUBLE_80331608;
+				float m00 = modelMtx[0][3];
+				float m10 = modelMtx[1][3];
+				float m20 = modelMtx[2][3];
+				modelMtx[0][3] = m00 + static_cast<float>(static_cast<float>(-m00 * u) * u);
+				modelMtx[1][3] = m10 + static_cast<float>(static_cast<float>(DOUBLE_80331628 - m10 * u) * u);
+				modelMtx[2][3] = m20 + static_cast<float>(static_cast<float>(DOUBLE_80331630 - m20) * u);
+			}
+
+			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&
+			    m_wmWorldState->m_delay != 0) {
 				PSMTXScale(scaleMtx, openScale, openScale, openScale);
 				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
 			}
 
-			CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[i];
-			if (handle != 0 && handle->m_model != 0) {
-				if (curState == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter));
-				} else if (curState == 2) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
-				} else if (curState == 3) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
-					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(world->m_frameCounter) -
+			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
+			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
+				float openScale2 = static_cast<float>(
+				    static_cast<float>(DOUBLE_803313f8 * (static_cast<double>(frame) / DOUBLE_80331608)) +
+				    DOUBLE_80331420);
+				PSMTXScale(scaleMtx, openScale2, openScale2, openScale2);
+				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
+			}
+
+			if (GetWmWorldHandles(this)[i] != 0 && GetWmWorldHandles(this)[i]->m_model != 0) {
+				if (m_wmWorldState->m_mainState == 1) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter));
+				} else if (m_wmWorldState->m_mainState == 2) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
+				} else if (m_wmWorldState->m_mainState == 3) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) =
+					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(m_wmWorldState->m_frameCounter) -
 					                         DOUBLE_80331420));
 				} else {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313dc;
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313dc;
 				}
-				if (world->m_nextMenuMode != -1 && world->m_cardChannel == 1 &&
+				if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == 1 &&
 				    i == 1) {
-					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(GetWmWorldHandles(this)[i]->m_model) + 0x9C) = FLOAT_803313e8;
 				}
-				handle->m_model->SetMatrix(modelMtx);
-				handle->m_model->CalcMatrix();
-				handle->m_model->CalcSkin();
+				GetWmWorldHandles(this)[i]->m_model->SetMatrix(modelMtx);
+				GetWmWorldHandles(this)[i]->m_model->CalcMatrix();
+				GetWmWorldHandles(this)[i]->m_model->CalcSkin();
 			}
 		}
 	}
@@ -9205,42 +10505,29 @@ void CMenuPcs::ChkSelectParty()
  */
 void CMenuPcs::DrawMainMenuSub()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldObj == 0 || worldState == 0) {
-		return;
-	}
+	int worldObj = reinterpret_cast<int>(m_wm.m_worldObjData);
 
-	Mtx savedCamera;
-	Mtx lookAtMtx;
 	Mtx modelMtx;
-	Mtx44 projectionMtx;
 	Mtx44 screenMtx;
-	GXColor clearColor = {0, 0, 0, 0};
-	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-	Vec target;
-	Vec up;
+	GXColor white;
 	float depthValues[5];
 	unsigned int drawOrder[5];
 
-	target.x = FLOAT_803313dc;
-	target.y = FLOAT_803313dc;
-	target.z = FLOAT_803313dc;
-	up.x = FLOAT_803313dc;
-	up.y = FLOAT_803313e8;
-	up.z = FLOAT_803313dc;
-
-	PSMTXCopy(CameraPcs.m_cameraMatrix, savedCamera);
-
+	Mtx44 projectionMtx;
+	Mtx lookAtMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), &up, reinterpret_cast<Point3d*>(&target));
+	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
+	CColor clearColor0(0, 0, 0, 0);
+	GXColor clearColor = clearColor0.color;
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	GXSetColorUpdate(1);
 	GXSetAlphaUpdate(1);
@@ -9252,79 +10539,112 @@ void CMenuPcs::DrawMainMenuSub()
 	             *reinterpret_cast<unsigned int*>(worldObj + 0x778), *reinterpret_cast<unsigned int*>(worldObj + 0x77C));
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
+	const double one = DOUBLE_80331420;
+	const double scaleX = DOUBLE_803315A0;
+	const float zSub = FLOAT_80331598;
+	const float zero = FLOAT_803313dc;
+	const float subY = FLOAT_803315b4;
+	const float subX = FLOAT_803315b0;
+	const double scaleY = DOUBLE_803315A8;
+	const Vec* posPtr = s_MMenuPos;
+	int viewOff = 0;
 	for (int i = 0; i < 5; i++) {
-		Vec viewPos = s_MMenuPos[i];
+		Vec viewPos;
 		Vec4d clipPos;
-		unsigned char* const view = worldObj + i * 0x50;
-		viewPos.z -= FLOAT_80331598;
+		viewPos.x = posPtr->x;
+		viewPos.z = posPtr->z - zSub;
+		viewPos.y = posPtr->y;
 		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
-		float ndcX = 0.0f;
-		float ndcY = 0.0f;
-		if (clipPos.w != 0.0f) {
-			ndcX = clipPos.x / clipPos.w;
-			ndcY = clipPos.y / clipPos.w;
-		}
+		posPtr++;
 
-		*reinterpret_cast<short*>(view + 8) = static_cast<short>(320.0f * (1.0f + ndcX) - FLOAT_803315b0);
-		*reinterpret_cast<short*>(view + 0xA) = static_cast<short>(240.0f * (1.0f - ndcY) - FLOAT_803315b4);
-		*reinterpret_cast<unsigned short*>(view + 0xC) = 0x280;
-		*reinterpret_cast<unsigned short*>(view + 0xE) = 0x1C0;
-		*reinterpret_cast<float*>(view + 0x10) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(view + 0x14) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(view + 0x18) = FLOAT_80331598;
+		clipPos.x = clipPos.x / clipPos.w;
+		clipPos.y = clipPos.y / clipPos.w;
+		double negY = -static_cast<double>(clipPos.y);
+		clipPos.x = static_cast<float>(scaleX * (one + static_cast<double>(clipPos.x)));
+		clipPos.y = static_cast<float>(scaleY * (one + negY));
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 8) =
+		    static_cast<short>(static_cast<int>(clipPos.x - subX));
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xA) =
+		    static_cast<short>(static_cast<int>(clipPos.y - subY));
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xC) = 0x280;
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0xE) = 0x1C0;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x10) = zero;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x14) = zero;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewOff + 0x18) = zSub;
+		viewOff += 0x50;
+	}
 
-		drawOrder[i] = static_cast<unsigned int>(i);
-		depthValues[i] = FLOAT_803313dc;
+	float* depthPtr = depthValues;
+	unsigned int* orderPtr = drawOrder;
+	unsigned char* handlePtr = reinterpret_cast<unsigned char*>(this);
+	for (unsigned int i = 0; static_cast<int>(i) < 5; i++) {
+		PSMTXCopy(reinterpret_cast<MtxPtr>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(handlePtr + 0x774) + 0x168) + 8),
+		          modelMtx);
+		*orderPtr = i;
+		handlePtr += 4;
+		orderPtr++;
+		*depthPtr = modelMtx[2][3];
+		depthPtr++;
+	}
 
-		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x774)[i]);
-		if (handle != 0) {
-			void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-			if (model != 0) {
-				PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(model) + 8), modelMtx);
-				depthValues[i] = modelMtx[2][3];
+	{
+		float* fp = depthValues;
+		unsigned int* op = drawOrder;
+		for (int i = 0; i < 5; i++) {
+			int next = i + 1;
+			int remaining = 5 - next;
+			float* fpInner = depthValues + next;
+			unsigned int* opInner = drawOrder + next;
+			if (next < 5) {
+				do {
+					float depth = *fp;
+					if (*fpInner < depth) {
+						unsigned int idx = *op;
+						unsigned int idxInner = *opInner;
+						*fp = *fpInner;
+						*op = idxInner;
+						*fpInner = depth;
+						*opInner = idx;
+					}
+					fpInner++;
+					opInner++;
+					remaining--;
+				} while (remaining != 0);
 			}
+			op++;
+			fp++;
 		}
 	}
 
-	for (int i = 0; i < 5; i++) {
-		for (int j = i + 1; j < 5; j++) {
-			if (depthValues[j] < depthValues[i]) {
-				const float depth = depthValues[i];
-				const unsigned int index = drawOrder[i];
-				depthValues[i] = depthValues[j];
-				drawOrder[i] = drawOrder[j];
-				depthValues[j] = depth;
-				drawOrder[j] = index;
-			}
-		}
-	}
-
-	const short state = worldState->m_mainState;
+	white.r = 0xFF;
+	white.g = 0xFF;
+	white.b = 0xFF;
+	white.a = 0xFF;
 	for (int orderIndex = 0; orderIndex < 5; orderIndex++) {
-		unsigned int handleIndex = drawOrder[orderIndex];
-		if ((state < 1 || state > 3) && (worldState->m_cardChannel != 1 || orderIndex != 1)) {
-			continue;
-		}
-		if ((state < 1 || state > 3) && worldState->m_cardChannel == 1 && orderIndex == 1) {
-			handleIndex = 1;
-		}
-
-		CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[handleIndex];
-		if (handle == 0) {
-			continue;
+		short state = *reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10);
+		if (state < 1 || state > 3) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x26) != 1 || orderIndex != 1) {
+				continue;
+			}
+			drawOrder[orderIndex] = 1;
 		}
 
-		unsigned char* const view = worldObj + handleIndex * 0x50;
-
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+		int view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
+		Mtx44 projectionMtx0;
+		Mtx lookAtMtx0;
+		C_MTXPerspective(projectionMtx0, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+		GXSetProjection(projectionMtx0, GX_PERSPECTIVE);
+		PSMTX44Copy(projectionMtx0, CameraPcs.m_screenMatrix);
+		CVector target0(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up0(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+		C_MTXLookAt(lookAtMtx0, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up0), reinterpret_cast<Point3d*>(&target0));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		PSMTXCopy(lookAtMtx0, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
+		CColor clearColor0(0, 0, 0, 0);
+		GXColor clearColor = clearColor0.color;
 		GXSetCopyClear(clearColor, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
@@ -9343,20 +10663,29 @@ void CMenuPcs::DrawMainMenuSub()
 				&lightTable.m_diffuseDirs[lightIndex], 0);
 		}
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
-		handle->Draw(5);
+		reinterpret_cast<CCharaPcs::CHandle*>(
+		    *reinterpret_cast<int*>(reinterpret_cast<int>(this) + drawOrder[orderIndex] * 4 + 0x774))
+		    ->Draw(5);
 		DrawInit();
 
-		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
-		GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-		PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
-		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
+		view = reinterpret_cast<int>(m_wm.m_worldObjData) + drawOrder[orderIndex] * 0x50;
+		Mtx44 projectionMtx1;
+		Mtx lookAtMtx1;
+		C_MTXPerspective(projectionMtx1, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+		GXSetProjection(projectionMtx1, GX_PERSPECTIVE);
+		PSMTX44Copy(projectionMtx1, CameraPcs.m_screenMatrix);
+		CVector target1(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+		CVector up1(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+		C_MTXLookAt(lookAtMtx1, reinterpret_cast<Point3d*>(view + 0x10), reinterpret_cast<Vec*>(&up1), reinterpret_cast<Point3d*>(&target1));
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(this) + 0x744));
+		PSMTXCopy(lookAtMtx1, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		GXSetCopyClear(clearColor, 0x00FFFFFF);
+		CColor clearColor1(0, 0, 0, 0);
+		GXColor clearColorB = clearColor1.color;
+		GXSetCopyClear(clearColorB, 0x00FFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
 		GXSetViewport(static_cast<float>(*reinterpret_cast<short*>(view + 8)), static_cast<float>(*reinterpret_cast<short*>(view + 0xA)),
@@ -9365,15 +10694,17 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 
-		if (state == 2) {
-			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		if (*reinterpret_cast<short*>(reinterpret_cast<int>(m_wmWorldState) + 0x10) == 2) {
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-			const float frameWidth = s_MainMenuSubFrameWidths[handleIndex];
-			DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
-			           static_cast<float>(static_cast<double>(s_MMenuPos[handleIndex].z) + DOUBLE_80331418 - DOUBLE_803315C0),
+			unsigned int idx = drawOrder[orderIndex];
+			float frameWidth = reinterpret_cast<float*>(lbl_801DC294)[idx];
+			MenuPcs.DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
+			           static_cast<float>(DOUBLE_80331418 + static_cast<double>(s_MMenuPos[idx].z) - DOUBLE_803315C0),
 			           frameWidth, FLOAT_80331554, FLOAT_803313dc,
-			           FLOAT_80331554 * static_cast<float>(handleIndex) + FLOAT_80331528, FLOAT_803315C8, FLOAT_803315C8);
+			           FLOAT_80331554 * static_cast<float>(static_cast<int>(idx)) + FLOAT_80331528,
+			           FLOAT_803315C8, FLOAT_803315C8);
 		}
 	}
 }
@@ -9449,9 +10780,14 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
+	const int* const DAT_801dc118 = reinterpret_cast<int*>(lbl_801DB7F8 + 0x920);
+	const int DAT_801dc140 = *reinterpret_cast<int*>(lbl_801DB7F8 + 0x948);
+	unsigned char* const lbl_801DC294 = reinterpret_cast<unsigned char*>(lbl_801DB7F8 + 0xA9C);
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* fontF8 = m_fonts[0];
 	WmWorldState* const worldState = m_wmWorldState;
+	const double kSlope = DOUBLE_80331498;
+	const double kBase = DOUBLE_80331490;
 	short state = worldState->m_mainState;
 
 	if ((state == 2 || state == 3) && worldState->m_subState != 0) {
@@ -9466,10 +10802,10 @@ void CMenuPcs::DrawMCList()
 				if (worldState->m_mainState == 2) {
 					animFrames = (int)worldState->m_frameCounter - iVar16;
 				} else {
-					animFrames = 10 - ((int)worldState->m_frameCounter + (3 - (int)slotIdx) * -3);
+					animFrames = 10 - ((int)worldState->m_frameCounter - (3 - (int)slotIdx) * 3);
 					}
 					if (animFrames >= 0) {
-						if (animFrames < 11) {
+						if (animFrames <= 10) {
 							alpha = static_cast<float>(DOUBLE_803314e8 *
 							                           (static_cast<double>(animFrames) - DOUBLE_80331408));
 							yPos = static_cast<float>(static_cast<float>(static_cast<double>(animFrames) -
@@ -9482,32 +10818,43 @@ void CMenuPcs::DrawMCList()
 			} else {
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {
-					float slotY = (float)(slotIdx) * FLOAT_80331498 + FLOAT_80331490;
-					SetAttrFmt((FMT)0);
-					unsigned int slotAlpha = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
+					float slotY = (float)(DOUBLE_80331498 * (double)(int)slotIdx + DOUBLE_80331490);
+					MenuPcs.SetAttrFmt((FMT)0);
+					unsigned int slotAlpha = (unsigned int)(int)(FLOAT_80331458 * alpha) & 0xFF;
 					slotAlpha = slotAlpha | 0xFFFFFF00;
 					GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&slotAlpha);
 
 					// Draw slot background
-					SetTexture((TEX)0x24);
-					DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
+					MenuPcs.SetTexture((TEX)0x24);
+					MenuPcs.DrawRect(0xFFFFFFFF, yPos, slotY, FLOAT_80331468, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
-					SetTexture((TEX)0x25);
-					DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
+					MenuPcs.SetTexture((TEX)0x25);
+					MenuPcs.DrawRect(0xFFFFFFFF, yPos + FLOAT_80331468, slotY, FLOAT_803314fc, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
 
 					// Draw slot content area
-					SetAttrFmt((FMT)1);
+					MenuPcs.SetAttrFmt((FMT)1);
 					float contentX = yPos + FLOAT_80331468 + FLOAT_803314fc;
-					GXColor contentColors[4] = {
-					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
-					    {0xFF, 0xFF, 0xFF, 0},
-					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
-					    {0xFF, 0xFF, 0xFF, 0},
-					};
-					DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
+					GXColor contentColors[4];
+					contentColors[0].r = 0xFF;
+					contentColors[0].g = 0xFF;
+					contentColors[0].b = 0xFF;
+					contentColors[0].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[1].r = 0xFF;
+					contentColors[1].g = 0xFF;
+					contentColors[1].b = 0xFF;
+					contentColors[1].a = 0;
+					contentColors[2].r = 0xFF;
+					contentColors[2].g = 0xFF;
+					contentColors[2].b = 0xFF;
+					contentColors[2].a = static_cast<unsigned char>(slotAlpha);
+					contentColors[3].r = 0xFF;
+					contentColors[3].g = 0xFF;
+					contentColors[3].b = 0xFF;
+					contentColors[3].a = 0;
+					MenuPcs.DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
 					         FLOAT_803313dc, FLOAT_803313dc, contentColors,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
 				}
@@ -9531,16 +10878,19 @@ LAB_draw:
 		                                   DOUBLE_80331408) -
 		                                  DOUBLE_80331420));
 	}
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF,
-	                      static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor;
+	frameColor.r = 0xFF;
+	frameColor.g = 0xFF;
+	frameColor.b = 0xFF;
+	frameColor.a = static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	unsigned char* const frame = m_wm.m_frameInfo;
 	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;
-			DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
@@ -9550,19 +10900,23 @@ LAB_draw:
 		}
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor white;
+	white.r = 0xFF;
+	white.g = 0xFF;
+	white.b = 0xFF;
+	white.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 	short separatorSub = worldState->m_subState;
 	if (separatorSub != 0 && separatorSub > 1 &&
 	    worldState->m_mainState == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
-			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-			DrawRect(0xFFFFFFFF, FLOAT_803314d8,
-			         static_cast<float>(static_cast<double>(FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490) -
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803314d8,
+			         static_cast<float>((kSlope * static_cast<double>(slot) + kBase) -
 			                            DOUBLE_80331510),
 			         FLOAT_803314d8, FLOAT_803314d8,
-			         FLOAT_80331490 * static_cast<float>(slot), FLOAT_803313e0,
+			         static_cast<float>(kBase * static_cast<double>(slot)), FLOAT_803313e0,
 			         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 		}
 	}
@@ -9572,11 +10926,11 @@ LAB_draw:
 		unsigned char* const mcData = m_wmCharaState;
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			unsigned char* const slotData = mcData + slot * kMcListEntrySize;
-			const float slotY = FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490;
-			if (slotData[0x42] == 0 && slotData[0x41] != 0) {
+			const float slotY = static_cast<float>(kSlope * static_cast<double>(slot) + kBase);
+			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<char*>(slotData + 0x41) != 0) {
 				const float rowY = slotY + FLOAT_80331440;
-				SetTexture(static_cast<CMenuPcs::TEX>(0x26));
-				DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+				MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
 				unsigned int memberCount = static_cast<unsigned int>(*reinterpret_cast<int*>(slotData + 0x18) >= 0);
@@ -9590,21 +10944,21 @@ LAB_draw:
 					memberCount++;
 				}
 				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
-				DrawRect(0xFFFFFFFF,
+				MenuPcs.DrawRect(0xFFFFFFFF,
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
 				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
-					SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-					DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
 					         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
-					const unsigned int language = Game.m_gameWork.m_languageId;
+					const int language = Game.m_gameWork.m_languageId;
 					float dateY = rowY;
 					if (language != 5) {
 						dateY = slotY + FLOAT_803314d8;
 					}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x17));
-					const unsigned int saveYear = *reinterpret_cast<unsigned int*>(slotData + 8);
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+					const int saveYear = *reinterpret_cast<int*>(slotData + 8);
 					int digitCount = 1;
 					if (saveYear > 99) {
 						digitCount = 3;
@@ -9612,7 +10966,7 @@ LAB_draw:
 						digitCount = 2;
 					}
 					if (digitCount == 3) {
-						DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
+						MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
 						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 					} else {
 						int digits[2];
@@ -9647,7 +11001,7 @@ LAB_draw:
 							const int row = digit / 5 + (digit >> 0x1F);
 							const int rowIndex = row - (row >> 0x1F);
 							const int col = digit + rowIndex * -5;
-							DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
 							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(col)),
 							         static_cast<float>(DOUBLE_80331540 * static_cast<double>(rowIndex) + DOUBLE_80331538),
 							         digitScale, FLOAT_803313e8, 0.0f);
@@ -9684,8 +11038,8 @@ LAB_draw:
 							} else if (language == 2) {
 								dateY += FLOAT_80331550;
 							}
-							SetTexture(static_cast<CMenuPcs::TEX>(0x34));
-							DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
+							MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x34));
+							MenuPcs.DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
 							         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, 0.0f);
 						}
 					}
@@ -9696,12 +11050,12 @@ LAB_draw:
 					} else {
 						dateLabelY = slotY + FLOAT_80331554;
 					}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-					DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
 					         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
-					SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x37));
 					float iconX = FLOAT_8033155C;
 				for (int member = 0; member < 4; member++) {
 					const int modelNo = *reinterpret_cast<int*>(slotData + 0x18 + member * 4);
@@ -9714,15 +11068,15 @@ LAB_draw:
 							texU = FLOAT_80331560;
 						}
 						const int variant = faceNo + (tribe - (tribe >> 31)) * -100;
-						DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
+						MenuPcs.DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
 						         texU + FLOAT_80331468 * static_cast<float>(variant),
 						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
 						         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 						iconX += FLOAT_80331468;
 					}
 				}
-					SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-					DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
 					         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
 					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
@@ -9760,13 +11114,13 @@ LAB_draw:
 					for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
 						if (playDigits[digitIdx] >= 0) {
 							if (digitIdx == 3) {
-								DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
+								MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
 								         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 								playX += static_cast<float>(playColonWidth);
 							}
 							const int digit = playDigits[digitIdx];
 							const int digitWidth = playDigitWidths[digit];
-							DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
+							MenuPcs.DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
 							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(digit) + DOUBLE_80331570),
 							         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 							playX += static_cast<float>(digitWidth);
@@ -9786,7 +11140,7 @@ LAB_draw:
 					GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
 					                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
 					TextureMan.SetTextureTev(texture);
-					DrawRect(0xFFFFFFFF,
+					MenuPcs.DrawRect(0xFFFFFFFF,
 					         static_cast<float>(static_cast<double>(FLOAT_80331518) + DOUBLE_80331510),
 					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
 					         FLOAT_80331578, FLOAT_80331578,
@@ -9810,10 +11164,10 @@ LAB_draw:
 				if (worldState->m_mainState == 2) {
 					af2 = (int)worldState->m_frameCounter - slot * 3;
 				} else {
-					af2 = 10 - ((int)worldState->m_frameCounter + (3 - slot) * -3);
+					af2 = 10 - ((int)worldState->m_frameCounter - (3 - slot) * 3);
 				}
 				if (af2 < 0) continue;
-				if (af2 < 11) {
+				if (af2 <= 10) {
 					alpha2 = (float)af2;
 				}
 			}
@@ -9821,14 +11175,14 @@ LAB_draw:
 			if (alpha2 <= FLOAT_803314f0) continue;
 
 			unsigned char* slotData = reinterpret_cast<unsigned char*>(mcData) + slot * 0x48;
-			const float slotY = static_cast<float>(slot) * FLOAT_80331498 + FLOAT_80331490;
+			const float slotY = static_cast<float>(kSlope * static_cast<double>(slot) + kBase);
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<int*>(slotData + 8) > 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_80331588);
 				fontF8->DrawInit();
-				unsigned int nameColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&nameColor);
+				CColor nameColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(nameColor.color);
 				fontF8->SetTlut(0x2C);
 				fontF8->SetPosX(FLOAT_80331520);
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
@@ -9843,8 +11197,8 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_8033158C);
 				fontF8->DrawInit();
-				unsigned int locationColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&locationColor);
+				CColor locationColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(locationColor.color);
 					fontF8->SetTlut(7);
 					char locationStr[64];
 					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
@@ -9853,10 +11207,10 @@ LAB_draw:
 					} else if (locationIndex == 0x16) {
 						if (Game.m_gameWork.m_languageId == 2) {
 							strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-							strcat(locationStr, lbl_80210D10[1], sizeof(locationStr));
+							strcat(locationStr, lbl_80210D10[1]);
 						} else {
 							strcpy(locationStr, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
-							strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C), sizeof(locationStr));
+							strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
 						}
 					} else {
 						strcpy(locationStr, Game.m_cFlatDataArr[1].TableStrings(3)[locationIndex]);
@@ -9874,8 +11228,8 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_803313e8);
 				fontF8->DrawInit();
-				unsigned int noDataColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&noDataColor);
+				CColor noDataColor(0xFF, 0xFF, 0xFF, 0xFF);
+				fontF8->SetColor(noDataColor.color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId = static_cast<unsigned int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
@@ -9889,17 +11243,16 @@ LAB_draw:
 	}
 	if (worldState->m_subState == 0x11) {
 		short mode = worldState->m_menuMode;
-		int msgId = -1;
 		if (mode == 5) {
-			msgId = 2;
+			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+			char* text = const_cast<char*>(GetMcStr(2));
+			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(2)), FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		} else if (mode == 2) {
-			msgId = 3;
-		}
-		if (msgId >= 0) {
-			_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-			char* text = const_cast<char*>(GetMcStr(msgId));
-			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
-			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+			char* text = const_cast<char*>(GetMcStr(3));
+			const int x = static_cast<int>(CalcCenteringPos2(const_cast<char*>(GetMcStr(3)), FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, 0x187, color.color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
 		}
 	}
 	DrawInit();
@@ -9938,11 +11291,11 @@ void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
 		alpha = 1.0f;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(kind == 0 ? 0x1F : 0x20));
-	DrawRect(0xFFFFFFFF, 0.0f, 0x1A8, 0x280, 0x18, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind == 0 ? 0x1F : 0x20));
+	MenuPcs.DrawRect(0xFFFFFFFF, 0.0f, 0x1A8, 0x280, 0x18, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -9958,30 +11311,54 @@ void CMenuPcs::CalcMcObj()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
-	unsigned int animCounter = 0;
 
-	for (int i = 0; i < 4; i++) {
-		unsigned int* const panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550 + i * 0x50);
-		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(FLOAT_80331480);
+	const float panelStateFloat = FLOAT_80331480;
+	const double yBase = DOUBLE_80331488;
+	const double ySlope = DOUBLE_80331498;
+	const double bias = DOUBLE_80331408;
+	const double yOffset = DOUBLE_80331490;
+	const float yScale = FLOAT_803314A0;
+	const float zero = FLOAT_803313dc;
+	const float six = FLOAT_803314a4;
+	const double doubleD = DOUBLE_803314a8;
 
+	union I2D {
+		double d;
+		struct {
+			unsigned int hi;
+			unsigned int lo;
+		} u;
+	};
+
+	unsigned int* panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550);
+	for (int i = 0; i < 4; i++, panelState = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(panelState) + 0x50)) {
+		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(panelStateFloat);
+
+		I2D iConv;
+		iConv.u.hi = 0x43300000;
+		iConv.u.lo = static_cast<unsigned int>(i) ^ 0x80000000;
 		const int y = static_cast<int>(
-		    static_cast<float>(DOUBLE_80331488 + DOUBLE_80331498 * static_cast<double>(animCounter) + DOUBLE_80331490) -
-		    FLOAT_803314A0);
+		    static_cast<float>(yBase + ySlope * (iConv.d - bias) + yOffset) -
+		    yScale);
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(panelState) + 0xA) = static_cast<short>(y);
 		*reinterpret_cast<unsigned short*>(panelState + 3) = 0x140;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(panelState) + 0xE) = 0xE0;
-		reinterpret_cast<float*>(panelState)[4] = FLOAT_803313dc;
-		reinterpret_cast<float*>(panelState)[5] = FLOAT_803313dc;
-		reinterpret_cast<float*>(panelState)[6] = FLOAT_803314a4;
+		reinterpret_cast<float*>(panelState)[4] = zero;
+		reinterpret_cast<float*>(panelState)[5] = zero;
+		reinterpret_cast<float*>(panelState)[6] = six;
 
 		panelState[1]++;
-		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    static_cast<double>(static_cast<float>(panelState[1]))) {
+		I2D pConv;
+		pConv.u.hi = 0x43300000;
+		pConv.u.lo = panelState[1] ^ 0x80000000;
+		if (static_cast<float>(pConv.d - bias) >=
+		    doubleD * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4])) {
 			panelState[1] = 0;
 		}
 
-		if (static_cast<int>(charaState[i * 0x12 + 2]) > 0) {
+		if (static_cast<int>(reinterpret_cast<unsigned int*>(m_wmCharaState)[i * 0x12 + 2]) <= 0) {
+			panelState[0] = 0;
+		} else {
 			panelState[0] = 1;
 			reinterpret_cast<float*>(panelState)[7] = FLOAT_803314B0;
 			reinterpret_cast<float*>(panelState)[8] = FLOAT_803314B4;
@@ -9992,73 +11369,65 @@ void CMenuPcs::CalcMcObj()
 			reinterpret_cast<float*>(panelState)[10] = FLOAT_803314B8;
 			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + FLOAT_803314bc;
 
-			float t = static_cast<float>(panelState[1]) / FLOAT_803314c0;
+			float t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
 			float yResult = FLOAT_803313dc;
-			if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+			if (t >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+				yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+			} else {
 				int idx = 0;
 				float* spline = gWmModelYOffsetSpline;
-				int count = gWmModelYOffsetSplineCount;
-				if (count > 0) {
-					do {
-						if (t <= *spline) {
-							if (idx == 0) {
-								yResult = gWmModelYOffsetSpline[1];
-							} else {
-								float* cur = gWmModelYOffsetSpline + idx * 4;
-								float* prev = gWmModelYOffsetSpline + (idx - 1) * 4;
-								float width = *cur - *prev;
-								float u = (t - *prev) / width;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								yResult =
-								    width * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + cur[2] * (u3 - u2)) +
-								    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+				for (int n = gWmModelYOffsetSplineCount; n > 0; n--) {
+					if (t <= *spline) {
+						if (idx == 0) {
+							yResult = gWmModelYOffsetSpline[idx * 4 + 1];
+						} else {
+							float* cur = gWmModelYOffsetSpline + idx * 4;
+							float* prev = gWmModelYOffsetSpline + (idx - 1) * 4;
+							float width = *cur - *prev;
+							float u = (t - *prev) / width;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							yResult =
+							    width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							    (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
-						spline += 4;
-						idx++;
-						count--;
-					} while (count != 0);
+						break;
+					}
+					spline += 4;
+					idx++;
 				}
-			} else {
-				yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 			}
 			reinterpret_cast<float*>(panelState)[8] = reinterpret_cast<float*>(panelState)[8] + yResult;
 
 			float rotResult = FLOAT_803313dc;
-			t = static_cast<float>(panelState[1]) / FLOAT_803314c0;
-			if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+			t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
+			if (t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+				rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+			} else {
 				int idx = 0;
 				float* spline = gWmModelRotationSpline;
-				int count = gWmModelRotationSplineCount;
-				if (count > 0) {
-					do {
-						if (t <= *spline) {
-							if (idx == 0) {
-								rotResult = gWmModelRotationSpline[1];
-							} else {
-								float* cur = gWmModelRotationSpline + idx * 4;
-								float* prev = gWmModelRotationSpline + (idx - 1) * 4;
-								float width = *cur - *prev;
-								float u = (t - *prev) / width;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								rotResult =
-								    width * (prev[3] * (u + -(FLOAT_803314c8 * u2 - u3)) + cur[2] * (u3 - u2)) +
-								    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+				for (int n = gWmModelRotationSplineCount; n > 0; n--) {
+					if (t <= *spline) {
+						if (idx == 0) {
+							rotResult = gWmModelRotationSpline[idx * 4 + 1];
+						} else {
+							float* cur = gWmModelRotationSpline + idx * 4;
+							float* prev = gWmModelRotationSpline + (idx - 1) * 4;
+							float width = *cur - *prev;
+							float u = (t - *prev) / width;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							rotResult =
+							    width * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							    prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							    cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
 						}
-						spline += 4;
-						idx++;
-						count--;
-					} while (count != 0);
+						break;
+					}
+					spline += 4;
+					idx++;
 				}
-			} else {
-				rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 			}
 			reinterpret_cast<float*>(panelState)[0xB] = FLOAT_803314bc * rotResult;
 
@@ -10075,16 +11444,16 @@ void CMenuPcs::CalcMcObj()
 			rotXMtx[2][3] = reinterpret_cast<float*>(panelState)[9];
 			PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-			CChara::CModel* const model =
-			    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168);
-			model->SetMatrix(scaleMtx);
-			model->CalcMatrix();
-			model->CalcSkin();
-		} else {
-			panelState[0] = 0;
+			reinterpret_cast<CChara::CModel*>(
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    ->SetMatrix(scaleMtx);
+			reinterpret_cast<CChara::CModel*>(
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    ->CalcMatrix();
+			reinterpret_cast<CChara::CModel*>(
+			    *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168))
+			    ->CalcSkin();
 		}
-
-		animCounter++;
 	}
 }
 
@@ -10128,9 +11497,9 @@ void CMenuPcs::DrawMcObj()
 			}
 
 			SetProjection(i + 0x11);
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-			SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x24));
 			DrawRect3d(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc, *reinterpret_cast<float*>(panel + 0x1C), FLOAT_80331554,
 			           FLOAT_80331554, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		}
@@ -10303,10 +11672,10 @@ void CMenuPcs::DrawPageMark()
 		alpha = 1.0f;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
 
 	const unsigned char cur = bytes[0x14];
 	unsigned char max = bytes[0x15];
@@ -10318,7 +11687,7 @@ void CMenuPcs::DrawPageMark()
 		const float py = 0x1A0;
 		const float tx = (i == cur) ? 0.0f : 16.0f;
 		const float scale = (i == cur) ? cursorScale : 1.0f;
-		DrawRect(0xFFFFFFFF, px, py, 16.0f, 16.0f, tx, 0.0f, scale, scale, 0.0f);
+		MenuPcs.DrawRect(0xFFFFFFFF, px, py, 16.0f, 16.0f, tx, 0.0f, scale, scale, 0.0f);
 	}
 
 	GetMcAccessPos(&x, &y);
@@ -10425,20 +11794,20 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 	float v0;
 	float v1;
 
-	if ((flags & 8) == 0) {
-		u0 = tx + halfTexel;
-		u1 = (tx + w) - halfTexel;
-	} else {
+	if ((flags & 8) != 0) {
 		u1 = tx + halfTexel;
 		u0 = (tx + w) - halfTexel;
+	} else {
+		u0 = tx + halfTexel;
+		u1 = (tx + w) - halfTexel;
 	}
 
-	if ((flags & 4) == 0) {
-		v0 = ty + halfTexel;
-		v1 = (ty + h) - halfTexel;
-	} else {
+	if ((flags & 4) != 0) {
 		v1 = ty + halfTexel;
 		v0 = (ty + h) - halfTexel;
+	} else {
+		v0 = ty + halfTexel;
+		v1 = (ty + h) - halfTexel;
 	}
 
 	if ((flags & 1) != 0) {
@@ -10504,35 +11873,33 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  */
 void CMenuPcs::DrawMcWin(short state, short kind)
 {
-	MenuWindowInfo* const win = m_menuWindowInfo;
-
-	if (state >= 0 && win->state != state) {
-		win->state = state;
+	if (state >= 0 && m_menuWindowInfo->state != state) {
+		m_menuWindowInfo->state = state;
 	}
 
-	if (win->state == 3) {
+	if (m_menuWindowInfo->state == 3) {
 		return;
 	}
 
-	const float centerX = static_cast<float>(win->x) + static_cast<float>(static_cast<double>(win->width) * DOUBLE_803313f8);
-	const float centerY = static_cast<float>(win->y) + static_cast<float>(static_cast<double>(win->height) * DOUBLE_803313f8);
+	const float centerX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) * DOUBLE_803313f8);
+	const float centerY = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) * DOUBLE_803313f8);
 
 	float sx;
 	float sy;
 	float sw;
 	float sh;
-	if (win->state == 1) {
-		sx = static_cast<float>(win->x);
-		sy = static_cast<float>(win->y);
-		sw = static_cast<float>(win->width);
-		sh = static_cast<float>(win->height);
-	} else {
-		const float xAdd = (((centerX - static_cast<float>(win->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
-		const float yAdd = (((centerY - static_cast<float>(win->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
+	if (m_menuWindowInfo->state != 1) {
+		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
+		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(m_menuWindowInfo->frame);
 		sx = (centerX - FLOAT_80331410) - xAdd;
 		sy = (centerY - FLOAT_80331410) - yAdd;
 		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
 		sh = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + yAdd));
+	} else {
+		sx = static_cast<float>(m_menuWindowInfo->x);
+		sy = static_cast<float>(m_menuWindowInfo->y);
+		sw = static_cast<float>(m_menuWindowInfo->width);
+		sh = static_cast<float>(m_menuWindowInfo->height);
 	}
 
 	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313f8));
@@ -10540,79 +11907,83 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = 0xFF;
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	const int cornerTex = (kind == 0) ? 0x2C : 0x24;
-	const int edgeHTex = (kind == 0) ? 0x2D : 0x26;
-	const int edgeVTex = (kind == 0) ? 0x2E : 0x25;
-	const int fillTex = (kind == 0) ? 0x2F : 0x27;
 	const float border = FLOAT_80331410;
+
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x24 : 0x2C));
 	const float right = (sx + sw) - border;
 	const float bottom = (sy + sh) - border;
-
-	SetTexture(static_cast<CMenuPcs::TEX>(cornerTex));
+	const float uv0 = FLOAT_803313dc;
 	for (int i = 0; i < 4; i++) {
 		float x = sx;
 		float y = sy;
-		float flags = FLOAT_803313dc;
+		unsigned long flags = 0;
 		if (i & 1) {
 			x = right;
-			flags = 8.0f;
+			flags |= 8;
 		}
 		if (i & 2) {
 			y = bottom;
-			flags += 4.0f;
+			flags |= 4;
 		}
-		DrawRect(0xFFFFFFFF, x, y, border, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+		MenuPcs.DrawRect(flags, x, y, border, border, uv0, uv0, FLOAT_803313e8, FLOAT_803313e8, uv0);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(edgeHTex));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x26 : 0x2D));
 	const float innerWidth = static_cast<float>(static_cast<double>(sw) - DOUBLE_80331428);
 	const float innerX = static_cast<float>(static_cast<double>(sx) + static_cast<double>(border));
+	const float uv1 = FLOAT_803313dc;
 	for (int i = 0; i < 2; i++) {
 		float y = sy;
-		float flags = FLOAT_803313dc;
+		unsigned long flags = 0;
 		if (i != 0) {
 			y = bottom;
-			flags = 4.0f;
+			flags |= 4;
 		}
-		DrawRect(0xFFFFFFFF, innerX, y, innerWidth, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+		MenuPcs.DrawRect(flags, innerX, y, innerWidth, border, uv1, uv1, FLOAT_803313e8, FLOAT_803313e8, uv1);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(edgeVTex));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x25 : 0x2E));
 	const float innerHeight = static_cast<float>(static_cast<double>(sh) - DOUBLE_80331428);
 	const float innerY = static_cast<float>(static_cast<double>(sy) + static_cast<double>(border));
-	float lastFlags = FLOAT_803313dc;
+	const float uv2 = FLOAT_803313dc;
+	unsigned long lastFlags = 0;
 	for (int i = 0; i < 2; i++) {
 		float x = sx;
-		lastFlags = FLOAT_803313dc;
+		lastFlags = 0;
 		if (i != 0) {
 			x = right;
-			lastFlags = 8.0f;
+			lastFlags |= 8;
 		}
-		DrawRect(0xFFFFFFFF, x, innerY, border, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
+		MenuPcs.DrawRect(lastFlags, x, innerY, border, innerHeight, uv2, uv2, FLOAT_803313e8, FLOAT_803313e8, uv2);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(fillTex));
-	DrawRect(0xFFFFFFFF, innerX, innerY, innerWidth, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? 0x27 : 0x2F));
+	const float uv3 = FLOAT_803313dc;
+	MenuPcs.DrawRect(lastFlags, innerX, innerY, innerWidth, innerHeight, uv3, uv3, FLOAT_803313e8, FLOAT_803313e8, uv3);
 
-	if (win->state == 0) {
-		win->frame++;
-		if (win->frame > 5) {
-			win->frame = 6;
-			win->state = 1;
+	if (m_menuWindowInfo->state == 0) {
+		m_menuWindowInfo->frame++;
+		if (m_menuWindowInfo->frame >= 6) {
+			m_menuWindowInfo->frame = 6;
+			m_menuWindowInfo->state = 1;
 		}
-	} else if (win->state == 1) {
-		if (win->frame != 6) {
-			win->frame = 6;
+	} else if (m_menuWindowInfo->state == 1) {
+		if (m_menuWindowInfo->frame != 6) {
+			m_menuWindowInfo->frame = 6;
 		}
-	} else if (win->state == 2) {
-		win->frame--;
-		if (win->frame < 1) {
-			win->frame = 0;
-			win->state = 3;
+	} else if (m_menuWindowInfo->state == 2) {
+		m_menuWindowInfo->frame--;
+		if (m_menuWindowInfo->frame <= 0) {
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
 		}
 	}
 }
@@ -10749,7 +12120,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 				text++;
 			}
 			const int textWidth = font->GetWidth(text);
-			if (maxWidth < textWidth) {
+			if (textWidth > maxWidth) {
 				maxWidth = textWidth;
 			}
 		}
@@ -10787,7 +12158,7 @@ void CMenuPcs::SetTextureLoc(int index)
 		index = 0xFF;
 	}
 	m_textureLocIndex = static_cast<unsigned char>(index);
-	SetTexture(static_cast<CMenuPcs::TEX>(index));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(index));
 	gWmMenuWorkA = index;
 }
 
@@ -11042,8 +12413,12 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 
 	if (strictMode == 0) {
 		unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
-		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D9C) ||
-		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1D98) ||
+		unsigned int s0 = *reinterpret_cast<unsigned int*>(src + 0x13D0);
+		unsigned int t0 = *reinterpret_cast<unsigned int*>(targetHeader + 0x1D98);
+		unsigned int s1 = *reinterpret_cast<unsigned int*>(src + 0x13D4);
+		unsigned int t1 = *reinterpret_cast<unsigned int*>(targetHeader + 0x1D9C);
+		unsigned int diff = (s0 ^ t0) | (s1 ^ t1);
+		if (diff != 0 ||
 		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<unsigned int*>(targetHeader + 0x1DA0)) {
 			return -2;
 		}
@@ -11062,11 +12437,13 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 					break;
 				}
 			} else if (src[0x1D91] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D9C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1D98) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x1DA0) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
-				break;
+			           *reinterpret_cast<unsigned int*>(src + 0x1D94) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x1D98) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
+				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x1D9C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
+				if ((e0 | e1) == 0 &&
+				    *reinterpret_cast<unsigned int*>(src + 0x1DA0) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
+					break;
+				}
 			}
 		}
 
@@ -11078,11 +12455,13 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 					break;
 				}
 			} else if (src[0x2751] != 0 &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x275C) == *reinterpret_cast<unsigned int*>(dst + 0x13D4) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2758) == *reinterpret_cast<unsigned int*>(dst + 0x13D0) &&
-			           *reinterpret_cast<unsigned int*>(src + 0x2760) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
-				break;
+			           *reinterpret_cast<unsigned int*>(src + 0x2754) == *reinterpret_cast<unsigned int*>(dst + cmpOffset)) {
+				unsigned int e0 = *reinterpret_cast<unsigned int*>(src + 0x2758) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D0);
+				unsigned int e1 = *reinterpret_cast<unsigned int*>(src + 0x275C) ^ *reinterpret_cast<unsigned int*>(dst + 0x13D4);
+				if ((e0 | e1) == 0 &&
+				    *reinterpret_cast<unsigned int*>(src + 0x2760) == *reinterpret_cast<unsigned int*>(dst + 0x13D8)) {
+					break;
+				}
 			}
 		}
 
@@ -11229,15 +12608,14 @@ void McCtrl::Init()
 int McCtrl::LoadMcList()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
 
 	switch (m_state) {
 	case 0:
-		MenuPcs.ClrMcList();
+		memset(MenuPcs.m_wmWorkBuffer, 0, kMcListEntrySize * kMcListCount);
 		MemoryCardMan.McMount(m_cardChannel);
 		m_lastResult = MemoryCardMan.GetResult();
 		m_state = 1;
@@ -11254,12 +12632,10 @@ int McCtrl::LoadMcList()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -11282,12 +12658,7 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
-				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
-				}
-				m_lastResult = -3;
-				return;
+				return (m_lastResult == -5) ? -4 : -3;
 			}
 			m_state = 4;
 		}
@@ -11300,52 +12671,53 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;
-				break;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				m_state = -1;
 			}
 			if (m_lastResult == -5) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-				m_state = -1;
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
-			MemoryCardMan.McUnmount(m_cardChannel);
-			MemoryCardMan.DestroyMcBuff();
-			m_state = -1;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
-			m_state = 5;
-		} else {
+		} else if (MemoryCardMan.IsBrokenFile()) {
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					entry[0x42] = 1;
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
-				}
-				m_state = 7;
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				struct McListEntry {
+					int m_words[11];
+					char m_name[0x15];
+					char m_byte41;
+					char m_byte42;
+					char m_byte43;
+				};
+				McListEntry entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_byte42 = 1;
+				for (int i = 0; i < kMcListCount; i++) {
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmWorkBuffer + i * kMcListEntrySize) = entry;
+				}
+				m_state = 7;
 			}
+		} else {
+			m_state = 5;
 		}
 		break;
 
 	case 5: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
+		m_serialHi = static_cast<unsigned int>(serial);
+		m_serialLo = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11361,8 +12733,7 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
@@ -11373,27 +12744,30 @@ int McCtrl::LoadMcList()
 					m_state = 5;
 				} else {
 					const int closeResult = MemoryCardMan.McClose();
-					if (closeResult == 0) {
+					if (closeResult != 0) {
+						m_lastResult = closeResult;
+						m_state = -1;
+					} else {
 						MemoryCardMan.McUnmount(m_cardChannel);
 						MemoryCardMan.DestroyMcBuff();
 						m_state = 7;
-					} else {
-						m_lastResult = closeResult;
-						m_state = -1;
 					}
 				}
 			}
 		}
 		break;
+
+	case 7:
+		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -1;
-	} else if (m_state == 7) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -1;
 	}
+	if (m_state == 7) {
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -11419,7 +12793,7 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		hasError = 0;
 	} else {
 		const int formatMatch = memcmp(save + 0x0C, DAT_8032E8A8, 4);
-		const unsigned int crcOk = MemoryCardMan.ChkCrc(0);
+		const unsigned char crcOk = MemoryCardMan.ChkCrc(0);
 		if (crcOk == 1 && formatMatch == 0) {
 			unsigned int playTime = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
@@ -11520,8 +12894,7 @@ void McCtrl::SetBrokenFile(int isBroken)
 int McCtrl::SaveDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -11544,12 +12917,10 @@ int McCtrl::SaveDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -11572,11 +12943,9 @@ int McCtrl::SaveDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
-				m_lastResult = -3;
-				return;
+				return -3;
 			}
 			m_state = 7;
 		}
@@ -11589,13 +12958,12 @@ int McCtrl::SaveDat()
 		} else if (m_lastResult == -5) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -4;
-			return;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
+			return -4;
+		} else if (MemoryCardMan.IsBrokenFile()) {
+			m_state = 8;
+		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x0C;
-		} else {
-			m_state = 8;
 		}
 		break;
 
@@ -11613,20 +12981,25 @@ int McCtrl::SaveDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
 			} else {
+				struct McListEntry {
+					int m_words[11];
+					char m_name[0x15];
+					char m_byte41;
+					char m_byte42;
+					char m_byte43;
+				};
+				McListEntry entry;
+				memset(&entry, 0, sizeof(entry));
 				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}
@@ -11646,8 +13019,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x10;
@@ -11657,15 +13029,14 @@ int McCtrl::SaveDat()
 
 	case 0x0C:
 		m_lastResult = MemoryCardMan.McGetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x0D;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x0D;
 		}
 		break;
 
@@ -11684,8 +13055,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x0F;
@@ -11695,16 +13065,15 @@ int McCtrl::SaveDat()
 
 	case 0x0F:
 		m_lastResult = MemoryCardMan.McSetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x12;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x12;
 		}
 		break;
 
@@ -11724,8 +13093,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else if (m_iteration < 4) {
 				m_state = 0x10;
@@ -11736,18 +13104,22 @@ int McCtrl::SaveDat()
 		break;
 
 	case 0x12: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
+		if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+			Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
+			Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
+			Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
+			Game.m_gameWork.m_mcHasSerial = 1;
+		}
+		m_serialLo = static_cast<unsigned int>(serial);
+		m_serialHi = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		if (m_userBuffer == 0) {
 			MemoryCardMan.MakeSaveData();
@@ -11768,35 +13140,37 @@ int McCtrl::SaveDat()
 					MemoryCardMan.McClose();
 					MemoryCardMan.McUnmount(m_cardChannel);
 					MemoryCardMan.DestroyMcBuff();
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
 				SetListDat(m_saveIndex, 1);
-				MenuPcs.BindMcObj();
+				MenuPcs.BindMcObj(m_saveIndex);
 				m_state = 0x14;
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
+		break;
+
+	case 0x14:
 		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -1;
-	} else if (m_state == 0x14) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -1;
 	}
+	if (m_state == 0x14) {
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -11811,8 +13185,7 @@ int McCtrl::SaveDat()
 int McCtrl::LoadDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -11964,7 +13337,6 @@ int McCtrl::LoadDat()
 int McCtrl::Format(int unmountAfter)
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
 		return -1;
 	}
 
@@ -12636,8 +14008,7 @@ void McCtrl::ChkParty(char*)
 int McCtrl::EraseDat()
 {
 	if (m_state < 0) {
-		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -12660,12 +14031,10 @@ int McCtrl::EraseDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -12688,11 +14057,9 @@ int McCtrl::EraseDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
-				m_lastResult = -3;
-				return;
+				return -3;
 			}
 			m_state = 7;
 		}
@@ -12705,13 +14072,12 @@ int McCtrl::EraseDat()
 		} else if (m_lastResult == -5) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -4;
-			return;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
+			return -4;
+		} else if (MemoryCardMan.IsBrokenFile()) {
+			m_state = 8;
+		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x0C;
-		} else {
-			m_state = 8;
 		}
 		break;
 
@@ -12729,20 +14095,26 @@ int McCtrl::EraseDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
 			} else {
+				struct McListEntry {
+					int m_words[11];
+					char m_name[0x15];
+					char m_byte41;
+					char m_byte42;
+					char m_byte43;
+				};
+				McListEntry entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_byte42 = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmWorkBuffer + i * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}
@@ -12762,8 +14134,7 @@ int McCtrl::EraseDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x10;
@@ -12773,15 +14144,14 @@ int McCtrl::EraseDat()
 
 	case 0x0C:
 		m_lastResult = MemoryCardMan.McGetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x0D;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x0D;
 		}
 		break;
 
@@ -12800,8 +14170,7 @@ int McCtrl::EraseDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x0F;
@@ -12811,16 +14180,15 @@ int McCtrl::EraseDat()
 
 	case 0x0F:
 		m_lastResult = MemoryCardMan.McSetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x12;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x12;
 		}
 		break;
 
@@ -12840,13 +14208,12 @@ int McCtrl::EraseDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				const int finishedSlot = m_iteration - 1;
 				SetListDat(finishedSlot, 1);
-				MenuPcs.BindMcObj();
+				MenuPcs.BindMcObj(m_iteration - 1);
 				if (m_iteration < 4) {
 					m_state = 0x10;
 				} else {
@@ -12857,18 +14224,17 @@ int McCtrl::EraseDat()
 		break;
 
 	case 0x12: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) == 0) {
+			m_serialHi = static_cast<unsigned int>(serial);
+			m_serialLo = static_cast<unsigned int>(serial >> 32);
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 0x13;
@@ -12884,35 +14250,37 @@ int McCtrl::EraseDat()
 					MemoryCardMan.McClose();
 					MemoryCardMan.McUnmount(m_cardChannel);
 					MemoryCardMan.DestroyMcBuff();
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
 				SetListDat(m_saveIndex, 1);
-				MenuPcs.BindMcObj();
+				MenuPcs.BindMcObj(m_saveIndex);
 				m_state = 0x14;
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
+		break;
+
+		case 0x14:
 		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -1;
-	} else if (m_state == 0x14) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -1;
 	}
+	if (m_state == 0x14) {
+		return 1;
+	}
+	return 0;
 }
 
 /*

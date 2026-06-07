@@ -399,6 +399,7 @@ void CGPartyObj::onChangeStat(int state)
 {
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	const char* msgBase = lbl_801DCA48;
 	m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 
 	switch (state) {
@@ -435,7 +436,7 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;
 		break;
 	case 6:
-		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x370), *reinterpret_cast<int*>(self + 0x560));
+		System.Printf(const_cast<char*>(msgBase + 0x370), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x560) =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
 		System.Printf(const_cast<char*>(lbl_80331B0C), *reinterpret_cast<int*>(self + 0x560));
@@ -445,8 +446,8 @@ void CGPartyObj::onChangeStat(int state)
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
 		int itemHigh = itemKind >> 8;
 		int itemLow = itemKind & 0xFF;
-		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x390), itemHigh);
-		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x3AC), itemLow);
+		System.Printf(const_cast<char*>(msgBase + 0x390), itemHigh);
+		System.Printf(const_cast<char*>(msgBase + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
 			int row = itemLow * 0x42;

@@ -840,9 +840,8 @@ void CGMonObj::seKiduki()
 		partyIndex = m_targetPartyIndex;
 	} else {
 		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? DOUBLE_80331A10 : DOUBLE_80331A18;
-		partyIndex = -1;
 
-		if (soundLimit > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
 			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
 			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
 			float hitScale;
@@ -850,9 +849,14 @@ void CGMonObj::seKiduki()
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8)),
 			         &hitScale, &partyIndex);
+			if (partyIndex >= 0) {
+				goto haveNotice;
+			}
 		}
+		partyIndex = -1;
 	}
 
+haveNotice:
 	if (partyIndex >= 0) {
 		int action = m_actionBranch;
 		int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);

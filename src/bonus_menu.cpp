@@ -18,9 +18,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern char s_menuSubfontPathFmt[];
+extern char lbl_801DD5D4[];
 extern const double kPppCrystal2RefractionScale;
 extern const float kBonusZClearOrigin;
+extern const float FLOAT_80331EB0;
+extern const float FLOAT_80331ED0;
+extern const float FLOAT_80331F6C;
 extern const float kBonusZClearWidth;
 extern const float kBonusZClearHeight;
 extern const float s_BonusModelYPos[];
@@ -135,8 +138,8 @@ static float* s_Base[1];
 extern "C" const char sDrawBonusFmt[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };
-extern "C" const char s_bonus_menu_cpp[] = "bonus_menu.cpp";
-extern "C" const char s_bonusAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
+extern "C" const char s_bonus_menu_cpp[];
+extern "C" const char s_bonusAllocErrorFmt[];
 
 namespace {
 
@@ -204,22 +207,35 @@ STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
 STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
 
-static inline void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
+static inline void InitBonusEffectSlots(CMenuPcs* menu)
 {
-	unsigned char* slotBase = slot->bytes;
-	static const int s_sentinelOffsets[] = {
-	    0x000, 0x004, 0x008,
-	    0x524, 0x528, 0x52C,
-	    0xA48, 0xA4C, 0xA50,
-	    0xF6C, 0xF70, 0xF74,
-	    0x1490, 0x1494, 0x1498,
-	    0x19B4, 0x19B8, 0x19BC,
-	    0x1ED8, 0x1EDC, 0x1EE0,
-	    0x23FC, 0x2400, 0x2404,
-	};
-
-	for (int i = 0; i < static_cast<int>(sizeof(s_sentinelOffsets) / sizeof(s_sentinelOffsets[0])); i++) {
-		*reinterpret_cast<int*>(slotBase + s_sentinelOffsets[i]) = -1;
+	int base = 0;
+	for (int i = 0; i < 5; i++) {
+		*(int*)(menu->m_bonusListPtr + base + 0x000) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x004) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x008) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x524) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x528) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x52C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA48) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA4C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xA50) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF6C) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF70) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0xF74) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1490) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1494) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1498) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19B4) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19B8) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x19BC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1ED8) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1EDC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x1EE0) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x23FC) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x2400) = -1;
+		*(int*)(menu->m_bonusListPtr + base + 0x2404) = -1;
+		base += 0x2920;
 	}
 }
 
@@ -249,7 +265,7 @@ static inline void InitBonusBoardEntry(MenuBoardEntry* entry)
 static inline void ReleaseBonusRefObject(void* object)
 {
 	CRef* ref = reinterpret_cast<CRef*>(object);
-	if (ref->DecRef() == 0 && object != 0) {
+	if (ref->DecRef() == 0) {
 		delete ref;
 	}
 }
@@ -324,7 +340,7 @@ static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
 
 static inline void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
 {
-	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
+	short x = ((1 <= slotIndex) && (slotIndex <= 2)) ? 0x30 : 0x48;
 
 	InitAnimSprite(sprite, 0, x, y, 0x60, 0x58, 0, 8);
 	ResetAnimSpriteMotion(sprite);
@@ -674,43 +690,46 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	short* board = reinterpret_cast<short*>(a);
 	short* icon = reinterpret_cast<short*>(b);
-	float* base = s_Base[0];
 
-	base[0] = (float)(board[0] + board[2] * 0.5);
-	base[1] = (float)(board[1] + board[3] * 0.5);
+	s_Base[0][0] = (float)(board[0] + board[2] * 0.5);
+	s_Base[0][1] = (float)(board[1] + board[3] * 0.5);
 
 	float iconW = (float)icon[2];
 	float iconH = (float)icon[3];
 	double iconHalfW = (double)iconW * 0.5;
 	double iconHalfH = (double)iconH * 0.5;
 
-	base[14] = (float)((double)base[0] - iconHalfW);
-	base[15] = (float)board[1];
-	base[6] = base[14];
-	base[7] = (float)((double)(float)(board[1] + board[3]) - (double)iconH);
-	base[10] = (float)board[0];
-	base[11] = (float)((double)base[1] - iconHalfH);
-	base[2] = (float)((double)(float)(board[0] + board[2]) - (double)iconW);
-	base[3] = base[11];
+	float v14 = (float)((double)s_Base[0][0] - iconHalfW);
+	float v15 = (float)board[1];
+	s_Base[0][14] = v14;
+	s_Base[0][15] = v15;
+	s_Base[0][6] = v14;
+	s_Base[0][7] = v15 + (float)((double)(float)board[3] - (double)iconH);
+	float v11 = (float)((double)s_Base[0][1] - iconHalfH);
+	float v10 = (float)board[0];
+	s_Base[0][10] = v10;
+	s_Base[0][11] = v11;
+	s_Base[0][2] = v10 + (float)((double)(float)board[2] - (double)iconW);
+	s_Base[0][3] = v11;
 
 	for (int row = 0; row < 2; row++) {
 		float slotX = (float)((double)(float)(board[0] + board[2] * 0.25) - iconHalfW);
 		float slotY = (float)((double)(float)(board[1] + board[3] * 0.25) - iconHalfH);
-		if (row == 0) {
-			base[12] = slotX;
-			base[13] = slotY;
-		} else {
+		if (row != 0) {
 			slotY = (float)(board[3] * 0.5 + slotY);
-			base[8] = slotX;
-			base[9] = slotY;
+			s_Base[0][8] = slotX;
+			s_Base[0][9] = slotY;
+		} else {
+			s_Base[0][12] = slotX;
+			s_Base[0][13] = slotY;
 		}
 		float nextX = (float)(board[2] * 0.5 + slotX);
 		if (row == 0) {
-			base[16] = nextX;
-			base[17] = slotY;
+			s_Base[0][16] = nextX;
+			s_Base[0][17] = slotY;
 		} else {
-			base[4] = nextX;
-			base[5] = slotY;
+			s_Base[0][4] = nextX;
+			s_Base[0][5] = slotY;
 		}
 	}
 }
@@ -730,10 +749,12 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		return;
 	}
 
-	int statePtr = this->m_bonusStatePtr;
-
-	if (*(short*)(statePtr + 0x1c) != 4) {
-		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+	if (*(short*)(this->m_bonusStatePtr + 0x1c) != 4) {
+		_GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = (unsigned char)(alpha * 255.0f);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -745,20 +766,19 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	float height = (float)sprite->h;
 
 	int partyIndex = 0;
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		if ((int)*(short*)(statePtr + 0xe) == s_Rinfo->m_party[i].m_rank) {
-			partyIndex = i;
+	for (; partyIndex < s_Rinfo->m_partyCount; partyIndex++) {
+		if ((int)*(short*)(this->m_bonusStatePtr + 0xe) == s_Rinfo->m_party[partyIndex].m_rank) {
 			break;
 		}
 	}
 
 	for (int i = 0; i < 8; i++) {
-		if (*(short*)(statePtr + 0x1c) == 4) {
+		if (*(short*)(this->m_bonusStatePtr + 0x1c) == 4) {
 			float rgb = 1.0f;
-			unsigned int mask = (int)(signed char)s_Rinfo->pad_0008 | s_Rinfo->m_party[partyIndex].m_ownedArtifactMask |
-			    (int)(signed char)s_Rinfo->m_missingArtifactMask;
+			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
+			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
 			if ((mask & (1 << i)) != 0) {
-				rgb = 0.5f;
+				rgb = 0.7f;
 			}
 			_GXColor color = {
 			    (unsigned char)(rgb * 255.0f),
@@ -788,48 +808,61 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 		return;
 	}
 
-	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0 * alpha)};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	_GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = (unsigned char)(255.0f * alpha);
 	const float corner = 8.0f;
 	const float texScale = 1.0f;
-	const float right = (x + w) - corner;
-	const float bottom = (y + h) - corner;
 
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
+	const float right = (x + w) - corner;
+	const float bottom = (y + h) - corner;
 	for (int i = 0; i < 4; i++) {
 		float drawX = x;
 		float drawY = y;
-		float texU = 0.0f;
-		float texV = 0.0f;
-		if (i == 1) {
-			drawX = right;
+		float texU;
+		float texV;
+		if (i == 0) {
+			texU = 0.0f;
+			texV = 0.0f;
+		} else if (i == 1) {
 			texU = corner;
-		} else if (i == 2) {
-			drawY = bottom;
-			texV = corner;
-		} else if (i == 3) {
 			drawX = right;
+			texV = 0.0f;
+		} else {
 			drawY = bottom;
-			texU = corner;
-			texV = corner;
+			if (i == 2) {
+				texU = 0.0f;
+				texV = corner;
+			} else {
+				texU = corner;
+				drawX = right;
+				texV = corner;
+			}
 		}
 		MenuPcs.DrawRect(0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
-	w -= 16.0f;
-	MenuPcs.DrawRect(0, x + corner, y, w, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	float innerW = (float)((double)w - 16.0);
+	float xCorner = corner + x;
+	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
-	MenuPcs.DrawRect(0, x + corner, bottom, w, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-	h -= 16.0f;
-	MenuPcs.DrawRect(0, x, y + corner, corner, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	float yCorner = corner + y;
+	float innerH = (float)((double)h - 16.0);
+	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-	MenuPcs.DrawRect(0, right, y + corner, corner, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	MenuPcs.DrawRect(0, x + corner, y + corner, w, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, yCorner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*
@@ -850,7 +883,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		int iconBase = 4;
 		int nameBase = iconBase + activePartyCount;
 		int slotBase = nameBase + activePartyCount;
@@ -923,7 +956,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		*(short*)(animPtr + 6) = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -934,27 +967,29 @@ void CMenuPcs::CalcSelectCloseAnim()
 		BonusAnimSprite* sprite = &sprites[i];
 		int flags = BonusSpriteFlags(sprite);
 
-		if ((flags & 1) == 0) {
+		if ((flags & 1) != 0) {
+			sprite->alpha = 0.0f;
+		} else {
 			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			}
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
-			} else {
+			if (sprite->startFrame + sprite->duration <= frame) {
 				sprite->alpha = 0.0f;
+			} else {
+				sprite->alpha = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			}
-		} else {
-			sprite->alpha = 0.0f;
 		}
 
-		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame >= 9999) {
 			doneCount++;
 		}
 
 		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float fy = (float)sprite->y;
+			float ty = sprite->targetY;
 			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+			sprite->motionY = (ty - fy) * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -1035,12 +1070,11 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 		scaleMtx[2][3] = 0.0f;
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
 	}
 
 	if (doneCount == (int)header->count) {
@@ -1062,16 +1096,21 @@ void CMenuPcs::CalcSelectWait()
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
-		int animPtr = this->m_bonusAnimPtr;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
 		this->m_menuWindowInfo->state = 3;
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].alpha = 1.0f;
-			BonusSpriteFlags(&sprites[i]) = 3;
+		int animBase;
+		short count;
+		int walkOff = 0;
+		for (int i = 0; ; i++) {
+			animBase = this->m_bonusAnimPtr;
+			count = *(short*)animBase;
+			if ((int)count <= i) {
+				break;
+			}
+			*(float*)(animBase + walkOff + 0x18) = 1.0f;
+			*(int*)(animBase + walkOff + 0x34) = 3;
+			walkOff += 0x40;
 		}
-		BonusAnimSprite* cursor = &sprites[header->count];
+		BonusAnimSprite* cursor = (BonusAnimSprite*)(animBase + count * 0x40 + 8);
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
 		cursor->kind = 0x20;
 		cursor->x = (short)(partySprite->x - 3);
@@ -1083,12 +1122,12 @@ void CMenuPcs::CalcSelectWait()
 		cursor->startFrame = 0;
 		cursor->duration = 8;
 		cursor->depth = 1.0f;
-		header->count = (short)(header->count + 1);
-		BonusSpriteFlags(&sprites[2]) = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(count + 1);
+		BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[2]) = 0;
 		*(short*)(this->m_bonusStatePtr + 0xe) = 0;
 		*(short*)(this->m_bonusStatePtr + 0x26) = 4;
 		*(short*)(this->m_bonusStatePtr + 0x18) = 0;
-		header->finished = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 		*(short*)(this->m_bonusStatePtr + 0x1a) = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;
@@ -1280,12 +1319,11 @@ void CMenuPcs::CalcSelectWait()
 		}
 		scaleMtx[2][3] = 0.0f;
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		handle->m_model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
 	}
 
 	if (currentPartyIndex >= activePartyCount && delay == 0) {
@@ -1321,39 +1359,35 @@ void CMenuPcs::CalcSelectWait()
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
-	int animPtr = this->m_bonusAnimPtr;
 	int statePtr = this->m_bonusStatePtr;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	float artiAlpha = 0.0f;
-	int modelIndex = 0;
-	int lastKind = 0;
+	BonusAnimSprite* artiSprite = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
-		float alpha = sprite->alpha;
+	int modelIndex = 0;
+	int lastKind = 0;
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int kind = sprite->kind;
-		switch (kind) {
-		case -4:
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
-			artiAlpha = alpha;
-			lastKind = kind;
-			break;
-		case -3:
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
-			lastKind = kind;
-			break;
-		case -2:
-			{
+		if (kind >= 0 || kind != -1) {
+			if (kind == -3) {
+				DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, sprite->alpha);
+				lastKind = sprite->kind;
+			} else if (kind == -4) {
+				if (artiSprite == 0) {
+					artiSprite = sprite;
+				}
+				DrawArtiBase((CMenuPcs::Sprt2*)sprite, sprite->alpha);
+				lastKind = sprite->kind;
+			} else if (kind == -2) {
 				CCharaPcs::CHandle* handle = 0;
 				int projectionIndex = modelIndex;
 				if (modelIndex < activePartyCount) {
@@ -1368,8 +1402,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 					handle = GetBonusDisplayHandleSlots(this)[projectionIndex];
 					if (handle == 0) {
 						modelIndex++;
-						lastKind = kind;
-						break;
+						lastKind = -2;
+						continue;
 					}
 				}
 
@@ -1384,19 +1418,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(listPtr + projectionIndex * 0x524 + 4));
 				}
 				RestoreProjection();
-			}
-			modelIndex++;
-			lastKind = kind;
-			break;
-		case -1:
-			break;
-		default:
-			{
+				lastKind = sprite->kind;
+				modelIndex++;
+			} else {
 				if (lastKind < 0) {
 					DrawInit();
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
-				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 				if (sprite->tex == 0x20) {
@@ -1409,14 +1438,16 @@ void CMenuPcs::DrawSelectOpenAnim()
 				if (sprite->tex == 0x20) {
 					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
-				lastKind = kind;
+				lastKind = sprite->kind;
 			}
-			break;
 		}
-
 	}
 
-	DrawBonusActiveMarks(this, statePtr, artiAlpha);
+	int animPtr = this->m_bonusAnimPtr;
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	DrawBonusActiveMarks(this, statePtr, artiSprite->alpha);
 	DrawBonusPartyNames(this, header, sprites);
 	DrawBonusSelectedArtifactHelp(this, statePtr, header, sprites);
 	DrawBonusMcWinOverlay(this, statePtr);
@@ -1435,7 +1466,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 {
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(this->m_bonusStatePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int animPtr = this->m_bonusAnimPtr;
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
@@ -1485,7 +1516,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		sprites[idx].duration = 8;
 		sprites[idx].depth = 1.0f;
 		idx++;
-		sprites[2].scale = 2.0f;
+		BonusSpriteFlags(&sprites[2]) = 2;
 		sprites[2].motionX = -150.0f;
 		sprites[2].motionY = -150.0f;
 		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
@@ -1541,7 +1572,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			short x = ((0 < i) && (i < 3)) ? 8 : 0x20;
+			short x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			InitAnimSprite(&sprites[idx], 0x19, x, y, 0x38, 0x28, i * 2, 8);
 			ResetAnimSpriteMotion(&sprites[idx]);
 			sprites[idx].mulX = (float)(i * sprites[idx].w);
@@ -1605,31 +1636,34 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int frame = (int)*(short*)(statePtr + 0x22);
 	int doneCount = 0;
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int flags = BonusSpriteFlags(sprite);
 
-		if ((flags & 1) == 0) {
+		if ((flags & 1) != 0) {
+			sprite->alpha = 1.0f;
+		} else {
 			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			}
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
-			} else {
+			if (sprite->startFrame + sprite->duration <= frame) {
 				sprite->alpha = 1.0f;
+			} else {
+				sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
 			}
-		} else {
-			sprite->alpha = 1.0f;
 		}
 
-		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame >= 9999) {
 			doneCount++;
 		}
 
 		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float fy = (float)sprite->y;
+			float ty = sprite->targetY;
 			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+			sprite->motionY = (ty - fy) * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -1661,61 +1695,92 @@ void CMenuPcs::CalcSelectOpenAnim()
 	}
 
 	Mtx scaleMtx;
-	Mtx rotMtx;
-	Mtx tempMtx;
+	Mtx rotZMtx;
+	Mtx rotYMtx;
+	Mtx rotXMtx;
 	Vec srcVec;
 	Vec dstVec;
 	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
-	for (int i = 0; i < activePartyCount + 8; i++) {
+	int partyByteOff = 0;
+	for (int i = 0; i < activePartyCount + 8; i++, partyByteOff += sizeof(BonusPartySummary)) {
+		BonusAnimSprite* iconSprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((int)(signed char)s_PlayerTop + i) * 0x40 + 8);
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
-			handle = s_Rinfo->m_party[i].m_partyHandle;
-			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			tribeId = *(int*)((int)s_Rinfo + partyByteOff + 0x44);
+			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + partyByteOff + 0x20);
 			float modelScale = s_BonusModelScale[tribeId];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 			scaleMtx[0][3] = 0.0f;
 		} else {
-			int artifactIndex = i - activePartyCount;
-			handle = displaySlots[activePartyCount * 2 + artifactIndex];
+			handle = displaySlots[i + activePartyCount];
 			if (handle == 0) {
 				continue;
 			}
-
 			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
-			srcVec.x = s_BonusModelScale[4];
+
+			int duration = iconSprite->duration;
+			int artifactIndex = i - activePartyCount;
+			int fcvIndex = duration / 5;
+			float rate = (float)(450.0 / (double)(float)duration);
+			int phase = (int)(((double)duration / 10.0) * (double)(10 - artifactIndex));
+
+			if (frame == iconSprite->startFrame && this->m_bonusCursorFlag == 0) {
+				this->m_bonusCursorFlag = 1;
+				Sound.PlaySe(0x4d, 0x40, 0x7f, 0);
+			}
+
+			float angle;
+			if (frame < iconSprite->startFrame) {
+				srcVec.x = s_BonusModelScale[6];
+				angle = -90.0f;
+			} else if (iconSprite->timer < phase) {
+				int last = iconSprite->timer - 1;
+				if (fcvIndex < last) {
+					srcVec.x = ((s_BonusModelScale[5] - s_BonusModelScale[4]) /
+					    ((float)phase - (float)fcvIndex)) *
+					    (float)(last - fcvIndex) - s_BonusModelScale[5];
+				} else {
+					srcVec.x = (float)last *
+					    ((s_BonusModelScale[6] - s_BonusModelScale[5]) / (float)fcvIndex) -
+					    s_BonusModelScale[6];
+				}
+				srcVec.x = -srcVec.x;
+				angle = (float)(-90.0 + (double)(float)(rate * (double)(float)last));
+			} else {
+				srcVec.x = s_BonusModelScale[4];
+				angle = (float)(45.0 * (double)(8 - artifactIndex));
+			}
 			srcVec.y = 0.0f;
 			srcVec.z = 0.0f;
-			PSMTXRotRad(rotMtx, 'z', 0.01745329238474369f * (float)(-45.0 * (double)artifactIndex));
-			PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
+			PSMTXRotRad(rotZMtx, 'z', 0.01745329238474369f * angle);
+			PSMTXMultVecSR(rotZMtx, &srcVec, &dstVec);
 
 			int charaNo = handle->m_charaNo;
 			if (charaNo == 0x44) {
-				PSMTXRotRad(tempMtx, 'y', 3.1415927410125732f);
-				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
-				PSMTXRotRad(tempMtx, 'x', -1.1693705320358276f);
-				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
+				PSMTXRotRad(rotYMtx, 'y', 3.1415927410125732f);
+				PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+				PSMTXRotRad(rotXMtx, 'x', -1.1693705320358276f);
+				PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
 			}
 
 			scaleMtx[0][3] = dstVec.x;
-			float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
+			scaleMtx[1][3] = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
 			if (charaNo == 0x41 || charaNo == 0x37) {
-				modelY += 3.4000000953674316f;
+				scaleMtx[1][3] = scaleMtx[1][3] + 3.4000000953674316f;
 			} else if (charaNo == 0x44) {
-				modelY += 5.0f;
+				scaleMtx[1][3] = scaleMtx[1][3] + 5.0f;
 			}
-			scaleMtx[1][3] = modelY;
 		}
 		scaleMtx[2][3] = 0.0f;
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		handle->m_model->m_lightAlpha = iconSprite->alpha;
 	}
 
 	if (doneCount == (int)header->count) {
@@ -1734,24 +1799,21 @@ void CMenuPcs::CalcSelectOpenAnim()
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
-	int animPtr = this->m_bonusAnimPtr;
 	int statePtr = this->m_bonusStatePtr;
-	int modelIndex = 0;
-	int lastKind = 0;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
 	int activePartyCount = s_Rinfo->m_partyCount;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int modelIndex = 0;
+	int lastKind = 0;
+	for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 		int kind = sprite->kind;
 
 		if (kind >= 0 || kind == -2) {
@@ -1766,7 +1828,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					continue;
 				}
 
-				if (0.0f < handle->m_model->m_lightAlpha) {
+				if ((double)handle->m_model->m_lightAlpha > 0.0) {
 					SetProjection(modelIndex);
 					SetLight(1);
 					unsigned int oldFlags = handle->m_flags;
@@ -1774,6 +1836,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					handle->Draw(5);
 					handle->m_flags = oldFlags;
 					RestoreProjection();
+					lastKind = sprite->kind;
 				}
 				modelIndex++;
 			} else {
@@ -1788,12 +1851,23 @@ void CMenuPcs::DrawResultCloseAnim()
 
 				_GXColor colors[4];
 				if (kind == 0x17) {
-					_GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-					colors[0] = white;
-					colors[1] = white;
-					colors[2] = white;
-					colors[3] = white;
-					_GXColor color = white;
+					colors[0].r = 0xFF;
+					colors[0].g = 0xFF;
+					colors[0].b = 0xFF;
+					colors[0].a = 0xFF;
+					colors[1].r = 0xFF;
+					colors[1].g = 0xFF;
+					colors[1].b = 0xFF;
+					colors[1].a = 0xFF;
+					colors[2].r = 0xFF;
+					colors[2].g = 0xFF;
+					colors[2].b = 0xFF;
+					colors[2].a = 0xFF;
+					colors[3].r = 0xFF;
+					colors[3].g = 0xFF;
+					colors[3].b = 0xFF;
+					colors[3].a = 0xFF;
+					_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 					GXSetChanMatColor(GX_COLOR0A0, color);
 				} else {
 					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
@@ -1826,12 +1900,12 @@ void CMenuPcs::DrawResultCloseAnim()
 						}
 					}
 				} else {
-					if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
+					if ((signed char)s_CntTop > i || i >= (signed char)s_CntTop + activePartyCount) {
 						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 						    (float)sprite->w, (float)sprite->h,
 						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 					} else {
-						int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
+						int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
 						int digits[3];
 						int digitCount;
 
@@ -1875,8 +1949,8 @@ void CMenuPcs::DrawResultCloseAnim()
 
 	int textIndex = 0;
 	char text[128];
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f));
 			font->SetColor(color.color);
@@ -1923,204 +1997,237 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	const int activePartyCount = s_Rinfo->m_partyCount;
-	const int baseCount = 1 + activePartyCount * 3;
-	const int frameBase = 1;
-	const int iconBase = frameBase + activePartyCount;
-	const int digitBase = iconBase + activePartyCount;
-	const int frameEchoBase = digitBase + activePartyCount;
-	const int iconEchoBase = frameEchoBase + activePartyCount;
-	const int digitEchoBase = iconEchoBase + activePartyCount;
-	const int nameBase = digitEchoBase + activePartyCount;
-	const int closeCount = nameBase + activePartyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].timer = 0;
-			sprites[i].motionX = 0.0f;
-			sprites[i].motionY = 0.0f;
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+		int off = 0;
+		short* count = (short*)this->m_bonusAnimPtr;
+		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
+			*(int*)((int)count + off + 0x28) = 0;
+			*(float*)(this->m_bonusAnimPtr + off + 0x38) = kBonusZClearOrigin;
+			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = kBonusZClearOrigin;
+			off += 0x40;
 		}
 
-		sprites[0].startFrame = 9999;
-		BonusSpriteFlags(&sprites[0]) = 3;
+		count[0x16] = 0;
+		count[0x17] = 9999;
+		count[0x1a] = 0;
+		count[0x1b] = 3;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[frameBase + i].startFrame = 0x10;
+			*(int*)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 0x2c) = 0x10;
 		}
 
+		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
+		int base = activePartyCount + 1;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[iconBase + i];
-			BonusAnimSprite* source = &sprites[frameBase + i];
-			sprite->startFrame = source->startFrame + source->duration;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
+			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// digitBase block: src = iconBase (back = activePartyCount sprites); no dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[digitBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame + source->duration;
-			BonusSpriteFlags(sprite) = 1;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int source = sprite - activePartyCount * 0x40;
+			*(int*)(sprite + 0x24) = *(int*)(source + 0x24) + *(int*)(source + 0x28);
+			*(int*)(sprite + 0x2c) = 1;
 		}
 
+		// frameEchoBase block: startFrame = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[frameEchoBase + i].startFrame = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// iconEchoBase block: startFrame = 9999, flags = 3
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[iconEchoBase + i].startFrame = 9999;
-			BonusSpriteFlags(&sprites[iconEchoBase + i]) = 3;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 9999;
+			*(int*)(sprite + 0x2c) = 3;
 		}
 
+		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[digitEchoBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
-		int countTop = digitEchoBase + activePartyCount + 1;
-		sprites[digitEchoBase + activePartyCount].startFrame = sprites[1].startFrame;
+		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
+		int countTop = base + activePartyCount + 1;
+		*(int*)(this->m_bonusAnimPtr + (base + activePartyCount) * 0x40 + 0x2c) =
+		    *(int*)(this->m_bonusAnimPtr + 0x6c);
 		s_CntTop = (unsigned char)countTop;
 
+		// countTop block: startFrame = 8, duration = 8
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[countTop + i];
-			sprite->startFrame = 8;
-			sprite->duration = 8;
+			int sprite = this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 8;
+			*(int*)(sprite + 0x28) = 8;
 		}
 
-		int extraBase = closeCount + 1;
+		// extraBase block: src = iconBase (back = base - (pc+1)); dance
+		base = countTop + activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// extraBase + pc block: flags = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[extraBase + activePartyCount + i]) = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 2 + i];
-			BonusAnimSprite* source = &sprites[extraBase + activePartyCount + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// extraBase + 3*pc block: flags = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[extraBase + activePartyCount * 3 + i]) = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// extraBase + 4*pc block: src = iconBase (back = base - (pc+1)); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 4 + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = FLOAT_80331ED0;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
-			if (sprite->motionX == 0.0f) {
-				sprite->targetX = (float)sprite->x;
+		off = 0;
+		short* sp = (short*)this->m_bonusAnimPtr;
+		for (int i = 0; i < *sp; i++, sp = (short*)this->m_bonusAnimPtr) {
+			if (0.0f == *(float*)((int)sp + off + 0x38)) {
+				*(float*)((int)sp + off + 0x40) = (float)(int)*(short*)((int)sp + off + 8);
 			}
-			if (sprite->motionY == 0.0f) {
-				sprite->targetY = (float)sprite->y;
+			int s = this->m_bonusAnimPtr + off;
+			if (0.0f == *(float*)(s + 0x3c)) {
+				*(float*)(s + 0x44) = (float)(int)*(short*)(s + 10);
 			}
+			off += 0x40;
 		}
 
-		*(short*)(animPtr + 6) = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		sp[3] = 0;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
-	int frame = (int)*(short*)(statePtr + 0x22);
 	int doneCount = 0;
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
-		int flags = BonusSpriteFlags(sprite);
+	int off = 0;
+	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
+		short* sprite = (short*)((int)this->m_bonusAnimPtr + off + 8);
 
-		if ((flags & 1) == 0) {
-			if (frame < sprite->startFrame) {
-				sprite->alpha = 0.0f;
+		if ((*(unsigned int*)(sprite + 0x16) & 1) == 0) {
+			if (frame < *(int*)(sprite + 0x12)) {
+				*(float*)(sprite + 8) = 0.0f;
 			}
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			if (frame < (int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14))) {
+				*(float*)(sprite + 8) =
+				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
 			} else {
-				sprite->alpha = 0.0f;
+				*(float*)(sprite + 8) = 0.0f;
 			}
 		} else {
-			sprite->alpha = 0.0f;
+			*(float*)(sprite + 8) = 0.0f;
 		}
 
-		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
+		if ((int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14)) <= frame ||
+		    0x270e < *(int*)(sprite + 0x12)) {
 			doneCount++;
 		}
 
-		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
-			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+		if ((*(unsigned int*)(sprite + 0x16) & 2) == 0 &&
+		    (*(float*)(sprite + 0x18) != 0.0f || *(float*)(sprite + 0x1a) != 0.0f)) {
+			float fy = (float)(int)sprite[1];
+			float ty = *(float*)(sprite + 0x1e);
+			float progress =
+			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+			*(float*)(sprite + 0x18) =
+			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
+			*(float*)(sprite + 0x1a) = (ty - fy) * progress;
 		}
 
-		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
-			sprite->timer++;
+		if (*(int*)(sprite + 0x12) < frame &&
+		    frame <= *(int*)(sprite + 0x12) + *(int*)(sprite + 0x14)) {
+			*(int*)(sprite + 0x10) = *(int*)(sprite + 0x10) + 1;
 		}
+
+		off += 0x40;
 	}
 
-	MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
-	for (int i = 0; i < activePartyCount; i++) {
-		MenuBoardEntry& entry = boardEntries[i];
-		BonusAnimSprite* sprite = &sprites[iconBase + i];
-		float x = (float)sprite->x + sprite->motionX;
-		float y = (float)sprite->y + sprite->motionY;
-		int screenX = (int)(x + 12.0f);
-		int screenY = (int)(y - 8.0f);
-		int centerX = (int)((double)(float)(24.0f + (float)sprite->w * 0.5f + x) - 320.0);
-		int centerY = (int)((double)(float)((float)sprite->h * 0.5f + y) - 224.0);
-		entry.m_centerX = (short)centerX;
-		entry.m_centerY = (short)centerY;
-		if (screenX < 0) {
-			screenX = 0;
+	int boardOff = 0;
+	off = 0;
+	if (0 < activePartyCount) {
+		int base = activePartyCount + 1;
+		for (int i = 0; i < activePartyCount; i++) {
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			int boardPtr = this->m_bonus.m_bonusBoardPtr;
+			float x = (float)(int)*sprite + *(float*)(sprite + 0x18);
+			float y = (float)(int)sprite[1] + *(float*)(sprite + 0x1a);
+			*(short*)(boardPtr + boardOff + 8) =
+			    (short)(int)((double)(float)(24.0f + (float)(int)sprite[2] * 0.5f + x) - 320.0);
+			*(short*)(boardPtr + boardOff + 10) =
+			    (short)(int)((double)(float)((float)(int)sprite[3] * 0.5f + y) - 224.0);
+			*(int*)(boardPtr + boardOff + 0x40) = (int)(x + 12.0f);
+			*(int*)(boardPtr + boardOff + 0x44) = (int)(y - 8.0f);
+			if ((double)*(int*)(boardPtr + boardOff + 0x40) < 0.0) {
+				*(int*)(boardPtr + boardOff + 0x40) = 0;
+			}
+			if ((double)*(int*)(boardPtr + boardOff + 0x44) < 0.0) {
+				*(int*)(boardPtr + boardOff + 0x44) = 0;
+			}
+			*(int*)(boardPtr + boardOff + 0x48) = 0x48;
+			*(int*)(boardPtr + boardOff + 0x4c) = 0x58;
+			boardOff += 0x50;
 		}
-		if (screenY < 0) {
-			screenY = 0;
-		}
-		entry.m_screenX = screenX;
-		entry.m_screenY = screenY;
-		entry.m_screenWidth = 0x48;
-		entry.m_screenHeight = 0x58;
 	}
-
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
+	int partyByteOff = 0;
+	int alphaOff = (activePartyCount * 2 + 1) * 0x40;
 	for (int i = 0; i < activePartyCount * 2; i++) {
+		int animPtr = this->m_bonusAnimPtr;
 		CCharaPcs::CHandle* handle;
-		int tribeId;
+		unsigned int tribeId = 0;
 		if (i < activePartyCount) {
-			handle = s_Rinfo->m_party[i].m_partyHandle;
-			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + partyByteOff + 0x20);
+			tribeId = *(unsigned int*)((int)s_Rinfo + partyByteOff + 0x44);
 			float modelScale = s_BonusModelScale[tribeId];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
@@ -2131,32 +2238,35 @@ void CMenuPcs::CalcResultCloseAnim()
 		if (i / activePartyCount == 1) {
 			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
 			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
 			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
 
 		if (i < activePartyCount) {
+			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+			scaleMtx[2][3] = 0.0f;
 		} else {
+			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
 		}
-		scaleMtx[0][3] = 0.0f;
-		scaleMtx[2][3] = scaleMtx[0][3];
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
 		if (i < activePartyCount) {
-			model->m_lightAlpha = 1.0f;
+			handle->m_model->m_lightAlpha = 1.0f;
 		} else {
-			model->m_lightAlpha = sprites[frameEchoBase + i - activePartyCount].alpha;
+			handle->m_model->m_lightAlpha = *(float*)(animPtr + alphaOff + 0x18);
 		}
+		alphaOff += 0x40;
+		partyByteOff += 0x2c;
 	}
 
-	if (doneCount == (int)header->count) {
-		header->finished = 1;
+	if (*(short*)this->m_bonusAnimPtr == doneCount) {
+		((short*)this->m_bonusAnimPtr)[3] = 1;
 	}
 }
 
@@ -2171,24 +2281,20 @@ void CMenuPcs::CalcResultCloseAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-
-	if (*(signed char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		return;
 	}
 
-	int animPtr = this->m_bonusAnimPtr;
-	int modelIndex = 0;
-	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int modelIndex = 0;
+	int lastKind = 0;
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int kind = sprite->kind;
 
 		if (kind >= 0 || kind == -2) {
@@ -2209,8 +2315,8 @@ void CMenuPcs::DrawResultCountAnim()
 				handle->Draw(5);
 				handle->m_flags = oldFlags;
 				RestoreProjection();
+				lastKind = sprite->kind;
 				modelIndex++;
-				lastKind = kind;
 			} else {
 				if (lastKind < 0) {
 					DrawInit();
@@ -2220,14 +2326,14 @@ void CMenuPcs::DrawResultCountAnim()
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
-				if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
+				if ((signed char)s_CntTop > i || i >= (signed char)s_CntTop + activePartyCount) {
 					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 					    (float)sprite->w, (float)sprite->h,
 					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				} else {
-					int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
-					if (*(short*)(statePtr + 0x10) == 0) {
-						int frame = (int)*(short*)(statePtr + 0x22) - 8;
+					int value = s_Rinfo->m_party[i - (signed char)s_CntTop].m_totalValue;
+					if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
+						int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 						if (frame > 0) {
 							if (frame < value) {
 								value = frame;
@@ -2263,7 +2369,7 @@ void CMenuPcs::DrawResultCountAnim()
 						digitX += digitW;
 					}
 				}
-				lastKind = kind;
+				lastKind = sprite->kind;
 			}
 		}
 	}
@@ -2278,8 +2384,9 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int textIndex = 0;
 	char text[128];
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			font->SetColor(color.color);
@@ -2326,31 +2433,27 @@ void CMenuPcs::DrawResultCountAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
-		int countTop = header->count;
-		s_CntTop = (unsigned char)countTop;
-		for (int i = 0; i < activePartyCount; i++) {
-			short stripX = ((0 < i) && (i < 3)) ? 8 : 0x20;
-			short y = (short)(0x28 + i * 0x60);
-			BonusAnimSprite* sprite = &sprites[countTop + i];
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
+		short y = 0x28;
+		int partyByteOff = 0;
+		for (int i = 0; i < activePartyCount; i++, partyByteOff += sizeof(BonusPartySummary)) {
+			int rank = *(int*)((int)s_Rinfo + partyByteOff + 0x34);
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
 			sprite->kind = 0x19;
+			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			sprite->x = stripX;
 			sprite->y = y;
 			sprite->w = 0x38;
+			y += 0x60;
 			sprite->h = 0x28;
-			sprite->mulX = (float)(s_Rinfo->m_party[i].m_rank * sprite->w);
-			sprite->alpha = 0.0f;
-			sprite->depth = 1.0f;
+			sprite->mulX = (float)(rank * sprite->w);
+			sprite->mulY = 0.0f;
 			sprite->startFrame = 9999;
 			sprite->duration = 4;
-			sprite->scale = 1.0f;
+			sprite->depth = 1.0f;
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;
 			sprite->targetX = (float)(sprite->x - 0x60);
@@ -2365,44 +2468,46 @@ void CMenuPcs::CalcResultCountAnim()
 			}
 		}
 
-		header->count = (short)(countTop + activePartyCount);
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(countTop + activePartyCount);
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0) {
-		*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
+		*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	}
 
-	int frame = (int)*(short*)(statePtr + 0x22) - 8;
-	int countTop = (int)header->count - activePartyCount;
+	int countTop = (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count - activePartyCount;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
 
 	for (int i = 0; i < activePartyCount; i++) {
-		BonusAnimSprite* sprite = &sprites[countTop + i];
-		if (*(short*)(statePtr + 0x10) == 0) {
+		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
+		if (*(short*)(this->m_bonusStatePtr + 0x10) != 0) {
+			sprite->motionX = 0.0f;
+			sprite->motionY = 0.0f;
+			sprite->alpha = 1.0f;
+		} else {
 			int value = s_Rinfo->m_party[i].m_totalValue;
 			if (frame == value) {
 				Sound.PlaySe(0x4b, 0x40, 0x7f, 0);
-				sprite->timer = frame;
+				sprite->startFrame = frame;
 			}
 
-			if (frame < sprite->timer) {
+			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			} else {
-				int elapsed = frame - sprite->timer;
+				int elapsed = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
 				if (elapsed < sprite->duration) {
-					float progress = 1.0f - ((float)elapsed / (float)sprite->duration);
-					sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-					sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+					float fy = (float)sprite->y;
+					float ty = sprite->targetY;
+					double progress = 1.0 - (double)((float)elapsed / (float)sprite->duration);
+					sprite->motionX = (float)((double)(sprite->targetX - (float)sprite->x) * progress);
+					sprite->motionY = (float)((double)(ty - fy) * progress);
 				} else {
 					sprite->motionX = 0.0f;
 					sprite->motionY = 0.0f;
 				}
 			}
-		} else {
-			sprite->motionX = 0.0f;
-			sprite->motionY = 0.0f;
-			sprite->alpha = 1.0f;
 		}
 	}
 
@@ -2425,7 +2530,7 @@ void CMenuPcs::CalcResultCountAnim()
 		if (i / activePartyCount == 1) {
 			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
 			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
 			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
 
@@ -2447,17 +2552,17 @@ void CMenuPcs::CalcResultCountAnim()
 		model->m_lightAlpha = 1.0f;
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 &&
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 &&
 	    (double)s_Rinfo->m_winnerTotalValue + 8.333333134651184 <= (double)frame) {
-		*(short*)(statePtr + 0x10) = 1;
+		*(short*)(this->m_bonusStatePtr + 0x10) = 1;
 		return;
 	}
 
-	if (*(short*)(statePtr + 0x10) != 0) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) != 0) {
 		unsigned short buttons = 0;
 		int padRemap = Pad.m_debugPadPort;
 		int padLock = Pad.m_debugPadLock;
@@ -2474,7 +2579,7 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
-			*(short*)(animPtr + 6) = 1;
+			((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 		}
 	}
 }
@@ -2490,22 +2595,19 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	int animPtr = this->m_bonusAnimPtr;
 	int statePtr = this->m_bonusStatePtr;
-	int modelIndex = 0;
 
 	if (*(signed char*)(statePtr + 0xb) != 0) {
 		int activePartyCount = s_Rinfo->m_partyCount;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int lastKind = 0;
 
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
+		int modelIndex = 0;
+
+		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			int kind = sprite->kind;
 
 			if (kind >= 0 || kind == -2) {
@@ -2514,10 +2616,10 @@ void CMenuPcs::DrawResultOpenAnim()
 					if (modelIndex < activePartyCount) {
 						handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 					} else {
-						handle = displaySlots[modelIndex - activePartyCount];
+						handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 					}
 
-					if (0.0f < handle->m_model->m_lightAlpha) {
+					if ((double)handle->m_model->m_lightAlpha > 0.0) {
 						SetProjection(modelIndex);
 						SetLight(1);
 						handle->m_flags = 0x300543;
@@ -2538,15 +2640,30 @@ void CMenuPcs::DrawResultOpenAnim()
 
 					_GXColor colors[4];
 					if (kind == 0x17) {
-						_GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-						colors[0] = white;
-						colors[1] = white;
-						colors[2] = white;
-						colors[3] = white;
-						_GXColor color = white;
+						colors[0].r = 0xFF;
+						colors[0].g = 0xFF;
+						colors[0].b = 0xFF;
+						colors[0].a = 0xFF;
+						colors[1].r = 0xFF;
+						colors[1].g = 0xFF;
+						colors[1].b = 0xFF;
+						colors[1].a = 0xFF;
+						colors[2].r = 0xFF;
+						colors[2].g = 0xFF;
+						colors[2].b = 0xFF;
+						colors[2].a = 0xFF;
+						colors[3].r = 0xFF;
+						colors[3].g = 0xFF;
+						colors[3].b = 0xFF;
+						colors[3].a = 0xFF;
+						_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 						GXSetChanMatColor(GX_COLOR0A0, color);
 					} else {
-						_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+						_GXColor color;
+						color.r = 0xFF;
+						color.g = 0xFF;
+						color.b = 0xFF;
+						color.a = (unsigned char)(sprite->alpha * 255.0f);
 						GXSetChanMatColor(GX_COLOR0A0, color);
 					}
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
@@ -2601,8 +2718,8 @@ void CMenuPcs::DrawResultOpenAnim()
 
 		int textIndex = 0;
 		char text[128];
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
+		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			if (sprite->kind == -1) {
 				CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f));
 				font->SetColor(color.color);
@@ -2655,10 +2772,6 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int frameBase = 1;
 	const int iconBase = frameBase + activePartyCount;
-	const int modelBase = iconBase + activePartyCount;
-	const int itemModelBase = modelBase + activePartyCount;
-	const int nameBase = itemModelBase + activePartyCount;
-	const int labelBase = nameBase + activePartyCount;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
 		int animPtr = this->m_bonusAnimPtr;
@@ -2669,20 +2782,23 @@ void CMenuPcs::CalcResultOpenAnim()
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
-		sprites[0].kind = 0x16;
-		sprites[0].y = 0;
-		sprites[0].x = 0;
-		sprites[0].w = 0x280;
-		sprites[0].h = 0x1c0;
-		sprites[0].mulX = 0.0f;
-		sprites[0].mulY = 0.0f;
-		sprites[0].startFrame = 0;
-		sprites[0].duration = 8;
-		sprites[0].depth = 1.0f;
-		sprites[0].alpha = 0.0f;
+		{
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
+			sprite->kind = 0x16;
+			sprite->y = 0;
+			sprite->x = 0;
+			sprite->w = 0x280;
+			sprite->h = 0x1c0;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->startFrame = 0;
+			sprite->duration = 8;
+			sprite->depth = 1.0f;
+			sprite->alpha = 0.0f;
+		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[frameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (frameBase + i) * 0x40 + 8);
 			sprite->kind = 0x17;
 			sprite->x = 0x80;
 			sprite->y = (short)(0x38 + i * 0x60);
@@ -2694,11 +2810,12 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
+		int base = iconBase;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = &sprites[base + i];
 			unsigned int partySlot = s_Rinfo->m_party[i].m_partySlot;
 			sprite->kind = 0x18;
-			sprite->x = ((0 < i) && (i < 3)) ? 0x30 : 0x48;
+			sprite->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 			sprite->y = (short)(0x28 + i * 0x60);
 			sprite->w = 0x60;
 			sprite->h = 0x58;
@@ -2709,15 +2826,16 @@ void CMenuPcs::CalcResultOpenAnim()
 			if (i == 0) {
 				sprite->startFrame = sprites[frameBase].startFrame + sprites[frameBase].duration + 0x18;
 			} else {
-				sprite->startFrame = sprites[iconBase + i - 1].startFrame + 3;
+				sprite->startFrame = sprites[base + i - 1].startFrame + 3;
 			}
 			sprite->duration = 8;
 			sprite->depth = 1.0f;
 		}
 
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[modelBase + i];
-			BonusAnimSprite* icon = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -2;
 			sprite->x = 0;
 			sprite->y = 0;
@@ -2730,8 +2848,9 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[itemModelBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
 			sprite->kind = -2;
 			sprite->x = 0;
 			sprite->y = 0;
@@ -2743,9 +2862,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[nameBase + i];
-			BonusAnimSprite* icon = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			BonusAnimSprite* icon = (BonusAnimSprite*)((int)sprite - 3 * activePartyCount * 0x40);
 			sprite->kind = -1;
 			sprite->x = (short)(icon->x + 0x50);
 			sprite->y = (short)(icon->y + 0x48);
@@ -2758,9 +2878,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->depth = 1.0f;
 		}
 
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[labelBase + i];
-			BonusAnimSprite* name = &sprites[nameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			BonusAnimSprite* name = (BonusAnimSprite*)((int)sprite - activePartyCount * 0x40);
 			sprite->kind = -1;
 			sprite->x = 0xb8;
 			sprite->y = (short)(name->y + 0x15);
@@ -2772,25 +2893,27 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprite->duration = 8;
 			sprite->depth = 1.0f;
 		}
-		int countBase = labelBase + activePartyCount;
-		BonusAnimSprite* count = &sprites[countBase];
-		count->kind = 0x19;
-		count->x = (short)((0x280 - 0x140) >> 1);
-		count->y = 0x10;
-		count->w = 0x140;
-		count->h = 0x28;
-		count->mulX = 0.0f;
-		count->mulY = 0.0f;
-		count->startFrame = sprites[1].startFrame;
-		count->duration = 8;
-		count->duration = 10;
-		count->depth = 1.0f;
-		int countTop = labelBase + activePartyCount + 1;
+		int countBase = base + activePartyCount;
+		{
+			BonusAnimSprite* count = (BonusAnimSprite*)(this->m_bonusAnimPtr + countBase * 0x40 + 8);
+			count->kind = 0x19;
+			count->x = (short)((0x280 - 0x140) >> 1);
+			count->y = 0x10;
+			count->w = 0x140;
+			count->h = 0x28;
+			count->mulX = 0.0f;
+			count->mulY = 0.0f;
+			count->startFrame = ((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[1].startFrame;
+			count->duration = 8;
+			count->duration = 10;
+			count->depth = 1.0f;
+		}
+		int countTop = countBase + 1;
 		s_CntTop = (unsigned char)countTop;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[countTop + i];
-			BonusAnimSprite* count = &sprites[countBase];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);
+			BonusAnimSprite* count = (BonusAnimSprite*)(this->m_bonusAnimPtr + countBase * 0x40 + 8);
 			sprite->kind = 0x19;
 			sprite->x = 0x200;
 			sprite->y = (short)(count->y + 0xC);
@@ -2806,7 +2929,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[i];
-			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (activePartyCount + i + 1) * 0x40 + 8);
 			int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + 24.0f)) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = (short)centerX;
@@ -2819,7 +2942,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
-			BonusAnimSprite* sprite = &sprites[countTop + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((signed char)s_CntTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
 			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
@@ -2833,7 +2956,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[activePartyCount * 2 + i];
-			BonusAnimSprite* sprite = &sprites[frameBase + i];
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (frameBase + i) * 0x40 + 8);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entry.m_centerX = 0;
 			entry.m_centerY = (short)centerY;
@@ -2847,7 +2970,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		header->count = (short)(countTop + activePartyCount);
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 		header->finished = 0;
 		return;
 	}
@@ -2862,34 +2985,32 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (frame < sprite->startFrame) {
-			continue;
-		}
+		if (sprite->startFrame <= frame) {
+			if (frame < sprite->startFrame + sprite->duration) {
+				sprite->timer++;
+				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
+			} else {
+				doneCount++;
+				sprite->alpha = 1.0f;
+			}
 
-		if (frame < sprite->startFrame + sprite->duration) {
-			sprite->timer++;
-			sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
-		} else {
-			sprite->alpha = 1.0f;
-			doneCount++;
-		}
-
-		if (sprite->kind == 0x17 && sprite->timer == 1) {
-			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
-		}
-		if (sprite->kind == -2 && sprite->timer == 1) {
-			Sound.PlaySe(0x47, 0x40, 0x7f, 0);
-		}
-		if (sprite->kind == -1 && sprite->timer == 1 && this->m_bonusAlpha == 0) {
-			Sound.PlaySe(0x48, 0x40, 0x7f, 0);
-			this->m_bonusAlpha = 1;
+			if (sprite->kind == 0x17) {
+				BonusAnimSprite* sound = sprite;
+				for (int j = 0; j < activePartyCount; j++) {
+					if (sound->timer == 1) {
+						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
+					}
+					sound++;
+				}
+			}
 		}
 	}
 
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	for (int i = 0; i < activePartyCount * 3; i++) {
+		BonusAnimSprite* sprite = &sprites[activePartyCount * 2 + 1 + i];
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -2899,7 +3020,20 @@ void CMenuPcs::CalcResultOpenAnim()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+			if (i < activePartyCount * 2) {
+				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+			} else {
+				float modelScale = 0.5f;
+				if (sprite->timer == 0x18 && this->m_bonusAlpha == 0) {
+					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
+					this->m_bonusAlpha = 1;
+				}
+				if (0x17 < sprite->timer) {
+					modelScale = (float)(0.5 * (double)((float)(sprite->timer - 0x18) /
+					                 (float)(sprite->duration - 0x18)) + (double)modelScale);
+				}
+				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+			}
 		}
 
 		if (i / activePartyCount == 1) {
@@ -2911,25 +3045,42 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		if (i < activePartyCount) {
 			scaleMtx[0][3] = 0.0f;
-			scaleMtx[2][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-		} else {
-			BonusAnimSprite* sprite = &sprites[modelBase + i];
-			int itemIndex = i - activePartyCount;
-			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
-			scaleMtx[1][3] = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
-			if (itemIndex >= 1 && itemIndex <= 2) {
-				scaleMtx[1][3] -= 0.5f;
-			}
 			scaleMtx[2][3] = 0.0f;
+		} else if (i < activePartyCount * 2) {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+		} else {
+			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+			if (sprite->timer == 8) {
+				Sound.PlaySe(0x47, 0x40, 0x7f, 0);
+			}
+			float ty = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
+			int itemIndex = i - activePartyCount * 2;
+			scaleMtx[1][3] = ty;
+			scaleMtx[2][3] = 0.0f;
+			if (itemIndex > 0 && itemIndex < 3) {
+				scaleMtx[1][3] = (float)((double)ty - 1.8);
+			}
 		}
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
-		model->m_lightAlpha = sprites[modelBase + i].alpha;
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
+		if (activePartyCount * 2 <= i) {
+			if (sprite->timer < 0x18) {
+				sprite->alpha = 1.0f;
+			} else {
+				sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
+				                 (float)(sprite->duration - 0x18)));
+				if ((double)sprite->alpha < 0.0) {
+					sprite->alpha = 0.0f;
+				}
+			}
+		}
+		handle->m_model->m_lightAlpha = sprite->alpha;
 	}
 
 	if (doneCount == (int)header->count) {
@@ -3056,16 +3207,15 @@ void CMenuPcs::destroyBonus()
 	}
 
 	for (int i = 0; i < 0x18; i++) {
-		CCharaPcs::CHandle** handleSlot = &GetBonusDisplayHandleSlots(this)[i];
-		if (*handleSlot != 0) {
-			delete *handleSlot;
-			*handleSlot = 0;
+		if (GetBonusDisplayHandleSlots(this)[i] != 0) {
+			delete GetBonusDisplayHandleSlots(this)[i];
+			GetBonusDisplayHandleSlots(this)[i] = 0;
 		}
 	}
 
-	int ptr = this->m_bonusListPtr;
-	if (ptr != 0) {
-		delete[] (CMenuPcs::EffectInfo*)ptr;
+	CMenuPcs::EffectInfo* list = (CMenuPcs::EffectInfo*)this->m_bonusListPtr;
+	if (list != 0) {
+		delete[] list;
 		this->m_bonusListPtr = 0;
 	}
 
@@ -3074,15 +3224,15 @@ void CMenuPcs::destroyBonus()
 		s_Rinfo = 0;
 	}
 
-	ptr = this->m_bonusStatePtr;
-	if (ptr != 0) {
-		delete (BonusMenuStateRaw*)ptr;
+	BonusMenuStateRaw* state = (BonusMenuStateRaw*)this->m_bonusStatePtr;
+	if (state != 0) {
+		delete state;
 		this->m_bonusStatePtr = 0;
 	}
 
-	ptr = this->m_bonusAnimPtr;
-	if (ptr != 0) {
-		delete (BonusAnimList*)ptr;
+	BonusAnimList* anim = (BonusAnimList*)this->m_bonusAnimPtr;
+	if (anim != 0) {
+		delete anim;
 		this->m_bonusAnimPtr = 0;
 	}
 
@@ -3091,9 +3241,9 @@ void CMenuPcs::destroyBonus()
 		s_Base[0] = 0;
 	}
 
-	ptr = this->m_bonus.m_bonusBoardPtr;
-	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+	unsigned char* board = (unsigned char*)this->m_bonus.m_bonusBoardPtr;
+	if (board != 0) {
+		delete[] board;
 		this->m_bonus.m_bonusBoardPtr = 0;
 	}
 
@@ -3118,11 +3268,6 @@ void CMenuPcs::destroyBonus()
 void CMenuPcs::createBonus()
 {
 	char fontPath[128];
-	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-	int listPtr = this->m_bonusListPtr;
-	MenuWindowInfo* window = this->m_menuWindowInfo;
-	int boardPtr = this->m_bonus.m_bonusBoardPtr;
 
 	Pad.m_stickDigitalThreshold = 0x28;
 	for (int i = 0; i < 4; i++) {
@@ -3131,11 +3276,10 @@ void CMenuPcs::createBonus()
 	}
 
 	loadTexture(sBonusTextureSetNames, 2, 1, sBonusTextureTable, 0x16, 0x12, 0);
-	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
+	sprintf(fontPath, lbl_801DD5D4, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
-	CMemory::CStage* stage = MenuPcs.m_menuStage;
-	s_Rinfo = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;
+	s_Rinfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
@@ -3144,29 +3288,47 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
-	statePtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
-	this->m_bonusStatePtr = statePtr;
-	listPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
-	this->m_bonusListPtr = listPtr;
+	this->m_bonusStatePtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
+	this->m_bonusListPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
 
-	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
-	for (int i = 0; i < 5; i++) {
-		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
-	}
-	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	s_Base[0] = reinterpret_cast<float*>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
+	InitBonusEffectSlots(this);
+	memset((void*)this->m_bonusStatePtr, 0, sizeof(BonusMenuStateRaw));
+	s_Base[0] = reinterpret_cast<float*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
-	animPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
-	this->m_bonusAnimPtr = animPtr;
-	memset((void*)animPtr, 0, sizeof(BonusAnimList));
-	boardPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
-	this->m_bonus.m_bonusBoardPtr = boardPtr;
-	window = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
-	this->m_menuWindowInfo = window;
-	memset(window, 0, sizeof(MenuWindowInfo));
-	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
+	this->m_bonusAnimPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
+	memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));
+	this->m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
+	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
+	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
+	const float depth1000 = FLOAT_80331F6C;
+	const float scale1 = FLOAT_80331EB0;
+	const float zero = kBonusZClearOrigin;
+	int off = 0;
 	for (int i = 0; i < 0x18; i++) {
-		InitBonusBoardEntry(&boardEntries->entries[i]);
+		float* pos = (float*)(this->m_bonus.m_bonusBoardPtr + off + 0x1c);
+		pos[2] = zero;
+		pos[1] = zero;
+		pos[0] = zero;
+		pos[5] = zero;
+		pos[4] = zero;
+		pos[3] = zero;
+		pos[8] = scale1;
+		pos[7] = scale1;
+		pos[6] = scale1;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x4) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0x8) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xa) = 0;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xc) = 0x280;
+		*(short*)(this->m_bonus.m_bonusBoardPtr + off + 0xe) = 0x1c0;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x10) = zero;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x14) = zero;
+		*(float*)(this->m_bonus.m_bonusBoardPtr + off + 0x18) = depth1000;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x40) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x44) = 0;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x48) = 0x280;
+		*(int*)(this->m_bonus.m_bonusBoardPtr + off + 0x4c) = 0x1c0;
+		off += 0x50;
 	}
 
 	if (s_Rinfo != 0) {
@@ -3183,34 +3345,42 @@ void CMenuPcs::createBonus()
 				break;
 			}
 
-			BonusPartySummary& entry = s_Rinfo->m_party[activeCount];
-			entry.m_partySlot = i;
-			entry.m_partyHandle =
+			s_Rinfo->m_party[activeCount].m_partySlot = i;
+			s_Rinfo->m_party[activeCount].m_partyHandle =
 			    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8);
-			entry.m_partyHandle->m_model->m_lightAlpha = 0.0f;
-			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
-			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
-			if (entry.m_foodValue > 100) {
-				entry.m_foodValue = 100;
+			s_Rinfo->m_party[activeCount].m_partyHandle->m_model->m_lightAlpha = 0.0f;
+			s_Rinfo->m_party[activeCount].m_bonusCondition = (int)caravanWork->m_bonusCondition;
+			int foodValue = (int)caravanWork->m_artifactRelated[3] + (int)caravanWork->m_artifactRelated[4];
+			int foodClamped;
+			if (foodValue < 0) {
+				foodClamped = 0;
+			} else {
+				foodClamped = 100;
+				if (foodValue <= 100) {
+					foodClamped = foodValue;
+				}
 			}
-			entry.m_artifactValue =
-			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[4];
-			entry.m_totalValue = entry.m_foodValue + entry.m_artifactValue;
-			entry.m_selectedItemId = -1;
-			entry.m_selectedSlot = -1;
+			s_Rinfo->m_party[activeCount].m_foodValue = foodClamped;
+			s_Rinfo->m_party[activeCount].m_artifactValue =
+			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[2];
+			s_Rinfo->m_party[activeCount].m_totalValue =
+			    s_Rinfo->m_party[activeCount].m_foodValue + s_Rinfo->m_party[activeCount].m_artifactValue;
+			s_Rinfo->m_party[activeCount].m_selectedItemId = -1;
+			s_Rinfo->m_party[activeCount].m_selectedSlot = -1;
+			int rawTotal = s_Rinfo->m_party[activeCount].m_totalValue;
 			int totalValueClamped;
-			if (entry.m_totalValue < 0) {
+			if (rawTotal < 0) {
 				totalValueClamped = 0;
 			} else {
 				totalValueClamped = 999;
-				if (entry.m_totalValue < 1000) {
-					totalValueClamped = entry.m_totalValue;
+				if (rawTotal <= 999) {
+					totalValueClamped = rawTotal;
 				}
 			}
-			entry.m_totalValue = totalValueClamped;
-			totalValue += entry.m_totalValue;
+			s_Rinfo->m_party[activeCount].m_totalValue = totalValueClamped;
+			totalValue += s_Rinfo->m_party[activeCount].m_totalValue;
+			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)caravanWork->m_tribeId;
 			activeCount++;
-			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 
 			if (caravanWork->m_treasures[0] > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[0];
@@ -3261,7 +3431,7 @@ void CMenuPcs::createBonus()
 					if (caravanWork->m_artifacts[artifactSlot] == itemId) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
-				} else if ((unsigned short)(caravanWork->m_inventoryItemCount + 1) > 0x40) {
+				} else if (caravanWork->m_inventoryItemCount + 1 > 0x40) {
 					s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 				}
 			}
@@ -3305,25 +3475,26 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		for (int i = 0; i < 0x18; i++) {
-			displaySlots[i] = 0;
+			this->m_wm.m_handles[i] = 0;
 		}
 
+		CCharaPcs::CHandle** slot = this->m_wm.m_handles;
 		for (int i = 0; i < s_Rinfo->m_partyCount * 2; i++) {
-			BonusPartySummary& entry = s_Rinfo->m_party[i % s_Rinfo->m_partyCount];
-			unsigned long modelCode = entry.m_partySlot + 0x83;
-			if (i < s_Rinfo->m_partyCount) {
-				modelCode = entry.m_partySlot + 0x87;
-			}
 			CCharaPcs::CHandle* handle =
-			    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
-			displaySlots[i] = handle;
-			handle->Add();
-			handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
-			handle->m_flags = 0x300543;
+			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
+			slot[0] = handle;
+			slot[0]->Add();
+			unsigned long modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x83;
+			if (i < s_Rinfo->m_partyCount) {
+				modelCode = s_Rinfo->m_party[i % s_Rinfo->m_partyCount].m_partySlot + 0x87;
+			}
+			slot[0]->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
+			slot = (CCharaPcs::CHandle**)((char*)slot + 4);
+			slot[-1]->m_flags = 0x300543;
 		}
 
+		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int handleIndex = s_Rinfo->m_partyCount * 2;
 		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
@@ -3332,13 +3503,13 @@ void CMenuPcs::createBonus()
 				displaySlots[handleIndex] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
-				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
+				    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
 				displaySlots[handleIndex] = itemHandle;
 				itemHandle->Add();
 				unsigned short itemModelCode =
 				    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
-				unsigned short modelNo = itemModelCode & 0x0FFF;
-				itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
+				int modelNo = itemModelCode & 0x0FFF;
+				itemHandle->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
 				itemHandle->m_flags = 0x300543;
 
 				if (modelNo == 0x79) {

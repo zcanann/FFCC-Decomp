@@ -66,7 +66,7 @@ private:
     u8 m_work1349[2];
     unsigned char m_playerMask; // 0x134B
     u8 m_work134C[4];
-    signed char m_managerIndex; // 0x1350
+    unsigned char m_managerIndex; // 0x1350
     u8 m_work1351[0x6484 - 0x1351];
 
 public:

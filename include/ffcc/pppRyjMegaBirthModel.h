@@ -15,16 +15,10 @@ struct PRyjMegaBirthModel
     float m_drawDepth;            // 0x18
     u8 _pad1C[0x04];
     u16 m_maxParticles;           // 0x20
-    union {
-        u16 m_emitCount;          // 0x22
-        struct EmitFields {
-            u8 m_fadeOutFrames;   // 0x22
-            u8 m_emitCountHigh;
-        } m_emit;
-    };
+    u16 m_emitCount;              // 0x22
     u16 m_emitInterval;           // 0x24
-    s16 m_life;                   // 0x26
-    u8 _pad28;
+    u16 m_life;                   // 0x26
+    u8 m_fadeOutFrames;           // 0x28
     u8 m_fadeInFrames;            // 0x29
     u8 m_spawnMode;               // 0x2A
     u8 m_spread;                  // 0x2B
@@ -47,9 +41,9 @@ struct PRyjMegaBirthModel
     float m_directionVelocityRandom; // 0x110
     float m_acceleration;          // 0x114
     float m_accelerationStep;      // 0x118
-    u8 _pad11C[0x04];
+    float m_speed;                // 0x11C
     Vec m_directionScale;         // 0x120
-    float m_speed;                // 0x12C
+    u8 _pad12C[0x04];
     u8 m_speedMode;               // 0x130
     u8 m_enableParticleColor;     // 0x131
     u8 m_rotationRandomFlags;     // 0x132

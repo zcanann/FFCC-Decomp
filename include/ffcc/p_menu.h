@@ -92,11 +92,11 @@ struct WmWorldState
 {
     float m_posX;
     float m_posY;
-    unsigned char m_worldReady;
-    unsigned char m_flag09;
-    unsigned char m_flag0A;
-    unsigned char m_flag0B;
-    unsigned char m_modelFlagsInitialized;
+    char m_worldReady;
+    char m_flag09;
+    char m_flag0A;
+    char m_flag0B;
+    char m_modelFlagsInitialized;
     unsigned char m_pad0D;
     short m_state0E;
     short m_mainState;
@@ -454,8 +454,8 @@ public:
     int EquipClose();
     void EquipDraw();
     int EquipCtrlCur();
-    bool EquipOpen0();
-    bool EquipClose0();
+    int EquipOpen0();
+    int EquipClose0();
     int ChkEquipActive(int);
     int ChkEquipPossible(int);
     int GetEquipType(int);
@@ -597,7 +597,6 @@ public:
     void LetterLstOpen();
     void LetterLstClose();
     void LetterMessOpen();
-    int LetterMessClose();
     void LetterItemWinOpen();
     void LetterItemWinClose();
     bool LetterReplyWinOpen();
@@ -791,8 +790,8 @@ public:
     };
     unsigned char* m_wmWorkBuffer;
     unsigned char m_wmThpActive;
-    unsigned char m_singleMenuStageActive;
-    unsigned char m_singleMenuInitialized;
+    signed char m_singleMenuStageActive;
+    signed char m_singleMenuInitialized;
     unsigned char m_pad85B[0x85C - 0x85B];
     int m_singleMenuTextureLoadIndex;
     int m_singleMenuTextureLoadState;
@@ -814,22 +813,22 @@ public:
         short m_wmTransitionCode;
         signed short m_goOutLoadResult;
     };
-    unsigned char m_singleMenuCtrlResetFlag;
+    signed char m_singleMenuCtrlResetFlag;
     unsigned char m_pad873;
     int m_singleLifeTimer;
+    CShopMenu* m_shopMenu;
     union {
-        CShopMenu* m_shopMenu;
+        unsigned char m_pad87C;
         GoOutResetFields m_goOutReset;
     };
     union {
-        unsigned char m_pad87C;
+        int m_pad880;
         Mc::SaveDat* m_goOutTransferSaveData;
     };
     union {
-        int m_pad880;
+        int m_pad884;
         void* m_goOutTransferWork;
     };
-    int m_pad884;
     union {
         unsigned char m_cmakeWorkActive;
         unsigned char m_goOutUnknown888;
@@ -930,10 +929,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_goOutLoadResult) == 0x870);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuCtrlResetFlag) == 0x872);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleLifeTimer) == 0x874);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset.m_resetFlag) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferSaveData) == 0x87C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWork) == 0x880);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset) == 0x87C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset.m_resetFlag) == 0x87C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferSaveData) == 0x880);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWork) == 0x884);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkActive) == 0x888);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown888) == 0x888);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkCardChannel) == 0x889);

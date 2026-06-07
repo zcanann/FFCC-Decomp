@@ -210,7 +210,7 @@ static inline CFlatRuntime2::CDebugDrawCC* DebugDrawCCEntries(u8* runtime)
 
 static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
 {
-	return reinterpret_cast<CFlatLayerResource*>(runtime->m_pad_1770_1BDC);
+	return reinterpret_cast<CFlatLayerResource*>(runtime->m_pad_1770_17D4);
 }
 
 static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)

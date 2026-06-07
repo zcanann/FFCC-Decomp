@@ -48,7 +48,13 @@ public:
 		short m_classIndex;        // 0x14
 		short m_activeClassIndex;  // 0x16
 		void* m_engineObject;      // 0x18
-		unsigned int m_codePos;    // 0x1C
+		union {
+			unsigned int m_codePos; // 0x1C
+			struct {
+				int m_codeFunc : 12;
+				int m_codeOffset : 20;
+			} m_codeIndex;
+		};
 		CObject* m_previous;       // 0x20
 		CObject* m_next;           // 0x24
 		int m_waitCounter;	       // 0x28
@@ -58,14 +64,16 @@ public:
 		unsigned char m_reqFlag3;  // 0x2F
 		short m_particleId;        // 0x30
 		short m_0x32;              // 0x32
-		short m_0x34;              // 0x34-0x36
+		unsigned short m_0x34;     // 0x34-0x36
 		short m_argCount;          // 0x36-0x38
 		union {
 			unsigned char m_flags;     // 0x38-0x3B
 			struct {
-				unsigned char m_flagBits0 : 3;
-				unsigned char m_constructFlag : 1;
-				unsigned char m_flagBits1 : 4;
+				signed char m_deleteFlag : 1;    // 0x80
+				signed char m_activeFlag : 1;    // 0x40
+				signed char m_callFlag : 1;      // 0x20
+				signed char m_constructFlag : 1; // 0x10
+				signed char m_flagBits1 : 4;     // 0x0F
 			} m_flagBits;
 		};
 		int m_0x3C;                // 0x3C
@@ -137,7 +145,7 @@ public:
 	int getTopBit(unsigned int);
 	void searchFunc(int, int, int);
 
-	void SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
+	int SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 
 	int request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*);
 	void callSetup(CFlatRuntime::CObject*, CFlatRuntime::CFunc*, int);
@@ -190,7 +198,9 @@ public:
     u8 m_pad_084C[0x80];            // 0x084C
     CObject m_objectSentinel;       // 0x08CC
     CObject m_freeObjectSentinel;   // 0x0918
-    u8 m_pad_0964[0xC];             // 0x0964
+    u32 m_currentCodePos;           // 0x0964
+    u32 m_previousCodePos;          // 0x0968
+    u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
     u8 m_pad_0974[4];               // 0x0974
     void** m_freeListPrev;          // 0x0978

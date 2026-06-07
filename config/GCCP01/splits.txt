@@ -1783,6 +1783,7 @@ menu_letter.cpp:
 	extab       start:0x80009FAC end:0x8000A004
 	extabindex  start:0x8001144C end:0x800114D0
 	.text       start:0x8016394C end:0x80167DD4
+	.rodata     start:0x801DEDF8 end:0x801DF264
 	.bss        start:0x8030BA88 end:0x8030BB08
 	.sbss       start:0x8032EEE8 end:0x8032EF08
 	.sdata2     start:0x80333080 end:0x803331A8
@@ -1844,6 +1845,7 @@ MenuUtil.cpp:
 	extab       start:0x8000A16C end:0x8000A1CC
 	extabindex  start:0x800116EC end:0x8001177C
 	.text       start:0x8017683C end:0x8017AF14
+	.rodata     start:0x801E3058 end:0x801E3838
 	.data       start:0x80215A48 end:0x80215BD8
 	.sdata2     start:0x80333460 end:0x80333680
 

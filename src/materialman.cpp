@@ -2973,7 +2973,7 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
 {
-    unsigned int materialIndex = 0;
+    long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned int>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];

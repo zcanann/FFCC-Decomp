@@ -1775,7 +1775,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -3:
         this->push(object, getNumFreeObject(5));
         outResult = 0;
-        return 1;
+        break;
     case -4:
         if (CameraPcs.IsAbsolute() != 0) {
             Vec refPosition;
@@ -1801,7 +1801,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -5: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
@@ -1812,19 +1812,19 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
-        return 1;
+        break;
     }
     case -6: {
         float value = sinf(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -7: {
         float value = cosf(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -8: {
         const unsigned int x = object->m_localBase[0];
@@ -1920,20 +1920,20 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -9:
         Game.ChangeMap(*object->m_localBase, object->m_localBase[1], 0, 1);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -10: {
         float value = atan2__3stdFff(
             *reinterpret_cast<float*>(object->m_localBase),
             *reinterpret_cast<float*>(object->m_localBase + 1));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x0B: {
         unsigned short buttons = 0;
@@ -1945,7 +1945,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x0C: {
         unsigned short buttons = 0;
@@ -1957,7 +1957,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, static_cast<short>(buttons));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x0D: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
@@ -1966,27 +1966,27 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         float value = PSVECDistance(&a, &b);
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x0E:
         this->push(object, Math.Rand(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0x0F: {
         float value = Math.RandF(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x10:
         this->push(object, Math.RandPM(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0x11: {
         float value = Math.RandFPM(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x12:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
@@ -2000,7 +2000,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x13:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) =
@@ -2013,12 +2013,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x14: {
         const int value = *object->m_localBase;
         this->push(object, value < 0 ? -value : value);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x15: {
         float value = *reinterpret_cast<float*>(object->m_localBase);
@@ -2027,7 +2027,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, *reinterpret_cast<int*>(&value));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x16: {
         CGame::CNextScript nextScript;
@@ -2036,18 +2036,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Game.SetNextScript(&nextScript);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x17:
         CameraPcs.SetZRotate(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x18:
         CameraPcs.SetFov(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x19: {
         if (m_pathPointCount < 0x40) {
             if (*object->m_localBase != 0) {
@@ -2070,7 +2070,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x1A: {
         const unsigned int mode = *object->m_localBase;
@@ -2140,7 +2140,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x1B: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2151,17 +2151,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position, localFloats[5]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x1C:
         RuntimeDebugFlags(this) = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x1D:
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x1E:
         if (*object->m_localBase < 0x10) {
             CLine<64>& line = m_debugLines[*object->m_localBase];
@@ -2170,7 +2170,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x1F:
         if (*object->m_localBase < 0x10) {
             CLine<64>& line = m_debugLines[*object->m_localBase];
@@ -2186,7 +2186,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x20: {
         CColor color(
             static_cast<u8>(object->m_localBase[1]),
@@ -2196,7 +2196,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, color);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x21: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2217,7 +2217,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             &CharaPcs, *object->m_localBase, object->m_localBase[1], color, &direction);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x22: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2259,7 +2259,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         this->push(object, found);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x23: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2289,7 +2289,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[4]) = position.z;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x24: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2324,7 +2324,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[5]) = direction.z;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x25: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2345,12 +2345,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[4]) = distance;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x26:
         this->push(object, *reinterpret_cast<int*>(&m_debugLines[*object->m_localBase].totalLength));
         outResult = 0;
-        return 1;
+        break;
     case -0x27: {
         if ((RuntimeDebugFlags(this) & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
             Mtx viewMtx;
@@ -2392,13 +2392,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x28:
         m_debugLines[*object->m_localBase].m_mask = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x29: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[0]),
@@ -2409,7 +2409,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Graphic.SetCopyClear(color, 0);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x2A: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2423,13 +2423,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Graphic.SetFogParam(localFloats[3], localFloats[4]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x2B:
         CameraPcs.SetFullScreenShadowEnable(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x2C: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
@@ -2440,34 +2440,34 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CameraPcs.SetFullScreenShadowPos(&position, localFloats[3]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x2D: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CameraPcs.SetFullScreenShadowRot(localFloats[0], localFloats[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x2E:
         MapPcs.IsHitDrawMode(static_cast<char>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x2F:
         MapMng.SetIdGrpMask(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x30:
         this->push(object, GraphicPcs.GetScreenFadeExecutingBit());
         outResult = 0;
-        return 1;
+        break;
     case -0x31:
         CGItemObj::DeleteAllFieldItem();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x32: {
         CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[3];
         fade.m_invert = *object->m_localBase;
@@ -2475,7 +2475,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         fade.m_duration = fade.m_timer;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x33: {
         CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[2];
@@ -2489,7 +2489,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         fade.m_duration = fade.m_timer;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x34: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2514,22 +2514,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x35:
         this->push(object, this->GetFreeParticleSlot());
         outResult = 0;
-        return 1;
+        break;
     case -0x36:
         this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x37:
         this->ResetParticleWork((*object->m_localBase << 8) | object->m_localBase[2], object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x38: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CVector position(
@@ -2539,7 +2539,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->SetParticleWorkPos(position, localFloats[3]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x39: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -2550,35 +2550,35 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->SetParticleWorkTarget(target);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x3A:
         this->SetParticleWorkVector(
             static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x3B:
         this->SetParticleWorkScale(static_cast<float>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x3C:
         this->SetParticleWorkCol(
             *object->m_localBase, object->m_localBase[1], static_cast<float>(object->m_localBase[2]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x3D:
         this->PutParticleWork();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x3E:
         PartMng.pppEndPart(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x3F: {
         Mtx matrix;
         Quaternion rotation;
@@ -2590,7 +2590,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[3]) = rotation.w;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x40: {
         float* values = reinterpret_cast<float*>(object->m_localBase);
@@ -2600,7 +2600,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CameraPcs.SetWorldMapMatrix(matrix);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x41: {
         const unsigned int* localBase = object->m_localBase;
@@ -2633,24 +2633,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(localBase[14]) = rotation.w;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x42: {
         const int padType = Joybus.GetPadType(*object->m_localBase);
         this->push(object, (0x40U - padType | padType - 0x40U) >> 31);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x43:
         PartMng.pppShowIdx(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x44:
         PartMng.pppShowSlot(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x45: {
         unsigned int* localBase = object->m_localBase;
         int a0 = localBase[0];
@@ -2681,7 +2681,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x46: {
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
@@ -2694,7 +2694,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x47: {
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
@@ -2707,7 +2707,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x48: {
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
@@ -2720,23 +2720,23 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             this->push(object, GetErrorLevel__7CSystemFv(mesMenu, object->m_localBase[1]));
         }
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x49:
         this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x4A:
         m_eventFlags = static_cast<unsigned int>(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x4B:
         PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x4C: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -2747,7 +2747,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x4D: {
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
@@ -2757,12 +2757,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             }
             this->push(object, 0);
             outResult = 0;
-            return 1;
+            break;
         }
         if (mesMenu->IsUse() == 0) {
             this->push(object, 0);
             outResult = 0;
-            return 1;
+            break;
         }
         return 1;
     }
@@ -2771,7 +2771,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->SetParticleWorkBind(targetObject);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
@@ -2783,7 +2783,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             (60.0f * 1000.0f * *reinterpret_cast<float*>(object->m_localBase + 5)) / 180.0f);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x50: {
         CGraphicPcs::ScreenFadeSlot* screenFade = &GraphicPcs.m_screenFade[0];
         unsigned int phase = 2;
@@ -2801,7 +2801,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         GraphicPcs.ReqScreenCapture();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x51: {
         char path[0x100];
@@ -2815,7 +2815,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x52: {
         const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
@@ -2831,26 +2831,26 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             object->m_localBase[7]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x53:
         CharaPcs.SetCharaAllocStage(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x54: {
         int index = m_debugDataIndex;
         m_debugDataIndex = index + 1;
         this->push(object, m_debugDataBuffer[index]);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x55: {
         int index = m_debugDataIndex;
         m_debugDataIndex = index + 1;
         this->push(object, m_debugDataBuffer[index]);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x56: {
         int index = m_debugDataIndex;
@@ -2858,7 +2858,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         m_debugDataBuffer[index] = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x57: {
         int index = m_debugDataIndex;
@@ -2866,7 +2866,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         m_debugDataBuffer[index] = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x58: {
         char filename[0x80];
@@ -2874,7 +2874,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MemoryCardMan.DebugReadWrite(1, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x59: {
         char filename[0x80];
@@ -2882,44 +2882,44 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MemoryCardMan.DebugReadWrite(0, filename, reinterpret_cast<u8*>(m_debugDataBuffer), sizeof(m_debugDataBuffer));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x5A:
         m_debugDataIndex = 0;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x5B: {
         CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
         this->SetParticleWorkParam(*object->m_localBase, targetObject);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x5C: {
         CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
         this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x5D:
         this->push(object, System.IsGdev());
         outResult = 0;
-        return 1;
+        break;
     case -0x5E:
         if (GetNumMes__9CFlatDataFv(&System) != 0) {
             System.Printf(const_cast<char*>("\203f\203o\203b\203O\227p\212\326\220\224setForceAnimInterp\202\315\224p\216~\202\263\202\352\202\334\202\265\202\275\201B\n"));
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x5F:
         this->push(object, static_cast<int>(Math.DstRot(
                                   *reinterpret_cast<float*>(object->m_localBase),
                                   *reinterpret_cast<float*>(object->m_localBase + 1))));
         outResult = 0;
-        return 1;
+        break;
     case -0x60: {
         const int alpha = static_cast<int>(FLOAT_80330b74 * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
@@ -2930,7 +2930,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             static_cast<short>(object->m_localBase[6]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x61: {
         const int group = (~(object->m_localBase[1] - 1 | 1 - object->m_localBase[1]) >> 31) & 3;
@@ -2939,26 +2939,26 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Memory.ResetDefaultGroup();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x62:
         CharaPcs.SetNoFreeMergeMask(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -99: {
         CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
         this->SetParticleWorkTrace(targetObject);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -100:
         this->initAllFinished();
         m_initAllFinishedFlag = 1;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x65: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[1]),
@@ -2970,12 +2970,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CharaPcs.SetMapShadeColor(*object->m_localBase, shadeColor);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x66:
         this->push(object, 2);
         outResult = 0;
-        return 1;
+        break;
     case -0x67:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWaveAsync\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -2983,7 +2983,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.LoadWaveASync(*object->m_localBase, -1, 0);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x68: {
         const int completed = Sound.IsLoadWaveASyncCompleted();
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
@@ -2992,7 +2992,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, completed);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x69:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
@@ -3001,7 +3001,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.LoadBgm(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x6A:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3009,16 +3009,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.PlayBgm(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x6B:
         Sound.LoadSe(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x6C:
         this->push(object, Sound.PlaySe(*object->m_localBase, 0x40, 0x7F, 0));
         outResult = 0;
-        return 1;
+        break;
     case -0x6D:
         Game.m_gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
                                    [object->m_localBase[1]] = static_cast<unsigned char>(object->m_localBase[4]);
@@ -3026,38 +3026,38 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                                    [object->m_localBase[3]] = static_cast<unsigned char>(object->m_localBase[4]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x6E:
         this->push(
             object, Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
                                           [object->m_localBase[3]]);
         outResult = 0;
-        return 1;
+        break;
     case -0x6F:
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Game.m_gameWork) + 8) = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x70:
         Game.m_gameWork.m_timerA = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x71:
         Game.m_gameWork.m_scriptGlobalTime = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x72:
         Game.m_gameWork.m_bossArtifactStageTable[*object->m_localBase] = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x73:
         Game.m_gameWork.m_unkStageTable[*object->m_localBase] = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x74: {
         unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -3065,18 +3065,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, static_cast<int>(static_cast<short>(buttonDown)));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x75:
         CMes::SetTempValue(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x76:
         *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1298) = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x77:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3084,12 +3084,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.LoadWave(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x78:
         Sound.Clear3DLine(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x79: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
@@ -3100,7 +3100,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.Add3DLine(*object->m_localBase, &position);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x7A: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -3114,7 +3114,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             Sound.PlaySe3D(
                 *object->m_localBase, &position, localFloats[4], localFloats[5], 0));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x7B:
         this->push(
@@ -3122,32 +3122,32 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                         *reinterpret_cast<float*>(object->m_localBase + 2),
                         *reinterpret_cast<float*>(object->m_localBase + 3), 0));
         outResult = 0;
-        return 1;
+        break;
     case -0x7C:
         Sound.StopSe3D(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x7D:
         PartMng.pppDeletePart(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x7E:
         PartMng.pppDeleteSlot(*object->m_localBase, 0);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x7F:
         Sound.SetReverb(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x80:
         this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x81: {
         float angle = static_cast<float>(object->m_localBase[2]);
         Vec normal = {sinf(angle), 0.0f, cosf(angle)};
@@ -3156,27 +3156,27 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         PSMTXReflect(reflectMtx, &point, &normal);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x82:
         CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x83:
         this->push(object, Graphic.GetProgressive());
         outResult = 0;
-        return 1;
+        break;
     case -0x84:
         Graphic.ChangeProgressive(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x85:
         this->push(
             object, Wind.AddAmbient(static_cast<float>(*object->m_localBase), static_cast<float>(object->m_localBase[1])));
         outResult = 0;
-        return 1;
+        break;
     case -0x86: {
         Vec position = {
             static_cast<float>(object->m_localBase[0]),
@@ -3188,7 +3188,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             Wind.AddDiffuse(&position, static_cast<float>(object->m_localBase[3]),
                 static_cast<float>(object->m_localBase[4]), static_cast<float>(object->m_localBase[5])));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x87: {
         Vec position = {
@@ -3201,13 +3201,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             Wind.AddSphere(&position, static_cast<float>(object->m_localBase[3]),
                 static_cast<float>(object->m_localBase[4]), object->m_localBase[5]));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x88:
         Wind.ChangePower(*object->m_localBase, static_cast<float>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x89:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadStream\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3215,7 +3215,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.LoadStream(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8A:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playStream\202\265\202\334\202\265\202\275\201B\n"));
@@ -3223,12 +3223,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.PlayStreamASync();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8B:
         Sound.StopStream();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8C:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347freeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3236,7 +3236,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.FreeWave(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8D:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347stopBgm\202\265\202\334\202\265\202\275\201B\n"));
@@ -3244,7 +3244,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.StopBgm();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8E:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347fadeOutBgm\202\265\202\334\202\265\202\275\201B\n"));
@@ -3252,12 +3252,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.FadeOutBgm(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x8F:
         Sound.FadeOutSe3D(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x90:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playNextBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3265,17 +3265,17 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.PlayNextBgm(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x91:
         this->push(object, PartMng.pppGetNumFreePppMngSt());
         outResult = 0;
-        return 1;
+        break;
     case -0x92:
         MapMng.SetMapTexAnim(
             *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x93:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3283,7 +3283,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.AddNoFreeWave(static_cast<short>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x94: {
         float* bounds = reinterpret_cast<float*>(object->m_localBase);
         ppvEnv->m_boxMinX = bounds[0];
@@ -3294,7 +3294,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         ppvEnv->m_boxMaxZ = bounds[5];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x95: {
         unsigned int result = 1;
@@ -3325,14 +3325,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, result);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x96:
         m_centerState = *object->m_localBase;
         *reinterpret_cast<int*>(&m_centerDistanceScale) = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x97: {
         unsigned int slot = static_cast<unsigned int>(*object->m_localBase);
         CMapObjectInfo& mapObject = m_mapObjectInfo[slot];
@@ -3343,33 +3343,33 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         mapObject.m_radius = *reinterpret_cast<float*>(object->m_localBase + 5);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x98:
         m_mapObjectInfo[*object->m_localBase].m_drawFlag = static_cast<char>(object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x99: {
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         MapMng.SetMapObjAnim(
             mapObjIndex, object->m_localBase[1], object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x9A: {
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         MapMng.SetMapObjMime(mapObjIndex, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x9B:
         CharaPcs.LoadCam(*object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0x9C: {
         int cameraSlot = *object->m_localBase;
         int cameraFrame = object->m_localBase[1];
@@ -3377,7 +3377,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             (CharaPcs.m_cameraFrameCount[cameraSlot] <= cameraFrame)) {
             this->push(object, 0);
             outResult = 0;
-            return 1;
+            break;
         }
 
         CCharaPcs::CCameraFrame* cameraData = &CharaPcs.m_cameraData[cameraSlot][cameraFrame];
@@ -3392,16 +3392,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             -(FLOAT_80330b54 * cameraData->m_values[7].m_float) / FLOAT_80330b64;
         this->push(object, 1);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0x9D:
         this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummyLoad())) >> 5) & 0xFF);
         outResult = 0;
-        return 1;
+        break;
     case -0x9E:
         this->push(object, (static_cast<unsigned int>(__cntlzw(MemoryCardMan.DummySave())) >> 5) & 0xFF);
         outResult = 0;
-        return 1;
+        break;
     case -0x9F:
         if (object->m_localBase[1] < 0) {
             Game.m_caravanWorkArr[*object->m_localBase].m_shopState = 0;
@@ -3413,7 +3413,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA0:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347streamVolume\202\265\202\334\202\265\202\275\201B\n"));
@@ -3421,91 +3421,91 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA1:
         CGItemObj::DispAllFieldItem(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA2:
         this->push(object, static_cast<int>(OSTicksToMilliseconds(OSGetTick())));
         outResult = 0;
-        return 1;
+        break;
     case -0xA3:
         GbaPcs.SetFirstZone();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA4:
         this->push(
             object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtFlag(object->m_localBase[1]));
         outResult = 0;
-        return 1;
+        break;
     case -0xA5:
         Game.m_caravanWorkArr[*object->m_localBase].SetEvtFlag(object->m_localBase[1], object->m_localBase[2]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA6:
         this->push(
             object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1]));
         outResult = 0;
-        return 1;
+        break;
     case -0xA7:
         Game.m_caravanWorkArr[*object->m_localBase].SetEvtWord(object->m_localBase[1],
             static_cast<short>(object->m_localBase[2]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xA8:
         this->push(object, MenuPcs.GetWorldParam(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0xA9:
         MenuPcs.SetWorldParam(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xAA:
         Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]] =
             static_cast<unsigned short>(object->m_localBase[2]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xAB:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_letterMeta[object->m_localBase[1]]);
         outResult = 0;
-        return 1;
+        break;
     case -0xAC:
         Game.m_caravanWorkArr[*object->m_localBase].unk_0x3a8 = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xAD:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3a8);
         outResult = 0;
-        return 1;
+        break;
     case -0xAE:
         strcpy(
             reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].m_name),
             this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xAF:
         this->push(
             object, static_cast<int>(Game.m_caravanWorkArr[*object->m_localBase].m_name[object->m_localBase[1]]));
         outResult = 0;
-        return 1;
+        break;
     case -0xB0:
         strcpy(Game.m_startScriptName, this->m_strBlob + this->m_strOffsets[*object->m_localBase]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xB1:
         this->push(object, static_cast<int>(Game.m_gameWork.m_townName[*object->m_localBase]));
         outResult = 0;
-        return 1;
+        break;
     case -0xB2: {
         CGraphicPcs::ScreenFadeSlot& fade = GraphicPcs.m_screenFade[1];
         fade.m_invert = 0;
@@ -3522,7 +3522,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         fade.m_colorB.a = static_cast<u8>(object->m_localBase[8]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xB3:
         this->push(
@@ -3530,29 +3530,29 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             CGItemObj::DeleteOld(*object->m_localBase, object->m_localBase[1], object,
                                  reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
         outResult = 0;
-        return 1;
+        break;
     case -0xB4:
         PartMng.pppSetDeltaSlot(
             *object->m_localBase, static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xB5:
         PartMng.pppSetDeltaIdx(
             static_cast<short>(*object->m_localBase),
             static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xB6:
         Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xB7:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
         outResult = 0;
-        return 1;
+        break;
     case -0xB8: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
@@ -3563,31 +3563,31 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.ChangeSe3DPos(*object->m_localBase, &position);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xB9:
         CharaPcs.m_overlapEnabled = *object->m_localBase;
         CharaPcs.m_overlapAlpha = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xBA:
         m_cameraScriptTargetMode = *object->m_localBase;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xBB: {
         PPPCREATEPARAM createParam;
         PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xBC:
         PartMng.pppFieldEndFpNo(static_cast<short>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xBD:
     case -0xBE: {
         CRomLetterWork* romLetterWork[8];
@@ -3611,7 +3611,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xBF:
         if (object->m_localBase[2] == 0) {
@@ -3621,7 +3621,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CVector position(
@@ -3639,27 +3639,27 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         CharaPcs.SetTexShadowRadius(localFloats[7]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xC1:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].GetFoodRank(object->m_localBase[1]));
         outResult = 0;
-        return 1;
+        break;
     case -0xC2:
         Game.m_caravanWorkArr[*object->m_localBase].m_progressValue =
             static_cast<unsigned short>(object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC3:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_progressValue);
         outResult = 0;
-        return 1;
+        break;
     case -0xC4:
         GXSetDispCopyGamma(static_cast<_GXGamma>(object->m_localBase[0]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC5: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         CVector position(
@@ -3675,7 +3675,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MapMng.SetMapObjWorldMapLightID(*object->m_localBase, color, position);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xC6:
         MenuPcs.m_battleHud.m_visible = *object->m_localBase;
@@ -3686,7 +3686,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MenuPcs.m_battleHud.m_gaugeValue = MenuPcs.m_battleHud.m_gaugeMax;
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC7:
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         MenuPcs.m_battleHud.m_worldPos[0] = localFloats[0];
@@ -3698,7 +3698,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MenuPcs.m_battleHud.m_gaugeTarget = object->m_localBase[3];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC8:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347cancelWaveAsync\202\265\202\334\202\265\202\275\201B\n"));
@@ -3706,7 +3706,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.CancelLoadWaveASync();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xC9: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
@@ -3714,7 +3714,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             mapObjIndex, localFloats[1], localFloats[2], localFloats[3]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xCA: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -3728,33 +3728,33 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             Sound.PlaySe3D(
                 *object->m_localBase, &position, localFloats[4], localFloats[5], object->m_localBase[6]));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xCB:
         CameraPcs.SetShadowAuto(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xCC:
         MenuPcs.LoadExtraFont(*object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xCD:
         gCFlatRuntime().ClearParmanent();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xCE:
         Game.m_gameWork.ClearEvtWork();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xCF:
         Game.m_caravanWorkArr[*object->m_localBase].ClearEvtWork();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD0: {
         enum
         {
@@ -3779,7 +3779,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         this->push(object, foundCount);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xD1:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
@@ -3788,7 +3788,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD2: {
         if (*object->m_localBase == 0) {
             CGame::CNextScript nextScript;
@@ -3800,7 +3800,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xD3:
         if (object->m_localBase[1] == 0) {
@@ -3810,7 +3810,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD4:
         if (*object->m_localBase == 0) {
             MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
@@ -3819,12 +3819,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD5:
         this->loadLayer(*object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD6: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         _GXColor color = {
@@ -3841,45 +3841,45 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             object->m_localBase[12]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xD7:
         this->loadLayerASync(*object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xD8:
         this->push(object, this->isLoadLayerASyncCompleted(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0xD9:
         this->push(object, 1);
         outResult = 0;
-        return 1;
+        break;
     case -0xDA:
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xDB:
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xDC: {
         CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
         this->push(object, letters[*object->m_localBase].Word(object->m_localBase[1]));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xDD:
         Sound.FadeOutSe(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xDE:
         this->SysControl(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xDF:
         if (*object->m_localBase == 1) {
             if (object->m_localBase[1] == 0) {
@@ -3896,21 +3896,21 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xE0:
         MapMng.SetMapObjPrioID(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xE1:
         this->push(object, MiniGamePcs.GetMiniGameParam(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0xE2:
         MiniGamePcs.SetMiniGameParam(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xE3: {
         unsigned int flags = 0;
         if ((object->m_localBase[1] & 2) != 0) {
@@ -3919,7 +3919,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, flags);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xE4:
         if (object->m_localBase[1] == 1) {
@@ -3927,22 +3927,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xE5:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].m_gil);
         outResult = 0;
-        return 1;
+        break;
     case -0xE6:
         this->push(object, static_cast<unsigned int>(Game.m_caravanWorkArr[*object->m_localBase].m_inventoryItemCount));
         outResult = 0;
-        return 1;
+        break;
     case -0xE7:
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x68) = *object->m_localBase;
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CharaPcs) + 0x72) =
             *reinterpret_cast<float*>(object->m_localBase + 1);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xE8: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[1]),
@@ -3953,7 +3953,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MenuPcs.SetExtraFontTlut(*object->m_localBase, color);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xE9:
         if (*object->m_localBase == 0) {
@@ -3973,24 +3973,24 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xEA:
         CharaPcs.SetSpecularAlpha(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xEB:
         CGPartyObj::SetBonusCondition(
             *object->m_localBase, object->m_localBase[1], object->m_localBase[2], object->m_localBase[3],
             object->m_localBase[4]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xEC: {
         const int padType = Joybus.GetPadType(*object->m_localBase);
         this->push(object, (static_cast<unsigned int>(__cntlzw(0x40000 - padType)) >> 5) & 0xFF);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xED: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -4007,7 +4007,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             this->push(object, 1);
         }
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xEE: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
@@ -4019,50 +4019,50 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             object->m_localBase[4]);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xEF:
         AStar.calcAStar();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF0: {
         this->push(
             object,
             m_spawnBits[*object->m_localBase].m_hi & static_cast<unsigned int>(1ULL << object->m_localBase[1]));
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xF1:
         this->resetSpawnBit(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF2:
         MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
             object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF3:
         this->push(object, this->GetSysControl(*object->m_localBase));
         outResult = 0;
-        return 1;
+        break;
     case -0xF4:
         PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF5:
         Sound.SeMaxVolume(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF6:
         Game.m_caravanWorkArr[*object->m_localBase].m_gil = object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF7: {
         _GXColor color = {
             static_cast<u8>(object->m_localBase[2]),
@@ -4074,7 +4074,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         MenuPcs.GetFont22()->FlushTlutColor();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     case -0xF8:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
@@ -4083,29 +4083,29 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Sound.AddNoFreeSeGroup(static_cast<short>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xF9:
         CameraPcs.SetFullScreenShadowCamLen(*reinterpret_cast<float*>(object->m_localBase));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xFA:
         CGItemObj::ItemJump(*object->m_localBase, *reinterpret_cast<float*>(object->m_localBase + 1));
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xFB:
         Game.SetNextScriptNewGame();
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xFC:
         *reinterpret_cast<int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10844) = *object->m_localBase;
         *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10848) =
             object->m_localBase[1];
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     case -0xFD: {
         const double stickX = Pad.GetLeftStickX(*object->m_localBase);
         const double stickY = Pad.GetLeftStickY(*object->m_localBase);
@@ -4113,7 +4113,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
         this->push(object, 0);
         outResult = 0;
-        return 1;
+        break;
     }
     default:
         return 0;

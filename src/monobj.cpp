@@ -1105,10 +1105,9 @@ void CGMonObj::onFrameStat()
  */
 void CGMonObj::onStatMagic()
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
+#define prgObj (reinterpret_cast<CGPrgObj*>(this))
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
 	switch (prgObj->m_subState) {
 	case 0:
 		if (prgObj->m_subFrame == 0) {
@@ -1120,9 +1119,25 @@ void CGMonObj::onStatMagic()
 				unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
 					*reinterpret_cast<int*>(mon + 0x560) * 0x48;
 				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
-					float rotLimit = 0.01f *
+					float rotLimit = FLOAT_80331A20 *
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
-					rotTarget(targetPartyIndex, rotLimit);
+					if (m_targetPartyIndex >= 0) {
+						float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
+						if (rotLimit > FLOAT_80331A48) {
+							object->m_rotTargetY = targetRot;
+						} else {
+							float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
+							float clamped = -rotLimit;
+							if (!(delta < clamped)) {
+								if (rotLimit < delta) {
+									clamped = rotLimit;
+								} else {
+									clamped = delta;
+								}
+							}
+							object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
+						}
+					}
 				}
 
 				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(target);
@@ -1144,8 +1159,11 @@ void CGMonObj::onStatMagic()
 	}
 
 	if ((prgObj->m_subState < 3) && (prgObj->isLoopAnim() != 0)) {
-		setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 	}
+#undef prgObj
+#undef object
+#undef mon
 }
 
 /*

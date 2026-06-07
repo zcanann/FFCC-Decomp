@@ -592,15 +592,16 @@ void GXSetTexCoordGen(void)
  */
 void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
 {
-    float warpMtx0 = kMaterialWarpCoeff;
-    float warpMtx1 = kTextureZero;
-    float warpMtx2 = kTextureZero;
-    float warpMtx3 = kTextureZero;
-    float warpMtx4 = kMaterialWarpCoeff;
-    float warpMtx5 = kTextureZero;
+    float warpMtx[6];
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
-    GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
+    warpMtx[0] = kMaterialWarpCoeff;
+    warpMtx[1] = kTextureZero;
+    warpMtx[2] = kTextureZero;
+    warpMtx[3] = kTextureZero;
+    warpMtx[4] = kMaterialWarpCoeff;
+    warpMtx[5] = kTextureZero;
+    GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(warpMtx), 1);
     GXSetNumIndStages(2);
 
     GXSetTevDirect((GXTevStageID)m_numTevStage);
@@ -670,15 +671,16 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
 {
-    float warpMtx0 = kMaterialWarpCoeff;
-    float warpMtx1 = kTextureZero;
-    float warpMtx2 = kTextureZero;
-    float warpMtx3 = kTextureZero;
-    float warpMtx4 = kMaterialWarpCoeff;
-    float warpMtx5 = kTextureZero;
+    float warpMtx[6];
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
-    GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
+    warpMtx[0] = kMaterialWarpCoeff;
+    warpMtx[1] = kTextureZero;
+    warpMtx[2] = kTextureZero;
+    warpMtx[3] = kTextureZero;
+    warpMtx[4] = kMaterialWarpCoeff;
+    warpMtx[5] = kTextureZero;
+    GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(warpMtx), 1);
     GXSetNumIndStages(2);
 
     GXSetTevDirect((GXTevStageID)m_numTevStage);

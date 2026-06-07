@@ -22,10 +22,10 @@ extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 extern const double kYmBreathIntToDoubleBias = 4503599627370496.0;
 extern const float kYmBreathSpreadScale = 2.0f;
 extern const double kYmBreathHalfChance = 0.5;
-extern const char s_CardGameCode_80330CB8[] = "FFCC";
-extern const char s_CardMakerCode_80330CC0[] = "GDS";
-extern const char s_CardMachineCode_80330CC4[] = "GC";
-extern const char s_CardVersion_80330CC8[] = "1.00";
+extern const char sCardGameCode[] = "FFCC";
+extern const char sCardMakerCode[] = "GDS";
+extern const char sCardMachineCode[] = "GC";
+extern const char sCardVersion[] = "1.00";
 extern const float kYmBreathZero = 0.0f;
 
 static inline float LoadFloat(const float& value)

@@ -1928,7 +1928,8 @@ int CMaterialMan::GetCharaShadow(
             ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
-             (searchBound.CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
+             (reinterpret_cast<CBound*>(searchBoundStorage)
+                  ->CheckFrustum(shadowPos, scaledShadowMtx, kMaterialShadowBoundsRadius) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite->shadow = shadow;

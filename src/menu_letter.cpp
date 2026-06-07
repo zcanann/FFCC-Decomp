@@ -2405,10 +2405,10 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		return;
 	}
 
-	double x0 = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<double>(FLOAT_803330d0) * param * DOUBLE_803330a8)) - DOUBLE_803330a8));
-	double y0 = static_cast<double>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + static_cast<double>(FLOAT_803330d0) * param)) - DOUBLE_803330e8));
-	double w = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
-	double h = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
+	float x0 = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<double>(FLOAT_803330d0) * param * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	float y0 = static_cast<float>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + static_cast<double>(FLOAT_803330d0) * param)) - DOUBLE_803330e8));
+	float w = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
+	float h = static_cast<float>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white;
@@ -2418,8 +2418,8 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	white.a = 0xFF;
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
-	double x1 = x0 + w - static_cast<double>(FLOAT_803330f4);
-	double y1 = y0 + h - static_cast<double>(FLOAT_803330f4);
+	float x1 = static_cast<float>(x0 + w - FLOAT_803330f4);
+	float y1 = static_cast<float>(y0 + h - FLOAT_803330f4);
 
 	for (int i = 0; i < 4; ++i) {
 		int tex;
@@ -2452,14 +2452,14 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    FLOAT_803330bc, FLOAT_803330bc, FLOAT_803330f8, FLOAT_803330f8, 0.0f);
 	}
 
-	double innerW = static_cast<double>(static_cast<float>(w - DOUBLE_803330d8));
-	double innerH = static_cast<double>(static_cast<float>(h - DOUBLE_803330d8));
-	double innerX = static_cast<double>(static_cast<float>(x0 + static_cast<double>(FLOAT_803330f4)));
-	double innerY = static_cast<double>(static_cast<float>(y0 + static_cast<double>(FLOAT_803330f4)));
+	float innerW = static_cast<float>(w - DOUBLE_803330d8);
+	float innerH = static_cast<float>(h - DOUBLE_803330d8);
+	float innerX = static_cast<float>(x0 + FLOAT_803330f4);
+	float innerY = static_cast<float>(y0 + FLOAT_803330f4);
 
 	for (int i = 0; i < 2; ++i) {
 		int tex = (i == 0) ? 0x49 : 0x4C;
-		double y = (i == 0) ? y0 : y1;
+		float y = (i == 0) ? y0 : y1;
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		MenuPcs.DrawRect(
 		    0, static_cast<float>(innerX), static_cast<float>(y), static_cast<float>(innerW), FLOAT_803330f4,
@@ -2483,10 +2483,10 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
 	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
 	double decoY0 = y0 - DOUBLE_80333100;
-	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
+	double decoX1 = DOUBLE_80333100 + decoX0;
 	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_8033310c)));
 	for (int i = 0; i < 4; ++i) {
-		double x = ((i & 1) == 0) ? static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110))) : decoX1;
+		double x = ((i & 1) == 0) ? (x0 - static_cast<double>(FLOAT_80333110)) : decoX1;
 		double y = ((i & 2) == 0) ? decoY0 : decoY1;
 		int flip = ((i & 2) == 0) ? 0 : 4;
 		MenuPcs.DrawRect(
@@ -2496,9 +2496,9 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x50));
 	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
-	double barX1 = static_cast<double>(static_cast<float>(decoX0 + static_cast<double>(FLOAT_80333110)));
+	double barX1 = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333110) + decoX0));
 	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
-	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(h - DOUBLE_80333120)));
+	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(static_cast<float>(h - DOUBLE_80333120))));
 	for (int side = 0; side < 2; ++side) {
 		double x = (side == 0) ? barX0 : barX1;
 		double y = barY0;

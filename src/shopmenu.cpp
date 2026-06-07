@@ -1437,6 +1437,21 @@ void CShopMenu::DrawSoubiBase()
 }
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void CShopMenu::DrawObi(int)
+{
+    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, 0.0f, 0);
+    int x = 0x52;
+    while (x < 0x20E) {
+        drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, 0.0f, 0);
+        x += 0x20;
+    }
+    drawShapeSeq(5, 0, x, 0x104, 0xFF, 1, 0, 0.0f, 0);
+}
+/*
+ * --INFO--
  * PAL Address: 0x801527EC
  * PAL Size: 832b
  * EN Address: TODO
@@ -3290,25 +3305,6 @@ void CShopMenu::DrawSell()
 void CShopMenu::InitDrawEnvShape()
 {
     pppInitDrawEnv(0);
-}
-
-
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CShopMenu::DrawObi(int)
-{
-    drawShapeSeq(5, 0, 0x32, 0x104, 0xFF, 0, 0, 0.0f, 0);
-    int x = 0x52;
-    while (x < 0x20E) {
-        drawShapeSeq(6, 0, x, 0x104, 0xFF, 0, 0, 0.0f, 0);
-        x += 0x20;
-    }
-    drawShapeSeq(5, 0, x, 0x104, 0xFF, 1, 0, 0.0f, 0);
 }
 
 

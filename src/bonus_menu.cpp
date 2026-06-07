@@ -798,7 +798,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	color.r = 0xFF;
 	color.g = 0xFF;
 	color.b = 0xFF;
-	color.a = (unsigned char)(255.0 * alpha);
+	color.a = (unsigned char)(255.0f * alpha);
 	const float corner = 8.0f;
 	const float texScale = 1.0f;
 

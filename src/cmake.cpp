@@ -2260,7 +2260,6 @@ void CMenuPcs::CmakeSexClose()
  */
 void CMenuPcs::CmakeSexDraw()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0(1, FLOAT_80333258);
 
@@ -2331,8 +2330,8 @@ void CMenuPcs::CmakeSexDraw()
     }
     DrawInit();
 
-    if (cmakeState->m_mode == 1) {
-        int sel = cmakeState->m_select;
+    if (CmakeState(this)->m_mode == 1) {
+        int sel = CmakeState(this)->m_select;
         int frame = System.m_frameCounter & 7;
         int cursorX = static_cast<int>(
             static_cast<double>(static_cast<float>(DOUBLE_80333288 - static_cast<double>(maxWidth) * DOUBLE_80333298) +
@@ -2828,8 +2827,7 @@ void CMenuPcs::CmakeJobClose()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = cmakeState->m_mode;
+    short mode = CmakeState(this)->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
@@ -2906,8 +2904,8 @@ void CMenuPcs::CmakeJobDraw()
         font->Draw(txt);
     }
 
-    if (cmakeState->m_mode == 1) {
-        int sel = cmakeState->m_select;
+    if (CmakeState(this)->m_mode == 1) {
+        int sel = CmakeState(this)->m_select;
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
         int cursorFrame = static_cast<int>(System.m_frameCounter) % 8;
@@ -3014,9 +3012,8 @@ void CMenuPcs::CmakeResultClose()
  */
 void CMenuPcs::CmakeResultDraw()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = cmakeState->m_mode;
-    short resultDir = cmakeState->m_resultDir;
+    short mode = CmakeState(this)->m_mode;
+    short resultDir = CmakeState(this)->m_resultDir;
     float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
@@ -3120,8 +3117,8 @@ void CMenuPcs::CmakeResultDraw()
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, crestAlpha);
 
     int yesNoSel = 0;
-    if (cmakeState->m_mode == 1) {
-        yesNoSel = cmakeState->m_select + 1;
+    if (CmakeState(this)->m_mode == 1) {
+        yesNoSel = CmakeState(this)->m_select + 1;
     }
     DrawCmakeYesNo(yesNoSel, alpha);
 
@@ -3278,8 +3275,7 @@ void CMenuPcs::CmakeResultClose1()
  */
 void CMenuPcs::CmakeResultDraw1()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short mode = cmakeState->m_mode;
+    short mode = CmakeState(this)->m_mode;
     float alpha = CalcCmakeFadeAlpha(this);
     float popupAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
 
@@ -3402,9 +3398,9 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawInit();
 
-    if (cmakeState->m_mode == 1) {
+    if (CmakeState(this)->m_mode == 1) {
         int cursorX = static_cast<int>(FLOAT_80333304 + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
-        int cursorY = 0x70 + cmakeState->m_select * 0x28;
+        int cursorY = 0x70 + CmakeState(this)->m_select * 0x28;
         DrawCursor(cursorX, cursorY, alpha);
     }
 }

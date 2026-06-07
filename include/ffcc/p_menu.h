@@ -823,19 +823,19 @@ public:
     unsigned char m_singleMenuCtrlResetFlag;
     unsigned char m_pad873;
     int m_singleLifeTimer;
+    CShopMenu* m_shopMenu;
     union {
-        CShopMenu* m_shopMenu;
+        unsigned char m_pad87C;
         GoOutResetFields m_goOutReset;
     };
     union {
-        unsigned char m_pad87C;
+        int m_pad880;
         Mc::SaveDat* m_goOutTransferSaveData;
     };
     union {
-        int m_pad880;
+        int m_pad884;
         void* m_goOutTransferWork;
     };
-    int m_pad884;
     union {
         unsigned char m_cmakeWorkActive;
         unsigned char m_goOutUnknown888;
@@ -936,10 +936,10 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_goOutLoadResult) == 0x870);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuCtrlResetFlag) == 0x872);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleLifeTimer) == 0x874);
 STATIC_ASSERT(offsetof(CMenuPcs, m_shopMenu) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset.m_resetFlag) == 0x878);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferSaveData) == 0x87C);
-STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWork) == 0x880);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset) == 0x87C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutReset.m_resetFlag) == 0x87C);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferSaveData) == 0x880);
+STATIC_ASSERT(offsetof(CMenuPcs, m_goOutTransferWork) == 0x884);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkActive) == 0x888);
 STATIC_ASSERT(offsetof(CMenuPcs, m_goOutUnknown888) == 0x888);
 STATIC_ASSERT(offsetof(CMenuPcs, m_cmakeWorkCardChannel) == 0x889);

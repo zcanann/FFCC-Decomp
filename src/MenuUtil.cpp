@@ -1247,7 +1247,65 @@ void CMenuPcs::DrawOptionMenu()
 		         kOptionAnimMax);
 		break;
 	}
-	case 0:
+	case 0: {
+		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
+		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
+		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
+		unsigned int sideWidth = sideTexture->m_width;
+		unsigned int sideHeight = sideTexture->m_height;
+		unsigned int selectorWidth = selectorTexture->m_width;
+		unsigned int selectorHeight = selectorTexture->m_height;
+		const f32* row = &s_MenuOptionEstandar_801E36C4.m_layout[10];
+		bool secondValue = m_gameInitMode != 0;
+		char* firstText = g_strMenuUtilMes[languageBase + 12];
+		char* secondText = g_strMenuUtilMes[languageBase + 13];
+		float leftX = row[0];
+		float rightX = row[2];
+		float selectorX = row[4];
+		float secondOffset = FLOAT_803335AC;
+
+		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
+		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
+		gUtil.RenderTextureQuad(leftX, row[1], static_cast<float>(sideWidth) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
+		SetUv(uv1, kOptionAnimMax, kOptionAnimMax);
+		gUtil.RenderTextureQuad(rightX, row[3], static_cast<float>(sideWidth) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
+		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), row[5],
+		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
+		                           DOUBLE_803335B8 : DOUBLE_803335C0;
+		float firstScale = static_cast<float>(optionScale);
+		float secondScale = static_cast<float>(optionScale);
+		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335A0;
+		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335A0 : FLOAT_803335A4;
+		int firstTlut = secondValue ? 6 : 0x17;
+		int secondTlut = secondValue ? 0x17 : 6;
+
+		font->SetMargin(kOptionAnimMax);
+		font->SetShadow(1);
+		font->SetScale(firstScale);
+		DrawFont2(static_cast<int>(selectorX + (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
+		          kOptionAnimMax);
+		font->SetMargin(kOptionAnimMax);
+		font->SetShadow(1);
+		font->SetScale(secondScale);
+		DrawFont2(static_cast<int>(selectorX + secondOffset + (FLOAT_803335B0 - font->GetWidth(secondText)) *
+		                                                  kMenuCenteringHalfWidth),
+		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
+		          kOptionAnimMax);
+		break;
+	}
 	case 1: {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
@@ -1256,14 +1314,14 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int sideHeight = sideTexture->m_height;
 		unsigned int selectorWidth = selectorTexture->m_width;
 		unsigned int selectorHeight = selectorTexture->m_height;
-		const f32* row = &s_MenuOptionEstandar_801E36C4.m_layout[(m_optionIndex + 1) * 10];
-		bool secondValue = (m_optionIndex == 0) ? (m_gameInitMode != 0) : (m_stereoMode != 0);
-		char* firstText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 12 : 14)];
-		char* secondText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 13 : 15)];
+		const f32* row = &s_MenuOptionEstandar_801E36C4.m_layout[20];
+		bool secondValue = m_stereoMode != 0;
+		char* firstText = g_strMenuUtilMes[languageBase + 14];
+		char* secondText = g_strMenuUtilMes[languageBase + 15];
 		float leftX = row[0];
 		float rightX = row[2];
 		float selectorX = row[4];
-		float secondOffset = (m_optionIndex == 0) ? FLOAT_803335AC : FLOAT_803335E0;
+		float secondOffset = FLOAT_803335E0;
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);

@@ -1023,12 +1023,10 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;
 				m_data->m_nodeCount = 0;
-				if (nodeCapacity != 0) {
-					CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
-					CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
-					m_data->m_nodeRefData = nodeRefs;
-					m_nodes = nodes;
-				}
+				CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
+				m_data->m_nodeRefData = nodeRefs;
+				CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
+				m_nodes = nodes;
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
@@ -1051,12 +1049,10 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 			} else if (chunk.m_id == 0x4D535354) {
 				const u32 meshCapacity = chunk.m_arg0;
 				m_data->m_meshCount = 0;
-				if (meshCapacity != 0) {
-					CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
-					CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
-					m_data->m_meshRefData = meshRefs;
-					m_meshes = meshes;
-				}
+				CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
+				m_data->m_meshRefData = meshRefs;
+				CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
+				m_meshes = meshes;
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
@@ -1068,11 +1064,9 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				}
 				chunkFile.PopChunk();
 			} else if (chunk.m_id == 0x42414E4B) {
-				if (chunk.m_size != 0) {
-					void* bank = new u8[chunk.m_size];
-					*(void**)((u8*)m_data + 0x14) = bank;
-					chunkFile.Get(bank, chunk.m_size);
-				}
+				void* bank = new(stage, const_cast<char*>(s_chara_cpp), 0x187) u8[chunk.m_size];
+				m_data->m_bank = bank;
+				memcpy(m_data->m_bank, chunkFile.GetAddress(), chunk.m_size);
 			}
 		}
 		chunkFile.PopChunk();
@@ -1080,10 +1074,8 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 	}
 
 	setup();
-	CTexAnimSet* texAnimSet = m_texAnimSet;
-	CMaterialSet* materialSet = ref->m_materialSet;
-	if (texAnimSet != 0 && materialSet != 0) {
-		texAnimSet->AttachMaterialSet(materialSet);
+	if (m_texAnimSet != 0) {
+		m_texAnimSet->AttachMaterialSet(m_data->m_materialSet);
 	}
 }
 

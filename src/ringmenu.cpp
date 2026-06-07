@@ -63,30 +63,30 @@ extern const float FLOAT_80330a48;
 extern const float FLOAT_80330a4c;
 extern const float FLOAT_80330A50;
 extern const float FLOAT_80330a54;
-static const float FLOAT_80330a58 = 240.0f;
-static const float FLOAT_80330a5c = 32.0f;
-static const float FLOAT_80330a60 = 472.0f;
-static const float FLOAT_80330a64 = 256.0f;
-static const float FLOAT_80330a68 = 40.0f;
-static const float FLOAT_80330a6c = 192.0f;
-static const float FLOAT_80330a70 = 16.0f;
-static const float FLOAT_80330a74 = 96.0f;
-static const float FLOAT_80330a78 = 0.125f;
-static const float FLOAT_80330a7c = 144.0f;
-static const float FLOAT_80330a80 = 24.0f;
-static const float FLOAT_80330a84 = 128.0f;
-static const float FLOAT_80330a88 = 88.0f;
-static const float FLOAT_80330a8c = -4.0f;
-static const double DOUBLE_80330a90 = 100.0;
+static const float kRingMenuCommandIconV = 240.0f;
+static const float kRingMenuButtonHeight = 32.0f;
+static const float kRingMenuAltBaseX = 472.0f;
+static const float kRingMenuAltBaseY = 256.0f;
+static const float kRingMenuButtonWidth = 40.0f;
+static const float kRingMenuMainBaseY = 192.0f;
+static const float kRingMenuButtonInsetX = 16.0f;
+static const float kRingMenuMainButtonY = 96.0f;
+static const float kRingMenuButtonFadeStep = 0.125f;
+static const float kRingMenuLabelPanelWidth = 144.0f;
+static const float kRingMenuIconSize = 24.0f;
+static const float kRingMenuCommandPanelWidth = 128.0f;
+static const float kRingMenuCommandIconY = 88.0f;
+static const float kRingMenuFontMargin = -4.0f;
+static const double kRingMenuSpinAlphaScale = 100.0;
 extern const double DOUBLE_80330a98;
-static const double DOUBLE_80330aa0 = 0.0099999997764825821;
-static const float FLOAT_80330aa8 = 64.0f;
-static const float FLOAT_80330aac = 20.0f;
-static const float FLOAT_80330ab0 = 3.0f;
-static const float FLOAT_80330ab4 = 6.0f;
-static const float FLOAT_80330ab8 = 0.85f;
-static const float FLOAT_80330abc = 0.3f;
-static const float FLOAT_80330ac0 = 0.35f;
+static const double kRingMenuSpinEpsilon = 0.0099999997764825821;
+static const float kRingMenuTextBaseX = 64.0f;
+static const float kRingMenuTextOffsetX = 20.0f;
+static const float kRingMenuTextOffsetY = 3.0f;
+static const float kRingMenuCommandTextOffsetY = 6.0f;
+static const float kRingMenuItemTextScale = 0.85f;
+static const float kRingMenuTextWobbleScale = 0.3f;
+static const float kRingMenuDimAlphaScale = 0.35f;
 extern const float FLOAT_80330ac4;
 extern const double DOUBLE_80330ac8;
 extern const double DOUBLE_80330ad0;
@@ -436,7 +436,7 @@ void CRingMenu::drawGBA()
 			    static_cast<int>(FLOAT_803309c4 * (alphaLit * (FLOAT_803309cc + blink))));
 			CColor sendColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
 			MenuPcs.SetColor(sendColor);
-			MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
+			MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, kRingMenuCommandIconV,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else {
 			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
@@ -508,14 +508,14 @@ void CRingMenu::onDraw()
 	const double pulse = sin(static_cast<double>(FLOAT_80330a0c) * showScale);
 
 	const float alphaScaleBase = FLOAT_80330a34 * static_cast<float>(showScale * transitionScale);
-	const float glowOffset = FLOAT_80330a5c * (FLOAT_803309cc - static_cast<float>(pulse));
+	const float glowOffset = kRingMenuButtonHeight * (FLOAT_803309cc - static_cast<float>(pulse));
 	const float iconAlphaScale = static_cast<float>(showScale * transitionScale);
 
-	const float posAltX = FLOAT_80330a60 + glowOffset;
-	const float posAltY = FLOAT_80330a64 + glowOffset;
+	const float posAltX = kRingMenuAltBaseX + glowOffset;
+	const float posAltY = kRingMenuAltBaseY + glowOffset;
 	const float posLeft = -glowOffset;
-	const float posMainX = posAltX - FLOAT_80330a68;
-	const float posMainY = FLOAT_80330a6c + glowOffset;
+	const float posMainX = posAltX - kRingMenuButtonWidth;
+	const float posMainY = kRingMenuMainBaseY + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
 		float posX;
@@ -526,7 +526,7 @@ void CRingMenu::onDraw()
 			if ((menuIndex & 1) != 0) {
 				sideX = posAltX;
 			}
-			posX = FLOAT_80330a70 + sideX;
+			posX = kRingMenuButtonInsetX + sideX;
 
 			float sideY = posLeft;
 			if ((menuIndex & 2) != 0) {
@@ -538,16 +538,16 @@ void CRingMenu::onDraw()
 			if ((menuIndex & 1) != 0) {
 				sideX = posMainX;
 			}
-			posX = FLOAT_80330a68 + sideX;
+			posX = kRingMenuButtonWidth + sideX;
 
 			float sideY = posLeft;
 			if ((menuIndex & 2) != 0) {
 				sideY = posMainY;
 			}
-			posY = FLOAT_80330a74 + sideY;
+			posY = kRingMenuMainButtonY + sideY;
 		}
 
-		double buttonAlpha = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + 2]) * FLOAT_80330a78);
+		double buttonAlpha = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + 2]) * kRingMenuButtonFadeStep);
 		if (m_battleButtons[group * 2 + 2] >= 0) {
 			buttonAlpha = static_cast<double>(FLOAT_803309cc) - buttonAlpha;
 		}
@@ -572,22 +572,22 @@ void CRingMenu::onDraw()
 		float drawY = posY;
 		if (group == 1 || group == 0) {
 			const float wobble = static_cast<float>(sin(static_cast<double>(FLOAT_80330a0c) * buttonAlpha));
-			drawX = -(FLOAT_80330a70 * wobble - ((group == 0) ? (FLOAT_80330a10 + posX) : posX));
-			drawY = posY + ((group == 1) ? FLOAT_80330a80 : FLOAT_803309c0);
+			drawX = -(kRingMenuButtonInsetX * wobble - ((group == 0) ? (FLOAT_80330a10 + posX) : posX));
+			drawY = posY + ((group == 1) ? kRingMenuIconSize : FLOAT_803309c0);
 		}
 
 		if (group == 2) {
-			MenuPcs.DrawRect(0, posX, posY, FLOAT_80330a84, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_80330a88,
+			MenuPcs.DrawRect(0, posX, posY, kRingMenuCommandPanelWidth, kRingMenuButtonHeight, FLOAT_803309c0, kRingMenuCommandIconY,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else if (group == 1) {
-			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a80, FLOAT_803309c0, FLOAT_80330a5c,
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuLabelPanelWidth, kRingMenuIconSize, FLOAT_803309c0, kRingMenuButtonHeight,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a80, FLOAT_80330a80, FLOAT_80330a68, FLOAT_803309f0,
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuIconSize, kRingMenuIconSize, kRingMenuButtonWidth, FLOAT_803309f0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else {
-			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309c0,
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuLabelPanelWidth, kRingMenuButtonHeight, FLOAT_803309c0, FLOAT_803309c0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a68, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309f0,
+			MenuPcs.DrawRect(0, drawX, drawY, kRingMenuButtonWidth, kRingMenuButtonHeight, FLOAT_803309c0, FLOAT_803309f0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		}
 
@@ -601,7 +601,7 @@ void CRingMenu::onDraw()
 
 				CFont* font = MenuPcs.m_fonts[0];
 				font->DrawInit();
-				font->SetMargin(FLOAT_80330a8c);
+				font->SetMargin(kRingMenuFontMargin);
 				font->SetShadow(1);
 				font->SetTlut(4);
 
@@ -624,8 +624,8 @@ void CRingMenu::onDraw()
 				}
 
 				double labelAlphaScale = DOUBLE_80330a98;
-				if (fabs(static_cast<double>(m_spinAccumulator)) < DOUBLE_80330aa0) {
-					labelAlphaScale = DOUBLE_80330a90 * fabs(static_cast<double>(m_spinAccumulator));
+				if (fabs(static_cast<double>(m_spinAccumulator)) < kRingMenuSpinEpsilon) {
+					labelAlphaScale = kRingMenuSpinAlphaScale * fabs(static_cast<double>(m_spinAccumulator));
 				}
 				labelAlphaScale = static_cast<double>(static_cast<float>(labelAlphaScale * static_cast<double>(iconAlphaScale)));
 
@@ -669,13 +669,13 @@ void CRingMenu::onDraw()
 				label = Game.m_cFlatDataArr[1].TableStrings(0)[(buttonValue & 0x7FFF) * 5 + 4];
 			}
 
-			double fade = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + button + 1]) * FLOAT_80330a78);
+			double fade = static_cast<double>(static_cast<float>(m_buttonTimers[group * 3 + button + 1]) * kRingMenuButtonFadeStep);
 			if (button == 0) {
 				fade = static_cast<double>(FLOAT_803309cc) - fade;
 			}
 
 			font->DrawInit();
-			font->SetMargin(FLOAT_80330a8c);
+			font->SetMargin(kRingMenuFontMargin);
 			font->SetShadow(1);
 
 			float textScale;
@@ -684,11 +684,11 @@ void CRingMenu::onDraw()
 				textScale = FLOAT_80330a4c;
 			} else if (group == 0) {
 				font->SetTlut(0xD);
-				textScale = FLOAT_80330ab8;
+				textScale = kRingMenuItemTextScale;
 			} else {
 				font->SetTlut((buttonValue == 1) ? 7 : 4);
 				const double wobble = sin(static_cast<double>(FLOAT_80330a0c) * static_cast<double>(FLOAT_803309cc - fade));
-				textScale = FLOAT_80330a4c * (FLOAT_80330abc * static_cast<float>(wobble) + FLOAT_803309cc);
+				textScale = FLOAT_80330a4c * (kRingMenuTextWobbleScale * static_cast<float>(wobble) + FLOAT_803309cc);
 			}
 
 			font->SetScaleX(textScale);
@@ -697,7 +697,7 @@ void CRingMenu::onDraw()
 			const float width = static_cast<float>(font->GetWidth(label));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
 			if ((group == 2) && (m_battleButtons[2] >= 0)) {
-				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
+				alpha = static_cast<int>(kRingMenuDimAlphaScale * static_cast<float>(alpha));
 			}
 
 			GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
@@ -706,14 +706,14 @@ void CRingMenu::onDraw()
 			float textX;
 			float textY;
 			if (group == 1) {
-				textX = -(FLOAT_803309c4 * width - (FLOAT_803309f0 + posX + FLOAT_80330aac));
-				textY = (FLOAT_80330ab0 + drawY) - FLOAT_803309ec;
+				textX = -(FLOAT_803309c4 * width - (FLOAT_803309f0 + posX + kRingMenuTextOffsetX));
+				textY = (kRingMenuTextOffsetY + drawY) - FLOAT_803309ec;
 			} else if (group == 0) {
-				textX = -(FLOAT_803309c4 * width - (FLOAT_80330aa8 + posX + FLOAT_80330aac));
+				textX = -(FLOAT_803309c4 * width - (kRingMenuTextBaseX + posX + kRingMenuTextOffsetX));
 				textY = (FLOAT_80330a3c + drawY) - FLOAT_803309ec;
 			} else {
-				textX = -(FLOAT_803309c4 * width - (FLOAT_80330aa8 + posX));
-				textY = FLOAT_80330ab4 + drawY;
+				textX = -(FLOAT_803309c4 * width - (kRingMenuTextBaseX + posX));
+				textY = kRingMenuCommandTextOffsetY + drawY;
 			}
 
 			font->SetPosX(textX);
@@ -730,13 +730,13 @@ void CRingMenu::onDraw()
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {
-						const float barY = FLOAT_80330aac + textY;
+						const float barY = kRingMenuTextOffsetX + textY;
 						const float fullAlpha =
 							static_cast<float>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
 						const float dimAlpha =
-							static_cast<float>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a84 * fade) * static_cast<float>(transitionScale)));
+							static_cast<float>(showScale * static_cast<double>(static_cast<float>(kRingMenuCommandPanelWidth * fade) * static_cast<float>(transitionScale)));
 						const float centerBase =
-							(FLOAT_80330aa8 + posX) -
+							(kRingMenuTextBaseX + posX) -
 							static_cast<float>(static_cast<double>((((caravanWork->m_numCmdListSlots >> 28) & 1) +
 							                                       (caravanWork->m_numCmdListSlots * 8)) >>
 							                                      1));
@@ -867,7 +867,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	font->SetColor(color.color);
 	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
 		textWidth * static_cast<double>(FLOAT_803309c4) -
-		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))));
+		static_cast<double>(static_cast<float>(static_cast<double>(kRingMenuTextBaseX) + static_cast<double>(posX))))))));
 	font->SetPosY(
 		FLOAT_80330a40 +
 			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(

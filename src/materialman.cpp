@@ -983,44 +983,41 @@ void CMaterialMan::addtev_full_shadow(long index)
     tevColor.a = static_cast<unsigned char>(m_fullShadowTevColor);
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
-    unsigned int stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+    GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
     _GXSetTevOrder(
-        stage, m_fullScreenShadowTexCoordIds1[index],
+        m_numTevStage, m_fullScreenShadowTexCoordIds1[index],
         m_fullScreenShadowTexMapIds1[index], 0xFF);
     _GXSetTevColorIn(
-        stage, 0xF, 0xF, 0xF, 8);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 1);
+        m_numTevStage, 0xF, 0xF, 0xF, 8);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 1);
     _GXSetTevAlphaIn(
-        stage, 7, 7, 7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+    GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
     _GXSetTevOrder(
-        stage, m_fullScreenShadowTexCoordIds0[index],
+        m_numTevStage, m_fullScreenShadowTexCoordIds0[index],
         m_fullScreenShadowTexMapIds0[index], 0xFF);
     _GXSetTevColorIn(
-        stage, 2, 8, 3, 0xF);
-    _GXSetTevColorOp(stage, 8, 0, 0, 1, 1);
+        m_numTevStage, 2, 8, 3, 0xF);
+    _GXSetTevColorOp(m_numTevStage, 8, 0, 0, 1, 1);
     _GXSetTevAlphaIn(
-        stage, 7, 7, 7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    _GXSetTevOrder(stage, 0xFF, 0xFF, 4);
+    GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
+    _GXSetTevOrder(m_numTevStage, 0xFF, 0xFF, 4);
     _GXSetTevColorIn(
-        stage, 0, 0xF, 2, 0xF);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
+        m_numTevStage, 0, 0xF, 2, 0xF);
+    _GXSetTevColorOp(m_numTevStage, 0, 0, 0, 1, 0);
     _GXSetTevAlphaIn(
-        stage, 7, 7, 7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
+        m_numTevStage, 7, 7, 7, 0);
+    _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode(m_numTevStage, 0, 0);
     IncNumTevStage();
 }
 

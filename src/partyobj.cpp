@@ -1937,18 +1937,18 @@ void CGPartyObj::onFrameStat()
 			} else {
 				reqAnim(0x27, 0, 0);
 			}
-			if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
+			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+				endPSlotBit(0x10000);
+				m_alpha = FLOAT_80331a54;
+				m_bgColMask |= 0x1000E;
+				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
+			} else {
 				m_alpha = FLOAT_80331A7C;
 				m_bgColMask &= 0xFFFEFFF1;
 				void* port = m_scriptHandle[0xED];
 				endPSlotBit(0x10000);
 				putParticle(reinterpret_cast<int>(port) + 3U | 0x100, m_particleSlots[16], this, FLOAT_80331a54, 0);
 				playSe3D(0x2D, 0x32, 0x96, 0, 0);
-			} else {
-				endPSlotBit(0x10000);
-				m_alpha = FLOAT_80331a54;
-				m_bgColMask |= 0x1000E;
-				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
 			}
 		} else if (isLoopAnim() != 0) {
 			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {

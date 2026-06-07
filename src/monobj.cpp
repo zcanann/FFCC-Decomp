@@ -2099,7 +2099,7 @@ void CGMonObj::onFrameAlways()
 
 	if (scriptHandle != nullptr) {
 		if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFE) & 4) != 0) {
-			char hasNearParty = 0;
+			int hasNearParty = 0;
 			if (m_unk6B9 == 0) {
 				for (int i = 0; i < 4; i++) {
 					CGPartyObj* party = Game.m_partyObjArr[i];

@@ -4890,6 +4890,12 @@ void CGPartyObj::gpmMove()
 
 	int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		stageMode = 0;
+		break;
 	case 4:
 	case 8:
 	case 9:

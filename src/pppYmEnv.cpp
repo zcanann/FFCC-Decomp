@@ -17,20 +17,20 @@
 
 #include <math.h>
 
-extern const float FLOAT_80331180;
-extern const float FLOAT_80331184;
-extern const float FLOAT_80331188;
-extern const float FLOAT_8033118C;
-extern const float FLOAT_80331190;
-extern const float FLOAT_80331194;
-extern const float FLOAT_80331198;
-extern const float FLOAT_8033119C;
-extern const float FLOAT_803311A0;
-extern const float FLOAT_803311B0;
-extern const float FLOAT_803311B4;
-extern const float FLOAT_803311B8;
-extern const double DOUBLE_803311C0;
-extern const float FLOAT_803311C8;
+extern const float kYmEnvRenderZero;
+extern const float kYmEnvRenderOne;
+extern const float kYmEnvNegativeOne;
+extern const float kYmEnvOrthoFarZ;
+extern const float kYmEnvTwo;
+extern const float kYmEnvFrustumExtent;
+extern const float kYmEnvFrustumNegExtent;
+extern const float kYmEnvFrustumScale;
+extern const float kYmEnvDegToRadF;
+extern const float kYmEnvPi;
+extern const float kYmEnvParaboloidNormalScale;
+extern const float kYmEnvNegativeTwoPi;
+extern const double kYmEnvCosEpsilon;
+extern const float kYmEnvTwoPi;
 extern const char s_Exiting_803311CC[8];
 extern const u32 sYmEnvXAxisIdsWord;
 extern const u16 sYmEnvXAxisIdsTail;
@@ -112,22 +112,22 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
-    gUtil.RenderColorQuad(FLOAT_80331180, FLOAT_80331180, texWidth, texHeight, color);
+    gUtil.RenderColorQuad(kYmEnvRenderZero, kYmEnvRenderZero, texWidth, texHeight, color);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
     const GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
     void* targetData = GXGetTexObjData(targetTexObj);
 
-    C_MTXOrtho(orthoMtx, FLOAT_80331184, FLOAT_80331188, FLOAT_80331188, FLOAT_80331184, FLOAT_80331184,
-               FLOAT_8033118C);
+    C_MTXOrtho(orthoMtx, kYmEnvRenderOne, kYmEnvNegativeOne, kYmEnvNegativeOne, kYmEnvRenderOne,
+               kYmEnvRenderOne, kYmEnvOrthoFarZ);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     C_MTXLookAt(cameraMtx, &s_cameraPos, &s_cameraUp, &s_cameraLook);
     GXLoadPosMtxImm(cameraMtx, 0);
 
     GXSetCullMode(GX_CULL_BACK);
-    GXSetViewport(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, FLOAT_80331180, FLOAT_80331184);
+    GXSetViewport(kYmEnvRenderZero, kYmEnvRenderZero, rtWidth, rtHeight, kYmEnvRenderZero, kYmEnvRenderOne);
     GXSetScissor(0, 0, rtWidth, rtHeight);
     GXSetTexCopySrc(0, 0, rtWidth, rtHeight);
     GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
@@ -145,10 +145,10 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     color.b = 0;
     color.a = 0;
     GXSetChanAmbColor(GX_COLOR0A0, color);
-    GXInitLightAttnA(&lightObj, FLOAT_80331180, FLOAT_80331190, FLOAT_80331180);
-    GXInitLightAttnK(&lightObj, FLOAT_80331180, FLOAT_80331184, FLOAT_80331180);
-    GXInitLightPos(&lightObj, FLOAT_80331180, FLOAT_80331180, FLOAT_80331188);
-    GXInitLightDir(&lightObj, FLOAT_80331180, FLOAT_80331180, FLOAT_80331188);
+    GXInitLightAttnA(&lightObj, kYmEnvRenderZero, kYmEnvTwo, kYmEnvRenderZero);
+    GXInitLightAttnK(&lightObj, kYmEnvRenderZero, kYmEnvRenderOne, kYmEnvRenderZero);
+    GXInitLightPos(&lightObj, kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvNegativeOne);
+    GXInitLightDir(&lightObj, kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvNegativeOne);
     GXLoadLightObjImm(&lightObj, GX_LIGHT0);
 
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
@@ -161,8 +161,9 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetNumTexGens(1);
     GXSetNumChans(1);
 
-    C_MTXLightFrustum(lightFrustumMtx, FLOAT_80331194, FLOAT_80331198, FLOAT_80331194, FLOAT_80331198,
-                      FLOAT_80331184, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C);
+    C_MTXLightFrustum(lightFrustumMtx, kYmEnvFrustumExtent, kYmEnvFrustumNegExtent, kYmEnvFrustumExtent,
+                      kYmEnvFrustumNegExtent, kYmEnvRenderOne, kYmEnvFrustumScale, kYmEnvFrustumScale,
+                      kYmEnvFrustumScale, kYmEnvFrustumScale);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
@@ -198,8 +199,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
-    const float kDegToRad = FLOAT_803311A0;
-    const float kZero = FLOAT_80331180;
+    const float kDegToRad = kYmEnvDegToRadF;
+    const float kZero = kYmEnvRenderZero;
     for (int i = 0; i < 5; i++) {
         const unsigned char texObjIdx = s_texObjIndices[modeOffset + i];
         const unsigned char xRotIdx = s_xAxisRotIndices[modeOffset + i];
@@ -215,7 +216,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
         const float yAxisAngle = reinterpret_cast<const float*>(&s_yAxisAngles)[yRotIdx];
         if (yAxisAngle != kZero) {
-            PSMTXRotRad(tempMtx, 'y', FLOAT_803311A0 * yAxisAngle);
+            PSMTXRotRad(tempMtx, 'y', kYmEnvDegToRadF * yAxisAngle);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
 
@@ -236,13 +237,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         Vec2d uvMin;
         Vec2d uvMax;
 
-        uvMin.x = FLOAT_80331184;
-        uvMin.y = FLOAT_80331180;
-        uvMax.x = FLOAT_80331180;
-        uvMax.y = FLOAT_80331184;
+        uvMin.x = kYmEnvRenderOne;
+        uvMin.y = kYmEnvRenderZero;
+        uvMax.x = kYmEnvRenderZero;
+        uvMax.y = kYmEnvRenderOne;
 
-        gUtil.RenderTextureQuad(FLOAT_80331180, FLOAT_80331180, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax, 0,
-                                (GXBlendFactor)4, (GXBlendFactor)5);
+        gUtil.RenderTextureQuad(kYmEnvRenderZero, kYmEnvRenderZero, rtWidth, rtHeight, targetTexObj, &uvMin, &uvMax,
+                                0, (GXBlendFactor)4, (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGB565, 0);
     }
 }
@@ -274,60 +275,62 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     GXBegin(GX_TRIANGLEFAN, GX_VTXFMT7, detail + 2);
 
-    const float latStep = FLOAT_803311B0 / (float)detail;
+    const float latStep = kYmEnvPi / (float)detail;
     const float firstLat = latStep;
-    const float firstRingSin = FLOAT_80331184 * (float)sin(firstLat);
-    const float firstRingCos = FLOAT_80331184 * (float)cos(firstLat);
-    const float firstNormalZ = FLOAT_80331190 * firstRingCos * firstRingCos;
+    const float firstRingSin = kYmEnvRenderOne * (float)sin(firstLat);
+    const float firstRingCos = kYmEnvRenderOne * (float)cos(firstLat);
+    const float firstNormalZ = kYmEnvTwo * firstRingCos * firstRingCos;
 
-    GXPosition3f32(FLOAT_80331180, FLOAT_80331180, FLOAT_80331184);
-    GXNormal3f32(FLOAT_80331180, FLOAT_80331180, FLOAT_80331190);
+    GXPosition3f32(kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvRenderOne);
+    GXNormal3f32(kYmEnvRenderZero, kYmEnvRenderZero, kYmEnvTwo);
 
     int i = 0;
-    float lon = FLOAT_80331180;
+    float lon = kYmEnvRenderZero;
     while (i <= (int)detail) {
         const float x = firstRingSin * (float)cos(lon);
         const float y = firstRingSin * (float)sin(lon);
         const float z = firstRingCos;
 
         GXPosition3f32(x, y, z);
-        GXNormal3f32(FLOAT_803311B4 * x * z, FLOAT_803311B4 * y * z, firstNormalZ);
+        GXNormal3f32(kYmEnvParaboloidNormalScale * x * z, kYmEnvParaboloidNormalScale * y * z, firstNormalZ);
 
         i++;
-        lon = (FLOAT_803311B8 * (float)i) / (float)detail;
+        lon = (kYmEnvNegativeTwoPi * (float)i) / (float)detail;
     }
 
     for (int ring = 2; ring < (int)detail; ring++) {
-        const float lowerLat = (FLOAT_803311B0 * (float)ring) / (float)detail;
-        const float upperLat = (FLOAT_803311B0 * (float)(ring - 1)) / (float)detail;
+        const float lowerLat = (kYmEnvPi * (float)ring) / (float)detail;
+        const float upperLat = (kYmEnvPi * (float)(ring - 1)) / (float)detail;
 
-        const float upperSin = FLOAT_80331184 * (float)sin(upperLat);
-        const float upperCos = FLOAT_80331184 * (float)cos(upperLat);
-        const float lowerSin = FLOAT_80331184 * (float)sin(lowerLat);
-        const float lowerCos = FLOAT_80331184 * (float)cos(lowerLat);
-        const float upperNormalZ = FLOAT_80331190 * upperCos * upperCos;
-        const float lowerNormalZ = FLOAT_80331190 * lowerCos * lowerCos;
+        const float upperSin = kYmEnvRenderOne * (float)sin(upperLat);
+        const float upperCos = kYmEnvRenderOne * (float)cos(upperLat);
+        const float lowerSin = kYmEnvRenderOne * (float)sin(lowerLat);
+        const float lowerCos = kYmEnvRenderOne * (float)cos(lowerLat);
+        const float upperNormalZ = kYmEnvTwo * upperCos * upperCos;
+        const float lowerNormalZ = kYmEnvTwo * lowerCos * lowerCos;
 
-        if (fabs(upperCos) < DOUBLE_803311C0 || fabs(lowerCos) < DOUBLE_803311C0) {
+        if (fabs(upperCos) < kYmEnvCosEpsilon || fabs(lowerCos) < kYmEnvCosEpsilon) {
             break;
         }
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, ringVertexCount * 2);
         i = 0;
-        lon = FLOAT_80331180;
+        lon = kYmEnvRenderZero;
         while (i <= (int)detail) {
             const float lx = lowerSin * (float)cos(lon);
             const float ly = lowerSin * (float)sin(lon);
             GXPosition3f32(lx, ly, lowerCos);
-            GXNormal3f32(FLOAT_803311B4 * lx * lowerCos, FLOAT_803311B4 * ly * lowerCos, lowerNormalZ);
+            GXNormal3f32(kYmEnvParaboloidNormalScale * lx * lowerCos,
+                         kYmEnvParaboloidNormalScale * ly * lowerCos, lowerNormalZ);
 
             const float ux = upperSin * (float)cos(lon);
             const float uy = upperSin * (float)sin(lon);
             GXPosition3f32(ux, uy, upperCos);
-            GXNormal3f32(FLOAT_803311B4 * ux * upperCos, FLOAT_803311B4 * uy * upperCos, upperNormalZ);
+            GXNormal3f32(kYmEnvParaboloidNormalScale * ux * upperCos,
+                         kYmEnvParaboloidNormalScale * uy * upperCos, upperNormalZ);
 
             i++;
-            lon = (FLOAT_803311C8 * (float)i) / (float)detail;
+            lon = (kYmEnvTwoPi * (float)i) / (float)detail;
         }
     }
 
@@ -422,12 +425,12 @@ void DisableIndWarp(_GXTevStageID tevStage, _GXIndTexStageID indStage)
     GXSetNumIndStages(0);
     GXSetIndTexCoordScale((GXIndTexStageID)indStage, GX_ITS_1, GX_ITS_1);
 
-    indMtx[0][0] = FLOAT_80331180;
-    indMtx[0][1] = FLOAT_80331180;
-    indMtx[0][2] = FLOAT_80331180;
-    indMtx[1][0] = FLOAT_80331180;
-    indMtx[1][1] = FLOAT_80331180;
-    indMtx[1][2] = FLOAT_80331180;
+    indMtx[0][0] = kYmEnvRenderZero;
+    indMtx[0][1] = kYmEnvRenderZero;
+    indMtx[0][2] = kYmEnvRenderZero;
+    indMtx[1][0] = kYmEnvRenderZero;
+    indMtx[1][1] = kYmEnvRenderZero;
+    indMtx[1][2] = kYmEnvRenderZero;
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 
@@ -604,12 +607,12 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     animFrameMax = (int)(float)animFrameCount;
     int frameDiv = frameInt / animFrameMax;
     frame = (float)(frameInt - frameDiv * animFrameMax);
-    if (frame < FLOAT_80331190) {
+    if (frame < kYmEnvTwo) {
         return 0;
     }
 
-    if (frame != FLOAT_80331180) {
-        frame -= FLOAT_80331184;
+    if (frame != kYmEnvRenderZero) {
+        frame -= kYmEnvRenderOne;
     }
 
     model->CalcFrameMatrix(frame + frameAdd, node, outMatrix);
@@ -677,7 +680,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             outMatrix[2][3] += ppvMng->m_position.z;
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (FLOAT_80331184 != mngSt->m_scale.x) {
+            if (kYmEnvRenderOne != mngSt->m_scale.x) {
                 localB8.x = localMatrix.value[0][0];
                 localB8.y = localMatrix.value[1][0];
                 localB8.z = localMatrix.value[2][0];
@@ -686,7 +689,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localB8.y;
                 localMatrix.value[2][0] = localB8.z;
             }
-            if (FLOAT_80331184 != mngSt->m_scale.y) {
+            if (kYmEnvRenderOne != mngSt->m_scale.y) {
                 localC4.x = localMatrix.value[0][1];
                 localC4.y = localMatrix.value[1][1];
                 localC4.z = localMatrix.value[2][1];
@@ -695,7 +698,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localC4.y;
                 localMatrix.value[2][1] = localC4.z;
             }
-            if (FLOAT_80331184 != mngSt->m_scale.z) {
+            if (kYmEnvRenderOne != mngSt->m_scale.z) {
                 localD0.x = localMatrix.value[0][2];
                 localD0.y = localMatrix.value[1][2];
                 localD0.z = localMatrix.value[2][2];
@@ -715,7 +718,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSMTXMultVecSR(outMatrix, &ppvMng->m_position, &local88);
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (FLOAT_80331184 != mngSt->m_scale.x) {
+            if (kYmEnvRenderOne != mngSt->m_scale.x) {
                 localDC.x = localMatrix.value[0][0];
                 localDC.y = localMatrix.value[1][0];
                 localDC.z = localMatrix.value[2][0];
@@ -724,7 +727,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localDC.y;
                 localMatrix.value[2][0] = localDC.z;
             }
-            if (FLOAT_80331184 != mngSt->m_scale.y) {
+            if (kYmEnvRenderOne != mngSt->m_scale.y) {
                 localE8.x = localMatrix.value[0][1];
                 localE8.y = localMatrix.value[1][1];
                 localE8.z = localMatrix.value[2][1];
@@ -733,7 +736,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localE8.y;
                 localMatrix.value[2][1] = localE8.z;
             }
-            if (FLOAT_80331184 != mngSt->m_scale.z) {
+            if (kYmEnvRenderOne != mngSt->m_scale.z) {
                 localF4.x = localMatrix.value[0][2];
                 localF4.y = localMatrix.value[1][2];
                 localF4.z = localMatrix.value[2][2];
@@ -748,7 +751,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         break;
     }
 
-    if (FLOAT_80331184 != mngSt->m_scale.x) {
+    if (kYmEnvRenderOne != mngSt->m_scale.x) {
         local100.x = localMatrix.value[0][0];
         local100.y = localMatrix.value[1][0];
         local100.z = localMatrix.value[2][0];
@@ -757,7 +760,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][0] = local100.y;
         localMatrix.value[2][0] = local100.z;
     }
-    if (FLOAT_80331184 != mngSt->m_scale.y) {
+    if (kYmEnvRenderOne != mngSt->m_scale.y) {
         local10C.x = localMatrix.value[0][1];
         local10C.y = localMatrix.value[1][1];
         local10C.z = localMatrix.value[2][1];
@@ -766,7 +769,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][1] = local10C.y;
         localMatrix.value[2][1] = local10C.z;
     }
-    if (FLOAT_80331184 != mngSt->m_scale.z) {
+    if (kYmEnvRenderOne != mngSt->m_scale.z) {
         local118.x = localMatrix.value[0][2];
         local118.y = localMatrix.value[1][2];
         local118.z = localMatrix.value[2][2];

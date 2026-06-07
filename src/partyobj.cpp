@@ -775,7 +775,7 @@ void CGPartyObj::onFrameAlways()
 		}
 
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		int shieldIndex = *reinterpret_cast<short*>(script + 0x58);
+		int shieldIndex = *reinterpret_cast<short*>(script + 0xB0);
 		int shieldItem;
 		if (shieldIndex < 0) {
 			shieldItem = 0;

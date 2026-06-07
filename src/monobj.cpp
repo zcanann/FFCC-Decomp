@@ -295,17 +295,18 @@ void CGMonObj::undeadOn()
 
 	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 	void* classId = object->m_scriptHandle[4];
-	int weaponMode = static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31;
+	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
+	int weaponMode = static_cast<int>(static_cast<unsigned int>(weaponFlags) << 24) >> 31;
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short count = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
-	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+	unsigned short count = (weaponMode != 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
+	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
 	for (int i = 0; i < static_cast<int>(count); i++) {
 		int dataNo = object->m_charaModelHandle != nullptr ? object->m_charaModelHandle->GetPdtSlot() : -1;
@@ -316,7 +317,7 @@ void CGMonObj::undeadOn()
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
-	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {
+	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
 		if (classId == reinterpret_cast<void*>(0x83)) {
 			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == reinterpret_cast<void*>(0x7F)) {
@@ -2568,7 +2569,7 @@ void CGMonObj::setRepop(int mode)
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
-	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {
+	if (static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24)) < 0) {
 		if (classId == reinterpret_cast<void*>(0x83)) {
 			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
 		} else if (classId == reinterpret_cast<void*>(0x7F)) {

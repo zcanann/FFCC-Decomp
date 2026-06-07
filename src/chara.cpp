@@ -3112,8 +3112,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 			s_charaMeshWorkOverflowSeen = 1;
 		}
 
-		if ((s_charaMeshWorkWarnArmed != 0) && (static_cast<u32>(System.m_execParam) > 1)) {
-			s_charaMeshWorkWarnArmed = 0;
+		if ((s_charaMeshWorkWarnArmed != 0) && (s_charaMeshWorkWarnArmed = 0, 1 < static_cast<u32>(System.m_execParam))) {
 			System.Printf(const_cast<char*>(s_charaMeshWorkOverflow));
 		}
 		return;
@@ -3121,12 +3120,12 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 	u8* workBase = CharaDrawBufferBase(bufferIndex);
 	mesh->m_workPositions = reinterpret_cast<S16Vec*>(workBase + cursor);
-	cursor += AlignCharaWorkBytes(meshRef->m_vertexCount * 6);
+	cursor += AlignCharaWorkBytes(mesh->m_data->m_vertexCount * 6);
 	mesh->m_workNormals = reinterpret_cast<S16Vec*>(workBase + cursor);
-	cursor += AlignCharaWorkBytes(meshRef->m_normalCount * 6);
+	cursor += AlignCharaWorkBytes(mesh->m_data->m_normalCount * 6);
 
-	float* skinData = reinterpret_cast<float*>(meshRef->m_skins);
-	for (u32 i = 0; i < meshRef->m_skinCount; i++) {
+	float* skinData = reinterpret_cast<float*>(mesh->m_data->m_skins);
+	for (u32 i = 0; i < mesh->m_data->m_skinCount; i++) {
 		int nodeIndex = reinterpret_cast<int*>(skinData + 0x18)[0];
 		PSMTXConcat(
 		    ModelNodes(model)[nodeIndex].m_mtx,
@@ -3135,10 +3134,10 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 		skinData += 0x19;
 	}
 
-	if (meshRef->m_infoWord1 != 0) {
-		S16Vec* srcNormals = meshRef->m_normals;
+	if (mesh->m_data->m_infoWord1 != 0) {
+		S16Vec* srcNormals = mesh->m_data->m_normals;
 		S16Vec* dstNormals = mesh->m_workNormals;
-		for (u32 i = 0; i < meshRef->m_infoWord1; i++) {
+		for (u32 i = 0; i < mesh->m_data->m_infoWord1; i++) {
 			dstNormals[1] = srcNormals[1];
 			dstNormals[2] = srcNormals[2];
 			srcNormals += 3;
@@ -3146,6 +3145,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 		}
 	}
 
+	meshRef = mesh->m_data;
 	skin(
 	    meshRef->m_oneWeightCountOrSize,
 	    meshRef->m_twoWeightCountOrSize,
@@ -3159,8 +3159,8 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	    meshRef->m_normals,
 	    mesh->m_workNormals);
 
-	DCFlushRange(mesh->m_workPositions, meshRef->m_vertexCount * 6);
-	DCFlushRange(mesh->m_workNormals, meshRef->m_normalCount * 6);
+	DCFlushRange(mesh->m_workPositions, mesh->m_data->m_vertexCount * 6);
+	DCFlushRange(mesh->m_workNormals, mesh->m_data->m_normalCount * 6);
 }
 
 /*

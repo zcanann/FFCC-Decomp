@@ -3193,14 +3193,16 @@ void CPartMng::pppDraw()
             PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
             mng->m_sortDepth = viewPos.z;
 
-            if ((signed char)mng->m_drawPass == 1) {
-                ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
-            } else if ((signed char)mng->m_drawPass < 1) {
-                if ((signed char)mng->m_drawPass >= 0) {
-                    ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+            if ((signed char)mng->m_drawPass != 1) {
+                if ((signed char)mng->m_drawPass < 1) {
+                    if ((signed char)mng->m_drawPass >= 0) {
+                        ppvDrawMng.AddPrim(viewPos.z, reinterpret_cast<_pppMngSt*>(mng), mng->m_drawSubType);
+                    }
+                } else if ((signed char)mng->m_drawPass < 3) {
+                    ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
                 }
-            } else if ((signed char)mng->m_drawPass < 3) {
-                ppvDrawMng.AddPrimOt(0, reinterpret_cast<_pppMngSt*>(mng));
+            } else {
+                ppvDrawMng.AddPrimOt(0x3FF, reinterpret_cast<_pppMngSt*>(mng));
             }
             goto nextPart;
 

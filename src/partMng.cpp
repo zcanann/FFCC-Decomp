@@ -3534,45 +3534,52 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
-
     ppvAmemCacheSet.CacheClear();
-    stageLoad->setDefaultParam(pdtSlotIndex);
+    PartPcs.m_usbStreamState.m_stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* path = g_StrTmp;
     sprintf(path, lbl_8032FE38, baseName);
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
 
     unsigned long fileSize = 0;
     void* fileData = pppFileRead(path, fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
-        stageLoad->resDefaultParam();
+        PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
         return 0;
     }
 
-    if (fileData == reinterpret_cast<void*>(1)) {
-        stageLoad->resDefaultParam();
+    if (m_partLoadMode == 2) {
+        return 1;
+    }
+    if (m_partLoadMode == 3) {
         return 1;
     }
 
     if (m_textureSet == 0) {
-        m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
+        m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
+        CTextureSet* textureSet = m_textureSet;
+        textureSet->m_textureArray.SetDefaultSize(0x180);
+        textureSet->m_textureArray.SetGrow(0);
     }
 
     if (m_materialSet == 0) {
-        CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
-        m_materialSet = materialSet;
+        m_materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
+        CMaterialSet* materialSet = m_materialSet;
+        materialSet->m_materials.SetDefaultSize(0x180);
+        materialSet->m_materials.SetGrow(0);
         m_pppEnvSt.m_materialSetPtr = m_materialSet;
 
-        CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
-        if (defaultMaterial != 0) {
-            defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-            m_materialSet->AddMaterial(defaultMaterial, 0);
+        CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
+        defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+        if (materialSet->m_materials.GetSize() == 0) {
+            materialSet->m_materials.Add(defaultMaterial);
+        } else {
+            materialSet->m_materials.SetAt(0, defaultMaterial);
         }
     }
 
@@ -3582,13 +3589,13 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == kChunkTSET) {
-            m_textureSet->Create(chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
         }
     }
 
     m_materialSet->SetPartFromTextureSet(m_textureSet, pdtSlotIndex);
     m_materialSet->SetTextureSet(m_textureSet);
-    stageLoad->resDefaultParam();
+    PartPcs.m_usbStreamState.m_stageLoad->resDefaultParam();
     return 1;
 }
 

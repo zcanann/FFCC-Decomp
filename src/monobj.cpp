@@ -733,8 +733,9 @@ void CGMonObj::isValidTarget()
 		         0x10;
 	}
 
+	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiData + 0x102);
 	if ((m_targetPartyIndex >= 0) &&
-	    ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0)) {
+	    ((aiFlags & 0x20) != 0)) {
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));
 		m_chaseState = 2;
@@ -743,7 +744,7 @@ void CGMonObj::isValidTarget()
 		return;
 	}
 
-	if (((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x20) != 0) ||
+	if (((aiFlags & 0x20) != 0) ||
 	    ((*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 8) != 0)) {
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 		memset(&m_moveWork, 0, sizeof(m_moveWork));

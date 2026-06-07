@@ -904,7 +904,6 @@ pppDrawMdlTs.cpp:
 	extab       start:0x80007A00 end:0x80007A08
 	extabindex  start:0x8000DC54 end:0x8000DC60
 	.text       start:0x80087EF0 end:0x800880F0
-	.sdata2     start:0x80330500 end:0x80330504
 
 pppKeShpTail.cpp:
 	extab       start:0x80007A08 end:0x80007A10
@@ -915,13 +914,12 @@ pppKeZCrctShp.cpp:
 	extab       start:0x80007A10 end:0x80007A18
 	extabindex  start:0x8000DC6C end:0x8000DC78
 	.text       start:0x8008821C end:0x80088698
-	.sdata2     start:0x80330504 end:0x80330508
 
 pppKeShpTail2X.cpp:
 	extab       start:0x80007A18 end:0x80007A38
 	extabindex  start:0x8000DC78 end:0x8000DCA8
 	.text       start:0x80088698 end:0x8008922C
-	.sdata2     start:0x80330508 end:0x80330520
+	.sdata2     start:0x80330500 end:0x80330520
 
 pppKeShpTail3X.cpp:
 	extab       start:0x80007A38 end:0x80007A50

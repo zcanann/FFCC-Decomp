@@ -3,7 +3,6 @@
 #include "ffcc/pppPart.h"
 
 extern const float kPppRyjMegaBirthModelZero;
-extern const float kPppKeShpTail2XAlphaScale = 16384.0f;
 
 /*
  * --INFO--

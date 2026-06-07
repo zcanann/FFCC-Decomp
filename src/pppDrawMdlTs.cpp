@@ -7,7 +7,6 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const float kPppKeShpTail2XZero = 0.0f;
 extern const float kPppRyjMegaBirthModelZeroPair[2];
 
 STATIC_ASSERT(offsetof(PDrawMdlTs, m_graphId) == 0x00);

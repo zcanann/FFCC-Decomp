@@ -45,7 +45,7 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
     return &self->m_usbStreamState;
 }
 
-extern float FLOAT_80330B30;
+extern float kCFlatPadStickZero;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
@@ -760,7 +760,7 @@ float CPad::GetRightStickY(long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return FLOAT_80330B30;
+        return kCFlatPadStickZero;
     }
 
     int slot = RemapPadSlot(this, padIndex);
@@ -792,7 +792,7 @@ float CPad::GetRightStickX(long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return FLOAT_80330B30;
+        return kCFlatPadStickZero;
     }
 
     int slot = RemapPadSlot(this, padIndex);
@@ -824,7 +824,7 @@ float CPad::GetLeftStickY(long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return FLOAT_80330B30;
+        return kCFlatPadStickZero;
     }
 
     int slot = RemapPadSlot(this, padIndex);
@@ -856,7 +856,7 @@ float CPad::GetLeftStickX(long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return FLOAT_80330B30;
+        return kCFlatPadStickZero;
     }
 
     int slot = RemapPadSlot(this, padIndex);

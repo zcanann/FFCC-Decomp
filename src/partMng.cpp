@@ -2120,15 +2120,7 @@ void CPartMng::pppEditBeforeCalc()
 
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
-        if (*reinterpret_cast<unsigned char*>(self + 0x15c) == 0) {
-            _GXColor fogColor;
-            fogColor.r = 0;
-            fogColor.g = 0;
-            fogColor.b = 0;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
-        } else {
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
             _GXColor fogColor;
             fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
@@ -2136,6 +2128,14 @@ void CPartMng::pppEditBeforeCalc()
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
+        } else {
+            _GXColor fogColor;
+            fogColor.r = 0;
+            fogColor.g = 0;
+            fogColor.b = 0;
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
         }
 
         ppvSysGoPartF = 1;
@@ -2166,15 +2166,7 @@ void CPartMng::pppEditBeforeCalc()
 
         float fogFar = *reinterpret_cast<float*>(self + 0x164);
         float fogNear = *reinterpret_cast<float*>(self + 0x160);
-        if (*reinterpret_cast<unsigned char*>(self + 0x15c) == 0) {
-            _GXColor fogColor;
-            fogColor.r = 0;
-            fogColor.g = 0;
-            fogColor.b = 0;
-            fogColor.a = 0;
-            Graphic.SetFogColor(fogColor);
-            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
-        } else {
+        if (*reinterpret_cast<unsigned char*>(self + 0x15c) != 0) {
             _GXColor fogColor;
             fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
             fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
@@ -2182,6 +2174,14 @@ void CPartMng::pppEditBeforeCalc()
             fogColor.a = 0;
             Graphic.SetFogColor(fogColor);
             Graphic.SetFogParam(fogNear, fogFar);
+        } else {
+            _GXColor fogColor;
+            fogColor.r = 0;
+            fogColor.g = 0;
+            fogColor.b = 0;
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
         }
 
         ppvSysGoPartF = 1;

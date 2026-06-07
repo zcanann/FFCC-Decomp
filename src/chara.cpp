@@ -170,7 +170,7 @@ static inline void* ModelBank(CChara::CModel* model)
 
 static inline float (*ModelDrawMtx(CChara::CModel* model))[4]
 {
-	return model->m_matrix;
+	return model->m_drawMtx;
 }
 
 static inline float (*ModelWorldBaseMtx(CChara::CModel* model))[4]
@@ -255,32 +255,32 @@ static inline BeforeCalcMatrixCallback ModelBeforeCalcMatrixCallback(CChara::CMo
 
 static inline BeforeDrawModelCallback ModelBeforeDrawCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<BeforeDrawModelCallback*>(ModelRaw(model) + 0xE4);
+	return *reinterpret_cast<BeforeDrawModelCallback*>(ModelRaw(model) + 0xF0);
 }
 
 static inline AfterDrawModelCallback ModelAfterDrawCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<AfterDrawModelCallback*>(ModelRaw(model) + 0xE8);
+	return *reinterpret_cast<AfterDrawModelCallback*>(ModelRaw(model) + 0x108);
 }
 
 static inline BeforeMeshCallback ModelBeforeMeshCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<BeforeMeshCallback*>(ModelRaw(model) + 0xEC);
+	return *reinterpret_cast<BeforeMeshCallback*>(ModelRaw(model) + 0xF4);
 }
 
 static inline AfterMeshDrawCallback ModelAfterMeshDrawCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0xF0);
+	return *reinterpret_cast<AfterMeshDrawCallback*>(ModelRaw(model) + 0xFC);
 }
 
 static inline AfterMeshEnvCallback ModelAfterMeshEnvCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<AfterMeshEnvCallback*>(ModelRaw(model) + 0xF4);
+	return *reinterpret_cast<AfterMeshEnvCallback*>(ModelRaw(model) + 0x104);
 }
 
 static inline CustomMeshDrawCallback ModelCustomMeshDrawCallback(CChara::CModel* model)
 {
-	return *reinterpret_cast<CustomMeshDrawCallback*>(ModelRaw(model) + 0xFC);
+	return *reinterpret_cast<CustomMeshDrawCallback*>(ModelRaw(model) + 0xF8);
 }
 
 static inline AfterMeshDrawCallback ModelShadowDisplayListCallback(CChara::CModel* model)
@@ -290,12 +290,12 @@ static inline AfterMeshDrawCallback ModelShadowDisplayListCallback(CChara::CMode
 
 static inline void* ModelCbUser0(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0x104);
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE4);
 }
 
 static inline void* ModelCbUser1(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(ModelRaw(model) + 0x108);
+	return *reinterpret_cast<void**>(ModelRaw(model) + 0xE8);
 }
 
 static inline float& ModelTwistAngle(CChara::CModel* model)
@@ -2244,7 +2244,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
  */
 void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 {
-	if (ModelLightAlpha(this) != FLOAT_803301bc) {
+	if (FLOAT_803301bc != ModelLightAlpha(this)) {
 		return;
 	}
 
@@ -2259,7 +2259,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);
 
-	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
+	for (u32 meshIndex = 0; meshIndex < this->m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0 || ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}

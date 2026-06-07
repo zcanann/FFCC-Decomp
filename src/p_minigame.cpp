@@ -2065,8 +2065,8 @@ next_player:
                     msgBase += 200;
                 } while (k < 4);
 
-                *reinterpret_cast<short*>(self + 0x134E) = static_cast<short>(*reinterpret_cast<short*>(self + 0x134E) + 1);
-                if (*reinterpret_cast<unsigned short*>(self + 0x134E) > 0x0FFE)
+                *reinterpret_cast<short*>(self + 0x134E) = static_cast<short>(*reinterpret_cast<unsigned short*>(self + 0x134E) + 1);
+                if (0x0FFE < *reinterpret_cast<unsigned short*>(self + 0x134E))
                 {
                     *reinterpret_cast<unsigned short*>(self + 0x134E) = 0x0FFF;
                 }

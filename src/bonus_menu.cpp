@@ -2242,18 +2242,16 @@ void CMenuPcs::DrawResultCountAnim()
 		return;
 	}
 
-	int animPtr = this->m_bonusAnimPtr;
 	int modelIndex = 0;
 	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int kind = sprite->kind;
 
 		if (kind >= 0 || kind == -2) {
@@ -2274,8 +2272,8 @@ void CMenuPcs::DrawResultCountAnim()
 				handle->Draw(5);
 				handle->m_flags = oldFlags;
 				RestoreProjection();
+				lastKind = sprite->kind;
 				modelIndex++;
-				lastKind = kind;
 			} else {
 				if (lastKind < 0) {
 					DrawInit();
@@ -2328,7 +2326,7 @@ void CMenuPcs::DrawResultCountAnim()
 						digitX += digitW;
 					}
 				}
-				lastKind = kind;
+				lastKind = sprite->kind;
 			}
 		}
 	}
@@ -2343,8 +2341,9 @@ void CMenuPcs::DrawResultCountAnim()
 
 	int textIndex = 0;
 	char text[128];
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		if (sprite->kind == -1) {
 			CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 			font->SetColor(color.color);

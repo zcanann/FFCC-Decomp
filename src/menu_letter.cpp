@@ -653,7 +653,7 @@ int CMenuPcs::LetterCtrl()
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
 						    static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
@@ -692,7 +692,7 @@ int CMenuPcs::LetterCtrl()
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
 						    static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
@@ -813,7 +813,7 @@ int CMenuPcs::LetterCtrl()
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
 						    static_cast<float>(DOUBLE_803330e8 -
@@ -1043,7 +1043,7 @@ void CMenuPcs::LetterLstOpen()
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
 		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-			if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
 				    static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
@@ -1087,7 +1087,7 @@ void CMenuPcs::LetterLstClose()
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
 		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-			if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
 				    static_cast<float>(DOUBLE_803330e8 -
@@ -1140,7 +1140,7 @@ void CMenuPcs::LetterMessOpen()
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
 		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-			if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
 				    static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
@@ -1199,7 +1199,7 @@ int CMenuPcs::LetterMessClose()
 		for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 			float f = FLOAT_803330bc;
 			if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
-				if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+				if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 					*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 					*reinterpret_cast<float*>(panel + 8) =
 					    static_cast<float>(DOUBLE_803330e8 -

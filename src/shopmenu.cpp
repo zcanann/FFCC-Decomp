@@ -2612,6 +2612,44 @@ updateWindow:
 }
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void CShopMenu::SelectSOUBI()
+{
+    if ((GetPadButtons() & 0xC) != 0) {
+        m_yesNo ^= 1;
+        Sound.PlaySe(1, 0x40, 0x7F, 0);
+        return;
+    }
+
+    if ((GetPadButtons() & 0x200) != 0) {
+        Sound.PlaySe(3, 0x40, 0x7F, 0);
+        m_nextMode = 9;
+        SetMode(0x11);
+        return;
+    }
+
+    if ((GetPadButtons() & 0x100) == 0) {
+        return;
+    }
+
+    if (m_yesNo != 0) {
+        m_nextMode = 9;
+        SetMode(0x11);
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
+        return;
+    }
+
+    m_nextMode = 9;
+    SetMode(0x11);
+
+    int equipType = MenuPcs.GetEquipType(m_resultItem);
+    ShopMenuCaravanWork(this)->ChgEquipPos(equipType, static_cast<short>(m_resultParam));
+    Sound.PlaySe(0x51, 0x40, 0x7F, 0);
+}
+/*
+ * --INFO--
  * PAL Address: 0x801577ac
  * PAL Size: 4352b
  * EN Address: TODO
@@ -3212,47 +3250,6 @@ mode_3_6_common:
 
 
 
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CShopMenu::SelectSOUBI()
-{
-    unsigned short buttons = GetPadButtons();
-    if ((buttons & 0xC) != 0) {
-        m_yesNo ^= 1;
-        Sound.PlaySe(1, 0x40, 0x7F, 0);
-        return;
-    }
-
-    if ((buttons & 0x200) != 0) {
-        Sound.PlaySe(3, 0x40, 0x7F, 0);
-        m_nextMode = 9;
-        SetMode(0x11);
-        return;
-    }
-
-    if ((buttons & 0x100) == 0) {
-        return;
-    }
-
-    if (m_yesNo != 0) {
-        m_nextMode = 9;
-        SetMode(0x11);
-        Sound.PlaySe(4, 0x40, 0x7F, 0);
-        return;
-    }
-
-    m_nextMode = 9;
-    SetMode(0x11);
-
-    int equipType = MenuPcs.GetEquipType(m_resultItem);
-    ShopMenuCaravanWork(this)->ChgEquipPos(equipType, static_cast<short>(m_resultParam));
-    Sound.PlaySe(0x51, 0x40, 0x7F, 0);
-}
 
 
 /*

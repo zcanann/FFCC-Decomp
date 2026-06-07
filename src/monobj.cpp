@@ -500,68 +500,57 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 	int foundCount = 0;
 	int selectedPartyIndex = -1;
 
+	unsigned char* slotPtr = mon;
 	for (int slot = 0; slot < 4; slot++) {
-		int partyIndex = *reinterpret_cast<int*>(mon + 0x620 + slot * 4);
+		int partyIndex = *reinterpret_cast<int*>(slotPtr + 0x620);
 		CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-		if (party != NULL) {
-			CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-			CGObject* partyObj = reinterpret_cast<CGObject*>(party);
-			void** partyScript = partyObj->m_scriptHandle;
+		CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+		CGObject* partyObj = reinterpret_cast<CGObject*>(party);
 
-			if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) == 0x6D) && (partyScript[0xED] != NULL)) {
-				goto next_slot;
-			}
-
-			bool valid = true;
-			if (valid && ((flags & 1) != 0)) {
-				int state = partyPrg->m_lastStateId;
-				valid = (*reinterpret_cast<short*>(partyScript + 7) != 0) && (state != 9) && (state != 0x22);
-			}
-			if (valid && ((flags & 0x10) != 0)) {
-				valid = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyScript) + 0x4E) != 0;
-			}
-			if (valid && ((flags & 0x20) != 0)) {
-				int state = partyPrg->m_lastStateId;
-				valid = ((state == 6) || (state == 2)) && (partyPrg->m_subState == 1);
-			}
-			if (valid && ((flags & 0x40) != 0)) {
-				valid = (static_cast<signed char>(party->m_partyData.unk6C0) >= 0) && (partyScript[4] == reinterpret_cast<void*>(classId));
-			}
-			if (valid && ((flags & 2) == 0)) {
-				valid = minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4);
-			}
-			if (valid && ((flags & 4) == 0)) {
-				valid = *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4) <= maxDist;
-			}
-
-			if (valid) {
-				float distance = *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4);
-				if (((flags & 8) != 0) && (distance > 0.0f)) {
-					Vec toParty;
-					Vec facing;
-					PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
-					PSVECScale(&toParty, &toParty, 1.0f / distance);
-					facing.x = sin(monObject->m_rotTargetY);
-					facing.y = 0.0f;
-					facing.z = cos(monObject->m_rotTargetY);
-					if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
-						goto next_slot;
-					}
+		if ((party != NULL) &&
+			(((Game.m_gameWork.m_menuStageMode == 0) ||
+				(0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
+				(partyObj->m_scriptHandle[0xED] == NULL))) &&
+			(((flags & 1) == 0) ||
+				((*reinterpret_cast<short*>(partyObj->m_scriptHandle + 7) != 0) &&
+					(partyPrg->m_lastStateId != 9) && (partyPrg->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+						(0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+						((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) != 0x6D) ||
+						(partyObj->m_scriptHandle[0xED] == NULL)))) &&
+			(((flags & 0x10) == 0) ||
+				(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x4E) != 0)) &&
+			(((flags & 0x20) == 0) ||
+				(((partyPrg->m_lastStateId == 6) || (partyPrg->m_lastStateId == 2)) &&
+					(partyPrg->m_subState == 1))) &&
+			(((flags & 0x40) == 0) ||
+				((static_cast<signed char>(party->m_partyData.unk6C0) >= 0) &&
+					(partyObj->m_scriptHandle[4] == reinterpret_cast<void*>(classId)))) &&
+			(((flags & 2) != 0) || (minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) &&
+			(((flags & 4) != 0) || (*reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4) <= maxDist))) {
+			if (((flags & 8) != 0) && (0.0f < *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4))) {
+				Vec toParty;
+				Vec facing;
+				PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
+				PSVECScale(&toParty, &toParty, 1.0f / *reinterpret_cast<float*>(mon + 0x5D0 + partyIndex * 4));
+				facing.x = sin(monObject->m_rotTargetY);
+				facing.y = 0.0f;
+				facing.z = cos(monObject->m_rotTargetY);
+				if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
+					goto next_slot;
 				}
-
-				if ((targetOrdinal == -1) || (targetOrdinal == foundCount)) {
-					selectedPartyIndex = partyIndex;
-					if (targetOrdinal == foundCount) {
-						return partyIndex;
-					}
-				}
-				foundCount++;
 			}
+
+			if (((targetOrdinal == -1) || (targetOrdinal == foundCount)) &&
+				(selectedPartyIndex = partyIndex, targetOrdinal == foundCount)) {
+				return partyIndex;
+			}
+			foundCount++;
 		}
 
-next_slot:
-		;
+	next_slot:
+		slotPtr += 4;
 	}
 
 	return selectedPartyIndex;

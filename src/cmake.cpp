@@ -1774,7 +1774,12 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         return 0;
     }
 
-    if (mcState == 3) {
+    if (mcState != 3) {
+        if (mcState == 1 && (down & 0x300) != 0) {
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+            mcState = 2;
+        }
+    } else {
         if ((repeat & 0x8) != 0) {
             if ((job % 4) == 0) {
                 job = static_cast<short>(job + 3);
@@ -1855,9 +1860,6 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                 return 1;
             }
         }
-    } else if (mcState == 1 && (down & 0x300) != 0) {
-        Sound.PlaySe(2, 0x40, 0x7F, 0);
-        mcState = 2;
     }
     return 0;
 }

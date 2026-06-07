@@ -12913,12 +12913,10 @@ int McCtrl::SaveDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -12941,11 +12939,9 @@ int McCtrl::SaveDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
-				m_lastResult = -3;
-				return;
+				return -3;
 			}
 			m_state = 7;
 		}
@@ -12958,13 +12954,12 @@ int McCtrl::SaveDat()
 		} else if (m_lastResult == -5) {
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
-			m_lastResult = -4;
-			return;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
+			return -4;
+		} else if (MemoryCardMan.IsBrokenFile()) {
+			m_state = 8;
+		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x0C;
-		} else {
-			m_state = 8;
 		}
 		break;
 
@@ -12982,20 +12977,25 @@ int McCtrl::SaveDat()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
 			} else {
+				struct McListEntry {
+					int m_words[11];
+					char m_name[0x15];
+					char m_byte41;
+					char m_byte42;
+					char m_byte43;
+				};
+				McListEntry entry;
+				memset(&entry, 0, sizeof(entry));
 				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmCharaState + i * kMcListEntrySize) = entry;
 				}
 				m_state = 10;
 			}
@@ -13015,8 +13015,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x10;
@@ -13026,15 +13025,14 @@ int McCtrl::SaveDat()
 
 	case 0x0C:
 		m_lastResult = MemoryCardMan.McGetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x0D;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x0D;
 		}
 		break;
 
@@ -13053,8 +13051,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				m_state = 0x0F;
@@ -13064,16 +13061,15 @@ int McCtrl::SaveDat()
 
 	case 0x0F:
 		m_lastResult = MemoryCardMan.McSetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x12;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			if (m_lastResult == -5) {
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
+		} else {
+			m_state = 0x12;
 		}
 		break;
 
@@ -13093,8 +13089,7 @@ int McCtrl::SaveDat()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else if (m_iteration < 4) {
 				m_state = 0x10;
@@ -13105,18 +13100,22 @@ int McCtrl::SaveDat()
 		break;
 
 	case 0x12: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
+		if (static_cast<signed char>(Game.m_gameWork.m_mcHasSerial) == 0) {
+			Game.m_gameWork.m_mcSerial1 = static_cast<unsigned int>(serial);
+			Game.m_gameWork.m_mcSerial0 = static_cast<unsigned int>(serial >> 32);
+			Game.m_gameWork.m_mcRandom = Math.Rand(0x7FFFFFFF);
+			Game.m_gameWork.m_mcHasSerial = 1;
+		}
+		m_serialLo = static_cast<unsigned int>(serial);
+		m_serialHi = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		if (m_userBuffer == 0) {
 			MemoryCardMan.MakeSaveData();
@@ -13137,35 +13136,37 @@ int McCtrl::SaveDat()
 					MemoryCardMan.McClose();
 					MemoryCardMan.McUnmount(m_cardChannel);
 					MemoryCardMan.DestroyMcBuff();
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
 				SetListDat(m_saveIndex, 1);
-				MenuPcs.BindMcObj();
+				MenuPcs.BindMcObj(m_saveIndex);
 				m_state = 0x14;
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
+		break;
+
+	case 0x14:
 		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -1;
-	} else if (m_state == 0x14) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -1;
 	}
+	if (m_state == 0x14) {
+		return 1;
+	}
+	return 0;
 }
 
 /*

@@ -690,43 +690,46 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	short* board = reinterpret_cast<short*>(a);
 	short* icon = reinterpret_cast<short*>(b);
-	float* base = s_Base[0];
 
-	base[0] = (float)(board[0] + board[2] * 0.5);
-	base[1] = (float)(board[1] + board[3] * 0.5);
+	s_Base[0][0] = (float)(board[0] + board[2] * 0.5);
+	s_Base[0][1] = (float)(board[1] + board[3] * 0.5);
 
 	float iconW = (float)icon[2];
 	float iconH = (float)icon[3];
 	double iconHalfW = (double)iconW * 0.5;
 	double iconHalfH = (double)iconH * 0.5;
 
-	base[14] = (float)((double)base[0] - iconHalfW);
-	base[15] = (float)board[1];
-	base[6] = base[14];
-	base[7] = (float)((double)(float)(board[1] + board[3]) - (double)iconH);
-	base[10] = (float)board[0];
-	base[11] = (float)((double)base[1] - iconHalfH);
-	base[2] = (float)((double)(float)(board[0] + board[2]) - (double)iconW);
-	base[3] = base[11];
+	float v14 = (float)((double)s_Base[0][0] - iconHalfW);
+	float v15 = (float)board[1];
+	s_Base[0][14] = v14;
+	s_Base[0][15] = v15;
+	s_Base[0][6] = v14;
+	s_Base[0][7] = v15 + (float)((double)(float)board[3] - (double)iconH);
+	float v11 = (float)((double)s_Base[0][1] - iconHalfH);
+	float v10 = (float)board[0];
+	s_Base[0][10] = v10;
+	s_Base[0][11] = v11;
+	s_Base[0][2] = v10 + (float)((double)(float)board[2] - (double)iconW);
+	s_Base[0][3] = v11;
 
 	for (int row = 0; row < 2; row++) {
 		float slotX = (float)((double)(float)(board[0] + board[2] * 0.25) - iconHalfW);
 		float slotY = (float)((double)(float)(board[1] + board[3] * 0.25) - iconHalfH);
 		if (row != 0) {
 			slotY = (float)(board[3] * 0.5 + slotY);
-			base[8] = slotX;
-			base[9] = slotY;
+			s_Base[0][8] = slotX;
+			s_Base[0][9] = slotY;
 		} else {
-			base[12] = slotX;
-			base[13] = slotY;
+			s_Base[0][12] = slotX;
+			s_Base[0][13] = slotY;
 		}
 		float nextX = (float)(board[2] * 0.5 + slotX);
 		if (row == 0) {
-			base[16] = nextX;
-			base[17] = slotY;
+			s_Base[0][16] = nextX;
+			s_Base[0][17] = slotY;
 		} else {
-			base[4] = nextX;
-			base[5] = slotY;
+			s_Base[0][4] = nextX;
+			s_Base[0][5] = slotY;
 		}
 	}
 }

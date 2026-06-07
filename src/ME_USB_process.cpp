@@ -11,9 +11,9 @@
 
 static const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
-extern "C" const float FLOAT_8032FD00;
-extern "C" const float FLOAT_8032FD04;
-extern "C" const double DOUBLE_8032FD08;
+extern "C" const float kMapEditorZero;
+extern "C" const float kMapEditorOne;
+extern "C" const double kMapEditorS32ToDoubleBias;
 
 namespace {
 struct ViewerSRT {
@@ -92,7 +92,7 @@ static inline f32 S32ToFloat(s32 value)
 
     cvt.words.hi = 0x43300000;
     cvt.words.lo = value ^ 0x80000000;
-    return static_cast<f32>(cvt.value - DOUBLE_8032FD08);
+    return static_cast<f32>(cvt.value - kMapEditorS32ToDoubleBias);
 }
 
 }
@@ -165,15 +165,15 @@ void CMaterialEditorPcs::SetUSBData()
         s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
         s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
-        srt.rotZ = FLOAT_8032FD00;
+        srt.rotZ = kMapEditorZero;
         srt.transY = S32ToFloat(-xDiff / 2);
-        srt.rotY = FLOAT_8032FD00;
-        srt.rotX = FLOAT_8032FD00;
-        srt.scaleZ = FLOAT_8032FD04;
-        srt.scaleY = FLOAT_8032FD04;
-        srt.scaleX = FLOAT_8032FD04;
+        srt.rotY = kMapEditorZero;
+        srt.rotX = kMapEditorZero;
+        srt.scaleZ = kMapEditorOne;
+        srt.scaleY = kMapEditorOne;
+        srt.scaleX = kMapEditorOne;
         srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
-        srt.transX = FLOAT_8032FD00;
+        srt.transX = kMapEditorZero;
         CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
         break;
     }

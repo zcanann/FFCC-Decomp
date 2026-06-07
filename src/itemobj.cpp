@@ -17,8 +17,8 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 
-extern float FLOAT_80331b1c;
-extern const float FLOAT_80331b18;
+extern const float kItemObjHeightOffset;
+extern const float kItemObjUnitScale;
 extern const float FLOAT_80331b20 = 0.0f;
 extern const float FLOAT_80331b24 = -2000.0f;
 extern const float FLOAT_80331b28 = 10000000000.0f;
@@ -173,7 +173,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			Vec bottom = object->m_worldPosition;
 			Vec move;
 
-			bottom.y += FLOAT_80331b1c;
+			bottom.y += kItemObjHeightOffset;
 			move.x = FLOAT_80331b20;
 			move.z = FLOAT_80331b20;
 			move.y = FLOAT_80331b24;
@@ -220,7 +220,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 
 			const char* name = Game.m_cFlatDataArr[1].TableStrings(2)[*(int*)(self + 0x570)];
 			float width = font->GetWidth(name);
-			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
+			float depthScale = kItemObjUnitScale / (*(float*)(self + 0x74) - kItemObjHeightOffset);
 			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
 			float posZ = *(float*)(self + 0x70) * depthScale;
 			float posX =
@@ -395,7 +395,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
 			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
 			ItemCFlatRuntime()->SetParticleWorkPos(*(Vec*)(self + 0x15C), FLOAT_80331b20);
-			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, FLOAT_80331b18);
+			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, kItemObjUnitScale);
 			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
 			ItemCFlatRuntime()->PutParticleWork();
 			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
@@ -467,7 +467,7 @@ void CGItemObj::onFrameAlways()
 
 		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
 			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
-			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, FLOAT_80331b18, 0);
+			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, kItemObjUnitScale, 0);
 		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
 			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
 			CFlatItemTraceParticleSlot() = 0;
@@ -687,7 +687,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 		if (createMode == 2) {
 			*(int*)(itemSelf + 0x558) = scriptArg;
-			newItem->m_radiusCtrl.y = FLOAT_80331b18;
+			newItem->m_radiusCtrl.y = kItemObjUnitScale;
 		}
 
 		newItem->changeStat(0x1B, 0, 0);
@@ -697,9 +697,9 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			Vec safePos;
 			float yRot = owner->m_rotBaseY + Math.RandFPM(FLOAT_80331b54);
 
-			newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
-			newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
+			newItem->m_worldPosition.x = kItemObjHeightOffset * (float)sin((double)yRot) + owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = kItemObjHeightOffset + owner->m_worldPosition.y;
+			newItem->m_worldPosition.z = kItemObjHeightOffset * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
 			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
 			if (FLOAT_80331b20 < safePosDist) {
@@ -715,7 +715,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition = owner->m_worldPosition;
 			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
-			CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
+			CVector moveVec((float)sin((double)launchAngle), kItemObjHeightOffset, (float)cos((double)launchAngle));
 			newItem->MoveVector((Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
 		}
 
@@ -933,12 +933,12 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (useMenuLaunchSpeed) {
-				launchSpeed = FLOAT_80331b18;
+				launchSpeed = kItemObjUnitScale;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
-					launchSpeed = FLOAT_80331b18;
+					launchSpeed = kItemObjUnitScale;
 				} else {
 					launchSpeed = FLOAT_80331BA8;
 				}
@@ -1036,8 +1036,8 @@ void CGItemObj::onFrameStat()
 				particleNoB = 0x1D;
 			}
 
-			putParticle(particleNoA | 0x100, 0, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
-			putParticle(particleNoB | 0x100, m_particleSlot, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			putParticle(particleNoA | 0x100, 0, &prgObj->m_worldPosition, kItemObjUnitScale, 0);
+			putParticle(particleNoB | 0x100, m_particleSlot, &prgObj->m_worldPosition, kItemObjUnitScale, 0);
 			playSe3D(0x1A, 0x32, 0x96, 0, 0);
 			prgObj->m_displayFlags &= ~1;
 			prgObj->m_bgColMask &= 0xFFFFFFF1;
@@ -1075,10 +1075,10 @@ void CGItemObj::onFrameStat()
 		break;
 	case 0x24:
 		prgObj->m_moveOffset.x = FLOAT_80331bb0;
-		prgObj->m_moveOffset.y = FLOAT_80331b18;
+		prgObj->m_moveOffset.y = kItemObjUnitScale;
 		prgObj->m_moveOffset.z = FLOAT_80331bb0;
 
-		if (prgObj->m_worldPosition.y < FLOAT_80331b1c) {
+		if (prgObj->m_worldPosition.y < kItemObjHeightOffset) {
 			prgObj->m_groundHitOffset.y += FLOAT_80331BB4 * prgObj->m_moveTimer;
 		} else if (FLOAT_80331bb8 < prgObj->m_worldPosition.y) {
 			prgObj->m_groundHitOffset.y = -(FLOAT_80331BB4 * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
@@ -1299,9 +1299,9 @@ void CGItemObj::onCancelStat(int)
 
 	if (*(int*)(self + 0x520) == 0x1b) {
 		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = FLOAT_80331b18;
-		*(float*)(self + 0x178) = FLOAT_80331b18;
-		*(float*)(self + 0x174) = FLOAT_80331b18;
+		*(float*)(self + 0x17c) = kItemObjUnitScale;
+		*(float*)(self + 0x178) = kItemObjUnitScale;
+		*(float*)(self + 0x174) = kItemObjUnitScale;
 	}
 }
 

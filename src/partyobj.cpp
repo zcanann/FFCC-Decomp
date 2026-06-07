@@ -88,7 +88,7 @@ extern const float FLOAT_80331b00 = 1.1f;
 extern const float FLOAT_80331b04 = 1.2f;
 extern const float FLOAT_80331b08 = 1.25f;
 extern const char lbl_80331B0C[] = "%d\n";
-extern const char s_CMcPcs_80331B10[] = "CMcPcs";
+extern const char s_CMcPcsName[] = "CMcPcs";
 extern float FLOAT_8032EE78;
 extern float FLOAT_8032EE7C;
 extern float FLOAT_8032EE80;

@@ -12,10 +12,10 @@
 
 extern const double kMapShadowDepthBias;
 static const float kMapShadowScaleStep = 0.5f;
-static const double DOUBLE_8032FCF8 = 4503599627370496.0;
-extern const float FLOAT_8032FD00;
-extern const float FLOAT_8032FD04;
-extern const double DOUBLE_8032FD08;
+static const double kMapShadowUnsignedDoubleBias = 4503599627370496.0;
+extern const float kMapEditorZero;
+extern const float kMapEditorOne;
+extern const double kMapEditorS32ToDoubleBias;
 
 static inline float LoadFloat(const float& value)
 {
@@ -139,6 +139,6 @@ void CMapShadow::Init()
 	}
 }
 
-extern const float FLOAT_8032FD00 = 0.0f;
-extern const float FLOAT_8032FD04 = 1.0f;
-extern const double DOUBLE_8032FD08 = 4503601774854144.0;
+extern const float kMapEditorZero = 0.0f;
+extern const float kMapEditorOne = 1.0f;
+extern const double kMapEditorS32ToDoubleBias = 4503601774854144.0;

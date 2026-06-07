@@ -2117,12 +2117,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 const int baseIndex = (mode & 1) + static_cast<int>(scaled);
                 const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
 
-                CVector startDelta = CVector(pathPoints[1].m_position) - CVector(pathPoints[0].m_position);
-                CVector startPhantom1 = CVector(pathPoints[0].m_position) - startDelta;
-                CVector startPhantom2 = startPhantom1 - startDelta;
-                CVector endDelta = CVector(pathPoints[maxIndex].m_position) - CVector(pathPoints[maxIndex - 1].m_position);
-                CVector endPhantom1 = CVector(pathPoints[maxIndex].m_position) + endDelta;
-                CVector endPhantom2 = endPhantom1 + endDelta;
+                CVector delta = CVector(pathPoints[1].m_position) - CVector(pathPoints[0].m_position);
+                CVector startPhantom1 = CVector(pathPoints[0].m_position) - delta;
+                CVector startPhantom2 = startPhantom1 - delta;
+                delta = CVector(pathPoints[m_pathPointCount - 1].m_position) -
+                        CVector(pathPoints[m_pathPointCount - 2].m_position);
+                CVector endPhantom1 = CVector(pathPoints[m_pathPointCount - 1].m_position) + delta;
+                CVector endPhantom2 = endPhantom1 + delta;
 
                 Vec* p0;
                 Vec* p1;

@@ -1447,7 +1447,7 @@ void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
         remaining--;
     }
 
-    if (checkSum != *reinterpret_cast<int*>(packet)) {
+    if (static_cast<unsigned int>(checkSum) != *reinterpret_cast<unsigned int*>(packet)) {
         Graphic.Printf(const_cast<char*>(s_CheckSum_ERROR_code_0x_x____801d82f0), code);
         Graphic.DrawDebugString();
     }

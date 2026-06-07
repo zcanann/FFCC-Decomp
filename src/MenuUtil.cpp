@@ -130,7 +130,7 @@ extern char s_Enhanced_801E31DC[];
 extern char s_Standard_801E31E8[];
 extern char s_Erkennungskreisel_801E31F4[];
 extern char s_Tonausgabe_801E3208[];
-extern char s_MenuOptionSoundEffectsDe_801E3214[];
+extern char s_MenuOptionSoundEffectsDe[];
 extern char s_Farbeinstellung_801E3224[];
 extern char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234[];
 extern char s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268[];
@@ -156,8 +156,8 @@ extern char s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4[];
 extern char s_Reglez_le_volume_de_la_musique_801E34E0[];
 extern char s_Reglez_le_volume_des_effets_sonores_801E3500[];
 extern char s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524[];
-extern char s_MenuOptionDesactive_801E355C[];
-extern char s_MenuOptionAmeliore_801E3568[];
+extern char s_MenuOptionDesactiveFr[];
+extern char s_MenuOptionAmelioreFr[];
 extern char s_Aro_de_posicion_801E3574[];
 extern char s_Tipo_de_sonido_801E3584[];
 extern char s_Efectos_de_sonido_801E3594[];
@@ -170,7 +170,7 @@ extern char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[];
 extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
-extern MenuOptionEstandarData s_MenuOptionEstandar_801E36C4;
+extern MenuOptionEstandarData s_MenuOptionEstandarEs;
 extern const char s_MenuOptionMusic[];
 extern const char s_MenuOptionOn[];
 extern const char s_MenuOptionOff[];
@@ -212,7 +212,7 @@ char* g_strMenuUtilMes[] = {
 	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), s_Monaural_801E31D0,
 	const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax), s_Enhanced_801E31DC, s_Standard_801E31E8,
 	const_cast<char*>(s_MenuOptionStrengthDe), const_cast<char*>(s_MenuOptionDefenceDe), s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
-	const_cast<char*>(s_MenuOptionMusicDe), s_MenuOptionSoundEffectsDe_801E3214, s_Farbeinstellung_801E3224,
+	const_cast<char*>(s_MenuOptionMusicDe), s_MenuOptionSoundEffectsDe, s_Farbeinstellung_801E3224,
 	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
 	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, s_Lautstaerke_der_Musik_aendern_801E3294, s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4,
 	s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC, const_cast<char*>(s_MenuOptionOnDe), const_cast<char*>(s_MenuOptionOffDe), const_cast<char*>(s_MenuOptionStereoDe), const_cast<char*>(s_MenuOptionMonoUpper),
@@ -228,14 +228,14 @@ char* g_strMenuUtilMes[] = {
 	const_cast<char*>(s_MenuOptionMusiqueFr), s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
 	s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4, s_Reglez_le_volume_de_la_musique_801E34E0, s_Reglez_le_volume_des_effets_sonores_801E3500, s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524, const_cast<char*>(s_MenuOptionActiveFr),
-	s_MenuOptionDesactive_801E355C, const_cast<char*>(s_MenuOptionStereoFr), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
-	s_MenuOptionAmeliore_801E3568, s_Standard_801E31E8,
+	s_MenuOptionDesactiveFr, const_cast<char*>(s_MenuOptionStereoFr), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
+	s_MenuOptionAmelioreFr, s_Standard_801E31E8,
 	const_cast<char*>(s_MenuOptionFuerzaEs), const_cast<char*>(s_MenuOptionDefensaEs), s_Aro_de_posicion_801E3574, s_Tipo_de_sonido_801E3584,
 	const_cast<char*>(s_MenuOptionMusicaEs), s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,
 	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
 	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereoEs), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs), const_cast<char*>(s_MenuOptionMaxEs),
-	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4.m_text,
+	s_Mejorado_801E36B8, s_MenuOptionEstandarEs.m_text,
 };
 
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
@@ -389,7 +389,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	const CCaravanWork* const caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	u32 lineBaseY[4];
-	const u32* lineBaseData = s_MenuOptionEstandar_801E36C4.m_helpLineBaseY;
+	const u32* lineBaseData = s_MenuOptionEstandarEs.m_helpLineBaseY;
 	lineBaseY[0] = lineBaseData[0];
 	lineBaseY[1] = lineBaseData[1];
 	lineBaseY[2] = lineBaseData[2];

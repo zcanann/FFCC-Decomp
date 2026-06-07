@@ -3229,14 +3229,12 @@ void CGPartyObj::canPlayerGoMenu()
  */
 int CGPartyObj::useItem(int itemId)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
 	bool canUse = false;
 	int result;
 
-	if ((static_cast<int>(static_cast<unsigned int>(weaponFlags[0]) << 24) < 0) &&
-	    (static_cast<int>(static_cast<unsigned int>(weaponFlags[1]) << 24) < 0) &&
-	    (static_cast<int>(static_cast<unsigned int>(self[0x63C]) << 24) < 0) &&
+	if ((static_cast<signed char>(m_weaponNodeFlagBytes.m_flags0) < 0) &&
+	    (static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
+	    (m_unk63CBits.m_bit80 < 0) &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 		canUse = true;
 	}

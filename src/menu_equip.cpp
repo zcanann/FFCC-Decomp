@@ -82,6 +82,11 @@ static inline CFont* GetEquipFont(CMenuPcs* menu)
 {
 	return menu->m_fonts[4];
 }
+
+static inline float EquipIntToFloat(int value)
+{
+	return (float)value;
+}
 } // namespace
 
 /*
@@ -132,7 +137,7 @@ int CMenuPcs::ChkEquipActive(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::EquipClose0()
+int CMenuPcs::EquipClose0()
 {
 	float fVar1;
 	double dVar2;
@@ -140,18 +145,18 @@ bool CMenuPcs::EquipClose0()
 	int timer;
 	int itemCount;
 
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	EquipOpenAnim* selected = &list->entries[menuState->selectedIndex];
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	int listBase = *(int*)&this->m_equipList;
+	int selOff = (int)GetEquipMenuState(this)->selectedIndex * 0x40 + 8;
 	if (7 < timer) {
-		selected->x = selected->x + 0x13;
+		*(short*)(listBase + selOff) = *(short*)(listBase + selOff) + 0x13;
 	}
 
+	short* base = (short*)*(int*)&this->m_equipList;
 	doneCount = 0;
-	itemCount = (int)list->listEnd - (int)list->count;
-	EquipOpenAnim* item = &list->entries[list->count];
+	itemCount = (int)base[1] - (int)base[0];
+	EquipOpenAnim* item = (EquipOpenAnim*)(base + base[0] * 0x20 + 4);
 	for (int i = 0; i < itemCount; i++) {
 		fVar1 = kEquipZero;
 		if (timer >= item->startFrame) {
@@ -163,80 +168,28 @@ bool CMenuPcs::EquipClose0()
 			} else {
 				item->step = item->step + 1;
 				dVar2 = kEquipOneDouble;
-				item->alpha =
-				    (float)-((kEquipOneDouble / (double)item->duration) * (double)item->step - kEquipOneDouble);
+				double recip = kEquipOneDouble / (double)item->duration;
+				item->alpha = (float)-(recip * (double)item->step - kEquipOneDouble);
 				if ((item->flags & 2) == 0) {
+					float dx = item->targetX - (float)item->x;
+					float dy = item->targetY - (float)item->y;
 					fVar1 = (float)-((dVar2 / (double)item->duration) * (double)item->step - dVar2);
-					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
-					item->dy = (item->targetY - (float)(double)item->y) * fVar1;
+					item->dx = dx * fVar1;
+					item->dy = dy * fVar1;
 				}
 			}
 		}
 		item++;
 	}
 
+	int result = 0;
 	if (itemCount == doneCount) {
+		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
-		return true;
+		result = 1;
 	}
 
-	return false;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8015b468
- * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-bool CMenuPcs::EquipOpen0()
-{
-	float fVar1;
-	double dVar2;
-	int timer;
-	int doneCount;
-	int itemCount;
-
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	EquipOpenAnim* selected = &list->entries[menuState->selectedIndex];
-
-	if (timer < 5) {
-		selected->x = selected->x - 0x13;
-	}
-
-	doneCount = 0;
-	itemCount = (int)list->listEnd - (int)list->count;
-	EquipOpenAnim* item = &list->entries[list->count];
-
-	for (int i = 0; i < itemCount; i++) {
-		fVar1 = kEquipZero;
-		if (timer >= item->startFrame) {
-			if (item->startFrame + item->duration <= timer) {
-				doneCount = doneCount + 1;
-				item->alpha = kEquipOne;
-				item->dx = kEquipZero;
-				item->dy = kEquipZero;
-			} else {
-				item->step = item->step + 1;
-				dVar2 = kEquipOneDouble;
-				item->alpha = (float)((kEquipOneDouble / (double)item->duration) * (double)item->step);
-				if ((item->flags & 2) == 0) {
-					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
-					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
-					item->dy = (item->targetY - (float)(double)item->y) * fVar1;
-				}
-			}
-		}
-		item++;
-	}
-
-	return itemCount == doneCount;
+	return result;
 }
 
 /*
@@ -255,7 +208,8 @@ int CMenuPcs::EquipCtrlCur()
 	unsigned int hold;
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	int padLock = Pad.m_debugPadLock;
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -267,7 +221,7 @@ int CMenuPcs::EquipCtrlCur()
 	}
 
 	blocked = false;
-	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
+	if ((padLock != 0) || (Pad.m_debugPadPort != -1)) {
 		blocked = true;
 	}
 	if (blocked) {
@@ -282,80 +236,76 @@ int CMenuPcs::EquipCtrlCur()
 		return 0;
 	}
 
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	int mode = static_cast<int>(menuState->mode);
+	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			if (menuState->selectedIndex == 0) {
-				menuState->selectedIndex = 3;
+			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
+				GetEquipModeSelected(GetEquipMenuState(this), mode) =
+				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
 			} else {
-				menuState->selectedIndex = menuState->selectedIndex - 1;
+				GetEquipModeSelected(GetEquipMenuState(this), mode) = 3;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 4) != 0) {
-			if (menuState->selectedIndex < 3) {
-				menuState->selectedIndex = menuState->selectedIndex + 1;
+			if (GetEquipModeSelected(GetEquipMenuState(this), mode) < 3) {
+				GetEquipModeSelected(GetEquipMenuState(this), mode) =
+				    GetEquipModeSelected(GetEquipMenuState(this), mode) + 1;
 			} else {
-				menuState->selectedIndex = 0;
+				GetEquipModeSelected(GetEquipMenuState(this), mode) = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 
 		if ((hold & 0xc) == 0) {
 			if ((press & 0x20) != 0) {
-				menuState->cursorMove = 1;
+				GetEquipMenuState(this)->cursorMove = 1;
 				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 				return 1;
 			}
 
 			if ((press & 0x40) != 0) {
-				menuState->cursorMove = -1;
+				GetEquipMenuState(this)->cursorMove = -1;
 				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 				return 1;
 			}
 
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) != 0) {
-					menuState->closeRequested = 1;
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-					return 1;
+			if ((press & 0x100) != 0) {
+				if (caravanWork->CanPlayerPutItem() == 0) {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				} else {
+					GetEquipMenuState(this)->mode = 1;
+					GetEquipMenuState(this)->step = 0;
+					GetEquipMenuState(this)->frame = 0;
+					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
-			} else if (caravanWork->CanPlayerPutItem() == 0) {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			} else {
-				menuState->mode = 1;
-				menuState->step = 0;
-				menuState->frame = 0;
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
+			} else if ((press & 0x200) != 0) {
+				GetEquipMenuState(this)->closeRequested = 1;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				return 1;
 			}
 		}
 	} else {
 		s16* letterBuffer = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 
 		if ((hold & 8) != 0) {
-			s16& modeSelected = GetEquipModeSelected(menuState, mode);
-			s16 selected = modeSelected;
-
-			if (selected == 0) {
-				if (menuState->scroll == 0) {
-					Sound.PlaySe(4, 0x40, 0x7f, 0);
-				} else {
-					menuState->scroll = menuState->scroll - 1;
-					Sound.PlaySe(1, 0x40, 0x7f, 0);
-				}
+			if (GetEquipModeSelected(GetEquipMenuState(this), mode) != 0) {
+				GetEquipModeSelected(GetEquipMenuState(this), mode) =
+				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else if (GetEquipMenuState(this)->scroll == 0) {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
-				modeSelected = selected - 1;
+				GetEquipMenuState(this)->scroll = GetEquipMenuState(this)->scroll - 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
 		} else if ((hold & 4) != 0) {
-			s16& modeSelected = GetEquipModeSelected(menuState, mode);
-			s16 selected = modeSelected;
+			s16 selected = GetEquipModeSelected(GetEquipMenuState(this), mode);
 
 			if (selected < 7) {
-				modeSelected = selected + 1;
-			} else if (static_cast<int>(menuState->scroll) + static_cast<int>(selected) < letterBuffer[0] - 1) {
-				menuState->scroll = menuState->scroll + 1;
+				GetEquipModeSelected(GetEquipMenuState(this), mode) = selected + 1;
+			} else if (static_cast<int>(GetEquipMenuState(this)->scroll) + static_cast<int>(selected) < letterBuffer[0] - 1) {
+				GetEquipMenuState(this)->scroll = GetEquipMenuState(this)->scroll + 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			} else {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -365,18 +315,11 @@ int CMenuPcs::EquipCtrlCur()
 		}
 
 		if ((hold & 0xc) == 0) {
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) != 0) {
-					menuState->step = menuState->step + 1;
-					menuState->frame = 0;
-					CmdInit2();
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-				}
-			} else {
-				int index = static_cast<int>(menuState->scroll) +
-				            static_cast<int>(GetEquipModeSelected(menuState, mode));
+			if ((press & 0x100) != 0) {
+				int index = static_cast<int>(GetEquipMenuState(this)->scroll) +
+				            static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-				int equipIndex = static_cast<int>(menuState->selectedIndex);
+				int equipIndex = static_cast<int>(GetEquipMenuState(this)->selectedIndex);
 				unsigned int valid = ChkEquipActive(index);
 
 				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk(entries[index]) != 0))) {
@@ -390,11 +333,16 @@ int CMenuPcs::EquipCtrlCur()
 					}
 					caravanWork->ChgEquipPos(equipIndex, item);
 					caravanWork->CalcStatus();
-					menuState->step = menuState->step + 1;
-					menuState->frame = 0;
+					GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
+					GetEquipMenuState(this)->frame = 0;
 					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
+			} else if ((press & 0x200) != 0) {
+				GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
+				GetEquipMenuState(this)->frame = 0;
+				CmdInit2();
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
 			}
 		}
 	}
@@ -413,50 +361,51 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	int mode = static_cast<int>(menuState->mode);
-	int listState = static_cast<int>(menuState->listState);
-	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	EquipOpenAnimList* menuData = GetEquipListStorage(this);
-	EquipOpenAnim* item = menuData->entries;
 	int helpItem = -1;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < menuData->count; i++) {
-		if (item->tex >= 0) {
-			double x = (double)(float)((double)item->x - kEquipIntToDoubleBias);
-			double y = (double)item->u;
-			double w = (double)(float)((double)item->w - kEquipIntToDoubleBias);
-			double h = (double)(float)((double)item->h - kEquipIntToDoubleBias);
-			double sx = (double)item->v;
-			int tex = item->tex;
+	int mode = static_cast<int>(GetEquipMenuState(this)->mode);
+	int listState = static_cast<int>(GetEquipMenuState(this)->listState);
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
 
-			if ((listState == 1) && (i == static_cast<int>(menuState->selectedIndex))) {
-				sx = sx + h;
-			}
+	for (int i = 0; i < GetEquipListStorage(this)->count; i++) {
+		int tex = item->tex;
+		if (tex >= 0) {
+			float x = (float)item->x;
+			float y = (float)item->y;
+			float w = (float)item->w;
+			float h = (float)item->h;
+			float u = item->u;
+			float v = item->v;
+			float alpha = item->alpha;
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+
+			if ((listState == 1) && (i == static_cast<int>(GetEquipMenuState(this)->selectedIndex))) {
+				v = v + h;
+			}
+
 			GXColor color;
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (u8)(kEquipColorMax * item->alpha);
-			GXSetChanMatColor((GXChannelID)4, color);
-			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), static_cast<float>((double)(float)((double)item->y - kEquipIntToDoubleBias)),
-			    static_cast<float>(w), static_cast<float>(h), static_cast<float>(y), static_cast<float>(sx),
-			    item->scale, item->scale, 0.0f);
+			color.a = (u8)(int)(kEquipColorMax * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, color);
+
+			float scale = item->scale;
+			MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, kEquipZero);
 		}
 		item++;
 	}
 
-	item = menuData->entries;
+	item = GetEquipListStorage(this)->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			int iconY = (int)((float)(item->y + 6) - kEquipOne);
-			int iconX = item->x + item->w - 0x10;
+			int iconX = (int)EquipIntToFloat(item->x + item->w - 0x10);
+			int iconY = (int)(EquipIntToFloat(item->y + 6) - kEquipOne);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			DrawSingleIcon(itemIdx, iconX, iconY, item->alpha, 0, kEquipOne);
 		}
@@ -469,46 +418,47 @@ void CMenuPcs::EquipDraw()
 	font->SetScale(kEquipListFontScale);
 	font->DrawInit();
 
-	item = menuData->entries;
+	item = GetEquipListStorage(this)->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			u8 alpha = (u8)(kEquipColorMax * item->alpha);
-			CColor color(0xff, 0xff, 0xff, alpha);
+			float alpha = item->alpha;
+			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * alpha));
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			const char* str = GetAttrStr(itemIdx);
-			if ((mode == 0) && (i == static_cast<int>(menuState->selectedIndex))) {
+			if ((mode == 0) && (i == static_cast<int>(GetEquipMenuState(this)->selectedIndex))) {
 				helpItem = itemIdx;
 			}
-			double textX = (double)item->x + ((double)item->w - (double)font->GetWidth(str)) * kEquipHalfDouble;
-			double textY = (double)(item->y + 0xb);
-			font->SetPosX((float)textX);
-			font->SetPosY((float)(textY - (double)kEquipTextYOffset));
+			float width = font->GetWidth(str);
+			float textX = (float)((((float)item->w - width) * kEquipHalfDouble) + (float)item->x);
+			float textY = (float)(item->y + 0xb);
+			font->SetPosX(textX);
+			font->SetPosY(textY - kEquipTextYOffset);
 			font->Draw(str);
 		}
 		item++;
 	}
 	DrawInit();
 
-	if (menuState->prevMode != 0) {
+	if (GetEquipMenuState(this)->prevMode != 0) {
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		int drawIndex = 0;
-		EquipOpenAnim* listItem = &menuData->entries[menuData->count];
+		EquipOpenAnim* listItem = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
 
-		for (int i = menuData->count; i < menuData->listEnd; i++) {
+		for (int i = GetEquipListStorage(this)->count; i < GetEquipListStorage(this)->listEnd; i++) {
 			int tex = listItem->tex;
 			if (tex >= 0) {
-				double x = (double)(float)((double)listItem->x - kEquipIntToDoubleBias);
-				double y = (double)(float)((double)listItem->y - kEquipIntToDoubleBias);
-				double w = (double)(float)((double)listItem->w - kEquipIntToDoubleBias);
-				double h = (double)(float)((double)listItem->h - kEquipIntToDoubleBias);
-				double u = (double)listItem->u;
-				double v = (double)listItem->v;
-				double alpha = (double)listItem->alpha;
+				float x = (float)listItem->x;
+				float y = (float)listItem->y;
+				float w = (float)listItem->w;
+				float h = (float)listItem->h;
+				float u = listItem->u;
+				float v = listItem->v;
+				float alpha = listItem->alpha;
 
-				if (i == menuData->count) {
+				if (i == GetEquipListStorage(this)->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 					GXColor colors[4];
@@ -524,63 +474,56 @@ void CMenuPcs::EquipDraw()
 					color.g = 0xff;
 					color.b = 0xff;
 					color.a = 0xff;
-					GXSetChanMatColor((GXChannelID)4, color);
-					double fillWidth = (double)(float)(alpha * w);
-					if ((double)kEquipZero < fillWidth) {
-						MenuPcs.DrawRect(
-						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fillWidth),
-						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    kEquipOne, kEquipOne, 0.0f);
-						x = (double)(float)(x + fillWidth);
-						u = (double)(float)(u + fillWidth);
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					float fillWidth = listItem->alpha * w;
+					if (fillWidth > kEquipZero) {
+						MenuPcs.DrawRect(0, x, y, fillWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
+						x = x + fillWidth;
+						u = u + fillWidth;
 					}
-					if (((double)kEquipZero < fillWidth) && (fillWidth < w)) {
+					if ((fillWidth > kEquipZero) && (fillWidth < (float)listItem->w)) {
 						colors[1].a = 0;
 						colors[3].a = 0;
-						double fadeWidth =
-						    (double)((float)(kEquipOneDouble / (double)listItem->duration) * (float)listItem->w);
-						MenuPcs.DrawRect(
-						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fadeWidth),
-						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    kEquipOne, kEquipOne, 0.0f);
+						float fadeWidth =
+						    (float)(kEquipOneDouble / (double)listItem->duration) * (float)listItem->w;
+						MenuPcs.DrawRect(0, x, y, fadeWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else if (tex == 0x37) {
-					int idx = drawIndex + menuState->scroll;
-					if ((idx < 1) || (letterCount <= idx)) {
+					int idx = drawIndex + GetEquipMenuState(this)->scroll;
+					if ((idx < 1) || (idx >= letterCount)) {
 						if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = kEquipHalfDouble * alpha;
+							alpha = (float)(kEquipHalfDouble * (double)alpha);
 						}
 					} else {
 						int equipped = EquipChk((int)letter[idx]);
 						if ((equipped == 0) && (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = kEquipHalfDouble * alpha;
+							alpha = (float)(kEquipHalfDouble * (double)alpha);
 						}
 						if (equipped != 0) {
-							int markX = (int)(x - (double)kEquipMarkXOffset);
-							int markY = (int)((h - (double)kEquipMarkHeight) * kEquipHalfDouble + y);
+							int markX = (int)(x - kEquipMarkXOffset);
+							int markY = (int)(((double)h - (double)kEquipMarkHeight) * kEquipHalfDouble + (double)y);
 							DrawEquipMark(markX, markY, listItem->alpha);
 						}
 					}
-					if ((tex == 0x37) && (drawIndex == menuState->subSelectedIndex)) {
+					if ((tex == 0x37) && (drawIndex == GetEquipMenuState(this)->subSelectedIndex)) {
 						v += h;
 					}
 					drawIndex++;
 				}
 
-				if (i != menuData->count) {
+				if (i != GetEquipListStorage(this)->count) {
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 					GXColor color;
 					color.r = 0xff;
 					color.g = 0xff;
 					color.b = 0xff;
-					color.a = (u8)((double)kEquipColorMax * alpha);
-					GXSetChanMatColor((GXChannelID)4, color);
-					MenuPcs.DrawRect(
-					    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h),
-					    static_cast<float>(u), static_cast<float>(v), listItem->scale, listItem->scale, 0.0f);
+					color.a = (u8)(int)(kEquipColorMax * alpha);
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					float scale = listItem->scale;
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, kEquipZero);
 				}
 			}
 			listItem++;
@@ -595,8 +538,8 @@ void CMenuPcs::EquipDraw()
 		font->DrawInit();
 
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		EquipOpenAnim* listStart = &menuData->entries[menuData->count];
-		for (int i = menuData->count; i < menuData->listEnd; i++) {
+		EquipOpenAnim* listStart = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+		for (int i = GetEquipListStorage(this)->count; i < GetEquipListStorage(this)->listEnd; i++) {
 			if (listStart->tex == 0x37) {
 				break;
 			}
@@ -604,8 +547,8 @@ void CMenuPcs::EquipDraw()
 		}
 
 		EquipOpenAnim* textItem = listStart;
-		for (int i = 0; (i < 8) && (i + menuState->scroll < letter[0]); i++) {
-			int idx = i + menuState->scroll;
+		for (int i = 0; (i < 8) && (i + GetEquipMenuState(this)->scroll < letter[0]); i++) {
+			int idx = i + GetEquipMenuState(this)->scroll;
 			CColor color(0xff, 0xff, 0xff, (u8)(kEquipColorMax * listStart->alpha));
 			font->SetColor(color.color);
 
@@ -615,15 +558,15 @@ void CMenuPcs::EquipDraw()
 			} else if (letter[idx] >= 0) {
 				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				str = GetAttrStr(itemIdx);
-				if (idx == static_cast<int>(menuState->subSelectedIndex) + static_cast<int>(menuState->scroll)) {
+				if (idx == static_cast<int>(GetEquipMenuState(this)->subSelectedIndex) + static_cast<int>(GetEquipMenuState(this)->scroll)) {
 					helpItem = itemIdx;
 				}
 			}
 
 			if (str != NULL) {
 				font->GetWidth(str);
-				font->SetPosX((float)(textItem->x + 0x1c));
-				font->SetPosY((float)(textItem->y + 0xb) - kEquipTextYOffset);
+				font->SetPosX(EquipIntToFloat(textItem->x + 0x1c));
+				font->SetPosY(EquipIntToFloat(textItem->y + 0xb) - kEquipTextYOffset);
 				font->Draw(str);
 			}
 			textItem++;
@@ -632,11 +575,11 @@ void CMenuPcs::EquipDraw()
 		DrawInit();
 
 		EquipOpenAnim* iconItem = listStart;
-		for (int i = 0; (i < 8) && (i + menuState->scroll < letter[0]); i++) {
-			int idx = i + menuState->scroll;
+		for (int i = 0; (i < 8) && (i + GetEquipMenuState(this)->scroll < letter[0]); i++) {
+			int idx = i + GetEquipMenuState(this)->scroll;
 			if ((idx > 0) && (letter[idx] >= 0)) {
-				int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
-				int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
+				int iconX = (int)EquipIntToFloat(iconItem->x + iconItem->w - 0x10);
+				int iconY = (int)(EquipIntToFloat(iconItem->y + 6) - kEquipOne);
 				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				DrawSingleIcon(itemIdx, iconX, iconY, listStart->alpha, 0, kEquipOne);
 			}
@@ -644,22 +587,22 @@ void CMenuPcs::EquipDraw()
 		}
 	}
 
-	if ((mode == 1) && (menuState->step == 1)) {
-		EquipOpenAnim* listStart = &menuData->entries[menuData->count];
+	if ((mode == 1) && (GetEquipMenuState(this)->step == 1)) {
+		EquipOpenAnim* listStart = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		double pos = CalcListPos(static_cast<int>(menuState->scroll), static_cast<int>(letter[0]), 0);
+		double pos = CalcListPos(static_cast<int>(GetEquipMenuState(this)->scroll), static_cast<int>(letter[0]), 0);
 		if (pos > (double)kEquipZero) {
 			DrawListPosMark(static_cast<float>(listStart->x), static_cast<float>(listStart->y), static_cast<float>(pos));
 		}
 	}
 
-	if (((mode == 0) && (menuState->listState == 1)) || ((mode != 0) && (menuState->step == 1))) {
+	if (((mode == 0) && (GetEquipMenuState(this)->listState == 1)) || ((mode != 0) && (GetEquipMenuState(this)->step == 1))) {
 		EquipOpenAnim* cursorItem;
 		if (mode == 0) {
-			cursorItem = &menuData->entries[menuState->selectedIndex];
+			cursorItem = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 		} else {
-			EquipOpenAnim* listBase = &menuData->entries[menuData->count];
-			cursorItem = &listBase[menuState->subSelectedIndex];
+			EquipOpenAnim* listBase = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+			cursorItem = &listBase[GetEquipMenuState(this)->subSelectedIndex];
 		}
 		int cursorX = (int)((double)cursorItem->y + ((double)(cursorItem->h - 0x20) * kEquipHalfDouble));
 		int frame = (int)System.m_frameCounter;
@@ -667,13 +610,13 @@ void CMenuPcs::EquipDraw()
 		DrawCursor(cursorY, cursorX, kEquipOne);
 	}
 
-	if ((mode == 1) && (menuState->step == 1)) {
+	if ((mode == 1) && (GetEquipMenuState(this)->step == 1)) {
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		int idx = menuState->subSelectedIndex + menuState->scroll;
+		int idx = GetEquipMenuState(this)->subSelectedIndex + GetEquipMenuState(this)->scroll;
 		if ((idx > 0) && (idx < letter[0]) && (letter[idx] >= 0)) {
 			if (EquipChk((int)letter[idx]) != 0) {
-				EquipOpenAnim* listBase = &menuData->entries[menuData->count];
-				EquipOpenAnim* markItem = &listBase[menuState->subSelectedIndex];
+				EquipOpenAnim* listBase = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+				EquipOpenAnim* markItem = &listBase[GetEquipMenuState(this)->subSelectedIndex];
 				int markX = (int)((double)markItem->x - (double)kEquipMarkXOffset);
 				int markY = (int)(((double)markItem->h - (double)kEquipMarkHeight) * kEquipHalfDouble + (double)markItem->y);
 				DrawEquipMark(markX, markY, markItem->alpha);
@@ -681,22 +624,22 @@ void CMenuPcs::EquipDraw()
 		}
 	}
 
-	int listIndex = static_cast<int>(GetEquipModeSelected(menuState, mode)) + static_cast<int>(menuState->scroll);
+	int listIndex = static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode)) + static_cast<int>(GetEquipMenuState(this)->scroll);
 	if ((mode == 1) && (listIndex < 1)) {
 		helpItem = -1;
 	}
-	if (((mode == 0) && (menuState->emptySlotHelpState == 0)) && (helpItem < 0)) {
+	if (((mode == 0) && (GetEquipMenuState(this)->emptySlotHelpState == 0)) && (helpItem < 0)) {
 		helpItem = 0x267;
 	}
 
-	int helpEntryIndex = (mode == 1) ? menuData->count : 0;
+	int helpEntryIndex = (mode == 1) ? GetEquipListStorage(this)->count : 0;
 	CColor helpColor(0xff, 0xff, 0xff,
-	                 static_cast<u8>(kEquipColorMax * menuData->entries[helpEntryIndex].alpha));
+	                 static_cast<u8>(kEquipColorMax * GetEquipListStorage(this)->entries[helpEntryIndex].alpha));
 	DrawHelpMessage(helpItem, m_fonts[0], 0, static_cast<int>(kEquipHelpY), helpColor.color, 10,
 	                kEquipOne, kEquipSmallScale);
 	if ((mode == 1) && (listIndex < 1)) {
 		CColor listHelpColor(
-		    0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * menuData->entries[menuData->count].alpha));
+		    0xff, 0xff, 0xff, static_cast<u8>(kEquipColorMax * GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count].alpha));
 		DrawHelpMessage(0x265, m_fonts[0], 0, static_cast<int>(kEquipHelpY), listHelpColor.color, 10,
 		                kEquipOne, kEquipSmallScale);
 	}
@@ -713,14 +656,12 @@ void CMenuPcs::EquipDraw()
  */
 int CMenuPcs::EquipClose()
 {
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	EquipOpenAnimList* menuData = GetEquipListStorage(this);
 	int doneCount = 0;
 
-	menuState->frame = menuState->frame + 1;
-	int timer = static_cast<int>(menuState->frame);
-	int itemCount = static_cast<int>(menuData->count);
-	EquipOpenAnim* item = menuData->entries;
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	int timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	int itemCount = static_cast<int>(GetEquipListStorage(this)->count);
+	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
 
 	for (int i = 0; i < itemCount; i++) {
 		if (item->startFrame <= timer) {
@@ -729,9 +670,8 @@ int CMenuPcs::EquipClose()
 				item->alpha = kEquipZero;
 			} else {
 				item->step = item->step + 1;
-				item->alpha = (float)-((kEquipOneDouble / static_cast<double>(item->duration)) *
-				                           static_cast<double>(item->step) -
-				                       kEquipOneDouble);
+				double recip = kEquipOneDouble / static_cast<double>(item->duration);
+				item->alpha = (float)-(recip * static_cast<double>(item->step) - kEquipOneDouble);
 				if ((double)item->alpha < kEquipZeroDouble) {
 					item->alpha = kEquipZero;
 				}
@@ -740,17 +680,19 @@ int CMenuPcs::EquipClose()
 		item++;
 	}
 
-	if (itemCount == doneCount) {
-		item = menuData->entries;
-		for (int i = 0; i < itemCount; i++) {
+	float fVar1 = kEquipZero;
+	int result = 0;
+	if (**(short**)&this->m_equipList == doneCount) {
+		item = GetEquipListStorage(this)->entries;
+		for (int j = 0; j < itemCount; j++) {
 			item->startFrame = 0;
 			item->duration = 1;
-			item->alpha = kEquipZero;
+			item->alpha = fVar1;
 			item++;
 		}
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -764,56 +706,155 @@ int CMenuPcs::EquipClose()
  */
 void CMenuPcs::EquipCtrl()
 {
-	int mode;
-	CCaravanWork* caravanWork;
-	float scale;
 	int state;
-	EquipMenuState* menuState;
 	int index;
-	u32 equipCount;
+	int itemCount;
+	unsigned int blockCount;
 
+	EquipMenuState* es = this->m_equipState;
+	es->prevMode = es->mode;
+	es = this->m_equipState;
+	int mode = es->mode;
 	state = 0;
-	menuState = GetEquipMenuState(this);
-	menuState->prevMode = menuState->mode;
-	mode = static_cast<int>(menuState->mode);
-	if ((mode == 0) || ((mode != 0) && (menuState->step == 1))) {
+	if ((mode == 0) || ((mode != 0) && (es->step == 1))) {
 		state = EquipCtrlCur();
-	} else if ((mode == 1) && (menuState->step == 0)) {
+	} else if ((mode == 1) && (es->step == 0)) {
 		state = EquipOpen0();
 		if (state != 0) {
 			state = 0;
-			menuState->step = menuState->step + 1;
+			this->m_equipState->step = this->m_equipState->step + 1;
 		}
-	} else if ((mode == 1) && ((menuState->step == 2) && (state = EquipClose0(), state != 0))) {
-		menuState->step = 0;
-		menuState->mode = 0;
-		menuState->frame = 0;
+	} else if ((mode == 1) && ((es->step == 2) && (state = EquipClose0(), state != 0))) {
+		this->m_equipState->step = 0;
+		this->m_equipState->mode = 0;
+		this->m_equipState->frame = 0;
 		CmdInit1();
 		state = 0;
 	}
 
-	scale = kEquipOne;
-	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	if (state != 0) {
-		EquipOpenAnimList* list = GetEquipListStorage(this);
-		EquipOpenAnim* entry = list->entries;
-		for (index = 0; index < list->count; index++) {
-			entry->alpha = scale;
-			entry->scale = scale;
+	if (state) {
+		float fVar2 = kEquipOne;
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+
+		EquipOpenAnim* entry = this->m_equipList->entries;
+		for (index = 0; index < this->m_equipList->count; index = index + 1) {
+			entry->alpha = fVar2;
+			entry->scale = fVar2;
 			entry++;
 		}
 
-		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
-		if (equipCount == 0) {
-			return;
-		}
-
-		for (int i = static_cast<int>(equipCount) - 1, index = 0; i >= 0; i--, index++) {
-			entry = &list->entries[i];
-			entry->startFrame = index;
-			entry->duration = 3;
+		unsigned int slotCount = (unsigned int)caravanWork->m_numCmdListSlots;
+		index = 0;
+		int byteOff = (slotCount - 1) * 0x40;
+		if (-1 < (int)(slotCount - 1)) {
+			blockCount = slotCount >> 3;
+			if (blockCount != 0) {
+				do {
+					int p;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + 0x2c) = index++;
+					*(int*)(p + 0x30) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0x14) = index++;
+					*(int*)(p + -0x10) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0x54) = index++;
+					*(int*)(p + -0x50) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0x94) = index++;
+					*(int*)(p + -0x90) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0xd4) = index++;
+					*(int*)(p + -0xd0) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0x114) = index++;
+					*(int*)(p + -0x110) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					*(int*)(p + -0x154) = index++;
+					*(int*)(p + -0x150) = 3;
+					p = *(int*)&this->m_equipList + byteOff;
+					byteOff = byteOff + -0x200;
+					*(int*)(p + -0x194) = index++;
+					*(int*)(p + -0x190) = 3;
+					blockCount = blockCount - 1;
+				} while (blockCount != 0);
+				slotCount = slotCount & 7;
+				if (slotCount == 0) {
+					return;
+				}
+			}
+			do {
+				int p2 = byteOff + 8;
+				byteOff = byteOff + -0x40;
+				p2 = *(int*)&this->m_equipList + p2;
+				*(int*)(p2 + 0x24) = index;
+				index = index + 1;
+				*(int*)(p2 + 0x28) = 3;
+				slotCount = slotCount - 1;
+			} while (slotCount != 0);
 		}
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015b468
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::EquipOpen0()
+{
+	float fVar1;
+	double dVar2;
+	int timer;
+	int doneCount;
+	int itemCount;
+
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
+
+	if (timer < 5) {
+		selected->x = selected->x - 0x13;
+	}
+
+	doneCount = 0;
+	EquipOpenAnim* item = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
+
+	for (int i = 0; i < itemCount; i++) {
+		fVar1 = kEquipZero;
+		if (timer >= item->startFrame) {
+			if (item->startFrame + item->duration <= timer) {
+				doneCount = doneCount + 1;
+				item->alpha = kEquipOne;
+				item->dx = kEquipZero;
+				item->dy = kEquipZero;
+			} else {
+				item->step = item->step + 1;
+				dVar2 = kEquipOneDouble;
+				double recip = kEquipOneDouble / (double)item->duration;
+				item->alpha = (float)(recip * (double)item->step);
+				if ((item->flags & 2) == 0) {
+					float dx = item->targetX - (float)item->x;
+					float dy = item->targetY - (float)item->y;
+					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
+					item->dx = dx * fVar1;
+					item->dy = dy * fVar1;
+				}
+			}
+		}
+		item++;
+	}
+
+	int result = 0;
+	if (itemCount == doneCount) {
+		result = 1;
+	}
+	return result;
 }
 
 /*
@@ -841,12 +882,10 @@ int CMenuPcs::EquipOpen()
 	u32 uVar12;
 	double dVar20;
 
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	if (menuState->initialized == '\0') {
-		EquipOpenAnimList* list = GetEquipListStorage(this);
-		memset(list, 0, sizeof(*list));
+	if ((signed char)GetEquipMenuState(this)->initialized == 0) {
+		memset(GetEquipListStorage(this), 0, sizeof(EquipOpenAnimList));
 		fVar5 = kEquipOne;
-		EquipOpenAnim* entry = list->entries;
+		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
 		iVar11 = 8;
 		do {
 			entry[0].scale = fVar5;
@@ -866,7 +905,7 @@ int CMenuPcs::EquipOpen()
 		} while (iVar11 != 0);
 
 		iVar6 = 0;
-		entry = list->entries;
+		entry = GetEquipListStorage(this)->entries;
 		iVar11 = 2;
 		do {
 			entry[0].tex = 0x34;
@@ -893,7 +932,7 @@ int CMenuPcs::EquipOpen()
 			iVar11--;
 		} while (iVar11 != 0);
 
-		list->count = 4;
+		GetEquipListStorage(this)->count = 4;
 		EquipInit1();
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
@@ -908,16 +947,15 @@ int CMenuPcs::EquipOpen()
 
 		psVar7 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		*psVar7 = sVar10 + 1;
-		menuState->selectedIndex = 0;
-		menuState->initialized = 1;
+		GetEquipMenuState(this)->selectedIndex = 0;
+		GetEquipMenuState(this)->initialized = 1;
 	}
 
 	iVar6 = 0;
-	menuState->frame = menuState->frame + 1;
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	uVar8 = (u32)list->count;
-	EquipOpenAnim* entry = list->entries;
-	iVar11 = static_cast<int>(menuState->frame);
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	uVar8 = (u32)GetEquipListStorage(this)->count;
+	EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
+	iVar11 = static_cast<int>(GetEquipMenuState(this)->frame);
 	for (int i = 0; i < (int)uVar8; i++) {
 		if (entry->startFrame <= iVar11) {
 			if (entry->startFrame + entry->duration <= iVar11) {
@@ -933,8 +971,9 @@ int CMenuPcs::EquipOpen()
 	}
 
 	fVar5 = kEquipOne;
-	if (list->count == iVar6) {
-		entry = list->entries;
+	int result = 0;
+	if (GetEquipListStorage(this)->count == iVar6) {
+		entry = GetEquipListStorage(this)->entries;
 		if (0 < (int)uVar8) {
 			uVar12 = uVar8 >> 3;
 			if (uVar12 != 0) {
@@ -980,9 +1019,9 @@ int CMenuPcs::EquipOpen()
 				uVar8--;
 			} while (uVar8 != 0);
 		}
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*
@@ -996,13 +1035,12 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	short sVar1;
+	int iVar11;
 	float fVar2;
 	float fVar3;
 	float fVar4;
 	float fVar5;
 	unsigned int uVar6;
-	short sVar7;
 	int iVar8;
 	int iVar9;
 	EquipOpenAnim* psVar10;
@@ -1014,10 +1052,9 @@ void CMenuPcs::EquipInit1()
 	fVar4 = kEquipInitU;
 	fVar3 = kEquipOne;
 	fVar2 = kEquipZero;
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	sVar7 = 0;
-	iVar8 = (int)list->count;
-	psVar10 = &list->entries[iVar8];
+	iVar11 = 0;
+	iVar8 = (int)GetEquipListStorage(this)->count;
+	psVar10 = &GetEquipListStorage(this)->entries[iVar8];
 	psVar10->tex = 0x2e;
 	psVar10->x = 0xb8;
 	psVar10->y = 0x28;
@@ -1031,7 +1068,7 @@ void CMenuPcs::EquipInit1()
 	psVar10->startFrame = 5;
 	psVar10->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 1];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 1];
 	puVar12->tex = 0x2f;
 	puVar12->x = 0xa0;
 	puVar12->y = 0xe;
@@ -1043,7 +1080,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 2];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 2];
 	puVar12->tex = 0x2f;
 	puVar12->w = 0x30;
 	puVar12->h = 0x30;
@@ -1055,7 +1092,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 3];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 3];
 	puVar12->flags = 2;
 	puVar12->tex = 0x2e;
 	puVar12->x = 0xa0;
@@ -1067,16 +1104,16 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	psVar10 = &list->entries[list->count];
+	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	iVar8 = 4;
 	do {
-		psVar13 = &list->entries[iVar9];
+		psVar13 = &GetEquipListStorage(this)->entries[iVar9];
 		psVar13[0].flags = 2;
 		psVar13[0].tex = 0x37;
 		iVar9 = iVar9 + 2;
 		psVar13[0].x = psVar10->x + 0x24;
-		sVar1 = sVar7 + 0x20;
-		psVar13[0].y = psVar10->y + sVar7;
+		psVar13[0].y = psVar10->y + iVar11;
+		iVar11 = iVar11 + 0x20;
 		psVar13[0].w = 200;
 		psVar13[0].h = 0x28;
 		psVar13[0].u = fVar2;
@@ -1087,8 +1124,8 @@ void CMenuPcs::EquipInit1()
 		psVar13[1].flags = 2;
 		psVar13[1].tex = 0x37;
 		psVar13[1].x = psVar10->x + 0x24;
-		sVar7 = sVar7 + 0x40;
-		psVar13[1].y = psVar10->y + sVar1;
+		psVar13[1].y = psVar10->y + iVar11;
+		iVar11 = iVar11 + 0x20;
 		psVar13[1].w = 200;
 		psVar13[1].h = 0x28;
 		psVar13[1].u = fVar2;
@@ -1099,9 +1136,9 @@ void CMenuPcs::EquipInit1()
 		iVar8 = iVar8 - 1;
 	} while (iVar8 != 0);
 
-	list->listEnd = (short)iVar9;
-	uVar6 = (unsigned int)((int)list->listEnd - (int)list->count);
-	psVar10 = &list->entries[list->count];
+	GetEquipListStorage(this)->listEnd = (short)iVar9;
+	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);
+	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	if (0 < (int)uVar6) {
 		uVar15 = uVar6 >> 3;
 		if (uVar15 != 0) {

@@ -1939,7 +1939,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			int b;
 			int a;
 
-			if (px < 0 || px >= width || py < 0 || py >= height) {
+			if (px < 0 || width <= px || py < 0 || height <= py) {
 				continue;
 			}
 

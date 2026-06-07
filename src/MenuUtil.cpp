@@ -1198,7 +1198,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int selectorWidth = selectorTexture->m_width;
 		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[10];
-		bool secondValue = m_gameInitMode != 0;
+		signed char secondValue = m_gameInitMode;
 		char* firstText = g_strMenuUtilMes[langRow * 20 + 12];
 		char* secondText = g_strMenuUtilMes[langRow * 20 + 13];
 		float leftX = row[0];
@@ -1271,7 +1271,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int selectorWidth = selectorTexture->m_width;
 		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[20];
-		bool secondValue = m_stereoMode != 0;
+		signed char secondValue = m_stereoMode;
 		char* firstText = g_strMenuUtilMes[langRow * 20 + 14];
 		char* secondText = g_strMenuUtilMes[langRow * 20 + 15];
 		float leftX = row[0];

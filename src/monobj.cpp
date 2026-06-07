@@ -837,13 +837,10 @@ void CGMonObj::seKiduki()
 	if (m_unk6BD != 0) {
 		partyIndex = m_targetPartyIndex;
 	} else {
+		double soundLimit = (Game.m_gameWork.m_soundOptionFlag != 0) ? DOUBLE_80331A10 : DOUBLE_80331A18;
 		partyIndex = -1;
-		double soundLimit = DOUBLE_80331A18;
-		if (Game.m_gameWork.m_soundOptionFlag != 0) {
-			soundLimit = DOUBLE_80331A10;
-		}
 
-		if (soundLimit > *reinterpret_cast<float*>(mon + 0x5BC)) {
+		if (static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC)) < soundLimit) {
 			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
 			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
 			float hitScale;

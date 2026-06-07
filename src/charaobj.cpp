@@ -2092,50 +2092,53 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  */
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	short* staPtr = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
-	if ((staIndex == 0 || staIndex == 4) && *staPtr != 0) {
+	if ((staIndex == 0 || staIndex == 4) &&
+		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) != 0) {
 		System.Printf(const_cast<char*>(lbl_801DC8D8));
-		return static_cast<int>(*staPtr);
+		return static_cast<int>(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)));
 	}
 
 	unsigned int base = 0;
 	unsigned char* gameFlat = reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc);
-	if (staIndex == 7) {
-		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x18);
-	} else if (staIndex < 7) {
-		if (staIndex == 3) {
+	switch (staIndex) {
+		case 0:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x10);
+			break;
+		case 1:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x0E);
+			break;
+		case 2:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1E);
+			break;
+		case 3:
 			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x22);
-		} else if (staIndex < 3) {
-			if (staIndex == 1) {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x0E);
-			} else if (staIndex < 1) {
-				if (staIndex >= 0) {
-					base = *reinterpret_cast<unsigned short*>(gameFlat + 0x10);
-				}
-			} else {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1E);
-			}
-		} else if (staIndex != 5) {
-			if (staIndex < 5) {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x12);
-			} else {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x20);
-			}
-		}
-	} else if (staIndex == 0x1C) {
-		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1C);
-	} else if (staIndex < 0x1C) {
-		if (staIndex == 10) {
+			break;
+		case 4:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x12);
+			break;
+		case 6:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x20);
+			break;
+		case 7:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x18);
+			break;
+		case 8:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x14);
+			break;
+		case 9:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x16);
+			break;
+		case 10:
 			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1A);
-		} else if (staIndex < 10) {
-			if (staIndex < 9) {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x14);
-			} else {
-				base = *reinterpret_cast<unsigned short*>(gameFlat + 0x16);
-			}
-		}
-	} else if (staIndex == 0x6A) {
-		base = *reinterpret_cast<unsigned short*>(gameFlat + 0x24);
+			break;
+		case 0x1C:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x1C);
+			break;
+		case 0x6A:
+			base = *reinterpret_cast<unsigned short*>(gameFlat + 0x24);
+			break;
+		default:
+			break;
 	}
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (amount * 0x48);

@@ -525,7 +525,7 @@ static inline char* AnimNodeName(CChara::CAnimNode* node)
 
 static inline bool AnimNodeUsesScale(CChara::CAnimNode* node)
 {
-	return *reinterpret_cast<s8*>(&node->m_flags) < 0;
+	return ((*reinterpret_cast<u8*>(&node->m_flags) >> 7) & 1) != 0;
 }
 
 static inline u8 ModelAttachMode(CChara::CModel* model)
@@ -1727,10 +1727,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 
-				float invX = (srt.m_scale.x != 0.0f) ? (FLOAT_803301BC / srt.m_scale.x) : FLOAT_803301BC;
-				float invY = (srt.m_scale.y != 0.0f) ? (FLOAT_803301BC / srt.m_scale.y) : FLOAT_803301BC;
-				float invZ = (srt.m_scale.z != 0.0f) ? (FLOAT_803301BC / srt.m_scale.z) : FLOAT_803301BC;
-				PSMTXScale(invScaleMtx, invX, invY, invZ);
+				PSMTXScale(invScaleMtx,
+				           FLOAT_803301BC / srt.m_scale.x,
+				           FLOAT_803301BC / srt.m_scale.y,
+				           FLOAT_803301BC / srt.m_scale.z);
 				PSMTXConcat(localMtx, invScaleMtx, localMtx);
 			}
 

@@ -1558,7 +1558,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	}
 
 	code = *reinterpret_cast<u8**>(
-	    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+	    funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
 	    + (static_cast<int>(object->m_codePos << 12) >> 12);
 
 	while (true) {
@@ -1800,7 +1800,7 @@ frameLoop:
 			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
 				funcs = *reinterpret_cast<u8**>(self + 0x20);
 				code = *reinterpret_cast<u8**>(
-				    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+				    funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
 				    + (static_cast<int>(object->m_codePos << 12) >> 12);
 				continue;
 			}
@@ -2094,7 +2094,7 @@ frameLoop:
 
 			funcs = *reinterpret_cast<u8**>(self + 0x20);
 			code = *reinterpret_cast<u8**>(
-			    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+			    funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
 			    + (static_cast<int>(object->m_codePos << 12) >> 12);
 			continue;
 		}
@@ -2134,7 +2134,7 @@ frameLoop:
 
 callSystemFunction:
 	{
-		const int funcIndex = static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4;
+		const int funcIndex = static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4;
 		CFunc* func = reinterpret_cast<CFunc*>(funcs) + funcIndex;
 		int systemResult;
 		const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
@@ -2184,7 +2184,7 @@ callSystemFunction:
 
 		funcs = *reinterpret_cast<u8**>(self + 0x20);
 		code = *reinterpret_cast<u8**>(
-		    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+		    funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
 		    + (static_cast<int>(object->m_codePos << 12) >> 12);
 		goto frameLoop;
 	}

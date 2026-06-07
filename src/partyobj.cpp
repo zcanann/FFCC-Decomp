@@ -2693,9 +2693,7 @@ void CGPartyObj::checkTargetParticle()
 		}
 	}
 
-	if (input.x == 0.0f && input.z == 0.0f) {
-		party.partyFlags &= 0xDF;
-	} else {
+	if (input.x != 0.0f || input.z != 0.0f) {
 		Vec* targetPos = &m_comboCenter;
 		Vec* centerPos = &m_comboTarget;
 		Vec move;
@@ -2799,6 +2797,8 @@ void CGPartyObj::checkTargetParticle()
 		}
 
 		*centerPos = *targetPos;
+	} else {
+		party.partyFlags &= 0xDF;
 	}
 
 	Vec delta;

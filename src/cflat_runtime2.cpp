@@ -36,8 +36,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern const float FLOAT_80330138;
-extern const float FLOAT_8033013C;
+extern const float kCFlatAngleHalfTurnDeg;
+extern const float kCFlatAnglePi;
 
 CFlatRuntime2 CFlat ATTRIBUTE_ALIGN(32);
 CFlatRuntime2& gCFlatRuntime2 = CFlat;
@@ -1312,7 +1312,7 @@ void CFlatRuntime2::Calc()
 		saveData[4] = SwapF32(CameraPcs.m_targetY);
 		saveData[5] = SwapF32(CameraPcs.m_targetZ);
 		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((FLOAT_80330138 * CameraPcs.m_zRotate) / FLOAT_8033013C);
+		saveData[7] = SwapF32((kCFlatAngleHalfTurnDeg * CameraPcs.m_zRotate) / kCFlatAnglePi);
 
 		u32 lastX = 0;
 		u32 lastY = 0;
@@ -2023,7 +2023,7 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 	ParticleWorkPosX(this) = vec.x;
 	ParticleWorkPosY(this) = vec.y;
 	ParticleWorkPosZ(this) = vec.z;
-	ParticleWorkPosAngle(this) = FLOAT_80330138 * angle / FLOAT_8033013C;
+	ParticleWorkPosAngle(this) = kCFlatAngleHalfTurnDeg * angle / kCFlatAnglePi;
 	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
 	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
 }

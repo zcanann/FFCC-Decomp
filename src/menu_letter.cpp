@@ -1688,7 +1688,7 @@ void CMenuPcs::LetterListDraw()
 {
 	int menuDataBase = GetLetterAnimBase(this);
 
-	if ((s_OpenClose != 0) && (m_singleMenuCtrlResetFlag == '\0')) {
+	if ((static_cast<char>(s_OpenClose) != 0) && (static_cast<char>(m_singleMenuCtrlResetFlag) == '\0')) {
 		DrawSingleCrescent(FLOAT_803330f8,
 			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
 		DrawSingleStat(

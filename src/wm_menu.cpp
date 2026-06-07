@@ -458,17 +458,6 @@ static inline unsigned char* GetWmCmakeWork(CMenuPcs* menu)
 	return menu->m_cmakeWorkActive == 1 ? menu->m_cmakeWork : 0;
 }
 
-static inline int GetWmMenuFade(short state, short frame)
-{
-	if (state == 1) {
-		return static_cast<int>(FLOAT_80331458 * static_cast<float>(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408)));
-	}
-	if (state == 2) {
-		return static_cast<int>(FLOAT_80331458);
-	}
-	return static_cast<int>(FLOAT_80331458 * static_cast<float>(-(DOUBLE_803314E8 * (static_cast<double>(frame) - DOUBLE_80331408) - DOUBLE_80331420)));
-}
-
 static inline CFont* GetWmFont(CMenuPcs* menu)
 {
 	return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xF8);
@@ -7843,25 +7832,37 @@ void CMenuPcs::DrawCharaName()
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 
-	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
-	if (Game.m_gameWork.m_languageId == 3) {
+	const int lang = Game.m_gameWork.m_languageId;
+	const char** emptyText;
+	if (lang == 3) {
 		emptyText = s_wmEmptyCreatingTextIt_8032E900;
-	} else if (Game.m_gameWork.m_languageId < 3) {
-		if (Game.m_gameWork.m_languageId != 0 && Game.m_gameWork.m_languageId != 1) {
+	} else if (lang < 3) {
+		if (lang != 1 && lang != 0) {
 			emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
+		} else {
+			emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 		}
-	} else if (Game.m_gameWork.m_languageId == 5) {
+	} else if (lang == 5) {
 		emptyText = s_wmEmptyCreatingTextEs_8032E910;
-	} else if (Game.m_gameWork.m_languageId < 5) {
+	} else if (lang < 5) {
 		emptyText = s_wmEmptyCreatingTextFr_8032E908;
+	} else {
+		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 	}
 
-	const int alpha = GetWmMenuFade(worldState->m_mainState, worldState->m_frameCounter);
+	float fade;
+	if (worldState->m_mainState == 1) {
+		fade = static_cast<float>(DOUBLE_803314E8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+	} else if (worldState->m_mainState == 2) {
+		fade = FLOAT_803313e8;
+	} else {
+		fade = static_cast<float>(-(DOUBLE_803314E8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+	}
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
-	for (int i = 0; i < kWmCharaSelectCount; i++) {
-		const WmCharaSelectEntry& entry = selectEntries[i];
+	for (int chan = 0; chan < 4; chan++) {
+		const WmCharaSelectEntry& entry = selectEntries[chan];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
 			activeMask |= bit;
@@ -7880,7 +7881,7 @@ void CMenuPcs::DrawCharaName()
 	font->DrawInit();
 	DrawInit();
 
-	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
+	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fade)));
 	GXSetChanMatColor(GX_COLOR0A0, shade.color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
 	for (int row = 0; row < 2; row++) {

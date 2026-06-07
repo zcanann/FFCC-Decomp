@@ -72,11 +72,6 @@ public:
     };
 
     CLightPcs();
-    static CProcessTableCallback m_table_desc0;
-    static CProcessTableCallback m_table_desc1;
-    static CProcessTableCallback m_table_desc2;
-    static CProcessTableCallback m_table_desc3;
-    static CProcessTableCallback m_table_desc4;
     static CProcessTable m_table;
 
     void Init();

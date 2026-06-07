@@ -1737,8 +1737,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
             continue;
         }
 
-        unsigned int bitMask = 1u << (i & 0x1F);
-        if ((shadow->m_materialMode == 1) || ((shadowBit32[i >> 5] & bitMask) != 0)) {
+        if ((shadow->m_materialMode == 1) || ((shadowBit32[i >> 5] & (1u << (i & 0x1F))) != 0)) {
             SetShadow(*shadow, viewMtx, static_cast<int>(i), 0xFFFFFFFF);
         }
     }

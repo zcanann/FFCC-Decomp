@@ -1472,7 +1472,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (itemKind == 1 || (itemKind == 9 && (GetCID() & 0xAD) == 0xAD && (sourceObj->GetCID() & 0x6D) == 0x6D)) {
-			if (staType == 0x1C || staType == 4 || staType < 2) {
+			switch (staType) {
+			case 0:
+			case 1:
+			case 4:
+			case 0x1C: {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				CGPrgObj* powerSource = sourceObj;
 				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
@@ -1494,8 +1498,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					0;
 				damageAmount = rawDamage + bonus;
 				System.Printf(dbg + 0x1DC, basePower, sourcePower, defense, bonus, damageAmount);
-			} else if (staType == 0x24 || staType == 0x25 || staType == 100 ||
-			           staType == 0x69 || staType == 0x6A) {
+				break;
+			}
+			case 0x24:
+			case 0x25:
+			case 100:
+			case 0x69:
+			case 0x6A: {
 				unsigned int basePower = (itemEffect == 0x1F8) ?
 					*reinterpret_cast<unsigned short*>(itemData + 6) :
 					0;
@@ -1537,7 +1546,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					sourceObj->changeStat(10, 0, 0);
 					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
 				}
-			} else if (staType == 10) {
+				break;
+			}
+			case 10: {
 				int recoilDamage;
 				unsigned char* selfReactive = reinterpret_cast<unsigned char*>(this) + 0x6C2;
 				if ((GetCID() & 0xAD) == 0xAD && *selfReactive != 0) {
@@ -1553,9 +1564,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf(dbg + 0x218, recoilDamage);
 				int nextSta = calcSta(10, resolvedItemId, sourceObj);
 				setSta(10, nextSta);
+				break;
+			}
+			default:
+				System.Printf(dbg + 0x230, staType);
+				break;
 			}
 		} else if (itemKind == 8 || (itemKind == 9 && (GetCID() & 0x6D) == 0x6D && (sourceObj->GetCID() & 0xAD) == 0xAD)) {
-			if (staType == 0x1C || staType == 4 || staType < 3) {
+			switch (staType) {
+			case 0:
+			case 1:
+			case 2:
+			case 4:
+			case 0x1C: {
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
@@ -1565,8 +1586,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (damageAmount < 1) {
 					damageAmount = 1;
 				}
-			} else if (staType == 0x24 || staType == 0x25 || staType == 100 ||
-			           staType == 0x69 || staType == 0x6A) {
+				break;
+			}
+			case 0x24:
+			case 0x25:
+			case 100:
+			case 0x69:
+			case 0x6A: {
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
@@ -1579,12 +1605,21 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
-			} else if (staType == 10) {
+				break;
+			}
+			case 10:
 				damageAmount = calcSta(10, resolvedItemId, sourceObj);
+				break;
+			default:
+				System.Printf(dbg + 0x230, staType);
+				break;
 			}
 		} else if (itemKind == 9 && (GetCID() & 0x2D) == 0x2D &&
 		           ((sourceObj->GetCID() & 0xAD) == 0xAD || (sourceObj->GetCID() & 0x1D) == 0x1D)) {
-			if (staType == 4 || staType < 2) {
+			switch (staType) {
+			case 0:
+			case 1:
+			case 4: {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = (sourceObj->GetCID() & 0xAD) == 0xAD ?
 					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 8) :
@@ -1600,8 +1635,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = 1;
 				}
 				System.Printf(dbg + 0x2BC, basePower, sourcePower, defense, damageAmount);
-			} else if (staType == 0x25) {
+				break;
+			}
+			case 0x25:
 				damageAmount = (resolvedItemId == 0x4AA) ? 1 : 10;
+				break;
+			default:
+				System.Printf(dbg + 0x230, staType);
+				break;
 			}
 		}
 

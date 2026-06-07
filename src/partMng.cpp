@@ -1076,7 +1076,7 @@ void CPartMng::SetFp()
         unsigned char* fpBytes = reinterpret_cast<unsigned char*>(recvBuff);
         mng->m_pppResSet = self + kResSetOffset;
 
-        int fpTime = static_cast<int>(recvBuff[0x0B]);
+        int fpTime = reinterpret_cast<int*>(recvBuff)[0x0B];
         if (mng->m_baseTime < 0) {
             mng->m_baseTime = fpTime;
         } else {

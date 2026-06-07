@@ -923,24 +923,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
-		case -0x1A:
-			engineObject->Turn(reinterpret_cast<float*>(object->m_localBase)[0], static_cast<int>(object->m_localBase[1]));
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x1B: {
-			u8 flags = *(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1);
-			if (static_cast<int>((static_cast<unsigned int>(flags) << 0x1A) | (static_cast<unsigned int>(flags) >> 6)) >= 0) {
-				PushValue(this, object, 0);
-				outResult = 0;
-			}
-			break;
-		}
-		case -0x1C:
-			engineObject->CancelMove(1);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
 		case -0x1D: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
 			CVector moveVector(params[0], params[1], params[2]);
@@ -975,14 +957,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x25: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[0], params[1], params[2]);
-			engineObject->SetPosBG(position, 0);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		}
 		case -0x24: {
 			Vec hitStart;
 			Vec hitMove;
@@ -999,6 +973,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				*reinterpret_cast<int*>(object->m_localBase[5]) = 0;
 			}
 			PushValue(this, object, hit);
+			outResult = 0;
+			break;
+		}
+		case -0x25: {
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			CVector position(params[0], params[1], params[2]);
+			engineObject->SetPosBG(position, 0);
+			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
@@ -1037,8 +1019,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x2B:
 		case -0x2A:
+		case -0x2B:
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1077,24 +1059,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
-		case -0x31:
-			engineObject->m_bgHitMask = object->m_localBase[0];
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x2F: {
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[4], params[5], params[6]);
-			engineObject->SetDamageCol(
-			    static_cast<int>(object->m_localBase[0]),
-			    RuntimeString(this, object->m_localBase[1]),
-			    params[2],
-			    params[3],
-			    position);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		}
 		case -0x2E: {
 			unsigned int index = object->m_localBase[0];
 			float x = reinterpret_cast<float*>(object->m_localBase)[1];
@@ -1114,6 +1078,24 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x2F: {
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			CVector position(params[4], params[5], params[6]);
+			engineObject->SetDamageCol(
+			    static_cast<int>(object->m_localBase[0]),
+			    RuntimeString(this, object->m_localBase[1]),
+			    params[2],
+			    params[3],
+			    position);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x31:
+			engineObject->m_bgHitMask = object->m_localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x33: {
 			float rotY = reinterpret_cast<float*>(object->m_localBase)[0];
 			engineObject->m_rotTargetY = rotY;
@@ -1164,6 +1146,24 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x3A:
 			engineObject->FreeAnim(static_cast<int>(object->m_localBase[0]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x1A:
+			engineObject->Turn(reinterpret_cast<float*>(object->m_localBase)[0], static_cast<int>(object->m_localBase[1]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x1B: {
+			u8 flags = *(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1);
+			if (static_cast<int>((static_cast<unsigned int>(flags) << 0x1A) | (static_cast<unsigned int>(flags) >> 6)) >= 0) {
+				PushValue(this, object, 0);
+				outResult = 0;
+			}
+			break;
+		}
+		case -0x1C:
+			engineObject->CancelMove(1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

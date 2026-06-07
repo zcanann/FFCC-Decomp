@@ -1484,7 +1484,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 8);
+					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 0x20);
 				float multiplier = CharaObjGetStatusMultiplier(0x2E);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
@@ -1554,7 +1554,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					recoilDamage = 1;
 				} else {
 					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0f;
-					int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7))) * recoilRate);
+					int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C))) * recoilRate);
 					recoilDamage = (raw < 1) ? 1 : raw;
 					if ((GetCID() & 0xAD) == 0xAD) {
 						*selfReactive = 1;
@@ -1579,12 +1579,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 8);
+					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
 				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x32));
 				damageAmount = static_cast<int>(basePower + sourcePower) - guardValue;
 				if (damageAmount < 1) {
 					damageAmount = 1;
 				}
+				System.Printf(dbg + 0x274);
 				break;
 			}
 			case 0x24:
@@ -1604,6 +1605,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
+				System.Printf(dbg + 0x240);
 				break;
 			}
 			case 10:
@@ -1621,7 +1623,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 4: {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				unsigned int sourcePower = (sourceObj->GetCID() & 0xAD) == 0xAD ?
-					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 8) :
+					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20) :
 					*reinterpret_cast<unsigned short*>(itemData + 0x30);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				float defenseRate = kOneF32;
@@ -1677,7 +1679,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (damageAmount != 0) {
 			addHp(-damageAmount, sourceObj);
-			bool selfHasGuard = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7) != 0;
+			bool selfHasGuard = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0;
 			if (selfHasGuard) {
 				bonus(0, resolvedItemId, sourceObj);
 				sourceObj->bonus(1, resolvedItemId, this);
@@ -1789,7 +1791,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
 		bonus(0x14, resolvedItemId, sourceObj);
 		sourceObj->bonus(0x10, resolvedItemId, this);
-		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7) != 0) {
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			sourceObj->bonus(0x0B, resolvedItemId, this);
 		}
 	}

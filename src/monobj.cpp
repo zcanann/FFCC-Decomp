@@ -28,35 +28,35 @@ u8 CGMonObj::m_aiWork[0xC];
 u8 CGMonObj::m_boss[0x8C];
 
 extern "C" float g_hit_t;
-extern float FLOAT_803319C0;
-extern "C" const float FLOAT_803319C8 = 0.0000001f;
-extern "C" const float FLOAT_803319CC = 0.01f;
-extern "C" const double DOUBLE_803319D0 = 0.000009999999747378752;
-extern "C" const float FLOAT_803319D8 = 0.0f;
-extern "C" const double DOUBLE_803319E0 = 4503599627370496.0;
-extern "C" const float FLOAT_803319E8 = 0.4f;
+extern float kMonObjDefaultScale;
+extern "C" const float kMonObjEpsilon = 0.0000001f;
+extern "C" const float kMonObjHundredth = 0.01f;
+extern "C" const double kMonObjSmallStepF64 = 0.000009999999747378752;
+extern "C" const float kMonObjZero = 0.0f;
+extern "C" const double kMonObjUnsignedIntBias = 4503599627370496.0;
+extern "C" const float kMonObjTwoFifths = 0.4f;
 static const char s_monObjTexAnimU1[3] = "u1";
 static const char s_monObjHeadNode[] = "head";
-extern "C" const float FLOAT_803319F8 = 10.0f;
-extern "C" const float FLOAT_803319FC = 2.0f;
-extern "C" const float FLOAT_80331A00 = 0.25f;
-extern "C" const float FLOAT_80331A04 = 0.2f;
-extern "C" const double DOUBLE_80331A08 = 4503601774854144.0;
-extern "C" const double DOUBLE_80331A10 = 10000.0;
-extern "C" const double DOUBLE_80331A18 = 180.0;
-extern "C" const float FLOAT_80331A20 = 0.017453292f;
-extern "C" const float FLOAT_80331A24 = 57.29578f;
+extern "C" const float kMonObjHomeSnapDistance = 10.0f;
+extern "C" const float kMonObjTwo = 2.0f;
+extern "C" const float kMonObjQuarter = 0.25f;
+extern "C" const float kMonObjFifth = 0.2f;
+extern "C" const double kMonObjSignedIntBias = 4503601774854144.0;
+extern "C" const double kMonObjWideSoundRange = 10000.0;
+extern "C" const double kMonObjNormalSoundRange = 180.0;
+extern "C" const float kMonObjDegToRad = 0.017453292f;
+extern "C" const float kMonObjRadToDeg = 57.29578f;
 static const char s_monObjPassThroughText[] = "\x92\xca\x89\xdf\x81\x42\n";
-extern "C" const float FLOAT_80331A30 = 1.5707964f;
-extern "C" const float FLOAT_80331A34 = 0.5f;
-extern "C" const float FLOAT_80331A38 = 10000000000.0f;
-extern "C" const float FLOAT_80331A3C = -10000000000.0f;
-extern "C" const float FLOAT_80331A40 = 20.0f;
-extern "C" const float FLOAT_80331A44 = 0.1f;
-extern "C" const float FLOAT_80331A48 = 2.0943952f;
+extern "C" const float kMonObjHalfPi = 1.5707964f;
+extern "C" const float kMonObjHalf = 0.5f;
+extern "C" const float kMonObjMaxBound = 10000000000.0f;
+extern "C" const float kMonObjMinBound = -10000000000.0f;
+extern "C" const float kMonObjConeSideRadius = 20.0f;
+extern "C" const float kMonObjParticleRadiusScale = 0.1f;
+extern "C" const float kMonObjTwoThirdsPi = 2.0943952f;
 static const char s_monObjTexAnimU0[3] = "u0";
-extern "C" const float FLOAT_80331A50 = 100.0f;
-extern "C" const float FLOAT_80331a54 = 1.0f;
+extern "C" const float kMonObjPercentMax = 100.0f;
+extern "C" const float kMonObjOne = 1.0f;
 static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
 static const char s_monObjDistanceFmt[] = "%d %d %d";
 
@@ -718,7 +718,7 @@ void CGMonObj::isValidTarget()
 	int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
 	unsigned char* script9 = reinterpret_cast<unsigned char*>(scriptHandle[9]);
 	float maxDist = static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xCC)) -
-	                                   DOUBLE_803319E0);
+	                                   kMonObjUnsignedIntBias);
 	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
 	unsigned char* aiData;
 
@@ -762,14 +762,14 @@ void CGMonObj::isValidTarget()
 	}
 
 	if (((*reinterpret_cast<short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
-	    ((*reinterpret_cast<short*>(script9 + 0x10C) == 1) || (FLOAT_80331A34 * maxDist <= homeDist))) {
+	    ((*reinterpret_cast<short*>(script9 + 0x10C) == 1) || (kMonObjHalf * maxDist <= homeDist))) {
 		goto check_home;
 	}
 
 	{
-		double soundLimit = DOUBLE_80331A18;
+		double soundLimit = kMonObjNormalSoundRange;
 		if (Game.m_gameWork.m_soundOptionFlag != 0) {
-			soundLimit = DOUBLE_80331A10;
+			soundLimit = kMonObjWideSoundRange;
 		}
 
 		int partyIndex = -1;
@@ -777,7 +777,7 @@ void CGMonObj::isValidTarget()
 			float hitScale;
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)) -
-			                            DOUBLE_803319E0),
+			                            kMonObjUnsignedIntBias),
 			         &hitScale, &partyIndex);
 			if (partyIndex < 0) {
 				partyIndex = -1;
@@ -798,7 +798,7 @@ void CGMonObj::isValidTarget()
 	}
 
 check_home:
-	if ((homeDist < FLOAT_803319F8) ||
+	if ((homeDist < kMonObjHomeSnapDistance) ||
 	    (static_cast<unsigned int>(m_chaseTimer) == *reinterpret_cast<unsigned short*>(script9 + 0x1B8))) {
 		m_homePosition = *reinterpret_cast<Vec*>(mon + 0x15C);
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
@@ -832,9 +832,9 @@ void CGMonObj::seKiduki()
 	int partyIndex = -1;
 
 	if (m_unk6BD == 0) {
-		double soundLimit = DOUBLE_80331A18;
+		double soundLimit = kMonObjNormalSoundRange;
 		if (Game.m_gameWork.m_soundOptionFlag != 0) {
-			soundLimit = DOUBLE_80331A10;
+			soundLimit = kMonObjWideSoundRange;
 		}
 
 		if (*reinterpret_cast<float*>(mon + 0x5BC) < soundLimit) {
@@ -844,7 +844,7 @@ void CGMonObj::seKiduki()
 
 			checkCol(6, *reinterpret_cast<float*>(mon + 0x1A8),
 			         static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xC8)) -
-			                            DOUBLE_803319E0),
+			                            kMonObjUnsignedIntBias),
 			         &hitScale, &partyIndex);
 		}
 	} else {
@@ -1393,12 +1393,12 @@ void CGMonObj::onStatDie()
 		}
 
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
-		*reinterpret_cast<float*>(mon + 0x694) = FLOAT_803319D8;
+		*reinterpret_cast<float*>(mon + 0x694) = kMonObjZero;
 		enableAttackCol(0, 0, 0);
 		object->m_bgColMask &= 0xFFF6FFFD;
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
-		CGItemObj::CreateFromScript(1, 0, 0, object, FLOAT_803319D8, 0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
+		CGItemObj::CreateFromScript(1, 0, 0, object, kMonObjZero, 0);
 		object->PutDropItem();
 		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
 		return;
@@ -1433,7 +1433,7 @@ void CGMonObj::onStatDie()
 		if (pId != 0xFFFF) {
 			int dataNo = -1;
 			dataNo = object->m_charaModelHandle->GetPdtSlot();
-			reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
+			reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, kMonObjParticleRadiusScale * object->m_attackColRadius, 0);
 		}
 
 		int option = static_cast<short>(Game.m_gameWork.m_optionValue);
@@ -1698,7 +1698,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
 	if (hitScale != NULL) {
-		*hitScale = FLOAT_803319C0;
+		*hitScale = kMonObjDefaultScale;
 	}
 	if (hitPartyIndex != NULL) {
 		*hitPartyIndex = -1;
@@ -1707,7 +1707,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	Vec startPos = object->m_worldPosition;
 	Vec forward = {
 		static_cast<float>(sin(static_cast<double>(rotY))),
-		FLOAT_803319D8,
+		kMonObjZero,
 		static_cast<float>(cos(static_cast<double>(rotY))),
 	};
 	Vec move;
@@ -1736,9 +1736,9 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		bindMtx[1][3] = startPos.y;
 		bindMtx[2][3] = startPos.z;
 
-		Vec localForward = { FLOAT_803319C0, FLOAT_803319D8, FLOAT_803319D8 };
+		Vec localForward = { kMonObjDefaultScale, kMonObjZero, kMonObjZero };
 		PSMTXMultVecSR(bindMtx, &localForward, &forward);
-		forward.y = FLOAT_803319D8;
+		forward.y = kMonObjZero;
 		PSVECNormalize(&forward, &forward);
 		PSVECScale(&forward, &move, distance);
 	}
@@ -1747,16 +1747,16 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom = startPos;
 		hitCylinder.m_top = move;
-		hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
-		hitCylinder.m_axis.y = FLOAT_80331A38;
-		hitCylinder.m_axis.z = FLOAT_80331A3C;
-		hitCylinder.m_radius = FLOAT_80331A3C;
-		hitCylinder.m_bound.m_min.x = FLOAT_80331A3C;
-		hitCylinder.m_bound.m_min.y = FLOAT_80331A38;
-		hitCylinder.m_bound.m_min.z = FLOAT_80331A38;
-		hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
-		hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
-		hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
+		hitCylinder.m_axis.x = kMonObjHalf * object->m_bodyEllipsoidRadius;
+		hitCylinder.m_axis.y = kMonObjMaxBound;
+		hitCylinder.m_axis.z = kMonObjMinBound;
+		hitCylinder.m_radius = kMonObjMinBound;
+		hitCylinder.m_bound.m_min.x = kMonObjMinBound;
+		hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
+		hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
+		hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
+		hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
+		hitCylinder.m_bound.m_max.z = kMonObjMinBound;
 
 		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 		if (hit != 0) {
@@ -1770,12 +1770,12 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 	}
 
 	if ((flags & 2) != 0) {
-		float halfAngle = FLOAT_80331A34 * FLOAT_80331A20 *
+		float halfAngle = kMonObjHalf * kMonObjDegToRad *
 			static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(baseScript + 0xCA)) -
-			                   DOUBLE_803319E0);
-		float sideDist = FLOAT_803319D8;
-		if (FLOAT_803319D8 != halfAngle) {
-			sideDist = FLOAT_80331A40 / static_cast<float>(tan(static_cast<double>(halfAngle)));
+			                   kMonObjUnsignedIntBias);
+		float sideDist = kMonObjZero;
+		if (kMonObjZero != halfAngle) {
+			sideDist = kMonObjConeSideRadius / static_cast<float>(tan(static_cast<double>(halfAngle)));
 		}
 
 		Vec coneStart = startPos;
@@ -1820,7 +1820,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			Vec targetDelta;
 			PSVECSubtract(&partyPos, &coneStart, &targetDelta);
 			float targetDist = PSVECMag(&targetDelta);
-			if (static_cast<double>(FLOAT_803319D8) >= static_cast<double>(targetDist)) {
+			if (static_cast<double>(kMonObjZero) >= static_cast<double>(targetDist)) {
 				continue;
 			}
 
@@ -1831,13 +1831,13 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			         static_cast<float>(static_cast<double>(sideDist) -
 			                            static_cast<double>(object->m_bodyEllipsoidRadius))) >
 			     static_cast<double>(targetDist)) ||
-				((static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) &&
-				 (static_cast<double>(FLOAT_803319D8) >= static_cast<double>(dot)))) {
+				((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
+				 (static_cast<double>(kMonObjZero) >= static_cast<double>(dot)))) {
 				continue;
 			}
 
 			float angle = static_cast<float>(acos(static_cast<double>(dot)));
-			if ((static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) &&
+			if ((static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) &&
 				(static_cast<double>(angle) >= static_cast<double>(halfAngle))) {
 				continue;
 			}
@@ -1846,16 +1846,16 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			CMapCylinder hitCylinder;
 			hitCylinder.m_bottom = startPos;
 			hitCylinder.m_top = targetDelta;
-			hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
-			hitCylinder.m_axis.y = FLOAT_80331A38;
-			hitCylinder.m_axis.z = FLOAT_80331A3C;
-			hitCylinder.m_radius = FLOAT_80331A3C;
-			hitCylinder.m_bound.m_min.x = FLOAT_80331A3C;
-			hitCylinder.m_bound.m_min.y = FLOAT_80331A38;
-			hitCylinder.m_bound.m_min.z = FLOAT_80331A38;
-			hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
-			hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
-			hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
+			hitCylinder.m_axis.x = kMonObjHalf * object->m_bodyEllipsoidRadius;
+			hitCylinder.m_axis.y = kMonObjMaxBound;
+			hitCylinder.m_axis.z = kMonObjMinBound;
+			hitCylinder.m_radius = kMonObjMinBound;
+			hitCylinder.m_bound.m_min.x = kMonObjMinBound;
+			hitCylinder.m_bound.m_min.y = kMonObjMaxBound;
+			hitCylinder.m_bound.m_min.z = kMonObjMaxBound;
+			hitCylinder.m_bound.m_max.x = kMonObjMaxBound;
+			hitCylinder.m_bound.m_max.y = kMonObjMaxBound;
+			hitCylinder.m_bound.m_max.z = kMonObjMinBound;
 
 			int mapHit = MapMng.CheckHitCylinderNear(
 				&hitCylinder, &targetDelta, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
@@ -1873,7 +1873,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			}
 		}
 
-		if (static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) {
+		if (static_cast<double>(kMonObjZero) != static_cast<double>(halfAngle)) {
 			float debugRadius = static_cast<float>(
 				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
 			gCFlatRuntime2.AddDebugDrawCC(&coneStart, &move, debugRadius, 0, didHit);
@@ -2954,10 +2954,10 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
 		if ((actionFlags & 0x40) != 0) {
 			float targetRot = *reinterpret_cast<float*>(mon + partyIndex * 4 + 0x610);
 			float baseRot =
-				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x118)) +
 				object->m_rotBaseY;
 			float angleLimit =
-				FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
+				kMonObjDegToRad * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));
 			float angleDelta = fabsf(Math.DstRot(targetRot, baseRot));
 			if (angleLimit <= angleDelta) {
 				continue;
@@ -2977,7 +2977,7 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
 			int partyState = reinterpret_cast<CGPrgObj*>(party)->m_lastStateId;
 			if (((partyState == 1) || (partyState == 7)) &&
-				(FLOAT_80331A30 < fabsf(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
+				(kMonObjHalfPi < fabsf(Math.DstRot(object->m_rotBaseY, reinterpret_cast<CGObject*>(party)->m_rotBaseY)))) {
 				if (*reinterpret_cast<short*>(baseScript + 0x10C) == 1) {
 					forceAction = monObj->m_forcedAction ==
 						*reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
@@ -3244,7 +3244,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 	if (prgObj->m_lastStateId == 0) {
 		monObj->m_unk6BD = 0;
 		float homeRange = static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCC)) -
-		                                     DOUBLE_803319E0);
+		                                     kMonObjUnsignedIntBias);
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
 		if (homeDist >= homeRange) {
 			actionState = 0;
@@ -3339,7 +3339,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 
 		if ((*reinterpret_cast<short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
 			float noticeRange = static_cast<float>(
-				static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) - DOUBLE_803319E0);
+				static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) - kMonObjUnsignedIntBias);
 			if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) < noticeRange) {
 				if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
 					chaseState = 5;
@@ -3445,7 +3445,7 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 					monObj->m_moveWork.m_mode = 4;
 					monObj->m_moveWork.m_range =
 						static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) -
-										  DOUBLE_803319E0);
+										  kMonObjUnsignedIntBias);
 					monObj->m_moveWork.m_limitFrame = *reinterpret_cast<unsigned short*>(script + 0x1B6);
 				}
 				monObj->m_moveWork.m_target = partyObj;
@@ -3655,7 +3655,7 @@ void CGMonObj::onChangePrg(int value)
 					(particleBase + 9) | (dataNo << 8),
 					*reinterpret_cast<int*>(mon + 0x594),
 					object,
-					FLOAT_803319C0,
+					kMonObjDefaultScale,
 					0
 				);
 			}
@@ -3666,7 +3666,7 @@ void CGMonObj::onChangePrg(int value)
 					(particleBase + i) | (dataNo << 8),
 					*reinterpret_cast<int*>(mon + 0x594),
 					object,
-					FLOAT_803319C0,
+					kMonObjDefaultScale,
 					0
 				);
 			}

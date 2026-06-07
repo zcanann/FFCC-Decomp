@@ -5142,7 +5142,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
 	CGCharaObj::onDrawDebug(font, x, y, z);
 
-	if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) >= 0) ||
+	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) == 0) ||
 	    (CFlatCenterState() != 0) ||
 	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
 		return;
@@ -5151,7 +5151,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	char text[256];
 	if ((Game.m_gameWork.m_menuStageMode == 0) ||
 	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-	    (((GetCID() & 0x6D) != 0x6D) || (m_scriptHandle[0xED] == nullptr))) {
+	    (((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) || (m_scriptHandle[0xED] == nullptr))) {
 		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
 		        *reinterpret_cast<short*>(work + 0xBC6), *reinterpret_cast<short*>(work + 0xBC8),

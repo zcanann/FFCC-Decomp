@@ -4331,8 +4331,8 @@ void calcWeightMax()
 void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 {
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
-	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x40);
-	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x44);
+	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
+	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 
 	if (activeTrailCount != 0) {
 		CVector unused;
@@ -4348,7 +4348,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			if (i == trailIndex) {
 				nextPos = &m_worldPosition;
 			} else {
-				nextPos = reinterpret_cast<Vec*>(ghostWork + 0x24 + i * sizeof(Vec));
+				nextPos = reinterpret_cast<Vec*>(ghostWork + 0x50 + (i - 1) * sizeof(Vec));
 			}
 			Vec delta;
 			PSVECSubtract(reinterpret_cast<Vec*>(ghostWork + 0x50 + i * sizeof(Vec)), nextPos, &delta);
@@ -4379,13 +4379,13 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	}
 
 	activeTrailCount = 0;
-	outVec->x = m_targetDelta.x;
-	outVec->y = m_targetDelta.y;
-	outVec->z = m_targetDelta.z;
+	outVec->x = m_partyDelta[0].x;
+	outVec->y = m_partyDelta[0].y;
+	outVec->z = m_partyDelta[0].z;
 	outVec->y = 0.0f;
 
 	float dist = PSVECMag(outVec);
-	float maxDist = m_targetDist;
+	float maxDist = m_partyDistance[0];
 	if (dist < maxDist) {
 		maxDist = dist;
 	}

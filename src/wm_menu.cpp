@@ -1244,7 +1244,7 @@ void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	if (s_wmMenuMountStateInitialized == 0) {
+	if (static_cast<signed char>(s_wmMenuMountStateInitialized) == 0) {
 		s_wmMenuLastMountState = 0;
 		s_wmMenuMountStateInitialized = 1;
 	}

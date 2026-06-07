@@ -324,10 +324,6 @@ static const f32 kPppYmLaserHitRayScale = 1.2f;
 static const f32 kPppYmLaserCylinderMax = 10000000000.0f;
 static const f32 kPppYmLaserCylinderMin = -10000000000.0f;
 static const f32 kPppYmLaserFullTurn[2] = {6.2831855f, 0.0f};
-extern const f32 kPppYmLaserTwo = 2.0f;
-extern const f32 kPppYmLaserHalf = 0.5f;
-extern const f32 kPppYmLaserQuarter = 0.25f;
-extern const f64 kPppYmLaserIntToDoubleBias = 4503601774854144.0;
 
 /*
  * --INFO--

@@ -16,6 +16,12 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
+extern const float gPppYmMoveParabolaYOffsetStep = 1.0f;
+extern const float gPppYmMoveParabolaZero = 0.0f;
+extern const float gPppYmMoveParabolaAngleScale = 32768.0f;
+extern const float gPppYmMoveParabolaAngleDivisor = 180.0f;
+extern const float gPppYmMoveParabolaGravityScale = 0.5f;
+
 STATIC_ASSERT(sizeof(YmMoveParabolaDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(YmMoveParabolaDataOffsets, m_workOffset) == 0x0);
 
@@ -142,10 +148,3 @@ extern "C" void pppConstructYmMoveParabola(pppYmMoveParabola* basePtr, _pppCtrlT
         pppMngSt->m_paramVec0.x = pppMngSt->m_paramVec0.x + gPppYmMoveParabolaYOffsetStep;
     }
 }
-
-extern const float gPppParMoveMatrixZero = 0.0f;
-extern const float gPppParMoveMatrixOne = 1.0f;
-extern const float kPppYmTraceMoveZero = 0.0f;
-extern const float kPppYmTraceMoveOne = 1.0f;
-extern const float kPppYmMoveParabolaNegHalfPi = -1.5707964f;
-extern const float kPppYmMoveParabolaZero = 0.0f;

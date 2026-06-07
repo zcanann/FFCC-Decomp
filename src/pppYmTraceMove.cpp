@@ -3,8 +3,8 @@
 #include "ffcc/gobject.h"
 #include "ffcc/ppp_linkage.h"
 extern "C" {
-extern const float kPppYmTraceMoveZero;
-extern const float kPppYmTraceMoveOne;
+extern const float kPppYmTraceMoveZero = 0.0f;
+extern const float kPppYmTraceMoveOne = 1.0f;
 }
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
@@ -146,6 +146,3 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, _pppCtrlTable* para
 	work->m_velocity = zero;
 	work->m_distance = zero;
 }
-
-extern const float FLOAT_80330e58 = 1.0f;
-extern const float FLOAT_80330e5c = 0.5f;

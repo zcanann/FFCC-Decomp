@@ -18,12 +18,12 @@
 
 
 
-extern const float kPppYmMoveParabolaNegHalfPi;
-extern const float kPppYmMoveParabolaZero;
+extern const float kPppYmMoveParabolaNegHalfPi = -1.5707964f;
+extern const float kPppYmMoveParabolaZero = 0.0f;
 extern const char s_ymManaRuin2Name[] = "ruin_2";
-extern const float FLOAT_80330e58;
+extern const float kYmManaOne = 1.0f;
 static const float kYmManaReflectionDenomBias = 1.0f;
-extern const float FLOAT_80330e5c;
+extern const float kYmManaHalf = 0.5f;
 
 extern const float kYmManaReflectionUvWarp = 2.0f;
 extern const float kYmManaReflectionUvWarpScale = 0.015625f;
@@ -440,7 +440,7 @@ void pppConstructYmMana(PYmMana* ymMana, _pppCtrlTable* param_2)
     CChara::CModel* model;
 
     if ((s32)Game.m_currentSceneId == 7) {
-        gObject->m_lookAtTimer = FLOAT_80330e58;
+        gObject->m_lookAtTimer = kYmManaOne;
     }
 
     if (Game.m_currentMapId != 0x21) {
@@ -1015,47 +1015,47 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     if (stepData->m_map21Flag != 0) {
         char* compareName = Game.m_currentScriptName;
-        C_MTXPerspective(projectionMtx, kYmManaCaptureFovY, FLOAT_80330e58, FLOAT_80330e58, kYmManaCaptureFarClip);
+        C_MTXPerspective(projectionMtx, kYmManaCaptureFovY, kYmManaOne, kYmManaOne, kYmManaCaptureFarClip);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
         for (i = 0; i < 6; i++) {
             cameraPos = centerPos;
             cameraUp.x = kPppYmMoveParabolaZero;
-            cameraUp.y = FLOAT_80330e58;
+            cameraUp.y = kYmManaOne;
             cameraUp.z = kPppYmMoveParabolaZero;
 
             s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
             if (nameCompare == 0) {
                 if (i == 0) {
-                    cameraPos.z -= FLOAT_80330e58;
+                    cameraPos.z -= kYmManaOne;
                 } else if (i == 1) {
-                    cameraPos.x += FLOAT_80330e58;
+                    cameraPos.x += kYmManaOne;
                 } else if (i == 2) {
-                    cameraPos.z += FLOAT_80330e58;
+                    cameraPos.z += kYmManaOne;
                 } else if (i == 3) {
-                    cameraPos.x -= FLOAT_80330e58;
+                    cameraPos.x -= kYmManaOne;
                 }
             }
 
             if (nameCompare != 0 || i == 4 || i == 5) {
                 if (i == 3) {
-                    cameraPos.z -= FLOAT_80330e58;
+                    cameraPos.z -= kYmManaOne;
                 } else if (i < 3) {
                     if (i == 1) {
-                        cameraPos.z += FLOAT_80330e58;
+                        cameraPos.z += kYmManaOne;
                     } else if (i < 1) {
                         if (-1 < i) {
-                            cameraPos.x += FLOAT_80330e58;
+                            cameraPos.x += kYmManaOne;
                         }
                     } else {
-                        cameraPos.x -= FLOAT_80330e58;
+                        cameraPos.x -= kYmManaOne;
                     }
                 } else if (i == 5) {
-                    cameraPos.y -= FLOAT_80330e58;
+                    cameraPos.y -= kYmManaOne;
                     cameraUp.y = kPppYmMoveParabolaZero;
                     cameraUp.z = kPppYmMoveParabolaZero;
                 } else if (i < 5) {
-                    cameraPos.y += FLOAT_80330e58;
+                    cameraPos.y += kYmManaOne;
                     cameraUp.y = kPppYmMoveParabolaZero;
                     cameraUp.z = kYmManaNegOne;
                 }
@@ -1067,7 +1067,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             gUtil.RenderTextureQuad(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize,
                                     sourceTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
-            GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, FLOAT_80330e58);
+            GXSetViewport(kPppYmMoveParabolaZero, kPppYmMoveParabolaZero, kYmManaCaptureTextureSize, kYmManaCaptureTextureSize, kPppYmMoveParabolaZero, kYmManaOne);
             GXSetScissor(0, 0, 0x80, 0x80);
             PSMTXCopy(lookAtMtx, CameraMatrix());
             GXSetProjection(projectionMtx, (_GXProjectionType)0);
@@ -1173,11 +1173,11 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int colCount;
     int pairCount;
 
-    normalY = LoadFloat(FLOAT_80330e58);
+    normalY = LoadFloat(kYmManaOne);
     zero = LoadFloat(kPppYmMoveParabolaZero);
     rowCount = 0;
     uvStep = LoadFloat(kYmManaWaterUvStep);
-    radius = size * LoadFloat(FLOAT_80330e5c);
+    radius = size * LoadFloat(kYmManaHalf);
     for (z = radius; -radius <= z; z -= size * uvStep) {
         colCount = 0;
         positions = reinterpret_cast<float*>(positionsInOut);
@@ -1267,7 +1267,7 @@ static int UpdateWaterMesh(VYmMana* mana)
     int rowBase = 0x11;
     do {
         currentScale = kPppYmMoveParabolaZero;
-        neighborScale = FLOAT_80330e5c;
+        neighborScale = kYmManaHalf;
         int index = rowBase + 1;
         for (int col = 1; col < 0x10; col += 5, index += 5) {
             int above0 = index - 0x11;
@@ -1586,7 +1586,7 @@ static void CalcWaterReflectionVector(
     reflectionIt = reflectionVec;
     normalIt = normals;
     zero = LoadFloat(kPppYmMoveParabolaZero);
-    half = LoadFloat(FLOAT_80330e5c);
+    half = LoadFloat(kYmManaHalf);
 
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
@@ -1600,7 +1600,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            denomBase = LoadFloat(FLOAT_80330e58);
+            denomBase = LoadFloat(kYmManaOne);
             *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
@@ -1610,7 +1610,7 @@ static void CalcWaterReflectionVector(
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            denomBase = LoadFloat(FLOAT_80330e58);
+            denomBase = LoadFloat(kYmManaOne);
             *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
             texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
@@ -1673,7 +1673,7 @@ void CalcReflectionVector2(
     u16* dl = (u16*)displayList;
     const float zero = kPppYmMoveParabolaZero;
     const float denomBias = kYmManaReflectionDenomBias;
-    const float half = FLOAT_80330e5c;
+    const float half = kYmManaHalf;
     const float warp = kYmManaReflectionUvWarp;
     const float scale = kYmManaReflectionUvWarpScale;
 

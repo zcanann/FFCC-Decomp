@@ -4,6 +4,9 @@
 
 #include <dolphin/mtx.h>
 
+extern const float gPppParMoveMatrixZero = 0.0f;
+extern const float gPppParMoveMatrixOne = 1.0f;
+
 /*
  * --INFO--
  * PAL Address: 0x800e092c

@@ -1072,16 +1072,14 @@ void CMenuPcs::CalcSelectWait()
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
-		int animPtr = this->m_bonusAnimPtr;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-
 		this->m_menuWindowInfo->state = 3;
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].alpha = 1.0f;
-			BonusSpriteFlags(&sprites[i]) = 3;
+		for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].alpha = 1.0f;
+			BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i]) = 3;
 		}
-		BonusAnimSprite* cursor = &sprites[header->count];
+		short count = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
+		BonusAnimSprite* sprites = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
+		BonusAnimSprite* cursor = &sprites[count];
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
 		cursor->kind = 0x20;
 		cursor->x = (short)(partySprite->x - 3);
@@ -1093,12 +1091,12 @@ void CMenuPcs::CalcSelectWait()
 		cursor->startFrame = 0;
 		cursor->duration = 8;
 		cursor->depth = 1.0f;
-		header->count = (short)(header->count + 1);
-		BonusSpriteFlags(&sprites[2]) = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(count + 1);
+		BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[2]) = 0;
 		*(short*)(this->m_bonusStatePtr + 0xe) = 0;
 		*(short*)(this->m_bonusStatePtr + 0x26) = 4;
 		*(short*)(this->m_bonusStatePtr + 0x18) = 0;
-		header->finished = 0;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 		*(short*)(this->m_bonusStatePtr + 0x1a) = 0;
 		*(unsigned char*)(this->m_bonusStatePtr + 8) = 0;

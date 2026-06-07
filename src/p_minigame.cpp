@@ -1717,13 +1717,13 @@ void CMiniGamePcs::EndThread()
 	// TODO
 }
 
-static unsigned int MiniGameCrc8(unsigned int value)
+static inline unsigned int MiniGameCrc8(unsigned int value)
 {
     unsigned int crc = 0;
 
     for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
     {
-        crc <<= 1;
+        crc = crc * 2;
         if (((value >> 16) & 0xFF & mask) == 0)
         {
             if ((crc & 0x100) != 0)
@@ -1743,8 +1743,8 @@ static unsigned int MiniGameCrc8(unsigned int value)
 
     for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
     {
-        crc <<= 1;
-        if (((value >> 8) & 0xFF & mask) == 0)
+        crc = crc * 2;
+        if (((value & 0xFF00) >> 8 & mask) == 0)
         {
             if ((crc & 0x100) != 0)
             {
@@ -1761,16 +1761,18 @@ static unsigned int MiniGameCrc8(unsigned int value)
         }
     }
 
-    for (int i = 0; i < 8; i++)
+    unsigned int i = 0;
+    do
     {
         crc <<= 1;
         if ((crc & 0x100) != 0)
         {
             crc ^= 0xCD;
         }
-    }
+        i++;
+    } while (i < 8);
 
-    return crc & 0xFF;
+    return crc;
 }
 
 /*
@@ -1870,131 +1872,340 @@ void CMiniGamePcs::MngThreadMain(void*)
             } while (true);
         }
 
-        if (m_playerMask != 0)
+        if (self[0x134B] != 0)
         {
             unsigned int successMask = 0;
-
-            for (int i = 0; i < 4; i++)
+            int i = 0;
+            unsigned char* channelBase = self;
+            unsigned char* playerBase = self;
+            do
             {
                 unsigned int bit = 1U << i;
-                unsigned char* threadParam = self + 0x138C + i * 200;
-                unsigned int* channelWord = reinterpret_cast<unsigned int*>(self + 0x1368 + i * 4);
-
-                if ((m_playerMask & bit) == 0 || threadParam[0xBD] != 0)
+                if ((self[0x134B] & bit) != 0 && playerBase[0x1449] == 0)
                 {
-                    continue;
-                }
-
-                if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0x40000)
-                {
-                    switch (threadParam[0xBF])
+                    if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0x40000)
                     {
-                    case 0:
-                        if (threadParam[0xC4] == 0)
+                        unsigned char state = playerBase[0x144B];
+                        if (state == 3)
                         {
-                            if (threadParam[0xC6] != 0)
-                            {
-                                goto disconnect_player;
-                            }
-
-                            *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
-                            OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(7), 1);
+                            *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
                         }
-                        else if (threadParam[0xC5] == 0)
+                        else if (state < 3 && state == 0)
                         {
-                            if (threadParam[0xC2] != 0)
+                            if (playerBase[0x1450] == 0)
                             {
-                                unsigned int packet = *reinterpret_cast<unsigned int*>(threadParam + 0xA0);
-                                unsigned int crc = MiniGameCrc8(packet);
-                                if ((packet & 0xFF) == crc)
+                                if (playerBase[0x1452] != 0)
                                 {
-                                    self[0x6490 + i] = threadParam[0xC2];
-                                    successMask |= bit;
-                                    *channelWord = packet & 0xFFFF00;
+                                    goto disconnect_player;
                                 }
+                                *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
+                                if (i == -1)
+                                {
+                                    OSSendMessage(reinterpret_cast<OSMessageQueue*>(playerBase + 0x138C), reinterpret_cast<OSMessage>(8), 1);
+                                }
+                                else
+                                {
+                                    OSSendMessage(reinterpret_cast<OSMessageQueue*>(playerBase + 0x138C), reinterpret_cast<OSMessage>(7), 1);
+                                }
+                            }
+                            else if (playerBase[0x1451] == 0)
+                            {
+                                if (playerBase[0x144E] != 0)
+                                {
+                                    unsigned int packet = *reinterpret_cast<unsigned int*>(playerBase + 0x142C);
+                                    unsigned int crc = 0;
+                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                                    {
+                                        crc = crc * 2;
+                                        if (((packet >> 16) & 0xFF & mask) == 0)
+                                        {
+                                            if ((crc & 0x100) != 0)
+                                            {
+                                                crc ^= 0xCD;
+                                            }
+                                        }
+                                        else if ((crc & 0x100) == 0)
+                                        {
+                                            crc += 1;
+                                        }
+                                        else
+                                        {
+                                            crc ^= 0xCC;
+                                        }
+                                    }
+                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                                    {
+                                        crc = crc * 2;
+                                        if (((packet & 0xFF00) >> 8 & mask) == 0)
+                                        {
+                                            if ((crc & 0x100) != 0)
+                                            {
+                                                crc ^= 0xCD;
+                                            }
+                                        }
+                                        else if ((crc & 0x100) == 0)
+                                        {
+                                            crc += 1;
+                                        }
+                                        else
+                                        {
+                                            crc ^= 0xCC;
+                                        }
+                                    }
+                                    unsigned int n = 0;
+                                    do
+                                    {
+                                        crc <<= 1;
+                                        if ((crc & 0x100) != 0)
+                                        {
+                                            crc ^= 0xCD;
+                                        }
+                                        n++;
+                                    } while (n < 8);
+                                    if ((packet & 0xFF) == (crc & 0xFF))
+                                    {
+                                        self[0x6490 + i] = playerBase[0x144E];
+                                        successMask |= bit & 0xFF;
+                                        *reinterpret_cast<unsigned int*>(channelBase + 0x1368) =
+                                            *reinterpret_cast<unsigned int*>(playerBase + 0x142C) & 0xFFFF00;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                playerBase[0x1452] = 1;
+                                self[0x6490 + i] = 1;
+                                successMask |= bit & 0xFF;
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0;
                             }
                         }
                         else
                         {
-                            threadParam[0xC6] = 1;
-                            self[0x6490 + i] = 1;
-                            successMask |= bit;
-                            *channelWord = 0;
+                            *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
                         }
-                        break;
-                    case 3:
-                    default:
-                        *reinterpret_cast<unsigned int*>(threadParam + 0x94) = 0;
-                        break;
                     }
-                }
-                else if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0 || (loopCounter & 0x1F) == 0)
-                {
-                    OSTime now = OSGetTime();
-                    if (OSMillisecondsToTicks(5000) < static_cast<unsigned long long>(now - startTime))
+                    else if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0 || (loopCounter & 0x1F) == 0)
                     {
-disconnect_player:
-                        if ((m_playerMask & bit) != 0)
+                        OSTime now = OSGetTime();
+                        if ((s64)OSMillisecondsToTicks(5000) < now - startTime)
                         {
-                            m_playerMask = static_cast<unsigned char>(m_playerMask & ~bit);
-                            if (m_playerMask == 0)
+disconnect_player:
+                            if ((self[0x134B] & bit) != 0)
                             {
-                                self[0x6495] = 1;
-                                continue;
+                                self[0x134B] = static_cast<unsigned char>(self[0x134B] & ~bit);
+                                if (self[0x134B] == 0)
+                                {
+                                    self[0x6495] = 1;
+                                    goto next_player;
+                                }
+                                self[0x6490 + i] = 1;
+                                bit = 0;
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0x40000000;
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= 0x12000;
+                                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                                {
+                                    bit = bit * 2;
+                                    if ((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) >> 16 & 0xFF & mask) == 0)
+                                    {
+                                        if ((bit & 0x100) != 0)
+                                        {
+                                            bit ^= 0xCD;
+                                        }
+                                    }
+                                    else if ((bit & 0x100) == 0)
+                                    {
+                                        bit += 1;
+                                    }
+                                    else
+                                    {
+                                        bit ^= 0xCC;
+                                    }
+                                }
+                                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                                {
+                                    bit = bit * 2;
+                                    if (((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) & 0xFF00) >> 8 & mask) == 0)
+                                    {
+                                        if ((bit & 0x100) != 0)
+                                        {
+                                            bit ^= 0xCD;
+                                        }
+                                    }
+                                    else if ((bit & 0x100) == 0)
+                                    {
+                                        bit += 1;
+                                    }
+                                    else
+                                    {
+                                        bit ^= 0xCC;
+                                    }
+                                }
+                                unsigned int n = 0;
+                                do
+                                {
+                                    bit <<= 1;
+                                    if ((bit & 0x100) != 0)
+                                    {
+                                        bit ^= 0xCD;
+                                    }
+                                    n++;
+                                } while (n < 8);
+                                *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= bit & 0xFF;
                             }
-
-                            self[0x6490 + i] = 1;
-                            *channelWord = 0x40012000;
-                            *channelWord |= MiniGameCrc8(*channelWord);
                         }
+                        OSSendMessage(reinterpret_cast<OSMessageQueue*>(playerBase + 0x138C), reinterpret_cast<OSMessage>(6), 1);
                     }
-
-                    OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(6), 1);
                 }
-            }
+next_player:
+                i++;
+                channelBase += 4;
+                playerBase += 200;
+            } while (i < 4);
 
-            if (successMask == (m_playerMask & 0xF))
+            if (successMask == (self[0x134B] & 0xF))
             {
                 self[0x6494] = 1;
-
-                for (int i = 0; i < 4; i++)
+                int j = 0;
+                unsigned char* txBase = self;
+                do
                 {
-                    unsigned int* channelWord = reinterpret_cast<unsigned int*>(self + 0x1368 + i * 4);
-                    unsigned int word = *channelWord;
-
+                    unsigned int word = *reinterpret_cast<unsigned int*>(txBase + 0x1368);
                     if ((word & 0x8000) != 0)
                     {
-                        unsigned short padCode = static_cast<unsigned short>((word & 0xFF00) | ((word & 0xFFFF00) >> 16));
-                        PadCodeProc(i, padCode);
+                        PadCodeProc(j, static_cast<unsigned short>((word & 0xFF00) | ((int)((word & 0xFFFF00) >> 8) >> 8)));
                     }
-
-                    unsigned int* txWord = reinterpret_cast<unsigned int*>(self + 0x1378 + i * 4);
-                    *txWord = static_cast<unsigned int>((i + 0x40) << 24) | (word & 0xFFFF00);
-                    *txWord |= MiniGameCrc8(*txWord);
-                }
-
-                unsigned int* seqWord = reinterpret_cast<unsigned int*>(self + 5000);
-                unsigned short seq = *reinterpret_cast<unsigned short*>(self + 0x134E);
-                unsigned short swappedSeq = static_cast<unsigned short>((seq << 8) | (seq >> 8));
-                *seqWord = 0x44000000 | (static_cast<unsigned int>(swappedSeq) << 8);
-                *seqWord |= MiniGameCrc8(*seqWord);
-
-                for (int i = 0; i < 4; i++)
-                {
-                    if ((successMask & (1U << i)) != 0)
+                    unsigned int crc = 0;
+                    *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
+                    *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
+                        *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (word & 0xFFFF00);
+                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
                     {
-                        unsigned char* threadParam = self + 0x138C + i * 200;
-                        threadParam[0xC5] = 0;
-                        memcpy(threadParam + 0xA8, self + 0x1378, 0x14);
-                        OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(10), 1);
+                        crc = crc * 2;
+                        if ((*reinterpret_cast<unsigned int*>(txBase + 0x1378) >> 16 & 0xFF & mask) == 0)
+                        {
+                            if ((crc & 0x100) != 0)
+                            {
+                                crc ^= 0xCD;
+                            }
+                        }
+                        else if ((crc & 0x100) == 0)
+                        {
+                            crc += 1;
+                        }
+                        else
+                        {
+                            crc ^= 0xCC;
+                        }
+                    }
+                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                    {
+                        crc = crc * 2;
+                        if (((*reinterpret_cast<unsigned int*>(txBase + 0x1378) & 0xFF00) >> 8 & mask) == 0)
+                        {
+                            if ((crc & 0x100) != 0)
+                            {
+                                crc ^= 0xCD;
+                            }
+                        }
+                        else if ((crc & 0x100) == 0)
+                        {
+                            crc += 1;
+                        }
+                        else
+                        {
+                            crc ^= 0xCC;
+                        }
+                    }
+                    unsigned int n = 0;
+                    do
+                    {
+                        crc <<= 1;
+                        if ((crc & 0x100) != 0)
+                        {
+                            crc ^= 0xCD;
+                        }
+                        n++;
+                    } while (n < 8);
+                    j++;
+                    *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
+                        *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (crc & 0xFF);
+                    txBase += 4;
+                } while (j < 4);
+
+                unsigned int seqCrc = 0;
+                *reinterpret_cast<unsigned int*>(self + 5000) = 0x44000000;
+                unsigned short seq = *reinterpret_cast<unsigned short*>(self + 0x134E);
+                *reinterpret_cast<unsigned int*>(self + 5000) =
+                    *reinterpret_cast<unsigned int*>(self + 5000) |
+                    (((seq & 0xFF) << 8 | (int)(unsigned int)seq >> 8) << 8);
+                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+                {
+                    seqCrc = seqCrc * 2;
+                    if ((*reinterpret_cast<unsigned int*>(self + 5000) >> 16 & 0xFF & mask) == 0)
+                    {
+                        if ((seqCrc & 0x100) != 0)
+                        {
+                            seqCrc ^= 0xCD;
+                        }
+                    }
+                    else if ((seqCrc & 0x100) == 0)
+                    {
+                        seqCrc += 1;
+                    }
+                    else
+                    {
+                        seqCrc ^= 0xCC;
                     }
                 }
-
-                unsigned short& frameCounter = *reinterpret_cast<unsigned short*>(self + 0x134E);
-                frameCounter += 1;
-                if (frameCounter > 0x0FFE)
+                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
                 {
-                    frameCounter = 0x0FFF;
+                    seqCrc = seqCrc * 2;
+                    if (((*reinterpret_cast<unsigned int*>(self + 5000) & 0xFF00) >> 8 & mask) == 0)
+                    {
+                        if ((seqCrc & 0x100) != 0)
+                        {
+                            seqCrc ^= 0xCD;
+                        }
+                    }
+                    else if ((seqCrc & 0x100) == 0)
+                    {
+                        seqCrc += 1;
+                    }
+                    else
+                    {
+                        seqCrc ^= 0xCC;
+                    }
+                }
+                unsigned int sn = 0;
+                do
+                {
+                    seqCrc <<= 1;
+                    if ((seqCrc & 0x100) != 0)
+                    {
+                        seqCrc ^= 0xCD;
+                    }
+                    sn++;
+                } while (sn < 8);
+                int k = 0;
+                *reinterpret_cast<unsigned int*>(self + 5000) =
+                    *reinterpret_cast<unsigned int*>(self + 5000) | (seqCrc & 0xFF);
+                unsigned char* msgBase = self;
+                do
+                {
+                    if ((successMask & (1U << k)) != 0)
+                    {
+                        msgBase[0x1451] = 0;
+                        memcpy(reinterpret_cast<void*>(msgBase + 0x1434), self + 0x1378, 0x14);
+                        OSSendMessage(reinterpret_cast<OSMessageQueue*>(msgBase + 0x138C), reinterpret_cast<OSMessage>(10), 1);
+                    }
+                    k++;
+                    msgBase += 200;
+                } while (k < 4);
+
+                *reinterpret_cast<short*>(self + 0x134E) = static_cast<short>(*reinterpret_cast<short*>(self + 0x134E) + 1);
+                if (*reinterpret_cast<unsigned short*>(self + 0x134E) > 0x0FFE)
+                {
+                    *reinterpret_cast<unsigned short*>(self + 0x134E) = 0x0FFF;
                 }
             }
         }

@@ -413,8 +413,7 @@ void CGMonObj::onStatAttack(int state)
 #define prgObj (reinterpret_cast<CGPrgObj*>(this))
 #define object (reinterpret_cast<CGObject*>(this))
 #define mon (reinterpret_cast<unsigned char*>(this))
-	unsigned char* attackBase = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-#define attackData (attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48)
+	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + *reinterpret_cast<int*>(mon + 0x560) * 0x48;
 	int attackType = *reinterpret_cast<unsigned short*>(attackData + 0xE);
 	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
 
@@ -455,7 +454,7 @@ void CGMonObj::onStatAttack(int state)
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);
 			}
-			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(attackBase + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x2E))) {
+			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x2E))) {
 				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 0) {

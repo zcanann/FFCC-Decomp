@@ -3663,12 +3663,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]),
-            static_cast<u8>(object->m_localBase[6]),
-        };
+            static_cast<u8>(object->m_localBase[6]));
         CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
         CharaPcs.SetTexShadowColor(color);
         CharaPcs.SetTexShadowRadius(localFloats[7]);
@@ -3979,12 +3978,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xE8: {
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[1]),
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
-            0xFF,
-        };
+            0xFF);
         MenuPcs.SetExtraFontTlut(*object->m_localBase, color);
         this->push(object, 0);
         outResult = 0;
@@ -4097,12 +4095,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xF7: {
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
-            static_cast<u8>(object->m_localBase[5]),
-        };
+            static_cast<u8>(object->m_localBase[5]));
         MenuPcs.GetFont22()->SetTlutColor(*object->m_localBase, 0xB, color);
         MenuPcs.GetFont22()->FlushTlutColor();
         this->push(object, 0);

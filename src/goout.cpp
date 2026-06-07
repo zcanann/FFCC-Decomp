@@ -2133,10 +2133,7 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
         m_cursorChoice = 1;
         break;
     case 5:
-        if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags == 0) {
-            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 88));
-        } else {
+        if (Game.m_caravanWorkArr[m_selectedChara].m_caravanLocalFlags != 0) {
             int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
             SetMenuStr(0, 8,
                        GetGoOutMessageLine(languageId, 80),
@@ -2147,6 +2144,9 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 85),
                        GetGoOutMessageLine(languageId, 86),
                        GetGoOutMessageLine(languageId, 87));
+        } else {
+            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 1, GetGoOutMessageLine(languageId, 88));
         }
         m_cursorChoice = 1;
         MenuPcs.SetMenuCharaAnim(m_selectedChara, 5);

@@ -639,11 +639,23 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 particleData->m_matrix[0][2] = param->m_speedRandRange * Math.RandF();
                 particleData->m_matrix[0][2] -= speedRandHalf;
             } else {
-                particleData->m_matrix[0][0] = Math.RandF() * (Math.RandF() * (param->m_speedRandRange * Math.RandF() * Math.RandF()));
+                float a0 = Math.RandF();
+                float b0 = Math.RandF();
+                float c0 = Math.RandF();
+                float d0 = Math.RandF();
+                particleData->m_matrix[0][0] = d0 * (c0 * (param->m_speedRandRange * b0 * a0));
                 particleData->m_matrix[0][0] -= speedRandHalf;
-                particleData->m_matrix[0][1] = Math.RandF() * (Math.RandF() * (param->m_speedRandRange * Math.RandF() * Math.RandF()));
+                float a1 = Math.RandF();
+                float b1 = Math.RandF();
+                float c1 = Math.RandF();
+                float d1 = Math.RandF();
+                particleData->m_matrix[0][1] = d1 * (c1 * (param->m_speedRandRange * b1 * a1));
                 particleData->m_matrix[0][1] -= speedRandHalf;
-                particleData->m_matrix[0][2] = Math.RandF() * (Math.RandF() * (param->m_speedRandRange * Math.RandF() * Math.RandF()));
+                float a2 = Math.RandF();
+                float b2 = Math.RandF();
+                float c2 = Math.RandF();
+                float d2 = Math.RandF();
+                particleData->m_matrix[0][2] = d2 * (c2 * (param->m_speedRandRange * b2 * a2));
                 particleData->m_matrix[0][2] -= speedRandHalf;
             }
         }

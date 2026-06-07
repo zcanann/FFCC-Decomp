@@ -4533,8 +4533,9 @@ void calcWeightMax()
  */
 void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 {
+	unsigned char* countBase = CGPartyObj::m_ghostWork;
 	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
-	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
+	int& activeTrailCount = *reinterpret_cast<int*>(countBase + 0x48);
 	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 
 	if (activeTrailCount == 0) {
@@ -4562,7 +4563,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			if (i == trailIndex) {
 				nextPos = &m_worldPosition;
 			} else {
-				nextPos = reinterpret_cast<Vec*>(ghostWork + (i - 1) * 0xC + 0x50);
+				nextPos = reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + (i - 1) * 0xC + 0x50);
 			}
 			Vec delta;
 			PSVECSubtract(reinterpret_cast<Vec*>(leaderPtr + 0x50), nextPos, &delta);

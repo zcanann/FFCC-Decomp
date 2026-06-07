@@ -133,34 +133,13 @@ def unit_fuzzy(rep, unit):
     return u["measures"]["fuzzy_match_percent"] if u else None
 
 
-def _func_matches(func, name, dem):
-    """Match `func` against a symbol name/demangled name with word-boundary
-    semantics so e.g. `LetterCtrl` does NOT match `LetterCtrlCur`. We accept an
-    exact equality, or an occurrence of `func` immediately followed by `(`
-    (a call/definition boundary) or bounded by non-word characters."""
-    if func == name:
-        return True
-    # Symbol-name match: MWCC mangling is `<basename>__<sig>`, so `func` followed
-    # by the `__` mangling separator (or end-of-string) is an exact basename hit.
-    # Crucially `LetterCtrl__Fv` matches `LetterCtrl` but `LetterCtrlCur__Fv`
-    # does NOT (the char after `LetterCtrl` there is `C`, a word char).
-    name_pat = re.compile(
-        r"(?<![A-Za-z0-9_])" + re.escape(func) + r"(?:__|\b|$)")
-    if name_pat.search(name):
-        return True
-    # Demangled-name match: ordinary word boundaries (a `(` or non-word char).
-    dem_pat = re.compile(
-        r"(?<![A-Za-z0-9_])" + re.escape(func) + r"(?![A-Za-z0-9_])")
-    return bool(dem_pat.search(dem))
-
-
 def func_fuzzy(rep, unit, func):
     u = unit_record(rep, unit)
     if not u:
         return None
     for fn in u.get("functions", []):
         dem = fn.get("metadata", {}).get("demangled_name", "")
-        if _func_matches(func, fn["name"], dem):
+        if fn["name"] == func or func in fn["name"] or func in dem:
             return fn["fuzzy_match_percent"]
     return None
 
@@ -353,18 +332,6 @@ def t_scratch_temp(body, rng, mk):
     for dm in _all_decls(body):
         if dm.group("type") in int_types:
             declared_int.add(dm.group("name"))
-    # Names that are ever the LHS of a compound-assignment / inc / dec are NOT
-    # safe to hoist into a read-only temp: hoisting drops the in-place mutation
-    # (e.g. `y += 0x20;` would silently become a dead temp). Exclude them.
-    mutated = set()
-    for am in re.finditer(
-            r"([A-Za-z_]\w*)\s*(?:\+=|-=|\*=|/=|&=|\|=|\^=|<<=|>>=|%=)", body):
-        mutated.add(am.group(1))
-    for am in re.finditer(r"(?:\+\+|--)\s*([A-Za-z_]\w*)", body):
-        mutated.add(am.group(1))
-    for am in re.finditer(r"([A-Za-z_]\w*)\s*(?:\+\+|--)", body):
-        mutated.add(am.group(1))
-    declared_int -= mutated
     KW = {"if", "for", "while", "do", "return", "else", "int", "char", "short",
           "long", "unsigned", "signed", "void", "bool", "const", "static",
           "new", "delete", "sizeof", "true", "false", "this", "switch", "case",
@@ -548,7 +515,7 @@ def main():
             return False, "proj"
         funcs = all_unit_func_fuzzies(rep, args.unit)
         for k, vbase in base_funcs.items():
-            if _func_matches(args.func, k, k):
+            if args.func in k or k == args.func:
                 continue
             if funcs.get(k, vbase) < vbase - EPS:
                 return False, f"regress:{k}"

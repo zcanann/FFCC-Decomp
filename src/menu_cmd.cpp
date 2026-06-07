@@ -1085,20 +1085,20 @@ void CMenuPcs::CmdDraw()
 					colors[3].a = 0xFF;
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-					const float fill = row->alpha * rowW;
+					float fill = row->alpha * static_cast<float>(row->width);
 					if (fill > FLOAT_80332ab0) {
 						MenuPcs.DrawRect(0, rowX, rowY, fill, rowH, rowU, rowV, colors,
 						    FLOAT_80332a70, FLOAT_80332a70, 0.0f);
 						rowX += fill;
 						rowU += fill;
 					}
-					if ((fill > FLOAT_80332ab0) && (fill < rowW)) {
+					if ((fill > FLOAT_80332ab0) && (fill < static_cast<float>(row->width))) {
 						colors[1].a = 0;
 						colors[3].a = 0;
 						const float frac = static_cast<float>(
 						    DOUBLE_80332a58 / static_cast<double>(row->duration));
-						const float gradW = frac * rowW;
-						MenuPcs.DrawRect(0, rowX, rowY, gradW, rowH, rowU, rowV, colors,
+						fill = frac * static_cast<float>(row->width);
+						MenuPcs.DrawRect(0, rowX, rowY, fill, rowH, rowU, rowV, colors,
 						    FLOAT_80332a70, FLOAT_80332a70, 0.0f);
 					}
 

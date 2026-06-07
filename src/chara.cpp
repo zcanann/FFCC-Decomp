@@ -1982,19 +1982,13 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 			rotateAngle = acosf(align);
 		}
 
-		Vec axis;
-		{
-			CVector tmp;
-			PSVECCrossProduct(&forward, &direction, reinterpret_cast<Vec*>(&tmp));
-			axis.x = tmp.x;
-			axis.y = tmp.y;
-			axis.z = tmp.z;
-		}
+		CVector axis;
+		PSVECCrossProduct(&forward, &direction, reinterpret_cast<Vec*>(&axis));
 		Mtx rotate;
 		Mtx base;
 		Mtx axisBase;
 		Mtx combined;
-		PSMTXRotAxisRad(rotate, &axis, rotateAngle);
+		PSMTXRotAxisRad(rotate, reinterpret_cast<Vec*>(&axis), rotateAngle);
 		PSMTXCopy(NodeWorldMtx(node), base);
 		PSMTXCopy(rotate, axisBase);
 		base[0][3] = CVector(FLOAT_803301b0, FLOAT_803301b0, FLOAT_803301b0).x;

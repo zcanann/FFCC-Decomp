@@ -1761,7 +1761,8 @@ void CMaterialMan::SetPosition(
     float (*viewMtx)[4],
     int ignoreFrustumCheck)
 {
-    CBound searchBound;
+    float searchBoundStorage[6];
+    CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
     searchBound.m_min.x = position->x - rangeXZ;
     searchBound.m_min.y = position->y;
     searchBound.m_min.z = position->z - rangeXZ;
@@ -1878,7 +1879,8 @@ int CMaterialMan::GetCharaShadow(
     float rangeY,
     int ignoreFrustumCheck)
 {
-    CBound searchBound;
+    float searchBoundStorage[6];
+    CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
     searchBound.m_min.x = position->x - rangeXZ;
     searchBound.m_min.y = position->y;
     searchBound.m_min.z = position->z - rangeXZ;

@@ -2525,7 +2525,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						handle = displaySlots[modelIndex - activePartyCount];
 					}
 
-					if (0.0f < handle->m_model->m_lightAlpha) {
+					if (handle->m_model->m_lightAlpha > 0.0f) {
 						SetProjection(modelIndex);
 						SetLight(1);
 						handle->m_flags = 0x300543;

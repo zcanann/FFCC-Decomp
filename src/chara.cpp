@@ -2135,12 +2135,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		return;
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	if (materialSet == 0) {
-		return;
-	}
-
-	materialSet->SetTextureSet(m_texSet);
+	ModelMaterialSet(this)->SetTextureSet(m_texSet);
 	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2150,16 +2145,9 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 	GXSetCullMode((GXCullMode)1);
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);
-	CNode* nodes = ModelNodes(this);
-	const u16 meshCount = ModelMeshCount(this);
-	CustomMeshDrawCallback customMeshDraw = ModelCustomMeshDrawCallback(this);
-	AfterMeshDrawCallback shadowDisplayList = ModelShadowDisplayListCallback(this);
 
-	for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_workPositions == 0 || mesh->m_data == 0) {
-			continue;
-		}
-		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
+		if (mesh->m_workPositions == 0 || ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
@@ -2167,13 +2155,13 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
 
-		if (customMeshDraw != 0) {
-			customMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+		if (ModelCustomMeshDrawCallback(this) != 0) {
+			ModelCustomMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2186,11 +2174,11 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (shadowDisplayList == 0) {
-				MaterialMan.SetMaterial(materialSet, displayList->m_material, 1, (_GXTevScale)0);
+			if (ModelShadowDisplayListCallback(this) == 0) {
+				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, 1, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			} else {
-				shadowDisplayList(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+				ModelShadowDisplayListCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			}
 		}
 	}

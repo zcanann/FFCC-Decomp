@@ -754,7 +754,7 @@ void CGMonObj::isValidTarget()
 		return;
 	}
 
-	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+	if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x21;
 		if (m_moveWork.m_mode != 3) {
 			memset(&m_moveWork, 0, sizeof(m_moveWork));
@@ -764,8 +764,8 @@ void CGMonObj::isValidTarget()
 		m_moveWork.m_targetPos = m_homePosition;
 	}
 
-	if (((*reinterpret_cast<short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
-	    ((*reinterpret_cast<short*>(script9 + 0x10C) == 1) || (FLOAT_80331A34 * maxDist <= homeDist))) {
+	if (((*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) || (m_moveWork.m_frame < 0x19)) &&
+	    ((*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) || (FLOAT_80331A34 * maxDist <= homeDist))) {
 		goto check_home;
 	}
 
@@ -788,7 +788,7 @@ void CGMonObj::isValidTarget()
 
 		if (partyIndex >= 0) {
 			m_targetPartyIndex = partyIndex;
-			if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				m_chaseState = 2;
 			} else {
 				m_chaseState = 1;
@@ -808,7 +808,7 @@ check_home:
 		m_chaseState = 0;
 		m_chaseTimer = 0;
 		m_chaseDirty = 1;
-	} else if (*reinterpret_cast<short*>(script9 + 0x10C) != 1) {
+	} else if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) != 1) {
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
 	}
 #undef script9

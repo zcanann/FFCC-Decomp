@@ -1089,10 +1089,6 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
  */
 void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 {
-	if (ModelRef(this) == 0 || dynData == 0) {
-		return;
-	}
-
 	CChunkFile chunkFile(dynData);
 	CChunkFile::CChunk chunk;
 	while (chunkFile.GetNextChunk(chunk)) {
@@ -1131,19 +1127,18 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 						continue;
 					}
 
-					float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24);
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
 						if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
-							dynParam[0] = chunkFile.GetF4();
-							dynParam[1] = chunkFile.GetF4();
-							dynParam[2] = chunkFile.GetF4();
-							*reinterpret_cast<u32*>(dynParam + 3) = chunkFile.Get4();
-							*reinterpret_cast<u32*>(dynParam + 4) = chunkFile.Get4();
-							dynParam[5] = chunkFile.GetF4();
-							dynParam[7] = chunkFile.GetF4();
-							dynParam[6] = chunkFile.GetF4();
-							dynParam[8] = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24) = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 4) = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 8) = chunkFile.GetF4();
+							*reinterpret_cast<u32*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0xC) = chunkFile.Get4();
+							*reinterpret_cast<u32*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0x10) = chunkFile.Get4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0x14) = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0x1C) = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0x18) = chunkFile.GetF4();
+							*reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + ModelDynCount(this) * 0x24 + 0x20) = chunkFile.GetF4();
 						}
 					}
 					chunkFile.PopChunk();

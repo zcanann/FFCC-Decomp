@@ -3774,7 +3774,7 @@ void CGMonObj::statWatch()
 				unsigned char* scriptBase = script;
 				if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) <
 					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
-					if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
+					if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 						chaseState = 5;
 						chaseTimer = 0;
 						monObj->m_chaseDirty = 1;
@@ -3804,7 +3804,7 @@ void CGMonObj::statWatch()
 			monObj->m_chaseDirty = 1;
 		} else {
 			unsigned char* scriptBase = script;
-			if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
+			if (*reinterpret_cast<unsigned short*>(scriptBase + 0x10C) == 1) {
 				if (actionState < 100) {
 					short aiState = monObj->m_aiState;
 					unsigned char* aiData = scriptBase;

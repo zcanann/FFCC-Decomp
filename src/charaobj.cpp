@@ -1391,7 +1391,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				}
 				if ((GetCID() & 0x6D) == 0x6D) {
 					changeSubStat(2);
-					if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8) == 0) {
+					if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 0) {
 						effectResult = 0;
 					} else {
 						damageClamp = 1;
@@ -1407,7 +1407,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	if (m_lastStateId == 6 &&
 	    static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 0x1A) |
 	                     (static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) >> 6)) < 0) {
-		unsigned int currentKind =
+		int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
 			if (staType != 0x66 && staType != 0x67 && staType != 7) {
@@ -1646,7 +1646,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (staType != 4 &&
-		    !((sourceObj->GetCID() & 0xAD) == 0xAD && sourceObj->m_scriptHandle[4] == reinterpret_cast<void*>(6) && staType == 0x6A) &&
+		    !((sourceObj->GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x10) == 6 && staType == 0x6A) &&
 		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 			setSta(4, 0);
 		}

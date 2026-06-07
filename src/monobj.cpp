@@ -1370,6 +1370,39 @@ void CGMonObj::onStatDie()
 	int subState = *reinterpret_cast<int*>(mon + 0x52C);
 
 	switch (subState) {
+	case 0:
+		if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(
+				*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
+				0x32,
+				0x96,
+				0,
+				(Vec*)0
+			);
+
+			unsigned short pId = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19E);
+			if (pId != 0xFFFF) {
+				int dataNo = -1;
+				dataNo = object->m_charaModelHandle->GetPdtSlot();
+				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
+			}
+
+			int option = *reinterpret_cast<short*>(&Game.m_gameWork.m_optionValue);
+			if (option < 9 && m_repop.delay == 0) {
+				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
+				unsigned long long bit = 1ULL << shift;
+				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
+				CFlatSpawnBitLo(option) |= static_cast<unsigned int>(bit >> 32);
+			}
+			return;
+		}
+
+		if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
+			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
+		}
+		return;
+
 	case 1: {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
@@ -1423,43 +1456,6 @@ void CGMonObj::onStatDie()
 		}
 		return;
 	}
-
-	case 0:
-		break;
-
-	default:
-		return;
-	}
-
-	if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
-		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		reinterpret_cast<CGPrgObj*>(this)->playSe3D(
-			*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
-			0x32,
-			0x96,
-			0,
-			(Vec*)0
-		);
-
-		unsigned short pId = *reinterpret_cast<unsigned short*>(aiData + 0x19E);
-		if (pId != 0xFFFF) {
-			int dataNo = -1;
-			dataNo = object->m_charaModelHandle->GetPdtSlot();
-			reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, FLOAT_80331A44 * object->m_attackColRadius, 0);
-		}
-
-		int option = static_cast<short>(Game.m_gameWork.m_optionValue);
-		if (option <= 8 && static_cast<short>(m_repop.delay) == 0) {
-			int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
-			unsigned long long bit = 1ULL << shift;
-			CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
-			CFlatSpawnBitLo(option) |= static_cast<unsigned int>(bit >> 32);
-		}
-		return;
-	}
-
-	if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
-		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
 	}
 }
 

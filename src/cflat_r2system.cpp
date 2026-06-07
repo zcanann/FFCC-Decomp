@@ -2672,8 +2672,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x4D: {
-        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
-        if (mesMenu == 0) {
+        if (MenuPcs.GetMesMenu(*object->m_localBase) == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
                 System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
@@ -2681,7 +2680,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             outResult = 0;
             break;
         }
-        if (mesMenu->IsUse() == 0) {
+        if (MenuPcs.GetMesMenu(*object->m_localBase)->IsUse() == 0) {
             this->push(object, 0);
             outResult = 0;
             break;

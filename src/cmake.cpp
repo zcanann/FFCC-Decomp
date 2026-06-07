@@ -3107,30 +3107,30 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    unsigned int yesX = static_cast<unsigned int>(
+    int yesX = static_cast<int>(
         (static_cast<float>(static_cast<double>(48.0f) - static_cast<double>(yesW)) * 0.5f) +
         0x1D0);
-    font->SetPosX(static_cast<float>(static_cast<int>(yesX)));
+    font->SetPosX(static_cast<float>(yesX));
     font->SetPosY(369.0f);
     font->Draw(yesStr);
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    unsigned int noX = static_cast<unsigned int>(
+    int noX = static_cast<int>(
         (static_cast<float>(static_cast<double>(48.0f) - static_cast<double>(noW)) * 0.5f) +
         0x218);
-    font->SetPosX(static_cast<float>(static_cast<int>(noX)));
+    font->SetPosX(static_cast<float>(noX));
     font->SetPosY(369.0f);
     font->Draw(noStr);
 
     DrawInit();
     if (yesNoSel != 0) {
-        unsigned int cursorBase = noX;
+        int cursorBase = noX;
         if (yesNoSel == 1) {
             cursorBase = yesX;
         }
         int frame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
+        DrawCursor(cursorBase - 0x24 + frame, 0x175, alpha);
     }
 }
 
@@ -3428,19 +3428,19 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
-    unsigned int tx = static_cast<unsigned int>(
+    int tx = static_cast<int>(
         static_cast<double>(static_cast<float>(static_cast<double>(120.0f) - static_cast<double>(w))) *
             0.5 +
         480.0);
     int cursorY = static_cast<int>(373.0);
-    font->SetPosX(static_cast<float>(static_cast<int>(tx)));
+    font->SetPosX(static_cast<float>(tx));
     font->SetPosY(static_cast<float>(cursorY - 4));
     font->Draw(txt);
     DrawInit();
 
     if (yesNoSel != 0) {
         int frame = static_cast<int>(System.m_frameCounter) % 8;
-        DrawCursor(static_cast<int>(tx) - 0x20 + frame, cursorY, alpha);
+        DrawCursor(tx - 0x20 + frame, cursorY, alpha);
     }
 }
 

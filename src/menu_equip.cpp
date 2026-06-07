@@ -147,9 +147,10 @@ int CMenuPcs::EquipClose0()
 
 	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
 	timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	int listBase = *(int*)&this->m_equipList;
+	int selOff = (int)GetEquipMenuState(this)->selectedIndex * 0x40 + 8;
 	if (7 < timer) {
-		GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex].x =
-		    GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex].x + 0x13;
+		*(short*)(listBase + selOff) = *(short*)(listBase + selOff) + 0x13;
 	}
 
 	doneCount = 0;

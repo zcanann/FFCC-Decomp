@@ -5,10 +5,10 @@
 
 #include <dolphin/mtx.h>
 
-extern const float FLOAT_80331920;
-extern const float FLOAT_80331924;
-extern const float FLOAT_80331928 = 640.0f;
-extern const float FLOAT_8033192c = 224.0f;
+extern const float kPppAlignmentScaleOne;
+extern const float kPppAlignmentScaleZero;
+extern const float kPppAlignmentScaleScreenWidth = 640.0f;
+extern const float kPppAlignmentScaleScreenHalfHeight = 224.0f;
 
 /*
  * --INFO--
@@ -38,19 +38,19 @@ void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleD
         objPos.z = ppvMng->m_matrix.value[2][3];
 
         scale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
-        if (scale <= FLOAT_80331920) {
-            scale = FLOAT_80331920;
+        if (scale <= kPppAlignmentScaleOne) {
+            scale = kPppAlignmentScaleOne;
         } else {
-            float deltaScale = scale - FLOAT_80331920;
+            float deltaScale = scale - kPppAlignmentScaleOne;
             float scaleFactor = data->m_unk0x8;
-            scale = deltaScale * scaleFactor + FLOAT_80331920;
+            scale = deltaScale * scaleFactor + kPppAlignmentScaleOne;
         }
 
         PSMTXScale(scaleMtx, scale, scale, scale);
 
-        ppvMng->m_matrix.value[0][3] = FLOAT_80331924;
-        ppvMng->m_matrix.value[1][3] = FLOAT_80331924;
-        ppvMng->m_matrix.value[2][3] = FLOAT_80331924;
+        ppvMng->m_matrix.value[0][3] = kPppAlignmentScaleZero;
+        ppvMng->m_matrix.value[1][3] = kPppAlignmentScaleZero;
+        ppvMng->m_matrix.value[2][3] = kPppAlignmentScaleZero;
         PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
         ppvMng->m_matrix.value[0][3] = objPos.x;
         ppvMng->m_matrix.value[1][3] = objPos.y;

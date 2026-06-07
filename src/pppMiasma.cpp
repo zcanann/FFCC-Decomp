@@ -10,8 +10,8 @@
 
 #include <string.h>
 
-extern const float FLOAT_80331928;
-extern const float FLOAT_8033192c;
+extern const float kPppAlignmentScaleScreenWidth;
+extern const float kPppAlignmentScaleScreenHalfHeight;
 static const float FLOAT_80331930 = -1000.0f;
 static const float FLOAT_80331934 = 1200.0f;
 static const float FLOAT_80331938 = 10.0f;
@@ -294,8 +294,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);
     packedWork.bytes[3] = (u8)(work->m_position[3] >> 7);
 
-    i4TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)6, GX_FALSE, 0);
-    rgba8TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)0x28, GX_FALSE, 0);
+    i4TexSize = GXGetTexBufferSize((int)kPppAlignmentScaleScreenWidth, (int)kPppAlignmentScaleScreenHalfHeight,
+                                   (GXTexFmt)6, GX_FALSE, 0);
+    rgba8TexSize = GXGetTexBufferSize((int)kPppAlignmentScaleScreenWidth, (int)kPppAlignmentScaleScreenHalfHeight,
+                                      (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = ppvMng->m_matrix.value[0][3];
     managerPos.y = ppvMng->m_matrix.value[1][3];
@@ -325,11 +327,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         isCameraInside = 1;
     }
 
-    texHeight = (int)FLOAT_8033192c;
-    texWidth = (int)FLOAT_80331928;
-    scissorHeight = (u32)FLOAT_8033192c;
-    scissorWidth = (u32)FLOAT_80331928;
-    const float& yStep = FLOAT_8033192c;
+    texHeight = (int)kPppAlignmentScaleScreenHalfHeight;
+    texWidth = (int)kPppAlignmentScaleScreenWidth;
+    scissorHeight = (u32)kPppAlignmentScaleScreenHalfHeight;
+    scissorWidth = (u32)kPppAlignmentScaleScreenWidth;
+    const float& yStep = kPppAlignmentScaleScreenHalfHeight;
     do {
         yPos = (float)slice * yStep;
         yOffset = (int)yPos;
@@ -349,7 +351,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             drawColor.rgba[2] = 0;
             drawColor.rgba[3] = 0xFF;
         }
-        gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
+        gUtil.RenderColorQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+                              kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
 
         pppSetDrawEnv(
             &drawColor, &pppMiasma->m_drawMatrix, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
@@ -432,7 +435,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                 drawColor.rgba[2] = 0;
                 drawColor.rgba[3] = 0xFF;
             }
-            gUtil.RenderColorQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, *(GXColor*)drawColor.rgba);
+            gUtil.RenderColorQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+                                  kPppAlignmentScaleScreenHalfHeight, *(GXColor*)drawColor.rgba);
             GXClearVtxDesc();
             GXSetVtxDesc((GXAttr)9, GX_INDEX16);
             GXSetVtxDesc((GXAttr)10, GX_INDEX16);
@@ -495,8 +499,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         }
 
         Graphic.SetViewport();
-        gUtil.RenderTextureQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
-                                       0, (GXBlendFactor)4, (GXBlendFactor)5);
+        gUtil.RenderTextureQuad(FLOAT_8033193c, yPos, kPppAlignmentScaleScreenWidth,
+                                kPppAlignmentScaleScreenHalfHeight, &backI4Tex, 0, 0,
+                                0, (GXBlendFactor)4, (GXBlendFactor)5);
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 
@@ -575,8 +580,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             quadA.x = FLOAT_8033193c;
             quadA.y = yPos;
             quadA.z = FLOAT_8033193c;
-            quadB.x = FLOAT_80331928;
-            quadB.y = yPos + FLOAT_8033192c;
+            quadB.x = kPppAlignmentScaleScreenWidth;
+            quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
             quadB.z = FLOAT_8033193c;
 
             pppInitBlendMode();
@@ -686,8 +691,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             quadA.x = FLOAT_8033193c;
             quadA.y = yPos;
             quadA.z = FLOAT_8033193c;
-            quadB.x = FLOAT_80331928;
-            quadB.y = yPos + FLOAT_8033192c;
+            quadB.x = kPppAlignmentScaleScreenWidth;
+            quadB.y = yPos + kPppAlignmentScaleScreenHalfHeight;
             quadB.z = FLOAT_8033193c;
             gUtil.RenderQuad(quadA, quadB, packedWork.color, 0, 0);
         }

@@ -788,6 +788,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		classLocalCount = classBase->m_localCount;
 	}
 
+	const int requiredWords = classLocalCount + 0x60;
 	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
 	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
 	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
@@ -795,7 +796,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		u8* const prev = scanNode;
 		scanNode = *reinterpret_cast<u8**>(prev + 4);
 		if (*reinterpret_cast<int*>(*reinterpret_cast<u8**>(prev + 4) + 8)
-		    >= (classLocalCount + 0x60 + *reinterpret_cast<int*>(prev + 8) + *reinterpret_cast<int*>(prev + 0xC))) {
+		    >= (requiredWords + *reinterpret_cast<int*>(prev + 8) + *reinterpret_cast<int*>(prev + 0xC))) {
 			scanNode = prev;
 			break;
 		}

@@ -250,7 +250,7 @@ void CGMonObj::undeadOff()
 
 	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
 	int weaponMode = static_cast<int>(static_cast<unsigned int>(weaponFlags) << 24) >> 31;
-	unsigned int isUndead =
+	int isUndead =
 		(static_cast<unsigned int>(
 			 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
 		 5) &
@@ -261,10 +261,10 @@ void CGMonObj::undeadOff()
 
 	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-	unsigned short count = (weaponMode == 0) ?
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
-		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
-	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+	unsigned short count = (weaponMode != 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
+	int particleBase = (weaponMode != 0) ? 0x46 : 0x3C;
 
 	if ((isUndead != 0) && (count != 0)) {
 		int dataNo = object->m_charaModelHandle->GetPdtSlot();

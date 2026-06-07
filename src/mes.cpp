@@ -1625,8 +1625,8 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
-	float zero = FLOAT_8033089c;
 	float one = FLOAT_80330898;
+	float zero = FLOAT_8033089c;
 	mText = text;
 	mWaitActive = 0;
 	mMaxHeight = zero;

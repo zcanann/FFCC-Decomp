@@ -192,7 +192,7 @@ struct CmdState {
 	unsigned char pad_0007;
 	s8 commandResult;
 	unsigned char pad_0009[0x0B - 0x09];
-	u8 initialized;
+	s8 initialized;
 	u8 unitePanelInitialized;
 	unsigned char pad_000D[0x10 - 0x0D];
 	s16 animState;

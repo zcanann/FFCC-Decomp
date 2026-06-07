@@ -1592,22 +1592,18 @@ void CMes::Next()
 			}
 			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
 			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
-			if (start <= curr - 5)
+			for (; runLength != 0; runLength = runLength - 1)
 			{
-				do
+				type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
+				if ((unsigned int)type == 1)
 				{
-					type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
-					if ((unsigned int)type == 1)
-					{
-						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
-					}
-					else if ((unsigned int)type == 2)
-					{
-						*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
-					}
-					start = start + 5;
-					runLength = runLength - 1;
-				} while (runLength != 0);
+					*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
+				}
+				else if ((unsigned int)type == 2)
+				{
+					*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
+				}
+				start = start + 5;
 			}
 		}
 	}

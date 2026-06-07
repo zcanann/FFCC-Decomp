@@ -450,9 +450,9 @@ void CChara::TimeMogFur()
 			int g;
 			int b;
 			int a;
-			unsigned int newA;
+			int newA;
 			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
-			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
+			short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			a = (packed >> 12) & 7;
 			light = 7 - a;
@@ -862,7 +862,7 @@ void CChara::InitFurTexBuffer()
 	int rowCount = 0;
 	int row = 0;
 	do {
-		int inner = 0;
+		unsigned int inner = 0;
 		int byteOffset = row << 1;
 		int count = 8;
 		do {
@@ -967,7 +967,7 @@ void CChara::CModel::InitMogFurTex()
 void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
 	MogWorkRaw& work = MogWork();
-	const unsigned short heldButtons = MogHeldButtons();
+	const short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
 	const unsigned short rotateButtons = (MogPadInt(64) == 0) ? heldButtons : 0;
 	int messageId = -1;
@@ -1023,7 +1023,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	const float cursorStep = 0.1f;
-	const int cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
+	const unsigned int cursorX = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorX)) +
 	                                     static_cast<float>(MogPadInt(36)) * cursorStep);
 	const int cursorY = static_cast<int>(static_cast<float>(static_cast<int>(Chara.MogFur().m_cursorY)) -
 	                                     static_cast<float>(MogPadInt(40)) * cursorStep);
@@ -1047,7 +1047,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
 	if ((heldButtons & 0x100) != 0) {
-		const unsigned char radarType = MogRadarType();
+		const signed char radarType = MogRadarType();
 		if (Chara.MogFur().m_prevRadarType != radarType) {
 			Chara.MogFur().m_prevRadarType = radarType;
 			work.m_pickTicks = 0;
@@ -1244,7 +1244,7 @@ int CChara::CModel::PickFur(
 		Mtx modelViewMtx;
 		PSMTXConcat(reinterpret_cast<MtxPtr>(param_2), meshMtx, modelViewMtx);
 		const unsigned int posGqr = ModelPosQuant(this);
-		const unsigned int normGqr = ModelNormQuant(this);
+		const int normGqr = ModelNormQuant(this);
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
 		              normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
 
@@ -1507,7 +1507,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, 4);
 
 		unsigned int posGqr = ModelPosQuant(this);
-		unsigned int normGqr = ModelNormQuant(this);
+		int normGqr = ModelNormQuant(this);
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
@@ -1640,8 +1640,10 @@ void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
 
-	static CColor furBaseColor(0x80, 0x80, 0x80, 0xFF), furTipColor(0xF0, 0xF0, 0xF0, 0);
-	static CColor furNoiseBase(0, 0, 0, 0), furNoiseRange(8, 8, 8, 0);
+	static CColor furBaseColor(0x80, 0x80, 0x80, 0xFF);
+	static CColor furTipColor(0xF0, 0xF0, 0xF0, 0);
+	static CColor furNoiseBase(0, 0, 0, 0);
+	static CColor furNoiseRange(8, 8, 8, 0);
 	static CVector velBase(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
 	static CVector velRand(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
 	static CVector accelBase(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
@@ -1650,7 +1652,7 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	for (int i = 0; i < 0x20; i++) {
+	for (unsigned int i = 0; i < 0x20; i++) {
 		CVector scaled;
 		PSVECScale(velRand, scaled, FurRandScale());
 		PSVECAdd(velBase, scaled, hairSet[i].m_vec0);
@@ -1864,10 +1866,10 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			}
 
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
-			unsigned int ux = px;
+			int ux = px;
 			unsigned int uy = py;
 			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
-			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
+			packed = *(short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;
 			g = (packed >> 4) & 0x0f;

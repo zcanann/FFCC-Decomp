@@ -1272,6 +1272,15 @@ void CMenuPcs::CmdDraw()
 		}
 	}
 
+	if ((cmdMode == 1) && (GetCmdStateView(this)->phase == 1)) {
+		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+		const float mark = CalcListPos(GetCmdStateView(this)->scrollTop, letter[0], 1);
+		CmdListEntry* listPos = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
+		if (mark > FLOAT_80332ab0) {
+			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
+		}
+	}
+
 	if (cmdMode == 2) {
 		CmdListEntry* panel = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd + 3];
 		SetTexture(static_cast<CMenuPcs::TEX>(panel->tex));
@@ -1317,15 +1326,6 @@ void CMenuPcs::CmdDraw()
 			choiceFont->Draw(text);
 		}
 		DrawInit();
-	}
-
-	if ((cmdMode == 1) && (GetCmdStateView(this)->phase == 1)) {
-		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const float mark = CalcListPos(GetCmdStateView(this)->scrollTop, letter[0], 1);
-		CmdListEntry* listPos = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->count];
-		if (mark > FLOAT_80332ab0) {
-			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
-		}
 	}
 
 	if (((cmdMode == 0) && (animState == 1)) ||

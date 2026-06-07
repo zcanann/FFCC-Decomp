@@ -951,7 +951,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		*(short*)(animPtr + 6) = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -1990,11 +1990,9 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
-	BonusSummaryData* rinfo = s_Rinfo;
-	int statePtr = this->m_bonusStatePtr;
-	const int activePartyCount = rinfo->m_partyCount;
+	const int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		int off = 0;
 		short* count = (short*)this->m_bonusAnimPtr;
 		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
@@ -2136,12 +2134,12 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		sp[3] = 0;
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
 	int doneCount = 0;
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
-	int frame = (int)*(short*)(statePtr + 0x22);
+	*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22);
 
 	int off = 0;
 	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
@@ -2232,27 +2230,28 @@ void CMenuPcs::CalcResultCloseAnim()
 		if (i / activePartyCount == 1) {
 			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
 			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
 			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
 
 		if (i < activePartyCount) {
+			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+			scaleMtx[2][3] = 0.0f;
 		} else {
+			scaleMtx[0][3] = 0.0f;
 			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
 		}
-		scaleMtx[0][3] = 0.0f;
-		scaleMtx[2][3] = scaleMtx[0][3];
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
 		if (i < activePartyCount) {
-			model->m_lightAlpha = 1.0f;
+			handle->m_model->m_lightAlpha = 1.0f;
 		} else {
-			model->m_lightAlpha = *(float*)(animPtr + alphaOff + 0x18);
+			handle->m_model->m_lightAlpha = *(float*)(animPtr + alphaOff + 0x18);
 		}
 		alphaOff += 0x40;
 		partyByteOff += 0x2c;
@@ -2960,7 +2959,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		header->count = (short)(countTop + activePartyCount);
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 		header->finished = 0;
 		return;
 	}

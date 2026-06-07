@@ -2672,40 +2672,40 @@ int CMenuPcs::CmakeNameCtrl()
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                     }
                     return 0;
-                }
+                } else {
+                    int nameLen = strlen(s_CmakeInfo.m_name);
+                    int spaceCount = 0;
+                    const char* scan = s_CmakeInfo.m_name;
+                    int remain = nameLen;
+                    if (0 < nameLen) {
+                        do {
+                            if (*scan != ' ') {
+                                break;
+                            }
+                            scan = scan + 1;
+                            spaceCount = spaceCount + 1;
+                            remain = remain - 1;
+                        } while (remain != 0);
+                    }
+                    if (spaceCount == nameLen) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        return 0;
+                    }
 
-                int nameLen = strlen(s_CmakeInfo.m_name);
-                int spaceCount = 0;
-                const char* scan = s_CmakeInfo.m_name;
-                int remain = nameLen;
-                if (0 < nameLen) {
-                    do {
-                        if (*scan != ' ') {
-                            break;
-                        }
-                        scan = scan + 1;
-                        spaceCount = spaceCount + 1;
-                        remain = remain - 1;
-                    } while (remain != 0);
-                }
-                if (spaceCount == nameLen) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    return 0;
-                }
+                    if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
+                        short winX = 0;
+                        short winY = 0;
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        GetWinSize(0x14, &winX, &winY, 0);
+                        SetMcWinInfo((int)winX, (int)winY);
+                        mcState = 0;
+                        return 0;
+                    }
 
-                if (IsDuplicateCmakeName(this, s_CmakeInfo.m_name)) {
-                    short winX = 0;
-                    short winY = 0;
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    GetWinSize(0x14, &winX, &winY, 0);
-                    SetMcWinInfo((int)winX, (int)winY);
-                    mcState = 0;
-                    return 0;
+                    resultDir = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 1;
                 }
-
-                resultDir = 1;
-                Sound.PlaySe(2, 0x40, 0x7F, 0);
-                return 1;
             } else if ((down & 0x200) != 0) {
                 unsigned int bsLen0 = strlen(s_CmakeInfo.m_name);
                 if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) == 0) {

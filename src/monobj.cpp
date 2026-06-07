@@ -3619,11 +3619,11 @@ void CGMonObj::onChangePrg(int value)
 			particleBase = 0x46;
 		}
 
-		if (isNormal == 0) {
-			if ((isUndead != 0) && (count != 0)) {
+		if (isNormal != 0) {
+			for (int i = 0; i < static_cast<int>(count); i++) {
 				int dataNo = object->m_charaModelHandle->GetPdtSlot();
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
-					(particleBase + 9) | (dataNo << 8),
+					(particleBase + i) | (dataNo << 8),
 					*reinterpret_cast<int*>(mon + 0x594),
 					object,
 					FLOAT_803319C0,
@@ -3631,10 +3631,10 @@ void CGMonObj::onChangePrg(int value)
 				);
 			}
 		} else {
-			for (int i = 0; i < static_cast<int>(count); i++) {
+			if ((isUndead != 0) && (count != 0)) {
 				int dataNo = object->m_charaModelHandle->GetPdtSlot();
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
-					(particleBase + i) | (dataNo << 8),
+					(particleBase + 9) | (dataNo << 8),
 					*reinterpret_cast<int*>(mon + 0x594),
 					object,
 					FLOAT_803319C0,

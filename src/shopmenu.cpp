@@ -801,7 +801,7 @@ void drawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char alph
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
-    int shapeCount = *reinterpret_cast<short*>(shapeBytes + 2);
+    int shapeCount = *reinterpret_cast<unsigned short*>(shapeBytes + 2);
     for (int i = 0; i < shapeCount; i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(shapeBytes + 0xC + i * 8), 0x60);
     }

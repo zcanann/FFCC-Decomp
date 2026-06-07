@@ -523,11 +523,14 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     }
 
     if (mode < 8) {
-        Vec baseDir = *(Vec*)(paramBytes + 0x20);
+        Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
-        Vec tempVec;
+        Vec velocity;
 
+        baseDir.x = param->m_matrix[2][0];
+        baseDir.y = param->m_matrix[2][1];
+        baseDir.z = param->m_matrix[2][2];
         angles[0] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
         angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
         angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
@@ -541,11 +544,13 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
 
         pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
         PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= *(float*)(paramBytes + 0x58);
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= param->m_speedScale.x;
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= param->m_speedScale.y;
-        tempVec = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
+        particleData->m_matrix[1][0] *= *(float*)(paramBytes + 0x58);
+        particleData->m_matrix[1][1] *= param->m_speedScale.x;
+        particleData->m_matrix[1][2] *= param->m_speedScale.y;
+        velocity.x = particleData->m_matrix[1][0];
+        velocity.y = particleData->m_matrix[1][1];
+        velocity.z = particleData->m_matrix[1][2];
+        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
     }
 
     if (mode < 6) {

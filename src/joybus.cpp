@@ -3338,7 +3338,7 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
     unsigned short& totalSize = *reinterpret_cast<unsigned short*>(temp + 0x12);
     unsigned short& chunkSize = *reinterpret_cast<unsigned short*>(temp + 0x14);
 
-    unsigned int localWord = 0;
+    unsigned int localWord;
     unsigned int gbaStatus = GBARecvSend(threadParam, &localWord);
 
     if (threadParam->m_skipProcessingFlag != 0)
@@ -3358,31 +3358,23 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     if ((gbaStatus & 1) == 0)
     {
-        if (phase == 2)
+        if (phase == 2 && chunkCount <= step)
         {
-            unsigned short sentBlocks = chunkCount;
-            unsigned short doneBlocks = step;
-
-            if (sentBlocks <= doneBlocks)
-            {
-                return -1;
-            }
+            return -1;
         }
 
         return 0;
     }
 
-    {
-        OSWaitSemaphore(&m_accessSemaphores[port]);
+    OSWaitSemaphore(&m_accessSemaphores[port]);
 
-        m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
-        m_secCmdCount[port]--;
+    m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
+    m_secCmdCount[port]--;
 
-        localWord = (localWord & 0xFFFF0000u) |
-                    static_cast<unsigned short>(static_cast<char>(localWord >> 24));
+    localWord = (localWord & 0xFFFF0000u) |
+                static_cast<unsigned short>(static_cast<char>(localWord >> 24));
 
-        OSSignalSemaphore(&m_accessSemaphores[port]);
-    }
+    OSSignalSemaphore(&m_accessSemaphores[port]);
 
     const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
     const unsigned char seq = static_cast<unsigned char>((localWord >> 8) & 0xFF);

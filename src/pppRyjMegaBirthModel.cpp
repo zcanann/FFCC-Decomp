@@ -544,14 +544,14 @@ void birth(
             s16 sampleIndex;
 
             if ((speedMode == 0) || (speedMode >= 6)) {
-                if ((s32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
+                if ((u32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
                     work->m_unused1E = 0;
                 }
                 sampleIndex = work->m_unused1E;
                 work->m_unused1E = sampleIndex + 1;
             } else {
                 float t = calc_mesh_sample_t(speedMode);
-                if ((s32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
+                if ((u32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {
                     work->m_unused1E = 0;
                 }
                 sampleIndex = (u16)((s32)(t * (float)pathInfo[1]));
@@ -635,7 +635,7 @@ join_position:
 
     if (params->m_scaleRandomFlags != 0) {
         if ((params->m_scaleRandomFlags & 0x20) != 0) {
-            s32 randomized = (s32)((float)*(s32*)(payload + 0x80) * Math.RandF());
+            s32 randomized = (s32)((float)*(u32*)(payload + 0x80) * Math.RandF());
             *s32_at(particleData, 0x58) = randomized;
             *s32_at(particleData, 0x54) = randomized;
             *s32_at(particleData, 0x50) = randomized;

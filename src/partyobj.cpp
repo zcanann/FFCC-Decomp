@@ -4413,12 +4413,12 @@ void CGPartyObj::gpmCol()
 	unsigned int i = 0;
 	do {
 		Vec* pos = (i == 0) ? &m_worldPosition
-		                    : reinterpret_cast<Vec*>(ghostWork + 0x50 + i * 0xC);
+		                    : reinterpret_cast<Vec*>(ghostWork + 0x50 + (i - 1) * 0xC);
 
 		CVector posV(*pos);
 		CVector leaderV(leader->m_worldPosition);
 		CVector diff;
-		PSVECSubtract(leaderV, posV, diff);
+		PSVECSubtract(reinterpret_cast<Vec*>(&leaderV), reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
 
 		unsigned int flags = m_attrFlags & ~0x10U;
 		float halfHeight = m_capsuleHalfHeight;

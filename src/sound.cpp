@@ -22,16 +22,16 @@
 
 extern char sSoundStageName[] = "CSound";
 extern const char sSoundManagerClassName[] = "CManager";
-extern const float FLOAT_80330ce8 = 127.0f;
+extern const float kSoundVolumeRange = 127.0f;
 extern const float kLineSegmentMinT = 0.0f;
 extern const float kLineSegmentMaxT = 1.0f;
-extern const float FLOAT_80330cf4 = 5.0f;
-extern const float FLOAT_80330cf8 = 3.0f;
-extern const float FLOAT_80330cfc = 2.5f;
-extern const float FLOAT_80330d00 = 100.0f;
-extern const double DOUBLE_80330d08 = 4503599627370496.0;
+extern const float kSoundBossDistanceScale = 5.0f;
+extern const float kSoundOptionDistanceScale = 3.0f;
+extern const float kSoundMap33PanDivisor = 2.5f;
+extern const float kSoundLineDebugScale = 100.0f;
+extern const double kSoundU32ToDoubleBias = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
-extern const double DOUBLE_80330d18 = 0.5;
+extern const double kLineBoundsHalf = 0.5;
 extern const float kVectorFive;
 extern const char sSoundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
@@ -1740,7 +1740,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
                 outVolume = 0x7F;
             } else {
                 fVar3 = se3D->m_nearDistance;
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
+                outVolume = 0x7F - (int)(kSoundVolumeRange * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             }
 
             iVar4 = (int)nearestPoint.x;
@@ -1766,10 +1766,10 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             switch (Game.m_gameWork.m_bossArtifactStageIndex) {
             case 8:
             case 0xE:
-                fVar1 = FLOAT_80330cf4;
+                fVar1 = kSoundBossDistanceScale;
                 break;
             default:
-                fVar1 = FLOAT_80330cf8;
+                fVar1 = kSoundOptionDistanceScale;
                 break;
             }
         }
@@ -1786,14 +1786,14 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             if (fVar3 < nearScaled) {
                 outVolume = 0x7F;
             } else {
-                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+                outVolume = 0x7F - (int)(kSoundVolumeRange * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
             }
         } else {
             outVolume = 0;
         }
 
         if (Game.m_currentMapId == 0x21) {
-            iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
+            iVar4 = (int)(nearestPoint.x / kSoundMap33PanDivisor);
             if (iVar4 < -0x38) {
                 iVar5 = -0x38;
             } else {

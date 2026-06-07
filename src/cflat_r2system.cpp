@@ -1844,9 +1844,6 @@ void CLine<64>::CalcBound()
 int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
     CFlatRuntime* runtime = reinterpret_cast<CFlatRuntime*>(this);
-    CGame::CGameWork& gameWork = Game.m_gameWork;
-    u16* strOffs = *reinterpret_cast<u16**>(reinterpret_cast<u8*>(runtime) + 0x34);
-    char* strBlob = *reinterpret_cast<char**>(reinterpret_cast<u8*>(runtime) + 0x38);
 
     switch (systemFunc) {
     case -3:
@@ -1907,7 +1904,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -8: {
         const unsigned int x = object->m_localBase[0];
         const unsigned int y = object->m_localBase[1];
-        char* format = strBlob + strOffs[object->m_localBase[2]];
+        char* format = runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[2]];
 
         if (object->m_argCount == 3) {
             Graphic.Printf(x, y, format);
@@ -1980,7 +1977,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                                 break;
                             }
                             case 's':
-                                sprintf(rendered, spec, strBlob + strOffs[object->m_localBase[argIndex]]);
+                                sprintf(rendered, spec, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[argIndex]]);
                                 scan = const_cast<char*>("");
                                 break;
                             default:
@@ -2110,7 +2107,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0x16: {
         CGame::CNextScript nextScript;
         nextScript.m_flags = 0;
-        strcpy(nextScript.m_name, strBlob + strOffs[*object->m_localBase]);
+        strcpy(nextScript.m_name, runtime->m_strBlob + runtime->m_strOffsets[*object->m_localBase]);
         Game.SetNextScript(&nextScript);
         runtime->push(object, 0);
         outResult = 0;
@@ -2874,7 +2871,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x51: {
         char path[0x100];
-        sprintf(path, s_cflatCfdPathFmt, Game.GetLangString(), strBlob + strOffs[*object->m_localBase]);
+        sprintf(path, s_cflatCfdPathFmt, Game.GetLangString(), runtime->m_strBlob + runtime->m_strOffsets[*object->m_localBase]);
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
             fileHandle->Read();
@@ -3089,16 +3086,16 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x6D:
-        gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
+        Game.m_gameWork.m_linkTable[object->m_localBase[2]][object->m_localBase[3]][object->m_localBase[0]]
                                    [object->m_localBase[1]] = static_cast<unsigned char>(object->m_localBase[4]);
-        gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
+        Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
                                    [object->m_localBase[3]] = static_cast<unsigned char>(object->m_localBase[4]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x6E:
         runtime->push(
-            object, gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
+            object, Game.m_gameWork.m_linkTable[object->m_localBase[0]][object->m_localBase[1]][object->m_localBase[2]]
                                           [object->m_localBase[3]]);
         outResult = 0;
         return 1;
@@ -3108,22 +3105,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x70:
-        gameWork.m_timerA = *object->m_localBase;
+        Game.m_gameWork.m_timerA = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x71:
-        gameWork.m_scriptGlobalTime = *object->m_localBase;
+        Game.m_gameWork.m_scriptGlobalTime = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x72:
-        gameWork.m_bossArtifactStageTable[*object->m_localBase] = object->m_localBase[1];
+        Game.m_gameWork.m_bossArtifactStageTable[*object->m_localBase] = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0x73:
-        gameWork.m_unkStageTable[*object->m_localBase] = object->m_localBase[1];
+        Game.m_gameWork.m_unkStageTable[*object->m_localBase] = object->m_localBase[1];
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3435,7 +3432,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0x9B:
-        CharaPcs.LoadCam(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        CharaPcs.LoadCam(*object->m_localBase, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3557,7 +3554,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0xAE:
         strcpy(
             reinterpret_cast<char*>(Game.m_caravanWorkArr[*object->m_localBase].m_name),
-            strBlob + strOffs[object->m_localBase[1]]);
+            runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3567,12 +3564,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xB0:
-        strcpy(Game.m_startScriptName, strBlob + strOffs[*object->m_localBase]);
+        strcpy(Game.m_startScriptName, runtime->m_strBlob + runtime->m_strOffsets[*object->m_localBase]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
     case -0xB1:
-        runtime->push(object, static_cast<int>(gameWork.m_townName[*object->m_localBase]));
+        runtime->push(object, static_cast<int>(Game.m_gameWork.m_townName[*object->m_localBase]));
         outResult = 0;
         return 1;
     case -0xB2: {
@@ -3805,7 +3802,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xCC:
-        MenuPcs.LoadExtraFont(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        MenuPcs.LoadExtraFont(*object->m_localBase, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3815,7 +3812,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xCE:
-        gameWork.ClearEvtWork();
+        Game.m_gameWork.ClearEvtWork();
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3890,7 +3887,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0xD5:
-        this->loadLayer(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        this->loadLayer(*object->m_localBase, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;
@@ -3903,7 +3900,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             static_cast<u8>(255.0f * localFloats[11]),
         };
         this->drawLayer(
-            *object->m_localBase, strBlob + strOffs[object->m_localBase[1]], object->m_localBase[2],
+            *object->m_localBase, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]], object->m_localBase[2],
             object->m_localBase[3], object->m_localBase[4], object->m_localBase[5],
             static_cast<short>(object->m_localBase[6]), static_cast<short>(object->m_localBase[7]),
             localFloats[8], localFloats[9], &color,
@@ -3913,7 +3910,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         return 1;
     }
     case -0xD7:
-        this->loadLayerASync(*object->m_localBase, strBlob + strOffs[object->m_localBase[1]]);
+        this->loadLayerASync(*object->m_localBase, runtime->m_strBlob + runtime->m_strOffsets[object->m_localBase[1]]);
         runtime->push(object, 0);
         outResult = 0;
         return 1;

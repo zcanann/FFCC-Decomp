@@ -10199,14 +10199,16 @@ input_check_done:
 					int valid = 0;
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
 					const unsigned char stageMode = Game.m_gameWork.m_menuStageMode;
-					for (int i = 0; i < 4; i++) {
+					int i = 0;
+					do {
 						if (stageMode != 0 && i != 0) {
 							break;
 						}
 						if (m_wmWorldState->m_backupParams[i] >= 0) {
 							valid++;
 						}
-					}
+						i++;
+					} while (i < 4);
 					if (valid == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {

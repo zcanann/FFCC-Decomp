@@ -1421,15 +1421,15 @@ void CMenuPcs::CalcMCardMenu()
 		mcCtrl.m_iteration = 0;
 		mcCtrl.m_userBuffer = 0;
 		mcCtrl.m_createFlag = 0;
-		if ((char)DAT_8032ee20 < 0 || 1 < (char)DAT_8032ee20) {
+		if (gWmMenuCursorX[0] >= 0 && gWmMenuCursorX[0] < 2) {
+			mcCtrl.m_cardChannel = (int)gWmMenuCursorX[0];
+		} else {
 			mcCtrl.m_cardChannel = 0;
-		} else {
-			mcCtrl.m_cardChannel = (int)DAT_8032ee20;
 		}
-		if ((char)uRam8032ee21 < 0 || 3 < (char)uRam8032ee21) {
-			mcCtrl.m_saveIndex = 0;
+		if (gWmMenuCursorX[1] >= 0 && gWmMenuCursorX[1] < 4) {
+			mcCtrl.m_saveIndex = (int)gWmMenuCursorX[1];
 		} else {
-			mcCtrl.m_saveIndex = (int)uRam8032ee21;
+			mcCtrl.m_saveIndex = 0;
 		}
 		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 		Game.m_gameWork.m_wmBackupParams[0] = worldState->m_originalBackupParams[0];

@@ -1804,14 +1804,14 @@ void CMenuPcs::LetterListDraw()
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[iconLetterIndex];
 		if (letter->AttachmentValue() != 0) {
 			const int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
-			DrawSingleIcon(icon, iconX, static_cast<int>(iconY), FLOAT_803330f8, 0, FLOAT_803330f8);
+			DrawSingleIcon(icon, iconX, static_cast<int>(static_cast<double>(iconY)), FLOAT_803330f8, 0, FLOAT_803330f8);
 		}
 		iconY += 0x20;
 	}
 
 	const int cursorState = m_singMenuState->selectedIndex;
-	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(System.m_frameCounter & 7));
-	const int cursorY = cursorState * 0x20 + 0x60;
+	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(static_cast<double>(System.m_frameCounter & 7)));
+	const int cursorY = static_cast<int>(static_cast<double>(cursorState * 0x20 + 0x60));
 	DrawCursor(cursorX, cursorY, FLOAT_803330f8);
 }
 

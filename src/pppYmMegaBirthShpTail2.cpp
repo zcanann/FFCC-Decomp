@@ -128,11 +128,16 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             float fadeG = (float)payload[0x65];
             float fadeB = (float)payload[0x66];
             float fadeA = (float)payload[0x67] * alphaScale;
-            float fadeRStep = LoadFloat(FLOAT_80330568);
-            float fadeGStep = LoadFloat(FLOAT_80330568);
-            float fadeBStep = LoadFloat(FLOAT_80330568);
-            float fadeAStep = LoadFloat(FLOAT_80330568);
-            if (stepDivisor != kPppYmMegaBirthShpTail2Zero) {
+            float fadeRStep;
+            float fadeGStep;
+            float fadeBStep;
+            float fadeAStep;
+            if (stepDivisor == kPppYmMegaBirthShpTail2Zero) {
+                fadeRStep = FLOAT_80330568;
+                fadeGStep = FLOAT_80330568;
+                fadeBStep = FLOAT_80330568;
+                fadeAStep = FLOAT_80330568;
+            } else {
                 fadeRStep = (fadeR - (float)payload[0x68]) / stepDivisor;
                 fadeGStep = (fadeG - (float)payload[0x69]) / stepDivisor;
                 fadeBStep = (fadeB - (float)payload[0x6A]) / stepDivisor;

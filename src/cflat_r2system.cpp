@@ -3114,7 +3114,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x67:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWaveAsync\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadWaveASync(*object->m_localBase, -1, 0);
@@ -3123,7 +3123,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x68: {
         const int completed = Sound.IsLoadWaveASyncCompleted();
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347isLoadWaveAsyncCompleted\202\265\202\334\202\265\202\275\201B\223\307\202\335\215\236\202\335\202\315%s\n"),
                 completed != 0 ? "\212\256\227\271" : "\226\242\212\256\227\271");
         }
@@ -3132,7 +3132,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x69:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadBgm\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadBgm(*object->m_localBase);
@@ -3140,7 +3140,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x6A:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.PlayBgm(*object->m_localBase);
@@ -3215,7 +3215,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x77:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadWave(*object->m_localBase);
@@ -3298,7 +3298,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x89:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347loadStream\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.LoadStream(*object->m_localBase);
@@ -3306,7 +3306,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x8A:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playStream\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.PlayStreamASync();
@@ -3319,7 +3319,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xA0:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347streamVolume\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
@@ -3327,7 +3327,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x8C:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347freeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.FreeWave(*object->m_localBase);
@@ -3335,7 +3335,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x8D:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347stopBgm\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.StopBgm();
@@ -3343,7 +3343,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x8E:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347fadeOutBgm\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.FadeOutBgm(*object->m_localBase);
@@ -3356,7 +3356,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x90:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347playNextBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.PlayNextBgm(*object->m_localBase);
@@ -3370,7 +3370,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x93:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.AddNoFreeWave(static_cast<short>(*object->m_localBase));
@@ -3732,7 +3732,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0xC8:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347cancelWaveAsync\202\265\202\334\202\265\202\275\201B\n"));
         }
         Sound.CancelLoadWaveASync();
@@ -3814,7 +3814,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xD1:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347crossPlayBgm\202\360\215\304\220\266\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.CrossPlayBgm(*object->m_localBase, object->m_localBase[1]);
@@ -4105,7 +4105,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xF8:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+        if (GetNumMes__9CFlatDataFv(&System) >= 3U) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347addNoFreeSeGroup\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
         }
         Sound.AddNoFreeSeGroup(static_cast<short>(*object->m_localBase));

@@ -8144,71 +8144,69 @@ void CMenuPcs::WMSubMenuInit()
 void CMenuPcs::WMChgMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const typedWorldState = m_wmWorldState;
-	int worldState = reinterpret_cast<int>(typedWorldState);
 
-	if (typedWorldState->m_changeRequest == 0) {
+	if (m_wmWorldState->m_changeRequest == 0) {
 		return;
 	}
 
-	int iVar14 = typedWorldState->m_menuMode;
+	int iVar14 = m_wmWorldState->m_menuMode;
 	DAT_8032ee1c = 1;
 
-	short sVar2 = typedWorldState->m_changeRequest;
+	short sVar2 = m_wmWorldState->m_changeRequest;
 
 	if (sVar2 == 2) {
 		char cVar1 = bytes[0xD];
 		if (cVar1 == 1) {
-			typedWorldState->m_menuMode = 0;
+			m_wmWorldState->m_menuMode = 0;
 		} else if (cVar1 == 2) {
-			typedWorldState->m_menuMode = 5;
+			m_wmWorldState->m_menuMode = 5;
 		} else if (cVar1 == 3) {
 			DAT_8032ee1c = 1;
 			if (iVar14 == 6) {
-				typedWorldState->m_changeRequest = 0;
+				m_wmWorldState->m_changeRequest = 0;
 				return;
 			}
-			typedWorldState->m_menuMode = 6;
+			m_wmWorldState->m_menuMode = 6;
 		} else if (cVar1 == 4) {
-			typedWorldState->m_menuMode = 4;
+			m_wmWorldState->m_menuMode = 4;
 		} else {
-			typedWorldState->m_menuMode = 1;
+			m_wmWorldState->m_menuMode = 1;
 		}
 	} else if (iVar14 == 0) {
 		if (sVar2 == 1) {
-			short sVar2b = typedWorldState->m_cardChannel;
+			short sVar2b = m_wmWorldState->m_cardChannel;
 			if (sVar2b == 0) {
-				typedWorldState->m_menuMode = 3;
+				m_wmWorldState->m_menuMode = 3;
 			} else if (sVar2b == 1) {
-				typedWorldState->m_menuMode = 1;
+				m_wmWorldState->m_menuMode = 1;
 				memset(m_wmWorldParams, 0, 0x10);
 			} else if (sVar2b == 2) {
-				typedWorldState->m_menuMode = 8;
+				m_wmWorldState->m_menuMode = 8;
 			} else if (sVar2b == 3) {
-				typedWorldState->m_menuMode = 7;
+				m_wmWorldState->m_menuMode = 7;
 			} else {
-				typedWorldState->m_menuMode = 2;
+				m_wmWorldState->m_menuMode = 2;
 			}
 		} else {
-			typedWorldState->m_menuMode = 4;
+			m_wmWorldState->m_menuMode = 4;
 		}
 	} else if (iVar14 == 1) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 1;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 1;
 	} else if (iVar14 == 8) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 2;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 2;
 	} else if (iVar14 == 7) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 3;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 3;
 	} else if (iVar14 == 2) {
-		typedWorldState->m_menuMode = 0;
-		typedWorldState->m_cardChannel = 4;
+		m_wmWorldState->m_menuMode = 0;
+		m_wmWorldState->m_cardChannel = 4;
 	} else if (iVar14 == 5) {
 		if (sVar2 == 1) {
-			typedWorldState->m_menuMode = 0;
+			m_wmWorldState->m_menuMode = 0;
 			bytes[0xD] = 0;
-			typedWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_cardChannel = 0;
 			CFlatRuntime::CStack stackA[3];
 			stackA[0].m_word = 1;
 			stackA[1].m_word = 1;
@@ -8216,7 +8214,7 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
 			DAT_8032ee1c = 1;
-			typedWorldState->m_menuMode = 6;
+			m_wmWorldState->m_menuMode = 6;
 			CFlatRuntime::CStack stackB[3];
 			stackB[0].m_word = 1;
 			stackB[1].m_word = 0;
@@ -8224,52 +8222,52 @@ void CMenuPcs::WMChgMenu()
 			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackB, 0);
 		}
 	} else if (iVar14 == 6) {
-		typedWorldState->m_menuMode = 0;
+		m_wmWorldState->m_menuMode = 0;
 	} else if (sVar2 == 1) {
-		if (typedWorldState->m_menuMode < 8) {
-			typedWorldState->m_menuMode++;
+		if (m_wmWorldState->m_menuMode < 8) {
+			m_wmWorldState->m_menuMode++;
 		} else {
 			bytes[0xD] = 0;
 		}
 	} else if (sVar2 == -1) {
-		short sVar2c = typedWorldState->m_menuMode;
+		short sVar2c = m_wmWorldState->m_menuMode;
 		if (sVar2c < 1) {
 			bytes[0xD] = 0;
 		} else if (sVar2c == 3) {
-			typedWorldState->m_menuMode = 0;
-			typedWorldState->m_cardChannel = 0;
+			m_wmWorldState->m_menuMode = 0;
+			m_wmWorldState->m_cardChannel = 0;
 		} else {
-			typedWorldState->m_menuMode = sVar2c - 1;
+			m_wmWorldState->m_menuMode = sVar2c - 1;
 		}
 	}
 
-	if (typedWorldState->m_menuMode != 0) {
-		typedWorldState->m_cardChannel = 0;
+	if (m_wmWorldState->m_menuMode != 0) {
+		m_wmWorldState->m_cardChannel = 0;
 	}
 
 	float fVar6 = FLOAT_803315b0;
-	typedWorldState->m_frameCounter = 0;
+	m_wmWorldState->m_frameCounter = 0;
 	float fVar5 = FLOAT_803313e8;
 	float fVar4 = FLOAT_803313dc;
 	double local_40 = (double)(long long)(int)fVar6;
-	typedWorldState->m_titleState = 0;
+	m_wmWorldState->m_titleState = 0;
 	double dVar16 = DOUBLE_803313f8;
 	double dVar15 = (double)FLOAT_80331430;
-	typedWorldState->m_worldReady = 0;
-	typedWorldState->m_flag09 = 0;
+	m_wmWorldState->m_worldReady = 0;
+	m_wmWorldState->m_flag09 = 0;
 	double local_38 = (double)(long long)(int)(float)(dVar15 * dVar16);
-	typedWorldState->m_flag0A = 0;
-	typedWorldState->m_state0E = 0;
-	typedWorldState->m_mainState = 0;
-	typedWorldState->m_state12 = 0;
-	typedWorldState->m_subState = 0;
-	typedWorldState->m_delay = 0;
-	typedWorldState->m_counter1A = 0;
-	typedWorldState->m_posY = fVar5;
-	typedWorldState->m_posX = fVar4;
-	typedWorldState->m_mcResult = 0;
-	typedWorldState->m_flag0B = 0;
-	typedWorldState->m_modelFlagsInitialized = 0;
+	m_wmWorldState->m_flag0A = 0;
+	m_wmWorldState->m_state0E = 0;
+	m_wmWorldState->m_mainState = 0;
+	m_wmWorldState->m_state12 = 0;
+	m_wmWorldState->m_subState = 0;
+	m_wmWorldState->m_delay = 0;
+	m_wmWorldState->m_counter1A = 0;
+	m_wmWorldState->m_posY = fVar5;
+	m_wmWorldState->m_posX = fVar4;
+	m_wmWorldState->m_mcResult = 0;
+	m_wmWorldState->m_flag0B = 0;
+	m_wmWorldState->m_modelFlagsInitialized = 0;
 
 	m_menuWindowInfo->x = (short)(int)fVar6;
 	m_menuWindowInfo->y = (short)(int)(float)(dVar15 * dVar16);
@@ -8307,12 +8305,12 @@ void CMenuPcs::WMChgMenu()
 	    && m_singleCmakeSlot >= 0
 	    && m_singleCmakeSlot < 8) {
 		m_singleCmakeMode = 1;
-		typedWorldState->m_menuMode = 3;
+		m_wmWorldState->m_menuMode = 3;
 	} else if (iVar14 == 3 && Game.m_gameWork.m_menuStageMode != 0
 	           && m_singleCmakeSlot > 7) {
 		m_singleCmakeMode = 0;
 		m_singleCmakeSlot = (short)0xFFFF;
-		typedWorldState->m_menuMode = 3;
+		m_wmWorldState->m_menuMode = 3;
 	} else {
 		m_singleCmakeMode = 0;
 		m_singleCmakeSlot = (short)0xFFFF;
@@ -8324,20 +8322,20 @@ void CMenuPcs::WMChgMenu()
 	unsigned char* const charaModelData = m_wm.m_charaModelData;
 	unsigned char* const charaSelectData = m_wm.m_charaSelectData;
 
-	sVar2 = typedWorldState->m_menuMode;
+	sVar2 = m_wmWorldState->m_menuMode;
 	if (sVar2 == 4) {
-		typedWorldState->m_posX = FLOAT_80331440;
+		m_wmWorldState->m_posX = FLOAT_80331440;
 	} else if (sVar2 < 4) {
 		if (sVar2 == 0) {
 			int iVar11 = reinterpret_cast<int>(worldObjData) + 0xA00;
 			int count = 4;
 			do {
 				const int paramIndex = iVar8 / 2;
-				if (Game.m_caravanWorkArr[typedWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
-					typedWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
+				if (Game.m_caravanWorkArr[m_wmWorldState->m_originalBackupParams[paramIndex]].m_shopState == 0) {
+					m_wmWorldState->m_originalBackupParams[paramIndex] = (short)0xFFFF;
 				}
-				if (Game.m_caravanWorkArr[typedWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
-					typedWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
+				if (Game.m_caravanWorkArr[m_wmWorldState->m_backupParams[paramIndex]].m_shopState == 0) {
+					m_wmWorldState->m_backupParams[paramIndex] = (short)0xFFFF;
 				}
 				int iVar13 = *reinterpret_cast<int*>(iVar11 + 0x20);
 				if (Game.m_caravanWorkArr[iVar13].m_shopState == 0) {
@@ -8353,8 +8351,8 @@ void CMenuPcs::WMChgMenu()
 				count = count - 1;
 			} while (count != 0);
 
-			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)typedWorldState->m_cardChannel));
-			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)typedWorldState->m_cardChannel));
+			*reinterpret_cast<float*>(bytes + 0x78) = -(FLOAT_8033151c * (float)((double)(int)m_wmWorldState->m_cardChannel));
+			*reinterpret_cast<float*>(bytes + 0x7C) = -(fVar4 * (float)((double)(int)m_wmWorldState->m_cardChannel));
 			m_effectTimer = 0;
 		} else if (sVar2 > 0 && sVar2 > 2) {
 			int iVar11 = 0;
@@ -8392,11 +8390,11 @@ void CMenuPcs::WMChgMenu()
 
 	switch (iVar14) {
 	case 0: {
-		if (typedWorldState->m_menuMode == 4) {
-			Game.m_gameWork.m_wmBackupParams[0] = (int)typedWorldState->m_backupParams[0];
-			Game.m_gameWork.m_wmBackupParams[1] = (int)typedWorldState->m_backupParams[1];
-			Game.m_gameWork.m_wmBackupParams[2] = (int)typedWorldState->m_backupParams[2];
-			Game.m_gameWork.m_wmBackupParams[3] = (int)typedWorldState->m_backupParams[3];
+		if (m_wmWorldState->m_menuMode == 4) {
+			Game.m_gameWork.m_wmBackupParams[0] = (int)m_wmWorldState->m_backupParams[0];
+			Game.m_gameWork.m_wmBackupParams[1] = (int)m_wmWorldState->m_backupParams[1];
+			Game.m_gameWork.m_wmBackupParams[2] = (int)m_wmWorldState->m_backupParams[2];
+			Game.m_gameWork.m_wmBackupParams[3] = (int)m_wmWorldState->m_backupParams[3];
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
 			bytes[0x13] = 0;
@@ -8410,7 +8408,7 @@ void CMenuPcs::WMChgMenu()
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
-				short sv = typedWorldState->m_backupParams[iVar11 / 2];
+				short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 				if (sv < 0) {
 					*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
 				} else {
@@ -8420,7 +8418,7 @@ void CMenuPcs::WMChgMenu()
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
 				*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
-				sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
+				sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
 				if (sv < 0) {
 					*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 				} else {
@@ -8463,35 +8461,35 @@ void CMenuPcs::WMChgMenu()
 		bytes[0x11] = 0;
 		break;
 	case 3: {
-		if (typedWorldState->m_menuMode == 4) {
+		if (m_wmWorldState->m_menuMode == 4) {
 			int selectBase = reinterpret_cast<int>(charaSelectData);
 			if (*reinterpret_cast<char*>(selectBase + 10) == 0) {
 				Game.m_gameWork.m_wmBackupParams[0] = -1;
 			} else {
 				Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(selectBase + 4);
 			}
-			typedWorldState->m_backupParams[0] = (short)Game.m_gameWork.m_wmBackupParams[0];
+			m_wmWorldState->m_backupParams[0] = (short)Game.m_gameWork.m_wmBackupParams[0];
 
 			if (*reinterpret_cast<char*>(selectBase + 0x1A) == 0) {
 				Game.m_gameWork.m_wmBackupParams[1] = -1;
 			} else {
 				Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(selectBase + 0x14);
 			}
-			typedWorldState->m_backupParams[1] = (short)Game.m_gameWork.m_wmBackupParams[1];
+			m_wmWorldState->m_backupParams[1] = (short)Game.m_gameWork.m_wmBackupParams[1];
 
 			if (*reinterpret_cast<char*>(selectBase + 0x2A) == 0) {
 				Game.m_gameWork.m_wmBackupParams[2] = -1;
 			} else {
 				Game.m_gameWork.m_wmBackupParams[2] = (int)*reinterpret_cast<short*>(selectBase + 0x24);
 			}
-			typedWorldState->m_backupParams[2] = (short)Game.m_gameWork.m_wmBackupParams[2];
+			m_wmWorldState->m_backupParams[2] = (short)Game.m_gameWork.m_wmBackupParams[2];
 
 			if (*reinterpret_cast<char*>(selectBase + 0x3A) == 0) {
 				Game.m_gameWork.m_wmBackupParams[3] = -1;
 			} else {
 				Game.m_gameWork.m_wmBackupParams[3] = (int)*reinterpret_cast<short*>(selectBase + 0x34);
 			}
-			typedWorldState->m_backupParams[3] = (short)Game.m_gameWork.m_wmBackupParams[3];
+			m_wmWorldState->m_backupParams[3] = (short)Game.m_gameWork.m_wmBackupParams[3];
 
 			bytes[0x10] = 1;
 			bytes[0x12] = 0;
@@ -8511,7 +8509,7 @@ void CMenuPcs::WMChgMenu()
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xC) = 0;
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0xB) = 0;
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 10) = 0;
-			short sv = typedWorldState->m_backupParams[iVar11 / 2];
+			short sv = m_wmWorldState->m_backupParams[iVar11 / 2];
 			if (sv < 0) {
 				*reinterpret_cast<short*>(charaSelectData + iVar8 + 4) = (short)0xFFFF;
 			} else {
@@ -8521,7 +8519,7 @@ void CMenuPcs::WMChgMenu()
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1C) = 0;
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1B) = 0;
 			*reinterpret_cast<unsigned char*>(charaSelectData + iVar8 + 0x1A) = 0;
-			sv = typedWorldState->m_backupParams[iVar11 / 2 + 1];
+			sv = m_wmWorldState->m_backupParams[iVar11 / 2 + 1];
 			if (sv < 0) {
 				*reinterpret_cast<short*>(charaSelectData + iVar8 + 0x14) = (short)0xFFFF;
 			} else {
@@ -8560,18 +8558,18 @@ void CMenuPcs::WMChgMenu()
 	}
 	}
 
-	if (typedWorldState->m_changeRequest == 2
-	    && typedWorldState->m_menuMode == 4) {
+	if (m_wmWorldState->m_changeRequest == 2
+	    && m_wmWorldState->m_menuMode == 4) {
 		bytes[0x10] = 1;
 		bytes[0x12] = 0;
 		bytes[0x13] = 0;
 	}
 
-	typedWorldState->m_changeRequest = 0;
-	typedWorldState->m_nextMenuMode = 0;
-	typedWorldState->m_delay = 0;
+	m_wmWorldState->m_changeRequest = 0;
+	m_wmWorldState->m_nextMenuMode = 0;
+	m_wmWorldState->m_delay = 0;
 
-	sVar2 = typedWorldState->m_menuMode;
+	sVar2 = m_wmWorldState->m_menuMode;
 	if (sVar2 == 6) {
 		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 0;
 	} else if (iVar14 == 6 && sVar2 != 6) {

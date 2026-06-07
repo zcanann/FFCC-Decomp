@@ -1948,7 +1948,7 @@ void CMenuPcs::LetterMessDraw()
 		int icon = 0x26 + (letter->IsAttachmentClaimed() ? 1 : 0);
 		DrawSingleIcon(
 		    icon, static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150),
-		    *reinterpret_cast<float*>(animBase + 0xC), 0, FLOAT_80333154);
+		    *reinterpret_cast<float*>(animBase + 0xC), 1, FLOAT_80333154);
 	}
 
 	if (mode <= 1) {

@@ -1076,13 +1076,20 @@ void CMenuPcs::CalcSelectWait()
 
 	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
 		this->m_menuWindowInfo->state = 3;
-		for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
-			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].alpha = 1.0f;
-			BonusSpriteFlags(&((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i]) = 3;
+		int animBase;
+		short count;
+		int walkOff = 0;
+		for (int i = 0; ; i++) {
+			animBase = this->m_bonusAnimPtr;
+			count = *(short*)animBase;
+			if ((int)count <= i) {
+				break;
+			}
+			*(float*)(animBase + walkOff + 0x18) = 1.0f;
+			*(int*)(animBase + walkOff + 0x34) = 3;
+			walkOff += 0x40;
 		}
-		short count = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(this->m_bonusAnimPtr + 8);
-		BonusAnimSprite* cursor = &sprites[count];
+		BonusAnimSprite* cursor = (BonusAnimSprite*)(animBase + count * 0x40 + 8);
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
 		cursor->kind = 0x20;
 		cursor->x = (short)(partySprite->x - 3);

@@ -177,17 +177,20 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
             segLen = PSVECDistance(&zeroVec, &segVec);
             segRemaining = segLen;
 
-            while (frameCount != 0) {
+            if (step[0x86] == 0) {
+                goto step_advance;
+            }
+            for (frameCount = frameCountRaw; (s32)frameCount > 0; frameCount--) {
                 Vec* testPos = &history[trailNextIndex];
                 bool canDraw = (testPos->x != 0.0f) || (testPos->y != 0.0f) || (testPos->z != 0.0f);
-                trailPos.x = drawX;
-                trailPos.y = drawY;
-                trailPos.z = drawZ;
-                if ((step[0x86] != 0) && canDraw) {
+                if (canDraw) {
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
                     drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
                     drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
+                    trailPos.x = drawX;
+                    trailPos.y = drawY;
+                    trailPos.z = drawZ;
 
                     if (step[0x8D] == 0) {
                         PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
@@ -195,7 +198,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                         managerPos.x = ppvMng->m_matrix.value[0][3];
                         managerPos.y = ppvMng->m_matrix.value[1][3];
                         managerPos.z = ppvMng->m_matrix.value[2][3];
-                        PSVECAdd(&trailPos, &managerPos, &trailPos);
+                        PSVECAdd(&managerPos, &trailPos, &trailPos);
                         PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
                     }
 
@@ -211,12 +214,12 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, step[0x6E]);
                 }
-
-                drawScale -= drawScaleStep;
+            step_advance:
                 fadeR -= fadeRStep;
                 fadeG -= fadeGStep;
                 fadeB -= fadeBStep;
                 fadeA -= fadeAStep;
+                drawScale -= drawScaleStep;
 
                 if (spacing <= 0.0f) {
                     break;
@@ -224,20 +227,20 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
 
                 while (segRemaining < spacing) {
                     Vec innerZero;
+                    bool wrap = (trailNextIndex == trailMaxIndex);
 
                     trailNextIndex++;
-                    if (trailNextIndex > trailMaxIndex) {
+                    if (wrap) {
                         trailNextIndex = 0;
                     }
-                    if (trailNextIndex == trailReadIndex) {
-                        frameCount = 0;
-                        break;
+                    if (trailNextIndex == *(u8*)(particle + 0x38)) {
+                        goto next_particle;
                     }
 
+                    segProgress -= segLen;
                     drawX = camX;
                     drawY = camY;
                     drawZ = camZ;
-                    segProgress -= segLen;
                     {
                         Vec* p = &history[trailNextIndex];
                         camX = p->x;
@@ -253,20 +256,15 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                     segLen = PSVECDistance(&innerZero, &segVec);
                     segRemaining += segLen;
                 }
-                if (frameCount == 0) {
-                    break;
-                }
-                {
-                    const float t = segProgress / segLen;
-                    drawX = drawX + segVec.x * t;
-                    drawY = drawY + segVec.y * t;
-                    drawZ = drawZ + segVec.z * t;
-                }
+
+                drawX = segVec.x * segProgress / segLen + drawX;
+                drawY = segVec.y * segProgress / segLen + drawY;
+                drawZ = segVec.z * segProgress / segLen + drawZ;
                 segProgress += spacing;
                 segRemaining -= spacing;
-                frameCount--;
             }
         }
+        next_particle:;
         if (wmats != 0) {
             wmats = wmats + 1;
         }

@@ -2507,29 +2507,36 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 
 		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 		CVector worldPos(m_worldPosition);
-		Vec startPos;
-		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), &startPos);
+		CVector startPos;
+		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), reinterpret_cast<Vec*>(&startPos));
 
 		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom = startPos;
-		hitCylinder.m_axis = rayDir;
-		hitCylinder.m_radius = radius;
+		hitCylinder.m_bottom.x = startPos.x;
+		hitCylinder.m_bottom.y = startPos.y;
+		hitCylinder.m_bottom.z = startPos.z;
 		hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
 		hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
 		hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
 		hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
 		hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
 		hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
+		hitCylinder.m_axis = rayDir;
+		hitCylinder.m_radius = radius;
 
-		Vec hitPos = startPos;
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
-			hitObj->CalcHitPosition(&hitPos);
+			hitObj->CalcHitPosition(&m_comboCenter);
 		} else {
-			PSVECAdd(&startPos, &rayDir, &hitPos);
+			CVector startOffset2(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+			CVector worldPos2(m_worldPosition);
+			CVector startPos2;
+			PSVECAdd(reinterpret_cast<Vec*>(&worldPos2), reinterpret_cast<Vec*>(&startOffset2), reinterpret_cast<Vec*>(&startPos2));
+			Vec startPosVec;
+			startPosVec.x = startPos2.x;
+			startPosVec.y = startPos2.y;
+			startPosVec.z = startPos2.z;
+			PSVECAdd(&startPosVec, &rayDir, &m_comboCenter);
 		}
-
-		m_comboCenter = hitPos;
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom = m_comboCenter;

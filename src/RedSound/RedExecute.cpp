@@ -1349,8 +1349,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
  */
 static void _PitchExecute(RedVoiceDATA* voice)
 {
-    int vibratoPitchDelta = 0;
     int adjustedPitchDelta = 0;
+    int vibratoPitchDelta = 0;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
         int vibratoDepth = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;

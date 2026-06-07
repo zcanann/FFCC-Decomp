@@ -3983,9 +3983,7 @@ void CGMonObj::statMove(int* targetIndex)
 				if (Game.m_gameWork.m_soundOptionFlag != 0) {
 					soundLimit2 = DOUBLE_80331A10;
 				}
-				if (soundLimit2 <= static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
-					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-				} else {
+				if (soundLimit2 > static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
 					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
 					float repopDist =
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
@@ -3993,6 +3991,8 @@ void CGMonObj::statMove(int* targetIndex)
 					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
 						monObj->isValidTarget();
 					}
+				} else {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 				}
 			}
 		} else {

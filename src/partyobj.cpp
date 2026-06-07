@@ -1142,23 +1142,38 @@ void CGPartyObj::command()
 			const int targetState = *reinterpret_cast<int*>(targetBytes + 0x500);
 
 			bool canAddBlock = false;
-			if (targetState == 0x24) {
+			switch (targetState) {
+			case 0x24:
 				canAddBlock = true;
-			} else if (targetState < 0x24) {
-				if (targetState < 0x12) {
-					if (targetState != 0x0B && targetState > 9 &&
-					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 4;
-					}
-				} else if (targetState < 0x1C) {
-					if (targetState < 0x19) {
-						canAddBlock = true;
-					}
-				} else if (targetState < 0x22) {
-					canAddBlock = true;
+				break;
+			case 0x0A:
+			case 0x0C:
+			case 0x0D:
+			case 0x0E:
+			case 0x0F:
+			case 0x10:
+			case 0x11:
+				if (*reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+					secondaryAvailable = true;
+					secondaryCommand = 4;
 				}
-			} else if (targetState == 0xCA) {
+				break;
+			case 0x12:
+			case 0x13:
+			case 0x14:
+			case 0x15:
+			case 0x16:
+			case 0x17:
+			case 0x18:
+			case 0x1C:
+			case 0x1D:
+			case 0x1E:
+			case 0x1F:
+			case 0x20:
+			case 0x21:
+				canAddBlock = true;
+				break;
+			case 0xCA:
 				if (CFlatCenterState() == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x1C;
@@ -1166,12 +1181,12 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x1C;
 				}
-			} else if (targetState > 0xCA) {
-				if (targetState == 0xCC) {
-					secondaryAvailable = true;
-					secondaryCommand = 6;
-				}
-			} else if (targetState == 0xC8) {
+				break;
+			case 0xCC:
+				secondaryAvailable = true;
+				secondaryCommand = 6;
+				break;
+			case 0xC8:
 				if (CFlatCenterState() == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0B;
@@ -1179,7 +1194,8 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x0B;
 				}
-			} else if (targetState > 0xC7) {
+				break;
+			case 0xC9:
 				if (CFlatCenterState() == 0) {
 					secondaryAvailable = true;
 					secondaryCommand = 0x0A;
@@ -1187,6 +1203,7 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x0A;
 				}
+				break;
 			}
 
 			if (canAddBlock && *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {

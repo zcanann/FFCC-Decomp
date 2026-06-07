@@ -520,8 +520,9 @@ void CMenuPcs::CmdInit1()
 	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
 	CmdListEntry* fillEntry = &entries[list->count];
 	for (u32 k = 0; k < count; k++) {
-		fillEntry[k].timer = 0;
-		fillEntry[k].alpha = FLOAT_80332ab0;
+		fillEntry->timer = 0;
+		fillEntry->alpha = FLOAT_80332ab0;
+		fillEntry++;
 	}
 }
 
@@ -576,8 +577,9 @@ void CMenuPcs::CmdInit2()
 	CmdListEntry* fillEntry = &entries[list->count];
 	const float alpha = FLOAT_80332a70;
 	for (u32 k = 0; k < count; k++) {
-		fillEntry[k].timer = 0;
-		fillEntry[k].alpha = alpha;
+		fillEntry->timer = 0;
+		fillEntry->alpha = alpha;
+		fillEntry++;
 	}
 }
 

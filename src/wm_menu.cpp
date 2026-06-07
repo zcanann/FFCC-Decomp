@@ -4851,9 +4851,12 @@ void CMenuPcs::DrawTitleMenu()
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
 			}
-			unsigned int itemColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
+			GXColor itemColor;
+			itemColor.r = 0xFF;
+			itemColor.g = 0xFF;
+			itemColor.b = 0xFF;
+			itemColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * alpha) & 0xFF);
+			GXSetChanMatColor(GX_COLOR0A0, itemColor);
 			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
@@ -4874,9 +4877,11 @@ void CMenuPcs::DrawTitleMenu()
 				secondAlpha = static_cast<float>(-(DOUBLE_803317A0 * static_cast<double>(pulse) -
 				                                  DOUBLE_80331420));
 			}
-			itemColor = (unsigned int)(FLOAT_80331458 * secondAlpha) & 0xFF;
-			itemColor = itemColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
+			itemColor.r = 0xFF;
+			itemColor.g = 0xFF;
+			itemColor.b = 0xFF;
+			itemColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * secondAlpha) & 0xFF);
+			GXSetChanMatColor(GX_COLOR0A0, itemColor);
 			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
@@ -4895,9 +4900,12 @@ void CMenuPcs::DrawTitleMenu()
 			if (typedWorldState->m_mainState == 1) {
 				labelAlpha = (float)typedWorldState->m_frameCounter;
 			}
-			unsigned int labelColor = (unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF;
-			labelColor = labelColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&labelColor);
+			GXColor labelColor;
+			labelColor.r = 0xFF;
+			labelColor.g = 0xFF;
+			labelColor.b = 0xFF;
+			labelColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * labelAlpha) & 0xFF);
+			GXSetChanMatColor(GX_COLOR0A0, labelColor);
 
 			float yPos = FLOAT_8033177c;
 			if (i != 0) {
@@ -4916,9 +4924,12 @@ void CMenuPcs::DrawTitleMenu()
 				if (timer > 0) {
 					cursorAlpha = (float)(timer);
 				}
-				unsigned int cursorColor = (unsigned int)(FLOAT_80331458 * cursorAlpha) & 0xFF;
-				cursorColor = cursorColor | 0xFFFFFF00;
-				GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&cursorColor);
+				GXColor cursorColor;
+				cursorColor.r = 0xFF;
+				cursorColor.g = 0xFF;
+				cursorColor.b = 0xFF;
+				cursorColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * cursorAlpha) & 0xFF);
+				GXSetChanMatColor(GX_COLOR0A0, cursorColor);
 				DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
 				         FLOAT_80331568, FLOAT_80331440,
 				         FLOAT_803313dc, (float)((int)uVar6),
@@ -4941,9 +4952,12 @@ void CMenuPcs::DrawTitleMenu()
 		if (typedWorldState->m_mainState == 1) {
 			copyrightAlpha = (float)typedWorldState->m_frameCounter;
 		}
-		unsigned int crColor = (unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF;
-		crColor = crColor | 0xFFFFFF00;
-		GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&crColor);
+		GXColor crColor;
+		crColor.r = 0xFF;
+		crColor.g = 0xFF;
+		crColor.b = 0xFF;
+		crColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * copyrightAlpha) & 0xFF);
+		GXSetChanMatColor(GX_COLOR0A0, crColor);
 		DrawRect(0xFFFFFFFF, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0);
 

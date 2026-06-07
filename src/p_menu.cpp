@@ -140,25 +140,33 @@ void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
 void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 }
 
-CProcessTableCallback CMenuPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-CProcessTableCallback CMenuPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-CProcessTableCallback CMenuPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-CProcessTableCallback CMenuPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-CProcessTableCallback CMenuPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-CProcessTableCallback CMenuPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
+static CProcessTableCallback s_menuTableDescCreate = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
+static CProcessTableCallback s_menuTableDescDestroy = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
+static CProcessTableCallback s_menuTableDescCalc = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
+static CProcessTableCallback s_menuTableDescDraw = {0, 0xFFFFFFFF,
+                                                     reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
+static CProcessTableCallback s_menuTableDescLoadTextureAsync = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
+static CProcessTableCallback s_menuTableDescDrawSingleMenu = {0, 0xFFFFFFFF,
+                                                              reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 CProcessTable CMenuPcs::m_table = {
     const_cast<char*>(s_CMenuPcs_801d9d3c),
     {
-        m_table_desc0.m_thisOffset, m_table_desc0.m_virtualOffset, m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset, m_table_desc1.m_virtualOffset, m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset, m_table_desc2.m_virtualOffset, m_table_desc2.m_function,
+        s_menuTableDescCreate.m_thisOffset, s_menuTableDescCreate.m_virtualOffset, s_menuTableDescCreate.m_function,
+        s_menuTableDescDestroy.m_thisOffset, s_menuTableDescDestroy.m_virtualOffset, s_menuTableDescDestroy.m_function,
+        s_menuTableDescCalc.m_thisOffset, s_menuTableDescCalc.m_virtualOffset, s_menuTableDescCalc.m_function,
         0x1A, 0,
-        m_table_desc3.m_thisOffset, m_table_desc3.m_virtualOffset, m_table_desc3.m_function,
+        s_menuTableDescDraw.m_thisOffset, s_menuTableDescDraw.m_virtualOffset, s_menuTableDescDraw.m_function,
         0x49, 0x1,
-        m_table_desc4.m_thisOffset, m_table_desc4.m_virtualOffset, m_table_desc4.m_function,
+        s_menuTableDescLoadTextureAsync.m_thisOffset, s_menuTableDescLoadTextureAsync.m_virtualOffset,
+        s_menuTableDescLoadTextureAsync.m_function,
         0x1A, 0x10,
-        m_table_desc5.m_thisOffset, m_table_desc5.m_virtualOffset, m_table_desc5.m_function,
+        s_menuTableDescDrawSingleMenu.m_thisOffset, s_menuTableDescDrawSingleMenu.m_virtualOffset,
+        s_menuTableDescDrawSingleMenu.m_function,
         0x49, 0x11,
     },
 };

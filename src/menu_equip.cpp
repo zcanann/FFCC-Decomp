@@ -712,14 +712,12 @@ void CMenuPcs::EquipDraw()
  */
 int CMenuPcs::EquipClose()
 {
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	EquipOpenAnimList* menuData = GetEquipListStorage(this);
 	int doneCount = 0;
 
-	menuState->frame = menuState->frame + 1;
-	int timer = static_cast<int>(menuState->frame);
-	int itemCount = static_cast<int>(menuData->count);
-	EquipOpenAnim* item = menuData->entries;
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	int timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	int itemCount = static_cast<int>(GetEquipListStorage(this)->count);
+	EquipOpenAnim* item = GetEquipListStorage(this)->entries;
 
 	for (int i = 0; i < itemCount; i++) {
 		if (item->startFrame <= timer) {
@@ -740,7 +738,7 @@ int CMenuPcs::EquipClose()
 	}
 
 	if (itemCount == doneCount) {
-		item = menuData->entries;
+		item = GetEquipListStorage(this)->entries;
 		for (int i = 0; i < itemCount; i++) {
 			item->startFrame = 0;
 			item->duration = 1;

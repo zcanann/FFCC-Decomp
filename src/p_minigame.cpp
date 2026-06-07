@@ -899,7 +899,7 @@ retry_loop:
                 else
                 {
                     ret = GBAWrite(
-                        channel, reinterpret_cast<u8*>(self + channel * 0x60 + (step - 1) * 4 + 0x16AC),
+                        channel, reinterpret_cast<u8*>(self + (channel * 0x60 + (step - 1) * 4 + 0x16AC)),
                         param + 0xC0);
                 }
 

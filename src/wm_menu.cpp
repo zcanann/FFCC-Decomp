@@ -4068,18 +4068,17 @@ void CMenuPcs::DrawCMakeMenu()
 	WmWorldState* const worldState = m_wmWorldState;
 
 	const short state = worldState->m_mainState;
-	const short step = worldState->m_frameCounter;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
 	} else if (state == 1) {
-		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
 	} else if (state == 2) {
 		frameAlpha = FLOAT_80331434;
 	} else if (state == 3) {
-		frameAlpha = static_cast<float>(DOUBLE_80331460 * (static_cast<double>(step) - DOUBLE_80331408) + DOUBLE_803313f8);
+		frameAlpha = static_cast<float>(DOUBLE_80331460 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) + DOUBLE_803313f8);
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -4105,11 +4104,11 @@ void CMenuPcs::DrawCMakeMenu()
 	if (state > 0 && state < 4) {
 		float contentAlpha;
 		if (state == 1) {
-			contentAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+			contentAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
 		} else if (state == 2) {
 			contentAlpha = FLOAT_803313e8;
 		} else {
-			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
 		}
 
 		DrawCharaBase();

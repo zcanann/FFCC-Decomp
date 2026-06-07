@@ -1037,10 +1037,9 @@ void CMenuPcs::EquipInit1()
 	fVar4 = kEquipInitU;
 	fVar3 = kEquipOne;
 	fVar2 = kEquipZero;
-	EquipOpenAnimList* list = GetEquipListStorage(this);
 	sVar7 = 0;
-	iVar8 = (int)list->count;
-	psVar10 = &list->entries[iVar8];
+	iVar8 = (int)GetEquipListStorage(this)->count;
+	psVar10 = &GetEquipListStorage(this)->entries[iVar8];
 	psVar10->tex = 0x2e;
 	psVar10->x = 0xb8;
 	psVar10->y = 0x28;
@@ -1054,7 +1053,7 @@ void CMenuPcs::EquipInit1()
 	psVar10->startFrame = 5;
 	psVar10->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 1];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 1];
 	puVar12->tex = 0x2f;
 	puVar12->x = 0xa0;
 	puVar12->y = 0xe;
@@ -1066,7 +1065,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 2];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 2];
 	puVar12->tex = 0x2f;
 	puVar12->w = 0x30;
 	puVar12->h = 0x30;
@@ -1078,7 +1077,7 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	puVar12 = &list->entries[iVar8 + 3];
+	puVar12 = &GetEquipListStorage(this)->entries[iVar8 + 3];
 	puVar12->flags = 2;
 	puVar12->tex = 0x2e;
 	puVar12->x = 0xa0;
@@ -1090,10 +1089,10 @@ void CMenuPcs::EquipInit1()
 	puVar12->startFrame = 0;
 	puVar12->duration = 5;
 
-	psVar10 = &list->entries[list->count];
+	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	iVar8 = 4;
 	do {
-		psVar13 = &list->entries[iVar9];
+		psVar13 = &GetEquipListStorage(this)->entries[iVar9];
 		psVar13[0].flags = 2;
 		psVar13[0].tex = 0x37;
 		iVar9 = iVar9 + 2;
@@ -1122,9 +1121,9 @@ void CMenuPcs::EquipInit1()
 		iVar8 = iVar8 - 1;
 	} while (iVar8 != 0);
 
-	list->listEnd = (short)iVar9;
-	uVar6 = (unsigned int)((int)list->listEnd - (int)list->count);
-	psVar10 = &list->entries[list->count];
+	GetEquipListStorage(this)->listEnd = (short)iVar9;
+	uVar6 = (unsigned int)((int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count);
+	psVar10 = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
 	if (0 < (int)uVar6) {
 		uVar15 = uVar6 >> 3;
 		if (uVar15 != 0) {

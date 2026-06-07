@@ -227,7 +227,7 @@ static bool CharaObjSkipComboScript(CGPrgObj* obj)
 		return false;
 	}
 
-	return ((obj->GetCID() & 0x6D) == 0x6D) &&
+	return ((static_cast<unsigned short>(obj->GetCID()) & 0x6D) == 0x6D) &&
 	       (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0);
 }
 
@@ -609,7 +609,7 @@ void CGCharaObj::onFramePostCalc()
 			m_stateTick += 1;
 		}
 
-		if ((GetCID() & 0x6D) == 0x6D &&
+		if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			char slot = m_animStateMisc;
@@ -966,7 +966,7 @@ void CGCharaObj::onFrameStat()
 				}
 			} else if (m_subState < 4) {
 				if (m_subFrame == 0) {
-					reqAnim(((GetCID() & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
+					reqAnim(((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) ? m_unk558 : m_unk55C, 0, 0);
 				}
 
 				if (isLoopAnim() != 0) {
@@ -988,7 +988,7 @@ void CGCharaObj::onFrameStat()
 				}
 				reqAnim(6, 1, 0);
 
-				if ((GetCID() & 0x6D) == 0x6D) {
+				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 					playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) + 0x10,
 					         0x32, 0x96, 0, 0);
 				}
@@ -1034,7 +1034,7 @@ void CGCharaObj::onFrameStat()
 
 		case 0x19:
 			if (m_stateFrame == 0) {
-				if ((GetCID() & 0x6D) == 0x6D) {
+				if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 					static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
 				}
 
@@ -2127,7 +2127,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
 				setSta(0, 0);
 			}
-			if ((GetCID() & 0xAD) != 0xAD ||
+			if ((static_cast<unsigned short>(GetCID()) & 0xAD) != 0xAD ||
 				(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 8) == 0) {
 				CVector sourcePos(sourceObj->m_worldPosition);
 				CVector selfPos(m_worldPosition);
@@ -2360,7 +2360,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
 	unsigned short powerValue;
-	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (source->GetCID() & 0x2D)))) >> 5) & 0xFFU) == 0) {
+	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (static_cast<unsigned short>(source->GetCID()) & 0x2D)))) >> 5) & 0xFFU) == 0) {
 		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	} else {
 		bool stageModeActive = false;
@@ -2371,7 +2371,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			stageModeActive = true;
 		}
 		if (stageModeActive) {
-			if ((((static_cast<unsigned int>(__cntlzw(0x6D - (source->GetCID() & 0x6D)))) >> 5) & 0xFFU) != 0) {
+			if ((((static_cast<unsigned int>(__cntlzw(0x6D - (static_cast<unsigned short>(source->GetCID()) & 0x6D)))) >> 5) & 0xFFU) != 0) {
 				usePartySource = true;
 			}
 		}
@@ -2387,7 +2387,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int power = powerValue;
-	if ((source->GetCID() & 0xAD) == 0xAD) {
+	if ((static_cast<unsigned short>(source->GetCID()) & 0xAD) == 0xAD) {
 		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -2556,7 +2556,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 			break;
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
 		staIndex != 0x1C) {
 		int clamped = 2;
@@ -2565,7 +2565,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		}
 		outA = clamped;
 	}
-	if ((GetCID() & 0xAD) == 0xAD &&
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0) {
 		int clamped = 2;
@@ -2575,7 +2575,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outA = clamped;
 	}
 
-	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x7F &&
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x7F &&
 	    static_cast<signed char>(SoundBuffer[0x4FC]) < 0) {
 		outA = 3;
 	}
@@ -2963,7 +2963,7 @@ void CGCharaObj::statAttack()
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
 		unsigned int seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
 		if (seSpec != 0) {
-			if ((GetCID() & 0xAD) == 0xAD) {
+			if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 				int seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 				playSe3D(seNo + Math.Rand(3), 0x32, 0x96, 0, 0);
 			} else {
@@ -3468,7 +3468,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 		CGPrgObj* link = comboLinks[entry];
 		if (link != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-			    (link->GetCID() & 0x6D) == 0x6D &&
+			    (static_cast<unsigned short>(link->GetCID()) & 0x6D) == 0x6D &&
 			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(link->m_scriptHandle) + 0x3B4) != 0) {
 				goto next_link;
 			} else if (link->m_lastStateId != 6 && link->m_lastStateId != 2) {

@@ -2321,7 +2321,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
 			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
 			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar14 = (int)((double)(float)(0x280 - sVar8) * DOUBLE_803313f8);
 			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
@@ -2393,7 +2393,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
 			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
 			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar14 = (int)((double)(float)(0x280 - sVar8) * DOUBLE_803313f8);
 			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
@@ -2481,7 +2481,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
 			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
 			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar14 = (int)((double)(float)(0x280 - sVar8) * DOUBLE_803313f8);
 			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
@@ -2576,7 +2576,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
 			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
 			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar14 = (int)((double)(float)(0x280 - sVar8) * DOUBLE_803313f8);
 			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;
@@ -2781,7 +2781,7 @@ void CMenuPcs::CalcLoadMenu()
 			if (iVar14 != (iVar10 - (iVar10 >> 0x1F)) * 0x16) sVar8 = sVar8 + 1;
 			sVar8 = (sVar8 + 2) * 0x16 + 0x40;
 			short sVar18 = (short)*piVar5 * 0x1E + 0x40;
-			iVar14 = (int)((float)(0x280 - sVar8) * (float)DOUBLE_803313f8);
+			iVar14 = (int)((double)(float)(0x280 - sVar8) * DOUBLE_803313f8);
 			iVar10 = (int)((double)(FLOAT_80331430 - (float)sVar18) * DOUBLE_803313f8);
 			m_menuWindowInfo->x = (short)iVar14;
 			m_menuWindowInfo->y = (short)iVar10;

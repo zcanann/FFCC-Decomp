@@ -2160,15 +2160,11 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const float alpha = GetCmdListStorage(this)->entries[0].alpha;
-		GXColor color;
-		color.r = 0xFF;
-		color.g = 0xFF;
-		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
 		DrawHelpMessage(
 			helpId, font, 0,
 			static_cast<int>(-(FLOAT_80332AEC * FLOAT_80332a88 - FLOAT_80332b08)),
-			color, 0, FLOAT_80332a88, FLOAT_80332b08);
+			CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color, 0,
+			FLOAT_80332a88, FLOAT_80332b08);
 	}
 }
 

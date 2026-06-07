@@ -4131,7 +4131,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x30, 1);
 		}
-	} else if (CFlatItemCarryMode() == 0) {
+	} else if (CFlatCenterState() == 0) {
 		if (mapId == 1) {
 			SetAnimSlot(0x0B, 0);
 			SetAnimSlot(0x0C, 1);

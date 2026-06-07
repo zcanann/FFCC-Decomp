@@ -510,7 +510,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
 {
     u8* paramBytes = (u8*)param;
     u8* particleBytes = (u8*)particleData;
-    u8 mode = paramBytes[0x18];
     float spread = (float)paramBytes[0x19];
     float spreadRange = FLOAT_80330588 * spread;
 
@@ -522,7 +521,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if (mode < 8) {
+    if (paramBytes[0x18] < 8) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
@@ -535,7 +534,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         angles[1] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
         angles[2] = (s32)((float)((s32)(spreadRange * Math.RandF() - spread) << 15) / FLOAT_8033058C);
         angles[3] = 0;
-        if ((mode == 2) || (mode == 3)) {
+        if ((paramBytes[0x18] == 2) || (paramBytes[0x18] == 3)) {
             angles[0] = 0;
             angles[1] = 0;
             angles[2] = 0;
@@ -553,8 +552,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
     }
 
-    if (mode < 6) {
-        if (mode > 3) {
+    if (paramBytes[0x18] < 6) {
+        if (paramBytes[0x18] > 3) {
         float speedRandRange = param->m_speedRandRange;
         if (speedRandRange == kPppYmMegaBirthShpTail2Zero) {
             goto done;
@@ -623,7 +622,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
         goto done;
         }
-    } else if (mode < 10) {
+    } else if (paramBytes[0x18] < 10) {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {
@@ -681,7 +680,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 particleData->m_matrix[0][1] = vy * param->m_speedScale.x;
                 particleData->m_matrix[0][2] = vz * param->m_speedScale.y;
 
-                if ((mode == 8) || (mode == 9)) {
+                if ((paramBytes[0x18] == 8) || (paramBytes[0x18] == 9)) {
                     Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[0]);
                     pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
                 }

@@ -1501,7 +1501,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
     _pppEnvSt* env = &m_pppEnvSt;
-    PppPdtSlot* pdtSlots = m_pdtSlots;
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* packetWords = reinterpret_cast<int*>(packet);
@@ -1760,22 +1759,22 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pppDataHead);
-            pdtSlots[0].m_pppDataHead = 0;
+        if (m_pdtSlots[0].m_pppDataHead != 0) {
+            delete[] reinterpret_cast<u8*>(m_pdtSlots[0].m_pppDataHead);
+            m_pdtSlots[0].m_pppDataHead = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
             delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
-        pdtSlots[0].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
+        m_pdtSlots[0].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
             operator new[](
                 packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            memcpy(pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
-            pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
+        if (m_pdtSlots[0].m_pppDataHead != 0) {
+            memcpy(m_pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
+            pppInitPdt(reinterpret_cast<long*>(m_pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
         }
 
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
@@ -1824,22 +1823,22 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
-        if (pdtSlots[pdtCount].m_pppDataHead != 0) {
-            delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pppDataHead);
-            pdtSlots[pdtCount].m_pppDataHead = 0;
+        if (m_pdtSlots[pdtCount].m_pppDataHead != 0) {
+            delete[] reinterpret_cast<u8*>(m_pdtSlots[pdtCount].m_pppDataHead);
+            m_pdtSlots[pdtCount].m_pppDataHead = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
             delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
 
-        pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
+        m_pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
             operator new[](
                 packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
-        memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
-        pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
+        memcpy(m_pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
+        pppInitPdt(reinterpret_cast<long*>(m_pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
         *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
         return;
     }

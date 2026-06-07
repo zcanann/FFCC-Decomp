@@ -1621,9 +1621,34 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (damageAmount != 0) {
 			addHp(-damageAmount, sourceObj);
-			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7) != 0) {
+			bool selfHasGuard = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 7) != 0;
+			if (selfHasGuard) {
 				bonus(0, resolvedItemId, sourceObj);
 				sourceObj->bonus(1, resolvedItemId, this);
+			}
+			if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0 &&
+			    ((sourceObj->GetCID() & 0x6D) != 0x6D || static_cast<int>(sourceObj->m_capsuleHalfHeight) < 0)) {
+				if (itemEffect == 0x1F8 || particleLife != 2) {
+					if (itemEffect == 0x1F8) {
+						bonus(0x13, resolvedItemId, sourceObj);
+						sourceObj->bonus(0xF, resolvedItemId, this);
+						if (selfHasGuard) {
+							sourceObj->bonus(10, resolvedItemId, this);
+						}
+					} else {
+						bonus(0x12, resolvedItemId, sourceObj);
+						sourceObj->bonus(0xE, resolvedItemId, this);
+						if (selfHasGuard) {
+							sourceObj->bonus(9, resolvedItemId, this);
+						}
+					}
+				}
+			} else {
+				bonus(0x15, resolvedItemId, sourceObj);
+				sourceObj->bonus(0x11, resolvedItemId, this);
+				if (selfHasGuard) {
+					sourceObj->bonus(0xC, resolvedItemId, this);
+				}
 			}
 			putHitParticleFromItem(sourceObj, resolvedItemId);
 			if ((GetCID() & 0xAD) == 0xAD) {

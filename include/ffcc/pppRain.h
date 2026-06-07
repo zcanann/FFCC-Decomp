@@ -3,11 +3,18 @@
 
 #include <dolphin/types.h>
 
-struct _pppCtrlTable;
 struct _pppPObject;
+struct pppProg;
 
 typedef _pppPObject pppRain;
-typedef _pppCtrlTable RAIN_DATA;
+
+struct RAIN_DATA {
+    pppProg* m_prog;
+    u16 m_workOffset;
+    u16 m_workFlags;
+    s32 m_unk8;
+    s32* m_serializedDataOffsets;
+};
 
 struct RainDataOffsets {
     s32 _unused0;

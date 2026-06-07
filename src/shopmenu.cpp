@@ -1187,7 +1187,6 @@ void CShopMenu::DrawBuySellInfo()
 {
     CFont* font = MenuPcs.m_fonts[0];
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    unsigned int selected = m_selectedIndex;
     int listType = m_listType;
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1215,9 +1214,9 @@ void CShopMenu::DrawBuySellInfo()
 
     int itemNo = -1;
     bool canTrade = false;
-    if (selected != -1) {
+    if (m_selectedIndex != -1) {
         const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-        itemNo = getItemNo(selected);
+        itemNo = getItemNo(m_selectedIndex);
 
         if (itemNo > 0) {
             if (listType == 0) {
@@ -1226,7 +1225,7 @@ void CShopMenu::DrawBuySellInfo()
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
                 canTrade = (caravanWork->m_shopArgs[(itemNo - 0x191) >> 5] &
                             (1U << (bit & 0x1F))) != 0;
-            } else if ((listType == 1) && MenuPcs.EquipChk(selected) == 0 && itemNo >= 0x9F) {
+            } else if ((listType == 1) && MenuPcs.EquipChk(m_selectedIndex) == 0 && itemNo >= 0x9F) {
                 canTrade = true;
             }
         }

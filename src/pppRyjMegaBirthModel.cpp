@@ -790,7 +790,7 @@ join_position:
     *u8_at(particleData, 0x9c) = 0;
 
     if (particleWMat != NULL) {
-        PSMTXCopy(ppvMng->m_matrix.value, *(Mtx*)particleWMat);
+        pppCopyMatrix(*(pppFMATRIX*)particleWMat, ppvMng->m_matrix);
     }
 
     if (particleColor != NULL) {

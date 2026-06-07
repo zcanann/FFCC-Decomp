@@ -591,11 +591,10 @@ cancel_done:
  */
 void CGCharaObj::onFramePostCalc()
 {
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (*reinterpret_cast<short*>(script + 0x42) != 0) {
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42) != 0) {
 		unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 		if (m_stateTick != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
-			if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1 &&
+			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) > 1 &&
 			    (CFlatGameFlags() & CFlatGameFlag_Bit5) == 0) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
 				addHp(-1, 0);
@@ -604,7 +603,7 @@ void CGCharaObj::onFramePostCalc()
 	}
 
 	for (int i = 0, statusOffset = 0; i < 0x27; i++, statusOffset += 2) {
-		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x3E + statusOffset)) - 1;
+		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + statusOffset)) - 1;
 		if (statusValue != 0 && i == 2) {
 			m_stateTick += 1;
 		}
@@ -637,10 +636,9 @@ void CGCharaObj::onFramePostCalc()
 		setSta(i, statusValue);
 	}
 
-	script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (*reinterpret_cast<unsigned short*>(script + 0x3E) == 0 &&
-	    *reinterpret_cast<unsigned short*>(script + 0x50) == 0 &&
-	    *reinterpret_cast<unsigned short*>(script + 0x44) == 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0 &&
+	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0 &&
+	    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) {
 		m_displayFlags |= 2;
 	} else {
 		m_displayFlags &= ~2;

@@ -1369,8 +1369,9 @@ void CMenuPcs::DrawSelectOpenAnim()
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
+	int off = 0;
+	for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++, off += 0x40) {
+		BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + off + 8);
 		int kind = sprite->kind;
 		if (kind >= 0 || kind != -1) {
 			if (kind == -3) {

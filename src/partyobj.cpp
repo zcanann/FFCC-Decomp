@@ -1032,7 +1032,7 @@ void CGPartyObj::onFramePostCalc()
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (GetCID() & 0x6D) == 0x6D &&
+	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    m_scriptHandle[0xED] != nullptr) {
 		ghostPartyMog();
 	} else {
@@ -1735,7 +1735,7 @@ void CGPartyObj::onFrameStat()
 	case 0x0B:
 		if (Game.m_gameWork.m_menuStageMode != 0 &&
 		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-		    (GetCID() & 0x6D) == 0x6D &&
+		    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 		    m_scriptHandle[0xED] != nullptr) {
 			if (m_stateFrame == 0) {
 				CancelMove(1);
@@ -3334,7 +3334,7 @@ void CGPartyObj::statPickup()
  */
 void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
-	if (source != nullptr && (source->GetCID() & 0x2D) != 0x2D) {
+	if (source != nullptr && (static_cast<unsigned short>(source->GetCID()) & 0x2D) != 0x2D) {
 		return;
 	}
 
@@ -4028,7 +4028,7 @@ void CGPartyObj::InitFinished()
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (GetCID() & 0x6D) == 0x6D &&
+	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
 		*reinterpret_cast<unsigned char*>(self + 0xE6) = 0;
 		*reinterpret_cast<float*>(self + 0x144) = FLOAT_80331AB0;

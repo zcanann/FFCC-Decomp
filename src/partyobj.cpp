@@ -979,7 +979,7 @@ void CGPartyObj::onFramePreCalc()
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (party.carryObject == nullptr) &&
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
 

@@ -2353,7 +2353,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 
 			u8 interpCount = AnimInterpCount(currentAnim);
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
-			int frame = static_cast<int>(m_time);
+			int frame = static_cast<int>(m_curFrame);
 
 			for (int i = 0; i < interpCount; i++) {
 				int start = (i == 0) ? 0 : interpTable[i * 2];

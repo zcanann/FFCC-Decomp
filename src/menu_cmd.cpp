@@ -1937,7 +1937,7 @@ void CMenuPcs::DrawUniteList()
 	bool active = false;
 	for (s32 i = 0; i < 8; i++) {
 		const s32 slotType = caravan->m_commandListExtra[i];
-		if (i == selected) {
+		if (i == cmd->selected) {
 			active = true;
 		} else if (slotType >= 0) {
 			active = false;
@@ -1973,10 +1973,10 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		if (slotType > 0) {
-			selected = cmd->selected;
+			selected = GetCmdStateView(this)->selected;
 			if ((i <= selected) && (selected < i + groupSize)) {
-				if ((cmd->phase == 3) && (i != selected)) {
-					cmd->selected = static_cast<s16>(i);
+				if ((GetCmdStateView(this)->phase == 3) && (i != selected)) {
+					GetCmdStateView(this)->selected = static_cast<s16>(i);
 				}
 				active = true;
 			}

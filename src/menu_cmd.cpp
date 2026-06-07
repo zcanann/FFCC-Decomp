@@ -1978,6 +1978,10 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		CmdListEntry* const entry = &entries[i];
+		const float rectX = static_cast<float>(entry->x + 4);
+		const float rectY = static_cast<float>(entry->y) - FLOAT_80332ad0;
+		const float rectW = static_cast<float>(entry->width) - 8.0f;
+		const float rectU = static_cast<float>(entry->u);
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
@@ -2006,11 +2010,11 @@ void CMenuPcs::DrawUniteList()
 
 		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
 		MenuPcs.DrawRect(0,
-			static_cast<float>(entry->x + 4),
-			static_cast<float>(entry->y) - FLOAT_80332ad0,
-			static_cast<float>(entry->width) - 8.0f,
+			rectX,
+			rectY,
+			rectW,
 			FLOAT_80332AD4,
-			static_cast<float>(entry->u),
+			rectU,
 			active ? FLOAT_80332AD4 : FLOAT_80332ab0,
 			FLOAT_80332a70,
 			FLOAT_80332a70,

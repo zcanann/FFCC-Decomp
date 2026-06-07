@@ -1103,9 +1103,9 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		}
 		ModelDynCount(this) = 0;
 
-		CNode* nodes = ModelNodes(this);
-		for (u32 i = 0; i < ModelNodeCount(this); i++) {
-			NodeDynParamIndex(&nodes[i]) = 0xFF;
+		CNode* node = ModelNodes(this);
+		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
+			NodeDynParamIndex(node) = 0xFF;
 		}
 
 		chunkFile.PushChunk();
@@ -1117,7 +1117,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 
 				ModelDynCount(this) = 0;
 				ModelDynParams(this) =
-				    Memory._Alloc(chunk.m_size * 0x24, stage, const_cast<char*>(s_chara_cpp), 0x1E7, 0);
+				    static_cast<void*>(new (stage, const_cast<char*>(s_chara_cpp), 0x1E7) u8[chunk.m_size * 0x24]);
 				if (ModelDynParams(this) == 0) {
 					continue;
 				}
@@ -1151,19 +1151,24 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == CharaFourCC('N', 'A', 'M', 'E')) {
-						currentNode = -1;
 						char* name = chunkFile.GetString();
-						for (u32 i = 0; i < ModelNodeCount(this); i++) {
-							if (strcmp(NodeRefName(&nodes[i]), name) == 0) {
+						CNode* searchNode = ModelNodes(this);
+						bool found = false;
+						for (u32 i = 0; i < ModelNodeCount(this); i++, searchNode++) {
+							if (strcmp(NodeRefName(searchNode), name) == 0) {
 								currentNode = static_cast<int>(i);
+								found = true;
 								break;
 							}
+						}
+						if (!found) {
+							currentNode = -1;
 						}
 					} else if (chunk.m_id == CharaFourCC('D', 'Y', 'N', ' ')) {
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M') && currentNode >= 0) {
-								NodeDynParamIndex(&nodes[currentNode]) = static_cast<u8>(chunkFile.Get4());
+								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<u8>(chunkFile.Get4());
 							}
 						}
 						chunkFile.PopChunk();

@@ -1560,8 +1560,10 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 
 	unsigned short prgFlags = static_cast<unsigned short>(prgObj->GetCID());
 	if ((prgFlags & 0x6D) == 0x6D) {
-		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-		if (m_aiState != 0) {
+		unsigned char* aiData;
+		if (m_aiState == 0) {
+			aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		} else {
 			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 				(m_aiState +
 					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
@@ -1614,7 +1616,7 @@ skip_target_update:
 					continue;
 				}
 
-				other->m_targetPartyIndex = attackerIndex;
+				other->m_targetPartyIndex = reinterpret_cast<int>(prgScript[0xED]);
 				other->m_unk6BD = 1;
 
 				if (other->m_chaseState == 4) {

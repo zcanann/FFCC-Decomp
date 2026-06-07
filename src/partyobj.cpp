@@ -805,15 +805,13 @@ void CGPartyObj::onFrameAlways()
 	}
 
 	PartyObjOverlay& party = PartyData(this);
-	if (party.target != nullptr && (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(party.target) + 0x38)) < 0)) {
+	if (party.target != nullptr &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(party.target) + 0x38)) << 24) & 0xC0000000) >> 31) != 0)) {
 		party.target = 0;
 	}
 
-	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0 ||
-	    (*reinterpret_cast<short*>(&m_lastMapIdHit) != 1)) {
-		LoadWeapon(-1, 0);
-		LoadShield(-1);
-	} else {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0 &&
+	    (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1)) {
 		if (m_weaponModelHandle == nullptr) {
 			int weaponItem = party.pendingWeaponItem;
 			int weaponRef = party.weaponItem;
@@ -845,6 +843,9 @@ void CGPartyObj::onFrameAlways()
 				LoadShield(shieldModel);
 			}
 		}
+	} else {
+		LoadWeapon(-1, 0);
+		LoadShield(-1);
 	}
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
@@ -853,12 +854,12 @@ void CGPartyObj::onFrameAlways()
 	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
 	    ((CFlatGameFlags() & 0x10) != 0) &&
 	    ((CFlatGameFlags() & 0x08) != 0) &&
-	    ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
-	     (static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 0x18) < 0)) &&
+	    ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) &&
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    (m_lastStateId != 6 && m_lastStateId != 2)) {
 		if ((Game.m_gameWork.m_menuStageMode == 0) ||
 		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
-		    ((GetCID() & 0x6D) != 0x6D) ||
+		    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 		    (m_scriptHandle[0xED] == nullptr)) {
 			showTraceParticle = true;
 		}

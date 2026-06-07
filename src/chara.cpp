@@ -1668,7 +1668,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXIdentity(out);
 
-	CNode* nodes = ModelNodes(this);
 	CNode* cur = node;
 	bool reuseAnimNode0Srt = false;
 	SRTView parentScaleSrt;
@@ -1678,7 +1677,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		if (parent < 0) {
 			parentNode = 0;
 		} else {
-			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parent * 0xC0);
+			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(ModelNodes(this)) + parent * 0xC0);
 		}
 
 		Mtx localMtx;

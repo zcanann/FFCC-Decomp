@@ -944,6 +944,22 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x20: {
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			Vec target;
+			target.x = params[3];
+			target.y = params[4];
+			target.z = params[5];
+			CGObject* hit = engineObject->CCClass(
+			    static_cast<int>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]), params[2], &target, params[6]);
+			if (hit != 0) {
+				*reinterpret_cast<int*>(object->m_localBase[7]) =
+				    *reinterpret_cast<short*>(reinterpret_cast<u8*>(hit) + 0x30);
+				PushValue(this, object, hit != 0);
+				outResult = 0;
+			}
+			break;
+		}
 		case -0x21: {
 			Vec hitStart;
 			Vec hitTarget;

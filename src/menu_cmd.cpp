@@ -702,17 +702,16 @@ int CMenuPcs::CmdCtrl()
 	GetCmdStateView(this)->prevMode = GetCmdStateView(this)->mode;
 
 	s16 mode = GetCmdStateView(this)->mode;
-	s16 state = GetCmdStateView(this)->phase;
 
-	if ((mode == 0) || (state == 1)) {
+	if ((mode == 0) || (GetCmdStateView(this)->phase == 1)) {
 		actionHandled = CmdCtrlCur();
-	} else if ((mode == 1) && (state == 0)) {
+	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 0)) {
 		actionHandled = CmdOpen0();
 		if (actionHandled != 0) {
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 1) && (state == 2)) {
+	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose0();
 		if (actionHandled != 0) {
 			if (GetCmdStateView(this)->commandResult == 0) {
@@ -726,7 +725,7 @@ int CMenuPcs::CmdCtrl()
 			}
 			actionHandled = 0;
 		}
-	} else if ((mode == 1) && (state == 3)) {
+	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 3)) {
 		actionHandled = static_cast<u32>(UniteOpenAnim(-1));
 		if (actionHandled != 0) {
 			GetCmdStateView(this)->phase = 0;
@@ -735,13 +734,13 @@ int CMenuPcs::CmdCtrl()
 			CmdInit1();
 			actionHandled = 0;
 		}
-	} else if ((mode == 2) && (state == 0)) {
+	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 0)) {
 		actionHandled = CmdOpen1();
 		if (actionHandled != 0) {
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 2) && (state == 2)) {
+	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose1();
 		if (actionHandled != 0) {
 			if (GetCmdStateView(this)->commandResult == 0) {
@@ -754,7 +753,7 @@ int CMenuPcs::CmdCtrl()
 			GetCmdStateView(this)->phase = 0;
 			GetCmdStateView(this)->transitionTimer = 0;
 		}
-	} else if ((mode == 3) && (state == 0)) {
+	} else if ((mode == 3) && (GetCmdStateView(this)->phase == 0)) {
 		GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 		s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
@@ -796,7 +795,7 @@ int CMenuPcs::CmdCtrl()
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 3) && (state == 2)) {
+	} else if ((mode == 3) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose2();
 		if (actionHandled != 0) {
 			actionHandled = 0;

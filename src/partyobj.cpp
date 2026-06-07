@@ -1460,8 +1460,6 @@ void CGPartyObj::onFrameStat()
 	}
 
 	PartyObjOverlay& party = PartyData(this);
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
 	switch (m_lastStateId) {
 	case 0:
@@ -1474,9 +1472,9 @@ void CGPartyObj::onFrameStat()
 			}
 		}
 		if ((static_cast<signed char>(party.partyFlags) < 0) ||
-		    (*reinterpret_cast<unsigned short*>(script + 0x3E) != 0) ||
-		    (*reinterpret_cast<unsigned short*>(script + 0x50) != 0) ||
-		    (*reinterpret_cast<unsigned short*>(script + 0x44) != 0)) {
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) ||
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0) ||
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0)) {
 			m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 			m_unk63CBits.m_bit80 = 0;
 		} else {
@@ -1573,7 +1571,7 @@ void CGPartyObj::onFrameStat()
 		if (isLoopAnim() != 0) {
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
@@ -1708,7 +1706,8 @@ void CGPartyObj::onFrameStat()
 			changeStat(0, 0, 0);
 		}
 		break;
-	case 0x22:
+	case 0x22: {
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		if (m_stateFrame == 0) {
 			if (party.flags.flag04) {
 				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
@@ -1771,6 +1770,7 @@ void CGPartyObj::onFrameStat()
 			changeStat(0, 0, 0);
 		}
 		break;
+	}
 	default:
 		break;
 	}

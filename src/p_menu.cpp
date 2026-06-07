@@ -51,7 +51,7 @@ extern const f32 kMenuPaletteBlendStep;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
-extern const char s_CMenuPcs_801d9d3c[] = "CMenuPcs";
+extern const char sCMenuPcsProcessName[] = "CMenuPcs";
 
 struct MenuFontTlutPalette
 {
@@ -154,7 +154,7 @@ static CProcessTableCallback s_menuTableDescDrawSingleMenu = {0, 0xFFFFFFFF,
                                                               reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 CProcessTable CMenuPcs::m_table = {
-    const_cast<char*>(s_CMenuPcs_801d9d3c),
+    const_cast<char*>(sCMenuPcsProcessName),
     {
         s_menuTableDescCreate.m_thisOffset, s_menuTableDescCreate.m_virtualOffset, s_menuTableDescCreate.m_function,
         s_menuTableDescDestroy.m_thisOffset, s_menuTableDescDestroy.m_virtualOffset, s_menuTableDescDestroy.m_function,
@@ -356,7 +356,7 @@ void CMenuPcs::create()
         menuHeapSize -= FontMan.GetInternal22Size();
     }
 
-    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(s_CMenuPcs_801d9d3c), 0);
+    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(sCMenuPcsProcessName), 0);
     m_mode = -1;
 
     memset(m_textureSets, 0, sizeof(m_textureSets));

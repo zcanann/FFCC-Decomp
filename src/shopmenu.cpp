@@ -23,6 +23,7 @@ char s_shopmenu_cpp[] = "shopmenu.cpp";
 extern char s_shop_80332e54[];
 unsigned short gShopMenuInputLatch;
 extern CShopMenu* g_shopMenu;
+extern float FLOAT_80332d10;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
 extern float FLOAT_80332d34;
@@ -364,6 +365,28 @@ static void SetupShopMenuAmountFont(CFont* font)
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d28);
     font->SetScaleY(FLOAT_80332d8c);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
+    font->DrawInit();
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    font->SetMargin(FLOAT_80332d64);
+}
+
+static void SetupShopMenuMakeAmountFont(CFont* font)
+{
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
+    font->DrawInit();
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    font->SetMargin(FLOAT_80332e10 * FLOAT_80332d28 + FLOAT_80332d10);
+}
+
+static void SetupShopMenuMakeOwnedFont(CFont* font)
+{
+    font->SetShadow(1);
+    font->SetScale(FLOAT_80332d28);
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
     font->DrawInit();
@@ -1909,7 +1932,7 @@ void CShopMenu::DrawMake()
         MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e3c, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        SetupShopMenuAmountFont(font);
+        SetupShopMenuMakeAmountFont(font);
         int rightEdge = static_cast<int>(372.0f - font->GetWidth(neededBuffer));
         MenuPcs.DrawNoShadowFont(font, neededBuffer, rightEdge, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
@@ -1936,7 +1959,7 @@ void CShopMenu::DrawMake()
         }
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
 
-        SetupShopMenuAmountFont(font);
+        SetupShopMenuMakeOwnedFont(font);
         float ownedX = 356.0f - font->GetWidth(ownedBuffer);
         MenuPcs.DrawNoShadowFont(font, ownedBuffer, ownedX, rowY, (ownedCount >= neededCount) ? 0x1B : 2, 0x12);
         MenuPcs.DrawInit();

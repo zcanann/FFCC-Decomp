@@ -57,7 +57,7 @@ public:
     void EndMemCardProc();
 
 private:
-    char m_lastMemCardProc;
+    unsigned char m_lastMemCardProc;
     char m_memCardProc;
     char m_cardChannel;
     char m_saveIndex;
@@ -72,8 +72,8 @@ private:
     char m_odekakeCardChannel;
     char m_odekakeSaveIndex;
     char m_watchCardDisconnect;
-    char m_saveLoadMenuOpen;
-    char m_returnTransfer;
+    unsigned char m_saveLoadMenuOpen;
+    unsigned char m_returnTransfer;
     char unk_0x1f;
     int m_selectedTransferChara;
     signed char m_deleteMode;
@@ -90,7 +90,7 @@ private:
     int m_pendingMessageTimer;
     int m_messageTimer;
     char m_messageState;
-    char m_messageWindowOpen;
+    unsigned char m_messageWindowOpen;
     unsigned char m_cursorChoice;
     unsigned char m_drawCursor;
     char m_messageCloseMode;

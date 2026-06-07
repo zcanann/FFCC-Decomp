@@ -661,7 +661,7 @@ void DrawGoOutMenu()
 
     switch (mode) {
     case 2:
-        if (goOutMenu.m_saveLoadMenuOpen) {
+        if (goOutMenu.m_saveLoadMenuOpen != 0) {
             MenuPcs.DrawInit();
             MenuPcs.DrawCMakeMenu();
         }

@@ -1064,13 +1064,12 @@ int CMenuPcs::EquipOpen()
  */
 void CMenuPcs::EquipInit1()
 {
-	short sVar1;
+	int iVar11;
 	float fVar2;
 	float fVar3;
 	float fVar4;
 	float fVar5;
 	unsigned int uVar6;
-	short sVar7;
 	int iVar8;
 	int iVar9;
 	EquipOpenAnim* psVar10;
@@ -1082,7 +1081,7 @@ void CMenuPcs::EquipInit1()
 	fVar4 = kEquipInitU;
 	fVar3 = kEquipOne;
 	fVar2 = kEquipZero;
-	sVar7 = 0;
+	iVar11 = 0;
 	iVar8 = (int)GetEquipListStorage(this)->count;
 	psVar10 = &GetEquipListStorage(this)->entries[iVar8];
 	psVar10->tex = 0x2e;
@@ -1142,8 +1141,8 @@ void CMenuPcs::EquipInit1()
 		psVar13[0].tex = 0x37;
 		iVar9 = iVar9 + 2;
 		psVar13[0].x = psVar10->x + 0x24;
-		sVar1 = sVar7 + 0x20;
-		psVar13[0].y = psVar10->y + sVar7;
+		psVar13[0].y = psVar10->y + iVar11;
+		iVar11 = iVar11 + 0x20;
 		psVar13[0].w = 200;
 		psVar13[0].h = 0x28;
 		psVar13[0].u = fVar2;
@@ -1154,8 +1153,8 @@ void CMenuPcs::EquipInit1()
 		psVar13[1].flags = 2;
 		psVar13[1].tex = 0x37;
 		psVar13[1].x = psVar10->x + 0x24;
-		sVar7 = sVar7 + 0x40;
-		psVar13[1].y = psVar10->y + sVar1;
+		psVar13[1].y = psVar10->y + iVar11;
+		iVar11 = iVar11 + 0x20;
 		psVar13[1].w = 200;
 		psVar13[1].h = 0x28;
 		psVar13[1].u = fVar2;

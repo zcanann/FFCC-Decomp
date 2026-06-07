@@ -2657,7 +2657,10 @@ unsigned int CMenuPcs::CmdClose1()
 		GetCmdListStorage(this)->entries[static_cast<s32>(GetCmdListStorage(this)->listEnd) + 3].alpha =
 			static_cast<float>(-(DOUBLE_80332a90 * static_cast<f64>(timer) - DOUBLE_80332a58));
 
-		done = static_cast<u32>(static_cast<f64>(timer) >= DOUBLE_80332a78);
+		done = 0;
+		if (static_cast<f64>(timer) >= DOUBLE_80332a78) {
+			done = 1;
+		}
 		if ((done != 0) && (GetCmdStateView(this)->commandResult != 0)) {
 			GetCmdStateView(this)->commandResult = 0;
 			if (GetCmdStateView(this)->choice == 0) {

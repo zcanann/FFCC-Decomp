@@ -2521,30 +2521,32 @@ void CPartMng::pppEditDraw()
                         partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
 
                         float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                        bool shouldDraw = (cullRadiusSq == 0.0f);
-                        if (!shouldDraw) {
+                        if (cullRadiusSq != 0.0f) {
                             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
-                                CBound bound;
-                                float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                                float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
-                                Vec min;
-                                min.x = partPos.x - cullRadius;
-                                min.y = partPos.y;
-                                min.z = partPos.z - cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) != 0);
+                            if (PSVECSquareMag(&cameraDelta) >= cullRadiusSq) {
+                                mng += kPppMngStride;
+                                continue;
+                            }
+                            CBound bound;
+                            float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
+                            float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
+                            Vec min;
+                            min.x = partPos.x - cullRadius;
+                            min.y = partPos.y;
+                            min.z = partPos.z - cullRadius;
+                            if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) == 0) {
+                                mng += kPppMngStride;
+                                continue;
                             }
                         }
 
-                        if (shouldDraw) {
-                            PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                            *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
+                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+                        *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
 
-                            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                            pppSetFpMatrix(ppvMng);
-                            _pppDrawPart(ppvMng);
-                        }
+                        ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                        ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                        pppSetFpMatrix(ppvMng);
+                        _pppDrawPart(ppvMng);
                     }
 
                     mng += kPppMngStride;

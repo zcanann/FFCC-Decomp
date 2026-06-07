@@ -523,7 +523,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s8)paramBytes[0x18] < 8 && (s8)paramBytes[0x18] >= 0) {
+    if ((s32)paramBytes[0x18] < 8 && (s32)paramBytes[0x18] >= 0) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
@@ -551,7 +551,19 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                      *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
     }
 
-    if ((s8)paramBytes[0x18] < 4 || (s8)paramBytes[0x18] >= 10) {
+    if ((s32)paramBytes[0x18] < 6) {
+        if ((s32)paramBytes[0x18] >= 4) {
+            goto mode_4_5;
+        }
+        goto scalar;
+    }
+    if ((s32)paramBytes[0x18] >= 10) {
+        goto scalar;
+    }
+    goto path;
+
+scalar:
+    {
         float speedRandRange = param->m_speedRandRange;
         if (speedRandRange != kPppYmMegaBirthShpTail2Zero) {
             float scale = speedRandRange;
@@ -589,7 +601,11 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
             pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
         }
-    } else if ((s8)paramBytes[0x18] < 6) {
+        goto done;
+    }
+
+mode_4_5:
+    {
         if (param->m_speedRandRange == kPppYmMegaBirthShpTail2Zero) {
             goto done;
         }
@@ -676,7 +692,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[0][1] *= param->m_speedScale.x;
         particleData->m_matrix[0][2] *= param->m_speedScale.y;
         goto done;
-    } else if ((s8)paramBytes[0x18] < 10) {
+    }
+
+path:
+    {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (param->m_tail2PathIndex >= 0) {

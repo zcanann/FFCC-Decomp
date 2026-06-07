@@ -138,8 +138,8 @@ static float* s_Base[1];
 extern "C" const char sDrawBonusFmt[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };
-extern "C" const char s_bonus_menu_cpp[] = "bonus_menu.cpp";
-extern "C" const char s_bonusAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
+extern "C" const char s_bonus_menu_cpp[];
+extern "C" const char s_bonusAllocErrorFmt[];
 
 namespace {
 
@@ -778,7 +778,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
 			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
 			if ((mask & (1 << i)) != 0) {
-				rgb = 0.5f;
+				rgb = 0.7f;
 			}
 			_GXColor color = {
 			    (unsigned char)(rgb * 255.0f),

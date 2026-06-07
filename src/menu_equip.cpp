@@ -189,62 +189,6 @@ int CMenuPcs::EquipClose0()
 
 /*
  * --INFO--
- * PAL Address: 0x8015b468
- * PAL Size: 432b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::EquipOpen0()
-{
-	float fVar1;
-	double dVar2;
-	int timer;
-	int doneCount;
-	int itemCount;
-
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	menuState->frame = menuState->frame + 1;
-	timer = static_cast<int>(menuState->frame);
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	EquipOpenAnim* selected = &list->entries[menuState->selectedIndex];
-
-	if (timer < 5) {
-		selected->x = selected->x - 0x13;
-	}
-
-	doneCount = 0;
-	itemCount = (int)list->listEnd - (int)list->count;
-	EquipOpenAnim* item = &list->entries[list->count];
-
-	for (int i = 0; i < itemCount; i++) {
-		fVar1 = kEquipZero;
-		if (timer >= item->startFrame) {
-			if (item->startFrame + item->duration <= timer) {
-				doneCount = doneCount + 1;
-				item->alpha = kEquipOne;
-				item->dx = kEquipZero;
-				item->dy = kEquipZero;
-			} else {
-				item->step = item->step + 1;
-				dVar2 = kEquipOneDouble;
-				item->alpha = (float)((kEquipOneDouble / (double)item->duration) * (double)item->step);
-				if ((item->flags & 2) == 0) {
-					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
-					item->dx = (item->targetX - (float)item->x) * fVar1;
-					item->dy = (item->targetY - (float)item->y) * fVar1;
-				}
-			}
-		}
-		item++;
-	}
-
-	return itemCount == doneCount;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8015b618
  * PAL Size: 1592b
  * EN Address: TODO
@@ -830,6 +774,60 @@ void CMenuPcs::EquipCtrl()
 			} while (itemCount != 0);
 		}
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8015b468
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::EquipOpen0()
+{
+	float fVar1;
+	double dVar2;
+	int timer;
+	int doneCount;
+	int itemCount;
+
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	timer = static_cast<int>(GetEquipMenuState(this)->frame);
+	EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
+
+	if (timer < 5) {
+		selected->x = selected->x - 0x13;
+	}
+
+	doneCount = 0;
+	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
+	EquipOpenAnim* item = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+
+	for (int i = 0; i < itemCount; i++) {
+		fVar1 = kEquipZero;
+		if (timer >= item->startFrame) {
+			if (item->startFrame + item->duration <= timer) {
+				doneCount = doneCount + 1;
+				item->alpha = kEquipOne;
+				item->dx = kEquipZero;
+				item->dy = kEquipZero;
+			} else {
+				item->step = item->step + 1;
+				dVar2 = kEquipOneDouble;
+				item->alpha = (float)((kEquipOneDouble / (double)item->duration) * (double)item->step);
+				if ((item->flags & 2) == 0) {
+					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
+					item->dx = (item->targetX - (float)item->x) * fVar1;
+					item->dy = (item->targetY - (float)item->y) * fVar1;
+				}
+			}
+		}
+		item++;
+	}
+
+	return itemCount == doneCount;
 }
 
 /*

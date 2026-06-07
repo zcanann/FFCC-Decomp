@@ -2459,10 +2459,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x30:
-        this->push(object, GraphicPcs.GetScreenFadeExecutingBit());
-        outResult = 0;
-        break;
     case -0x31:
         CGItemObj::DeleteAllFieldItem();
         this->push(object, 0);
@@ -2516,12 +2512,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x35:
-        this->push(object, this->GetFreeParticleSlot());
-        outResult = 0;
-        break;
-    case -0x36:
-        this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
+    case -0x3D:
+        this->PutParticleWork();
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2569,8 +2561,114 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x3D:
-        this->PutParticleWork();
+    case -0x62:
+        CharaPcs.SetNoFreeMergeMask(*object->m_localBase);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -99: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkTrace(targetObject);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x49:
+        this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x4A:
+        m_eventFlags = static_cast<unsigned int>(*object->m_localBase);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x4B:
+        PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x4C: {
+        _GXColor color = {
+            static_cast<u8>(object->m_localBase[2]),
+            static_cast<u8>(object->m_localBase[3]),
+            static_cast<u8>(object->m_localBase[4]),
+            0x80,
+        };
+        MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x4D: {
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
+        if (mesMenu == 0) {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
+            }
+            this->push(object, 0);
+            outResult = 0;
+            break;
+        }
+        if (mesMenu->IsUse() == 0) {
+            this->push(object, 0);
+            outResult = 0;
+            break;
+        }
+        return 1;
+    }
+    case -0x4E: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
+        this->SetParticleWorkBind(targetObject);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x5A:
+        m_debugDataIndex = 0;
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x5B: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->SetParticleWorkParam(*object->m_localBase, targetObject);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x5C: {
+        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
+        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x80:
+        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x81: {
+        float angle = static_cast<float>(object->m_localBase[2]);
+        Vec normal = {sinf(angle), 0.0f, cosf(angle)};
+        Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
+        Mtx& reflectMtx = m_centerMatrix;
+        PSMTXReflect(reflectMtx, &point, &normal);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    }
+    case -0x35:
+        this->push(object, this->GetFreeParticleSlot());
+        outResult = 0;
+        break;
+    case -0x82:
+        CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0x36:
+        this->EndParticleSlot(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2722,57 +2820,55 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x49:
-        this->SetParticleWorkSpeed(static_cast<float>(*object->m_localBase));
+    case -0x7D:
+        PartMng.pppDeletePart(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x4A:
-        m_eventFlags = static_cast<unsigned int>(*object->m_localBase);
+    case -0x7E:
+        PartMng.pppDeleteSlot(*object->m_localBase, 0);
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x4B:
-        PartMng.pppFieldShowFpNo(static_cast<short>(*object->m_localBase), static_cast<unsigned char>(object->m_localBase[1]));
+    case -0x91:
+        this->push(object, PartMng.pppGetNumFreePppMngSt());
+        outResult = 0;
+        break;
+    case -0xB4:
+        PartMng.pppSetDeltaSlot(
+            *object->m_localBase, static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x4C: {
-        _GXColor color = {
-            static_cast<u8>(object->m_localBase[2]),
-            static_cast<u8>(object->m_localBase[3]),
-            static_cast<u8>(object->m_localBase[4]),
-            0x80,
-        };
-        MapMng.SetIdGrpColor(*object->m_localBase, object->m_localBase[1], color);
+    case -0xB5:
+        PartMng.pppSetDeltaIdx(
+            static_cast<short>(*object->m_localBase),
+            static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         this->push(object, 0);
         outResult = 0;
         break;
-    }
-    case -0x4D: {
-        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
-        if (mesMenu == 0) {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
-            }
-            this->push(object, 0);
-            outResult = 0;
-            break;
-        }
-        if (mesMenu->IsUse() == 0) {
-            this->push(object, 0);
-            outResult = 0;
-            break;
-        }
-        return 1;
-    }
-    case -0x4E: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
-        this->SetParticleWorkBind(targetObject);
+    case -0xB6:
+        Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac = object->m_localBase[1];
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0xBA:
+        m_cameraScriptTargetMode = *object->m_localBase;
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0xBB: {
+        PPPCREATEPARAM createParam;
+        PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
         this->push(object, 0);
         outResult = 0;
         break;
     }
+    case -0xBC:
+        PartMng.pppFieldEndFpNo(static_cast<short>(*object->m_localBase));
+        this->push(object, 0);
+        outResult = 0;
+        break;
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
             static_cast<unsigned short>(*object->m_localBase),
@@ -2884,25 +2980,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0x5A:
-        m_debugDataIndex = 0;
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0x5B: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
-        this->SetParticleWorkParam(*object->m_localBase, targetObject);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    }
-    case -0x5C: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, object->m_localBase[1]);
-        this->IgnoreParticle(static_cast<short>(*object->m_localBase), targetObject);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    }
     case -0x5D:
         this->push(object, System.IsGdev());
         outResult = 0;
@@ -2937,18 +3014,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         Memory.SetDefaultGroup(group);
         CharaPcs.LoadMergeFile(*object->m_localBase, object->m_localBase[1], 0);
         Memory.ResetDefaultGroup();
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    }
-    case -0x62:
-        CharaPcs.SetNoFreeMergeMask(*object->m_localBase);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -99: {
-        CFlatRuntime::CObject* targetObject = ResolveRuntimeObjectById(this, *object->m_localBase);
-        this->SetParticleWorkTrace(targetObject);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3128,38 +3193,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0x7D:
-        PartMng.pppDeletePart(*object->m_localBase);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0x7E:
-        PartMng.pppDeleteSlot(*object->m_localBase, 0);
-        this->push(object, 0);
-        outResult = 0;
-        break;
     case -0x7F:
         Sound.SetReverb(*object->m_localBase, object->m_localBase[1]);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0x80:
-        this->SetParticleWorkSe(*object->m_localBase, static_cast<char>(object->m_localBase[1]), object->m_localBase[2]);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0x81: {
-        float angle = static_cast<float>(object->m_localBase[2]);
-        Vec normal = {sinf(angle), 0.0f, cosf(angle)};
-        Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
-        Mtx& reflectMtx = m_centerMatrix;
-        PSMTXReflect(reflectMtx, &point, &normal);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    }
-    case -0x82:
-        CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3229,6 +3264,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
+    case -0xA0:
+        if (GetNumMes__9CFlatDataFv(&System) > 2) {
+            System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347streamVolume\202\265\202\334\202\265\202\275\201B\n"));
+        }
+        Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
+        this->push(object, 0);
+        outResult = 0;
+        break;
     case -0x8C:
         if (GetNumMes__9CFlatDataFv(&System) > 2) {
             System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347freeWave\202\265\202\334\202\265\202\275\201B%d\n"), *object->m_localBase);
@@ -3264,10 +3307,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         }
         Sound.PlayNextBgm(*object->m_localBase);
         this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0x91:
-        this->push(object, PartMng.pppGetNumFreePppMngSt());
         outResult = 0;
         break;
     case -0x92:
@@ -3365,6 +3404,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
+    case -0xF2:
+        MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
+            object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+        this->push(object, 0);
+        outResult = 0;
+        break;
     case -0x9B:
         CharaPcs.LoadCam(*object->m_localBase, this->m_strBlob + this->m_strOffsets[object->m_localBase[1]]);
         this->push(object, 0);
@@ -3414,28 +3459,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xA0:
-        if (GetNumMes__9CFlatDataFv(&System) > 2) {
-            System.Printf(const_cast<char*>("\201\254\201\254\203X\203N\203\212\203v\203g\202\251\202\347streamVolume\202\265\202\334\202\265\202\275\201B\n"));
-        }
-        Sound.SetStreamVolume(*object->m_localBase, object->m_localBase[1]);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xA1:
-        CGItemObj::DispAllFieldItem(*object->m_localBase);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xA2:
-        this->push(object, static_cast<int>(OSTicksToMilliseconds(OSGetTick())));
-        outResult = 0;
-        break;
-    case -0xA3:
-        GbaPcs.SetFirstZone();
-        this->push(object, 0);
-        outResult = 0;
-        break;
     case -0xA4:
         this->push(
             object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtFlag(object->m_localBase[1]));
@@ -3457,13 +3480,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xA8:
-        this->push(object, MenuPcs.GetWorldParam(*object->m_localBase));
-        outResult = 0;
-        break;
     case -0xA9:
         MenuPcs.SetWorldParam(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0xA8:
+        this->push(object, MenuPcs.GetWorldParam(*object->m_localBase));
         outResult = 0;
         break;
     case -0xAA:
@@ -3531,24 +3554,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                                  reinterpret_cast<CFlatRuntime::CObject*>(object->m_engineObject)));
         outResult = 0;
         break;
-    case -0xB4:
-        PartMng.pppSetDeltaSlot(
-            *object->m_localBase, static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xB5:
-        PartMng.pppSetDeltaIdx(
-            static_cast<short>(*object->m_localBase),
-            static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xB6:
-        Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac = object->m_localBase[1];
-        this->push(object, 0);
-        outResult = 0;
-        break;
     case -0xB7:
         this->push(object, Game.m_caravanWorkArr[*object->m_localBase].unk_0x3ac);
         outResult = 0;
@@ -3568,23 +3573,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -0xB9:
         CharaPcs.m_overlapEnabled = *object->m_localBase;
         CharaPcs.m_overlapAlpha = object->m_localBase[1];
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xBA:
-        m_cameraScriptTargetMode = *object->m_localBase;
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xBB: {
-        PPPCREATEPARAM createParam;
-        PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    }
-    case -0xBC:
-        PartMng.pppFieldEndFpNo(static_cast<short>(*object->m_localBase));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3902,10 +3890,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         this->push(object, 0);
         outResult = 0;
         break;
-    case -0xE1:
-        this->push(object, MiniGamePcs.GetMiniGameParam(*object->m_localBase));
-        outResult = 0;
-        break;
     case -0xE2:
         MiniGamePcs.SetMiniGameParam(*object->m_localBase, object->m_localBase[1]);
         this->push(object, 0);
@@ -3921,6 +3905,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
+    case -0xE1:
+        this->push(object, MiniGamePcs.GetMiniGameParam(*object->m_localBase));
+        outResult = 0;
+        break;
     case -0xE4:
         if (object->m_localBase[1] == 1) {
             Game.m_caravanWorkArr[object->m_localBase[0]].DeleteItem(object->m_localBase[2], 1);
@@ -4021,6 +4009,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
+    case -0xA3:
+        GbaPcs.SetFirstZone();
+        this->push(object, 0);
+        outResult = 0;
+        break;
     case -0xEF:
         AStar.calcAStar();
         this->push(object, 0);
@@ -4035,12 +4028,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xF1:
         this->resetSpawnBit(*object->m_localBase);
-        this->push(object, 0);
-        outResult = 0;
-        break;
-    case -0xF2:
-        MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
-            object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -4115,6 +4102,19 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
+    case -0x30:
+        this->push(object, GraphicPcs.GetScreenFadeExecutingBit());
+        outResult = 0;
+        break;
+    case -0xA1:
+        CGItemObj::DispAllFieldItem(*object->m_localBase);
+        this->push(object, 0);
+        outResult = 0;
+        break;
+    case -0xA2:
+        this->push(object, static_cast<int>(OSTicksToMilliseconds(OSGetTick())));
+        outResult = 0;
+        break;
     default:
         return 0;
     }

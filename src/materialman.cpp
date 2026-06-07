@@ -2685,14 +2685,12 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
-    CPtrArray<CMaterial*>* materialArray = &m_materials;
     u32 textureIndex = 0;
-    u32 textureCount = static_cast<u32>(textureSet->GetNumTexture());
 
-    while (textureIndex < textureCount) {
+    while (textureIndex < static_cast<u32>(textureSet->GetNumTexture())) {
         CTexture* texture = textureSet->GetTexture(textureIndex);
         if (texture != 0) {
-            u32 materialCount = static_cast<u32>(materialArray->GetSize());
+            u32 materialCount = static_cast<u32>(m_materials.GetSize());
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && (m_materials[materialIndex] != 0)) {
                 goto next;
@@ -2710,11 +2708,10 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(m_materials.GetSize());
-            if (materialIndex >= materialCount) {
-                materialArray->Add(newMaterial);
+            if (materialIndex < static_cast<u32>(m_materials.GetSize())) {
+                m_materials.SetAt(materialIndex, newMaterial);
             } else {
-                materialArray->SetAt(materialIndex, newMaterial);
+                m_materials.Add(newMaterial);
             }
         }
 next:

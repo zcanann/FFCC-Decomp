@@ -5504,13 +5504,12 @@ void CMenuPcs::DrawObj(int kind)
 void CMenuPcs::CalcPitcher()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* worldObj = m_wm.m_worldObjData;
 
-	short state = m_wmWorldState->m_mainState;
-	if (state == 0 || state >= 3) {
+	if (m_wmWorldState->m_mainState == 0 || m_wmWorldState->m_mainState >= 3) {
 		return;
 	}
 
+	unsigned char* worldObj = m_wm.m_worldObjData;
 	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
 	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
 	reinterpret_cast<short*>(worldObj + 0x19A)[0] = 0xE0;
@@ -5537,6 +5536,7 @@ void CMenuPcs::CalcPitcher()
 	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
+	short state = m_wmWorldState->m_mainState;
 	short step = m_wmWorldState->m_frameCounter;
 	float blendStep = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(step));
 	if (state == 1 && step < 10) {

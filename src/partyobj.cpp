@@ -2629,7 +2629,7 @@ void CGPartyObj::checkTargetParticle()
 
 	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(flags) << 27) & 0xC0000000) >> 31) != 0) {
 		putTargetParticle(static_cast<int>((static_cast<unsigned int>(flags) << 25) & 0xC0000000) >> 31, 0);
-		party.partyFlags &= 0xEF;
+		party.flags.flag10 = 0;
 	}
 
 	Vec input;

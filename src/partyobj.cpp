@@ -4691,11 +4691,12 @@ void CGPartyObj::ghostPartyMog()
 	float scale;
 	if (stageMode == 2) {
 		scale = FLOAT_80331A58 * ramp + FLOAT_80331A58;
+	} else if (stageMode > 2) {
+		scale = FLOAT_80331a54;
+	} else if (stageMode == 1) {
+		scale = FLOAT_80331A58 * (FLOAT_80331a54 - ramp) + FLOAT_80331A58;
 	} else {
 		scale = FLOAT_80331a54;
-		if (stageMode < 2 && stageMode != 0) {
-			scale = FLOAT_80331A58 * (FLOAT_80331a54 - ramp) + FLOAT_80331A58;
-		}
 	}
 	unsigned int distFar = static_cast<unsigned int>(FLOAT_80331A5C * scale);
 
@@ -4877,11 +4878,15 @@ void CGPartyObj::gpmMove()
 	}
 
 	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / FLOAT_80331A50;
-	float pressureScale = FLOAT_80331a54;
+	float pressureScale;
 	if (stageMode == 2) {
 		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
+	} else if (stageMode > 2) {
+		pressureScale = FLOAT_80331a54;
 	} else if (stageMode == 1) {
 		pressureScale = FLOAT_80331A58 * (FLOAT_80331a54 - frameScale) + FLOAT_80331A58;
+	} else {
+		pressureScale = FLOAT_80331a54;
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);

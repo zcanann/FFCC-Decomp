@@ -1617,7 +1617,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 		BonusAnimSprite* sprite = &sprites[i];
 		int flags = BonusSpriteFlags(sprite);
 
-		if ((flags & 1) == 0) {
+		if ((flags & 1) != 0) {
+			sprite->alpha = 1.0f;
+		} else {
 			if (frame < sprite->startFrame) {
 				sprite->alpha = 0.0f;
 			}
@@ -1626,8 +1628,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 			} else {
 				sprite->alpha = 1.0f;
 			}
-		} else {
-			sprite->alpha = 1.0f;
 		}
 
 		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame >= 9999) {

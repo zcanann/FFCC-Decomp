@@ -1621,9 +1621,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				System.Printf(dbg + 0x240);
 				break;
 			}
-			case 10:
-				damageAmount = calcSta(10, resolvedItemId, sourceObj);
+			case 10: {
+				float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0f;
+				int raw = static_cast<int>(static_cast<float>(static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1C))) * recoilRate);
+				damageAmount = (raw < 1) ? 1 : raw;
+				System.Printf(dbg + 0x2A4, damageAmount);
 				break;
+			}
 			default:
 				System.Printf(dbg + 0x230, staType);
 				break;

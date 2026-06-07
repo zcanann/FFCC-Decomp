@@ -1173,7 +1173,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	unsigned int particleId = 0xFFFF;
 	unsigned int soundId = 0xFFFF;
 
-	if ((param3 < 0xC) && (param3 > 9)) {
+	if ((param3 < 0xC) && (param3 >= 0xA)) {
 		unsigned char* scriptData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		particleId = *reinterpret_cast<unsigned short*>(scriptData + 0x1A4);
 		if ((particleId != 0xFFFF) && (param3 == 10)) {

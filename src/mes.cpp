@@ -66,11 +66,11 @@ static inline int ReadTagNibble(char** text)
 
 static inline int ReadTagS16(char** text)
 {
-	int n0 = ReadTagNibble(text);
-	int n1 = ReadTagNibble(text);
-	int n2 = ReadTagNibble(text);
-	int n3 = ReadTagNibble(text);
-	return (int)(short)((unsigned short)((short)((unsigned short)((short)(n0 << 4 | n1) << 4) | n2) << 4) | n3);
+	short acc = (short)(ReadTagNibble(text) << 4);
+	acc = (short)(acc | ReadTagNibble(text));
+	acc = (short)((short)(acc << 4) | ReadTagNibble(text));
+	acc = (short)((short)(acc << 4) | ReadTagNibble(text));
+	return (int)acc;
 }
 
 static inline void ApplyCaseMode(char* text, int& caseMode)

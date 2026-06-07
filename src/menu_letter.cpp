@@ -1780,8 +1780,12 @@ void CMenuPcs::LetterListDraw()
 
 	DrawInit();
 
-	unsigned char pageMark = (m_singMenuState->topIndex != 0) ? 1 : 0;
-	if (topRow + 9 < caravanWork->m_letterCount) {
+	s16 topVal = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34);
+	unsigned char pageMark = 0;
+	if (topVal != 0) {
+		pageMark = 1;
+	}
+	if (topVal + 9 < caravanWork->m_letterCount) {
 		pageMark = static_cast<unsigned char>(pageMark | 2);
 	}
 

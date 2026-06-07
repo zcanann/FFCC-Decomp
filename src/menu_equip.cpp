@@ -705,20 +705,25 @@ void CMenuPcs::EquipCtrl()
 	int itemCount;
 	unsigned int blockCount;
 
-	this->m_equipState->prevMode = this->m_equipState->mode;
-	int mode = static_cast<int>(this->m_equipState->mode);
+	EquipMenuState* es = this->m_equipState;
+	es->prevMode = es->mode;
+	es = this->m_equipState;
+	int mode = es->mode;
 	state = 0;
-	if ((mode == 0) || ((mode != 0) && (this->m_equipState->step == 1))) {
+	if ((mode == 0) || ((mode != 0) && (es->step == 1))) {
 		state = EquipCtrlCur();
-	} else if ((mode == 1) && (this->m_equipState->step == 0)) {
-		if (EquipOpen0()) {
+	} else if ((mode == 1) && (es->step == 0)) {
+		state = EquipOpen0();
+		if (state != 0) {
+			state = 0;
 			this->m_equipState->step = this->m_equipState->step + 1;
 		}
-	} else if ((mode == 1) && ((this->m_equipState->step == 2) && EquipClose0())) {
+	} else if ((mode == 1) && ((es->step == 2) && (state = EquipClose0(), state != 0))) {
 		this->m_equipState->step = 0;
 		this->m_equipState->mode = 0;
 		this->m_equipState->frame = 0;
 		CmdInit1();
+		state = 0;
 	}
 
 	if (state) {

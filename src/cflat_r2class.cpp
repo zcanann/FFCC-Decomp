@@ -1115,13 +1115,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x34:
-			if (object->m_localBase[0] != 0) {
+			if (static_cast<int>(object->m_localBase[0]) != 0) {
 				engineObject->ResetAnimPoint(static_cast<int>(object->m_localBase[1]));
 			}
 			engineObject->AddAnimPoint(
 			    static_cast<int>(object->m_localBase[1]),
-			    static_cast<short>(object->m_localBase[3]),
-			    static_cast<short>(object->m_localBase[2]));
+			    static_cast<int>(object->m_localBase[3]),
+			    static_cast<int>(object->m_localBase[2]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

@@ -3919,9 +3919,9 @@ void CMenuPcs::DrawMainMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	float frameAlpha;
 	if (m_wmWorldState->m_mainState == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 	} else if (m_wmWorldState->m_mainState <= 0 || m_wmWorldState->m_mainState >= 4) {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 	} else {
 		frameAlpha = FLOAT_803313e8;
 	}
@@ -3947,11 +3947,11 @@ void CMenuPcs::DrawMainMenu()
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		float tileAlpha;
 		if (m_wmWorldState->m_mainState == 1) {
-			tileAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
+			tileAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 		} else if (m_wmWorldState->m_mainState == 2) {
 			tileAlpha = FLOAT_803313e8;
 		} else {
-			tileAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+			tileAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 		}
 		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * DOUBLE_803313f8);
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -3988,11 +3988,11 @@ void CMenuPcs::DrawMainMenu()
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 4) {
 		float helpAlpha;
 		if (m_wmWorldState->m_mainState == 1) {
-			helpAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
+			helpAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 		} else if (m_wmWorldState->m_mainState == 2) {
 			helpAlpha = FLOAT_803313e8;
 		} else {
-			helpAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+			helpAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) - DOUBLE_80331420));
 		}
 		if (static_cast<double>(helpAlpha) > DOUBLE_803314f0) {
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -4088,12 +4088,12 @@ void CMenuPcs::DrawDiaryMenu()
 		float alpha;
 		if (state == 1) {
 			alpha = static_cast<float>(DOUBLE_803314e8 *
-			                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+			                           static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 		} else if (state == 2) {
 			alpha = FLOAT_803313e8;
 		} else {
 			alpha = static_cast<float>(-(DOUBLE_803314e8 *
-			                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+			                             static_cast<double>(static_cast<int>(worldState->m_frameCounter)) -
 			                             DOUBLE_80331420));
 		}
 		DrawDiaryBase(0, alpha);
@@ -4598,15 +4598,15 @@ void CMenuPcs::DrawCMakeMenu()
 	const short state = worldState->m_mainState;
 	float frameAlpha;
 	if (state == 0) {
-		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 	} else if (state == 1) {
-		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
 	} else if (state == 2) {
 		frameAlpha = FLOAT_80331434;
 	} else if (state == 3) {
-		frameAlpha = static_cast<float>(DOUBLE_80331460 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) + DOUBLE_803313f8);
+		frameAlpha = static_cast<float>(DOUBLE_80331460 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) + DOUBLE_803313f8);
 	} else {
-		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
 	}
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -4632,11 +4632,11 @@ void CMenuPcs::DrawCMakeMenu()
 	if (state > 0 && state < 4) {
 		float contentAlpha;
 		if (state == 1) {
-			contentAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+			contentAlpha = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 		} else if (state == 2) {
 			contentAlpha = FLOAT_803313e8;
 		} else {
-			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+			contentAlpha = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
 		}
 
 		DrawCharaBase();
@@ -4746,9 +4746,9 @@ void CMenuPcs::DrawMoveMenu()
 	DrawFukidashi();
 	float moveAlpha;
 	if (m_wmWorldState->m_mainState == 1) {
-		moveAlpha = static_cast<float>((static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) / DOUBLE_803316e8);
 	} else if (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0) {
-		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
 	}
@@ -7125,14 +7125,14 @@ void CMenuPcs::DrawWMFrame()
 			m_wmWorldState->m_posX = FLOAT_803313dc;
 		}
 		alpha = static_cast<float>(DOUBLE_803316d8 *
-		                           (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
+		                           static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)));
 	} else if (sVar == 3) {
 		m_wmWorldState->m_posX += FLOAT_80331550;
 		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
 			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
 		alpha = static_cast<float>(-(DOUBLE_803316d8 *
-		                             (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) -
+		                             static_cast<double>(static_cast<int>(m_wmWorldState->m_frameCounter)) -
 		                             DOUBLE_80331508));
 	} else {
 		alpha = FLOAT_80331458;
@@ -8411,11 +8411,11 @@ void CMenuPcs::DrawCharaName()
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314E8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		fade = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314E8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) - DOUBLE_80331420));
+		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) - DOUBLE_80331420));
 	}
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
@@ -8543,11 +8543,11 @@ void CMenuPcs::DrawCMLife()
 
 	float fade;
 	if (worldState->m_mainState == 1) {
-		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		fade = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 	} else if (worldState->m_mainState == 2) {
 		fade = FLOAT_803313e8;
 	} else {
-		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		fade = static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(worldState->m_frameCounter)) -
 		                            DOUBLE_80331420));
 	}
 	const int alpha = static_cast<int>(FLOAT_80331458 * fade);

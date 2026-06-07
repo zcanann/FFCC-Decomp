@@ -548,7 +548,17 @@ void bButtonNoRepeat(unsigned short button)
  */
 int CShopMenu::getItemCnt()
 {
-    return ResolveShopMenuItemCount(this);
+    int listType = m_listType;
+    if (listType == 0) {
+        return m_caravanWork->m_shopListCount;
+    }
+    if (listType == 1) {
+        return 0x40;
+    }
+    if (listType == 2) {
+        return m_itemCount;
+    }
+    return -1;
 }
 
 /*
@@ -2519,13 +2529,11 @@ void CShopMenu::SelectItemIdx()
 {
     m_quantity = 1;
 
-    int itemCount = ResolveShopMenuItemCount(this);
-    if (itemCount <= m_selectedIndex) {
-        m_selectedIndex = itemCount - 1;
+    if (getItemCnt() <= m_selectedIndex) {
+        m_selectedIndex = getItemCnt() - 1;
     }
 
-    unsigned short buttons = GetShopMenuListButtons();
-    if ((buttons & 8) != 0) {
+    if ((GetShopMenuListButtons() & 8) != 0) {
         --m_selectedIndex;
         if (m_selectedIndex < 0) {
             gShopMenuInputLatch = 8;
@@ -2534,72 +2542,116 @@ void CShopMenu::SelectItemIdx()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else {
-        buttons = GetShopMenuListButtons();
-        if ((buttons & 4) != 0) {
-            ++m_selectedIndex;
-            if (m_selectedIndex < itemCount) {
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
+    } else if ((GetShopMenuListButtons() & 4) != 0) {
+        ++m_selectedIndex;
+        if (m_selectedIndex < getItemCnt()) {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else {
+            gShopMenuInputLatch = 4;
+            m_selectedIndex = getItemCnt() - 1;
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        }
+    } else if ((GetPadButtons() & 0x100) != 0) {
+        bool canSelect = false;
+        m_figureMode = 0;
+        m_yesNo = 0;
+
+        int listType = m_listType;
+        if (listType == 0) {
+            if (m_selectedIndex != -1) {
+                canSelect = m_caravanWork->m_shopList[m_selectedIndex] >= 1;
+            }
+            if (canSelect) {
+                CCaravanWork* caravanWork = m_caravanWork;
+                if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
+                    int itemId = getItemNo(m_selectedIndex);
+                    int unitGil;
+                    if (m_listType == 0) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = gil - (gil >> 0x1F);
+                        }
+                    } else if (m_listType == 1) {
+                        if (itemId < 1) {
+                            unitGil = 0;
+                        } else {
+                            int gil = caravanWork->m_shopParam *
+                                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+                            gil = gil / 100 + (gil >> 0x1F);
+                            unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(gil - (gil >> 0x1F)));
+                        }
+                    } else {
+                        unitGil = -1;
+                    }
+                    int totalGil = m_quantity * unitGil;
+                    if (caravanWork->CanAddGil(-totalGil) != 0) {
+                        m_subMode = 1;
+                        Sound.PlaySe(2, 0x40, 0x7F, 0);
+                        goto updateWindow;
+                    }
+                }
+            }
+            Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else if (listType == 1) {
+            int idx = m_selectedIndex;
+            if (idx != -1) {
+                short itemNo = m_caravanWork->m_inventoryItems[idx];
+                if (itemNo < 1) {
+                    canSelect = false;
+                } else if (MenuPcs.EquipChk(idx) == 0) {
+                    canSelect = itemNo >= 0x9F;
+                } else {
+                    canSelect = false;
+                }
+            }
+            if (canSelect) {
+                m_subMode = 2;
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
             } else {
-                gShopMenuInputLatch = 4;
-                m_selectedIndex = itemCount - 1;
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
-        } else if ((GetPadButtons() & 0x100) != 0) {
-            int listType = m_listType;
-            int itemIndex = m_selectedIndex;
-            int itemNo = ResolveShopMenuSelectedItemId(this);
-            bool canSelect = false;
-
-            m_figureMode = 0;
-            m_yesNo = 0;
-
-            if (listType == 0) {
-                if ((itemIndex != -1) && (itemNo >= 1)) {
-                    CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
-                    int quantity = m_quantity;
-                    if (quantity <= (0x40 - caravanWork->m_inventoryItemCount)) {
-                        int totalGil = quantity * CalcShopMenuTradeGil(this, itemNo);
-                        canSelect = caravanWork->CanAddGil(-totalGil) != 0;
+        } else if (listType == 2) {
+            if (m_selectedIndex != -1) {
+                int itemNo;
+                if (m_itemTable[m_selectedIndex] == -1) {
+                    itemNo = -1;
+                } else {
+                    itemNo = m_caravanWork->m_inventoryItems[m_itemTable[m_selectedIndex]];
+                }
+                if (itemNo < 1) {
+                    canSelect = false;
+                } else {
+                    canSelect = true;
+                    if ((m_caravanWork->m_shopArgs[((int)(itemNo - 0x191U) >> 5)] &
+                         (1 << ((itemNo - 0x191U) & 0x1F))) == 0) {
+                        canSelect = false;
                     }
                 }
-                if (canSelect) {
-                    m_subMode = 1;
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                } else {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                }
-            } else if (listType == 1) {
-                if ((itemIndex != -1) && (itemNo >= 1)) {
-                    if (MenuPcs.EquipChk(itemIndex) == 0) {
-                        canSelect = itemNo >= 0x9F;
-                    }
-                }
-                if (canSelect) {
-                    m_subMode = 2;
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                } else {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                }
-            } else if (listType == 2) {
-                if ((itemIndex != -1) && (itemNo >= 1)) {
-                    unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
-                    canSelect = (ShopMenuCaravanWork(this)->m_shopArgs[(itemNo - 0x191) >> 5] &
-                                 (1U << (bit & 0x1F))) != 0;
-                }
-                if (canSelect) {
-                    m_nextMode = 0xC;
-                    m_resultItem = MenuPcs.GetSmithItem(itemNo);
-                    SetMode(0xB);
-                    Sound.PlaySe(2, 0x40, 0x7F, 0);
-                } else {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                }
+            }
+            if (canSelect) {
+                m_nextMode = 0xC;
+                m_resultItem = MenuPcs.GetSmithItem(getItemNo(m_selectedIndex));
+                SetMode(0xB);
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
+            } else {
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
             }
         }
     }
 
-    UpdateShopMenuListWindow(this);
+updateWindow:
+    if (m_selectedIndex < m_listTop) {
+        m_listTop = m_selectedIndex;
+    }
+    if ((m_listTop + m_visibleRows) <= m_selectedIndex) {
+        m_listTop = (m_selectedIndex - m_visibleRows) + 1;
+    }
+    m_canScrollUp = (m_listTop < 1) ? 0 : 1;
+    m_canScrollDown = ((m_listTop + m_visibleRows) < getItemCnt()) ? 1 : 0;
 }
 /*
  * --INFO--

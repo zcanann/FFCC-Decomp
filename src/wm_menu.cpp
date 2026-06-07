@@ -7953,7 +7953,6 @@ void CMenuPcs::DrawCMLife()
 {
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
 	float fade;
 	if (worldState->m_mainState == 1) {
@@ -7978,9 +7977,9 @@ void CMenuPcs::DrawCMLife()
 
 		unsigned short life = 0;
 		bool enabled = false;
-		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && cmakeWork != 0 &&
-		    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-			life = *reinterpret_cast<unsigned short*>(cmakeWork + slot * 0x9C0 + 0x14D6);
+		if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0 &&
+		    *reinterpret_cast<int*>(m_cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+			life = *reinterpret_cast<unsigned short*>(m_cmakeWork + slot * 0x9C0 + 0x14D6);
 			enabled = true;
 		} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
 			life = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[slot]) + 0x1A);
@@ -8050,8 +8049,8 @@ void CMenuPcs::DrawCMLife()
 			x += FLOAT_80331558;
 		}
 
-		if (m_cmakeWorkActive == 1 && cmakeWork != 0) {
-			const unsigned char* const work = cmakeWork + slot * 0x9C0;
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			const unsigned char* const work = m_cmakeWork + slot * 0x9C0;
 			const char flagA = work[0x1D90];
 			const char flagB = work[0x1D91];
 			if (flagA != 0 || flagB != 0) {

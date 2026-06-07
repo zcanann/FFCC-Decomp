@@ -5579,20 +5579,20 @@ void CMenuPcs::CalcFukidashi()
 		return;
 	}
 
+	*reinterpret_cast<short*>(m_wm.m_bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
+	*reinterpret_cast<short*>(m_wm.m_bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
+	*reinterpret_cast<short*>(m_wm.m_bubbleData + 4) = 0xF0;
+	*reinterpret_cast<short*>(m_wm.m_bubbleData + 6) = 0xC4;
+	*reinterpret_cast<float*>(m_wm.m_bubbleData + 0x0C) = fVar1;
 	int bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
-	*reinterpret_cast<short*>(bubbleData) = *reinterpret_cast<short*>(bytes + 0x1C);
-	*reinterpret_cast<short*>(bubbleData + 2) = *reinterpret_cast<short*>(bytes + 0x1E);
-	*reinterpret_cast<short*>(bubbleData + 4) = 0xF0;
-	*reinterpret_cast<short*>(bubbleData + 6) = 0xC4;
-	*reinterpret_cast<float*>(bubbleData + 0x0C) = fVar1;
-	if (bytes[0x08] == 2 || bytes[0x08] == 3) {
+	if (static_cast<signed char>(bytes[0x08]) == 2 || static_cast<signed char>(bytes[0x08]) == 3) {
 		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_803313dc;
 	} else {
 		*reinterpret_cast<float*>(bubbleData + 8) = FLOAT_80331704;
 	}
 
 	fVar1 = FLOAT_80331708;
-	unsigned short uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	unsigned short uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
 	if ((uVar3 & 0x3F0) != 0) {
 		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x20) = 0x50;
@@ -5617,7 +5617,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
 	if ((uVar3 & 0x1FF) != 0) {
 		bubbleData = reinterpret_cast<int>(m_wm.m_bubbleData);
 		*reinterpret_cast<short*>(bubbleData + 0x3C) = 0x20;
@@ -5703,7 +5703,7 @@ void CMenuPcs::CalcFukidashi()
 	short sVar15 = 0x4C;
 	float fVar2 = FLOAT_803314a4;
 	fVar1 = FLOAT_803313dc;
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
 	if ((uVar3 & 0x3F0) != 0) {
 		sVar15 = 0x6C;
 	}
@@ -5761,7 +5761,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Setup tribe/character model slot
-	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
+	uVar3 = static_cast<unsigned short>(*reinterpret_cast<short*>(bytes + 0x1A));
 	if ((uVar3 & 0x3F0) != 0) {
 		int modelIdx;
 		if ((uVar3 & 0x200) == 0) {

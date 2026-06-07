@@ -146,7 +146,7 @@ void CGMonObj::onFramePreCalc()
 	CGCharaObj::onFramePreCalc();
 	m_aliveFrames += 1;
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		short& aiState = m_aiState;
 		short& aiStatePrev = m_aiStatePrev;

@@ -1506,8 +1506,10 @@ void CGPartyObj::shouki()
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 
-	if (*reinterpret_cast<short*>(script + 0x1C) == 0 ||
-	    ((CFlatGameFlags() & 0x80) == 0 && (CFlatGameFlags() & 0x10) == 0) ||
+	unsigned char gameFlags = CFlatGameFlags();
+	if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0 ||
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(gameFlags) << 24) & 0xC0000000) >> 31) == 0 &&
+	     static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(gameFlags) << 27) & 0xC0000000) >> 31) == 0) ||
 	    m_weaponNodeFlagAll.m_bits1.m_shield >= 0) {
 		if (m_unk688 != 0) {
 			deletePSlotBit(0x200);

@@ -1836,7 +1836,8 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x14:
-		if (m_subState == 1) {
+		switch (m_subState) {
+		case 1:
 			if (m_subFrame == 0) {
 				m_alpha = FLOAT_80331ABC;
 				reqAnim(0x16, 1, 0);
@@ -1850,23 +1851,24 @@ void CGPartyObj::onFrameStat()
 				changeSubStat(2);
 				enableDamageCol(1);
 			}
-		} else if (m_subState < 1) {
-			if (m_subState >= 0) {
-				if (m_subFrame == 0) {
-					playSe3D(0x2F, 0x32, 0x96, 0, 0);
-					reqAnim(0x15, 0, 0);
-				}
-				if (isLoopAnim() != 0) {
-					changeSubStat(1);
-				}
+			break;
+		case 0:
+			if (m_subFrame == 0) {
+				playSe3D(0x2F, 0x32, 0x96, 0, 0);
+				reqAnim(0x15, 0, 0);
 			}
-		} else if (m_subState < 3) {
+			if (isLoopAnim() != 0) {
+				changeSubStat(1);
+			}
+			break;
+		case 2:
 			if (m_subFrame == 0) {
 				reqAnim(0x17, 0, 0);
 			}
 			if (isLoopAnim() != 0) {
 				changeStat(0, 0, 0);
 			}
+			break;
 		}
 		break;
 	case 0x15:

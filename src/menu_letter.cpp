@@ -1842,7 +1842,7 @@ void CMenuPcs::LetterListDraw()
 	}
 
 	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(static_cast<int>(System.m_frameCounter) % 8));
-	const int cursorY = static_cast<int>(static_cast<double>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) * 0x20 + 0x60));
+	const int cursorY = static_cast<int>(static_cast<float>(*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26) * 0x20 + 0x60));
 	DrawCursor(cursorX, cursorY, FLOAT_803330f8);
 }
 

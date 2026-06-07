@@ -1098,27 +1098,27 @@ void CGPartyObj::command()
 					primaryAvailable = true;
 					primaryCommand = 0x1C;
 				}
-			} else if (targetState < 0xCA) {
-				if (targetState == 0xC8) {
-					if (CFlatCenterState() == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0B;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0B;
-					}
-				} else if (targetState > 0xC7) {
-					if (CFlatCenterState() == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x0A;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x0A;
-					}
+			} else if (targetState > 0xCA) {
+				if (targetState == 0xCC) {
+					secondaryAvailable = true;
+					secondaryCommand = 6;
 				}
-			} else if (targetState == 0xCC) {
-				secondaryAvailable = true;
-				secondaryCommand = 6;
+			} else if (targetState == 0xC8) {
+				if (CFlatCenterState() == 0) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x0B;
+				} else {
+					primaryAvailable = true;
+					primaryCommand = 0x0B;
+				}
+			} else if (targetState > 0xC7) {
+				if (CFlatCenterState() == 0) {
+					secondaryAvailable = true;
+					secondaryCommand = 0x0A;
+				} else {
+					primaryAvailable = true;
+					primaryCommand = 0x0A;
+				}
 			}
 
 			if (canAddBlock && *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {

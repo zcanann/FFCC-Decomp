@@ -2199,7 +2199,6 @@ void CMenuPcs::DrawUniteList()
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CmdState* const cmd = GetCmdStateView(this);
 	s16 selected = cmd->selected;
-	const s16 foodCount = caravan->m_numCmdListSlots;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2274,7 +2273,7 @@ void CMenuPcs::DrawUniteList()
 	font->SetTlut(7);
 
 	const u16 topX = GetCmdListStorage(this)->entries[0].x;
-	for (s32 i = 0; i < foodCount; i++) {
+	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
 		if ((i <= 7) && (slotType == 0)) {
 			continue;
@@ -2315,7 +2314,7 @@ void CMenuPcs::DrawUniteList()
 	s_unitePanelCount = 0;
 	CmdListEntry* const unitePanels = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd];
 	for (s32 i = 0; i < 8; i++) {
-		if (i >= foodCount) {
+		if (i >= caravan->m_numCmdListSlots) {
 			break;
 		}
 
@@ -2340,11 +2339,11 @@ void CMenuPcs::DrawUniteList()
 			continue;
 		}
 
-		const s32 labelAnchor = (i == selected) ? i + 1 : i;
+		const s32 labelAnchor = (i == GetCmdStateView(this)->selected) ? i + 1 : i;
 		CmdListEntry* const endEntry = &GetCmdListStorage(this)->entries[i + groupSize - 1];
 		CmdListEntry* const anchorEntry = &GetCmdListStorage(this)->entries[labelAnchor];
 		CmdListEntry* const startEntry = &GetCmdListStorage(this)->entries[i];
-		const bool active = (i <= selected) && (selected < i + groupSize);
+		const bool active = (i <= GetCmdStateView(this)->selected) && (GetCmdStateView(this)->selected < i + groupSize);
 		const float panelX = static_cast<float>(topX * 2 - anchorEntry->x);
 		const float panelY = (static_cast<float>(endEntry->width + endEntry->height - startEntry->width) -
 		                      FLOAT_80332ac8) * static_cast<float>(DOUBLE_80332a60) +
@@ -2415,8 +2414,8 @@ void CMenuPcs::DrawUniteList()
 
 	DrawInit();
 	if ((cmd->mode == 0) &&
-	    (caravan->m_commandListExtra[selected] != 0)) {
-		unsigned int helpId = caravan->m_commandListExtra[selected];
+	    (caravan->m_commandListExtra[GetCmdStateView(this)->selected] != 0)) {
+		unsigned int helpId = caravan->m_commandListExtra[GetCmdStateView(this)->selected];
 		if (helpId == 0x207 || helpId == 0x20B || helpId == 0x20F) {
 			helpId += 2;
 		}

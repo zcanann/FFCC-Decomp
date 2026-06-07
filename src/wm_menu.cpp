@@ -815,11 +815,17 @@ void CMenuPcs::loadData()
 
 	m_effectWork = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x252) EffectInfo[0x28];
 	{
-		unsigned char* base = reinterpret_cast<unsigned char*>(m_effectWork);
-		for (int i = 0; i < 0x28; i += 8) {
-			for (int j = 0; j < 8; j++) {
-				*reinterpret_cast<unsigned int*>(base + (i + j) * 0x524) = 0xFFFFFFFF;
+		int off = 0;
+		for (int n = 0; n < 5; n++) {
+			static const int firstOffsets[24] = {
+			    0x0000, 0x0004, 0x0008, 0x0524, 0x0528, 0x052C, 0x0A48, 0x0A4C,
+			    0x0A50, 0x0F6C, 0x0F70, 0x0F74, 0x1490, 0x1494, 0x1498, 0x19B4,
+			    0x19B8, 0x19BC, 0x1ED8, 0x1EDC, 0x1EE0, 0x23FC, 0x2400, 0x2404,
+			};
+			for (int k = 0; k < 24; k++) {
+				*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + off + firstOffsets[k]) = 0xFFFFFFFF;
 			}
+			off += 0x2920;
 		}
 	}
 

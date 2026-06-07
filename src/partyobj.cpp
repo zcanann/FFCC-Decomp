@@ -2537,7 +2537,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom = m_comboCenter;
-		floorCylinder.m_axis = down;
+		floorCylinder.m_axis = *reinterpret_cast<Vec*>(&down);
 		floorCylinder.m_radius = FLOAT_80331a78;
 		floorCylinder.m_bound.m_min.x = FLOAT_80331a9c;
 		floorCylinder.m_bound.m_min.y = FLOAT_80331a9c;

@@ -1013,10 +1013,10 @@ void CGMonObj::onFrameStat()
 			if (*reinterpret_cast<unsigned short*>(script9 + 0x10C) == 1) {
 				if (prgObj->m_subState == 0) {
 					unsigned int chaseFlag = 0;
-					unsigned char* aiData2 = script9;
+					unsigned char* aiData2 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 					if (aiState != 0) {
 						aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-							(aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) * 0x1D0 + 0x10;
+							(aiState + *reinterpret_cast<unsigned short*>(aiData2 + 0x100)) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
 						chaseFlag = 0x8000;

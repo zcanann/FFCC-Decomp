@@ -406,12 +406,12 @@ static inline void CGMonObj_SetAttackAfter(CGMonObj* monObj, int attackKind)
  */
 void CGMonObj::onStatAttack(int state)
 {
-	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+#define prgObj (reinterpret_cast<CGPrgObj*>(this))
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
 	unsigned char* attackBase = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
 #define attackData (attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48)
-	short attackType = *reinterpret_cast<short*>(attackData + 0xE);
+	int attackType = *reinterpret_cast<unsigned short*>(attackData + 0xE);
 	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
 
 	if (state == 0) {
@@ -420,19 +420,22 @@ void CGMonObj::onStatAttack(int state)
 			m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
 			if ((attackFlags & 2) == 0) {
-				float rotLimit = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+				float rotLimit = FLOAT_80331A20 * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
 				if (m_targetPartyIndex >= 0) {
-					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(target));
+					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[m_targetPartyIndex]));
 					if (rotLimit > FLOAT_80331A48) {
 						object->m_rotTargetY = targetRot;
 					} else {
 						float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
-						if (delta < -rotLimit) {
-							delta = -rotLimit;
-						} else if (rotLimit < delta) {
-							delta = rotLimit;
+						float clamped = -rotLimit;
+						if (!(delta < clamped)) {
+							if (rotLimit < delta) {
+								clamped = rotLimit;
+							} else {
+								clamped = delta;
+							}
 						}
-						object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + delta;
+						object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + clamped;
 					}
 				}
 			}
@@ -471,6 +474,9 @@ void CGMonObj::onStatAttack(int state)
 		CGMonObj_SetAttackAfter(this, *reinterpret_cast<int*>(mon + 0x560));
 	}
 #undef attackData
+#undef prgObj
+#undef object
+#undef mon
 }
 
 /*

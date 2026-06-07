@@ -1062,7 +1062,10 @@ void CMenuPcs::DrawOptionMenu()
 {
 	CFont* font = m_fonts[0];
 	int languageBase = (Game.m_gameWork.m_languageId - 1) * 20;
-	_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	_GXColor color = {
+	    0xFF, 0xFF, 0xFF,
+	    static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim)),
+	};
 	Vec2d uv0;
 	Vec2d uv1;
 
@@ -1080,7 +1083,6 @@ void CMenuPcs::DrawOptionMenu()
 	    g_strMenuUtilMes[languageBase + 10],
 	    g_strMenuUtilMes[languageBase + 11],
 	};
-	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim));
 
 	font->SetScale(FLOAT_80333548);
 	font->SetMargin(kOptionAnimMin);

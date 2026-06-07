@@ -147,9 +147,9 @@ bool CMenuPcs::EquipClose0()
 
 	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
 	timer = static_cast<int>(GetEquipMenuState(this)->frame);
-	EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 	if (7 < timer) {
-		selected->x = selected->x + 0x13;
+		GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex].x =
+		    GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex].x + 0x13;
 	}
 
 	doneCount = 0;
@@ -179,6 +179,7 @@ bool CMenuPcs::EquipClose0()
 	}
 
 	if (itemCount == doneCount) {
+		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
 		return true;
 	}

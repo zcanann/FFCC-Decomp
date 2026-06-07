@@ -9412,14 +9412,20 @@ void CMenuPcs::CalcMainMenuSub()
 				} else if ((btn & 0x200) != 0) {
 					int valid = 0;
 					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
-					for (int i = 0; i < 4; i++) {
+					int i = 0;
+					int paramOff = 0;
+					int remaining = 4;
+					do {
 						if (Game.m_gameWork.m_menuStageMode != 0 && i != 0) {
 							break;
 						}
-						if (m_wmWorldState->m_backupParams[i] >= 0) {
+						if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + paramOff + 0x3E) >= 0) {
 							valid++;
 						}
-					}
+						paramOff += 2;
+						i++;
+						remaining--;
+					} while (remaining != 0);
 					if (valid == 0) {
 						Sound.PlaySe(4, 0x40, 0x7F, 0);
 					} else {

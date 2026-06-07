@@ -1100,7 +1100,7 @@ void CGPartyObj::command()
 			ringCommand = 9;
 		} else {
 			const int itemId = caravan->DelCmdListAndItem(caravan->GetIdxCmdList());
-			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 			if (itemKind == 0x125) {
 				ringCommand = itemId | 0x8000;
 			} else if (itemKind < 0x125) {
@@ -1126,9 +1126,9 @@ void CGPartyObj::command()
 		ringCommandArg = caravan->GetIdxCmdList();
 	}
 
-	if (((static_cast<signed char>(m_weaponNodeFlags) < 0) &&
-	     (static_cast<signed char>(m_shieldAttachNodeIndex) < 0) &&
-	     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0)) &&
+	if (((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
+	     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(reinterpret_cast<unsigned char*>(this)[0x9B]) << 24) & 0xC0000000) >> 31) != 0)) &&
 	    Joybus.GetCtrlMode(padSlot) != 1) {
 		if (caravan->m_hp == 0) {
 			primaryAvailable = true;

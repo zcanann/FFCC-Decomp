@@ -2642,12 +2642,9 @@ CChara::CNode::~CNode()
 void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNode::TYPE type, CMemory::CStage* stage)
 {
 	(void)stage;
-	CCharaModelRefRaw* modelRef = model->m_data;
-	u32 idx = modelRef->m_nodeCount;
-	void* nodeRefBase = modelRef->m_nodeRefData;
-	u8* nodeRef = reinterpret_cast<u8*>((u8*)nodeRefBase + (idx * 0x94));
-	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(nodeRef);
-	m_refData->m_index = static_cast<u16>(idx);
+	m_refData = reinterpret_cast<CChara::CNode::CRefData*>(
+	    reinterpret_cast<u8*>(model->m_data->m_nodeRefData) + model->m_data->m_nodeCount * 0x94);
+	m_refData->m_index = static_cast<u16>(model->m_data->m_nodeCount);
 	m_refData->m_type = static_cast<u8>(type);
 	m_refData->m_dynParamIndex = 0xFF;
 	m_refData->m_bindFlags = 0;
@@ -2655,33 +2652,26 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 	CChunkFile::CChunk chunkInfo;
 	chunk.PushChunk();
 	while (chunk.GetNextChunk(chunkInfo)) {
-		switch (chunkInfo.m_id) {
-		case 0x494E464F:
+		if (chunkInfo.m_id == 0x494E464F) {
 			m_refData->m_parentIndex = static_cast<s16>(chunk.Get4());
 			m_refData->m_childCount = static_cast<u8>(chunk.Get4());
 			m_refData->m_childBankOffset = static_cast<s16>(chunk.Get4());
 			m_refData->m_usesParentLenX = static_cast<u8>(chunk.Get4());
-			break;
-		case 0x42494E46:
+		} else if (chunkInfo.m_id == 0x42494E46) {
 			m_refData->m_bindFlags = static_cast<u8>(chunk.Get4());
 			m_refData->m_boneLen = chunk.GetF4();
-			break;
-		case 0x4E414D45:
+		} else if (chunkInfo.m_id == 0x4E414D45) {
 			strcpy(m_refData->m_name, chunk.GetString());
-			break;
-		case 0x4E414D32:
+		} else if (chunkInfo.m_id == 0x4E414D32) {
 			strcpy(m_refData->m_altName, chunk.GetString());
-			break;
-		case 0x5446524D:
+		} else if (chunkInfo.m_id == 0x5446524D) {
 			chunk.Get(m_refData->m_localMtx, 0x30);
 			if (m_refData->m_parentIndex == -1) {
-				float baseScale = modelRef->m_baseScale;
+				float baseScale = model->m_data->m_baseScale;
 				PSMTXScaleApply(m_refData->m_localMtx, m_refData->m_localMtx, baseScale, baseScale, baseScale);
 			}
-			break;
-		case 0x4D494458:
+		} else if (chunkInfo.m_id == 0x4D494458) {
 			m_refData->m_displayIndex = static_cast<s8>(chunk.Get4());
-			break;
 		}
 	}
 	chunk.PopChunk();

@@ -1578,7 +1578,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
 				} else {
 					value = object->m_thisBase + index;
 				}
@@ -1593,7 +1593,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + ((index + stackIndex) * 4));
 				} else {
 					value = object->m_thisBase + index + stackIndex;
 				}
@@ -1605,7 +1605,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
 				} else {
 					value = object->m_thisBase + index;
 				}
@@ -1626,7 +1626,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
 				} else {
 					value = object->m_thisBase + index;
 				}
@@ -1641,7 +1641,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index + stackIndex;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + ((index + stackIndex) * 4));
 				} else {
 					value = object->m_thisBase + index + stackIndex;
 				}
@@ -1653,7 +1653,7 @@ frameLoop:
 				} else if ((arg & 8) == 0) {
 					value = object->m_localBase + index;
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+					value = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(m_permanentVarValues) + (index * 4));
 				} else {
 					value = object->m_thisBase + index;
 				}

@@ -1148,11 +1148,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                             m_vtxDescMode = 2;
                         }
                         int texCoordId;
-                        if ((tevBit & 0x40) == 0) {
+                        if ((tevBit & 0x40) != 0) {
+                            texCoordId = m_texScroll1TexCoord;
+                        } else {
                             texCoordId = IncTexCoordIdCur();
                             GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordId), GX_TG_MTX2x4, GX_TG_TEX1, 0x3C, GX_FALSE, 0x7D);
-                        } else {
-                            texCoordId = m_texScroll1TexCoord;
                         }
                         GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
                         _GXSetTevOrder(m_numTevStage, texCoordId, (m_texMapIdCurShadow & 0xFF) + 1, 4);
@@ -1182,11 +1182,11 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                         m_vtxDescMode = 2;
                     }
                     int texCoordId;
-                    if ((tevBit & 0x40) == 0) {
+                    if ((tevBit & 0x40) != 0) {
+                        texCoordId = m_texScroll1TexCoord;
+                    } else {
                         texCoordId = IncTexCoordIdCur();
                         GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordId), GX_TG_MTX2x4, GX_TG_TEX1, 0x3C, GX_FALSE, 0x7D);
-                    } else {
-                        texCoordId = m_texScroll1TexCoord;
                     }
                     GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
                     _GXSetTevOrder(m_numTevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
@@ -1490,12 +1490,12 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 m_vtxDescMode = 2;
             }
             int texCoordId;
-            if ((tevBit & 0x40) == 0) {
+            if ((tevBit & 0x40) != 0) {
+                texCoordId = m_texScroll1TexCoord;
+            } else {
                 IncTexCoordIdCur();
                 texCoordId = m_texCoordIdCur;
                 GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordId), GX_TG_MTX2x4, GX_TG_TEX1, 0x3C, GX_FALSE, 0x7D);
-            } else {
-                texCoordId = m_texScroll1TexCoord;
             }
             m_numTevStage = 1;
             IncTexMtxCur();

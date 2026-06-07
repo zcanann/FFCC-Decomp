@@ -127,140 +127,165 @@ void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
 void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
 }
 
-CProcessTableCallback CCameraPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createChara__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyChara__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcChara__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMap__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMap__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMap__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMaterialEditor__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMaterialEditor__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMaterialEditor__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFunnyShape__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFunnyShape__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcFunnyShape__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createPart__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyPart__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcPart__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc19 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFullShadow__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc20 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFullShadow__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowBegin__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
-CProcessTableCallback CCameraPcs::m_table_desc24 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreate = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroy = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalc = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDraw = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(draw__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreateChara = {0, 0xFFFFFFFF,
+                                                             reinterpret_cast<unsigned int>(createChara__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyChara = {0, 0xFFFFFFFF,
+                                                              reinterpret_cast<unsigned int>(destroyChara__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalcChara = {0, 0xFFFFFFFF,
+                                                           reinterpret_cast<unsigned int>(calcChara__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreateMap = {0, 0xFFFFFFFF,
+                                                           reinterpret_cast<unsigned int>(createMap__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyMap = {0, 0xFFFFFFFF,
+                                                            reinterpret_cast<unsigned int>(destroyMap__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalcMap = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(calcMap__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreateMaterialEditor = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createMaterialEditor__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyMaterialEditor = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyMaterialEditor__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalcMaterialEditor = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcMaterialEditor__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreateFunnyShape = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFunnyShape__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyFunnyShape = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFunnyShape__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalcFunnyShape = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcFunnyShape__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreatePart = {0, 0xFFFFFFFF,
+                                                            reinterpret_cast<unsigned int>(createPart__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyPart = {0, 0xFFFFFFFF,
+                                                             reinterpret_cast<unsigned int>(destroyPart__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCalcPart = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(calcPart__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescCreateFullShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createFullShadow__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDestroyFullShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyFullShadow__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDrawShadowBegin = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowBegin__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDrawShadowEnd = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDrawShadowChrBegin = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
+static CProcessTableCallback s_cameraTableDescDrawShadowEndAll = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
 CProcessTable CCameraPcs::m_table[7] = {
     {
         const_cast<char*>(sCameraPcsGameTableName),
-        m_table_desc0.m_thisOffset,
-        m_table_desc0.m_virtualOffset,
-        m_table_desc0.m_function,
-        m_table_desc1.m_thisOffset,
-        m_table_desc1.m_virtualOffset,
-        m_table_desc1.m_function,
-        m_table_desc2.m_thisOffset,
-        m_table_desc2.m_virtualOffset,
-        m_table_desc2.m_function,
+        s_cameraTableDescCreate.m_thisOffset,
+        s_cameraTableDescCreate.m_virtualOffset,
+        s_cameraTableDescCreate.m_function,
+        s_cameraTableDescDestroy.m_thisOffset,
+        s_cameraTableDescDestroy.m_virtualOffset,
+        s_cameraTableDescDestroy.m_function,
+        s_cameraTableDescCalc.m_thisOffset,
+        s_cameraTableDescCalc.m_virtualOffset,
+        s_cameraTableDescCalc.m_function,
         0x18,
         0x4,
-        m_table_desc3.m_thisOffset,
-        m_table_desc3.m_virtualOffset,
-        m_table_desc3.m_function,
+        s_cameraTableDescDraw.m_thisOffset,
+        s_cameraTableDescDraw.m_virtualOffset,
+        s_cameraTableDescDraw.m_function,
         0x3D,
         0x1,
-        m_table_desc4.m_thisOffset,
-        m_table_desc4.m_virtualOffset,
-        m_table_desc4.m_function,
+        s_cameraTableDescCreateChara.m_thisOffset,
+        s_cameraTableDescCreateChara.m_virtualOffset,
+        s_cameraTableDescCreateChara.m_function,
     },
     {
         const_cast<char*>(sCameraPcsCharaTableName),
-        m_table_desc5.m_thisOffset,
-        m_table_desc5.m_virtualOffset,
-        m_table_desc5.m_function,
-        m_table_desc6.m_thisOffset,
-        m_table_desc6.m_virtualOffset,
-        m_table_desc6.m_function,
-        m_table_desc7.m_thisOffset,
-        m_table_desc7.m_virtualOffset,
-        m_table_desc7.m_function,
+        s_cameraTableDescDestroyChara.m_thisOffset,
+        s_cameraTableDescDestroyChara.m_virtualOffset,
+        s_cameraTableDescDestroyChara.m_function,
+        s_cameraTableDescCalcChara.m_thisOffset,
+        s_cameraTableDescCalcChara.m_virtualOffset,
+        s_cameraTableDescCalcChara.m_function,
+        s_cameraTableDescCreateMap.m_thisOffset,
+        s_cameraTableDescCreateMap.m_virtualOffset,
+        s_cameraTableDescCreateMap.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(sCameraPcsMapTableName),
-        m_table_desc8.m_thisOffset,
-        m_table_desc8.m_virtualOffset,
-        m_table_desc8.m_function,
-        m_table_desc9.m_thisOffset,
-        m_table_desc9.m_virtualOffset,
-        m_table_desc9.m_function,
-        m_table_desc10.m_thisOffset,
-        m_table_desc10.m_virtualOffset,
-        m_table_desc10.m_function,
+        s_cameraTableDescDestroyMap.m_thisOffset,
+        s_cameraTableDescDestroyMap.m_virtualOffset,
+        s_cameraTableDescDestroyMap.m_function,
+        s_cameraTableDescCalcMap.m_thisOffset,
+        s_cameraTableDescCalcMap.m_virtualOffset,
+        s_cameraTableDescCalcMap.m_function,
+        s_cameraTableDescCreateMaterialEditor.m_thisOffset,
+        s_cameraTableDescCreateMaterialEditor.m_virtualOffset,
+        s_cameraTableDescCreateMaterialEditor.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(sCameraPcsMaterialEditorTableName),
-        m_table_desc11.m_thisOffset,
-        m_table_desc11.m_virtualOffset,
-        m_table_desc11.m_function,
-        m_table_desc12.m_thisOffset,
-        m_table_desc12.m_virtualOffset,
-        m_table_desc12.m_function,
-        m_table_desc13.m_thisOffset,
-        m_table_desc13.m_virtualOffset,
-        m_table_desc13.m_function,
+        s_cameraTableDescDestroyMaterialEditor.m_thisOffset,
+        s_cameraTableDescDestroyMaterialEditor.m_virtualOffset,
+        s_cameraTableDescDestroyMaterialEditor.m_function,
+        s_cameraTableDescCalcMaterialEditor.m_thisOffset,
+        s_cameraTableDescCalcMaterialEditor.m_virtualOffset,
+        s_cameraTableDescCalcMaterialEditor.m_function,
+        s_cameraTableDescCreateFunnyShape.m_thisOffset,
+        s_cameraTableDescCreateFunnyShape.m_virtualOffset,
+        s_cameraTableDescCreateFunnyShape.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(sCameraPcsFunnyShapeTableName),
-        m_table_desc14.m_thisOffset,
-        m_table_desc14.m_virtualOffset,
-        m_table_desc14.m_function,
-        m_table_desc15.m_thisOffset,
-        m_table_desc15.m_virtualOffset,
-        m_table_desc15.m_function,
-        m_table_desc16.m_thisOffset,
-        m_table_desc16.m_virtualOffset,
-        m_table_desc16.m_function,
+        s_cameraTableDescDestroyFunnyShape.m_thisOffset,
+        s_cameraTableDescDestroyFunnyShape.m_virtualOffset,
+        s_cameraTableDescDestroyFunnyShape.m_function,
+        s_cameraTableDescCalcFunnyShape.m_thisOffset,
+        s_cameraTableDescCalcFunnyShape.m_virtualOffset,
+        s_cameraTableDescCalcFunnyShape.m_function,
+        s_cameraTableDescCreatePart.m_thisOffset,
+        s_cameraTableDescCreatePart.m_virtualOffset,
+        s_cameraTableDescCreatePart.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(sCameraPcsPartTableName),
-        m_table_desc17.m_thisOffset,
-        m_table_desc17.m_virtualOffset,
-        m_table_desc17.m_function,
-        m_table_desc18.m_thisOffset,
-        m_table_desc18.m_virtualOffset,
-        m_table_desc18.m_function,
-        m_table_desc19.m_thisOffset,
-        m_table_desc19.m_virtualOffset,
-        m_table_desc19.m_function,
+        s_cameraTableDescDestroyPart.m_thisOffset,
+        s_cameraTableDescDestroyPart.m_virtualOffset,
+        s_cameraTableDescDestroyPart.m_function,
+        s_cameraTableDescCalcPart.m_thisOffset,
+        s_cameraTableDescCalcPart.m_virtualOffset,
+        s_cameraTableDescCalcPart.m_function,
+        s_cameraTableDescCreateFullShadow.m_thisOffset,
+        s_cameraTableDescCreateFullShadow.m_virtualOffset,
+        s_cameraTableDescCreateFullShadow.m_function,
         0x18,
         0x4,
     },
     {
         const_cast<char*>(sCameraPcsShadowTableName),
-        m_table_desc20.m_thisOffset,
-        m_table_desc20.m_virtualOffset,
-        m_table_desc20.m_function,
-        m_table_desc21.m_thisOffset,
-        m_table_desc21.m_virtualOffset,
-        m_table_desc21.m_function,
-        m_table_desc22.m_thisOffset,
-        m_table_desc22.m_virtualOffset,
-        m_table_desc22.m_function,
+        s_cameraTableDescDestroyFullShadow.m_thisOffset,
+        s_cameraTableDescDestroyFullShadow.m_virtualOffset,
+        s_cameraTableDescDestroyFullShadow.m_function,
+        s_cameraTableDescDrawShadowBegin.m_thisOffset,
+        s_cameraTableDescDrawShadowBegin.m_virtualOffset,
+        s_cameraTableDescDrawShadowBegin.m_function,
+        s_cameraTableDescDrawShadowEnd.m_thisOffset,
+        s_cameraTableDescDrawShadowEnd.m_virtualOffset,
+        s_cameraTableDescDrawShadowEnd.m_function,
         0x2E,
         0x1,
-        m_table_desc23.m_thisOffset,
-        m_table_desc23.m_virtualOffset,
-        m_table_desc23.m_function,
+        s_cameraTableDescDrawShadowChrBegin.m_thisOffset,
+        s_cameraTableDescDrawShadowChrBegin.m_virtualOffset,
+        s_cameraTableDescDrawShadowChrBegin.m_function,
         0x32,
         0x1,
         0,
@@ -268,9 +293,9 @@ CProcessTable CCameraPcs::m_table[7] = {
         0,
         0x39,
         0x1,
-        m_table_desc24.m_thisOffset,
-        m_table_desc24.m_virtualOffset,
-        m_table_desc24.m_function,
+        s_cameraTableDescDrawShadowEndAll.m_thisOffset,
+        s_cameraTableDescDrawShadowEndAll.m_virtualOffset,
+        s_cameraTableDescDrawShadowEndAll.m_function,
         0x43,
         0x1,
     }

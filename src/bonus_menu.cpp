@@ -324,7 +324,7 @@ static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
 
 static inline void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
 {
-	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
+	short x = ((1 <= slotIndex) && (slotIndex <= 2)) ? 0x30 : 0x48;
 
 	InitAnimSprite(sprite, 0, x, y, 0x60, 0x58, 0, 8);
 	ResetAnimSpriteMotion(sprite);
@@ -1549,7 +1549,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		y = 0x28;
 		for (int i = 0; i < activePartyCount; i++) {
-			short x = ((0 < i) && (i < 3)) ? 8 : 0x20;
+			short x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
 			InitAnimSprite(&sprites[idx], 0x19, x, y, 0x38, 0x28, i * 2, 8);
 			ResetAnimSpriteMotion(&sprites[idx]);
 			sprites[idx].mulX = (float)(i * sprites[idx].w);
@@ -2710,7 +2710,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			BonusAnimSprite* sprite = &sprites[iconBase + i];
 			unsigned int partySlot = s_Rinfo->m_party[i].m_partySlot;
 			sprite->kind = 0x18;
-			sprite->x = ((0 < i) && (i < 3)) ? 0x30 : 0x48;
+			sprite->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 			sprite->y = (short)(0x28 + i * 0x60);
 			sprite->w = 0x60;
 			sprite->h = 0x58;

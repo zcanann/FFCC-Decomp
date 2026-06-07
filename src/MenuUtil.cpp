@@ -1530,7 +1530,7 @@ void CMenuPcs::DrawOptionMenu()
 				font->SetShadow(1);
 				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
-				                                         kMenuCenteringHalfWidth),
+				                                         DOUBLE_803335D0),
 				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
 			} else {
@@ -1538,7 +1538,7 @@ void CMenuPcs::DrawOptionMenu()
 				font->SetShadow(1);
 				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
-				                                         kMenuCenteringHalfWidth),
+				                                         DOUBLE_803335D0),
 				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);

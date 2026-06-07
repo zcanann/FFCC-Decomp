@@ -3,7 +3,6 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/gobject.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"

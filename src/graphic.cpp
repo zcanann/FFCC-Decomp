@@ -2,7 +2,6 @@
 #include "global.h"
 #include "ffcc/graphic_symbols.h"
 #include "ffcc/gxfunc.h"
-#include "ffcc/render_buffers.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -1677,8 +1676,9 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 	}
 
 	gUtil.SetVtxFmt_POS_CLR_TEX();
-	CreateSmallBackTexture(gRenderScratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
-	GetBackBufferRect2(gRenderScratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
+	CreateSmallBackTexture(m_scratchTextureBuffer, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_RGBA8, 0);
+	GetBackBufferRect2(m_scratchTextureBuffer, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR,
+	                   (_GXTexFmt)0x11, 0);
 	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	gUtil.SetOrthoEnv();
 

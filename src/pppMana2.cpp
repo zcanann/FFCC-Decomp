@@ -1,6 +1,5 @@
 #include "ffcc/pppMana2.h"
 #include "ffcc/graphic.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"

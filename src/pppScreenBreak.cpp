@@ -14,7 +14,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppVec.h"
 #include "ffcc/pppYmEnv.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"

@@ -4,7 +4,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/gobject.h"
 #include "ffcc/joybus.h"
@@ -405,7 +404,8 @@ void CGraphicPcs::drawScreenFade()
                     const float t0 = ((tile & 2) ? kGraphicOne : kGraphicZero) * kGraphicHalf;
                     const float t1 = t0 + 0.5f;
 
-                    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+                    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, x, y, 0x140, 0xE0, 0,
+                                               GX_LINEAR, GX_TF_RGBA8, 0);
                     GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 
                     CColor topColor;

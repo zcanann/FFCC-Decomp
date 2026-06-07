@@ -6,7 +6,6 @@
 #include "ffcc/materialman.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>

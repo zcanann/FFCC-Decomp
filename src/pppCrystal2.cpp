@@ -3,7 +3,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/hsd_image.h"
-#include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"

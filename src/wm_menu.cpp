@@ -7466,7 +7466,8 @@ void CMenuPcs::CalcChara()
 				animState[0] = 0;
 				animState[1] = -1;
 				animState[2] = rand() % 250;
-				loadHandle->SetAnim(baseAnim, -1, -1, -1 - (loadHandle->m_currentAnimIndex >> 31), 1);
+				loadHandle->SetAnim(baseAnim, -1, -1,
+				    -1 - static_cast<int>(static_cast<unsigned int>(loadHandle->m_currentAnimIndex) >> 31), 1);
 				animState[3] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xB4)[0];
 				animState[4] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xC0)[0];
 			}

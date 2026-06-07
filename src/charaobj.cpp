@@ -1318,7 +1318,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	int resistType = 0;
 	int allowEffect = 0;
 	int damageClamp = 0;
-	int severity = 0;
 	int effectResult = 0;
 	char* dbg = s_CGCharaObj_801DC548;
 
@@ -1349,7 +1348,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	unsigned int particleLife = particleLife;
 	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
 	short scriptDefense = scriptDefense;
-	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
+	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, effectResult, 0);
 
 	if (resistType == 3) {
 		if (CharaObjIsElementalStatus(staType)) {

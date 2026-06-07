@@ -483,8 +483,8 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
                      static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]),
                      static_cast<GXTexMapID>(m_bumpTexMapIds[0]));
     GXSetIndTexCoordScale(static_cast<GXIndTexStageID>(0),
-                          static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftU),
-                          static_cast<GXIndTexScale>(g_drawMaterial->m_texShiftV));
+                          static_cast<GXIndTexScale>(static_cast<u8>(g_drawMaterial->m_texShiftU)),
+                          static_cast<GXIndTexScale>(static_cast<u8>(g_drawMaterial->m_texShiftV)));
 
     GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
     _GXSetTevOrder(

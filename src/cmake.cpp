@@ -3818,13 +3818,15 @@ void CMenuPcs::CalcSingCMake()
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = static_cast<unsigned short>(CmakeNameCtrl());
-        } else if (CmakeState(this)->m_frame < 10) {
-            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            if (CmakeState(this)->m_resultDir < 0) {
-                ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
+            if (CmakeState(this)->m_frame >= 10) {
+                if (CmakeState(this)->m_resultDir < 0) {
+                    ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
+                }
+                result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
             }
-            result = 1;
         }
         break;
     case 2: {
@@ -3883,10 +3885,12 @@ void CMenuPcs::CalcSingCMake()
                 }
                 result = 0;
             }
-        } else if (CmakeState(this)->m_frame < 10) {
-            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            result = 1;
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+            }
         }
         break;
     }
@@ -3906,10 +3910,12 @@ void CMenuPcs::CalcSingCMake()
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeTribeCtrl();
-        } else if (CmakeState(this)->m_frame < 10) {
-            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            result = 1;
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+            }
         }
         break;
     case 4:
@@ -3926,10 +3932,12 @@ void CMenuPcs::CalcSingCMake()
             }
         } else if (CmakeState(this)->m_mode == 1) {
             result = CmakeJobCtrl();
-        } else if (CmakeState(this)->m_frame < 10) {
-            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            result = 1;
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+            }
         }
         break;
     case 5: {
@@ -4023,10 +4031,10 @@ void CMenuPcs::CalcSingCMake()
             }
         } else {
             if (CmakeState(this)->m_stepTimer == 0) {
-                if (CmakeState(this)->m_frame < 10) {
-                    CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
-                } else {
+                if (CmakeState(this)->m_frame >= 10) {
                     result = 1;
+                } else {
+                    CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
                 }
             } else {
                 CmakeState(this)->m_stepTimer =
@@ -4104,10 +4112,12 @@ void CMenuPcs::CalcSingCMake()
                 }
                 result = 0;
             }
-        } else if (CmakeState(this)->m_frame < 10) {
-            CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
         } else {
-            result = 1;
+            if (CmakeState(this)->m_frame >= 10) {
+                result = 1;
+            } else {
+                CmakeState(this)->m_frame = CmakeState(this)->m_frame + 1;
+            }
         }
         break;
     }

@@ -374,7 +374,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					const int bit = systemVal + 0xBE7;
 					u8* const byteRef = classData + (bit / 8) + 0x8A4;
 					const u8 mask = static_cast<u8>(1 << (bit % 8));
-					const int oldValue = -((*byteRef & mask) != 0);
+					const int oldValue = (*byteRef & mask) != 0;
 
 					stack[-1].m_word = oldValue;
 					int newValue = oldValue;

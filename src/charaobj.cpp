@@ -1375,7 +1375,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		effectResult = 0;
 	}
 
-	if (m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
+	if (m_lastStateId == 6 &&
+	    static_cast<int>((static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) << 0x1A) |
+	                     (static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1)) >> 6)) < 0) {
 		unsigned int currentKind =
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {

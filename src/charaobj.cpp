@@ -1605,9 +1605,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
 				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x32));
-				damageAmount = static_cast<int>(basePower + sourcePower) - guardValue;
-				if (damageAmount < 1) {
-					damageAmount = 1;
+				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
+				damageAmount = 1;
+				if (computed32 >= 1) {
+					damageAmount = computed32;
 				}
 				System.Printf(dbg + 0x274);
 				break;
@@ -1622,9 +1623,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
 				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x30));
-				damageAmount = static_cast<int>(basePower + sourcePower) - guardValue;
-				if (damageAmount < 1) {
-					damageAmount = 1;
+				int computed30 = static_cast<int>(basePower + sourcePower) - guardValue;
+				damageAmount = 1;
+				if (computed30 >= 1) {
+					damageAmount = computed30;
 				}
 				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
@@ -1659,9 +1661,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
 				}
 				int guardValue = static_cast<int>(static_cast<float>(static_cast<int>(defense)) * defenseRate);
-				damageAmount = static_cast<int>(basePower + sourcePower) - guardValue;
-				if (damageAmount < 1) {
-					damageAmount = 1;
+				int computedGuard = static_cast<int>(basePower + sourcePower) - guardValue;
+				damageAmount = 1;
+				if (computedGuard >= 1) {
+					damageAmount = computedGuard;
 				}
 				System.Printf(dbg + 0x2BC, basePower, sourcePower, defense, damageAmount);
 				break;

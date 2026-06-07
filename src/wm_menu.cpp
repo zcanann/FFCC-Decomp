@@ -4217,10 +4217,7 @@ void CMenuPcs::DrawCMakeMenu()
 void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (((m_wmWorldState->m_mainState == 0) && bytes[0x12] == 0) || m_wmWorldState->m_mainState >= 4) {
-		return;
-	}
-
+	if ((m_wmWorldState->m_mainState != 0 || bytes[0x12] != 0) && m_wmWorldState->m_mainState <= 3) {
 	DrawFukidashi();
 	float moveAlpha;
 	if (m_wmWorldState->m_mainState == 1) {
@@ -4337,6 +4334,7 @@ void CMenuPcs::DrawMoveMenu()
 		stackData[1].m_word = 0;
 		stackData[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+	}
 	}
 }
 

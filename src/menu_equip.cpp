@@ -168,8 +168,8 @@ int CMenuPcs::EquipClose0()
 			} else {
 				item->step = item->step + 1;
 				dVar2 = kEquipOneDouble;
-				item->alpha =
-				    (float)-((kEquipOneDouble / (double)item->duration) * (double)item->step - kEquipOneDouble);
+				double recip = kEquipOneDouble / (double)item->duration;
+				item->alpha = (float)-(recip * (double)item->step - kEquipOneDouble);
 				if ((item->flags & 2) == 0) {
 					fVar1 = (float)-((dVar2 / (double)item->duration) * (double)item->step - dVar2);
 					item->dx = (item->targetX - (float)item->x) * fVar1;

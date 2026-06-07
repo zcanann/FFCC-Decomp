@@ -895,6 +895,7 @@ static inline double SingWinUIntToDouble(unsigned int value)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void CMenuPcs::createSingleMenu()
 {
     u8* self = reinterpret_cast<u8*>(this);
@@ -940,6 +941,7 @@ void CMenuPcs::createSingleMenu()
         }
     }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

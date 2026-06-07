@@ -609,20 +609,17 @@ void CMenuPcs::CmdOpen()
 	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (entry->startFrame > timer) {
-			entry++;
-			continue;
+		if (entry->startFrame <= timer) {
+			if ((entry->startFrame + entry->duration) <= timer) {
+				finishedCount += 1;
+				entry->alpha = FLOAT_80332a70;
+			} else {
+				entry->timer++;
+				entry->alpha = static_cast<float>(
+				    (DOUBLE_80332a58 / static_cast<double>(entry->duration)) *
+				    static_cast<double>(entry->timer));
+			}
 		}
-		if ((entry->startFrame + entry->duration) <= timer) {
-			finishedCount += 1;
-			entry->alpha = FLOAT_80332a70;
-			entry++;
-			continue;
-		}
-		entry->timer++;
-		entry->alpha = static_cast<float>(
-		    (DOUBLE_80332a58 / static_cast<double>(entry->duration)) *
-		    static_cast<double>(entry->timer));
 		entry++;
 	}
 

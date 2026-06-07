@@ -1374,10 +1374,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
 
-		CMemory::CStage* stage = GetLetterMenuStage(this);
-		char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
-		stage = GetLetterMenuStage(this);
-		char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
+		char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
+		char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
 
 		memset(srcText, 0, kLetterTextScratchSize);
 		memset(workText, 0, kLetterTextScratchSize);

@@ -2581,7 +2581,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			} else if ((particleFlags & 0x4000) != 0) {
 				particleBank = 3;
 			} else if (particleBank == 1 && particleNo < 8 && m_scriptHandle != 0) {
-				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xF8);
+				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
 			}
 
 			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {

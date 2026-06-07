@@ -8703,16 +8703,15 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::ChgAllModel()
 {
-	unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* gameData = reinterpret_cast<unsigned char*>(&Game);
-	unsigned char* handleData = bytes;
+	unsigned char* handleData = reinterpret_cast<unsigned char*>(this);
 	int modelOffset = 0;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = m_wm.m_charaModelData + modelOffset;
 		unsigned int race;
-		unsigned int variant;
+		int variant;
 		unsigned int index;
 		int modelId;
 

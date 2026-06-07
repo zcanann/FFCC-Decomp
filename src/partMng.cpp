@@ -1505,7 +1505,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* packetWords = reinterpret_cast<int*>(packet);
-    CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
 
     switch (code) {
     case 1:
@@ -1611,15 +1610,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         env->m_isEditMode = 0;
 
         if (res->m_textureSet == 0) {
-            res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
+            res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
         }
 
         if (res->m_materialSet == 0) {
-            CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
+            CMaterialSet* materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
             res->m_materialSet = materialSet;
             env->m_materialSetPtr = materialSet;
 
-            CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
+            CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
             if (defaultMaterial != 0) {
                 defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                 res->m_materialSet->AddMaterial(defaultMaterial, 0);
@@ -1633,7 +1632,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
-                *modelTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
+                *modelTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
                 if (*modelTablePtr != 0) {
                     memset(*modelTablePtr, 0, sizeof(pppModelSt*) * 0x88);
                 }
@@ -1657,7 +1656,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     modelSlot = 0;
                 }
 
-                modelSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
+                modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
                 if (modelSlot != 0) {
                     modelSlot->m_refCount = 0;
                     modelSlot->m_cacheId = -1;
@@ -1681,7 +1680,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
             if (*shapeSlotTablePtr == 0) {
-                *shapeSlotTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
+                *shapeSlotTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
                 if (*shapeSlotTablePtr != 0) {
                     memset(*shapeSlotTablePtr, 0, sizeof(pppShapeSt*) * 0x80);
                 }
@@ -1707,7 +1706,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot = 0;
                 }
 
-                shapeSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
+                shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
                 if (shapeSlot != 0) {
                     CChunkFile chunkFile;
                     chunkFile.SetBuf(packetWords + 0xC);
@@ -1724,13 +1723,13 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             void**& textTable = *reinterpret_cast<void***>(self + kUsbTextTableOffset);
             if (textTable == 0) {
                 textTable = reinterpret_cast<void**>(
-                    operator new[](0x400, stageLoad, const_cast<char*>(s_partMng_cpp), 0x61F));
+                    operator new[](0x400, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x61F));
             }
 
             int slotIndex = static_cast<int>(payloadFloats[0]);
             void*& textRaw = *reinterpret_cast<void**>(self + kStreamTextRawOffset + slotIndex * 0xC);
             if (textRaw == 0) {
-                textRaw = operator new[](packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
+                textRaw = operator new[](packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
             }
 
             memcpy(textRaw, payload, packetSize - 0x20);
@@ -1771,9 +1770,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         pdtSlots[0].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
             operator new[](
-                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
+                packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
         if (pdtSlots[0].m_pppDataHead != 0) {
             memcpy(pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
             pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
@@ -1836,9 +1835,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
         pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
             operator new[](
-                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
+                packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
         memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
         pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
         *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
@@ -1859,15 +1858,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
 
                 if (res->m_textureSet == 0) {
-                    res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
+                    res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
                 }
 
                 if (res->m_materialSet == 0) {
-                    CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
+                    CMaterialSet* materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
                     res->m_materialSet = materialSet;
                     env->m_materialSetPtr = materialSet;
 
-                    CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
+                    CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     if (defaultMaterial != 0) {
                         defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                         res->m_materialSet->AddMaterial(defaultMaterial, 0);
@@ -1875,7 +1874,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
 
                 if (res->m_textureSet != 0 && res->m_materialSet != 0) {
-                    res->m_textureSet->Create(chunkFile, stageLoad, 1, 0, 0, 0);
+                    res->m_textureSet->Create(chunkFile, PartPcs.m_usbStreamState.m_stageLoad, 1, 0, 0, 0);
                     res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
                     res->m_materialSet->SetTextureSet(res->m_textureSet);
                 }

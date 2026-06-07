@@ -2159,7 +2159,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
-		if (meshIndex <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
+		if (static_cast<int>(meshIndex) <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 

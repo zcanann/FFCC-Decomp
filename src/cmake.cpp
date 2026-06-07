@@ -1539,7 +1539,7 @@ void CMenuPcs::CmakeResultDraw()
 
     int textColor = static_cast<int>(static_cast<double>(255.0f) * textAlpha);
     CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
-    labelFont->SetColor(color);
+    labelFont->SetColor(color.color);
 
     float labelWidths[4];
     int labelY = 0x70;
@@ -1558,7 +1558,7 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetShadow(1);
     valueFont->SetScale(1.0f);
     valueFont->DrawInit();
-    valueFont->SetColor(color);
+    valueFont->SetColor(color.color);
     valueFont->SetTlut(6);
 
     char tribeWithSlash[0x40];

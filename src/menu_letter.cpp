@@ -1967,7 +1967,7 @@ int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
 	unsigned int press;
-	u16 hold;
+	s16 hold;
 	int padState = Pad.m_debugPadLock;
 
 	if ((padState != 0) || (Pad.m_debugPadPort != -1)) {

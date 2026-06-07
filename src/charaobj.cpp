@@ -2304,7 +2304,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int affinity = 0;
-	if ((source->GetCID() & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
+	if ((static_cast<unsigned short>(source->GetCID()) & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
 		affinity = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDA));
 	}
 

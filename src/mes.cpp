@@ -1597,11 +1597,11 @@ void CMes::Next()
 				do
 				{
 					type = (int)(((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4) & 0xF);
-					if (type == 1)
+					if ((unsigned int)type == 1)
 					{
 						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
 					}
-					else if (type == 2)
+					else if ((unsigned int)type == 2)
 					{
 						*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
 					}

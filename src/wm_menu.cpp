@@ -6389,14 +6389,12 @@ void CMenuPcs::CalcFukidashi()
 			*reinterpret_cast<short*>(BUB() + 0x1E) = *reinterpret_cast<short*>(BUB() + 0x1E) + 0x10;
 		}
 		*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB());
-		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) == 0) {
-			if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) == 0) {
-				*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
-			} else {
-				*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
-			}
-		} else {
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
 			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x20;
+		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x50;
+		} else {
+			*reinterpret_cast<short*>(BUB() + 0x1C) = *reinterpret_cast<short*>(BUB() + 0x1C) + 0x38;
 		}
 	}
 
@@ -6470,13 +6468,14 @@ void CMenuPcs::CalcFukidashi()
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 	} else if (fieldVal == 0x16) {
 		char* const townName = Game.m_gameWork.m_townName;
+		int languageId = Game.m_gameWork.m_languageId;
 		strcpy(nameBuffer, townName);
-		if (Game.m_gameWork.m_languageId == 2) {
+		if (languageId == 2) {
 			strcpy(nameBuffer, townName);
-			strcat(nameBuffer, lbl_80210D10[Game.m_gameWork.m_languageId - 1], sizeof(nameBuffer));
+			strcat(nameBuffer, lbl_80210D10[languageId - 1]);
 		} else {
-			strcpy(nameBuffer, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
-			strcat(nameBuffer, townName, sizeof(nameBuffer));
+			strcpy(nameBuffer, lbl_80210D10[languageId - 1]);
+			strcat(nameBuffer, townName);
 		}
 	} else {
 		strcpy(nameBuffer, Game.m_cFlatDataArr[1].TableStrings(3)[fieldVal]);
@@ -6497,11 +6496,11 @@ void CMenuPcs::CalcFukidashi()
 	if (dVar23 > static_cast<double>(static_cast<float>(static_cast<int>(textWidth)))) {
 		strcpy(tempBuf, nameBuffer);
 		char* spacePos = strrchr(tempBuf, 0x20);
-		if (spacePos == NULL) {
-			secondLine[0] = 0;
-		} else {
+		if (spacePos != NULL) {
 			*spacePos = 0;
 			strcpy(secondLine, spacePos + 1);
+		} else {
+			secondLine[0] = 0;
 		}
 		strcpy(nameBuffer, tempBuf);
 	}
@@ -6594,7 +6593,7 @@ void CMenuPcs::CalcFukidashi()
 	// Fill remaining viewport slots
 	iVar9 = 0x11 - iVar11;
 	iVar13 = iVar11 * 0x50;
-	if (iVar11 < 0x11) {
+	if (iVar11 <= 0x10) {
 		do {
 			int* puVar20 = reinterpret_cast<int*>(WOBJ() + iVar13);
 			iVar13 += 0x50;
@@ -6616,7 +6615,13 @@ void CMenuPcs::CalcFukidashi()
 	uVar3 = *reinterpret_cast<unsigned short*>(bytes + 0x1A);
 	if ((uVar3 & 0x3F0) != 0) {
 		int modelIdx;
-		if ((uVar3 & 0x200) == 0) {
+		if ((uVar3 & 0x200) != 0) {
+			if ((char)bytes[0x06] == 1) {
+				modelIdx = 7;
+			} else {
+				modelIdx = 6;
+			}
+		} else {
 			modelIdx = 0;
 			if ((uVar3 & 0x10) == 0) { modelIdx = 1;
 			if ((uVar3 & 0x20) == 0) { modelIdx = 2;
@@ -6624,10 +6629,6 @@ void CMenuPcs::CalcFukidashi()
 			if ((uVar3 & 0x80) == 0) { modelIdx = 4;
 			if ((uVar3 & 0x100) == 0) { modelIdx = 5; }}}}}
 			modelIdx = modelIdx + 0x0C;
-		} else if ((char)bytes[0x06] == 1) {
-			modelIdx = 7;
-		} else {
-			modelIdx = 6;
 		}
 
 		int* puVar20 = reinterpret_cast<int*>(WOBJ() + modelIdx * 0x50);
@@ -6641,26 +6642,26 @@ void CMenuPcs::CalcFukidashi()
 		if ((char)bytes[0x08] == 2 || (char)bytes[0x08] == 3) {
 			*reinterpret_cast<float*>(puVar20 + 8) = FLOAT_80331710;
 		}
-		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) == 0) {
-			if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) == 0) {
-				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331718;
-				*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-				    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331720);
-			} else {
-				*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_803313dc;
-				*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
-				    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
-			}
-		} else {
+		if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0xF) != 0) {
 			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331714;
 			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
 			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+		} else if ((*reinterpret_cast<short*>(bytes + 0x1A) & 0x200) != 0) {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331420);
+		} else {
+			*reinterpret_cast<float*>(puVar20 + 7) = FLOAT_80331718;
+			*reinterpret_cast<float*>(puVar20 + 8) = static_cast<float>(
+			    static_cast<double>(*reinterpret_cast<float*>(puVar20 + 8)) + DOUBLE_80331720);
 		}
 
 		// Spline evaluation for Y position
 		float t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 		float yResult = fVar1;
-		if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+		if (t >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+			yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+		} else {
 			int idx = 0;
 			float* pf = gWmModelYOffsetSpline;
 			int splineCnt = gWmModelYOffsetSplineCount;
@@ -6687,15 +6688,15 @@ void CMenuPcs::CalcFukidashi()
 					splineCnt--;
 				} while (splineCnt != 0);
 			}
-		} else {
-			yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yResult;
 
 		// Spline evaluation for rotation
 		float rotResult = FLOAT_803313dc;
 		t = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
-		if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+		if (t >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+			rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+		} else {
 			int idx = 0;
 			float* pf = gWmModelRotationSpline;
 			int splineCnt = gWmModelRotationSplineCount;
@@ -6722,8 +6723,6 @@ void CMenuPcs::CalcFukidashi()
 					splineCnt--;
 				} while (splineCnt != 0);
 			}
-		} else {
-			rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotResult;
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
@@ -6789,14 +6788,17 @@ void CMenuPcs::CalcFukidashi()
 					}
 				}
 				*reinterpret_cast<float*>(puVar20 + 9) = FLOAT_803313dc;
-				*reinterpret_cast<float*>(puVar20 + 0xD) = FLOAT_80331740;
-				*reinterpret_cast<float*>(puVar20 + 0xE) = FLOAT_80331740;
-				*reinterpret_cast<float*>(puVar20 + 0xF) = FLOAT_80331740;
+				float f740 = FLOAT_80331740;
+				*reinterpret_cast<float*>(puVar20 + 0xD) = f740;
+				*reinterpret_cast<float*>(puVar20 + 0xE) = f740;
+				*reinterpret_cast<float*>(puVar20 + 0xF) = f740;
 
 				// Spline Y for player models
 				float t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
 				float yRes2 = FLOAT_803313dc;
-				if (t2 < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+				if (t2 >= gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
+					yRes2 = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
+				} else {
 					int si = 0;
 					float* spf = gWmModelYOffsetSpline;
 					int sc = gWmModelYOffsetSplineCount;
@@ -6823,15 +6825,15 @@ void CMenuPcs::CalcFukidashi()
 							sc--;
 						} while (sc != 0);
 					}
-				} else {
-					yRes2 = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yRes2;
 
 				// Spline rotation for player models
 				float rotRes2 = FLOAT_803313dc;
 				t2 = static_cast<float>(static_cast<double>(puVar20[1])) / FLOAT_803314c0;
-				if (t2 < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+				if (t2 >= gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
+					rotRes2 = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
+				} else {
 					int si = 0;
 					float* spf = gWmModelRotationSpline;
 					int sc = gWmModelRotationSplineCount;
@@ -6858,8 +6860,6 @@ void CMenuPcs::CalcFukidashi()
 							sc--;
 						} while (sc != 0);
 					}
-				} else {
-					rotRes2 = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotRes2;
 				if (playerCount == 1) {

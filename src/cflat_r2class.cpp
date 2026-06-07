@@ -1279,6 +1279,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x5F:
+			if (engineObject->m_charaModelHandle != 0 && PartMng.pppIsDeadCHandle(engineObject->m_charaModelHandle) != 0) {
+				PushValue(this, object, 0);
+				outResult = 0;
+			}
+			break;
 		case -0x60: {
 			Vec safePos;
 			float safeDist = engineObject->CalcSafePos(static_cast<int>(object->m_localBase[0]), FindRuntimeObject(this, object->m_localBase[1]), &safePos);

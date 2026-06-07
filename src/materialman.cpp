@@ -2597,15 +2597,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     unsigned int slot = chunkFile.Get2() & 0xFFFF;
                     chunkFile.Get2();
                     float valueU = chunkFile.GetF4();
-                    float valueV = chunkFile.GetF4();
                     CTexScroll* texScroll = material->GetTexScroll(slot);
 
                     texScroll->m_u1 = valueU;
-                    texScroll->m_v1 = valueV;
-                    if (kTextureZero != valueU) {
+                    texScroll->m_v1 = chunkFile.GetF4();
+                    if (kTextureZero != texScroll->m_u1) {
                         texScroll->m_type0 = 1;
                     }
-                    if (kTextureZero != valueV) {
+                    if (kTextureZero != texScroll->m_v1) {
                         texScroll->m_type1 = 1;
                     }
                 }

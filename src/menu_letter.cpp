@@ -1096,7 +1096,10 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	bool allFinished = panelCount == finished;
+	int allFinished = 0;
+	if (panelCount == finished) {
+		allFinished = 1;
+	}
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
 		int state2 = GetLetterStateBase(this);
 		s_BackUpCur[0] = *reinterpret_cast<s16*>(state2 + 0x26);

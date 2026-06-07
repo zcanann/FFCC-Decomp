@@ -845,17 +845,19 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
-	w -= 16.0f;
-	MenuPcs.DrawRect(0, x + corner, y, w, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	float innerW = (float)((double)w - 16.0);
+	float xCorner = corner + x;
+	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
-	MenuPcs.DrawRect(0, x + corner, bottom, w, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-	h -= 16.0f;
-	MenuPcs.DrawRect(0, x, y + corner, corner, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	float yCorner = corner + y;
+	float innerH = (float)((double)h - 16.0);
+	MenuPcs.DrawRect(0, x, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-	MenuPcs.DrawRect(0, right, y + corner, corner, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, right, yCorner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	MenuPcs.DrawRect(0, x + corner, y + corner, w, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.DrawRect(0, xCorner, yCorner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*

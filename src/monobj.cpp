@@ -651,9 +651,9 @@ void CGMonObj::setActionParam(int state)
 	*reinterpret_cast<unsigned int*>(mon + 0x630) =
 		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x20);
 	*reinterpret_cast<unsigned int*>(mon + 0x634) =
-		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22);
+		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
 	*reinterpret_cast<unsigned int*>(mon + 0x638) =
-		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22);
+		*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (*reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22));
 }
 
 /*

@@ -455,7 +455,7 @@ void CGMonObj::onStatAttack(int state)
 			if (prgObj->m_subFrame == 0) {
 				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);
 			}
-			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(attackData + 0x2E)) {
+			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(attackBase + (*reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x2E))) {
 				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 0) {

@@ -730,15 +730,15 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
-    unsigned int command = 0;
-    unsigned int identity = 0;
-    int message = 0;
-    int ret = 0;
-    int step = 0;
-    int contextRecvOffset = 0;
-    int retryLine = 0;
-    OSTime timeoutTicks = 0;
-    OSTime startTime = 0;
+    unsigned int command;
+    unsigned int identity;
+    int message;
+    int ret;
+    int step;
+    int contextRecvOffset;
+    int retryLine;
+    OSTime timeoutTicks;
+    OSTime startTime;
 #define channel (static_cast<signed char>(param[0xBC]))
 
 receive_message:

@@ -180,13 +180,14 @@ int CMenuPcs::EquipClose0()
 		item++;
 	}
 
+	int result = 0;
 	if (itemCount == doneCount) {
 		EquipOpenAnim* selected = &GetEquipListStorage(this)->entries[GetEquipMenuState(this)->selectedIndex];
 		selected->x = (s16)(int)-(((double)selected->w - kEquipIntToDoubleBias) * kEquipHalfDouble - kEquipWindowCenterX);
-		return true;
+		result = 1;
 	}
 
-	return false;
+	return result;
 }
 
 /*

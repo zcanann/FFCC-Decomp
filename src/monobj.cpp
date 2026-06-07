@@ -2143,11 +2143,11 @@ void CGMonObj::onFrameAlways()
 
 		if (stepSeId != 0) {
 			int& stepSeHandle = m_stepSeHandle;
-			if (object->m_currentAnimSlot == static_cast<char>(object->m_animStartFrame)) {
-				if (stepSeHandle == 0) {
-					stepSeHandle = reinterpret_cast<CGPrgObj*>(this)->playSe3D(stepSeId, 0x32, 0x96, 0, (Vec*)0);
-				} else {
+			if (object->m_currentAnimSlot == *reinterpret_cast<char*>(&object->m_animStartFrame)) {
+				if (stepSeHandle != 0) {
 					Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
+				} else {
+					stepSeHandle = reinterpret_cast<CGPrgObj*>(this)->playSe3D(stepSeId, 0x32, 0x96, 0, (Vec*)0);
 				}
 			} else if (stepSeHandle != 0) {
 				Sound.FadeOutSe3D(stepSeHandle, 0x32);

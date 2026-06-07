@@ -1761,14 +1761,14 @@ void CMaterialMan::SetPosition(
     float searchBoundStorage[6];
     CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
     searchBound.m_min.x = position->x - rangeXZ;
-    searchBound.m_min.y = position->y;
-    searchBound.m_min.z = position->z - rangeXZ;
     searchBound.m_max.x = position->x + rangeXZ;
-    searchBound.m_max.y = position->y + rangeY;
+    searchBound.m_min.z = position->z - rangeXZ;
     searchBound.m_max.z = position->z + rangeXZ;
+    searchBound.m_min.y = position->y;
+    searchBound.m_max.y = position->y + rangeY;
 
-    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     if (target == static_cast<CMapShadow::TARGET>(0)) {
+        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         ShadowCandidate shadowCandidates[128];
         ShadowCandidate* candidateWrite = shadowCandidates;
         int candidateCount = 0;
@@ -1776,7 +1776,7 @@ void CMaterialMan::SetPosition(
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[i];
 
-            if (shadow->m_targetEnabled[0] == 0) {
+            if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {
                 continue;
             }
 
@@ -1830,6 +1830,7 @@ void CMaterialMan::SetPosition(
             SetShadow(*nearest->shadow, viewMtx, nearest->index, 0xFFFFFFFF);
         }
     } else {
+        CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
         for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
             CMapShadow* shadow = (*mapShadowArray)[i];
 

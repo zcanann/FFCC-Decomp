@@ -12013,15 +12013,16 @@ int McCtrl::Format(int unmountAfter)
 		}
 	}
 
+	int result;
 	if (m_state == -1) {
-		m_lastResult = -1;
+		result = -1;
 	} else if (m_state == 4) {
-		m_lastResult = 1;
+		result = 1;
 	} else {
-		m_lastResult = 0;
+		result = 0;
 	}
 
-	return m_lastResult;
+	return result;
 }
 
 /*

@@ -981,15 +981,10 @@ extern "C" const char* gSingMenuAttrTableEs[] = {
     s_Revitalia_801DE674, s_Superataque_801DE680, s_Danos_magicos_801DE68C, s_No_se_aturde_801DE69C,
 };
 extern "C" {
-int s_DynamicMess[5];
+extern int s_DynamicMess[5];
 }
-static char s_DynamicMessStr[0x400];
-
-extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
-    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
-    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
-    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
-};
+extern char s_DynamicMessStr[0x400];
+extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[];
 
 extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
     {(char*)s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -2959,6 +2954,16 @@ void CMenuPcs::SetSingDynamicWinMessInfo(
         strcpy(s_DynamicMessStr + 0x380, line7);
     }
 }
+
+extern "C" {
+int s_DynamicMess[5];
+}
+char s_DynamicMessStr[0x400];
+extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
+    {4, {14, 15, 16, 3, 0, 0, 0, 0}},
+    {2, {15, 3, 0, 0, 0, 0, 0, 0}},
+    {4, {30, 31, 32, 3, 0, 0, 0, 0}},
+};
 
 /*
  * --INFO--

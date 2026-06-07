@@ -735,7 +735,7 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     unsigned int command8;
     unsigned int command7;
     unsigned int command;
-    unsigned int message;
+    int message;
     int ret;
     int step;
     int contextRecvOffset;

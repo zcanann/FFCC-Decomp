@@ -991,7 +991,12 @@ bool CMenuPcs::LetterClose()
 	for (int i = 0; i < panelCount; ++i, entry += 0x20) {
 		float f = FLOAT_803330bc;
 		if (frame >= *reinterpret_cast<int*>(entry + 0x12)) {
-			if (*reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14) > frame) {
+			if (*reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14) <= frame) {
+				++finished;
+				*reinterpret_cast<float*>(entry + 8) = FLOAT_803330bc;
+				*reinterpret_cast<float*>(entry + 0x18) = f;
+				*reinterpret_cast<float*>(entry + 0x1A) = f;
+			} else {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
 				*reinterpret_cast<float*>(entry + 8) =
 				    static_cast<float>(DOUBLE_803330e8 -
@@ -1006,11 +1011,6 @@ bool CMenuPcs::LetterClose()
 					*reinterpret_cast<float*>(entry + 0x1A) =
 					    (*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
 				}
-			} else {
-				++finished;
-				*reinterpret_cast<float*>(entry + 8) = FLOAT_803330bc;
-				*reinterpret_cast<float*>(entry + 0x18) = f;
-				*reinterpret_cast<float*>(entry + 0x1A) = f;
 			}
 		}
 	}

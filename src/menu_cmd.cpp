@@ -1934,8 +1934,6 @@ void CMenuPcs::CmdDismantle(int selected)
 void CMenuPcs::DrawUniteList()
 {
 	const CCaravanWork* const caravan = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CmdListStorage* const list = GetCmdListStorage(this);
-	CmdListEntry* const entries = list->entries;
 	CmdState* const cmd = GetCmdStateView(this);
 	s16 selected = cmd->selected;
 	const s16 foodCount = caravan->m_numCmdListSlots;
@@ -1961,7 +1959,7 @@ void CMenuPcs::DrawUniteList()
 			continue;
 		}
 
-		CmdListEntry* const entry = &entries[i];
+		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float rectX = static_cast<float>(entry->x + 4);
 		const float rectY = static_cast<float>(entry->y) - FLOAT_80332ad0;
 		const float rectW = static_cast<float>(entry->width) - 8.0f;
@@ -2012,14 +2010,14 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(7);
 
-	const s16 topX = entries[0].x;
+	const s16 topX = GetCmdListStorage(this)->entries[0].x;
 	for (s32 i = 0; i < foodCount; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
 		if ((i <= 7) && (slotType == 0)) {
 			continue;
 		}
 
-		CmdListEntry* const entry = &entries[i];
+		CmdListEntry* const entry = &GetCmdListStorage(this)->entries[i];
 		const float alpha = (cmd->mode == 3) ? FLOAT_80332a70 : entry->alpha;
 
 		GXColor color;
@@ -2057,7 +2055,7 @@ void CMenuPcs::DrawUniteList()
 
 	DrawInit();
 	s_unitePanelCount = 0;
-	CmdListEntry* const unitePanels = &entries[list->listEnd];
+	CmdListEntry* const unitePanels = &GetCmdListStorage(this)->entries[GetCmdListStorage(this)->listEnd];
 	for (s32 i = 0; i < 8; i++) {
 		if (i >= foodCount) {
 			break;
@@ -2085,9 +2083,9 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		const s32 labelAnchor = (i == selected) ? i + 1 : i;
-		CmdListEntry* const endEntry = &entries[i + groupSize - 1];
-		CmdListEntry* const anchorEntry = &entries[labelAnchor];
-		CmdListEntry* const startEntry = &entries[i];
+		CmdListEntry* const endEntry = &GetCmdListStorage(this)->entries[i + groupSize - 1];
+		CmdListEntry* const anchorEntry = &GetCmdListStorage(this)->entries[labelAnchor];
+		CmdListEntry* const startEntry = &GetCmdListStorage(this)->entries[i];
 		const bool active = (i <= selected) && (selected < i + groupSize);
 		const float panelX = static_cast<float>(topX * 2 - anchorEntry->x);
 		const float panelY = (static_cast<float>(endEntry->width + endEntry->height - startEntry->width) -
@@ -2170,7 +2168,7 @@ void CMenuPcs::DrawUniteList()
 			helpId += 2;
 		}
 
-		const float alpha = entries[0].alpha;
+		const float alpha = GetCmdListStorage(this)->entries[0].alpha;
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;

@@ -1831,8 +1831,8 @@ void CMaterialMan::SetPosition(
             }
 
             bool yFilterPass =
-                ((shadow->m_yFilterMode != 1) || (shadowPos.y <= position->y)) &&
-                ((shadow->m_yFilterMode != 2) || (position->y <= shadowPos.y));
+                !((shadow->m_yFilterMode == 1) && (position->y < shadowPos.y)) &&
+                !((shadow->m_yFilterMode == 2) && (position->y > shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
                  (reinterpret_cast<CBound*>(searchBoundStorage)

@@ -1411,8 +1411,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
 		if (currentKind == 2) {
 			if (staType != 0x66 && staType != 0x67 && staType != 7) {
+				CVector sourcePos(sourceObj->m_worldPosition);
+				CVector selfPos(m_worldPosition);
+				CVector deltaVec;
+				PSVECSubtract(reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
 				Vec delta;
-				PSVECSubtract(&m_worldPosition, &sourceObj->m_worldPosition, &delta);
+				delta.x = deltaVec.x;
+				delta.y = deltaVec.y;
+				delta.z = deltaVec.z;
 				moveVectorH(&delta, 10.0f, 10);
 				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 				changeStat(0x1A, 0, 0);
@@ -1425,8 +1431,14 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 	if (itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
 	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
+		CVector sourcePos(sourceObj->m_worldPosition);
+		CVector selfPos(m_worldPosition);
+		CVector deltaVec;
+		PSVECSubtract(reinterpret_cast<Vec*>(&selfPos), reinterpret_cast<Vec*>(&sourcePos), reinterpret_cast<Vec*>(&deltaVec));
 		Vec delta;
-		PSVECSubtract(&m_worldPosition, &sourceObj->m_worldPosition, &delta);
+		delta.x = deltaVec.x;
+		delta.y = deltaVec.y;
+		delta.z = deltaVec.z;
 		moveVectorH(&delta, 10.0f, 10);
 		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
 		changeStat(0x19, 0, 0);

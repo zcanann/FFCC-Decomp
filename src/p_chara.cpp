@@ -25,14 +25,14 @@ static const char s_p_chara_collection_ptrarray_h[] = "collection_ptrarray.h";
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 
-extern const float FLOAT_80330288;
-extern const float FLOAT_8033028c;
-extern const float FLOAT_8033030C;
-extern const float FLOAT_80330310;
-extern const float FLOAT_80330314;
-extern const float FLOAT_80330318;
-extern const float FLOAT_8033031C;
-extern const float FLOAT_80330320;
+extern const float kCharaZero;
+extern const float kCharaOne;
+extern const float kCharaBumpLightPosX;
+extern const float kCharaBumpLightPosY;
+extern const float kCharaBumpLightPosZ;
+extern const float kCharaBumpLightTargetX;
+extern const float kCharaBumpLightTargetY;
+extern const float kCharaBumpLightTargetZ;
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
@@ -676,12 +676,12 @@ void CCharaPcs::create()
         sentinel->m_pdtLoadRef = 0;
         sentinel->m_currentAnimIndex = -1;
         sentinel->m_flags = 0;
-        sentinel->m_colorPhase = FLOAT_8033028c;
-        sentinel->m_sortZ = FLOAT_80330288;
+        sentinel->m_colorPhase = kCharaOne;
+        sentinel->m_sortZ = kCharaZero;
         sentinel->m_shadowTexturePtr = 0;
         sentinel->m_asyncState = 0;
         sentinel->m_asyncFileHandle = 0;
-        sentinel->m_fogBlend = FLOAT_80330288;
+        sentinel->m_fogBlend = kCharaZero;
         sentinel->m_unk0x158 = 0;
         sentinel->m_drawListFlags = static_cast<unsigned char>(__rlwimi(sentinel->m_drawListFlags, 1, 7, 24, 24));
     }
@@ -698,12 +698,12 @@ void CCharaPcs::create()
     CLightPcs::CBumpLight bumpLight;
 
     bumpLight.m_type = 1;
-    bumpLight.m_position.x = FLOAT_8033030C;
-    bumpLight.m_position.y = FLOAT_80330310;
-    bumpLight.m_position.z = FLOAT_80330314;
-    bumpLight.m_targetPosition.x = FLOAT_80330318;
-    bumpLight.m_targetPosition.y = FLOAT_8033031C;
-    bumpLight.m_targetPosition.z = FLOAT_80330320;
+    bumpLight.m_position.x = kCharaBumpLightPosX;
+    bumpLight.m_position.y = kCharaBumpLightPosY;
+    bumpLight.m_position.z = kCharaBumpLightPosZ;
+    bumpLight.m_targetPosition.x = kCharaBumpLightTargetX;
+    bumpLight.m_targetPosition.y = kCharaBumpLightTargetY;
+    bumpLight.m_targetPosition.z = kCharaBumpLightTargetZ;
     PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
                   reinterpret_cast<Vec*>(&bumpLight.m_direction));
     PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));
@@ -711,8 +711,8 @@ void CCharaPcs::create()
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0x00;
     bumpLight.m_bumpShade[3] = 0xFF;
-    bumpLight.m_offsetX = FLOAT_80330288;
-    bumpLight.m_offsetZ = FLOAT_80330288;
+    bumpLight.m_offsetX = kCharaZero;
+    bumpLight.m_offsetZ = kCharaZero;
 
     gCharaPartWorkPtr = LightPcs.AddBump(&bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4);
     Chara.Create();
@@ -2127,14 +2127,14 @@ CCharaPcs::CHandle::CHandle()
 	m_currentAnimIndex = -1;
 	m_flags = 0;
 
-	m_colorPhase = FLOAT_8033028c;
-	m_sortZ = FLOAT_80330288;
+	m_colorPhase = kCharaOne;
+	m_sortZ = kCharaZero;
 	m_shadowTexturePtr = nullptr;
 
 	m_asyncState = 0;
 	m_asyncFileHandle = (CFile::CHandle*)nullptr;
 
-	m_fogBlend = FLOAT_80330288;
+	m_fogBlend = kCharaZero;
 	m_unk0x158 = 0;
 	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
 }
@@ -2629,7 +2629,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
     const float lightAlpha = m_model->m_lightAlpha;
-    if (lightAlpha == FLOAT_80330288 && (flags & 0x80) == 0) {
+    if (lightAlpha == kCharaZero && (flags & 0x80) == 0) {
         return;
     }
     if ((flags & 0x100) != 0 && drawPass != 5) {
@@ -2651,7 +2651,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
-    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < FLOAT_8033028c || (flags & 0x40000) != 0)) {
+    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < kCharaOne || (flags & 0x40000) != 0)) {
         ppvDrawMng.AddPrim(-m_sortZ, this);
         return;
     }
@@ -2749,9 +2749,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     bool restoreFog = false;
     if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
-        float invBlend = FLOAT_8033028c - m_fogBlend;
-        float fogBlend = FLOAT_8033028c - invBlend * invBlend;
-        float fogRemainder = FLOAT_8033028c - fogBlend;
+        float invBlend = kCharaOne - m_fogBlend;
+        float fogBlend = kCharaOne - invBlend * invBlend;
+        float fogRemainder = kCharaOne - fogBlend;
 
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor whitePart;
@@ -2782,7 +2782,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor fogColor = blendedFogCopy.color;
         GXSetFog(GX_FOG_PERSP_LIN,
                  Graphic.m_fogStart * fogRemainder + nearZ * fogBlend,
-                 (Graphic.m_fogEnd + FLOAT_8033028c) * fogRemainder + (nearZ + FLOAT_8033028c) * fogBlend,
+                 (Graphic.m_fogEnd + kCharaOne) * fogRemainder + (nearZ + kCharaOne) * fogBlend,
                  nearZ,
                  farZ,
                  fogColor);

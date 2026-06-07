@@ -2364,7 +2364,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 				*reinterpret_cast<int*>(CGMonObj::m_boss + 0x88) -= delta;
 			}
 			if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x70 &&
-			    static_cast<int>(hpValue + delta) < 1) {
+			    static_cast<int>(hpValue + delta) <= 0) {
 				delta = -(static_cast<int>(hpValue) - 1);
 			}
 		}

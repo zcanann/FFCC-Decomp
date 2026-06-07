@@ -352,7 +352,7 @@ static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
 
 static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, float y, float w, float h, float scaleX, float scaleY)
 {
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1074,7 +1074,7 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
@@ -1123,7 +1123,7 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
 
@@ -1164,7 +1164,7 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
 
@@ -1214,7 +1214,7 @@ void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     if (a < 0) {
         a = 0;
     } else if (a > 0xFF) {
@@ -1273,7 +1273,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
 
@@ -1357,7 +1357,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
     labelFont->SetScale(FLOAT_80333258);
     labelFont->DrawInit();
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     if (a < 0) {
         a = 0;
     } else if (a > 0xFF) {
@@ -1461,7 +1461,7 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
@@ -1493,7 +1493,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     int baseY = 300;
-    unsigned int nameX = static_cast<unsigned int>(
+    int nameX = static_cast<int>(
         -((static_cast<double>(FLOAT_80333364) * DOUBLE_80333298) - DOUBLE_80333288));
 
     if (x != 0) {
@@ -1507,13 +1507,13 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80333258);
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
     font->SetTlut(6);
 
     float textW = static_cast<float>(font->GetWidth(text));
-    font->SetPosX(static_cast<float>(static_cast<int>(nameX)));
+    font->SetPosX(static_cast<float>(nameX));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);
     font->renderFlags &= 0xEF;
@@ -1532,7 +1532,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x60 : 0x39));
 
-        int cursorX = static_cast<int>(static_cast<float>(static_cast<int>(nameX)) + textW);
+        int cursorX = static_cast<int>(static_cast<float>(nameX) + textW);
         MenuPcs.DrawRect(
             0,
             static_cast<float>(cursorX),
@@ -1579,7 +1579,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col;
     col.r = 0xFF;
     col.g = 0xFF;
@@ -2279,7 +2279,7 @@ void CMenuPcs::CmakeSexDraw()
 
     DrawCmakePreviewChara(this);
 
-    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int panelAlpha = static_cast<int>(FLOAT_80333240 * alpha);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -2297,7 +2297,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
@@ -2559,7 +2559,7 @@ void CMenuPcs::CmakeTribeDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
@@ -2856,7 +2856,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakePreviewChara(this);
 
-    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int panelAlpha = static_cast<int>(FLOAT_80333240 * alpha);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -3632,7 +3632,7 @@ void CMenuPcs::CmakeVillageDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    int a = static_cast<int>(FLOAT_80333240 * alpha);
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));

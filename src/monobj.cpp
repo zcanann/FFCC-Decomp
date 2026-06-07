@@ -1643,7 +1643,7 @@ void CGMonObj::onStatShield()
 	if (*reinterpret_cast<int*>(mon + 0x52C) == 1) {
 		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
 		int action = *reinterpret_cast<int*>(mon + 0x560);
-		int waitFrame = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + action * 0x48 + 0x2E);
+		int waitFrame = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0x2E));
 
 		if (subFrame == waitFrame) {
 			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(3);

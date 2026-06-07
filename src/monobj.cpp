@@ -595,18 +595,16 @@ void CGMonObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
 
 		actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0xE);
-		if (actionType <= 3) {
-			if (actionType == 2) {
-				*reinterpret_cast<unsigned int*>(mon + 0x68C) =
-					CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
-			} else if ((actionType <= 1) || (actionType == 3)) {
-				*reinterpret_cast<unsigned int*>(mon + 0x630) =
-					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x20);
-				*reinterpret_cast<unsigned int*>(mon + 0x634) =
-					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22);
-				*reinterpret_cast<unsigned int*>(mon + 0x638) =
-					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22);
-			}
+		if ((actionType == 3) || ((actionType < 2) && (actionType >= 0))) {
+			*reinterpret_cast<unsigned int*>(mon + 0x630) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x20);
+			*reinterpret_cast<unsigned int*>(mon + 0x634) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22);
+			*reinterpret_cast<unsigned int*>(mon + 0x638) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(mon + 0x560) * 0x48 + 0x22);
+		} else if (actionType == 2) {
+			*reinterpret_cast<unsigned int*>(mon + 0x68C) =
+				CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
 		}
 	}
 
@@ -3569,14 +3567,14 @@ void CGMonObj::sysControl(int controlType)
 		object->m_displayFlags &= 0xFFBFFFFF;
 		break;
 
-	case 0x15:
-		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
-			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
-		break;
-
 	case 0x16:
 		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
 			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 0, 3, 28, 28));
+		break;
+
+	case 0x15:
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+			static_cast<unsigned char>(__rlwimi(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags), 1, 3, 28, 28));
 		break;
 	}
 }

@@ -3533,7 +3533,7 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 	outFallback = 0;
 
 	unsigned short* combiCursor = reinterpret_cast<unsigned short*>(Game.unk_flat3_field_1C_0xc7d8);
-	for (int combiIndex = 0; combiIndex < Game.unk_flat3_count_0xc7d4; combiIndex++, combiCursor += 0xD) {
+	for (int combiIndex = 0; combiIndex < static_cast<int>(Game.unk_flat3_count_0xc7d4); combiIndex++, combiCursor += 0xD) {
 		int reqCount = 0;
 		if (combiCursor[0] != 0) {
 			reqCount = 1;
@@ -3552,7 +3552,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			return found;
 		}
 
-		CGCharaObj* baseParty = reinterpret_cast<CGCharaObj*>(partyList[0]);
 		for (int slot = 0; slot < reqCount; slot++) {
 			CGPartyObj* obj = partyList[slot];
 			CGCharaObj* partyObj = reinterpret_cast<CGCharaObj*>(obj);
@@ -3561,16 +3560,18 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 				int scanSlot = slot;
 				for (int remaining = reqCount - slot; remaining != 0; remaining--, scanSlot++, fallbackCursor += 3) {
 					unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
-					bool itemMatch = false;
-					if (scanSlot == lastSlot) {
-						unsigned short itemCode =
-							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48));
-						if (itemCode == 0x1F8 && fallbackCursor[0] == 0x1F8) {
-							itemMatch = true;
-						}
+					int itemMatch;
+					if (scanSlot == lastSlot &&
+						*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
+						fallbackCursor[0] == 0x1F8) {
+						itemMatch = 1;
+					} else if (objParticle == fallbackCursor[0]) {
+						itemMatch = 1;
+					} else {
+						itemMatch = 0;
 					}
-					if (itemMatch || objParticle == fallbackCursor[0]) {
-						if (partyList[0] == obj || baseParty->m_comboFrame <= static_cast<int>(combiCursor[slot * 3 + 2])) {
+					if (itemMatch) {
+						if (partyList[0] == obj || reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame <= static_cast<int>(combiCursor[slot * 3 + 2])) {
 							break;
 						}
 					}
@@ -3583,20 +3584,21 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 			}
 
 			unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
-			unsigned short reqParticle = combiCursor[slot * 3 + 0];
-			bool itemMatch = objParticle == reqParticle;
-			if (slot == lastSlot) {
-				unsigned short itemCode =
-					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48));
-				if (itemCode == 0x1F8 && reqParticle == 0x1F8) {
-					itemMatch = true;
-				}
+			int itemMatch;
+			if (slot == lastSlot &&
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48)) == 0x1F8 &&
+				combiCursor[slot * 3 + 0] == 0x1F8) {
+				itemMatch = 1;
+			} else if (objParticle == combiCursor[slot * 3 + 0]) {
+				itemMatch = 1;
+			} else {
+				itemMatch = 0;
 			}
 			if (!itemMatch) {
 				break;
 			}
 
-			int diff = baseParty->m_comboFrame - partyObj->m_comboFrame;
+			int diff = reinterpret_cast<CGCharaObj*>(partyList[0])->m_comboFrame - partyObj->m_comboFrame;
 			int minWindow = static_cast<int>(combiCursor[slot * 3 + 1]);
 			int maxWindow = static_cast<int>(combiCursor[slot * 3 + 2]);
 			if (!(partyList[0] == obj || (minWindow <= diff && diff <= maxWindow))) {

@@ -1683,9 +1683,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		bool nextReuseAnimNode0Srt = false;
 		SRTView cachedParentScaleSrt = parentScaleSrt;
 
-		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
-			PSMTXCopy(ref->m_localMtx, localMtx);
-		} else {
+		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
 			Mtx animMtx;
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
@@ -1759,6 +1757,8 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
+		} else {
+			PSMTXCopy(ref->m_localMtx, localMtx);
 		}
 		reuseAnimNode0Srt = nextReuseAnimNode0Srt;
 

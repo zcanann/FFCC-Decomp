@@ -17,6 +17,8 @@
 #include <string.h>
 
 extern "C" float FLOAT_803301b0;
+extern "C" float FLOAT_803301B4;
+extern "C" float FLOAT_803301B8;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
 extern "C" float FLOAT_803301cc;
@@ -2081,22 +2083,20 @@ int CChara::CModel::SearchNodeSk(char* name)
 		if (name[1] == 's' && name[2] == 'k') {
 			u32 i = 0;
 			CNode* node = ModelNodes(this);
-			for (; i < ModelNodeCount(this); i++) {
+			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 3;
 				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
 					return (int)i;
 				}
-				node++;
 			}
 		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
 			u32 i = 0;
 			CNode* node = ModelNodes(this);
-			for (; i < ModelNodeCount(this); i++) {
+			for (; i < ModelNodeCount(this); i++, node++) {
 				int tail = strlen(NodeRefName(node)) - 5;
 				if (tail > 0 && strcmp(NodeRefName(node) + tail, name) == 0) {
 					return (int)i;
 				}
-				node++;
 			}
 		}
 	} else {
@@ -2520,10 +2520,10 @@ void CChara::CModel::CalcFurColor()
 {
 	float delta = m_furTarget - m_furCur;
 	float step;
-	if (delta < -0.01f) {
-		step = -0.01f;
-	} else if (0.01f < delta) {
-		step = 0.01f;
+	if (delta < FLOAT_803301B4) {
+		step = FLOAT_803301B4;
+	} else if (FLOAT_803301B8 < delta) {
+		step = FLOAT_803301B8;
 	} else {
 		step = delta;
 	}

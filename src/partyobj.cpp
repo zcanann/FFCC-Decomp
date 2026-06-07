@@ -4404,43 +4404,66 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
  */
 void CGPartyObj::gpmCol()
 {
+	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
+	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
+	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 
-	for (int i = 0; i < 5; i++) {
-		Vec* basePos = (i == 0) ? &m_worldPosition : reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + 0x24 + i * sizeof(Vec));
+	int newIndex = 0;
+	unsigned int i = 0;
+	do {
+		Vec* pos = (i == 0) ? &m_worldPosition
+		                    : reinterpret_cast<Vec*>(ghostWork + 0x50 + i * 0xC);
 
-		Vec moveVec;
-		PSVECSubtract(&leader->m_worldPosition, basePos, &moveVec);
+		CVector posV(*pos);
+		CVector leaderV(leader->m_worldPosition);
+		CVector diff;
+		PSVECSubtract(leaderV, posV, diff);
 
-		CMapCylinder col;
-		col.m_bottom = *basePos;
-		col.m_bottom.y += FLOAT_80331aa0;
-		col.m_top = moveVec;
-		col.m_axis.x = m_bodyEllipsoidRadius;
-		col.m_axis.y = m_bodyEllipsoidRadius;
-		col.m_axis.z = FLOAT_80331a9c;
-		col.m_radius = FLOAT_80331a9c;
-		col.m_bound.m_min.x = FLOAT_80331a9c;
-		col.m_bound.m_min.y = FLOAT_80331aa0;
-		col.m_bound.m_min.z = FLOAT_80331aa0;
-		col.m_bound.m_max.x = FLOAT_80331aa0;
+		unsigned int flags = m_attrFlags & ~0x10U;
+		float halfHeight = m_capsuleHalfHeight;
+		CVector bottom(pos->x, FLOAT_80331A98 + pos->y, pos->z);
 
-		if (MapMng.CheckHitCylinderNear(&col, &moveVec, m_attrFlags & ~0x10U) == 0) {
-			sGhostPartyWork.activeTrailCount = i + 1;
-			*reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + 0x30 + i * sizeof(Vec)) = leader->m_worldPosition;
+		float cyl[14];
+		cyl[0] = bottom.x;
+		cyl[1] = bottom.y;
+		cyl[2] = bottom.z;
+		cyl[3] = diff.x;
+		cyl[4] = diff.y;
+		cyl[5] = diff.z;
+		cyl[6] = halfHeight;
+		cyl[7] = FLOAT_80331a9c;
+		cyl[8] = FLOAT_80331a9c;
+		cyl[9] = FLOAT_80331a9c;
+		cyl[10] = FLOAT_80331aa0;
+		cyl[11] = FLOAT_80331aa0;
+		cyl[12] = FLOAT_80331aa0;
+		cyl[13] = FLOAT_80331aa0;
+
+		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(cyl),
+		        reinterpret_cast<Vec*>(&cyl[3]), flags) == 0) {
+			activeTrailCount = i + 1;
+			*reinterpret_cast<Vec*>(ghostWork + 0x50 + i * 0xC) = leader->m_worldPosition;
+			newIndex = (static_cast<int>(i) > trailIndex) ? trailIndex : static_cast<int>(i);
 			break;
 		}
 
-		int nextCount = i + 1;
-		if (sGhostPartyWork.activeTrailCount > nextCount) {
-			sGhostPartyWork.activeTrailCount = nextCount;
+		int capped = i + 1;
+		if (activeTrailCount < capped) {
+			capped = activeTrailCount;
 		}
-	}
+		i++;
+		activeTrailCount = capped;
+		newIndex = trailIndex;
+	} while (i < 5);
 
-	if (sGhostPartyWork.activeTrailCount <= 0) {
-		sGhostPartyWork.trailIndex = 0;
-	} else if (sGhostPartyWork.trailIndex >= sGhostPartyWork.activeTrailCount) {
-		sGhostPartyWork.trailIndex = sGhostPartyWork.activeTrailCount - 1;
+	trailIndex = newIndex;
+	int clamp = activeTrailCount - 1;
+	if (clamp < 0) {
+		clamp = 0;
+	}
+	if (clamp <= trailIndex) {
+		trailIndex = clamp;
 	}
 }
 

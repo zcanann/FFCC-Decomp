@@ -953,13 +953,13 @@ void CGMonObj::onFrameStat()
 		mon[0x63C] = (mon[0x63C] & 0x7F) | 0x80;
 		if ((prgObj->m_stateFrame == 0) && (object->CancelAnim(1), m_unk6B8 == 0)) {
 			unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
-			int soundId = static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
+			short soundId = static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
 				static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x190)) * 1000 + Math.Rand(3);
 			prgObj->playSe3D(soundId, 0x32, 0x96, 0, (Vec*)0);
 			m_unk6B8 = 1;
 		}
 
-		int targetPartyIndex = m_targetPartyIndex;
+		short targetPartyIndex = m_targetPartyIndex;
 		if ((targetPartyIndex < 0) || (targetPartyIndex >= 4)) {
 			prgObj->changeStat(0, 0, 0);
 			break;

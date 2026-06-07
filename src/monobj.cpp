@@ -3413,7 +3413,7 @@ void CGMonObj::statAround()
 	if (targetPartyIndex >= 0) {
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
-		if (homeRange > homeDist) {
+		if (!(homeRange <= homeDist)) {
 			if (monObj->m_unk6BD != 0) {
 				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
 				int hitPartyIndex;

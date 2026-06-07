@@ -930,7 +930,7 @@ void CMenuPcs::CmdDraw()
 	bool hasItemHelp = false;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (i = 0; i < cmdList->count; i++) {
 		const s32 tex = entry->tex;
@@ -1203,6 +1203,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	bool blocked = false;
 	unsigned int press;
 	u16 hold;
+	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -1308,7 +1309,6 @@ unsigned int CMenuPcs::CmdCtrlCur()
 			}
 		}
 	} else if (mode == 1) {
-		s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int itemCount = static_cast<int>(list[0]);
 
 		if ((hold & 8) == 0) {
@@ -1957,7 +1957,7 @@ void CMenuPcs::DrawUniteList()
 	const s16 foodCount = caravan->m_numCmdListSlots;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	s_unitePanelCount = 0;
 	bool active = false;

@@ -157,8 +157,8 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         int flagMask = -(flags >> 1 & 1);
         int displayOffset = 0x1C;
         displayOffset &= flagMask;
-        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)displayOffset;
-        *(unsigned int*)((char*)this + 0x3D54) = uVar2;
+        m_mes.SetTlutBase(displayOffset);
+        m_mes.SetShadow(uVar2);
     } else {
         MenuPcs.m_battleRingMenus[m_menuIndex]->SetFade(0);
         fVar1 = FLOAT_803308e0;
@@ -173,8 +173,8 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     m_mes.Set(script, flags & 0x20);
 
     fVar1 = FLOAT_803308e8;
-    m_windowWidth = FLOAT_803308e8 * m_marginX + *(float*)((char*)this + 0x3CC0);
-    m_windowHeight = fVar1 * m_marginY + *(float*)((char*)this + 0x3CC4);
+    m_windowWidth = FLOAT_803308e8 * m_marginX + m_mes.GetMaxWidth();
+    m_windowHeight = fVar1 * m_marginY + m_mes.GetMaxHeight();
 
     if (m_menuIndex >= 4) {
         if ((flags & 8) != 0) {

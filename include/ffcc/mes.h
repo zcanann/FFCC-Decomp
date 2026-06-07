@@ -31,6 +31,10 @@ public:
     void GET_1(char**);
     int GetWait();
     void SetPlayerIndex(int index) { m_playerIndex = index; }
+    float GetMaxWidth() const { return mMaxWidth; }
+    float GetMaxHeight() const { return mMaxHeight; }
+    void SetTlutBase(int tlutBase) { mTlutBase = tlutBase; }
+    void SetShadow(int shadow) { mShadow = shadow; }
     void Calc();
     void Draw();
     void SetPosition(float, float);

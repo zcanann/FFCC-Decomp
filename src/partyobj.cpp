@@ -3670,7 +3670,7 @@ int CGPartyObj::useItem(int itemId)
 			result = 0;
 		} else {
 			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x170), itemId, itemKind);
-			ClassControl(5, itemId);
+			bonus(5, itemId, 0);
 
 			if (itemKind == 0x186) {
 				int heal = 2;

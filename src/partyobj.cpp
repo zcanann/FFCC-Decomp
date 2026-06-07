@@ -2953,38 +2953,38 @@ void CGPartyObj::onStatMagic()
 		ghostTargetActive = true;
 	}
 
-	if (ghostTargetActive) {
-		if (m_subState == 1 && m_comboState != 0 &&
-		    sGhostMogMenuWork.flags.carryActive < 0) {
-			if (m_comboFrame == 1) {
-				putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
-				    m_particleSlots[8], this, FLOAT_80331a54, 0);
-				playSe3D(0x3E, 0x32, 0x96, 0, 0);
+	if (!ghostTargetActive) {
+		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		if ((held & 0x100) == 0) {
+			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
+				if ((magicReady >> 5) == 0) {
+					changeStat(0, 0, 0);
+				}
+			} else {
+				if (m_comboFrame == 1) {
+					putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+					    m_particleSlots[8], this, FLOAT_80331a54, 0);
+					playSe3D(0x3E, 0x32, 0x96, 0, 0);
+				}
+				m_comboFrame++;
 			}
-			m_comboFrame++;
+		} else {
+			unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+			if ((trig & 0x200) != 0 && (magicReady >> 5) == 0) {
+				changeStat(0, 0, 0);
+			}
 		}
 		return;
 	}
 
-	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
-	if ((held & 0x100) == 0) {
-		if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
-			if ((magicReady >> 5) == 0) {
-				changeStat(0, 0, 0);
-			}
-		} else {
-			if (m_comboFrame == 1) {
-				putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
-				    m_particleSlots[8], this, FLOAT_80331a54, 0);
-				playSe3D(0x3E, 0x32, 0x96, 0, 0);
-			}
-			m_comboFrame++;
+	if (m_subState == 1 && m_comboState != 0 &&
+	    sGhostMogMenuWork.flags.carryActive < 0) {
+		if (m_comboFrame == 1) {
+			putParticleTrace(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) + 0x4FU | 0x100,
+			    m_particleSlots[8], this, FLOAT_80331a54, 0);
+			playSe3D(0x3E, 0x32, 0x96, 0, 0);
 		}
-	} else {
-		unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
-		if ((trig & 0x200) != 0 && (magicReady >> 5) == 0) {
-			changeStat(0, 0, 0);
-		}
+		m_comboFrame++;
 	}
 }
 

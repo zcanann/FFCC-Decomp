@@ -2833,8 +2833,7 @@ unsigned int CMenuPcs::CmdClose2()
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	switch (GetCmdStateView(this)->uniteState) {
-	case 0:
+	if (GetCmdStateView(this)->uniteState == 0) {
 		GetCmdStateView(this)->transitionTimer = 0;
 		if (GetCmdStateView(this)->commandResult < 0) {
 			GetCmdStateView(this)->uniteState = 3;
@@ -2844,7 +2843,7 @@ unsigned int CMenuPcs::CmdClose2()
 			GetCmdStateView(this)->uniteState = 1;
 		}
 		return 0;
-	case 1: {
+	} else if (GetCmdStateView(this)->uniteState == 1) {
 		s32 uniteIdx = 0;
 		for (; uniteIdx < s_unitePanelCount; uniteIdx++) {
 			if (s_UniteTop[uniteIdx] == selected) {
@@ -2878,8 +2877,7 @@ unsigned int CMenuPcs::CmdClose2()
 			GetCmdStateView(this)->uniteState = 2;
 		}
 		return 0;
-	}
-	case 2:
+	} else if (GetCmdStateView(this)->uniteState == 2) {
 		if (caravanWork->m_commandListExtra[selected] == 0) {
 			int combo[2][2];
 			ChkUnite(selected, combo);
@@ -2898,7 +2896,7 @@ unsigned int CMenuPcs::CmdClose2()
 			GetCmdStateView(this)->uniteState = 3;
 		}
 		return 0;
-	case 3:
+	} else if (GetCmdStateView(this)->uniteState == 3) {
 		for (s32 i = 0; i < static_cast<s32>(list->count); i++) {
 			CmdListEntry* entry = &list->entries[i];
 			if (static_cast<f64>(entry->alpha) < DOUBLE_80332a58) {
@@ -2909,9 +2907,8 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 		}
 		return static_cast<u32>(static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= DOUBLE_80332a78);
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 /*

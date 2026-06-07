@@ -2079,7 +2079,13 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         return 0;
     }
 
-    if (mcState == 3) {
+    if (mcState != 3) {
+        if (mcState == 1 && (down & 0x300) != 0) {
+            Sound.PlaySe(2, 0x40, 0x7F, 0);
+            mcState = 2;
+        }
+        return 0;
+    } else {
         short& currentValue = CmakeStateSelectField(cmakeState, selectField);
 
         if ((repeat & 0x8) != 0) {
@@ -2159,13 +2165,6 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
 
         return 0;
     }
-
-    if (mcState == 1 && (down & 0x300) != 0) {
-        Sound.PlaySe(2, 0x40, 0x7F, 0);
-        mcState = 2;
-    }
-
-    return 0;
 }
 
 /*

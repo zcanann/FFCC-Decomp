@@ -2205,12 +2205,14 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 	result = 1;
 
 	if (systemKind == 1) {
-		if (systemIndex == -1) {
+		switch (systemIndex) {
+		case -1:
 			if (static_cast<int>(*object->m_localBase) <= object->m_waitCounter) {
 				*object->m_sp++ = 0;
 				result = 0;
 			}
-		} else if (systemIndex == -2) {
+			break;
+		case -2:
 			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1298) != 0) {
 				char* format = m_strBlob + m_strOffsets[*object->m_localBase];
 
@@ -2302,7 +2304,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 			*object->m_sp++ = 0;
 			result = 0;
-		} else {
+			break;
+		default: {
 			CStopWatch watch("no name");
 			watch.Reset();
 			watch.Start();
@@ -2310,6 +2313,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			watch.Stop();
 			*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x4C) += watch.Get();
 			*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x44C) += 1;
+			break;
+		}
 		}
 	} else if (systemIndex == -2) {
 		CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);

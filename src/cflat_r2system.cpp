@@ -2833,15 +2833,15 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         int a7 = localBase[7];
         if (MenuPcs.GetMesMenu(a0) != 0) {
             char* message;
-            if ((a3 & 0x80) == 0) {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
-            } else {
+            if ((a3 & 0x80) != 0) {
                 message = GetNumSysMes__5CGameFv(&Game, a7);
+            } else {
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
             }
-            if ((a3 & 0x80) == 0) {
-                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
-            } else {
+            if ((a3 & 0x80) != 0) {
                 message = GetNumSysMes__5CGameFv(&Game, a7);
+            } else {
+                message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
             }
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
         } else {

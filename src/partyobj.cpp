@@ -1899,63 +1899,183 @@ int CGPartyObj::getReplaceStat(int state)
  */
 void CGPartyObj::statCharge()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (m_subState == 0) {
-		if (m_subFrame == 0) {
-			reqAnim(0x10, 0, 0);
-			putTargetParticle(0, 1);
-			*reinterpret_cast<int*>(self + 0x664) = 0;
-		}
-
-		moveCenterTargetParticle();
-		checkTargetParticle();
-
-		if (isLoopAnim() != 0) {
-			changeSubStat(1);
-		}
-		return;
-	}
-
 	if (m_subState == 1) {
 		if (m_subFrame == 0) {
-			reqAnim(0x11, 0, 0);
-			*reinterpret_cast<int*>(self + 0x664) = 0;
+			reqAnim(m_unk554, 1, 0);
+		}
+		if (m_comboState == 0 && m_comboFramePrev < m_subFrame) {
+			putTargetParticle(0, 1);
+			m_comboState = 1;
+		}
+		if (m_comboState != 0) {
+			checkTargetParticle();
+		}
+		if (m_itemId == 0x206) {
+			int frame = m_comboFramePrev;
+			int counter = m_comboState;
+			if (counter == frame * 3) {
+				putParticle(0x578, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
+			} else if (counter == frame << 1) {
+				putParticle(0x577, 0, reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x80D);
+			}
+		}
+		m_comboState++;
+	} else if (m_subState < 1) {
+		if (m_subState >= 0) {
+			if (m_subFrame == 0) {
+				m_comboFramePrev = 0;
+				reqAnim(m_attackAnimId, 0, 0);
+				putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x7EE);
+			}
+			if (isLoopAnim() != 0) {
+				changeSubStat(1);
+				return;
+			}
+		}
+	} else if (m_subState < 3) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+
+		if (m_subFrame == 0) {
+			endPSlotBit(8);
+			enableAttackCol(0x18, 0, 0);
+		}
+		if (m_subFrame == 5 && m_comboItemState >= 0) {
+			endPSlotBit(0x20);
+			gCFlatRuntime2.ResetParticleWork(
+			    (m_comboItemState + *reinterpret_cast<unsigned short*>(script + 0x3E0) * 5 + 0x1C) | 0x400,
+			    m_particleSlots[5]);
+			gCFlatRuntime2.SetParticleWorkBind(reinterpret_cast<CFlatRuntime::CObject*>(this));
+			gCFlatRuntime2.PutParticleWork();
+			playSe3D(m_comboItemState + 0x7EB, 0x32, 0x96, 0, 0);
 		}
 
-		moveCenterTargetParticle();
-		checkTargetParticle();
+		int phase = (m_comboItemState == -1) ? m_subFrame : (m_subFrame - 0x10);
+		unsigned short itemType =
+		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 10) & 0xFF;
 
-		*reinterpret_cast<int*>(self + 0x664) = *reinterpret_cast<int*>(self + 0x664) + 1;
-		if (m_subFrame == 0x0C) {
-			putParticle(0x577, 0, this, 0.0f, 0x80D);
-		} else if (m_subFrame == 0x12) {
-			putParticle(0x578, 0, this, 0.0f, 0x80D);
+		if (phase == 0) {
+			if (m_comboLinkCount != 0) {
+				sendCombiToScript(reinterpret_cast<CGCharaObj*>(m_comboScriptArg), m_comboScriptMode, m_subFrame);
+			}
+			resetIgnoreHit();
+			putParticleFromItem(m_itemId, 0, m_particleSlots[0], static_cast<Vec*>(0));
+			putParticleFromItem(m_itemId, 1, m_particleSlots[0], static_cast<Vec*>(0));
+			putParticleFromItem(m_itemId, 2, m_particleSlots[0], static_cast<Vec*>(0));
+			reqAnim(m_unk558, 0, 0);
+			endPSlotBit(0x10);
+			int item = m_itemId;
+			if (item == 0x1FC || item == 0x23D) {
+				int base = 0;
+				if (item == 0x23D) {
+					base = 0x6F;
+				} else if (item < 0x23D && item == 0x1FC) {
+					base = 0x1B;
+				}
+				if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1) {
+					addHp(-1, static_cast<CGPrgObj*>(0));
+				}
+				putParticle((base + *reinterpret_cast<unsigned short*>(script + 0x3E2)) | 0x500, 0,
+				    reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0);
+			}
 		}
 
-		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
-		if ((held & 0x100) == 0 || m_subFrame > 0x20) {
-			changeSubStat(2);
+		if (phase == *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x20)) {
+			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
-		return;
+
+		int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
+		int row = (static_cast<int>(*reinterpret_cast<unsigned short*>(
+		               Game.unkCFlatData0[2] + m_itemId * 0x48 + 10)) >> 8) * 0x42;
+		unsigned short* table =
+		    reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + row + 0x36);
+
+		unsigned short* p = table;
+		for (int i = 0; i < 5; i++, p += 6) {
+			if (phase == p[3] && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+				int dist = (p[4] - p[3]) + 1;
+				if (i == 0 && (itemType == 2 || itemType == 3)) {
+					Vec delta;
+					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
+					float mag = PSVECMag(&delta);
+					CVector dest(m_comboCenter);
+					if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x32) & 0x10) != 0) {
+						float limit = static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
+						if (mag <= limit) {
+							mag = FLOAT_80331a78;
+						} else {
+							CVector dir(delta);
+							CVector scaled;
+							PSVECScale(dir, scaled, mag - limit);
+							CVector unit;
+							PSVECScale(scaled, unit, FLOAT_80331a54 / mag);
+							CVector origin(m_worldPosition);
+							CVector sum;
+							PSVECAdd(origin, unit, sum);
+							dest = sum;
+							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
+						}
+					}
+					if (FLOAT_80331a78 != mag) {
+						Move(dest, mag / static_cast<float>(-dist), dist, 1, 1, 0, 1);
+					}
+				} else {
+					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),
+					    dist);
+				}
+			}
+			if (phase == p[1]) {
+				ClassControl(1, 1);
+			}
+			if (phase == p[2]) {
+				ClassControl(0, 0);
+			}
+		}
+
+		if (phase >= 0 && isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+			return;
+		}
+
+		unsigned int limitFrames = table[0x1E];
+		if (limitFrames != 0) {
+			float angLimit = FLOAT_80331AE0 * static_cast<float>(limitFrames);
+			if (phase == table[0x1F]) {
+				CVector worldPos(m_worldPosition);
+				CVector center(m_comboCenter);
+				CVector diff;
+				PSVECSubtract(center, worldPos, diff);
+				float horizSq = diff.z * diff.z + diff.x * diff.x;
+				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
+				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {
+					float ang = -static_cast<float>(atan2(diff.y, horiz));
+					float clamped = -angLimit;
+					if (-angLimit <= ang) {
+						clamped = ang;
+						if (angLimit < ang) {
+							clamped = angLimit;
+						}
+					}
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x4FC) = clamped;
+				}
+			} else if (phase == table[0x20]) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x4FC) = FLOAT_80331a78;
+			}
+		}
 	}
 
-	if (m_subState == 2) {
-		if (m_subFrame == 0) {
-			endPSlotBit(0x10);
-			endPSlotBit(0x100);
-			reqAnim(0x12, 0, 0);
-		}
-
-		moveCenterTargetParticle();
-		checkTargetParticle();
-		if (isLoopAnim() != 0) {
+	if (m_subState < 2) {
+		int slot = static_cast<signed char>(m_animStateMisc);
+		if ((getPadHeldForSlot(slot) & 0x100) == 0) {
+			if (m_subState == 0 || (m_subState == 1 && m_comboState == 0)) {
+				changeStat(0, 0, 0);
+			} else {
+				m_comboFrame++;
+			}
+		} else if ((getPadHeldForSlot(slot) & 0x200) != 0) {
 			changeStat(0, 0, 0);
 		}
-		return;
 	}
-
-	moveCenterTargetParticle();
-	checkTargetParticle();
 }
 
 /*

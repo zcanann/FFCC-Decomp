@@ -39,8 +39,6 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 	return pppMngSt->m_owner->m_charaModelHandle->m_model;
 }
 
-static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
-static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
 extern "C" const unsigned int gPppFixedWhite = 0xffffffff;
 extern "C" const float kPppPartZero = 0.0f;

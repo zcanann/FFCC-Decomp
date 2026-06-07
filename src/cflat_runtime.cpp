@@ -1543,7 +1543,6 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	watch.Reset();
 	watch.Start();
 
-	u8* const self = reinterpret_cast<u8*>(this);
 	int watchdog = 100000;
 	u8* code;
 
@@ -1557,8 +1556,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 
 	while (true) {
 frameLoop:
-		*reinterpret_cast<u32*>(self + 0x968) = *reinterpret_cast<u32*>(self + 0x964);
-		*reinterpret_cast<u32*>(self + 0x964) = object->m_codePos;
+		m_previousCodePos = m_currentCodePos;
+		m_currentCodePos = object->m_codePos;
 
 		switch (code[0]) {
 		case 0: {
@@ -2133,7 +2132,7 @@ callSystemFunction:
 				object->m_waitCounter++;
 			}
 			watch.Stop();
-			*reinterpret_cast<float*>(self + 0x48) += watch.Get();
+			m_performanceTotalTime += watch.Get();
 			return 0;
 		}
 

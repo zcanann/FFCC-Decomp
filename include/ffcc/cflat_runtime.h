@@ -198,7 +198,9 @@ public:
     u8 m_pad_084C[0x80];            // 0x084C
     CObject m_objectSentinel;       // 0x08CC
     CObject m_freeObjectSentinel;   // 0x0918
-    u8 m_pad_0964[0xC];             // 0x0964
+    u32 m_currentCodePos;           // 0x0964
+    u32 m_previousCodePos;          // 0x0968
+    u8 m_pad_096C[4];               // 0x096C
     int m_0x970;                    // 0x0970
     u8 m_pad_0974[4];               // 0x0974
     void** m_freeListPrev;          // 0x0978

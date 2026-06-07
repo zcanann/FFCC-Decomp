@@ -2352,55 +2352,74 @@ void CPartMng::pppEditPartCalc()
         return;
     }
 
-    int editDrawMode = *reinterpret_cast<int*>(self + 0x174);
-    int loopCount = *reinterpret_cast<int*>(self + 0x2355C);
-    if (loopCount > kPppMngCount) {
-        loopCount = kPppMngCount;
-    }
+    int* recvBuff = *reinterpret_cast<int**>(self + 0x1C8);
 
-    _pppMngSt* mng = m_pppMng;
-    for (int i = 0; i < loopCount; i++) {
-        int baseTime = mng->m_baseTime;
-        ppvMng = mng;
-        if (baseTime == -0x1000) {
-            mng++;
-            continue;
-        }
-
-        if (editDrawMode >= 4 && baseTime == -0x1000) {
-            mng->m_baseTime = 0;
-            baseTime = 0;
-        }
-
-        if (baseTime >= 0) {
-            baseTime -= 1;
-            mng->m_baseTime = baseTime;
-            if (baseTime < 0) {
+    if (*reinterpret_cast<int*>(self + 0x174) <= 3) {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            _pppMngSt* mng = &m_pppMng[i];
+            int baseTime = mng->m_baseTime;
+            ppvMng = mng;
+            if (baseTime == -0x1000) {
+                continue;
+            }
+            if (baseTime >= 0) {
+                baseTime -= 1;
+                mng->m_baseTime = baseTime;
+                if (baseTime >= 0) {
+                    continue;
+                }
                 mng->m_particleEnded = 0;
                 *reinterpret_cast<int*>(&mng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
-                _pppStartPart(mng, reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
+                _pppStartPart(mng, reinterpret_cast<long*>(self + 0x5dc) + recvBuff[i * 0x18 + 0xC], 1);
+            }
+
+            pppSetMatrix(mng);
+            pppSetFpMatrix(mng);
+            _pppCalcPart(mng);
+            _pppDeadPart(mng);
+
+            if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x827);
+                _pppAllFreePObject(mng);
+                Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x82b);
+                if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                    pppHeapCheckLeak(ppvEnv->m_stagePtr);
+                }
+                if (i == 0) {
+                    usbEdit[0x1A] = 1;
+                }
+                gPppHeapUseRateWords[1] = 0;
             }
         }
-
-        ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
-        pppSetMatrix(mng);
-        pppSetFpMatrix(mng);
-        _pppCalcPart(mng);
-        _pppDeadPart(mng);
-
-        if (mng->m_isFinished != 0 || mng->m_mode != 0) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x827 : 0x861);
-            _pppAllFreePObject(mng);
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x82b : 0x865);
-            if (editDrawMode > 3) {
-                pppHeapCheckLeak(ppvEnv->m_stagePtr);
+    } else {
+        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+            _pppMngSt* mng = &m_pppMng[i];
+            ppvMng = mng;
+            if (mng->m_baseTime == -0x1000) {
+                mng->m_baseTime = 0;
             }
-            if (i == 0) {
-                usbEdit[0x1A] = 1;
+            if (mng->m_baseTime < 0) {
+                pppSetMatrix(mng);
+                pppSetFpMatrix(mng);
+                _pppCalcPart(mng);
+                if (mng->m_mode != 0 && mng->m_currentFrame == mng->m_lifeEnd) {
+                    gPppHeapUseRateWords[1] = 0;
+                }
+                _pppDeadPart(mng);
+                if (mng->m_isFinished != 0 || mng->m_hitBgFlag != 0) {
+                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x861);
+                    _pppAllFreePObject(mng);
+                    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x865);
+                    if (*reinterpret_cast<int*>(self + 0x174) > 3) {
+                        pppHeapCheckLeak(ppvEnv->m_stagePtr);
+                    }
+                    if (i == 0) {
+                        usbEdit[0x1A] = 1;
+                    }
+                    gPppHeapUseRateWords[1] = 0;
+                }
             }
         }
-
-        mng++;
     }
 }
 

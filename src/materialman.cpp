@@ -2682,8 +2682,8 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_tevBit = 0xFFF531F0;
             newMaterial->m_bumpLight = 0;
             newMaterial->m_textureCount = 1;
-            newMaterial->m_scaleU = 1.0f;
-            newMaterial->m_scaleV = 1.0f;
+            newMaterial->m_scaleU = kTextureOne;
+            newMaterial->m_scaleV = kTextureOne;
             newMaterial->m_singleTextureFlag = 0;
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;

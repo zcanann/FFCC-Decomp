@@ -8941,7 +8941,19 @@ void CMenuPcs::CalcMainMenuSub()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmWorldState* const world = m_wmWorldState;
-	const unsigned short btn = static_cast<unsigned short>(GetButtonDown(0));
+
+	bool noInput = false;
+	if (Pad.m_debugPadLock != 0 || Pad.m_debugPadPort != -1) {
+		noInput = true;
+	}
+	unsigned short btn;
+	if (noInput) {
+		btn = 0;
+	} else {
+		__cntlzw(static_cast<unsigned int>(Pad.m_debugPadPort));
+		btn = Pad.GetPadInputs()[0].buttonDown[0];
+	}
+
 	const short state = world->m_mainState;
 
 	if (((state > 0) && (state < 4)) || world->m_cardChannel == 1) {

@@ -55,30 +55,54 @@ CRelProfile::~CRelProfile()
 {
 }
 
-CProcessTableCallback CMapPcs::m_table_desc0 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc1 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc2 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc3 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc4 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc5 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc6 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc7 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc8 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc9 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc10 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc11 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc12 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc13 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc14 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc15 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc16 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc17 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc18 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc19 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc20 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc21 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc22 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-CProcessTableCallback CMapPcs::m_table_desc23 = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescCreate = {0, 0xFFFFFFFF,
+                                                      reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescDestroy = {0, 0xFFFFFFFF,
+                                                       reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescCalcInit = {0, 0xFFFFFFFF,
+                                                        reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescCalc = {0, 0xFFFFFFFF,
+                                                    reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescDrawShadow = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescDrawBefore = {0, 0xFFFFFFFF,
+                                                          reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescDraw = {0, 0xFFFFFFFF,
+                                                    reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
+static CProcessTableCallback s_mapTableDescDrawAfter = {0, 0xFFFFFFFF,
+                                                         reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescCreate = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescDestroy = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescCalcInit = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescCalc = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescDrawShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescDrawBefore = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescDraw = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapViewerTableDescDrawAfter = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescCreate = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescDestroy = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescCalcInit = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescCalc = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescDrawShadow = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescDrawBefore = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescDraw = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+static CProcessTableCallback s_mapPartTableDescDrawAfter = {
+    0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
 static const char sMapPcsGameTableName[] = "CMapPcs(GAME)";
 static const char sMapPcsViewerTableName[] = "CMapPcs(VIEWER)";
@@ -127,32 +151,32 @@ inline CMapPcs::CMapPcs()
 {
     CProcessTable* table = reinterpret_cast<CProcessTable*>(m_table);
 
-    table[0].m_fields.m_create = m_table_desc0;
-    table[0].m_fields.m_destroy = m_table_desc1;
-    table[0].m_fields.m_entries[0].m_callback = m_table_desc2;
-    table[0].m_fields.m_entries[1].m_callback = m_table_desc3;
-    table[0].m_fields.m_entries[2].m_callback = m_table_desc4;
-    table[0].m_fields.m_entries[3].m_callback = m_table_desc5;
-    table[0].m_fields.m_entries[4].m_callback = m_table_desc6;
-    table[0].m_fields.m_entries[5].m_callback = m_table_desc7;
+    table[0].m_fields.m_create = s_mapTableDescCreate;
+    table[0].m_fields.m_destroy = s_mapTableDescDestroy;
+    table[0].m_fields.m_entries[0].m_callback = s_mapTableDescCalcInit;
+    table[0].m_fields.m_entries[1].m_callback = s_mapTableDescCalc;
+    table[0].m_fields.m_entries[2].m_callback = s_mapTableDescDrawShadow;
+    table[0].m_fields.m_entries[3].m_callback = s_mapTableDescDrawBefore;
+    table[0].m_fields.m_entries[4].m_callback = s_mapTableDescDraw;
+    table[0].m_fields.m_entries[5].m_callback = s_mapTableDescDrawAfter;
 
-    table[1].m_fields.m_create = m_table_desc8;
-    table[1].m_fields.m_destroy = m_table_desc9;
-    table[1].m_fields.m_entries[0].m_callback = m_table_desc10;
-    table[1].m_fields.m_entries[1].m_callback = m_table_desc11;
-    table[1].m_fields.m_entries[2].m_callback = m_table_desc12;
-    table[1].m_fields.m_entries[3].m_callback = m_table_desc13;
-    table[1].m_fields.m_entries[4].m_callback = m_table_desc14;
-    table[1].m_fields.m_entries[5].m_callback = m_table_desc15;
+    table[1].m_fields.m_create = s_mapViewerTableDescCreate;
+    table[1].m_fields.m_destroy = s_mapViewerTableDescDestroy;
+    table[1].m_fields.m_entries[0].m_callback = s_mapViewerTableDescCalcInit;
+    table[1].m_fields.m_entries[1].m_callback = s_mapViewerTableDescCalc;
+    table[1].m_fields.m_entries[2].m_callback = s_mapViewerTableDescDrawShadow;
+    table[1].m_fields.m_entries[3].m_callback = s_mapViewerTableDescDrawBefore;
+    table[1].m_fields.m_entries[4].m_callback = s_mapViewerTableDescDraw;
+    table[1].m_fields.m_entries[5].m_callback = s_mapViewerTableDescDrawAfter;
 
-    table[2].m_fields.m_create = m_table_desc16;
-    table[2].m_fields.m_destroy = m_table_desc17;
-    table[2].m_fields.m_entries[0].m_callback = m_table_desc18;
-    table[2].m_fields.m_entries[1].m_callback = m_table_desc19;
-    table[2].m_fields.m_entries[2].m_callback = m_table_desc20;
-    table[2].m_fields.m_entries[3].m_callback = m_table_desc21;
-    table[2].m_fields.m_entries[4].m_callback = m_table_desc22;
-    table[2].m_fields.m_entries[5].m_callback = m_table_desc23;
+    table[2].m_fields.m_create = s_mapPartTableDescCreate;
+    table[2].m_fields.m_destroy = s_mapPartTableDescDestroy;
+    table[2].m_fields.m_entries[0].m_callback = s_mapPartTableDescCalcInit;
+    table[2].m_fields.m_entries[1].m_callback = s_mapPartTableDescCalc;
+    table[2].m_fields.m_entries[2].m_callback = s_mapPartTableDescDrawShadow;
+    table[2].m_fields.m_entries[3].m_callback = s_mapPartTableDescDrawBefore;
+    table[2].m_fields.m_entries[4].m_callback = s_mapPartTableDescDraw;
+    table[2].m_fields.m_entries[5].m_callback = s_mapPartTableDescDrawAfter;
 }
 
 CMapPcs MapPcs;

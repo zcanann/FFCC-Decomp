@@ -132,9 +132,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         (fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale) /
                         stepDivisor;
                 }
-                double drawScale = (double)*(float*)(payload + 0x5C);
+                float drawScale = *(float*)(payload + 0x5C);
                 const float drawScaleStep =
-                    ((float)drawScale - *(float*)(payload + 0x60)) / stepDivisor;
+                    (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
                 Vec* history = (Vec*)(particle + 0x80);
                 float segLen;
                 u16 frameCount = frameCountRaw;
@@ -193,9 +193,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) + frame->m_shapeOffset);
 
                         pppUnitMatrix(drawMtx);
-                        drawMtx.value[0][0] = (float)(drawScale * (double)ppvMng->m_scale.x);
-                        drawMtx.value[1][1] = (float)(drawScale * (double)ppvMng->m_scale.y);
-                        drawMtx.value[2][2] = (float)(drawScale * (double)ppvMng->m_scale.z);
+                        drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
+                        drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
+                        drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
 
                         if (*(s16*)(payload + 0x94) != 0) {
                             pppFMATRIX rotMtx;
@@ -243,7 +243,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeG -= fadeGStep;
                     fadeB -= fadeBStep;
                     fadeA -= fadeAStep;
-                    drawScale = (double)(float)(drawScale - (double)drawScaleStep);
+                    drawScale -= drawScaleStep;
                     if (*(float*)(payload + 0x98) <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }

@@ -1689,6 +1689,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
 		} else {
 			SRTView cachedParentScaleSrt = parentScaleSrt;
+			Mtx animMtx;
 			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
 			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
 				if (parentNode == 0) {
@@ -1714,54 +1715,52 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
-			Mtx animMtx;
+			SRTView srt;
 			if (animNode1 != 0) {
-				SRTView srt1;
 				Mtx invScaleMtx;
 
-				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt1), frame);
+				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				if (AnimNodeUsesScale(animNode1)) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt1));
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt1));
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 
-				float invX = (srt1.m_scale.x != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.x) : FLOAT_803301BC;
-				float invY = (srt1.m_scale.y != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.y) : FLOAT_803301BC;
-				float invZ = (srt1.m_scale.z != 0.0f) ? (FLOAT_803301BC / srt1.m_scale.z) : FLOAT_803301BC;
+				float invX = (srt.m_scale.x != 0.0f) ? (FLOAT_803301BC / srt.m_scale.x) : FLOAT_803301BC;
+				float invY = (srt.m_scale.y != 0.0f) ? (FLOAT_803301BC / srt.m_scale.y) : FLOAT_803301BC;
+				float invZ = (srt.m_scale.z != 0.0f) ? (FLOAT_803301BC / srt.m_scale.z) : FLOAT_803301BC;
 				PSMTXScale(invScaleMtx, invX, invY, invZ);
 				PSMTXConcat(localMtx, invScaleMtx, localMtx);
 			}
 
 			if (animNode0 != 0) {
-				SRTView srt0;
 				u16 nodeIndex;
 
 				if (reuseAnimNode0Srt) {
-					srt0 = cachedParentScaleSrt;
+					srt = cachedParentScaleSrt;
 				} else {
-					animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt0), frame);
+					animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				}
 				nodeIndex = NodeRefIndex(cur);
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
 					if (nodeIndex == ModelChest3Index(this)) {
-						srt0.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt0.m_rotation.y);
+						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301D0 - srt.m_rotation.y);
 						tiltScale = FLOAT_803301D0;
 					} else {
-						srt0.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt0.m_rotation.x;
+						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301F8 + srt.m_rotation.x;
 						tiltScale = FLOAT_803301F8;
 					}
-					srt0.m_rotation.z = ModelChestTilt(this) * tiltScale + srt0.m_rotation.z;
+					srt.m_rotation.z = ModelChestTilt(this) * tiltScale + srt.m_rotation.z;
 				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
-					srt0.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
+					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
 				if (AnimNodeUsesScale(animNode0)) {
-					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt0));
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
-					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt0));
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}

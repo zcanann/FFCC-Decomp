@@ -109,12 +109,16 @@ static inline void StoreU16Value(CFlatRuntime::CStack* stack, unsigned short& va
 {
 	stack[-1].m_word = value;
 
-	if (setMode == 0) {
+	switch (setMode) {
+	case 0:
 		value = stack->m_word;
-	} else if (setMode == -1) {
+		break;
+	case -1:
 		value = value - stack->m_word;
-	} else if (setMode == 1) {
+		break;
+	case 1:
 		value = value + stack->m_word;
+		break;
 	}
 }
 

@@ -1717,8 +1717,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
                 *modelTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
-                if (*modelTablePtr != 0) {
-                    memset(*modelTablePtr, 0, sizeof(pppModelSt*) * 0x88);
+                for (int slot = 0; slot < 0x88; slot++) {
+                    (*modelTablePtr)[slot] = 0;
                 }
             }
 
@@ -1762,8 +1762,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
             if (*shapeSlotTablePtr == 0) {
                 *shapeSlotTablePtr = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
-                if (*shapeSlotTablePtr != 0) {
-                    memset(*shapeSlotTablePtr, 0, sizeof(pppShapeSt*) * 0x80);
+                for (int slot = 0; slot < 0x80; slot++) {
+                    (*shapeSlotTablePtr)[slot] = 0;
                 }
             }
 

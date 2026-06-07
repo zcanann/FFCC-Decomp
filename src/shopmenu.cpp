@@ -2013,12 +2013,10 @@ void CShopMenu::DrawShop0()
         s_shopMenuTopMenuTextInitialized = 1;
     }
 
-    int selected = m_topChoice;
-
     CFont* font;
     ShopMenuTopMenuEntry* entry = s_shopMenuTopMenuEntries;
     for (int i = 0; i < 3; i++, entry++) {
-        int highlight = (i == selected) ? 1 : 0;
+        int highlight = (i == m_topChoice) ? 1 : 0;
         s_currentShopMenuTopMenuEntry = entry;
 
         Graphic.SetDrawDoneDebugData(0x1E);

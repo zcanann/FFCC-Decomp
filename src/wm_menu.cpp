@@ -3458,7 +3458,7 @@ void CMenuPcs::drawWorld()
 
 	if (bytes[0xD] == 0) {
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = reinterpret_cast<CMenu**>(bytes + 0x11C)[i - 4];
 			menu->Draw();
 		}
 	} else {
@@ -3504,7 +3504,7 @@ void CMenuPcs::drawWorld()
 		}
 
 		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			CMenu* const menu = reinterpret_cast<CMenu**>(bytes + 0x11C)[i - 4];
 			menu->Draw();
 		}
 		DrawInit();

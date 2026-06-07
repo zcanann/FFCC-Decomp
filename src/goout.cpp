@@ -2581,14 +2581,9 @@ void CGoOutMenu::Calc()
                     }
                 } else if (nextMode == 1) {
                     int characterCount = 0;
-                    int transferableCount = 0;
                     for (int i = 0; i < 8; i++) {
-                        CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
-                        if (caravanWork.m_shopState != 0) {
+                        if (Game.m_caravanWorkArr[i].m_shopState != 0) {
                             characterCount++;
-                            if (caravanWork.m_caravanLocalFlags == 0) {
-                                transferableCount++;
-                            }
                         }
                     }
 
@@ -2604,19 +2599,29 @@ void CGoOutMenu::Calc()
                                    GetGoOutMessageLine(languageId, 107));
                         m_nextMainMode = 1;
                         SetMainMode(0);
-                    } else if (transferableCount < 8) {
-                        SetMainMode(2);
                     } else {
-                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-                        SetMenuStr(0, 6,
-                                   GetGoOutMessageLine(languageId, 62),
-                                   GetGoOutMessageLine(languageId, 63),
-                                   GetGoOutMessageLine(languageId, 64),
-                                   GetGoOutMessageLine(languageId, 65),
-                                   GetGoOutMessageLine(languageId, 66),
-                                   GetGoOutMessageLine(languageId, 67));
-                        m_nextMainMode = 1;
-                        SetMainMode(0);
+                        int transferableCount = 0;
+                        for (int i = 0; i < 8; i++) {
+                            CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
+                            if (caravanWork.m_shopState != 0 && caravanWork.m_shopBusyFlag == 0) {
+                                transferableCount++;
+                            }
+                        }
+
+                        if (transferableCount < 8) {
+                            SetMainMode(2);
+                        } else {
+                            int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                            SetMenuStr(0, 6,
+                                       GetGoOutMessageLine(languageId, 62),
+                                       GetGoOutMessageLine(languageId, 63),
+                                       GetGoOutMessageLine(languageId, 64),
+                                       GetGoOutMessageLine(languageId, 65),
+                                       GetGoOutMessageLine(languageId, 66),
+                                       GetGoOutMessageLine(languageId, 67));
+                            m_nextMainMode = 1;
+                            SetMainMode(0);
+                        }
                     }
                 }
             }

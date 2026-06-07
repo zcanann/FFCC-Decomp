@@ -798,13 +798,12 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
 	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
 	while (noScan == 0) {
+		const int need = *reinterpret_cast<int*>(scanNode + 0xC) + requiredWords;
 		u8* const next = *reinterpret_cast<u8**>(scanNode + 4);
-		if ((*reinterpret_cast<int*>(scanNode + 0xC) + requiredWords + *reinterpret_cast<int*>(scanNode + 8))
-		    > *reinterpret_cast<int*>(next + 8)) {
-			scanNode = next;
-			continue;
+		if ((*reinterpret_cast<int*>(scanNode + 8) + need) <= *reinterpret_cast<int*>(next + 8)) {
+			break;
 		}
-		break;
+		scanNode = next;
 	}
 
 	void** const freeNode = m_objectFreeListHead;

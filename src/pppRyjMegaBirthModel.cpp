@@ -229,15 +229,15 @@ static inline void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
 static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
 {
     s32 count = 3;
-    s32* value = s32_at(particleBytes, offset);
     do {
+        s32* value = s32_at(particleBytes, offset);
         while (*value >= 0x8000) {
             *value -= 0x10000;
         }
         while (*value < -0x8000) {
             *value += 0x10000;
         }
-        value++;
+        particleBytes += 4;
         count--;
     } while (count != 0);
 }

@@ -116,12 +116,17 @@ void CGMonObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801162B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::resetWork()
 {
-	// TODO
+	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+	memset(&m_moveWork, 0, sizeof(m_moveWork));
 }
 
 /*
@@ -2011,16 +2016,6 @@ void CGMonObj::mlMove()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::mlAttackCheck(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGMonObj::mlAttack()
 {
 	// TODO
@@ -2066,26 +2061,6 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
 	}
 
 	return 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::statWatch()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::statAround()
-{
-	// TODO
 }
 
 /*
@@ -2606,16 +2581,6 @@ void CGMonObj::setRepop(int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::statMove()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8011367C
  * PAL Size: 740b
  * EN Address: TODO
@@ -2879,8 +2844,9 @@ void CGMonObj::moveFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyIndex)
+int CGMonObj::mlAttackCheck(int partyIndex)
 {
+	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
@@ -3036,8 +3002,9 @@ extern "C" int CGMonObj_SelectActionFromAIScript(CGMonObj* monObj, int partyInde
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
+void CGMonObj::statAround()
 {
+	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	int& targetPartyIndex = monObj->m_targetPartyIndex;
@@ -3057,7 +3024,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 				}
 			}
 
-			int nextAction = CGMonObj_SelectActionFromAIScript(monObj, targetPartyIndex);
+			int nextAction = monObj->mlAttackCheck(targetPartyIndex);
 			if (nextAction == -2) {
 				actionState = 0;
 				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
@@ -3225,8 +3192,9 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
+void CGMonObj::statWatch()
 {
+	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
@@ -3348,7 +3316,7 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 			monObj->m_unk6BC = 0;
 		}
 
-		CGMonObj_UpdateActionStateFromTarget(monObj);
+		monObj->statAround();
 		return;
 	}
 
@@ -3368,21 +3336,6 @@ extern "C" void CGMonObj_TickActionState(CGMonObj* monObj)
 
 /*
  * --INFO--
- * PAL Address: 0x801162B4
- * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
-{
-	*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
-	memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8011467C
  * PAL Size: 1272b
  * EN Address: TODO
@@ -3390,8 +3343,9 @@ extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
+void CGMonObj::statMove(int* targetIndex)
 {
+	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
@@ -3460,14 +3414,14 @@ extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 	}
 
 	if (state == 1) {
-		CGMonObj_TickActionState(monObj);
+		monObj->statWatch();
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
 		goto updateTimer;
 	}
 	if (state > 0) {
-		CGMonObj_UpdateActionStateFromTarget(monObj);
+		monObj->statAround();
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
@@ -3499,7 +3453,7 @@ updateTimer:
 void CGMonObj::logicFuncDefault()
 {
 	int targetIndex = 0;
-	MonObjRelated(this, &targetIndex);
+	statMove(&targetIndex);
 }
 
 /*

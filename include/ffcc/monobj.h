@@ -84,7 +84,7 @@ public:
     void moveAway(CGCharaObj*, int, int, int, int);
     void moveChaseAndStat(CGCharaObj*, int, float, int, int);
     void mlMove();
-    void mlAttackCheck(int);
+    int mlAttackCheck(int);
     void mlAttack();
     void aiAddDefault(int&);
     int aiSeq(int, int, int, int, int, int);
@@ -100,7 +100,7 @@ public:
     void setUndeadEffect(int, int);
     unsigned int IsDispRader();
     void setRepop(int);
-    void statMove();
+    void statMove(int*);
     void moveAStar(int, int, Vec&);
     void moveFrame();
     void logicFuncDefault();

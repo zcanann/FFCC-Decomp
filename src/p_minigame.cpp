@@ -877,7 +877,7 @@ retry_loop:
         goto comm_fail;
     case 5:
         System.Printf(const_cast<char*>(s_miniGameContextRecvFmt), channel, step, contextRecvOffset);
-        if (contextRecvOffset > 0x5F)
+        if (contextRecvOffset >= 0x60)
         {
             retryLine = 0x27A;
             goto retry_loop;
@@ -941,7 +941,20 @@ retry_loop:
         {
             System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x27F);
         }
-        goto comm_fail;
+comm_fail:
+        System.Printf(const_cast<char*>(s_miniGameRecvStatusFmt), ret,
+                             param[0xC0] & GBA_JSTAT_FLAGS_MASK, step, contextRecvOffset);
+        if (ret == 0)
+        {
+            ret = 3;
+        }
+        param[0xBF] = static_cast<unsigned char>(ret);
+        if (param[0xC4] != 0)
+        {
+            System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x287);
+        }
+        param[0xC4] = 0;
+        goto receive_message;
     case 6:
         ret = 1;
         if (param[0xC4] != 0)
@@ -1281,21 +1294,6 @@ retry_loop:
         System.Printf(const_cast<char*>(s_miniGameSourceLineFmt), s_miniGameSourceName, 0x3AC);
         goto comm_fail;
     }
-
-comm_fail:
-    System.Printf(const_cast<char*>(s_miniGameRecvStatusFmt), ret,
-                         param[0xC0] & GBA_JSTAT_FLAGS_MASK, step, contextRecvOffset);
-    if (ret == 0)
-    {
-        ret = 3;
-    }
-    param[0xBF] = static_cast<unsigned char>(ret);
-    if (param[0xC4] != 0)
-    {
-        System.Printf(const_cast<char*>(s_miniGameConnectedLineFmt), channel, 0x287);
-    }
-    param[0xC4] = 0;
-    goto receive_message;
 }
 #undef channel
 

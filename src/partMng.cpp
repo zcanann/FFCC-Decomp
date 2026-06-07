@@ -3738,13 +3738,13 @@ void CPartMng::pppLoadPan(const char* baseName)
     unsigned long fileSize = 0;
 
     sprintf(path, lbl_8032FE28, baseName);
-    if (System.m_execParam > 2) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
         System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
 
     void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
-        if (System.m_execParam != 0) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
             System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         return;

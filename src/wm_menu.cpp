@@ -12024,18 +12024,16 @@ int McCtrl::ChkEmpty(int param_2)
 
 	m_previousState = m_state;
 
-	int state = m_state;
-
-	if (state < 2)
+	switch (m_state)
 	{
-		if (state == 0)
-		{
-			MemoryCardMan.McMount(m_cardChannel);
-			m_lastResult = MemoryCardMan.GetResult();
-			m_state = 1;
-			m_iteration = 0;
-		}
-		else if (state > -1 && MemoryCardMan.AsyncFinished() == 1)
+	case 0:
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		break;
+	case 1:
+		if (MemoryCardMan.AsyncFinished() == 1)
 		{
 			m_lastResult = MemoryCardMan.GetResult();
 
@@ -12074,23 +12072,24 @@ int McCtrl::ChkEmpty(int param_2)
 				m_state = -1;
 			}
 		}
-	}
-	else if (state == 2)
-	{
+		break;
+	case 2:
 		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
 
 		if (m_lastResult < 0)
 		{
 			if (m_lastResult == -4)
 			{
-				if (param_2 != 0)
+				if (param_2 == 0)
+				{
+					m_state = 3;
+				}
+				else
 				{
 					MemoryCardMan.McUnmount(m_cardChannel);
 					m_state = -1;
 					return -6;
 				}
-
-				m_state = 3;
 			}
 			else
 			{
@@ -12111,9 +12110,8 @@ int McCtrl::ChkEmpty(int param_2)
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = 4;
 		}
-	}
-	else if (state != 4 && state < 4)
-	{
+		break;
+	case 3:
 		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
 		MemoryCardMan.McUnmount(m_cardChannel);
 
@@ -12143,6 +12141,9 @@ int McCtrl::ChkEmpty(int param_2)
 
 			m_state = 4;
 		}
+		break;
+	case 4:
+		break;
 	}
 
 	int result;

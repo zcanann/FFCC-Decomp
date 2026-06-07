@@ -246,7 +246,17 @@ public:
 		Mtx m_drawMtx;
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
-		u8 m_flagsA0;
+		union
+		{
+			u8 m_flagsA0;
+			struct
+			{
+				u8 m_flagA0_80 : 1;
+				u8 m_flagA0_40 : 1;
+				u8 m_flagA0_20 : 1;
+				u8 m_flagA0_lo : 5;
+			} m_flagsA0Bits;
+		};
 		u8 m_attachMode;
 		u8 _padA2[0x2];
 		CCharaModelData* m_data;
@@ -274,7 +284,16 @@ public:
 		DrawMeshDLCallback m_drawShadowMeshDLCallback;
 		AfterDrawMeshCallback m_afterDrawMeshCallback;
 		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
-		u8 m_flags10C;
+		union
+		{
+			u8 m_flags10C;
+			struct
+			{
+				u8 m_flag10C_80 : 1;
+				u8 m_flag10C_40 : 1;
+				u8 m_flag10C_lo : 6;
+			} m_flags10CBits;
+		};
 		u8 _pad10D[3];
 		float m_furStep;
 		float m_furLenScale;

@@ -1960,9 +1960,7 @@ void CMenuPcs::LetterMessDraw()
 			cursorY = static_cast<float>(window->y + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
-		int frame = static_cast<int>(System.m_frameCounter);
-		int frameSign = frame >> 31;
-		int frameAnim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
+		int frameAnim = static_cast<int>(System.m_frameCounter) % 8;
 		DrawCursor(static_cast<int>(cursorX + static_cast<float>(frameAnim)), static_cast<int>(cursorY), FLOAT_803330f8);
 	}
 }

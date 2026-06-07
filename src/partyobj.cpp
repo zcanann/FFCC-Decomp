@@ -4700,6 +4700,17 @@ void CGPartyObj::ghostPartyMog()
 
 	unsigned int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+	default:
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		stageMode = 0;
+		break;
+	case 6:
+	case 10:
+		stageMode = 1;
+		break;
 	case 4:
 	case 8:
 	case 9:
@@ -4707,13 +4718,6 @@ void CGPartyObj::ghostPartyMog()
 	case 0x0C:
 	case 0x0D:
 		stageMode = 2;
-		break;
-	case 6:
-	case 10:
-		stageMode = 1;
-		break;
-	default:
-		stageMode = 0;
 		break;
 	}
 
@@ -4753,6 +4757,17 @@ void CGPartyObj::ghostPartyMog()
 			if (settled) {
 				unsigned int innerMode;
 				switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+				default:
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+					innerMode = 0;
+					break;
+				case 6:
+				case 10:
+					innerMode = 1;
+					break;
 				case 4:
 				case 8:
 				case 9:
@@ -4760,13 +4775,6 @@ void CGPartyObj::ghostPartyMog()
 				case 0x0C:
 				case 0x0D:
 					innerMode = 2;
-					break;
-				case 6:
-				case 10:
-					innerMode = 1;
-					break;
-				default:
-					innerMode = 0;
 					break;
 				}
 				float innerScale;
@@ -4793,6 +4801,17 @@ void CGPartyObj::ghostPartyMog()
 		} else {
 			unsigned int moodMode;
 			switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+			default:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				moodMode = 0;
+				break;
+			case 6:
+			case 10:
+				moodMode = 1;
+				break;
 			case 4:
 			case 8:
 			case 9:
@@ -4800,13 +4819,6 @@ void CGPartyObj::ghostPartyMog()
 			case 0x0C:
 			case 0x0D:
 				moodMode = 2;
-				break;
-			case 6:
-			case 10:
-				moodMode = 1;
-				break;
-			default:
-				moodMode = 0;
 				break;
 			}
 			if (moodMode == 1) {

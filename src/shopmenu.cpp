@@ -2066,13 +2066,10 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned int canSelect = static_cast<unsigned int>(MenuPcs.ChkEquipPossible(m_resultItem));
-    canSelect = static_cast<unsigned int>(-(-static_cast<int>(canSelect & 0xFF) >> 0x1F));
-    if (canSelect != 0) {
+    bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem);
+    if (canSelect) {
         int selected = getItemNo(m_selectedIndex);
-        unsigned int money = static_cast<unsigned int>(m_caravanWork->m_gil);
-        unsigned int craftGil = static_cast<unsigned int>(CalcShopMenuMakeGil(this, selected));
-        canSelect = ((int)money >> 0x1F) + ((craftGil <= money) - ((int)craftGil >> 0x1F));
+        canSelect = CalcShopMenuMakeGil(this, selected) <= m_caravanWork->m_gil;
     }
 
     int selected = getItemNo(m_selectedIndex);
@@ -2086,10 +2083,9 @@ void CShopMenu::SelectMake()
             break;
         }
 
-        canSelect = static_cast<unsigned int>(-static_cast<int>(-canSelect) >> 0x1F);
-        if (canSelect != 0) {
+        if (canSelect) {
             short* inventory = m_caravanWork->m_inventoryItems;
-            unsigned int total = 0;
+            int total = 0;
             for (int j = 0; j < 8; j++, inventory += 8) {
                 if (inventory[0] == itemNo) {
                     ++total;
@@ -2116,51 +2112,15 @@ void CShopMenu::SelectMake()
                     ++total;
                 }
             }
-            canSelect = ((int)total >> 0x1F) +
-                        ((static_cast<unsigned int>(material[3]) <= total) - ((int)material[3] >> 0x1F));
+            canSelect = material[3] <= total;
         }
     }
 
-    canSelect &= 0xFF;
-    if (canSelect == 0) {
+    if (!canSelect) {
         m_yesNo = 1;
     }
 
-    unsigned short press = GetPadButtons();
-    if ((press & 0xC) == 0) {
-        if ((press & 0x100) != 0) {
-            int yesNo = m_yesNo;
-            if (yesNo != 1) {
-                if (yesNo > 0) {
-                    return;
-                }
-                if (yesNo < 0) {
-                    return;
-                }
-
-                int itemId = getItemNo(m_selectedIndex);
-                int makeGil;
-                if (itemId < 1) {
-                    makeGil = 0;
-                } else {
-                    int gil = m_caravanWork->m_shopParam *
-                              *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
-                    gil = gil / 100 + (gil >> 0x1F);
-                    makeGil = gil - (gil >> 0x1F);
-                }
-                if (m_caravanWork->CanAddGil(-makeGil) != 0) {
-                    Sound.PlaySe(0x52, 0x40, 0x7F, 0);
-                    m_nextMode = 0xF;
-                    SetMode(0xE);
-                    return;
-                }
-            }
-
-            Sound.PlaySe(4, 0x40, 0x7F, 0);
-            m_nextMode = 9;
-            SetMode(0xE);
-        }
-    } else {
+    if ((GetPadButtons() & 0xC) != 0) {
         m_yesNo ^= 1;
         if (canSelect == 1) {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2168,6 +2128,37 @@ void CShopMenu::SelectMake()
             m_yesNo = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
         }
+    } else if ((GetPadButtons() & 0x100) != 0) {
+        int yesNo = m_yesNo;
+        if (yesNo != 1) {
+            if (yesNo > 0) {
+                return;
+            }
+            if (yesNo < 0) {
+                return;
+            }
+
+            int itemId = getItemNo(m_selectedIndex);
+            int makeGil;
+            if (itemId < 1) {
+                makeGil = 0;
+            } else {
+                int gil = m_caravanWork->m_shopParam *
+                          *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
+                gil = gil / 100 + (gil >> 0x1F);
+                makeGil = gil - (gil >> 0x1F);
+            }
+            if (m_caravanWork->CanAddGil(-makeGil) != 0) {
+                Sound.PlaySe(0x52, 0x40, 0x7F, 0);
+                m_nextMode = 0xF;
+                SetMode(0xE);
+                return;
+            }
+        }
+
+        Sound.PlaySe(4, 0x40, 0x7F, 0);
+        m_nextMode = 9;
+        SetMode(0xE);
     }
 }
 /*

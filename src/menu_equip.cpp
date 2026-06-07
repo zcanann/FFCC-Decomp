@@ -319,19 +319,19 @@ int CMenuPcs::EquipCtrlCur()
 				return 1;
 			}
 
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) != 0) {
-					GetEquipMenuState(this)->closeRequested = 1;
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-					return 1;
+			if ((press & 0x100) != 0) {
+				if (caravanWork->CanPlayerPutItem() == 0) {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				} else {
+					GetEquipMenuState(this)->mode = 1;
+					GetEquipMenuState(this)->step = 0;
+					GetEquipMenuState(this)->frame = 0;
+					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
-			} else if (caravanWork->CanPlayerPutItem() == 0) {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			} else {
-				GetEquipMenuState(this)->mode = 1;
-				GetEquipMenuState(this)->step = 0;
-				GetEquipMenuState(this)->frame = 0;
-				Sound.PlaySe(2, 0x40, 0x7f, 0);
+			} else if ((press & 0x200) != 0) {
+				GetEquipMenuState(this)->closeRequested = 1;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				return 1;
 			}
 		}
 	} else {

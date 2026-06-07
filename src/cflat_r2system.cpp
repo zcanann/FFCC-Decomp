@@ -50,7 +50,12 @@ extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
 extern const float FLOAT_80330B34;
+extern const float FLOAT_80330B38;
 extern float FLOAT_80330B3C;
+extern const float FLOAT_80330B40;
+extern const float FLOAT_80330B44;
+extern const float FLOAT_80330B48;
+extern const float FLOAT_80330B4C;
 extern float FLOAT_80330B50;
 extern float FLOAT_80330B54;
 extern float FLOAT_80330B58;
@@ -133,20 +138,40 @@ static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
     out.z = a.z + (b.z - a.z) * t;
 }
 
-static inline void CatmullRomVec(Vec& out, const Vec& p0, const Vec& p1, const Vec& p2, const Vec& p3, float t)
+static inline void BSplineVec(Vec& out, Vec* p0, Vec* p1, Vec* p2, Vec* p3, float t)
 {
-    const float t2 = t * t;
-    const float t3 = t2 * t;
+    Vec c3;
+    Vec c2;
+    Vec c1;
+    Vec c0;
 
-    out.x = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t +
-                    (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * t2 +
-                    (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
-    out.y = 0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t +
-                    (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * t2 +
-                    (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3);
-    out.z = 0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * t +
-                    (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * t2 +
-                    (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * t3);
+    PSVECScale(p0, &c3, FLOAT_80330B38);
+    VECMultAdd(&c3, p1, &c3, FLOAT_80330B3C);
+    VECMultAdd(&c3, p2, &c3, FLOAT_80330B40);
+    VECMultAdd(&c3, p3, &c3, FLOAT_80330B44);
+
+    PSVECScale(p0, &c2, FLOAT_80330B3C);
+    VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
+    VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
+
+    PSVECScale(p0, &c1, FLOAT_80330B40);
+    VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
+
+    PSVECScale(p0, &c0, FLOAT_80330B44);
+    VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
+    VECMultAdd(&c0, p2, &c0, FLOAT_80330B44);
+
+    PSVECScale(&c3, &c3, t);
+    PSVECAdd(&c3, &c2, &c3);
+    PSVECScale(&c3, &c3, t);
+    PSVECAdd(&c3, &c1, &c3);
+    PSVECScale(&c3, &c3, t);
+    PSVECAdd(&c3, &c0, &out);
+}
+
+static inline Vec* ClampPathPoint(Vec* points, int index, int maxIndex)
+{
+    return &points[ClampIndex(index, maxIndex)];
 }
 
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
@@ -2082,22 +2107,79 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
                       static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
-            switch (mode & 3) {
-            case 3:
-                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
-                      FLOAT_80330B34);
-                break;
-            case 1:
-                t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
-                break;
-            case 2:
-                t = sinf(FLOAT_80330B50 * t);
-                break;
-            default:
-                break;
-            }
+            if ((mode & 4) != 0) {
+                Vec* pathPoints = &m_pathPoints[0].m_position;
+                const int maxIndex = pointCount - 1;
+                const int segmentCount = pointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
+                const float scaled = t * static_cast<float>(segmentCount);
+                const int baseIndex = (mode & 1) + static_cast<int>(scaled);
+                const float segmentT = fmodf(scaled, FLOAT_80330B34);
 
-            if ((mode & 4) == 0) {
+                CVector startDelta = CVector(pathPoints[1]) - CVector(pathPoints[0]);
+                CVector startPhantom1 = CVector(pathPoints[0]) - startDelta;
+                CVector startPhantom2 = startPhantom1 - startDelta;
+                CVector endDelta = CVector(pathPoints[maxIndex]) - CVector(pathPoints[maxIndex - 1]);
+                CVector endPhantom1 = CVector(pathPoints[maxIndex]) + endDelta;
+                CVector endPhantom2 = endPhantom1 + endDelta;
+
+                Vec* p0;
+                Vec* p1;
+                Vec* p2;
+                Vec* p3;
+
+                if ((mode & 1) != 0) {
+                    if (baseIndex == 0) {
+                        p0 = startPhantom2;
+                    } else if (baseIndex == 1) {
+                        p0 = startPhantom1;
+                    } else {
+                        p0 = ClampPathPoint(pathPoints, baseIndex - 2, maxIndex);
+                    }
+                    if (baseIndex == 0) {
+                        p1 = startPhantom1;
+                    } else {
+                        p1 = ClampPathPoint(pathPoints, baseIndex - 1, maxIndex);
+                    }
+                } else {
+                    p0 = ClampPathPoint(pathPoints, baseIndex - 2, maxIndex);
+                    p1 = ClampPathPoint(pathPoints, baseIndex - 1, maxIndex);
+                }
+
+                if ((mode & 2) != 0) {
+                    if (baseIndex == pointCount) {
+                        p2 = endPhantom1;
+                    } else {
+                        p2 = ClampPathPoint(pathPoints, baseIndex, maxIndex);
+                    }
+                    if (baseIndex == maxIndex) {
+                        p3 = endPhantom1;
+                    } else if (baseIndex == pointCount) {
+                        p3 = endPhantom2;
+                    } else {
+                        p3 = ClampPathPoint(pathPoints, baseIndex + 1, maxIndex);
+                    }
+                } else {
+                    p2 = ClampPathPoint(pathPoints, baseIndex, maxIndex);
+                    p3 = ClampPathPoint(pathPoints, baseIndex + 1, maxIndex);
+                }
+
+                BSplineVec(result, p0, p1, p2, p3, segmentT);
+            } else {
+                switch (mode & 3) {
+                case 3:
+                    t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
+                          FLOAT_80330B34);
+                    break;
+                case 1:
+                    t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                    break;
+                case 2:
+                    t = sinf(FLOAT_80330B50 * t);
+                    break;
+                default:
+                    break;
+                }
+
                 const float totalDistance = m_pathTotalDistance;
                 const float pathDistance = totalDistance * t;
 
@@ -2116,22 +2198,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                         break;
                     }
                 }
-            } else {
-                const int maxIndex = pointCount - 1;
-                float scaled = t * static_cast<float>(pointCount - 1);
-                int baseIndex = static_cast<int>(scaled);
-                float segmentT = scaled - static_cast<float>(baseIndex);
-
-                if (baseIndex >= maxIndex) {
-                    baseIndex = maxIndex;
-                    segmentT = 0.0f;
-                }
-
-                const Vec& p0 = m_pathPoints[ClampIndex(baseIndex - 1, maxIndex)].m_position;
-                const Vec& p1 = m_pathPoints[ClampIndex(baseIndex, maxIndex)].m_position;
-                const Vec& p2 = m_pathPoints[ClampIndex(baseIndex + 1, maxIndex)].m_position;
-                const Vec& p3 = m_pathPoints[ClampIndex(baseIndex + 2, maxIndex)].m_position;
-                CatmullRomVec(result, p0, p1, p2, p3, segmentT);
             }
         }
 

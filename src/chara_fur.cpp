@@ -296,43 +296,49 @@ static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, 
     PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&rayStart));
     PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayEnd));
 
-    Vec ray;
-    PSVECSubtract(reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayStart), &ray);
+    CVector ray;
+    PSVECSubtract(reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&ray));
 
-    Vec normalA;
-    Vec normalB;
-    Vec normal;
-    PSVECCrossProduct(&b.m_viewPos, &a.m_viewPos, &normalA);
-    PSVECCrossProduct(&c.m_viewPos, &a.m_viewPos, &normalB);
-    PSVECCrossProduct(&normalA, &normalB, &normal);
-    PSVECNormalize(&normal, &normal);
+    CVector normalA;
+    CVector normalB;
+    CVector normal;
+    PSVECCrossProduct(&b.m_viewPos, &a.m_viewPos, reinterpret_cast<Vec*>(&normalA));
+    PSVECCrossProduct(&c.m_viewPos, &a.m_viewPos, reinterpret_cast<Vec*>(&normalB));
+    PSVECCrossProduct(reinterpret_cast<Vec*>(&normalA), reinterpret_cast<Vec*>(&normalB), reinterpret_cast<Vec*>(&normal));
+    normal.Normalize();
 
-    Vec planeDelta;
-    PSVECSubtract(&a.m_viewPos, reinterpret_cast<Vec*>(&rayStart), &planeDelta);
-    Vec scaledRay;
-    PSVECScale(&ray, &scaledRay, PSVECDotProduct(&normal, &planeDelta) / PSVECDotProduct(&normal, &ray));
-    PSVECAdd(reinterpret_cast<Vec*>(&rayStart), &scaledRay, &outViewPos);
+    CVector vertA(a.m_viewPos);
+    CVector planeDelta;
+    PSVECSubtract(reinterpret_cast<Vec*>(&vertA), reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&planeDelta));
+    CVector scaledRay;
+    const float rayDot = PSVECDotProduct(reinterpret_cast<Vec*>(&normal), reinterpret_cast<Vec*>(&ray));
+    const float planeDot = PSVECDotProduct(reinterpret_cast<Vec*>(&normal), reinterpret_cast<Vec*>(&planeDelta));
+    PSVECScale(reinterpret_cast<Vec*>(&ray), reinterpret_cast<Vec*>(&scaledRay), planeDot / rayDot);
+    PSVECAdd(reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&scaledRay), &outViewPos);
 
-    Vec hitToA;
-    Vec hitToB;
-    Vec hitToC;
-    PSVECSubtract(&a.m_viewPos, &outViewPos, &hitToA);
-    PSVECSubtract(&b.m_viewPos, &outViewPos, &hitToB);
-    PSVECSubtract(&c.m_viewPos, &outViewPos, &hitToC);
+    CVector hitToA;
+    CVector hitToB;
+    CVector hitToC;
+    PSVECSubtract(reinterpret_cast<Vec*>(&vertA), &outViewPos, reinterpret_cast<Vec*>(&hitToA));
+    CVector vertB(b.m_viewPos);
+    PSVECSubtract(reinterpret_cast<Vec*>(&vertB), &outViewPos, reinterpret_cast<Vec*>(&hitToB));
+    CVector vertC(c.m_viewPos);
+    PSVECSubtract(reinterpret_cast<Vec*>(&vertC), &outViewPos, reinterpret_cast<Vec*>(&hitToC));
 
-    Vec areaAB;
-    Vec areaBC;
-    Vec areaCA;
-    PSVECCrossProduct(&hitToA, &hitToB, &areaAB);
-    PSVECCrossProduct(&hitToB, &hitToC, &areaBC);
-    PSVECCrossProduct(&hitToC, &hitToA, &areaCA);
+    CVector areaAB;
+    CVector areaBC;
+    CVector areaCA;
+    PSVECCrossProduct(reinterpret_cast<Vec*>(&hitToA), reinterpret_cast<Vec*>(&hitToB), reinterpret_cast<Vec*>(&areaAB));
+    PSVECCrossProduct(reinterpret_cast<Vec*>(&hitToB), reinterpret_cast<Vec*>(&hitToC), reinterpret_cast<Vec*>(&areaBC));
+    PSVECCrossProduct(reinterpret_cast<Vec*>(&hitToC), reinterpret_cast<Vec*>(&hitToA), reinterpret_cast<Vec*>(&areaCA));
 
-    Vec weights;
-    weights.x = PSVECMag(&areaBC);
-    weights.y = PSVECMag(&areaCA);
-    weights.z = PSVECMag(&areaAB);
-    PSVECScale(&weights, &weights, FLOAT_80331148);
-    PSVECScale(&weights, &weights, kCharaFurDepthScaleBase / (weights.x + weights.y + weights.z));
+    CVector weights;
+    weights.x = PSVECMag(reinterpret_cast<Vec*>(&areaBC));
+    weights.y = PSVECMag(reinterpret_cast<Vec*>(&areaCA));
+    weights.z = PSVECMag(reinterpret_cast<Vec*>(&areaAB));
+    PSVECScale(reinterpret_cast<Vec*>(&weights), reinterpret_cast<Vec*>(&weights), FLOAT_80331148);
+    PSVECScale(reinterpret_cast<Vec*>(&weights), reinterpret_cast<Vec*>(&weights),
+               kCharaFurDepthScaleBase / (weights.x + weights.y + weights.z));
 
     outU = a.m_u * weights.x + b.m_u * weights.y + c.m_u * weights.z;
     outV = a.m_v * weights.x + b.m_v * weights.y + c.m_v * weights.z;

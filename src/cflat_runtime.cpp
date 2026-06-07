@@ -2242,6 +2242,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 						}
 
 						const int argIndex = i + 1;
+						unsigned int* const arg = object->m_localBase + argIndex;
 						char* scan = spec + 1;
 						if (spec[0] == '%') {
 							int fmtIndex = 1;
@@ -2254,7 +2255,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 							if (spec[fmtIndex] == 'b') {
 								char* out = rendered;
-								u32 value = object->m_localBase[argIndex];
+								u32 value = *arg;
 								int outLen = 0;
 
 								for (int bit = 0; bit < width; bit++) {
@@ -2274,7 +2275,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 									switch (*scan) {
 									case 'd':
 									case 'x':
-										sprintf(rendered, spec, object->m_localBase[argIndex]);
+										sprintf(rendered, spec, *arg);
 										scan = const_cast<char*>("");
 										break;
 									case 'f': {
@@ -2282,13 +2283,13 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 											u32 u;
 											float f;
 										} value;
-										value.u = object->m_localBase[argIndex];
+										value.u = *arg;
 										sprintf(rendered, spec, static_cast<double>(value.f));
 										scan = const_cast<char*>("");
 										break;
 									}
 									case 's':
-										sprintf(rendered, spec, m_strBlob + m_strOffsets[object->m_localBase[argIndex]]);
+										sprintf(rendered, spec, m_strBlob + m_strOffsets[*arg]);
 										scan = const_cast<char*>("");
 										break;
 									default:

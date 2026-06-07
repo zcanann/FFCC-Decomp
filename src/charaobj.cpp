@@ -987,16 +987,7 @@ void CGCharaObj::onFrameStat()
 			break;
 
 		case 0xA:
-			if (m_subState == 1) {
-				if (m_subFrame == 0) {
-					reqAnim(0x1B, 1, 0);
-				}
-
-				if (m_scriptHandle != 0 &&
-				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
-					changeSubStat(2);
-				}
-			} else if (m_subState == 0) {
+			if (m_subState == 0) {
 				if (m_subFrame == 0) {
 					Sound.StopSe3DGroup(m_particleId);
 					for (int i = 0; i < 0x16; i++) {
@@ -1009,6 +1000,15 @@ void CGCharaObj::onFrameStat()
 
 				if (isLoopAnim() != 0) {
 					changeSubStat(1);
+				}
+			} else if (m_subState == 1) {
+				if (m_subFrame == 0) {
+					reqAnim(0x1B, 1, 0);
+				}
+
+				if (m_scriptHandle != 0 &&
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
+					changeSubStat(2);
 				}
 			} else if (m_subState < 3) {
 				if (m_subFrame == 0) {

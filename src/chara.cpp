@@ -1814,7 +1814,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::calcSkin()
+inline void CChara::CModel::calcSkin()
 {
 	CalcSkin();
 }
@@ -2042,8 +2042,6 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
  */
 void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 {
-	calcSkin();
-
 	if (ModelLightAlpha(this) != FLOAT_803301bc) {
 		return;
 	}

@@ -1414,7 +1414,7 @@ void CMenuPcs::CalcMCardMenu()
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
-	if (worldState->m_worldReady == 0) {
+	if (static_cast<signed char>(worldState->m_worldReady) == 0) {
 		mcCtrl.m_previousState = 0;
 		mcCtrl.m_state = 0;
 		mcCtrl.m_lastResult = 0;
@@ -3015,7 +3015,7 @@ void CMenuPcs::CalcTitleMenu()
 	const unsigned short repeat = GetButtonRepeat(0);
 
 	if (worldState != 0) {
-		if (worldState->m_worldReady == 0) {
+		if (static_cast<signed char>(worldState->m_worldReady) == 0) {
 			worldState->m_delay = 0;
 			worldState->m_titleState = 0;
 			worldState->m_state0E = -1;

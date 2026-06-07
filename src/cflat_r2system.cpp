@@ -176,11 +176,6 @@ static inline void BSplineVec(Vec& out, Vec* p0, Vec* p1, Vec* p2, Vec* p3, floa
     PSVECAdd(&c3, &c0, &out);
 }
 
-static inline Vec* ClampPathPoint(CFlatPathPoint* points, int index, int maxIndex)
-{
-    return &points[ClampIndex(index, maxIndex)].m_position;
-}
-
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
 {
     return reinterpret_cast<unsigned int*>(&gameWork.m_linkTable[0][0][0][0]);
@@ -2140,34 +2135,34 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     } else if (baseIndex == 1) {
                         p0 = startPhantom1;
                     } else {
-                        p0 = ClampPathPoint(pathPoints, baseIndex - 2, maxIndex);
+                        p0 = &pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
                     }
                     if (baseIndex == 0) {
                         p1 = startPhantom1;
                     } else {
-                        p1 = ClampPathPoint(pathPoints, baseIndex - 1, maxIndex);
+                        p1 = &pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
                     }
                 } else {
-                    p0 = ClampPathPoint(pathPoints, baseIndex - 2, maxIndex);
-                    p1 = ClampPathPoint(pathPoints, baseIndex - 1, maxIndex);
+                    p0 = &pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
+                    p1 = &pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
                 }
 
                 if ((mode & 2) != 0) {
                     if (baseIndex == pointCount) {
                         p2 = endPhantom1;
                     } else {
-                        p2 = ClampPathPoint(pathPoints, baseIndex, maxIndex);
+                        p2 = &pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
                     }
                     if (baseIndex == maxIndex) {
                         p3 = endPhantom1;
                     } else if (baseIndex == pointCount) {
                         p3 = endPhantom2;
                     } else {
-                        p3 = ClampPathPoint(pathPoints, baseIndex + 1, maxIndex);
+                        p3 = &pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
                     }
                 } else {
-                    p2 = ClampPathPoint(pathPoints, baseIndex, maxIndex);
-                    p3 = ClampPathPoint(pathPoints, baseIndex + 1, maxIndex);
+                    p2 = &pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
+                    p3 = &pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
                 }
 
                 BSplineVec(result, p0, p1, p2, p3, segmentT);

@@ -45,11 +45,11 @@ extern "C" const double DOUBLE_8032FE08 = 0.0;
 extern "C" const float FLOAT_8032FE10 = 32768.0f;
 extern "C" const float FLOAT_8032FE14 = 180.0f;
 extern "C" const float FLOAT_8032fe18 = 1.0f;
-extern "C" const char lbl_8032FE1C[4] = "";
-extern "C" const char lbl_8032FE20[] = "%s.pdt";
-extern "C" const char lbl_8032FE28[] = "%s.pan";
-extern "C" const char lbl_8032FE30[] = "%s.pmd";
-extern "C" const char lbl_8032FE38[] = "%s.ptx";
+extern "C" const char sPartMngEmptyString[4] = "";
+extern "C" const char sPdtPathFmt[] = "%s.pdt";
+extern "C" const char sPanPathFmt[] = "%s.pan";
+extern "C" const char sPmdPathFmt[] = "%s.pmd";
+extern "C" const char sPtxPathFmt[] = "%s.ptx";
 extern "C" const double DOUBLE_8032FE40 = -1.0;
 extern "C" const float FLOAT_8032FE48 = -100000000.0f;
 extern "C" const float FLOAT_8032fe4c = 25.0f;
@@ -66,7 +66,7 @@ extern "C" const float FLOAT_8032FE74 = 224.0f;
 extern "C" const float FLOAT_8032FE78 = 16777216.0f;
 extern "C" const float FLOAT_8032FE7C = 320.0f;
 extern "C" const double DOUBLE_8032fe80 = 4503601774854144.0;
-extern "C" const char lbl_8032FE88[] = "\n\n\n";
+extern "C" const char sPartMngTripleNewline[] = "\n\n\n";
 extern "C" const float FLOAT_8032fe8c = 33.3f;
 extern "C" const float FLOAT_8032fe90 = 0.93333334f;
 extern "C" const float FLOAT_8032fe94 = 0.125f;
@@ -3504,7 +3504,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     stageLoad->setDefaultParam(pdtSlotIndex);
 
     char* path = g_StrTmp;
-    sprintf(path, lbl_8032FE38, baseName);
+    sprintf(path, sPtxPathFmt, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
@@ -3580,7 +3580,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
     char* path = g_StrTmp;
     unsigned long fileSize = 0;
 
-    sprintf(path, lbl_8032FE30, baseName);
+    sprintf(path, sPmdPathFmt, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPmdLogFormat), path);
     }
@@ -3694,7 +3694,7 @@ void CPartMng::pppLoadPan(const char* baseName)
     char* path = g_StrTmp;
     unsigned long fileSize = 0;
 
-    sprintf(path, lbl_8032FE28, baseName);
+    sprintf(path, sPanPathFmt, baseName);
     if (System.m_execParam > 2) {
         System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
@@ -3791,7 +3791,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     stageLoad->setDefaultParam(pdtSlotIndex);
 
     char pdtPath[256];
-    sprintf(pdtPath, lbl_8032FE20, baseName);
+    sprintf(pdtPath, sPdtPathFmt, baseName);
     strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
     pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
 

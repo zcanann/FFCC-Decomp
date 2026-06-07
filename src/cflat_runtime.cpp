@@ -786,7 +786,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		classLocalCount = classBase->m_localCount;
 	}
 
-	u8* scanNode = *reinterpret_cast<u8**>(*reinterpret_cast<u8**>(self + 0x984) + 4);
+	u8* scanNode = reinterpret_cast<u8*>(m_freeListNext);
 	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
 	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
 	while (noScan == 0) {

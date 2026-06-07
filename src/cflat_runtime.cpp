@@ -1090,7 +1090,7 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	u8* const targetObject = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(object) + 0x18);
 	u8* func = 0;
 
-	if (static_cast<s8>(targetObject[0x38]) < 0) {
+	if (reinterpret_cast<CObject*>(targetObject)->m_flagBits.m_deleteFlag != 0) {
 		return 1;
 	}
 

@@ -69,11 +69,11 @@ public:
 		union {
 			unsigned char m_flags;     // 0x38-0x3B
 			struct {
-				unsigned char m_deleteFlag : 1;    // 0x80
-				unsigned char m_activeFlag : 1;    // 0x40
-				unsigned char m_callFlag : 1;      // 0x20
-				unsigned char m_constructFlag : 1; // 0x10
-				unsigned char m_flagBits1 : 4;     // 0x0F
+				signed char m_deleteFlag : 1;    // 0x80
+				signed char m_activeFlag : 1;    // 0x40
+				signed char m_callFlag : 1;      // 0x20
+				signed char m_constructFlag : 1; // 0x10
+				signed char m_flagBits1 : 4;     // 0x0F
 			} m_flagBits;
 		};
 		int m_0x3C;                // 0x3C

@@ -13,9 +13,9 @@ unsigned char g_tFont22[0x10D40] = {
 #include <dolphin/mtx.h>
 
 extern const float kFontZero = 0.0f;
-extern const double DOUBLE_803306C0 = 4503601774854144.0;
+extern const double kFontUnsignedIntToDoubleBias = 4503601774854144.0;
 extern const float kFontOne = 1.0f;
-extern const double DOUBLE_803306D0 = 4503599627370496.0;
+extern const double kFontSignedIntToDoubleBias = 4503599627370496.0;
 extern const float kFontOrthoHeight = 448.0f;
 extern const float kFontOrthoWidth = 640.0f;
 

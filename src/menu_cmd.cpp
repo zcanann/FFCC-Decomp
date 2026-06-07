@@ -1227,11 +1227,9 @@ void CMenuPcs::CmdDraw()
 				}
 			}
 
-			const float width = static_cast<float>(listFont->GetWidth(text));
-			listFont->SetPosX(
-			    static_cast<float>(textRow->x + 0x1C) +
-			    ((static_cast<float>(textRow->width) - width) * static_cast<float>(DOUBLE_80332a60)));
-			listFont->SetPosY(static_cast<float>(textRow->y + 3) - FLOAT_80332ae8);
+			listFont->GetWidth(text);
+			listFont->SetPosX(static_cast<float>(textRow->x + 0x1C));
+			listFont->SetPosY(static_cast<float>(textRow->y + 0x0B) - FLOAT_80332ae8);
 			listFont->Draw(text);
 
 			textRow++;

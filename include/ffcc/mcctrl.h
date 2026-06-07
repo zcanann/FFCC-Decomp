@@ -26,15 +26,15 @@ public:
     int LoadMcList();
     void SetListDat(int, int);
     void SetBrokenFile(int);
-    void SaveDat();
-    void LoadDat();
+    int SaveDat();
+    int LoadDat();
     int Format(int);
     int ChkEmpty(int param_2);
     int ChkConnect(int chan);
     int ChkNowData();
     int SaveDataBuffer(char*);
     void ChkParty(char*);
-    void EraseDat();
+    int EraseDat();
     void GetDno();
     void GetSerial();
     void SetDataBuff(char*);

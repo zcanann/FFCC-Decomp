@@ -428,7 +428,7 @@ void CMenuPcs::LetterInit4()
 	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
 	char** itemTable = Game.m_cFlatDataArr[1].TableStrings(0);
 
-	const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
+	const char* title = subjectTable[(letterWord >> 9) & 0x1FF];
 	if (languageId == 3) {
 		sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 	} else if (languageId == 2) {
@@ -1542,7 +1542,7 @@ bool CMenuPcs::LetterConfirmOpen()
 		memset(lines, 0, sizeof(lines));
 		CCaravanWork* caravanWork = GetLetterCaravanWork();
 		unsigned int letterWord = caravanWork->m_letters[s_SelLetter].Word0();
-		const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
+		const char* title = subjectTable[(letterWord >> 9) & 0x1FF];
 		if (languageId == 3) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else if (languageId < 3) {
@@ -1748,7 +1748,7 @@ void CMenuPcs::LetterListDraw()
 		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(from);
 
-		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 7) & 0x1FF];
+		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letter->Word0() >> 9) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
 		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(subject);

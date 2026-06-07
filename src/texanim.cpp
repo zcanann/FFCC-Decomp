@@ -16,11 +16,11 @@ extern const double kTexAnimIntToDoubleBias = 4503599627370496.0;
 static const char s_texAnimSeqE1[] = "e1";
 extern const float kTexAnimChinFrameStep = 1.25f;
 
-static const char s_ptrarray_grow_error_801D7B14[] = {
+static const char sTexAnimPtrArrayGrowError[] = {
     0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
     0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
 };
-static const char s_collection_ptrarray_h_801D7B30[] = "collection_ptrarray.h";
+static const char sTexAnimCollectionPtrArrayHeader[] = "collection_ptrarray.h";
 
 namespace {
 static inline int IsTexAnimChinFlag(unsigned char flags)
@@ -875,13 +875,13 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D7B14));
+                System.Printf(const_cast<char*>(sTexAnimPtrArrayGrowError));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CTexAnimSeq**)Memory._Alloc(
-            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(sTexAnimCollectionPtrArrayHeader), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }
@@ -1087,13 +1087,13 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             m_size = m_defaultSize;
         } else {
             if (m_growCapacity == 0) {
-                System.Printf(const_cast<char*>(s_ptrarray_grow_error_801D7B14));
+                System.Printf(const_cast<char*>(sTexAnimPtrArrayGrowError));
             }
             m_size = m_size << 1;
         }
 
         newItems = (CTexAnim**)Memory._Alloc(
-            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(sTexAnimCollectionPtrArrayHeader), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

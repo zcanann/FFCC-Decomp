@@ -991,7 +991,7 @@ int CMenuPcs::LetterCtrl()
 		} else if (mode == 2) {
 			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) < 1) {
+				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
 				} else {
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
@@ -1004,7 +1004,7 @@ int CMenuPcs::LetterCtrl()
 		} else if (mode == 3) {
 			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) < 1) {
+				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 1;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 1;
 				} else {
@@ -1016,7 +1016,7 @@ int CMenuPcs::LetterCtrl()
 		} else if (mode == 4) {
 			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) < 1) {
+				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
@@ -1054,7 +1054,7 @@ int CMenuPcs::LetterCtrl()
 		} else if (mode == 5) {
 			if (m_menuWindowInfo->state == 3) {
 				*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
-				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) < 1) {
+				if (*reinterpret_cast<signed char*>(GetLetterStateBase(this) + 8) <= 0) {
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 3;
 					*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x12) = 0;
 					*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) = 0;
@@ -1398,7 +1398,7 @@ void CMenuPcs::LetterItemWinClose()
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
-		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+		if (*reinterpret_cast<signed char*>(state + 8) <= 0) {
 			*reinterpret_cast<s16*>(state + 0x30) = 1;
 		} else {
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
@@ -1504,7 +1504,7 @@ void CMenuPcs::LetterReplyWinClose()
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
-		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+		if (*reinterpret_cast<signed char*>(state + 8) <= 0) {
 			*reinterpret_cast<s16*>(state + 0x30) = 1;
 			*reinterpret_cast<s16*>(state + 0x12) = 1;
 		} else {
@@ -1549,7 +1549,7 @@ void CMenuPcs::LetterAttachWinClose()
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
-		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+		if (*reinterpret_cast<signed char*>(state + 8) <= 0) {
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;
@@ -1703,7 +1703,7 @@ void CMenuPcs::LetterConfirmClose()
 	int state = GetLetterStateBase(this);
 	if (m_menuWindowInfo->state == 3) {
 		*reinterpret_cast<char*>(state + 0xC) = 0;
-		if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+		if (*reinterpret_cast<signed char*>(state + 8) <= 0) {
 			*reinterpret_cast<s16*>(state + 0x30) = 3;
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;

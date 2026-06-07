@@ -159,7 +159,7 @@ static inline CChara::CNode* ModelNodes(CChara::CModel* model)
 
 static inline void* ModelBank(CChara::CModel* model)
 {
-	return *reinterpret_cast<void**>(reinterpret_cast<u8*>(ModelRef(model)) + 0x14);
+	return ModelRef(model)->m_bank;
 }
 
 static inline float (*ModelDrawMtx(CChara::CModel* model))[4]

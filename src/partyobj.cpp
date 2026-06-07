@@ -4688,29 +4688,25 @@ void CGPartyObj::gpmCol()
 		CVector leaderV(leader->m_worldPosition);
 		CVector diff;
 		PSVECSubtract(reinterpret_cast<Vec*>(&leaderV), reinterpret_cast<Vec*>(&posV), reinterpret_cast<Vec*>(&diff));
+		Vec diffVec;
+		diffVec.x = diff.x;
+		diffVec.y = diff.y;
+		diffVec.z = diff.z;
 
-		unsigned int flags = m_attrFlags & ~0x10U;
+		unsigned int flags = leader->m_bgHitMask & ~0x10U;
 		float halfHeight = m_capsuleHalfHeight;
 		CVector bottom(pos->x, FLOAT_80331A98 + pos->y, pos->z);
 
-		float cyl[14];
-		cyl[0] = bottom.x;
-		cyl[1] = bottom.y;
-		cyl[2] = bottom.z;
-		cyl[3] = diff.x;
-		cyl[4] = diff.y;
-		cyl[5] = diff.z;
-		cyl[6] = halfHeight;
-		cyl[7] = FLOAT_80331a9c;
-		cyl[8] = FLOAT_80331a9c;
-		cyl[9] = FLOAT_80331a9c;
-		cyl[10] = FLOAT_80331aa0;
-		cyl[11] = FLOAT_80331aa0;
-		cyl[12] = FLOAT_80331aa0;
-		cyl[13] = FLOAT_80331aa0;
+		CMapCylinder cylinder(FLOAT_80331a9c, FLOAT_80331aa0);
+		cylinder.m_bottom.x = bottom.x;
+		cylinder.m_bottom.y = bottom.y;
+		cylinder.m_bottom.z = bottom.z;
+		cylinder.m_top.x = diffVec.x;
+		cylinder.m_top.y = diffVec.y;
+		cylinder.m_top.z = diffVec.z;
+		cylinder.m_axis.x = halfHeight;
 
-		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(cyl),
-		        reinterpret_cast<Vec*>(&cyl[3]), flags) != 0) {
+		if (MapMng.CheckHitCylinderNear(&cylinder, &diffVec, flags) != 0) {
 			int capped = i + 1;
 			if (activeTrailCount < capped) {
 				capped = activeTrailCount;

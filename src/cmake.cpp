@@ -2056,7 +2056,7 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetScale(1.0f);
     tribeFont->DrawInit();
     CColor tribeRgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    tribeFont->SetColor(tribeRgba);
+    tribeFont->SetColor(tribeRgba.color);
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetTribeStr(i);
@@ -2070,7 +2070,7 @@ void CMenuPcs::CmakeTribeDraw()
     hairFont->SetShadow(1);
     hairFont->SetScale(1.0f);
     hairFont->DrawInit();
-    hairFont->SetColor(tribeRgba);
+    hairFont->SetColor(tribeRgba.color);
     hairFont->SetTlut(6);
 
     int hairBase = MenuS16(this, 0x862) * 8;
@@ -2588,8 +2588,8 @@ void CMenuPcs::CmakeNameDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    GXColor textCol = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
-    font->SetColor(textCol);
+    CColor textCol(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    font->SetColor(textCol.color);
 
     int y = 0x6C;
     for (int i = 0; i < 5; i++) {

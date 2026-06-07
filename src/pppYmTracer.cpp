@@ -13,22 +13,22 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern const u32 kYmTracerTopColorBase = 0xFFFFFF00;
-extern const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
-extern const f32 kYmTracerZero = 0.0f;
-extern const f32 kYmTracerOne = 1.0f;
+static const u32 kYmTracerTopColorBase = 0xFFFFFF00;
+static const u32 kYmTracerBottomColorBase = 0xFFFFFF00;
+static const f32 kYmTracerZero = 0.0f;
+static const f32 kYmTracerOne = 1.0f;
 
 static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
 STATIC_ASSERT(sizeof(YmTracerDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
-STATIC_ASSERT(sizeof(YmTracerPolygon) == 0x28);
-STATIC_ASSERT(offsetof(YmTracerPolygon, from) == 0x0);
-STATIC_ASSERT(offsetof(YmTracerPolygon, to) == 0x10);
-STATIC_ASSERT(offsetof(YmTracerPolygon, colorR) == 0x1c);
-STATIC_ASSERT(offsetof(YmTracerPolygon, life) == 0x20);
-STATIC_ASSERT(offsetof(YmTracerPolygon, decay) == 0x22);
+STATIC_ASSERT(sizeof(TRACE_POLYGON) == 0x28);
+STATIC_ASSERT(offsetof(TRACE_POLYGON, from) == 0x0);
+STATIC_ASSERT(offsetof(TRACE_POLYGON, to) == 0x10);
+STATIC_ASSERT(offsetof(TRACE_POLYGON, colorR) == 0x1c);
+STATIC_ASSERT(offsetof(TRACE_POLYGON, life) == 0x20);
+STATIC_ASSERT(offsetof(TRACE_POLYGON, decay) == 0x22);
 STATIC_ASSERT(sizeof(YmTracerWork) == 0x30);
 STATIC_ASSERT(offsetof(YmTracerWork, initWork) == 0x20);
 STATIC_ASSERT(offsetof(YmTracerWork, entries) == 0x28);
@@ -40,7 +40,7 @@ static inline YmTracerDataOffsets* GetYmTracerDataOffsets(pppYmTracerCtrl* ctrl)
     return reinterpret_cast<YmTracerDataOffsets*>(ctrl->m_serializedDataOffsets);
 }
 
-static inline void copyPolygonData(YmTracerPolygon* dst, YmTracerPolygon* src)
+static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 {
     pppCopyVector(dst->from, src->from);
     pppCopyVector(dst->to, src->to);
@@ -78,7 +78,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     YmTracerWork* work;
     CMapMesh* mapMesh;
     YmTracerColorBlock* colorData;
-    YmTracerPolygon* poly;
+    TRACE_POLYGON* poly;
     CTexture* texture;
     s32 i;
     s32 colorOffset;
@@ -128,7 +128,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
             GXSetCullMode(GX_CULL_NONE);
 
             for (i = 0; i < (s32)(work->count - 1); i++) {
-                YmTracerPolygon* next = poly + 1;
+                TRACE_POLYGON* next = poly + 1;
 
                 if ((next->life > 0) && (kYmTracerZero != poly->to.x) && (kYmTracerZero != poly->to.y) &&
                     (kYmTracerZero != poly->to.z) && (kYmTracerZero != poly->from.x) &&
@@ -177,13 +177,13 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
  */
 void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmTracerCtrl* param_3)
 {
-    YmTracerPolygon* entries;
-    YmTracerPolygon* entry;
-    YmTracerPolygon* poly;
+    TRACE_POLYGON* entries;
+    TRACE_POLYGON* entry;
+    TRACE_POLYGON* poly;
     YmTracerWork* work;
     f32 fVar3;
     s32 i;
-    YmTracerPolygon* entriesPtr;
+    TRACE_POLYGON* entriesPtr;
 
     if (ppvUserStopPartF != 0) {
         return;
@@ -193,8 +193,8 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
     entriesPtr = work->entries;
     entries = entriesPtr;
     if (entriesPtr == 0) {
-        work->entries = (YmTracerPolygon*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * sizeof(YmTracerPolygon), ppvEnv->m_stagePtr,
+        work->entries = (TRACE_POLYGON*)pppMemAlloc(
+            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
         fVar3 = kYmTracerZero;
         entries = work->entries;
@@ -302,7 +302,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
                 }
             }
 
-            YmTracerPolygon* splineEntry = entries;
+            TRACE_POLYGON* splineEntry = entries;
             for (i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
                 splineEntry[2].alpha = param_2->m_tracer.m_entryAlpha - idx * splineEntry[2].decay;

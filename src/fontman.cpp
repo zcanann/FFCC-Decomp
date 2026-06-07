@@ -20,7 +20,7 @@ extern const float kFontOrthoHeight = 448.0f;
 extern const float kFontOrthoWidth = 640.0f;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
-static const char s_CFontMan_801D9CC4[] = "CFontMan";
+static const char sFontManClassName[] = "CFontMan";
 
 CFontMan FontMan;
 
@@ -874,7 +874,7 @@ void CFontMan::Init()
 {
 	m_font = 0;
 
-	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan_801D9CC4), 0);
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(sFontManClassName), 0);
 	m_stage = stage;
 
 	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;

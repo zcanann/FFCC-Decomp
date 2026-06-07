@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-static const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
+static const char sCharaAnimClassName[] = "CChara::CAnim";
 static const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 static const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"

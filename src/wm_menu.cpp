@@ -3165,10 +3165,7 @@ void CMenuPcs::CalcTitleMenu()
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	WmWorldState* const worldState = m_wmWorldState;
-	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
-
-	if (worldState->m_mainState != 2) {
+	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
@@ -3197,7 +3194,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	WmCharaSelectEntry& entry = selectState[0];
+	WmCharaSelectEntry& entry = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData)[0];
 	if (loadedCount != validCount || entry.m_confirmed != 0) {
 		return;
 	}
@@ -3218,7 +3215,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		down = GetButtonDown(0);
 	}
 
-	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
+	if (m_wmWorldState->m_mainState != 2 || m_wmWorldState->m_nextMenuMode != 0) {
 		return;
 	}
 

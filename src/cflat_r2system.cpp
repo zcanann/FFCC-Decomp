@@ -1193,19 +1193,6 @@ CMesMenu* CMenuPcs::GetMesMenu(int index)
     return reinterpret_cast<CMesMenu**>(reinterpret_cast<char*>(this) + 0x10C)[index];
 }
 
-/*
- * --INFO--
- * PAL Address: 0x800B95AC
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector::operator Vec&()
-{
-    return *reinterpret_cast<Vec*>(this);
-}
 
 /*
  * --INFO--
@@ -1390,20 +1377,6 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
 
     PSVECScale(b, &scaled, scale);
     PSVECAdd(a, &scaled, out);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800B97D8
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CVector::operator Vec*()
-{
-    return reinterpret_cast<Vec*>(this);
 }
 
 /*

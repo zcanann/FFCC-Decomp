@@ -4743,9 +4743,9 @@ void CMenuPcs::DrawTitleMenu()
 	WmWorldState* const typedWorldState = m_wmWorldState;
 	short state = typedWorldState->m_mainState;
 
-		if (state == 0 && typedWorldState->m_worldReady != 0) {
-			if (m_wmThpActive != 0) {
-				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+		if (state == 0 && static_cast<signed char>(typedWorldState->m_worldReady) != 0) {
+			if (static_cast<signed char>(m_wmThpActive) != 0) {
+				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)Graphic.m_renderMode, 0, 0, 0x280, 0x1C0);
 				Graphic._WaitDrawDone(const_cast<char*>(s_wm_menu_cpp), 0x12A2);
 			}
 		short sVarE = typedWorldState->m_state0E;

@@ -3268,11 +3268,6 @@ void CMenuPcs::destroyBonus()
 void CMenuPcs::createBonus()
 {
 	char fontPath[128];
-	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-	int listPtr = this->m_bonusListPtr;
-	MenuWindowInfo* window = this->m_menuWindowInfo;
-	int boardPtr = this->m_bonus.m_bonusBoardPtr;
 
 	Pad.m_stickDigitalThreshold = 0x28;
 	for (int i = 0; i < 4; i++) {
@@ -3293,23 +3288,18 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
-	statePtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
-	this->m_bonusStatePtr = statePtr;
-	listPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
-	this->m_bonusListPtr = listPtr;
+	this->m_bonusStatePtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
+	this->m_bonusListPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
 
 	InitBonusEffectSlots(this);
-	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
+	memset((void*)this->m_bonusStatePtr, 0, sizeof(BonusMenuStateRaw));
 	s_Base[0] = reinterpret_cast<float*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
-	animPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
-	this->m_bonusAnimPtr = animPtr;
-	memset((void*)animPtr, 0, sizeof(BonusAnimList));
-	boardPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
-	this->m_bonus.m_bonusBoardPtr = boardPtr;
-	window = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
-	this->m_menuWindowInfo = window;
-	memset(window, 0, sizeof(MenuWindowInfo));
+	this->m_bonusAnimPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
+	memset((void*)this->m_bonusAnimPtr, 0, sizeof(BonusAnimList));
+	this->m_bonus.m_bonusBoardPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
+	this->m_menuWindowInfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
+	memset(this->m_menuWindowInfo, 0, sizeof(MenuWindowInfo));
 	const float depth1000 = FLOAT_80331F6C;
 	const float scale1 = FLOAT_80331EB0;
 	const float zero = FLOAT_80331EAC;

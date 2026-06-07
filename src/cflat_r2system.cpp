@@ -2012,8 +2012,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             *reinterpret_cast<float*>(object->m_localBase[2]) =
                 static_cast<float>(Pad.GetLeftStickY(*object->m_localBase));
         } else {
-            *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
-            *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
+            *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
         }
         this->push(object, 0);
         outResult = 0;
@@ -2025,8 +2025,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             *reinterpret_cast<float*>(object->m_localBase[2]) =
                 static_cast<float>(Pad.GetRightStickY(*object->m_localBase));
         } else {
-            *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
-            *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
+            *reinterpret_cast<float*>(object->m_localBase[1]) = kCFlatPadStickZero;
+            *reinterpret_cast<float*>(object->m_localBase[2]) = kCFlatPadStickZero;
         }
         this->push(object, 0);
         outResult = 0;

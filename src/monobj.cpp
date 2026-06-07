@@ -422,7 +422,9 @@ void CGMonObj::onStatAttack(int state)
 				float rotLimit = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
 				if (m_targetPartyIndex >= 0) {
 					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(target));
-					if (rotLimit <= FLOAT_80331A48) {
+					if (rotLimit > FLOAT_80331A48) {
+						object->m_rotTargetY = targetRot;
+					} else {
 						float delta = Math.DstRot(targetRot, *reinterpret_cast<float*>(&object->m_bgFlags));
 						if (delta < -rotLimit) {
 							delta = -rotLimit;
@@ -430,8 +432,6 @@ void CGMonObj::onStatAttack(int state)
 							delta = rotLimit;
 						}
 						object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags) + delta;
-					} else {
-						object->m_rotTargetY = targetRot;
 					}
 				}
 			}

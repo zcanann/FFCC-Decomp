@@ -336,11 +336,9 @@ void CMenuPcs::CmdInit()
 	} while (iVar8 != 0);
 
 	entry = entries;
-	int iVar5 = 0;
-	iVar8 = 8;
 	float fVar3 = FLOAT_80332ab0;
 	float fVar4 = FLOAT_80332ad0;
-	do {
+	for (s32 iVar5 = 0; iVar5 < 8; iVar5++) {
 		if (iVar5 < caravanWork->m_numCmdListSlots) {
 			entry->tex = 0x2D;
 		} else {
@@ -354,23 +352,20 @@ void CMenuPcs::CmdInit()
 		entry->u = fVar3;
 		entry->v = fVar4;
 
-		if ((1 < iVar5) && (caravanWork->m_commandListInventorySlotRef[iVar5] < 0)) {
-			entry->v += static_cast<float>(static_cast<double>(entry->height));
+		if ((2 <= iVar5) && (caravanWork->m_commandListInventorySlotRef[iVar5] < 0)) {
+			entry->v += static_cast<float>(entry->height);
 		}
 
 		entry->startFrame = iVar5;
-		iVar5++;
 		entry->duration = 3;
 		entry++;
-		iVar8--;
-	} while (iVar8 != 0);
+	}
 
 	GetCmdListStorage(this)->count = 8;
 	CmdInit1();
 	GetCmdItem();
-	CmdState* cmd = GetCmdStateView(this);
-	cmd->selected = 2;
-	cmd->initialized = 1;
+	GetCmdStateView(this)->selected = 2;
+	GetCmdStateView(this)->initialized = 1;
 }
 
 /*

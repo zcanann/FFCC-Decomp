@@ -403,16 +403,19 @@ void CGPartyObj::onChangeStat(int state)
 	case 1: {
 		int attackSel = party.attackSel;
 		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-		             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA +
-		            attackSel * 0x12;
+		int row = attackSel * 0x12;
 		*reinterpret_cast<int*>(self + 0x630) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry);
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
+		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row);
 		*reinterpret_cast<int*>(self + 0x634) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 2);
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
+		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 2);
 		*reinterpret_cast<int*>(self + 0x638) =
-		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 10);
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
+		        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+		         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 10);
 		break;
 	}
 	case 2:
@@ -427,7 +430,7 @@ void CGPartyObj::onChangeStat(int state)
 		*reinterpret_cast<int*>(self + 0x68C) = castTime;
 		break;
 	case 6:
-		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x40), *reinterpret_cast<int*>(self + 0x560));
+		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x370), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x560) =
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
 		System.Printf(const_cast<char*>(lbl_80331B0C), *reinterpret_cast<int*>(self + 0x560));
@@ -437,18 +440,19 @@ void CGPartyObj::onChangeStat(int state)
 		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
 		int itemHigh = itemKind >> 8;
 		int itemLow = itemKind & 0xFF;
-		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x60), itemHigh);
-		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x7C), itemLow);
+		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x390), itemHigh);
+		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x3AC), itemLow);
 		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
 		{
-			unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
-			             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA +
-			            itemLow * 0x42;
+			int row = itemLow * 0x42;
 			*reinterpret_cast<int*>(self + 0x630) =
-			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 0x38);
+			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
+			        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 0x38);
 			*reinterpret_cast<int*>(self + 0x634) =
-			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 0x3A);
+			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 +
+			        (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) +
+			         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) * 2) * 0x1CA + row + 0x3A);
 		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		if (Game.m_gameWork.m_menuStageMode != 0) {

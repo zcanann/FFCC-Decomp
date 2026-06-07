@@ -256,6 +256,15 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
     } while (count != 0);
 }
 
+static inline void wrap_birth_angle(s32* value)
+{
+    s32 v = *value;
+    if ((0x7FFF < v) || (v < -0x8000)) {
+        s32 sign = v >> 0x1F;
+        *value = (s32)((u32)(sign * 0x8000 | (u32)(v * 0x20000 + sign) >> 0x11) - sign);
+    }
+}
+
 static inline signed char random_signed_byte_span(u8 span)
 {
     (void)Math.RandF();
@@ -692,7 +701,9 @@ join_position:
         }
     }
 
-    wrap_particle_rotation_triplet_s32((u8*)particleData, 0x38);
+    wrap_birth_angle(s32_at(particleData, 0x38));
+    wrap_birth_angle(s32_at(particleData, 0x3C));
+    wrap_birth_angle(s32_at(particleData, 0x40));
 
     *f32_at(particleData, 0x5C) = *(float*)(payload + 0x90);
     *f32_at(particleData, 0x60) = *(float*)(payload + 0x94);

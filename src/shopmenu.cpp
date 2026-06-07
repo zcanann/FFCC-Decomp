@@ -1951,10 +1951,10 @@ void CShopMenu::DrawSmith0()
         title = MenuPcs.GetJobStr(1);
     }
 
-    float textX = 264.0f - font->GetWidth(title);
+    float width = font->GetWidth(title);
 
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), textX, FLOAT_80332e4c, 9, 0x12);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(title), 264.0f - width, FLOAT_80332e4c, 9, 0x12);
     MenuPcs.DrawInit();
     MenuPcs.DrawInit();
 }
@@ -2350,11 +2350,11 @@ void CShopMenu::SelectFigure()
 {
     if ((GetPadButtons() & 1) != 0) {
         ++m_figureMode;
-        if (m_figureMode < 2) {
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else {
+        if (m_figureMode >= 2) {
             m_figureMode = 1;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
+        } else {
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
     } else if ((GetPadButtons() & 2) != 0) {
         --m_figureMode;
@@ -2410,7 +2410,7 @@ void CShopMenu::SelectFigure()
 
             m_quantity -= 10;
             Sound.PlaySe(4, 0x40, 0x7F, 0);
-        } else if ((figureMode < 1) && (figureMode >= 0)) {
+        } else if (figureMode == 0) {
             ++m_quantity;
             CCaravanWork* caravanWork = m_caravanWork;
             if (m_quantity <= (0x40 - static_cast<unsigned short>(caravanWork->m_inventoryItemCount))) {
@@ -2467,7 +2467,7 @@ void CShopMenu::SelectFigure()
         } else {
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
-    } else if ((figureMode < 1) && (figureMode >= 0)) {
+    } else if (figureMode == 0) {
         --m_quantity;
         if (m_quantity < 1) {
             gShopMenuInputLatch = 4;

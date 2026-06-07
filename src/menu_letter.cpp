@@ -587,7 +587,7 @@ bool CMenuPcs::LetterOpen()
 		do {
 			fVar1 = FLOAT_803330bc;
 			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
-				if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
+				if (*reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14) <= iVar8) {
 					iVar6 = iVar6 + 1;
 					*reinterpret_cast<float*>(psVar7 + 8) = FLOAT_803330f8;
 					*reinterpret_cast<float*>(psVar7 + 0x18) = fVar1;

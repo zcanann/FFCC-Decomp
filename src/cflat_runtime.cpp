@@ -592,21 +592,21 @@ int CFlatRuntime::Frame(int mode, int unused)
 					scanCount = 4;
 
 					do {
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
-						if ((scriptMask & 0x80000000) != 0) { break; }
+						if (static_cast<int>(scriptMask) < 0) { break; }
 						scriptMask <<= 1; scriptIndex--;
 						scanCount--;
 					} while (scanCount != 0);
@@ -625,21 +625,21 @@ int CFlatRuntime::Frame(int mode, int unused)
 						scanCount = 4;
 
 						do {
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
-							if ((scriptMask & 0x80000000) != 0) { break; }
+							if (static_cast<int>(scriptMask) < 0) { break; }
 							scriptMask <<= 1; scriptIndex--;
 							scanCount--;
 						} while (scanCount != 0);

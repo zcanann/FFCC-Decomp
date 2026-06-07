@@ -1672,7 +1672,7 @@ void CGPartyObj::onFrameStat()
 		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(onFrameSelf[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
 		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(onFrameSelf[0x9B]) << 25) & 0xC0000000) >> 31) != 0) &&
 		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0))) {
-			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
+			if ((FLOAT_80331a74 * Game.unkFloat_0xca10 < m_targetDist) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&

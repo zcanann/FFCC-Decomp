@@ -718,32 +718,34 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 } else {
                     float sampleT;
 
-                    if (param->m_randType == 1) {
-                        Math.RandF();
-                        sampleT = Math.RandF();
-                    } else if (param->m_randType == 3) {
+                    if (param->m_randType == 3) {
                         float a = Math.RandF();
                         float b = Math.RandF();
                         float c = Math.RandF();
                         sampleT = static_cast<float>(DOUBLE_80330598 - (c * (b * a)));
-                    } else if (param->m_randType == 5) {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        float c = Math.RandF();
-                        float d = Math.RandF();
-                        float e = Math.RandF();
-                        sampleT = static_cast<float>(DOUBLE_80330598 - (e * (d * (c * (b * a)))));
-                    } else if (param->m_randType == 2) {
-                        float a = Math.RandF();
-                        float b = Math.RandF();
-                        float c = Math.RandF();
-                        sampleT = c * (b * a);
+                    } else if (param->m_randType > 2) {
+                        if (param->m_randType == 5) {
+                            float a = Math.RandF();
+                            float b = Math.RandF();
+                            float c = Math.RandF();
+                            float d = Math.RandF();
+                            float e = Math.RandF();
+                            sampleT = static_cast<float>(DOUBLE_80330598 - (e * (d * (c * (b * a)))));
+                        } else {
+                            float a = Math.RandF();
+                            float b = Math.RandF();
+                            float c = Math.RandF();
+                            float d = Math.RandF();
+                            sampleT = d * (c * (b * a));
+                        }
+                    } else if (param->m_randType == 1) {
+                        Math.RandF();
+                        sampleT = Math.RandF();
                     } else {
                         float a = Math.RandF();
                         float b = Math.RandF();
                         float c = Math.RandF();
-                        float d = Math.RandF();
-                        sampleT = d * (c * (b * a));
+                        sampleT = c * (b * a);
                     }
 
                     if ((int)work->m_pathIndex >= pathInfo[1]) {

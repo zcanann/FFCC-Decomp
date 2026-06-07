@@ -1529,44 +1529,56 @@ bool CMenuPcs::LetterConfirmOpen()
 	if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
-		if (languageId == 3) {
+		switch (languageId) {
+		case 3: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-		} else if (languageId < 3) {
-			if (languageId == 2) {
-				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-				sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
-			} else {
-				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
-			}
-		} else if (languageId == 5) {
+			break;
+		}
+		case 2: {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
+			break;
+		}
+		case 5: {
 			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-		} else {
-			if (4 < languageId) {
-				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
-			} else {
-				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
-				sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
-			}
+			break;
+		}
+		case 4: {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
+			break;
+		}
+		case 0:
+		case 1:
+		default: {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
+			sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
+			break;
+		}
 		}
 
-		if (languageId == 3) {
+		switch (languageId) {
+		case 3:
 			sprintf(lines[1], "%s%s%s%s",
 			        GetMenuStr(0x25),
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24));
-		} else if (languageId == 2) {
+			break;
+		case 2:
 			sprintf(lines[1], "%s%s%s%s",
 			        GetMenuStr(0x23),
 			        s_ReplyStr,
 			        GetMenuStr(0x24),
 			        GetMenuStr(0x27));
-		} else {
+			break;
+		case 0:
+		case 1:
+		default:
 			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
+			break;
 		}
 
 		int lineCount = 2;

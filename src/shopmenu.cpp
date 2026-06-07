@@ -618,7 +618,7 @@ char* CShopMenu::GetItemName(int itemNo)
         return 0;
     }
 
-    return reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
+    return reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]);
 }
 
 /*
@@ -1077,7 +1077,7 @@ void CShopMenu::DrawItemInfo0()
         font->SetMargin(FLOAT_80332d28);
         char* itemName = 0;
         if (itemNo >= 1) {
-            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]);
+            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]);
         }
         font->DrawInit();
         MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
@@ -1359,7 +1359,7 @@ void CShopMenu::DrawItemList()
             font->DrawInit();
             font->SetPosX(static_cast<float>(frameX - 0x54));
             font->SetPosY(static_cast<float>(y - 0x14));
-            font->Draw(reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[itemNo * 5 + 4]));
+            font->Draw(reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[itemNo * 5 + 4]));
             MenuPcs.DrawInit();
             MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }
@@ -1747,7 +1747,7 @@ void CShopMenu::DrawSoubi()
 
     char* itemName = 0;
     if (resultItem >= 1) {
-        itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.unkCFlatData0[1])[resultItem * 5 + 4]);
+        itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.m_cFlatDataArr[1].TableStrings(0))[resultItem * 5 + 4]);
     }
     MenuPcs.DrawShadowFont(font, itemName, FLOAT_80332d54, 112.0f, 0x18, 0x12);
     MenuPcs.DrawInit();

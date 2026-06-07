@@ -1938,7 +1938,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                             break;
                         }
                     }
-                    else if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0 || (loopCounter & 0x1F) == 0)
+                    else if (*reinterpret_cast<unsigned int*>(playerBase + 0x1420) == 0 || (int)(loopCounter & 0x1F) == 0)
                     {
                         OSTime now = OSGetTime();
                         if ((s64)OSMillisecondsToTicks(5000) < now - startTime)

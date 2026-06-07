@@ -1720,11 +1720,12 @@ void CMiniGamePcs::EndThread()
 static inline unsigned int MiniGameCrc8(unsigned int value)
 {
     unsigned int crc = 0;
+    unsigned int data = ((value >> 16) & 0xFF) | (value & 0xFF00);
 
     for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
     {
         crc = crc * 2;
-        if (((value >> 16) & 0xFF & mask) == 0)
+        if ((data & 0xFF & mask) == 0)
         {
             if ((crc & 0x100) != 0)
             {
@@ -1741,10 +1742,12 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
         }
     }
 
+    data >>= 8;
+
     for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
     {
         crc = crc * 2;
-        if (((value & 0xFF00) >> 8 & mask) == 0)
+        if ((data & 0xFF & mask) == 0)
         {
             if ((crc & 0x100) != 0)
             {
@@ -1916,55 +1919,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                                 if (playerBase[0x144E] != 0)
                                 {
                                     unsigned int packet = *reinterpret_cast<unsigned int*>(playerBase + 0x142C);
-                                    unsigned int crc = 0;
-                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                                    {
-                                        crc = crc * 2;
-                                        if (((packet >> 16) & 0xFF & mask) == 0)
-                                        {
-                                            if ((crc & 0x100) != 0)
-                                            {
-                                                crc ^= 0xCD;
-                                            }
-                                        }
-                                        else if ((crc & 0x100) == 0)
-                                        {
-                                            crc += 1;
-                                        }
-                                        else
-                                        {
-                                            crc ^= 0xCC;
-                                        }
-                                    }
-                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                                    {
-                                        crc = crc * 2;
-                                        if (((packet & 0xFF00) >> 8 & mask) == 0)
-                                        {
-                                            if ((crc & 0x100) != 0)
-                                            {
-                                                crc ^= 0xCD;
-                                            }
-                                        }
-                                        else if ((crc & 0x100) == 0)
-                                        {
-                                            crc += 1;
-                                        }
-                                        else
-                                        {
-                                            crc ^= 0xCC;
-                                        }
-                                    }
-                                    unsigned int n = 0;
-                                    do
-                                    {
-                                        crc <<= 1;
-                                        if ((crc & 0x100) != 0)
-                                        {
-                                            crc ^= 0xCD;
-                                        }
-                                        n++;
-                                    } while (n < 8);
+                                    unsigned int crc = MiniGameCrc8(packet);
                                     if ((packet & 0xFF) == (crc & 0xFF))
                                     {
                                         self[0x6490 + i] = playerBase[0x144E];
@@ -1999,42 +1954,47 @@ disconnect_player:
                                 bit = 0;
                                 *reinterpret_cast<unsigned int*>(channelBase + 0x1368) = 0x40000000;
                                 *reinterpret_cast<unsigned int*>(channelBase + 0x1368) |= 0x12000;
-                                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
                                 {
-                                    bit = bit * 2;
-                                    if ((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) >> 16 & 0xFF & mask) == 0)
+                                    unsigned int data = ((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) >> 16) & 0xFF) |
+                                                        (*reinterpret_cast<unsigned int*>(channelBase + 0x1368) & 0xFF00);
+                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
                                     {
-                                        if ((bit & 0x100) != 0)
+                                        bit = bit * 2;
+                                        if ((data & 0xFF & mask) == 0)
                                         {
-                                            bit ^= 0xCD;
+                                            if ((bit & 0x100) != 0)
+                                            {
+                                                bit ^= 0xCD;
+                                            }
+                                        }
+                                        else if ((bit & 0x100) == 0)
+                                        {
+                                            bit += 1;
+                                        }
+                                        else
+                                        {
+                                            bit ^= 0xCC;
                                         }
                                     }
-                                    else if ((bit & 0x100) == 0)
+                                    data >>= 8;
+                                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
                                     {
-                                        bit += 1;
-                                    }
-                                    else
-                                    {
-                                        bit ^= 0xCC;
-                                    }
-                                }
-                                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                                {
-                                    bit = bit * 2;
-                                    if (((*reinterpret_cast<unsigned int*>(channelBase + 0x1368) & 0xFF00) >> 8 & mask) == 0)
-                                    {
-                                        if ((bit & 0x100) != 0)
+                                        bit = bit * 2;
+                                        if ((data & 0xFF & mask) == 0)
                                         {
-                                            bit ^= 0xCD;
+                                            if ((bit & 0x100) != 0)
+                                            {
+                                                bit ^= 0xCD;
+                                            }
                                         }
-                                    }
-                                    else if ((bit & 0x100) == 0)
-                                    {
-                                        bit += 1;
-                                    }
-                                    else
-                                    {
-                                        bit ^= 0xCC;
+                                        else if ((bit & 0x100) == 0)
+                                        {
+                                            bit += 1;
+                                        }
+                                        else
+                                        {
+                                            bit ^= 0xCC;
+                                        }
                                     }
                                 }
                                 unsigned int n = 0;
@@ -2075,54 +2035,7 @@ next_player:
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) = (j + 0x40) * 0x1000000;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (word & 0xFFFF00);
-                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                    {
-                        crc = crc * 2;
-                        if ((*reinterpret_cast<unsigned int*>(txBase + 0x1378) >> 16 & 0xFF & mask) == 0)
-                        {
-                            if ((crc & 0x100) != 0)
-                            {
-                                crc ^= 0xCD;
-                            }
-                        }
-                        else if ((crc & 0x100) == 0)
-                        {
-                            crc += 1;
-                        }
-                        else
-                        {
-                            crc ^= 0xCC;
-                        }
-                    }
-                    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                    {
-                        crc = crc * 2;
-                        if (((*reinterpret_cast<unsigned int*>(txBase + 0x1378) & 0xFF00) >> 8 & mask) == 0)
-                        {
-                            if ((crc & 0x100) != 0)
-                            {
-                                crc ^= 0xCD;
-                            }
-                        }
-                        else if ((crc & 0x100) == 0)
-                        {
-                            crc += 1;
-                        }
-                        else
-                        {
-                            crc ^= 0xCC;
-                        }
-                    }
-                    unsigned int n = 0;
-                    do
-                    {
-                        crc <<= 1;
-                        if ((crc & 0x100) != 0)
-                        {
-                            crc ^= 0xCD;
-                        }
-                        n++;
-                    } while (n < 8);
+                    crc = MiniGameCrc8(*reinterpret_cast<unsigned int*>(txBase + 0x1378));
                     j++;
                     *reinterpret_cast<unsigned int*>(txBase + 0x1378) =
                         *reinterpret_cast<unsigned int*>(txBase + 0x1378) | (crc & 0xFF);
@@ -2135,54 +2048,7 @@ next_player:
                 *reinterpret_cast<unsigned int*>(self + 5000) =
                     *reinterpret_cast<unsigned int*>(self + 5000) |
                     (((seq & 0xFF) << 8 | (int)(unsigned int)seq >> 8) << 8);
-                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                {
-                    seqCrc = seqCrc * 2;
-                    if ((*reinterpret_cast<unsigned int*>(self + 5000) >> 16 & 0xFF & mask) == 0)
-                    {
-                        if ((seqCrc & 0x100) != 0)
-                        {
-                            seqCrc ^= 0xCD;
-                        }
-                    }
-                    else if ((seqCrc & 0x100) == 0)
-                    {
-                        seqCrc += 1;
-                    }
-                    else
-                    {
-                        seqCrc ^= 0xCC;
-                    }
-                }
-                for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
-                {
-                    seqCrc = seqCrc * 2;
-                    if (((*reinterpret_cast<unsigned int*>(self + 5000) & 0xFF00) >> 8 & mask) == 0)
-                    {
-                        if ((seqCrc & 0x100) != 0)
-                        {
-                            seqCrc ^= 0xCD;
-                        }
-                    }
-                    else if ((seqCrc & 0x100) == 0)
-                    {
-                        seqCrc += 1;
-                    }
-                    else
-                    {
-                        seqCrc ^= 0xCC;
-                    }
-                }
-                unsigned int sn = 0;
-                do
-                {
-                    seqCrc <<= 1;
-                    if ((seqCrc & 0x100) != 0)
-                    {
-                        seqCrc ^= 0xCD;
-                    }
-                    sn++;
-                } while (sn < 8);
+                seqCrc = MiniGameCrc8(*reinterpret_cast<unsigned int*>(self + 5000));
                 int k = 0;
                 *reinterpret_cast<unsigned int*>(self + 5000) =
                     *reinterpret_cast<unsigned int*>(self + 5000) | (seqCrc & 0xFF);

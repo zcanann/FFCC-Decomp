@@ -914,8 +914,8 @@ void CGPartyObj::onFramePreCalc()
 		    ((party.partyFlags & 0x40) == 0) &&
 		    (party.carryObject == nullptr) &&
 		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) &&
-		    (reinterpret_cast<short*>(m_scriptHandle)[0x14] == 0) &&
-		    (reinterpret_cast<short*>(m_scriptHandle)[0x11] == 0);
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
+		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
 
 		if (canImmediateSwap) {
 			if (weaponItem < 1) {
@@ -1014,8 +1014,8 @@ void CGPartyObj::command()
 	int ringCommand = -1;
 	int ringCommandArg = -1;
 
-	if ((reinterpret_cast<short*>(m_scriptHandle)[7] != 0) &&
-	    ((party.commandFlags & 1) != 0) &&
+	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
+	    ((party.commandMode & 1) != 0) &&
 	    Joybus.GetCtrlMode(padSlot) != 1) {
 		int cmdDir = 0;
 

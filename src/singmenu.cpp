@@ -598,6 +598,85 @@ extern char s_Ausruesten_801DDA50[], s_Resistance_801DDB64[], s_Defendre_801DDB8
 extern char s_Detruire_801DDBAC[], s_la_reponse_801DDC14[], s_Envoyer_a_801DDC20[], s_Preferences_801DDC50[];
 extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 }
+char* CMenuPcs::GetAttrStr(int index)
+{
+    switch (Game.m_gameWork.m_languageId) {
+        case 1:
+            return (char*)gSingMenuAttrTableDe[index];
+        case 2:
+            return (char*)gSingMenuAttrTableIt[index];
+        case 3:
+            return (char*)gSingMenuAttrTableFr[index];
+        case 4:
+            return (char*)gSingMenuAttrTableEs[index];
+        default:
+            return (char*)gSingMenuAttrTableEn[index];
+    }
+}
+
+char* CMenuPcs::GetMenuStr(int index)
+{
+    switch (Game.m_gameWork.m_languageId) {
+        case 1:
+            return (char*)gSingMenuTextTableDe[index];
+        case 2:
+            return (char*)gSingMenuTextTableIt[index];
+        case 3:
+            return (char*)gSingMenuTextTableFr[index];
+        case 4:
+            return (char*)gSingMenuTextTableEs[index];
+        default:
+            return (char*)gSingMenuTextTableEn[index];
+    }
+}
+
+char* CMenuPcs::GetHairStr(int index)
+{
+    switch (Game.m_gameWork.m_languageId) {
+        case 1:
+            return (char*)PTR_s_Spitzschopf[index];
+        case 2:
+            return (char*)PTR_s_Ciuffo_ribelle[index];
+        case 3:
+            return (char*)gSingMenuHairTableFr[index];
+        case 4:
+            return (char*)PTR_s_Remolino[index];
+        default:
+            return (char*)PTR_s_Cowlick[index];
+    }
+}
+
+char* CMenuPcs::GetJobStr(int index)
+{
+    switch (Game.m_gameWork.m_languageId) {
+        case 1:
+            return (char*)PTR_s_Schmied[index];
+        case 2:
+            return (char*)PTR_s_Fabbri[index];
+        case 3:
+            return (char*)PTR_s_Forgeron[index];
+        case 4:
+            return (char*)PTR_s_Herrero[index];
+        default:
+            return (char*)PTR_s_Blacksmith[index];
+    }
+}
+
+char* CMenuPcs::GetTribeStr(int index)
+{
+    switch (Game.m_gameWork.m_languageId) {
+        case 1:
+            return (char*)PTR_s_Clavat_80214100[index];
+        case 2:
+            return (char*)PTR_s_Clavat_80214110[index];
+        case 3:
+            return (char*)PTR_s_Clavat_80214120[index];
+        case 4:
+            return (char*)PTR_s_Clavate[index];
+        default:
+            return (char*)PTR_s_Clavat_802140f0[index];
+    }
+}
 extern "C" const char* PTR_s_Clavat_802140f0[] = {
     s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
@@ -3276,122 +3355,6 @@ void CMenuPcs::SingLifeResetWait()
  * JP Address: TODO
  * JP Size: TODO
  */
-char* CMenuPcs::GetTribeStr(int index)
-{
-    switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Clavat_80214100[index];
-        case 2:
-            return (char*)PTR_s_Clavat_80214110[index];
-        case 3:
-            return (char*)PTR_s_Clavat_80214120[index];
-        case 4:
-            return (char*)PTR_s_Clavate[index];
-        default:
-            return (char*)PTR_s_Clavat_802140f0[index];
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801455d8
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char* CMenuPcs::GetJobStr(int index)
-{
-    switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Schmied[index];
-        case 2:
-            return (char*)PTR_s_Fabbri[index];
-        case 3:
-            return (char*)PTR_s_Forgeron[index];
-        case 4:
-            return (char*)PTR_s_Herrero[index];
-        default:
-            return (char*)PTR_s_Blacksmith[index];
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8014553c
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char* CMenuPcs::GetHairStr(int index)
-{
-    switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)PTR_s_Spitzschopf[index];
-        case 2:
-            return (char*)PTR_s_Ciuffo_ribelle[index];
-        case 3:
-            return (char*)gSingMenuHairTableFr[index];
-        case 4:
-            return (char*)PTR_s_Remolino[index];
-        default:
-            return (char*)PTR_s_Cowlick[index];
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801454a0
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char* CMenuPcs::GetMenuStr(int index)
-{
-    switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)gSingMenuTextTableDe[index];
-        case 2:
-            return (char*)gSingMenuTextTableIt[index];
-        case 3:
-            return (char*)gSingMenuTextTableFr[index];
-        case 4:
-            return (char*)gSingMenuTextTableEs[index];
-        default:
-            return (char*)gSingMenuTextTableEn[index];
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80145404
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-char* CMenuPcs::GetAttrStr(int index)
-{
-    switch (Game.m_gameWork.m_languageId) {
-        case 1:
-            return (char*)gSingMenuAttrTableDe[index];
-        case 2:
-            return (char*)gSingMenuAttrTableIt[index];
-        case 3:
-            return (char*)gSingMenuAttrTableFr[index];
-        case 4:
-            return (char*)gSingMenuAttrTableEs[index];
-        default:
-            return (char*)gSingMenuAttrTableEn[index];
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801453f4

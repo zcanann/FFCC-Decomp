@@ -2334,19 +2334,14 @@ void CMenuPcs::DrawResultCountAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	int statePtr = this->m_bonusStatePtr;
-	BonusAnimList* list = (BonusAnimList*)this->m_bonusAnimPtr;
-
-	BonusAnimHeader* header = &list->header;
-	BonusAnimSprite* sprites = list->sprites;
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(signed char*)(statePtr + 0xb) == 0) {
-		int countTop = header->count;
+	if (*(signed char*)(this->m_bonusStatePtr + 0xb) == 0) {
+		int countTop = ((BonusAnimHeader*)this->m_bonusAnimPtr)->count;
 		s_CntTop = (unsigned char)countTop;
 		for (int i = 0; i < activePartyCount; i++) {
 			short y = (short)(0x28 + i * 0x60);
-			BonusAnimSprite* sprite = &sprites[countTop + i];
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
 			int rank = s_Rinfo->m_party[i].m_rank;
 			sprite->kind = 0x19;
 			short stripX = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
@@ -2373,20 +2368,20 @@ void CMenuPcs::CalcResultCountAnim()
 			}
 		}
 
-		header->count = (short)(countTop + activePartyCount);
-		*(unsigned char*)(statePtr + 0xb) = 1;
+		((BonusAnimHeader*)this->m_bonusAnimPtr)->count = (short)(countTop + activePartyCount);
+		*(unsigned char*)(this->m_bonusStatePtr + 0xb) = 1;
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0) {
-		*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0) {
+		*(short*)(this->m_bonusStatePtr + 0x22) = *(short*)(this->m_bonusStatePtr + 0x22) + 1;
 	}
 
-	int frame = (int)*(short*)(statePtr + 0x22) - 8;
-	int countTop = (int)header->count - activePartyCount;
+	int frame = (int)*(short*)(this->m_bonusStatePtr + 0x22) - 8;
+	int countTop = (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count - activePartyCount;
 
 	for (int i = 0; i < activePartyCount; i++) {
-		BonusAnimSprite* sprite = &sprites[countTop + i];
-		if (*(short*)(statePtr + 0x10) != 0) {
+		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[countTop + i];
+		if (*(short*)(this->m_bonusStatePtr + 0x10) != 0) {
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;
 			sprite->alpha = 1.0f;
@@ -2433,7 +2428,7 @@ void CMenuPcs::CalcResultCountAnim()
 		if (i / activePartyCount == 1) {
 			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
 			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
-			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(this->m_bonusStatePtr));
 			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
 
@@ -2455,17 +2450,17 @@ void CMenuPcs::CalcResultCountAnim()
 		model->m_lightAlpha = 1.0f;
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 &&
+	if (*(short*)(this->m_bonusStatePtr + 0x10) == 0 && frame >= 0 &&
 	    (double)s_Rinfo->m_winnerTotalValue + 8.333333134651184 <= (double)frame) {
-		*(short*)(statePtr + 0x10) = 1;
+		*(short*)(this->m_bonusStatePtr + 0x10) = 1;
 		return;
 	}
 
-	if (*(short*)(statePtr + 0x10) != 0) {
+	if (*(short*)(this->m_bonusStatePtr + 0x10) != 0) {
 		unsigned short buttons = 0;
 		int padRemap = Pad.m_debugPadPort;
 		int padLock = Pad.m_debugPadLock;
@@ -2482,7 +2477,7 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
-			header->finished = 1;
+			((BonusAnimHeader*)this->m_bonusAnimPtr)->finished = 1;
 		}
 	}
 }

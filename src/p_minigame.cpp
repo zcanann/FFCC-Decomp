@@ -1891,13 +1891,9 @@ void CMiniGamePcs::MngThreadMain(void*)
 
                 if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0x40000)
                 {
-                    unsigned char state = threadParam[0xBF];
-                    if (state == 3)
+                    switch (threadParam[0xBF])
                     {
-                        *reinterpret_cast<unsigned int*>(threadParam + 0x94) = 0;
-                    }
-                    else if (state == 0)
-                    {
+                    case 0:
                         if (threadParam[0xC4] == 0)
                         {
                             if (threadParam[0xC6] != 0)
@@ -1929,10 +1925,11 @@ void CMiniGamePcs::MngThreadMain(void*)
                             successMask |= bit;
                             *channelWord = 0;
                         }
-                    }
-                    else
-                    {
+                        break;
+                    case 3:
+                    default:
                         *reinterpret_cast<unsigned int*>(threadParam + 0x94) = 0;
+                        break;
                     }
                 }
                 else if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0 || (loopCounter & 0x1F) == 0)

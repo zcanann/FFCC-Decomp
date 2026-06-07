@@ -1917,7 +1917,7 @@ void CMenuPcs::GetCmdItem()
 		write3[1] = 0xa3;
 	}
 
-	*reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0)) = static_cast<s16>(count + 2);
+	*reinterpret_cast<u16*>(Joybus.GetLetterBuffer(0)) = static_cast<s16>(count + 2);
 }
 
 /*
@@ -2232,7 +2232,7 @@ void CMenuPcs::DrawUniteList()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * entry->alpha);
+		color.a = static_cast<s8>(FLOAT_80332acc * entry->alpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		s32 groupSize = 1;
@@ -2274,7 +2274,7 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(7);
 
-	const s16 topX = GetCmdListStorage(this)->entries[0].x;
+	const u16 topX = GetCmdListStorage(this)->entries[0].x;
 	for (s32 i = 0; i < foodCount; i++) {
 		const s16 slotType = caravan->m_commandListExtra[i];
 		if ((i <= 7) && (slotType == 0)) {
@@ -2417,7 +2417,7 @@ void CMenuPcs::DrawUniteList()
 	DrawInit();
 	if ((cmd->mode == 0) &&
 	    (caravan->m_commandListExtra[selected] != 0)) {
-		int helpId = caravan->m_commandListExtra[selected];
+		unsigned int helpId = caravan->m_commandListExtra[selected];
 		if (helpId == 0x207 || helpId == 0x20B || helpId == 0x20F) {
 			helpId += 2;
 		}

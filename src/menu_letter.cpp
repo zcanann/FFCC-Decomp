@@ -1687,10 +1687,12 @@ void CMenuPcs::LetterListDraw()
 	int menuDataBase = GetLetterAnimBase(this);
 
 	if ((s_OpenClose != 0) && (m_singleMenuCtrlResetFlag == '\0')) {
-		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
-		DrawSingleCrescent(FLOAT_803330f8, anim);
-		DrawSingleStat(anim);
-		DrawSingleHelpWim(anim);
+		DrawSingleCrescent(FLOAT_803330f8,
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
+		DrawSingleStat(
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
+		DrawSingleHelpWim(
+			static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18))));
 	}
 
 	if (GetLetterAnimStorage(this)->count == 1) {

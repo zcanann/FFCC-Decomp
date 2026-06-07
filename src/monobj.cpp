@@ -3222,7 +3222,7 @@ void CGMonObj::statWatch()
 		monObj->m_unk6BD = 0;
 		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
 		float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
-		if (homeDist >= homeRange) {
+		if (homeRange <= homeDist) {
 			actionState = 0;
 			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
 			chaseState = 3;

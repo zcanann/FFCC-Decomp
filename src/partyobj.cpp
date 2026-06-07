@@ -2845,7 +2845,7 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	CMapCylinder hitCylinder;
 	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), &hitCylinder.m_bottom);
-	hitCylinder.m_top = moveVec;
+	hitCylinder.m_top = *reinterpret_cast<Vec*>(&moveVec);
 	hitCylinder.m_axis.x = FLOAT_80331a78;
 	hitCylinder.m_axis.y = FLOAT_80331aa0;
 	hitCylinder.m_axis.z = FLOAT_80331a9c;

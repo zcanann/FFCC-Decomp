@@ -1477,15 +1477,14 @@ void CChara::CModel::calcMatrix()
 		m_anim->InitQuantize();
 	}
 
-	CNode* nodes = ModelNodes(this);
-	u16 nodeCount = ModelNodeCount(this);
-	CNode* node = nodes;
+	CNode* node = ModelNodes(this);
+	u32 nodeCount = ModelNodeCount(this);
 	for (u32 i = 0; i < nodeCount; i++, node++) {
 		CNode* parentNode;
 		if (NodeParentIndex(node) < 0) {
 			parentNode = 0;
 		} else {
-			parentNode = nodes + NodeParentIndex(node);
+			parentNode = ModelNodes(this) + NodeParentIndex(node);
 		}
 
 		MtxPtr localMtx = NodeLocalRuntimeMtx(node);

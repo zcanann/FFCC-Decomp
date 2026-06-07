@@ -2590,12 +2590,7 @@ void CShopMenu::SelectItemIdx()
             }
         } else if (listType == 2) {
             if (m_selectedIndex != -1) {
-                int itemNo;
-                if (m_itemTable[m_selectedIndex] == -1) {
-                    itemNo = -1;
-                } else {
-                    itemNo = m_caravanWork->m_inventoryItems[m_itemTable[m_selectedIndex]];
-                }
+                int itemNo = getItemNo(m_selectedIndex);
                 if (itemNo < 1) {
                     canSelect = false;
                 } else {

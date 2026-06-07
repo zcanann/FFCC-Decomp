@@ -3687,27 +3687,68 @@ void CMenuPcs::CalcTitleMenu()
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
-
 	if (m_wmWorldState->m_mainState != 2) {
 		return;
 	}
 
-	unsigned int validCount;
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
-	if (cmakeWork != 0) {
-		validCount = 0;
-		for (int i = 0; i < 8; i++) {
-			if (*reinterpret_cast<int*>(cmakeWork + i * 0x9C0 + 0x1A84) != 0) {
-				validCount++;
-			}
+	unsigned int validCount = 0;
+	if (m_cmakeWorkActive == 1) {
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x1A84) != 0) {
+			validCount = 1;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2444) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x2E04) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x37C4) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4184) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x4B44) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5504) != 0) {
+			validCount++;
+		}
+		if (*reinterpret_cast<int*>(m_cmakeWork + 0x5EC4) != 0) {
+			validCount++;
 		}
 	} else {
-		validCount = 0;
-		for (int i = 0; i < 8; i++) {
-			if (Game.m_caravanWorkArr[i].m_shopState != 0) {
-				validCount++;
-			}
+		unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game);
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount = 1;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
+		}
+		caravan += 0xC30;
+		if (*reinterpret_cast<int*>(caravan + 0x1794) != 0) {
+			validCount++;
 		}
 	}
 
@@ -3719,7 +3760,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		}
 	}
 
-	WmCharaSelectEntry& entry = selectState[0];
+	WmCharaSelectEntry& entry = *reinterpret_cast<WmCharaSelectEntry*>(m_wm.m_charaSelectData);
 	if (loadedCount != validCount || entry.m_confirmed != 0) {
 		return;
 	}
@@ -3780,13 +3821,15 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 		return;
 	}
 
-	if ((down & 0x200) != 0) {
-		entry._pad0E = 1;
-		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
-	} else if ((down & 0x100) != 0) {
+	if ((down & 0x100) == 0) {
+		if ((down & 0x200) != 0) {
+			entry._pad0E = 1;
+			Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+		}
+	} else {
 		int shopState;
-		if (cmakeWork != 0) {
-			shopState = *reinterpret_cast<int*>(cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
+		if (m_cmakeWorkActive == 1 && m_cmakeWork != 0) {
+			shopState = *reinterpret_cast<int*>(m_cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
 		} else {
 			shopState = Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState;
 		}
@@ -3797,7 +3840,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 			entry.m_confirmed = 1;
 			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 			if (state != 0) {
-				GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 3;
+				GetWmCharaAnimState(this)[cursor * 5 + 1] = 3;
 			}
 		}
 	}

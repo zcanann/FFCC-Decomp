@@ -1665,8 +1665,8 @@ pppCharaBreak.cpp:
 	extab       start:0x80009B4C end:0x80009B84
 	extabindex  start:0x80010DBC end:0x80010E10
 	.text       start:0x8013F9D0 end:0x80141204
-	.rodata     start:0x801DD690 end:0x801DD6A8
-	.sdata2     start:0x80332068 end:0x80332078
+	.rodata     start:0x801DD678 end:0x801DD6A8
+	.sdata2     start:0x80332048 end:0x80332080
 
 pppCallBackDistance.cpp:
 	extab       start:0x80009B84 end:0x80009B94

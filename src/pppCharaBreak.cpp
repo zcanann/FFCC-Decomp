@@ -18,22 +18,20 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-extern Vec kPppCharaBreakUpVector;
-extern const int kCharaBreakInitialVertexFlag0;
-extern const int kCharaBreakInitialVertexFlag1;
-extern const int kCharaBreakInitialVertexFlag2;
+extern const Vec kPppCharaBreakUpVector = {0.0f, 1.0f, 0.0f};
+extern const int kCharaBreakInitialVertexFlag0 = 0;
+extern const int kCharaBreakInitialVertexFlag1 = 0;
+extern const int kCharaBreakInitialVertexFlag2 = 0;
 static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
-extern const float FLOAT_80332048;
-extern const float FLOAT_8033204c;
-extern const float FLOAT_80332050;
-extern const char sPppCharaBreakObjMeshName[4];
-extern const float FLOAT_80332058;
-extern const float FLOAT_8033205c;
-extern const float FLOAT_80332060;
-extern const float FLOAT_80332064;
-extern const double DOUBLE_80332068;
-extern const double DOUBLE_80332070;
-extern const float FLOAT_80332078[2];
+extern const float kPppCharaBreakZero = 0.0f;
+extern const float kPppCharaBreakOne = 1.0f;
+extern const float kPppCharaBreakInitialMiscValue = -10000.0f;
+extern const char sPppCharaBreakObjMeshName[4] = "obj";
+extern const float kPppCharaBreakTriangleCenterScale = 0.3333333f;
+extern const float kPppCharaBreakDegToRad = 0.017453292f;
+extern const float kPppCharaBreakHalfTurnDegrees = 180.0f;
+extern const float kPppCharaBreakWobbleRange = 0.8f;
+extern const float kPppCharaBreakRandomSignTable[2] = {-1.0f, 0.0f};
 
 static inline Mtx& CameraMatrix()
 {
@@ -147,7 +145,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep*, _pppCtrlTab
         pppSetDrawEnv(
             reinterpret_cast<pppCVECTOR*>(&colorWork->result),
             &charaBreak->m_drawMatrix,
-            FLOAT_80332048,
+            kPppCharaBreakZero,
             0,
             0,
             0,
@@ -214,10 +212,10 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
     SetCharaBreakModelCallbacks(model, work, step);
 
     if (step->m_graphId == charaBreak->m_graphId) {
-        f32 zero = FLOAT_80332048;
+        f32 zero = kPppCharaBreakZero;
         if (zero == step->m_direction.x && zero == step->m_direction.y &&
             zero == step->m_direction.z) {
-            step->m_direction.x = FLOAT_8033204c;
+            step->m_direction.x = kPppCharaBreakOne;
             step->m_direction.y = zero;
             step->m_direction.z = zero;
         } else {
@@ -228,7 +226,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtr
     mesh = model->m_meshes;
 
     if (work->m_meshBuffers == NULL) {
-        work->m_miscValue = FLOAT_80332050;
+        work->m_miscValue = kPppCharaBreakInitialMiscValue;
         work->m_meshBuffers =
             static_cast<CharaBreakDisplayListPair***>(
                 pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
@@ -402,10 +400,10 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = FLOAT_80332048;
+    float fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
-    work->m_value2 = FLOAT_80332048;
+    work->m_value2 = kPppCharaBreakZero;
     work->m_value1 = fVar1;
     work->m_value0 = fVar1;
     work->m_value5 = fVar1;
@@ -424,7 +422,7 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    float fVar1 = FLOAT_80332048;
+    float fVar1 = kPppCharaBreakZero;
     CharaBreakWork* work = GetCharaBreakWork(charaBreak, data);
 
     work->m_meshBuffers = 0;
@@ -545,9 +543,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     }
                 } else {
                     Vec center;
-                    center.z = FLOAT_80332048;
-                    center.y = FLOAT_80332048;
-                    center.x = FLOAT_80332048;
+                    center.z = kPppCharaBreakZero;
+                    center.y = kPppCharaBreakZero;
+                    center.x = kPppCharaBreakZero;
 
                     int sumX = (int)polygon->m_pos[0].x + (int)polygon->m_pos[1].x + (int)polygon->m_pos[2].x;
                     int sumY = (int)polygon->m_pos[0].y + (int)polygon->m_pos[1].y + (int)polygon->m_pos[2].y;
@@ -572,15 +570,15 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
-                        PSVECScale(&center, &center, FLOAT_80332058);
+                        PSVECScale(&center, &center, kPppCharaBreakTriangleCenterScale);
 
                         gUtil.ConvI2FVector(axis, polygon->m_normalB, ModelData(model)->m_normQuant);
                         gUtil.ConvI2FVector(velocity, polygon->m_normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
-                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);
+                        C_QUATRotAxisRad(&rotQuat, &axis, kPppCharaBreakDegToRad * (float)polygon->m_alpha);
                         PSMTXQuat(rotMtx, &rotQuat);
-                        cosValue = FLOAT_80332048;
+                        cosValue = kPppCharaBreakZero;
                         sinValue = cosValue;
 
                         if (stepData->m_spinMode == 1) {
@@ -604,7 +602,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 *angleState = angle;
                             }
 
-                            s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
+                            s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / kPppCharaBreakHalfTurnDegrees);
                             sinValue = ppvSinTbl[(sinIndex & 0xFFFC) >> 2];
                             cosValue = ppvSinTbl[((sinIndex + 0x4000) & 0xFFFC) >> 2];
                         }
@@ -621,10 +619,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
                                 verts[i].z += velocity.z;
                             } else if (stepData->m_spinMode == 1) {
-                                wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
+                                wobbleScale = kPppCharaBreakOne + Math.RandF(kPppCharaBreakWobbleRange);
                                 verts[i].x += cosValue * wobbleScale;
                                 verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
-                                wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
+                                wobbleScale = kPppCharaBreakOne + Math.RandF(kPppCharaBreakWobbleRange);
                                 verts[i].z += sinValue * wobbleScale;
                             }
 
@@ -663,7 +661,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
     u32 count = polygonCount;
     CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
-    f32 zero = FLOAT_80332048;
+    f32 zero = kPppCharaBreakZero;
 
     for (u32 i = 0; i < count; i++) {
         Vec normal;
@@ -684,12 +682,12 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
         }
 
         if (MeshData(mesh)->m_skinCount == 0) {
-            normal.x = Math.RandF(FLOAT_8033204c);
-            normal.y = Math.RandF(FLOAT_8033204c);
-            normal.z = Math.RandF(FLOAT_8033204c);
-            normal.x *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
-            normal.y *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
-            normal.z *= (rand() % 2) ? FLOAT_8033204c : FLOAT_80332078[0];
+            normal.x = Math.RandF(kPppCharaBreakOne);
+            normal.y = Math.RandF(kPppCharaBreakOne);
+            normal.z = Math.RandF(kPppCharaBreakOne);
+            normal.x *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
+            normal.y *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
+            normal.z *= (rand() % 2) ? kPppCharaBreakOne : kPppCharaBreakRandomSignTable[0];
             PSVECNormalize(&normal, &normal);
             gUtil.ConvF2IVector(polygon->m_normalA, normal, ModelData(modelPtr)->m_normQuant);
         } else {
@@ -704,11 +702,11 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             tangent.y = zero;
             tangent.z = zero;
         } else {
-            PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
+            PSVECScale(&tangent, &tangent, kPppCharaBreakOne / tangentMag);
         }
 
         if (zero == tangent.x && zero == tangent.y && zero == tangent.z) {
-            tangent.x = FLOAT_8033204c;
+            tangent.x = kPppCharaBreakOne;
             tangent.y = zero;
             tangent.z = zero;
         }

@@ -1915,8 +1915,6 @@ int CChara::CModel::SearchNodeSk(char* name)
  */
 void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
-	calcSkin();
-
 	if (ModelLightAlpha(this) == FLOAT_803301b0) {
 		return;
 	}

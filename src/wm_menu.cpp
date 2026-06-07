@@ -12482,16 +12482,16 @@ int McCtrl::SaveDataBuffer(char* buffer)
 		break;
 
 	case 0x10: {
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) == 0) {
+			m_serialHi = serialHi;
+			m_serialLo = serialLo;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			break;
 		}
-
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 
 		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
 		memcpy(save, buffer, 0x8BD0);
@@ -12540,12 +12540,12 @@ int McCtrl::SaveDataBuffer(char* buffer)
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
 		break;

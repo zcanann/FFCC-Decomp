@@ -665,19 +665,13 @@ mode_4_5:
 
         switch (pYmMegaBirthShpTail3->m_randType) {
         case 3:
-        {
-            float srr;
-            srr = pYmMegaBirthShpTail3->m_speedRandRange;
-            particleData->m_matrix[0][0] = srr - FLOAT_803305D0 * (srr * Math.RandF() * Math.RandF());
+            particleData->m_matrix[0][0] = pYmMegaBirthShpTail3->m_speedRandRange - FLOAT_803305D0 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF());
             particleData->m_matrix[0][0] -= speedRandHalf;
-            srr = pYmMegaBirthShpTail3->m_speedRandRange;
-            particleData->m_matrix[0][1] = srr - FLOAT_803305D0 * (srr * Math.RandF() * Math.RandF());
+            particleData->m_matrix[0][1] = pYmMegaBirthShpTail3->m_speedRandRange - FLOAT_803305D0 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF());
             particleData->m_matrix[0][1] -= speedRandHalf;
-            srr = pYmMegaBirthShpTail3->m_speedRandRange;
-            particleData->m_matrix[0][2] = srr - FLOAT_803305D0 * (srr * Math.RandF() * Math.RandF());
+            particleData->m_matrix[0][2] = pYmMegaBirthShpTail3->m_speedRandRange - FLOAT_803305D0 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF());
             particleData->m_matrix[0][2] -= speedRandHalf;
             break;
-        }
         case 1:
             Math.RandF();
             particleData->m_matrix[0][0] = pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF();

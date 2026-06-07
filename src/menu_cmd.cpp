@@ -770,7 +770,7 @@ int CMenuPcs::CmdCtrl()
 		GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 		s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
-		s32 prev = selected - 1;
+		u32 prev = selected - 1;
 		for (; prev > 2; --prev) {
 			if (caravanWork->m_commandListExtra[prev] >= 0) {
 				break;
@@ -787,7 +787,7 @@ int CMenuPcs::CmdCtrl()
 
 		CmdListStorage* list = GetCmdListStorage(this);
 		float minAnim = static_cast<float>(DOUBLE_80332a60);
-		double timer = static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer));
+		double timer = static_cast<double>(static_cast<u32>(GetCmdStateView(this)->transitionTimer));
 		double anim = -((DOUBLE_80332a68 * timer) - DOUBLE_80332a58);
 		for (s32 i = 0; i < static_cast<s32>(list->count); i++) {
 			if ((i < prev) || (next < i)) {
@@ -1450,7 +1450,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 {
 	bool blocked = false;
 	unsigned int press;
-	u16 hold;
+	s16 hold;
 	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
@@ -1478,7 +1478,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	}
 
 	CmdListStorage* cmdList = GetCmdListStorage(this);
-	int mode = GetCmdStateView(this)->mode;
+	unsigned int mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
 		s16 cmdCount = caravanWork->m_numCmdListSlots;
@@ -1974,7 +1974,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	memset(candidates, -1, sizeof(candidates));
 
 	const s16 selectedState = caravan->m_commandListExtra[selected];
-	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState);
+	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<s32>(selectedState);
 
 	if ((GetCmdStateView(this)->mode == 1) && (GetCmdStateView(this)->phase == 2)) {
 		if (selectedState < 0) {
@@ -2049,7 +2049,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 	memset(matches, -1, sizeof(matches));
 
-	int matchCount = 0;
+	unsigned int matchCount = 0;
 	if (itemKinds[selected] > 0) {
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;

@@ -7707,17 +7707,17 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
-		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		if (handle->m_charaKind != 3 && handle->m_currentAnimIndex < 0) {
-			continue;
-		}
-
 		unsigned int selectedMask = 0;
 		for (int chan = 0; chan < 4; chan++) {
 			const int slot = *reinterpret_cast<short*>(m_wm.m_charaSelectData + chan * 0x10 + 0x04);
 			if (m_wm.m_charaSelectData[chan * 0x10 + 0x0D] == 1 && slot >= 0 && i == slot) {
 				selectedMask |= 1 << chan;
 			}
+		}
+
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		if (handle->m_charaKind != 3 && handle->m_currentAnimIndex < 0) {
+			continue;
 		}
 
 		SetProjection(i + 0x20);

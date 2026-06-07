@@ -2048,15 +2048,7 @@ void CShopMenu::SelectMake()
     if (canSelect != 0) {
         int selected = getItemNo(m_selectedIndex);
         unsigned int money = static_cast<unsigned int>(m_caravanWork->m_gil);
-        unsigned int craftGil;
-        if (selected < 1) {
-            craftGil = 0;
-        } else {
-            int gil = m_caravanWork->m_shopParam *
-                      *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + selected * 0x48 + 0x24);
-            gil = gil / 100 + (gil >> 0x1F);
-            craftGil = gil - (gil >> 0x1F);
-        }
+        unsigned int craftGil = static_cast<unsigned int>(CalcShopMenuMakeGil(this, selected));
         canSelect = ((int)money >> 0x1F) + ((craftGil <= money) - ((int)craftGil >> 0x1F));
     }
 
@@ -2491,7 +2483,7 @@ void CShopMenu::SelectItemIdx()
 {
     m_quantity = 1;
 
-    if (getItemCnt() <= m_selectedIndex) {
+    if (m_selectedIndex >= getItemCnt()) {
         m_selectedIndex = getItemCnt() - 1;
     }
 

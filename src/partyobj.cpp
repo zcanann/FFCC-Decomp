@@ -3595,7 +3595,9 @@ int CGPartyObj::useItem(int itemId)
 		canUse = true;
 	}
 
-	if (canUse) {
+	if (!canUse) {
+		result = 0;
+	} else {
 		unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
 		if (((itemId == 0x17D) || (itemId == 0x186)) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
@@ -3641,8 +3643,6 @@ int CGPartyObj::useItem(int itemId)
 			gCFlatRuntime().SystemCall(this, 2, 0x15, 2, stack, 0);
 			result = 1;
 		}
-	} else {
-		result = 0;
 	}
 	return result;
 }

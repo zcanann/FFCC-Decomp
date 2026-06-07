@@ -792,6 +792,8 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 		return;
 	}
 
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
 	_GXColor color;
 	color.r = 0xFF;
 	color.g = 0xFF;
@@ -799,11 +801,11 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	color.a = (unsigned char)(255.0 * alpha);
 	const float corner = 8.0f;
 	const float texScale = 1.0f;
+
+	GXSetChanMatColor(GX_COLOR0A0, color);
+
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
-
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXSetChanMatColor(GX_COLOR0A0, color);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
 	for (int i = 0; i < 4; i++) {

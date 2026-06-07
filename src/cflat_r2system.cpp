@@ -2191,7 +2191,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
                     const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
                     const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
-                    float segmentT = 0.0f;
+                    float segmentT = kCFlatPadStickZero;
                     if (scaleB != kCFlatPadStickZero) {
                         segmentT = (pathDistance - point->m_distance) / scaleB;
                     }

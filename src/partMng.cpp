@@ -2822,8 +2822,11 @@ void CPartMng::pppDumpCacheIdx()
         PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(
             reinterpret_cast<unsigned char*>(this) + 0x2A18 + i * 0x158);
         if ((gamePaused == 0 || (mng->m_drawPass >= 6 && mng->m_drawPass <= 7)) &&
-            mng->m_baseTime != -0x1000 && mng->m_hitBgFlag == 0) {
+            mng->m_baseTime != -0x1000) {
             ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            if (mng->m_hitBgFlag != 0) {
+                continue;
+            }
             ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 
             if (mng->m_baseTime >= 0) {

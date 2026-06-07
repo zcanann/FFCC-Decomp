@@ -284,9 +284,6 @@ void CFlatRuntime::Create(void* filePtr)
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
 						switch (chunk.m_id) {
-						case 'VAL ':
-							classBase->m_localCount = chunk.m_arg0;
-							break;
 						case 'NAME':
 							strcpy(classBase->m_name, chunkFile.GetString());
 							break;
@@ -297,6 +294,9 @@ void CFlatRuntime::Create(void* filePtr)
 							for (int i = 0; i < 0x80; i++) {
 								classBase->m_functionTable[i] = chunkFile.Get4();
 							}
+							break;
+						case 'VAL ':
+							classBase->m_localCount = chunk.m_arg0;
 							break;
 						default:
 							break;
@@ -341,6 +341,14 @@ void CFlatRuntime::Create(void* filePtr)
 							funcBase->m_reqFlagIndex = chunkFile.Get4();
 							funcBase->m_useCallerArgs = chunkFile.Get4();
 							break;
+						case 'VAL ':
+							funcBase->m_localCount = chunk.m_arg0;
+							break;
+						case 'RET ':
+							funcBase->m_returnType = chunkFile.Get1();
+							funcBase->m_returnFlags = chunkFile.Get1();
+							funcBase->m_returnValue = chunkFile.Get2();
+							break;
 						case 'CODE':
 							funcBase->m_codeSize = chunk.m_size;
 							funcBase->m_codePos = 0;
@@ -353,14 +361,6 @@ void CFlatRuntime::Create(void* filePtr)
 								        u8[chunk.m_size]);
 								memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
 							}
-							break;
-						case 'VAL ':
-							funcBase->m_localCount = chunk.m_arg0;
-							break;
-						case 'RET ':
-							funcBase->m_returnType = chunkFile.Get1();
-							funcBase->m_returnFlags = chunkFile.Get1();
-							funcBase->m_returnValue = chunkFile.Get2();
 							break;
 						default:
 							break;

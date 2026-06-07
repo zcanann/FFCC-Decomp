@@ -1850,28 +1850,24 @@ void CMiniGamePcs::MngThreadMain(void*)
                 MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
             }
 
-            while (true)
+            do
             {
-                bool allTerminated = true;
-                for (int i = 0; i < 4; i++)
+                int count = 0;
+                unsigned char* threadState = self;
+                while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState + 0x1830)) != 0)
                 {
-                    unsigned char* threadState = self + 0x1830 + i * sizeof(OSThread);
-                    if (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState)) == 0)
+                    count++;
+                    threadState += sizeof(OSThread);
+                    if (count > 3)
                     {
-                        allTerminated = false;
-                        break;
+                        MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
+
+                        self[0x649C] = 0;
+                        OSExitThread(0);
+                        return;
                     }
                 }
-
-                if (allTerminated)
-                {
-                    MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
-
-                    self[0x649C] = 0;
-                    OSExitThread(0);
-                    return;
-                }
-            }
+            } while (true);
         }
 
         if (m_playerMask != 0)

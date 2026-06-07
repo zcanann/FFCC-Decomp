@@ -559,21 +559,18 @@ void CMenuPcs::CmdInit2()
  */
 void CMenuPcs::CmdOpen()
 {
-	CmdState* cmd = GetCmdStateView(this);
-
-	if (cmd->initialized == 0) {
+	if (GetCmdStateView(this)->initialized == 0) {
 		CmdInit();
 	}
 
-	cmd = GetCmdStateView(this);
 	CmdListStorage* list = GetCmdListStorage(this);
 	CmdListEntry* entries = list->entries;
 	s32 finishedCount = 0;
-	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 	u32 count = static_cast<u32>(list->count);
 	CmdListEntry* entry = entries;
-	const s32 timer = static_cast<s32>(cmd->transitionTimer);
+	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
 	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {

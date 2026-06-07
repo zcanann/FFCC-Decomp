@@ -861,9 +861,12 @@ done:
     zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
     Vec* history = (Vec*)((u8*)particleData + 0x80);
+    s16* angle = (s16*)((u8*)particleData + 0x4c);
     for (int i = 0; i < 0x1f; i++) {
-        pppCopyVector(history[i], zeroVec);
-        *(s16*)((u8*)particleData + 0x4c + i * sizeof(u16)) = (s16)(rand() % 360);
+        pppCopyVector(*history, zeroVec);
+        history++;
+        *angle = (s16)(rand() % 360);
+        angle++;
     }
 
     particleBytes[0x38] = particleBytes[0x37] - 1;

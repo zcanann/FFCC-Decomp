@@ -1799,8 +1799,8 @@ void CShopMenu::DrawMake()
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
 
     const char* itemName = GetItemName(resultItem);
     font->DrawInit();
@@ -1842,13 +1842,13 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
     MenuPcs.DrawInit();
 
-    SetupShopMenuAmountFont(font, &white);
+    SetupShopMenuAmountFont(font, &white.color);
     DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
     DrawShopMenuAmount(
         font, currentMoney, FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18, (makeGil <= currentMoney) ? 0x14 : 2);
 
     CFont* labelFont = MenuPcs.m_fonts[4];
-    SetupShopMenuLabelFont(labelFont, &white);
+    SetupShopMenuLabelFont(labelFont, &white.color);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE), FLOAT_80332e28, FLOAT_80332e24);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY), FLOAT_80332d68, FLOAT_80332e2c);
     MenuPcs.DrawInit();
@@ -1858,7 +1858,7 @@ void CShopMenu::DrawMake()
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    font->SetColor(white);
+    font->SetColor(white.color);
     font->DrawInit();
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
     float materialsX = FLOAT_80332e30 - font->GetWidth(materialsText) * FLOAT_80332d78;
@@ -1887,13 +1887,13 @@ void CShopMenu::DrawMake()
         font->SetMargin(FLOAT_80332d28);
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
-        font->SetColor(white);
+        font->SetColor(white.color);
 
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, 60.0f, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        SetupShopMenuAmountFont(font, &white);
+        SetupShopMenuAmountFont(font, &white.color);
         float neededX = 244.0f - font->GetWidth(neededBuffer);
         MenuPcs.DrawNoShadowFont(font, neededBuffer, neededX, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
@@ -1901,7 +1901,7 @@ void CShopMenu::DrawMake()
         font->SetMargin(FLOAT_80332d28);
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
-        font->SetColor(white);
+        font->SetColor(white.color);
         float slashX = neededX - FLOAT_80332d28 - font->GetWidth("/");
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>("/"), slashX, rowY, 0x1B, 0x12);
@@ -1920,7 +1920,7 @@ void CShopMenu::DrawMake()
         }
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
 
-        SetupShopMenuAmountFont(font, &white);
+        SetupShopMenuAmountFont(font, &white.color);
         float ownedX = 356.0f - font->GetWidth(ownedBuffer);
         MenuPcs.DrawNoShadowFont(font, ownedBuffer, ownedX, rowY, (ownedCount >= neededCount) ? 0x1B : 2, 0x12);
         MenuPcs.DrawInit();
@@ -1933,7 +1933,7 @@ void CShopMenu::DrawMake()
     drawShapeSeq(0xB, 0, 0x226, 0x168, 0xFF, 0, 0, 0.0f, 0);
     drawShapeSeq(1, 1, 0x36, 0x18C, 0xFF, 0, 0, 0.0f, 0);
 
-    SetupShopMenuLabelFont(labelFont, &white);
+    SetupShopMenuLabelFont(labelFont, &white.color);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CRAFT), 148.0f, 332.0f);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL), 148.0f, FLOAT_80332e44);
     MenuPcs.DrawInit();

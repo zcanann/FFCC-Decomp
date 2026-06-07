@@ -1859,10 +1859,11 @@ void CRedEntry::DisplayMMemoryInfo()
 			int blockEnd = RedMemoryBlockGetEndAddress(bankEntry);
 
 			if (RedMemoryBlockGetNext(bankEntry)->m_size > 0) {
-				freeSize = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
+				blockEnd = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
 			} else {
-				freeSize = bufferTop - blockEnd;
+				blockEnd = bufferTop - blockEnd;
 			}
+			freeSize = blockEnd;
 
 			history = m_musicBankBase;
 			do {

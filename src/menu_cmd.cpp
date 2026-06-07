@@ -1680,7 +1680,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 				} while (remaining != 0);
 			}
 
-			int next = selected + 1;
+			unsigned int next = selected + 1;
 			remaining = caravanWork->m_numCmdListSlots - next;
 			if (next < caravanWork->m_numCmdListSlots) {
 				do {

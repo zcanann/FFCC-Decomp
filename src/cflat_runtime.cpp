@@ -8,11 +8,11 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-char s_cflat_runtime_newline[];
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
+static const char s_cflat_runtime_newline[] = "\n";
 static const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 
@@ -2239,7 +2239,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 				if (object->m_argCount == 1) {
 					System.Printf(format);
-					System.Printf(s_cflat_runtime_newline);
+					System.Printf(const_cast<char*>(s_cflat_runtime_newline));
 				} else {
 					char spec[256];
 					char rendered[256];
@@ -2324,7 +2324,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					}
 
 					System.Printf(line);
-					System.Printf(s_cflat_runtime_newline);
+					System.Printf(const_cast<char*>(s_cflat_runtime_newline));
 				}
 			}
 

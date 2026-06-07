@@ -3057,10 +3057,9 @@ void CMenuPcs::destroyBonus()
 	}
 
 	for (int i = 0; i < 0x18; i++) {
-		CCharaPcs::CHandle** handleSlot = &GetBonusDisplayHandleSlots(this)[i];
-		if (*handleSlot != 0) {
-			delete *handleSlot;
-			*handleSlot = 0;
+		if (GetBonusDisplayHandleSlots(this)[i] != 0) {
+			delete GetBonusDisplayHandleSlots(this)[i];
+			GetBonusDisplayHandleSlots(this)[i] = 0;
 		}
 	}
 

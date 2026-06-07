@@ -1113,23 +1113,23 @@ void CGMonObj::onStatMagic()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
-		*reinterpret_cast<int*>(mon + 0x560) * 0x48;
 
-	if (prgObj->m_subState == 1) {
+	switch (prgObj->m_subState) {
+	case 1:
 		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
 			prgObj->changeSubStat(2);
 		}
 		return;
-	}
 
-	if (prgObj->m_subState == 0) {
+	case 0:
 		if (prgObj->m_subFrame == 0) {
 			int targetPartyIndex = m_targetPartyIndex;
 			if (targetPartyIndex >= 0) {
 				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
+				unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) +
+					*reinterpret_cast<int*>(mon + 0x560) * 0x48;
 				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
 					float rotLimit = 0.01f *
 						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));

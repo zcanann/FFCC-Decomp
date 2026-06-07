@@ -1384,7 +1384,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		CCaravanWork::CLetterWork* letter = &caravanWork->m_letters[s_SelLetter];
 		unsigned short msgIndex = letter->HeaderWord();
-		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x10));
+		strcpy(srcText, Game.m_cFlatDataArr[1].Message(((msgIndex & 0x7FC) >> 1) + 0x11));
 		CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
 
 		s_ReplyMax = 0;

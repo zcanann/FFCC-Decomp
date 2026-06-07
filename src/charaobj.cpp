@@ -2430,26 +2430,23 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  */
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
-	unsigned short cid = GetCID();
-	if ((cid & 0x6D) == 0x6D &&
+	if ((GetCID() & 0x6D) == 0x6D &&
 	    (MiniGamePcs.m_flags & 4) != 0) {
 		return;
 	}
 
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned short* hp = reinterpret_cast<unsigned short*>(script + 0x1C);
-	unsigned int hpValue = *hp;
+	unsigned int hpValue = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
 	unsigned int next = hpValue;
 
 	if (delta > 0) {
-		unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
+		unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
 		next = hpValue + delta;
 		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
 			next = maxHp;
 		}
-		*hp = static_cast<unsigned short>(next);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 	} else if (delta < 0 && hpValue != 0) {
-		if ((cid & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
+		if ((GetCID() & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
 		    static_cast<int>(hpValue + delta) <= 0) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -2471,10 +2468,10 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 
 		next = hpValue + delta;
 		next &= ~(static_cast<int>(next) >> 31);
-		*hp = static_cast<unsigned short>(next);
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) = static_cast<unsigned short>(next);
 		m_worldParam = kOneF32;
 
-		if ((cid & 0x6D) == 0x6D) {
+		if ((GetCID() & 0x6D) == 0x6D) {
 			CGPartyObj* party = static_cast<CGPartyObj*>(this);
 			if (static_cast<signed char>(party->m_partyData.partyFlags) < 0) {
 				int stackArgs[2];
@@ -2505,7 +2502,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 		CGPartyObj* party = static_cast<CGPartyObj*>(this);
 		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
-		for (int i = 2; i < *reinterpret_cast<short*>(script + 0xBAA); i++) {
+		for (int i = 2; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAA); i++) {
 			if (caravan->DelCmdListAndItem(i) == 0x125) {
 				caravan->GetNumCombi(i, 1);
 				unsigned char& flags = party->m_partyData.partyFlags;

@@ -1500,7 +1500,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    _pppEnvSt* env = &m_pppEnvSt;
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* packetWords = reinterpret_cast<int*>(packet);
@@ -1508,7 +1507,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     switch (code) {
     case 1:
     case 2: {
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
 
@@ -1524,10 +1523,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + 0x16C) = packetWords[0x53];
         *reinterpret_cast<int*>(self + 0x170) = packetWords[0x54];
         *reinterpret_cast<int*>(self + kEditDrawModeOffset) = packetWords[0x55];
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
             *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
             *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
 
         if (code == 1) {
@@ -1551,7 +1550,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         return;
     }
     case 3:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
 
@@ -1606,7 +1605,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         self[0x807] = 0xFF;
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         *reinterpret_cast<int*>(self + kPdtCountOffset) = 0;
-        env->m_isEditMode = 0;
+        m_pppEnvSt.m_isEditMode = 0;
 
         if (res->m_textureSet == 0) {
             res->m_textureSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
@@ -1615,7 +1614,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (res->m_materialSet == 0) {
             CMaterialSet* materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
             res->m_materialSet = materialSet;
-            env->m_materialSetPtr = materialSet;
+            m_pppEnvSt.m_materialSetPtr = materialSet;
 
             CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
             if (defaultMaterial != 0) {
@@ -1625,7 +1624,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         return;
     case 5:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         {
@@ -1673,7 +1672,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         return;
     case 6:
     case 10:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         {
@@ -1715,7 +1714,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         return;
     case 8:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         {
@@ -1742,7 +1741,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         return;
     case 0x0B:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
@@ -1800,14 +1799,14 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_pppResSet = self + 0x23518;
         m_pppMng[0].m_nodeIndex = 0;
         m_pppMng[0].m_fieldF2 = 1;
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
             *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
             *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
         return;
     case 0x0C:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         if (*reinterpret_cast<int*>(self + kEditCountOffset) == 0) {
@@ -1818,7 +1817,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
         return;
     case 0x0D: {
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
@@ -1843,7 +1842,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         return;
     }
     case 0x0E:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         {
@@ -1863,7 +1862,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 if (res->m_materialSet == 0) {
                     CMaterialSet* materialSet = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
                     res->m_materialSet = materialSet;
-                    env->m_materialSetPtr = materialSet;
+                    m_pppEnvSt.m_materialSetPtr = materialSet;
 
                     CMaterial* defaultMaterial = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     if (defaultMaterial != 0) {
@@ -1881,7 +1880,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         return;
     case 0x0F:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
@@ -1900,26 +1899,26 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         ppvSysStopPartF = 1;
         return;
     case 0x10:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
-        env->m_envParam = FLOAT_8032fe5c;
-        env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
+        m_pppEnvSt.m_envParam = FLOAT_8032fe5c;
+        m_pppEnvSt.m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[0]) =
             *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
-        *reinterpret_cast<unsigned int*>(&env->m_particleColors[1]) =
+        *reinterpret_cast<unsigned int*>(&m_pppEnvSt.m_particleColors[1]) =
             *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
         SetFp();
         return;
     case 0x11:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         m_pppMng[0].m_particleEnded = 1;
         return;
     case 0x12:
     case 0x13:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
@@ -1950,7 +1949,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         memcpy(self + kCmd16PayloadOffset, payload, 8);
         return;
     case 0x17:
-        if (env->m_isEditMode != 0) {
+        if (m_pppEnvSt.m_isEditMode != 0) {
             return;
         }
         *reinterpret_cast<int*>(self + kCursorPacketOffset) = *reinterpret_cast<int*>(self + kCursorXOffset);

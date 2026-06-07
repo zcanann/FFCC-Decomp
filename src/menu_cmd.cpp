@@ -1511,24 +1511,22 @@ unsigned int CMenuPcs::CmdCtrlCur()
  */
 unsigned int CMenuPcs::CmdOpen0()
 {
-	CmdState* cmd = GetCmdStateView(this);
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-
-	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
-	const s32 timer = static_cast<s32>(cmd->transitionTimer);
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
+	const s32 timer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
+	CmdListEntry* entries = GetCmdListStorage(this)->entries;
+	const s32 sel = GetCmdStateView(this)->selected;
 	if (timer < 5) {
-		entries[cmd->selected].x = static_cast<s16>(entries[cmd->selected].x - 0x13);
+		entries[sel].x = static_cast<s16>(entries[sel].x - 0x13);
 	}
 
 	s32 doneCount = 0;
-	s32 entryCount = static_cast<s32>(list->listEnd) - static_cast<s32>(list->count);
-	CmdListEntry* entry = &entries[list->count];
+	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
+	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 	const float fVar1 = FLOAT_80332ab0;
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (entry->startFrame <= timer) {
-			if (timer >= entry->startFrame + entry->duration) {
+		if (timer >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= timer) {
 				doneCount++;
 				entry->alpha = FLOAT_80332a70;
 				entry->dx = fVar1;
@@ -1540,8 +1538,10 @@ unsigned int CMenuPcs::CmdOpen0()
 					static_cast<double>(entry->timer));
 				entry->alpha = t;
 				if ((entry->flags & 2) == 0) {
-					entry->dx = t * (entry->targetX - static_cast<float>(entry->x));
-					entry->dy = t * (entry->targetY - static_cast<float>(entry->y));
+					const float dx = entry->targetX - static_cast<float>(entry->x);
+					const float dy = entry->targetY - static_cast<float>(entry->y);
+					entry->dx = t * dx;
+					entry->dy = t * dy;
 				}
 			}
 		}
@@ -1563,25 +1563,22 @@ unsigned int CMenuPcs::CmdOpen0()
  */
 unsigned int CMenuPcs::CmdClose0()
 {
-	u8* self = reinterpret_cast<u8*>(this);
-	CmdState* cmd = GetCmdStateView(this);
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-
-	cmd->transitionTimer = static_cast<s16>(cmd->transitionTimer + 1);
-	s32 time = static_cast<s32>(cmd->transitionTimer);
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
+	s32 time = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
+	CmdListEntry* entries = GetCmdListStorage(this)->entries;
+	const s32 sel = GetCmdStateView(this)->selected;
 
 	if (time > 7) {
-		entries[cmd->selected].x = static_cast<s16>(entries[cmd->selected].x + 0x13);
+		entries[sel].x = static_cast<s16>(entries[sel].x + 0x13);
 	}
 
 	s32 doneCount = 0;
-	s32 entryCount = static_cast<s32>(list->listEnd) - static_cast<s32>(list->count);
-	CmdListEntry* entry = &entries[list->count];
+	s32 entryCount = static_cast<s32>(GetCmdListStorage(this)->listEnd) - static_cast<s32>(GetCmdListStorage(this)->count);
+	CmdListEntry* entry = &entries[GetCmdListStorage(this)->count];
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (entry->startFrame <= time) {
-			if (time >= (entry->startFrame + entry->duration)) {
+		if (time >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= time) {
 				doneCount++;
 				entry->alpha = 0.0f;
 				entry->dx = 0.0f;
@@ -1594,19 +1591,22 @@ unsigned int CMenuPcs::CmdClose0()
 
 				entry->alpha = t;
 				if ((entry->flags & 2) == 0) {
-					entry->dx = t * (entry->targetX - static_cast<f32>(entry->x));
-					entry->dy = t * (entry->targetY - static_cast<f32>(entry->y));
+					const f32 dx = entry->targetX - static_cast<f32>(entry->x);
+					const f32 dy = entry->targetY - static_cast<f32>(entry->y);
+					entry->dx = t * dx;
+					entry->dy = t * dy;
 				}
 			}
 		}
 		entry++;
 	}
 
-	if (entryCount == doneCount) {
-		entries[cmd->selected].x = entries[0].x;
+	unsigned int done = static_cast<unsigned int>(entryCount == doneCount);
+	if (done) {
+		entries[sel].x = entries[0].x;
 	}
 
-	return static_cast<unsigned int>(entryCount == doneCount);
+	return done;
 }
 
 /*

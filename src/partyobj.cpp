@@ -2425,11 +2425,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		party.flags.flag40 = targetSide;
 		party.flags.flag10 = 0;
 
-		Vec rayDir = {
-		    sinf(m_rotTargetY) * FLOAT_80331A98,
-		    FLOAT_80331a78,
-		    cosf(m_rotTargetY) * FLOAT_80331A98,
-		};
+		Vec rayDir;
+		rayDir.x = sinf(m_rotTargetY) * FLOAT_80331A98;
+		rayDir.y = FLOAT_80331a78;
+		rayDir.z = cosf(m_rotTargetY) * FLOAT_80331A98;
 		bool bossStage = false;
 		bool bossCid = false;
 		bool bossTarget = false;

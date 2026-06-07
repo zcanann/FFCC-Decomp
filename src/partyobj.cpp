@@ -3252,7 +3252,7 @@ void CGPartyObj::statPut()
 			FLOAT_8032EE84 = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
 		}
 
-		if (m_stateFrame < 0x0C) {
+		if (m_stateFrame <= 0x0B) {
 			const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
 			m_extraMoveVec.x = FLOAT_8032EE80 * phase * sinf(m_rotBaseY);
 			m_extraMoveVec.z = FLOAT_8032EE80 * phase * cosf(m_rotBaseY);
@@ -4943,16 +4943,16 @@ void CGPartyObj::gpmMove()
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
-	if (sGhostPartyWork.carrySpeed <= FLOAT_80331A58) {
-		if (PartyData(this).carryObject == nullptr) {
-			sGhostPartyWork.pressure -= 4;
-		} else {
-			sGhostPartyWork.pressure -= 3;
+	if (FLOAT_80331A58 < sGhostPartyWork.carrySpeed) {
+		int delta = -2;
+		if (PartyData(this).carryObject != nullptr) {
+			delta = 2;
 		}
+		sGhostPartyWork.pressure += delta;
 	} else if (PartyData(this).carryObject != nullptr) {
-		sGhostPartyWork.pressure += 2;
+		sGhostPartyWork.pressure -= 3;
 	} else {
-		sGhostPartyWork.pressure -= 2;
+		sGhostPartyWork.pressure -= 4;
 	}
 
 	if (sGhostPartyWork.pressure < 0) {
@@ -4962,7 +4962,7 @@ void CGPartyObj::gpmMove()
 	}
 
 	if (sGhostPartyWork.pressure < pressureLimit / 3) {
-		PartyData(this).partyFlags &= 0xFB;
+		sGhostPartyWork.flagBits.flag04 = 0;
 	}
 	if (sGhostPartyWork.activeTrailCount > 0) {
 		sGhostPartyWork.activeTrailCount--;
@@ -4977,7 +4977,7 @@ void CGPartyObj::gpmMove()
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
-	float clampedDist = (*reinterpret_cast<float*>(self + 0x5C4) < dist) ? *reinterpret_cast<float*>(self + 0x5C4) : dist;
+	float clampedDist = (*reinterpret_cast<float*>(self + 0x5BC) < dist) ? *reinterpret_cast<float*>(self + 0x5BC) : dist;
 
 	if (m_lastStateId == 0 && (static_cast<signed char>(m_shieldAttachNodeIndex) < 0)) {
 		int moveKind;

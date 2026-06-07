@@ -82,8 +82,22 @@ STATIC_ASSERT(offsetof(PartyObjOverlay, commandMode) == 0x3C);
 
 STATIC_ASSERT(sizeof(PartyObjOverlay) == 0x40);
 
+struct GhostPartyWorkFlags {
+	unsigned char flag80 : 1;
+	unsigned char flag40 : 1;
+	unsigned char flag20 : 1;
+	unsigned char flag10 : 1;
+	unsigned char flag08 : 1;
+	unsigned char flag04 : 1;
+	unsigned char flag02 : 1;
+	unsigned char flag01 : 1;
+};
+
 struct GhostPartyWork {
-	unsigned char flags;       // 0x00
+	union {
+		unsigned char flags;   // 0x00
+		GhostPartyWorkFlags flagBits;
+	};
 	unsigned char _pad0[3];
 	int field04;               // 0x04
 	int field08;               // 0x08

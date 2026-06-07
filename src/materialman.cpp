@@ -2593,7 +2593,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            if (material->m_textureCount == 0) {
+            if (static_cast<int>(material->m_textureCount) == 0) {
                 material->m_tevBit |= 1;
             } else {
                 for (int i = 0; i < material->m_textureCount; i++) {
@@ -2618,7 +2618,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                                 } else if (format == 1) {
                                     material->m_tevBit |= 0x400;
                                 }
-                                if (material->m_textureData.m_textures[i]->m_isAlphaLut != 0) {
+                                if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
                                     material->m_tevBit |= 0x800;
                                 }
                             }

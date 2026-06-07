@@ -602,15 +602,16 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
                      *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
     }
 
-    if ((s32)paramBytes[0x18] >= 6) {
-        if ((s32)paramBytes[0x18] >= 10) {
-            goto scalar;
+    if ((s32)paramBytes[0x18] < 6) {
+        if ((s32)paramBytes[0x18] >= 4) {
+            goto mode_4_5;
         }
-        goto path;
+        goto scalar;
     }
-    if ((s32)paramBytes[0x18] >= 4) {
-        goto mode_4_5;
+    if ((s32)paramBytes[0x18] >= 10) {
+        goto scalar;
     }
+    goto path;
 
 scalar:
     {

@@ -843,7 +843,7 @@ void CGMonObj::seKiduki()
 			soundLimit = DOUBLE_80331A10;
 		}
 
-		if (*reinterpret_cast<float*>(mon + 0x5BC) < soundLimit) {
+		if (soundLimit > *reinterpret_cast<float*>(mon + 0x5BC)) {
 			int* scriptHandle = *reinterpret_cast<int**>(mon + 0x58);
 			unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
 			float hitScale;

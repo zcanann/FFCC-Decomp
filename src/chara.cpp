@@ -1714,9 +1714,9 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
+			Mtx animMtx;
 			if (animNode1 != 0) {
 				SRTView srt1;
-				Mtx animMtx;
 				Mtx invScaleMtx;
 
 				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt1), frame);
@@ -1736,7 +1736,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 			if (animNode0 != 0) {
 				SRTView srt0;
-				Mtx animMtx;
 				u16 nodeIndex;
 
 				if (reuseAnimNode0Srt) {

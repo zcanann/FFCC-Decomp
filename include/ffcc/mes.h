@@ -16,8 +16,6 @@ public:
         unsigned char m_index;  // 0x02
         unsigned char m_pad03;  // 0x03
         short m_value;          // 0x04
-
-        void operator=(const CFlag&);
     };
 	
     CMes();

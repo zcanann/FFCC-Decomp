@@ -233,8 +233,8 @@ static bool CharaObjIsPlayerCid(unsigned int cid)
 
 static bool CharaObjIsElementalStatus(unsigned int staType)
 {
-	return staType == 0 || staType == 1 || staType == 3 || staType == 4 ||
-	       staType == 6 || staType == 8 || staType == 9 || staType == 0x1C;
+	return staType == 4 || staType == 0x1C || staType < 3 ||
+	       staType - 8 < 3 || staType == 6 || staType == 3;
 }
 
 static bool CharaObjIsBreakStatus(unsigned int staType)

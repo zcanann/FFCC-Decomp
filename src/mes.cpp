@@ -1437,7 +1437,7 @@ void CMes::addString(char** text, int branchMode)
 			int* glyph = (int*)this + mCounter * 5 + 3;
 			*(char*)((int)glyph + 0x12) = (char)mColor;
 			*(char*)(glyph + 4) = (char)uch;
-			glyph[0] = (int)mCurrentX;
+			*(float*)glyph = mCurrentX;
 			*(short*)(glyph + 2) = (short)(int)mCurrentY;
 
 			font->renderFlags = font->renderFlags & 0xF7 | 8;
@@ -1450,7 +1450,7 @@ void CMes::addString(char** text, int branchMode)
 			{
 				width = font->GetWidth((unsigned short)uch);
 			}
-			glyph[1] = (int)width;
+			*(float*)(glyph + 1) = width;
 			font->renderFlags = font->renderFlags & 0xF7;
 
 			*(short*)(glyph + 3) = (short)mRevealCursor;
@@ -1462,7 +1462,7 @@ void CMes::addString(char** text, int branchMode)
 			*(char*)((int)glyph + 0xA) = (char)(int)(FLOAT_803308ac * mScaleX);
 			*(char*)((int)glyph + 0x11) = (char)(int)(FLOAT_803308ac * mScaleY);
 
-			mCurrentX = mCurrentX + (float)glyph[1] + mLineSpacing;
+			mCurrentX = mCurrentX + *(float*)(glyph + 1) + mLineSpacing;
 			if (mAdvanceEnabled != 0)
 			{
 				int step = mAdvanceStep;

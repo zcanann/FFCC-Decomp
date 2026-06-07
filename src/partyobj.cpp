@@ -2843,28 +2843,47 @@ void CGPartyObj::moveCenterTargetParticle()
 
 	CVector centerPos(m_comboTarget);
 	CVector targetPos(m_comboCenter);
+	CVector subResult;
+	PSVECSubtract(reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&centerPos), reinterpret_cast<Vec*>(&subResult));
 	Vec toTarget;
+	toTarget.x = subResult.x;
+	toTarget.y = subResult.y;
+	toTarget.z = subResult.z;
+
+	CVector scaleResult;
+	PSVECScale(&toTarget, reinterpret_cast<Vec*>(&scaleResult), wave);
 	Vec movement;
+	movement.x = scaleResult.x;
+	movement.y = scaleResult.y;
+	movement.z = scaleResult.z;
+
+	CVector centerPos2(m_comboTarget);
+	CVector addResult;
+	PSVECAdd(reinterpret_cast<Vec*>(&centerPos2), &movement, reinterpret_cast<Vec*>(&addResult));
 	Vec hitPos;
+	hitPos.x = addResult.x;
+	hitPos.y = addResult.y;
+	hitPos.z = addResult.z;
+
 	CVector moveVec(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 	CVector yOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
 	Vec hitNormal;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&centerPos), &toTarget);
-	PSVECScale(&toTarget, &movement, wave);
-	PSVECAdd(reinterpret_cast<Vec*>(&centerPos), &movement, &hitPos);
+	CVector bottomResult;
+	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), reinterpret_cast<Vec*>(&bottomResult));
 
 	CMapCylinder hitCylinder;
-	PSVECAdd(&hitPos, reinterpret_cast<Vec*>(&yOffset), &hitCylinder.m_bottom);
-	hitCylinder.m_top = *reinterpret_cast<Vec*>(&moveVec);
-	hitCylinder.m_axis.x = FLOAT_80331a78;
-	hitCylinder.m_axis.y = FLOAT_80331aa0;
-	hitCylinder.m_axis.z = FLOAT_80331a9c;
-	hitCylinder.m_radius = FLOAT_80331a9c;
 	hitCylinder.m_bound.m_min.x = FLOAT_80331a9c;
-	hitCylinder.m_bound.m_min.y = FLOAT_80331aa0;
-	hitCylinder.m_bound.m_min.z = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_min.y = FLOAT_80331a9c;
+	hitCylinder.m_bound.m_min.z = FLOAT_80331a9c;
 	hitCylinder.m_bound.m_max.x = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_max.y = FLOAT_80331aa0;
+	hitCylinder.m_bound.m_max.z = FLOAT_80331aa0;
+	hitCylinder.m_bottom.x = bottomResult.x;
+	hitCylinder.m_bottom.y = bottomResult.y;
+	hitCylinder.m_bottom.z = bottomResult.z;
+	hitCylinder.m_top = *reinterpret_cast<Vec*>(&moveVec);
+	hitCylinder.m_radius = FLOAT_80331a78;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&moveVec), 0x30) != 0) {
 		CMapObj* hitObj = getMapHitObject();

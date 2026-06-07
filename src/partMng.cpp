@@ -1721,34 +1721,32 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
-            if (*modelTablePtr != 0 && 0 <= slotIndex && slotIndex < 0x88) {
-                pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
-                if (modelSlot != 0) {
-                    modelSlot->m_refCount--;
-                    if (modelSlot->m_refCount < 1) {
-                        if (modelSlot->m_cacheId != -1) {
-                            ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
-                            modelSlot->m_meshData = 0;
-                            modelSlot->m_displayListData = 0;
-                        }
-                        modelSlot->Destroy();
-                        modelSlot->m_refCount = 0;
-                        modelSlot->m_isUsed = 0;
+            pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
+            if (modelSlot != 0) {
+                modelSlot->m_refCount--;
+                if (modelSlot->m_refCount < 1) {
+                    if (modelSlot->m_cacheId != -1) {
+                        ppvAmemCacheSet.DestroyCache(modelSlot->m_cacheId);
+                        modelSlot->m_meshData = 0;
+                        modelSlot->m_displayListData = 0;
                     }
-                    modelSlot = 0;
-                }
-
-                modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
-                if (modelSlot != 0) {
+                    modelSlot->Destroy();
                     modelSlot->m_refCount = 0;
-                    modelSlot->m_cacheId = -1;
                     modelSlot->m_isUsed = 0;
-                    CChunkFile chunkFile;
-                    chunkFile.SetBuf(payloadWords + 8);
-                    pppReadRsd(chunkFile, modelSlot);
                 }
-                *reinterpret_cast<int*>(self + 0x804) = -1;
+                modelSlot = 0;
             }
+
+            modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
+            if (modelSlot != 0) {
+                modelSlot->m_refCount = 0;
+                modelSlot->m_cacheId = -1;
+                modelSlot->m_isUsed = 0;
+                CChunkFile chunkFile;
+                chunkFile.SetBuf(payloadWords + 8);
+                pppReadRsd(chunkFile, modelSlot);
+            }
+            *reinterpret_cast<int*>(self + 0x804) = -1;
         }
         return;
     case 6:
@@ -1766,31 +1764,29 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             int slotIndex = payloadWords[0];
-            if (*shapeSlotTablePtr != 0 && 0 <= slotIndex && slotIndex < 0x80) {
-                pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
-                if (shapeSlot != 0) {
-                    shapeSlot->m_refCount--;
-                    if (shapeSlot->m_refCount < 1) {
-                        if (shapeSlot->m_animData != 0) {
-                            delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
-                            shapeSlot->m_animData = 0;
-                        }
-                        if (shapeSlot->m_displayListData != 0) {
-                            delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
-                            shapeSlot->m_displayListData = 0;
-                        }
-                        shapeSlot->m_refCount = 0;
-                        shapeSlot->m_inUse = 0;
+            pppShapeSt*& shapeSlot = (*shapeSlotTablePtr)[slotIndex];
+            if (shapeSlot != 0) {
+                shapeSlot->m_refCount--;
+                if (shapeSlot->m_refCount < 1) {
+                    if (shapeSlot->m_animData != 0) {
+                        delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
+                        shapeSlot->m_animData = 0;
                     }
-                    shapeSlot = 0;
+                    if (shapeSlot->m_displayListData != 0) {
+                        delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
+                        shapeSlot->m_displayListData = 0;
+                    }
+                    shapeSlot->m_refCount = 0;
+                    shapeSlot->m_inUse = 0;
                 }
+                shapeSlot = 0;
+            }
 
-                shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
-                if (shapeSlot != 0) {
-                    CChunkFile chunkFile;
-                    chunkFile.SetBuf(payloadWords + 4);
-                    pppReadShp(chunkFile, shapeSlot);
-                }
+            shapeSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
+            if (shapeSlot != 0) {
+                CChunkFile chunkFile;
+                chunkFile.SetBuf(payloadWords + 4);
+                pppReadShp(chunkFile, shapeSlot);
             }
         }
         return;

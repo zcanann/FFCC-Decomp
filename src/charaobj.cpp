@@ -2088,6 +2088,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				break;
+			case 0x67:
+				break;
 			default:
 				break;
 		}

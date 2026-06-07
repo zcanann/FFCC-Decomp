@@ -48,7 +48,13 @@ public:
 		short m_classIndex;        // 0x14
 		short m_activeClassIndex;  // 0x16
 		void* m_engineObject;      // 0x18
-		unsigned int m_codePos;    // 0x1C
+		union {
+			unsigned int m_codePos; // 0x1C
+			struct {
+				int m_codeFunc : 12;
+				int m_codeOffset : 20;
+			} m_codeIndex;
+		};
 		CObject* m_previous;       // 0x20
 		CObject* m_next;           // 0x24
 		int m_waitCounter;	       // 0x28

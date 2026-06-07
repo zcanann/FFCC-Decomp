@@ -1558,8 +1558,8 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	}
 
 	code = *reinterpret_cast<u8**>(
-	    m_funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
-	    + (static_cast<int>(object->m_codePos << 12) >> 12);
+	    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+	    + object->m_codeIndex.m_codeOffset;
 
 	while (true) {
 frameLoop:
@@ -1797,8 +1797,8 @@ frameLoop:
 
 			if (((func->m_systemKind != 1) && (func->m_systemKind != 2)) || (func->m_systemIndex >= 0)) {
 				code = *reinterpret_cast<u8**>(
-				    m_funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
-				    + (static_cast<int>(object->m_codePos << 12) >> 12);
+				    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+				    + object->m_codeIndex.m_codeOffset;
 				continue;
 			}
 			goto callSystemFunction;
@@ -2090,8 +2090,8 @@ frameLoop:
 			}
 
 			code = *reinterpret_cast<u8**>(
-			    m_funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
-			    + (static_cast<int>(object->m_codePos << 12) >> 12);
+			    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+			    + object->m_codeIndex.m_codeOffset;
 			continue;
 		}
 		case 0x3D: {
@@ -2122,16 +2122,14 @@ frameLoop:
 		}
 
 		const int step = (code[0] < 0x0C) ? 5 : 1;
-		const u32 codePos = object->m_codePos;
-		const int current = static_cast<int>(codePos << 12) >> 12;
 		code += step;
 		--watchdog;
-		object->m_codePos = (codePos & 0xFFF00000) | ((current + step) & 0x000FFFFF);
+		object->m_codeIndex.m_codeOffset += step;
 	}
 
 callSystemFunction:
 	{
-		const int funcIndex = static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4;
+		const int funcIndex = object->m_codeIndex.m_codeFunc;
 		CFunc* func = reinterpret_cast<CFunc*>(m_funcs) + funcIndex;
 		int systemResult;
 		const int ret = systemFunc(object, func->m_systemKind, func->m_systemIndex, systemResult);
@@ -2180,8 +2178,8 @@ callSystemFunction:
 		}
 
 		code = *reinterpret_cast<u8**>(
-		    m_funcs + ((static_cast<int>(*reinterpret_cast<s16*>(&object->m_codePos)) >> 4) * 0x50) + 0x34)
-		    + (static_cast<int>(object->m_codePos << 12) >> 12);
+		    m_funcs + (object->m_codeIndex.m_codeFunc * 0x50) + 0x34)
+		    + object->m_codeIndex.m_codeOffset;
 		goto frameLoop;
 	}
 

@@ -16,11 +16,9 @@
 
 #include <string.h>
 
-extern "C" {
-extern const f32 kPppYmLaserZero;
-extern const f32 kPppYmLaserOne;
-extern const f32 kPppYmLaserDebugPointScale;
-}
+static const f32 kPppYmLaserZero = 0.0f;
+static const f32 kPppYmLaserOne = 1.0f;
+static const f32 kPppYmLaserDebugPointScale = 2.0f;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 

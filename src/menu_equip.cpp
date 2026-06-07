@@ -153,9 +153,10 @@ int CMenuPcs::EquipClose0()
 		*(short*)(listBase + selOff) = *(short*)(listBase + selOff) + 0x13;
 	}
 
+	short* base = (short*)*(int*)&this->m_equipList;
 	doneCount = 0;
-	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
-	EquipOpenAnim* item = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	itemCount = (int)base[1] - (int)base[0];
+	EquipOpenAnim* item = (EquipOpenAnim*)(base + base[0] * 0x20 + 4);
 	for (int i = 0; i < itemCount; i++) {
 		fVar1 = kEquipZero;
 		if (timer >= item->startFrame) {

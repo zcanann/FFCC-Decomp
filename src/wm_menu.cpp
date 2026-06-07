@@ -2250,13 +2250,13 @@ void CMenuPcs::CalcLoadMenu()
 		Game.m_gameWork.m_wmBackupParams[1] = worldState->m_originalBackupParams[1];
 		Game.m_gameWork.m_wmBackupParams[2] = worldState->m_originalBackupParams[2];
 		Game.m_gameWork.m_wmBackupParams[3] = worldState->m_originalBackupParams[3];
-		if (worldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
+		if (m_wmWorldState->m_menuMode == 8 && m_cmakeWorkCardChannel != 0) {
 			mcCtrl.m_cardChannel = (int)m_cmakeWorkCardChannel - 1;
-			worldState->m_subState = 3;
-			worldState->m_flag09 = 1;
+			m_wmWorldState->m_subState = 3;
+			m_wmWorldState->m_flag09 = 1;
 		}
-		worldState->m_flag0A = 0;
-		worldState->m_worldReady = 1;
+		m_wmWorldState->m_flag0A = 0;
+		m_wmWorldState->m_worldReady = 1;
 	}
 
 	int iVar14;

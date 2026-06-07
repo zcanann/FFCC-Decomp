@@ -1068,20 +1068,36 @@ void CGPartyObj::command()
 
 		CGObject* target = party.target;
 		if (target != nullptr) {
-			const int targetState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(target) + 0x500);
-			const bool alreadyCarried =
-				*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(target) + 0x550) != nullptr;
+			unsigned char* targetBytes = reinterpret_cast<unsigned char*>(target);
+			const int targetState = *reinterpret_cast<int*>(targetBytes + 0x500);
 
-			if (!alreadyCarried) {
-				if (targetState == 0x0B || targetState == 0x0C || targetState == 0x0D ||
-				    targetState == 0x0E || targetState == 0x12 || targetState == 0x13 ||
-				    targetState == 0x14 || targetState == 0x15 || targetState == 0x16 ||
-				    targetState == 0x17 || targetState == 0x18 || targetState == 0x1C ||
-				    targetState == 0x1D || targetState == 0x1E || targetState == 0x1F ||
-				    targetState == 0x20 || targetState == 0x21 || targetState == 0x24) {
+			bool canAddBlock = false;
+			if (targetState == 0x24) {
+				canAddBlock = true;
+			} else if (targetState < 0x24) {
+				if (targetState < 0x12) {
+					if (targetState != 0x0B && targetState > 9 &&
+					    *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+						secondaryAvailable = true;
+						secondaryCommand = 4;
+					}
+				} else if (targetState < 0x1C) {
+					if (targetState < 0x19) {
+						canAddBlock = true;
+					}
+				} else if (targetState < 0x22) {
+					canAddBlock = true;
+				}
+			} else if (targetState == 0xCA) {
+				if (CFlatCenterState() == 0) {
 					secondaryAvailable = true;
-					secondaryCommand = 0x17;
-				} else if (targetState == 0xC8) {
+					secondaryCommand = 0x1C;
+				} else {
+					primaryAvailable = true;
+					primaryCommand = 0x1C;
+				}
+			} else if (targetState < 0xCA) {
+				if (targetState == 0xC8) {
 					if (CFlatCenterState() == 0) {
 						secondaryAvailable = true;
 						secondaryCommand = 0x0B;
@@ -1089,7 +1105,7 @@ void CGPartyObj::command()
 						primaryAvailable = true;
 						primaryCommand = 0x0B;
 					}
-				} else if (targetState == 0xC9) {
+				} else if (targetState > 0xC7) {
 					if (CFlatCenterState() == 0) {
 						secondaryAvailable = true;
 						secondaryCommand = 0x0A;
@@ -1097,19 +1113,22 @@ void CGPartyObj::command()
 						primaryAvailable = true;
 						primaryCommand = 0x0A;
 					}
-				} else if (targetState == 0xCA) {
-					if (CFlatCenterState() == 0) {
-						secondaryAvailable = true;
-						secondaryCommand = 0x1C;
-					} else {
-						primaryAvailable = true;
-						primaryCommand = 0x1C;
-					}
-				} else if (targetState == 0xCC) {
-					secondaryAvailable = true;
-					secondaryCommand = 6;
+				}
+			} else if (targetState == 0xCC) {
+				secondaryAvailable = true;
+				secondaryCommand = 6;
+			}
+
+			if (canAddBlock && *reinterpret_cast<int*>(targetBytes + 0x550) == 0) {
+				secondaryAvailable = true;
+				if ((targetState == 0x24 && caravan->CanAddTmpArtifact(1) != 0) ||
+				    (*reinterpret_cast<int*>(targetBytes + 0x500) == 0x20 &&
+				     caravan->CanAddGil(*reinterpret_cast<int*>(targetBytes + 0x558)) != 0) ||
+				    ((*reinterpret_cast<int*>(targetBytes + 0x500) != 0x24 &&
+				      *reinterpret_cast<int*>(targetBytes + 0x500) != 0x20) &&
+				     *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x5A) + 1 < 0x41)) {
+					secondaryCommand = 0x17;
 				} else {
-					secondaryAvailable = true;
 					secondaryCommand = 4;
 				}
 			}
@@ -1280,7 +1299,10 @@ void CGPartyObj::command()
 		}
 	}
 
-	if ((trig & 0x200) == 0 || !secondaryAvailable) {
+	if ((getPadTrigForSlot(padSlot) & 0x200) == 0) {
+		return;
+	}
+	if (!secondaryAvailable) {
 		return;
 	}
 
@@ -1294,32 +1316,66 @@ void CGPartyObj::command()
 		caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
 		m_itemId = weaponRef;
 		changeStat(1, 0, 0);
-		commandFinished();
-		return;
-	}
-
-	if (secondaryCommand == 4) {
+	} else if (secondaryCommand == 4) {
 		carry(0, party.target, 0);
-		commandFinished();
-		return;
-	}
-
-	if ((secondaryCommand >= 2 && secondaryCommand <= 3) || secondaryCommand == 0x17) {
+	} else if (static_cast<unsigned int>(secondaryCommand - 2) <= 1 || secondaryCommand == 0x17) {
+		unsigned char* targetBytes = reinterpret_cast<unsigned char*>(party.target);
 		rotTarget(reinterpret_cast<CGPrgObj*>(party.target));
 		changeStat(0x0E, 0, 0);
-		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
+		*reinterpret_cast<CGPartyObj**>(targetBytes + 0x550) = this;
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
-		party.commandFlags |= 0x80;
-		CFlatRuntime::CStack stack[2];
-		stack[0].m_word = secondaryCommand;
-		stack[1].m_word = party.target != nullptr ? *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x30) : 0;
-		gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
-		commandFinished();
-		return;
+
+		int itemIdx = *reinterpret_cast<int*>(targetBytes + 0x504);
+		unsigned short kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
+		int kindClass;
+		if (kind == 0x125) {
+			kindClass = 0;
+		} else if (kind < 0x125) {
+			kindClass = (kind == 0x100 || kind == 1) ? 0 : 2;
+		} else if (kind == 0x190) {
+			kindClass = 1;
+		} else {
+			kindClass = 2;
+		}
+
+		if (kindClass == 0 || kindClass == 2) {
+			int addedItem;
+			if (itemIdx < 0x9F || itemIdx > 0xFF) {
+				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2E0), *reinterpret_cast<int*>(targetBytes + 0x504));
+			} else {
+				caravan->AddTmpArtifact(itemIdx, &addedItem);
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2C0), *reinterpret_cast<int*>(targetBytes + 0x504));
+			}
+			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
+				int addedSlot;
+				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2F8), addedItem, addedSlot);
+			}
+			if (*reinterpret_cast<short*>(targetBytes + 0x560) != 1) {
+				enableAttackCol(4, *reinterpret_cast<int*>(targetBytes + 0x504), 0);
+			}
+		} else if (itemIdx == 0x190) {
+			enableAttackCol(5, 0x190, 0);
+			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x324), *reinterpret_cast<int*>(targetBytes + 0x558));
+			caravan->AddGil(*reinterpret_cast<int*>(targetBytes + 0x558));
+			if (*reinterpret_cast<short*>(targetBytes + 0x560) != 1) {
+				enableAttackCol(4, *reinterpret_cast<int*>(targetBytes + 0x504), 0);
+			}
+		}
 	}
 
-	callCommandScript(secondaryCommand, party.target);
-	commandFinished();
+	party.partyFlags |= 0x80;
+	CGObject* tgt = party.target;
+	CFlatRuntime::CStack stack[2];
+	stack[0].m_word = secondaryCommand;
+	stack[1].m_word = tgt != nullptr ? *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(tgt) + 0x30) : 0;
+	gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
+	if (secondaryCommand == 5) {
+		carry(1, static_cast<CGObject*>(0), 0);
+	} else if (secondaryCommand == 7 || secondaryCommand == 8) {
+		carry(2, static_cast<CGObject*>(0), 0);
+	}
 }
 
 /*

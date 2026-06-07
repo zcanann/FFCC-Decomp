@@ -2404,7 +2404,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double w = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
 	double h = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(GX_COLOR0A0, white);
 

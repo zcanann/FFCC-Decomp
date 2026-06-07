@@ -6361,32 +6361,32 @@ void CMenuPcs::CalcWMFrame()
 		}
 	}
 LAB_calc:
-	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
+	*reinterpret_cast<short*>(m_wm.m_frameData + 0x98) = 0x68;
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;
-	*reinterpret_cast<short*>(wmFrame + 0x9C) = 200;
-	*reinterpret_cast<short*>(wmFrame + 0x9E) = 0x28;
-	*reinterpret_cast<float*>(wmFrame + 0xA0) = fVar1;
+	*reinterpret_cast<short*>(m_wm.m_frameData + 0x9A) = 0x14;
+	*reinterpret_cast<short*>(m_wm.m_frameData + 0x9C) = 200;
+	*reinterpret_cast<short*>(m_wm.m_frameData + 0x9E) = 0x28;
+	*reinterpret_cast<float*>(m_wm.m_frameData + 0xA0) = fVar1;
+	int wmFrame;
 
-	if ((bytes[0x0A] & 1) == 0) {
-		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
-		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
-	} else {
+	if ((bytes[0x0A] & 1) != 0) {
 		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x05];
 		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
+	} else {
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
+		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
+		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
 	}
 
-	*reinterpret_cast<short*>(wmFrame + 0x98) =
-	    (short)(10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
+	*reinterpret_cast<short*>(m_wm.m_frameData + 0x98) =
+	    (10 - *reinterpret_cast<int*>(m_wm.m_frameData + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
-	     (worldState->m_mainState == 2 && bytes[0x13] != 0))
-	    && *reinterpret_cast<int*>(wmFrame + 8) > 9) {
-		*reinterpret_cast<int*>(wmFrame + 8) = 0;
-		bytes[0x0A] = bytes[0x0A] & 0xFD;
+	     (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0))
+	    && *reinterpret_cast<int*>(m_wm.m_frameData + 8) >= 10) {
+		*reinterpret_cast<int*>(m_wm.m_frameData + 8) = 0;
+		bytes[0x0A] = static_cast<unsigned char>(bytes[0x0A] & ~2);
 	}
 
 	fVar1 = FLOAT_803313e8;

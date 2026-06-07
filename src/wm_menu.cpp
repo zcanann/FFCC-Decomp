@@ -7814,7 +7814,6 @@ void CMenuPcs::DrawCharaName()
 	CFont* const font = GetWmFont(this);
 	WmWorldState* const worldState = GetWmWorldState(this);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
-	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
 	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 	if (Game.m_gameWork.m_languageId == 3) {
@@ -7902,9 +7901,9 @@ void CMenuPcs::DrawCharaName()
 			bool restoreColor = false;
 			const char* text = 0;
 
-			if (worldState->m_menuMode == 8 && cmakeWork != 0 &&
-			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
-				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
+			if (worldState->m_menuMode == 8 && m_cmakeWorkActive == 1 && m_cmakeWork != 0 &&
+			    *reinterpret_cast<int*>(m_cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
+				text = reinterpret_cast<const char*>(m_cmakeWork + slot * 0x9C0 + 0x15C0);
 				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
 			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
 				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].m_name);

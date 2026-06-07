@@ -2066,11 +2066,8 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem);
-    if (canSelect) {
-        int selected = getItemNo(m_selectedIndex);
-        canSelect = CalcShopMenuMakeGil(this, selected) <= m_caravanWork->m_gil;
-    }
+    bool canSelect = MenuPcs.ChkEquipPossible(m_resultItem) &&
+                     (CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) <= m_caravanWork->m_gil);
 
     int selected = getItemNo(m_selectedIndex);
     short recipeMaterial[8];

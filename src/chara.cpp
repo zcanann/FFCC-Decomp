@@ -1191,14 +1191,11 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 void CChara::CModel::setup()
 {
 	CNode* node = ModelNodes(this);
-	CMesh* mesh = reinterpret_cast<CMesh*>(ModelMeshes(this));
-	u32 nodeCount = ModelNodeCount(this);
-	u32 meshCount = ModelMeshCount(this);
-	for (u32 i = 0; i < nodeCount; i++) {
+	for (u32 i = 0; i < ModelNodeCount(this); i++) {
 		PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
 		s8 disp = node->m_refData->m_displayIndex;
-		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
-			node->m_displayMesh = mesh + disp;
+		if (disp >= 0 && static_cast<u32>(disp) < ModelRef(this)->m_meshCount) {
+			node->m_displayMesh = reinterpret_cast<CMesh*>(ModelMeshes(this)) + disp;
 		}
 		node = (CNode*)((u8*)node + 0xC0);
 	}
@@ -1206,14 +1203,13 @@ void CChara::CModel::setup()
 	calcBindMatrix();
 
 	CCharaMeshRaw* meshRaw = ModelMeshes(this);
-	for (u32 i = 0; i < meshCount; i++) {
-		CCharaMeshRefRaw* meshData = meshRaw->m_data;
-		u8* skin = reinterpret_cast<u8*>(meshData->m_skins);
-		for (u32 j = 0; j < meshData->m_skinCount; j++) {
+	for (u32 i = 0; i < ModelRef(this)->m_meshCount; i++) {
+		u8* skin = reinterpret_cast<u8*>(meshRaw->m_data->m_skins);
+		for (u32 j = 0; j < meshRaw->m_data->m_skinCount; j++) {
 			u32 skinNodeIndex = *reinterpret_cast<u32*>(skin + 0x60);
 			MtxPtr skinInvBind = reinterpret_cast<MtxPtr>(skin + 0x30);
 			PSMTXInverse(NodeRefBindMtx(&ModelNodes(this)[skinNodeIndex]), skinInvBind);
-			PSMTXConcat(skinInvBind, NodeRefBindMtx(&ModelNodes(this)[meshData->m_nodeIndex]), skinInvBind);
+			PSMTXConcat(skinInvBind, NodeRefBindMtx(&ModelNodes(this)[meshRaw->m_data->m_nodeIndex]), skinInvBind);
 			skin += 0x64;
 		}
 		meshRaw++;

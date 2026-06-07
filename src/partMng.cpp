@@ -259,8 +259,8 @@ void CPartMng::Create()
 
     ppvSysStopPartF = 1;
     ppvSysGoPartF = 0;
-    gPppCalcDisabled = 0;
     ppvUserStopPartF = 0;
+    ppvEmptyLoop = 0;
 
     if (Game.m_currentSceneId == 7) {
         pppCreateHeap(env, 0x100000);
@@ -269,7 +269,6 @@ void CPartMng::Create()
     }
 
     ppvEnv = env;
-    ppvEmptyLoop = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
     ppvZeroVector.x = FLOAT_8032fe5c;

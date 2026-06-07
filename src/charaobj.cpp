@@ -2427,7 +2427,6 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
  */
 void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int& outC, int forceNormal)
 {
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + (itemId * 0x48);
 
 	int isNormal = 0;
@@ -2437,16 +2436,16 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 
 	outA = 3;
 	switch (staIndex) {
-		case 0: outA = *reinterpret_cast<unsigned short*>(script + 0x2C); break;
-		case 1: outA = *reinterpret_cast<unsigned short*>(script + 0x2A); break;
-		case 2: outA = *reinterpret_cast<unsigned short*>(script + 0x38); break;
-		case 3: outA = *reinterpret_cast<unsigned short*>(script + 0x3C); break;
-		case 4: outA = *reinterpret_cast<unsigned short*>(script + 0x2E); break;
-		case 6: outA = *reinterpret_cast<unsigned short*>(script + 0x3A); break;
-		case 8: outA = *reinterpret_cast<unsigned short*>(script + 0x30); break;
-		case 9: outA = *reinterpret_cast<unsigned short*>(script + 0x32); break;
-		case 10: outA = *reinterpret_cast<unsigned short*>(script + 0x34); break;
-		case 0x1C: outA = *reinterpret_cast<unsigned short*>(script + 0x36); break;
+		case 0: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x2C); break;
+		case 1: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x2A); break;
+		case 2: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x38); break;
+		case 3: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3C); break;
+		case 4: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x2E); break;
+		case 6: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3A); break;
+		case 8: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x30); break;
+		case 9: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x32); break;
+		case 10: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x34); break;
+		case 0x1C: outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x36); break;
 		case 0x24:
 		case 0x25:
 		case 0x26:
@@ -2454,13 +2453,13 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		case 0x6A:
 		case 0x6B:
 		case 100:
-			outA = *reinterpret_cast<unsigned short*>(script + 0x28);
+			outA = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x28);
 			break;
 		default:
 			break;
 	}
 
-	if (*reinterpret_cast<short*>(script + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
 		staIndex != 0x1C) {
 		int clamped = 2;
@@ -2471,7 +2470,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	}
 	if ((GetCID() & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
-		*reinterpret_cast<short*>(script + 0x52) == 0) {
+		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0) {
 		int clamped = 2;
 		if (outA > 1) {
 			clamped = outA;
@@ -2479,12 +2478,12 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outA = clamped;
 	}
 
-	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(script + 0x10) == 0x7F &&
+	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0x7F &&
 	    static_cast<signed char>(SoundBuffer[0x4FC]) < 0) {
 		outA = 3;
 	}
 
-	if (*reinterpret_cast<short*>(script + 0x74) != 0) {
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x74) != 0) {
 		outA = 3;
 	}
 

@@ -107,7 +107,7 @@ extern "C" const char* s_SkillStr_sp[];
 
 namespace {
 
-static const char* GetLocalizedStrikeName(int itemId)
+static inline const char* GetLocalizedStrikeName(int itemId)
 {
 	int idx = -1;
 	if (itemId == 0x207) {
@@ -147,7 +147,7 @@ static const char* GetLocalizedStrikeName(int itemId)
 	return names[idx];
 }
 
-static const char* GetUniteListName(int itemId)
+static inline const char* GetUniteListName(int itemId)
 {
 	const char* localized = GetLocalizedStrikeName(itemId);
 	if (localized != 0 && localized[0] != '\0') {

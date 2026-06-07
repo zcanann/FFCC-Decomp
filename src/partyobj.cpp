@@ -4732,9 +4732,9 @@ void CGPartyObj::ghostPartyMog()
 
 	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
 		bool exceeded;
-		if (CharaGhostValue(0x2048) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x04)) &&
-		    CharaGhostValue(0x204C) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x08)) &&
-		    CharaGhostValue(0x2050) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x0C))) {
+		if (static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x04)) < CharaGhostValue(0x2048) &&
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x08)) < CharaGhostValue(0x204C) &&
+		    static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x0C)) < CharaGhostValue(0x2050)) {
 			exceeded = false;
 		} else {
 			exceeded = true;

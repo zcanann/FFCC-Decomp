@@ -2651,12 +2651,13 @@ void CGPartyObj::checkTargetParticle()
 		party.flags.flag10 = 0;
 	}
 
-	Vec input;
-	input.x = 0.0f;
-	input.y = 0.0f;
-	input.z = 0.0f;
+	CVector input;
+	input.Identity();
 
-	if (!isGhostPartyTargetMode(this)) {
+	if ((Game.m_gameWork.m_menuStageMode == 0) ||
+	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
+	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
 		if ((MiniGamePcs.m_flags & 0x100) != 0) {
 			input.x -= getPadLeftStickXForSlot(static_cast<unsigned char>(m_animStateMisc));
 			input.z += getPadLeftStickYForSlot(static_cast<unsigned char>(m_animStateMisc));
@@ -2702,8 +2703,8 @@ void CGPartyObj::checkTargetParticle()
 		float maxRange;
 
 		party.partyFlags |= 0x20;
-		PSVECNormalize(&input, &input);
-		PSVECScale(&input, &input, FLOAT_80331ad4);
+		PSVECNormalize(input, input);
+		PSVECScale(input, input, FLOAT_80331ad4);
 
 			float angle = CameraPcs.m_yaw;
 			if (isGhostPartyTargetMode(this)) {

@@ -588,23 +588,26 @@ int CFlatRuntime::Frame(int mode, int unused)
 
 					object->m_sp--;
 					scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
+					scriptIndex = bitBase;
 					scanCount = 4;
 
 					do {
-						scriptIndex = bitBase;
-						if ((((((scriptMask & 0x80000000) != 0)
-						       || ((scriptIndex = bitBase - 1), (scriptMask & 0x40000000) != 0))
-						      || ((scriptIndex = bitBase - 2), (scriptMask & 0x20000000) != 0))
-						     || (((scriptIndex = bitBase - 3), (scriptMask & 0x10000000) != 0)
-						         || ((scriptIndex = bitBase - 4), (scriptMask & 0x08000000) != 0)))
-						    || (((scriptIndex = bitBase - 5), (scriptMask & 0x04000000) != 0)
-						        || (((scriptIndex = bitBase - 6), (scriptMask & 0x02000000) != 0)
-						            || ((scriptIndex = bitBase - 7), (scriptMask & 0x01000000) != 0)))) {
-							break;
-						}
-
-						scriptMask <<= 8;
-						bitBase -= 8;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
+						if ((scriptMask & 0x80000000) != 0) { break; }
+						scriptMask <<= 1; scriptIndex--;
 						scanCount--;
 					} while (scanCount != 0);
 
@@ -617,25 +620,27 @@ int CFlatRuntime::Frame(int mode, int unused)
 
 						object->m_0x34 = static_cast<s16>(object->m_0x34 & ~(1U << scriptIndex));
 
-						bitBase = 0x1F;
+						scriptIndex = 0x1F;
 						scriptMask = static_cast<unsigned int>(static_cast<unsigned short>(object->m_0x34));
 						scanCount = 4;
 
 						do {
-							scriptIndex = bitBase;
-							if ((((((scriptMask & 0x80000000) != 0)
-							       || ((scriptIndex = bitBase - 1), (scriptMask & 0x40000000) != 0))
-							      || ((scriptIndex = bitBase - 2), (scriptMask & 0x20000000) != 0))
-							     || (((scriptIndex = bitBase - 3), (scriptMask & 0x10000000) != 0)
-							         || ((scriptIndex = bitBase - 4), (scriptMask & 0x08000000) != 0)))
-							    || (((scriptIndex = bitBase - 5), (scriptMask & 0x04000000) != 0)
-							        || (((scriptIndex = bitBase - 6), (scriptMask & 0x02000000) != 0)
-							            || ((scriptIndex = bitBase - 7), (scriptMask & 0x01000000) != 0)))) {
-								break;
-							}
-
-							scriptMask <<= 8;
-							bitBase -= 8;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
+							if ((scriptMask & 0x80000000) != 0) { break; }
+							scriptMask <<= 1; scriptIndex--;
 							scanCount--;
 						} while (scanCount != 0);
 

@@ -3170,8 +3170,6 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     int baseY = 300;
-    int nameX = static_cast<int>(
-        -((static_cast<double>(161.0f) * 0.5) - 400.0));
 
     if (x != 0) {
         baseY = 0x130;
@@ -3190,6 +3188,8 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetTlut(6);
 
     float textW = static_cast<float>(font->GetWidth(text));
+    int nameX = static_cast<int>(
+        -((static_cast<double>(textW) * 0.5) - 400.0));
     font->SetPosX(static_cast<float>(nameX));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);

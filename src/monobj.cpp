@@ -1601,8 +1601,8 @@ int CGMonObj::getReplaceStat(int state)
 		break;
 	default:
 	if ((state < -4) && (state > -0xF)) {
-		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (state + 0xE) * 2 + 0xD0);
-		short actionType = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + action * 0x48 + 0xE);
+		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + ((state + 0xE) * 2 + 0xD0));
+		short actionType = *reinterpret_cast<short*>(Game.unkCFlatData0[2] + (action * 0x48 + 0xE));
 		if (actionType == 3) {
 			return 0x12;
 		}

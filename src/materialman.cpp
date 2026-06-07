@@ -2609,65 +2609,63 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
  */
 void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 {
-    CPtrArray<CMaterial*>* materialArray = &m_materials;
     unsigned long materialIndex = 0;
 
-    while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
-        CMaterial* material = (*materialArray)[materialIndex];
+    while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
+        CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            unsigned short numTexture = material->m_textureCount;
-            if (numTexture == 0) {
+            if (material->m_textureCount == 0) {
                 material->m_tevBit |= 1;
             } else {
-                for (int i = 0; i < numTexture; i++) {
+                for (int i = 0; i < material->m_textureCount; i++) {
                     ReleaseRef(material->m_textureData.m_textures[i]);
                     material->m_textureData.m_textures[i] = 0;
 
                     if (textureSet != 0) {
-                        CTexture* texture = 0;
-                        short textureIndex = static_cast<short>(material->m_textureIndices[i]);
-                        if (textureIndex >= 0) {
-                            unsigned long textureCount = static_cast<unsigned long>(textureSet->GetNumTexture());
-                            if (static_cast<unsigned long>(textureIndex) < textureCount) {
-                                texture = textureSet->GetTexture(textureIndex);
-                            }
-                        }
-
-                        material->m_textureData.m_textures[i] = texture;
-                        if (texture != 0) {
-                            texture->AddRef();
-
-                            unsigned long& flags = material->m_tevBit;
-                            int format = texture->m_format;
-                            if ((format == 9) || (format == 8)) {
-                                flags |= 0x200;
-                            } else if (format == 1) {
-                                flags |= 0x400;
-                            }
-
-                            if (texture->m_isAlphaLut != 0) {
-                                flags |= 0x800;
+                        unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
+                        if ((static_cast<long>(textureIndex) < 0) ||
+                            (static_cast<unsigned long>(textureSet->GetNumTexture()) <= textureIndex)) {
+                            material->m_textureData.m_textures[i] = 0;
+                        } else {
+                            material->m_textureData.m_textures[i] =
+                                textureSet->GetTexture(textureIndex);
+                            if (material->m_textureData.m_textures[i] != 0) {
+                                bool isIntensity = true;
+                                material->m_textureData.m_textures[i]->AddRef();
+                                unsigned int format = material->m_textureData.m_textures[i]->m_format;
+                                if ((format != 9) && (format != 8)) {
+                                    isIntensity = false;
+                                }
+                                if (isIntensity) {
+                                    material->m_tevBit |= 0x200;
+                                } else if (format == 1) {
+                                    material->m_tevBit |= 0x400;
+                                }
+                                if (material->m_textureData.m_textures[i]->m_isAlphaLut != 0) {
+                                    material->m_tevBit |= 0x800;
+                                }
                             }
                         }
                     }
                 }
 
                 if ((material->m_materialType != 0) &&
-                    (numTexture > 1) &&
+                    (material->m_textureCount > 1) &&
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
-                    CTexture* texture0 = material->m_textureData.m_textures[0];
-                    CTexture* texture1 = material->m_textureData.m_textures[1];
+                    material->m_texShiftU = static_cast<char>(HighestSetBit(
+                        material->m_textureData.m_textures[0]->m_width /
+                        material->m_textureData.m_textures[1]->m_width));
+                    if (static_cast<unsigned char>(material->m_texShiftU) == 0xFF) {
+                        material->m_texShiftU = 0;
+                    }
 
-                    unsigned int scaleU =
-                        texture0->m_width / texture1->m_width;
-                    int uShift = HighestSetBit(scaleU);
-                    material->m_texShiftU = (uShift == -1) ? 0 : static_cast<char>(uShift);
-
-                    unsigned int scaleV =
-                        texture0->m_height / texture1->m_height;
-                    int vShift = HighestSetBit(scaleV);
-                    material->m_texShiftV = (vShift == -1) ? 0 : static_cast<char>(vShift);
+                    material->m_texShiftV = static_cast<char>(HighestSetBit(
+                        material->m_textureData.m_textures[0]->m_height /
+                        material->m_textureData.m_textures[1]->m_height));
+                    if (static_cast<unsigned char>(material->m_texShiftV) == 0xFF) {
+                        material->m_texShiftV = 0;
+                    }
                 }
             }
         }

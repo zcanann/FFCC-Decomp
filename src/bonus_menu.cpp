@@ -2490,9 +2490,11 @@ void CMenuPcs::CalcResultCountAnim()
 				int elapsed = frame - sprite->startFrame;
 				sprite->alpha = 1.0f;
 				if (elapsed < sprite->duration) {
+					float fy = (float)sprite->y;
+					float ty = sprite->targetY;
 					double progress = 1.0 - (double)((float)elapsed / (float)sprite->duration);
 					sprite->motionX = (float)((double)(sprite->targetX - (float)sprite->x) * progress);
-					sprite->motionY = (float)((double)(sprite->targetY - (float)sprite->y) * progress);
+					sprite->motionY = (float)((double)(ty - fy) * progress);
 				} else {
 					sprite->motionX = 0.0f;
 					sprite->motionY = 0.0f;

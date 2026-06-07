@@ -1380,13 +1380,10 @@ void CGPartyObj::shouki()
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	const unsigned char cflatFlags = CFlatGameFlags();
-	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
-	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
-	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
-	const bool weaponFlag = m_weaponNodeFlagAll.m_bits1.m_shield < 0;
 
-	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag)) {
+	if (*reinterpret_cast<short*>(script + 0x1C) == 0 ||
+	    ((CFlatGameFlags() & 0x80) == 0 && (CFlatGameFlags() & 0x10) == 0) ||
+	    m_weaponNodeFlagAll.m_bits1.m_shield >= 0) {
 		if (m_unk688 != 0) {
 			deletePSlotBit(0x200);
 			m_unk688 = 0;
@@ -1396,7 +1393,7 @@ void CGPartyObj::shouki()
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || cflatBit4) {
+	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || (CFlatGameFlags() & 0x10) != 0) {
 		if (m_unk688 != 2) {
 			deletePSlotBit(0x200);
 			gCFlatRuntime2.ResetParticleWork(1, m_particleSlots[9]);
@@ -1423,7 +1420,7 @@ void CGPartyObj::shouki()
 	}
 
 	const unsigned int frame = static_cast<unsigned char>(m_flags);
-	if (m_unk688 == 0 && !cflatBit4) {
+	if (m_unk688 == 0 && (CFlatGameFlags() & 0x10) == 0) {
 		unsigned int healCount = 0;
 		if (PartyData(this).carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
 			healCount = isFrameInterval(frame, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4));
@@ -1445,7 +1442,7 @@ void CGPartyObj::shouki()
 		}
 		if (isFrameInterval(frame, damageInterval)) {
 			playSe3D(0x19, 0x32, 0x96, 0, 0);
-			if (!cflatBit5) {
+			if ((CFlatGameFlags() & 0x20) == 0) {
 				addHp(-1, static_cast<CGPrgObj*>(0));
 			}
 		}

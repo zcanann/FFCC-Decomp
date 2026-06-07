@@ -162,7 +162,15 @@ public:
 		CAnimNode* m_animNode1;
 		CVector m_dynPosition;
 		CVector m_dynVel;
-		u8 m_flags;
+		union
+		{
+			u8 m_flags;
+			struct
+			{
+				s8 m_flag_80 : 1;
+				s8 m_flag_lo : 7;
+			} m_flagsBits;
+		};
 		u8 _padBD[3];
 	};
 

@@ -483,6 +483,11 @@ static inline u8& NodeRuntimeFlags(CChara::CNode* node)
 	return node->m_flags;
 }
 
+static inline s8 NodeRuntimeFlag80(CChara::CNode* node)
+{
+	return node->m_flagsBits.m_flag_80;
+}
+
 static inline u8 AnimFlags(CChara::CAnim* anim)
 {
 	return anim->m_flags;
@@ -1492,25 +1497,25 @@ void CChara::CModel::calcMatrix()
 		SRTView srt;
 
 		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
-			if ((s8)NodeRuntimeFlags(node) < 0) {
+			if (NodeRuntimeFlag80(node)) {
 				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
 			}
 		} else {
-			if (parentNode == 0 || NodeAnimNode0(parentNode) == 0 || !AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
-				if ((s8)NodeRuntimeFlags(node) < 0) {
-					float baseScale;
-					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301BC) {
-						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
-					} else {
-						PSMTXIdentity(localMtx);
-					}
+			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 && AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
+				if (NodeRuntimeFlag80(node)) {
+					float* parentScale = NodeRuntimeScale(parentNode);
+					PSMTXScale(localMtx,
+					           FLOAT_803301BC / parentScale[0],
+					           FLOAT_803301BC / parentScale[1],
+					           FLOAT_803301BC / parentScale[2]);
 				}
-			} else if ((s8)NodeRuntimeFlags(node) < 0) {
-				float* parentScale = NodeRuntimeScale(parentNode);
-				PSMTXScale(localMtx,
-				           FLOAT_803301BC / parentScale[0],
-				           FLOAT_803301BC / parentScale[1],
-				           FLOAT_803301BC / parentScale[2]);
+			} else if (NodeRuntimeFlag80(node)) {
+				float baseScale;
+				if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301BC) {
+					PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+				} else {
+					PSMTXIdentity(localMtx);
+				}
 			}
 
 			if (NodeUsesParentLenX(node) != 0) {
@@ -1561,7 +1566,7 @@ void CChara::CModel::calcMatrix()
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
-				if ((s8)NodeRuntimeFlags(node) < 0) {
+				if (NodeRuntimeFlag80(node)) {
 					PSMTXConcat(localMtx, animMtx, localMtx);
 				}
 				float* runtimeScale = NodeRuntimeScale(node);

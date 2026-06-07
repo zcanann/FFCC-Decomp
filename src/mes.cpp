@@ -570,9 +570,9 @@ void CMes::Draw()
 			CFont* nextFont = font;
 			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
 			{
-				unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
-				if (ch < 0x20)
+				if ((unsigned int)*(unsigned char*)(glyph + 4) < 0x20)
 				{
+					unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
 					if (font != 0)
 					{
 						font->DrawQuit();
@@ -744,7 +744,7 @@ void CMes::Draw()
 					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
 					font->SetScaleY(glyphScaleY);
 					GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
-					font->Draw((unsigned short)ch);
+					font->Draw((unsigned short)*(unsigned char*)(glyph + 4));
 					GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
 				}
 			}

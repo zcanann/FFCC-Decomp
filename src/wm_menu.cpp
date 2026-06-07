@@ -7694,7 +7694,7 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
-		unsigned int selectedMask = 0;
+		int selectedMask = 0;
 		for (int chan = 0; chan < 4; chan++) {
 			const int slot = *reinterpret_cast<short*>(m_wm.m_charaSelectData + chan * 0x10 + 0x04);
 			if (m_wm.m_charaSelectData[chan * 0x10 + 0x0D] == 1 && slot >= 0 && i == slot) {

@@ -415,7 +415,6 @@ void birth(
 {
     (void)pObject;
     u8* payload = (u8*)params;
-    u8 mode = params->m_spawnMode;
     float spread = (float)params->m_spread;
     float halfSpread = spread;
     float randomRange = FLOAT_803304c0 * spread;
@@ -430,7 +429,7 @@ void birth(
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
 
-    if (mode < 8) {
+    if (params->m_spawnMode < 8) {
         Vec baseDirection;
         Vec angles;
         Vec forward;
@@ -443,7 +442,7 @@ void birth(
         angles.y = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
         angles.z = (kPppRyjMegaBirthAngleIndexScale * (float)(randomRange * Math.RandF() - halfSpread)) / FLOAT_803304c4;
 
-        if ((mode == 2) || (mode == 3)) {
+        if ((params->m_spawnMode == 2) || (params->m_spawnMode == 3)) {
             angles.x = kPppRyjMegaBirthSharedZero;
             angles.y = kPppRyjMegaBirthSharedZero;
         }
@@ -504,7 +503,7 @@ void birth(
         pppCopyMatrix(*(pppFMATRIX*)&particleData->m_matrix, basis);
     }
 
-    mode = params->m_spawnMode;
+    u8 mode = params->m_spawnMode;
     if (mode < 6) {
         if (mode > 3) {
             if (params->m_speed != kPppRyjMegaBirthSharedZero) {

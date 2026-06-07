@@ -1317,11 +1317,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		System.Printf(dbg + 0x118);
 		return;
 	}
-	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && *reinterpret_cast<short*>(&m_lastMapIdHit) != 1) {
 		System.Printf(dbg + 0x138);
 		return;
 	}
-	if ((m_weaponNodeFlags & 0x80) == 0) {
+	if (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) >= 0) {
 		System.Printf(dbg + 0x160);
 		return;
 	}

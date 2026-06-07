@@ -56,7 +56,7 @@ extern const float kItemObjMemoryChaseScale = 1.5f;
 static const char s_itemDamageBoneHip[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-extern const char lbl_801DCE20[];
+extern const char sItemObjStringTableBase[];
 extern const char sItemNoDeletableObjectMsg[];
 extern const char sItemMemoryCapsuleAsyncEndMsg[];
 
@@ -630,7 +630,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
-	char* itemObjStrings = const_cast<char*>(lbl_801DCE20);
+	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
 	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
 	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
@@ -827,7 +827,7 @@ void CGItemObj::onFrameStat()
 	unsigned char* self = (unsigned char*)this;
 	CGPrgObj* prgObj = (CGPrgObj*)this;
 	int stateId = m_lastStateId;
-	char* itemObjStrings = const_cast<char*>(lbl_801DCE20);
+	char* itemObjStrings = const_cast<char*>(sItemObjStringTableBase);
 	float zero = kItemObjZero;
 
 	switch (stateId) {

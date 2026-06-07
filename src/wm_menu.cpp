@@ -4222,11 +4222,15 @@ void CMenuPcs::DrawMoveMenu()
 		moveAlpha = FLOAT_803313e8;
 	}
 	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 3) {
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha))};
+		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		GXColor helpColor;
+		helpColor.r = 0xFF;
+		helpColor.g = 0xFF;
+		helpColor.b = 0xFF;
+		helpColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha));
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
-		SetTexture(static_cast<CMenuPcs::TEX>(0x23));
-		DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 	}
 	DrawWMFrame();

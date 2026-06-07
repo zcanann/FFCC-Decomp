@@ -152,7 +152,7 @@ static inline void ClearLetterAnimStorage(CMenuPcs* menu)
 static inline CMemory::CStage* GetLetterMenuStage(CMenuPcs* menu)
 {
 	(void)menu;
-	if (Game.m_gameWork.m_menuStageMode != '\0') {
+	if (Game.m_gameWork.m_menuStageMode != 0) {
 		return MenuPcs.m_stageF4;
 	}
 	return MenuPcs.m_menuStage;

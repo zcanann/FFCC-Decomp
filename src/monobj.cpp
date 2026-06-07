@@ -1393,10 +1393,10 @@ void CGMonObj::onStatDie()
 				}
 
 				*reinterpret_cast<int*>(mon + 0x560) = particleId;
-				CGCharaObj::putParticleFromItem(particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				CGCharaObj::putParticleFromItem(particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(*reinterpret_cast<int*>(mon + 0x560), 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
 				return;
 			}
 			if (subFrame != 0x19) {

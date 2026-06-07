@@ -6569,38 +6569,41 @@ LAB_calc:
 void CMenuPcs::DrawWMFrame()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 
-	float rotation = worldState->m_posX * FLOAT_803314bc;
+	float rotation = m_wmWorldState->m_posX * FLOAT_803314bc;
 	Mtx rotMtx;
 	PSMTXRotRad(rotMtx, 'z', rotation);
 
-	short sVar = worldState->m_mainState;
+	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
-		worldState->m_posX -= FLOAT_80331550;
-		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
-			worldState->m_posX = FLOAT_803313dc;
+		m_wmWorldState->m_posX -= FLOAT_80331550;
+		if (static_cast<double>(m_wmWorldState->m_posX) <= DOUBLE_803314f0) {
+			m_wmWorldState->m_posX = FLOAT_803313dc;
 		}
 		alpha = static_cast<float>(DOUBLE_803316d8 *
-		                           (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408));
+		                           (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408));
 	} else if (sVar == 3) {
-		worldState->m_posX += FLOAT_80331550;
-		if (DOUBLE_803316e0 <= static_cast<double>(worldState->m_posX)) {
-			worldState->m_posX = FLOAT_80331440;
+		m_wmWorldState->m_posX += FLOAT_80331550;
+		if (DOUBLE_803316e0 <= static_cast<double>(m_wmWorldState->m_posX)) {
+			m_wmWorldState->m_posX = FLOAT_80331440;
 		}
 		alpha = static_cast<float>(-(DOUBLE_803316d8 *
-		                             (static_cast<double>(worldState->m_frameCounter) - DOUBLE_80331408) -
+		                             (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) -
 		                             DOUBLE_80331508));
 	} else {
 		alpha = FLOAT_80331458;
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alpha))};
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor;
+	frameColor.r = 0xFF;
+	frameColor.g = 0xFF;
+	frameColor.b = 0xFF;
+	frameColor.a = static_cast<unsigned char>(static_cast<int>(alpha));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x16));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
 	for (int i = 0; i < 5; i++) {
 		int off = wmFrame + 0x0C + i * 0x1C;

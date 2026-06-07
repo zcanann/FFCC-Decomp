@@ -1893,7 +1893,7 @@ void CMenuPcs::LetterMessDraw()
 
 		if (strlen(curLine) != 0) {
 			font->SetPosX(FLOAT_80333144);
-			font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
+			font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 			font->Draw(curLine);
 		}
 

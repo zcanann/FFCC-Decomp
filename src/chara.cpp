@@ -1717,8 +1717,6 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 			SRTView srt;
 			if (animNode1 != 0) {
-				Mtx invScaleMtx;
-
 				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				if (AnimNodeUsesScale(animNode1)) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
@@ -1727,11 +1725,11 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				}
 				PSMTXConcat(localMtx, animMtx, localMtx);
 
-				PSMTXScale(invScaleMtx,
+				PSMTXScale(animMtx,
 				           FLOAT_803301BC / srt.m_scale.x,
 				           FLOAT_803301BC / srt.m_scale.y,
 				           FLOAT_803301BC / srt.m_scale.z);
-				PSMTXConcat(localMtx, invScaleMtx, localMtx);
+				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 
 			if (animNode0 != 0) {

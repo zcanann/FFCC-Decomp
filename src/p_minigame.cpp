@@ -732,7 +732,7 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
     unsigned int command;
     unsigned int identity;
-    int message;
+    unsigned int message;
     int ret;
     int step;
     int contextRecvOffset;
@@ -774,17 +774,17 @@ receive_message:
     contextRecvOffset = 0;
     step = 0;
     param[0xC2] = 0;
-    if (message == 5)
+    switch (message)
     {
-        timeoutTicks = OSMillisecondsToTicks(1000);
-    }
-    else if (message == 3 || message == 10)
-    {
+    case 3:
         timeoutTicks = OSMillisecondsToTicks(500);
-    }
-    else
-    {
+        break;
+    case 10:
+        timeoutTicks = OSMillisecondsToTicks(500);
+        break;
+    default:
         timeoutTicks = OSMillisecondsToTicks(1000);
+        break;
     }
     startTime = OSGetTime();
     retryLine = 0x22C;

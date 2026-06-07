@@ -2079,7 +2079,6 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                       static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
             if ((mode & 4) != 0) {
-                const int maxIndex = m_pathPointCount - 1;
                 const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
                 const float scaled = t * static_cast<float>(segmentCount);
                 const int baseIndex = (mode & 1) + static_cast<int>(scaled);
@@ -2104,34 +2103,34 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     } else if (baseIndex == 1) {
                         p0 = startPhantom1;
                     } else {
-                        p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
+                        p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 2))].m_position;
                     }
                     if (baseIndex == 0) {
                         p1 = startPhantom1;
                     } else {
-                        p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
+                        p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
                     }
                 } else {
-                    p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
-                    p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
+                    p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 2))].m_position;
+                    p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
                 }
 
                 if ((mode & 2) != 0) {
                     if (baseIndex == m_pathPointCount) {
                         p2 = endPhantom1;
                     } else {
-                        p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
+                        p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex))].m_position;
                     }
                     if (baseIndex == m_pathPointCount - 1) {
                         p3 = endPhantom1;
                     } else if (baseIndex == m_pathPointCount) {
                         p3 = endPhantom2;
                     } else {
-                        p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
+                        p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex + 1))].m_position;
                     }
                 } else {
-                    p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
-                    p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
+                    p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex))].m_position;
+                    p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex + 1))].m_position;
                 }
 
                 Vec c3;

@@ -4730,9 +4730,7 @@ void CGPartyObj::ghostPartyMog()
 	unsigned char* mboss = CGMonObj::m_boss;
 	int& bossState = *reinterpret_cast<int*>(mboss + 0x88);
 
-	if (DOUBLE_80331A90 < static_cast<double>(m_partyDistance[0])) {
-		bossState = 1;
-	} else {
+	if (static_cast<double>(m_partyDistance[0]) <= DOUBLE_80331A90) {
 		bool exceeded;
 		if (CharaGhostValue(0x2048) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x04)) &&
 		    CharaGhostValue(0x204C) > static_cast<int>(*reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x08)) &&
@@ -4819,6 +4817,8 @@ void CGPartyObj::ghostPartyMog()
 			}
 			mboss[0x6C] = (mboss[0x6C] & 0xF7) | 8;
 		}
+	} else {
+		bossState = 1;
 	}
 
 messageMenu:

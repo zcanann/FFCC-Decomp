@@ -638,17 +638,19 @@ void CGMonObj::setActionParam(int state)
 
 	unsigned int motion = *reinterpret_cast<unsigned short*>(script + scriptOffset + 0xF0);
 	*reinterpret_cast<unsigned int*>(mon + 0x550) = motion;
-	*reinterpret_cast<int*>(mon + 0x554) = static_cast<int>(motion) + 1;
+	*reinterpret_cast<int*>(mon + 0x554) = *reinterpret_cast<int*>(mon + 0x550) + 1;
 	*reinterpret_cast<int*>(mon + 0x558) = *reinterpret_cast<int*>(mon + 0x554) + 1;
 	*reinterpret_cast<int*>(mon + 0x55C) = *reinterpret_cast<int*>(mon + 0x558) + 1;
 
-	int actionOffset = static_cast<int>(action) * 0x48;
-	unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0xE);
+	int actionType = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0xE);
 	if (actionType <= 3) {
 		if (actionType < 2 || actionType == 3) {
-			*reinterpret_cast<unsigned int*>(mon + 0x630) = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x20);
-			*reinterpret_cast<unsigned int*>(mon + 0x634) = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x22);
-			*reinterpret_cast<unsigned int*>(mon + 0x638) = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x22);
+			*reinterpret_cast<unsigned int*>(mon + 0x630) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x20);
+			*reinterpret_cast<unsigned int*>(mon + 0x634) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22);
+			*reinterpret_cast<unsigned int*>(mon + 0x638) =
+				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<unsigned int*>(mon + 0x560) * 0x48 + 0x22);
 		} else if (actionType == 2) {
 			*reinterpret_cast<int*>(mon + 0x68C) = reinterpret_cast<CGCharaObj*>(this)->calcCastTime(static_cast<int>(action));
 		}

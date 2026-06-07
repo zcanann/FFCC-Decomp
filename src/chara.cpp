@@ -1672,7 +1672,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXIdentity(out);
 
-	bool reuseAnimNode0Srt = false;
+	int reuseAnimNode0Srt = 0;
 	SRTView parentScaleSrt;
 	while (node != 0) {
 		CNode* parentNode = 0;
@@ -1685,7 +1685,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		}
 
 		Mtx localMtx;
-		bool nextReuseAnimNode0Srt = false;
+		int nextReuseAnimNode0Srt = 0;
 		SRTView cachedParentScaleSrt = parentScaleSrt;
 
 		if (NodeAnimNode0(node) != 0 || NodeAnimNode1(node) != 0) {
@@ -1693,7 +1693,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 			if (parentNode != 0 && NodeAnimNode0(parentNode) != 0 &&
 			    AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
 				NodeAnimNode0(parentNode)->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
-				nextReuseAnimNode0Srt = true;
+				nextReuseAnimNode0Srt = 1;
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.x,
 				           FLOAT_803301BC / parentScaleSrt.m_scale.y,

@@ -403,12 +403,12 @@ static inline float* NodeRuntimeScale(CChara::CNode* node)
 
 static inline Vec& NodeDynPosition(CChara::CNode* node)
 {
-	return node->m_dynPosition;
+	return reinterpret_cast<Vec&>(node->m_dynPosition);
 }
 
 static inline Vec& NodeDynVelocity(CChara::CNode* node)
 {
-	return node->m_dynVel;
+	return reinterpret_cast<Vec&>(node->m_dynVel);
 }
 
 static inline MtxPtr NodeRefLocalMtx(CChara::CNode* node)

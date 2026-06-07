@@ -2779,6 +2779,19 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 	chunk.PushChunk();
 	while (chunk.GetNextChunk(chunkInfo)) {
 		switch (chunkInfo.m_id) {
+		case 0x4D4E414D:
+			strcpy(m_data->m_name, chunk.GetString());
+			break;
+		case 0x494E464F:
+			m_data->m_nodeIndex = chunk.Get4();
+			m_data->m_infoWord1 = chunk.Get4();
+			m_data->m_flags = static_cast<u8>(((static_cast<s8>(chunk.Get4()) << 7) & 0x80) | (m_data->m_flags & 0x7F));
+			m_data->m_flags = static_cast<u8>(((static_cast<s8>(chunk.Get4()) << 6) & 0x40) | (m_data->m_flags & 0xBF));
+			chunk.Get4();
+			chunk.Get4();
+			chunk.Get4();
+			chunk.Get4();
+			break;
 		case 0x56455254:
 			m_data->m_vertexCount = chunkInfo.m_size / 6;
 			m_data->m_vertices = static_cast<S16Vec*>(
@@ -2814,16 +2827,6 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				memcpy(m_data->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(m_data->m_uvs, m_data->m_uvCount << 2);
 			}
-			break;
-		case 0x494E464F:
-			m_data->m_nodeIndex = chunk.Get4();
-			m_data->m_infoWord1 = chunk.Get4();
-			m_data->m_flags = static_cast<u8>((static_cast<s8>(chunk.Get4()) << 7) | (m_data->m_flags & 0x7F));
-			m_data->m_flags = static_cast<u8>(((static_cast<s8>(chunk.Get4()) << 6) & 0x40) | (m_data->m_flags & 0xBF));
-			chunk.Get4();
-			chunk.Get4();
-			chunk.Get4();
-			chunk.Get4();
 			break;
 		case 0x534B494E: {
 			m_data->m_skinCount = chunkInfo.m_arg0;
@@ -2907,9 +2910,6 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			chunk.PopChunk();
 			break;
 		}
-		case 0x4D4E414D:
-			strcpy(m_data->m_name, chunk.GetString());
-			break;
 		}
 	}
 	chunk.PopChunk();

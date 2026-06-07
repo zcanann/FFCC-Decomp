@@ -804,6 +804,8 @@ void CMenuPcs::CmakeVillageDraw()
         short row = villageWork->m_row;
         unsigned int cursorX = static_cast<unsigned int>(
             26.9f * static_cast<float>(villageWork->m_select) + 0xE5);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXColor cursorColor;
         cursorColor.r = 0xFF;
         cursorColor.g = 0xFF;

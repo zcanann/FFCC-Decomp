@@ -2490,22 +2490,19 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	int animPtr = this->m_bonusAnimPtr;
 	int statePtr = this->m_bonusStatePtr;
 	int modelIndex = 0;
 
 	if (*(signed char*)(statePtr + 0xb) != 0) {
 		int activePartyCount = s_Rinfo->m_partyCount;
-		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int lastKind = 0;
 
 		DrawInit();
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
+		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			int kind = sprite->kind;
 
 			if (kind >= 0 || kind == -2) {
@@ -2605,8 +2602,8 @@ void CMenuPcs::DrawResultOpenAnim()
 
 		int textIndex = 0;
 		char text[128];
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
+		for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
+			BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 			if (sprite->kind == -1) {
 				CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f));
 				font->SetColor(color.color);

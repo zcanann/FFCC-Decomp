@@ -2041,9 +2041,10 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 	}
 
+	unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
 	if ((m_bind != 0) &&
-		(((m_chaseState == 4) && ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 8) == 0)) ||
-		 ((m_chaseState != 4) && ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 4) == 0)))) {
+		(((m_chaseState == 4) && ((aiFlags & 8) == 0)) ||
+		 ((m_chaseState != 4) && ((aiFlags & 4) == 0)))) {
 		unsigned char* bind = m_bind;
 		unsigned char* modelData = *reinterpret_cast<unsigned char**>(
 			reinterpret_cast<unsigned char*>(object->m_charaModelHandle) + 0x168);

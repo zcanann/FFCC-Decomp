@@ -3202,9 +3202,7 @@ void CMenuPcs::createBonus()
 			entry.m_partyHandle->m_model->m_lightAlpha = 0.0f;
 			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
 			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
-			if (entry.m_foodValue > 100) {
-				entry.m_foodValue = 100;
-			}
+			entry.m_foodValue = (entry.m_foodValue > 100) ? 100 : entry.m_foodValue;
 			entry.m_artifactValue =
 			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[4];
 			entry.m_totalValue = entry.m_foodValue + entry.m_artifactValue;
@@ -3215,7 +3213,7 @@ void CMenuPcs::createBonus()
 				totalValueClamped = 0;
 			} else {
 				totalValueClamped = 999;
-				if (entry.m_totalValue < 1000) {
+				if (entry.m_totalValue <= 999) {
 					totalValueClamped = entry.m_totalValue;
 				}
 			}

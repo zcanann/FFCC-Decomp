@@ -40,6 +40,10 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" void CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+    float scaleA, float scaleB, float scaleC, float radius, float scale, CMath* math, float* outResult,
+    Vec* p0, Vec* p1, Vec* p2, Vec* p3);
+
 namespace std {
 float sinf(float x);
 float cosf(float x);
@@ -2070,136 +2074,147 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0x1A: {
         const unsigned int mode = *object->m_localBase;
-        
-        const int pointCount = m_pathPointCount;
-        Vec result = {0.0f, 0.0f, 0.0f};
 
-        if (pointCount > 0 && object->m_localBase[2] != 0) {
-            float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
-                      static_cast<float>(static_cast<int>(object->m_localBase[2]));
+        float t = static_cast<float>(static_cast<int>(object->m_localBase[1])) /
+                  static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
-            if ((mode & 4) != 0) {
-                const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
-                const float scaled = t * static_cast<float>(segmentCount);
-                const int baseIndex = (mode & 1) + static_cast<int>(scaled);
-                const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
+        if ((mode & 4) != 0) {
+            const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
+            const float scaled = t * static_cast<float>(segmentCount);
+            const int baseIndex = (mode & 1) + static_cast<int>(scaled);
+            const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
 
-                CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
-                CVector startPhantom1 = CVector(m_pathPoints[0].m_position) - delta;
-                CVector startPhantom2 = startPhantom1 - delta;
-                delta = CVector(m_pathPoints[m_pathPointCount - 1].m_position) -
-                        CVector(m_pathPoints[m_pathPointCount - 2].m_position);
-                CVector endPhantom1 = CVector(m_pathPoints[m_pathPointCount - 1].m_position) + delta;
-                CVector endPhantom2 = endPhantom1 + delta;
+            CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
+            CVector startPhantom1 = CVector(m_pathPoints[0].m_position) - delta;
+            CVector startPhantom2 = startPhantom1 - delta;
+            delta = CVector(m_pathPoints[m_pathPointCount - 1].m_position) -
+                    CVector(m_pathPoints[m_pathPointCount - 2].m_position);
+            CVector endPhantom1 = CVector(m_pathPoints[m_pathPointCount - 1].m_position) + delta;
+            CVector endPhantom2 = endPhantom1 + delta;
 
-                Vec* p0;
-                Vec* p1;
-                Vec* p2;
-                Vec* p3;
+            Vec* p0;
+            Vec* p1;
+            Vec* p2;
+            Vec* p3;
 
-                if ((mode & 1) != 0) {
-                    if (baseIndex == 0) {
-                        p0 = startPhantom2;
-                    } else if (baseIndex == 1) {
-                        p0 = startPhantom1;
-                    } else {
-                        p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 2))].m_position;
-                    }
-                    if (baseIndex == 0) {
-                        p1 = startPhantom1;
-                    } else {
-                        p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
-                    }
+            if ((mode & 1) != 0) {
+                if (baseIndex == 0) {
+                    p0 = startPhantom2;
+                } else if (baseIndex == 1) {
+                    p0 = startPhantom1;
                 } else {
                     p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 2))].m_position;
+                }
+                if (baseIndex == 0) {
+                    p1 = startPhantom1;
+                } else {
                     p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
                 }
+            } else {
+                p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 2))].m_position;
+                p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex - 1))].m_position;
+            }
 
-                if ((mode & 2) != 0) {
-                    if (baseIndex == m_pathPointCount) {
-                        p2 = endPhantom1;
-                    } else {
-                        p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex))].m_position;
-                    }
-                    if (baseIndex == m_pathPointCount - 1) {
-                        p3 = endPhantom1;
-                    } else if (baseIndex == m_pathPointCount) {
-                        p3 = endPhantom2;
-                    } else {
-                        p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex + 1))].m_position;
-                    }
+            if ((mode & 2) != 0) {
+                if (baseIndex == m_pathPointCount) {
+                    p2 = endPhantom1;
                 } else {
                     p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex))].m_position;
+                }
+                if (baseIndex == m_pathPointCount - 1) {
+                    p3 = endPhantom1;
+                } else if (baseIndex == m_pathPointCount) {
+                    p3 = endPhantom2;
+                } else {
                     p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex + 1))].m_position;
                 }
-
-                Vec c3;
-                Vec c2;
-                Vec c1;
-                Vec c0;
-
-                PSVECScale(p0, &c3, FLOAT_80330B38);
-                VECMultAdd(&c3, p1, &c3, FLOAT_80330B3C);
-                VECMultAdd(&c3, p2, &c3, FLOAT_80330B40);
-                VECMultAdd(&c3, p3, &c3, FLOAT_80330B44);
-
-                PSVECScale(p0, &c2, FLOAT_80330B3C);
-                VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
-                VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
-
-                PSVECScale(p0, &c1, FLOAT_80330B40);
-                VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
-
-                PSVECScale(p0, &c0, FLOAT_80330B44);
-                VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
-                VECMultAdd(&c0, p2, &c0, FLOAT_80330B44);
-
-                PSVECScale(&c3, &c3, segmentT);
-                PSVECAdd(&c3, &c2, &c3);
-                PSVECScale(&c3, &c3, segmentT);
-                PSVECAdd(&c3, &c1, &c3);
-                PSVECScale(&c3, &c3, segmentT);
-                PSVECAdd(&c3, &c0, &result);
             } else {
-                switch (mode & 3) {
-                case 3:
-                    t = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
-                          FLOAT_80330B34);
-                    break;
-                case 1:
-                    t = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
-                    break;
-                case 2:
-                    t = std::sinf(FLOAT_80330B50 * t);
-                    break;
-                default:
-                    break;
+                p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex))].m_position;
+                p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > m_pathPointCount - 1 ? m_pathPointCount - 1 : (baseIndex + 1))].m_position;
+            }
+
+            Vec result;
+            Vec c2;
+            Vec c1;
+            Vec c0;
+
+            PSVECScale(p0, &result, FLOAT_80330B38);
+            VECMultAdd(&result, p1, &result, FLOAT_80330B3C);
+            VECMultAdd(&result, p2, &result, FLOAT_80330B40);
+            VECMultAdd(&result, p3, &result, FLOAT_80330B44);
+
+            PSVECScale(p0, &c2, FLOAT_80330B3C);
+            VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
+            VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
+
+            PSVECScale(p0, &c1, FLOAT_80330B40);
+            VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
+
+            PSVECScale(p0, &c0, FLOAT_80330B44);
+            VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
+            VECMultAdd(&c0, p2, &c0, FLOAT_80330B44);
+
+            PSVECScale(&result, &result, segmentT);
+            PSVECAdd(&result, &c2, &result);
+            PSVECScale(&result, &result, segmentT);
+            PSVECAdd(&result, &c1, &result);
+            PSVECScale(&result, &result, segmentT);
+            PSVECAdd(&result, &c0, &result);
+
+            *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
+            *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
+            *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
+        } else {
+            switch (mode & 3) {
+            case 3:
+                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + std::sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
+                      FLOAT_80330B34);
+                break;
+            case 1:
+                t = FLOAT_80330B34 + std::sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                break;
+            case 2:
+                t = std::sinf(FLOAT_80330B50 * t);
+                break;
+            default:
+                break;
+            }
+
+            const float pathDistance = m_pathTotalDistance * t;
+            const int maxIndex = m_pathPointCount - 1;
+            for (int i = 0; i < maxIndex; i++) {
+                const float startDistance = m_pathPoints[i].m_distance;
+                if (startDistance > pathDistance) {
+                    continue;
+                }
+                const float endDistance = m_pathPoints[i + 1].m_distance;
+                if (pathDistance > endDistance) {
+                    continue;
                 }
 
-                const float totalDistance = m_pathTotalDistance;
-                const float pathDistance = totalDistance * t;
-
-                result = m_pathPoints[0].m_position;
-                for (int i = 0; i + 1 < pointCount; i++) {
-                    const float startDistance = m_pathPoints[i].m_distance;
-                    const float endDistance = m_pathPoints[i + 1].m_distance;
-                    if (startDistance <= pathDistance && pathDistance <= endDistance) {
-                        float segmentT = 0.0f;
-                        if (endDistance != startDistance) {
-                            segmentT = (pathDistance - startDistance) / (endDistance - startDistance);
-                        }
-                        const Vec& startPoint = m_pathPoints[i].m_position;
-                        const Vec& endPoint = m_pathPoints[i + 1].m_position;
-                        VECLerp(const_cast<Vec*>(&startPoint), const_cast<Vec*>(&endPoint), &result, segmentT);
-                        break;
-                    }
+                const int i0 = (i - 1) < 0 ? 0 : (i - 1);
+                const int i2 = (i + 1) > maxIndex ? maxIndex : (i + 1);
+                const int i3 = (i + 2) > maxIndex ? maxIndex : (i + 2);
+                const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
+                const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
+                const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
+                float segmentT = 0.0f;
+                if (scaleB != kCFlatPadStickZero) {
+                    segmentT = (pathDistance - startDistance) / scaleB;
                 }
+
+                Vec result;
+                CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+                    scaleA, scaleB, scaleC, segmentT, FLOAT_80330B34, &Math, reinterpret_cast<float*>(&result),
+                    &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
+                    &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
+                *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
+                *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
+                *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
+                break;
             }
         }
 
-        *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
-        *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
-        *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
         this->push(object, 0);
         outResult = 0;
         break;

@@ -3103,7 +3103,8 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 	}
 
 	int bufferIndex = CharaDrawBufferIndex();
-	u32& cursor = CharaDrawBufferCursor(bufferIndex);
+	CChara::CDrawBuffer& drawBuffer = Chara.GetDrawBuffer(bufferIndex);
+	u32& cursor = drawBuffer.m_cursor;
 	u32 needed = (meshRef->m_vertexCount + meshRef->m_normalCount) * 6 + 0x40;
 	if (0x58000u - cursor < needed) {
 		mesh->m_workPositions = 0;
@@ -3120,10 +3121,9 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 		return;
 	}
 
-	u8* workBase = CharaDrawBufferBase(bufferIndex);
-	mesh->m_workPositions = reinterpret_cast<S16Vec*>(workBase + cursor);
+	mesh->m_workPositions = reinterpret_cast<S16Vec*>(drawBuffer.m_base + cursor);
 	cursor += AlignCharaWorkBytes(mesh->m_data->m_vertexCount * 6);
-	mesh->m_workNormals = reinterpret_cast<S16Vec*>(workBase + cursor);
+	mesh->m_workNormals = reinterpret_cast<S16Vec*>(drawBuffer.m_base + cursor);
 	cursor += AlignCharaWorkBytes(mesh->m_data->m_normalCount * 6);
 
 	float* skinData = reinterpret_cast<float*>(mesh->m_data->m_skins);

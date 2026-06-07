@@ -395,6 +395,12 @@ public:
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
     u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
+    struct CDrawBuffer
+    {
+        u32 m_cursor;
+        u8* m_base;
+    };
+    CDrawBuffer& GetDrawBuffer(int index) { return m_drawBuffers[index]; }
     u32& AmemAnimSize() { return m_amemAnimSize; }
     u32 GetAmemAnimSize() const { return m_amemAnimSize; }
     void ResetAmem(int) { m_amemSize = 0; }
@@ -435,12 +441,6 @@ public:
     MogFurState& MogFur() { return m_sharedState.m_mogFur; }
 
 private:
-    struct CDrawBuffer
-    {
-        u32 m_cursor;
-        u8* m_base;
-    };
-
     union CSharedState
     {
         MogFurState m_mogFur;

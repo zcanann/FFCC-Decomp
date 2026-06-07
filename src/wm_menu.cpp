@@ -7524,8 +7524,8 @@ void CMenuPcs::CalcCharaSelect()
 			winWidth = static_cast<short>((winWidth + 2) * 0x16 + 0x40);
 			const short winHeight = static_cast<short>(*winMess) * 0x1E + 0x40;
 			MenuWindowInfo* const win = m_menuWindowInfo;
-			win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - winWidth) *
-			                                             static_cast<float>(DOUBLE_803313f8)));
+			win->x = static_cast<short>(static_cast<int>(static_cast<double>(static_cast<float>(0x280 - winWidth)) *
+			                                             DOUBLE_803313f8));
 			win->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
 			                                                                  static_cast<float>(winHeight))) *
 			                                             DOUBLE_803313f8));

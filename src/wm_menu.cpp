@@ -4122,10 +4122,10 @@ void CMenuPcs::DrawDiaryMenu()
 	y = static_cast<float>(-(static_cast<double>(FLOAT_80331440) * scale - static_cast<double>(FLOAT_80331440)) *
 	                       DOUBLE_803313f8 + static_cast<double>(y));
 	if ((bytes[0xF] & 2) != 0) {
-		MenuPcs.DrawRect(0xFFFFFFFF, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, 8.0f);
+		MenuPcs.DrawRect(8, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
 	if ((bytes[0xF] & 1) != 0) {
-		MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_8033146c)), y,
+		MenuPcs.DrawRect(0, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_8033146c)), y,
 		         FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
 	}
 }

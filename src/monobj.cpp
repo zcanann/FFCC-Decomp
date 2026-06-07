@@ -2007,16 +2007,30 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		*hitPartyIndex = -1;
 	}
 
-	Vec startPos;
-	startPos.x = object->m_worldPosition.x;
-	startPos.y = object->m_worldPosition.y;
-	startPos.z = object->m_worldPosition.z;
-	Vec forward;
-	forward.x = static_cast<float>(sin(static_cast<double>(rotY)));
-	forward.y = FLOAT_803319D8;
-	forward.z = static_cast<float>(cos(static_cast<double>(rotY)));
-	Vec move;
-	PSVECScale(&forward, &move, distance);
+	CVector startPos;
+	CVector forward;
+	CVector move;
+	{
+		CVector tmp(object->m_worldPosition.x, object->m_worldPosition.y, object->m_worldPosition.z);
+		startPos.x = tmp.x;
+		startPos.y = tmp.y;
+		startPos.z = tmp.z;
+	}
+	{
+		float sinY = static_cast<float>(sin(static_cast<double>(rotY)));
+		float cosY = static_cast<float>(cos(static_cast<double>(rotY)));
+		CVector tmp(sinY, FLOAT_803319D8, cosY);
+		forward.x = tmp.x;
+		forward.y = tmp.y;
+		forward.z = tmp.z;
+	}
+	{
+		CVector scaled;
+		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
+		move.x = scaled.x;
+		move.y = scaled.y;
+		move.z = scaled.z;
+	}
 
 	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 	unsigned char* aiScript = baseScript;
@@ -2041,17 +2055,21 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		bindMtx[1][3] = startPos.y;
 		bindMtx[2][3] = startPos.z;
 
-		Vec localForward = { FLOAT_803319C0, FLOAT_803319D8, FLOAT_803319D8 };
-		PSMTXMultVecSR(bindMtx, &localForward, &forward);
+		CVector localForward(FLOAT_803319C0, FLOAT_803319D8, FLOAT_803319D8);
+		PSMTXMultVecSR(bindMtx, reinterpret_cast<Vec*>(&localForward), reinterpret_cast<Vec*>(&forward));
 		forward.y = FLOAT_803319D8;
-		PSVECNormalize(&forward, &forward);
-		PSVECScale(&forward, &move, distance);
+		forward.Normalize();
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), distance);
+			move.x = scaled.x;
+			move.y = scaled.y;
+			move.z = scaled.z;
+		}
 	}
 
 	if ((flags & 1) != 0) {
 		CMapCylinder hitCylinder;
-		hitCylinder.m_bottom = startPos;
-		hitCylinder.m_top = move;
 		hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
 		hitCylinder.m_axis.y = FLOAT_80331A38;
 		hitCylinder.m_axis.z = FLOAT_80331A3C;
@@ -2062,16 +2080,22 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
 		hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
 		hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
+		hitCylinder.m_bottom.x = startPos.x;
+		hitCylinder.m_bottom.y = startPos.y;
+		hitCylinder.m_bottom.z = startPos.z;
+		hitCylinder.m_top.x = move.x;
+		hitCylinder.m_top.y = move.y;
+		hitCylinder.m_top.z = move.z;
 
-		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, reinterpret_cast<Vec*>(&move), *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 		if (hit != 0) {
 			if (hitScale != NULL) {
 				*hitScale = g_hit_t;
 			}
-			PSVECScale(&move, &move, g_hit_t);
+			PSVECScale(reinterpret_cast<Vec*>(&move), reinterpret_cast<Vec*>(&move), g_hit_t);
 			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
 		}
-		gCFlatRuntime2.AddDebugDrawCC(&startPos, &move, hitCylinder.m_axis.x, 1, hit);
+		gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&move), hitCylinder.m_axis.x, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {
@@ -2082,14 +2106,30 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			sideDist = FLOAT_80331A40 / static_cast<float>(tan(static_cast<double>(halfAngle)));
 		}
 
-		Vec coneStart = startPos;
-		Vec sideOffset;
-		PSVECScale(&forward, &sideOffset, sideDist);
-		PSVECSubtract(&coneStart, &sideOffset, &coneStart);
+		Vec coneStart;
+		coneStart.x = startPos.x;
+		coneStart.y = startPos.y;
+		coneStart.z = startPos.z;
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
+			Vec sideOffset;
+			sideOffset.x = scaled.x;
+			sideOffset.y = scaled.y;
+			sideOffset.z = scaled.z;
+			PSVECSubtract(&coneStart, &sideOffset, &coneStart);
+		}
 
 		float coneLength = static_cast<float>(static_cast<double>(distance) + static_cast<double>(sideDist));
-		PSVECScale(&forward, &sideOffset, sideDist);
-		PSVECAdd(&move, &sideOffset, &move);
+		{
+			CVector scaled;
+			PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&scaled), sideDist);
+			Vec sideOffset;
+			sideOffset.x = scaled.x;
+			sideOffset.y = scaled.y;
+			sideOffset.z = scaled.z;
+			PSVECAdd(reinterpret_cast<Vec*>(&move), &sideOffset, reinterpret_cast<Vec*>(&move));
+		}
 
 		unsigned char didHit = 0;
 		for (int rank = 0; rank < 4; rank++) {
@@ -2118,19 +2158,31 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 				continue;
 			}
 
-			Vec partyPos = partyObj->m_worldPosition;
-			partyPos.y += partyObj->unk_0x184;
+			Vec partyPos;
+			{
+				CVector partyPosVec(partyObj->m_worldPosition.x,
+					partyObj->m_worldPosition.y + partyObj->unk_0x184, partyObj->m_worldPosition.z);
+				partyPos.x = partyPosVec.x;
+				partyPos.y = partyPosVec.y;
+				partyPos.z = partyPosVec.z;
+			}
 
 			Vec targetDelta;
-			PSVECSubtract(&partyPos, &coneStart, &targetDelta);
+			{
+				CVector delta;
+				PSVECSubtract(&partyPos, &coneStart, reinterpret_cast<Vec*>(&delta));
+				targetDelta.x = delta.x;
+				targetDelta.y = delta.y;
+				targetDelta.z = delta.z;
+			}
 			float targetDist = PSVECMag(&targetDelta);
 			if (static_cast<double>(FLOAT_803319D8) >= static_cast<double>(targetDist)) {
 				continue;
 			}
 
-			Vec targetDir;
-			PSVECNormalize(&targetDelta, &targetDir);
-			float dot = PSVECDotProduct(&forward, &targetDir);
+			CVector targetDir;
+			PSVECNormalize(&targetDelta, reinterpret_cast<Vec*>(&targetDir));
+			float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&targetDir));
 			if ((static_cast<double>(
 			         static_cast<float>(static_cast<double>(sideDist) -
 			                            static_cast<double>(object->m_bodyEllipsoidRadius))) >
@@ -2147,10 +2199,17 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			}
 
 			didHit = 1;
+			float cylRadius = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
+			unsigned short hitMask = *reinterpret_cast<unsigned short*>(baseScript + 0x1B2);
+			Vec cylTop;
+			{
+				CVector delta;
+				PSVECSubtract(&partyPos, reinterpret_cast<Vec*>(&startPos), reinterpret_cast<Vec*>(&delta));
+				cylTop.x = delta.x;
+				cylTop.y = delta.y;
+				cylTop.z = delta.z;
+			}
 			CMapCylinder hitCylinder;
-			hitCylinder.m_bottom = startPos;
-			hitCylinder.m_top = targetDelta;
-			hitCylinder.m_axis.x = FLOAT_80331A34 * object->m_bodyEllipsoidRadius;
 			hitCylinder.m_axis.y = FLOAT_80331A38;
 			hitCylinder.m_axis.z = FLOAT_80331A3C;
 			hitCylinder.m_radius = FLOAT_80331A3C;
@@ -2160,14 +2219,21 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			hitCylinder.m_bound.m_max.x = FLOAT_80331A38;
 			hitCylinder.m_bound.m_max.y = FLOAT_80331A38;
 			hitCylinder.m_bound.m_max.z = FLOAT_80331A3C;
+			hitCylinder.m_bottom.x = startPos.x;
+			hitCylinder.m_bottom.y = startPos.y;
+			hitCylinder.m_bottom.z = startPos.z;
+			hitCylinder.m_top = cylTop;
+			hitCylinder.m_axis.x = cylRadius;
 
-			int mapHit = MapMng.CheckHitCylinderNear(
-				&hitCylinder, &targetDelta, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
-			Vec debugDelta = targetDelta;
+			int mapHit = MapMng.CheckHitCylinderNear(&hitCylinder, &cylTop, hitMask);
+			Vec debugDelta;
+			debugDelta.x = targetDelta.x;
+			debugDelta.y = targetDelta.y;
+			debugDelta.z = targetDelta.z;
 			if (mapHit != 0) {
 				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
 			}
-			gCFlatRuntime2.AddDebugDrawCC(&startPos, &debugDelta, hitCylinder.m_axis.x, 1, mapHit == 0);
+			gCFlatRuntime2.AddDebugDrawCC(reinterpret_cast<Vec*>(&startPos), &debugDelta, cylRadius, 1, mapHit == 0);
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {
@@ -2180,7 +2246,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		if (static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) {
 			float debugRadius = static_cast<float>(
 				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
-			gCFlatRuntime2.AddDebugDrawCC(&coneStart, &move, debugRadius, 0, didHit);
+			gCFlatRuntime2.AddDebugDrawCC(&coneStart, reinterpret_cast<Vec*>(&move), debugRadius, 0, didHit);
 		}
 	}
 }

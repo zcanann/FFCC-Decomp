@@ -975,7 +975,7 @@ void CMenuPcs::DrawSingCMake()
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * static_cast<double>(alpha));
+        int a = static_cast<int>(FLOAT_80333240 * alpha);
         GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
         GXSetChanMatColor(GX_COLOR0A0, col);
 

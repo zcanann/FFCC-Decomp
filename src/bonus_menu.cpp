@@ -983,9 +983,11 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 
 		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float fy = (float)sprite->y;
+			float ty = sprite->targetY;
 			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+			sprite->motionY = (ty - fy) * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -1654,9 +1656,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float fy = (float)sprite->y;
+			float ty = sprite->targetY;
 			float progress = 1.0f - ((1.0f / (float)sprite->duration) * (float)sprite->timer);
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+			sprite->motionY = (ty - fy) * progress;
 		}
 
 		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
@@ -2166,12 +2170,13 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		if ((*(unsigned int*)(sprite + 0x16) & 2) == 0 &&
 		    (*(float*)(sprite + 0x18) != 0.0f || *(float*)(sprite + 0x1a) != 0.0f)) {
+			float fy = (float)(int)sprite[1];
+			float ty = *(float*)(sprite + 0x1e);
 			float progress =
 			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
 			*(float*)(sprite + 0x18) =
 			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
-			*(float*)(sprite + 0x1a) =
-			    (*(float*)(sprite + 0x1e) - (float)(int)sprite[1]) * progress;
+			*(float*)(sprite + 0x1a) = (ty - fy) * progress;
 		}
 
 		if (*(int*)(sprite + 0x12) < frame &&

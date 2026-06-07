@@ -1088,11 +1088,11 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 		return 1;
 	}
 
-	if ((reinterpret_cast<CObject*>(targetObject)->m_activeClassIndex >= 0)
+	const s16 classIndex = reinterpret_cast<CObject*>(targetObject)->m_activeClassIndex;
+	if ((classIndex >= 0)
 	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
-		const s16 classIndex = reinterpret_cast<CObject*>(targetObject)->m_activeClassIndex;
-		u8* const classes = *reinterpret_cast<u8**>(self + 0x18);
-		const int funcIndex = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
+		u8* const classes = *reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C) + 0x24;
+		const int funcIndex = *reinterpret_cast<int*>(classes + (systemIndex * 4));
 		if (funcIndex >= 0) {
 			func = *reinterpret_cast<u8**>(self + 0x20) + (funcIndex * 0x50);
 		}

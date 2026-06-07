@@ -1819,9 +1819,10 @@ void CMaterialMan::SetPosition(
         float nearestDist = kMaterialNearestDistanceInit;
         ShadowCandidate* candidateRead = shadowCandidates;
         for (int i = 0; i < candidateCount; i++) {
-            if (static_cast<float>(candidateRead->distance) < nearestDist) {
+            float candidateDist = static_cast<float>(candidateRead->distance);
+            if (candidateDist < nearestDist) {
                 nearest = candidateRead;
-                nearestDist = static_cast<float>(candidateRead->distance);
+                nearestDist = candidateDist;
             }
             candidateRead++;
         }
@@ -1944,9 +1945,10 @@ int CMaterialMan::GetCharaShadow(
     float nearestDist = kMaterialNearestDistanceInit;
     ShadowCandidate* candidateRead = shadowCandidates;
     for (int i = 0; i < candidateCount; i++) {
-        if (static_cast<float>(candidateRead->distance) < nearestDist) {
+        float candidateDist = static_cast<float>(candidateRead->distance);
+        if (candidateDist < nearestDist) {
             nearest = candidateRead;
-            nearestDist = static_cast<float>(candidateRead->distance);
+            nearestDist = candidateDist;
         }
         candidateRead++;
     }

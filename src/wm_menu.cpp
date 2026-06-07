@@ -11073,17 +11073,17 @@ int CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int mem
 		result = index;
 	} while (count != 0);
 
-	if (strictMode != 0) {
-		if (result < 8) {
-			return -3;
+	if (strictMode == 0) {
+		if (static_cast<int>(result) < 8) {
+			return result;
 		}
-		return -4;
+		return -1;
 	}
 
-	if (static_cast<int>(result) < 8) {
-		return result;
+	if (result < 8) {
+		return -3;
 	}
-	return -1;
+	return -4;
 }
 
 /*

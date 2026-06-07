@@ -1384,7 +1384,7 @@ void CGPartyObj::shouki()
 	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
 	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
 	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
-	const bool weaponFlag = static_cast<signed char>(m_weaponNodeFlags >> 8) < 0;
+	const bool weaponFlag = m_weaponNodeFlagAll.m_bits1.m_shield < 0;
 
 	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag)) {
 		if (m_unk688 != 0) {

@@ -7845,10 +7845,87 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
-		SetProjection(i + 0x20);
+		{
+			unsigned char* const slot = m_wm.m_worldObjData + 0xA00 + i * 0x50;
+			Mtx44 projectionMtx;
+			C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+			GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+			PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+
+			CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+			CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+
+			Mtx lookAtMtx;
+			C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+			PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
+			PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+
+			CharaPcs.InitEnv(5);
+			GXSetColorUpdate(0);
+			GXSetAlphaUpdate(0);
+			_GXColor clearColor = CColor(0, 0, 0, 0).color;
+			GXSetCopyClear(clearColor, 0x00FFFFFF);
+			GXSetColorUpdate(1);
+			GXSetAlphaUpdate(1);
+			GXSetViewport(
+			    static_cast<float>(*reinterpret_cast<short*>(slot + 8)),
+			    static_cast<float>(*reinterpret_cast<short*>(slot + 0xA)),
+			    static_cast<float>(*reinterpret_cast<short*>(slot + 0xC)),
+			    static_cast<float>(*reinterpret_cast<short*>(slot + 0xE)),
+			    FLOAT_803313dc, FLOAT_803313e8);
+			GXSetScissor(
+			    *reinterpret_cast<unsigned int*>(slot + 0x40),
+			    *reinterpret_cast<unsigned int*>(slot + 0x44),
+			    *reinterpret_cast<unsigned int*>(slot + 0x48),
+			    *reinterpret_cast<unsigned int*>(slot + 0x4C));
+			Graphic.SetFog(1, 0);
+			WmMenuLightTable& lightTable = gWmMenuLightTables[0];
+			LightPcs.SetAmbient(lightTable.m_ambient);
+			LightPcs.SetNumDiffuse(lightTable.m_diffuseCount);
+			for (int lightIndex = 0; lightIndex < lightTable.m_diffuseCount; lightIndex++) {
+				LightPcs.SetDiffuse(
+					lightIndex, lightTable.m_diffuseColors[lightIndex],
+					&lightTable.m_diffuseDirs[lightIndex], 0);
+			}
+			LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+		}
 		if (handle->m_charaKind == 3) {
 			DrawInit();
-			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+			GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+			{
+				unsigned char* const slot = m_wm.m_worldObjData + 0xA00 + i * 0x50;
+				Mtx44 projectionMtx;
+				C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+				GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+				PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
+
+				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
+
+				Mtx lookAtMtx;
+				C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
+				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+
+				CharaPcs.InitEnv(5);
+				GXSetColorUpdate(0);
+				GXSetAlphaUpdate(0);
+				_GXColor clearColor = CColor(0, 0, 0, 0).color;
+				GXSetCopyClear(clearColor, 0x00FFFFFF);
+				GXSetColorUpdate(1);
+				GXSetAlphaUpdate(1);
+				GXSetViewport(
+				    static_cast<float>(*reinterpret_cast<short*>(slot + 8)),
+				    static_cast<float>(*reinterpret_cast<short*>(slot + 0xA)),
+				    static_cast<float>(*reinterpret_cast<short*>(slot + 0xC)),
+				    static_cast<float>(*reinterpret_cast<short*>(slot + 0xE)),
+				    FLOAT_803313dc, FLOAT_803313e8);
+				GXSetScissor(
+				    *reinterpret_cast<unsigned int*>(slot + 0x40),
+				    *reinterpret_cast<unsigned int*>(slot + 0x44),
+				    *reinterpret_cast<unsigned int*>(slot + 0x48),
+				    *reinterpret_cast<unsigned int*>(slot + 0x4C));
+			}
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
 			MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			float alpha = FLOAT_803313e8;

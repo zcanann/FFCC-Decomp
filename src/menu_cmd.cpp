@@ -2655,7 +2655,7 @@ unsigned int CMenuPcs::CmdClose1()
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
-	const s16 timer = GetCmdStateView(this)->transitionTimer;
+	const u16 timer = GetCmdStateView(this)->transitionTimer;
 	s32 state = GetCmdStateView(this)->uniteState;
 	u32 done = 0;
 

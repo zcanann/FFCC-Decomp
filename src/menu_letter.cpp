@@ -652,7 +652,7 @@ int CMenuPcs::LetterCtrl()
 			done = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
-				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+				if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
@@ -691,7 +691,7 @@ int CMenuPcs::LetterCtrl()
 			int messOpenDone = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
-				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+				if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
@@ -812,7 +812,7 @@ int CMenuPcs::LetterCtrl()
 			done = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
-				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+				if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 					if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 						*reinterpret_cast<float*>(panel + 8) =
@@ -1042,7 +1042,7 @@ void CMenuPcs::LetterLstOpen()
 
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
-		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+		if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
@@ -1086,7 +1086,7 @@ void CMenuPcs::LetterLstClose()
 
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
-		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+		if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
@@ -1139,7 +1139,7 @@ void CMenuPcs::LetterMessOpen()
 
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		float f = FLOAT_803330bc;
-		if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+		if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 			if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
@@ -1198,7 +1198,7 @@ int CMenuPcs::LetterMessClose()
 
 		for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 			float f = FLOAT_803330bc;
-			if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+			if (frame >= *reinterpret_cast<int*>(panel + 0x12)) {
 				if (*reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14) > frame) {
 					*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 					*reinterpret_cast<float*>(panel + 8) =

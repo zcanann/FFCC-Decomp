@@ -3411,7 +3411,7 @@ void CGMonObj::statAround()
 					}
 
 					int actionOffset = nextAction * 0x10;
-					if ((*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110) & 0x20) != 0) {
+					if ((*reinterpret_cast<unsigned short*>(aiScript + (actionOffset + 0x110)) & 0x20) != 0) {
 						actionState = 0x21;
 						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 						if (monObj->m_moveWork.m_mode != 4) {
@@ -3446,7 +3446,7 @@ void CGMonObj::statAround()
 						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
 							(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 					}
-					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11C));
+					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + (actionOffset + 0x11C)));
 					if (aiState == 0) {
 						aiScript = script;
 					} else {

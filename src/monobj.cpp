@@ -2064,11 +2064,11 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
 	int& aiState = m_unk6C8;
 	int& aiPriority = m_unk6CC;
 
-	if (aiPriority < priority && currentState == aiState) {
+	if (priority > aiPriority && currentState == aiState) {
 		if (Math.Rand(100) <= static_cast<unsigned int>(chance)) {
 			if (aiPriority < priority) {
-				aiPriority = priority;
 				m_actionBranch = seqId;
+				aiPriority = priority;
 			}
 			aiState = nextState;
 			return 1;

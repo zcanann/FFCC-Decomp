@@ -1564,11 +1564,11 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		}
 
 		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
-		if ((*reinterpret_cast<unsigned short*>(aiData + 0x106) == 1) || (m_targetPartyIndex < 0)) {
+		if ((static_cast<int>(*reinterpret_cast<unsigned short*>(aiData + 0x106)) == 1) || (m_targetPartyIndex < 0)) {
 			if ((Game.m_gameWork.m_menuStageMode != '\0') && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
 				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
 				if ((prgFlags & 0x6D) == 0x6D) {
-					if (prgScript[0xED] != nullptr) {
+					if (reinterpret_cast<int>(prgScript[0xED]) != 0) {
 						goto skip_target_update;
 					}
 				}
@@ -1579,7 +1579,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 skip_target_update:
 		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(prgObj) + 0x6C0) = teamNo;
-		GbaQue.SetHitEnemy(attackerIndex, teamNo);
+		GbaQue.SetHitEnemy(reinterpret_cast<int>(prgScript[0xED]), teamNo);
 
 		unsigned short groupTag = m_groupTag;
 		if ((groupTag & 0x7FFF) != 0) {
@@ -1613,16 +1613,13 @@ skip_target_update:
 				other->m_targetPartyIndex = reinterpret_cast<int>(prgScript[0xED]);
 				other->m_unk6BD = 1;
 
-				if (other->m_chaseState == 4) {
-					unsigned char* otherMon = reinterpret_cast<unsigned char*>(other);
-					if ((static_cast<int>(static_cast<unsigned int>(otherMon[0x63C]) << 24) >= 0) &&
-						(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4] == reinterpret_cast<void*>(0x55))) {
-						reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
-						other->m_chaseState = 2;
-						other->m_chaseTimer = 0;
-						other->m_chaseDirty = 1;
-					}
-				} else {
+				if (other->m_chaseState != 4) {
+					other->m_chaseState = 2;
+					other->m_chaseTimer = 0;
+					other->m_chaseDirty = 1;
+				} else if ((other->m_actionBranch == 0) &&
+					(reinterpret_cast<int>(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4]) == 0x55)) {
+					reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
 					other->m_chaseState = 2;
 					other->m_chaseTimer = 0;
 					other->m_chaseDirty = 1;
@@ -1635,8 +1632,8 @@ skip_target_update:
 		prgObj->changeStat(0, 0, 0);
 	}
 
-	if ((static_cast<int>(static_cast<unsigned int>(mon[0x63C]) << 24) >= 0) &&
-		(object->m_scriptHandle[4] == reinterpret_cast<void*>(0x55))) {
+	if ((m_actionBranch == 0) &&
+		(reinterpret_cast<int>(object->m_scriptHandle[4]) == 0x55)) {
 		prgObj->changeStat(0x18, 0, 0);
 	}
 

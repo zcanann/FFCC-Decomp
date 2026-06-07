@@ -475,8 +475,9 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
  */
 void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
+    float indMtx[9];
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(indMtx), 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder(static_cast<GXIndTexStageID>(0),
                      static_cast<GXTexCoordID>(m_bumpTexCoordIds[0]),

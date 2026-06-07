@@ -240,7 +240,11 @@ static inline void DrawNamePreviewChara(CMenuPcs* menu, float modelAlpha, int gx
     } else {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-        GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(gxAlpha)};
+        GXColor col;
+        col.r = 0xFF;
+        col.g = 0xFF;
+        col.b = 0xFF;
+        col.a = static_cast<unsigned char>(gxAlpha);
         GXSetChanMatColor(GX_COLOR0A0, col);
         MenuPcs.DrawRect(
             0,
@@ -351,16 +355,6 @@ extern "C" const char lbl_801E2FE0[];
 extern "C" const char lbl_801E2FF0[];
 extern "C" const char lbl_801E3000[];
 extern "C" const char lbl_801E3010[];
-extern "C" char lbl_803331F0[];
-extern "C" char lbl_803331F8[];
-extern "C" char lbl_80333200[];
-extern "C" char lbl_80333208[];
-extern "C" char lbl_80333210[];
-extern "C" char lbl_80333218[];
-extern "C" char lbl_80333220[];
-extern "C" char lbl_80333228[];
-extern "C" char lbl_80333230[];
-extern "C" char lbl_80333238[];
 
 static const char* s_NameEntryStr[] = {
     s_ABCDEFGHIJKL_801E2F30,
@@ -380,8 +374,19 @@ static const char* s_NameEntryStr[] = {
     lbl_801E3010
 };
 
-extern "C" char* PTR_s_world2[] = {
-    lbl_803331F0,
+static const char s_world2[] = "world2";
+static const char s_crystal[] = "crystal";
+static const char s_world27[] = "world27";
+static const char s_world28[] = "world28";
+static const char s_world29[] = "world29";
+static const char s_world44[] = "world44";
+static const char s_world45[] = "world45";
+static const char s_world48[] = "world48";
+static const char s_world49[] = "world49";
+static const char s_world51[] = "world51";
+
+char* PTR_s_world2[] = {
+    (char*)s_world2,
     0,
     0,
     0,
@@ -392,15 +397,15 @@ extern "C" char* PTR_s_world2[] = {
     0,
 };
 CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
-    {8, lbl_803331F8},
-    {8, lbl_80333200},
-    {8, lbl_80333208},
-    {8, lbl_80333210},
-    {8, lbl_80333218},
-    {8, lbl_80333220},
-    {8, lbl_80333228},
-    {8, lbl_80333230},
-    {8, lbl_80333238},
+    {8, (char*)s_crystal},
+    {8, (char*)s_world27},
+    {8, (char*)s_world28},
+    {8, (char*)s_world29},
+    {8, (char*)s_world44},
+    {8, (char*)s_world45},
+    {8, (char*)s_world48},
+    {8, (char*)s_world49},
+    {8, (char*)s_world51},
 };
 
 static CmakeInfo s_CmakeInfo;
@@ -900,7 +905,11 @@ void CMenuPcs::DrawSingCMake()
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
         int a = static_cast<int>(255.0f * alpha);
-        GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+        GXColor col;
+        col.r = 0xFF;
+        col.g = 0xFF;
+        col.b = 0xFF;
+        col.a = static_cast<unsigned char>(a);
         GXSetChanMatColor(GX_COLOR0A0, col);
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
@@ -1051,7 +1060,11 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(255.0f * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     int frameH = (x == 0.0f) ? 0x150 : 0x180;
@@ -1092,7 +1105,11 @@ void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(255.0f * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x62 : 0x3B));
@@ -1148,7 +1165,11 @@ void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
         a = 0xFF;
     }
 
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
     MenuPcs.DrawRect(
@@ -1201,7 +1222,11 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(255.0f * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
@@ -1969,7 +1994,11 @@ void CMenuPcs::CmakeNameDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     int a = static_cast<int>(static_cast<double>(255.0f) * static_cast<double>(alpha));
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -2485,7 +2514,11 @@ void CMenuPcs::CmakeTribeDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(255.0f * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(
@@ -3554,7 +3587,11 @@ void CMenuPcs::CmakeVillageDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(255.0f * alpha);
-    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXColor col;
+    col.r = 0xFF;
+    col.g = 0xFF;
+    col.b = 0xFF;
+    col.a = static_cast<unsigned char>(a);
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((CmakeResult(this) != 0) ? 0x61 : 0x3A));
     MenuPcs.DrawRect(

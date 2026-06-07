@@ -966,14 +966,8 @@ void CMenuPcs::CalcSingCMake()
  */
 void CMenuPcs::DrawSingCMake()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short step = cmakeState->m_step;
-    short& mode = cmakeState->m_mode;
-    short& resultDir = cmakeState->m_resultDir;
-    short& resultFlag = cmakeState->m_resultFlag;
-    short& frame = cmakeState->m_frame;
 
-    switch (step) {
+    switch (CmakeState(this)->m_step) {
     case 0: {
         float alpha = CalcCmakeFadeAlpha(this);
         DrawWMFrame0(1, alpha);
@@ -1033,39 +1027,39 @@ void CMenuPcs::DrawSingCMake()
         break;
     }
 
-    if (resultFlag == 0) {
+    if (CmakeState(this)->m_resultFlag == 0) {
         return;
     }
 
-    if (mode < 2) {
-        mode = static_cast<short>(mode + 1);
-        frame = 0;
+    if (CmakeState(this)->m_mode < 2) {
+        CmakeState(this)->m_mode = static_cast<short>(CmakeState(this)->m_mode + 1);
+        CmakeState(this)->m_frame = 0;
         CmakeMcState(this) = 3;
         return;
     }
 
-    gCmakePreviousStep = static_cast<int>(step);
+    gCmakePreviousStep = static_cast<int>(CmakeState(this)->m_step);
 
-    if (step == 6) {
-        step = static_cast<short>(cmakeState->m_select + 1);
-        mode = (step == 0) ? 2 : 0;
-    } else if (resultDir < 0) {
-        if (step == 5) {
-            step = 6;
+    if (CmakeState(this)->m_step == 6) {
+        CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_select + 1);
+        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
+    } else if (CmakeState(this)->m_resultDir < 0) {
+        if (CmakeState(this)->m_step == 5) {
+            CmakeState(this)->m_step = 6;
         } else {
-            step = static_cast<short>(step - 1);
+            CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step - 1);
         }
-        mode = (step == 0) ? 2 : 0;
-    } else if (step != 5) {
-        step = static_cast<short>(step + 1);
-        mode = (step == 0) ? 2 : 0;
+        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
+    } else if (CmakeState(this)->m_step != 5) {
+        CmakeState(this)->m_step = static_cast<short>(CmakeState(this)->m_step + 1);
+        CmakeState(this)->m_mode = (CmakeState(this)->m_step == 0) ? 2 : 0;
     } else {
-        step = 0;
-        mode = 2;
+        CmakeState(this)->m_step = 0;
+        CmakeState(this)->m_mode = 2;
     }
 
-    cmakeState->m_selectionInitialized = 0;
-    frame = 0;
+    CmakeState(this)->m_selectionInitialized = 0;
+    CmakeState(this)->m_frame = 0;
     CmakeMcState(this) = 3;
 }
 

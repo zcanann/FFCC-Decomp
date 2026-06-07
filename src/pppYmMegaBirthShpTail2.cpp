@@ -754,11 +754,13 @@ done:
     zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
     Vec* history = (Vec*)(particleBytes + 0x40);
-    for (int i = 0; i < 0x1f; i++) {
-        pppCopyVector(history[i], zeroVec);
+    for (int i = 0x1e; i >= 0; i--) {
+        pppCopyVector(*history, zeroVec);
+        history++;
     }
 
-    particleBytes[0x38] = particleBytes[0x37] - 1;
+    particleBytes[0x38] = particleBytes[0x37];
+    particleBytes[0x38] = particleBytes[0x38] - 1;
 }
 
 /*

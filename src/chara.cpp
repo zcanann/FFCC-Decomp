@@ -1699,43 +1699,34 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 {
 	(void)parent;
-	if (node == 0 || ModelDynParams(this) == 0) {
-		return;
-	}
-
-	u8 dynIndex = NodeDynParamIndex(node);
-	if (dynIndex == 0xFF || dynIndex >= ModelDynCount(this)) {
-		return;
-	}
-
 	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + static_cast<char>(NodeDynParamIndex(node)) * 0x24);
 	MtxPtr nodeMtx = NodeWorldMtx(node);
 
-	CVector forward;
+	Vec forward;
 	{
-		CVector tmp = CVector(nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]);
+		CVector tmp(nodeMtx[0][0], nodeMtx[1][0], nodeMtx[2][0]);
 		forward.x = tmp.x;
 		forward.y = tmp.y;
 		forward.z = tmp.z;
 	}
 	Vec right;
 	{
-		CVector tmp = CVector(nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]);
+		CVector tmp(nodeMtx[0][1], nodeMtx[1][1], nodeMtx[2][1]);
 		right.x = tmp.x;
 		right.y = tmp.y;
 		right.z = tmp.z;
 	}
 	Vec up;
 	{
-		CVector tmp = CVector(nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]);
+		CVector tmp(nodeMtx[0][2], nodeMtx[1][2], nodeMtx[2][2]);
 		up.x = tmp.x;
 		up.y = tmp.y;
 		up.z = tmp.z;
 	}
-	forward.Normalize();
+	reinterpret_cast<CVector&>(forward).Normalize();
 	Vec origin;
 	{
-		CVector tmp = CVector(nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]);
+		CVector tmp(nodeMtx[0][3], nodeMtx[1][3], nodeMtx[2][3]);
 		origin.x = tmp.x;
 		origin.y = tmp.y;
 		origin.z = tmp.z;
@@ -1745,7 +1736,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	Vec target;
 	{
 		CVector tmp;
-		PSVECScale(reinterpret_cast<Vec*>(&forward), reinterpret_cast<Vec*>(&tmp), boneLen);
+		PSVECScale(&forward, reinterpret_cast<Vec*>(&tmp), boneLen);
 		target.x = tmp.x;
 		target.y = tmp.y;
 		target.z = tmp.z;
@@ -1826,11 +1817,11 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		if (dynParam[3] != 0.0f) {
 			float angle;
 			if (axis == 0) {
-				float dotForward = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+				float dotForward = PSVECDotProduct(&forward, &direction);
 				float dotSide = PSVECDotProduct(&up, &direction);
 				angle = -atan2f(dotSide, dotForward);
 			} else {
-				float dotForward = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+				float dotForward = PSVECDotProduct(&forward, &direction);
 				float dotSide = PSVECDotProduct(&right, &direction);
 				angle = atan2f(dotSide, dotForward);
 			}
@@ -1852,7 +1843,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 	}
 
 	reinterpret_cast<CVector&>(direction).Normalize();
-	float align = PSVECDotProduct(reinterpret_cast<Vec*>(&forward), &direction);
+	float align = PSVECDotProduct(&forward, &direction);
 	if (align <= FLOAT_803301d8) {
 		float rotateAngle = FLOAT_803301e0;
 		if (FLOAT_803301dc <= align) {
@@ -1862,7 +1853,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		Vec axis;
 		{
 			CVector tmp;
-			PSVECCrossProduct(reinterpret_cast<Vec*>(&forward), &direction, reinterpret_cast<Vec*>(&tmp));
+			PSVECCrossProduct(&forward, &direction, reinterpret_cast<Vec*>(&tmp));
 			axis.x = tmp.x;
 			axis.y = tmp.y;
 			axis.z = tmp.z;

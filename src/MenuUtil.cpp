@@ -103,14 +103,14 @@ extern const char sMenuUtilSpaceText[] = " ";
 extern const char sMenuUtilValueSuffixFormat[] = " %d";
 extern const char sMenuUtilSignedDeltaFormat[] = " %+d";
 extern const char sMenuUtilAttrBonusFormat[] = " %s";
-extern "C" const char s_Force_803334F0[] = "Force";
-extern "C" const char s_Musique_803334F8[] = "Musique";
-extern "C" const char s_Active_80333500[8] = "Activ\351";
-extern "C" const char s_Stereo_80333508[8] = "St\351r\351o";
-extern "C" const char s_Fuerza_80333510[] = "Fuerza";
-extern "C" const char s_Defensa_80333518[] = "Defensa";
+extern "C" const char s_MenuOptionForceFr[] = "Force";
+extern "C" const char s_MenuOptionMusiqueFr[] = "Musique";
+extern "C" const char s_MenuOptionActiveFr[8] = "Activ\351";
+extern "C" const char s_MenuOptionStereoFr[8] = "St\351r\351o";
+extern "C" const char s_MenuOptionFuerzaEs[] = "Fuerza";
+extern "C" const char s_MenuOptionDefensaEs[] = "Defensa";
 extern "C" const char s_MenuOptionMusicaEs[8] = "M\372sica";
-extern "C" const char s_Apagado_80333528[] = "Apagado";
+extern "C" const char s_MenuOptionApagadoEs[] = "Apagado";
 extern "C" const char s_MenuOptionEstereo_80333530[8] = "Est\351reo";
 extern "C" const char s_MenuOptionMinEs_80333538[8] = "M\355n.";
 extern "C" const char s_MenuOptionMaxEs_80333540[8] = "M\341x.";
@@ -192,14 +192,14 @@ extern const char s_MenuOptionMusicaIt[];
 extern const char s_MenuOptionMonoIt[];
 extern const char s_MenuOptionContr[];
 extern const char s_MenuOptionNorm[];
-extern const char s_Force_803334F0[];
-extern const char s_Musique_803334F8[];
-extern const char s_Active_80333500[];
-extern const char s_Stereo_80333508[];
-extern const char s_Fuerza_80333510[];
-extern const char s_Defensa_80333518[];
+extern const char s_MenuOptionForceFr[];
+extern const char s_MenuOptionMusiqueFr[];
+extern const char s_MenuOptionActiveFr[];
+extern const char s_MenuOptionStereoFr[];
+extern const char s_MenuOptionFuerzaEs[];
+extern const char s_MenuOptionDefensaEs[];
 extern const char s_MenuOptionMusicaEs[];
-extern const char s_Apagado_80333528[];
+extern const char s_MenuOptionApagadoEs[];
 extern const char s_MenuOptionEstereo_80333530[];
 extern const char s_MenuOptionMinEs_80333538[];
 extern const char s_MenuOptionMaxEs_80333540[];
@@ -224,17 +224,17 @@ char* g_strMenuUtilMes[] = {
 	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
 	const_cast<char*>(s_MenuOptionOn), const_cast<char*>(s_MenuOptionOff), const_cast<char*>(s_MenuOptionStereo), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
 	const_cast<char*>(s_MenuOptionContr), const_cast<char*>(s_MenuOptionNorm),
-	const_cast<char*>(s_Force_803334F0), s_ResistanceFr_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
-	const_cast<char*>(s_Musique_803334F8), s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
+	const_cast<char*>(s_MenuOptionForceFr), s_ResistanceFr_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
+	const_cast<char*>(s_MenuOptionMusiqueFr), s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
-	s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4, s_Reglez_le_volume_de_la_musique_801E34E0, s_Reglez_le_volume_des_effets_sonores_801E3500, s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524, const_cast<char*>(s_Active_80333500),
-	s_MenuOptionDesactive_801E355C, const_cast<char*>(s_Stereo_80333508), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
+	s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4, s_Reglez_le_volume_de_la_musique_801E34E0, s_Reglez_le_volume_des_effets_sonores_801E3500, s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524, const_cast<char*>(s_MenuOptionActiveFr),
+	s_MenuOptionDesactive_801E355C, const_cast<char*>(s_MenuOptionStereoFr), const_cast<char*>(s_MenuOptionMonoIt), const_cast<char*>(s_MenuOptionMin), const_cast<char*>(s_MenuOptionMax),
 	s_MenuOptionAmeliore_801E3568, s_Standard_801E31E8,
-	const_cast<char*>(s_Fuerza_80333510), const_cast<char*>(s_Defensa_80333518), s_Aro_de_posicion_801E3574, s_Tipo_de_sonido_801E3584,
+	const_cast<char*>(s_MenuOptionFuerzaEs), const_cast<char*>(s_MenuOptionDefensaEs), s_Aro_de_posicion_801E3574, s_Tipo_de_sonido_801E3584,
 	const_cast<char*>(s_MenuOptionMusicaEs), s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,
 	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
-	const_cast<char*>(s_Apagado_80333528), const_cast<char*>(s_MenuOptionEstereo_80333530), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
+	const_cast<char*>(s_MenuOptionApagadoEs), const_cast<char*>(s_MenuOptionEstereo_80333530), s_Monoaural_801E36AC, const_cast<char*>(s_MenuOptionMinEs_80333538), const_cast<char*>(s_MenuOptionMaxEs_80333540),
 	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4.m_text,
 };
 

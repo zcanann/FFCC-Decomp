@@ -1054,7 +1054,6 @@ void CShopMenu::DrawItemInfo0()
         return;
     }
 
-    int listType = m_listType;
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
     int itemNo = getItemNo(itemIndex);
 
@@ -1087,15 +1086,15 @@ void CShopMenu::DrawItemInfo0()
 
     bool canTrade = false;
     if (itemNo > 0) {
-        if (listType == 0) {
+        if (m_listType == 0) {
             canTrade = true;
-        } else if (listType == 2) {
+        } else if (m_listType == 2) {
             canTrade = true;
             if ((caravanWork->m_shopArgs[(itemNo - 0x191U) >> 5] &
                  (1U << ((itemNo - 0x191U) & 0x1F))) == 0) {
                 canTrade = false;
             }
-        } else if (listType == 1) {
+        } else if (m_listType == 1) {
             if (MenuPcs.EquipChk(itemIndex) == 0) {
                 canTrade = itemNo >= 0x9F;
             }
@@ -1110,7 +1109,7 @@ void CShopMenu::DrawItemInfo0()
         float amountRightX = rightX - FLOAT_80332d5c;
         int totalGil;
 
-        if (listType == 0) {
+        if (m_listType == 0) {
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
@@ -1119,7 +1118,7 @@ void CShopMenu::DrawItemInfo0()
                 totalGil = totalGil / 100 + (totalGil >> 31);
                 totalGil = totalGil - (totalGil >> 31);
             }
-        } else if (listType == 1) {
+        } else if (m_listType == 1) {
             if (itemNo < 1) {
                 totalGil = 0;
             } else {
@@ -1141,7 +1140,7 @@ void CShopMenu::DrawItemInfo0()
         MenuPcs.DrawInit();
     } else {
         SetupShopMenuUnitFont(font);
-        const char* message = (listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
+        const char* message = (m_listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
                                                 ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_SELL);
         font->DrawInit();
         DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
@@ -1151,7 +1150,7 @@ void CShopMenu::DrawItemInfo0()
         DrawItemInfo(itemNo, 0, 0xA8, 0, 0xC6, 0, 0, 0);
     }
 
-    if ((m_subMode == 1) && (listType == 0)) {
+    if ((m_subMode == 1) && (m_listType == 0)) {
         int amount = m_quantity;
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);

@@ -858,8 +858,8 @@ int CMenuPcs::EquipOpen0()
 	}
 
 	doneCount = 0;
-	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
 	EquipOpenAnim* item = &GetEquipListStorage(this)->entries[GetEquipListStorage(this)->count];
+	itemCount = (int)GetEquipListStorage(this)->listEnd - (int)GetEquipListStorage(this)->count;
 
 	for (int i = 0; i < itemCount; i++) {
 		fVar1 = kEquipZero;

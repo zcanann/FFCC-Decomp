@@ -505,7 +505,7 @@ void birth(
 
     s32 mode = params->m_spawnMode;
     if (mode < 6) {
-        if (mode > 3) {
+        if (mode >= 4) {
             if (params->m_speed != kPppRyjMegaBirthSharedZero) {
                 u8 speedMode = params->m_speedMode;
                 Vec speed;

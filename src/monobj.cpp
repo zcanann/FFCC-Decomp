@@ -1177,7 +1177,7 @@ void CGMonObj::onStatMagic()
  */
 void CGMonObj::onAnimPoint(int param2, int param3)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
+#define object (reinterpret_cast<CGObject*>(this))
 	int soundEffect;
 	unsigned int particleId = 0xFFFF;
 	unsigned int soundId = 0xFFFF;
@@ -1192,9 +1192,8 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	}
 
 	if (particleId != 0xFFFF) {
-		int dataNo = -1;
-		dataNo = object->m_charaModelHandle->GetPdtSlot();
-		reinterpret_cast<CGPrgObj*>(this)->putParticle(particleId | (dataNo << 8), 0, object, 0.0f, 0);
+		int dataNo = object->m_charaModelHandle->GetPdtSlot();
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(particleId | (dataNo << 8), 0, object, FLOAT_803319C0, 0);
 	}
 
 	if (soundId != 0xFFFF) {
@@ -1213,6 +1212,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 	}
 
 	CGCharaObj::onAnimPoint(param2, param3);
+#undef object
 }
 
 /*

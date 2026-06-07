@@ -1483,8 +1483,14 @@ void CGPartyObj::onFrameStat()
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
+				CVector worldPos(m_worldPosition);
+				CVector chalicePos(*reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C));
+				CVector diff;
+				PSVECSubtract(reinterpret_cast<Vec*>(&chalicePos), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				Vec moveVec;
-				PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition, &moveVec);
+				moveVec.x = diff.x;
+				moveVec.y = diff.y;
+				moveVec.z = diff.z;
 				moveVector(&moveVec, m_moveBaseSpeed, 0x0F);
 			}
 		}

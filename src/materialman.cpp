@@ -1644,11 +1644,10 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
         m_curEnvTevBit |= 0x80;
 
         PSMTXConcat(shadow.m_shadowTexMtx, viewMtx, m_fullScreenShadowMtx0);
-        GXTexObj* texObj = &shadow.m_texObjs[flags];
-        m_fullScreenShadowTexObj0 = texObj;
+        m_fullScreenShadowTexObj0 = &shadow.m_texObjs[flags];
 
         PSMTXConcat(shadow.m_depthMtx, viewMtx, m_fullScreenShadowMtx1);
-        m_fullScreenShadowTexObj1 = texObj + 1;
+        m_fullScreenShadowTexObj1 = &shadow.m_texObjs[flags] + 1;
     }
 }
 

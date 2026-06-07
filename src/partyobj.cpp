@@ -399,12 +399,11 @@ void CGPartyObj::onChangeStat(int state)
 {
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
-	weaponFlags[1] &= 0xBF;
+	m_weaponNodeFlagAll.m_bits1.m_menuReady = 0;
 
 	switch (state) {
 	case 0:
-		weaponFlags[1] |= 0x40;
+		m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 		break;
 	case 1: {
 		int attackSel = party.attackSel;

@@ -1358,7 +1358,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
 	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
-	           CharaObjIsElementalStatus(staType)) {
+	           (staType - 8 < 2 || staType == 6 || staType == 3)) {
 		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x65);
 	}
 

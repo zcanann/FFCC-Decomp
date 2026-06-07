@@ -5153,7 +5153,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		GbaQue.SetControllerMode(static_cast<int>((static_cast<unsigned int>(-value) | static_cast<unsigned int>(value)) >> 31));
 		break;
 	default:
-		if (System.m_execParam != 0) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
 		}
 		break;

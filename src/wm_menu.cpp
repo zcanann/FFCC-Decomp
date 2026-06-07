@@ -2671,7 +2671,7 @@ void CMenuPcs::CalcLoadMenu()
 	unsigned int uVar15;
 	if (sVar8 == 0) {
 		uVar15 = static_cast<int>(m_wmWorldState->m_frameCounter) - 10;
-	} else if (sVar8 < 1 || sVar8 > 3) {
+	} else if (sVar8 <= 0 || sVar8 >= 4) {
 		uVar15 = -static_cast<int>(m_wmWorldState->m_frameCounter);
 	} else {
 		uVar15 = 0;
@@ -11104,18 +11104,18 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	float sy;
 	float sw;
 	float sh;
-	if (win->state == 1) {
-		sx = static_cast<float>(win->x);
-		sy = static_cast<float>(win->y);
-		sw = static_cast<float>(win->width);
-		sh = static_cast<float>(win->height);
-	} else {
+	if (win->state != 1) {
 		const float xAdd = (((centerX - static_cast<float>(win->x)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
 		const float yAdd = (((centerY - static_cast<float>(win->y)) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win->frame);
 		sx = (centerX - FLOAT_80331410) - xAdd;
 		sy = (centerY - FLOAT_80331410) - yAdd;
 		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
 		sh = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + yAdd));
+	} else {
+		sx = static_cast<float>(win->x);
+		sy = static_cast<float>(win->y);
+		sw = static_cast<float>(win->width);
+		sh = static_cast<float>(win->height);
 	}
 
 	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313f8));

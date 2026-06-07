@@ -2939,34 +2939,32 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (frame < sprite->startFrame) {
-			continue;
-		}
+		if (sprite->startFrame <= frame) {
+			if (frame < sprite->startFrame + sprite->duration) {
+				sprite->timer++;
+				sprite->alpha = (float)((1.0 / (double)sprite->duration) * (double)sprite->timer);
+			} else {
+				doneCount++;
+				sprite->alpha = 1.0f;
+			}
 
-		if (sprite->startFrame + sprite->duration <= frame) {
-			sprite->alpha = 1.0f;
-			doneCount++;
-		} else {
-			sprite->timer++;
-			sprite->alpha = (1.0f / (float)sprite->duration) * (float)sprite->timer;
-		}
-
-		if (sprite->kind == 0x17 && sprite->timer == 1) {
-			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
-		}
-		if (sprite->kind == -2 && sprite->timer == 1) {
-			Sound.PlaySe(0x47, 0x40, 0x7f, 0);
-		}
-		if (sprite->kind == -1 && sprite->timer == 1 && this->m_bonusAlpha == 0) {
-			Sound.PlaySe(0x48, 0x40, 0x7f, 0);
-			this->m_bonusAlpha = 1;
+			if (sprite->kind == 0x17) {
+				BonusAnimSprite* sound = sprite;
+				for (int j = 0; j < activePartyCount; j++) {
+					if (sound->timer == 1) {
+						Sound.PlaySe(0x49, 0x40, 0x7f, 0);
+					}
+					sound++;
+				}
+			}
 		}
 	}
 
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
-	for (int i = 0; i < activePartyCount * 2; i++) {
+	for (int i = 0; i < activePartyCount * 3; i++) {
+		BonusAnimSprite* sprite = &sprites[modelBase + i];
 		CCharaPcs::CHandle* handle;
 		int tribeId;
 		if (i < activePartyCount) {
@@ -2976,7 +2974,20 @@ void CMenuPcs::CalcResultOpenAnim()
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
 			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
-			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+			if (i < activePartyCount * 2) {
+				PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+			} else {
+				float modelScale = 0.5f;
+				if (sprite->timer == 0x18 && this->m_bonusAlpha == 0) {
+					Sound.PlaySe(0x48, 0x40, 0x7f, 0);
+					this->m_bonusAlpha = 1;
+				}
+				if (0x17 < sprite->timer) {
+					modelScale = (float)(0.5 * (double)((float)(sprite->timer - 0x18) /
+					                 (float)(sprite->duration - 0x18)) + (double)modelScale);
+				}
+				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+			}
 		}
 
 		if (i / activePartyCount == 1) {
@@ -2988,17 +2999,24 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		if (i < activePartyCount) {
 			scaleMtx[0][3] = 0.0f;
-			scaleMtx[2][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
-		} else {
-			BonusAnimSprite* sprite = &sprites[modelBase + i];
-			int itemIndex = i - activePartyCount;
-			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
-			scaleMtx[1][3] = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
-			if (itemIndex >= 1 && itemIndex <= 2) {
-				scaleMtx[1][3] -= 0.5f;
-			}
 			scaleMtx[2][3] = 0.0f;
+		} else if (i < activePartyCount * 2) {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+		} else {
+			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+			if (sprite->timer == 8) {
+				Sound.PlaySe(0x47, 0x40, 0x7f, 0);
+			}
+			float ty = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
+			int itemIndex = i - activePartyCount * 2;
+			scaleMtx[1][3] = ty;
+			scaleMtx[2][3] = 0.0f;
+			if (itemIndex > 0 && itemIndex < 3) {
+				scaleMtx[1][3] = (float)((double)ty - 1.8);
+			}
 		}
 
 		CChara::CModel* model = handle->m_model;
@@ -3006,7 +3024,18 @@ void CMenuPcs::CalcResultOpenAnim()
 		model->SetMatrix(scaleMtx);
 		model->CalcMatrix();
 		model->CalcSkin();
-		model->m_lightAlpha = sprites[modelBase + i].alpha;
+		if (activePartyCount * 2 <= i) {
+			if (sprite->timer < 0x18) {
+				sprite->alpha = 1.0f;
+			} else {
+				sprite->alpha = (float)(1.0 - (double)((float)(sprite->timer - 0x18) /
+				                 (float)(sprite->duration - 0x18)));
+				if ((double)sprite->alpha < 0.0) {
+					sprite->alpha = 0.0f;
+				}
+			}
+		}
+		model->m_lightAlpha = sprite->alpha;
 	}
 
 	if (doneCount == (int)header->count) {

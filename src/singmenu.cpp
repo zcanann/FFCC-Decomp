@@ -2846,13 +2846,13 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetShadow(1);
     font->SetScale(FLOAT_8032ea78);
 
-    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
     int lineCount;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
-        lineCount = staticMessage.lineCount;
+        lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
     }
+    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
 
     int maxWidth = 0;
     char* dynamicText = s_DynamicMessStr;

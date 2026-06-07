@@ -2852,7 +2852,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	CGMonObj* monObj = this;
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
 	CGObject* object = reinterpret_cast<CGObject*>(monObj);
-	unsigned char* baseScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+#define baseScript (reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]))
 	if (monObj->m_funcs->attackCheck != 0) {
 		int result = (monObj->*monObj->m_funcs->attackCheck)(partyIndex);
 		if (result == -2) {
@@ -2994,6 +2994,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 	}
 
 	return selectedAction;
+#undef baseScript
 }
 
 /*

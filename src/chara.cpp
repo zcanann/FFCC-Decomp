@@ -2157,7 +2157,7 @@ void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode*
  */
 void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFrame, int blendMode)
 {
-	if (blendMode < 0) {
+	if (blendMode == -1) {
 		CAnim* currentAnim = m_anim;
 		if (currentAnim == 0) {
 			blendMode = 0;
@@ -2168,9 +2168,9 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 
 			u8 interpCount = AnimInterpCount(currentAnim);
 			u16* interpTable = reinterpret_cast<u16*>(reinterpret_cast<u8*>(AnimBank(currentAnim)) + AnimInterpOffset(currentAnim));
-			int frame = static_cast<int>(m_curFrame);
+			int frame = static_cast<int>(m_time);
 
-			for (u32 i = 0; i < interpCount; i++) {
+			for (int i = 0; i < interpCount; i++) {
 				int start = (i == 0) ? 0 : interpTable[i * 2];
 				int end = (i + 1 < interpCount) ? interpTable[i * 2 + 2] : 10000000;
 				if (start <= frame && frame < end) {
@@ -2188,8 +2188,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	}
 
 	CNode* nodes = ModelNodes(this);
-	u16 nodeCount = ModelNodeCount(this);
-	for (u32 i = 0; i < nodeCount; i++) {
+	for (u32 i = 0; i < ModelNodeCount(this); i++) {
 		CNode* node = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + i * 0xC0);
 
 		NodeAnimNode0(node) = 0;

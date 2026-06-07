@@ -1452,9 +1452,10 @@ void CChara::CModel::calcMatrix()
 		float total = FLOAT_803301BC + (m_animEnd - m_animStart);
 		if (((AnimFlags(m_anim) >> 6) & 1) != 0) {
 			if (m_time < FLOAT_803301b0) {
+				float negTime = -m_time;
 				float clamped = total - FLOAT_803301BC;
-				if (-m_time < clamped) {
-					clamped = -m_time;
+				if (negTime < clamped) {
+					clamped = negTime;
 				}
 				frame = ((m_animStart + total) - FLOAT_803301BC) - clamped;
 			} else {

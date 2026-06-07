@@ -722,29 +722,7 @@ void CGPartyObj::menu()
 		}
 
 	LAB_OPEN:
-		if (Game.m_gameWork.m_menuStageMode != 0) {
-			bool bVar3;
-			if ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
-			    ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
-			     ((party.commandMode & 2) != 0) ||
-			     ((party.commandMode & 4) != 0)) &&
-			    (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
-			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-				bVar3 = true;
-			} else {
-				bVar3 = false;
-			}
-
-			if (bVar3) {
-				Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
-				Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
-			} else {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			}
-			return;
-		}
-
-		{
+		if (Game.m_gameWork.m_menuStageMode == 0) {
 			int slot = static_cast<char>(m_animStateMisc);
 			bool bVar3 = false;
 			if (Pad.m_debugPadLock != 0 || (slot == 0 && Pad.m_debugPadPort != -1)) {
@@ -758,9 +736,29 @@ void CGPartyObj::menu()
 			} else if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 				Sound.PlaySe(8, 0x40, 0x7F, 0);
 			}
+
+			Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+			return;
 		}
 
-		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+		bool bVar3;
+		if ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
+		    ((static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_shieldAttachNodeIndex)) << 0x18) < 0) ||
+		     ((party.commandMode & 2) != 0) ||
+		     ((party.commandMode & 4) != 0)) &&
+		    (static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x63C)) << 0x18) < 0) &&
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
+			bVar3 = true;
+		} else {
+			bVar3 = false;
+		}
+
+		if (bVar3) {
+			Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
+			Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
+		}
 		return;
 	}
 

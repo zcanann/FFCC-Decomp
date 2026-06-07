@@ -92,9 +92,9 @@ Mtx ppvUnitMatrix;
 Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
-extern "C" const char s_pppPart_cpp[];
-extern "C" const char s_ERROR_prog_NULL[];
-extern "C" const char s_CPartPcs_heap_801D821C[];
+extern "C" const char s_pppPart_cpp[] = "pppPart.cpp";
+extern "C" const char sPppProgNullErrorMsg[] = "\nERROR!!!! prog=NULL\n\n";
+extern "C" const char sPartPcsHeapStageName[] = "CPartPcs.heap";
 
 /*
  * --INFO--
@@ -337,7 +337,7 @@ float pppVectorLength(Vec vec)
  */
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
 {
-	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, const_cast<char*>(s_CPartPcs_heap_801D821C), 0);
+	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, const_cast<char*>(sPartPcsHeapStageName), 0);
 }
 
 /*
@@ -1951,7 +1951,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					}
 					else
 					{
-						printf(s_ERROR_prog_NULL);
+						printf(sPppProgNullErrorMsg);
 					}
 
 					stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
@@ -2020,7 +2020,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				}
 				else
 				{
-					printf(s_ERROR_prog_NULL);
+					printf(sPppProgNullErrorMsg);
 				}
 
 				stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));

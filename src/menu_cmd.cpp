@@ -1472,7 +1472,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	}
 
 	CmdListStorage* cmdList = GetCmdListStorage(this);
-	unsigned int mode = GetCmdStateView(this)->mode;
+	s32 mode = GetCmdStateView(this)->mode;
 
 	if (mode == 0) {
 		s16 cmdCount = caravanWork->m_numCmdListSlots;

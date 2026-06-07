@@ -6337,32 +6337,32 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	if (sVar3 == 2 && bytes[0x13] != 0) {
-		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
-		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
-			*reinterpret_cast<int*>(wmFrame + 4) = 0;
+		*reinterpret_cast<int*>(m_wm.m_frameData + 4) = *reinterpret_cast<int*>(m_wm.m_frameData + 4) - 1;
+		if (*reinterpret_cast<int*>(m_wm.m_frameData + 4) < 0) {
+			*reinterpret_cast<int*>(m_wm.m_frameData + 4) = 0;
 		}
 	} else {
 		if ((bytes[0x0A] & 1) != 0) {
-			int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
+			int iVar16 = *reinterpret_cast<int*>(m_wm.m_frameData + 4);
 			if (iVar16 != 0) {
-				*reinterpret_cast<int*>(wmFrame + 4) = iVar16 - 1;
-				if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
-					*reinterpret_cast<int*>(wmFrame + 4) = 0;
+				*reinterpret_cast<int*>(m_wm.m_frameData + 4) = iVar16 - 1;
+				if (*reinterpret_cast<int*>(m_wm.m_frameData + 4) < 0) {
+					*reinterpret_cast<int*>(m_wm.m_frameData + 4) = 0;
 				}
-				if (*reinterpret_cast<int*>(wmFrame + 4) == 0) {
-					bytes[0x0A] = bytes[0x0A] & 0xFE;
+				if (*reinterpret_cast<int*>(m_wm.m_frameData + 4) == 0) {
+					bytes[0x0A] = static_cast<unsigned char>(bytes[0x0A] & ~1);
 				}
 				goto LAB_calc;
 			}
 		}
-		int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
+		int iVar16 = *reinterpret_cast<int*>(m_wm.m_frameData + 4);
 		if (iVar16 < 10) {
-			*reinterpret_cast<int*>(wmFrame + 4) = iVar16 + 1;
+			*reinterpret_cast<int*>(m_wm.m_frameData + 4) = iVar16 + 1;
 		}
 	}
 LAB_calc:
+	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
 	float fVar1 = FLOAT_803313dc;
 	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;

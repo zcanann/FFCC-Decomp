@@ -10100,13 +10100,13 @@ LAB_draw:
 	for (int i = 0, offset = 0; i < 2; i++, offset += 0x1C) {
 		if (((1 << i) & 2) != 0) {
 			unsigned char* const frameEntry = frame + offset + 4;
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
+			MenuPcs.DrawRect(*reinterpret_cast<unsigned int*>(frameEntry + 0x18), static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
 			         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
 			         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
 			         FLOAT_803313e8, FLOAT_803313e8,
-			         static_cast<float>(*reinterpret_cast<unsigned int*>(frameEntry + 0x18)));
+			         FLOAT_803313dc);
 		}
 	}
 
@@ -10150,10 +10150,10 @@ LAB_draw:
 					memberCount++;
 				}
 				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
-				MenuPcs.DrawRect(0xFFFFFFFF,
+				MenuPcs.DrawRect(8,
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
+				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
 					MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
 					         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);

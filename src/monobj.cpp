@@ -720,7 +720,7 @@ void CGMonObj::onCancelStat(int state)
 void CGMonObj::isValidTarget()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]);
+#define script9 (reinterpret_cast<unsigned char*>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[9]))
 	float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
 	float homeDist = PSVECDistance(&m_homePosition, reinterpret_cast<Vec*>(mon + 0x15C));
 	unsigned char* aiData;
@@ -811,6 +811,7 @@ check_home:
 	} else if (*reinterpret_cast<short*>(script9 + 0x10C) != 1) {
 		*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1C;
 	}
+#undef script9
 }
 
 /*

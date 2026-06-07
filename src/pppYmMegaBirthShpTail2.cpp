@@ -555,34 +555,36 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
     if ((s8)paramBytes[0x18] < 4 || (s8)paramBytes[0x18] >= 10) {
         float speedRandRange = param->m_speedRandRange;
         if (speedRandRange != kPppYmMegaBirthShpTail2Zero) {
-            u8 randType = param->m_randType;
             float scale = speedRandRange;
 
-            if (randType == 3) {
+            switch (param->m_randType) {
+            case 1:
+                Math.RandF();
+                scale = param->m_speedRandRange * Math.RandF();
+                break;
+            case 2: {
                 float a = Math.RandF();
-                float b = Math.RandF();
-                scale = -(FLOAT_80330590 * ((param->m_speedRandRange * b) * a) - param->m_speedRandRange);
-            } else if (randType < 3) {
-                if (randType == 1) {
-                    Math.RandF();
-                    float a = Math.RandF();
-                    scale = param->m_speedRandRange * a;
-                } else if (randType != 0) {
-                    float a = Math.RandF();
-                    float b = Math.RandF();
-                    scale = (param->m_speedRandRange * b) * a;
-                }
-            } else if (randType == 5) {
+                scale = a * (param->m_speedRandRange * Math.RandF());
+                break;
+            }
+            case 3: {
                 float a = Math.RandF();
-                float b = Math.RandF();
-                float c = Math.RandF();
-                scale = -(FLOAT_80330568 * (c * ((param->m_speedRandRange * b) * a)) - param->m_speedRandRange);
-            } else if (randType < 5) {
+                scale = -(FLOAT_80330590 * (a * (param->m_speedRandRange * Math.RandF())) - param->m_speedRandRange);
+                break;
+            }
+            case 4: {
                 float a = Math.RandF();
                 float b = Math.RandF();
                 float c = Math.RandF();
-                float d = Math.RandF();
-                scale = d * (c * ((param->m_speedRandRange * b) * a));
+                scale = Math.RandF() * (c * (a * (param->m_speedRandRange * b)));
+                break;
+            }
+            case 5: {
+                float a = Math.RandF();
+                float b = Math.RandF();
+                scale = -(FLOAT_80330568 * (Math.RandF() * (a * (param->m_speedRandRange * b))) - param->m_speedRandRange);
+                break;
+            }
             }
 
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);

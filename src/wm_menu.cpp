@@ -2691,27 +2691,20 @@ void CMenuPcs::CalcLoadMenu()
 	*reinterpret_cast<short*>(iVar10 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		double dVar26;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
+		double dVar26 = (double)(float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 > -11) {
-			unsigned int absOff;
-			if ((int)uVar15 < 0) {
-				absOff = -(int)uVar15;
-			} else {
-				absOff = uVar15;
-			}
+			unsigned int uVar11 = (int)uVar15 >> 0x1f;
+			double dVar27 = (double)(float)(dVar26 * DOUBLE_803314e8 * static_cast<double>((int)((uVar11 ^ uVar15) - uVar11)));
+			unsigned int absOff = (uVar11 ^ uVar15) - uVar11;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
-			double dVar27 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
-			dVar26 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
+			dVar26 = (double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
 			dVar26 = (double)(float)(dVar27 * (double)(float)dVar26);
-		} else {
-			dVar26 = (double)baseWidth;
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar26);
+		iVar14 = (int)((double)(float)(int)*reinterpret_cast<short*>(frame + 4) - dVar26);
 		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar26);
+		iVar14 = (int)((double)(float)(int)*reinterpret_cast<short*>(frame + 0x20) + dVar26);
 		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
 	}
 

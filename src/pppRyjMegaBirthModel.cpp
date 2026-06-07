@@ -519,9 +519,12 @@ void birth(
                 speed.x = calc_spawn_speed(params->m_speed, speedMode);
                 speed.y = calc_spawn_speed(params->m_speed, speedMode);
                 speed.z = calc_spawn_speed(params->m_speed, speedMode);
-                particleData->m_matrix[0][3] = speed.x * params->m_directionScale.x;
-                particleData->m_matrix[1][3] = speed.y * params->m_directionScale.y;
-                particleData->m_matrix[2][3] = speed.z * params->m_directionScale.z;
+                particleData->m_matrix[0][3] = speed.x;
+                particleData->m_matrix[1][3] = speed.y;
+                particleData->m_matrix[2][3] = speed.z;
+                particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
+                particleData->m_matrix[1][3] = particleData->m_matrix[1][3] * params->m_directionScale.y;
+                particleData->m_matrix[2][3] = particleData->m_matrix[2][3] * params->m_directionScale.z;
             }
             goto join_position;
         }

@@ -928,13 +928,20 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 	}
 
 	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);
-	if ((static_cast<int>(object->m_flags) << 24) < 0) {
+	if (object->m_flagBits.m_deleteFlag != 0) {
 		return;
 	}
 
 	u8* func = 0;
-	if ((object->m_activeClassIndex < 0)
-	    || (((systemKind != 2) && (systemKind != 3)) || (systemIndex < 0))) {
+	if ((object->m_activeClassIndex >= 0)
+	    && (((systemKind == 2) || (systemKind == 3)) && (systemIndex >= 0))) {
+		const s16 classIndex = object->m_activeClassIndex;
+		u8* const classes = reinterpret_cast<u8*>(m_classes);
+		const int funcPos = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
+		if (funcPos >= 0) {
+			func = m_funcs + (funcPos * 0x50);
+		}
+	} else {
 		u8* searchFunc = m_funcs;
 		int funcCount = m_funcCount;
 
@@ -944,13 +951,6 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 				func = searchFunc;
 				break;
 			}
-		}
-	} else {
-		const s16 classIndex = object->m_activeClassIndex;
-		u8* const classes = reinterpret_cast<u8*>(m_classes);
-		const int funcPos = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
-		if (funcPos >= 0) {
-			func = m_funcs + (funcPos * 0x50);
 		}
 	}
 

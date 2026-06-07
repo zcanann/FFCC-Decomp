@@ -32,6 +32,12 @@ extern "C" float FLOAT_803301E8;
 extern "C" float FLOAT_803301F8;
 extern const char s_CChara_80330220[];
 
+extern const char lbl_80330200[];
+extern const char lbl_80330208[];
+extern const char lbl_80330210[];
+extern const char lbl_80330218[];
+extern "C" const char lbl_801D90D4[];
+
 inline void* operator new(unsigned long, void* ptr)
 {
 	return ptr;
@@ -993,16 +999,16 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
 			if (chunk.m_id == 0x494E464F) {
-				ref->m_baseScale = chunkFile.GetF4();
+				m_data->m_baseScale = chunkFile.GetF4();
 				m_furLenScale = chunkFile.GetF4();
 				m_furStep = chunkFile.GetF4();
 			} else if (chunk.m_id == 0x5155414E) {
-				ref->m_posQuant = chunkFile.Get4();
-				ref->m_normQuant = chunkFile.Get4();
+				m_data->m_posQuant = chunkFile.Get4();
+				m_data->m_normQuant = chunkFile.Get4();
 			} else if (chunk.m_id == 0x4D534554) {
 				CMaterialSet* materialSet =
 				    new(stage, const_cast<char*>("src/chara.cpp"), 0x132) CMaterialSet();
-				ref->m_materialSet = materialSet;
+				m_data->m_materialSet = materialSet;
 				if (materialSet != 0) {
 					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
 				}
@@ -1016,48 +1022,55 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				}
 			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;
-				ref->m_nodeCount = 0;
+				m_data->m_nodeCount = 0;
 				if (nodeCapacity != 0) {
 					CChara::CNode::CRefData* nodeRefs = new CChara::CNode::CRefData[nodeCapacity];
 					CChara::CNode* nodes = new CChara::CNode[nodeCapacity];
-					ref->m_nodeRefData = nodeRefs;
+					m_data->m_nodeRefData = nodeRefs;
 					m_nodes = nodes;
 				}
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == 0x4E4F4445 && m_nodes != 0) {
-						u16 nodeCount = ref->m_nodeCount;
-						CNode* node = &m_nodes[nodeCount];
+						CNode* node = &m_nodes[m_data->m_nodeCount];
 						node->Create(chunkFile, this, static_cast<CChara::CNode::TYPE>(chunk.m_arg0), stage);
-						ref->m_nodeCount = nodeCount + 1;
+						if (strcmp(NodeRefName(node), lbl_80330200) == 0) {
+							m_data->m_headNodeIndex = node->m_refData->m_index;
+						} else if (strcmp(NodeRefName(node), lbl_80330208) == 0) {
+							m_data->m_chest3NodeIndex = node->m_refData->m_index;
+						} else if (strcmp(NodeRefName(node), lbl_80330210) == 0) {
+							m_data->m_chest2NodeIndex = node->m_refData->m_index;
+						} else if (strcmp(NodeRefName(node), lbl_80330218) == 0) {
+							m_data->m_chest1NodeIndex = node->m_refData->m_index;
+						}
+						m_data->m_nodeCount = m_data->m_nodeCount + 1;
 					}
 				}
 				chunkFile.PopChunk();
 			} else if (chunk.m_id == 0x4D535354) {
 				const u32 meshCapacity = chunk.m_arg0;
-				ref->m_meshCount = 0;
+				m_data->m_meshCount = 0;
 				if (meshCapacity != 0) {
 					CChara::CMesh::CRefData* meshRefs = new CChara::CMesh::CRefData[meshCapacity];
 					CChara::CMesh* meshes = new CChara::CMesh[meshCapacity];
-					ref->m_meshRefData = meshRefs;
+					m_data->m_meshRefData = meshRefs;
 					m_meshes = meshes;
 				}
 
 				chunkFile.PushChunk();
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == 0x4D455348 && m_meshes != 0) {
-						u16 meshCount = ref->m_meshCount;
-						CMesh* mesh = &m_meshes[meshCount];
+						CMesh* mesh = &m_meshes[m_data->m_meshCount];
 						mesh->Create(this, chunkFile, stage);
-						ref->m_meshCount = meshCount + 1;
+						m_data->m_meshCount = m_data->m_meshCount + 1;
 					}
 				}
 				chunkFile.PopChunk();
 			} else if (chunk.m_id == 0x42414E4B) {
 				if (chunk.m_size != 0) {
 					void* bank = new u8[chunk.m_size];
-					*(void**)((u8*)ref + 0x14) = bank;
+					*(void**)((u8*)m_data + 0x14) = bank;
 					chunkFile.Get(bank, chunk.m_size);
 				}
 			}

@@ -52,9 +52,9 @@ STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_useEnvDepth) == 0x0D);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_drawDepth) == 0x18);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_maxParticles) == 0x20);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitCount) == 0x22);
-STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emit) == 0x22);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_emitInterval) == 0x24);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_life) == 0x26);
+STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fadeOutFrames) == 0x28);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fadeInFrames) == 0x29);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spawnMode) == 0x2A);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_spread) == 0x2B);
@@ -620,9 +620,9 @@ join_position:
         particleBytes[0x35] = random_signed_byte_span(payload[0x4F]);
     }
 
-    if (params->m_emit.m_fadeOutFrames != 0) {
+    if (params->m_fadeOutFrames != 0) {
         *f32_at(particleData, 0x98) = static_cast<float>(color->m_alpha);
-        *u8_at(particleData, 0x9D) = params->m_emit.m_fadeOutFrames;
+        *u8_at(particleData, 0x9D) = params->m_fadeOutFrames;
     }
     if (params->m_fadeInFrames != 0) {
         *u8_at(particleData, 0x9E) = params->m_fadeInFrames;

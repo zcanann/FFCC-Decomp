@@ -1172,11 +1172,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x41:
-			engineObject->m_bgDownDist = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
 		case -0x43: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
 			engineObject->moveVectorRot(params[0], params[1], params[2], static_cast<int>(params[3]));
@@ -1196,21 +1191,16 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x8C:
+			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, RuntimeString(this, object->m_localBase[1]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x48:
 			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (object->m_localBase[0] != 0) {
 				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
 			}
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x4A:
-			engineObject->m_hitNormal.x = reinterpret_cast<float*>(object->m_localBase)[0];
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x4B:
-			engineObject->ResetDynamics();
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1246,19 +1236,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x54: {
-			Vec moveVector;
-			float* params = reinterpret_cast<float*>(object->m_localBase);
-			float rotX = params[0];
-			float rotY = params[1];
-			moveVector.x = static_cast<float>(sin(rotX)) * static_cast<float>(cos(rotY));
-			moveVector.y = static_cast<float>(sin(rotY));
-			moveVector.z = static_cast<float>(cos(rotX)) * static_cast<float>(cos(rotY));
-			engineObject->MoveVector(&moveVector, params[2], static_cast<int>(object->m_localBase[3]), 0, 0, 1);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		}
 		case -0x55:
 			ScriptWork(engineObject)->m_hp = static_cast<unsigned short>(object->m_localBase[1]);
 			PushValue(this, object, 0);
@@ -1510,6 +1487,34 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x54: {
+			Vec moveVector;
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			float rotX = params[0];
+			float rotY = params[1];
+			moveVector.x = static_cast<float>(sin(rotX)) * static_cast<float>(cos(rotY));
+			moveVector.y = static_cast<float>(sin(rotY));
+			moveVector.z = static_cast<float>(cos(rotX)) * static_cast<float>(cos(rotY));
+			engineObject->MoveVector(&moveVector, params[2], static_cast<int>(object->m_localBase[3]), 0, 0, 1);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x4A:
+			engineObject->m_hitNormal.x = reinterpret_cast<float*>(object->m_localBase)[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x4B:
+			engineObject->ResetDynamics();
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x41:
+			engineObject->m_bgDownDist = 0.5f / static_cast<float>(static_cast<int>(object->m_localBase[0]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x82:
 			engineObject->PlayAnim(static_cast<int>(object->m_localBase[0]), 0, 1, -1, -1, 0);
 			PushValue(this, object, 0);
@@ -1573,11 +1578,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x8B:
 			engineObject->m_moveModePrevious = static_cast<unsigned char>(object->m_localBase[0]);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x8C:
-			engineObject->LookAt(object->m_localBase[0] != 0 ? FindRuntimeObject(this, object->m_localBase[0]) : 0, RuntimeString(this, object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

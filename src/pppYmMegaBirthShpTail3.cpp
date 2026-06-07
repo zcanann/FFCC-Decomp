@@ -624,17 +624,27 @@ scalar:
                 scale = pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF();
                 break;
             case 2:
-                scale = Math.RandF() * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF());
+            {
+                float rand1 = Math.RandF();
+                scale = rand1 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF());
                 break;
+            }
             case 3:
                 scale = -(FLOAT_803305D0 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF()) - pYmMegaBirthShpTail3->m_speedRandRange);
                 break;
             case 4:
-                scale = Math.RandF() * (Math.RandF() * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF()));
+            {
+                float rand1 = Math.RandF();
+                float rand2 = Math.RandF();
+                scale = rand1 * (rand2 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF()));
                 break;
+            }
             case 5:
-                scale = -(FLOAT_803305D4 * (Math.RandF() * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF())) - pYmMegaBirthShpTail3->m_speedRandRange);
+            {
+                float rand1 = Math.RandF();
+                scale = -(FLOAT_803305D4 * (rand1 * (pYmMegaBirthShpTail3->m_speedRandRange * Math.RandF() * Math.RandF())) - pYmMegaBirthShpTail3->m_speedRandRange);
                 break;
+            }
             }
 
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);

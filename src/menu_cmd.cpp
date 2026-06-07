@@ -107,55 +107,79 @@ extern "C" const char* s_SkillStr_sp[];
 
 namespace {
 
-static inline const char* GetLocalizedStrikeName(int itemId)
+static inline const char* GetStrikeListName(int itemId)
 {
-	int idx = -1;
-	if (itemId == 0x207) {
-		idx = 0;
-	} else if (itemId == 0x20B) {
-		idx = 1;
-	} else if (itemId == 0x20F) {
-		idx = 2;
-	} else if (itemId == 0x222) {
-		idx = 3;
-	} else if (itemId == 0x227) {
-		idx = 4;
+	switch (itemId) {
+	case 0x207:
+		switch (Game.m_gameWork.m_languageId) {
+		case 2:
+			return s_SkillStr_ge[0];
+		case 3:
+			return s_SkillStr_it[0];
+		case 4:
+			return s_SkillStr_fr[0];
+		case 5:
+			return s_SkillStr_sp[0];
+		default:
+			return s_SkillStr_us[0];
+		}
+	case 0x20B:
+		switch (Game.m_gameWork.m_languageId) {
+		case 2:
+			return s_SkillStr_ge[1];
+		case 3:
+			return s_SkillStr_it[1];
+		case 4:
+			return s_SkillStr_fr[1];
+		case 5:
+			return s_SkillStr_sp[1];
+		default:
+			return s_SkillStr_us[1];
+		}
+	case 0x20F:
+		switch (Game.m_gameWork.m_languageId) {
+		case 2:
+			return s_SkillStr_ge[2];
+		case 3:
+			return s_SkillStr_it[2];
+		case 4:
+			return s_SkillStr_fr[2];
+		case 5:
+			return s_SkillStr_sp[2];
+		default:
+			return s_SkillStr_us[2];
+		}
+	case 0x222:
+		switch (Game.m_gameWork.m_languageId) {
+		case 2:
+			return s_SkillStr_ge[3];
+		case 3:
+			return s_SkillStr_it[3];
+		case 4:
+			return s_SkillStr_fr[3];
+		case 5:
+			return s_SkillStr_sp[3];
+		default:
+			return s_SkillStr_us[3];
+		}
+	case 0x227:
+		switch (Game.m_gameWork.m_languageId) {
+		case 2:
+			return s_SkillStr_ge[4];
+		case 3:
+			return s_SkillStr_it[4];
+		case 4:
+			return s_SkillStr_fr[4];
+		case 5:
+			return s_SkillStr_sp[4];
+		default:
+			return s_SkillStr_us[4];
+		}
+	default: {
+		char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
+		return flatText[itemId * 5 + 4];
 	}
-
-	if (idx < 0) {
-		return 0;
 	}
-
-	const char** names = s_SkillStr_us;
-	switch (Game.m_gameWork.m_languageId) {
-	case 2:
-		names = s_SkillStr_ge;
-		break;
-	case 3:
-		names = s_SkillStr_it;
-		break;
-	case 4:
-		names = s_SkillStr_fr;
-		break;
-	case 5:
-		names = s_SkillStr_sp;
-		break;
-	default:
-		break;
-	}
-
-	return names[idx];
-}
-
-static inline const char* GetUniteListName(int itemId)
-{
-	const char* localized = GetLocalizedStrikeName(itemId);
-	if (localized != 0 && localized[0] != '\0') {
-		return localized;
-	}
-
-	char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
-	return flatText[itemId * 5 + 4];
 }
 
 struct CmdListEntry {
@@ -2359,7 +2383,7 @@ void CMenuPcs::DrawUniteList()
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color);
 
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
-		const char* text = GetUniteListName(itemId);
+		const char* text = GetStrikeListName(itemId);
 		const float width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX((static_cast<float>(panel->width) - width) *
 		                  static_cast<float>(DOUBLE_80332a60) +

@@ -1038,13 +1038,20 @@ comm_fail:
             else
             {
                 int status = GBAGetStatus(channel, param + 0xC0);
-                if (status == 0 && param[0xC0] == 0x28)
+                if (status == 0)
                 {
-                    status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
-                    if (status == 0)
+                    if (param[0xC0] == 0x28)
                     {
-                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
-                        param[0xC3] = 1;
+                        status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                        if (status == 0)
+                        {
+                            *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                            param[0xC3] = 1;
+                        }
+                    }
+                    else
+                    {
+                        status = 1;
                     }
                 }
                 if (status == 0 &&
@@ -1061,7 +1068,14 @@ comm_fail:
                         status = GBAWrite(channel, self + 0x1344, param + 0xC0);
                         if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
                         {
-                            status = (param[0xC0] == 0x30) ? 0 : 1;
+                            if (param[0xC0] == 0x30)
+                            {
+                                status = 0;
+                            }
+                            else
+                            {
+                                status = 1;
+                            }
                         }
                     }
                     else
@@ -1116,13 +1130,20 @@ comm_fail:
         if (ret == 0)
         {
             int status = GBAGetStatus(channel, param + 0xC0);
-            if (status == 0 && param[0xC0] == 0x28)
+            if (status == 0)
             {
-                status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
-                if (status == 0)
+                if (param[0xC0] == 0x28)
                 {
-                    *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
-                    param[0xC3] = 1;
+                    status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                    if (status == 0)
+                    {
+                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                        param[0xC3] = 1;
+                    }
+                }
+                else
+                {
+                    status = 1;
                 }
             }
             if (status == 0 &&
@@ -1138,7 +1159,14 @@ comm_fail:
                     status = GBAWrite(channel, self + 0x1344, param + 0xC0);
                     if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
                     {
-                        status = (param[0xC0] == 0x30) ? 0 : 1;
+                        if (param[0xC0] == 0x30)
+                        {
+                            status = 0;
+                        }
+                        else
+                        {
+                            status = 1;
+                        }
                     }
                 }
                 else

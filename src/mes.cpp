@@ -572,13 +572,13 @@ void CMes::Draw()
 			{
 				if ((unsigned int)*(unsigned char*)(glyph + 4) < 0x20)
 				{
-					unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
 					if (font != 0)
 					{
 						font->DrawQuit();
 					}
 					MenuPcs.DrawInit();
 
+					unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
 					int iconId = ch;
 					switch (ch + 0x48)
 					{

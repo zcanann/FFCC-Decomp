@@ -1108,7 +1108,7 @@ void CMenuPcs::drawSingleMenu()
         gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332A20);
         DrawInit();
 
-        u8 menuType = SingleCaravanWork()->m_shopRequestState;
+        char menuType = SingleCaravanWork()->m_shopRequestState;
         if (menuType == 1) {
             if (m_shopMenu != 0) {
                 m_shopMenu->Draw();

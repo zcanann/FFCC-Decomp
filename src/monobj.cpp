@@ -3038,9 +3038,10 @@ void CGMonObj::statAround()
 		if (homeRange > homeDist) {
 			if (monObj->m_unk6BD != 0) {
 				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
-				int nearTarget = monObj->getNearParty(6, 0, object->m_rotBaseY, reacquireRange, -1);
-				if (nearTarget >= 0) {
-					targetPartyIndex = nearTarget;
+				int hitPartyIndex;
+				monObj->checkCol(6, object->m_rotBaseY, reacquireRange, (float*)NULL, &hitPartyIndex);
+				if (hitPartyIndex >= 0) {
+					targetPartyIndex = hitPartyIndex;
 					monObj->m_unk6BD = 0;
 				}
 			}

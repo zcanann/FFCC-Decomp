@@ -123,6 +123,6 @@ void pppConstructLerpPos(_pppPObject* object, _pppCtrlTable* ctrl)
     *work = 0;
 }
 
-extern const float FLOAT_80331bf8 = 0.0f;
-extern const float FLOAT_80331bfc = 1.0f;
-extern const double DOUBLE_80331C00 = 4503599627370496.0;
+extern const float kPppLerpPosZero = 0.0f;
+extern const float kPppLerpPosOne = 1.0f;
+extern const double kPppLerpPosIntToDoubleBias = 4503599627370496.0;

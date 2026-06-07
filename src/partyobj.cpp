@@ -2422,13 +2422,13 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (doInit != 0) {
-		party.flags.flag40 = (targetSide != 0);
+		party.flags.flag40 = targetSide;
 		party.flags.flag10 = 0;
 
 		Vec rayDir = {
-		    sinf(m_rotationY) * FLOAT_80331A98,
+		    sinf(m_rotTargetY) * FLOAT_80331A98,
 		    FLOAT_80331a78,
-		    cosf(m_rotationY) * FLOAT_80331A98,
+		    cosf(m_rotTargetY) * FLOAT_80331A98,
 		};
 		bool bossStage = false;
 		bool bossCid = false;

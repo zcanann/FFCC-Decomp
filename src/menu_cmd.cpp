@@ -967,6 +967,7 @@ void CMenuPcs::CmdDraw()
 			float y = static_cast<float>(entry->y);
 			const float w = static_cast<float>(entry->width);
 			float h = static_cast<float>(entry->height);
+			const float u = entry->u;
 			float t = FLOAT_80332ad0;
 
 			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
@@ -990,7 +991,7 @@ void CMenuPcs::CmdDraw()
 				GXSetChanMatColor(GX_COLOR0A0, boxColor);
 
 				MenuPcs.DrawRect(
-				    0, x, y, w, h, entry->u, t, entry->scale, entry->scale, 0.0f);
+				    0, x, y, w, h, u, t, entry->scale, entry->scale, 0.0f);
 			}
 		}
 		entry++;

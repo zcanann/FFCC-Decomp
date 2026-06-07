@@ -2436,7 +2436,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 			bossStage = true;
 		}
-		if (bossStage && ((GetCID() & 0x6D) == 0x6D)) {
+		if (bossStage && ((__cntlzw(0x6D - (static_cast<unsigned short>(GetCID()) & 0x6D)) >> 5 & 0xFF) != 0)) {
 			bossCid = true;
 		}
 		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {

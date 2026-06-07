@@ -860,12 +860,12 @@ done:
     zeroVec.x = 0.0f;
     zeroVec.y = 0.0f;
     zeroVec.z = 0.0f;
+    s16* angle = (s16*)particleData;
     Vec* history = (Vec*)((u8*)particleData + 0x80);
-    s16* angle = (s16*)((u8*)particleData + 0x4c);
     for (int i = 0; i < 0x1f; i++) {
         pppCopyVector(*history, zeroVec);
         history++;
-        *angle = (s16)(rand() % 360);
+        *(s16*)((u8*)angle + 0x40) = (s16)(rand() % 360);
         angle++;
     }
 

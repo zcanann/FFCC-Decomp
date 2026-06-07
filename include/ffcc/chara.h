@@ -55,6 +55,8 @@ public:
 		~CSkin();
 
 		void Create(CChunkFile&, CMemory::CStage*);
+
+		u8 _pad[0x64];
 	};
 
 	class CAnim : public CRef

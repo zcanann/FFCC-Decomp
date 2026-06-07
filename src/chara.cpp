@@ -2827,9 +2827,6 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			if (m_data->m_skinCount != 0) {
 				m_data->m_skins =
 				    new (stage, const_cast<char*>(s_chara_cpp), 0x7F8) CChara::CSkin[m_data->m_skinCount];
-				if (m_data->m_skins != 0) {
-					memset(m_data->m_skins, 0, m_data->m_skinCount * 0x64);
-				}
 			}
 
 			unsigned int skinIndex = 0;

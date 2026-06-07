@@ -10382,32 +10382,42 @@ void CMenuPcs::DrawHelpBase(int kind, float baseAlpha)
  */
 void CMenuPcs::CalcMcObj()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	unsigned int* charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
+	unsigned int* panelState = reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + 0x550);
+	unsigned int* serial = &m_mcCtrl.m_serialHi;
 	unsigned int animCounter = 0;
+	int charaOff = 0;
 
-	for (int i = 0; i < 4; i++) {
-		unsigned int* const panelState = reinterpret_cast<unsigned int*>(worldObj + 0x550 + i * 0x50);
-		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(FLOAT_80331480);
+	const long long zPos = static_cast<long long>(static_cast<int>(FLOAT_80331480));
+	const double yBase = DOUBLE_80331488;
+	const double yScale = DOUBLE_80331498;
+	const double intBias = DOUBLE_80331408;
+	const double yOffset = DOUBLE_80331490;
+	const float yShift = FLOAT_803314A0;
+	const double scaleXY = static_cast<double>(FLOAT_803313dc);
+	const double scaleZ = static_cast<double>(FLOAT_803314a4);
+	const double animLimit = DOUBLE_803314a8;
+
+	do {
+		*reinterpret_cast<short*>(panelState + 2) = static_cast<short>(zPos);
 
 		const int y = static_cast<int>(
-		    static_cast<float>(DOUBLE_80331488 + DOUBLE_80331498 * static_cast<double>(animCounter) + DOUBLE_80331490) -
-		    FLOAT_803314A0);
+		    static_cast<float>(yBase + yScale * static_cast<double>(animCounter) + yOffset) - yShift);
 		*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(panelState) + 0xA) = static_cast<short>(y);
 		*reinterpret_cast<unsigned short*>(panelState + 3) = 0x140;
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(panelState) + 0xE) = 0xE0;
-		reinterpret_cast<float*>(panelState)[4] = FLOAT_803313dc;
-		reinterpret_cast<float*>(panelState)[5] = FLOAT_803313dc;
-		reinterpret_cast<float*>(panelState)[6] = FLOAT_803314a4;
+		reinterpret_cast<float*>(panelState)[4] = static_cast<float>(scaleXY);
+		reinterpret_cast<float*>(panelState)[5] = static_cast<float>(scaleXY);
+		reinterpret_cast<float*>(panelState)[6] = static_cast<float>(scaleZ);
 
+		unsigned int* const charaState = reinterpret_cast<unsigned int*>(m_wmCharaState);
 		panelState[1]++;
-		if (DOUBLE_803314a8 * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
-		    static_cast<double>(static_cast<float>(panelState[1]))) {
+		if (animLimit * static_cast<double>(gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
+		    static_cast<double>(static_cast<float>(static_cast<int>(panelState[1])))) {
 			panelState[1] = 0;
 		}
 
-		if (static_cast<int>(charaState[i * 0x12 + 2]) > 0) {
+		if (static_cast<int>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(charaState) + charaOff + 8)) >
+		    0) {
 			panelState[0] = 1;
 			reinterpret_cast<float*>(panelState)[7] = FLOAT_803314B0;
 			reinterpret_cast<float*>(panelState)[8] = FLOAT_803314B4;
@@ -10418,7 +10428,7 @@ void CMenuPcs::CalcMcObj()
 			reinterpret_cast<float*>(panelState)[10] = FLOAT_803314B8;
 			reinterpret_cast<float*>(panelState)[0xB] = reinterpret_cast<float*>(panelState)[0xB] + FLOAT_803314bc;
 
-			float t = static_cast<float>(panelState[1]) / FLOAT_803314c0;
+			float t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
 			float yResult = FLOAT_803313dc;
 			if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
 				int idx = 0;
@@ -10454,7 +10464,7 @@ void CMenuPcs::CalcMcObj()
 			reinterpret_cast<float*>(panelState)[8] = reinterpret_cast<float*>(panelState)[8] + yResult;
 
 			float rotResult = FLOAT_803313dc;
-			t = static_cast<float>(panelState[1]) / FLOAT_803314c0;
+			t = static_cast<float>(static_cast<int>(panelState[1])) / FLOAT_803314c0;
 			if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
 				int idx = 0;
 				float* spline = gWmModelRotationSpline;
@@ -10501,8 +10511,7 @@ void CMenuPcs::CalcMcObj()
 			rotXMtx[2][3] = reinterpret_cast<float*>(panelState)[9];
 			PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-			CChara::CModel* const model =
-			    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7B8 + i * 4) + 0x168);
+			CChara::CModel* const model = *reinterpret_cast<CChara::CModel**>(serial[0x1dd] + 0x168);
 			model->SetMatrix(scaleMtx);
 			model->CalcMatrix();
 			model->CalcSkin();
@@ -10511,7 +10520,10 @@ void CMenuPcs::CalcMcObj()
 		}
 
 		animCounter++;
-	}
+		panelState += 0x14;
+		serial += 1;
+		charaOff += 0x48;
+	} while (static_cast<int>(animCounter) < 4);
 }
 
 /*

@@ -3101,31 +3101,25 @@ int CMaterial::Set(_GXTexMapID texMapId)
     Mtx texMtx;
     PSMTXIdentity(texMtx);
 
-    int textureCount = static_cast<int>(m_textureCount);
-    CTexScroll* scroll = GetTexScroll(0);
-    CTexture** textureSlot = m_textureData.m_textures;
-    int i = 0;
-
     bool hasDualScroll = false;
-    if ((textureCount == 2) &&
-        (kTextureZero == scroll[0].m_u0) &&
-        (kTextureZero == scroll[0].m_v0) &&
-        ((kTextureZero != scroll[1].m_u0) ||
-         (kTextureZero != scroll[1].m_v0))) {
+    if ((m_textureCount == 2) &&
+        (kTextureZero == GetTexScroll(0)->m_u0) &&
+        (kTextureZero == GetTexScroll(0)->m_v0) &&
+        ((kTextureZero != GetTexScroll(1)->m_u0) ||
+         (kTextureZero != GetTexScroll(1)->m_v0))) {
         hasDualScroll = true;
     }
 
-    for (; i < textureCount; i++) {
-        CTexture* texture = *textureSlot;
-        if ((texture != 0) && ((m_singleTextureFlag == 0) || (i < 1))) {
-            TextureMan.SetTexture(texMapId, texture);
+    for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
+        if ((m_textureData.m_textures[i] != 0) &&
+            ((m_singleTextureFlag == 0) || (i < 1))) {
+            TextureMan.SetTexture(texMapId, m_textureData.m_textures[i]);
             texMapId = static_cast<_GXTexMapID>(static_cast<int>(texMapId) + 1);
 
-            float scrollU = scroll->m_u0;
-            float scrollV = scroll->m_v0;
-            if ((scrollU != kTextureZero) || ((scrollV != kTextureZero) || hasDualScroll)) {
-                texMtx[0][3] = scrollU;
-                texMtx[1][3] = scrollV;
+            if ((GetTexScroll(i)->m_u0 != kTextureZero) ||
+                ((GetTexScroll(i)->m_v0 != kTextureZero) || hasDualScroll)) {
+                texMtx[0][3] = GetTexScroll(i)->m_u0;
+                texMtx[1][3] = GetTexScroll(i)->m_v0;
 
                 if (i == 0) {
                     MaterialMan.m_curEnvTevBit |= 0x20;
@@ -3157,9 +3151,6 @@ int CMaterial::Set(_GXTexMapID texMapId)
                 MaterialMan.m_texCoordIdCur += 1;
             }
         }
-
-        textureSlot++;
-        scroll++;
     }
 
     return static_cast<int>(texMapId);

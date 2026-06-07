@@ -4223,27 +4223,20 @@ void CMenuPcs::DrawCMakeMenu()
 void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
-	if (worldState == 0) {
-		return;
-	}
-
-	const short state = worldState->m_mainState;
-	if (((state == 0) && bytes[0x12] == 0) || state >= 4) {
+	if (((m_wmWorldState->m_mainState == 0) && bytes[0x12] == 0) || m_wmWorldState->m_mainState >= 4) {
 		return;
 	}
 
 	DrawFukidashi();
-	const short step = worldState->m_frameCounter;
 	float moveAlpha;
-	if (state == 1) {
-		moveAlpha = static_cast<float>((static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
-	} else if (state == 2 && bytes[0x13] != 0) {
-		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
+	if (m_wmWorldState->m_mainState == 1) {
+		moveAlpha = static_cast<float>((static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
+	} else if (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0) {
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331408) / DOUBLE_803316e8);
 	} else {
 		moveAlpha = FLOAT_803313e8;
 	}
-	if (state > 0 && state < 3) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 3) {
 		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 		GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha))};
 		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
@@ -4253,7 +4246,7 @@ void CMenuPcs::DrawMoveMenu()
 	}
 	DrawWMFrame();
 
-	if (worldState->m_mainState > 0 && worldState->m_mainState < 3) {
+	if (m_wmWorldState->m_mainState > 0 && m_wmWorldState->m_mainState < 3) {
 		unsigned char* const worldObj = m_wm.m_worldObjData;
 		CCharaPcs::CHandle* const handle = reinterpret_cast<CCharaPcs::CHandle*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
 		Mtx savedCamera;
@@ -4326,32 +4319,32 @@ void CMenuPcs::DrawMoveMenu()
 		DrawInit();
 	}
 
-	if (worldState->m_mainState != 2 || bytes[0x13] != 0) {
-		worldState->m_frameCounter++;
+	if (m_wmWorldState->m_mainState != 2 || bytes[0x13] != 0) {
+		m_wmWorldState->m_frameCounter++;
 	}
 
-	if (worldState->m_mainState == 0 ||
-	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
-		if (static_cast<double>(worldState->m_posX) <= DOUBLE_803314f0) {
-			worldState->m_mainState++;
+	if (m_wmWorldState->m_mainState == 0 ||
+	    (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0)) {
+		if (static_cast<double>(m_wmWorldState->m_posX) <= DOUBLE_803314f0) {
+			m_wmWorldState->m_mainState++;
 			*reinterpret_cast<int*>(m_wm.m_frameData + 4) = 0;
 			*reinterpret_cast<int*>(m_wm.m_frameData + 8) = 0;
-			worldState->m_frameCounter = 0;
+			m_wmWorldState->m_frameCounter = 0;
 		}
-	} else if (worldState->m_mainState == 1 && worldState->m_frameCounter > 9) {
-		worldState->m_mainState++;
-		worldState->m_frameCounter = 0;
+	} else if (m_wmWorldState->m_mainState == 1 && m_wmWorldState->m_frameCounter > 9) {
+		m_wmWorldState->m_mainState++;
+		m_wmWorldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];
 		stackData[0].m_word = 3;
 		stackData[1].m_word = 0;
 		stackData[2].m_word = 0;
 		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-	} else if (worldState->m_mainState == 2 && worldState->m_frameCounter > 9) {
-		worldState->m_mainState++;
-		worldState->m_frameCounter = 0;
-	} else if (worldState->m_mainState == 3 && worldState->m_frameCounter > 9) {
-		worldState->m_mainState++;
-		worldState->m_frameCounter = 0;
+	} else if (m_wmWorldState->m_mainState == 2 && m_wmWorldState->m_frameCounter > 9) {
+		m_wmWorldState->m_mainState++;
+		m_wmWorldState->m_frameCounter = 0;
+	} else if (m_wmWorldState->m_mainState == 3 && m_wmWorldState->m_frameCounter > 9) {
+		m_wmWorldState->m_mainState++;
+		m_wmWorldState->m_frameCounter = 0;
 		CFlatRuntime::CStack stackData[3];
 		stackData[0].m_word = 4;
 		stackData[1].m_word = 0;

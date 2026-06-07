@@ -2110,19 +2110,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                       static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
             if ((mode & 4) != 0) {
-                CFlatPathPoint* pathPoints = m_pathPoints;
-                const int maxIndex = pointCount - 1;
-                const int segmentCount = pointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
+                const int maxIndex = m_pathPointCount - 1;
+                const int segmentCount = m_pathPointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
                 const float scaled = t * static_cast<float>(segmentCount);
                 const int baseIndex = (mode & 1) + static_cast<int>(scaled);
                 const float segmentT = std::fmodf(scaled, FLOAT_80330B34);
 
-                CVector delta = CVector(pathPoints[1].m_position) - CVector(pathPoints[0].m_position);
-                CVector startPhantom1 = CVector(pathPoints[0].m_position) - delta;
+                CVector delta = CVector(m_pathPoints[1].m_position) - CVector(m_pathPoints[0].m_position);
+                CVector startPhantom1 = CVector(m_pathPoints[0].m_position) - delta;
                 CVector startPhantom2 = startPhantom1 - delta;
-                delta = CVector(pathPoints[m_pathPointCount - 1].m_position) -
-                        CVector(pathPoints[m_pathPointCount - 2].m_position);
-                CVector endPhantom1 = CVector(pathPoints[m_pathPointCount - 1].m_position) + delta;
+                delta = CVector(m_pathPoints[m_pathPointCount - 1].m_position) -
+                        CVector(m_pathPoints[m_pathPointCount - 2].m_position);
+                CVector endPhantom1 = CVector(m_pathPoints[m_pathPointCount - 1].m_position) + delta;
                 CVector endPhantom2 = endPhantom1 + delta;
 
                 Vec* p0;
@@ -2136,34 +2135,34 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     } else if (baseIndex == 1) {
                         p0 = startPhantom1;
                     } else {
-                        p0 = &pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
+                        p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
                     }
                     if (baseIndex == 0) {
                         p1 = startPhantom1;
                     } else {
-                        p1 = &pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
+                        p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
                     }
                 } else {
-                    p0 = &pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
-                    p1 = &pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
+                    p0 = &m_pathPoints[(baseIndex - 2) < 0 ? 0 : ((baseIndex - 2) > maxIndex ? maxIndex : (baseIndex - 2))].m_position;
+                    p1 = &m_pathPoints[(baseIndex - 1) < 0 ? 0 : ((baseIndex - 1) > maxIndex ? maxIndex : (baseIndex - 1))].m_position;
                 }
 
                 if ((mode & 2) != 0) {
-                    if (baseIndex == pointCount) {
+                    if (baseIndex == m_pathPointCount) {
                         p2 = endPhantom1;
                     } else {
-                        p2 = &pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
+                        p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
                     }
-                    if (baseIndex == maxIndex) {
+                    if (baseIndex == m_pathPointCount - 1) {
                         p3 = endPhantom1;
-                    } else if (baseIndex == pointCount) {
+                    } else if (baseIndex == m_pathPointCount) {
                         p3 = endPhantom2;
                     } else {
-                        p3 = &pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
+                        p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
                     }
                 } else {
-                    p2 = &pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
-                    p3 = &pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
+                    p2 = &m_pathPoints[(baseIndex) < 0 ? 0 : ((baseIndex) > maxIndex ? maxIndex : (baseIndex))].m_position;
+                    p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
                 }
 
                 BSplineVec(result, p0, p1, p2, p3, segmentT);

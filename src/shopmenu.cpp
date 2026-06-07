@@ -264,10 +264,9 @@ static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)
     }
 
     const CCaravanWork* const caravanWork = ShopMenuCaravanWork(shopMenu);
-    unsigned int gilValue = caravanWork->m_shopParam *
+    int gilValue = caravanWork->m_shopParam *
                    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 0x24);
-    gilValue = gilValue / 100 + (gilValue >> 0x1F);
-    return gilValue - (gilValue >> 0x1F);
+    return gilValue / 100;
 }
 
 static int CalcShopMenuGilRatio(CShopMenu* shopMenu, int baseGil)
@@ -359,12 +358,13 @@ static void SetupShopMenuUnitFont(CFont* font)
     font->SetMargin(FLOAT_80332d28);
 }
 
-static void SetupShopMenuAmountFont(CFont* font, _GXColor* color)
+static void SetupShopMenuAmountFont(CFont* font)
 {
     font->SetShadow(1);
     font->SetScaleX(FLOAT_80332d28);
     font->SetScaleY(FLOAT_80332d8c);
-    font->SetColor(*color);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     font->DrawInit();
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     font->SetMargin(FLOAT_80332d64);
@@ -390,14 +390,15 @@ static void DrawShopMenuRightAlignedText(CFont* font, const char* text, float ri
     MenuPcs.DrawInit();
 }
 
-static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
+static void SetupShopMenuLabelFont(CFont* font)
 {
     font->DrawInit();
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(0);
     font->SetScaleX(FLOAT_80332d2c);
     font->SetScaleY(FLOAT_80332d28);
-    font->SetColor(*color);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
 }
 
 static inline CFont* GetShopMenuInfoPanelFont()
@@ -1131,7 +1132,7 @@ void CShopMenu::DrawItemInfo0()
             totalGil = -1;
         }
 
-        SetupShopMenuAmountFont(font, &white.color);
+        SetupShopMenuAmountFont(font);
         DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
         SetupShopMenuUnitFont(font);
@@ -1258,13 +1259,13 @@ void CShopMenu::DrawBuySellInfo()
 
     float rightPrice = FLOAT_80332d88 - unitWidth;
     float amountRightPrice = rightPrice - FLOAT_80332d5c;
-    SetupShopMenuAmountFont(font, &white);
+    SetupShopMenuAmountFont(font);
     DrawShopMenuAmount(font, totalGil, amountRightPrice, FLOAT_80332d90, 0x13);
 
     float rightMoney = FLOAT_80332d94 - unitWidth;
     float amountRightMoney = rightMoney - FLOAT_80332d5c;
     int currentMoney = ShopMenuCaravanWork(this)->m_gil;
-    SetupShopMenuAmountFont(font, &white);
+    SetupShopMenuAmountFont(font);
     DrawShopMenuAmount(font, currentMoney, amountRightMoney, FLOAT_80332d90, 0x14);
 
     SetupShopMenuUnitFont(font);
@@ -1798,7 +1799,7 @@ void CShopMenu::DrawMake()
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
 
-    drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, 0.0f, 0);
+    drawShapeSeq(0xF, 0, 0xA8, 0x4A, 0xFF, 0, 0, FLOAT_80332d9c, 0);
     MenuPcs.DrawInit();
     MenuPcs.DrawSingleIcon(m_resultItem, 0x40, 0x32, FLOAT_80332d28, 0, FLOAT_80332d28);
 
@@ -1820,12 +1821,12 @@ void CShopMenu::DrawMake()
     const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(raceText), 176.0f, 120.0f, 0x18, 0x12);
+    MenuPcs.DrawNoShadowFont(font, const_cast<char*>(raceText), 180, FLOAT_80332d58, 0x18, 0x12);
     MenuPcs.DrawInit();
 
-    float raceX = 176.0f + FLOAT_80332d5c + font->GetWidth(raceText);
+    float raceX = 180 + FLOAT_80332d5c + font->GetWidth(raceText);
     font->DrawInit();
-    MenuPcs.DrawNoShadowFont(font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
+    MenuPcs.DrawNoShadowFont(font, raceBuffer, raceX, FLOAT_80332d58, raceColor, 0x12);
     MenuPcs.DrawInit();
 
     const char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
@@ -1849,16 +1850,17 @@ void CShopMenu::DrawMake()
     MenuPcs.DrawNoShadowFont(font, const_cast<char*>(gilUnitText), FLOAT_80332e1c - gilUnitWidth, FLOAT_80332e20, 0x19, 0x12);
     MenuPcs.DrawInit();
 
-    SetupShopMenuAmountFont(font, &white.color);
+    SetupShopMenuAmountFont(font);
     int makeGil = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
     DrawShopMenuAmount(font, makeGil, FLOAT_80332e14 - gilUnitWidth - FLOAT_80332d5c - FLOAT_80332d5c, FLOAT_80332e18, 0x13);
+    SetupShopMenuAmountFont(font);
     int makeGil2 = getItemNo(m_selectedIndex) > 0 ? CalcShopMenuMakeGil(this, getItemNo(m_selectedIndex)) : 0;
     DrawShopMenuAmount(font, ShopMenuCaravanWork(this)->m_gil,
         FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18,
         (makeGil2 <= ShopMenuCaravanWork(this)->m_gil) ? 0x14 : 2);
 
     CFont* labelFont = MenuPcs.m_fonts[4];
-    SetupShopMenuLabelFont(labelFont, &white.color);
+    SetupShopMenuLabelFont(labelFont);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE), FLOAT_80332e28, FLOAT_80332e24);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY), FLOAT_80332d68, FLOAT_80332e2c);
     MenuPcs.DrawInit();
@@ -1868,7 +1870,10 @@ void CShopMenu::DrawMake()
     font->SetMargin(FLOAT_80332d28);
     font->SetShadow(1);
     font->SetScale(FLOAT_80332d28);
-    font->SetColor(white.color);
+    {
+        CColor materialsColor(0xFF, 0xFF, 0xFF, 0xFF);
+        font->SetColor(materialsColor.color);
+    }
     font->DrawInit();
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
     float materialsX = FLOAT_80332e30 - font->GetWidth(materialsText) * FLOAT_80332d78;
@@ -1894,24 +1899,24 @@ void CShopMenu::DrawMake()
         char ownedBuffer[64];
         sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
 
+        font->DrawInit();
         font->SetMargin(FLOAT_80332d28);
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
-        font->SetColor(white.color);
 
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e3c, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        SetupShopMenuAmountFont(font, &white.color);
+        SetupShopMenuAmountFont(font);
         int rightEdge = static_cast<int>(372.0f - font->GetWidth(neededBuffer));
         MenuPcs.DrawNoShadowFont(font, neededBuffer, rightEdge, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
+        font->DrawInit();
         font->SetMargin(FLOAT_80332d28);
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
-        font->SetColor(white.color);
         rightEdge = static_cast<int>(static_cast<float>(rightEdge - 8) - font->GetWidth("/"));
         font->DrawInit();
         MenuPcs.DrawNoShadowFont(font, const_cast<char*>("/"), rightEdge, rowY, 0x1B, 0x12);
@@ -1930,7 +1935,7 @@ void CShopMenu::DrawMake()
         }
         sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
 
-        SetupShopMenuAmountFont(font, &white.color);
+        SetupShopMenuAmountFont(font);
         float ownedX = 356.0f - font->GetWidth(ownedBuffer);
         MenuPcs.DrawNoShadowFont(font, ownedBuffer, ownedX, rowY, (ownedCount >= neededCount) ? 0x1B : 2, 0x12);
         MenuPcs.DrawInit();
@@ -1943,7 +1948,7 @@ void CShopMenu::DrawMake()
     drawShapeSeq(0xB, 0, 0x226, 0x168, 0xFF, 0, 0, 0.0f, 0);
     drawShapeSeq(1, 1, 0x36, 0x18C, 0xFF, 0, 0, 0.0f, 0);
 
-    SetupShopMenuLabelFont(labelFont, &white.color);
+    SetupShopMenuLabelFont(labelFont);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CRAFT), 148.0f, 332.0f);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL), 148.0f, FLOAT_80332e44);
     MenuPcs.DrawInit();

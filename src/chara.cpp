@@ -2014,12 +2014,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		beforeDrawModel(this, ModelCbUser0(this), ModelCbUser1(this), view, cullFlag);
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(this);
-	if (materialSet == 0) {
-		return;
-	}
-
-	materialSet->SetTextureSet(m_texSet);
+	ModelMaterialSet(this)->SetTextureSet(m_texSet);
 	CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
 	if (texAnimSet != 0) {
 		texAnimSet->SetTexGen();
@@ -2034,16 +2029,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 
 	CCharaMeshRaw* mesh = ModelMeshes(this);
-	CNode* nodes = ModelNodes(this);
-	const u16 meshCount = ModelMeshCount(this);
 	int lastLightEnable = -1;
 	int lastZWrite = -1;
-	BeforeMeshCallback beforeMesh = ModelBeforeMeshCallback(this);
-	AfterMeshDrawCallback afterMeshDraw = ModelAfterMeshDrawCallback(this);
-	AfterMeshEnvCallback afterMeshEnv = ModelAfterMeshEnvCallback(this);
 
-	for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_workPositions == 0 || mesh->m_data == 0) {
+	for (u32 meshIndex = 0; meshIndex < ModelMeshCount(this); meshIndex++, mesh++) {
+		if (mesh->m_workPositions == 0) {
 			continue;
 		}
 		if (meshIndex <= 0x1F && ((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
@@ -2054,7 +2044,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(this), nodes[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
+			PSMTXConcat(ModelDrawMtx(this), ModelNodes(this)[mesh->m_data->m_nodeIndex].m_mtx, meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
@@ -2084,8 +2074,8 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 			lastZWrite = zWriteEnable;
 		}
 
-		if (beforeMesh != 0) {
-			beforeMesh(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
+		if (ModelBeforeMeshCallback(this) != 0) {
+			ModelBeforeMeshCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex);
 		}
 
 		CopyCharaMaterialEnv();
@@ -2101,16 +2091,16 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		CCharaDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (int displayListIndex = static_cast<int>(mesh->m_data->m_displayListCount) - 1; displayListIndex >= 0; displayListIndex--, displayList++) {
-			if (afterMeshDraw == 0) {
-				MaterialMan.SetMaterial(materialSet, displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
+			if (ModelAfterMeshDrawCallback(this) == 0) {
+				MaterialMan.SetMaterial(ModelMaterialSet(this), displayList->m_material, (flags >> 2) & 1, (_GXTevScale)0);
 				GXCallDisplayList(displayList->m_data, displayList->m_size);
 			} else {
-				afterMeshDraw(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
+				ModelAfterMeshDrawCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, static_cast<unsigned int>(displayListIndex), meshMtx);
 			}
 		}
 
-		if (afterMeshEnv != 0) {
-			afterMeshEnv(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, meshMtx);
+		if (ModelAfterMeshEnvCallback(this) != 0) {
+			ModelAfterMeshEnvCallback(this)(this, ModelCbUser0(this), ModelCbUser1(this), meshIndex, meshMtx);
 		}
 	}
 

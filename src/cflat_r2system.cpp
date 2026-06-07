@@ -2832,11 +2832,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         int a5 = localBase[5];
         int a6 = localBase[6];
         int a7 = localBase[7];
-        if (MenuPcs.GetMesMenu(a0) == 0) {
-            if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
-            }
-        } else {
+        if (MenuPcs.GetMesMenu(a0) != 0) {
             char* message;
             if ((a3 & 0x80) == 0) {
                 message = reinterpret_cast<char*>(GetSysMes__5CGameFi(&m_flatData, a7));
@@ -2849,6 +2845,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                 message = GetNumSysMes__5CGameFv(&Game, a7);
             }
             MenuPcs.GetMesMenu(a0)->Open(message, a1, a2, a3, a4, a5, a6);
+        } else {
+            if (GetNumMes__9CFlatDataFv(&System) != 0) {
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), a0);
+            }
         }
         this->push(object, 0);
         outResult = 0;

@@ -10646,7 +10646,6 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
 	CFont* const font = m_fonts[0];
-	MenuWindowInfo* const win = m_menuWindowInfo;
 
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
@@ -10679,10 +10678,10 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			entry += 2;
 		}
-		posX = static_cast<float>(win->x) + static_cast<float>(win->width - maxWidth) * static_cast<float>(DOUBLE_803313f8);
+		posX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width - maxWidth) * static_cast<float>(DOUBLE_803313f8);
 	}
 
-	float y = static_cast<float>(win->y + 0x20);
+	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
@@ -10699,7 +10698,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 			if (winType == 0 || !noMarker) {
 				const int textWidth = font->GetWidth(textBuf);
-				posX = static_cast<float>(win->x) + static_cast<float>(win->width - textWidth) * static_cast<float>(DOUBLE_803313f8);
+				posX = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(m_menuWindowInfo->width - textWidth) * static_cast<float>(DOUBLE_803313f8);
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);

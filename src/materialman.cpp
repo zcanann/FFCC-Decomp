@@ -2690,10 +2690,10 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             newMaterial->m_textureIndices[0] = static_cast<short>(textureIndex);
             newMaterial->m_pdtSlotIndex = pdtSlotIndex;
 
-            if (materialIndex < static_cast<u32>(m_materials.GetSize())) {
-                m_materials.SetAt(materialIndex, newMaterial);
-            } else {
+            if (materialIndex >= static_cast<u32>(m_materials.GetSize())) {
                 m_materials.Add(newMaterial);
+            } else {
+                m_materials.SetAt(materialIndex, newMaterial);
             }
         }
 next:

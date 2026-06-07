@@ -1535,29 +1535,32 @@ void CMenuPcs::LetterAttachWinClose()
  */
 bool CMenuPcs::LetterConfirmOpen()
 {
+	CCaravanWork* caravanWork = GetLetterCaravanWork();
 	int languageId = Game.m_gameWork.m_languageId;
-	char** subjectTable = Game.m_cFlatDataArr[1].TableStrings(2);
 
 	if (*reinterpret_cast<char*>(GetLetterStateBase(this) + 0xC) == '\0') {
 		char lines[8][0x80];
 		memset(lines, 0, sizeof(lines));
-		CCaravanWork* caravanWork = GetLetterCaravanWork();
-		unsigned int letterWord = caravanWork->m_letters[s_SelLetter].Word0();
-		const char* title = subjectTable[(letterWord >> 9) & 0x1FF];
 		if (languageId == 3) {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else if (languageId < 3) {
 			if (languageId == 2) {
+				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 				sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
 			} else {
+				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
 			}
 		} else if (languageId == 5) {
+			const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else {
 			if (4 < languageId) {
+				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
 			} else {
+				const char* title = Game.m_cFlatDataArr[1].TableStrings(2)[caravanWork->m_letters[s_SelLetter].SenderId()];
 				sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
 			}
 		}

@@ -9843,8 +9843,7 @@ LAB_draw:
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_80331588);
 				fontF8->DrawInit();
-				unsigned int nameColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&nameColor);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x2C);
 				fontF8->SetPosX(FLOAT_80331520);
 				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
@@ -9859,8 +9858,7 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_8033158C);
 				fontF8->DrawInit();
-				unsigned int locationColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&locationColor);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 					fontF8->SetTlut(7);
 					char locationStr[64];
 					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
@@ -9890,8 +9888,7 @@ LAB_draw:
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_803313e8);
 				fontF8->DrawInit();
-				unsigned int noDataColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&noDataColor);
+				fontF8->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 				fontF8->SetTlut(0x19);
 				const unsigned int msgId = static_cast<unsigned int>(
 					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;

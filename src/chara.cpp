@@ -2986,7 +2986,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 	if (meshRef->m_skinCount == 0) {
 		mesh->m_workPositions = meshRef->m_vertices;
-		mesh->m_workNormals = meshRef->m_normals;
+		mesh->m_workNormals = mesh->m_data->m_normals;
 		return;
 	}
 

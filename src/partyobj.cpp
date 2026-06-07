@@ -4511,49 +4511,60 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x48);
 	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x4C);
 
-	if (activeTrailCount != 0) {
-		CVector unused;
-		float flatLen = 0.0f;
-		int capturedCurrent = 0;
-		unsigned char* leaderPtr = ghostWork;
+	if (activeTrailCount == 0) {
+		activeTrailCount = 0;
+		outVec->x = m_partyDelta[0].x;
+		outVec->y = m_partyDelta[0].y;
+		outVec->z = m_partyDelta[0].z;
+		outVec->y = 0.0f;
 
-		outDist = 0.0f;
-		for (int i = 0; i < activeTrailCount; i++) {
-			if (trailIndex <= i) {
-				Vec* nextPos;
-				if (i == trailIndex) {
-					nextPos = &m_worldPosition;
-				} else {
-					nextPos = reinterpret_cast<Vec*>(ghostWork + (i - 1) * 0xC + 0x50);
-				}
-				Vec delta;
-				PSVECSubtract(reinterpret_cast<Vec*>(leaderPtr + 0x50), nextPos, &delta);
-				outDist += PSVECMag(&delta);
+		outDist = PSVECMag(outVec);
+		float maxDist0 = m_partyDistance[0];
+		outDist = (outDist < maxDist0) ? outDist : maxDist0;
+		return;
+	}
 
-				delta.y = 0.0f;
-				float flatStep = PSVECMag(&delta);
-				flatLen += flatStep;
+	CVector unused;
+	float flatLen = 0.0f;
+	int capturedCurrent = 0;
+	unsigned char* leaderPtr = ghostWork;
 
-				if (!capturedCurrent && i == trailIndex) {
-					capturedCurrent = 1;
-					outVec->x = delta.x;
-					outVec->y = delta.y;
-					outVec->z = delta.z;
-					if (flatStep < m_capsuleHalfHeight) {
-						trailIndex++;
-					}
+	outDist = 0.0f;
+	for (int i = 0; i < activeTrailCount; i++) {
+		if (trailIndex <= i) {
+			Vec* nextPos;
+			if (i == trailIndex) {
+				nextPos = &m_worldPosition;
+			} else {
+				nextPos = reinterpret_cast<Vec*>(ghostWork + (i - 1) * 0xC + 0x50);
+			}
+			Vec delta;
+			PSVECSubtract(reinterpret_cast<Vec*>(leaderPtr + 0x50), nextPos, &delta);
+			outDist += PSVECMag(&delta);
+
+			delta.y = 0.0f;
+			float flatStep = PSVECMag(&delta);
+			flatLen += flatStep;
+
+			if (!capturedCurrent && i == trailIndex) {
+				capturedCurrent = 1;
+				outVec->x = delta.x;
+				outVec->y = delta.y;
+				outVec->z = delta.z;
+				if (flatStep < m_capsuleHalfHeight) {
+					trailIndex++;
 				}
 			}
-			leaderPtr += 0xC;
 		}
+		leaderPtr += 0xC;
+	}
 
-		if (outDist < flatLen) {
-			flatLen = outDist;
-		}
-		outDist = flatLen;
-		if (outDist <= DOUBLE_80331AA8) {
-			return;
-		}
+	if (outDist < flatLen) {
+		flatLen = outDist;
+	}
+	outDist = flatLen;
+	if (outDist <= DOUBLE_80331AA8) {
+		return;
 	}
 
 	activeTrailCount = 0;
@@ -4562,12 +4573,11 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	outVec->z = m_partyDelta[0].z;
 	outVec->y = 0.0f;
 
-	float dist = PSVECMag(outVec);
+	outDist = PSVECMag(outVec);
 	float maxDist = m_partyDistance[0];
-	if (dist < maxDist) {
-		maxDist = dist;
+	if (outDist >= maxDist) {
+		outDist = maxDist;
 	}
-	outDist = maxDist;
 }
 
 /*

@@ -1001,7 +1001,7 @@ void CGCharaObj::onFrameStat()
 				}
 
 				if (m_scriptHandle != 0 &&
-				    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) == 0) {
 					changeSubStat(2);
 				}
 			} else if (m_subState == 0) {
@@ -1647,7 +1647,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (staType != 4 &&
 		    !((sourceObj->GetCID() & 0xAD) == 0xAD && sourceObj->m_scriptHandle[4] == reinterpret_cast<void*>(6) && staType == 0x6A) &&
-		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 			setSta(4, 0);
 		}
 		if (scriptDefense != 0 && staType != 2 && staType != 0) {
@@ -1660,10 +1660,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if ((GetCID() & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
-		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0 && damageAmount < 1) {
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0 && damageAmount < 1) {
 			damageAmount = 1;
 		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
+		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
 		    staType != 0x1C && damageAmount < 1) {
 			damageAmount = 1;

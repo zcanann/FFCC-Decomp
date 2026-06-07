@@ -2868,7 +2868,8 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			}
 		}
 	} else if (effectArg0 == 2) {
-		seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
+		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x40);
+		seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 		if (seNo != 0) {
 			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
 			Sound.SetSe3DGroup(seHandle, m_particleId);

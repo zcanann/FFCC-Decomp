@@ -109,7 +109,7 @@ ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
     {0x1AE, 0x140, 0},
 };
 ShopMenuTopMenuEntry* s_currentShopMenuTopMenuEntry;
-unsigned char s_shopMenuTopMenuTextInitialized;
+s8 s_shopMenuTopMenuTextInitialized;
 
 enum ShopMenuTextIndex {
     SHOP_MENU_TEXT_BUY = 0,

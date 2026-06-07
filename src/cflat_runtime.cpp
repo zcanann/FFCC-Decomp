@@ -1142,11 +1142,12 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 	int copiedArgs = 0;
 	if (argCount > 0) {
 		if (argCount > 8) {
-			unsigned int batchCount = (static_cast<unsigned int>(argCount) - 1) >> 3;
+			const int batchRemaining = argCount - 8;
+			unsigned int batchCount = (static_cast<unsigned int>(batchRemaining) + 7) >> 3;
 			int byteOffset = 0;
 			CStack* batchArgs = args;
 
-			if (argCount - 8 > 0) {
+			if (batchRemaining > 0) {
 				do {
 					const int offset1 = byteOffset + 4;
 					const int offset2 = byteOffset + 8;
@@ -1158,7 +1159,6 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 					const int offset6 = byteOffset + 0x18;
 					const int offset7 = byteOffset + 0x1C;
 					byteOffset += 0x20;
-					copiedArgs += 8;
 					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset1) =
 					    batchArgs[1].m_word;
 					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset2) =
@@ -1175,6 +1175,7 @@ int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sys
 					batchArgs += 8;
 					*reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x08) + offset7) =
 					    finalArg->m_word;
+					copiedArgs += 8;
 					batchCount--;
 				} while (batchCount != 0);
 			}

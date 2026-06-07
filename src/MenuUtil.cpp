@@ -93,8 +93,8 @@ extern const double DOUBLE_803335E8 = 360.0;
 extern const double DOUBLE_803335F0 = 472.0;
 extern const float FLOAT_803335F8 = 348.0f;
 extern const float FLOAT_803335FC = 192.0f;
-extern const float FLOAT_80333600 = 556.0f;
-extern const float FLOAT_80333604 = 184.0f;
+extern const float kOptionRightIconBaseX = 556.0f;
+extern const float kOptionRightIconBaseY = 184.0f;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -1173,9 +1173,9 @@ void CMenuPcs::DrawOptionMenu()
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
 		float rightIconX = static_cast<float>(static_cast<int>(
-		    -(((kOptionSmallIconSize + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
+		    -(((kOptionSmallIconSize + kOptionRightIconBaseX) - FLOAT_803335A8) * rowCos - kOptionRightIconBaseX)));
 		float leftIconY = FLOAT_803335FC - iconWave;
-		float rightIconY = FLOAT_80333604 + iconWave;
+		float rightIconY = kOptionRightIconBaseY + iconWave;
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
@@ -1292,9 +1292,9 @@ void CMenuPcs::DrawOptionMenu()
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
 		float rightIconX = static_cast<float>(static_cast<int>(
-		    -(((kOptionSmallIconSize + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
+		    -(((kOptionSmallIconSize + kOptionRightIconBaseX) - FLOAT_803335A8) * rowCos - kOptionRightIconBaseX)));
 		float leftIconY = FLOAT_803335FC + iconWave;
-		float rightIconY = FLOAT_80333604 - iconWave;
+		float rightIconY = kOptionRightIconBaseY - iconWave;
 
 		gUtil.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);

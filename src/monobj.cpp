@@ -3336,24 +3336,51 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 
 	if (selectorType == 1) {
 		int& groupCursor = monObj->m_unk6CC;
-		while ((groupCount[groupCursor] == 0) && (groupCursor < 8)) {
+		while (groupCount[groupCursor] == 0) {
 			groupCursor += 1;
-		}
-		if (groupCursor >= 8) {
-			groupCursor = 0;
+			if (7 < groupCursor) {
+				groupCursor = 0;
+			}
 		}
 
-		unsigned int pick = Math.Rand(8);
-		unsigned int seen = 0;
-		for (int i = 0; i < 8; i++) {
-			if (groupTable[i] == static_cast<unsigned int>(groupCursor)) {
+		int pick = Math.Rand(8);
+		int seen = 0;
+		int i = 0;
+		unsigned int* groupPtr = groupTable;
+		int iter = 2;
+		do {
+			if (static_cast<unsigned int>(groupCursor) == groupPtr[0]) {
 				if (seen == pick) {
-					groupCursor = (groupCursor + 1) & 7;
+					groupCursor += 1;
 					return i;
 				}
 				seen += 1;
 			}
-		}
+			if (static_cast<unsigned int>(groupCursor) == groupPtr[1]) {
+				if (seen == pick) {
+					groupCursor += 1;
+					return i + 1;
+				}
+				seen += 1;
+			}
+			if (static_cast<unsigned int>(groupCursor) == groupPtr[2]) {
+				if (seen == pick) {
+					groupCursor += 1;
+					return i + 2;
+				}
+				seen += 1;
+			}
+			if (static_cast<unsigned int>(groupCursor) == groupPtr[3]) {
+				if (seen == pick) {
+					groupCursor += 1;
+					return i + 3;
+				}
+				seen += 1;
+			}
+			groupPtr += 4;
+			i += 4;
+			iter -= 1;
+		} while (iter != 0);
 	}
 
 	return selectedAction;

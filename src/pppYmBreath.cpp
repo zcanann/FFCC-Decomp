@@ -17,16 +17,16 @@ extern const float kCharaAnimZero;
 extern const float kCharaAnimDegToRad;
 extern const float kCharaAnimNegativeOne;
 extern const float kCharaAnimFullTurnDegrees;
-extern const float kYmBreathHalfCircleDegrees = 180.0f;
-extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
-extern const double kYmBreathIntToDoubleBias = 4503599627370496.0;
-extern const float kYmBreathSpreadScale = 2.0f;
-extern const double kYmBreathHalfChance = 0.5;
+static const float kYmBreathHalfCircleDegrees = 180.0f;
+static const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
+static const double kYmBreathIntToDoubleBias = 4503599627370496.0;
+static const float kYmBreathSpreadScale = 2.0f;
+static const double kYmBreathHalfChance = 0.5;
 extern const char sCardGameCode[] = "FFCC";
 extern const char sCardMakerCode[] = "GDS";
 extern const char sCardMachineCode[] = "GC";
 extern const char sCardVersion[] = "1.00";
-extern const float kYmBreathZero = 0.0f;
+static const float kYmBreathZero = 0.0f;
 
 static inline float LoadFloat(const float& value)
 {

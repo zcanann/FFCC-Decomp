@@ -587,7 +587,12 @@ bool CMenuPcs::LetterOpen()
 		do {
 			fVar1 = FLOAT_803330bc;
 			if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12)) {
-				if (iVar8 < *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
+				if (iVar8 >= *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
+					iVar6 = iVar6 + 1;
+					*reinterpret_cast<float*>(psVar7 + 8) = FLOAT_803330f8;
+					*reinterpret_cast<float*>(psVar7 + 0x18) = fVar1;
+					*reinterpret_cast<float*>(psVar7 + 0x1A) = fVar1;
+				} else {
 					*reinterpret_cast<int*>(psVar7 + 0x10) = *reinterpret_cast<int*>(psVar7 + 0x10) + 1;
 					*reinterpret_cast<float*>(psVar7 + 8) =
 						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
@@ -600,11 +605,6 @@ bool CMenuPcs::LetterOpen()
 						*reinterpret_cast<float*>(psVar7 + 0x1A) =
 							(*reinterpret_cast<float*>(psVar7 + 0x1E) - static_cast<float>(psVar7[1])) * fVar1;
 					}
-				} else {
-					iVar6 = iVar6 + 1;
-					*reinterpret_cast<float*>(psVar7 + 8) = FLOAT_803330f8;
-					*reinterpret_cast<float*>(psVar7 + 0x18) = fVar1;
-					*reinterpret_cast<float*>(psVar7 + 0x1A) = fVar1;
 				}
 			}
 			psVar7 += 0x20;

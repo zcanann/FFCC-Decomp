@@ -1471,26 +1471,19 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			itemKind = *reinterpret_cast<short*>(itemData + 2);
 		}
 
-		unsigned int sourceCid = sourceObj->GetCID();
-		bool selfIsPlayer = CharaObjIsPlayerCid(GetCID());
-		bool selfIsMonster = (GetCID() & 0xAD) == 0xAD;
-		bool sourceIsPlayer = CharaObjIsPlayerCid(sourceCid);
-		bool sourceIsMonster = (sourceCid & 0xAD) == 0xAD;
-		bool sourceIsPrize = (sourceCid & 0x2D) == 0x2D;
-
-		if (itemKind == 1 || (itemKind == 9 && selfIsMonster && sourceIsPlayer)) {
+		if (itemKind == 1 || (itemKind == 9 && (GetCID() & 0xAD) == 0xAD && (sourceObj->GetCID() & 0x6D) == 0x6D)) {
 			if (staType == 0x1C || staType == 4 || staType < 2) {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
 				CGPrgObj* powerSource = sourceObj;
 				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				    sourceIsPlayer && sourceObj->m_scriptHandle[0xED] != 0) {
+				    (sourceObj->GetCID() & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
 					powerSource = Game.m_partyObjArr[0];
 				}
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 8);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				unsigned int bonus = sourceIsPlayer ?
+				unsigned int bonus = (sourceObj->GetCID() & 0x6D) == 0x6D ?
 					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
 					0;
@@ -1505,7 +1498,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int basePower = (itemEffect == 0x1F8) ?
 					*reinterpret_cast<unsigned short*>(itemData + 6) :
 					0;
-				if (sourceIsPlayer && resolvedItemId == 0x206) {
+				if ((sourceObj->GetCID() & 0x6D) == 0x6D && resolvedItemId == 0x206) {
 					int castCurrent = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x644);
 					int castEnd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x648);
 					if (castEnd >= castCurrent * 3) {
@@ -1518,7 +1511,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x1E);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				unsigned int bonus = (sourceIsPlayer && itemEffect == 0x1F8) ?
+				unsigned int bonus = ((sourceObj->GetCID() & 0x6D) == 0x6D && itemEffect == 0x1F8) ?
 					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDD)) :
 					0;
@@ -1532,7 +1525,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
 
-				if (staType != 0x6A && sourceIsPlayer && selfIsMonster &&
+				if (staType != 0x6A && (sourceObj->GetCID() & 0x6D) == 0x6D && (GetCID() & 0xAD) == 0xAD &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x2E) == 0 &&
@@ -1546,7 +1539,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				int nextSta = calcSta(10, resolvedItemId, sourceObj);
 				setSta(10, nextSta);
 			}
-		} else if (itemKind == 8 || (itemKind == 9 && selfIsPlayer && sourceIsMonster)) {
+		} else if (itemKind == 8 || (itemKind == 9 && (GetCID() & 0x6D) == 0x6D && (sourceObj->GetCID() & 0xAD) == 0xAD)) {
 			if (staType == 0x1C || staType == 4 || staType < 3) {
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
@@ -1575,15 +1568,15 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				damageAmount = calcSta(10, resolvedItemId, sourceObj);
 			}
 		} else if (itemKind == 9 && (GetCID() & 0x2D) == 0x2D &&
-		           (sourceIsMonster || (sourceCid & 0x1D) == 0x1D)) {
+		           ((sourceObj->GetCID() & 0xAD) == 0xAD || (sourceObj->GetCID() & 0x1D) == 0x1D)) {
 			if (staType == 4 || staType < 2) {
 				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
-				unsigned int sourcePower = sourceIsMonster ?
+				unsigned int sourcePower = (sourceObj->GetCID() & 0xAD) == 0xAD ?
 					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 8) :
 					*reinterpret_cast<unsigned short*>(itemData + 0x30);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
 				float defenseRate = 1.0f;
-				if (sourceIsMonster) {
+				if ((sourceObj->GetCID() & 0xAD) == 0xAD) {
 					defenseRate = CharaObjGetStatusMultiplier(0x32);
 				}
 				damageAmount = static_cast<int>(defense * defenseRate);
@@ -1597,7 +1590,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 
 		if (staType != 4 &&
-		    !(sourceIsMonster && sourceObj->m_scriptHandle[4] == reinterpret_cast<void*>(6) && staType == 0x6A) &&
+		    !((sourceObj->GetCID() & 0xAD) == 0xAD && sourceObj->m_scriptHandle[4] == reinterpret_cast<void*>(6) && staType == 0x6A) &&
 		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 			setSta(4, 0);
 		}
@@ -1609,17 +1602,17 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			damageAmount = (damageAmount < 2) ? 0 : 1;
 		}
 
-		if (selfIsMonster &&
+		if ((GetCID() & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
 		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x52) == 0 && damageAmount < 1) {
 			damageAmount = 1;
 		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && selfIsMonster &&
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
 		    staType != 0x1C && damageAmount < 1) {
 			damageAmount = 1;
 		}
-		if (sourceIsPrize && static_cast<int>(sourceObj->m_capsuleHalfHeight) >= 0 &&
+		if ((sourceObj->GetCID() & 0x2D) == 0x2D && static_cast<int>(sourceObj->m_capsuleHalfHeight) >= 0 &&
 		    sourceObj->m_nearColRadius != 0.0f) {
 			damageAmount *= static_cast<int>(sourceObj->m_nearColRadius);
 		}
@@ -1631,7 +1624,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				sourceObj->bonus(1, resolvedItemId, this);
 			}
 			putHitParticleFromItem(sourceObj, resolvedItemId);
-			if (selfIsMonster) {
+			if ((GetCID() & 0xAD) == 0xAD) {
 				unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 				int seNo = *reinterpret_cast<unsigned short*>(script9 + 0x192) +
 					(*reinterpret_cast<unsigned short*>(script9 + 0x190) * 1000) + 6 +

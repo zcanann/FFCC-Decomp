@@ -528,7 +528,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
-        Vec velocity;
 
         baseDir.x = param->m_matrix[2][0];
         baseDir.y = param->m_matrix[2][1];
@@ -549,10 +548,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         particleData->m_matrix[1][0] *= *(float*)(paramBytes + 0x58);
         particleData->m_matrix[1][1] *= param->m_speedScale.x;
         particleData->m_matrix[1][2] *= param->m_speedScale.y;
-        velocity.x = particleData->m_matrix[1][0];
-        velocity.y = particleData->m_matrix[1][1];
-        velocity.z = particleData->m_matrix[1][2];
-        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
+        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]),
+                     *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
     }
 
     if (paramBytes[0x18] < 6) {

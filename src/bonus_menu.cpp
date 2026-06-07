@@ -1360,13 +1360,13 @@ void CMenuPcs::CalcSelectWait()
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
-	int animPtr = this->m_bonusAnimPtr;
 	int statePtr = this->m_bonusStatePtr;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
+	int animPtr = this->m_bonusAnimPtr;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	BonusAnimSprite* artiSprite = 0;

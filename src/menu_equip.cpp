@@ -82,6 +82,11 @@ static inline CFont* GetEquipFont(CMenuPcs* menu)
 {
 	return menu->m_fonts[4];
 }
+
+static inline float EquipIntToFloat(int value)
+{
+	return (float)value;
+}
 } // namespace
 
 /*
@@ -425,16 +430,18 @@ void CMenuPcs::EquipDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < menuData->count; i++) {
-		if (item->tex >= 0) {
-			double x = (double)(float)((double)item->x - kEquipIntToDoubleBias);
-			double y = (double)item->u;
-			double w = (double)(float)((double)item->w - kEquipIntToDoubleBias);
-			double h = (double)(float)((double)item->h - kEquipIntToDoubleBias);
-			double sx = (double)item->v;
-			int tex = item->tex;
+		int tex = item->tex;
+		if (tex >= 0) {
+			float x = (float)item->x;
+			float y = (float)item->y;
+			float w = (float)item->w;
+			float h = (float)item->h;
+			float u = item->u;
+			float v = item->v;
+			float alpha = item->alpha;
 
 			if ((listState == 1) && (i == static_cast<int>(menuState->selectedIndex))) {
-				sx = sx + h;
+				v = v + h;
 			}
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -442,12 +449,11 @@ void CMenuPcs::EquipDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (u8)(kEquipColorMax * item->alpha);
-			GXSetChanMatColor((GXChannelID)4, color);
-			MenuPcs.DrawRect(
-			    0, static_cast<float>(x), static_cast<float>((double)(float)((double)item->y - kEquipIntToDoubleBias)),
-			    static_cast<float>(w), static_cast<float>(h), static_cast<float>(y), static_cast<float>(sx),
-			    item->scale, item->scale, 0.0f);
+			color.a = (u8)(int)(kEquipColorMax * alpha);
+			GXSetChanMatColor(GX_COLOR0A0, color);
+
+			float scale = item->scale;
+			MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, kEquipZero);
 		}
 		item++;
 	}

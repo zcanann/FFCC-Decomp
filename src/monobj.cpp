@@ -1611,11 +1611,12 @@ int CGMonObj::getReplaceStat(int state)
 		if (actionType == 2) {
 			return 2;
 		}
-		if (actionType == 4) {
-			return 8;
+		if (4 < actionType) {
+			return state;
 		}
+		return 8;
 	} else {
-		state = reinterpret_cast<CGCharaObj*>(this)->getReplaceStat(state);
+		state = CGCharaObj::getReplaceStat(state);
 	}
 		break;
 	}

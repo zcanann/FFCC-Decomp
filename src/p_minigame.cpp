@@ -1727,13 +1727,13 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
         crc = crc * 2;
         if ((data & mask) != 0)
         {
-            if ((crc & 0x100) == 0)
+            if ((crc & 0x100) != 0)
             {
-                crc += 1;
+                crc ^= 0xCC;
             }
             else
             {
-                crc ^= 0xCC;
+                crc += 1;
             }
         }
         else if ((crc & 0x100) != 0)
@@ -1749,13 +1749,13 @@ static inline unsigned int MiniGameCrc8(unsigned int value)
         crc = crc * 2;
         if ((data & mask) != 0)
         {
-            if ((crc & 0x100) == 0)
+            if ((crc & 0x100) != 0)
             {
-                crc += 1;
+                crc ^= 0xCC;
             }
             else
             {
-                crc ^= 0xCC;
+                crc += 1;
             }
         }
         else if ((crc & 0x100) != 0)
@@ -1962,13 +1962,13 @@ disconnect_player:
                                         bit = bit * 2;
                                         if ((data & mask) != 0)
                                         {
-                                            if ((bit & 0x100) == 0)
+                                            if ((bit & 0x100) != 0)
                                             {
-                                                bit += 1;
+                                                bit ^= 0xCC;
                                             }
                                             else
                                             {
-                                                bit ^= 0xCC;
+                                                bit += 1;
                                             }
                                         }
                                         else if ((bit & 0x100) != 0)
@@ -1982,13 +1982,13 @@ disconnect_player:
                                         bit = bit * 2;
                                         if ((data & mask) != 0)
                                         {
-                                            if ((bit & 0x100) == 0)
+                                            if ((bit & 0x100) != 0)
                                             {
-                                                bit += 1;
+                                                bit ^= 0xCC;
                                             }
                                             else
                                             {
-                                                bit ^= 0xCC;
+                                                bit += 1;
                                             }
                                         }
                                         else if ((bit & 0x100) != 0)

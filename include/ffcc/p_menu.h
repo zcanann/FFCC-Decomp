@@ -820,7 +820,7 @@ public:
         short m_wmTransitionCode;
         signed short m_goOutLoadResult;
     };
-    unsigned char m_singleMenuCtrlResetFlag;
+    signed char m_singleMenuCtrlResetFlag;
     unsigned char m_pad873;
     int m_singleLifeTimer;
     union {

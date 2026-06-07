@@ -862,14 +862,14 @@ void CMenuPcs::InitCharaInfo()
 	int modelOffset = 0;
 	for (int i = 4; i != 0; i--) {
 		unsigned char* entry0 = m_wm.m_charaModelData + modelOffset;
-		if (*reinterpret_cast<int*>(gameData + 0x1794) == 0) {
-			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
-		} else {
+		if (*reinterpret_cast<int*>(gameData + 0x1794) != 0) {
 			int modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 100;
 			if (*reinterpret_cast<unsigned short*>(gameData + 0x17D2) != 0) {
 				modelNo = *reinterpret_cast<unsigned short*>(gameData + 0x17D0) * 200 + 200;
 			}
 			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(gameData + 0x17D4);
+		} else {
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
 		}
 
 		unsigned char* entry1 = entry0 + 0x34;

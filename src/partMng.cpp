@@ -3124,11 +3124,25 @@ void CPartMng::pppDrawIdx(int partIndex)
     partPos.z = mng->m_matrix.value[2][3];
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
-        PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-        if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
-            return;
-        }
+        goto checkCull;
+    }
 
+drawPart:
+    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
+    mng->m_sortDepth = viewPos.z;
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+    pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+    _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
+    return;
+
+checkCull:
+    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+    if (PSVECSquareMag(&cameraDelta) >= mng->m_cullRadiusSq) {
+        return;
+    }
+
+    {
         PppCullBound bound;
         float radius = mng->m_cullRadius;
         bound.m_min.x = partPos.x - radius;
@@ -3137,17 +3151,10 @@ void CPartMng::pppDrawIdx(int partIndex)
         bound.m_max.x = partPos.x + radius;
         bound.m_max.y = partPos.y + mng->m_cullYOffset;
         bound.m_max.z = partPos.z + radius;
-        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(bound.m_min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
-            return;
+        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(cameraPos, ppvCameraMatrix, FLOAT_8032FE48) != 0) {
+            goto drawPart;
         }
     }
-
-    PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-    mng->m_sortDepth = viewPos.z;
-    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-    pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
-    _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
 }
 
 /*

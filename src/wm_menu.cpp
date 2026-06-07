@@ -1873,27 +1873,20 @@ void CMenuPcs::CalcMCardMenu()
 	*reinterpret_cast<short*>(iVar12 + 0x20) = (short)iVar14;
 
 	if ((int)uVar15 < 0) {
-		double dVar22;
-		float baseWidth = (float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
+		double dVar22 = (double)(float)((int)*reinterpret_cast<short*>(frame + 8) + (int)*reinterpret_cast<short*>(frame + 4));
 		if ((int)uVar15 > -11) {
-			unsigned int absOff;
-			if ((int)uVar15 < 0) {
-				absOff = -(int)uVar15;
-			} else {
-				absOff = uVar15;
-			}
+			unsigned int uVar11 = (int)uVar15 >> 0x1f;
+			double dVar23 = (double)(float)(dVar22 * DOUBLE_803314e8 * static_cast<double>((int)((uVar11 ^ uVar15) - uVar11)));
+			unsigned int absOff = (uVar11 ^ uVar15) - uVar11;
 			if ((int)absOff < 0) absOff = 0;
 			if ((int)absOff > 10) absOff = 10;
-			double dVar23 = (double)(baseWidth * FLOAT_8033151c * (float)(int)absOff);
-			dVar22 = (double)(float)((double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4)));
+			dVar22 = (double)(float)sin((double)(FLOAT_803314bc * (float)(int)absOff * FLOAT_803316d4));
 			dVar22 = (double)(float)(dVar23 * (double)(float)dVar22);
-		} else {
-			dVar22 = (double)baseWidth;
 		}
 
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 4) - (float)dVar22);
+		iVar14 = (int)((double)(float)(int)*reinterpret_cast<short*>(frame + 4) - dVar22);
 		*reinterpret_cast<short*>(frame + 4) = (short)iVar14;
-		iVar14 = (int)((float)(int)*reinterpret_cast<short*>(frame + 0x20) + (float)dVar22);
+		iVar14 = (int)((double)(float)(int)*reinterpret_cast<short*>(frame + 0x20) + dVar22);
 		*reinterpret_cast<short*>(frame + 0x20) = (short)iVar14;
 	}
 

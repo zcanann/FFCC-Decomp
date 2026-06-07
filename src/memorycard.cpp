@@ -17,16 +17,16 @@ extern const char sCardMakerCode[];
 extern const char sCardMachineCode[];
 extern const char sCardVersion[];
 
-static const char s_dvd_gba_801DA9C0[] = "dvd/gba/";
-static const char s_ffcc_cli_bin_801DA9CC[] = "ffcc_cli.bin";
-static const char s_objdat_spt_801DA9DC[] = "objdat.spt";
-static const char s_icon_dat_801DA9E8[] = "icon.dat";
-static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
+static const char sMemoryCardGbaDvdDir[] = "dvd/gba/";
+static const char sMemoryCardGbaClientBinaryName[] = "ffcc_cli.bin";
+static const char sMemoryCardObjDataScriptName[] = "objdat.spt";
+static const char sMemoryCardIconFileName[] = "icon.dat";
+static const char sMemoryCardCommentText[] = "FF Crystal Chronicles";
 
 namespace CardConst {
-static char* MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
+static char* MC_ICONIMG_FNAME = const_cast<char*>(sMemoryCardIconFileName);
 static char* MC_FNAME = const_cast<char*>(sCardGameCode);
-static char* MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
+static char* MC_COMMENT = const_cast<char*>(sMemoryCardCommentText);
 static char* MCDAT_MAKER = const_cast<char*>(sCardMakerCode);
 static char* MCDAT_TITLE = const_cast<char*>(sCardGameCode);
 static char* MCDAT_MACHINE = const_cast<char*>(sCardMachineCode);

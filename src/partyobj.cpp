@@ -4247,33 +4247,33 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 	enableDamageCol(1);
 
 	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
-	if (party.carryObject == 0) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+	if (party.carryObject != 0) {
+		if (CFlatCenterState() == 0) {
 			if (mapId == 1) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(2, 1);
 			}
-		} else if (mapId == 1) {
+		} else {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(0x0C, 1);
+		}
+	} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		if (mapId == 1) {
 			SetAnimSlot(0, 0);
 			SetAnimSlot(1, 1);
 		} else {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x30, 1);
 		}
-	} else if (CFlatCenterState() == 0) {
-		if (mapId == 1) {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(0x0C, 1);
-		} else {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(2, 1);
-		}
+	} else if (mapId == 1) {
+		SetAnimSlot(0x25, 0);
+		SetAnimSlot(0x24, 1);
 	} else {
-		SetAnimSlot(0x0B, 0);
-		SetAnimSlot(0x0C, 1);
+		SetAnimSlot(0x25, 0);
+		SetAnimSlot(0x24, 1);
 	}
 
 	if (restoreDamageCol == 0) {
@@ -4284,7 +4284,14 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 		}
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		endPSlotBit(0x10000);
+		m_alpha = FLOAT_80331a54;
+		m_bgColMask |= 0x1000E;
+		if (restoreDamageCol == 0) {
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x48) = 0x5A;
+		}
+	} else {
 		m_alpha = FLOAT_80331A7C;
 		m_bgColMask &= 0xFFFEFFF1;
 		void* port = m_scriptHandle[0xED];
@@ -4297,13 +4304,6 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 		if (restoreDamageCol == 0) {
 			playSe3D(0x2D, 0x32, 0x96, 0, 0);
-		}
-	} else {
-		endPSlotBit(0x10000);
-		m_alpha = FLOAT_80331a54;
-		m_bgColMask |= 0x1000E;
-		if (restoreDamageCol == 0) {
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x12) = 0x5A;
 		}
 	}
 }

@@ -15,8 +15,6 @@
 
 extern "C" char* strcat(char*, const char*);
 
-extern "C" const char s_pctspctd_pcts_801DEE20[];
-
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -78,10 +76,46 @@ static int s_BackUpCur[2];
 static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
-extern "C" const char s_menu_letter_cpp[];
+extern "C" const char s_menu_letter_cpp[] = "menu_letter.cpp";
+static const char s_letterItemInfoFmt[] = "%s%s%s%s";
+static const char s_pctspctspctspcts[] = "%s%s%s%s?";
+static const char s_pctspctd_pcts_801DEE20[] = "%s%d %s?";
+
+extern "C" const char s_msg_801DEE30[] __attribute__((aligned(8))) = "The Memory Card in Slot A contains";
+extern "C" const char s_msg_801DEE54[] = "no save data for your current game,";
+extern "C" const char s_msg_801DEE78[] = "or contains corrupt data. Please";
+extern "C" const char s_msg_801DEE9C[] = "insert a Memory Card containing";
+extern "C" const char s_msg_801DEEBC[] = "valid save data into Slot A.";
+extern "C" const char s_msg_801DEEDC[] = "This game has not been saved.";
+extern "C" const char s_msg_801DEEFC[] = "You must save your game before";
+extern "C" const char s_msg_801DEF1C[] = "you can import a character.";
+extern "C" const char s_msg_801DEF38[] = "This game contains character data";
+extern "C" const char s_msg_801DEF5C[] = "that has not yet been saved.";
+extern "C" const char s_msg_801DEF7C[] = "Please insert a Memory Card with the";
+extern "C" const char s_msg_801DEFA4[] = "current game's data into Slot A.";
+extern "C" const char s_msg_801DEFC8[] = "Insert into Slot B a Memory Card";
+extern "C" const char s_msg_801DEFEC[] = "with the character data to be transferred.";
+extern "C" const char s_msg_801DF018[] = "Please do not remove either Memory Card";
+extern "C" const char s_msg_801DF040[] = "until the transfer is complete.";
+extern "C" const char s_msg_801DF060[] = "Are you sure you wish to import";
+extern "C" const char s_msg_801DF080[] = "the selected character into the";
+extern "C" const char s_msg_801DF0A0[] = "current game? The character will";
+extern "C" const char s_msg_801DF0C4[] = "be unavailable until returned.";
+extern "C" const char s_msg_801DF0E4[] = "$Yes      No";
+extern "C" const char s_msg_801DF0F4[] = "Are you sure you wish to return";
+extern "C" const char s_msg_801DF114[] = "the selected character to the";
+extern "C" const char s_msg_801DF134[] = "current game? The character's";
+extern "C" const char s_msg_801DF154[] = "guest data will be deleted.";
+extern "C" const char s_msg_801DF170[] = "Saving data to the Memory";
+extern "C" const char s_msg_801DF18C[] = "Card in Slot A. Please do";
+extern "C" const char s_msg_801DF1A8[] = "not touch the Memory Card";
+extern "C" const char s_msg_801DF1C4[] = "or the POWER Button.";
+extern "C" const char s_msg_801DF1DC[] = "Card in Slot B. Please do";
+extern "C" const char s_msg_801DF1F8[] = "A Memory Card has been removed.";
+extern "C" const char s_msg_801DF218[] = "Cancelling character transfer.";
+extern "C" const char s_msg_801DF238[] = "until the character transfer is complete.";
 
 namespace {
-static const char s_letterItemInfoFmt[] = "%s%s%s%s";
 enum {
 	kLetterTextScratchSize = 0x400,
 };

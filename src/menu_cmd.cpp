@@ -2046,10 +2046,10 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	memset(matches, -1, sizeof(matches));
-
 	unsigned int matchCount = 0;
 	if (itemKinds[selected] > 0) {
+		memset(matches, -1, sizeof(matches));
+
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;
 			for (const s16* pat = s_uniteRecipePatterns; pat[1] >= 0; pat += 6, patIdx++) {

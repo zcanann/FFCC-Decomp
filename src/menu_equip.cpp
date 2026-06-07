@@ -506,13 +506,13 @@ void CMenuPcs::EquipDraw()
 		for (int i = menuData->count; i < menuData->listEnd; i++) {
 			int tex = listItem->tex;
 			if (tex >= 0) {
-				double x = (double)(float)((double)listItem->x - kEquipIntToDoubleBias);
-				double y = (double)(float)((double)listItem->y - kEquipIntToDoubleBias);
-				double w = (double)(float)((double)listItem->w - kEquipIntToDoubleBias);
-				double h = (double)(float)((double)listItem->h - kEquipIntToDoubleBias);
-				double u = (double)listItem->u;
-				double v = (double)listItem->v;
-				double alpha = (double)listItem->alpha;
+				float x = (float)listItem->x;
+				float y = (float)listItem->y;
+				float w = (float)listItem->w;
+				float h = (float)listItem->h;
+				float u = listItem->u;
+				float v = listItem->v;
+				float alpha = listItem->alpha;
 
 				if (i == menuData->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -530,25 +530,19 @@ void CMenuPcs::EquipDraw()
 					color.g = 0xff;
 					color.b = 0xff;
 					color.a = 0xff;
-					GXSetChanMatColor((GXChannelID)4, color);
-					double fillWidth = (double)(float)(alpha * w);
-					if ((double)kEquipZero < fillWidth) {
-						MenuPcs.DrawRect(
-						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fillWidth),
-						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    kEquipOne, kEquipOne, 0.0f);
-						x = (double)(float)(x + fillWidth);
-						u = (double)(float)(u + fillWidth);
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					float fillWidth = alpha * w;
+					if (kEquipZero < fillWidth) {
+						MenuPcs.DrawRect(0, x, y, fillWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
+						x = x + fillWidth;
+						u = u + fillWidth;
 					}
-					if (((double)kEquipZero < fillWidth) && (fillWidth < w)) {
+					if ((kEquipZero < fillWidth) && (fillWidth < w)) {
 						colors[1].a = 0;
 						colors[3].a = 0;
-						double fadeWidth =
-						    (double)((float)(kEquipOneDouble / (double)listItem->duration) * (float)listItem->w);
-						MenuPcs.DrawRect(
-						    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(fadeWidth),
-						    static_cast<float>(h), static_cast<float>(u), static_cast<float>(v), colors,
-						    kEquipOne, kEquipOne, 0.0f);
+						float fadeWidth =
+						    (float)(kEquipOneDouble / (double)listItem->duration) * (float)listItem->w;
+						MenuPcs.DrawRect(0, x, y, fadeWidth, h, u, v, colors, kEquipOne, kEquipOne, kEquipZero);
 					}
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else if (tex == 0x37) {
@@ -556,17 +550,17 @@ void CMenuPcs::EquipDraw()
 					if ((idx < 1) || (letterCount <= idx)) {
 						if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = kEquipHalfDouble * alpha;
+							alpha = (float)(kEquipHalfDouble * (double)alpha);
 						}
 					} else {
 						int equipped = EquipChk((int)letter[idx]);
 						if ((equipped == 0) && (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
-							alpha = kEquipHalfDouble * alpha;
+							alpha = (float)(kEquipHalfDouble * (double)alpha);
 						}
 						if (equipped != 0) {
-							int markX = (int)(x - (double)kEquipMarkXOffset);
-							int markY = (int)((h - (double)kEquipMarkHeight) * kEquipHalfDouble + y);
+							int markX = (int)(x - kEquipMarkXOffset);
+							int markY = (int)((h - kEquipMarkHeight) * kEquipHalf + y);
 							DrawEquipMark(markX, markY, listItem->alpha);
 						}
 					}
@@ -582,11 +576,10 @@ void CMenuPcs::EquipDraw()
 					color.r = 0xff;
 					color.g = 0xff;
 					color.b = 0xff;
-					color.a = (u8)((double)kEquipColorMax * alpha);
-					GXSetChanMatColor((GXChannelID)4, color);
-					MenuPcs.DrawRect(
-					    0, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h),
-					    static_cast<float>(u), static_cast<float>(v), listItem->scale, listItem->scale, 0.0f);
+					color.a = (u8)(int)(kEquipColorMax * alpha);
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					float scale = listItem->scale;
+					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, kEquipZero);
 				}
 			}
 			listItem++;

@@ -693,17 +693,8 @@ void CChara::ChangeMogMode(int mogMode)
 extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
 
 extern "C" {
-CVector vel[4];
 unsigned char m_mogWork[0x2C];
 }
-static bool s_mogFurBaseColorsInit;
-static CColor s_mogFurColors[2];
-static bool s_mogFurNoiseColorsInit;
-static CColor s_mogFurNoise[2];
-static bool s_mogFurVelocityInit;
-static bool s_mogFurVelocityRandInit;
-static bool s_mogFurAccelInit;
-static bool s_mogFurAccelRandInit;
 static unsigned int s_mogFurRand;
 static float s_mogFurMaxY;
 
@@ -718,70 +709,6 @@ static inline float FurRandScale()
 	return kCharaFurDepthScaleBase * (FLOAT_80331164 * static_cast<float>(FurRandNext()) + kCharaFurViewDepthThreshold);
 }
 
-static inline void FurInitTextureDefaults()
-{
-	if (!s_mogFurBaseColorsInit) {
-		s_mogFurColors[0] = CColor(0x80, 0x80, 0x80, 0xFF);
-		s_mogFurColors[1] = CColor(0xF0, 0xF0, 0xF0, 0);
-		s_mogFurBaseColorsInit = true;
-	}
-
-	if (!s_mogFurNoiseColorsInit) {
-		s_mogFurNoise[0] = CColor(0, 0, 0, 0);
-		s_mogFurNoise[1] = CColor(8, 8, 8, 0);
-		s_mogFurNoiseColorsInit = true;
-	}
-
-	if (!s_mogFurVelocityInit) {
-		vel[0] = CVector(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
-		s_mogFurVelocityInit = true;
-	}
-
-	if (!s_mogFurVelocityRandInit) {
-		vel[1] = CVector(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
-		s_mogFurVelocityRandInit = true;
-	}
-
-	if (!s_mogFurAccelInit) {
-		vel[2] = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-		s_mogFurAccelInit = true;
-	}
-
-	if (!s_mogFurAccelRandInit) {
-		vel[3] = CVector(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
-		s_mogFurAccelRandInit = true;
-	}
-}
-
-static inline void FurSetupTextureCopyEnv()
-{
-	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
-	GXSetAlphaUpdate(GX_TRUE);
-	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
-	GXSetScissor(0, 0, 0x80, 0x80);
-	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	GXSetZCompLoc(GX_FALSE);
-	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-	GXSetCullMode(GX_CULL_NONE);
-	GXSetNumTevStages(1);
-	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-	GXClearVtxDesc();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GXSetTexCopySrc(0, 0, 0x80, 0x80);
-	GXSetTexCopyDst(0x80, 0x80, GX_TF_IA4, GX_FALSE);
-
-	Mtx44 projection;
-	PSMTX44Identity(projection);
-	GXSetProjection(projection, GX_ORTHOGRAPHIC);
-}
-
 static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, float scale)
 {
 	return CColor(
@@ -789,24 +716,6 @@ static inline CColor FurNoiseColor(const CColor& base, const CColor& noise, floa
 	    static_cast<unsigned char>(base.color.g + static_cast<int>(noise.color.g * scale)),
 	    static_cast<unsigned char>(base.color.b + static_cast<int>(noise.color.b * scale)),
 	    static_cast<unsigned char>(base.color.a + static_cast<int>(noise.color.a * scale)));
-}
-
-static inline void FurInitHairSet(CHairSet& hair)
-{
-	CVector scaled;
-	PSVECScale(vel[1], scaled, FurRandScale());
-	PSVECAdd(vel[0], scaled, hair.m_vec0);
-
-	PSVECScale(vel[3], scaled, FurRandScale());
-	PSVECAdd(vel[2], scaled, hair.m_vec1);
-
-	hair.m_colors[0] = FurNoiseColor(s_mogFurColors[0], s_mogFurNoise[0], FurRandScale());
-	hair.m_colors[1] = FurNoiseColor(s_mogFurColors[1], s_mogFurNoise[1], FurRandScale());
-
-	float endY = hair.m_vec0.y + FLOAT_80331148 * hair.m_vec1.y;
-	if (s_mogFurMaxY < endY) {
-		s_mogFurMaxY = endY;
-	}
 }
 
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
@@ -1731,11 +1640,31 @@ void CChara::makeFurTex()
 {
 	CHairSet hairSet[0x20];
 
-	FurInitTextureDefaults();
+	static CColor furBaseColor(0x80, 0x80, 0x80, 0xFF), furTipColor(0xF0, 0xF0, 0xF0, 0);
+	static CColor furNoiseBase(0, 0, 0, 0), furNoiseRange(8, 8, 8, 0);
+	static CVector velBase(kCharaFurDepthZero, FLOAT_80331160, kCharaFurDepthZero);
+	static CVector velRand(kCharaFurDepthZero, kYmEnvQuarter, kCharaFurDepthZero);
+	static CVector accelBase(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+	static CVector accelRand(kCharaFurDepthZero, kCharaFurDepthZero, kCharaFurDepthZero);
+
 	s_mogFurRand = 0;
+	s_mogFurMaxY = 0.0f;
 
 	for (int i = 0; i < 0x20; i++) {
-		FurInitHairSet(hairSet[i]);
+		CVector scaled;
+		PSVECScale(velRand, scaled, FurRandScale());
+		PSVECAdd(velBase, scaled, hairSet[i].m_vec0);
+
+		PSVECScale(accelRand, scaled, FurRandScale());
+		PSVECAdd(accelBase, scaled, hairSet[i].m_vec1);
+
+		hairSet[i].m_colors[0] = FurNoiseColor(furBaseColor, furNoiseBase, FurRandScale());
+		hairSet[i].m_colors[1] = FurNoiseColor(furTipColor, furNoiseRange, FurRandScale());
+
+		float endY = hairSet[i].m_vec0.y + FLOAT_80331148 * hairSet[i].m_vec1.y;
+		if (s_mogFurMaxY < endY) {
+			s_mogFurMaxY = endY;
+		}
 	}
 
 	GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
@@ -1791,14 +1720,14 @@ void CChara::makeFurTex()
 		float layerFactor = static_cast<float>(layer) * FLOAT_8033115C;
 		layerFactor = layerFactor * layerFactor;
 		CColor layerColor(
-		    static_cast<unsigned char>(static_cast<int>(s_mogFurColors[0].color.r * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(s_mogFurColors[1].color.r * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(s_mogFurColors[0].color.g * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(s_mogFurColors[1].color.g * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(s_mogFurColors[0].color.b * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(s_mogFurColors[1].color.b * layerFactor)),
-		    static_cast<unsigned char>(static_cast<int>(s_mogFurColors[0].color.a * (kCharaFurDepthScaleBase - layerFactor)) +
-		                               static_cast<int>(s_mogFurColors[1].color.a * layerFactor)));
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.r * (kCharaFurDepthScaleBase - layerFactor)) +
+		                               static_cast<int>(furTipColor.color.r * layerFactor)),
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.g * (kCharaFurDepthScaleBase - layerFactor)) +
+		                               static_cast<int>(furTipColor.color.g * layerFactor)),
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.b * (kCharaFurDepthScaleBase - layerFactor)) +
+		                               static_cast<int>(furTipColor.color.b * layerFactor)),
+		    static_cast<unsigned char>(static_cast<int>(furBaseColor.color.a * (kCharaFurDepthScaleBase - layerFactor)) +
+		                               static_cast<int>(furTipColor.color.a * layerFactor)));
 		Graphic.SetCopyClear(layerColor, 0xFFFFFF);
 		GXCopyTex(static_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000, GX_TRUE);
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);

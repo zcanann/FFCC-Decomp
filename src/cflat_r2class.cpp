@@ -779,8 +779,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -6: {
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			CVector position(params[0], params[1], params[2]);
-			engineObject->SetPosBG(position, 1);
+			engineObject->SetPosBG(CVector(params[0], params[1], params[2]), 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

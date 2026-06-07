@@ -737,46 +737,56 @@ void CMenuPcs::EquipCtrl()
 			entry++;
 		}
 
-		itemCount = caravanWork->m_numCmdListSlots;
+		unsigned int slotCount = (unsigned int)caravanWork->m_numCmdListSlots;
 		index = 0;
-		EquipOpenAnim* entries = GetEquipListStorage(this)->entries;
-		int setupIndex = itemCount - 1;
-		if (setupIndex > -1) {
-			blockCount = (unsigned int)itemCount >> 3;
+		int byteOff = (slotCount - 1) * 0x40;
+		if (-1 < (int)(slotCount - 1)) {
+			blockCount = slotCount >> 3;
 			if (blockCount != 0) {
 				do {
-					EquipOpenAnim* setupEntry = entries + setupIndex;
-					setupEntry[0].startFrame = index++;
-					setupEntry[0].duration = 3;
-					setupEntry[-1].startFrame = index++;
-					setupEntry[-1].duration = 3;
-					setupEntry[-2].startFrame = index++;
-					setupEntry[-2].duration = 3;
-					setupEntry[-3].startFrame = index++;
-					setupEntry[-3].duration = 3;
-					setupEntry[-4].startFrame = index++;
-					setupEntry[-4].duration = 3;
-					setupEntry[-5].startFrame = index++;
-					setupEntry[-5].duration = 3;
-					setupEntry[-6].startFrame = index++;
-					setupEntry[-6].duration = 3;
-					setupEntry[-7].startFrame = index++;
-					setupEntry[-7].duration = 3;
-					setupIndex -= 8;
+					int p;
+					p = *(int*)&this->m_equipList + byteOff + 8;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0x38;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0x78;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0xb8;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0xf8;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0x138;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = *(int*)&this->m_equipList + byteOff + -0x178;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
+					p = byteOff + -0x1b8;
+					byteOff = byteOff + -0x200;
+					p = *(int*)&this->m_equipList + p;
+					*(int*)(p + 0x24) = index++;
+					*(int*)(p + 0x28) = 3;
 					blockCount = blockCount - 1;
 				} while (blockCount != 0);
-				itemCount = itemCount & 7;
-				if (itemCount == 0) {
+				slotCount = slotCount & 7;
+				if (slotCount == 0) {
 					return;
 				}
 			}
 			do {
-				entries[setupIndex].startFrame = index;
+				int p2 = byteOff + 8;
+				byteOff = byteOff + -0x40;
+				p2 = *(int*)&this->m_equipList + p2;
+				*(int*)(p2 + 0x24) = index;
 				index = index + 1;
-				entries[setupIndex].duration = 3;
-				setupIndex--;
-				itemCount = itemCount - 1;
-			} while (itemCount != 0);
+				*(int*)(p2 + 0x28) = 3;
+				slotCount = slotCount - 1;
+			} while (slotCount != 0);
 		}
 	}
 }

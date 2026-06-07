@@ -559,18 +559,30 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             float scale = speedRandRange;
 
             if (randType == 3) {
-                scale = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+                float a = Math.RandF();
+                float b = Math.RandF();
+                scale = -(FLOAT_80330590 * ((param->m_speedRandRange * b) * a) - param->m_speedRandRange);
             } else if (randType < 3) {
                 if (randType == 1) {
                     Math.RandF();
-                    scale = speedRandRange * Math.RandF();
+                    float a = Math.RandF();
+                    scale = param->m_speedRandRange * a;
                 } else if (randType != 0) {
-                    scale = Math.RandF() * (speedRandRange * Math.RandF());
+                    float a = Math.RandF();
+                    float b = Math.RandF();
+                    scale = (param->m_speedRandRange * b) * a;
                 }
             } else if (randType == 5) {
-                scale = -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
+                float a = Math.RandF();
+                float b = Math.RandF();
+                float c = Math.RandF();
+                scale = -(FLOAT_80330568 * (c * ((param->m_speedRandRange * b) * a)) - param->m_speedRandRange);
             } else if (randType < 5) {
-                scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
+                float a = Math.RandF();
+                float b = Math.RandF();
+                float c = Math.RandF();
+                float d = Math.RandF();
+                scale = d * (c * ((param->m_speedRandRange * b) * a));
             }
 
             Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);

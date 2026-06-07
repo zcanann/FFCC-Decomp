@@ -353,7 +353,7 @@ static inline char* NodeRefAltName(CChara::CNode* node)
 	return node->m_refData->m_altName;
 }
 
-static inline u8& NodeDynParamIndex(CChara::CNode* node)
+static inline s8& NodeDynParamIndex(CChara::CNode* node)
 {
 	return node->m_refData->m_dynParamIndex;
 }
@@ -1090,7 +1090,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 
 		CNode* node = ModelNodes(this);
 		for (u32 i = 0; i < ModelNodeCount(this); i++, node++) {
-			NodeDynParamIndex(node) = 0xFF;
+			NodeDynParamIndex(node) = -1;
 		}
 
 		chunkFile.PushChunk();
@@ -1145,7 +1145,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 						chunkFile.PushChunk();
 						while (chunkFile.GetNextChunk(chunk)) {
 							if (chunk.m_id == CharaFourCC('P', 'A', 'R', 'M')) {
-								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<u8>(chunkFile.Get4());
+								NodeDynParamIndex(&ModelNodes(this)[currentNode]) = static_cast<s8>(chunkFile.Get4());
 							}
 						}
 						chunkFile.PopChunk();
@@ -1614,7 +1614,7 @@ void CChara::CModel::calcMatrix()
 			PSMTXConcat(NodeWorldMtx(parentNode), localMtx, NodeWorldMtx(node));
 		}
 
-		if (NodeDynParamIndex(node) != 0xFF) {
+		if (NodeDynParamIndex(node) >= 0) {
 			dynamics(node, parentNode);
 		}
 
@@ -1823,7 +1823,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 {
 	(void)parent;
-	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + static_cast<char>(NodeDynParamIndex(node)) * 0x24);
+	float* dynParam = reinterpret_cast<float*>(reinterpret_cast<u8*>(ModelDynParams(this)) + NodeDynParamIndex(node) * 0x24);
 
 	Vec forward;
 	{
@@ -2610,7 +2610,7 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 	    reinterpret_cast<u8*>(model->m_data->m_nodeRefData) + model->m_data->m_nodeCount * 0x94);
 	m_refData->m_index = static_cast<u16>(model->m_data->m_nodeCount);
 	m_refData->m_type = static_cast<u8>(type);
-	m_refData->m_dynParamIndex = 0xFF;
+	m_refData->m_dynParamIndex = -1;
 	m_refData->m_bindFlags = 0;
 
 	CChunkFile::CChunk chunkInfo;

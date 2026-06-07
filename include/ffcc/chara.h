@@ -142,7 +142,7 @@ public:
 			s8 m_displayIndex;              // 0x8D
 			u8 m_miscFlags;                 // 0x8E
 			u8 m_usesParentLenX;            // 0x8F
-			u8 m_dynParamIndex;             // 0x90
+			s8 m_dynParamIndex;             // 0x90
 			u8 _pad91[0x03];                // 0x91
 		};
 

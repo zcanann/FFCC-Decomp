@@ -1975,7 +1975,7 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
 {
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+    for (long i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
 
         if (shadow->m_targetEnabled[static_cast<int>(target)] == 0) {

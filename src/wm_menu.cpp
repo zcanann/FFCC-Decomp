@@ -6003,7 +6003,6 @@ void CMenuPcs::DrawFukidashi()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const bubbleData = m_wm.m_bubbleData;
 	unsigned char* const worldObj = m_wm.m_worldObjData;
-	Mtx m_cameraMatrix;
 	CFont* fontFC = m_fonts[1];
 	if (bytes[0x09] != 1) {
 		return;
@@ -6149,17 +6148,17 @@ void CMenuPcs::DrawFukidashi()
 					C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 					GXSetProjection(projMtx, GX_PERSPECTIVE);
 
-					Vec eye = { FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc };
-					Vec up = { FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc };
+					CVector eye(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+					CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 					Mtx lookAtMtx;
-					C_MTXLookAt(lookAtMtx, &eye, &up, (Vec*)(piVar10 + 4));
-					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+					C_MTXLookAt(lookAtMtx, (Vec*)(piVar10 + 4), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&eye));
+					PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
 					GXSetAlphaUpdate(0);
-					unsigned int clearColor = 0;
-					GXSetCopyClear(*(_GXColor*)&clearColor, 0xFFFFFF);
+					_GXColor clearColor = CColor(0, 0, 0, 0).color;
+					GXSetCopyClear(clearColor, 0xFFFFFF);
 					GXSetColorUpdate(1);
 					GXSetAlphaUpdate(1);
 
@@ -6188,7 +6187,7 @@ void CMenuPcs::DrawFukidashi()
 	}
 
 	if (viewportSetup) {
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(m_wm.m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		DrawInit();
 	}
 }

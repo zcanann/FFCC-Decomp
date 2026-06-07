@@ -617,8 +617,9 @@ static inline unsigned short GetGoOutInputMask()
         return 0;
     }
 
-    __cntlzw(Pad.m_debugPadPort);
-    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+    int padIndex = 0;
+    padIndex &= ~(-static_cast<int>(static_cast<unsigned int>(__cntlzw(Pad.m_debugPadPort)) >> 5));
+    return static_cast<unsigned short>(Pad.GetPadInputs()[padIndex].buttonDown[0]);
 }
 
 static inline const char* GetGoOutMessageLine(int languageId, int line)

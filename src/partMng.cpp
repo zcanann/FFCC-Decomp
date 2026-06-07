@@ -550,11 +550,12 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
+    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (pppMngSt[i].m_pppResSet == pdtSlot) {
-            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(&pppMngSt[i]));
+        if (pppMngSt->m_pppResSet == pdtSlot) {
+            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
         }
+        pppMngSt++;
     }
 
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);

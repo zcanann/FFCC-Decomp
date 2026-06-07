@@ -239,7 +239,7 @@ static bool CharaObjIsElementalStatus(unsigned int staType)
 
 static bool CharaObjIsBreakStatus(unsigned int staType)
 {
-	return staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A;
+	return staType - 0x24 < 2 || staType == 0x69 || staType == 0x6A;
 }
 
 struct CharaObjIgnoreFlagBits

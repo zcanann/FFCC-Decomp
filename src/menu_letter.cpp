@@ -1832,7 +1832,7 @@ void CMenuPcs::LetterListDraw()
 void CMenuPcs::LetterMessDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
 	int state = GetLetterStateBase(this);
@@ -1846,13 +1846,17 @@ void CMenuPcs::LetterMessDraw()
 			continue;
 		}
 
+		float x0 = static_cast<float>(panel[0]);
+		float y0 = static_cast<float>(panel[1]);
+		float x1 = static_cast<float>(panel[2]);
+		float y1 = static_cast<float>(panel[3]);
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color.color);
 		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect(
-		    0, static_cast<float>(panel[0]), static_cast<float>(panel[1]), static_cast<float>(panel[2]),
-		    static_cast<float>(panel[3]), *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
+		    0, x0, y0, x1,
+		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
 		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
 	}
 

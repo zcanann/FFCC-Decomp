@@ -574,7 +574,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
-    if ((s8)paramBytes[0x18] >= 0 && (s8)paramBytes[0x18] < 8) {
+    if ((s32)paramBytes[0x18] >= 0 && (s32)paramBytes[0x18] < 8) {
         Vec baseDir;
         s32 angles[4];
         pppFMATRIX rot;
@@ -603,8 +603,46 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
-    if ((s8)paramBytes[0x18] < 6) {
-        if ((s8)paramBytes[0x18] > 3) {
+    if ((s32)paramBytes[0x18] >= 6) {
+        if ((s32)paramBytes[0x18] >= 10) {
+            goto scalar;
+        }
+        goto path;
+    }
+    if ((s32)paramBytes[0x18] >= 4) {
+        goto mode_4_5;
+    }
+
+scalar:
+    {
+        float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
+        if (speedRandRange != kPppYmMegaBirthShpTail3Zero) {
+            u8 randType = pYmMegaBirthShpTail3->m_randType;
+            float scale = speedRandRange;
+
+            if (randType == 3) {
+                scale = -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+            } else if (randType < 3) {
+                if (randType == 1) {
+                    Math.RandF();
+                    scale = speedRandRange * Math.RandF();
+                } else if (randType != 0) {
+                    scale = Math.RandF() * (speedRandRange * Math.RandF());
+                }
+            } else if (randType == 5) {
+                scale = -(FLOAT_803305D4 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
+            } else if (randType < 5) {
+                scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
+            }
+
+            Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
+            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
+        }
+        goto done;
+    }
+
+mode_4_5:
+    {
         float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
         if (speedRandRange == kPppYmMegaBirthShpTail3Zero) {
             goto done;
@@ -672,8 +710,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_speedScaleYZ.x;
         particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_speedScaleYZ.y;
         goto done;
-        }
-    } else if ((s8)paramBytes[0x18] < 10) {
+    }
+
+path:
+    {
         float* pathBase = reinterpret_cast<float*>(pppPObject->m_drawMatrixPtr);
 
         if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
@@ -739,32 +779,6 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
             }
         }
         goto done;
-    }
-
-    {
-        float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
-        if (speedRandRange != kPppYmMegaBirthShpTail3Zero) {
-            u8 randType = pYmMegaBirthShpTail3->m_randType;
-            float scale = speedRandRange;
-
-            if (randType == 3) {
-                scale = -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
-            } else if (randType < 3) {
-                if (randType == 1) {
-                    Math.RandF();
-                    scale = speedRandRange * Math.RandF();
-                } else if (randType != 0) {
-                    scale = Math.RandF() * (speedRandRange * Math.RandF());
-                }
-            } else if (randType == 5) {
-                scale = -(FLOAT_803305D4 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
-            } else if (randType < 5) {
-                scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
-            }
-
-            Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
-        }
     }
 
 done:

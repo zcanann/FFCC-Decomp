@@ -1164,20 +1164,39 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
     unsigned int tevBit = m_curEnvTevBit & material->m_tevBit;
-    if (m_activeEnvTevBit == tevBit) {
-        if ((tevBit & 0x200) != 0) {
+    if (m_activeEnvTevBit != tevBit) {
+        m_activeEnvTevBit = tevBit;
+        GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
+        GXSetNumIndStages(0);
+        GXSetTevDirect(GX_TEVSTAGE0);
+
+    if ((tevBit & 0x400) != 0) {
+        if ((tevBit & 0x20) != 0) {
+            m_texCoordIdCur = m_texCoordIdCur - 1;
             _GXSetTevOrder(
-                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
+                0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
+        } else {
+            GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
+                              static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
+            _GXSetTevOrder(
+                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
         }
-        return;
-    }
+        _GXSetTevColorIn(0, 0xF, 0xC, 0xA, 0xF);
+        _GXSetTevColorOp(0, 0, 0, 1, 1, 0);
+        _GXSetTevAlphaIn(0, 7, 4, 5, 7);
+        _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
+        _GXSetTevSwapMode(0, 0, 0);
+        m_numTevStage = 1;
 
-    m_activeEnvTevBit = tevBit;
-    GXSetArray(GX_VA_TEX0, m_geometryArraySource, 6);
-    GXSetNumIndStages(0);
-    GXSetTevDirect(GX_TEVSTAGE0);
-
-    if ((tevBit & 0x400) == 0) {
+        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+            m_vtxDescMode = 0;
+        }
+    } else {
         if ((tevBit & 1) != 0) {
             _GXSetTevOrder(0, 0xFF, 0xFF, 4);
             _GXSetTevColorIn(
@@ -1202,17 +1221,110 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             return;
         }
 
-        if ((tevBit & 0x200) == 0) {
-            if ((tevBit & 0x800) == 0) {
-                if ((tevBit & 0x20) == 0) {
+        if ((tevBit & 0x200) != 0) {
+            GXColor tevColor2;
+            GXColor tevColor3;
+            *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
+            m_texMapIdCur = m_texMapIdCur + 1;
+            *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
+            GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
+            GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
+
+            if ((tevBit & 0x20) != 0) {
+                m_texCoordIdCur = m_texCoordIdCur - 1;
+                m_texCoordIdCurShadow = m_texScroll0TexCoord;
+            } else {
+                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
+                                  static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
+            }
+
+            _GXSetTevSwapModeTable(
+                1, 0, 3, 3, 3);
+            _GXSetTevSwapModeTable(
+                2, 2, 2, 2, 3);
+
+            GXSetTevDirect(GX_TEVSTAGE0);
+            _GXSetTevColorIn(
+                0, 0xF, 8, 4, 0xF);
+            _GXSetTevColorOp(0, 0, 0, 0, 0, 0);
+            _GXSetTevSwapMode(0, 0, 1);
+            _GXSetTevOrder(
+                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 0xFF);
+
+            GXSetTevDirect(GX_TEVSTAGE1);
+            _GXSetTevColorIn(
+                1, 0xF, 8, 6, 0);
+            _GXSetTevAlphaIn(
+                1, 7, 6, 4, 7);
+            _GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+            _GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+            _GXSetTevSwapMode(1, 0, 2);
+            _GXSetTevOrder(
+                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
+
+            GXSetTevDirect(GX_TEVSTAGE2);
+            _GXSetTevColorIn(
+                2, 0xF, 0, 0xA, 0xF);
+            _GXSetTevAlphaIn(
+                2, 7, 0, 5, 7);
+            _GXSetTevColorOp(2, 0, 0, 1, 1, 0);
+            _GXSetTevAlphaOp(2, 0, 0, 2, 1, 0);
+            _GXSetTevSwapMode(2, 0, 0);
+            _GXSetTevOrder(2, 0xFF, 0xFF, 4);
+
+            m_numTevStage = 3;
+            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
+                GXClearVtxDesc();
+                GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                m_vtxDescMode = 0;
+            }
+        } else {
+            if ((tevBit & 0x800) != 0) {
+                if ((tevBit & 0x20) != 0) {
+                    m_texCoordIdCur = m_texCoordIdCur - 1;
+                    _GXSetTevOrder(
+                        0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
+                } else {
                     GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                       static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
                     _GXSetTevOrder(
                         0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
-                } else {
+                }
+
+                _GXSetTevSwapModeTable(
+                    1, 3, 3, 3, 0);
+                _GXSetTevColorIn(
+                    0, 0xF, 8, 0xA, 0xF);
+                _GXSetTevColorOp(
+                    0, 0, 0, 1, 1, 0);
+                _GXSetTevAlphaIn(
+                    0, 7, 4, 5, 7);
+                _GXSetTevAlphaOp(
+                    0, 0, 0, 2, 1, 0);
+                _GXSetTevSwapMode(0, 0, 1);
+                m_numTevStage = 1;
+
+                if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
+                    GXClearVtxDesc();
+                    GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+                    GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+                    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+                    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+                    m_vtxDescMode = 0;
+                }
+            } else {
+                if ((tevBit & 0x20) != 0) {
                     m_texCoordIdCur = m_texCoordIdCur - 1;
                     _GXSetTevOrder(
                         0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
+                } else {
+                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
+                                      static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
+                    _GXSetTevOrder(
+                        0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
                 }
 
                 _GXSetTevColorIn(
@@ -1291,134 +1403,19 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                     m_numTevStage =
                         ((m_numTevStage & 0xFF) + 1) & 0xFF;
                 }
-            } else {
-                if ((tevBit & 0x20) == 0) {
-                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
-                                      static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
-                    _GXSetTevOrder(
-                        0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
-                } else {
-                    m_texCoordIdCur = m_texCoordIdCur - 1;
-                    _GXSetTevOrder(
-                        0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
-                }
-
-                _GXSetTevSwapModeTable(
-                    1, 3, 3, 3, 0);
-                _GXSetTevColorIn(
-                    0, 0xF, 8, 0xA, 0xF);
-                _GXSetTevColorOp(
-                    0, 0, 0, 1, 1, 0);
-                _GXSetTevAlphaIn(
-                    0, 7, 4, 5, 7);
-                _GXSetTevAlphaOp(
-                    0, 0, 0, 2, 1, 0);
-                _GXSetTevSwapMode(0, 0, 1);
-                m_numTevStage = 1;
-
-                if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
-                    GXClearVtxDesc();
-                    GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-                    GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                    m_vtxDescMode = 0;
-                }
             }
-        } else {
-            GXColor tevColor2;
-            GXColor tevColor3;
-            *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
-            m_texMapIdCur = m_texMapIdCur + 1;
-            *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
-            GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
-            GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
-
-            if ((tevBit & 0x20) == 0) {
-                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
-                                  static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
-            } else {
-                m_texCoordIdCur = m_texCoordIdCur - 1;
-                m_texCoordIdCurShadow = m_texScroll0TexCoord;
-            }
-
-            _GXSetTevSwapModeTable(
-                1, 0, 3, 3, 3);
-            _GXSetTevSwapModeTable(
-                2, 2, 2, 2, 3);
-
-            GXSetTevDirect(GX_TEVSTAGE0);
-            _GXSetTevColorIn(
-                0, 0xF, 8, 4, 0xF);
-            _GXSetTevColorOp(0, 0, 0, 0, 0, 0);
-            _GXSetTevSwapMode(0, 0, 1);
-            _GXSetTevOrder(
-                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 0xFF);
-
-            GXSetTevDirect(GX_TEVSTAGE1);
-            _GXSetTevColorIn(
-                1, 0xF, 8, 6, 0);
-            _GXSetTevAlphaIn(
-                1, 7, 6, 4, 7);
-            _GXSetTevColorOp(1, 0, 0, 0, 1, 0);
-            _GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
-            _GXSetTevSwapMode(1, 0, 2);
-            _GXSetTevOrder(
-                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
-
-            GXSetTevDirect(GX_TEVSTAGE2);
-            _GXSetTevColorIn(
-                2, 0xF, 0, 0xA, 0xF);
-            _GXSetTevAlphaIn(
-                2, 7, 0, 5, 7);
-            _GXSetTevColorOp(2, 0, 0, 1, 1, 0);
-            _GXSetTevAlphaOp(2, 0, 0, 2, 1, 0);
-            _GXSetTevSwapMode(2, 0, 0);
-            _GXSetTevOrder(2, 0xFF, 0xFF, 4);
-
-            m_numTevStage = 3;
-            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
-                GXClearVtxDesc();
-                GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                m_vtxDescMode = 0;
-            }
-        }
-    } else {
-        if ((tevBit & 0x20) == 0) {
-            GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
-                              static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
-            _GXSetTevOrder(
-                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
-        } else {
-            m_texCoordIdCur = m_texCoordIdCur - 1;
-            _GXSetTevOrder(
-                0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
-        }
-        _GXSetTevColorIn(0, 0xF,
-                                                                                                              0xC, 0xA,
-                                                                                                              0xF);
-        _GXSetTevColorOp(0, 0, 0, 1, 1, 0);
-        _GXSetTevAlphaIn(0, 7, 4,
-                                                                                                              5, 7);
-        _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
-        _GXSetTevSwapMode(0, 0, 0);
-        m_numTevStage = 1;
-
-        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            m_vtxDescMode = 0;
         }
     }
 
-    GXSetNumTexGens(((m_texCoordIdCur & 0xFF) + 1) & 0xFF);
-    GXSetNumTevStages(m_numTevStage & 0xFF);
+        GXSetNumTexGens(((m_texCoordIdCur & 0xFF) + 1) & 0xFF);
+        GXSetNumTevStages(m_numTevStage & 0xFF);
+        return;
+    }
+
+    if ((tevBit & 0x200) != 0) {
+        _GXSetTevOrder(
+            1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
+    }
 }
 
 /*

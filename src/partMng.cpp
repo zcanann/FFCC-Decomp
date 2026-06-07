@@ -1063,17 +1063,16 @@ void CPartMng::SetFp()
 
     static const int kUsbEditOffset = 0x7F0;
     static const int kResSetOffset = 0x23518;
-    static const int kRecvBuffOffset = 0x23554;
-    static const int kEditCountOffset = 0x2355C;
+    static const int kRecvBuffOffset = 0x1C8;
+    static const int kEditCountOffset = 0x4;
     static const int kPppMngOffset = 0x2A18;
     static const int kPacketStride = 0x60;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-    float* recvBuff = *reinterpret_cast<float**>(self + kRecvBuffOffset);
     PppMngSetFpRaw* mng = reinterpret_cast<PppMngSetFpRaw*>(self + kPppMngOffset);
-    for (int i = 0; i < editCount; i++) {
-        unsigned char* fpBytes = reinterpret_cast<unsigned char*>(recvBuff);
+    for (int i = 0; i < *reinterpret_cast<int*>(self + kEditCountOffset); i++) {
+        unsigned char* fpBytes = *reinterpret_cast<unsigned char**>(self + kRecvBuffOffset) + i * kPacketStride;
+        float* recvBuff = reinterpret_cast<float*>(fpBytes);
         mng->m_pppResSet = self + kResSetOffset;
 
         int fpTime = reinterpret_cast<int*>(recvBuff)[0x0B];
@@ -1139,7 +1138,6 @@ void CPartMng::SetFp()
             }
         }
 
-        recvBuff = reinterpret_cast<float*>(fpBytes + kPacketStride);
         mng = reinterpret_cast<PppMngSetFpRaw*>(reinterpret_cast<unsigned char*>(mng) + sizeof(_pppMngSt));
     }
 }

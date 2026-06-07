@@ -8949,6 +8949,7 @@ void CMenuPcs::DrawCharaName()
 	case 5:
 		emptyText = s_wmEmptyCreatingTextEs_8032E910;
 		break;
+	case 1:
 	default:
 		emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 		break;
@@ -9034,19 +9035,19 @@ void CMenuPcs::DrawCharaName()
 				const float width = font->GetWidth(text);
 				float scale = FLOAT_803313e8;
 				double xOffset = xOffsetDefault;
-				if (static_cast<double>(FLOAT_80331680) < static_cast<double>(width) * DOUBLE_803313f8) {
-					scale = static_cast<float>((static_cast<double>(width) + DOUBLE_80331510) * DOUBLE_803313f8 /
-					                          static_cast<double>(FLOAT_80331680));
-					xOffset = static_cast<float>(FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510));
+				if (static_cast<double>(width) * DOUBLE_803313f8 > static_cast<double>(FLOAT_80331680)) {
+					const float widthPlus = static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
+					scale = static_cast<float>(widthPlus * DOUBLE_803313f8 / static_cast<double>(FLOAT_80331680));
+					xOffset = static_cast<float>(FLOAT_8033155C - widthPlus);
 				}
 				const float x = static_cast<float>(xOffset * DOUBLE_803313f8 + xBase);
 				MenuPcs.DrawRect(
 				    0, x, y, FLOAT_80331680, FLOAT_80331410,
-				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, 0.0f);
+				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, FLOAT_803313dc);
 				MenuPcs.DrawRect(
 				    8, FLOAT_80331680 * scale + x, y,
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
-				                                scale, FLOAT_803313e8, 0.0f);
+				                                scale, FLOAT_803313e8, FLOAT_803313dc);
 			}
 			caravanOffset += 0xC30;
 			xCounter += 0x90;
@@ -9072,8 +9073,8 @@ void CMenuPcs::DrawCharaName()
 	const double k3f8_2 = DOUBLE_803313f8;
 	const double bias2 = DOUBLE_80331408;
 	int yCounter2 = 0;
-	int slotBase2 = 0;
 	for (int row = 0; row < 2; row++) {
+		const int slotBase2 = row * 4;
 		cvt.w.hi = 0x43300000;
 		cvt.w.lo = static_cast<unsigned int>(yCounter2) ^ 0x80000000;
 		float y = (yBase2 + static_cast<float>(cvt.d - bias2)) + yExtra2;
@@ -9087,26 +9088,25 @@ void CMenuPcs::DrawCharaName()
 		int slot = slotBase2;
 		for (int col = 0; col < 4; col++) {
 			int restoreColor = 0;
-			const short menuMode = worldState->m_menuMode;
-			unsigned char* const rawCmake = this->m_cmakeWork;
 			const char* text;
 
 			cvt.w.hi = 0x43300000;
 			cvt.w.lo = xCounter2 ^ 0x80000000;
 			const float xBase = xBase2 + static_cast<float>(cvt.d - bias2);
 
+			const int menuMode = this->m_wmWorldState->m_menuMode;
 			bool hasName;
-			if (menuMode == 8 && rawCmake != 0) {
-				hasName = *reinterpret_cast<unsigned int*>(rawCmake + cmakeOffset + 0x1A84) != 0;
+			if (menuMode == 8 && this->m_cmakeWork != 0) {
+				hasName = *reinterpret_cast<unsigned int*>(this->m_cmakeWork + cmakeOffset + 0x1A84) != 0;
 			} else {
 				hasName = *reinterpret_cast<unsigned int*>(
 				              reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x1794) != 0;
 			}
 
 			if (hasName) {
-				if (menuMode == 8 && this->m_cmakeWorkActive == 1 && rawCmake != 0) {
+				if (menuMode == 8 && this->m_cmakeWorkActive == 1 && this->m_cmakeWork != 0) {
 					memset(nameBuf, 0, 0x20);
-					memcpy(nameBuf, rawCmake + cmakeOffset + 0x15C0, 0x10);
+					memcpy(nameBuf, this->m_cmakeWork + cmakeOffset + 0x15C0, 0x10);
 					text = reinterpret_cast<const char*>(nameBuf);
 				} else {
 					text = reinterpret_cast<const char*>(reinterpret_cast<unsigned char*>(&Game) + caravanOffset + 0x17BA);
@@ -9116,27 +9116,27 @@ void CMenuPcs::DrawCharaName()
 				} else {
 					font->SetTlut(8);
 				}
-			} else if ((pendingMask & (1u << slot)) == 0) {
+			} else if ((pendingMask & (1u << slot)) != 0) {
+				font->SetTlut(0x10);
+				text = emptyText[1];
+				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
+				float blinkFade = fade;
+				if (this->m_wmWorldState->m_mainState == 2) {
+					const int absPhase = phase < 0 ? -phase : phase;
+					cvt.w.hi = 0x43300000;
+					cvt.w.lo = static_cast<unsigned int>(absPhase) ^ 0x80000000;
+					blinkFade = static_cast<float>(-(DOUBLE_80331460 * (cvt.d - DOUBLE_80331408) - DOUBLE_80331420));
+					restoreColor = 1;
+				}
+				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade)));
+				font->SetColor(blinkColor.color);
+			} else {
 				if ((activeMask & (1u << slot)) != 0) {
 					font->SetTlut(7);
 				} else {
 					font->SetTlut(8);
 				}
 				text = emptyText[0];
-			} else {
-				font->SetTlut(0x10);
-				text = emptyText[1];
-				restoreColor = worldState->m_mainState == 2 ? 1 : 0;
-				const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
-				float blinkFade = fade;
-				if (restoreColor) {
-					const int absPhase = phase < 0 ? -phase : phase;
-					cvt.w.hi = 0x43300000;
-					cvt.w.lo = static_cast<unsigned int>(absPhase) ^ 0x80000000;
-					blinkFade = static_cast<float>(-(DOUBLE_80331460 * (cvt.d - DOUBLE_80331408) - DOUBLE_80331420));
-				}
-				CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * blinkFade)));
-				font->SetColor(blinkColor.color);
 			}
 
 			const float widthDiff = xMax2 - font->GetWidth(text);
@@ -9154,7 +9154,6 @@ void CMenuPcs::DrawCharaName()
 			slot++;
 		}
 		yCounter2 += 0xB8;
-		slotBase2 += 4;
 	}
 
 	DrawInit();

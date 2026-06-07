@@ -920,9 +920,9 @@ void CPartMng::pppGet2Dpos()
     PartMngMouseRaw* raw = reinterpret_cast<PartMngMouseRaw*>(this);
 
     if (raw->requestFlag != 0) {
-        unsigned int x = raw->cursorX + 0x140;
-        unsigned int y = raw->cursorY + 0xE0;
-        if ((-1 < (int)x) && ((int)x < 0x27E) && (-1 < (int)y) && ((int)y < 0x1BE)) {
+        int x = raw->cursorX + 0x140;
+        int y = raw->cursorY + 0xE0;
+        if ((x >= 0) && (x < 0x27E) && (y >= 0) && (y < 0x1BE)) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 

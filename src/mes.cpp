@@ -30,6 +30,21 @@ static const char s_mesEmpty[] = "";
 static char* sTag54Source;
 static char sTag54Init;
 
+struct CFontRenderFlagBits
+{
+	signed char shadow : 1;
+	signed char zCompare : 1;
+	signed char zUpdate : 1;
+	signed char fixedWidth : 1;
+	signed char snapPosition : 1;
+	signed char pad : 3;
+};
+
+static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+	return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
+
 static inline int GetMesNibbleValue(const char* data)
 {
 	int low = (unsigned char)data[1] & 0x0F;
@@ -733,9 +748,9 @@ void CMes::Draw()
 					float glyphScaleY = FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11);
 					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
 					font->SetScaleY(glyphScaleY);
-					font->renderFlags = font->renderFlags & 0xF7 | 8;
+					GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
 					font->Draw((unsigned short)ch);
-					font->renderFlags &= 0xF7;
+					GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
 				}
 			}
 
@@ -1440,7 +1455,7 @@ void CMes::addString(char** text, int branchMode)
 			*(float*)glyph = mCurrentX;
 			*(short*)(glyph + 2) = (short)(int)mCurrentY;
 
-			font->renderFlags = font->renderFlags & 0xF7 | 8;
+			GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
 			float width;
 			if (uch < 0x20)
 			{
@@ -1451,7 +1466,7 @@ void CMes::addString(char** text, int branchMode)
 				width = font->GetWidth((unsigned short)uch);
 			}
 			*(float*)(glyph + 1) = width;
-			font->renderFlags = font->renderFlags & 0xF7;
+			GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
 
 			*(short*)(glyph + 3) = (short)mRevealCursor;
 			*(char*)((int)glyph + 0xF) = (mTextAlign << 4) | *(char*)((int)glyph + 0xF) & 0xF;

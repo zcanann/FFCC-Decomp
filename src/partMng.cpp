@@ -1538,12 +1538,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
 
         _pppMngSt* mng = m_pppMng;
-        int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
-        for (int i = 0; i < editCount; i++) {
-            mng->m_envColorR = self[0x168];
-            mng->m_envColorG = self[0x169];
-            mng->m_envColorB = self[0x16A];
-            mng->m_envColorA = self[0x16B];
+        int mngCount = *reinterpret_cast<int*>(self + 0x4);
+        for (int i = 0; i < mngCount; i++) {
+            *reinterpret_cast<unsigned int*>(&mng->m_envColorR) = *reinterpret_cast<unsigned int*>(self + 0x168);
             mng++;
         }
         return;

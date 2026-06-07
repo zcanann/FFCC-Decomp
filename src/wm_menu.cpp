@@ -21,6 +21,7 @@
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
+#include "ffcc/vector.h"
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/textureman.h"
 
@@ -5393,34 +5394,24 @@ double CMenuPcs::GetFcvValue(CMenuPcs::FCV fcv, float value)
  */
 void CMenuPcs::SetProjection(int mode)
 {
-	unsigned char* const worldObj = m_wm.m_worldObjData;
-	if (worldObj == 0) {
-		return;
-	}
-
-	unsigned char* const slot = worldObj + mode * 0x50;
+	unsigned char* const slot = m_wm.m_worldObjData + mode * 0x50;
 	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 
-	Vec target;
-	target.x = FLOAT_803313dc;
-	target.y = FLOAT_803313dc;
-	target.z = FLOAT_803313dc;
-	Vec up;
-	up.x = FLOAT_803313dc;
-	up.y = FLOAT_803313e8;
-	up.z = FLOAT_803313dc;
+	CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+	CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 
 	Mtx lookAtMtx;
-	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+	PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
-	_GXColor clearColor = {0, 0, 0, 0};
+	_GXColor clearColor = CColor(0, 0, 0, 0).color;
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	GXSetColorUpdate(1);
 	GXSetAlphaUpdate(1);

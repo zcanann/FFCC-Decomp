@@ -9,6 +9,7 @@
 #include "ffcc/system.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class CColor;
 class CFontMan;
@@ -682,7 +683,7 @@ public:
 
     struct WmStorage
     {
-        unsigned char m_pad744[0x774 - 0x744];
+        Mtx m_cameraMatrix;
         CCharaPcs::CHandle* m_handles[0x28];
         unsigned char* m_worldObjData;
         unsigned char* m_bubbleData;

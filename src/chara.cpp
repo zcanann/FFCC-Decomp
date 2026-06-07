@@ -1669,12 +1669,12 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 	PSMTXIdentity(out);
 
-	CNode* cur = node;
 	bool reuseAnimNode0Srt = false;
 	SRTView parentScaleSrt;
-	while (cur != 0) {
+	while (node != 0) {
 		CNode* parentNode = 0;
-		s16 parent = NodeParentIndex(cur);
+		CChara::CNode::CRefData* ref = node->m_refData;
+		s16 parent = ref->m_parentIndex;
 		if (parent < 0) {
 			parentNode = 0;
 		} else {
@@ -1682,12 +1682,10 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		}
 
 		Mtx localMtx;
-		CChara::CAnimNode* animNode0 = NodeAnimNode0(cur);
-		CChara::CAnimNode* animNode1 = NodeAnimNode1(cur);
 		bool nextReuseAnimNode0Srt = false;
 
-		if (animNode0 == 0 && animNode1 == 0) {
-			PSMTXCopy(NodeRefLocalMtx(cur), localMtx);
+		if (NodeAnimNode0(node) == 0 && NodeAnimNode1(node) == 0) {
+			PSMTXCopy(ref->m_localMtx, localMtx);
 		} else {
 			SRTView cachedParentScaleSrt = parentScaleSrt;
 			Mtx animMtx;
@@ -1712,14 +1710,14 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				           FLOAT_803301BC / parentScaleSrt.m_scale.z);
 			}
 
-			if (NodeUsesParentLenX(cur) != 0) {
+			if (ref->m_usesParentLenX != 0) {
 				localMtx[0][3] = NodeBoneLen(parentNode);
 			}
 
 			SRTView srt;
-			if (animNode1 != 0) {
-				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
-				if (AnimNodeUsesScale(animNode1)) {
+			if (NodeAnimNode1(node) != 0) {
+				NodeAnimNode1(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				if (AnimNodeUsesScale(NodeAnimNode1(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
@@ -1733,15 +1731,15 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				PSMTXConcat(localMtx, animMtx, localMtx);
 			}
 
-			if (animNode0 != 0) {
+			if (NodeAnimNode0(node) != 0) {
 				u16 nodeIndex;
 
 				if (reuseAnimNode0Srt) {
 					srt = cachedParentScaleSrt;
 				} else {
-					animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+					NodeAnimNode0(node)->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
 				}
-				nodeIndex = NodeRefIndex(cur);
+				nodeIndex = ref->m_index;
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
 				    nodeIndex == ModelChest3Index(this)) {
 					float tiltScale;
@@ -1756,7 +1754,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
 					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
 				}
-				if (AnimNodeUsesScale(animNode0)) {
+				if (AnimNodeUsesScale(NodeAnimNode0(node))) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
@@ -1780,18 +1778,18 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 
 			Math.MTXGetScale(localMtx, &targetScale);
 			if (FLOAT_803301E4 <= targetScale.x) {
-				PSVECScale(&NodePreviousScale(cur), &positionScaleA, FLOAT_803301BC - alpha);
+				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301BC - alpha);
 				PSVECScale(&targetScale, &positionScaleB, alpha);
 				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
 			} else {
 				targetScale.y = FLOAT_803301E8;
 				targetScale.z = FLOAT_803301E8;
 			}
-			PSVECScale(&NodePreviousPosition(cur), &positionScaleA, FLOAT_803301BC - alpha);
+			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301BC - alpha);
 			PSVECScale(&targetPos, &positionScaleB, alpha);
 			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
 			C_QUATMtx(&targetQuat, localMtx);
-			C_QUATSlerp(&NodePreviousQuat(cur), &targetQuat, &targetQuat, alpha);
+			C_QUATSlerp(&NodePreviousQuat(node), &targetQuat, &targetQuat, alpha);
 			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);
 			PSMTXQuat(localMtx, &targetQuat);
 			PSMTXConcat(localMtx, scaleMtx, localMtx);
@@ -1805,7 +1803,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 		if (parentNode == 0) {
 			break;
 		}
-		cur = parentNode;
+		node = parentNode;
 	}
 
 	PSMTXConcat(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(this) + 0x08), out, out);

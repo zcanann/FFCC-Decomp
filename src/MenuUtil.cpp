@@ -1503,7 +1503,8 @@ void CMenuPcs::DrawOptionMenu()
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 			unsigned int modeWidth = static_cast<unsigned int>(static_cast<float>(modePanel->m_width));
 			unsigned int modeHeight = static_cast<unsigned int>(static_cast<float>(modePanel->m_height));
-			gUtil.CalcUV(uv0.x, uv0.y, modeWidth - 0x30, uvY, modeWidth, modeHeight);
+			gUtil.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(static_cast<float>(modeWidth) - FLOAT_803335B4),
+			             uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);
 			const float modeX = static_cast<float>(
 				static_cast<int>((static_cast<float>(modeU) - 330.0f) * specialRowCos + 330.0f));

@@ -679,6 +679,7 @@ int CMenuPcs::EquipClose()
 	}
 
 	float fVar1 = kEquipZero;
+	int result = 0;
 	if (**(short**)&this->m_equipList == doneCount) {
 		item = GetEquipListStorage(this)->entries;
 		for (int j = 0; j < itemCount; j++) {
@@ -687,9 +688,9 @@ int CMenuPcs::EquipClose()
 			item->alpha = fVar1;
 			item++;
 		}
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }
 
 /*

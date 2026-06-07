@@ -145,37 +145,6 @@ static inline void LerpVec(Vec& out, const Vec& a, const Vec& b, float t)
     out.z = a.z + (b.z - a.z) * t;
 }
 
-static inline void BSplineVec(Vec& out, Vec* p0, Vec* p1, Vec* p2, Vec* p3, float t)
-{
-    Vec c3;
-    Vec c2;
-    Vec c1;
-    Vec c0;
-
-    PSVECScale(p0, &c3, FLOAT_80330B38);
-    VECMultAdd(&c3, p1, &c3, FLOAT_80330B3C);
-    VECMultAdd(&c3, p2, &c3, FLOAT_80330B40);
-    VECMultAdd(&c3, p3, &c3, FLOAT_80330B44);
-
-    PSVECScale(p0, &c2, FLOAT_80330B3C);
-    VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
-    VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
-
-    PSVECScale(p0, &c1, FLOAT_80330B40);
-    VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
-
-    PSVECScale(p0, &c0, FLOAT_80330B44);
-    VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
-    VECMultAdd(&c0, p2, &c0, FLOAT_80330B44);
-
-    PSVECScale(&c3, &c3, t);
-    PSVECAdd(&c3, &c2, &c3);
-    PSVECScale(&c3, &c3, t);
-    PSVECAdd(&c3, &c1, &c3);
-    PSVECScale(&c3, &c3, t);
-    PSVECAdd(&c3, &c0, &out);
-}
-
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
 {
     return reinterpret_cast<unsigned int*>(&gameWork.m_linkTable[0][0][0][0]);
@@ -2165,7 +2134,33 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                     p3 = &m_pathPoints[(baseIndex + 1) < 0 ? 0 : ((baseIndex + 1) > maxIndex ? maxIndex : (baseIndex + 1))].m_position;
                 }
 
-                BSplineVec(result, p0, p1, p2, p3, segmentT);
+                Vec c3;
+                Vec c2;
+                Vec c1;
+                Vec c0;
+
+                PSVECScale(p0, &c3, FLOAT_80330B38);
+                VECMultAdd(&c3, p1, &c3, FLOAT_80330B3C);
+                VECMultAdd(&c3, p2, &c3, FLOAT_80330B40);
+                VECMultAdd(&c3, p3, &c3, FLOAT_80330B44);
+
+                PSVECScale(p0, &c2, FLOAT_80330B3C);
+                VECMultAdd(&c2, p1, &c2, FLOAT_80330B48);
+                VECMultAdd(&c2, p2, &c2, FLOAT_80330B3C);
+
+                PSVECScale(p0, &c1, FLOAT_80330B40);
+                VECMultAdd(&c1, p2, &c1, FLOAT_80330B3C);
+
+                PSVECScale(p0, &c0, FLOAT_80330B44);
+                VECMultAdd(&c0, p1, &c0, FLOAT_80330B4C);
+                VECMultAdd(&c0, p2, &c0, FLOAT_80330B44);
+
+                PSVECScale(&c3, &c3, segmentT);
+                PSVECAdd(&c3, &c2, &c3);
+                PSVECScale(&c3, &c3, segmentT);
+                PSVECAdd(&c3, &c1, &c3);
+                PSVECScale(&c3, &c3, segmentT);
+                PSVECAdd(&c3, &c0, &result);
             } else {
                 switch (mode & 3) {
                 case 3:

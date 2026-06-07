@@ -46,6 +46,7 @@ extern const float FLOAT_80331994;
 extern const float FLOAT_80331998;
 extern const float FLOAT_8033199C;
 extern const float FLOAT_803319A0;
+extern const float FLOAT_803319A4;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -2856,11 +2857,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (!emittedCustom) {
-			unsigned int fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			int fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
 			if (effectArg0 == 3 && fanCount > 1) {
-				for (unsigned int i = 0; i < fanCount; i++) {
-					float t = (float)i / (float)fanCount;
-					CFlatRuntime2Storage().SetParticleWorkVector(t * 0.75f, 0.0f);
+				for (int i = 0; i < fanCount; i++) {
+					CFlatRuntime2Storage().SetParticleWorkVector(FLOAT_803319A4 * static_cast<float>(i) / static_cast<float>(fanCount), FLOAT_80331988);
 					CFlatRuntime2Storage().PutParticleWork();
 				}
 			} else {

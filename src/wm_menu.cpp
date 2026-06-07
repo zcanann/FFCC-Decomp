@@ -8498,7 +8498,11 @@ void CMenuPcs::CalcCharaSelect()
 		entry.m_padType = Joybus.GetPadType(i);
 		if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
 		    (entry.m_padType == -0x78000000)) {
-			entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				entry.m_connected = 1;
+			} else {
+				entry.m_connected = 0;
+			}
 		} else {
 			entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
 		}
@@ -8525,7 +8529,27 @@ void CMenuPcs::CalcCharaSelect()
 	}
 
 	const short winState = m_menuWindowInfo->state;
-	if (winState == 3) {
+	if (winState != 3) {
+		unsigned short anyTrig = 0;
+		for (int i = 0; i < 4; i++) {
+			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
+		}
+		if (winState == 1 && (anyTrig & 0x0300) != 0) {
+			m_menuWindowInfo->state = 2;
+			for (int i = 0; i < 4; i++) {
+				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
+				if (entry.m_confirmed != 0) {
+					GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 0;
+				}
+				entry.m_confirmed = 0;
+				entry.m_cmakePending = 0;
+				entry.m_cmakeReady = 0;
+			}
+			Sound.PlaySe(2, 0x40, 0x7F, 0);
+		}
+		return;
+	}
+	{
 		unsigned int pendingMask = 0;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -8622,24 +8646,23 @@ void CMenuPcs::CalcCharaSelect()
 				msgIter = reinterpret_cast<int*>(reinterpret_cast<int>(msgIter) + 2);
 			}
 
-			int widthCells = maxWidth / 0x16 + (maxWidth >> 0x1F);
-			short winWidth = static_cast<short>(widthCells) - static_cast<short>(widthCells >> 0x1F);
-			if (maxWidth != (widthCells - (widthCells >> 0x1F)) * 0x16) {
+			int widthCells = maxWidth / 0x16;
+			int winWidth = widthCells - (widthCells >> 0x1F);
+			if (maxWidth != winWidth * 0x16) {
 				winWidth++;
 			}
-			winWidth = static_cast<short>((winWidth + 2) * 0x16 + 0x40);
-			const short winHeight = static_cast<short>(*winMess) * 0x1E + 0x40;
-			MenuWindowInfo* const win = m_menuWindowInfo;
-			win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - winWidth) *
-			                                             static_cast<float>(DOUBLE_803313f8)));
-			win->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
+			winWidth = (winWidth + 2) * 0x16 + 0x40;
+			const int winHeight = *winMess * 0x1E + 0x40;
+			m_menuWindowInfo->x = static_cast<short>(static_cast<int>(static_cast<float>(
+			    static_cast<double>(0x280 - winWidth) * DOUBLE_803313F8)));
+			m_menuWindowInfo->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
 			                                                                  static_cast<float>(winHeight))) *
 			                                             DOUBLE_803313f8));
-			win->width = winWidth;
-			win->height = winHeight;
-			win->frame = 0;
-			win->state = 3;
-			win->state = 0;
+			m_menuWindowInfo->width = winWidth;
+			m_menuWindowInfo->height = winHeight;
+			m_menuWindowInfo->frame = 0;
+			m_menuWindowInfo->state = 3;
+			m_menuWindowInfo->state = 0;
 			return;
 		}
 
@@ -8700,12 +8723,12 @@ void CMenuPcs::CalcCharaSelect()
 				stackArgs[2].m_word = 0;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-				QueueWmCharaAnimState(this, caravanSlot, 3);
+				GetWmCharaAnimState(this)[caravanSlot * 5 + 1] = 3;
 			}
 
 			if (entry.m_connected == 0) {
 				if (entry.m_confirmed != 0) {
-					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
+					GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 0;
 				}
 				entry.m_confirmed = 0;
 				entry.m_cmakePending = 0;
@@ -8721,28 +8744,28 @@ void CMenuPcs::CalcCharaSelect()
 			entry.m_disconnectTime = 0;
 			int currentSlot = static_cast<int>(entry.m_currentSlot);
 			if ((padRepeat[i] & 0x000C) != 0) {
-				if (entry.m_confirmed == 0) {
+				if (entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 					currentSlot = (currentSlot < 4) ? currentSlot + 4 : currentSlot - 4;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
 			if ((padRepeat[i] & 0x0001) != 0) {
-				if (entry.m_confirmed == 0) {
+				if (entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 					currentSlot = (currentSlot > ((currentSlot >> 2) != 0 ? 4 : 0)) ? currentSlot - 1
 					                                                             : currentSlot + 3;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			} else if ((padRepeat[i] & 0x0002) != 0) {
-				if (entry.m_confirmed == 0) {
+				if (entry.m_confirmed != 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
 					const int maxSlot = (currentSlot >> 2) == 0 ? 3 : 7;
 					currentSlot = (currentSlot < maxSlot) ? currentSlot + 1 : currentSlot - 3;
 					Sound.PlaySe(1, 0x40, 0x7F, 0);
-				} else {
-					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				}
 			}
 			entry.m_currentSlot = static_cast<short>(currentSlot);
@@ -8758,15 +8781,15 @@ void CMenuPcs::CalcCharaSelect()
 							    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
 								Sound.PlaySe(4, 0x40, 0x7F, 0);
 							} else {
-								bool duplicatePending = false;
-								for (int other = 0; other < 4; other++) {
-									if (other != i && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
+								int other;
+								for (other = 0; other < 4; other++) {
+									if (i != other && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
 									    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
-										duplicatePending = true;
+										Sound.PlaySe(4, 0x40, 0x7F, 0);
 										break;
 									}
 								}
-								if (!duplicatePending) {
+								if (other >= 4) {
 									if (Game.m_gameWork.m_menuStageMode == 0) {
 										GbaQue.InitCmakeInfo(i, currentSlot);
 										entry.m_cmakePending = 1;
@@ -8774,24 +8797,22 @@ void CMenuPcs::CalcCharaSelect()
 										m_singleCmakeSlot = static_cast<short>(currentSlot);
 									}
 									Sound.PlaySe(2, 0x40, 0x7F, 0);
-								} else {
-									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								}
 							}
 						} else {
-							bool duplicateConfirmed = false;
-							for (int other = 0; other < 4; other++) {
-								if (other != i && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
+							int other;
+							for (other = 0; other < 4; other++) {
+								if (i != other && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
 								    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
-									duplicateConfirmed = true;
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
 									break;
 								}
 							}
-							if (!duplicateConfirmed) {
+							if (other >= 4) {
 								if (Game.m_caravanWorkArr[currentSlot].m_caravanLocalFlags == 0) {
 									entry.m_confirmed = 1;
 									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-									QueueWmCharaAnimState(this, currentSlot, 3);
+									GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
 								} else if (Game.m_gameWork.m_menuStageMode == 0) {
 									if (connectedCount == locallyConfirmedCount + 1) {
 										Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -8799,13 +8820,11 @@ void CMenuPcs::CalcCharaSelect()
 										entry.m_confirmed = 1;
 										locallyConfirmedCount++;
 										Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-										QueueWmCharaAnimState(this, currentSlot, 3);
+										GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 3;
 									}
 								} else {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								}
-							} else {
-								Sound.PlaySe(4, 0x40, 0x7F, 0);
 							}
 						}
 					} else {
@@ -8816,7 +8835,7 @@ void CMenuPcs::CalcCharaSelect()
 						requestCancel = true;
 					} else {
 						entry.m_confirmed = 0;
-						QueueWmCharaAnimState(this, currentSlot, 0);
+						GetWmCharaAnimState(this)[currentSlot * 5 + 1] = 0;
 						Sound.PlaySe(0x34, 0x40, 0x7F, 0);
 					}
 				} else if ((padTrig[i] & 0x1000) != 0) {
@@ -8826,19 +8845,19 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (requestCancel) {
-			bool anySelected = false;
+			int anySelected = 0;
 			for (int i = 0; i < 4; i++) {
 				if ((GetWmCharaSelectEntries(this)[i].m_confirmed != 0) || (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0)) {
-					anySelected = true;
+					anySelected = 1;
 					break;
 				}
 			}
-			if (anySelected) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			} else {
+			if (anySelected == 0) {
 				GetWmWorldState(this)->m_nextMenuMode = -1;
 				GetWmWorldState(this)->m_delay = 10;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 
@@ -8855,26 +8874,26 @@ void CMenuPcs::CalcCharaSelect()
 					break;
 				}
 			}
-			if (activeCount <= static_cast<unsigned int>(locallyConfirmedCount)) {
-				Sound.PlaySe(4, 0x40, 0x7F, 0);
-			} else {
+			if (activeCount > static_cast<unsigned int>(locallyConfirmedCount)) {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 				GetWmWorldState(this)->m_nextMenuMode = 1;
 				GetWmWorldState(this)->m_delay = 10;
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 		}
 
-		unsigned int finishedMask = 0;
+		int finishedMask = 0;
 		for (int i = 0; i < 4; i++) {
 			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
-				finishedMask |= 1u << i;
+				finishedMask |= 1 << i;
 			}
 		}
 		if (Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) {
-			unsigned int readyMask = 0;
+			int readyMask = 0;
 			for (int i = 0; i < 4; i++) {
 				if (GetWmCharaSelectEntries(this)[i].m_connected == 0 && GetWmCharaSelectEntries(this)[i].m_disconnectTime < 0x1E) {
-					readyMask |= 1u << i;
+					readyMask |= 1 << i;
 				}
 			}
 			if (finishedMask != 0 && finishedMask == readyMask) {
@@ -8889,30 +8908,13 @@ void CMenuPcs::CalcCharaSelect()
 		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
 			GbaQue.SetControllerMode(1);
 			for (int i = 0; i < 4; i++) {
-				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
-					GetWmCharaSelectEntries(this)[i].m_confirmed = 0;
-					GetWmCharaSelectEntries(this)[i].m_cmakePending = 0;
-					GetWmCharaSelectEntries(this)[i].m_cmakeReady = 0;
-				}
-			}
-		}
-	} else {
-		unsigned short anyTrig = 0;
-		for (int i = 0; i < 4; i++) {
-			anyTrig = static_cast<unsigned short>(anyTrig | padTrig[i]);
-		}
-		if (winState == 1 && (anyTrig & 0x0300) != 0) {
-			m_menuWindowInfo->state = 2;
-			for (int i = 0; i < 4; i++) {
 				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
-				if (entry.m_confirmed != 0) {
-					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
+				if (entry.m_cmakePending != 0) {
+					entry.m_confirmed = 0;
+					entry.m_cmakePending = 0;
+					entry.m_cmakeReady = 0;
 				}
-				entry.m_confirmed = 0;
-				entry.m_cmakePending = 0;
-				entry.m_cmakeReady = 0;
 			}
-			Sound.PlaySe(2, 0x40, 0x7F, 0);
 		}
 	}
 }

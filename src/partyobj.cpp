@@ -3902,12 +3902,20 @@ void CGPartyObj::InitFinished()
 	    PartyData(this).pendingWeaponItem);
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
-	if ((Game.m_gameWork.m_menuStageMode != 0) &&
-	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
-	    (m_scriptHandle[0xED] != nullptr)) {
-		*reinterpret_cast<float*>(self + 0x144) = 0.0f;
-		*reinterpret_cast<float*>(self + 0x134) = 0.0f;
-		*reinterpret_cast<float*>(self + 0x13C) = 1.0f;
+	if (Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    (GetCID() & 0x6D) == 0x6D &&
+	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
+		*reinterpret_cast<unsigned char*>(self + 0xE6) = 0;
+		*reinterpret_cast<float*>(self + 0x144) = FLOAT_80331AB0;
+		*reinterpret_cast<float*>(self + 0x134) = FLOAT_80331AB0;
+		*reinterpret_cast<float*>(self + 0x13C) = FLOAT_80331A98;
+		*reinterpret_cast<float*>(self + 0x4E8) = FLOAT_80331AB4;
+		unsigned int leadingZeros = __cntlzw(*reinterpret_cast<unsigned int*>(self + 0x6F0));
+		CGPartyObj::m_ghostWork[0] = static_cast<unsigned char>(
+		    (static_cast<int>(static_cast<signed char>(leadingZeros >> 5)) << 7)) |
+		    (CGPartyObj::m_ghostWork[0] & 0x7F);
 	}
 }
 

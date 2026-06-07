@@ -1494,33 +1494,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if (itemKind == 1 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D)) {
 			switch (staType) {
-			case 0:
-			case 1:
-			case 4:
-			case 0x1C: {
-				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
-				CGPrgObj* powerSource = sourceObj;
-				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				    (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
-					powerSource = Game.m_partyObjArr[0];
-				}
-
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 0x20);
-				float multiplier = CharaObjGetStatusMultiplier(0x2E);
-				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
-				if (rawDamage < 1) {
-					rawDamage = 1;
-				}
-				unsigned int bonus = (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D ?
-					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
-						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
-					0;
-				damageAmount = rawDamage + bonus;
-				System.Printf(dbg + 0x1DC, basePower, sourcePower, defense, bonus, damageAmount);
-				break;
-			}
 			case 0x24:
 			case 0x25:
 			case 100:
@@ -1569,6 +1542,33 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					sourceObj->changeStat(10, 0, 0);
 					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
 				}
+				break;
+			}
+			case 0:
+			case 1:
+			case 4:
+			case 0x1C: {
+				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
+				CGPrgObj* powerSource = sourceObj;
+				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+				    (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
+					powerSource = Game.m_partyObjArr[0];
+				}
+
+				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
+					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 0x20);
+				float multiplier = CharaObjGetStatusMultiplier(0x2E);
+				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
+				if (rawDamage < 1) {
+					rawDamage = 1;
+				}
+				unsigned int bonus = (static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D ?
+					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
+					0;
+				damageAmount = rawDamage + bonus;
+				System.Printf(dbg + 0x1DC, basePower, sourcePower, defense, bonus, damageAmount);
 				break;
 			}
 			case 10: {

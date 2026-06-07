@@ -6764,22 +6764,23 @@ void CMenuPcs::CalcWMFrame0(int param)
  */
 void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
-	unsigned char* const frame = m_wm.m_frameInfo;
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-	unsigned char alphaU8 = static_cast<unsigned char>(static_cast<int>(255.0 * static_cast<double>(alpha)));
-	GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(255.0 * static_cast<double>(alpha)));
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	int i = 0;
 	int offset = 0;
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
-			short* psVar1 = reinterpret_cast<short*>(frame + offset + 4);
-			DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
+			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
+			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
 			         1.0f, 1.0f, *reinterpret_cast<float*>(psVar1 + 0xC));

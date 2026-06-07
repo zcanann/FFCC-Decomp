@@ -3832,7 +3832,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             strcpy(nextScript.m_name, m_savedNextScript);
             Game.SetNextScript(&nextScript);
         } else {
-            memset(m_savedNextScript, 0, sizeof(m_savedNextScript));
+            memcpy(m_savedNextScript, Game.m_currentScriptName, sizeof(m_savedNextScript));
         }
         this->push(object, 0);
         outResult = 0;

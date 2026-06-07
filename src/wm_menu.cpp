@@ -4892,7 +4892,7 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 
 			// Cursor on selected item
-			if (m_wmWorldState->m_flag09 == 0 &&
+			if (static_cast<signed char>(m_wmWorldState->m_flag09) == 0 &&
 			    i == m_wmWorldState->m_cardChannel) {
 				int timer = (int)m_wmWorldState->m_titleState;
 				float cursorAlpha = FLOAT_803313e8;

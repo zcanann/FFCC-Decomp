@@ -959,8 +959,8 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     }
 
     int itemData = Game.unkCFlatData0[2] + itemNo * 0x48;
-    unsigned short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
-    unsigned int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
+    short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
+    int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
     char textBuffer[256];
 
     if (label != 0) {
@@ -1187,7 +1187,7 @@ void CShopMenu::DrawBuySellInfo()
 {
     CFont* font = MenuPcs.m_fonts[0];
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    int selected = m_selectedIndex;
+    unsigned int selected = m_selectedIndex;
     int listType = m_listType;
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1235,7 +1235,7 @@ void CShopMenu::DrawBuySellInfo()
     int totalGil = 0;
     if (canTrade) {
         if (listType == 0) {
-            int gil = 0;
+            unsigned int gil = 0;
             if (itemNo >= 1) {
                 const CCaravanWork* const caravanWork = ShopMenuCaravanWork(this);
                 gil = static_cast<int>(caravanWork->m_shopParam) *

@@ -1106,6 +1106,21 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
 
     switch (params->m_spawnMode) {
+    default:
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
+
+        if (particleWMat != NULL) {
+            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
+        } else {
+            pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
+        }
+
+        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, mtxB);
+        pppCopyMatrix(pObject->m_drawMatrix, mtxB);
+        if (copyOut != 0) {
+            pppCopyMatrix(out, mtxB);
+        }
+        break;
     case 1:
     case 3:
     case 5:
@@ -1128,21 +1143,6 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         }
         break;
     }
-    default:
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
-
-        if (particleWMat != NULL) {
-            pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
-        } else {
-            pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
-        }
-
-        pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, mtxB);
-        pppCopyMatrix(pObject->m_drawMatrix, mtxB);
-        if (copyOut != 0) {
-            pppCopyMatrix(out, mtxB);
-        }
-        break;
     }
 
     if (params->m_matrixFinalizeMode != 0) {

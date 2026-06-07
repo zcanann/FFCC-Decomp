@@ -1023,6 +1023,11 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
     pppInitBlendMode();
     pppSetBlendMode(0);
 
+    int baseRed = baseColor->m_red;
+    int baseGreen = baseColor->m_green;
+    int baseBlue = baseColor->m_blue;
+    int baseAlpha = baseColor->m_alpha;
+
     for (int i = 0; i < numParticles; i++) {
         _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)particleBlock + i * 0xA0);
         _PARTICLE_WMAT* particleWorldMatrix = 0;
@@ -1040,10 +1045,13 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         }
 
         pppFMATRIX drawMatrix;
-        int red = baseColor->m_red + (int)*(s8*)((u8*)particle + 0x32);
-        int green = baseColor->m_green + (int)*(s8*)((u8*)particle + 0x33);
-        int blue = baseColor->m_blue + (int)*(s8*)((u8*)particle + 0x34);
-        int alpha = baseColor->m_alpha + (int)*(s8*)((u8*)particle + 0x35) - (int)*f32_at(particle, 0x98);
+
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
+
+        int red = baseRed + (int)*(s8*)((u8*)particle + 0x32);
+        int green = baseGreen + (int)*(s8*)((u8*)particle + 0x33);
+        int blue = baseBlue + (int)*(s8*)((u8*)particle + 0x34);
+        int alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x35) - *f32_at(particle, 0x98));
 
         if (particleColor != NULL) {
             red += (int)particleColor->m_color[0];
@@ -1059,7 +1067,6 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
             clamp_alpha_7f(alpha),
         }};
 
-        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, params->m_useEnvDepth);
         GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 
         pppCopyMatrix(*(pppFMATRIX*)&g_matTmp, obj->m_localMatrix);

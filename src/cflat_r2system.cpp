@@ -3213,28 +3213,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -0x86: {
-        Vec position = {
-            static_cast<float>(object->m_localBase[0]),
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-        };
+        const float* f = reinterpret_cast<float*>(object->m_localBase);
         this->push(
             object,
-            Wind.AddDiffuse(&position, static_cast<float>(object->m_localBase[3]),
-                static_cast<float>(object->m_localBase[4]), static_cast<float>(object->m_localBase[5])));
+            Wind.AddDiffuse(CVector(f[0], f[1], f[2]), f[3], f[4], f[5]));
         outResult = 0;
         break;
     }
     case -0x87: {
-        Vec position = {
-            static_cast<float>(object->m_localBase[0]),
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-        };
+        const float* f = reinterpret_cast<float*>(object->m_localBase);
         this->push(
             object,
-            Wind.AddSphere(&position, static_cast<float>(object->m_localBase[3]),
-                static_cast<float>(object->m_localBase[4]), object->m_localBase[5]));
+            Wind.AddSphere(CVector(f[0], f[1], f[2]), f[3], f[4], object->m_localBase[5]));
         outResult = 0;
         break;
     }

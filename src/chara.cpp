@@ -2388,7 +2388,10 @@ void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFram
 	}
 
 	if (anim != m_anim) {
-		ReleaseRefCounted(m_anim);
+		if (m_anim != 0) {
+			ReleaseRefCountedNonNull(m_anim);
+			m_anim = 0;
+		}
 		m_anim = anim;
 		RetainRefCounted(m_anim);
 	}

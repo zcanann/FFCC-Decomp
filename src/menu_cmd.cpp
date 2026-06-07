@@ -423,13 +423,8 @@ void CMenuPcs::CmdInit1()
 	basePanel->startFrame = 5;
 	basePanel->duration = 5;
 
-	u32 tex = 0x2f;
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = 0x46;
-	}
-
 	CmdListEntry* leftIcon = &entries[start + 1];
-	leftIcon->tex = tex;
+	leftIcon->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	leftIcon->x = 0xa0;
 	leftIcon->y = 0xe;
 	leftIcon->width = 0x30;
@@ -441,7 +436,7 @@ void CMenuPcs::CmdInit1()
 	leftIcon->duration = 5;
 
 	CmdListEntry* rightIcon = &entries[start + 2];
-	rightIcon->tex = tex;
+	rightIcon->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	rightIcon->width = 0x30;
 	rightIcon->height = 0x30;
 	rightIcon->x = 0xa5;

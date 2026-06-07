@@ -1638,7 +1638,7 @@ void CGPartyObj::onFrameStat()
 				reqAnim(-1, 0, 0);
 			}
 		}
-		if ((static_cast<signed char>(party.partyFlags) < 0) ||
+		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0) ||
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0)) {
@@ -1648,13 +1648,14 @@ void CGPartyObj::onFrameStat()
 			m_weaponNodeFlagAll.m_bits1.m_menuReady = 1;
 			m_unk63CBits.m_bit80 = 1;
 		}
+		unsigned char* onFrameSelf = reinterpret_cast<unsigned char*>(this);
 		if (((DbgMenuPcs.GetDbgFlagsRaw() & 8) != 0) ||
 		    ((Game.unk_flat3_0xc7d0 != 0) &&
 		     (Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)) == 1) &&
-		     (m_unk63CBits.m_bit80 < 0) &&
-		     (m_weaponNodeFlagAll.m_bits1.m_shield < 0) &&
-		     (m_weaponNodeFlagAll.m_bits1.m_menuReady < 0) &&
-		     (static_cast<signed char>(party.partyFlags) >= 0))) {
+		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(onFrameSelf[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
+		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(onFrameSelf[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
+		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(onFrameSelf[0x9B]) << 25) & 0xC0000000) >> 31) != 0) &&
+		     (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(party.partyFlags) << 24) & 0xC0000000) >> 31) == 0))) {
 			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
 			    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
@@ -1671,7 +1672,7 @@ void CGPartyObj::onFrameStat()
 				moveVector(&moveVec, m_moveBaseSpeed, 0x0F);
 			}
 		}
-		if ((static_cast<signed char>(m_weaponNodeFlagBytes.m_flags1) < 0) &&
+		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(m_weaponNodeFlagBytes.m_flags1) << 24) & 0xC0000000) >> 31) != 0) &&
 		    Game.m_gameWork.m_menuStageMode != 0 &&
 		    m_scriptHandle[0xED] == nullptr &&
 		    Game.m_partyObjArr[1] != nullptr &&

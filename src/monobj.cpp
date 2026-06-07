@@ -3293,13 +3293,11 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if (selectorType == 0) {
-			float minDist = static_cast<float>(*reinterpret_cast<short*>(aiScript + actionOffset + 0x112));
-			float maxDist = static_cast<float>(*reinterpret_cast<short*>(aiScript + actionOffset + 0x114));
+			float maxDist = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x114));
+			float minDist = static_cast<float>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x112)));
 			unsigned short chance = *reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x116);
 
-			if ((targetDist <= minDist) || (maxDist < targetDist)) {
-				continue;
-			}
+			if ((targetDist < maxDist) && (minDist < targetDist)) {
 
 			bool forceAction = false;
 			CGPartyObj* party = Game.m_partyObjArr[partyIndex];
@@ -3319,6 +3317,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 				if ((*reinterpret_cast<unsigned short*>(baseScript + 0x10C) == 1) || forceAction) {
 					break;
 				}
+			}
 			}
 		} else {
 			unsigned int groupIndex;

@@ -1493,12 +1493,12 @@ void CChara::CModel::calcMatrix()
 		SRTView srt;
 
 		if (animNode0 == 0 && animNode1 == 0) {
-			if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+			if ((s8)NodeRuntimeFlags(node) < 0) {
 				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
 			}
 		} else {
 			if (parentNode == 0 || NodeAnimNode0(parentNode) == 0 || !AnimNodeUsesScale(NodeAnimNode0(parentNode))) {
-				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+				if ((s8)NodeRuntimeFlags(node) < 0) {
 					float baseScale;
 					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301BC) {
 						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
@@ -1506,7 +1506,7 @@ void CChara::CModel::calcMatrix()
 						PSMTXIdentity(localMtx);
 					}
 				}
-			} else if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+			} else if ((s8)NodeRuntimeFlags(node) < 0) {
 				float* parentScale = NodeRuntimeScale(parentNode);
 				PSMTXScale(localMtx,
 				           FLOAT_803301BC / parentScale[0],
@@ -1562,7 +1562,7 @@ void CChara::CModel::calcMatrix()
 				} else {
 					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
 				}
-				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+				if ((s8)NodeRuntimeFlags(node) < 0) {
 					PSMTXConcat(localMtx, animMtx, localMtx);
 				}
 				float* runtimeScale = NodeRuntimeScale(node);

@@ -522,15 +522,10 @@ void CMenuPcs::CmdInit2()
 	entries[startIndex].startFrame = 2;
 	entries[startIndex].duration = 5;
 
-	u32 tex = 0x2f;
-	if (GetCmdLayoutFlag(this) == 0) {
-		tex = 0x46;
-	}
-
-	entries[startIndex + 1].tex = tex;
+	entries[startIndex + 1].tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entries[startIndex + 1].startFrame = 7;
 	entries[startIndex + 1].duration = 5;
-	entries[startIndex + 2].tex = tex;
+	entries[startIndex + 2].tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
 	entries[startIndex + 2].startFrame = 7;
 	entries[startIndex + 2].duration = 5;
 

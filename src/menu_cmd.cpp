@@ -1631,7 +1631,13 @@ unsigned int CMenuPcs::CmdCtrlCur()
 							caravanWork->UniteComList(
 							    comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 						} else if (comboCount > 1) {
-							GetCmdStateView(this)->commandResult = 1;
+							if (GetUniteRecipeCount(comboChoice[1][0]) == 2) {
+								GetCmdStateView(this)->commandResult = 1;
+							} else {
+								const int recipe = comboChoice[0][0];
+								caravanWork->UniteComList(
+								    comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+							}
 						}
 					}
 

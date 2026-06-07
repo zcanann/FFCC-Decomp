@@ -238,8 +238,9 @@ char* g_strMenuUtilMes[] = {
 	s_Mejorado, s_MenuOptionEstandarEs.m_text,
 };
 
-#define PTR_s_Strength__80215a48 g_strMenuUtilMes
-#define PTR_s_Defence__80215a4c (g_strMenuUtilMes + 1)
+#define MENU_UTIL_OPTION_LANGUAGE_STRIDE 20
+#define MENU_UTIL_STRENGTH_TEXT(languageIndex) g_strMenuUtilMes[(languageIndex) * MENU_UTIL_OPTION_LANGUAGE_STRIDE]
+#define MENU_UTIL_DEFENCE_TEXT(languageIndex) g_strMenuUtilMes[(languageIndex) * MENU_UTIL_OPTION_LANGUAGE_STRIDE + 1]
 
 // Constants placed in .sdata2 by the linker.
 extern const float kMenuCenteringHalfWidth = 0.5f;
@@ -499,13 +500,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
 	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
 	if ((flags & 0x100) != 0) {
-		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex * 20]);
+		strcpy(scratch, MENU_UTIL_STRENGTH_TEXT(languageIndex));
 	} else if ((flags & 0x200) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, MENU_UTIL_DEFENCE_TEXT(languageIndex));
 	} else if ((flags & 0x400) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, MENU_UTIL_DEFENCE_TEXT(languageIndex));
 	} else if ((flags & 0x800) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
+		strcpy(scratch, MENU_UTIL_DEFENCE_TEXT(languageIndex));
 	} else if ((flags & 0x1000) != 0) {
 		strcpy(scratch, sMenuUtilEmptyText);
 	} else if ((flags & 0x2000) != 0) {

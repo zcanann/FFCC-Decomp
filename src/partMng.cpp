@@ -2311,25 +2311,21 @@ void CPartMng::pppEditPartCalc()
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3a9);
         _pppMngSt* mng = m_pppMng;
-        for (int i = 0; i < kPppMngCount; i++) {
+        int activeCount = *reinterpret_cast<int*>(self + 0x4);
+        for (int i = 0; i < activeCount; i++) {
             if (mng->m_baseTime != -0x1000) {
                 _pppAllFreePObject(mng);
             }
             mng++;
         }
 
-        *reinterpret_cast<int*>(self + 0x2355C) = 0;
+        *reinterpret_cast<int*>(self + 0x4) = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3b3);
-        if (pdtSlots[0].m_pppDataHead != 0) {
-            _pppMngSt* firstMng = m_pppMng;
-            firstMng->m_particleEnded = 0;
-            firstMng->m_envColorR = *reinterpret_cast<unsigned char*>(self + 0x158);
-            firstMng->m_envColorG = *reinterpret_cast<unsigned char*>(self + 0x159);
-            firstMng->m_envColorB = *reinterpret_cast<unsigned char*>(self + 0x15A);
-            firstMng->m_envColorA = *reinterpret_cast<unsigned char*>(self + 0x15B);
-            _pppStartPart(firstMng, reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
-        }
+        _pppMngSt* firstMng = m_pppMng;
+        firstMng->m_particleEnded = 0;
+        *reinterpret_cast<int*>(&firstMng->m_envColorR) = *reinterpret_cast<int*>(self + 0x168);
+        _pppStartPart(firstMng, *reinterpret_cast<long**>(self + 0x5dc), 1);
     }
 
     if (ppvSysStopPartF != 0 || *reinterpret_cast<long**>(self + 0x5dc) == 0) {

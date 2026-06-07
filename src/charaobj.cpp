@@ -236,15 +236,15 @@ static bool CharaObjIsPlayerCid(unsigned int cid)
 	return (cid & 0x6D) == 0x6D;
 }
 
-static bool CharaObjIsElementalStatus(unsigned int staType)
+static bool CharaObjIsElementalStatus(int staType)
 {
 	return staType == 4 || staType == 0x1C || staType < 3 ||
-	       staType - 8 < 3 || staType == 6 || staType == 3;
+	       static_cast<unsigned int>(staType - 8) <= 2 || staType == 6 || staType == 3;
 }
 
-static bool CharaObjIsBreakStatus(unsigned int staType)
+static bool CharaObjIsBreakStatus(int staType)
 {
-	return staType - 0x24 < 2 || staType == 0x69 || staType == 0x6A;
+	return static_cast<unsigned int>(staType - 0x24) <= 1 || staType == 0x69 || staType == 0x6A;
 }
 
 struct CharaObjIgnoreFlagBits
@@ -1361,7 +1361,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 	} else if ((resistType > 1 || (resistType == 1 &&
 	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
-	           (staType - 8 < 2 || staType == 6 || staType == 3)) {
+	           (static_cast<unsigned int>(staType - 8) <= 1 || staType == 6 || staType == 3)) {
 		putParticle(0x201, 0, hitPos, FLOAT_803319A8 * FLOAT_803319AC * m_attackColRadius, 0x65);
 	}
 

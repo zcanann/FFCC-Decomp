@@ -2941,7 +2941,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			MenuBoardEntry& entry = boardEntries[activePartyCount + i];
-			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8);
+			BonusAnimSprite* sprite = (BonusAnimSprite*)(this->m_bonusAnimPtr + ((signed char)s_CntTop + i) * 0x40 + 8);
 			int extent = sprite->w * 3 + 0x20;
 			int centerX = (int)((double)(float)((double)(sprite->w * 3) * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);

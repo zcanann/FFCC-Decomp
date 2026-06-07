@@ -7345,10 +7345,10 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 	do {
 		if ((static_cast<unsigned int>(mask) & (1 << i)) != 0) {
 			short* psVar1 = reinterpret_cast<short*>(m_wm.m_frameInfo + offset + 4);
-			MenuPcs.DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
+			MenuPcs.DrawRect(*reinterpret_cast<unsigned long*>(psVar1 + 0xC), static_cast<float>(static_cast<int>(psVar1[0])), static_cast<float>(static_cast<int>(psVar1[1])),
 			         static_cast<float>(static_cast<int>(psVar1[2])), static_cast<float>(static_cast<int>(psVar1[3])),
 			         *reinterpret_cast<float*>(psVar1 + 4), *reinterpret_cast<float*>(psVar1 + 6),
-			         FLOAT_803313e8, FLOAT_803313e8, *reinterpret_cast<float*>(psVar1 + 0xC));
+			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 		i = i + 1;
 		offset = offset + 0x1C;

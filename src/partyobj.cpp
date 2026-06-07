@@ -2186,18 +2186,20 @@ void CGPartyObj::statCharge()
 						} else {
 							CVector dir(delta);
 							CVector scaled;
-							PSVECScale(dir, scaled, mag - static_cast<float>(maxReach));
+							PSVECScale(reinterpret_cast<Vec*>(&dir), reinterpret_cast<Vec*>(&scaled), mag - static_cast<float>(maxReach));
 							CVector unit;
-							PSVECScale(scaled, unit, FLOAT_80331a54 / mag);
+							PSVECScale(reinterpret_cast<Vec*>(&scaled), reinterpret_cast<Vec*>(&unit), FLOAT_80331a54 / mag);
 							CVector origin(m_worldPosition);
 							CVector sum;
-							PSVECAdd(origin, unit, sum);
-							dest = sum;
+							PSVECAdd(reinterpret_cast<Vec*>(&origin), reinterpret_cast<Vec*>(&unit), reinterpret_cast<Vec*>(&sum));
+							dest.x = sum.x;
+							dest.y = sum.y;
+							dest.z = sum.z;
 							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
 						}
 					}
 					if (FLOAT_80331a78 != mag) {
-						Move(dest, mag / static_cast<float>(-dist), dist, 1, 1, 0, 1);
+						Move(reinterpret_cast<Vec*>(&dest), mag / static_cast<float>(-dist), dist, 1, 1, 0, 1);
 					}
 				} else {
 					moveVectorRot(m_rotTargetY, FLOAT_80331a78, FLOAT_80331ADC * static_cast<float>(p[5]),
@@ -2224,7 +2226,7 @@ void CGPartyObj::statCharge()
 				CVector worldPos(m_worldPosition);
 				CVector center(m_comboCenter);
 				CVector diff;
-				PSVECSubtract(center, worldPos, diff);
+				PSVECSubtract(reinterpret_cast<Vec*>(&center), reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&diff));
 				float horizSq = diff.z * diff.z + diff.x * diff.x;
 				float horiz = (horizSq > FLOAT_80331a78) ? sqrtf(horizSq) : horizSq;
 				if (FLOAT_80331a78 != diff.y && FLOAT_80331a78 != horiz) {

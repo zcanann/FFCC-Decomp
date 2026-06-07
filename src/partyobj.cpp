@@ -4961,8 +4961,9 @@ void CGPartyObj::gpmMove()
 	float clampedDist = (*reinterpret_cast<float*>(self + 0x5C4) < dist) ? *reinterpret_cast<float*>(self + 0x5C4) : dist;
 
 	if (m_lastStateId == 0 && (static_cast<signed char>(m_shieldAttachNodeIndex) < 0)) {
-		int moveKind = 0;
+		int moveKind;
 		if (static_cast<signed char>(PartyData(this).partyFlags) >= 0) {
+			moveKind = 0;
 			if (chalice != nullptr &&
 			    PartyData(this).carryObject == nullptr &&
 			    (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(chalice) + 0x9A)) < 0) &&
@@ -4991,6 +4992,7 @@ void CGPartyObj::gpmMove()
 				}
 			}
 		} else {
+			moveKind = 0;
 			if (PartyData(this).carryObject != nullptr) {
 				sGhostPartyWork.carrySpeed = 0.0f;
 				carry(1, static_cast<CGObject*>(0), 0);

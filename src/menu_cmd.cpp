@@ -906,13 +906,12 @@ int CMenuPcs::CmdClose()
 void CMenuPcs::CmdDraw()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	CmdState* cmd = GetCmdStateView(this);
 	CmdListStorage* cmdList = GetCmdListStorage(this);
 	CmdListEntry* entries = cmdList->entries;
 	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CmdListEntry* entry = entries;
-	const s16 cmdMode = cmd->mode;
-	const s16 animState = cmd->animState;
+	const s16 cmdMode = GetCmdStateView(this)->mode;
+	const s16 animState = GetCmdStateView(this)->animState;
 	s32 i;
 	s32 helpId = -1;
 	bool hasItemHelp = false;
@@ -936,7 +935,7 @@ void CMenuPcs::CmdDraw()
 					t += h;
 				}
 				if ((animState == 1) && (i < caravan->m_numCmdListSlots) &&
-				    (i == cmd->selected)) {
+				    (i == GetCmdStateView(this)->selected)) {
 					t = FLOAT_80332b10;
 					y -= FLOAT_80332ad0;
 					h += FLOAT_80332ad0;
@@ -989,7 +988,7 @@ void CMenuPcs::CmdDraw()
 				const s16 skillId = caravan->m_inventoryItems[cmdId];
 				char** flatText = Game.m_cFlatDataArr[1].TableStrings(0);
 				text = flatText[skillId * 5 + 4];
-				if ((cmdMode == 0) && (i == cmd->selected)) {
+				if ((cmdMode == 0) && (i == GetCmdStateView(this)->selected)) {
 					hasItemHelp = true;
 					helpId = skillId;
 				}
@@ -1066,9 +1065,9 @@ void CMenuPcs::CmdDraw()
 		DrawInit();
 	}
 
-	if ((cmdMode == 1) && (cmd->phase == 1)) {
+	if ((cmdMode == 1) && (GetCmdStateView(this)->phase == 1)) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const float mark = CalcListPos(cmd->scrollTop, letter[0], 1);
+		const float mark = CalcListPos(GetCmdStateView(this)->scrollTop, letter[0], 1);
 		CmdListEntry* listPos = &entries[cmdList->count];
 		if (mark > FLOAT_80332ab0) {
 			DrawListPosMark(static_cast<float>(listPos->x), static_cast<float>(listPos->y), mark);
@@ -1076,14 +1075,14 @@ void CMenuPcs::CmdDraw()
 	}
 
 	if (((cmdMode == 0) && (animState == 1)) ||
-	    ((cmdMode != 0) && (cmd->phase == 1))) {
+	    ((cmdMode != 0) && (GetCmdStateView(this)->phase == 1))) {
 		float cursorX = FLOAT_80332a70;
 		float cursorY = FLOAT_80332a70;
 		CmdListEntry* cursorEntry = entries;
 		bool cursorOnUnite = false;
 
 		if ((cmdMode == 0) || (cmdMode == 3)) {
-			s32 index = GetCmdStateSelections(cmd)[cmdMode];
+			s32 index = GetCmdStateSelections(GetCmdStateView(this))[cmdMode];
 			if (caravan->m_commandListExtra[index] == 0) {
 				cursorEntry = &entries[index];
 			} else {
@@ -1115,7 +1114,7 @@ void CMenuPcs::CmdDraw()
 				scan++;
 				idx++;
 			}
-			const s32 cur = cmd->itemSelected + cmd->scrollTop;
+			const s32 cur = GetCmdStateView(this)->itemSelected + GetCmdStateView(this)->scrollTop;
 			s32 wrapped = cur;
 			if (letter[0] <= cur) {
 				wrapped -= letter[0];
@@ -1131,7 +1130,7 @@ void CMenuPcs::CmdDraw()
 			    static_cast<float>(choices));
 			cursorX = static_cast<float>(panel->x - 0x14);
 			cursorY = ((pitch - static_cast<float>(DOUBLE_80332af8)) * static_cast<float>(DOUBLE_80332a60)) +
-			          ((pitch * static_cast<float>(cmd->choice)) + static_cast<float>(panel->y + 8));
+			          ((pitch * static_cast<float>(GetCmdStateView(this)->choice)) + static_cast<float>(panel->y + 8));
 		}
 
 		const s32 frame = System.m_frameCounter & 7;
@@ -1142,12 +1141,12 @@ void CMenuPcs::CmdDraw()
 		helpId = -1;
 	}
 	if ((cmdMode == 0) && (helpId == -1) &&
-	    (caravan->m_commandListExtra[cmd->selected] == 0)) {
+	    (caravan->m_commandListExtra[GetCmdStateView(this)->selected] == 0)) {
 		helpId = 0x266;
 	}
 	if (cmdMode == 1) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		s32 idx = cmd->itemSelected + cmd->scrollTop;
+		s32 idx = GetCmdStateView(this)->itemSelected + GetCmdStateView(this)->scrollTop;
 		if (letter[0] <= idx) {
 			idx -= letter[0];
 		}
@@ -1156,7 +1155,7 @@ void CMenuPcs::CmdDraw()
 		}
 	}
 	if (cmdMode == 2) {
-		if (cmd->choice == 0) {
+		if (GetCmdStateView(this)->choice == 0) {
 			helpId = 0x25B;
 		} else {
 			helpId = -1;

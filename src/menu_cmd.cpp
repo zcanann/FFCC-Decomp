@@ -532,43 +532,53 @@ void CMenuPcs::CmdInit1()
  */
 void CMenuPcs::CmdInit2()
 {
-	CmdListStorage* list = GetCmdListStorage(this);
-	CmdListEntry* entries = list->entries;
-	const s16 start = list->count;
-	const s32 startIndex = start;
+	s32 i = GetCmdListStorage(this)->count;
+	CmdListEntry* entry;
 
-	entries[startIndex].tex = 0x2e;
-	entries[startIndex].startFrame = 2;
-	entries[startIndex].duration = 5;
+	entry = &GetCmdListStorage(this)->entries[i];
+	entry->tex = 0x2e;
+	entry->startFrame = 2;
+	entry->duration = 5;
+	i++;
 
-	entries[startIndex + 1].tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
-	entries[startIndex + 1].startFrame = 7;
-	entries[startIndex + 1].duration = 5;
-	entries[startIndex + 2].tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
-	entries[startIndex + 2].startFrame = 7;
-	entries[startIndex + 2].duration = 5;
+	entry = &GetCmdListStorage(this)->entries[i];
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->startFrame = 7;
+	entry->duration = 5;
+	i++;
+	entry = &GetCmdListStorage(this)->entries[i];
+	entry->tex = (GetCmdLayoutFlag(this) == 0) ? 0x46 : 0x2f;
+	entry->startFrame = 7;
+	entry->duration = 5;
+	i++;
 
-	entries[startIndex + 3].flags = 2;
-	entries[startIndex + 3].tex = 0x2e;
-	entries[startIndex + 3].startFrame = 7;
-	entries[startIndex + 3].duration = 5;
+	entry = &GetCmdListStorage(this)->entries[i];
+	entry->flags = 2;
+	entry->tex = 0x2e;
+	entry->startFrame = 7;
+	entry->duration = 5;
+	i++;
 
-	for (s32 i = 4; i < 12; i++) {
-		CmdListEntry* entry = &entries[startIndex + i];
+	for (s32 j = 0; j < 8; j++) {
+		entry = &GetCmdListStorage(this)->entries[i];
 		entry->flags = 2;
 		entry->tex = 0x37;
 		entry->startFrame = 0;
 		entry->duration = 5;
+		i++;
 	}
 
+	CmdListStorage* list = GetCmdListStorage(this);
+	CmdListEntry* entries = list->entries;
+	const s16 start = list->count;
 	list->listEnd = start + 0xc;
 
 	const u32 count = static_cast<u32>(static_cast<s32>(list->listEnd) - static_cast<s32>(list->count));
-	CmdListEntry* entry = &entries[list->count];
+	CmdListEntry* fillEntry = &entries[list->count];
 	const float alpha = FLOAT_80332a70;
-	for (u32 i = 0; i < count; i++) {
-		entry[i].timer = 0;
-		entry[i].alpha = alpha;
+	for (u32 k = 0; k < count; k++) {
+		fillEntry[k].timer = 0;
+		fillEntry[k].alpha = alpha;
 	}
 }
 

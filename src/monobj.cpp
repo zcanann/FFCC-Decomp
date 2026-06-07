@@ -3734,6 +3734,98 @@ void CGMonObj::statMove(int* targetIndex)
 
 	int state = *chaseState;
 	switch (state) {
+	case 4:
+		monObj->seKiduki();
+		break;
+
+	default: {
+		unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+			*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+		}
+		if (*chaseTimer == 0) {
+			object->m_rotTargetY = *reinterpret_cast<float*>(&object->m_bgFlags);
+		}
+
+		double soundLimit = DOUBLE_80331A18;
+		if (Game.m_gameWork.m_soundOptionFlag != 0) {
+			soundLimit = DOUBLE_80331A10;
+		}
+
+		int hitPartyIndex;
+		if (soundLimit <= static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+			hitPartyIndex = -1;
+		} else {
+			float hitScale;
+			monObj->checkCol(6, object->m_rotBaseY,
+				static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xC8)),
+				&hitScale, &hitPartyIndex);
+			if (hitPartyIndex < 0) {
+				hitPartyIndex = -1;
+			}
+		}
+
+		if (hitPartyIndex < 0) {
+			unsigned char* aiData;
+			if (monObj->m_aiState == 0) {
+				aiData = script9;
+			} else {
+				aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+					(monObj->m_aiState +
+					 *reinterpret_cast<unsigned short*>(script9 + 0x100)) *
+						0x1D0 +
+					0x10;
+			}
+			unsigned short alertMode = *reinterpret_cast<unsigned short*>(aiData + 0x104);
+			if (alertMode == 1) {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x10;
+			} else if (alertMode == 0) {
+				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+			} else if (alertMode < 3) {
+				double soundLimit2 = DOUBLE_80331A18;
+				if (Game.m_gameWork.m_soundOptionFlag != 0) {
+					soundLimit2 = DOUBLE_80331A10;
+				}
+				if (soundLimit2 <= static_cast<double>(*reinterpret_cast<float*>(mon + 0x5BC))) {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
+				} else {
+					*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0x1D;
+					float repopDist =
+						static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0xCC));
+					float homeDist = PSVECDistance(&monObj->m_homePosition, &object->m_worldPosition);
+					if (static_cast<double>(repopDist) <= static_cast<double>(homeDist)) {
+						monObj->isValidTarget();
+					}
+				}
+			}
+		} else {
+			*targetPartyIdx = hitPartyIndex;
+			*chaseState = 2;
+			*chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+			if (monObj->m_unk6B8 == 0) {
+				void** scriptHandle = object->m_scriptHandle;
+				int randVal = Math.Rand(3);
+				unsigned char* script = reinterpret_cast<unsigned char*>(scriptHandle[9]);
+				prgObj->playSe3D(
+					*reinterpret_cast<unsigned short*>(script + 0x192) +
+						*reinterpret_cast<unsigned short*>(script + 0x190) * 1000 + randVal,
+					0x32, 0x96, 0, reinterpret_cast<Vec*>(NULL));
+				monObj->m_unk6B8 = 1;
+			}
+		}
+		break;
+	}
+
+	case 2:
+		monObj->statAround();
+		break;
+
+	case 1:
+		monObj->statWatch();
+		break;
+
 	case 3:
 		monObj->isValidTarget();
 		break;
@@ -3791,27 +3883,6 @@ void CGMonObj::statMove(int* targetIndex)
 		break;
 	}
 
-	case 4:
-		monObj->seKiduki();
-		break;
-
-	case 1:
-		monObj->statWatch();
-		if (targetIndex != NULL) {
-			*targetIndex = *targetPartyIdx;
-		}
-		break;
-
-	case 2:
-		monObj->statAround();
-		if (targetIndex != NULL) {
-			*targetIndex = *targetPartyIdx;
-		}
-		monObj->m_unk6B8 = 1;
-		break;
-
-	default:
-		break;
 	}
 
 	if (monObj->m_chaseDirty == 0) {

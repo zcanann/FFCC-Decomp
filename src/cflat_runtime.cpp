@@ -86,10 +86,9 @@ void CFlatRuntime::Destroy()
 {
 	u8* const self = reinterpret_cast<u8*>(this);
 	const u32 clearBit = 0;
-	CObject* const root = &m_objectSentinel;
 	CObject* object = m_objectSentinel.m_next;
 
-	while (object != root) {
+	while (object != &m_objectSentinel) {
 		CObject* const next = object->m_next;
 
 		object->m_previous->m_next = object->m_next;

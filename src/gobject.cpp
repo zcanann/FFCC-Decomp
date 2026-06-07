@@ -490,24 +490,22 @@ void CGObject::move()
     moveVec.z = sZeroFloat;
     m_groundHitOffset.y += m_gravityY;
 
-    u8 weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
-    if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1A) | (weaponFlagsHi >> 6)) < 0) {
+    if (m_weaponNodeFlagAll.m_bits1.m_bit20) {
         int scriptMoveEnd = 0;
-        if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5)) < 0) {
+        if (m_weaponNodeFlagAll.m_bits1.m_bit10) {
             moveVec = m_moveTarget;
         } else {
             PSVECSubtract(&m_moveTarget, &m_worldPosition, &moveVec);
         }
 
-        if ((Game.m_currentMapId != 0x21)
-            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1E) | (weaponFlagsHi >> 2)) >= 0)) {
+        if ((Game.m_currentMapId != 0x21) && !m_weaponNodeFlagAll.m_bits1.m_bit02) {
             moveVec.y = sZeroFloat;
         }
 
         const double moveMag = static_cast<double>(PSVECMag(&moveVec));
         if (moveMag == static_cast<double>(sZeroFloat)) {
             scriptMoveEnd = 1;
-        } else if ((static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5)) < 0)
+        } else if (m_weaponNodeFlagAll.m_bits1.m_bit10
                    || (static_cast<double>(m_moveTimer) <= moveMag)) {
             PSVECNormalize(&moveVec, &moveVec);
             PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
@@ -520,10 +518,9 @@ void CGObject::move()
             scriptMoveEnd = 2;
         }
 
-        weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
-        const u32 scriptMoveFlag = (static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5);
-        if (((static_cast<int>(scriptMoveFlag) >= 0) && (scriptMoveEnd != 0))
-            || ((static_cast<int>(scriptMoveFlag) < 0) && (scriptMoveEnd == 2))) {
+        const bool scriptMoveFlag = m_weaponNodeFlagAll.m_bits1.m_bit10;
+        if ((!scriptMoveFlag && (scriptMoveEnd != 0))
+            || (scriptMoveFlag && (scriptMoveEnd == 2))) {
             *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xDF;
             CFlatRuntime::CStack stack;
             stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
@@ -535,8 +532,8 @@ void CGObject::move()
         const u8 player = m_animStateMisc;
         const bool canReadPad = (static_cast<char>(player) >= 0)
             && (static_cast<char>(player) <= 3)
-            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x18) | (weaponFlagsHi >> 8)) < 0)
-            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
+            && m_weaponNodeFlagAll.m_bits1.m_shield
+            && m_weaponNodeFlagAll.m_bits1.m_menuReady
             && ((Game.m_gameWork.m_menuStageMode == 0) || (player == 0));
 
         if (canReadPad) {
@@ -591,9 +588,7 @@ void CGObject::move()
             }
 
             if (((miniGameFlags & 0x40) == 0) && ((buttonsDown & 0x1000) != 0)) {
-                if (static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1B)
-                                         | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 5))
-                    < 0) {
+                if (m_weaponNodeFlagBits.m_unk10) {
                     PSVECAdd(&m_groundHitOffset, &m_jumpOffset, &m_groundHitOffset);
                 } else {
                     m_worldPosition.y += sJumpLift;
@@ -640,9 +635,8 @@ void CGObject::move()
 
             PSVECNormalize(&moveVec, &moveVec);
 
-            weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
-            if ((static_cast<int>(static_cast<u32>(weaponFlagsHi) << 0x18) < 0)
-                && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
+            if (m_weaponNodeFlagAll.m_bits1.m_shield
+                && m_weaponNodeFlagAll.m_bits1.m_menuReady
                 && (m_ownerType == 0)) {
                 if ((MiniGamePcs.m_flags & 2) != 0) {
                     speed *= static_cast<double>(sAnalogSpeedScale);
@@ -683,10 +677,7 @@ void CGObject::move()
 
         PSVECAdd(&m_groundHitOffset, &moveVec, &m_groundHitOffset);
 
-        if (!movingWithScript
-            || (static_cast<int>((static_cast<u32>(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1)) << 0x1C)
-                                     | (*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) >> 4))
-                < 0)) {
+        if (!movingWithScript || m_weaponNodeFlagAll.m_bits1.m_bit08) {
             if (Game.m_currentMapId == 0x21) {
                 const double slideSq = static_cast<double>(PSVECSquareMag(&m_groundHitOffset));
                 if (static_cast<double>(sSlideThreshold) < slideSq) {
@@ -733,10 +724,7 @@ void CGObject::move()
             }
         }
 
-        if (movingWithScript
-            && (static_cast<int>((static_cast<u32>(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1)) << 0x1D)
-                                     | (*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) >> 3))
-                >= 0)) {
+        if (movingWithScript && !m_weaponNodeFlagAll.m_bits1.m_bit04) {
             m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
         } else {
             m_animSlotSel = *reinterpret_cast<s8*>(&m_animStartFrame);

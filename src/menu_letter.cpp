@@ -1017,9 +1017,10 @@ bool CMenuPcs::LetterClose()
 
 	bool allFinished = panelCount == finished;
 	if (allFinished && SingGetLetterAttachflg() >= 0) {
-		s_BackUpCur[0] = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x26);
+		int state2 = GetLetterStateBase(this);
+		s_BackUpCur[0] = *reinterpret_cast<s16*>(state2 + 0x26);
+		s_BackUpCur[1] = *reinterpret_cast<s16*>(state2 + 0x28);
 		s_BackUpTopPos = s_SelLetter - s_BackUpCur[0];
-		s_BackUpCur[1] = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x28);
 	}
 
 	return allFinished;

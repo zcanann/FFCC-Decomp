@@ -3141,8 +3141,7 @@ void CMenuPcs::createBonus()
 	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
-	CMemory::CStage* stage = MenuPcs.m_menuStage;
-	s_Rinfo = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;
+	s_Rinfo = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
@@ -3151,9 +3150,9 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
-	statePtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
+	statePtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
 	this->m_bonusStatePtr = statePtr;
-	listPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
+	listPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
 	this->m_bonusListPtr = listPtr;
 
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
@@ -3161,14 +3160,14 @@ void CMenuPcs::createBonus()
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	s_Base[0] = reinterpret_cast<float*>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
+	s_Base[0] = reinterpret_cast<float*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
-	animPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
+	animPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
 	this->m_bonusAnimPtr = animPtr;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
-	boardPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
+	boardPtr = reinterpret_cast<int>(new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
 	this->m_bonus.m_bonusBoardPtr = boardPtr;
-	window = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
+	window = new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) MenuWindowInfo;
 	this->m_menuWindowInfo = window;
 	memset(window, 0, sizeof(MenuWindowInfo));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
@@ -3322,7 +3321,7 @@ void CMenuPcs::createBonus()
 				modelCode = entry.m_partySlot + 0x87;
 			}
 			CCharaPcs::CHandle* handle =
-			    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
+			    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
 			displaySlots[i] = handle;
 			handle->Add();
 			handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
@@ -3337,7 +3336,7 @@ void CMenuPcs::createBonus()
 				displaySlots[handleIndex] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =
-				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
+				    new (MenuPcs.m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
 				displaySlots[handleIndex] = itemHandle;
 				itemHandle->Add();
 				unsigned short itemModelCode =

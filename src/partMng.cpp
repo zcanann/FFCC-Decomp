@@ -1500,8 +1500,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    char* payload = packet + 0x20;
-    float* payloadFloats = reinterpret_cast<float*>(payload);
+    float* payloadFloats = reinterpret_cast<float*>(packet + 0x20);
     int* packetWords = reinterpret_cast<int*>(packet);
 
     switch (code) {
@@ -1512,7 +1511,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
 
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = static_cast<int>(code);
-        memcpy(self + kEditCameraMatrixOffset, payload, 0x30);
+        memcpy(self + kEditCameraMatrixOffset, (packet + 0x20), 0x30);
         *reinterpret_cast<int*>(self + kEditCameraExtraOffset) = packetWords[0x14];
         memcpy(self + kEditCameraExtraOffset + 4, packetWords + 0x15, 0xE0);
         *reinterpret_cast<unsigned int*>(self + 0x158) = static_cast<unsigned int>(packetWords[0x4E]);
@@ -1636,7 +1635,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
             }
 
-            int slotIndex = static_cast<int>(*reinterpret_cast<short*>(payload));
+            int slotIndex = static_cast<int>(*reinterpret_cast<short*>((packet + 0x20)));
             if (*modelTablePtr != 0 && 0 <= slotIndex && slotIndex < 0x88) {
                 pppModelSt*& modelSlot = (*modelTablePtr)[slotIndex];
                 if (modelSlot != 0) {
@@ -1730,7 +1729,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 textRaw = operator new[](packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x625);
             }
 
-            memcpy(textRaw, payload, packetSize - 0x20);
+            memcpy(textRaw, (packet + 0x20), packetSize - 0x20);
 
             unsigned char* textBytes = reinterpret_cast<unsigned char*>(textRaw);
             unsigned short* textEntry = reinterpret_cast<unsigned short*>(
@@ -1772,7 +1771,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
         if (m_pdtSlots[0].m_pppDataHead != 0) {
-            memcpy(m_pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
+            memcpy(m_pdtSlots[0].m_pppDataHead, (packet + 0x20), packetSize - 0x20);
             pppInitPdt(reinterpret_cast<long*>(m_pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
         }
 
@@ -1812,7 +1811,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (*reinterpret_cast<int*>(self + kEditCountOffset) == 0) {
             *reinterpret_cast<void**>(self + kRecvWriteOffset) = *reinterpret_cast<void**>(self + kRecvBuffOffset);
         }
-        memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), payload, packetSize - 0x20);
+        memcpy(*reinterpret_cast<void**>(self + kRecvWriteOffset), (packet + 0x20), packetSize - 0x20);
         *reinterpret_cast<unsigned char**>(self + kRecvWriteOffset) += 0x60;
         *reinterpret_cast<int*>(self + kEditCountOffset) += 1;
         return;
@@ -1836,7 +1835,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
-        memcpy(m_pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
+        memcpy(m_pdtSlots[pdtCount].m_pppDataHead, (packet + 0x20), packetSize - 0x20);
         pppInitPdt(reinterpret_cast<long*>(m_pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
         *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
         return;
@@ -1847,7 +1846,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         {
             CChunkFile chunkFile;
-            chunkFile.SetBuf(payload);
+            chunkFile.SetBuf((packet + 0x20));
 
             CChunkFile::CChunk chunk;
             while (chunkFile.GetNextChunk(chunk)) {
@@ -1946,7 +1945,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         gPppCalcDisabled = 1;
         return;
     case 0x16:
-        memcpy(self + kCmd16PayloadOffset, payload, 8);
+        memcpy(self + kCmd16PayloadOffset, (packet + 0x20), 8);
         return;
     case 0x17:
         if (m_pppEnvSt.m_isEditMode != 0) {
@@ -1958,23 +1957,23 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         return;
     case 0x18:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x18;
-        memcpy(self + kLoadMapArgsOffset, payload, 8);
+        memcpy(self + kLoadMapArgsOffset, (packet + 0x20), 8);
         return;
     case 0x19:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x19;
-        memcpy(self + kLoadModelArgsOffset, payload, 0xC);
+        memcpy(self + kLoadModelArgsOffset, (packet + 0x20), 0xC);
         return;
     case 0x1A:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1A;
-        memcpy(self + kLoadAnimNameOffset, payload, 0x20);
+        memcpy(self + kLoadAnimNameOffset, (packet + 0x20), 0x20);
         return;
     case 0x1B:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1B;
-        memcpy(self + kMapPcsFlagOffset, payload, 4);
+        memcpy(self + kMapPcsFlagOffset, (packet + 0x20), 4);
         return;
     case 0x1C:
         *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1C;
-        memcpy(self + kCharaVisToggleOffset, payload, 4);
+        memcpy(self + kCharaVisToggleOffset, (packet + 0x20), 4);
         return;
     case 0x1D:
         *reinterpret_cast<int*>(self + kCursorRequestOffset) = 1;
@@ -1989,7 +1988,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kEditFrameOffset) = 0;
         return;
     case 0x42:
-        memcpy(self + kCursorPacketOffset, payload, 0x28);
+        memcpy(self + kCursorPacketOffset, (packet + 0x20), 0x28);
         *reinterpret_cast<int*>(self + kEditFrameOffset) = 1;
         return;
     case 0x1f:

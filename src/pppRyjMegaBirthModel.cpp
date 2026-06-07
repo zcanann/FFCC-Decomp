@@ -564,7 +564,25 @@ void birth(
 
             mode = params->m_spawnMode;
             if ((mode == 8) || (mode == 9)) {
-                orthonormalize_particle_matrix(particleData);
+                Vec rowX;
+                Vec rowY;
+                Vec rowZ;
+                Vec rowPos;
+
+                pppGetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
+                pppNormalize(rowY, rowPos);
+                rowY.x = rowY.x * params->m_directionScale.x;
+                rowY.y = rowY.y * params->m_directionScale.y;
+                rowY.z = rowY.z * params->m_directionScale.z;
+                particleData->m_matrix[0][1] = rowY.x;
+                particleData->m_matrix[1][1] = rowY.y;
+                particleData->m_matrix[2][1] = rowY.z;
+                pppNormalize(rowY, rowY);
+                pppOuterProduct(rowZ, rowY, rowX);
+                pppNormalize(rowZ, rowZ);
+                pppOuterProduct(rowX, rowZ, rowY);
+                pppNormalize(rowX, rowX);
+                pppSetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
             }
         }
         goto join_position;

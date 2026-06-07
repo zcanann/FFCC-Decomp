@@ -972,15 +972,14 @@ void CGPartyObj::onFramePreCalc()
 
 	int weaponItem;
 	int weaponRef;
-	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-
-	if ((Game.m_gameWork.m_menuStageMode == 0) &&
-	    ((party.pendingWeaponItem != weaponItem) || (party.weaponItem != weaponRef))) {
+	if ((CFlatCenterState() == 0) &&
+	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef),
+	     (party.weaponItem != weaponItem) || (party.pendingWeaponItem != weaponRef))) {
 		bool canImmediateSwap =
-		    ((party.partyFlags & 0x80) == 0) &&
-		    ((party.partyFlags & 0x40) == 0) &&
+		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
+		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (party.carryObject == nullptr) &&
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) &&
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0);
 
@@ -991,13 +990,13 @@ void CGPartyObj::onFramePreCalc()
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
 			}
-			party.pendingWeaponItem = weaponItem;
-			party.weaponItem = weaponRef;
-			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			party.weaponItem = weaponItem;
+			party.pendingWeaponItem = weaponRef;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(party.weaponItem);
 			party.commandFlags &= 0xDF;
 		} else {
-			party.pendingWeaponItem = weaponItem;
-			party.weaponItem = weaponRef;
+			*reinterpret_cast<int*>(self + 0x6D4) = weaponItem;
+			party.weaponRef = weaponRef;
 			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
 			changeStat(0x0F, 0, 0);
 		}
@@ -4550,7 +4549,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 		outVec->x = m_partyDelta[0].x;
 		outVec->y = m_partyDelta[0].y;
 		outVec->z = m_partyDelta[0].z;
-		outVec->y = 0.0f;
+		outVec->y = FLOAT_80331a78;
 
 		outDist = PSVECMag(outVec);
 		float maxDist0 = m_partyDistance[0];
@@ -4576,7 +4575,7 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 			PSVECSubtract(reinterpret_cast<Vec*>(leaderPtr + 0x50), nextPos, &delta);
 			outDist += PSVECMag(&delta);
 
-			delta.y = 0.0f;
+			delta.y = FLOAT_80331a78;
 			float flatStep = PSVECMag(&delta);
 			flatLen += flatStep;
 
@@ -4605,13 +4604,14 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 	outVec->x = m_partyDelta[0].x;
 	outVec->y = m_partyDelta[0].y;
 	outVec->z = m_partyDelta[0].z;
-	outVec->y = 0.0f;
+	outVec->y = FLOAT_80331a78;
 
 	outDist = PSVECMag(outVec);
 	float maxDist = m_partyDistance[0];
-	if (outDist >= maxDist) {
-		outDist = maxDist;
+	if (outDist < maxDist) {
+		maxDist = outDist;
 	}
+	outDist = maxDist;
 }
 
 /*

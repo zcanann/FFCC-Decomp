@@ -1482,17 +1482,18 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(powerSource->m_scriptHandle) + 8);
+				float multiplier = CharaObjGetStatusMultiplier(0x2E);
 				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				int rawDamage = static_cast<int>(multiplier * static_cast<float>(basePower + sourcePower)) - defense;
+				if (rawDamage < 1) {
+					rawDamage = 1;
+				}
 				unsigned int bonus = (sourceObj->GetCID() & 0x6D) == 0x6D ?
 					static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
 						reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDE)) :
 					0;
-				damageAmount =
-					static_cast<int>(((basePower + sourcePower) * CharaObjGetStatusMultiplier(0x2E)) - defense);
-				if (damageAmount < 1) {
-					damageAmount = 1;
-				}
-				damageAmount += bonus;
+				damageAmount = rawDamage + bonus;
+				System.Printf(dbg + 0x1DC, basePower, sourcePower, defense, bonus, damageAmount);
 			} else if (staType == 0x24 || staType == 0x25 || staType == 100 ||
 			           staType == 0x69 || staType == 0x6A) {
 				unsigned int basePower = (itemEffect == 0x1F8) ?

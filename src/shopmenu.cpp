@@ -3153,7 +3153,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
 
     unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
     unsigned char* displayList = shapeBytes;
-    int shapeCount = *reinterpret_cast<short*>(shapeBytes + 2);
+    int shapeCount = *reinterpret_cast<unsigned short*>(shapeBytes + 2);
     for (int i = 0; i < shapeCount; i++) {
         GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
         displayList += 8;

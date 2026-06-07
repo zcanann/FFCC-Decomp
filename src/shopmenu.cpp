@@ -875,7 +875,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     const char* sourceText;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    if (CanTradeShopMenuItem(this, index, itemNo)) {
+    if (CanTradeShopMenuItem(this, index, getItemNo(index))) {
         sourceText = reinterpret_cast<const char*>(GetShopMenuHelpMsgTable()[itemNo]);
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);

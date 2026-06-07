@@ -3028,38 +3028,35 @@ void CMaterialSet::Calc()
     while (materialIndex < static_cast<unsigned long>(m_materials.GetSize())) {
         CMaterial* material = m_materials[materialIndex];
         if (material != 0) {
-            CTexScroll* texScroll = material->GetTexScroll(0);
-            for (int i = 0; i < 4; i++) {
+            int i = 0;
+            do {
+                CTexScroll* texScroll = material->GetTexScroll(i);
                 if (texScroll->m_type0 == 1) {
-                    float& offsetU = texScroll->m_u0;
-                    offsetU += texScroll->m_u1;
-                    if (offsetU > 1.0f) {
-                        offsetU -= 1.0f;
-                    } else if (offsetU < 0.0f) {
-                        offsetU += 1.0f;
+                    texScroll->m_u0 = texScroll->m_u0 + texScroll->m_u1;
+                    if (texScroll->m_u0 > 1.0f) {
+                        texScroll->m_u0 = texScroll->m_u0 - 1.0f;
+                    } else if (texScroll->m_u0 < 0.0f) {
+                        texScroll->m_u0 = texScroll->m_u0 + 1.0f;
                     }
                 } else if (texScroll->m_type0 == 2) {
-                    CMapKeyFrame* keyFrameU = texScroll->m_uKeyFrame;
-                    texScroll->m_u0 = keyFrameU->Get();
-                    keyFrameU->Calc();
+                    texScroll->m_u0 = texScroll->m_uKeyFrame->Get();
+                    texScroll->m_uKeyFrame->Calc();
                 }
 
                 if (texScroll->m_type1 == 1) {
-                    float& offsetV = texScroll->m_v0;
-                    offsetV += texScroll->m_v1;
-                    if (offsetV > 1.0f) {
-                        offsetV -= 1.0f;
-                    } else if (offsetV < 0.0f) {
-                        offsetV += 1.0f;
+                    texScroll->m_v0 = texScroll->m_v0 + texScroll->m_v1;
+                    if (texScroll->m_v0 > 1.0f) {
+                        texScroll->m_v0 = texScroll->m_v0 - 1.0f;
+                    } else if (texScroll->m_v0 < 0.0f) {
+                        texScroll->m_v0 = texScroll->m_v0 + 1.0f;
                     }
                 } else if (texScroll->m_type1 == 2) {
-                    CMapKeyFrame* keyFrameV = texScroll->m_vKeyFrame;
-                    texScroll->m_v0 = keyFrameV->Get();
-                    keyFrameV->Calc();
+                    texScroll->m_v0 = texScroll->m_vKeyFrame->Get();
+                    texScroll->m_vKeyFrame->Calc();
                 }
 
-                texScroll++;
-            }
+                i++;
+            } while (i < 4);
         }
 
         materialIndex++;

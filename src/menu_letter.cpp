@@ -715,7 +715,7 @@ int CMenuPcs::LetterCtrl()
 			}
 			if (panelCount == messOpenDone) {
 				if (SingGetLetterAttachflg() >= 0) {
-					if (s_AttachMode >= 1) {
+					if (s_AttachMode > 0) {
 						*reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x30) = 5;
 					} else {
 						s_Attach = 2;

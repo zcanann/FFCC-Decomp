@@ -3104,6 +3104,11 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
  */
 void CPartMng::pppDrawIdx(int partIndex)
 {
+    struct PppCullBound {
+        Vec m_min;
+        Vec m_max;
+    };
+
     struct PppMngStDrawIdxRaw {
         void* m_pppResSet;                   // 0x00
         unsigned char m_pad04[0x14 - 0x4];
@@ -3153,12 +3158,15 @@ void CPartMng::pppDrawIdx(int partIndex)
             return;
         }
 
-        CBound bound;
-        Vec min;
-        min.x = partPos.x - mng->m_cullRadius;
-        min.y = partPos.y;
-        min.z = partPos.z - mng->m_cullRadius;
-        if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
+        PppCullBound bound;
+        float radius = mng->m_cullRadius;
+        bound.m_min.x = partPos.x - radius;
+        bound.m_min.y = partPos.y;
+        bound.m_min.z = partPos.z - radius;
+        bound.m_max.x = partPos.x + radius;
+        bound.m_max.y = partPos.y + mng->m_cullYOffset;
+        bound.m_max.z = partPos.z + radius;
+        if (reinterpret_cast<CBound*>(&bound)->CheckFrustum(bound.m_min, ppvCameraMatrix, partPos.y + mng->m_cullYOffset) == 0) {
             return;
         }
     }

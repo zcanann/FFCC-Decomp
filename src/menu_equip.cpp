@@ -461,8 +461,8 @@ void CMenuPcs::EquipDraw()
 	item = menuData->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			int iconY = (int)((float)(item->y + 6) - kEquipOne);
-			int iconX = item->x + item->w - 0x10;
+			int iconX = (int)EquipIntToFloat(item->x + item->w - 0x10);
+			int iconY = (int)(EquipIntToFloat(item->y + 6) - kEquipOne);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			DrawSingleIcon(itemIdx, iconX, iconY, item->alpha, 0, kEquipOne);
 		}
@@ -478,18 +478,19 @@ void CMenuPcs::EquipDraw()
 	item = menuData->entries;
 	for (int i = 0; i < 4; i++) {
 		if (caravanWork->m_equipment[i] >= 0) {
-			u8 alpha = (u8)(kEquipColorMax * item->alpha);
-			CColor color(0xff, 0xff, 0xff, alpha);
+			float alpha = item->alpha;
+			CColor color(0xff, 0xff, 0xff, (u8)(int)(kEquipColorMax * alpha));
 			font->SetColor(color.color);
 			int itemIdx = caravanWork->m_inventoryItems[caravanWork->m_equipment[i]];
 			const char* str = GetAttrStr(itemIdx);
 			if ((mode == 0) && (i == static_cast<int>(menuState->selectedIndex))) {
 				helpItem = itemIdx;
 			}
-			double textX = (double)item->x + ((double)item->w - (double)font->GetWidth(str)) * kEquipHalfDouble;
-			double textY = (double)(item->y + 0xb);
-			font->SetPosX((float)textX);
-			font->SetPosY((float)(textY - (double)kEquipTextYOffset));
+			float width = font->GetWidth(str);
+			float textX = (float)((((float)item->w - width) * kEquipHalfDouble) + (float)item->x);
+			float textY = (float)(item->y + 0xb);
+			font->SetPosX(textX);
+			font->SetPosY(textY - kEquipTextYOffset);
 			font->Draw(str);
 		}
 		item++;
@@ -621,8 +622,8 @@ void CMenuPcs::EquipDraw()
 
 			if (str != NULL) {
 				font->GetWidth(str);
-				font->SetPosX((float)(textItem->x + 0x1c));
-				font->SetPosY((float)(textItem->y + 0xb) - kEquipTextYOffset);
+				font->SetPosX(EquipIntToFloat(textItem->x + 0x1c));
+				font->SetPosY(EquipIntToFloat(textItem->y + 0xb) - kEquipTextYOffset);
 				font->Draw(str);
 			}
 			textItem++;
@@ -634,8 +635,8 @@ void CMenuPcs::EquipDraw()
 		for (int i = 0; (i < 8) && (i + menuState->scroll < letter[0]); i++) {
 			int idx = i + menuState->scroll;
 			if ((idx > 0) && (letter[idx] >= 0)) {
-				int iconY = (int)((float)(iconItem->y + 6) - kEquipOne);
-				int iconX = (int)(float)(iconItem->x + iconItem->w - 0x10);
+				int iconX = (int)EquipIntToFloat(iconItem->x + iconItem->w - 0x10);
+				int iconY = (int)(EquipIntToFloat(iconItem->y + 6) - kEquipOne);
 				int itemIdx = caravanWork->m_inventoryItems[letter[idx]];
 				DrawSingleIcon(itemIdx, iconX, iconY, listStart->alpha, 0, kEquipOne);
 			}

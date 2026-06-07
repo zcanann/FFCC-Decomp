@@ -12568,7 +12568,7 @@ int McCtrl::LoadMcList()
 
 	switch (m_state) {
 	case 0:
-		MenuPcs.ClrMcList();
+		memset(MenuPcs.m_wmWorkBuffer, 0, kMcListEntrySize * kMcListCount);
 		MemoryCardMan.McMount(m_cardChannel);
 		m_lastResult = MemoryCardMan.GetResult();
 		m_state = 1;
@@ -12585,12 +12585,10 @@ int McCtrl::LoadMcList()
 					m_state = 2;
 				} else if (m_lastResult == -0x0D) {
 					m_state = -1;
-					m_lastResult = -2;
-					return;
+					return -2;
 				} else if (m_lastResult == -5) {
 					m_state = -1;
-					m_lastResult = -4;
-					return;
+					return -4;
 				} else {
 					m_state = -1;
 				}
@@ -12613,12 +12611,7 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
-				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
-				}
-				m_lastResult = -3;
-				return;
+				return (m_lastResult == -5) ? -4 : -3;
 			}
 			m_state = 4;
 		}
@@ -12631,52 +12624,53 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.McUnmount(m_cardChannel);
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;
-				break;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				m_state = -1;
 			}
 			if (m_lastResult == -5) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-				m_state = -1;
-				m_lastResult = -4;
-				return;
+				return -4;
 			}
-			MemoryCardMan.McUnmount(m_cardChannel);
-			MemoryCardMan.DestroyMcBuff();
-			m_state = -1;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
-			m_state = 5;
-		} else {
+		} else if (MemoryCardMan.IsBrokenFile()) {
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					entry[0x42] = 1;
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
-				}
-				m_state = 7;
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				struct McListEntry {
+					int m_words[11];
+					char m_name[0x15];
+					char m_byte41;
+					char m_byte42;
+					char m_byte43;
+				};
+				McListEntry entry;
+				memset(&entry, 0, sizeof(entry));
+				entry.m_byte42 = 1;
+				for (int i = 0; i < kMcListCount; i++) {
+					*reinterpret_cast<McListEntry*>(MenuPcs.m_wmWorkBuffer + i * kMcListEntrySize) = entry;
+				}
+				m_state = 7;
 			}
+		} else {
+			m_state = 5;
 		}
 		break;
 
 	case 5: {
-		unsigned int serialLo = 0;
-		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		unsigned long long serial;
+		if (CARDGetSerialNo(m_cardChannel, &serial) != 0) {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
-			m_lastResult = -1;
-			return;
+			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
+		m_serialHi = static_cast<unsigned int>(serial);
+		m_serialLo = static_cast<unsigned int>(serial >> 32);
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_iteration * 0xA000 + 0x4000);
 		m_state = 6;
@@ -12692,8 +12686,7 @@ int McCtrl::LoadMcList()
 				MemoryCardMan.DestroyMcBuff();
 				m_state = -1;
 				if (m_lastResult == -5) {
-					m_lastResult = -4;
-					return;
+					return -4;
 				}
 			} else {
 				MemoryCardMan.DecodeData();
@@ -12704,27 +12697,30 @@ int McCtrl::LoadMcList()
 					m_state = 5;
 				} else {
 					const int closeResult = MemoryCardMan.McClose();
-					if (closeResult == 0) {
+					if (closeResult != 0) {
+						m_lastResult = closeResult;
+						m_state = -1;
+					} else {
 						MemoryCardMan.McUnmount(m_cardChannel);
 						MemoryCardMan.DestroyMcBuff();
 						m_state = 7;
-					} else {
-						m_lastResult = closeResult;
-						m_state = -1;
 					}
 				}
 			}
 		}
 		break;
+
+	case 7:
+		break;
 	}
 
 	if (m_state == -1) {
-		m_lastResult = -1;
-	} else if (m_state == 7) {
-		m_lastResult = 1;
-	} else {
-		m_lastResult = 0;
+		return -1;
 	}
+	if (m_state == 7) {
+		return 1;
+	}
+	return 0;
 }
 
 /*

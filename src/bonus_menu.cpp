@@ -1799,8 +1799,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 void CMenuPcs::DrawResultCloseAnim()
 {
 	int statePtr = this->m_bonusStatePtr;
-	int modelIndex = 0;
-	int lastKind = 0;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
 		return;
@@ -1811,6 +1809,8 @@ void CMenuPcs::DrawResultCloseAnim()
 	DrawInit();
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
+	int modelIndex = 0;
+	int lastKind = 0;
 	for (int i = 0; i < (int)((BonusAnimList*)this->m_bonusAnimPtr)->header.count; i++) {
 		BonusAnimSprite* sprite = &((BonusAnimList*)this->m_bonusAnimPtr)->sprites[i];
 		int kind = sprite->kind;

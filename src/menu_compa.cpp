@@ -25,18 +25,8 @@ static const double kCompaIntToDoubleBias = 4503601774854144.0;
 extern "C" const float FLOAT_80333038;
 extern "C" const float FLOAT_8033303C;
 
-static const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
+static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
 static const char s_menu_compa_cpp[] = "menu_compa.cpp";
-
-extern "C" const char s_MenuOptionMonoUpper_803334A8[];
-extern "C" const char s_MenuOptionNormalIt_803334B0[];
-extern "C" const char s_MenuOptionForza_803334B8[];
-extern "C" const char s_MenuOptionDifesa_803334C0[];
-extern "C" const char s_MenuOptionSonoro_803334C8[];
-extern "C" const char s_MenuOptionMusica_803334D0[];
-extern "C" const char s_MenuOptionMonoIt_803334D8[];
-extern "C" const char s_MenuOptionContr_803334E0[];
-extern "C" const char s_MenuOptionNorm_803334E8[];
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
@@ -198,7 +188,7 @@ void CMenuPcs::CompaDraw()
 		}
 	}
 	if (familyCount > 4 && System.m_execParam >= 1) {
-		System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp, 0x1BF,
+		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
 	}
 	if (familyCount > 4) {
@@ -229,7 +219,7 @@ void CMenuPcs::CompaDraw()
 
 		u8 food = Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
 		if (food == 0 && System.m_execParam >= 1) {
-			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp, 0x1E0,
+			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
 		int icon = 0x1D;

@@ -509,16 +509,15 @@ int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float ma
 			CGObject* partyObj = reinterpret_cast<CGObject*>(party);
 			void** partyScript = partyObj->m_scriptHandle;
 
-			bool menuBlocked = false;
 			if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-				((partyPrg->GetCID() & 0x6D) == 0x6D) && (partyScript[0xED] != NULL)) {
-				menuBlocked = true;
+				((static_cast<unsigned short>(partyPrg->GetCID()) & 0x6D) == 0x6D) && (partyScript[0xED] != NULL)) {
+				goto next_slot;
 			}
 
-			bool valid = !menuBlocked;
+			bool valid = true;
 			if (valid && ((flags & 1) != 0)) {
 				int state = partyPrg->m_lastStateId;
-				valid = (*reinterpret_cast<short*>(partyScript + 7) != 0) && (state != 9) && (state != 0x22) && !menuBlocked;
+				valid = (*reinterpret_cast<short*>(partyScript + 7) != 0) && (state != 9) && (state != 0x22);
 			}
 			if (valid && ((flags & 0x10) != 0)) {
 				valid = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyScript) + 0x4E) != 0;

@@ -522,9 +522,14 @@ void birth(
                 particleData->m_matrix[0][3] = speed.x;
                 particleData->m_matrix[1][3] = speed.y;
                 particleData->m_matrix[2][3] = speed.z;
+
+                float speedY = particleData->m_matrix[1][3];
+                float scaleY = params->m_directionScale.y;
+                float speedZ = particleData->m_matrix[2][3];
+                float scaleZ = params->m_directionScale.z;
                 particleData->m_matrix[0][3] = particleData->m_matrix[0][3] * params->m_directionScale.x;
-                particleData->m_matrix[1][3] = particleData->m_matrix[1][3] * params->m_directionScale.y;
-                particleData->m_matrix[2][3] = particleData->m_matrix[2][3] * params->m_directionScale.z;
+                particleData->m_matrix[1][3] = speedY * scaleY;
+                particleData->m_matrix[2][3] = speedZ * scaleZ;
             }
             goto join_position;
         }

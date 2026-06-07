@@ -2204,12 +2204,12 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
 void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int rawIcon, float uvScale)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture(static_cast<CMenuPcs::TEX>(0x25));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x25));
     if (rawIcon == 0) {
         iconNo = static_cast<int>(gSingMenuItemIconByType[iconNo]);
     }
@@ -2221,7 +2221,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
         row--;
     }
 
-    DrawRect(0, static_cast<float>(posX), static_cast<float>(posY), FLOAT_8033292c, FLOAT_8033292c,
+    MenuPcs.DrawRect(0, static_cast<float>(posX), static_cast<float>(posY), FLOAT_8033292c, FLOAT_8033292c,
         static_cast<float>(col * 0x20), static_cast<float>(row * 0x20), uvScale, uvScale, FLOAT_8033294c);
 }
 
@@ -3064,22 +3064,22 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     unsigned char alphaU8 = static_cast<unsigned char>(FLOAT_80332940 * alpha);
     _GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture(static_cast<CMenuPcs::TEX>(0x53));
-    DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80332944,
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x53));
+    MenuPcs.DrawRect(0, static_cast<float>(x), static_cast<float>(y), FLOAT_80332944,
                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
-    DrawRect(8, static_cast<float>(x + 0x60), static_cast<float>(y), FLOAT_80332944,
+    MenuPcs.DrawRect(8, static_cast<float>(x + 0x60), static_cast<float>(y), FLOAT_80332944,
                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
 
-    SetTexture(static_cast<CMenuPcs::TEX>(0x54));
-    DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x54));
+    MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
                                     FLOAT_80332950, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
 
@@ -3096,17 +3096,17 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
         ++bars;
     }
 
-    SetTexture(static_cast<CMenuPcs::TEX>(tex));
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
     int barY = y + 8;
-    DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(barY),
+    MenuPcs.DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(barY),
                                     FLOAT_80332954, FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
-    DrawRect(8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+    MenuPcs.DrawRect(8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
                                     FLOAT_80332954, FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
 
-    SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
-    DrawRect(0, static_cast<float>(x + 0x14), static_cast<float>(barY),
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
+    MenuPcs.DrawRect(0, static_cast<float>(x + 0x14), static_cast<float>(barY),
                                     static_cast<float>(bars * 8 - 8), FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, FLOAT_8033294c);
 }

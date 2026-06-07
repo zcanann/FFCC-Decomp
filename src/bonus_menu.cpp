@@ -2514,7 +2514,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						handle = displaySlots[modelIndex - activePartyCount];
 					}
 
-					if (handle->m_model->m_lightAlpha > 0.0f) {
+					if ((double)handle->m_model->m_lightAlpha > 0.0) {
 						SetProjection(modelIndex);
 						SetLight(1);
 						handle->m_flags = 0x300543;
@@ -2535,12 +2535,23 @@ void CMenuPcs::DrawResultOpenAnim()
 
 					_GXColor colors[4];
 					if (kind == 0x17) {
-						_GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-						colors[0] = white;
-						colors[1] = white;
-						colors[2] = white;
-						colors[3] = white;
-						_GXColor color = white;
+						colors[0].r = 0xFF;
+						colors[0].g = 0xFF;
+						colors[0].b = 0xFF;
+						colors[0].a = 0xFF;
+						colors[1].r = 0xFF;
+						colors[1].g = 0xFF;
+						colors[1].b = 0xFF;
+						colors[1].a = 0xFF;
+						colors[2].r = 0xFF;
+						colors[2].g = 0xFF;
+						colors[2].b = 0xFF;
+						colors[2].a = 0xFF;
+						colors[3].r = 0xFF;
+						colors[3].g = 0xFF;
+						colors[3].b = 0xFF;
+						colors[3].a = 0xFF;
+						_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 						GXSetChanMatColor(GX_COLOR0A0, color);
 					} else {
 						_GXColor color;

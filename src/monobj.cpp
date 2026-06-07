@@ -3580,9 +3580,8 @@ void CGMonObj::sysControl(int controlType)
  */
 void CGMonObj::onChangePrg(int value)
 {
-	CGObject* object = reinterpret_cast<CGObject*>(this);
-	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-
+#define object (reinterpret_cast<CGObject*>(this))
+#define mon (reinterpret_cast<unsigned char*>(this))
 	unsigned int weaponModeBits = (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000;
 	if ((static_cast<int>(weaponModeBits) >> 31) != value &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB)) {
@@ -3633,6 +3632,8 @@ void CGMonObj::onChangePrg(int value)
 	}
 
 	CGCharaObj::onChangePrg(value);
+#undef object
+#undef mon
 }
 
 /*

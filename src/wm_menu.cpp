@@ -68,8 +68,11 @@ int gWmModelYOffsetSplineCount = 9;
 float* gWmModelYOffsetSpline = gWmModelYOffsetSplinePoints;
 int gWmModelRotationSplineCount = 5;
 float* gWmModelRotationSpline = gWmModelRotationSplinePoints;
-int DAT_8032e8c0 = 5;
-float* DAT_8032e8c4 = lbl_802109B4;
+struct SplineTable {
+	int count;
+	float* data;
+};
+SplineTable s_YearTrns = {5, lbl_802109B4};
 int DAT_8032e8c8 = 3;
 float* DAT_8032e8cc = lbl_80210A04;
 int DAT_8032E8D0 = 4;
@@ -7247,26 +7250,32 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	int wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
+	int wmFrame;
 	if (sVar3 == 2 && bytes[0x13] != 0) {
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		*reinterpret_cast<int*>(wmFrame + 4) = *reinterpret_cast<int*>(wmFrame + 4) - 1;
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
 			*reinterpret_cast<int*>(wmFrame + 4) = 0;
 		}
 	} else {
 		if ((bytes[0x0A] & 1) != 0) {
+			wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 			int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
 			if (iVar16 != 0) {
 				*reinterpret_cast<int*>(wmFrame + 4) = iVar16 - 1;
+				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 				if (*reinterpret_cast<int*>(wmFrame + 4) < 0) {
 					*reinterpret_cast<int*>(wmFrame + 4) = 0;
 				}
+				wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 				if (*reinterpret_cast<int*>(wmFrame + 4) == 0) {
-					bytes[0x0A] = bytes[0x0A] & 0xFE;
+					bytes[0x0A] = bytes[0x0A] & ~1;
 				}
 				goto LAB_calc;
 			}
 		}
+		wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 		int iVar16 = *reinterpret_cast<int*>(wmFrame + 4);
 		if (iVar16 < 10) {
 			*reinterpret_cast<int*>(wmFrame + 4) = iVar16 + 1;
@@ -7295,13 +7304,12 @@ LAB_calc:
 	    (10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
-	     (worldState->m_mainState == 2 && bytes[0x13] != 0))
+	     (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0))
 	    && *reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) >= 10) {
 		*reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_frameData) + 8) = 0;
 		bytes[0x0A] = bytes[0x0A] & ~2;
 	}
 
-	fVar1 = FLOAT_803313e8;
 	char cVar2;
 	if ((bytes[0x0A] & 2) != 0) {
 		cVar2 = (char)bytes[0x0B];
@@ -7314,21 +7322,20 @@ LAB_calc:
 		gWmMenuScriptValueCache = 100;
 	}
 
-	unsigned int uVar14 = ((unsigned int)(((int)(uVar13 ^ 9) >> 1) - (int)((uVar13 ^ 9) & uVar13)) >> 0x1F) + 1;
+	int uVar14 = ((unsigned int)(((int)(uVar13 ^ 9) >> 1) - (int)((uVar13 ^ 9) & uVar13)) >> 0x1F) + 1;
 	if ((int)uVar13 > 99) {
 		uVar14 = 3;
 	}
 
-	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
-	*reinterpret_cast<float*>(wmFrame + 200) = FLOAT_803313e8;
-	*reinterpret_cast<float*>(wmFrame + 0xE4) = fVar1;
+	float fE8 = FLOAT_803313e8;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 200) = fE8;
+	*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xE4) = fE8;
 
 	const double dV12 = DOUBLE_80331540;
 	const double dV11 = DOUBLE_80331538;
 	const float fV4 = FLOAT_80331528;
 	const float fV1 = FLOAT_80331524;
 	const double dV10 = DOUBLE_80331490;
-	const double dV9 = DOUBLE_80331408;
 	int iVar16 = DAT_801dc140;
 	if (uVar14 == 3) {
 		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB4) = (0x2B - DAT_801dc140) / 2 + 0x2C;
@@ -7353,21 +7360,21 @@ LAB_calc:
 		int iVar15 = (0x2B - iVar16) / 2 + 0x2C;
 		int off = iVar19 * 0x1C;
 		int* piVar17 = digits + iVar19;
-		unsigned int cnt = uVar14;
+		int cnt = iVar19 + 1;
 		if (iVar19 >= 0) {
 			do {
 				int digit = *piVar17;
-				*reinterpret_cast<short*>(wmFrame + off + 0xB4) = (short)iVar15;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB4) = (short)iVar15;
 				int digitW = DAT_801dc118[digit];
 				piVar17--;
 				int iVar21 = digit / 5 + (digit >> 0x1F);
-				*reinterpret_cast<short*>(wmFrame + off + 0xB6) = 0x43;
-				*reinterpret_cast<short*>(wmFrame + off + 0xB8) = (short)digitW;
-				*reinterpret_cast<short*>(wmFrame + off + 0xBA) = 0x20;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB6) = 0x43;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xB8) = (short)digitW;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBA) = 0x20;
 				int col = digit + (iVar21 - (iVar21 >> 0x1F)) * -5;
 				int row = iVar21 - (iVar21 >> 0x1F);
-				*reinterpret_cast<float*>(wmFrame + off + 0xBC) = (float)(dV10 * (double)(float)col);
-				*reinterpret_cast<float*>(wmFrame + off + 0xC0) = (float)(dV12 * (double)(float)row + dV11);
+				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xBC) = (float)(dV10 * (double)(float)col);
+				*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + off + 0xC0) = (float)(dV12 * (double)(float)row + dV11);
 				iVar15 = iVar15 + digitW;
 				off = off - 0x1C;
 				cnt--;
@@ -7375,16 +7382,18 @@ LAB_calc:
 		}
 	}
 
-	wmFrame = reinterpret_cast<int>(m_wm.m_frameData);
 	if ((bytes[0x0A] & 2) != 0 ||
 	    (worldState->m_mainState == 2 && bytes[0x13] != 0)) {
 		int i = 0;
 		int off = 0;
-		unsigned int cnt = uVar14;
+		int cnt = uVar14;
 		const double dC0 = DOUBLE_80331408;
 		const double dE8 = DOUBLE_803316e8;
 		const double dF8 = DOUBLE_803313f8;
-		while (cnt != 0 && (i == 0 || uVar14 == 2)) {
+		for (; cnt != 0; cnt--, i++, off += 0x1C) {
+			if (i != 0 && uVar14 != 2) {
+				break;
+			}
 			int base = reinterpret_cast<int>(m_wm.m_frameData);
 			float fVar1 = static_cast<float>(
 			    static_cast<double>(static_cast<float>(10 - *reinterpret_cast<int*>(base + 8))) / dE8);
@@ -7393,39 +7402,39 @@ LAB_calc:
 			    static_cast<float>(dF8 * static_cast<double>(fVar1) + dF8);
 
 			int entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+			float prodBA = static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) *
+			               *reinterpret_cast<float*>(entry + 200);
 			*reinterpret_cast<short*>(entry + 0xB6) =
 			    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB6) +
 			                       static_cast<int>(
 			                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) -
-			                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xBA)) *
-			                               *reinterpret_cast<float*>(entry + 200)));
+			                           prodBA));
 
 			if (i == 0 && (uVar14 == 1 || uVar14 == 3)) {
 				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+				float prodB8a = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
+				               *reinterpret_cast<float*>(entry + 200);
 				*reinterpret_cast<short*>(entry + 0xB4) =
 				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
 				                       static_cast<int>(static_cast<float>(
 				                           (DOUBLE_80331420 +
 				                            static_cast<double>(
 				                                static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
-				                                static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
-				                                    *reinterpret_cast<float*>(entry + 200))) *
+				                                prodB8a)) *
 				                           DOUBLE_803313f8)));
 			} else if (i != 0) {
 				entry = reinterpret_cast<int>(m_wm.m_frameData) + off;
+				float prodB8b = static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
+				               *reinterpret_cast<float*>(entry + 200);
 				*reinterpret_cast<short*>(entry + 0xB4) =
 				    static_cast<short>(*reinterpret_cast<short*>(entry + 0xB4) +
 				                       static_cast<int>(
 				                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) -
-				                           static_cast<float>(*reinterpret_cast<short*>(entry + 0xB8)) *
-				                               *reinterpret_cast<float*>(entry + 200)));
+				                           prodB8b));
 			}
-
-			off += 0x1C;
-			i++;
-			cnt--;
 		}
-		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
+		int wmEnd = reinterpret_cast<int>(m_wm.m_frameData);
+		*reinterpret_cast<int*>(wmEnd + 8) = *reinterpret_cast<int*>(wmEnd + 8) + 1;
 	} else {
 		const double dE8 = DOUBLE_803316e8;
 		const double dC0 = DOUBLE_80331408;
@@ -7434,69 +7443,57 @@ LAB_calc:
 		int base = reinterpret_cast<int>(m_wm.m_frameData);
 		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(base + 8);
 		if (static_cast<float>(static_cast<int>(uVar - 5)) <
-		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]))) {
+		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(s_YearTrns.data[s_YearTrns.count * 4 - 4]))) {
 			float t = (float)(uVar) / FLOAT_803314c0;
 			float fVar5 = fDc;
-			if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
-				int idx = 0;
-				float* pf = DAT_8032e8c4;
-				int cnt = DAT_8032e8c0;
-				if (cnt > 0) {
-					do {
-						if (t <= *pf) {
-							if (idx == 0) {
-								fVar5 = DAT_8032e8c4[1];
-							} else {
-								float* cur = DAT_8032e8c4 + idx * 4;
-								float* prev = DAT_8032e8c4 + (idx - 1) * 4;
-								float dt = *cur - *prev;
-								float u = (t - *prev) / dt;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-								        prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				float* pf = s_YearTrns.data;
+				int cnt = s_YearTrns.count;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar5 = s_YearTrns.data[1];
+						} else {
+							float* cur = s_YearTrns.data + idx * 4;
+							float* prev = s_YearTrns.data + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
-						pf += 4;
-						idx++;
-						cnt--;
-					} while (cnt != 0);
+						break;
+					}
 				}
 			} else {
-				fVar5 = DAT_8032e8c4[DAT_8032e8c0 * 4 - 3];
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(base + 0xD2) =
 			    static_cast<short>(static_cast<int>(static_cast<float>(*reinterpret_cast<short*>(base + 0xD2)) + fVar5));
 
 			float fVar1 = fDc;
 			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
-				int idx = 0;
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
-				if (cnt > 0) {
-					do {
-						if (t <= *pf) {
-							if (idx == 0) {
-								fVar1 = DAT_8032e8cc[1];
-							} else {
-								float* cur = DAT_8032e8cc + idx * 4;
-								float* prev = DAT_8032e8cc + (idx - 1) * 4;
-								float dt = *cur - *prev;
-								float u = (t - *prev) / dt;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-								        prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar1 = DAT_8032e8cc[1];
+						} else {
+							float* cur = DAT_8032e8cc + idx * 4;
+							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
-						pf += 4;
-						idx++;
-						cnt--;
-					} while (cnt != 0);
+						break;
+					}
 				}
 			} else {
 				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
@@ -7509,66 +7506,54 @@ LAB_calc:
 			}
 			t = (float)(uVar) / FLOAT_803314c0;
 			fVar5 = fDc;
-			if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
-				int idx = 0;
-				float* pf = DAT_8032e8c4;
-				int cnt = DAT_8032e8c0;
-				if (cnt > 0) {
-					do {
-						if (t <= *pf) {
-							if (idx == 0) {
-								fVar5 = DAT_8032e8c4[1];
-							} else {
-								float* cur = DAT_8032e8c4 + idx * 4;
-								float* prev = DAT_8032e8c4 + (idx - 1) * 4;
-								float dt = *cur - *prev;
-								float u = (t - *prev) / dt;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-								        prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+			if (t < s_YearTrns.data[s_YearTrns.count * 4 - 4]) {
+				float* pf = s_YearTrns.data;
+				int cnt = s_YearTrns.count;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar5 = s_YearTrns.data[1];
+						} else {
+							float* cur = s_YearTrns.data + idx * 4;
+							float* prev = s_YearTrns.data + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar5 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
-						pf += 4;
-						idx++;
-						cnt--;
-					} while (cnt != 0);
+						break;
+					}
 				}
 			} else {
-				fVar5 = DAT_8032e8c4[DAT_8032e8c0 * 4 - 3];
+				fVar5 = s_YearTrns.data[s_YearTrns.count * 4 - 3];
 			}
 			*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) =
 			    static_cast<short>(static_cast<int>(
 			        static_cast<float>(*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6)) + fVar5));
 
 			if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
-				int idx = 0;
 				float* pf = DAT_8032e8cc;
 				int cnt = DAT_8032e8c8;
-				if (cnt > 0) {
-					do {
-						if (t <= *pf) {
-							if (idx == 0) {
-								fVar1 = DAT_8032e8cc[1];
-							} else {
-								float* cur = DAT_8032e8cc + idx * 4;
-								float* prev = DAT_8032e8cc + (idx - 1) * 4;
-								float dt = *cur - *prev;
-								float u = (t - *prev) / dt;
-								float u2 = u * u;
-								float u3 = u2 * u;
-								fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
-								        prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
-								        cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
-							}
-							break;
+				for (int idx = 0; idx < cnt; idx++, pf += 4) {
+					if (t <= *pf) {
+						if (idx == 0) {
+							fVar1 = DAT_8032e8cc[1];
+						} else {
+							float* cur = DAT_8032e8cc + idx * 4;
+							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							fVar1 = dt * (prev[3] * (u + (u3 - FLOAT_803314c8 * u2)) + cur[2] * (u3 - u2)) +
+							        (prev[1] * (FLOAT_803313e8 + (FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2)) +
+							         cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2));
 						}
-						pf += 4;
-						idx++;
-						cnt--;
-					} while (cnt != 0);
+						break;
+					}
 				}
 			} else {
 				fVar1 = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];

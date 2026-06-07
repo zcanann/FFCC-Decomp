@@ -1703,12 +1703,12 @@ frameLoop:
 			object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
 			continue;
 		}
-		case 8: {
+		case 9: {
 			--object->m_sp;
-			if (*object->m_sp == 0) {
+			if (*object->m_sp != 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
-					*object->m_sp++ = 0;
+					*object->m_sp++ = 1;
 				}
 				const u32 codePos = object->m_codePos;
 				const int current = static_cast<int>(codePos << 12) >> 12;
@@ -1719,12 +1719,12 @@ frameLoop:
 			}
 			break;
 		}
-		case 9: {
+		case 8: {
 			--object->m_sp;
-			if (*object->m_sp != 0) {
+			if (*object->m_sp == 0) {
 				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
 				if ((static_cast<int>(jumpArg) >> 24) != 0) {
-					*object->m_sp++ = 1;
+					*object->m_sp++ = 0;
 				}
 				const u32 codePos = object->m_codePos;
 				const int current = static_cast<int>(codePos << 12) >> 12;

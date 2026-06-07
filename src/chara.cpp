@@ -2805,13 +2805,9 @@ CChara::CMesh::~CMesh()
  */
 void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
-	CCharaModelRefRaw* modelRef = model->m_data;
-	u32 idx = modelRef->m_meshCount;
-	void* meshRefBase = modelRef->m_meshRefData;
-	CCharaMeshRefRaw* meshRef = reinterpret_cast<CCharaMeshRefRaw*>((u8*)meshRefBase + (idx * 0x64));
-	m_data = meshRef;
-	m_workPositions = 0;
-	m_workNormals = 0;
+	m_data = reinterpret_cast<CCharaMeshRefRaw*>(
+	    reinterpret_cast<u8*>(model->m_data->m_meshRefData) + model->m_data->m_meshCount * 0x64);
+	CCharaMeshRefRaw* meshRef = m_data;
 
 	CChunkFile::CChunk chunkInfo;
 	chunk.PushChunk();

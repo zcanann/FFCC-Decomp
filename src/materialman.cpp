@@ -1663,26 +1663,24 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CMaterial* material = (*materials)[shadow.m_materialIndex];
 
-    unsigned long useShadowBit32 = materialFlag & material->m_tevBit & 0x8000;
+    unsigned long useShadowBit32 = materialFlag & (material->m_tevBit & 0x8000);
     if (useShadowBit32 != 0) {
-        if (m_shadowTextureCount > 3) {
+        if (m_shadowTextureCount >= 4) {
             return;
         }
-    } else if (m_shadowTextureCount > 4) {
+    } else if (m_shadowTextureCount >= 5) {
         return;
     }
 
-    if (((m_texMapIdCur & 0xFF) < 8) &&
-        ((m_texMtxCur & 0xFF) < 0x3C) &&
-        ((m_texCoordIdCur & 0xFF) < 8)) {
-        int materialNum = m_shadowMaterialCount;
-
+    if ((static_cast<unsigned long>(m_texMapIdCur & 0xFF) < 8) &&
+        (static_cast<unsigned long>(m_texMtxCur & 0xFF) < 0x3C) &&
+        (static_cast<unsigned long>(m_texCoordIdCur & 0xFF) < 8)) {
         m_curEnvTevBit |= 0x10;
-        m_shadowMaterialType[materialNum] = shadow.m_shadowMaterialType;
-        m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
-        m_shadowTexMapIds[materialNum] = m_texMapIdCur;
-        m_shadowTexMtxIds[materialNum] = m_texMtxCur;
-        m_shadowTexCoordIds[materialNum] = m_texCoordIdCur;
+        m_shadowMaterialType[m_shadowMaterialCount] = shadow.m_shadowMaterialType;
+        m_shadowIndices[m_shadowMaterialCount] = static_cast<unsigned char>(shadowIndex);
+        m_shadowTexMapIds[m_shadowMaterialCount] = m_texMapIdCur;
+        m_shadowTexMtxIds[m_shadowMaterialCount] = m_texMtxCur;
+        m_shadowTexCoordIds[m_shadowMaterialCount] = m_texCoordIdCur;
 
         Mtx texMtx;
         PSMTXConcat(shadow.m_shadowMtx, viewMtx, texMtx);
@@ -1704,12 +1702,12 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
             texMapCur = m_texMapIdCur;
             m_texMapIdCur = texMapCur + 1;
             TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), material->m_textureData.m_textures[1]);
-            m_shadowKColorIds[materialNum] = material->m_shadowKColorId;
-            m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
+            m_shadowKColorIds[m_shadowMaterialCount] = material->m_shadowKColorId;
+            m_shadowKColorMask |= static_cast<unsigned char>(1 << m_shadowMaterialCount);
             m_shadowTextureCount = m_shadowTextureCount + 1;
         }
 
-        m_shadowMaterialCount = materialNum + 1;
+        m_shadowMaterialCount = m_shadowMaterialCount + 1;
         m_shadowTextureCount = m_shadowTextureCount + 1;
     }
 }

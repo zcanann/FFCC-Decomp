@@ -1595,24 +1595,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 		} else if (itemKind == 8 || (itemKind == 9 && (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && (static_cast<unsigned short>(sourceObj->GetCID()) & 0xAD) == 0xAD)) {
 			switch (staType) {
-			case 0:
-			case 1:
-			case 2:
-			case 4:
-			case 0x1C: {
-				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
-				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
-				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
-				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x32));
-				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
-				damageAmount = 1;
-				if (computed32 >= 1) {
-					damageAmount = computed32;
-				}
-				System.Printf(dbg + 0x274);
-				break;
-			}
 			case 0x24:
 			case 0x25:
 			case 100:
@@ -1632,6 +1614,24 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
 				System.Printf(dbg + 0x240);
+				break;
+			}
+			case 0:
+			case 1:
+			case 2:
+			case 4:
+			case 0x1C: {
+				unsigned int defense = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x22);
+				unsigned int basePower = *reinterpret_cast<unsigned short*>(itemData + 6);
+				unsigned int sourcePower = *reinterpret_cast<unsigned short*>(
+					reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x20);
+				int guardValue = static_cast<int>(defense * CharaObjGetStatusMultiplier(0x32));
+				int computed32 = static_cast<int>(basePower + sourcePower) - guardValue;
+				damageAmount = 1;
+				if (computed32 >= 1) {
+					damageAmount = computed32;
+				}
+				System.Printf(dbg + 0x274);
 				break;
 			}
 			case 10: {

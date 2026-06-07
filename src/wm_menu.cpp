@@ -7589,7 +7589,7 @@ void CMenuPcs::PCAnimCtrl()
 	int* animState = m_wmCharaAnimState;
 	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		const int blendMode = -1 - (handle->m_currentAnimIndex >> 31);
+		const int blendMode = -1 - static_cast<int>(static_cast<unsigned int>(handle->m_currentAnimIndex) >> 31);
 
 		CChara::CModel* const modelObj = handle->m_model;
 		unsigned char* const model = reinterpret_cast<unsigned char*>(modelObj);

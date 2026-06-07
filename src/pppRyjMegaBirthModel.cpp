@@ -1112,12 +1112,12 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         if (particleWMat != NULL) {
             pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         } else {
             pppMulMatrix(mtxB, *(pppFMATRIX*)&pObject->m_localMatrix, mtxB);
             pppMulMatrix(mtxB, ppvMng->m_matrix, mtxB);
-            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix0, mtxB);
+            pppMulMatrix(mtxB, *(pppFMATRIX*)&ppvCameraMatrix, mtxB);
             pppCopyMatrix(pObject->m_drawMatrix, mtxB);
         }
         if (copyOut != 0) {

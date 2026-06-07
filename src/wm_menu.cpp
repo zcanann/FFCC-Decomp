@@ -636,7 +636,8 @@ void CMenuPcs::loadData()
 		m_wm.m_handles[i] = 0;
 	}
 
-	for (int i = 0; i < 0x28; i++) {
+	const unsigned short* modelPtr = s_wmLoadCharaModels;
+	for (int i = 0; i < 0x28; i++, modelPtr++) {
 		CCharaPcs::CHandle* handle = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
 		m_wm.m_handles[i] = handle;
 		handle->Add();
@@ -646,7 +647,7 @@ void CMenuPcs::loadData()
 		if (i < 0x20) {
 			CharaPcs.m_charaAllocStage = 1;
 			charaKind = 3;
-			charaNo = s_wmLoadCharaModels[i];
+			charaNo = *modelPtr;
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
 			CharaPcs.m_charaAllocStage = 0;
@@ -867,36 +868,36 @@ void CMenuPcs::loadData()
 
 	{
 		unsigned char used = 0;
-		unsigned char* selectEntry = m_wm.m_charaSelectData;
-		unsigned char* modelEntry = reinterpret_cast<unsigned char*>(m_wmWorldState);
+		int selOff = 0;
+		int modOff = 0;
 		for (int i = 0; i < 2; i++) {
-			selectEntry[0x0C] = 0;
-			selectEntry[0x0B] = 0;
-			selectEntry[0x0A] = 0;
-			short v0 = *reinterpret_cast<short*>(modelEntry + 0x3E);
+			m_wm.m_charaSelectData[selOff + 0x0C] = 0;
+			m_wm.m_charaSelectData[selOff + 0x0B] = 0;
+			m_wm.m_charaSelectData[selOff + 0x0A] = 0;
+			short v0 = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + modOff + 0x3E);
 			if (v0 < 0) {
-				*reinterpret_cast<unsigned short*>(selectEntry + 4) = 0xFFFF;
+				*reinterpret_cast<unsigned short*>(m_wm.m_charaSelectData + selOff + 4) = 0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(selectEntry + 4) = v0;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + selOff + 4) = v0;
 				used = static_cast<unsigned char>(used | (1 << v0));
 			}
-			selectEntry[0x1C] = 0;
-			selectEntry[0x1B] = 0;
-			selectEntry[0x1A] = 0;
-			short v1 = *reinterpret_cast<short*>(modelEntry + 0x40);
+			m_wm.m_charaSelectData[selOff + 0x1C] = 0;
+			m_wm.m_charaSelectData[selOff + 0x1B] = 0;
+			m_wm.m_charaSelectData[selOff + 0x1A] = 0;
+			short v1 = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + modOff + 0x40);
 			if (v1 < 0) {
-				*reinterpret_cast<unsigned short*>(selectEntry + 0x14) = 0xFFFF;
+				*reinterpret_cast<unsigned short*>(m_wm.m_charaSelectData + selOff + 0x14) = 0xFFFF;
 			} else {
-				*reinterpret_cast<short*>(selectEntry + 0x14) = v1;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + selOff + 0x14) = v1;
 				used = static_cast<unsigned char>(used | (1 << v1));
 			}
-			selectEntry += 0x20;
-			modelEntry += 4;
+			selOff += 0x20;
+			modOff += 4;
 		}
 
-		unsigned char* slot = m_wm.m_charaSelectData;
+		int slotOff = 0;
 		for (int i = 0; i < 4; i++) {
-			if (*reinterpret_cast<short*>(slot + 4) < 0) {
+			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + slotOff + 4) < 0) {
 				int assigned = 0;
 				unsigned int mask = static_cast<unsigned int>(static_cast<char>(used));
 				if ((mask & 1) != 0) {
@@ -923,11 +924,12 @@ void CMenuPcs::loadData()
 						}
 					}
 				}
-				*reinterpret_cast<short*>(slot + 4) = static_cast<short>(assigned);
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + slotOff + 4) = static_cast<short>(assigned);
 				used = static_cast<unsigned char>(used | (1 << assigned));
 			}
-			*reinterpret_cast<short*>(slot + 6) = *reinterpret_cast<short*>(slot + 4);
-			slot += 0x10;
+			unsigned char* s = m_wm.m_charaSelectData + slotOff;
+			slotOff += 0x10;
+			*reinterpret_cast<short*>(s + 6) = *reinterpret_cast<short*>(s + 4);
 		}
 	}
 

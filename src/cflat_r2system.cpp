@@ -46,16 +46,15 @@ static inline CUSBStreamDataState* UsbStream(CPartPcs* self)
 }
 
 extern float kCFlatPadStickZero;
-extern float FLOAT_80330b74;
-extern float FLOAT_80330b54;
-extern float FLOAT_80330b64;
-extern const float FLOAT_80330B34;
-extern float FLOAT_80330B3C;
-extern float FLOAT_80330B50;
-extern float FLOAT_80330B54;
-extern float FLOAT_80330B58;
+extern float kCFlatAlphaMax;
+extern float kCFlatPi;
+extern float kCFlatDegrees180;
+extern const float kCFlatOneF;
+extern float kCFlatHalfF;
+extern float kCFlatHalfPi;
+extern float kCFlatThreeHalfPi;
 
-static const char s_SetMiniGameParam_no_0xpct04x_data_pctd_801DA74C[] = "SetMiniGameParam no 0x%04x data[%d]\n";
+static const char sMiniGameParamDebugFmt[] = "SetMiniGameParam no 0x%04x data[%d]\n";
 static const char s_cflatDebugFileFmt[] = "cflat_d%d.bin";
 static const char s_cflatCfdPathFmt[] = "dvd/%scft/%s.cfd";
 static const char s_cflatForceAnimInterpDeprecatedFmt[] =
@@ -484,7 +483,7 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        System.Printf(const_cast<char*>(s_SetMiniGameParam_no_0xpct04x_data_pctd_801DA74C), id, value);
+        System.Printf(const_cast<char*>(sMiniGameParamDebugFmt), id, value);
     }
 
     switch (id) {
@@ -1324,7 +1323,7 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
     Vec scaledA;
     Vec scaledB;
 
-    PSVECScale(a, &scaledA, FLOAT_80330B34 - t);
+    PSVECScale(a, &scaledA, kCFlatOneF - t);
     PSVECScale(b, &scaledB, t);
     PSVECAdd(&scaledA, &scaledB, out);
 }
@@ -2158,14 +2157,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
             switch (mode & 3) {
             case 3:
-                t = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * t + FLOAT_80330B50))) -
-                      FLOAT_80330B34);
+                t = -((kCFlatHalfF * (kCFlatOneF + sinf(kCFlatPi * t + kCFlatHalfPi))) -
+                      kCFlatOneF);
                 break;
             case 1:
-                t = FLOAT_80330B34 + sinf(FLOAT_80330B50 * t + FLOAT_80330B58);
+                t = kCFlatOneF + sinf(kCFlatHalfPi * t + kCFlatThreeHalfPi);
                 break;
             case 2:
-                t = sinf(FLOAT_80330B50 * t);
+                t = sinf(kCFlatHalfPi * t);
                 break;
             default:
                 break;
@@ -2687,14 +2686,14 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
         switch (*localBase & 3) {
         case 3:
-            alpha = -((FLOAT_80330B3C * (FLOAT_80330B34 + sinf(FLOAT_80330B54 * alpha + FLOAT_80330B50))) -
-                      FLOAT_80330B34);
+            alpha = -((kCFlatHalfF * (kCFlatOneF + sinf(kCFlatPi * alpha + kCFlatHalfPi))) -
+                      kCFlatOneF);
             break;
         case 1:
-            alpha = FLOAT_80330B34 + sinf(FLOAT_80330B50 * alpha + FLOAT_80330B58);
+            alpha = kCFlatOneF + sinf(kCFlatHalfPi * alpha + kCFlatThreeHalfPi);
             break;
         case 2:
-            alpha = sinf(FLOAT_80330B50 * alpha);
+            alpha = sinf(kCFlatHalfPi * alpha);
             break;
         default:
             break;
@@ -2984,7 +2983,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         return 1;
     case -0x60: {
-        const int alpha = static_cast<int>(FLOAT_80330b74 * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
+        const int alpha = static_cast<int>(kCFlatAlphaMax * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
         const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
         GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),
@@ -3452,7 +3451,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         *reinterpret_cast<float*>(object->m_localBase[7]) = -cameraData->m_values[5].m_float;
         *reinterpret_cast<int*>(object->m_localBase[8]) = cameraData->m_values[6].m_int;
         *reinterpret_cast<float*>(object->m_localBase[9]) =
-            -(FLOAT_80330b54 * cameraData->m_values[7].m_float) / FLOAT_80330b64;
+            -(kCFlatPi * cameraData->m_values[7].m_float) / kCFlatDegrees180;
         runtime->push(object, 1);
         outResult = 0;
         return 1;

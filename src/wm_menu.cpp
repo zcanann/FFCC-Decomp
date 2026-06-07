@@ -632,7 +632,9 @@ void CMenuPcs::loadData()
 	GbaQue.SetControllerMode(1);
 	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
 
-	memset(m_wm.m_handles, 0, sizeof(m_wm.m_handles));
+	for (int i = 0; i < 0x28; i++) {
+		m_wm.m_handles[i] = 0;
+	}
 
 	for (int i = 0; i < 0x28; i++) {
 		CCharaPcs::CHandle* handle = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
@@ -669,20 +671,36 @@ void CMenuPcs::loadData()
 	    FLOAT_803314B0;
 
 	m_wm.m_worldObjData = static_cast<unsigned char*>(operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214));
-	memset(m_wm.m_worldObjData, 0, 0xC80);
-	for (int i = 0; i < 0x28; i++) {
-		unsigned char* const entry = m_wm.m_worldObjData + i * 0x50;
-		*reinterpret_cast<short*>(entry + 0x0C) = 0;
-		*reinterpret_cast<short*>(entry + 0x0E) = 0;
-		*reinterpret_cast<short*>(entry + 0x10) = 0x280;
-		*reinterpret_cast<short*>(entry + 0x12) = 0x1C0;
-		*reinterpret_cast<float*>(entry + 0x14) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(entry + 0x18) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(entry + 0x1C) = FLOAT_80331598;
-		*reinterpret_cast<unsigned int*>(entry + 0x40) = 0;
-		*reinterpret_cast<unsigned int*>(entry + 0x44) = 0;
-		*reinterpret_cast<unsigned int*>(entry + 0x48) = 0x280;
-		*reinterpret_cast<unsigned int*>(entry + 0x4C) = 0x1C0;
+	{
+		const float far = FLOAT_80331598;
+		const float one = FLOAT_803313e8;
+		const float zero = FLOAT_803313dc;
+		for (int i = 0; i < 0x28; i++) {
+			const int off = i * 0x50;
+			float* const v = reinterpret_cast<float*>(m_wm.m_worldObjData + off + 0x1C);
+			v[2] = zero;
+			v[1] = zero;
+			v[0] = zero;
+			v[5] = zero;
+			v[4] = zero;
+			v[3] = zero;
+			v[8] = one;
+			v[7] = one;
+			v[6] = one;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x00) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x04) = 0;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + off + 0x08) = 0;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + off + 0x0A) = 0;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + off + 0x0C) = 0x280;
+			*reinterpret_cast<unsigned short*>(m_wm.m_worldObjData + off + 0x0E) = 0x1C0;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + off + 0x10) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + off + 0x14) = zero;
+			*reinterpret_cast<float*>(m_wm.m_worldObjData + off + 0x18) = far;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x40) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x44) = 0;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x48) = 0x280;
+			*reinterpret_cast<unsigned int*>(m_wm.m_worldObjData + off + 0x4C) = 0x1C0;
+		}
 	}
 
 	m_wm.m_bubbleData =

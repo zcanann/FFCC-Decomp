@@ -1416,7 +1416,7 @@ void CMenuPcs::SingCalcChara(float frameStep)
 {
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
 
-    if (model->m_animEnd <= model->m_time) {
+    if (model->m_curFrame >= model->m_animEnd) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(frameStep);
@@ -1730,7 +1730,7 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd <= model->m_time) {
+    if (model->m_curFrame >= model->m_animEnd) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(FLOAT_80332934);
@@ -1833,7 +1833,7 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     CChara::CModel* model = m_wm.m_handles[0]->m_model;
-    if (model->m_animEnd <= model->m_time) {
+    if (model->m_curFrame >= model->m_animEnd) {
         model->SetFrame(FLOAT_8033294c);
     } else {
         model->AddFrame(FLOAT_80332934);

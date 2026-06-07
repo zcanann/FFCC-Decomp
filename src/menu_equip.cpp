@@ -862,8 +862,7 @@ int CMenuPcs::EquipOpen()
 	u32 uVar12;
 	double dVar20;
 
-	EquipMenuState* menuState = GetEquipMenuState(this);
-	if (menuState->initialized == '\0') {
+	if (GetEquipMenuState(this)->initialized == '\0') {
 		EquipOpenAnimList* list = GetEquipListStorage(this);
 		memset(list, 0, sizeof(*list));
 		fVar5 = kEquipOne;
@@ -914,7 +913,7 @@ int CMenuPcs::EquipOpen()
 			iVar11--;
 		} while (iVar11 != 0);
 
-		list->count = 4;
+		GetEquipListStorage(this)->count = 4;
 		EquipInit1();
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
@@ -929,16 +928,15 @@ int CMenuPcs::EquipOpen()
 
 		psVar7 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		*psVar7 = sVar10 + 1;
-		menuState->selectedIndex = 0;
-		menuState->initialized = 1;
+		GetEquipMenuState(this)->selectedIndex = 0;
+		GetEquipMenuState(this)->initialized = 1;
 	}
 
 	iVar6 = 0;
-	menuState->frame = menuState->frame + 1;
-	EquipOpenAnimList* list = GetEquipListStorage(this);
-	uVar8 = (u32)list->count;
-	EquipOpenAnim* entry = list->entries;
-	iVar11 = static_cast<int>(menuState->frame);
+	GetEquipMenuState(this)->frame = GetEquipMenuState(this)->frame + 1;
+	uVar8 = (u32)GetEquipListStorage(this)->count;
+	EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
+	iVar11 = static_cast<int>(GetEquipMenuState(this)->frame);
 	for (int i = 0; i < (int)uVar8; i++) {
 		if (entry->startFrame <= iVar11) {
 			if (entry->startFrame + entry->duration <= iVar11) {
@@ -954,8 +952,8 @@ int CMenuPcs::EquipOpen()
 	}
 
 	fVar5 = kEquipOne;
-	if (list->count == iVar6) {
-		entry = list->entries;
+	if (GetEquipListStorage(this)->count == iVar6) {
+		entry = GetEquipListStorage(this)->entries;
 		if (0 < (int)uVar8) {
 			uVar12 = uVar8 >> 3;
 			if (uVar12 != 0) {

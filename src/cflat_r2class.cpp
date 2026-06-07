@@ -903,24 +903,24 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x18:
-			engineObject->m_rotationX = static_cast<float>(object->m_localBase[0]);
-			engineObject->m_rotationY = static_cast<float>(object->m_localBase[1]);
-			engineObject->m_rotationZ = static_cast<float>(object->m_localBase[2]);
+			engineObject->m_rotationX = reinterpret_cast<float*>(object->m_localBase)[0];
+			engineObject->m_rotationY = reinterpret_cast<float*>(object->m_localBase)[1];
+			engineObject->m_rotationZ = reinterpret_cast<float*>(object->m_localBase)[2];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x19: {
 			CGQuadObj* quad = reinterpret_cast<CGQuadObj*>(engineObject);
 			if (object->m_localBase[0] == 1) {
-				quad->Reset(static_cast<float>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]));
+				quad->Reset(reinterpret_cast<float*>(object->m_localBase)[1], reinterpret_cast<float*>(object->m_localBase)[2]);
 			}
-			quad->Add(static_cast<float>(object->m_localBase[3]), static_cast<float>(object->m_localBase[4]));
+			quad->Add(reinterpret_cast<float*>(object->m_localBase)[3], reinterpret_cast<float*>(object->m_localBase)[4]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x1A:
-			engineObject->Turn(static_cast<float>(object->m_localBase[0]), static_cast<int>(object->m_localBase[1]));
+			engineObject->Turn(reinterpret_cast<float*>(object->m_localBase)[0], static_cast<int>(object->m_localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1089,7 +1089,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x2E: {
 			unsigned int index = object->m_localBase[0];
-			float x = static_cast<float>(object->m_localBase[1]);
+			float x = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (index == static_cast<unsigned int>(-1)) {
 				engineObject->m_attackColliders[1].m_localStart.x = x;
 				engineObject->m_attackColliders[2].m_localStart.x = x;
@@ -1107,7 +1107,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x33: {
-			float rotY = static_cast<float>(object->m_localBase[0]);
+			float rotY = reinterpret_cast<float*>(object->m_localBase)[0];
 			engineObject->m_rotTargetY = rotY;
 			engineObject->m_rotBaseY = rotY;
 			PushValue(this, object, 0);
@@ -1160,7 +1160,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x3C:
-			engineObject->m_frontHitAngle = static_cast<float>(object->m_localBase[0]);
+			engineObject->m_frontHitAngle = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1189,7 +1189,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x48:
-			engineObject->m_stepSlopeLimit = static_cast<float>(object->m_localBase[1]);
+			engineObject->m_stepSlopeLimit = reinterpret_cast<float*>(object->m_localBase)[1];
 			if (object->m_localBase[0] != 0) {
 				engineObject->m_lookAtTimer = engineObject->m_stepSlopeLimit;
 			}
@@ -1197,7 +1197,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x4A:
-			engineObject->m_hitNormal.x = static_cast<float>(object->m_localBase[0]);
+			engineObject->m_hitNormal.x = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1341,12 +1341,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x6F:
 			{
-				float horizontal = static_cast<float>(object->m_localBase[0]);
+				float horizontal = reinterpret_cast<float*>(object->m_localBase)[0];
 				engineObject->m_moveOffset.z = horizontal;
 				engineObject->m_moveOffset.x = horizontal;
 			}
-			engineObject->m_moveOffset.y = static_cast<float>(object->m_localBase[1]);
-			engineObject->m_bounceFactor = static_cast<float>(object->m_localBase[2]);
+			engineObject->m_moveOffset.y = reinterpret_cast<float*>(object->m_localBase)[1];
+			engineObject->m_bounceFactor = reinterpret_cast<float*>(object->m_localBase)[2];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1358,7 +1358,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x71:
-			engineObject->m_jumpLandingDampening = static_cast<float>(object->m_localBase[0]);
+			engineObject->m_jumpLandingDampening = reinterpret_cast<float*>(object->m_localBase)[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1394,7 +1394,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			} else {
 				PSVECScale(&moveVector, &moveVector, 0.5f / magnitude);
 			}
-			engineObject->MoveVector(&moveVector, static_cast<float>(object->m_localBase[3]), static_cast<int>(object->m_localBase[4]), 1, 1, 1);
+			engineObject->MoveVector(&moveVector, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]), 1, 1, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1475,7 +1475,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x7D:
 			if (object->m_localBase[0] == 1) {
-				engineObject->m_bodyEllipsoidAspect = static_cast<float>(object->m_localBase[1]);
+				engineObject->m_bodyEllipsoidAspect = reinterpret_cast<float*>(object->m_localBase)[1];
 			}
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1536,15 +1536,15 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x87: {
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
-			model->m_furLenScale = static_cast<float>(object->m_localBase[0]);
-			model->m_furStep = static_cast<float>(object->m_localBase[1]);
+			model->m_furLenScale = reinterpret_cast<float*>(object->m_localBase)[0];
+			model->m_furStep = reinterpret_cast<float*>(object->m_localBase)[1];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		}
 		case -0x88: {
 			Vec nearPos;
-			engineObject->CalcSphereNearPos(static_cast<float>(object->m_localBase[0]), static_cast<float>(object->m_localBase[1]), nearPos);
+			engineObject->CalcSphereNearPos(reinterpret_cast<float*>(object->m_localBase)[0], reinterpret_cast<float*>(object->m_localBase)[1], nearPos);
 			*reinterpret_cast<unsigned int*>(object->m_localBase[2]) = *reinterpret_cast<unsigned int*>(&nearPos.x);
 			*reinterpret_cast<unsigned int*>(object->m_localBase[3]) = *reinterpret_cast<unsigned int*>(&nearPos.y);
 			*reinterpret_cast<unsigned int*>(object->m_localBase[4]) = *reinterpret_cast<unsigned int*>(&nearPos.z);
@@ -1558,7 +1558,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveTarget.x = params[0];
 			moveTarget.y = params[1];
 			moveTarget.z = params[2];
-			engineObject->Move(&moveTarget, static_cast<float>(object->m_localBase[3]), static_cast<int>(object->m_localBase[4]), 1, 1, 1, 1);
+			engineObject->Move(&moveTarget, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]), 1, 1, 1, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -1590,14 +1590,14 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x90:
-			engineObject->m_lookAtAccumYaw = static_cast<float>(object->m_localBase[0]);
-			engineObject->m_lookAtAccumPitch = static_cast<float>(object->m_localBase[1]);
+			engineObject->m_lookAtAccumYaw = reinterpret_cast<float*>(object->m_localBase)[0];
+			engineObject->m_lookAtAccumPitch = reinterpret_cast<float*>(object->m_localBase)[1];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x91: {
-			float furTarget = static_cast<float>(object->m_localBase[0]);
-			float furSetCur = static_cast<float>(object->m_localBase[1]);
+			float furTarget = reinterpret_cast<float*>(object->m_localBase)[0];
+			float furSetCur = reinterpret_cast<float*>(object->m_localBase)[1];
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
 			model->m_furTarget = furTarget;
 			if (furSetCur != 0.0f) {
@@ -1618,7 +1618,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveTarget.x = params[0];
 			moveTarget.y = params[1];
 			moveTarget.z = params[2];
-			engineObject->Move(&moveTarget, static_cast<float>(object->m_localBase[3]), static_cast<int>(object->m_localBase[4]), 1, 0, 1, 0);
+			engineObject->Move(&moveTarget, reinterpret_cast<float*>(object->m_localBase)[3], static_cast<int>(object->m_localBase[4]), 1, 0, 1, 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

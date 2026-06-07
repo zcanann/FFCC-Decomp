@@ -2659,27 +2659,28 @@ unsigned int CMenuPcs::CmdClose1()
 	CCaravanWork* const caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
-	const u16 timer = GetCmdStateView(this)->transitionTimer;
 	s32 state = GetCmdStateView(this)->uniteState;
 	u32 done = 0;
 
 	if (state == 0) {
 		const s16 selected = GetCmdStateView(this)->selected;
-		const float t = static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(timer));
-		GetCmdListStorage(this)->entries[selected].alpha = t;
+		GetCmdListStorage(this)->entries[selected].alpha =
+			static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 
 		if (caravanWork->m_commandListExtra[selected + 1] == -1) {
-			GetCmdListStorage(this)->entries[selected + 1].alpha = t;
+			GetCmdListStorage(this)->entries[selected + 1].alpha =
+				static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			if (caravanWork->m_commandListExtra[selected + 2] == -1) {
-				GetCmdListStorage(this)->entries[selected + 2].alpha = t;
+				GetCmdListStorage(this)->entries[selected + 2].alpha =
+					static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer));
 			}
 		}
 
 		GetCmdListStorage(this)->entries[static_cast<s32>(GetCmdListStorage(this)->listEnd) + 3].alpha =
-			static_cast<float>(-(DOUBLE_80332a90 * static_cast<f64>(timer) - DOUBLE_80332a58));
+			static_cast<float>(-(DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer) - DOUBLE_80332a58));
 
 		done = 0;
-		if (static_cast<f64>(timer) >= DOUBLE_80332a78) {
+		if (static_cast<f64>(GetCmdStateView(this)->transitionTimer) >= DOUBLE_80332a78) {
 			done = 1;
 		}
 		if ((done != 0) && (GetCmdStateView(this)->commandResult != 0)) {

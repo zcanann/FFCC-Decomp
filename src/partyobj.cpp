@@ -1068,6 +1068,7 @@ void CGPartyObj::command()
 	}
 
 	PartyObjOverlay& party = PartyData(this);
+	const char* msgBase = lbl_801DCA48;
 #define caravan reinterpret_cast<CCaravanWork*>(m_scriptHandle)
 #define padSlot static_cast<char>(m_animStateMisc)
 	bool primaryAvailable = false;
@@ -1459,22 +1460,22 @@ void CGPartyObj::command()
 			int addedItem;
 			if (itemIdx < 0x9F || itemIdx > 0xFF) {
 				caravan->AddItem(static_cast<short>(itemIdx), &addedItem);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+				System.Printf(const_cast<char*>(msgBase + 0x2E0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			} else {
 				caravan->AddTmpArtifact(itemIdx, &addedItem);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
+				System.Printf(const_cast<char*>(msgBase + 0x2C0), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504));
 			}
 			if (kindClass == 0 && caravan->CanAddComList(1) != 0) {
 				int addedSlot;
 				caravan->AddComList(static_cast<short>(addedItem), &addedSlot);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x2F8), addedItem, addedSlot);
+				System.Printf(const_cast<char*>(msgBase + 0x2F8), addedItem, addedSlot);
 			}
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);
 			}
 		} else if (itemIdx == 0x190) {
 			enableAttackCol(5, 0x190, 0);
-			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
+			System.Printf(const_cast<char*>(msgBase + 0x324), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			caravan->AddGil(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x558));
 			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x560) != 1) {
 				enableAttackCol(4, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party.target) + 0x504), 0);

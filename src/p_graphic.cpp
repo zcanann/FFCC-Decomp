@@ -61,8 +61,8 @@ inline CGraphicPcs::CGraphicPcs()
 
 CGraphicPcs GraphicPcs;
 static const char s_CGraphicPcs[] = "CGraphicPcs";
-static const char s_CManager_801D7B8C[] = "CManager";
-static const char s_CProcess_801D7B98[] = "CProcess";
+static const char sGraphicPcsManagerClassName[] = "CManager";
+static const char sGraphicPcsProcessClassName[] = "CProcess";
 
 CProcessTable CGraphicPcs::m_table = {
     const_cast<char*>(s_CGraphicPcs),

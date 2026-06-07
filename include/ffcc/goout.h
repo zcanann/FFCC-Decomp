@@ -71,7 +71,7 @@ private:
     char m_returnGoOutMode;
     char m_odekakeCardChannel;
     char m_odekakeSaveIndex;
-    char m_watchCardDisconnect;
+    unsigned char m_watchCardDisconnect;
     unsigned char m_saveLoadMenuOpen;
     unsigned char m_returnTransfer;
     char unk_0x1f;
@@ -83,7 +83,7 @@ private:
     int m_selectedChara;
     char m_mainMode;
     char m_nextMainMode;
-    int m_modeFrame;
+    unsigned int m_modeFrame;
     short m_pendingMessage;
     short m_currentMessage;
     short m_menuStringSlot;

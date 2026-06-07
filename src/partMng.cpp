@@ -1502,11 +1502,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
     _pppEnvSt* env = &m_pppEnvSt;
     PppPdtSlot* pdtSlots = m_pdtSlots;
-    _pppMngSt* firstMng = m_pppMng;
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* packetWords = reinterpret_cast<int*>(packet);
-    int* payloadWords = reinterpret_cast<int*>(payload);
     CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
 
     switch (code) {
@@ -1535,12 +1533,12 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             *reinterpret_cast<unsigned int*>(self + kUsbTextTableOffset);
 
         if (code == 1) {
-            firstMng->m_ownerScale = FLOAT_8032fe18;
-            firstMng->m_scaleFactor = FLOAT_8032fe18;
-            firstMng->m_userFloat1 = FLOAT_8032fe18;
-            firstMng->m_userFloat0 = FLOAT_8032fe18;
-            firstMng->m_useOwnerScaleSign = 0;
-            firstMng->m_matrixMode = 0;
+            m_pppMng[0].m_ownerScale = FLOAT_8032fe18;
+            m_pppMng[0].m_scaleFactor = FLOAT_8032fe18;
+            m_pppMng[0].m_userFloat1 = FLOAT_8032fe18;
+            m_pppMng[0].m_userFloat0 = FLOAT_8032fe18;
+            m_pppMng[0].m_useOwnerScaleSign = 0;
+            m_pppMng[0].m_matrixMode = 0;
         }
 
         _pppMngSt* mng = m_pppMng;
@@ -1559,29 +1557,29 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
 
-        firstMng->m_position.x = payloadFloats[0];
-        firstMng->m_position.y = payloadFloats[1];
-        firstMng->m_position.z = payloadFloats[2];
-        firstMng->m_rotation.x = static_cast<short>(packetWords[0xC] >> 16);
-        firstMng->m_rotation.y = static_cast<short>(packetWords[0xC]);
-        firstMng->m_rotation.z = static_cast<short>(packetWords[0xD] >> 16);
-        firstMng->m_rotation.w = static_cast<short>(packetWords[0xD]);
-        firstMng->m_rotationSpeed = packetWords[0xE];
-        firstMng->m_scale.x = payloadFloats[8];
-        firstMng->m_scale.y = payloadFloats[9];
-        firstMng->m_scale.z = payloadFloats[0xA];
-        firstMng->m_savedPosition.x = payloadFloats[0x10];
-        firstMng->m_savedPosition.y = payloadFloats[0x11];
-        firstMng->m_savedPosition.z = payloadFloats[0x12];
-        firstMng->m_paramVec0.x = payloadFloats[0x14];
-        firstMng->m_paramVec0.y = payloadFloats[0x15];
-        firstMng->m_paramVec0.z = payloadFloats[0x16];
+        m_pppMng[0].m_position.x = payloadFloats[0];
+        m_pppMng[0].m_position.y = payloadFloats[1];
+        m_pppMng[0].m_position.z = payloadFloats[2];
+        m_pppMng[0].m_rotation.x = static_cast<short>(packetWords[0xC] >> 16);
+        m_pppMng[0].m_rotation.y = static_cast<short>(packetWords[0xC]);
+        m_pppMng[0].m_rotation.z = static_cast<short>(packetWords[0xD] >> 16);
+        m_pppMng[0].m_rotation.w = static_cast<short>(packetWords[0xD]);
+        m_pppMng[0].m_rotationSpeed = packetWords[0xE];
+        m_pppMng[0].m_scale.x = payloadFloats[8];
+        m_pppMng[0].m_scale.y = payloadFloats[9];
+        m_pppMng[0].m_scale.z = payloadFloats[0xA];
+        m_pppMng[0].m_savedPosition.x = payloadFloats[0x10];
+        m_pppMng[0].m_savedPosition.y = payloadFloats[0x11];
+        m_pppMng[0].m_savedPosition.z = payloadFloats[0x12];
+        m_pppMng[0].m_paramVec0.x = payloadFloats[0x14];
+        m_pppMng[0].m_paramVec0.y = payloadFloats[0x15];
+        m_pppMng[0].m_paramVec0.z = payloadFloats[0x16];
         ppvChrScl[0] = payloadFloats[0xC];
         ppvChrScl[1] = payloadFloats[0xD];
         ppvChrScl[2] = payloadFloats[0xE];
-        firstMng->m_previousPosition.x = payloadFloats[0x17];
-        firstMng->m_previousPosition.y = payloadFloats[0x18];
-        firstMng->m_mode = 0;
+        m_pppMng[0].m_previousPosition.x = payloadFloats[0x17];
+        m_pppMng[0].m_previousPosition.y = payloadFloats[0x18];
+        m_pppMng[0].m_mode = 0;
         return;
     case 4:
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
@@ -1790,20 +1788,20 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             *reinterpret_cast<float*>(recvBytes + 0x3C) = FLOAT_8032FE70;
         }
 
-        firstMng->m_baseTime = 0;
-        firstMng->m_cullRadiusSq = FLOAT_8032FE6C;
-        firstMng->m_cullRadius = FLOAT_8032FE70;
-        firstMng->m_cullYOffset = FLOAT_8032FE70;
+        m_pppMng[0].m_baseTime = 0;
+        m_pppMng[0].m_cullRadiusSq = FLOAT_8032FE6C;
+        m_pppMng[0].m_cullRadius = FLOAT_8032FE70;
+        m_pppMng[0].m_cullYOffset = FLOAT_8032FE70;
         *reinterpret_cast<int*>(self + kEditCountOffset) = 1;
         *reinterpret_cast<int*>(self + kPdtCountOffset) = 1;
-        firstMng->m_objHitMask = 0xFFFFFFFF;
-        firstMng->m_cylinderAttribute = 0xFFFFFFFF;
-        firstMng->m_paramA = 0;
-        firstMng->m_slotVisible = 1;
-        firstMng->m_ownerFlagsInitialized = 1;
-        firstMng->m_pppResSet = self + 0x23518;
-        firstMng->m_nodeIndex = 0;
-        firstMng->m_fieldF2 = 1;
+        m_pppMng[0].m_objHitMask = 0xFFFFFFFF;
+        m_pppMng[0].m_cylinderAttribute = 0xFFFFFFFF;
+        m_pppMng[0].m_paramA = 0;
+        m_pppMng[0].m_slotVisible = 1;
+        m_pppMng[0].m_ownerFlagsInitialized = 1;
+        m_pppMng[0].m_pppResSet = self + 0x23518;
+        m_pppMng[0].m_nodeIndex = 0;
+        m_pppMng[0].m_fieldF2 = 1;
         env->m_mapMeshPtr = *reinterpret_cast<CMapMesh***>(self + kUsbMapMeshTableOffset);
         *reinterpret_cast<unsigned int*>(&env->m_particleColors[0]) =
             *reinterpret_cast<unsigned int*>(self + kUsbShapeSlotTableOffset);
@@ -1919,7 +1917,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        firstMng->m_particleEnded = 1;
+        m_pppMng[0].m_particleEnded = 1;
         return;
     case 0x12:
     case 0x13:

@@ -1314,7 +1314,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	l_idxAttackCol = attackColIndex;
 
 	int resolvedItemId = itemId;
-	unsigned int staType;
+	int staType;
 	int resistType = 0;
 	int allowEffect = 0;
 	int damageClamp = 0;

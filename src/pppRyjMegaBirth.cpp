@@ -10,17 +10,6 @@ extern const float kPppRyjMegaBirthZero;
 }
 #include <string.h>
 
-extern const float FLOAT_80330458;
-extern float FLOAT_8033044C;
-extern const float FLOAT_8033045c;
-extern const float FLOAT_80330460;
-extern const float FLOAT_80330470;
-extern const float FLOAT_80330474;
-extern const float FLOAT_80330478;
-extern const double DOUBLE_80330480;
-extern const double DOUBLE_80330488;
-extern const float FLOAT_80330490[2];
-
 static Mtx g_matUnit;
 
 static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
@@ -39,16 +28,17 @@ static inline RyjMegaBirthDataOffsets* GetRyjMegaBirthDataOffsets(_pppCtrlTable*
 	return reinterpret_cast<RyjMegaBirthDataOffsets*>(ctrlTable->m_serializedDataOffsets);
 }
 
-extern const float FLOAT_80330458 = 360.0f;
-extern const float FLOAT_8033045c = 180.0f;
-extern const float FLOAT_80330460 = -180.0f;
-extern const double DOUBLE_80330468 = 4503599627370496.0;
-extern const float FLOAT_80330470 = 2.0f;
-extern const float FLOAT_80330474 = 0.7f;
-extern const float FLOAT_80330478 = 0.5f;
-extern const double DOUBLE_80330480 = 1.0;
-extern const double DOUBLE_80330488 = 0.5;
-extern const float FLOAT_80330490[2] = { -1.0f, 0.0f };
+extern const float kPppRyjMegaBirthDegToRad = 0.017453292f;
+extern const float kPppRyjMegaBirthAngleWrapDegrees = 360.0f;
+extern const float kPppRyjMegaBirthHalfTurnDegrees = 180.0f;
+extern const float kPppRyjMegaBirthNegativeHalfTurnDegrees = -180.0f;
+extern const double kPppRyjMegaBirthS32ToDoubleBias = 4503599627370496.0;
+extern const float kPppRyjMegaBirthDouble = 2.0f;
+extern const float kPppRyjMegaBirthRandomSpeedScale = 0.7f;
+extern const float kPppRyjMegaBirthHalf = 0.5f;
+extern const double kPppRyjMegaBirthOneDouble = 1.0;
+extern const double kPppRyjMegaBirthHalfDouble = 0.5;
+extern const float kPppRyjMegaBirthSignFlipTable[2] = { -1.0f, 0.0f };
 extern const float kPppRyjMegaBirthSharedZero = 0.0f;
 extern const float kPppRyjMegaBirthModelInitialY = 30.0f;
 extern const float kPppRyjMegaBirthPi = 3.1415927f;
@@ -100,11 +90,11 @@ static inline float calc_mesh_sample_t(u8 mode)
 	case 2:
 		return Math.RandF() * Math.RandF() * Math.RandF();
 	case 3:
-		return (float)(DOUBLE_80330480 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
+		return (float)(kPppRyjMegaBirthOneDouble - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
 	case 5:
-		return (float)(DOUBLE_80330480 - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+		return (float)(kPppRyjMegaBirthOneDouble - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
 	default:
 		return Math.RandF();
 	}
@@ -112,7 +102,7 @@ static inline float calc_mesh_sample_t(u8 mode)
 
 static inline float calc_spawn_speed(float speed, u8 mode)
 {
-	float halfSpeed = FLOAT_80330478 * speed;
+	float halfSpeed = kPppRyjMegaBirthHalf * speed;
 
 	switch (mode) {
 	case 1:
@@ -121,11 +111,11 @@ static inline float calc_spawn_speed(float speed, u8 mode)
 	case 2:
 		return speed * Math.RandF() * Math.RandF() - halfSpeed;
 	case 3:
-		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		return -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
 	case 5:
-		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		return -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 	default:
 		return speed * Math.RandF() - halfSpeed;
 	}
@@ -140,11 +130,11 @@ static inline float calc_direction_speed(float speed, u8 mode)
 	case 2:
 		return speed * Math.RandF() * Math.RandF();
 	case 3:
-		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed);
+		return -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed);
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed;
 	case 5:
-		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed);
+		return -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed);
 	default:
 		return speed;
 	}
@@ -152,7 +142,7 @@ static inline float calc_direction_speed(float speed, u8 mode)
 
 static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 {
-	float halfSpeed = FLOAT_80330478 * speed;
+	float halfSpeed = kPppRyjMegaBirthHalf * speed;
 
 	switch (mode) {
 	case 1:
@@ -167,9 +157,9 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
 		break;
 	case 3:
-		out->x = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
-		out->y = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
-		out->z = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->x = -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->y = -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->z = -(kPppRyjMegaBirthRandomSpeedScale * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
 		break;
 	case 4:
 		out->x = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
@@ -177,9 +167,9 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
 		break;
 	case 5:
-		out->x = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
-		out->y = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
-		out->z = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->x = -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->y = -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->z = -(kPppRyjMegaBirthHalf * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 		break;
 	default:
 		out->x = speed * Math.RandF() - halfSpeed;
@@ -197,15 +187,15 @@ static inline signed char random_signed_byte_span(u8 span)
 static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 flags)
 {
 	if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-		if (DOUBLE_80330488 < (double)Math.RandF()) {
-			*f32_at(particle, offset) = *f32_at(particle, offset) * FLOAT_80330490[0];
+		if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
+			*f32_at(particle, offset) = *f32_at(particle, offset) * kPppRyjMegaBirthSignFlipTable[0];
 		}
-		if (DOUBLE_80330488 < (double)Math.RandF()) {
-			*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * FLOAT_80330490[0];
+		if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
+			*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * kPppRyjMegaBirthSignFlipTable[0];
 		}
 	} else if ((flags & 2) != 0) {
-		*f32_at(particle, offset) = *f32_at(particle, offset) * FLOAT_80330490[0];
-		*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * FLOAT_80330490[0];
+		*f32_at(particle, offset) = *f32_at(particle, offset) * kPppRyjMegaBirthSignFlipTable[0];
+		*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * kPppRyjMegaBirthSignFlipTable[0];
 	}
 }
 
@@ -411,7 +401,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 			if (*f32_at(particle, 0x28) != kPppRyjMegaBirthZero) {
 				Mtx rotMatrix;
 
-				PSMTXRotRad(rotMatrix, 'Z', FLOAT_8033044C * *f32_at(particle, 0x28));
+				PSMTXRotRad(rotMatrix, 'Z', kPppRyjMegaBirthDegToRad * *f32_at(particle, 0x28));
 				PSMTXConcat(drawMatrix, rotMatrix, drawMatrix);
 			}
 
@@ -783,8 +773,8 @@ void calc(
 	}
 
 	{
-		const float& angleWrap = FLOAT_80330458;
-		const float& angleMax = FLOAT_8033045c;
+		const float& angleWrap = kPppRyjMegaBirthAngleWrapDegrees;
+		const float& angleMax = kPppRyjMegaBirthHalfTurnDegrees;
 		volatile float* angle = f32_at(particlePayload, 0x28);
 		while (angleMax <= *angle)
 		{
@@ -792,8 +782,8 @@ void calc(
 		}
 	}
 	{
-		const float& angleWrap = FLOAT_80330458;
-		const float& angleMin = FLOAT_80330460;
+		const float& angleWrap = kPppRyjMegaBirthAngleWrapDegrees;
+		const float& angleMin = kPppRyjMegaBirthNegativeHalfTurnDegrees;
 		volatile float* angle = f32_at(particlePayload, 0x28);
 		while (*angle < angleMin)
 		{
@@ -890,7 +880,7 @@ void birth(
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
 	float spread = (float)payload[0x2B];
-	float range = FLOAT_80330470 * spread;
+	float range = kPppRyjMegaBirthDouble * spread;
 
 	memset(particle, 0, 0x60);
 	if (worldMat != NULL) {
@@ -910,9 +900,9 @@ void birth(
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
 
-		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
-		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
-		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
+		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
+		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / kPppRyjMegaBirthHalfTurnDegrees);
 
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;
@@ -1003,11 +993,11 @@ void birth(
 	if (payload[0xEB] != 0) {
 		*f32_at(particlePayload, 0x30) = *f32_at(payload, 0x9C) * Math.RandF();
 		if (((payload[0xEB] & 1) != 0) && ((payload[0xEB] & 2) != 0)) {
-			if (DOUBLE_80330488 < (double)Math.RandF()) {
-				*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * FLOAT_80330490[0];
+			if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
+				*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * kPppRyjMegaBirthSignFlipTable[0];
 			}
 		} else if ((payload[0xEB] & 2) != 0) {
-			*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * FLOAT_80330490[0];
+			*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * kPppRyjMegaBirthSignFlipTable[0];
 		}
 	}
 	if ((payload[0xEB] & 4) != 0) {
@@ -1017,15 +1007,15 @@ void birth(
 		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
 	}
 	{
-		float angleWrap = FLOAT_80330458;
-		float angleMax = FLOAT_8033045c;
+		float angleWrap = kPppRyjMegaBirthAngleWrapDegrees;
+		float angleMax = kPppRyjMegaBirthHalfTurnDegrees;
 		while (angleMax <= *f32_at(particlePayload, 0x28)) {
 			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
 		}
 	}
 	{
-		float angleWrap = FLOAT_80330458;
-		float angleMin = FLOAT_80330460;
+		float angleWrap = kPppRyjMegaBirthAngleWrapDegrees;
+		float angleMin = kPppRyjMegaBirthNegativeHalfTurnDegrees;
 		while (*f32_at(particlePayload, 0x28) < angleMin) {
 			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
 		}
@@ -1046,13 +1036,13 @@ void birth(
 			*f32_at(particlePayload, 0x44) = randomRotation;
 			*f32_at(particlePayload, 0x48) = randomRotation;
 			if (((payload[0xEA] & 1) != 0) && ((payload[0xEA] & 2) != 0)) {
-				if (DOUBLE_80330488 < (double)Math.RandF()) {
-					*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * FLOAT_80330490[0];
-					*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * FLOAT_80330490[0];
+				if (kPppRyjMegaBirthHalfDouble < (double)Math.RandF()) {
+					*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
+					*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * kPppRyjMegaBirthSignFlipTable[0];
 				}
 			} else if ((payload[0xEA] & 2) != 0) {
-				*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * FLOAT_80330490[0];
-				*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * FLOAT_80330490[0];
+				*f32_at(particlePayload, 0x44) = *f32_at(particlePayload, 0x44) * kPppRyjMegaBirthSignFlipTable[0];
+				*f32_at(particlePayload, 0x48) = *f32_at(particlePayload, 0x48) * kPppRyjMegaBirthSignFlipTable[0];
 			}
 		}
 	}
@@ -1071,7 +1061,7 @@ void birth(
 		float velocityRandom = *f32_at(payload, 0xC8);
 		if (velocityRandom != kPppRyjMegaBirthZero) {
 			*f32_at(particlePayload, 0x4C) =
-				*f32_at(particlePayload, 0x4C) + FLOAT_80330470 * velocityRandom * Math.RandF() - velocityRandom;
+				*f32_at(particlePayload, 0x4C) + kPppRyjMegaBirthDouble * velocityRandom * Math.RandF() - velocityRandom;
 		}
 	}
 

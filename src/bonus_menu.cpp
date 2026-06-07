@@ -730,9 +730,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		return;
 	}
 
-	int statePtr = this->m_bonusStatePtr;
-
-	if (*(short*)(statePtr + 0x1c) != 4) {
+	if (*(short*)(this->m_bonusStatePtr + 0x1c) != 4) {
 		_GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
@@ -757,10 +755,10 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	for (int i = 0; i < 8; i++) {
-		if (*(short*)(statePtr + 0x1c) == 4) {
+		if (*(short*)(this->m_bonusStatePtr + 0x1c) == 4) {
 			float rgb = 1.0f;
-			unsigned int mask = (int)(signed char)s_Rinfo->pad_0008 | s_Rinfo->m_party[partyIndex].m_ownedArtifactMask |
-			    (int)(signed char)s_Rinfo->m_missingArtifactMask;
+			unsigned int mask = ((int)(signed char)s_Rinfo->pad_0008 | (int)(signed char)s_Rinfo->m_missingArtifactMask) |
+			    s_Rinfo->m_party[partyIndex].m_ownedArtifactMask;
 			if ((mask & (1 << i)) != 0) {
 				rgb = 0.5f;
 			}

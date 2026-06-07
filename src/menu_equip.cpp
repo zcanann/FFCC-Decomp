@@ -366,14 +366,7 @@ int CMenuPcs::EquipCtrlCur()
 		}
 
 		if ((hold & 0xc) == 0) {
-			if ((press & 0x100) == 0) {
-				if ((press & 0x200) != 0) {
-					GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
-					GetEquipMenuState(this)->frame = 0;
-					CmdInit2();
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-				}
-			} else {
+			if ((press & 0x100) != 0) {
 				int index = static_cast<int>(GetEquipMenuState(this)->scroll) +
 				            static_cast<int>(GetEquipModeSelected(GetEquipMenuState(this), mode));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
@@ -396,6 +389,11 @@ int CMenuPcs::EquipCtrlCur()
 					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
+			} else if ((press & 0x200) != 0) {
+				GetEquipMenuState(this)->step = GetEquipMenuState(this)->step + 1;
+				GetEquipMenuState(this)->frame = 0;
+				CmdInit2();
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
 			}
 		}
 	}

@@ -6154,8 +6154,7 @@ void CMenuPcs::DrawFukidashi()
 	fontFC->SetShadow(0);
 	fontFC->SetScale(FLOAT_803313e8);
 	fontFC->DrawInit();
-	unsigned int whiteColor = 0xFFFFFFFF;
-	fontFC->SetColor(*(_GXColor*)&whiteColor);
+	fontFC->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 	fontFC->SetPosX((float)*reinterpret_cast<short*>(bubbleData + 0x70));
 	fontFC->SetPosY((float)*reinterpret_cast<short*>(bubbleData + 0x72));
 	fontFC->Draw(nameBuffer);

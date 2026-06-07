@@ -3313,16 +3313,16 @@ void CGPartyObj::statPut()
 			anim = 0x19;
 			seNo = 0x24;
 			break;
+		case 0x0C:
+			anim = 0x0E;
+			seNo = 0x23;
+			break;
 		case 0x1B:
 			anim = 9;
 			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				anim = 0x28;
 			}
 			seNo = 0x24;
-			break;
-		default:
-			anim = 0x0E;
-			seNo = 0x23;
 			break;
 		}
 		reqAnim(anim, 0, 0);
@@ -3332,28 +3332,28 @@ void CGPartyObj::statPut()
 	if (isLoopAnim() != 0) {
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		PartyObjOverlay& party = PartyData(this);
-		if (party.carryObject == 0) {
-			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x24, 1);
-			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+		if (party.carryObject != 0) {
+			if (CFlatCenterState() == 0) {
+				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(2, 1);
+				}
 			} else {
-				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
-			}
-		} else if (CFlatCenterState() == 0) {
-			if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(2, 1);
 			}
+		} else if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x24, 1);
+		} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+			SetAnimSlot(0, 0);
+			SetAnimSlot(1, 1);
 		} else {
-			SetAnimSlot(0x0B, 0);
-			SetAnimSlot(0x0C, 1);
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x30, 1);
 		}
 		changeStat(0, 0, 0);
 	}

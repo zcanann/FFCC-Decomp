@@ -2148,9 +2148,8 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	CGPrgObj* sourceObj = reinterpret_cast<CGPrgObj*>(source);
-	unsigned int sourceCid = static_cast<unsigned int>(source->GetCID());
 	unsigned short powerValue;
-	if ((((static_cast<unsigned int>(__cntlzw(0x2D - static_cast<int>(sourceCid & 0x2D)))) >> 5) & 0xFFU) == 0) {
+	if ((((static_cast<unsigned int>(__cntlzw(0x2D - (source->GetCID() & 0x2D)))) >> 5) & 0xFFU) == 0) {
 		powerValue = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
 	} else {
 		bool stageModeActive = false;
@@ -2161,8 +2160,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 			stageModeActive = true;
 		}
 		if (stageModeActive) {
-			sourceCid = static_cast<unsigned int>(source->GetCID());
-			if ((((static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(sourceCid & 0x6D)))) >> 5) & 0xFFU) != 0) {
+			if ((((static_cast<unsigned int>(__cntlzw(0x6D - (source->GetCID() & 0x6D)))) >> 5) & 0xFFU) != 0) {
 				usePartySource = true;
 			}
 		}
@@ -2178,8 +2176,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int power = powerValue;
-	sourceCid = static_cast<unsigned int>(source->GetCID());
-	if ((sourceCid & 0xAD) == 0xAD) {
+	if ((source->GetCID() & 0xAD) == 0xAD) {
 		int stageLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			stageLevel = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
@@ -2196,8 +2193,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	}
 
 	unsigned int affinity = 0;
-	sourceCid = static_cast<unsigned int>(source->GetCID());
-	if ((sourceCid & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
+	if ((source->GetCID() & 0x6D) == 0x6D && (itemType == 1 || itemType == 9)) {
 		affinity = static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0xBDA));
 	}
 

@@ -1544,11 +1544,11 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	void** prgScript = *reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58);
+#define prgScript (*reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58))
 
 	m_unk6BF = 1;
 
-	unsigned int prgFlags = prgObj->GetCID();
+	unsigned short prgFlags = static_cast<unsigned short>(prgObj->GetCID());
 	if ((prgFlags & 0x6D) == 0x6D) {
 		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		if (m_aiState != 0) {
@@ -1560,7 +1560,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
 		if ((*reinterpret_cast<unsigned short*>(aiData + 0x106) == 1) || (m_targetPartyIndex < 0)) {
 			if ((Game.m_gameWork.m_menuStageMode != '\0') && (Game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
-				prgFlags = prgObj->GetCID();
+				prgFlags = static_cast<unsigned short>(prgObj->GetCID());
 				if ((prgFlags & 0x6D) == 0x6D) {
 					if (prgScript[0xED] != nullptr) {
 						goto skip_target_update;
@@ -1641,6 +1641,7 @@ skip_target_update:
 	if (m_funcs->damaged != 0) {
 		(this->*m_funcs->damaged)();
 	}
+#undef prgScript
 }
 
 /*

@@ -2480,78 +2480,74 @@ void CPartMng::pppEditDraw()
 
     m_pppEnvSt.m_debugCounter = 0;
 
-    Mtx invCamera;
-    Vec cameraPos;
     Vec partPos;
-    Vec cameraDelta;
     Vec viewPos;
 
     if (*reinterpret_cast<long**>(reinterpret_cast<unsigned char*>(this) + 0x5dc) != 0) {
         if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x174) <= 3) {
-            for (int passIndex = 0; passIndex < 4; passIndex++) {
-                unsigned char drawPass = 0;
-                if (passIndex == 0) {
-                    drawPass = 8;
-                } else if (passIndex == 1) {
-                    drawPass = 4;
-                } else if (passIndex == 2) {
-                    pppDraw();
-                    drawPass = 6;
-                } else {
-                    drawPass = 7;
-                }
-
-                PSMTXInverse(ppvCameraMatrix, invCamera);
-                cameraPos.x = invCamera[0][3];
-                cameraPos.y = invCamera[1][3];
-                cameraPos.z = invCamera[2][3];
-
-                char* mng = reinterpret_cast<char*>(m_pppMng);
-                for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
-                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
-                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
-                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
-
-                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0
-                        && slotVisible != 0 && ownerVisible != 0) {
-                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-
-                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                        if (cullRadiusSq != 0.0f) {
-                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if (PSVECSquareMag(&cameraDelta) >= cullRadiusSq) {
-                                mng += kPppMngStride;
-                                continue;
-                            }
-                            CBound bound;
-                            float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                            float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
-                            Vec min;
-                            min.x = partPos.x - cullRadius;
-                            min.y = partPos.y;
-                            min.z = partPos.z - cullRadius;
-                            if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) == 0) {
-                                mng += kPppMngStride;
-                                continue;
-                            }
-                        }
-
-                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
-                        *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-
-                        ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                        ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                        pppSetFpMatrix(ppvMng);
-                        _pppDrawPart(ppvMng);
-                    }
-
-                    mng += kPppMngStride;
-                }
+#define PPP_EDIT_DRAW_PASS(drawPass)                                                                       \
+            {                                                                                              \
+                Mtx invCamera;                                                                             \
+                Vec cameraPos;                                                                             \
+                Vec cameraDelta;                                                                           \
+                PSMTXInverse(ppvCameraMatrix, invCamera);                                                  \
+                cameraPos.x = invCamera[0][3];                                                             \
+                cameraPos.y = invCamera[1][3];                                                             \
+                cameraPos.z = invCamera[2][3];                                                             \
+                                                                                                           \
+                char* mng = reinterpret_cast<char*>(m_pppMng);                                             \
+                for (int i = 0; i < kPppMngCount; i++) {                                                   \
+                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);                         \
+                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);   \
+                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset); \
+                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);     \
+                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);   \
+                                                                                                           \
+                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == (drawPass) && baseTime < 0  \
+                        && slotVisible != 0 && ownerVisible != 0) {                                        \
+                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);                  \
+                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);                 \
+                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);                 \
+                                                                                                           \
+                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);         \
+                        if (cullRadiusSq != 0.0f) {                                                        \
+                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);                             \
+                            if (PSVECSquareMag(&cameraDelta) >= cullRadiusSq) {                            \
+                                mng += kPppMngStride;                                                      \
+                                continue;                                                                  \
+                            }                                                                              \
+                            CBound bound;                                                                  \
+                            float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);         \
+                            float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);       \
+                            Vec min;                                                                       \
+                            min.x = partPos.x - cullRadius;                                                \
+                            min.y = partPos.y;                                                             \
+                            min.z = partPos.z - cullRadius;                                                \
+                            if (bound.CheckFrustum(min, ppvCameraMatrix, partPos.y + cullYOffset) == 0) {  \
+                                mng += kPppMngStride;                                                      \
+                                continue;                                                                  \
+                            }                                                                              \
+                        }                                                                                  \
+                                                                                                           \
+                        PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);                                 \
+                        *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;                     \
+                                                                                                           \
+                        ppvMng = reinterpret_cast<_pppMngSt*>(mng);                                        \
+                        ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);         \
+                        pppSetFpMatrix(ppvMng);                                                            \
+                        _pppDrawPart(ppvMng);                                                              \
+                    }                                                                                      \
+                                                                                                           \
+                    mng += kPppMngStride;                                                                  \
+                }                                                                                          \
             }
+
+            PPP_EDIT_DRAW_PASS(8)
+            PPP_EDIT_DRAW_PASS(4)
+            pppDraw();
+            PPP_EDIT_DRAW_PASS(6)
+            PPP_EDIT_DRAW_PASS(7)
+#undef PPP_EDIT_DRAW_PASS
         } else {
             char* mng = reinterpret_cast<char*>(m_pppMng);
             int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);

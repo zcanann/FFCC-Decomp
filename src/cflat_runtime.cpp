@@ -246,11 +246,11 @@ void CFlatRuntime::clear()
 void CFlatRuntime::Create(void* filePtr)
 {
 	CChunkFile::CChunk chunk;
-	CChunkFile chunkFile(filePtr);
 	u8* const self = reinterpret_cast<u8*>(this);
 
 	Destroy();
 
+	CChunkFile chunkFile(filePtr);
 	while (chunkFile.GetNextChunk(chunk)) {
 		if (chunk.m_id != 'CFLT') {
 			continue;
@@ -260,7 +260,7 @@ void CFlatRuntime::Create(void* filePtr)
 		while (chunkFile.GetNextChunk(chunk)) {
 			switch (chunk.m_id) {
 			case 'NAME':
-				strcpy(reinterpret_cast<char*>(self + 0x00), chunkFile.GetString());
+				strcpy(reinterpret_cast<char*>(self + 0x84C), chunkFile.GetString());
 				break;
 
 			case 'CLAS': {

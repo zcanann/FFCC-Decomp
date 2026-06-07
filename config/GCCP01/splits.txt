@@ -239,7 +239,7 @@ materialman.cpp:
 	.bss        start:0x80268C70 end:0x80268E8C
 	.sdata      start:0x8032E568 end:0x8032E598
 	.sbss       start:0x8032ECE8 end:0x8032ED00
-	.sdata2     start:0x8032FB18 end:0x8032FB28
+	.sdata2     start:0x8032FAF8 end:0x8032FB28
 
 ref.cpp:
 	extab       start:0x80006754 end:0x8000675C

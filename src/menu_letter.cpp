@@ -1713,11 +1713,11 @@ void CMenuPcs::LetterListDraw()
 	font->SetColor(titleColor.color);
 
 	char* menuTitle = GetMenuStr(0x1D);
-	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
+	float titleX = static_cast<float>((FLOAT_80333158 - font->GetWidth(menuTitle)) *
 	                                  DOUBLE_803330a8);
 	DrawShadowFont(font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
-	if (DOUBLE_803330e8 > static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58))) {
+	if (static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58)) < DOUBLE_803330e8) {
 		return;
 	}
 

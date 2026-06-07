@@ -697,7 +697,7 @@ void CFlatRuntime::AfterFrame(int mode)
 	while (object != &m_objectSentinel) {
 		CObject* const next = object->m_next;
 
-		if ((mode != 0) || (static_cast<s8>(object->m_flags) < 0)) {
+		if ((mode != 0) || (object->m_flagBits.m_deleteFlag != 0)) {
 			object->m_previous->m_next = object->m_next;
 			object->m_next->m_previous = object->m_previous;
 

@@ -12,6 +12,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "ffcc/partMng.h"
@@ -1366,8 +1367,8 @@ void CGObject::hit()
  */
 void CGObject::update()
 {
-    const unsigned int miniGameFlags = MiniGamePcs.m_flags;
-    const unsigned int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(miniGameFlags & 0x8000)) >> 5) & 0xFF;
+    const unsigned int dbgFlags = DbgMenuPcs.GetDbgFlagsRaw();
+    const unsigned int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(dbgFlags & 0x8000)) >> 5) & 0xFF;
     unsigned char& weaponFlagsLo = m_weaponNodeFlagBytes.m_flags0;
     unsigned char& weaponFlagsHi = m_weaponNodeFlagBytes.m_flags1;
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);

@@ -2078,7 +2078,8 @@ int CGPartyObj::getReplaceStat(int state)
  */
 void CGPartyObj::statCharge()
 {
-	if (m_subState == 1) {
+	switch (m_subState) {
+	case 1:
 		if (m_subFrame == 0) {
 			reqAnim(m_unk554, 1, 0);
 		}
@@ -2099,19 +2100,19 @@ void CGPartyObj::statCharge()
 			}
 		}
 		m_comboFramePrev++;
-	} else if (m_subState < 1) {
-		if (m_subState >= 0) {
-			if (m_subFrame == 0) {
-				m_comboFramePrev = 0;
-				reqAnim(m_attackAnimId, 0, 0);
-				putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x7EE);
-			}
-			if (isLoopAnim() != 0) {
-				changeSubStat(1);
-				return;
-			}
+		break;
+	case 0:
+		if (m_subFrame == 0) {
+			m_comboFramePrev = 0;
+			reqAnim(m_attackAnimId, 0, 0);
+			putParticle(0x210, m_particleSlots[3], reinterpret_cast<CGObject*>(this), FLOAT_80331a54, 0x7EE);
 		}
-	} else if (m_subState < 3) {
+		if (isLoopAnim() != 0) {
+			changeSubStat(1);
+			return;
+		}
+		break;
+	case 2: {
 		if (m_subFrame == 0) {
 			endPSlotBit(8);
 			enableAttackCol(0x18, 0, 0);
@@ -2239,6 +2240,8 @@ void CGPartyObj::statCharge()
 				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x4FC) = FLOAT_80331a78;
 			}
 		}
+		break;
+	}
 	}
 
 	if (m_subState < 2) {

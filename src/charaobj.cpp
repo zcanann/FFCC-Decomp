@@ -1625,15 +1625,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 void CGCharaObj::setSta(int staIndex, int value)
 {
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (script == 0) {
-		return;
-	}
 
-	int cid = GetCID();
 	bool isIceJ = false;
 	bool isMon = false;
 	unsigned char* script9 = 0;
-	if ((cid & 0xAD) == 0xAD) {
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 		isMon = true;
 		script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 		if (*reinterpret_cast<unsigned short*>(script9 + 0xFC) == 0xB) {

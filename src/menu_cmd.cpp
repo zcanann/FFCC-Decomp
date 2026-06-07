@@ -940,9 +940,9 @@ void CMenuPcs::CmdDraw()
 			float h = static_cast<float>(entry->height);
 			float t = FLOAT_80332ad0;
 
-			if ((i > 7) || (caravan->m_commandListExtra[i] == 0)) {
-				SetTexture(static_cast<CMenuPcs::TEX>(tex));
-				if ((caravan->m_commandListInventorySlotRef[i] > 1) &&
+			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				if ((caravan->m_commandListInventorySlotRef[i] >= 2) &&
 				    (caravan->m_commandListInventorySlotRef[i] == -1)) {
 					t += h;
 				}
@@ -960,7 +960,7 @@ void CMenuPcs::CmdDraw()
 				boxColor.a = static_cast<u8>(FLOAT_80332acc * entry->alpha);
 				GXSetChanMatColor(GX_COLOR0A0, boxColor);
 
-				DrawRect(
+				MenuPcs.DrawRect(
 				    0, x, y, w, h, entry->u, t, entry->scale, entry->scale, 0.0f);
 			}
 		}
@@ -975,7 +975,7 @@ void CMenuPcs::CmdDraw()
 
 	entry = entries;
 	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
-		if ((i > 7) || (caravan->m_commandListExtra[i] == 0)) {
+		if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
 			float alpha = entry->alpha;
 			if (cmdMode == 3) {
 				alpha = FLOAT_80332a70;
@@ -1021,10 +1021,11 @@ void CMenuPcs::CmdDraw()
 
 	entry = entries;
 	for (i = 0; i < caravan->m_numCmdListSlots; i++) {
-		if ((i > 1) && (caravan->m_commandListInventorySlotRef[i] >= 0)) {
+		if ((i >= 2) && (caravan->m_commandListInventorySlotRef[i] >= 0)) {
 			DrawSingleIcon(
 			    caravan->m_inventoryItems[caravan->m_commandListInventorySlotRef[i]],
-			    entry->x + entry->width - 0x10, entry->y - 2, entry->alpha, 0, 0.0f);
+			    static_cast<s32>(static_cast<float>(entry->x + entry->width - 0x10)),
+			    static_cast<s32>(static_cast<float>(entry->y - 2)), entry->alpha, 0, 0.0f);
 		}
 		entry++;
 	}

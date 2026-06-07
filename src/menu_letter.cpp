@@ -1895,13 +1895,14 @@ void CMenuPcs::LetterMessDraw()
 	int y = 0x58;
 	for (int i = 0; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
+		const float yf = static_cast<float>(y);
 		if (newline != 0) {
 			*newline = '\0';
 		}
 
 		if (strlen(curLine) != 0) {
 			font->SetPosX(FLOAT_80333144);
-			font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
+			font->SetPosY(yf - FLOAT_80333148);
 			font->Draw(curLine);
 		}
 

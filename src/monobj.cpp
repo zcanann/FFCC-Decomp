@@ -3369,12 +3369,13 @@ void CGMonObj::statMove(int* targetIndex)
 	int* targetPartyIdx = &monObj->m_targetPartyIndex;
 
 	int state = *chaseState;
-	if (state == 3) {
+	switch (state) {
+	case 3:
 		monObj->isValidTarget();
-		goto updateTimer;
-	}
-	if (state > 2) {
-		if (state == 5) {
+		break;
+
+	case 5: {
+		{
 			if (*targetPartyIdx < 0) {
 				*reinterpret_cast<int*>(CGMonObj::m_aiWork + 4) = 0;
 				memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
@@ -3422,32 +3423,33 @@ void CGMonObj::statMove(int* targetIndex)
 					monObj->m_chaseDirty = 1;
 				}
 			}
-		} else if (state < 5) {
-			monObj->seKiduki();
 		}
-		goto updateTimer;
+		break;
 	}
 
-	if (state == 1) {
+	case 4:
+		monObj->seKiduki();
+		break;
+
+	case 1:
 		monObj->statWatch();
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
-		goto updateTimer;
-	}
-	if (state > 0) {
+		break;
+
+	case 2:
 		monObj->statAround();
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
 		monObj->m_unk6B8 = 1;
-		goto updateTimer;
-	}
-	if (state < 0) {
-		goto updateTimer;
+		break;
+
+	default:
+		break;
 	}
 
-updateTimer:
 	if (monObj->m_chaseDirty == 0) {
 		*chaseTimer += 1;
 	} else {

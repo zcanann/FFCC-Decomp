@@ -429,7 +429,7 @@ void birth(
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
 
-    if (params->m_spawnMode < 8) {
+    if ((s8)params->m_spawnMode < 8) {
         Vec baseDirection;
         Vec angles;
         Vec forward;
@@ -503,7 +503,7 @@ void birth(
         pppCopyMatrix(*(pppFMATRIX*)&particleData->m_matrix, basis);
     }
 
-    u8 mode = params->m_spawnMode;
+    s32 mode = params->m_spawnMode;
     if (mode < 6) {
         if (mode > 3) {
             if (params->m_speed != kPppRyjMegaBirthSharedZero) {

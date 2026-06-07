@@ -725,35 +725,38 @@ void CMenuPcs::loadData()
 	m_wm.m_handles[0x26] = 0;
 	m_wm.m_handles[0x27] = 0;
 
-	for (int i = 0; i < 0x28; i++) {
-		CCharaPcs::CHandle* handle = new (MenuPcs.m_menuStage, srcFile, 0x1F4) CCharaPcs::CHandle;
-		m_wm.m_handles[i] = handle;
-		handle->Add();
+	const short* charaNoTable = reinterpret_cast<const short*>(rodataBase + 0x970);
+	const short* const charaNoDefault = charaNoTable + 21;
+	for (int i = 0; i < 0x28; i++, charaNoTable++) {
+		m_wm.m_handles[i] = new (MenuPcs.m_menuStage, srcFile, 0x1F4) CCharaPcs::CHandle;
+		m_wm.m_handles[i]->Add();
 
 		int charaKind;
 		unsigned long charaNo;
 		if (i < 0x20) {
 			CharaPcs.m_charaAllocStage = 1;
 			charaKind = 3;
-			charaNo = reinterpret_cast<const unsigned short*>(rodataBase + 0x970)[i];
+			charaNo = *charaNoTable;
 		} else {
 			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
 			CharaPcs.m_charaAllocStage = 0;
 			if (caravan.m_shopState != 0) {
 				charaKind = 0;
 				charaNo = caravan.m_tribeId * 200 + 100;
-				if (caravan.m_genderFlag != 0) {
+				unsigned short variant = caravan.m_appearanceVariant;
+				int gender = caravan.m_genderFlag;
+				if (gender != 0) {
 					charaNo += 100;
 				}
-				charaNo += caravan.m_appearanceVariant;
+				charaNo += variant;
 			} else {
 				charaKind = 3;
-				charaNo = reinterpret_cast<const unsigned short*>(rodataBase + 0x970)[21];
+				charaNo = *charaNoDefault;
 			}
 		}
 
-		handle->LoadModel(charaKind, charaNo, 0, 0, -1, 0, 0);
-		handle->m_flags |= 0x141;
+		m_wm.m_handles[i]->LoadModel(charaKind, charaNo, 0, 0, -1, 0, 0);
+		m_wm.m_handles[i]->m_flags |= 0x141;
 	}
 	CharaPcs.m_charaAllocStage = 0;
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(m_wm.m_handles[6]->m_model) + 0x9C) =
@@ -933,11 +936,33 @@ void CMenuPcs::loadData()
 	memset(m_wmWorldParams, 0, 0x10);
 
 	m_effectWork = new (MenuPcs.m_menuStage, srcFile, 0x252) EffectInfo[0x28];
-	for (int i = 0; i < 0x28; i++) {
-		EffectInfo* const effect = &m_effectWork[i];
-		effect->m_effectNo = -1;
-		effect->m_partNo = -1;
-		effect->m_slotNo = -1;
+	{
+		for (int i = 0, count = 5; count != 0; count--, i += 0x2920) {
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x524) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x528) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x52C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA48) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA4C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xA50) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF6C) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF70) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0xF74) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1490) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1494) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1498) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B4) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19B8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x19BC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1ED8) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EDC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x1EE0) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x23FC) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2400) = -1;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + i + 0x2404) = -1;
+		}
 	}
 
 	m_wmCharaAnimState =
@@ -989,34 +1014,51 @@ void CMenuPcs::loadData()
 			m_wm.m_charaSelectData[i + 0x0C] = 0;
 			m_wm.m_charaSelectData[i + 0x0B] = 0;
 			m_wm.m_charaSelectData[i + 0x0A] = 0;
-			short slotA = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x3E);
+			int slotA = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x3E);
 			if (slotA < 0) {
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = -1;
 			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = slotA;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(slotA);
 				usedMask = static_cast<signed char>(usedMask | (1 << slotA));
 			}
 			m_wm.m_charaSelectData[i + 0x1C] = 0;
 			m_wm.m_charaSelectData[i + 0x1B] = 0;
 			m_wm.m_charaSelectData[i + 0x1A] = 0;
-			short slotB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x40);
+			int slotB = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_wmWorldState) + j + 0x40);
 			if (slotB < 0) {
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = -1;
 			} else {
-				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = slotB;
+				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 0x14) = static_cast<short>(slotB);
 				usedMask = static_cast<signed char>(usedMask | (1 << slotB));
 			}
 		}
 		for (int i = 0, count = 4; count != 0; count--, i += 0x10) {
 			if (*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) < 0) {
 				int freeSlot = 0;
-				unsigned int mask = static_cast<unsigned int>(usedMask);
-				if ((mask & 1) != 0 && (freeSlot = 1, (mask & 2) != 0) &&
-				    (freeSlot = 2, (mask & 4) != 0) &&
-				    (freeSlot = 3, (mask & 8) != 0 && (freeSlot = 4, (mask & 0x10) != 0)) &&
-				    (freeSlot = 5, (mask & 0x20) != 0 &&
-				     (freeSlot = 6, (mask & 0x40) != 0 && (freeSlot = 7, (mask & 0x80) != 0)))) {
-					freeSlot = 8;
+				signed char mask = usedMask;
+				if ((mask & (1 << freeSlot)) != 0) {
+					freeSlot = 1;
+					if ((mask & (1 << freeSlot)) != 0) {
+						freeSlot = 2;
+						if ((mask & (1 << freeSlot)) != 0) {
+							freeSlot = 3;
+							if ((mask & (1 << freeSlot)) != 0) {
+								freeSlot = 4;
+								if ((mask & (1 << freeSlot)) != 0) {
+									freeSlot = 5;
+									if ((mask & (1 << freeSlot)) != 0) {
+										freeSlot = 6;
+										if ((mask & (1 << freeSlot)) != 0) {
+											freeSlot = 7;
+											if ((mask & (1 << freeSlot)) != 0) {
+												freeSlot = 8;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 				*reinterpret_cast<short*>(m_wm.m_charaSelectData + i + 4) = static_cast<short>(freeSlot);
 				usedMask = static_cast<signed char>(usedMask | (1 << freeSlot));
@@ -1055,7 +1097,7 @@ void CMenuPcs::loadData()
 		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 8) * 0x524);
 		if (i + 8 == 5 && i + 5 < 0x13) {
 			effect += 0x149;
-		} else if (i + 8 > 0x10 && i + 8 < 0x15 && i + 5 > 0x19) {
+		} else if (i + 8 >= 0x11 && i + 8 <= 0x14 && i + 5 > 0x19) {
 			effect += 0x149;
 		}
 		unsigned int effectNo = i + 5;
@@ -1078,7 +1120,7 @@ void CMenuPcs::loadData()
 		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0xC) * 0x524);
 		if (i + 0xC == 5 && static_cast<int>(i) < 0x13) {
 			effect += 0x149;
-		} else if (static_cast<int>(i + 0xC) > 0x10 && static_cast<int>(i + 0xC) < 0x15 &&
+		} else if (static_cast<int>(i + 0xC) >= 0x11 && static_cast<int>(i + 0xC) <= 0x14 &&
 		           static_cast<int>(i) > 0x19) {
 			effect += 0x149;
 		}
@@ -1101,7 +1143,7 @@ void CMenuPcs::loadData()
 		    reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (i + 0x20) * 0x524);
 		if (i + 0x20 == 5 && i + 0xA < 0x13) {
 			effect += 0x149;
-		} else if (i + 0x20 > 0x10 && i + 0x20 < 0x15 && i + 0xA > 0x19) {
+		} else if (i + 0x20 >= 0x11 && i + 0x20 <= 0x14 && i + 0xA > 0x19) {
 			effect += 0x149;
 		}
 		unsigned int effectNo = i + 0xA;

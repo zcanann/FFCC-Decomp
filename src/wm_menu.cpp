@@ -3755,12 +3755,15 @@ void CMenuPcs::DrawMCardMenu()
 			alpha = FLOAT_803313e8 - (float)typedWorldState->m_frameCounter;
 		}
 		if (alpha > FLOAT_803314f0) {
-			SetAttrFmt((FMT)0);
-			unsigned int bgColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-			bgColor = bgColor | 0xFFFFFF00;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&bgColor);
-			SetTexture((TEX)0x1F);
-			DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
+			MenuPcs.SetAttrFmt((FMT)0);
+			GXColor bgColor;
+			bgColor.r = 0xFF;
+			bgColor.g = 0xFF;
+			bgColor.b = 0xFF;
+			bgColor.a = static_cast<unsigned char>((unsigned int)(FLOAT_80331458 * alpha) & 0xFF);
+			GXSetChanMatColor(GX_COLOR0A0, bgColor);
+			MenuPcs.SetTexture((TEX)0x1F);
+			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803313dc, (float)(FLOAT_803314d8 - FLOAT_80331440),
 			         FLOAT_803313e0, FLOAT_80331440,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, 0);

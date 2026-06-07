@@ -739,10 +739,11 @@ void CMiniGamePcs::GbaThreadMain(void* threadParam)
     int retryLine = 0;
     OSTime timeoutTicks = 0;
     OSTime startTime = 0;
-    const int channel = static_cast<int>(static_cast<signed char>(param[0xBC]));
+#define channel (static_cast<int>(static_cast<signed char>(param[0xBC])))
 
 receive_message:
-    if (OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0) == 0)
+    ret = OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0);
+    if (ret == 0)
     {
         param[0xBD] = 0;
         OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 1);
@@ -1296,6 +1297,7 @@ comm_fail:
     param[0xC4] = 0;
     goto receive_message;
 }
+#undef channel
 
 /*
  * --INFO--

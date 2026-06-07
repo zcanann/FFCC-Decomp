@@ -2906,13 +2906,9 @@ void CShopMenu::Calc()
  */
 void CMenuPcs::CreateSmithMenu()
 {
-    CMemory::CStage* stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        operator new(0x158, stage, s_shopmenu_cpp, 0x2E9));
+        operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+            s_shopmenu_cpp, 0x2E9));
     m_shopMenu = shopMenu;
     shopMenu = m_shopMenu;
 
@@ -2942,13 +2938,9 @@ void CMenuPcs::CreateSmithMenu()
  */
 void CMenuPcs::CreateShopMenu()
 {
-    CMemory::CStage* stage = m_menuStage;
-    if (Game.m_gameWork.m_menuStageMode != 0) {
-        stage = m_stageF4;
-    }
-
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        operator new(0x158, stage, s_shopmenu_cpp, 0x2E2));
+        operator new(0x158, (Game.m_gameWork.m_menuStageMode != 0) ? MenuPcs.m_stageF4 : MenuPcs.m_menuStage,
+            s_shopmenu_cpp, 0x2E2));
     m_shopMenu = shopMenu;
     shopMenu = m_shopMenu;
 

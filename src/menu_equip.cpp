@@ -542,7 +542,7 @@ void CMenuPcs::EquipDraw()
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				} else if (tex == 0x37) {
 					int idx = drawIndex + GetEquipMenuState(this)->scroll;
-					if ((idx < 1) || (letterCount <= idx)) {
+					if ((idx < 1) || (idx >= letterCount)) {
 						if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
 							alpha = (float)(kEquipHalfDouble * (double)alpha);

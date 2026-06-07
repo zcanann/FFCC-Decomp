@@ -3230,7 +3230,7 @@ void CGPartyObj::statPut()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	    (GetCID() & 0x6D) == 0x6D &&
+	    (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
 	    m_scriptHandle[0xED] != 0) {
 		if (m_stateFrame == 0) {
 			CancelMove(1);
@@ -3247,17 +3247,24 @@ void CGPartyObj::statPut()
 	}
 
 	if (m_stateFrame == 0) {
-		int anim = 0x0E;
-		int seNo = 0x23;
-		if (m_lastStateId == 0x0D) {
+		int anim;
+		int seNo;
+		switch (m_lastStateId) {
+		case 0x0D:
 			anim = 0x19;
 			seNo = 0x24;
-		} else if (m_lastStateId == 0x1B) {
+			break;
+		case 0x1B:
 			anim = 9;
 			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
 				anim = 0x28;
 			}
 			seNo = 0x24;
+			break;
+		default:
+			anim = 0x0E;
+			seNo = 0x23;
+			break;
 		}
 		reqAnim(anim, 0, 0);
 		playSe3D(seNo, 0x32, 0x96, 0, 0);

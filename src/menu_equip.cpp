@@ -667,9 +667,8 @@ int CMenuPcs::EquipClose()
 				item->alpha = kEquipZero;
 			} else {
 				item->step = item->step + 1;
-				item->alpha = (float)-((kEquipOneDouble / static_cast<double>(item->duration)) *
-				                           static_cast<double>(item->step) -
-				                       kEquipOneDouble);
+				double recip = kEquipOneDouble / static_cast<double>(item->duration);
+				item->alpha = (float)-(recip * static_cast<double>(item->step) - kEquipOneDouble);
 				if ((double)item->alpha < kEquipZeroDouble) {
 					item->alpha = kEquipZero;
 				}

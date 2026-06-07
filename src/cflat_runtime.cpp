@@ -2208,7 +2208,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		switch (systemIndex) {
 		case -1:
 			if (static_cast<int>(*object->m_localBase) <= object->m_waitCounter) {
-				*object->m_sp++ = 0;
+				*object->m_sp = 0;
+				object->m_sp++;
 				result = 0;
 			}
 			break;

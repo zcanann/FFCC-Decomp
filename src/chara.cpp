@@ -1448,29 +1448,29 @@ void CChara::CModel::calcNowFrame()
 void CChara::CModel::calcMatrix()
 {
 	float frame;
-	if (m_anim == 0) {
-		frame = FLOAT_803301b0;
-	} else {
+	if (m_anim != 0) {
 		float total = FLOAT_803301BC + (m_animEnd - m_animStart);
-		if (((AnimFlags(m_anim) >> 6) & 1) == 0) {
-			if (m_time >= FLOAT_803301b0) {
-				frame = m_animStart + static_cast<float>(fmod(m_time, total));
+		if (((AnimFlags(m_anim) >> 6) & 1) != 0) {
+			if (m_time < FLOAT_803301b0) {
+				float clamped = total - FLOAT_803301BC;
+				if (-m_time < clamped) {
+					clamped = -m_time;
+				}
+				frame = ((m_animStart + total) - FLOAT_803301BC) - clamped;
 			} else {
-				frame = ((m_animStart + total) - FLOAT_803301BC) - static_cast<float>(fmod(-m_time, total));
+				float clamped = total - FLOAT_803301BC;
+				if (m_time < clamped) {
+					clamped = m_time;
+				}
+				frame = m_animStart + clamped;
 			}
 		} else if (m_time >= FLOAT_803301b0) {
-			float clamped = total - FLOAT_803301BC;
-			if (m_time < clamped) {
-				clamped = m_time;
-			}
-			frame = m_animStart + clamped;
+			frame = m_animStart + static_cast<float>(fmod(m_time, total));
 		} else {
-			float clamped = total - FLOAT_803301BC;
-			if (-m_time < clamped) {
-				clamped = -m_time;
-			}
-			frame = ((m_animStart + total) - FLOAT_803301BC) - clamped;
+			frame = ((m_animStart + total) - FLOAT_803301BC) - static_cast<float>(fmod(-m_time, total));
 		}
+	} else {
+		frame = FLOAT_803301b0;
 	}
 	m_curFrame = frame;
 	if (m_anim != 0) {

@@ -280,8 +280,8 @@ public:
 		CNode* m_nodes;
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;
-		float m_curFrame;
 		float m_time;
+		float m_curFrame;
 		float m_animStart;
 		float m_animEnd;
 		CVector m_dynJitter;

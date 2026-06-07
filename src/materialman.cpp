@@ -1879,14 +1879,12 @@ int CMaterialMan::GetCharaShadow(
     float searchBoundStorage[6];
     CBound& searchBound = *reinterpret_cast<CBound*>(searchBoundStorage);
     searchBound.m_min.x = position->x - rangeXZ;
-    searchBound.m_min.y = position->y;
-    searchBound.m_min.z = position->z - rangeXZ;
     searchBound.m_max.x = position->x + rangeXZ;
-    searchBound.m_max.y = position->y + rangeY;
+    searchBound.m_min.z = position->z - rangeXZ;
     searchBound.m_max.z = position->z + rangeXZ;
+    searchBound.m_min.y = position->y;
+    searchBound.m_max.y = position->y + rangeY;
 
-    CMaterialSet* materialSet = MapMng.m_materialSet;
-    CPtrArray<CMaterial*>* materials = &materialSet->m_materials;
     CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     ShadowCandidate shadowCandidates[128];
@@ -1915,7 +1913,7 @@ int CMaterialMan::GetCharaShadow(
 
         if (shadow->m_materialMode == 1) {
             if (outputCount < maxShadows) {
-                materialsOut[outputCount] = (*materials)[shadow->m_materialIndex];
+                materialsOut[outputCount] = MapMng.m_materialSet->m_materials[shadow->m_materialIndex];
                 shadowMtxOut[outputCount] = shadow->m_shadowMtx;
                 outputCount++;
             }
@@ -1952,7 +1950,7 @@ int CMaterialMan::GetCharaShadow(
     if ((nearest != 0) && (outputCount < maxShadows)) {
         nearest->distance = static_cast<int>(kMaterialMaxDistance);
         CMapShadow* nearestShadow = nearest->shadow;
-        materialsOut[outputCount] = (*materials)[nearestShadow->m_materialIndex];
+        materialsOut[outputCount] = MapMng.m_materialSet->m_materials[nearestShadow->m_materialIndex];
         shadowMtxOut[outputCount] = nearestShadow->m_shadowMtx;
         outputCount++;
     }

@@ -3763,7 +3763,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == kChunkRSDM) {
+                switch (innerChunk.m_id) {
+                case kChunkRSDM:
                     if (targetModel != 0) {
                         CChunkFile rsdFile;
                         rsdFile.SetBuf(chunkFile.GetAddress());
@@ -3783,7 +3784,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                         targetModel->m_refCount++;
                         targetModel = 0;
                     }
-                } else if (innerChunk.m_id == kChunkNAME) {
+                    break;
+                case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
                     targetModel = 0;
@@ -3810,6 +3812,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
                     } else {
                         targetModel = 0;
                     }
+                    break;
+                }
                 }
             }
         }
@@ -3877,7 +3881,8 @@ void CPartMng::pppLoadPan(const char* baseName)
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == kChunkSHPM) {
+                switch (innerChunk.m_id) {
+                case kChunkSHPM:
                     if (targetShape != 0) {
                         CChunkFile shpFile;
                         shpFile.SetBuf(chunkFile.GetAddress());
@@ -3885,7 +3890,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                         targetShape->m_refCount++;
                         targetShape = 0;
                     }
-                } else if (innerChunk.m_id == kChunkNAME) {
+                    break;
+                case kChunkNAME: {
                     char* name = chunkFile.GetString();
 
                     targetShape = 0;
@@ -3912,6 +3918,8 @@ void CPartMng::pppLoadPan(const char* baseName)
                     } else {
                         targetShape = 0;
                     }
+                    break;
+                }
                 }
             }
         }

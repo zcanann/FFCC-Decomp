@@ -10403,33 +10403,32 @@ void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float 
 		return;
 	}
 
-	const float halfTexel = FLOAT_80331434;
 	float u0;
 	float u1;
 	float v0;
 	float v1;
 
-	if ((flags & 8) == 0) {
-		u0 = tx + halfTexel;
-		u1 = (tx + w) - halfTexel;
+	if ((flags & 8) != 0) {
+		u1 = FLOAT_80331434 + tx;
+		u0 = (tx + w) - FLOAT_80331434;
 	} else {
-		u1 = tx + halfTexel;
-		u0 = (tx + w) - halfTexel;
+		u0 = FLOAT_80331434 + tx;
+		u1 = (tx + w) - FLOAT_80331434;
 	}
 
-	if ((flags & 4) == 0) {
-		v0 = ty + halfTexel;
-		v1 = (ty + h) - halfTexel;
+	if ((flags & 4) != 0) {
+		v1 = FLOAT_80331434 + ty;
+		v0 = (ty + h) - FLOAT_80331434;
 	} else {
-		v1 = ty + halfTexel;
-		v0 = (ty + h) - halfTexel;
+		v0 = FLOAT_80331434 + ty;
+		v1 = (ty + h) - FLOAT_80331434;
 	}
 
 	if ((flags & 1) != 0) {
-		x = x - halfTexel * (w * scaleX);
+		x = x - FLOAT_80331434 * (w * scaleX);
 	}
 	if ((flags & 2) != 0) {
-		y = y - halfTexel * (h * scaleY);
+		y = y - FLOAT_80331434 * (h * scaleY);
 	}
 
 	Vec out[4];

@@ -3990,9 +3990,9 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     }
-    case -0xE9:
+    case -0xE9: {
+        _GXTexObj backTexObj;
         if (*object->m_localBase == 0) {
-            _GXTexObj backTexObj;
             _GXColor color = { 0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]) };
 
             GXInitTexObj(
@@ -4002,13 +4002,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             gUtil.RenderTextureQuad(
                 0.0f, 0.0f, 640.0f, 448.0f, &backTexObj, 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
         } else {
-            _GXTexObj backTexObj;
             Graphic.GetBackBufferRect2(
                 Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
         }
         this->push(object, 0);
         outResult = 0;
         break;
+    }
     case -0xEA:
         CharaPcs.SetSpecularAlpha(*object->m_localBase);
         this->push(object, 0);

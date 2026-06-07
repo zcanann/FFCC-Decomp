@@ -11143,16 +11143,16 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	for (int i = 0; i < 4; i++) {
 		float x = sx;
 		float y = sy;
-		float flags = FLOAT_803313dc;
+		int flags = 0;
 		if (i & 1) {
 			x = right;
-			flags = 8.0f;
+			flags = 8;
 		}
 		if (i & 2) {
 			y = bottom;
-			flags += 4.0f;
+			flags |= 4;
 		}
-		DrawRect(0xFFFFFFFF, x, y, border, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+		DrawRect(flags, x, y, border, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(edgeHTex));
@@ -11160,30 +11160,30 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const float innerX = static_cast<float>(static_cast<double>(sx) + static_cast<double>(border));
 	for (int i = 0; i < 2; i++) {
 		float y = sy;
-		float flags = FLOAT_803313dc;
+		int flags = 0;
 		if (i != 0) {
 			y = bottom;
-			flags = 4.0f;
+			flags = 4;
 		}
-		DrawRect(0xFFFFFFFF, innerX, y, innerWidth, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+		DrawRect(flags, innerX, y, innerWidth, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(edgeVTex));
 	const float innerHeight = static_cast<float>(static_cast<double>(sh) - DOUBLE_80331428);
 	const float innerY = static_cast<float>(static_cast<double>(sy) + static_cast<double>(border));
-	float lastFlags = FLOAT_803313dc;
+	int lastFlags = 0;
 	for (int i = 0; i < 2; i++) {
 		float x = sx;
-		lastFlags = FLOAT_803313dc;
+		lastFlags = 0;
 		if (i != 0) {
 			x = right;
-			lastFlags = 8.0f;
+			lastFlags = 8;
 		}
-		DrawRect(0xFFFFFFFF, x, innerY, border, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
+		DrawRect(lastFlags, x, innerY, border, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(fillTex));
-	DrawRect(0xFFFFFFFF, innerX, innerY, innerWidth, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
+	DrawRect(lastFlags, innerX, innerY, innerWidth, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 	if (win->state == 0) {
 		win->frame++;

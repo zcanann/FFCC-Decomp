@@ -662,12 +662,12 @@ bool CMenuPcs::LetterOpen()
 	bool allFinished = iVar5 == iVar6;
 	if (allFinished) {
 		iVar4 = SingGetLetterAttachflg();
-		if (iVar4 < 0) {
-			m_singMenuState->procState = 1;
-		} else {
+		if (iVar4 >= 0) {
 			m_singMenuState->procState = 0;
 			m_singMenuState->uniteState = 1;
 			LetterInit1();
+		} else {
+			m_singMenuState->procState = 1;
 		}
 	}
 	return allFinished;

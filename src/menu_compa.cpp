@@ -22,8 +22,8 @@ static const float kCompaTextYOffset = 4.0f;
 static const float kCompaJobFontScale = 1.2f;
 static const float kCompaJobYOffset = 2.0f;
 static const double kCompaIntToDoubleBias = 4503601774854144.0;
-extern "C" const float FLOAT_80333038;
-extern "C" const float FLOAT_8033303C;
+extern "C" const float kCompaFoodIconUvScale;
+extern "C" const float kCompaFrameU;
 
 static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
 static const char s_menu_compa_cpp[] = "menu_compa.cpp";
@@ -662,7 +662,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
 	setupEntry->u = kCompaZero;
 	setupEntry->v = kCompaZero;
-	setupEntry->uvScale = FLOAT_80333038;
+	setupEntry->uvScale = kCompaFoodIconUvScale;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;
 
@@ -674,7 +674,7 @@ void CMenuPcs::CompaInit()
 	setupEntry->y = 8;
 	setupEntry->w = 0x30;
 	setupEntry->h = 0x140;
-	setupEntry->u = FLOAT_8033303C;
+	setupEntry->u = kCompaFrameU;
 	setupEntry->v = kCompaZero;
 	setupEntry->startFrame = 0;
 	setupEntry->duration = 5;

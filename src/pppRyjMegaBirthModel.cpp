@@ -1008,7 +1008,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* stepData, _p
         _PARTICLE_WMAT* particleWorldMatrix = 0;
         _PARTICLE_COLOR* particleColor = 0;
 
-        if (*s16_at(particle, 0x22) == 0) {
+        if (*u16_at(particle, 0x30) == 0) {
             continue;
         }
 

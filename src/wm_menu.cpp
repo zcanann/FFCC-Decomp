@@ -11391,6 +11391,9 @@ void McCtrl::LoadMcList()
 			}
 		}
 		break;
+
+	case 7:
+		break;
 	}
 
 	if (m_state == -1) {
@@ -11794,6 +11797,9 @@ void McCtrl::SaveDat()
 			}
 		}
 		break;
+
+	case 0x14:
+		break;
 	}
 
 	if (m_state == -1) {
@@ -11946,6 +11952,9 @@ void McCtrl::LoadDat()
 				m_state = 7;
 			}
 		}
+		break;
+
+	case 7:
 		break;
 	}
 
@@ -12915,6 +12924,9 @@ void McCtrl::EraseDat()
 				m_state = -1;
 			}
 		}
+		break;
+
+	case 0x14:
 		break;
 	}
 

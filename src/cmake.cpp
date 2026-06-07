@@ -923,14 +923,12 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((repeat & 0x8) != 0) {
-        if (row == 0) {
-            if (select < 10) {
-                row = 4;
-            } else {
-                row = 5;
-            }
-        } else {
+        if (row != 0) {
             row = static_cast<short>(row - 1);
+        } else if (select < 10) {
+            row = 4;
+        } else {
+            row = 5;
         }
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     } else if ((repeat & 0x4) != 0) {
@@ -2692,14 +2690,12 @@ int CMenuPcs::CmakeNameCtrl()
         }
     } else {
         if ((repeat & 0x8) != 0) {
-            if (CmakeState(this)->m_row == 0) {
-                if (CmakeState(this)->m_select < 10) {
-                    CmakeState(this)->m_row = 4;
-                } else {
-                    CmakeState(this)->m_row = 5;
-                }
-            } else {
+            if (CmakeState(this)->m_row != 0) {
                 CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row - 1);
+            } else if (CmakeState(this)->m_select < 10) {
+                CmakeState(this)->m_row = 4;
+            } else {
+                CmakeState(this)->m_row = 5;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {

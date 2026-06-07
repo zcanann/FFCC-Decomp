@@ -1260,14 +1260,20 @@ void CGPartyObj::command()
 		}
 
 		if (cmdIdx == 1) {
-			const unsigned short element = reinterpret_cast<unsigned short*>(m_scriptHandle)[0xF8];
+			const int element =
+			    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
 			if (element == 2) {
 				changeStat(0x14, 0, 0);
-			} else if (element < 2) {
-				changeStat(8, 0, 0);
-			} else if (element < 4) {
-				changeStat(0x15, 0, 0);
+				return;
 			}
+			if (element < 2) {
+				changeStat(8, 0, 0);
+				return;
+			}
+			if (element > 3) {
+				return;
+			}
+			changeStat(0x15, 0, 0);
 			return;
 		}
 

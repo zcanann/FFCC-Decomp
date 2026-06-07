@@ -1106,26 +1106,16 @@ void CGPartyObj::command()
 		} else {
 			const int itemId = caravan->DelCmdListAndItem(caravan->GetIdxCmdList());
 			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
-			if (itemKind == 0x125) {
+			switch (itemKind) {
+			case 1:
+			case 0xDF:
+			case 0x100:
+			case 0x125:
+			case 0x17D:
+			case 0x186:
+			case 0x1F5:
 				ringCommand = itemId | 0x8000;
-			} else if (itemKind < 0x125) {
-				if (itemKind == 0xDF) {
-					ringCommand = itemId | 0x8000;
-				} else if (itemKind < 0xDF) {
-					if (itemKind == 1) {
-						ringCommand = itemId | 0x8000;
-					}
-				} else if (itemKind == 0x100) {
-					ringCommand = itemId | 0x8000;
-				}
-			} else if (itemKind == 0x186) {
-				ringCommand = itemId | 0x8000;
-			} else if (itemKind < 0x186) {
-				if (itemKind == 0x17D) {
-					ringCommand = itemId | 0x8000;
-				}
-			} else if (itemKind == 0x1F5) {
-				ringCommand = itemId | 0x8000;
+				break;
 			}
 		}
 		ringCommandArg = caravan->GetIdxCmdList();

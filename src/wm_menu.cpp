@@ -5578,7 +5578,6 @@ void CMenuPcs::DrawLoadMenu()
 void CMenuPcs::DrawTitleMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	Mtx m_cameraMatrix;
 	short state = m_wmWorldState->m_mainState;
 
 		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
@@ -5612,6 +5611,7 @@ void CMenuPcs::DrawTitleMenu()
 		}
 	} else {
 		// 3D viewport setup
+		GXColor matColor;
 		Mtx44 projMtx;
 		C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 		GXSetProjection(projMtx, GX_PERSPECTIVE);
@@ -5625,13 +5625,12 @@ void CMenuPcs::DrawTitleMenu()
 		CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 		Mtx lookAtMtx;
 		C_MTXLookAt(lookAtMtx, &eye, (Vec*)&up, (Vec*)&target);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
+		PSMTXCopy(CameraPcs.m_cameraMatrix, reinterpret_cast<MtxPtr>(m_wm.m_pad744));
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
-		CColor clearColor(0, 0, 0, 0);
-		_GXColor clearGxColor = *reinterpret_cast<_GXColor*>(&clearColor);
+		_GXColor clearGxColor = CColor(0, 0, 0, 0).color;
 		GXSetCopyClear(clearGxColor, 0xFFFFFF);
 		GXSetColorUpdate(1);
 		GXSetAlphaUpdate(1);
@@ -5639,7 +5638,7 @@ void CMenuPcs::DrawTitleMenu()
 		              FLOAT_803313dc, FLOAT_803313e8);
 
 		PartPcs.DrawMenuIdx(m_effectWork[23].m_partNo);
-		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		PSMTXCopy(reinterpret_cast<MtxPtr>(m_wm.m_pad744), CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
 		Mtx44 projMtx2;
@@ -5656,8 +5655,11 @@ void CMenuPcs::DrawTitleMenu()
 				                                        static_cast<double>(m_wmWorldState->m_frameCounter) -
 				                                        DOUBLE_80331420));
 				SetAttrFmt((FMT)2);
-			GXColor fadeColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha))};
-			GXSetChanMatColor(GX_COLOR0A0, fadeColor);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
 			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -5687,9 +5689,12 @@ void CMenuPcs::DrawTitleMenu()
 				                           static_cast<double>(fX)));
 				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
 			}
-			GXColor itemColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha))};
-			GXSetChanMatColor(GX_COLOR0A0, itemColor);
-			MenuPcs.DrawRect(0xFFFFFFFF, fX, fYRect,
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.DrawRect(0, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -5713,9 +5718,12 @@ void CMenuPcs::DrawTitleMenu()
 			} else {
 				secondAlpha = FLOAT_803313e8;
 			}
-			GXColor itemColor2 = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha))};
-			GXSetChanMatColor(GX_COLOR0A0, itemColor2);
-			MenuPcs.DrawRect(0xFFFFFFFF, fX, fYRect,
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
+			MenuPcs.DrawRect(0, fX, fYRect,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
@@ -5735,14 +5743,17 @@ void CMenuPcs::DrawTitleMenu()
 			if (m_wmWorldState->m_mainState == 1) {
 				labelAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 			}
-			GXColor labelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(kColorScale * labelAlpha))};
-			GXSetChanMatColor(GX_COLOR0A0, labelColor);
+			matColor.r = 0xFF;
+			matColor.g = 0xFF;
+			matColor.b = 0xFF;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(kColorScale * labelAlpha));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
 
 			float yPos = FLOAT_8033177c;
 			if (i != 0) {
 				yPos = yPos + (float)((int)uVar7);
 			}
-			MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_80331778, yPos,
+			MenuPcs.DrawRect(0, FLOAT_80331778, yPos,
 			         FLOAT_80331568, FLOAT_80331440,
 			         kZero, (float)((int)uVar6),
 			         FLOAT_803313e8, FLOAT_803313e8, kZero);
@@ -5756,31 +5767,36 @@ void CMenuPcs::DrawTitleMenu()
 				int cursorAlpha = static_cast<int>(kColorScale *
 				                                   static_cast<float>(-(DOUBLE_803317B0 * static_cast<double>(timer) -
 				                                                        DOUBLE_80331420)));
-				GXColor cursorColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(cursorAlpha)};
-				GXSetChanMatColor(GX_COLOR0A0, cursorColor);
-				float cursorY = FLOAT_8033177c - static_cast<float>(static_cast<double>(FLOAT_80331440) * static_cast<double>(cursorScale) -
-				                                                    static_cast<double>(FLOAT_80331440));
+				matColor.r = 0xFF;
+				matColor.g = 0xFF;
+				matColor.b = 0xFF;
+				matColor.a = static_cast<unsigned char>(cursorAlpha);
+				GXSetChanMatColor(GX_COLOR0A0, matColor);
+				float cursorX = static_cast<float>((FLOAT_803313e0 - FLOAT_80331568 * cursorScale) * DOUBLE_803313f8);
+				float cursorY = FLOAT_8033177c - (FLOAT_80331440 * cursorScale - FLOAT_80331440);
 				if (i != 0) {
 					cursorY = cursorY + (float)((int)uVar7);
 				}
-				MenuPcs.DrawRect(0xFFFFFFFF,
-				         static_cast<float>(-static_cast<float>((static_cast<double>(FLOAT_80331568) * static_cast<double>(cursorScale) -
-				                                                 static_cast<double>(FLOAT_803313e0)) * DOUBLE_803313f8)),
+				MenuPcs.DrawRect(0,
+				         cursorX,
 				         cursorY,
 				         FLOAT_80331568, FLOAT_80331440,
 				         kZero, (float)((int)uVar6),
 				         cursorScale, cursorScale, kZero);
 			}
-			uVar6 += 0x28;
 			uVar7 += 0x28;
+			uVar6 += 0x28;
 		}
 
 		// Logo and copyright textures
 		MenuPcs.SetAttrFmt((FMT)0);
-		GXColor logoColor = {0xFF, 0xFF, 0xFF, 0xFF};
-		GXSetChanMatColor(GX_COLOR0A0, logoColor);
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = 0xFF;
+		GXSetChanMatColor(GX_COLOR0A0, matColor);
 		MenuPcs.SetTexture((TEX)0x42);
-		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
+		MenuPcs.DrawRect(0, FLOAT_803317b8, FLOAT_803317bc, FLOAT_803317c0, FLOAT_803315b4,
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		MenuPcs.SetTexture((TEX)0x44);
@@ -5788,9 +5804,12 @@ void CMenuPcs::DrawTitleMenu()
 		if (m_wmWorldState->m_mainState == 1) {
 			copyrightAlpha = static_cast<float>(DOUBLE_80331770 * static_cast<double>(m_wmWorldState->m_frameCounter));
 		}
-		GXColor crColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * copyrightAlpha))};
-		GXSetChanMatColor(GX_COLOR0A0, crColor);
-		MenuPcs.DrawRect(0xFFFFFFFF, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
+		matColor.r = 0xFF;
+		matColor.g = 0xFF;
+		matColor.b = 0xFF;
+		matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * copyrightAlpha));
+		GXSetChanMatColor(GX_COLOR0A0, matColor);
+		MenuPcs.DrawRect(0, FLOAT_803317c4, FLOAT_803317c8, FLOAT_803317cc, FLOAT_80331440,
 		         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 		// Timer / state transitions
@@ -5817,8 +5836,11 @@ void CMenuPcs::DrawTitleMenu()
 			}
 			if (FLOAT_803313e8 <= fadeAlpha2) fadeAlpha2 = FLOAT_803313e8;
 			SetAttrFmt((FMT)2);
-			unsigned int fadeColor2 = static_cast<int>(FLOAT_80331458 * fadeAlpha2) & 0xFF;
-			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor2);
+			matColor.r = 0;
+			matColor.g = 0;
+			matColor.b = 0;
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * fadeAlpha2));
+			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.SetTexture((TEX)0xFFFFFFFF);
 			_GXSetBlendMode(static_cast<_GXBlendMode>(1), static_cast<_GXBlendFactor>(4), static_cast<_GXBlendFactor>(5), static_cast<_GXLogicOp>(1));
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -5834,11 +5856,11 @@ void CMenuPcs::DrawTitleMenu()
 			PartMng.pppDeletePart(m_effectWork[23].m_partNo);
 			if (m_wmWorldState->m_state0E != 0) {
 				DAT_8032e8ac = 1;
+				m_wmWorldState->m_changeRequest = 1;
 				CFlatRuntime::CStack flatArgs2[3];
 				flatArgs2[0].m_word = 7;
 				flatArgs2[1].m_word = static_cast<int>(m_wmWorldState->m_cardChannel);
 				flatArgs2[2].m_word = 0;
-				m_wmWorldState->m_changeRequest = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
 			} else {
@@ -5848,7 +5870,7 @@ void CMenuPcs::DrawTitleMenu()
 			m_wmWorldState->m_frameCounter = 0;
 			m_wmWorldState->m_worldReady = 0;
 		} else if (state != 2) {
-			short threshold = 10;
+			int threshold = 10;
 			m_wmWorldState->m_frameCounter++;
 			if (m_wmWorldState->m_mainState == 1) {
 				threshold = 0x28;

@@ -1894,7 +1894,7 @@ int CMaterialMan::GetCharaShadow(
     ShadowCandidate shadowCandidates[128];
     ShadowCandidate* candidateWrite = shadowCandidates;
     int candidateCount = 0;
-    int outputCount = 0;
+    unsigned int outputCount = 0;
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];

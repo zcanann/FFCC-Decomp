@@ -1085,7 +1085,7 @@ void CPartMng::SetFp()
         }
 
         mng->m_cullRadiusSq = recvBuff[0x0D];
-        if (mng->m_cullRadiusSq > 0.0f) {
+        if (mng->m_cullRadiusSq > 0.0) {
             mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
         }
         mng->m_nodeIndex = static_cast<short>(i);

@@ -2602,10 +2602,8 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
 
                     if (textureSet != 0) {
                         unsigned long textureIndex = static_cast<unsigned long>(material->m_textureIndices[i]);
-                        if ((static_cast<long>(textureIndex) < 0) ||
-                            (static_cast<unsigned long>(textureSet->GetNumTexture()) <= textureIndex)) {
-                            material->m_textureData.m_textures[i] = 0;
-                        } else {
+                        if ((static_cast<long>(textureIndex) >= 0) &&
+                            (textureIndex < static_cast<unsigned long>(textureSet->GetNumTexture()))) {
                             material->m_textureData.m_textures[i] =
                                 textureSet->GetTexture(textureIndex);
                             if (material->m_textureData.m_textures[i] != 0) {

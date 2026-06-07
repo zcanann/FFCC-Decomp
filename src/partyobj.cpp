@@ -3934,30 +3934,34 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	PartyObjOverlay& party = PartyData(this);
 
-	if ((party.partyFlags & 0x04) != 0) {
+	if (party.flags.flag04) {
 		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
 			addHp(*reinterpret_cast<unsigned short*>(work + 0x1A), static_cast<CGPrgObj*>(0));
 		}
-		party.partyFlags &= 0xFB;
+		party.flags.flag04 = 0;
 	}
 
 	enableDamageCol(1);
 
+	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 	if (party.carryObject == 0) {
 		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
-			SetAnimSlot(0x25, 0);
-			SetAnimSlot(0x24, 1);
-		} else {
-			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
-				SetAnimSlot(0, 0);
-				SetAnimSlot(1, 1);
+			if (mapId == 1) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
 			} else {
 				SetAnimSlot(0x25, 0);
-				SetAnimSlot(0x30, 1);
+				SetAnimSlot(0x24, 1);
 			}
+		} else if (mapId == 1) {
+			SetAnimSlot(0, 0);
+			SetAnimSlot(1, 1);
+		} else {
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x30, 1);
 		}
 	} else if (CFlatItemCarryMode() == 0) {
-		if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
+		if (mapId == 1) {
 			SetAnimSlot(0x0B, 0);
 			SetAnimSlot(0x0C, 1);
 		} else {
@@ -3978,7 +3982,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 	}
 
 	if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
-		*reinterpret_cast<float*>(self + 0x694) = 1.0f;
+		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
 		m_bgColMask &= 0xFFFEFFF1;
 
 		if (restoreDamageCol == 0 || keepTarget != 0) {

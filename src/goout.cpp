@@ -1252,11 +1252,6 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 
 	m_goOutMode = mode;
 	switch(m_goOutMode) {
-	case 1:
-		m_watchCardDisconnect = 0;
-        MenuGoOutState().m_resultDir = -1;
-        MenuGoOutState().m_waitFrames = 10;
-		break;
     case 7:
         MenuPcs.m_goOutUnknown888 = 1;
         unk_0x14 = 0;
@@ -1275,6 +1270,11 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
                        GetGoOutMessageLine(languageId, 20));
         }
         break;
+	case 1:
+		m_watchCardDisconnect = 0;
+        MenuGoOutState().m_resultDir = -1;
+        MenuGoOutState().m_waitFrames = 10;
+		break;
     case 0xC:
         if (m_currentMessage >= 0) {
             MenuPcs.m_menuWindowInfo->state = 2;

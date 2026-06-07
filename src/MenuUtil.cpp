@@ -1063,30 +1063,33 @@ void CMenuPcs::DrawOptionMenu()
 	const f32* layoutBase = s_MenuOptionEstandar_801E36C4.m_layout;
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
-	_GXColor color = {
-	    0xFF, 0xFF, 0xFF,
-	    static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim)),
-	};
+	char** langStrings = &g_strMenuUtilMes[langRow * 20];
+	_GXColor color;
 	Vec2d uv0;
 	Vec2d uv1;
 
-	char* optionText[5] = {
-	    g_strMenuUtilMes[langRow * 20 + 2],
-	    g_strMenuUtilMes[langRow * 20 + 3],
-	    g_strMenuUtilMes[langRow * 20 + 4],
-	    g_strMenuUtilMes[langRow * 20 + 5],
-	    g_strMenuUtilMes[langRow * 20 + 6],
-	};
-	char* helpText[5] = {
-	    g_strMenuUtilMes[langRow * 20 + 7],
-	    g_strMenuUtilMes[langRow * 20 + 8],
-	    g_strMenuUtilMes[langRow * 20 + 9],
-	    g_strMenuUtilMes[langRow * 20 + 10],
-	    g_strMenuUtilMes[langRow * 20 + 11],
-	};
-
 	font->SetScale(FLOAT_80333548);
 	font->SetMargin(kOptionAnimMin);
+
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim));
+
+	char* optionText[5] = {
+	    langStrings[2],
+	    langStrings[3],
+	    langStrings[4],
+	    langStrings[5],
+	    langStrings[6],
+	};
+	char* helpText[5] = {
+	    langStrings[7],
+	    langStrings[8],
+	    langStrings[9],
+	    langStrings[10],
+	    langStrings[11],
+	};
 
 	CTexture* banner = GetMenuTexture(this, 0xD4);
 	float bannerWidth = static_cast<float>(banner->m_width);
@@ -1199,8 +1202,8 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[10];
 		signed char secondValue = m_gameInitMode;
-		char* firstText = g_strMenuUtilMes[langRow * 20 + 12];
-		char* secondText = g_strMenuUtilMes[langRow * 20 + 13];
+		char* firstText = langStrings[12];
+		char* secondText = langStrings[13];
 		float leftX = row[0];
 		float rightX = row[2];
 		float selectorX = row[4];
@@ -1272,8 +1275,8 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int selectorHeight = selectorTexture->m_height;
 		const f32* row = &layoutBase[20];
 		signed char secondValue = m_stereoMode;
-		char* firstText = g_strMenuUtilMes[langRow * 20 + 14];
-		char* secondText = g_strMenuUtilMes[langRow * 20 + 15];
+		char* firstText = langStrings[14];
+		char* secondText = langStrings[15];
 		float leftX = row[0];
 		float rightX = row[2];
 		float selectorX = row[4];
@@ -1392,9 +1395,9 @@ void CMenuPcs::DrawOptionMenu()
 
 		float minTextX = FLOAT_80333614;
 		float volumeTextY = FLOAT_80333618;
-		char* maxText = g_strMenuUtilMes[langRow * 20 + 17];
+		char* maxText = langStrings[17];
 		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
-		         g_strMenuUtilMes[langRow * 20 + 16], kOptionAnimMax, kOptionAnimMax);
+		         langStrings[16], kOptionAnimMax, kOptionAnimMax);
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
@@ -1457,9 +1460,9 @@ void CMenuPcs::DrawOptionMenu()
 
 		float minTextX = FLOAT_80333614;
 		float volumeTextY = FLOAT_80333618;
-		char* maxText = g_strMenuUtilMes[langRow * 20 + 17];
+		char* maxText = langStrings[17];
 		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
-		         g_strMenuUtilMes[langRow * 20 + 16], kOptionAnimMax, kOptionAnimMax);
+		         langStrings[16], kOptionAnimMax, kOptionAnimMax);
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
@@ -1514,12 +1517,12 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.RenderTextureQuad(modeX, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			char* modeText = g_strMenuUtilMes[langRow * 20 + 19];
+			char* modeText = langStrings[19];
 			float textPanelX = 492.0f;
 			float textY = 132.0f;
 			float textPanelWidth = 112.0f;
 			if (m_specialModeFlags[i] == 0) {
-				modeText = g_strMenuUtilMes[langRow * 20 + 18];
+				modeText = langStrings[18];
 				textPanelX = 372.0f;
 				textY = 136.0f;
 				textPanelWidth = 120.0f;

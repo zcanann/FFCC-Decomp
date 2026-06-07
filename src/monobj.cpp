@@ -2168,12 +2168,12 @@ void CGMonObj::InitFinished()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	void* classId = object->m_scriptHandle[4];
 
 	m_homePosition.x = object->unk_0x168;
 	m_homePosition.y = object->unk_0x16C;
 	m_homePosition.z = object->unk_0x170;
 
+	void* classId = object->m_scriptHandle[4];
 	switch (reinterpret_cast<unsigned int>(classId)) {
 	case 0x5B:
 		m_funcs = &funcsGiantCrab;

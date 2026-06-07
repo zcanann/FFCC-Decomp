@@ -10,15 +10,15 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern float FLOAT_80330890;
-extern float FLOAT_80330894;
-extern float FLOAT_80330898;
-extern float FLOAT_8033089c;
-extern float FLOAT_803308a0;
-extern float FLOAT_803308a4;
-extern float FLOAT_803308A8;
-extern float FLOAT_803308ac;
-extern float FLOAT_803308b0;
+extern float kMesIconDrawYOffset;
+extern float kMesIconDefaultWidth;
+extern float kMesOne;
+extern float kMesZero;
+extern float kMesTagScaleStep;
+extern float kMesLineHeightAdjust;
+extern float kMesRubyLineIndent;
+extern float kMesPackedScaleFactor;
+extern float kMesHalf;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 
@@ -95,13 +95,13 @@ static inline char* FlatNameDirect(int tableIndex, int entryIndex)
 
 inline void CMes::advanceLine(CFont* font)
 {
-	mCurrentX = FLOAT_8033089c;
-	mCurrentY = mCurrentY + FLOAT_803308a4 + (float)font->m_glyphHeight * font->scaleY;
+	mCurrentX = kMesZero;
+	mCurrentY = mCurrentY + kMesLineHeightAdjust + (float)font->m_glyphHeight * font->scaleY;
 
 	if (mRubyEnabled != 0)
 	{
 		mRubyLine++;
-		mCurrentX += FLOAT_803308A8 + mLineSpacing;
+		mCurrentX += kMesRubyLineIndent + mLineSpacing;
 	}
 }
 
@@ -669,9 +669,9 @@ void CMes::Draw()
 
 					MenuPcs.DrawRect(
 					    0, mBaseX + *glyph,
-					    FLOAT_80330890 + mBaseY + (float)*(short*)(glyph + 2),
-					    FLOAT_80330894, FLOAT_80330894, (float)((iconId % 5) * 0x16),
-					    (float)((iconId / 5) * 0x16), FLOAT_80330898, FLOAT_80330898, 0.0f);
+					    kMesIconDrawYOffset + mBaseY + (float)*(short*)(glyph + 2),
+					    kMesIconDefaultWidth, kMesIconDefaultWidth, (float)((iconId % 5) * 0x16),
+					    (float)((iconId / 5) * 0x16), kMesOne, kMesOne, 0.0f);
 
 					if (font != 0)
 					{
@@ -705,7 +705,7 @@ void CMes::Draw()
 						}
 
 						nextFont->SetShadow(mShadow);
-						nextFont->SetMargin(FLOAT_8033089c);
+						nextFont->SetMargin(kMesZero);
 						float fontScaleY = mScaleY;
 						nextFont->SetScaleX(mScaleX);
 						nextFont->SetScaleY(fontScaleY);
@@ -718,7 +718,7 @@ void CMes::Draw()
 					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4;
 					float ratio = (float)fadeCur / (float)fadeMax;
 					unsigned char alpha;
-					if (ratio >= FLOAT_80330898)
+					if (ratio >= kMesOne)
 					{
 						alpha = (unsigned char)globalAlpha;
 					}
@@ -739,8 +739,8 @@ void CMes::Draw()
 
 					font->SetPosX(mBaseX + *glyph);
 					font->SetPosY(mBaseY + (float)*(short*)(glyph + 2));
-					float glyphScaleY = FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11);
-					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
+					float glyphScaleY = kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x11);
+					font->SetScaleX(kMesTagScaleStep * (float)*(unsigned char*)((char*)glyph + 0x0A));
 					font->SetScaleY(glyphScaleY);
 					font->renderFlags = font->renderFlags & 0xF7 | 8;
 					font->Draw((unsigned short)ch);
@@ -892,7 +892,7 @@ void CMes::addString(char** text, int branchMode)
 	}
 
 	font->SetShadow(mShadow);
-	font->SetMargin(FLOAT_8033089c);
+	font->SetMargin(kMesZero);
 	font->SetScaleX(mScaleX);
 	font->SetScaleY(mScaleY);
 
@@ -962,10 +962,10 @@ void CMes::addString(char** text, int branchMode)
 				mRubyEnabled = 1;
 				mRubyLine = 0;
 				mRubyHeight = ReadTagS8(text);
-				mRubySpacing = (int)(FLOAT_803308a4 + (float)font->m_glyphHeight * font->scaleY);
+				mRubySpacing = (int)(kMesLineHeightAdjust + (float)font->m_glyphHeight * font->scaleY);
 				mRubyY = mCurrentY;
 				mRubyOffset = ReadTagS8(text);
-				mCurrentX += FLOAT_803308A8 + mLineSpacing;
+				mCurrentX += kMesRubyLineIndent + mLineSpacing;
 				break;
 			case 8:
 			{
@@ -1175,7 +1175,7 @@ void CMes::addString(char** text, int branchMode)
 				mColor = (int)tag - 0x0C;
 				break;
 			case 0x1A:
-				mScaleX = FLOAT_803308a0 * (float)ReadTagS16(text);
+				mScaleX = kMesTagScaleStep * (float)ReadTagS16(text);
 				font->SetScaleX(mScaleX);
 				font->SetScaleY(mScaleY);
 				break;
@@ -1240,14 +1240,14 @@ void CMes::addString(char** text, int branchMode)
 					font = MenuPcs.m_fonts[2];
 				}
 				font->SetShadow(mShadow);
-				font->SetMargin(FLOAT_8033089c);
+				font->SetMargin(kMesZero);
 				font->SetScaleX(mScaleX);
 				font->SetScaleY(mScaleY);
 				break;
 			}
 			case 0x35:
 			{
-				float scale = FLOAT_803308a0 * (float)ReadTagS16(text);
+				float scale = kMesTagScaleStep * (float)ReadTagS16(text);
 				mScaleY = scale;
 				mScaleX = scale;
 				font->SetScaleX(mScaleX);
@@ -1345,7 +1345,7 @@ render_char:
 		font->renderFlags = (font->renderFlags & 0xF7) | 8;
 		if (ch < 0x20)
 		{
-			glyph[1] = FLOAT_80330894;
+			glyph[1] = kMesIconDefaultWidth;
 		}
 		else
 		{
@@ -1362,8 +1362,8 @@ render_char:
 		    (unsigned char)(mFontAlign << 4) | (*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
 		*(unsigned char*)((char*)glyph + 0x0E) =
 		    (unsigned char)((mFontIndex & 0x0F) | (*(unsigned char*)((char*)glyph + 0x0E) & 0xF0));
-		*(unsigned char*)((char*)glyph + 0x0A) = (unsigned char)(FLOAT_803308ac * mScaleX);
-		*(unsigned char*)((char*)glyph + 0x11) = (unsigned char)(FLOAT_803308ac * mScaleY);
+		*(unsigned char*)((char*)glyph + 0x0A) = (unsigned char)(kMesPackedScaleFactor * mScaleX);
+		*(unsigned char*)((char*)glyph + 0x11) = (unsigned char)(kMesPackedScaleFactor * mScaleY);
 
 		mCurrentX += glyph[1] + mLineSpacing;
 		if (mAdvanceEnabled == 0)
@@ -1413,7 +1413,7 @@ void CMes::Next()
 	{
 		entryCount = mFlagCount;
 		flagEntry = &mFlagEntries[mFlagCursor];
-		while ((halfVal = FLOAT_8033089c, mFlagCursor < entryCount))
+		while ((halfVal = kMesZero, mFlagCursor < entryCount))
 		{
 			type = flagEntry->m_type;
 			if ((type != 3) && (type < 3))
@@ -1447,7 +1447,7 @@ void CMes::Next()
 		memcpy(tempFlags, mFlagVars, sizeof(tempFlags));
 		addString(&mText, 0);
 		memcpy(mFlagVars, tempFlags, sizeof(tempFlags));
-		halfVal = FLOAT_803308b0;
+		halfVal = kMesHalf;
 		i = 0;
 		curr = (float*)((char*)this + 0xc);
 		while ((start = curr, remaining = mCounter, i < remaining))
@@ -1499,8 +1499,8 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
-	float zero = FLOAT_8033089c;
-	float one = FLOAT_80330898;
+	float zero = kMesZero;
+	float one = kMesOne;
 	mText = text;
 	mWaitActive = 0;
 	mMaxHeight = zero;
@@ -1519,7 +1519,7 @@ void CMes::Set(char* text, int param)
 	if (text != 0) {
 		unsigned char flagBackup[0x50];
 		memcpy(flagBackup, mFlagVars, sizeof(flagBackup));
-		float lineZero = FLOAT_8033089c;
+		float lineZero = kMesZero;
 
 		while (mWaitActive == 0) {
 			mCounter = 0;
@@ -1546,9 +1546,9 @@ void CMes::Set(char* text, int param)
 		}
 
 		memcpy(mFlagVars, flagBackup, sizeof(flagBackup));
-		float lineSkip = FLOAT_803308a4;
-		zero = FLOAT_8033089c;
-		one = FLOAT_80330898;
+		float lineSkip = kMesLineHeightAdjust;
+		zero = kMesZero;
+		one = kMesOne;
 		mMaxWidth = mMaxWidth - mLineSpacing;
 		mMaxHeight = mMaxHeight - lineSkip;
 

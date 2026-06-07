@@ -12413,15 +12413,20 @@ int McCtrl::ChkNowData()
 		break;
 	}
 
+	int result;
 	if (m_state == -1)
 	{
-		return -999;
+		result = -999;
 	}
-	if (m_state == 7)
+	else if (m_state == 7)
 	{
-		return 1;
+		result = 1;
 	}
-	return 0;
+	else
+	{
+		result = 0;
+	}
+	return result;
 }
 
 /*

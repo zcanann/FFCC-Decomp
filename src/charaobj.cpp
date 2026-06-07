@@ -22,11 +22,11 @@
 extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
-extern "C" char lbl_801DC590[];
-extern "C" char lbl_801DC8CC[];
-extern "C" char lbl_801DC8D8[];
-extern "C" char lbl_801DC8EC[];
-extern "C" char lbl_801DC940[];
+extern "C" char sCharaObjComboDecisionFmt[];
+extern "C" char sCharaObjResistanceFmt[];
+extern "C" char sCharaObjEffectTimeNoOverwriteMsg[];
+extern "C" char sCharaObjEffectTimeCalcFmt[];
+extern "C" char sCharaObjGearGachaMsg[];
 
 static Vec* l_pHitCross = 0;
 static int l_idxAttackCol = 0;
@@ -35,11 +35,11 @@ char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
-extern const float FLOAT_80331988;
-extern const float FLOAT_8033198C;
-extern const float FLOAT_80331990;
-extern const float FLOAT_80331994;
-extern const float FLOAT_80331998;
+extern const float kCharaObjZero;
+extern const float kCharaObjHalfPi;
+extern const float kCharaObjNegativeHalfPi;
+extern const float kCharaObjSideParticleRadius;
+extern const float kCharaObjForwardParticleOffset;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -150,7 +150,7 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 	}
 
 	int frame = static_cast<int>(charaObj->m_turnSpeed);
-	if (FLOAT_80331988 <= charaObj->m_lastBgAttr) {
+	if (kCharaObjZero <= charaObj->m_lastBgAttr) {
 		return span <= frame;
 	}
 
@@ -614,7 +614,7 @@ void CGCharaObj::onFramePostCalc()
 			}
 			if ((padMask & 0xF) != 0) {
 				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
-				System.Printf(const_cast<char*>(lbl_801DC940));
+				System.Printf(const_cast<char*>(sCharaObjGearGachaMsg));
 			}
 		}
 
@@ -684,11 +684,11 @@ void CGCharaObj::onFramePreCalc()
 			m_partyDistance[i] = PSVECMag(&m_partyDelta[i]);
 			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
 		} else {
-			m_partyDistance[i] = FLOAT_80331988;
-			m_partyDelta[i].z = FLOAT_80331988;
-			m_partyDelta[i].y = FLOAT_80331988;
-			m_partyDelta[i].x = FLOAT_80331988;
-			m_partyAngle[i] = FLOAT_80331988;
+			m_partyDistance[i] = kCharaObjZero;
+			m_partyDelta[i].z = kCharaObjZero;
+			m_partyDelta[i].y = kCharaObjZero;
+			m_partyDelta[i].x = kCharaObjZero;
+			m_partyAngle[i] = kCharaObjZero;
 		}
 
 		m_partyRank[i] = 0;
@@ -2094,7 +2094,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	short* staPtr = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 	if ((staIndex == 0 || staIndex == 4) && *staPtr != 0) {
-		System.Printf(const_cast<char*>(lbl_801DC8D8));
+		System.Printf(const_cast<char*>(sCharaObjEffectTimeNoOverwriteMsg));
 		return static_cast<int>(*staPtr);
 	}
 
@@ -2205,7 +2205,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	unsigned int next = affinity + (base * power);
 	next &= ~((static_cast<int>(next)) >> 31);
-	System.Printf(const_cast<char*>(lbl_801DC8EC), base, power, affinity, next);
+	System.Printf(const_cast<char*>(sCharaObjEffectTimeCalcFmt), base, power, affinity, next);
 	return static_cast<int>(next);
 }
 
@@ -2378,7 +2378,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outA = 3;
 	}
 
-	System.Printf(const_cast<char*>(lbl_801DC8CC), outA);
+	System.Printf(const_cast<char*>(sCharaObjResistanceFmt), outA);
 
 	if (outA == 1) {
 		outB = (isNormal != 0) ? 1 : 0;
@@ -2422,7 +2422,7 @@ int CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, 
 			} else {
 				frame = static_cast<int>(m_turnSpeed);
 				int frameMod = frame % period;
-				if (m_lastBgAttr < FLOAT_80331988) {
+				if (m_lastBgAttr < kCharaObjZero) {
 					result = static_cast<unsigned int>(__cntlzw(frameMod)) >> 5;
 				} else {
 					bool isPeriod = (period <= frame);
@@ -2561,13 +2561,13 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 		if (effectId == 0x410) {
 			if (effectArg0 == 2 || effectArg0 == 3) {
-				float angleOffset = FLOAT_80331990;
+				float angleOffset = kCharaObjNegativeHalfPi;
 				if (effectArg0 == 2) {
-					angleOffset = FLOAT_8033198C;
+					angleOffset = kCharaObjHalfPi;
 				}
 				float angle = m_rotTargetY + angleOffset;
-				CFlatParticleWorkPosition().x = FLOAT_80331994 * sinf(angle) + m_worldPosition.x;
-				CFlatParticleWorkPosition().z = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
+				CFlatParticleWorkPosition().x = kCharaObjSideParticleRadius * sinf(angle) + m_worldPosition.x;
+				CFlatParticleWorkPosition().z = kCharaObjSideParticleRadius * cosf(angle) + m_worldPosition.z;
 				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = true;
@@ -2621,7 +2621,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 			for (int i = 0; i < 2; i++) {
 				float side = (i == 0) ? 76.0f : -76.0f;
-				Vec sidePos = { side, 0.0f, FLOAT_80331998 };
+				Vec sidePos = { side, 0.0f, kCharaObjForwardParticleOffset };
 				Vec offsetPos;
 				PSMTXMultVec(rotMtx, &sidePos, &offsetPos);
 				CFlatParticleWorkPosition().x = m_worldPosition.x + offsetPos.x;
@@ -3177,7 +3177,7 @@ void CGCharaObj::combi2()
 		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}
 
-	System.Printf(const_cast<char*>(lbl_801DC590), System.m_frameCounter, comboCmd);
+	System.Printf(const_cast<char*>(sCharaObjComboDecisionFmt), System.m_frameCounter, comboCmd);
 
 	CGPartyObj* leadParty = candidates[participantCount - 1];
 	bool playedComboSe = false;

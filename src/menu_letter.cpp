@@ -2020,7 +2020,8 @@ void CMenuPcs::LetterMessDraw()
 			if (mode == 2) {
 				itemSel += 1;
 			} else {
-				itemSel += ((s_Attach == 2) ? 1 : 0) + 4;
+				int attach = static_cast<int>(s_Attach);
+				itemSel += (~((attach - 2) | (2 - attach)) >> 31) + 4;
 			}
 			cursorX = static_cast<float>(window->x + 0x14);
 			cursorY = static_cast<float>(window->y + itemSel * SingWinMessHeight() + 0x20);

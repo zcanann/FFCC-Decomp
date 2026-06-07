@@ -537,8 +537,8 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
         return;
     }
 
-    unsigned int hasProjTex =
-        (static_cast<unsigned int>(static_cast<int>(g_drawMaterial->m_textureIndices[3]) >> 0x1F)) ^ 1;
+    u8 hasProjTex =
+        (static_cast<unsigned int>(static_cast<int>(g_drawMaterial->m_textureIndices[3])) >> 0x1F) ^ 1;
     if (hasProjTex != 0) {
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_bumpTexCoordIds[6]), GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY,
                           GX_FALSE, GX_PTIDENTITY);
@@ -547,11 +547,11 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     _GXSetTevOrder(
         m_numTevStage, m_bumpTexCoordIds[3], m_bumpTexMapIds[1], 0xFF);
     _GXSetTevColorIn(
-        m_numTevStage, 0xF, 4, 9, (hasProjTex != 0) ? 0xF : 0);
+        m_numTevStage, 0xF, 4, 9, hasProjTex ? 0xF : 0);
     _GXSetTevAlphaIn(m_numTevStage, 7,
                                                                                                            7, 7, 0);
     _GXSetTevColorOp(
-        m_numTevStage, 0, 0, 0, 1, static_cast<int>((-hasProjTex) >> 0x1F));
+        m_numTevStage, 0, 0, 0, 1, hasProjTex != 0);
     _GXSetTevAlphaOp(m_numTevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 

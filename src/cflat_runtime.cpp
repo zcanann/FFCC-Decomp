@@ -1991,45 +1991,40 @@ frameLoop:
 			         + ((sp[-1] <= sp[-2]) - (static_cast<int>(sp[-1]) >> 31)) & 0xFF;
 			break;
 		}
-		case 0x32:
-		case 0x33:
-		case 0x34:
-		case 0x35:
-		case 0x36:
-		case 0x37: {
-			union FloatWord {
-				u32 u;
-				float f;
-			};
-			unsigned int* sp = object->m_sp;
+		case 0x32: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
 			--object->m_sp;
-			FloatWord lhs;
-			FloatWord rhs;
-			FloatWord result;
-			lhs.u = sp[-2];
-			rhs.u = sp[-1];
-
-			switch (code[0]) {
-			case 0x32:
-				result.f = (lhs.f == rhs.f) ? 1.0f : 0.0f;
-				break;
-			case 0x33:
-				result.f = (lhs.f != rhs.f) ? 1.0f : 0.0f;
-				break;
-			case 0x34:
-				result.f = (lhs.f < rhs.f) ? 1.0f : 0.0f;
-				break;
-			case 0x35:
-				result.f = (lhs.f <= rhs.f) ? 1.0f : 0.0f;
-				break;
-			case 0x36:
-				result.f = (rhs.f < lhs.f) ? 1.0f : 0.0f;
-				break;
-			default:
-				result.f = (rhs.f <= lhs.f) ? 1.0f : 0.0f;
-				break;
-			}
-			sp[-2] = result.u;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] == sp[-1]));
+			break;
+		}
+		case 0x33: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
+			--object->m_sp;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] != sp[-1]));
+			break;
+		}
+		case 0x34: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
+			--object->m_sp;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] < sp[-1]));
+			break;
+		}
+		case 0x35: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
+			--object->m_sp;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-2] <= sp[-1]));
+			break;
+		}
+		case 0x36: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
+			--object->m_sp;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-1] < sp[-2]));
+			break;
+		}
+		case 0x37: {
+			float* sp = reinterpret_cast<float*>(object->m_sp);
+			--object->m_sp;
+			sp[-2] = static_cast<float>(static_cast<unsigned int>(sp[-1] <= sp[-2]));
 			break;
 		}
 		case 0x39: {
@@ -2206,7 +2201,6 @@ void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex&)
  */
 int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int& result)
 {
-	u8* const self = reinterpret_cast<u8*>(this);
 	int ret = 1;
 	result = 1;
 
@@ -2217,7 +2211,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				result = 0;
 			}
 		} else if (systemIndex == -2) {
-			if (*reinterpret_cast<int*>(self + 0x1298) != 0) {
+			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1298) != 0) {
 				char* format = m_strBlob + m_strOffsets[*object->m_localBase];
 
 				if (object->m_argCount == 1) {
@@ -2319,8 +2313,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			watch.Start();
 			ret = onClassSystemFunc(object, 1, systemIndex, result);
 			watch.Stop();
-			*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x4C) += watch.Get();
-			*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x44C) += 1;
+			*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x4C) += watch.Get();
+			*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x44C) += 1;
 		}
 	} else if (systemIndex == -2) {
 		CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
@@ -2423,8 +2417,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 		watch.Start();
 		ret = onSystemFunc(object, systemKind, systemIndex, result);
 		watch.Stop();
-		*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x24C) += watch.Get();
-		*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x64C) += 1;
+		*reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x24C) += watch.Get();
+		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + ((-systemIndex) * 4) + 0x64C) += 1;
 	}
 
 	return ret;

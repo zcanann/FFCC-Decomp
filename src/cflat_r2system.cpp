@@ -2182,36 +2182,30 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
 
             const float pathDistance = m_pathTotalDistance * t;
             const int maxIndex = m_pathPointCount - 1;
-            for (int i = 0; i < maxIndex; i++) {
-                const float startDistance = m_pathPoints[i].m_distance;
-                if (startDistance > pathDistance) {
-                    continue;
-                }
-                const float endDistance = m_pathPoints[i + 1].m_distance;
-                if (pathDistance > endDistance) {
-                    continue;
-                }
+            CFlatPathPoint* point = m_pathPoints;
+            for (int i = 0; i < maxIndex; i++, point++) {
+                if (point->m_distance <= pathDistance && pathDistance <= point[1].m_distance) {
+                    const int i0 = (i - 1) < 0 ? 0 : (i - 1);
+                    const int i2 = (i + 1) > maxIndex ? maxIndex : (i + 1);
+                    const int i3 = (i + 2) > maxIndex ? maxIndex : (i + 2);
+                    const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
+                    const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
+                    const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
+                    float segmentT = 0.0f;
+                    if (scaleB != kCFlatPadStickZero) {
+                        segmentT = (pathDistance - point->m_distance) / scaleB;
+                    }
 
-                const int i0 = (i - 1) < 0 ? 0 : (i - 1);
-                const int i2 = (i + 1) > maxIndex ? maxIndex : (i + 1);
-                const int i3 = (i + 2) > maxIndex ? maxIndex : (i + 2);
-                const float scaleA = m_pathPoints[i].m_distance - m_pathPoints[i0].m_distance;
-                const float scaleB = m_pathPoints[i2].m_distance - m_pathPoints[i].m_distance;
-                const float scaleC = m_pathPoints[i3].m_distance - m_pathPoints[i2].m_distance;
-                float segmentT = 0.0f;
-                if (scaleB != kCFlatPadStickZero) {
-                    segmentT = (pathDistance - startDistance) / scaleB;
+                    Vec result;
+                    CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
+                        scaleA, scaleB, scaleC, segmentT, FLOAT_80330B34, &Math, reinterpret_cast<float*>(&result),
+                        &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
+                        &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
+                    *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
+                    *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
+                    *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
+                    break;
                 }
-
-                Vec result;
-                CrossCheckEllipseCapsule__5CMathFP3VecPfP3VecP3VecfP3Vecff(
-                    scaleA, scaleB, scaleC, segmentT, FLOAT_80330B34, &Math, reinterpret_cast<float*>(&result),
-                    &m_pathPoints[i0].m_position, &m_pathPoints[i].m_position,
-                    &m_pathPoints[i2].m_position, &m_pathPoints[i3].m_position);
-                *reinterpret_cast<float*>(object->m_localBase[3]) = result.x;
-                *reinterpret_cast<float*>(object->m_localBase[4]) = result.y;
-                *reinterpret_cast<float*>(object->m_localBase[5]) = result.z;
-                break;
             }
         }
 

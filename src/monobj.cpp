@@ -165,10 +165,10 @@ void CGMonObj::onFramePreCalc()
 		}
 	}
 
-	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x3E) == 0) &&
-		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
-		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
-		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x3E) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
 		(static_cast<signed char>(mon[0x63C]) < 0) &&
 		(m_unk6B9 == 0) &&
 		(m_unk6C1 == 0)) {

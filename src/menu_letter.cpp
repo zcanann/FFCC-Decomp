@@ -1828,12 +1828,12 @@ void CMenuPcs::LetterListDraw()
 	DrawInit();
 
 	s16 topVal = *reinterpret_cast<s16*>(GetLetterStateBase(this) + 0x34);
-	unsigned char pageMark = 0;
+	int pageMark = 0;
 	if (topVal != 0) {
-		pageMark = 1;
+		pageMark |= 1;
 	}
 	if (topVal + 9 < caravanWork->m_letterCount) {
-		pageMark = static_cast<unsigned char>(pageMark | 2);
+		pageMark = pageMark | 2;
 	}
 
 	if (pageMark != 0) {

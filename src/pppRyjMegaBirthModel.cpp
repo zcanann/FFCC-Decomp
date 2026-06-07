@@ -231,7 +231,7 @@ static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 off
     s32 count = 3;
     s32* value = s32_at(particleBytes, offset);
     do {
-        while (*value > 0x7FFF) {
+        while (*value >= 0x8000) {
             *value -= 0x10000;
         }
         while (*value < -0x8000) {

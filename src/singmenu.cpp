@@ -3033,20 +3033,18 @@ int CMenuPcs::ChkEquipPossible(int itemNo)
         genderMask = 0x20;
     }
 
-    unsigned int raceBits = flags & 0xF;
-    unsigned int genderBits = flags & 0x30;
+    int raceBits = flags & 0xF;
+    int genderBits = flags & 0x30;
 
+    int result;
     if (raceBits != 0 && genderBits != 0) {
-        if ((raceBits & raceMask) != 0 && (genderBits & genderMask) != 0) {
-            return 1;
-        }
-        return 0;
+        result = (raceBits & raceMask) != 0 && (genderBits & genderMask) != 0;
+    } else if (raceBits != 0) {
+        result = (raceBits & raceMask) != 0;
+    } else {
+        result = (genderBits & genderMask) != 0;
     }
-
-    if (raceBits != 0) {
-        return (raceBits & raceMask) != 0;
-    }
-    return (genderBits & genderMask) != 0;
+    return result;
 }
 
 /*

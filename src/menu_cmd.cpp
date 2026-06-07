@@ -2004,8 +2004,8 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
-		DrawRect(0,
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
+		MenuPcs.DrawRect(0,
 			static_cast<float>(entry->x + 4),
 			static_cast<float>(entry->y) - FLOAT_80332ad0,
 			static_cast<float>(entry->width) - 8.0f,
@@ -2136,8 +2136,8 @@ void CMenuPcs::DrawUniteList()
 		s_UniteTop[s_unitePanelCount] = i;
 		s_unitePanelCount++;
 
-		SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-		DrawRect(0,
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+		MenuPcs.DrawRect(0,
 			panelX,
 			panelY - FLOAT_80332AF0,
 			FLOAT_80332AEC,

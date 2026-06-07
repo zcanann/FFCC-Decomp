@@ -1538,7 +1538,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (staType != 0x6A && (sourceObj->GetCID() & 0x6D) == 0x6D && (GetCID() & 0xAD) == 0xAD &&
 				    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 0x100) != 0 &&
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
-				    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x2E) == 0 &&
+				    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x2E) == 0 &&
 				    (sourceObj->m_lastStateId != 6 ||
 				     ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x560) * 0x48 + 10) & 0xFF) > 1))) {
 					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, 0x19);

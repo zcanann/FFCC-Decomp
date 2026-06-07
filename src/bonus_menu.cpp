@@ -1507,7 +1507,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		sprites[idx].duration = 8;
 		sprites[idx].depth = 1.0f;
 		idx++;
-		sprites[2].scale = 2.0f;
+		BonusSpriteFlags(&sprites[2]) = 2;
 		sprites[2].motionX = -150.0f;
 		sprites[2].motionY = -150.0f;
 		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);

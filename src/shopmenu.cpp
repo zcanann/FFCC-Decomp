@@ -2573,7 +2573,7 @@ void CShopMenu::SelectItemIdx()
         } else if (listType == 1) {
             int idx = m_selectedIndex;
             if (idx != -1) {
-                short itemNo = m_caravanWork->m_inventoryItems[idx];
+                int itemNo = getItemNo(m_selectedIndex);
                 if (itemNo < 1) {
                     canSelect = false;
                 } else if (MenuPcs.EquipChk(idx) == 0) {

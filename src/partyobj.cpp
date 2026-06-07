@@ -1275,44 +1275,72 @@ void CGPartyObj::command()
 		}
 
 		const int itemId = caravan->DelCmdListAndItem(cmdIdx);
-		const unsigned short itemKind = getItemKindFromCfd(itemId);
-		if (itemKind == 1) {
-			int weaponItem = 0;
-			int weaponRef = 0;
-			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
-			if (weaponItem == cmdIdx && weaponRef == itemId) {
-				m_itemId = itemId;
-				changeStat(7, 0, 0);
-				return;
-			}
-			party.pendingWeaponItem = cmdIdx;
-			party.weaponItem = itemId;
-			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
-			changeStat(0x0F, 0, 0);
-			return;
-		}
-
+		const int kindOffset = itemId * 0x48;
+		const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset);
 		if (itemKind == 0x125) {
 			m_itemId = 0x220;
 			changeStat(2, 0, 2);
 			return;
 		}
-		if (itemKind == 0xDF || itemKind == 0x100) {
-			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 10);
-			changeStat(2, 0, 0);
-			return;
-		}
-		if (itemKind == 0x17D || itemKind == 0x186) {
+		if (itemKind > 0x124) {
+			if (itemKind != 0x186) {
+				if (itemKind > 0x185) {
+					if (itemKind != 0x1F5) {
+						return;
+					}
+					m_itemId = itemId;
+					changeStat(2, 0, 0);
+					return;
+				}
+				if (itemKind != 0x17D) {
+					return;
+				}
+			}
 			if (useItem(itemId) != 0) {
 				caravan->GetNumCombi(party.unk6EC, 1);
 			}
 			return;
 		}
-		if (itemKind == 0x1F5) {
-			m_itemId = itemId;
+		if (itemKind == 0xDF) {
+			m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
 			changeStat(2, 0, 0);
 			return;
 		}
+		if (itemKind < 0xDF) {
+			if (itemKind != 1) {
+				return;
+			}
+			int weaponItem = 0;
+			int weaponRef = 0;
+			caravan->GetCurrentWeaponItem(weaponItem, weaponRef);
+			if (weaponItem == caravan->GetIdxCmdList() && weaponRef == itemId) {
+				m_itemId = itemId;
+				changeStat(7, 0, 0);
+				return;
+			}
+			party.pendingWeaponItem = caravan->GetIdxCmdList();
+			party.weaponItem = itemId;
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+			return;
+		}
+		if (itemKind != 0x100) {
+			return;
+		}
+		if (itemId == 0x103) {
+			if (Math.Rand(3) == 0) {
+				ClearAllSta();
+				setSta(0x1B, 900);
+				caravan->GetNumCombi(party.unk6EC, 1);
+				return;
+			}
+			m_itemId = 0x103;
+			changeStat(2, 0, 2);
+			return;
+		}
+		m_itemId = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + kindOffset + 10);
+		changeStat(2, 0, 0);
+		return;
 	}
 
 	if ((getPadTrigForSlot(padSlot) & 0x200) == 0) {

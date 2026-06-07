@@ -1989,7 +1989,26 @@ void CMenuPcs::CmakeTribeDraw()
         0.0f, 0.0f, 1.0f, 0.90909094f, 0.0f);
 
     DrawCmakeTitle(3, 1.0f, alpha);
-    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, alpha);
+    {
+        int tribe = cmakeState->m_select;
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+        int crestA = static_cast<int>(255.0f * alpha);
+        GXColor crestCol;
+        crestCol.r = 0xFF;
+        crestCol.g = 0xFF;
+        crestCol.b = 0xFF;
+        crestCol.a = static_cast<unsigned char>(crestA);
+        GXSetChanMatColor(GX_COLOR0A0, crestCol);
+        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
+        MenuPcs.DrawRect(
+            0,
+            351.0f, 96.0f, 184.0f, 184.0f,
+            static_cast<float>((tribe & 1) * 0xB8),
+            static_cast<float>((tribe / 2) * 0xB8),
+            1.0f, 1.0f, 0.0f);
+    }
 
     CFont* tribeFont = m_fonts[CMAKE_FONT_LABEL];
     tribeFont->SetMargin(1.0f);

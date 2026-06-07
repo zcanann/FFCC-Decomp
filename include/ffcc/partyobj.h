@@ -48,23 +48,19 @@ struct PartyObjOverlay {
     unsigned short _pad6D4;
     int weaponRef;
     int weaponItem;
+    int pendingWeaponItem;
     union {
-        int pendingWeaponItem;
+        CGObject* target;
         CGBaseObj* carryTarget;
     };
     union {
-        CGObject* target;
-        CGBaseObj* secondaryTarget;
-    };
-    union {
         CGObject* targetOverride;
-        float targetSearchDistance;
+        CGBaseObj* secondaryTarget;
     };
     union {
         int unk6EC;
         float unk6ECFloat;
-        int _legacy6EC;
-        float legacyTargetSearchDistance;
+        float targetSearchDistance;
     };
     CGObject* carryObject;
     short commandMode;

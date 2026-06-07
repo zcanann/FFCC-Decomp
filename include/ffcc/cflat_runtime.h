@@ -58,7 +58,7 @@ public:
 		unsigned char m_reqFlag3;  // 0x2F
 		short m_0x30;              // 0x30
 		short m_particleId;        // 0x32
-		short m_0x34;              // 0x34-0x36
+		unsigned short m_0x34;     // 0x34-0x36
 		short m_argCount;          // 0x36-0x38
 		union {
 			unsigned char m_flags;     // 0x38-0x3B

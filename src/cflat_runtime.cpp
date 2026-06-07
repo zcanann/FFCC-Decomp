@@ -579,7 +579,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 		CObject* const next = object->m_next;
 
 		if (((static_cast<int>(object->m_flags) << 24) >= 0) && (mode != 0)) {
-			object->m_flags &= 0xBF;
+			object->m_flagBits.m_activeFlag = 0;
 			if (objectFrame(object) != 0) {
 				int scriptIndex;
 
@@ -647,7 +647,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 					} while (scriptIndex >= 0);
 				}
 
-				object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
+				object->m_flagBits.m_deleteFlag = 1;
 				if (object->m_particleId == 1) {
 					hasParticle = 1;
 				}
@@ -2395,7 +2395,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 					onDeleteObject(engineObject);
 				} else {
-					object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
+					object->m_flagBits.m_deleteFlag = 1;
 				}
 
 				*object->m_sp++ = 0;

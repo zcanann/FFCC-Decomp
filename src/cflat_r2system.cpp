@@ -2277,7 +2277,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         const float cosYaw = std::cosf(yaw);
         const float sinPitch = std::sinf(pitch);
         const float cosPitch = std::cosf(pitch);
-        Vec direction = {-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch};
+        CVector direction(-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch);
         CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
@@ -2285,7 +2285,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             0xFF);
 
         SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-            &CharaPcs, *object->m_localBase, object->m_localBase[1], color, &direction);
+            &CharaPcs, *object->m_localBase, object->m_localBase[1], color, direction);
         this->push(object, 0);
         outResult = 0;
         break;
@@ -2721,10 +2721,12 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x81: {
         float angle = static_cast<float>(object->m_localBase[2]);
-        Vec normal = {std::sinf(angle), 0.0f, std::cosf(angle)};
-        Vec point = {static_cast<float>(*object->m_localBase), 0.0f, static_cast<float>(object->m_localBase[1])};
         Mtx& reflectMtx = m_centerMatrix;
-        PSMTXReflect(reflectMtx, &point, &normal);
+        PSMTXReflect(
+            reflectMtx,
+            CVector(static_cast<float>(*object->m_localBase), kCFlatPadStickZero,
+                static_cast<float>(object->m_localBase[1])),
+            CVector(std::sinf(angle), kCFlatPadStickZero, std::cosf(angle)));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3228,27 +3230,19 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0x79: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
-        Sound.Add3DLine(*object->m_localBase, &position);
+        Sound.Add3DLine(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]));
         this->push(object, 0);
         outResult = 0;
         break;
     }
     case -0x7A: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
         this->push(
             object,
             Sound.PlaySe3D(
-                *object->m_localBase, &position, localFloats[4], localFloats[5], 0));
+                *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]),
+                localFloats[4], localFloats[5], 0));
         outResult = 0;
         break;
     }
@@ -3621,12 +3615,8 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0xB8: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
-            localFloats[1],
-            localFloats[2],
-            localFloats[3],
-        };
-        Sound.ChangeSe3DPos(*object->m_localBase, &position);
+        Sound.ChangeSe3DPos(
+            *object->m_localBase, CVector(localFloats[1], localFloats[2], localFloats[3]));
         this->push(object, 0);
         outResult = 0;
         break;
@@ -3673,17 +3663,13 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector position(
-            localFloats[0],
-            localFloats[1],
-            localFloats[2]);
         _GXColor color = {
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]),
             static_cast<u8>(object->m_localBase[6]),
         };
-        CharaPcs.SetTexShadowPos(position);
+        CharaPcs.SetTexShadowPos(CVector(localFloats[0], localFloats[1], localFloats[2]));
         CharaPcs.SetTexShadowColor(color);
         CharaPcs.SetTexShadowRadius(localFloats[7]);
         this->push(object, 0);
@@ -4047,8 +4033,7 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
             localFloats[0],
             localFloats[1],
             localFloats[2]);
-        Vec cylinderTop = { 0.0f, 1.0f, 0.0f };
-        if (MapPcs.CheckHitCylinderNear(hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
+        if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, 1.0f, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
             this->push(object, 0);
         } else {
             MapPcs.CalcHitPosition(hitPosition);

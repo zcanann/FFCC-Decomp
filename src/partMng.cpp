@@ -430,7 +430,9 @@ void CPartMng::pppDumpMngSt()
 {
     struct PppMngStDumpRaw {
         void* m_pppResSet;                 // 0x00
-        unsigned char m_pad04[0x74 - 0x4];
+        unsigned char m_pad04[0x14 - 0x4];
+        int m_baseTime;                    // 0x14
+        unsigned char m_pad18[0x74 - 0x18];
         short m_kind;                      // 0x74
         short m_nodeIndex;                 // 0x76
         unsigned char m_pad78[0xAC - 0x78];
@@ -451,9 +453,9 @@ void CPartMng::pppDumpMngSt()
         System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 
-    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
+    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x2A18);
     for (int i = 0; i < 0x180; i++) {
-        if (mng->m_prioTime != -0x1000 && System.m_execParam != 0) {
+        if (mng->m_baseTime != -0x1000 && System.m_execParam != 0) {
             int kind = static_cast<int>(mng->m_kind);
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));

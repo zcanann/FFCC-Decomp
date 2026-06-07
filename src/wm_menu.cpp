@@ -637,7 +637,7 @@ void CMenuPcs::loadData()
 		m_wm.m_handles[i] = 0;
 	}
 
-	const unsigned short* modelPtr = s_wmLoadCharaModels;
+	const short* modelPtr = reinterpret_cast<const short*>(s_wmLoadCharaModels);
 	for (int i = 0; i < 0x28; i++, modelPtr++) {
 		CCharaPcs::CHandle* handle = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
 		m_wm.m_handles[i] = handle;
@@ -654,14 +654,15 @@ void CMenuPcs::loadData()
 			CharaPcs.m_charaAllocStage = 0;
 			if (caravan.m_shopState != 0) {
 				charaKind = 0;
-				charaNo = caravan.m_tribeId * 200 + 100;
+				const int tribeBase = caravan.m_tribeId * 200;
+				int modelBase = tribeBase + 100;
 				if (caravan.m_genderFlag != 0) {
-					charaNo += 100;
+					modelBase = tribeBase + 200;
 				}
-				charaNo += caravan.m_appearanceVariant;
+				charaNo = modelBase + caravan.m_appearanceVariant;
 			} else {
 				charaKind = 3;
-				charaNo = s_wmLoadCharaModels[21];
+				charaNo = reinterpret_cast<const short*>(s_wmLoadCharaModels)[21];
 			}
 		}
 

@@ -1838,10 +1838,9 @@ void CMenuPcs::LetterMessDraw()
 	CCaravanWork* const caravanWork = GetLetterCaravanWork();
 	int state = GetLetterStateBase(this);
 	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
-	s16* animBase = reinterpret_cast<s16*>(m_singleFadeState);
 
-	s16* panel = animBase + 4;
-	for (int i = 0; i < animBase[0]; ++i, panel += 0x20) {
+	s16* panel = reinterpret_cast<s16*>(m_singleFadeState) + 4;
+	for (int i = 0; i < reinterpret_cast<s16*>(m_singleFadeState)[0]; ++i, panel += 0x20) {
 		int tex = *reinterpret_cast<int*>(panel + 0xE);
 		if (tex < 0) {
 			continue;
@@ -1858,13 +1857,14 @@ void CMenuPcs::LetterMessDraw()
 		color.b = 0xFF;
 		color.a = alpha;
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		SetTexture(static_cast<CMenuPcs::TEX>(tex));
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect(
 		    0, x0, y0, x1,
 		    y1, *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
 		    *reinterpret_cast<float*>(panel + 10), *reinterpret_cast<float*>(panel + 10), 0.0f);
 	}
 
+	s16* animBase = reinterpret_cast<s16*>(m_singleFadeState);
 	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
 	font->SetShadow(0);
 	font->SetMargin(FLOAT_8033313c);

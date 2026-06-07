@@ -4732,7 +4732,7 @@ void CGPartyObj::ghostPartyMog()
 	} else {
 		scale = FLOAT_80331a54;
 	}
-	unsigned int distFar = static_cast<unsigned int>(FLOAT_80331A5C * scale);
+	unsigned int distFar = static_cast<unsigned int>(static_cast<int>(FLOAT_80331A5C * scale));
 
 	unsigned char* flags = &CGPartyObj::m_ghostWork[0];
 	int& bossState = *reinterpret_cast<int*>(CGPartyObj::m_ghostWork + 0x1C);

@@ -12183,10 +12183,29 @@ int McCtrl::SaveDat()
 					m_state = -1;
 				}
 			} else {
+				unsigned char entry[kMcListEntrySize];
+				memset(entry, 0, sizeof(entry));
+				unsigned int* const srcWords = reinterpret_cast<unsigned int*>(entry);
+				int byteOffset = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
+					unsigned char* const dst = MenuPcs.m_wmCharaState + byteOffset;
+					unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
+					dstWords[1] = srcWords[1];
+					dstWords[0] = srcWords[0];
+					dstWords[2] = srcWords[2];
+					dstWords[3] = srcWords[3];
+					dstWords[4] = srcWords[4];
+					dstWords[5] = srcWords[5];
+					dstWords[6] = srcWords[6];
+					dstWords[7] = srcWords[7];
+					dstWords[8] = srcWords[8];
+					dstWords[9] = srcWords[9];
+					dstWords[10] = srcWords[10];
+					memcpy(dst + 0x2C, entry + 0x2C, 0x15);
+					byteOffset += kMcListEntrySize;
+					dst[0x41] = entry[0x41];
+					dst[0x42] = entry[0x42];
+					dst[0x43] = entry[0x43];
 				}
 				m_state = 10;
 			}
@@ -13301,10 +13320,29 @@ int McCtrl::EraseDat()
 					m_state = -1;
 				}
 			} else {
+				unsigned char entry[kMcListEntrySize];
+				memset(entry, 0, sizeof(entry));
+				unsigned int* const srcWords = reinterpret_cast<unsigned int*>(entry);
+				int byteOffset = 0;
 				for (int i = 0; i < kMcListCount; i++) {
-					unsigned char entry[kMcListEntrySize];
-					memset(entry, 0, sizeof(entry));
-					MenuPcs.SetMcList(i, reinterpret_cast<McListInfo*>(entry));
+					unsigned char* const dst = MenuPcs.m_wmCharaState + byteOffset;
+					unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
+					dstWords[1] = srcWords[1];
+					dstWords[0] = srcWords[0];
+					dstWords[2] = srcWords[2];
+					dstWords[3] = srcWords[3];
+					dstWords[4] = srcWords[4];
+					dstWords[5] = srcWords[5];
+					dstWords[6] = srcWords[6];
+					dstWords[7] = srcWords[7];
+					dstWords[8] = srcWords[8];
+					dstWords[9] = srcWords[9];
+					dstWords[10] = srcWords[10];
+					memcpy(dst + 0x2C, entry + 0x2C, 0x15);
+					byteOffset += kMcListEntrySize;
+					dst[0x41] = entry[0x41];
+					dst[0x42] = entry[0x42];
+					dst[0x43] = entry[0x43];
 				}
 				m_state = 10;
 			}

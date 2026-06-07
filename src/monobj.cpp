@@ -2278,13 +2278,13 @@ void CGMonObj::initFinishedFuncDefault()
 	// Script value is authored in centi-units.
 	object->m_hitNormal.x = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
 
-	short animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
-	if (animPoint != -1) {
+	unsigned short animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xB);
 	}
 
-	animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
-	if (animPoint != -1) {
+	animPoint = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != 0xFFFF) {
 		object->AddAnimPoint(1, animPoint, 0xA);
 	}
 

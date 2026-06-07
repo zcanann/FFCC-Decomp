@@ -869,7 +869,8 @@ done:
         angle++;
     }
 
-    particleBytes[0x38] = particleBytes[0x37] - 1;
+    particleBytes[0x38] = particleBytes[0x37];
+    particleBytes[0x38] = particleBytes[0x38] - 1;
     *(u16*)(particleData->m_matrix[1] + 3) = 0;
 }
 

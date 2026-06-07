@@ -151,26 +151,24 @@ static inline unsigned char clamp_alpha_7f(int value)
     return (unsigned char)value;
 }
 
-static inline float calc_spawn_speed(float speedMag, u8 speedMode)
+static inline float calc_spawn_speed(PRyjMegaBirthModel* params, u8 speedMode)
 {
-    const float halfSpeed = MegaBirthHalf() * speedMag;
-
     switch (speedMode) {
     case 0:
-        return Math.RandF() * speedMag - halfSpeed;
+        return Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 1:
         (void)Math.RandF();
-        return Math.RandF() * speedMag - halfSpeed;
+        return Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 2:
-        return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
+        return Math.RandF() * Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 3:
-        return -(MegaBirthSpeedFalloff() * (Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
+        return -(MegaBirthSpeedFalloff() * (Math.RandF() * Math.RandF() * params->m_speed) - params->m_speed) - MegaBirthHalf() * params->m_speed;
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     case 5:
-        return -(MegaBirthHalf() * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
+        return -(MegaBirthHalf() * (Math.RandF() * Math.RandF() * Math.RandF() * params->m_speed) - params->m_speed) - MegaBirthHalf() * params->m_speed;
     default:
-        return Math.RandF() * speedMag - halfSpeed;
+        return Math.RandF() * params->m_speed - MegaBirthHalf() * params->m_speed;
     }
 }
 
@@ -193,22 +191,22 @@ static inline float calc_mesh_sample_t(u8 mode)
     }
 }
 
-static inline float calc_direction_speed(float speedMag, u8 speedMode)
+static inline float calc_direction_speed(PRyjMegaBirthModel* params, u8 speedMode)
 {
     switch (speedMode) {
     case 1:
         (void)Math.RandF();
-        return speedMag * Math.RandF();
+        return params->m_speed * Math.RandF();
     case 2:
-        return speedMag * Math.RandF() * Math.RandF();
+        return params->m_speed * Math.RandF() * Math.RandF();
     case 3:
-        return -(MegaBirthSpeedFalloff() * (speedMag * Math.RandF() * Math.RandF()) - speedMag);
+        return -(MegaBirthSpeedFalloff() * (params->m_speed * Math.RandF() * Math.RandF()) - params->m_speed);
     case 4:
-        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag;
+        return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * params->m_speed;
     case 5:
-        return -(MegaBirthHalf() * (Math.RandF() * (speedMag * Math.RandF() * Math.RandF())) - speedMag);
+        return -(MegaBirthHalf() * (Math.RandF() * (params->m_speed * Math.RandF() * Math.RandF())) - params->m_speed);
     default:
-        return speedMag;
+        return params->m_speed;
     }
 }
 
@@ -513,9 +511,9 @@ void birth(
                 speed.x = particleData->m_matrix[0][3];
                 speed.y = particleData->m_matrix[1][3];
                 speed.z = particleData->m_matrix[2][3];
-                speed.x = calc_spawn_speed(params->m_speed, speedMode);
-                speed.y = calc_spawn_speed(params->m_speed, speedMode);
-                speed.z = calc_spawn_speed(params->m_speed, speedMode);
+                speed.x = calc_spawn_speed(params, speedMode);
+                speed.y = calc_spawn_speed(params, speedMode);
+                speed.z = calc_spawn_speed(params, speedMode);
                 particleData->m_matrix[0][3] = speed.x;
                 particleData->m_matrix[1][3] = speed.y;
                 particleData->m_matrix[2][3] = speed.z;
@@ -594,7 +592,7 @@ void birth(
     }
 
     if (params->m_speed != kPppRyjMegaBirthSharedZero) {
-        float speedScalar = calc_direction_speed(params->m_speed, params->m_speedMode);
+        float speedScalar = calc_direction_speed(params, params->m_speedMode);
         Vec direction;
         Vec position;
 

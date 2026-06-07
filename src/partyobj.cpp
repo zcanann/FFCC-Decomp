@@ -245,16 +245,26 @@ static bool isFrameInterval(unsigned int frame, unsigned int interval)
 
 static bool isGhostPartyTargetMode(CGPartyObj* self)
 {
-	if (!isBossArtifactStage()) {
-		return false;
+	bool result = false;
+	bool cidMatch = false;
+	bool stageOk = false;
+
+	if (Game.m_gameWork.m_menuStageMode != 0) {
+		if (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) {
+			stageOk = true;
+		}
 	}
-	if ((self->GetCID() & 0x6D) != 0x6D) {
-		return false;
+	if (stageOk) {
+		if ((__cntlzw(0x6D - (static_cast<unsigned short>(self->GetCID()) & 0x6D)) >> 5 & 0xFF) != 0) {
+			cidMatch = true;
+		}
 	}
-	if (self->m_scriptHandle == nullptr) {
-		return false;
+	if (cidMatch) {
+		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0) {
+			result = true;
+		}
 	}
-	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0;
+	return result;
 }
 
 static int getCarryAnimNo(CGPartyObj* self, int carryType)
@@ -3000,28 +3010,28 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 
 		if (forceMode != 0) {
 			PartyData(this).carryObject = object;
-			if (PartyData(this).carryObject == nullptr) {
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x24, 1);
-				} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0, 0);
-					SetAnimSlot(1, 1);
+			if (PartyData(this).carryObject != nullptr) {
+				if (CFlatItemCarryMode() == 0) {
+					if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
+					}
 				} else {
-					SetAnimSlot(0x25, 0);
-					SetAnimSlot(0x30, 1);
-				}
-			} else if (CFlatItemCarryMode() == 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
 					SetAnimSlot(0x0B, 0);
 					SetAnimSlot(0x0C, 1);
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(2, 1);
 				}
+			} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
+			} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
 			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
 			}
 			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, 0, 0);
 		} else {
@@ -3037,8 +3047,20 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			}
 			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, 0);
 			PartyData(this).carryObject = (CGObject*)0;
-			if (PartyData(this).carryObject == nullptr) {
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				if (PartyData(this).carryObject != nullptr) {
+					if (CFlatItemCarryMode() == 0) {
+						if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
+							SetAnimSlot(0x0B, 0);
+							SetAnimSlot(0x0C, 1);
+						} else {
+							SetAnimSlot(0x0B, 0);
+							SetAnimSlot(2, 1);
+						}
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					}
+				} else if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x24, 1);
 				} else if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
@@ -3048,18 +3070,6 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 					SetAnimSlot(0x25, 0);
 					SetAnimSlot(0x30, 1);
 				}
-			} else if (CFlatItemCarryMode() == 0) {
-				if (*reinterpret_cast<short*>(&m_lastMapIdHit) == 1) {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(0x0C, 1);
-				} else {
-					SetAnimSlot(0x0B, 0);
-					SetAnimSlot(2, 1);
-				}
-			} else {
-				SetAnimSlot(0x0B, 0);
-				SetAnimSlot(0x0C, 1);
-			}
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
 			reinterpret_cast<CGItemObj*>(PartyData(this).carryObject)->carry(this, carryType, getCarryAnimNo(this, carryType));

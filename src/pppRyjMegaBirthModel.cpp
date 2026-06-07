@@ -44,7 +44,7 @@ extern const double DOUBLE_803304D8 = 1.0;
 extern const double DOUBLE_803304E0 = 0.5;
 extern const float FLOAT_803304E8[2] = { -1.0f, 0.0f };
 extern const float FLOAT_803304F0[2] = { 0.0f, 0.0f };
-extern const float FLOAT_803304F8 = 0.0f;
+extern const float kPppRyjMegaBirthModelZero = 0.0f;
 
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_modelIndex) == 0x04);
 STATIC_ASSERT(offsetof(PRyjMegaBirthModel, m_fogIndex) == 0x09);

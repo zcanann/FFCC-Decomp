@@ -172,8 +172,8 @@ bool CMenuPcs::EquipClose0()
 				    (float)-((kEquipOneDouble / (double)item->duration) * (double)item->step - kEquipOneDouble);
 				if ((item->flags & 2) == 0) {
 					fVar1 = (float)-((dVar2 / (double)item->duration) * (double)item->step - dVar2);
-					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
-					item->dy = (item->targetY - (float)(double)item->y) * fVar1;
+					item->dx = (item->targetX - (float)item->x) * fVar1;
+					item->dy = (item->targetY - (float)item->y) * fVar1;
 				}
 			}
 		}
@@ -233,8 +233,8 @@ bool CMenuPcs::EquipOpen0()
 				item->alpha = (float)((kEquipOneDouble / (double)item->duration) * (double)item->step);
 				if ((item->flags & 2) == 0) {
 					fVar1 = (float)((dVar2 / (double)item->duration) * (double)item->step);
-					item->dx = (item->targetX - (float)(double)item->x) * fVar1;
-					item->dy = (item->targetY - (float)(double)item->y) * fVar1;
+					item->dx = (item->targetX - (float)item->x) * fVar1;
+					item->dy = (item->targetY - (float)item->y) * fVar1;
 				}
 			}
 		}
@@ -770,54 +770,78 @@ int CMenuPcs::EquipClose()
  */
 void CMenuPcs::EquipCtrl()
 {
-	int mode;
-	CCaravanWork* caravanWork;
-	float scale;
 	int state;
-	EquipMenuState* menuState;
 	int index;
-	u32 equipCount;
+	int itemCount;
+	unsigned int blockCount;
 
+	this->m_equipState->prevMode = this->m_equipState->mode;
+	int mode = static_cast<int>(this->m_equipState->mode);
 	state = 0;
-	menuState = GetEquipMenuState(this);
-	menuState->prevMode = menuState->mode;
-	mode = static_cast<int>(menuState->mode);
-	if ((mode == 0) || ((mode != 0) && (menuState->step == 1))) {
+	if ((mode == 0) || ((mode != 0) && (this->m_equipState->step == 1))) {
 		state = EquipCtrlCur();
-	} else if ((mode == 1) && (menuState->step == 0)) {
-		state = EquipOpen0();
-		if (state != 0) {
-			state = 0;
-			menuState->step = menuState->step + 1;
+	} else if ((mode == 1) && (this->m_equipState->step == 0)) {
+		if (EquipOpen0()) {
+			this->m_equipState->step = this->m_equipState->step + 1;
 		}
-	} else if ((mode == 1) && ((menuState->step == 2) && (state = EquipClose0(), state != 0))) {
-		menuState->step = 0;
-		menuState->mode = 0;
-		menuState->frame = 0;
+	} else if ((mode == 1) && ((this->m_equipState->step == 2) && EquipClose0())) {
+		this->m_equipState->step = 0;
+		this->m_equipState->mode = 0;
+		this->m_equipState->frame = 0;
 		CmdInit1();
-		state = 0;
 	}
 
-	scale = kEquipOne;
-	caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	if (state != 0) {
-		EquipOpenAnimList* list = GetEquipListStorage(this);
-		EquipOpenAnim* entry = list->entries;
-		for (index = 0; index < list->count; index++) {
-			entry->alpha = scale;
-			entry->scale = scale;
+	if (state) {
+		float fVar2 = kEquipOne;
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+
+		EquipOpenAnim* entry = this->m_equipList->entries;
+		for (index = 0; index < this->m_equipList->count; index = index + 1) {
+			entry->alpha = fVar2;
+			entry->scale = fVar2;
 			entry++;
 		}
 
-		equipCount = static_cast<u32>(caravanWork->m_numCmdListSlots);
-		if (equipCount == 0) {
-			return;
-		}
-
-		for (int i = static_cast<int>(equipCount) - 1, index = 0; i >= 0; i--, index++) {
-			entry = &list->entries[i];
-			entry->startFrame = index;
-			entry->duration = 3;
+		itemCount = caravanWork->m_numCmdListSlots;
+		index = 0;
+		EquipOpenAnim* entries = GetEquipListStorage(this)->entries;
+		int setupIndex = itemCount - 1;
+		if (setupIndex > -1) {
+			blockCount = (unsigned int)itemCount >> 3;
+			if (blockCount != 0) {
+				do {
+					EquipOpenAnim* setupEntry = entries + setupIndex;
+					setupEntry[0].startFrame = index++;
+					setupEntry[0].duration = 3;
+					setupEntry[-1].startFrame = index++;
+					setupEntry[-1].duration = 3;
+					setupEntry[-2].startFrame = index++;
+					setupEntry[-2].duration = 3;
+					setupEntry[-3].startFrame = index++;
+					setupEntry[-3].duration = 3;
+					setupEntry[-4].startFrame = index++;
+					setupEntry[-4].duration = 3;
+					setupEntry[-5].startFrame = index++;
+					setupEntry[-5].duration = 3;
+					setupEntry[-6].startFrame = index++;
+					setupEntry[-6].duration = 3;
+					setupEntry[-7].startFrame = index++;
+					setupEntry[-7].duration = 3;
+					setupIndex -= 8;
+					blockCount = blockCount - 1;
+				} while (blockCount != 0);
+				itemCount = itemCount & 7;
+				if (itemCount == 0) {
+					return;
+				}
+			}
+			do {
+				entries[setupIndex].startFrame = index;
+				index = index + 1;
+				entries[setupIndex].duration = 3;
+				setupIndex--;
+				itemCount = itemCount - 1;
+			} while (itemCount != 0);
 		}
 	}
 }

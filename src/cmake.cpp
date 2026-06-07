@@ -893,7 +893,6 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short down;
     unsigned short repeat;
     char picked[8];
-    int len = strlen(s_CmakeInfo.m_name);
 
     bool padBusy = false;
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {

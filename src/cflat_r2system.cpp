@@ -1856,16 +1856,22 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     case -4:
         if (CameraPcs.IsAbsolute() != 0) {
             const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-            CVector refPosition(localFloats[0], localFloats[1], localFloats[2]);
+            Vec refPosition;
+            refPosition.x = localFloats[0];
+            refPosition.y = localFloats[1];
+            refPosition.z = localFloats[2];
             if (m_cameraScriptTargetMode == 0) {
-                CameraPcs.SetRefPosition(refPosition);
+                CameraPcs.SetRefPosition(&refPosition);
             } else {
                 CharaPcs.m_overlapTargetPos = refPosition;
             }
 
-            CVector position(localFloats[3], localFloats[4], localFloats[5]);
+            Vec position;
+            position.x = localFloats[3];
+            position.y = localFloats[4];
+            position.z = localFloats[5];
             if (m_cameraScriptTargetMode == 0) {
-                CameraPcs.SetPosition(position);
+                CameraPcs.SetPosition(&position);
             } else {
                 CharaPcs.m_overlapEyePos = position;
             }

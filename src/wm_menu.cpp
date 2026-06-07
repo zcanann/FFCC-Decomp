@@ -7788,10 +7788,8 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const modelData = GetWmCharaModelData(this);
 	int* const animState = GetWmCharaAnimState(this);
-	WmWorldState* const worldState = GetWmWorldState(this);
 
 	unsigned short padTrig[4];
 	unsigned short padRepeat[4];
@@ -7803,7 +7801,7 @@ void CMenuPcs::CalcCharaSelect()
 	}
 
 	for (int i = 0; i < 4; i++) {
-		WmCharaSelectEntry& entry = selectEntries[i];
+		WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 		padTrig[i] = 0;
 		padRepeat[i] = 0;
 
@@ -7811,7 +7809,11 @@ void CMenuPcs::CalcCharaSelect()
 			entry.m_padType = Joybus.GetPadType(i);
 			if ((entry.m_padType == 0x09000000) || (entry.m_padType == -0x74F00000) ||
 			    (entry.m_padType == -0x78000000)) {
-				entry.m_connected = static_cast<unsigned char>(Game.m_gameWork.m_menuStageMode != 0);
+				if (Game.m_gameWork.m_menuStageMode == 0) {
+					entry.m_connected = 0;
+				} else {
+					entry.m_connected = 1;
+				}
 			} else {
 				entry.m_connected = static_cast<unsigned char>(Joybus.GetGBAConnect(i));
 			}
@@ -7835,7 +7837,7 @@ void CMenuPcs::CalcCharaSelect()
 		}
 	}
 
-	if (worldState->m_mainState != 2 || worldState->m_nextMenuMode != 0) {
+	if (GetWmWorldState(this)->m_mainState != 2 || GetWmWorldState(this)->m_nextMenuMode != 0) {
 		return;
 	}
 
@@ -7844,14 +7846,14 @@ void CMenuPcs::CalcCharaSelect()
 		unsigned int pendingMask = 0;
 		if (Game.m_gameWork.m_menuStageMode == 0) {
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0 && selectEntries[i].m_currentSlot >= 0) {
-					pendingMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0 && GetWmCharaSelectEntries(this)[i].m_currentSlot >= 0) {
+					pendingMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 				}
 			}
 		}
 
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (Game.m_gameWork.m_menuStageMode != 0) {
 				break;
 			}
@@ -7885,8 +7887,8 @@ void CMenuPcs::CalcCharaSelect()
 
 		unsigned int confirmedSlotMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (selectEntries[i].m_confirmed != 0 && selectEntries[i].m_currentSlot >= 0) {
-				confirmedSlotMask |= 1u << static_cast<unsigned int>(selectEntries[i].m_currentSlot);
+			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0 && GetWmCharaSelectEntries(this)[i].m_currentSlot >= 0) {
+				confirmedSlotMask |= 1u << static_cast<unsigned int>(GetWmCharaSelectEntries(this)[i].m_currentSlot);
 			}
 		}
 
@@ -7905,7 +7907,7 @@ void CMenuPcs::CalcCharaSelect()
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
 		for (int i = 0; i < 4; i++) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_connected != 0) {
 				connectedCount++;
 				if (entry.m_confirmed != 0 &&
@@ -7962,7 +7964,7 @@ void CMenuPcs::CalcCharaSelect()
 		bool requestCancel = false;
 		bool requestFinalize = false;
 		for (int i = 3; i >= 0; i--) {
-			WmCharaSelectEntry& entry = selectEntries[i];
+			WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 			if (entry.m_cmakeReady != 0) {
 				GbaCMakeInfoRaw info;
 				entry.m_confirmed = 1;
@@ -8089,8 +8091,8 @@ void CMenuPcs::CalcCharaSelect()
 							} else {
 								bool duplicatePending = false;
 								for (int other = 0; other < 4; other++) {
-									if (other != i && selectEntries[other].m_cmakePending != 0 &&
-									    selectEntries[other].m_currentSlot == currentSlot) {
+									if (other != i && GetWmCharaSelectEntries(this)[other].m_cmakePending != 0 &&
+									    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
 										duplicatePending = true;
 										break;
 									}
@@ -8110,8 +8112,8 @@ void CMenuPcs::CalcCharaSelect()
 						} else {
 							bool duplicateConfirmed = false;
 							for (int other = 0; other < 4; other++) {
-								if (other != i && selectEntries[other].m_confirmed != 0 &&
-								    selectEntries[other].m_currentSlot == currentSlot) {
+								if (other != i && GetWmCharaSelectEntries(this)[other].m_confirmed != 0 &&
+								    GetWmCharaSelectEntries(this)[other].m_currentSlot == currentSlot) {
 									duplicateConfirmed = true;
 									break;
 								}
@@ -8157,7 +8159,7 @@ void CMenuPcs::CalcCharaSelect()
 		if (requestCancel) {
 			bool anySelected = false;
 			for (int i = 0; i < 4; i++) {
-				if ((selectEntries[i].m_confirmed != 0) || (selectEntries[i].m_cmakePending != 0)) {
+				if ((GetWmCharaSelectEntries(this)[i].m_confirmed != 0) || (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0)) {
 					anySelected = true;
 					break;
 				}
@@ -8165,8 +8167,8 @@ void CMenuPcs::CalcCharaSelect()
 			if (anySelected) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
-				worldState->m_nextMenuMode = -1;
-				worldState->m_delay = 10;
+				GetWmWorldState(this)->m_nextMenuMode = -1;
+				GetWmWorldState(this)->m_delay = 10;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
 		}
@@ -8174,12 +8176,12 @@ void CMenuPcs::CalcCharaSelect()
 		if (requestFinalize) {
 			unsigned int activeCount = 0;
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_confirmed != 0) {
+				if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
 					activeCount++;
 				}
 			}
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0) {
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
 					activeCount = 0;
 					break;
 				}
@@ -8188,37 +8190,37 @@ void CMenuPcs::CalcCharaSelect()
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
-				worldState->m_nextMenuMode = 1;
-				worldState->m_delay = 10;
+				GetWmWorldState(this)->m_nextMenuMode = 1;
+				GetWmWorldState(this)->m_delay = 10;
 			}
 		}
 
 		unsigned int finishedMask = 0;
 		unsigned int readyMask = 0;
 		for (int i = 0; i < 4; i++) {
-			if (selectEntries[i].m_confirmed != 0) {
+			if (GetWmCharaSelectEntries(this)[i].m_confirmed != 0) {
 				finishedMask |= 1u << i;
 			}
-			if (selectEntries[i].m_connected == 0 && selectEntries[i].m_disconnectTime < 0x1E) {
+			if (GetWmCharaSelectEntries(this)[i].m_connected == 0 && GetWmCharaSelectEntries(this)[i].m_disconnectTime < 0x1E) {
 				readyMask |= 1u << i;
 			}
 		}
 		if ((Game.m_gameWork.m_menuStageMode == 0 || m_singleCmakeSlot < 0) &&
 		    finishedMask != 0 && finishedMask == readyMask) {
-			worldState->m_nextMenuMode = 1;
-			worldState->m_delay = static_cast<short>(FLOAT_8032ee18);
+			GetWmWorldState(this)->m_nextMenuMode = 1;
+			GetWmWorldState(this)->m_delay = static_cast<short>(FLOAT_8032ee18);
 		} else if (Game.m_gameWork.m_menuStageMode != 0 && m_singleCmakeSlot >= 0) {
-			worldState->m_nextMenuMode = 1;
-			worldState->m_delay = 10;
+			GetWmWorldState(this)->m_nextMenuMode = 1;
+			GetWmWorldState(this)->m_delay = 10;
 		}
 
-		if (worldState->m_nextMenuMode != 0) {
+		if (GetWmWorldState(this)->m_nextMenuMode != 0) {
 			GbaQue.SetControllerMode(1);
 			for (int i = 0; i < 4; i++) {
-				if (selectEntries[i].m_cmakePending != 0) {
-					selectEntries[i].m_confirmed = 0;
-					selectEntries[i].m_cmakePending = 0;
-					selectEntries[i].m_cmakeReady = 0;
+				if (GetWmCharaSelectEntries(this)[i].m_cmakePending != 0) {
+					GetWmCharaSelectEntries(this)[i].m_confirmed = 0;
+					GetWmCharaSelectEntries(this)[i].m_cmakePending = 0;
+					GetWmCharaSelectEntries(this)[i].m_cmakeReady = 0;
 				}
 			}
 		}
@@ -8230,7 +8232,7 @@ void CMenuPcs::CalcCharaSelect()
 		if (winState == 1 && (anyTrig & 0x0300) != 0) {
 			m_menuWindowInfo->state = 2;
 			for (int i = 0; i < 4; i++) {
-				WmCharaSelectEntry& entry = selectEntries[i];
+				WmCharaSelectEntry& entry = GetWmCharaSelectEntries(this)[i];
 				if (entry.m_confirmed != 0) {
 					QueueWmCharaAnimState(this, entry.m_currentSlot, 0);
 				}

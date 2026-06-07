@@ -9487,8 +9487,12 @@ LAB_draw:
 					float slotY = (float)(slotIdx) * FLOAT_80331498 + FLOAT_80331490;
 					SetAttrFmt((FMT)0);
 					unsigned int slotAlpha = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
-					slotAlpha = slotAlpha | 0xFFFFFF00;
-					GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&slotAlpha);
+					GXColor slotColor;
+					slotColor.r = 0xFF;
+					slotColor.g = 0xFF;
+					slotColor.b = 0xFF;
+					slotColor.a = static_cast<unsigned char>(slotAlpha);
+					GXSetChanMatColor(GX_COLOR0A0, slotColor);
 
 					// Draw slot background
 					SetTexture((TEX)0x24);

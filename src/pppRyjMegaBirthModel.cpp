@@ -505,7 +505,7 @@ void birth(
     s32 mode = params->m_spawnMode;
     if (mode < 6) {
         if (mode >= 4) {
-            if (params->m_speed != kPppRyjMegaBirthSharedZero) {
+            if (kPppRyjMegaBirthSharedZero != params->m_speed) {
                 u8 speedMode = params->m_speedMode;
                 Vec speed;
                 speed.x = particleData->m_matrix[0][3];
@@ -591,7 +591,7 @@ void birth(
         goto join_position;
     }
 
-    if (params->m_speed != kPppRyjMegaBirthSharedZero) {
+    if (kPppRyjMegaBirthSharedZero != params->m_speed) {
         float speedScalar = calc_direction_speed(params, params->m_speedMode);
         Vec direction;
         Vec position;

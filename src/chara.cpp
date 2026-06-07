@@ -1415,7 +1415,7 @@ void CChara::CModel::calcNowFrame()
 	}
 
 	float total = 1.0f + (m_animEnd - m_animStart);
-	if ((AnimFlags(m_anim) & 0x40) == 0) {
+	if (((AnimFlags(m_anim) >> 6) & 1) == 0) {
 		if (m_time >= 0.0f) {
 			m_curFrame = m_animStart + static_cast<float>(fmod(m_time, total));
 		} else {
@@ -1452,7 +1452,7 @@ void CChara::CModel::calcMatrix()
 		frame = FLOAT_803301b0;
 	} else {
 		float total = FLOAT_803301bc + (m_animEnd - m_animStart);
-		if ((AnimFlags(m_anim) & 0x40) == 0) {
+		if (((AnimFlags(m_anim) >> 6) & 1) == 0) {
 			if (m_time >= FLOAT_803301b0) {
 				frame = m_animStart + static_cast<float>(fmod(m_time, total));
 			} else {

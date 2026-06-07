@@ -3619,11 +3619,12 @@ void CGMonObj::statWatch()
 			return;
 		}
 
-		unsigned char* aiScript = script;
-		int aiState = monObj->m_aiState;
-		if (aiState != 0) {
+		unsigned char* aiScript;
+		if (monObj->m_aiState == 0) {
+			aiScript = script;
+		} else {
 			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
 		unsigned short targetMode = *reinterpret_cast<unsigned short*>(aiScript + 0x106);
@@ -3636,50 +3637,80 @@ void CGMonObj::statWatch()
 		}
 
 		if (targetMode < 10) {
+			// Pass 1: count valid party members.
 			int validCount = 0;
 			for (int slot = 0; slot < 4; slot++) {
-				int partyIndex = *reinterpret_cast<int*>(mon + 0x620 + slot * 4);
-				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
-				if (party != NULL) {
-					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
-					CGObject* partyObj = reinterpret_cast<CGObject*>(party);
-					bool menuBlocked = false;
-					if ((Game.m_gameWork.m_menuStageMode != 0) &&
-						(Game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
-						((partyPrg->GetCID() & 0x6D) == 0x6D) &&
-						(partyObj->m_scriptHandle[0xED] != NULL)) {
-						menuBlocked = true;
-					}
-					if ((*reinterpret_cast<unsigned short*>(partyObj->m_scriptHandle + 7) != 0) &&
-						(partyPrg->m_lastStateId != 9) &&
-						(partyPrg->m_lastStateId != 0x22) &&
-						!menuBlocked) {
-						if ((static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) < homeRange) &&
-							(targetMode == 0)) {
-							selectedTarget = partyIndex;
-							break;
-						}
-						if ((targetMode == 1) && (targetPartyIndex == partyIndex)) {
-							selectedTarget = partyIndex;
-						} else if (targetMode == 2) {
-							if ((selectedTarget < 0) ||
-								(*reinterpret_cast<unsigned short*>(
-									 reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle) + 0x1C) <
-								 *reinterpret_cast<unsigned short*>(
-									 reinterpret_cast<unsigned char*>(Game.m_partyObjArr[selectedTarget]->m_scriptHandle) + 0x1C))) {
-								selectedTarget = partyIndex;
-							}
-						} else if (targetMode == 3) {
-							if ((partyPrg->m_lastStateId != 6) && (partyPrg->m_lastStateId != 2)) {
-								selectedTarget = partyIndex;
-							}
-						} else if ((targetMode == 4) && (validCount == Math.Rand(validCount + 1))) {
-							selectedTarget = partyIndex;
-						}
-						validCount++;
-					}
+				CGPartyObj* party = Game.m_partyObjArr[*reinterpret_cast<int*>(mon + slot * 4 + 0x620)];
+				if ((party != NULL) &&
+					(*reinterpret_cast<short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+					 (0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((reinterpret_cast<CGPrgObj*>(party)->GetCID() & 0x6D) != 0x6D) ||
+					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
+					validCount++;
 				}
 			}
+
+			int pick = Math.Rand(validCount);
+			unsigned int minHp = 10000000;
+			int validIndex = 0;
+			double homeRange2 = static_cast<double>(static_cast<float>(
+				*reinterpret_cast<unsigned short*>(script + 0xCC)));
+			int accum = -1;
+			int mode0Target = -1;
+
+			// Pass 2: select target.
+			int result = -1;
+			for (int slot = 0; slot < 4; slot++) {
+				int partyIndex = *reinterpret_cast<int*>(mon + slot * 4 + 0x620);
+				CGPartyObj* party = Game.m_partyObjArr[partyIndex];
+				int candidate = accum;
+				if ((party != NULL) &&
+					(*reinterpret_cast<short*>(reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7) != 0) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 9) &&
+					(reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 0x22) &&
+					((Game.m_gameWork.m_menuStageMode == 0) ||
+					 (0xE < Game.m_gameWork.m_bossArtifactStageIndex) ||
+					 ((reinterpret_cast<CGPrgObj*>(party)->GetCID() & 0x6D) != 0x6D) ||
+					 (reinterpret_cast<CGObject*>(party)->m_scriptHandle[0xED] == NULL))) {
+					if ((static_cast<double>(*reinterpret_cast<float*>(mon + partyIndex * 4 + 0x5D0)) < homeRange2) &&
+						(mode0Target = partyIndex, targetMode == 0)) {
+						result = partyIndex;
+						break;
+					}
+					candidate = partyIndex;
+					if ((targetMode != 3) ||
+						((reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 6) &&
+						 (reinterpret_cast<CGPrgObj*>(party)->m_lastStateId != 2))) {
+						if (targetMode == 2) {
+							unsigned int hp = *reinterpret_cast<unsigned short*>(
+								reinterpret_cast<CGObject*>(party)->m_scriptHandle + 7);
+							candidate = accum;
+							if (hp < minHp) {
+								minHp = hp;
+								candidate = partyIndex;
+							}
+						} else {
+							candidate = accum;
+							if ((targetMode == 4) && (validIndex == pick)) {
+								candidate = partyIndex;
+							}
+						}
+					}
+					validIndex++;
+				}
+				result = mode0Target;
+				accum = candidate;
+			}
+
+			if (targetMode == 1) {
+				result = targetPartyIndex;
+			} else if ((targetMode != 0) && (targetMode < 5) && (-1 < accum)) {
+				result = accum;
+			}
+			selectedTarget = result;
 		} else if (monObj->m_funcs->target != 0) {
 			selectedTarget = (monObj->*monObj->m_funcs->target)(targetMode);
 		}
@@ -3694,31 +3725,135 @@ void CGMonObj::statWatch()
 		}
 
 		targetPartyIndex = selectedTarget;
-		aiScript = script;
-		aiState = monObj->m_aiState;
-		if (aiState != 0) {
-			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
-		}
-
-		if ((*reinterpret_cast<unsigned short*>(aiScript + 0x10A) == 1) && (monObj->m_unk6BC == 0)) {
-			float noticeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCE));
-			if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) < noticeRange) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x10C) == 1) {
-					chaseState = 5;
-					chaseTimer = 0;
-					monObj->m_chaseDirty = 1;
-				} else {
-					actionState = 0x1E;
-				}
-				monObj->m_unk6BC = 1;
-				return;
-			}
+		if (monObj->m_aiState == 0) {
+			aiScript = script;
 		} else {
-			monObj->m_unk6BC = 0;
+			aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+				(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		monObj->statAround();
+		if (*reinterpret_cast<short*>(aiScript + 0x10A) == 1) {
+			if (monObj->m_unk6BC == 0) {
+				unsigned char* scriptBase = script;
+				if (*reinterpret_cast<float*>(mon + targetPartyIndex * 4 + 0x5D0) <
+					static_cast<float>(*reinterpret_cast<unsigned short*>(scriptBase + 0xCE))) {
+					if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
+						chaseState = 5;
+						chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+					} else {
+						actionState = 0x1E;
+					}
+					monObj->m_unk6BC = 1;
+					return;
+				}
+			} else {
+				monObj->m_unk6BC = 0;
+			}
+		}
+
+		actionState = monObj->mlAttackCheck(selectedTarget);
+		if (actionState == -2) {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 0;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else if (actionState == -1) {
+			actionState = 0;
+			memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+			chaseState = 2;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		} else {
+			unsigned char* scriptBase = script;
+			if (*reinterpret_cast<short*>(scriptBase + 0x10C) == 1) {
+				if (actionState < 100) {
+					short aiState = monObj->m_aiState;
+					unsigned char* aiData = scriptBase;
+					if (aiState != 0) {
+						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(scriptBase + 0x100)) * 0x1D0 + 0x10;
+					}
+					int actionOff = actionState * 0x10;
+					if ((*reinterpret_cast<unsigned short*>(aiData + actionOff + 0x110) & 0x20) != 0) {
+						actionState = 0x21;
+						CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
+						if (monObj->m_moveWork.m_mode != 4) {
+							memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+							monObj->m_moveWork.m_flags = 0x855;
+							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+								monObj->m_moveWork.m_flags |= 0x400;
+							}
+							unsigned char* aiData2;
+							if (monObj->m_aiState == 0) {
+								aiData2 = script;
+							} else {
+								aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+									(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							}
+							if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x80) != 0) {
+								monObj->m_moveWork.m_flags |= 0x20000;
+							}
+							monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+							monObj->m_moveWork.m_mode = 4;
+							monObj->m_moveWork.m_range =
+								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
+							monObj->m_moveWork.m_limitFrame =
+								*reinterpret_cast<unsigned short*>(script + 0x1B6);
+						}
+						monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+						chaseState = 5;
+						chaseTimer = 0;
+						monObj->m_chaseDirty = 1;
+						return;
+					}
+					unsigned char* aiData3;
+					if (aiState == 0) {
+						aiData3 = script;
+					} else {
+						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+					float range = static_cast<float>(
+						*reinterpret_cast<unsigned short*>(aiData3 + actionOff + 0x11C));
+					unsigned char* aiData4;
+					if (aiState == 0) {
+						aiData4 = script;
+					} else {
+						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiState + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+					short changeStat = *reinterpret_cast<short*>(aiData4 + actionOff + 0x11E);
+					actionState = 0x21;
+					CGPartyObj* party = Game.m_partyObjArr[selectedTarget];
+					if (monObj->m_moveWork.m_mode != 2) {
+						memset(&monObj->m_moveWork, 0, sizeof(monObj->m_moveWork));
+						monObj->m_moveWork.m_flags = 0x325;
+						unsigned char* aiData5;
+						if (monObj->m_aiState == 0) {
+							aiData5 = script;
+						} else {
+							aiData5 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+								(static_cast<int>(monObj->m_aiState) + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+						}
+						if ((*reinterpret_cast<unsigned short*>(aiData5 + 0x102) & 0x40) != 0) {
+							monObj->m_moveWork.m_flags |= 0x10000;
+						}
+						monObj->m_moveWork.m_flags = monObj->m_moveWork.m_flags;
+						monObj->m_moveWork.m_mode = 2;
+					}
+					monObj->m_moveWork.m_target = reinterpret_cast<CGCharaObj*>(party);
+					monObj->m_moveWork.m_range = range;
+					monObj->m_moveWork.m_changeStat = static_cast<int>(changeStat);
+				}
+			} else {
+				actionState = actionState - 0xE;
+			}
+			chaseState = 1;
+			chaseTimer = 0;
+			monObj->m_chaseDirty = 1;
+		}
 		return;
 	}
 

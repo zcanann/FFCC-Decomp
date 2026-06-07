@@ -71,8 +71,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* workBytes = object->m_workArea + particleDataOffset;
     VColor* colorWork = (VColor*)(object->m_workArea + colorOffset);
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)(workBytes + 0x3c);
-    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)(workBytes + 0x44);
+    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)(workBytes + 0x40);
     s8 hasRequiredMemory;
 
     if (particles == 0) {
@@ -125,13 +125,13 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 float fadeAStep = kPppYmMegaBirthShpTail3Zero;
                 if (stepDivisor != kPppYmMegaBirthShpTail3Zero) {
                     fadeRStep =
-                        (fadeR - (float)(*(s16*)(workBytes + 0x5c) >> 7)) / stepDivisor;
+                        (fadeR - (float)(*(s16*)(workBytes + 0x58) >> 7)) / stepDivisor;
                     fadeGStep =
-                        (fadeG - (float)(*(s16*)(workBytes + 0x5e) >> 7)) / stepDivisor;
+                        (fadeG - (float)(*(s16*)(workBytes + 0x5a) >> 7)) / stepDivisor;
                     fadeBStep =
-                        (fadeB - (float)(*(s16*)(workBytes + 0x60) >> 7)) / stepDivisor;
+                        (fadeB - (float)(*(s16*)(workBytes + 0x5c) >> 7)) / stepDivisor;
                     fadeAStep =
-                        (fadeA - (float)(*(s16*)(workBytes + 0x62) >> 7) * alphaScale) /
+                        (fadeA - (float)(*(s16*)(workBytes + 0x5e) >> 7) * alphaScale) /
                         stepDivisor;
                 }
                 const float spacing = *(float*)(payload + 0x98);

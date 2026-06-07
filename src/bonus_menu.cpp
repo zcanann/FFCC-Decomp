@@ -3054,11 +3054,10 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		CChara::CModel* model = handle->m_model;
-		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
-		model->SetMatrix(scaleMtx);
-		model->CalcMatrix();
-		model->CalcSkin();
+		handle->m_model->m_flags10C = (handle->m_model->m_flags10C & 0x7F) | 0x80;
+		handle->m_model->SetMatrix(scaleMtx);
+		handle->m_model->CalcMatrix();
+		handle->m_model->CalcSkin();
 		if (activePartyCount * 2 <= i) {
 			if (sprite->timer < 0x18) {
 				sprite->alpha = 1.0f;
@@ -3070,7 +3069,7 @@ void CMenuPcs::CalcResultOpenAnim()
 				}
 			}
 		}
-		model->m_lightAlpha = sprite->alpha;
+		handle->m_model->m_lightAlpha = sprite->alpha;
 	}
 
 	if (doneCount == (int)header->count) {

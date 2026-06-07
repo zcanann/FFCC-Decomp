@@ -7,8 +7,8 @@
 #include "ffcc/pppPart.h"
 extern "C" {
 extern const float kPppRainTexCoordBase;
-extern const float FLOAT_8033101c;
-extern const float FLOAT_80331020;
+extern const float kPppRainTexCoordOne;
+extern const float kPppRainRandomUnitScale;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
@@ -117,7 +117,7 @@ void pppRenderRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
-    tex1 = FLOAT_8033101c;
+    tex1 = kPppRainTexCoordOne;
     {
         RainDrop* currentDrop = drop;
         for (i = 0; i < (int)(u32)param_2->m_dataValIndex; i++, currentDrop++) {
@@ -186,8 +186,8 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 
             randA = rand();
             randB = rand();
-            unitA = FLOAT_80331020 * (float)randA;
-            unitB = FLOAT_80331020 * (float)randB;
+            unitA = kPppRainRandomUnitScale * (float)randA;
+            unitB = kPppRainRandomUnitScale * (float)randB;
             minX = param_2->m_minX;
             maxX = param_2->m_maxX;
             zRange = param_2->m_maxZ - param_2->m_minZ;
@@ -245,8 +245,8 @@ void pppFrameRain(pppRain* pppRain, PRain* param_2, RAIN_DATA* param_3)
 
             randA = rand();
             randB = rand();
-            unitA = FLOAT_80331020 * (float)randA;
-            unitB = FLOAT_80331020 * (float)randB;
+            unitA = kPppRainRandomUnitScale * (float)randA;
+            unitB = kPppRainRandomUnitScale * (float)randB;
             minX = param_2->m_minX;
             maxX = param_2->m_maxX;
             zRange = param_2->m_maxZ - param_2->m_minZ;
@@ -373,8 +373,8 @@ inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
     for (int i = 0; i < (int)rain->m_dataValIndex; i++) {
         int randA = rand();
         int randB = rand();
-        float unitA = FLOAT_80331020 * (float)randA;
-        float unitB = FLOAT_80331020 * (float)randB;
+        float unitA = kPppRainRandomUnitScale * (float)randA;
+        float unitB = kPppRainRandomUnitScale * (float)randB;
         float lengthDelta;
         int lifeRemainder;
 
@@ -400,6 +400,6 @@ inline void InitRainData(VRain* work, PRain* rain, RAIN_DATA*)
     }
 }
 
-extern const float FLOAT_80330FD4 = -1.0f;
-extern const float FLOAT_80330FD8 = 0.0f;
-extern const double DOUBLE_80330FE0 = 0.5;
+extern const float kPppCrystalCoordMin = -1.0f;
+extern const float kPppCrystalZero = 0.0f;
+extern const double kPppNewtonSqrtHalf = 0.5;

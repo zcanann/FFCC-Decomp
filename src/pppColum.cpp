@@ -28,19 +28,19 @@ STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 
 static const char s_pppColum_cpp[] = "pppColum.cpp";
 
-extern const float FLOAT_80331008 = 5.0f;
-extern const float FLOAT_8033100C = 128.0f;
-extern const float FLOAT_80331010[] = {127.0f, 0.0f};
+extern const float kPppCrystalModulationScale = 5.0f;
+extern const float kPppCrystalCoordOffset = 128.0f;
+extern const float kPppCrystalCoordScaleAndZero[] = {127.0f, 0.0f};
 extern const float kPppRainTexCoordBase = 0.0f;
-extern const float FLOAT_8033101c = 1.0f;
-extern const float FLOAT_80331020 = 0.00003051851f;
-extern const double DOUBLE_80331028 = 4503601774854144.0;
-extern const float FLOAT_80331030 = 0.0f;
-extern const float FLOAT_80331034 = 0.003125f;
-extern const float FLOAT_80331038 = -0.004464f;
-extern const float FLOAT_8033103c = 1.0f;
-extern const float FLOAT_80331040 = -1.0f;
-extern const float FLOAT_80331044 = 1.3333334f;
+extern const float kPppRainTexCoordOne = 1.0f;
+extern const float kPppRainRandomUnitScale = 0.00003051851f;
+extern const double kPppColumS32ToDoubleBias = 4503601774854144.0;
+extern const float kPppBlurZero = 0.0f;
+extern const float kPppBlurProjScaleX = 0.003125f;
+extern const float kPppBlurProjScaleY = -0.004464f;
+extern const float kPppBlurOne = 1.0f;
+extern const float kPppBlurNegOne = -1.0f;
+extern const float kPppScreenAspect = 1.3333334f;
 
 extern const float FLOAT_80331078;
 extern const float FLOAT_8033107C;

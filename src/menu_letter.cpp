@@ -264,8 +264,9 @@ void CMenuPcs::LetterInit1()
 	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x5F;
 	*reinterpret_cast<s16*>(iVar4 + 0xC) = 0x238;
 	*reinterpret_cast<s16*>(iVar4 + 0xE) = 0x178;
-	*reinterpret_cast<s16*>(iVar4 + 8) = static_cast<s16>((0x280 - *reinterpret_cast<s16*>(iVar4 + 0xC)) * DOUBLE_803330a8);
-	*reinterpret_cast<s16*>(iVar4 + 0xA) = static_cast<s16>((0x1C0 - *reinterpret_cast<s16*>(iVar4 + 0xE)) * DOUBLE_803330a8);
+	double scale = DOUBLE_803330a8;
+	*reinterpret_cast<s16*>(iVar4 + 8) = static_cast<s16>((0x280 - *reinterpret_cast<s16*>(iVar4 + 0xC)) * scale);
+	*reinterpret_cast<s16*>(iVar4 + 0xA) = static_cast<s16>((0x1C0 - *reinterpret_cast<s16*>(iVar4 + 0xE)) * scale);
 	fVar1 = FLOAT_803330bc;
 	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
 	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;

@@ -1350,7 +1350,6 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     unsigned char* paramBytes = reinterpret_cast<unsigned char*>(param);
     bool doWrite = true;
     bool wasResync = false;
-    int baseTick = *reinterpret_cast<int*>(paramBytes + 0x30);
 
     if (paramBytes[0xC4] != 0)
     {
@@ -1359,6 +1358,7 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam* param, void* context)
     paramBytes[0xC4] = 0;
     paramBytes[0xC6] = 0;
     paramBytes[0xBF] = 3;
+    int baseTick = *reinterpret_cast<int*>(paramBytes + 0x30);
     *reinterpret_cast<int*>(paramBytes + 0x30) = *reinterpret_cast<int*>(self + (static_cast<int>(*reinterpret_cast<s8*>(paramBytes + 0xBC)) * 0x60 + 0x16B4));
 
     if (paramBytes[0x28] == 0)

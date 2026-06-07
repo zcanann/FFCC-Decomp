@@ -1094,9 +1094,9 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         *s32_at(particleData, 0x3C) != 0 ||
         *s32_at(particleData, 0x40) != 0) {
         Vec rot;
-        rot.x = (kPppRyjMegaBirthPi * (float)-*s32_at(particleData, 0x38)) / kPppRyjMegaBirthAngleIndexScale;
-        rot.y = (kPppRyjMegaBirthPi * (float)-*s32_at(particleData, 0x3C)) / kPppRyjMegaBirthAngleIndexScale;
-        rot.z = (kPppRyjMegaBirthPi * (float)-*s32_at(particleData, 0x40)) / kPppRyjMegaBirthAngleIndexScale;
+        rot.x = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x38)) / kPppRyjMegaBirthAngleIndexScale;
+        rot.y = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x3C)) / kPppRyjMegaBirthAngleIndexScale;
+        rot.z = (kPppRyjMegaBirthPi * (float)*s32_at(particleData, 0x40)) / kPppRyjMegaBirthAngleIndexScale;
         pppFMATRIX r;
         pppUnitMatrix(r);
         pppRotMatrix(r, r, rot);
@@ -1170,7 +1170,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 
         pppFMATRIX rot;
 
-        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)-*s32_at(particleData, 0x40));
+        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)*s32_at(particleData, 0x40));
         pppMulMatrix(pObject->m_drawMatrix, rot, pObject->m_drawMatrix);
 
         pObject->m_drawMatrix.value[0][3] = endPos.x;

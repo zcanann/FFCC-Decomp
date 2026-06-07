@@ -3075,6 +3075,7 @@ unsigned long CMaterialSet::Find(char* name)
  */
 int CMaterial::Set(_GXTexMapID texMapId)
 {
+    register int curTexMap = texMapId;
     Mtx texMtx;
     PSMTXIdentity(texMtx);
 
@@ -3090,8 +3091,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
     for (int i = 0; i < static_cast<int>(m_textureCount); i++) {
         if ((m_textureData.m_textures[i] != 0) &&
             ((m_singleTextureFlag == 0) || (i <= 0))) {
-            TextureMan.SetTexture(texMapId, m_textureData.m_textures[i]);
-            texMapId = static_cast<_GXTexMapID>(static_cast<int>(texMapId) + 1);
+            TextureMan.SetTexture(static_cast<_GXTexMapID>(curTexMap), m_textureData.m_textures[i]);
+            curTexMap++;
 
             if ((GetTexScroll(i)->m_u0 != kTextureZero) ||
                 ((GetTexScroll(i)->m_v0 != kTextureZero) || hasDualScroll)) {
@@ -3130,7 +3131,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
         }
     }
 
-    return static_cast<int>(texMapId);
+    return curTexMap;
 }
 
 /*

@@ -291,17 +291,19 @@ int CMenuPcs::EquipCtrlCur()
 
 	if (mode == 0) {
 		if ((hold & 8) != 0) {
-			if (GetEquipMenuState(this)->selectedIndex == 0) {
-				GetEquipMenuState(this)->selectedIndex = 3;
+			if (GetEquipModeSelected(GetEquipMenuState(this), mode) == 0) {
+				GetEquipModeSelected(GetEquipMenuState(this), mode) = 3;
 			} else {
-				GetEquipMenuState(this)->selectedIndex = GetEquipMenuState(this)->selectedIndex - 1;
+				GetEquipModeSelected(GetEquipMenuState(this), mode) =
+				    GetEquipModeSelected(GetEquipMenuState(this), mode) - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((hold & 4) != 0) {
-			if (GetEquipMenuState(this)->selectedIndex < 3) {
-				GetEquipMenuState(this)->selectedIndex = GetEquipMenuState(this)->selectedIndex + 1;
+			if (GetEquipModeSelected(GetEquipMenuState(this), mode) < 3) {
+				GetEquipModeSelected(GetEquipMenuState(this), mode) =
+				    GetEquipModeSelected(GetEquipMenuState(this), mode) + 1;
 			} else {
-				GetEquipMenuState(this)->selectedIndex = 0;
+				GetEquipModeSelected(GetEquipMenuState(this), mode) = 0;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}

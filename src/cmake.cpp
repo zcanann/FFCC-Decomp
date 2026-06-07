@@ -160,6 +160,21 @@ static inline CmakeMenuState* CmakeVillageState(CMenuPcs* menu)
     return static_cast<CmakeMenuState*>(CmakeVillageWork(menu));
 }
 
+struct CFontRenderFlagBits
+{
+    signed char shadow : 1;
+    signed char zCompare : 1;
+    signed char zUpdate : 1;
+    signed char fixedWidth : 1;
+    signed char snapPosition : 1;
+    signed char pad : 3;
+};
+
+static inline CFontRenderFlagBits& GetRenderFlagBits(unsigned char& flags)
+{
+    return reinterpret_cast<CFontRenderFlagBits&>(flags);
+}
+
 static inline short& CmakeSlot(CMenuPcs* menu)
 {
     return menu->m_singleCmakeSlot;
@@ -1504,7 +1519,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetShadow(1);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(FLOAT_80333258);
 
     int a = static_cast<int>(FLOAT_80333240 * alpha);
@@ -1516,7 +1531,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     font->SetPosX(static_cast<float>(nameX));
     font->SetPosY(static_cast<float>(baseY - 4));
     font->Draw(text);
-    font->renderFlags &= 0xEF;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     DrawInit();
 
     if (y != 0) {
@@ -2106,7 +2121,7 @@ void CMenuPcs::CmakeNameDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(FLOAT_803332c4);
     GXColor textCol = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     font->SetColor(textCol);
@@ -2120,7 +2135,7 @@ void CMenuPcs::CmakeNameDraw()
         y += 0x20;
     }
 
-    reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
     DrawInit();
 
     if ((cmakeState->m_mode == 1) && (cmakeState->m_row < 5)) {
@@ -3683,7 +3698,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
-    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(FLOAT_803332c4);
     font->SetColor(col);
 
@@ -3695,7 +3710,7 @@ void CMenuPcs::CmakeVillageDraw()
         font->Draw(rowText);
     }
 
-    reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
+    GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
 
     DrawInit();
     if (mode == 1 && villageWork->m_row < 5) {

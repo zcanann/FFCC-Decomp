@@ -2627,7 +2627,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                 }
 
                 if ((material->m_materialType != 0) &&
-                    (material->m_textureCount > 1) &&
+                    (material->m_textureCount >= 2) &&
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
                     material->m_texShiftU = static_cast<char>(HighestSetBit(

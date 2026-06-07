@@ -15,6 +15,8 @@
 
 extern "C" char* strcat(char*, const char*);
 
+extern "C" const char s_pctspctd_pcts_801DEE20[];
+
 typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -750,12 +752,12 @@ int CMenuPcs::LetterCtrl()
 				if (letter->AttachmentIsGil()) {
 					s16 gil = static_cast<int>(letter->AttachmentValue()) * 100;
 					if (Game.m_gameWork.m_languageId == 2) {
-						sprintf(info, "%d%s%s",
+						sprintf(info, "%d %s%s",
 						        gil,
 						        GetMenuStr(4),
 						        GetMenuStr(0x22));
 					} else {
-						sprintf(info, "%s%d%s",
+						sprintf(info, s_pctspctd_pcts_801DEE20,
 						        GetMenuStr(0x22),
 						        gil,
 						        GetMenuStr(4));
@@ -770,12 +772,12 @@ int CMenuPcs::LetterCtrl()
 						        GetMenuStr(0x24),
 						        GetMenuStr(0x22));
 					} else {
-						sprintf(info, "%s%s", GetMenuStr(0x22), value);
+						sprintf(info, "%s%s?", GetMenuStr(0x22), value);
 					}
 				}
-				strcpy(left, "");
+				strcpy(left, "  ");
 				strcat(left, GetMenuStr(1));
-				strcpy(right, "");
+				strcpy(right, "  ");
 				strcat(right, GetMenuStr(2));
 				SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
 				GetSingWinSize(0, &winW, &winH, 1);

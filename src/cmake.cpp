@@ -2655,14 +2655,8 @@ void CMenuPcs::CmakeNameClose()
  */
 int CMenuPcs::CmakeNameCtrl()
 {
-    CmakeMenuState* cmakeState = CmakeState(this);
-    short& resultDir = cmakeState->m_resultDir;
-    short& select = cmakeState->m_select;
-    short& row = cmakeState->m_row;
-    short& table = cmakeState->m_table;
     unsigned short down;
     unsigned short repeat;
-    short& mcState = CmakeMcState(this);
 
     bool padBusy = false;
     if ((Pad.m_debugPadLock != 0) || (Pad.m_debugPadPort != -1)) {
@@ -2692,50 +2686,50 @@ int CMenuPcs::CmakeNameCtrl()
         return 0;
     }
 
-    if (mcState != 3) {
-        if (mcState == 1 && (down & 0x300) != 0) {
+    if (CmakeMcState(this) != 3) {
+        if (CmakeMcState(this) == 1 && (down & 0x300) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
-            mcState = 2;
+            CmakeMcState(this) = 2;
         }
     } else {
         if ((repeat & 0x8) != 0) {
-            if (row == 0) {
-                if (select < 10) {
-                    row = 4;
+            if (CmakeState(this)->m_row == 0) {
+                if (CmakeState(this)->m_select < 10) {
+                    CmakeState(this)->m_row = 4;
                 } else {
-                    row = 5;
+                    CmakeState(this)->m_row = 5;
                 }
             } else {
-                row = static_cast<short>(row - 1);
+                CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row - 1);
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            if (row < ((static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4)) {
-                row = static_cast<short>(row + 1);
+            if (CmakeState(this)->m_row < ((static_cast<int>(CmakeState(this)->m_select) >> 31) + (static_cast<unsigned int>(CmakeState(this)->m_select) > 9) + 4)) {
+                CmakeState(this)->m_row = static_cast<short>(CmakeState(this)->m_row + 1);
             } else {
-                row = 0;
+                CmakeState(this)->m_row = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0x1) == 0) {
             if ((repeat & 0x2) != 0) {
-                if (row < 5) {
-                    if (select < 0xB) {
-                        select = static_cast<short>(select + 1);
+                if (CmakeState(this)->m_row < 5) {
+                    if (CmakeState(this)->m_select < 0xB) {
+                        CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select + 1);
                     } else {
-                        select = 0;
+                        CmakeState(this)->m_select = 0;
                     }
                     Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 }
             }
-        } else if (row < 5) {
-            if (select > 0) {
-                select = static_cast<short>(select - 1);
+        } else if (CmakeState(this)->m_row < 5) {
+            if (CmakeState(this)->m_select > 0) {
+                CmakeState(this)->m_select = static_cast<short>(CmakeState(this)->m_select - 1);
             } else {
-                select = 0xB;
+                CmakeState(this)->m_select = 0xB;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
@@ -2744,24 +2738,24 @@ int CMenuPcs::CmakeNameCtrl()
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x40) != 0) {
-                table = static_cast<short>(table - 1);
-                if (table < 0) {
-                    table = 2;
+                CmakeState(this)->m_table = static_cast<short>(CmakeState(this)->m_table - 1);
+                if (CmakeState(this)->m_table < 0) {
+                    CmakeState(this)->m_table = 2;
                 }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x20) != 0) {
-                table = static_cast<short>(table + 1);
-                if (table > 2) {
-                    table = 0;
+                CmakeState(this)->m_table = static_cast<short>(CmakeState(this)->m_table + 1);
+                if (CmakeState(this)->m_table > 2) {
+                    CmakeState(this)->m_table = 0;
                 }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x1000) != 0) {
-                select = 0xB;
-                row = 5;
+                CmakeState(this)->m_select = 0xB;
+                CmakeState(this)->m_row = 5;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
                 return 0;
             } else if ((down & 0x100) != 0) {
-                short curRow = row;
+                short curRow = CmakeState(this)->m_row;
                 if (curRow >= 5) {
                     unsigned int emptyLen = strlen(s_CmakeInfo.m_name);
                     if ((emptyLen & (static_cast<int>(-emptyLen | emptyLen) >> 31)) == 0) {
@@ -2791,16 +2785,16 @@ int CMenuPcs::CmakeNameCtrl()
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
                         GetWinSize(0x14, &winX, &winY, 0);
                         SetMcWinInfo((int)winX, (int)winY);
-                        mcState = 0;
+                        CmakeMcState(this) = 0;
                         return 0;
                     }
 
-                    resultDir = 1;
+                    CmakeState(this)->m_resultDir = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                     return 1;
                 } else {
-                    short curTable = table;
-                    short curSelect = select;
+                    short curTable = CmakeState(this)->m_table;
+                    short curSelect = CmakeState(this)->m_select;
                     char picked[12];
                     memset(picked, 0, 3);
                     picked[0] = '\0';
@@ -2853,8 +2847,8 @@ int CMenuPcs::CmakeNameCtrl()
                     if (ret == 0) {
                         unsigned int finalLen = strlen(s_CmakeInfo.m_name);
                         if (static_cast<int>(finalLen & (static_cast<int>(-finalLen | finalLen) >> 31)) > 6) {
-                            select = 0xB;
-                            row = 5;
+                            CmakeState(this)->m_select = 0xB;
+                            CmakeState(this)->m_row = 5;
                         }
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                     } else {
@@ -2867,7 +2861,7 @@ int CMenuPcs::CmakeNameCtrl()
                 if ((bsLen0 & (static_cast<int>(-bsLen0 | bsLen0) >> 31)) == 0) {
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     ChgModel(static_cast<int>(CmakeSlot(this)), -1, -1, -1);
-                    resultDir = -1;
+                    CmakeState(this)->m_resultDir = -1;
                     return -1;
                 }
                 int bsRet;

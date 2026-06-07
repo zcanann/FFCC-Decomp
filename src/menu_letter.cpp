@@ -1744,12 +1744,12 @@ void CMenuPcs::LetterListDraw()
 
 		const char* from = Game.m_cFlatDataArr[1].TableStrings(5)[(letterWord & 0x7FC) >> 2];
 		font->SetPosX(FLOAT_80333160);
-		font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
+		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(from);
 
 		const char* subject = Game.m_cFlatDataArr[1].TableStrings(2)[(letterWord >> 7) & 0x1FF];
 		font->SetPosX(FLOAT_80333164);
-		font->SetPosY(static_cast<float>(static_cast<double>(static_cast<float>(y)) - static_cast<double>(FLOAT_80333148)));
+		font->SetPosY(static_cast<float>(y) - FLOAT_80333148);
 		font->Draw(subject);
 
 		y += 0x20;

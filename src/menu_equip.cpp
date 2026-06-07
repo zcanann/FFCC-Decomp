@@ -418,16 +418,17 @@ int CMenuPcs::EquipCtrlCur()
  */
 void CMenuPcs::EquipDraw()
 {
+	int helpItem = -1;
+
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
 	EquipMenuState* menuState = GetEquipMenuState(this);
 	int mode = static_cast<int>(menuState->mode);
 	int listState = static_cast<int>(menuState->listState);
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	EquipOpenAnimList* menuData = GetEquipListStorage(this);
 	EquipOpenAnim* item = menuData->entries;
-	int helpItem = -1;
-
-	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < menuData->count; i++) {
 		int tex = item->tex;

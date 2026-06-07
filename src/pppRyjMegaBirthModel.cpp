@@ -248,8 +248,9 @@ static inline void wrap_birth_angle(s32* value)
 {
     s32 v = *value;
     if ((0x7FFF < v) || (v < -0x8000)) {
-        s32 sign = v >> 0x1F;
-        *value = (s32)((u32)(sign * 0x8000 | (u32)(v * 0x20000 + sign) >> 0x11) - sign);
+        u32 sign = (u32)v >> 0x1F;
+        u32 y = (u32)(v << 0x11) - sign;
+        *value = (s32)(((y >> 0x11) | (y << 0xF)) + sign);
     }
 }
 

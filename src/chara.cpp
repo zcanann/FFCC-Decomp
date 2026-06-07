@@ -396,6 +396,11 @@ static inline MtxPtr NodeLocalRuntimeMtx(CChara::CNode* node)
 	return node->m_localRuntimeMtx;
 }
 
+static inline float* NodeRuntimeScale(CChara::CNode* node)
+{
+	return reinterpret_cast<float*>(reinterpret_cast<u8*>(node) + 0x8);
+}
+
 static inline Vec& NodeDynPosition(CChara::CNode* node)
 {
 	return node->m_dynPosition;
@@ -1465,7 +1470,32 @@ void CChara::CModel::calcNowFrame()
  */
 void CChara::CModel::calcMatrix()
 {
-	calcNowFrame();
+	float frame;
+	if (m_anim == 0) {
+		frame = FLOAT_803301b0;
+	} else {
+		float total = FLOAT_803301bc + (m_animEnd - m_animStart);
+		if ((AnimFlags(m_anim) & 0x40) == 0) {
+			if (m_time >= FLOAT_803301b0) {
+				frame = m_animStart + static_cast<float>(fmod(m_time, total));
+			} else {
+				frame = ((m_animStart + total) - FLOAT_803301bc) - static_cast<float>(fmod(-m_time, total));
+			}
+		} else if (m_time >= FLOAT_803301b0) {
+			float clamped = total - FLOAT_803301bc;
+			if (m_time < clamped) {
+				clamped = m_time;
+			}
+			frame = m_animStart + clamped;
+		} else {
+			float clamped = total - FLOAT_803301bc;
+			if (-m_time < clamped) {
+				clamped = -m_time;
+			}
+			frame = ((m_animStart + total) - FLOAT_803301bc) - clamped;
+		}
+	}
+	m_curFrame = frame;
 	if (m_anim != 0) {
 		m_anim->InitQuantize();
 	}
@@ -1481,7 +1511,133 @@ void CChara::CModel::calcMatrix()
 			parentNode = reinterpret_cast<CNode*>(reinterpret_cast<u8*>(nodes) + parentIndex * 0xC0);
 		}
 
-		CalcFrameMatrix(m_curFrame, node, NodeWorldMtx(node));
+		MtxPtr localMtx = NodeLocalRuntimeMtx(node);
+		CChara::CAnimNode* animNode0 = NodeAnimNode0(node);
+		CChara::CAnimNode* animNode1 = NodeAnimNode1(node);
+		SRTView srt;
+
+		if (animNode0 == 0 && animNode1 == 0) {
+			if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+				PSMTXCopy(NodeRefLocalMtx(node), localMtx);
+			}
+		} else {
+			CChara::CAnimNode* parentAnimNode0 = parentNode != 0 ? NodeAnimNode0(parentNode) : 0;
+			if (parentNode == 0 || parentAnimNode0 == 0 || !AnimNodeUsesScale(parentAnimNode0)) {
+				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+					float baseScale;
+					if (parentNode == 0 && (baseScale = ModelBaseScale(this)) != FLOAT_803301bc) {
+						PSMTXScale(localMtx, baseScale, baseScale, baseScale);
+					} else {
+						PSMTXIdentity(localMtx);
+					}
+				}
+			} else if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+				float* parentScale = NodeRuntimeScale(parentNode);
+				PSMTXScale(localMtx,
+				           FLOAT_803301bc / parentScale[0],
+				           FLOAT_803301bc / parentScale[1],
+				           FLOAT_803301bc / parentScale[2]);
+			}
+
+			if (NodeUsesParentLenX(node) != 0) {
+				localMtx[0][3] = NodeBoneLen(parentNode);
+			}
+
+			if (animNode1 != 0) {
+				Mtx animMtx;
+				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				if (AnimNodeUsesScale(animNode1)) {
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+				} else {
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+				}
+				PSMTXConcat(localMtx, animMtx, localMtx);
+				PSMTXScale(animMtx,
+				           FLOAT_803301bc / srt.m_scale.x,
+				           FLOAT_803301bc / srt.m_scale.y,
+				           FLOAT_803301bc / srt.m_scale.z);
+				PSMTXConcat(localMtx, animMtx, localMtx);
+			}
+
+			if (animNode0 == 0) {
+				float* runtimeScale = NodeRuntimeScale(node);
+				runtimeScale[2] = FLOAT_803301b0;
+				runtimeScale[1] = FLOAT_803301b0;
+				runtimeScale[0] = FLOAT_803301b0;
+			} else {
+				Mtx animMtx;
+				animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt), frame);
+				u16 nodeIndex = NodeRefIndex(node);
+				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
+				    nodeIndex == ModelChest3Index(this)) {
+					float tiltScale;
+					if (nodeIndex == ModelChest3Index(this)) {
+						srt.m_rotation.y = -(ModelChestAmp(this) * FLOAT_803301d0 - srt.m_rotation.y);
+						tiltScale = FLOAT_803301d0;
+					} else {
+						srt.m_rotation.x = ModelChestAmp(this) * FLOAT_803301f8 + srt.m_rotation.x;
+						tiltScale = FLOAT_803301f8;
+					}
+					srt.m_rotation.z = ModelChestTilt(this) * tiltScale + srt.m_rotation.z;
+				} else if (nodeIndex == ModelHeadIndex(this) && ModelTexAnimSet(this) != 0) {
+					srt.m_rotation.z += TexAnimSetChin(ModelTexAnimSet(this));
+				}
+				if (AnimNodeUsesScale(animNode0)) {
+					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt));
+				} else {
+					Math.SRTToMatrixRT(animMtx, reinterpret_cast<SRT*>(&srt));
+				}
+				if ((NodeRuntimeFlags(node) & 0x80) != 0) {
+					PSMTXConcat(localMtx, animMtx, localMtx);
+				}
+				float* runtimeScale = NodeRuntimeScale(node);
+				runtimeScale[0] = srt.m_scale.x;
+				runtimeScale[1] = srt.m_scale.y;
+				runtimeScale[2] = srt.m_scale.z;
+			}
+		}
+
+		u16 blendCur = ModelBlendCur(this);
+		if (blendCur != 0) {
+			u16 blendMax = ModelBlendMax(this);
+			float alpha = FLOAT_803301bc - (static_cast<float>(blendCur) * (FLOAT_803301bc / static_cast<float>(blendMax)));
+			Vec targetPos = {localMtx[0][3], localMtx[1][3], localMtx[2][3]};
+			Vec targetScale;
+			Quaternion targetQuat;
+			Vec positionScaleA;
+			Vec positionScaleB;
+			Vec blendedPos;
+			Mtx quatMtx;
+			Mtx scaleMtx;
+
+			Math.MTXGetScale(localMtx, &targetScale);
+			if (FLOAT_803301e4 <= targetScale.x) {
+				PSVECScale(&NodePreviousScale(node), &positionScaleA, FLOAT_803301bc - alpha);
+				PSVECScale(&targetScale, &positionScaleB, alpha);
+				PSVECAdd(&positionScaleA, &positionScaleB, &targetScale);
+			} else {
+				targetScale.y = FLOAT_803301e8;
+				targetScale.z = FLOAT_803301e8;
+			}
+			PSVECScale(&NodePreviousPosition(node), &positionScaleA, FLOAT_803301bc - alpha);
+			PSVECScale(&targetPos, &positionScaleB, alpha);
+			PSVECAdd(&positionScaleA, &positionScaleB, &blendedPos);
+			C_QUATMtx(&targetQuat, localMtx);
+			C_QUATSlerp(&NodePreviousQuat(node), &targetQuat, &targetQuat, alpha);
+			PSMTXScale(scaleMtx, targetScale.x, targetScale.y, targetScale.z);
+			PSMTXQuat(quatMtx, &targetQuat);
+			PSMTXConcat(quatMtx, scaleMtx, localMtx);
+			localMtx[0][3] = blendedPos.x;
+			localMtx[1][3] = blendedPos.y;
+			localMtx[2][3] = blendedPos.z;
+		}
+
+		if (parentNode == 0) {
+			PSMTXConcat(ModelWorldBaseMtx(this), localMtx, NodeWorldMtx(node));
+		} else {
+			PSMTXConcat(NodeWorldMtx(parentNode), localMtx, NodeWorldMtx(node));
+		}
+
 		if (NodeDynParamIndex(node) != 0xFF) {
 			dynamics(node, parentNode);
 		}

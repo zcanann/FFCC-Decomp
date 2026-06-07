@@ -576,8 +576,6 @@ int CFlatRuntime::Frame(int mode, int unused)
 	int hasParticle = 0;
 
 	while (object != root) {
-		CObject* const next = object->m_next;
-
 		if ((object->m_flagBits.m_deleteFlag == 0) && (mode != 0)) {
 			object->m_flagBits.m_activeFlag = 0;
 			if (objectFrame(object) != 0) {
@@ -653,6 +651,8 @@ int CFlatRuntime::Frame(int mode, int unused)
 				}
 			}
 		}
+
+		CObject* const next = object->m_next;
 
 		if ((static_cast<int>(object->m_flags) << 24) < 0) {
 			object->m_previous->m_next = object->m_next;

@@ -966,12 +966,7 @@ void CMenuPcs::CmdDraw()
 				alpha = FLOAT_80332a70;
 			}
 
-			GXColor textColor;
-			textColor.r = 0xFF;
-			textColor.g = 0xFF;
-			textColor.b = 0xFF;
-			textColor.a = static_cast<u8>(FLOAT_80332acc * alpha);
-			nameFont->SetColor(textColor);
+			nameFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332acc * alpha)).color);
 
 			const char* text;
 			if (i < 2) {

@@ -2831,7 +2831,7 @@ void CGMonObj::moveFrame()
 		}
 
 		moveFrame++;
-		if (((moveFlags & 0x10) == 0) || (moveFrame < (int)moveLimitFrame)) {
+		if (((moveFlags & 0x10) == 0) || ((int)moveLimitFrame > moveFrame)) {
 			return;
 		}
 	}

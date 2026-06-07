@@ -47,9 +47,9 @@ struct PRyjMegaBirthModel
     float m_directionVelocityRandom; // 0x110
     float m_acceleration;          // 0x114
     float m_accelerationStep;      // 0x118
-    u8 _pad11C[0x04];
+    float m_speed;                // 0x11C
     Vec m_directionScale;         // 0x120
-    float m_speed;                // 0x12C
+    u8 _pad12C[0x04];
     u8 m_speedMode;               // 0x130
     u8 m_enableParticleColor;     // 0x131
     u8 m_rotationRandomFlags;     // 0x132

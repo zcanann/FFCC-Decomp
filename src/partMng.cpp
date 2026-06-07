@@ -1234,40 +1234,36 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	char* textureNames[0x101];
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
-	CMemory::CStage* stageLoad = PartPcs.m_usbStreamState.m_stageLoad;
 
 	while (chunkFile.GetNextChunk(chunk))
 	{
 		chunkFile.PushChunk();
-		if (chunk.m_id == 0x46534850) // 'FSHP'
+		if ((int)chunk.m_id == 0x46534850) // 'FSHP'
 		{
 			while (chunkFile.GetNextChunk(chunk))
 			{
-				if (chunk.m_id == 0x444C5354) // 'DLST'
+				switch (chunk.m_id)
 				{
-					shapeSt->m_displayListData =
-						operator new[](
-						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B3);
-					chunkFile.Get(shapeSt->m_displayListData, chunk.m_arg0);
-					DCFlushRange(shapeSt->m_displayListData, (chunk.m_arg0 + 0x1F) & 0xFFFFFFE0);
-				}
-				else if ((int)chunk.m_id < 0x444C5354)
-				{
-					if (chunk.m_id == 0x414E494D) // 'ANIM'
-					{
-						shapeSt->m_animData =
-							operator new[](
-							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B9);
-						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
-						pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
-					}
-				}
-				else if (chunk.m_id == 0x54584E4D) // 'TXNM'
-				{
+				case 0x54584E4D: // 'TXNM'
 					chunkFile.PushChunk();
 					*textureNameIt = chunkFile.GetString();
 					chunkFile.PopChunk();
 					textureNameIt++;
+					break;
+				case 0x444C5354: // 'DLST'
+					shapeSt->m_displayListData =
+						operator new[](
+						    chunk.m_size, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B3);
+					chunkFile.Get(shapeSt->m_displayListData, chunk.m_size);
+					DCFlushRange(shapeSt->m_displayListData, (chunk.m_size + 0x1F) & 0xFFFFFFE0);
+					break;
+				case 0x414E494D: // 'ANIM'
+					shapeSt->m_animData =
+						operator new[](
+						    chunk.m_size, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B9);
+					chunkFile.Get(shapeSt->m_animData, chunk.m_size);
+					pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
+					break;
 				}
 			}
 		}

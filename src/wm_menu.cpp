@@ -4193,10 +4193,14 @@ void CMenuPcs::DrawMCardMenu()
 		         FLOAT_803313e8, FLOAT_803313e8, 0);
 
 		// 3D character viewports (4 slots)
-		for (int i = 0; i < 4; i++) {
-			int viewOff = reinterpret_cast<int>(m_wm.m_worldObjData) + (i * 0x50 + 0x550);
-			int* piVar12 = reinterpret_cast<int*>(viewOff);
+		int i = 0;
+		int* piVar12 = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + 0x550);
+		int effectOff = 0;
+		unsigned int* handlePtr = &mcCtrl.m_serialHi;
+		int viewByteOff = 0x550;
+		do {
 			if (*piVar12 != 0) {
+				int* slot = reinterpret_cast<int*>(reinterpret_cast<int>(m_wm.m_worldObjData) + viewByteOff);
 				Mtx44 projMtx;
 				C_MTXPerspective(projMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 				GXSetProjection(projMtx, GX_PERSPECTIVE);
@@ -4204,7 +4208,7 @@ void CMenuPcs::DrawMCardMenu()
 				CVector target(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
 				CVector up(FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313dc);
 				Mtx lookAtMtx;
-				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
+				C_MTXLookAt(lookAtMtx, (Vec*)(slot + 4), reinterpret_cast<Vec*>(&up), reinterpret_cast<Point3d*>(&target));
 				PSMTXCopy(CameraPcs.m_cameraMatrix, m_wm.m_cameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 				CharaPcs.InitEnv(5);
@@ -4215,12 +4219,12 @@ void CMenuPcs::DrawMCardMenu()
 				GXSetColorUpdate(1);
 				GXSetAlphaUpdate(1);
 				GXSetViewport(
-					(float)*reinterpret_cast<short*>(piVar12 + 2),
-					(float)*reinterpret_cast<short*>((int)(piVar12 + 2) + 2),
-					(float)*reinterpret_cast<short*>(piVar12 + 3),
-					(float)*reinterpret_cast<short*>((int)(piVar12 + 3) + 2),
+					(float)*reinterpret_cast<short*>(slot + 2),
+					(float)*reinterpret_cast<short*>((int)(slot + 2) + 2),
+					(float)*reinterpret_cast<short*>(slot + 3),
+					(float)*reinterpret_cast<short*>((int)(slot + 3) + 2),
 					FLOAT_803313dc, FLOAT_803313e8);
-				GXSetScissor(piVar12[0x10], piVar12[0x11], piVar12[0x12], piVar12[0x13]);
+				GXSetScissor(slot[0x10], slot[0x11], slot[0x12], slot[0x13]);
 				Graphic.SetFog(1, 0);
 				WmMenuLightTable& lightTable = gWmMenuLightTables[0];
 				LightPcs.SetAmbient(lightTable.m_ambient);
@@ -4231,8 +4235,20 @@ void CMenuPcs::DrawMCardMenu()
 						&lightTable.m_diffuseDirs[j], 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
+				reinterpret_cast<CCharaPcs::CHandle*>(handlePtr[0x1dd])->Draw(5);
+				if (0 <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (effectOff + 0x5768))) {
+					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (effectOff + 0x5768)));
+				}
+				if (0 <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (effectOff + 0x6bf8))) {
+					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_effectWork) + (effectOff + 0x6bf8)));
+				}
 			}
-		}
+			i++;
+			viewByteOff += 0x50;
+			handlePtr++;
+			piVar12 += 0x14;
+			effectOff += 0x524;
+		} while (i < 4);
 		DrawInit();
 		PSMTXCopy(m_wm.m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);

@@ -1327,13 +1327,15 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	}
 
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
-	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
 	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
 	if (static_cast<int>(staType) != 0x67 && static_cast<int>(staType) != 0x65 && static_cast<int>(staType) != 0x66 && (CFlatGameFlags() & CFlatGameFlag_Bit5) != 0) {
 		System.Printf(dbg + 0x17C);
 		return;
 	}
 
+	unsigned int particleLife = particleLife;
+	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
+	short scriptDefense = scriptDefense;
 	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
 
 	if (resistType == 3) {
@@ -1484,7 +1486,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					damageAmount = 1;
 				}
 				damageAmount += bonus;
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
+				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
 
@@ -1524,7 +1526,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (damageAmount < 1) {
 					damageAmount = 1;
 				}
-				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
+				if (scriptDefense != 0) {
 					damageAmount = static_cast<int>(damageAmount * CharaObjGetStatusMultiplier(0x42));
 				}
 			} else if (staType == 10) {
@@ -1557,7 +1559,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46) != 0) {
 			setSta(4, 0);
 		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0 && staType != 2 && staType != 0) {
+		if (scriptDefense != 0 && staType != 2 && staType != 0) {
 			setSta(0, 0);
 		}
 
@@ -1595,7 +1597,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		sourceObj->onAttacked(this);
 	}
 
-	if (itemEffect != 0x1F8 && *reinterpret_cast<unsigned short*>(itemData + 0x0E) == 2 &&
+	if (itemEffect != 0x1F8 && particleLife == 2 &&
 	    (allowEffect != 0 || damageAmount != 0) &&
 	    staType != 0x66 && staType != 0x67 && staType != 0x65) {
 		bonus(0x14, resolvedItemId, sourceObj);

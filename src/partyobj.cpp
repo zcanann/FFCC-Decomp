@@ -4654,20 +4654,20 @@ void CGPartyObj::gpmCol()
 		cyl[13] = FLOAT_80331aa0;
 
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(cyl),
-		        reinterpret_cast<Vec*>(&cyl[3]), flags) == 0) {
+		        reinterpret_cast<Vec*>(&cyl[3]), flags) != 0) {
+			int capped = i + 1;
+			if (activeTrailCount < capped) {
+				capped = activeTrailCount;
+			}
+			i++;
+			activeTrailCount = capped;
+			newIndex = trailIndex;
+		} else {
 			activeTrailCount = i + 1;
 			*reinterpret_cast<Vec*>(ghostWork + 0x50 + i * 0xC) = leader->m_worldPosition;
 			newIndex = (static_cast<int>(i) > trailIndex) ? trailIndex : static_cast<int>(i);
 			break;
 		}
-
-		int capped = i + 1;
-		if (activeTrailCount < capped) {
-			capped = activeTrailCount;
-		}
-		i++;
-		activeTrailCount = capped;
-		newIndex = trailIndex;
 	} while (i < 5);
 
 	trailIndex = newIndex;

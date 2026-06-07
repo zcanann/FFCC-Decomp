@@ -11846,15 +11846,16 @@ int McCtrl::LoadDat()
 	case 5: {
 		unsigned int serialLo = 0;
 		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) == 0) {
+			m_serialHi = serialHi;
+			m_serialLo = serialLo;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 6;
@@ -11876,13 +11877,13 @@ int McCtrl::LoadDat()
 				MemoryCardMan.DecodeData();
 				MemoryCardMan.McClose();
 				MemoryCardMan.McUnmount(m_cardChannel);
-				if (m_userBuffer == 0) {
+				if (m_userBuffer != 0) {
+					memcpy(m_userBuffer, MemoryCardMan.m_saveBuffer, 0x8BD0);
+					MemoryCardMan.CalcSaveDatHpMax(reinterpret_cast<Mc::SaveDat*>(m_userBuffer));
+				} else {
 					Game.LoadInit();
 					MemoryCardMan.SetLoadData();
 					Game.LoadFinished();
-				} else {
-					memcpy(m_userBuffer, MemoryCardMan.m_saveBuffer, 0x8BD0);
-					MemoryCardMan.CalcSaveDatHpMax(reinterpret_cast<Mc::SaveDat*>(m_userBuffer));
 				}
 				MemoryCardMan.DestroyMcBuff();
 				m_state = 7;

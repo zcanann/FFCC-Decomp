@@ -207,7 +207,8 @@ static inline unsigned char& MenuU8(CMenuPcs* menu, int offset)
 
 static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
 {
-    return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x7F4)[slot];
+    int index = slot + 0x20;
+    return menu->m_wm.m_handles[index];
 }
 
 static inline void ReleaseRefObject(void* object)
@@ -3902,10 +3903,10 @@ void CMenuPcs::CalcSingleCMakeChara()
 {
     int slot = static_cast<int>(CmakeSlot(this));
     CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-    CChara::CModel* model = handle->m_model;
     unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
 
-    if (model == nullptr || *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0xB0) == 0) {
+    if (handle->m_model == nullptr ||
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xB0) == 0) {
         *reinterpret_cast<int*>(modelWork + 0x00) = 0;
         return;
     }
@@ -3944,9 +3945,9 @@ void CMenuPcs::CalcSingleCMakeChara()
         rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
         rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
         PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
-        model->SetMatrix(scaleMtx);
-        model->CalcMatrix();
-        model->CalcSkin();
+        handle->m_model->SetMatrix(scaleMtx);
+        handle->m_model->CalcMatrix();
+        handle->m_model->CalcSkin();
         PCAnimCtrl();
     }
 }

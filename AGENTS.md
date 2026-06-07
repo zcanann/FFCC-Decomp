@@ -2,6 +2,8 @@
 
 This is the concise runbook for automated contributions to **FFCC-Decomp**.
 
+> **Parallel campaign:** when work is multiplexed across multiple Claude operators, see [`WORK_SPLIT.md`](WORK_SPLIT.md) for the 4-employee bucket assignments (units < 95% match divided by domain), coordination rules, and the proven toolbox (`tools/permute_fn.py`, switch-case-order extraction, MWCC idioms). Each employee owns one bucket and spawns one agent per unit.
+
 Goal: maximize real progress by improving C/C++ source, linkage, headers, types, data layout, and adjacent code where needed, then rebuilding, diffing, and submitting clean PRs only when the result is both better and plausible.
 
 ## Source Of Truth

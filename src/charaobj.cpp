@@ -1828,12 +1828,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
  */
 void CGCharaObj::setSta(int staIndex, int value)
 {
-	bool isIceJ = false;
-	bool isMon = false;
+	int isIceJ = 0;
+	int isMon = 0;
 	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
-		isMon = true;
+		isMon = 1;
 		if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFC) == 0xB) {
-			isIceJ = true;
+			isIceJ = 1;
 		}
 	}
 

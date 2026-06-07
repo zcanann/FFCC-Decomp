@@ -3930,13 +3930,11 @@ void CGPartyObj::setIdleMotion()
  */
 void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	PartyObjOverlay& party = PartyData(this);
 
 	if (party.flags.flag04) {
-		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
-			addHp(*reinterpret_cast<unsigned short*>(work + 0x1A), static_cast<CGPrgObj*>(0));
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
 		}
 		party.flags.flag04 = 0;
 	}
@@ -3945,7 +3943,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 
 	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 	if (party.carryObject == 0) {
-		if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			if (mapId == 1) {
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x24, 1);
@@ -3981,14 +3979,15 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 		}
 	}
 
-	if (*reinterpret_cast<short*>(work + 0x1C) == 0) {
-		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		m_alpha = FLOAT_80331A7C;
 		m_bgColMask &= 0xFFFEFFF1;
+		void* port = m_scriptHandle[0xED];
 
 		if (restoreDamageCol == 0 || keepTarget != 0) {
 			endPSlotBit(0x10000);
-			putParticle((reinterpret_cast<int>(m_scriptHandle[0xED]) + 3) | 0x100,
-			            *reinterpret_cast<int*>(self + 0x5A4), this, FLOAT_80331a54, 0);
+			putParticle((reinterpret_cast<int>(port) + 3) | 0x100,
+			            m_particleSlots[16], this, FLOAT_80331a54, 0);
 		}
 
 		if (restoreDamageCol == 0) {
@@ -3996,10 +3995,10 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 		}
 	} else {
 		endPSlotBit(0x10000);
-		*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331a54;
+		m_alpha = FLOAT_80331a54;
 		m_bgColMask |= 0x1000E;
 		if (restoreDamageCol == 0) {
-			*reinterpret_cast<unsigned short*>(work + 0x12) = 0x5A;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x12) = 0x5A;
 		}
 	}
 }

@@ -90,19 +90,19 @@ int gPppCalcDisabled = 0;
 CPartMng PartMng;
 static PPPCREATEPARAM g_dcp;
 static const char s_partMng_cpp[] = "partMng.cpp";
-static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
+static const char sPppCreateLogFmt[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
-static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
+static const char sPppFreeDataMngAllocError[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
 static const char s_ReadPdtLogFormat[] = "ReadPdt fn=%s\n";
 static const char s_CanNotReadFormat[] = "CAN NOT READ %s !!!!!!\n";
 static const char s_ReadPanLogFormat[] = "ReadPan fn=%s\n";
 static const char s_ReadPmdLogFormat[] = "ReadPmd fn=%s\n";
 static const char s_ReadPtxLogFormat[] = "ReadPtx fn=%s\n";
-static const char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code=0x%x!!!\n";
-static const char s__________________________________801d8358[] = "----------------------------------\n";
-static const char s_prioTime__d_prio__d_heapSize__d_p_801d8454[] =
+static const char sPartMngChecksumErrorFmt[] = "CheckSum ERROR code=0x%x!!!\n";
+static const char sPartMngDumpSeparator[] = "----------------------------------\n";
+static const char sPartMngDumpEntryFmt[] =
     "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
-static const char s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0[] =
+static const char sPartMngHeapSummaryFmt[] =
     "HEAP TOTAL=%dKbyte  USE=%dKbyte  FREE=%dKbyte\n";
 
 enum PppChunkId {
@@ -448,7 +448,7 @@ void CPartMng::pppDumpMngSt()
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (System.m_execParam != 0) {
-        System.Printf(const_cast<char*>(s__________________________________801d8358));
+        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
@@ -459,7 +459,7 @@ void CPartMng::pppDumpMngSt()
             int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
             System.Printf(
-                const_cast<char*>(s_prioTime__d_prio__d_heapSize__d_p_801d8454), mng->m_prioTime,
+                const_cast<char*>(sPartMngDumpEntryFmt), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
                 pdtSlots[kind].m_name);
         }
@@ -471,10 +471,10 @@ void CPartMng::pppDumpMngSt()
 
     if (System.m_execParam != 0) {
         System.Printf(
-            const_cast<char*>(s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0),
+            const_cast<char*>(sPartMngHeapSummaryFmt),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        System.Printf(const_cast<char*>(s__________________________________801d8358));
+        System.Printf(const_cast<char*>(sPartMngDumpSeparator));
     }
 }
 
@@ -1451,7 +1451,7 @@ void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
     }
 
     if (checkSum != *reinterpret_cast<int*>(packet)) {
-        Graphic.Printf(const_cast<char*>(s_CheckSum_ERROR_code_0x_x____801d82f0), code);
+        Graphic.Printf(const_cast<char*>(sPartMngChecksumErrorFmt), code);
         Graphic.DrawDebugString();
     }
 }
@@ -3979,7 +3979,7 @@ int CPartMng::pppGetFreeDataMng()
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC));
+            System.Printf(const_cast<char*>(sPppFreeDataMngAllocError));
         }
         OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, "");
         return -1;
@@ -4122,7 +4122,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
 
     PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
     if (System.m_execParam != 0) {
-        System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
+        System.Printf(const_cast<char*>(sPppCreateLogFmt), pdtSlotIndex, fpNo, freeIdx,
                       slot->m_name);
     }
 

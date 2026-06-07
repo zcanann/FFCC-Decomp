@@ -3656,10 +3656,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0xBF:
-        if (object->m_localBase[2] == 0) {
-            MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
-        } else {
+        if (object->m_localBase[2] != 0) {
             MapMng.ShowMapObjChildID(*object->m_localBase, object->m_localBase[1]);
+        } else {
+            MapMng.ShowMapObjID(*object->m_localBase, object->m_localBase[1]);
         }
         this->push(object, 0);
         outResult = 0;

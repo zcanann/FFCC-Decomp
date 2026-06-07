@@ -1755,7 +1755,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 		}
 	}
 
-	short current = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
+	unsigned short current = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 	value &= ~(value >> 31);
 
 	if (current == 0 && value != 0) {

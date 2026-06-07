@@ -788,7 +788,11 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 		return;
 	}
 
-	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0 * alpha)};
+	_GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = (unsigned char)(255.0 * alpha);
 	const float corner = 8.0f;
 	const float texScale = 1.0f;
 	const float right = (x + w) - corner;
@@ -2327,10 +2331,10 @@ void CMenuPcs::DrawResultCountAnim()
 void CMenuPcs::CalcResultCountAnim()
 {
 	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
+	BonusAnimList* list = (BonusAnimList*)this->m_bonusAnimPtr;
 
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	BonusAnimHeader* header = &list->header;
+	BonusAnimSprite* sprites = list->sprites;
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
@@ -2474,7 +2478,7 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
-			*(short*)(animPtr + 6) = 1;
+			header->finished = 1;
 		}
 	}
 }

@@ -4029,10 +4029,10 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
     }
     case -0xED: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        CVector hitPosition(
-            localFloats[0],
-            localFloats[1],
-            localFloats[2]);
+        CVector hitPosition;
+        hitPosition.x = localFloats[0];
+        hitPosition.y = localFloats[1];
+        hitPosition.z = localFloats[2];
         if (MapPcs.CheckHitCylinderNear(hitPosition, CVector(kCFlatPadStickZero, 1.0f, kCFlatPadStickZero), kCFlatPadStickZero, object->m_localBase[3]) == 0) {
             this->push(object, 0);
         } else {

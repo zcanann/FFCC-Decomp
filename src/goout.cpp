@@ -659,23 +659,23 @@ void DrawGoOutMenu()
     g_pGoOutMenu = &goOutMenu;
     signed char mode = goOutMenu.m_mainMode;
 
-    if (mode != 3) {
-        if (mode < 3 && mode > 1) {
-            if (goOutMenu.m_saveLoadMenuOpen != 0) {
-                MenuPcs.DrawInit();
-                MenuPcs.DrawCMakeMenu();
-            }
-            if (goOutMenu.m_goOutMode > 0xD && goOutMenu.m_goOutMode < 0xF) {
-                MenuPcs.DrawLoadMenu();
-            }
-            if (goOutMenu.m_goOutMode == 1 &&
-                MenuGoOutState().m_resultSelect != 0) {
-                MenuGoOutState().m_closeMode = 8;
-                goOutMenu.SetMainMode(1);
-                MenuGoOutState().m_resultSelect = 0;
-            }
+    switch (mode) {
+    case 2:
+        if (goOutMenu.m_saveLoadMenuOpen) {
+            MenuPcs.DrawInit();
+            MenuPcs.DrawCMakeMenu();
         }
-    } else {
+        if (goOutMenu.m_goOutMode > 0xD && goOutMenu.m_goOutMode < 0xF) {
+            MenuPcs.DrawLoadMenu();
+        }
+        if (goOutMenu.m_goOutMode == 1 &&
+            MenuGoOutState().m_resultSelect != 0) {
+            MenuGoOutState().m_closeMode = 8;
+            goOutMenu.SetMainMode(1);
+            MenuGoOutState().m_resultSelect = 0;
+        }
+        break;
+    case 3:
         MenuPcs.DrawInit();
         MenuPcs.DrawCMakeMenu();
         if (goOutMenu.m_deleteMode == 1 &&
@@ -684,6 +684,7 @@ void DrawGoOutMenu()
             goOutMenu.SetMainMode(1);
             MenuGoOutState().m_resultSelect = 0;
         }
+        break;
     }
 
     if (goOutMenu.m_currentMessage != -1) {
@@ -817,7 +818,7 @@ int CGoOutMenu::SetMemCardError()
             return 1;
         }
 
-        if ((m_memCardResult == -999 || m_memCardResult == -1000) && m_memCardProc == 1) {
+        if ((m_memCardResult == -999 || m_memCardResult == -1000) && m_lastMemCardProc == 1) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;
@@ -830,7 +831,7 @@ int CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 2),
                        GetGoOutMessageLine(languageId, 3),
                        GetGoOutMessageLine(languageId, 4));
-        } else if (m_memCardProc == 3) {
+        } else if (m_lastMemCardProc == 3) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;
@@ -844,7 +845,7 @@ int CGoOutMenu::SetMemCardError()
             m_pendingMessage = 0xd;
             m_messageCloseMode = 0;
             m_pendingMessageTimer = 0;
-        } else if (m_memCardProc == 2) {
+        } else if (m_lastMemCardProc == 2) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;
@@ -888,7 +889,7 @@ int CGoOutMenu::SetMemCardError()
         m_messageCloseMode = 0;
         m_pendingMessageTimer = 0;
     } else if (m_memCardResult == -4) {
-        if (m_memCardProc != 1) {
+        if (m_lastMemCardProc != 1) {
             MenuPcs.m_menuWindowInfo->state = 3;
             MenuGoOutState().m_animFrame = 0;
             m_currentMessage = -1;

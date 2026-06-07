@@ -198,13 +198,10 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 	unsigned char caseMode = 0;
 	int branchMode = 0;
 
-	while (true)
+	const unsigned char* next;
+	while (in[0] != 0)
 	{
 		unsigned char c = in[0];
-		if (c == 0)
-		{
-			return;
-		}
 
 		if (c != 0xFF)
 		{
@@ -218,7 +215,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		}
 
 		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
-		const unsigned char* next = in + 2;
+		next = in + 2;
 
 		switch (tag)
 		{
@@ -245,8 +242,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 8:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			const char* text = FlatNameDirect(5, CMes::m_tempVar[varIndex]);
-			strcpy(dst, text);
+			strcpy(dst, FlatNameDirect(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;

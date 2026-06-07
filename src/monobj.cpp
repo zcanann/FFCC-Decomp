@@ -297,7 +297,7 @@ void CGMonObj::undeadOn()
 	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
 	void* classId = object->m_scriptHandle[4];
 	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
 		weaponMode = 1;
 	}
 
@@ -313,7 +313,7 @@ void CGMonObj::undeadOn()
 		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
 		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
@@ -2868,8 +2868,8 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			(aiState + *reinterpret_cast<unsigned short*>(baseScript + 0x100)) * 0x1D0 + 0x10;
 	}
 
-	short selectorType = *reinterpret_cast<short*>(aiScript + 0x108);
-	if (selectorType == -1) {
+	unsigned short selectorType = *reinterpret_cast<unsigned short*>(aiScript + 0x108);
+	if (selectorType == 0xFFFF) {
 		return -1;
 	}
 

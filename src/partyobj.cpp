@@ -3935,25 +3935,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			continue;
 		}
 
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(party->m_scriptHandle);
-		if (useRandom == 0) {
-			int bonus = bonus2;
-			if (slot != 2) {
-				if (slot < 2) {
-					bonus = bonus0;
-					if (slot != 0) {
-						bonus = bonus1;
-					}
-				} else {
-					bonus = bonus3;
-				}
-			}
-
-			caravanWork->SetBonusCondition(bonus);
-			if ((unsigned int)System.m_execParam > 2) {
-				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
-			}
-		} else {
+		if (useRandom != 0) {
 			int bonusIndex;
 			for (;;) {
 				bonusIndex = Math.Rand(bonusCount);
@@ -3974,14 +3956,36 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			chosenBonus[chosenCount] = bonusIndex;
 			chosenCount++;
 
-			int bonus = bossArtifacts->m_bonusConditions[bonusIndex];
-			caravanWork->SetBonusCondition(bonus);
+			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)
+			    ->SetBonusCondition(bossArtifacts->m_bonusConditions[bonusIndex]);
 			if ((unsigned int)System.m_execParam > 2) {
-				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex, bonus);
+				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex,
+				    bossArtifacts->m_bonusConditions[bonusIndex]);
+			}
+		} else {
+			int bonus;
+			switch (slot) {
+			case 0:
+				bonus = bonus0;
+				break;
+			case 1:
+				bonus = bonus1;
+				break;
+			case 2:
+				bonus = bonus2;
+				break;
+			default:
+				bonus = bonus3;
+				break;
+			}
+
+			reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->SetBonusCondition(bonus);
+			if ((unsigned int)System.m_execParam > 2) {
+				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
 			}
 		}
 
-		caravanWork->CalcStatus();
+		reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->CalcStatus();
 	}
 }
 

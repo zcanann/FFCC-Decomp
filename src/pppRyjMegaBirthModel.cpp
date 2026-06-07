@@ -226,21 +226,18 @@ static inline float calc_direction_speed(float speedMag, u8 speedMode)
 
 static inline void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
 {
-    pppFMATRIX model;
     Vec rowX;
     Vec rowY;
     Vec rowZ;
     Vec rowPos;
 
-    PSMTXCopy(particleData->m_matrix, model.value);
-    pppGetRowVector(model, rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
     pppNormalize(rowY, rowY);
     pppOuterProduct(rowZ, rowY, rowX);
     pppNormalize(rowZ, rowZ);
     pppOuterProduct(rowX, rowZ, rowY);
     pppNormalize(rowX, rowX);
-    pppSetRowVector(model, rowX, rowY, rowZ, rowPos);
-    PSMTXCopy(model.value, particleData->m_matrix);
+    pppSetRowVector(*(pppFMATRIX*)&particleData->m_matrix, rowX, rowY, rowZ, rowPos);
 }
 
 static inline void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
@@ -518,6 +515,46 @@ void birth(
         particleData->m_matrix[1][1] = forward.y;
         particleData->m_matrix[2][1] = forward.z;
         orthonormalize_particle_matrix(particleData);
+
+        pppFMATRIX basis;
+        Vec direction;
+        Vec right;
+        Vec up;
+        Vec worldUp;
+        Vec translation;
+
+        pppUnitMatrix(basis);
+        direction.x = particleData->m_matrix[0][1];
+        direction.y = particleData->m_matrix[1][1];
+        direction.z = particleData->m_matrix[2][1];
+        translation.x = particleData->m_matrix[0][3];
+        translation.y = particleData->m_matrix[1][3];
+        translation.z = particleData->m_matrix[2][3];
+        pppNormalize(direction, direction);
+        pppCopyVector(direction, direction);
+
+        worldUp.x = kPppRyjMegaBirthSharedZero;
+        worldUp.y = kPppRyjMegaBirthSharedZero;
+        worldUp.z = FLOAT_803304c8;
+        pppOuterProduct(right, direction, worldUp);
+        pppNormalize(right, right);
+        pppOuterProduct(up, right, direction);
+        pppNormalize(up, up);
+
+        pppUnitMatrix(basis);
+        basis.value[0][0] = right.x;
+        basis.value[1][0] = right.y;
+        basis.value[2][0] = right.z;
+        basis.value[0][1] = direction.x;
+        basis.value[1][1] = direction.y;
+        basis.value[2][1] = direction.z;
+        basis.value[0][2] = up.x;
+        basis.value[1][2] = up.y;
+        basis.value[2][2] = up.z;
+        basis.value[0][3] = translation.x;
+        basis.value[1][3] = translation.y;
+        basis.value[2][3] = translation.z;
+        pppCopyMatrix(*(pppFMATRIX*)&particleData->m_matrix, basis);
     }
 
     mode = params->m_spawnMode;

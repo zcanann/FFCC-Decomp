@@ -1319,7 +1319,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     font->SetTlut(7);
 
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    font->SetColor(rgba);
+    font->SetColor(rgba.color);
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
@@ -1380,7 +1380,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
     }
 
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    labelFont->SetColor(rgba);
+    labelFont->SetColor(rgba.color);
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
@@ -1400,7 +1400,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
     valueFont->SetShadow(1);
     valueFont->SetScale(FLOAT_80333258);
     valueFont->DrawInit();
-    valueFont->SetColor(rgba);
+    valueFont->SetColor(rgba.color);
     valueFont->SetTlut(6);
 
     char tribeWithSep[0x40];
@@ -1524,7 +1524,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     int a = static_cast<int>(FLOAT_80333240 * alpha);
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    font->SetColor(rgba);
+    font->SetColor(rgba.color);
     font->SetTlut(6);
 
     float textW = static_cast<float>(font->GetWidth(text));
@@ -2314,7 +2314,7 @@ void CMenuPcs::CmakeSexDraw()
 
     int a = static_cast<int>(FLOAT_80333240 * alpha);
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
-    font->SetColor(rgba);
+    font->SetColor(rgba.color);
 
     float maxWidth = FLOAT_80333254;
     int y = 0x9C;
@@ -2896,7 +2896,7 @@ void CMenuPcs::CmakeJobDraw()
     font->DrawInit();
 
     CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha));
-    font->SetColor(textColor);
+    font->SetColor(textColor.color);
 
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);

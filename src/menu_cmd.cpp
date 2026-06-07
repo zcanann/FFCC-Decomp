@@ -2579,18 +2579,21 @@ unsigned int CMenuPcs::CmdOpen1()
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
 	const s32 selected = static_cast<s32>(GetCmdStateView(this)->selected);
-	const f32 t = static_cast<f32>(
+	GetCmdListStorage(this)->entries[selected].alpha = static_cast<f32>(
 		-((DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - DOUBLE_80332a58)
 	);
-	GetCmdListStorage(this)->entries[selected].alpha = t;
 
 	s32 chainCount = 1;
 	if (caravanWork->m_commandListExtra[selected + 1] == -1) {
 		chainCount = 2;
-		GetCmdListStorage(this)->entries[selected + 1].alpha = t;
+		GetCmdListStorage(this)->entries[selected + 1].alpha = static_cast<f32>(
+			-((DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - DOUBLE_80332a58)
+		);
 		if (caravanWork->m_commandListExtra[selected + 2] == -1) {
 			chainCount = 3;
-			GetCmdListStorage(this)->entries[selected + 2].alpha = t;
+			GetCmdListStorage(this)->entries[selected + 2].alpha = static_cast<f32>(
+				-((DOUBLE_80332a90 * static_cast<f64>(GetCmdStateView(this)->transitionTimer)) - DOUBLE_80332a58)
+			);
 		}
 	}
 

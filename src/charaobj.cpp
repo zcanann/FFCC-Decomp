@@ -297,16 +297,16 @@ static int CharaObjDecodeSe(unsigned short encodedSe)
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
 }
 
-static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
+static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned int particleClass)
 {
 	if (particleClass == 0xFE) {
 		int pdtNo = CharaObjGetModelPdtNo(charaObj);
 		return (pdtNo >= 0) ? static_cast<unsigned int>(pdtNo) : 0xFFFFFFFF;
-	}
-	if (particleClass >= 0xFD && particleClass <= 0xFF) {
+	} else if (particleClass >= 0xFD && particleClass <= 0xFF) {
 		return 0xFFFFFFFF;
+	} else {
+		return particleClass;
 	}
-	return particleClass;
 }
 
 /*

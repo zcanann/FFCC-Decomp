@@ -903,18 +903,18 @@ int CMenuPcs::CmdClose()
 void CMenuPcs::CmdDraw()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	CmdListStorage* cmdList = GetCmdListStorage(this);
-	CmdListEntry* entries = cmdList->entries;
-	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	CmdListEntry* entry = entries;
-	const s16 cmdMode = GetCmdStateView(this)->mode;
-	const s16 animState = GetCmdStateView(this)->animState;
 	s32 i;
 	s32 helpId = -1;
 	bool hasItemHelp = false;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	CmdListEntry* entries = GetCmdListStorage(this)->entries;
+	CCaravanWork* const caravan = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+	CmdListEntry* entry = entries;
+	const s16 animState = GetCmdStateView(this)->animState;
+	const s16 cmdMode = GetCmdStateView(this)->mode;
 
 	for (i = 0; i < GetCmdListStorage(this)->count; i++) {
 		const s32 tex = entry->tex;

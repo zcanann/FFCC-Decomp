@@ -776,10 +776,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	object->m_0x34 = 0;
 	object->m_particleId = 0xF;
 	object->m_waitCounter = 0;
-	object->m_reqFlag0 = 0;
-	object->m_reqFlag1 = 0;
-	object->m_reqFlag2 = 0;
-	object->m_reqFlag3 = 0;
+	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 	object->m_classIndex = static_cast<s16>(classIndex);
 	object->m_activeClassIndex = object->m_classIndex;
 	object->m_flagBits.m_activeFlag = setBit;
@@ -1039,10 +1036,7 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 	object->m_codePos &= 0xFFF00000;
 	object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | 0x20);
 	object->m_waitCounter = 0;
-	object->m_reqFlag0 = 0;
-	object->m_reqFlag1 = 0;
-	object->m_reqFlag2 = 0;
-	object->m_reqFlag3 = 0;
+	*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
 	*object->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
 	*object->m_sp++ = prevCodePos;
@@ -1777,10 +1771,7 @@ frameLoop:
 			object->m_codePos &= 0xFFF00000;
 			object->m_flags = static_cast<u8>(object->m_flags & 0xDF);
 			object->m_waitCounter = 0;
-			object->m_reqFlag0 = 0;
-			object->m_reqFlag1 = 0;
-			object->m_reqFlag2 = 0;
-			object->m_reqFlag3 = 0;
+			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
 			*object->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
 			*object->m_sp++ = prevCodePos;
@@ -1836,10 +1827,7 @@ frameLoop:
 			newObject->m_codePos &= 0xFFF00000;
 			newObject->m_flags = static_cast<u8>((newObject->m_flags & 0xDF) | 0x20);
 			newObject->m_waitCounter = 0;
-			newObject->m_reqFlag0 = 0;
-			newObject->m_reqFlag1 = 0;
-			newObject->m_reqFlag2 = 0;
-			newObject->m_reqFlag3 = 0;
+			*reinterpret_cast<int*>(&newObject->m_reqFlag0) = 0;
 
 			*newObject->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
 			*newObject->m_sp++ = prevCodePos;
@@ -2429,10 +2417,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				return 1;
 			}
 
-			object->m_reqFlag0 = 0;
-			object->m_reqFlag1 = 0;
-			object->m_reqFlag2 = 0;
-			object->m_reqFlag3 = 0;
+			*reinterpret_cast<int*>(&object->m_reqFlag0) = 0;
 
 			if (noPush != 0) {
 				return 1;

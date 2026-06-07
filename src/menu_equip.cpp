@@ -912,11 +912,10 @@ int CMenuPcs::EquipOpen()
 	u32 uVar12;
 	double dVar20;
 
-	if (GetEquipMenuState(this)->initialized == '\0') {
-		EquipOpenAnimList* list = GetEquipListStorage(this);
-		memset(list, 0, sizeof(*list));
+	if ((signed char)GetEquipMenuState(this)->initialized == 0) {
+		memset(GetEquipListStorage(this), 0, sizeof(EquipOpenAnimList));
 		fVar5 = kEquipOne;
-		EquipOpenAnim* entry = list->entries;
+		EquipOpenAnim* entry = GetEquipListStorage(this)->entries;
 		iVar11 = 8;
 		do {
 			entry[0].scale = fVar5;
@@ -936,7 +935,7 @@ int CMenuPcs::EquipOpen()
 		} while (iVar11 != 0);
 
 		iVar6 = 0;
-		entry = list->entries;
+		entry = GetEquipListStorage(this)->entries;
 		iVar11 = 2;
 		do {
 			entry[0].tex = 0x34;

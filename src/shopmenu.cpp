@@ -1459,23 +1459,32 @@ void CShopMenu::DrawMakeBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    _GXColor colorA = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor colorB = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor colorC = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor colorD = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor colorA;
+    colorA.r = 0xFF; colorA.g = 0xFF; colorA.b = 0xFF; colorA.a = 0x00;
+    _GXColor colorB;
+    colorB.r = 0xFF; colorB.g = 0xFF; colorB.b = 0xFF; colorB.a = 0xFF;
+    _GXColor colorC;
+    colorC.r = 0xFF; colorC.g = 0xFF; colorC.b = 0xFF; colorC.a = 0x00;
+    _GXColor colorD;
+    colorD.r = 0xFF; colorD.g = 0xFF; colorD.b = 0xFF; colorD.a = 0xFF;
     drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, colorA, colorB, colorC, colorD);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor white;
+    white.r = 0xFF; white.g = 0xFF; white.b = 0xFF; white.a = 0xFF;
     int x = 0x3C;
     while (x < 0x25C) {
         drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
 
-    _GXColor endA = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor endB = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
+    _GXColor endA;
+    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
+    _GXColor endB;
+    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
+    _GXColor endC;
+    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
+    _GXColor endD;
+    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
     drawShapeSeqGrouad(9, 0, x, 0xB8, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
 
     drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
@@ -1526,23 +1535,32 @@ void CShopMenu::DrawShopBase()
     }
 
     Graphic.SetDrawDoneDebugData(3);
-    _GXColor fadeA = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor fadeD = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor fadeA;
+    fadeA.r = 0xFF; fadeA.g = 0xFF; fadeA.b = 0xFF; fadeA.a = 0x00;
+    _GXColor fadeB;
+    fadeB.r = 0xFF; fadeB.g = 0xFF; fadeB.b = 0xFF; fadeB.a = 0xFF;
+    _GXColor fadeC;
+    fadeC.r = 0xFF; fadeC.g = 0xFF; fadeC.b = 0xFF; fadeC.a = 0x00;
+    _GXColor fadeD;
+    fadeD.r = 0xFF; fadeD.g = 0xFF; fadeD.b = 0xFF; fadeD.a = 0xFF;
     drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor white;
+    white.r = 0xFF; white.g = 0xFF; white.b = 0xFF; white.a = 0xFF;
     int x = 0x3C;
     while (x < 0x25C) {
         drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
 
-    _GXColor endA = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor endB = {0xFF, 0xFF, 0xFF, 0x00};
-    _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
-    _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
+    _GXColor endA;
+    endA.r = 0xFF; endA.g = 0xFF; endA.b = 0xFF; endA.a = 0xFF;
+    _GXColor endB;
+    endB.r = 0xFF; endB.g = 0xFF; endB.b = 0xFF; endB.a = 0x00;
+    _GXColor endC;
+    endC.r = 0xFF; endC.g = 0xFF; endC.b = 0xFF; endC.a = 0xFF;
+    _GXColor endD;
+    endD.r = 0xFF; endD.g = 0xFF; endD.b = 0xFF; endD.a = 0x00;
     drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
     Graphic.SetDrawDoneDebugData(4);
 

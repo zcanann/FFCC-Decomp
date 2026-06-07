@@ -743,9 +743,9 @@ void CMes::Draw()
 					float glyphScaleY = FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11);
 					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
 					font->SetScaleY(glyphScaleY);
-					GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
+					GetRenderFlagBits(font->renderFlags).snapPosition = 1;
 					font->Draw((unsigned short)*(unsigned char*)(glyph + 4));
-					GetRenderFlagBits(font->renderFlags).fixedWidth = 0;
+					GetRenderFlagBits(font->renderFlags).snapPosition = 0;
 				}
 			}
 

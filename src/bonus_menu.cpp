@@ -1954,204 +1954,238 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
+	BonusSummaryData* rinfo = s_Rinfo;
 	int statePtr = this->m_bonusStatePtr;
-	int animPtr = this->m_bonusAnimPtr;
-
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	const int activePartyCount = s_Rinfo->m_partyCount;
-	const int baseCount = 1 + activePartyCount * 3;
-	const int frameBase = 1;
-	const int iconBase = frameBase + activePartyCount;
-	const int digitBase = iconBase + activePartyCount;
-	const int frameEchoBase = digitBase + activePartyCount;
-	const int iconEchoBase = frameEchoBase + activePartyCount;
-	const int digitEchoBase = iconEchoBase + activePartyCount;
-	const int nameBase = digitEchoBase + activePartyCount;
-	const int closeCount = nameBase + activePartyCount;
+	const int activePartyCount = rinfo->m_partyCount;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
-		for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
-			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].timer = 0;
-			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].motionX = 0.0f;
-			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].motionY = 0.0f;
+		int off = 0;
+		short* count = (short*)this->m_bonusAnimPtr;
+		for (int i = 0; i < *count; i++, count = (short*)this->m_bonusAnimPtr) {
+			*(int*)((int)count + off + 0x28) = 0;
+			*(float*)(this->m_bonusAnimPtr + off + 0x38) = 0.0f;
+			*(float*)(this->m_bonusAnimPtr + off + 0x3c) = 0.0f;
+			off += 0x40;
 		}
 
-		sprites[0].startFrame = 9999;
-		BonusSpriteFlags(&sprites[0]) = 3;
+		count[0x16] = 0;
+		count[0x17] = 9999;
+		count[0x1a] = 0;
+		count[0x1b] = 3;
 
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[frameBase + i].startFrame = 0x10;
+			*(int*)(this->m_bonusAnimPtr + (i + 1) * 0x40 + 0x2c) = 0x10;
 		}
 
+		// iconBase block: src = frameBase (back = activePartyCount sprites); dance
+		int base = activePartyCount + 1;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[iconBase + i];
-			BonusAnimSprite* source = &sprites[frameBase + i];
-			sprite->startFrame = source->startFrame + source->duration;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12) +
+			    *(int*)(sprite - activePartyCount * 0x20 + 0x14);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = 100.0f;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// digitBase block: src = iconBase (back = activePartyCount sprites); no dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[digitBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame + source->duration;
-			BonusSpriteFlags(sprite) = 1;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			int source = sprite - activePartyCount * 0x40;
+			*(int*)(sprite + 0x24) = *(int*)(source + 0x24) + *(int*)(source + 0x28);
+			*(int*)(sprite + 0x2c) = 1;
 		}
 
+		// frameEchoBase block: startFrame = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[frameEchoBase + i].startFrame = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// iconEchoBase block: startFrame = 9999, flags = 3
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			sprites[iconEchoBase + i].startFrame = 9999;
-			BonusSpriteFlags(&sprites[iconEchoBase + i]) = 3;
+			int sprite = this->m_bonusAnimPtr + (base + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 9999;
+			*(int*)(sprite + 0x2c) = 3;
 		}
 
+		// digitEchoBase block: src = iconBase (back = base - iconBase = base - (pc+1)); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[digitEchoBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = 100.0f;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
-		int countTop = digitEchoBase + activePartyCount + 1;
-		sprites[digitEchoBase + activePartyCount].startFrame = sprites[1].startFrame;
+		// sprites[digitEchoBase + pc].startFrame = sprites[1].startFrame
+		int countTop = base + activePartyCount + 1;
+		*(int*)(this->m_bonusAnimPtr + (base + activePartyCount) * 0x40 + 0x2c) =
+		    *(int*)(this->m_bonusAnimPtr + 0x6c);
 		s_CntTop = (unsigned char)countTop;
 
+		// countTop block: startFrame = 8, duration = 8
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[countTop + i];
-			sprite->startFrame = 8;
-			sprite->duration = 8;
+			int sprite = this->m_bonusAnimPtr + (countTop + i) * 0x40 + 8;
+			*(int*)(sprite + 0x24) = 8;
+			*(int*)(sprite + 0x28) = 8;
 		}
 
-		int extraBase = closeCount + 1;
+		// extraBase block: src = iconBase (back = base - (pc+1)); dance
+		base = countTop + activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = 100.0f;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// extraBase + pc block: flags = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[extraBase + activePartyCount + i]) = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// extraBase + 2*pc block: src = extraBase + pc (back = activePartyCount sprites); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 2 + i];
-			BonusAnimSprite* source = &sprites[extraBase + activePartyCount + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - activePartyCount * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = 100.0f;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
+		// extraBase + 3*pc block: flags = 0
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusSpriteFlags(&sprites[extraBase + activePartyCount * 3 + i]) = 0;
+			*(int*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 0x2c) = 0;
 		}
 
+		// extraBase + 4*pc block: src = iconBase (back = base - (pc+1)); dance
+		base += activePartyCount;
 		for (int i = 0; i < activePartyCount; i++) {
-			BonusAnimSprite* sprite = &sprites[extraBase + activePartyCount * 4 + i];
-			BonusAnimSprite* source = &sprites[iconBase + i];
-			sprite->startFrame = source->startFrame;
-			BonusSpriteFlags(sprite) = 1;
-			sprite->targetX = (float)sprite->x;
-			sprite->motionX = 100.0f;
-			sprite->x = (short)(int)((float)sprite->x - sprite->motionX);
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			*(int*)(sprite + 0x12) = *(int*)(sprite - (base - activePartyCount - 1) * 0x20 + 0x12);
+			sprite[0x16] = 0;
+			sprite[0x17] = 1;
+			*(float*)(sprite + 0x1c) = (float)(int)*sprite;
+			*(float*)(sprite + 0x18) = 100.0f;
+			*sprite = (short)(int)((float)(int)*sprite - *(float*)(sprite + 0x18));
 		}
 
-		for (int i = 0; i < (int)header->count; i++) {
-			BonusAnimSprite* sprite = &sprites[i];
-			if (sprite->motionX == 0.0f) {
-				sprite->targetX = (float)sprite->x;
+		off = 0;
+		short* sp = (short*)this->m_bonusAnimPtr;
+		for (int i = 0; i < *sp; i++, sp = (short*)this->m_bonusAnimPtr) {
+			if (0.0f == *(float*)((int)sp + off + 0x38)) {
+				*(float*)((int)sp + off + 0x40) = (float)(int)*(short*)((int)sp + off + 8);
 			}
-			if (sprite->motionY == 0.0f) {
-				sprite->targetY = (float)sprite->y;
+			int s = this->m_bonusAnimPtr + off;
+			if (0.0f == *(float*)(s + 0x3c)) {
+				*(float*)(s + 0x44) = (float)(int)*(short*)(s + 10);
 			}
+			off += 0x40;
 		}
 
-		*(short*)(animPtr + 6) = 0;
+		sp[3] = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 
+	int doneCount = 0;
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
 	int frame = (int)*(short*)(statePtr + 0x22);
-	int doneCount = 0;
 
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
-		int flags = BonusSpriteFlags(sprite);
+	int off = 0;
+	for (int i = 0; i < *(short*)this->m_bonusAnimPtr; i++) {
+		short* sprite = (short*)((int)this->m_bonusAnimPtr + off + 8);
 
-		if ((flags & 1) != 0) {
-			sprite->alpha = 0.0f;
-		} else {
-			if (frame < sprite->startFrame) {
-				sprite->alpha = 0.0f;
+		if ((*(unsigned int*)(sprite + 0x16) & 1) == 0) {
+			if (frame < *(int*)(sprite + 0x12)) {
+				*(float*)(sprite + 8) = 0.0f;
 			}
-			if (frame < sprite->startFrame + sprite->duration) {
-				sprite->alpha = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			if (frame < (int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14))) {
+				*(float*)(sprite + 8) =
+				    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
 			} else {
-				sprite->alpha = 0.0f;
+				*(float*)(sprite + 8) = 0.0f;
 			}
+		} else {
+			*(float*)(sprite + 8) = 0.0f;
 		}
 
-		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame >= 9999) {
+		if ((int)(*(int*)(sprite + 0x12) + *(unsigned int*)(sprite + 0x14)) <= frame ||
+		    0x270e < *(int*)(sprite + 0x12)) {
 			doneCount++;
 		}
 
-		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
-			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
-			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
-			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+		if ((*(unsigned int*)(sprite + 0x16) & 2) == 0 &&
+		    (*(float*)(sprite + 0x18) != 0.0f || *(float*)(sprite + 0x1a) != 0.0f)) {
+			float progress =
+			    1.0f - ((float)*(int*)(sprite + 0x10) / (float)*(unsigned int*)(sprite + 0x14));
+			*(float*)(sprite + 0x18) =
+			    (*(float*)(sprite + 0x1c) - (float)(int)*sprite) * progress;
+			*(float*)(sprite + 0x1a) =
+			    (*(float*)(sprite + 0x1e) - (float)(int)sprite[1]) * progress;
 		}
 
-		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
-			sprite->timer++;
+		if (*(int*)(sprite + 0x12) < frame &&
+		    frame <= *(int*)(sprite + 0x12) + *(int*)(sprite + 0x14)) {
+			*(int*)(sprite + 0x10) = *(int*)(sprite + 0x10) + 1;
 		}
+
+		off += 0x40;
 	}
 
-	MenuBoardEntry* boardEntries = GetBonusBoardEntries(this);
-	for (int i = 0; i < activePartyCount; i++) {
-		MenuBoardEntry& entry = boardEntries[i];
-		BonusAnimSprite* sprite = &sprites[iconBase + i];
-		float x = (float)sprite->x + sprite->motionX;
-		float y = (float)sprite->y + sprite->motionY;
-		int screenX = (int)(x + 12.0f);
-		int screenY = (int)(y - 8.0f);
-		int centerX = (int)((double)(float)(24.0f + (float)sprite->w * 0.5f + x) - 320.0);
-		int centerY = (int)((double)(float)((float)sprite->h * 0.5f + y) - 224.0);
-		entry.m_centerX = (short)centerX;
-		entry.m_centerY = (short)centerY;
-		if (screenX < 0) {
-			screenX = 0;
+	int boardOff = 0;
+	off = 0;
+	if (0 < activePartyCount) {
+		int base = activePartyCount + 1;
+		for (int i = 0; i < activePartyCount; i++) {
+			short* sprite = (short*)(this->m_bonusAnimPtr + (base + i) * 0x40 + 8);
+			int boardPtr = this->m_bonus.m_bonusBoardPtr;
+			float x = (float)(int)*sprite + *(float*)(sprite + 0x18);
+			float y = (float)(int)sprite[1] + *(float*)(sprite + 0x1a);
+			*(short*)(boardPtr + boardOff + 8) =
+			    (short)(int)((double)(float)(24.0f + (float)(int)sprite[2] * 0.5f + x) - 320.0);
+			*(short*)(boardPtr + boardOff + 10) =
+			    (short)(int)((double)(float)((float)(int)sprite[3] * 0.5f + y) - 224.0);
+			*(int*)(boardPtr + boardOff + 0x40) = (int)(x + 12.0f);
+			*(int*)(boardPtr + boardOff + 0x44) = (int)(y - 8.0f);
+			if ((double)*(int*)(boardPtr + boardOff + 0x40) < 0.0) {
+				*(int*)(boardPtr + boardOff + 0x40) = 0;
+			}
+			if ((double)*(int*)(boardPtr + boardOff + 0x44) < 0.0) {
+				*(int*)(boardPtr + boardOff + 0x44) = 0;
+			}
+			*(int*)(boardPtr + boardOff + 0x48) = 0x48;
+			*(int*)(boardPtr + boardOff + 0x4c) = 0x58;
+			boardOff += 0x50;
 		}
-		if (screenY < 0) {
-			screenY = 0;
-		}
-		entry.m_screenX = screenX;
-		entry.m_screenY = screenY;
-		entry.m_screenWidth = 0x48;
-		entry.m_screenHeight = 0x58;
 	}
-
 	Mtx scaleMtx;
 	Mtx rotXMtx;
 	Mtx rotYMtx;
+	int partyByteOff = 0;
+	int alphaOff = (activePartyCount * 2 + 1) * 0x40;
 	for (int i = 0; i < activePartyCount * 2; i++) {
+		int animPtr = this->m_bonusAnimPtr;
 		CCharaPcs::CHandle* handle;
-		int tribeId;
+		unsigned int tribeId = 0;
 		if (i < activePartyCount) {
-			handle = s_Rinfo->m_party[i].m_partyHandle;
-			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			handle = *(CCharaPcs::CHandle**)((int)s_Rinfo + partyByteOff + 0x20);
+			tribeId = *(unsigned int*)((int)s_Rinfo + partyByteOff + 0x44);
 			float modelScale = s_BonusModelScale[tribeId];
 			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 		} else {
@@ -2182,12 +2216,14 @@ void CMenuPcs::CalcResultCloseAnim()
 		if (i < activePartyCount) {
 			model->m_lightAlpha = 1.0f;
 		} else {
-			model->m_lightAlpha = sprites[frameEchoBase + i - activePartyCount].alpha;
+			model->m_lightAlpha = *(float*)(animPtr + alphaOff + 0x18);
 		}
+		alphaOff += 0x40;
+		partyByteOff += 0x2c;
 	}
 
-	if (doneCount == (int)header->count) {
-		header->finished = 1;
+	if (*(short*)this->m_bonusAnimPtr == doneCount) {
+		((short*)this->m_bonusAnimPtr)[3] = 1;
 	}
 }
 

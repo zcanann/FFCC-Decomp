@@ -283,9 +283,26 @@ void CPartMng::Create()
     PSMTXIdentity(ppvCameraMatrix0);
     PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
 
+    m_materialSet = 0;
+    m_textureSet = 0;
+    m_pppModelStArr = 0;
+    m_pppShapeStArr = 0;
+
     {
         int* zero = reinterpret_cast<int*>(self + 0x1d4);
-        for (int i = 0; i < 0x180; i++) {
+        for (int i = 0; i < 0x80; i++) {
+            zero[i] = 0;
+        }
+    }
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x3d8);
+        for (int i = 0; i < 0x80; i++) {
+            zero[i] = 0;
+        }
+    }
+    {
+        int* zero = reinterpret_cast<int*>(self + 0x5dc);
+        for (int i = 0; i < 0x80; i++) {
             zero[i] = 0;
         }
     }

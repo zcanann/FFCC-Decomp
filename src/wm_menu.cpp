@@ -1078,17 +1078,16 @@ void CMenuPcs::destroyWorld()
 void CMenuPcs::calcWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 	unsigned char* const worldParams = m_wmWorldParams;
 
 	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
 
-	if (static_cast<signed char>(worldState->m_worldReady) == 0) {
+	if (static_cast<signed char>(m_wmWorldState->m_worldReady) == 0) {
 		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
 		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-		worldState->m_worldReady = 1;
-		worldState->m_mainState = 1;
+		m_wmWorldState->m_worldReady = 1;
+		m_wmWorldState->m_mainState = 1;
 	}
 
 	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
@@ -1096,11 +1095,11 @@ void CMenuPcs::calcWorld()
 	unsigned char* const modelBytes = reinterpret_cast<unsigned char*>(model);
 	const float animEnd = reinterpret_cast<float*>(modelBytes + 0xC0)[0];
 	const float animTime = reinterpret_cast<float*>(modelBytes + 0xB4)[0];
-	const short animState = worldState->m_mainState;
+	const short animState = m_wmWorldState->m_mainState;
 
 	if (animState == 1) {
 		if (animEnd <= animTime) {
-			if (worldState->m_frameCounter > 9) {
+			if (m_wmWorldState->m_frameCounter > 9) {
 				CFlatRuntime::CStack stackData[3];
 				stackData[0].m_word = 2;
 				stackData[1].m_word = 0;
@@ -1109,12 +1108,12 @@ void CMenuPcs::calcWorld()
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
 				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
-				worldState->m_mainState = 2;
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_mainState = 2;
+				m_wmWorldState->m_frameCounter = 0;
 			}
 		} else {
 			model->AddFrame(FLOAT_80331698);
-			worldState->m_frameCounter = 0;
+			m_wmWorldState->m_frameCounter = 0;
 		}
 	} else if (animState == 2) {
 		int nextAnim = static_cast<signed char>(bytes[0xE]);
@@ -1133,8 +1132,8 @@ void CMenuPcs::calcWorld()
 			} else if (nextAnim == 5) {
 				Sound.PlaySe(0x138D, 0x40, 0x7F, 0);
 				nextAnim = 6;
-				worldState->m_mainState = 3;
-				worldState->m_frameCounter = 0;
+				m_wmWorldState->m_mainState = 3;
+				m_wmWorldState->m_frameCounter = 0;
 			}
 
 			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
@@ -1147,23 +1146,23 @@ void CMenuPcs::calcWorld()
 			}
 			bytes[0xE] = 0;
 		}
-	} else if (animState == 3 && worldState->m_frameCounter > 9) {
+	} else if (animState == 3 && m_wmWorldState->m_frameCounter > 9) {
 		if (animEnd <= animTime) {
 			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
-			worldState->m_delay = 10;
-			worldState->m_nextMenuMode = -1;
-			worldState->m_mainState = 4;
+			m_wmWorldState->m_delay = 10;
+			m_wmWorldState->m_nextMenuMode = -1;
+			m_wmWorldState->m_mainState = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		} else {
 			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
-		if (worldState->m_delay == 0) {
-			worldState->m_changeRequest = worldState->m_nextMenuMode;
-			worldState->m_nextMenuMode = 0;
+		if (m_wmWorldState->m_delay == 0) {
+			m_wmWorldState->m_changeRequest = m_wmWorldState->m_nextMenuMode;
+			m_wmWorldState->m_nextMenuMode = 0;
 		} else {
-			worldState->m_delay--;
+			m_wmWorldState->m_delay--;
 		}
 	}
 
@@ -1198,14 +1197,14 @@ void CMenuPcs::calcWorld()
 	model->CalcMatrix();
 	model->CalcSkin();
 
-	const short updatedAnimState = worldState->m_mainState;
+	const short updatedAnimState = m_wmWorldState->m_mainState;
 
 	if (updatedAnimState == 1 && animTime >= animEnd) {
-		if (worldState->m_frameCounter < 10) {
-			worldState->m_frameCounter++;
+		if (m_wmWorldState->m_frameCounter < 10) {
+			m_wmWorldState->m_frameCounter++;
 		}
-	} else if (updatedAnimState == 3 && worldState->m_frameCounter < 10) {
-		worldState->m_frameCounter++;
+	} else if (updatedAnimState == 3 && m_wmWorldState->m_frameCounter < 10) {
+		m_wmWorldState->m_frameCounter++;
 	}
 }
 
@@ -1255,7 +1254,6 @@ void CMenuPcs::CalcMainMenu()
 void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	WmWorldState* const worldState = m_wmWorldState;
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;
@@ -1290,15 +1288,15 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
-	switch (worldState->m_menuMode) {
+	switch (m_wmWorldState->m_menuMode) {
 	case 0:
-		if (worldState->m_mainState <= 4) {
-			const short state = worldState->m_mainState;
+		if (m_wmWorldState->m_mainState <= 4) {
+			const short state = m_wmWorldState->m_mainState;
 			int frameStep = 0;
 			if (state == 0) {
-				frameStep = worldState->m_frameCounter - 10;
+				frameStep = m_wmWorldState->m_frameCounter - 10;
 			} else if (state < 1 || state > 3) {
-				frameStep = -worldState->m_frameCounter;
+				frameStep = -m_wmWorldState->m_frameCounter;
 			}
 			CalcWMFrame0(frameStep);
 		}
@@ -1312,7 +1310,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	case 3:
 		if (m_singleCmakeMode == 0) {
-			if (worldState->m_modelFlagsInitialized == 0) {
+			if (m_wmWorldState->m_modelFlagsInitialized == 0) {
 				unsigned char* const modelData = m_wm.m_charaModelData;
 				modelData[0x0C] = 1;
 				modelData[0x40] = 1;
@@ -1322,19 +1320,19 @@ void CMenuPcs::CalcDiaryMenu()
 				modelData[0x110] = 1;
 				modelData[0x144] = 1;
 				modelData[0x178] = 1;
-				worldState->m_modelFlagsInitialized = 1;
+				m_wmWorldState->m_modelFlagsInitialized = 1;
 			}
-			if (worldState->m_mainState <= 4) {
+			if (m_wmWorldState->m_mainState <= 4) {
 				CalcCharaSelect();
-				const short state = worldState->m_mainState;
+				const short state = m_wmWorldState->m_mainState;
 				int frameStep = 0;
 				if (state == 0) {
-					frameStep = worldState->m_frameCounter - 10;
+					frameStep = m_wmWorldState->m_frameCounter - 10;
 				} else if (state < 1 || state > 3) {
-					frameStep = -worldState->m_frameCounter;
+					frameStep = -m_wmWorldState->m_frameCounter;
 				}
 				CalcWMFrame0(frameStep);
-				const short animState = worldState->m_mainState;
+				const short animState = m_wmWorldState->m_mainState;
 				if (animState > 0 && animState < 4) {
 					CalcChara();
 				}
@@ -1344,8 +1342,8 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		if (((worldState->m_mainState != 0) || bytes[0x12] != 0) &&
-		    worldState->m_mainState < 4) {
+		if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+		    m_wmWorldState->m_mainState < 4) {
 			if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 				SetCrystalCageAttr();
 			}

@@ -1007,18 +1007,18 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				m_data->m_normQuant = chunkFile.Get4();
 			} else if (chunk.m_id == 0x4D534554) {
 				CMaterialSet* materialSet =
-				    new(stage, const_cast<char*>("src/chara.cpp"), 0x132) CMaterialSet();
+				    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x132) CMaterialSet();
 				m_data->m_materialSet = materialSet;
-				if (materialSet != 0) {
-					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
-				}
+				CMaterialSet* createdSet = m_data->m_materialSet;
+				createdSet->m_materials.SetDefaultSize(0x20);
+				createdSet->m_materials.SetGrow(0);
+				m_data->m_materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
 			} else if (chunk.m_id == 0x54415354) {
 				if (chunk.m_arg0 != 0) {
-					CTexAnimSet* texAnimSet = new CTexAnimSet();
+					CTexAnimSet* texAnimSet =
+					    new(Chara.GetMemoryStage(), const_cast<char*>(s_chara_cpp), 0x13A) CTexAnimSet();
 					m_texAnimSet = texAnimSet;
-					if (texAnimSet != 0) {
-						texAnimSet->Create(chunkFile, stage);
-					}
+					m_texAnimSet->Create(chunkFile, stage);
 				}
 			} else if (chunk.m_id == 0x4E534554) {
 				const u32 nodeCapacity = chunk.m_arg0;

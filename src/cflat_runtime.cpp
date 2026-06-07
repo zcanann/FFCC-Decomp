@@ -2071,10 +2071,7 @@ frameLoop:
 			object->m_codePos = previousCodePos;
 			object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
 			object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
-			object->m_reqFlag0 = 0;
-			object->m_reqFlag1 = 0;
-			object->m_reqFlag2 = 0;
-			object->m_reqFlag3 = static_cast<u8>((packedFlags >> 15) & 1);
+			*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 			object->m_argCount = static_cast<s16>(packedFlags);
 
 			if ((static_cast<int>(object->m_flags) << 24) < 0) {
@@ -2159,10 +2156,7 @@ callSystemFunction:
 		object->m_codePos = previousCodePos;
 		object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
 		object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
-		object->m_reqFlag0 = 0;
-		object->m_reqFlag1 = 0;
-		object->m_reqFlag2 = 0;
-		object->m_reqFlag3 = static_cast<u8>((packedFlags >> 15) & 1);
+		*reinterpret_cast<int*>(&object->m_reqFlag0) = (packedFlags >> 15) & 1;
 		object->m_argCount = static_cast<s16>(packedFlags);
 
 		if ((static_cast<int>(object->m_flags) << 24) < 0) {
@@ -2400,10 +2394,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 			const u32 requestIndex = object->m_localBase[0];
 			const u32 noPush = object->m_localBase[1];
 			object->m_waitCounter = 1;
-			object->m_reqFlag0 = 0;
-			object->m_reqFlag1 = 0;
-			object->m_reqFlag2 = 0;
-			object->m_reqFlag3 = 1;
+			*reinterpret_cast<int*>(&object->m_reqFlag0) = 1;
 
 			if (request(object, 2, requestIndex, object->m_argCount - 2,
 			            reinterpret_cast<CStack*>(object->m_localBase + 2)) != 0) {

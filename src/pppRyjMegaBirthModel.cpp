@@ -129,18 +129,6 @@ static inline double MegaBirthHalfDouble()
     return DOUBLE_803304E0;
 }
 
-static inline unsigned char clamp_u8(float value)
-{
-    int ivalue = (int)value;
-    if (ivalue < 0) {
-        return 0;
-    }
-    if (ivalue > 0xFF) {
-        return 0xFF;
-    }
-    return (unsigned char)ivalue;
-}
-
 static inline unsigned char clamp_u8_int(int value)
 {
     if (value < 0) {

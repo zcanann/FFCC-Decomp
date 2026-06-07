@@ -823,7 +823,8 @@ void CMenuPcs::CmakeVillageDraw()
     font->DrawInit();
     GetRenderFlagBits(font->renderFlags).fixedWidth = 1;
     font->SetMargin(4.9f);
-    font->SetColor(col);
+    CColor textColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(255.0f * alpha)));
+    font->SetColor(textColor.color);
 
     int tableBase = villageWork->m_table * 5;
     for (int i = 0; i < 5; i++) {

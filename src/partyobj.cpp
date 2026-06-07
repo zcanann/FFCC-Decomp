@@ -2652,12 +2652,12 @@ void CGPartyObj::checkTargetParticle()
 	    ((static_cast<unsigned short>(GetCID()) & 0x6D) != 0x6D) ||
 	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) == 0)) {
 		if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0) {
-			input.x -= getPadLeftStickXForSlot(static_cast<unsigned char>(m_animStateMisc));
-			input.z += getPadLeftStickYForSlot(static_cast<unsigned char>(m_animStateMisc));
+			input.x -= getPadLeftStickXForSlot(static_cast<signed char>(m_animStateMisc));
+			input.z += getPadLeftStickYForSlot(static_cast<signed char>(m_animStateMisc));
 		}
 
 			if (input.x == 0.0f && input.z == 0.0f) {
-				unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+				unsigned short held = getPadHeldForSlot(static_cast<signed char>(m_animStateMisc));
 			if ((held & 1) != 0) {
 				input.x += FLOAT_80331a54;
 			}

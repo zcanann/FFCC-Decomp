@@ -1895,15 +1895,15 @@ void CGPartyObj::onFrameStat()
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		if (m_stateFrame == 0) {
 			if (party.flags.flag04) {
-				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
 					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), static_cast<CGPrgObj*>(0));
 				}
-				party.partyFlags &= 0xFB;
+				party.flags.flag04 = 0;
 			}
 			enableDamageCol(1);
 			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
 			if (party.carryObject == nullptr) {
-				if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+				if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
 					if (mapId == 1) {
 						SetAnimSlot(0x25, 0);
 						SetAnimSlot(0x24, 1);
@@ -1935,7 +1935,7 @@ void CGPartyObj::onFrameStat()
 			} else {
 				reqAnim(0x27, 0, 0);
 			}
-			if (*reinterpret_cast<short*>(script + 0x1C) == 0) {
+			if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0) {
 				m_alpha = FLOAT_80331A7C;
 				m_bgColMask &= 0xFFFEFFF1;
 				void* port = m_scriptHandle[0xED];
@@ -1949,7 +1949,7 @@ void CGPartyObj::onFrameStat()
 				*reinterpret_cast<unsigned short*>(script + 0x12) = 0x5A;
 			}
 		} else if (isLoopAnim() != 0) {
-			if (*reinterpret_cast<short*>(script + 0x1C) != 0) {
+			if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
 				party.partyFlags = (party.partyFlags & 0xFD) | 2;
 			}
 			changeStat(0, 0, 0);

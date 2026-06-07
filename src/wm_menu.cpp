@@ -11549,11 +11549,11 @@ int McCtrl::SaveDat()
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
 			return -4;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
+		} else if (MemoryCardMan.IsBrokenFile()) {
+			m_state = 8;
+		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x0C;
-		} else {
-			m_state = 8;
 		}
 		break;
 
@@ -11612,14 +11612,14 @@ int McCtrl::SaveDat()
 
 	case 0x0C:
 		m_lastResult = MemoryCardMan.McGetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x0D;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = -1;
 			if (m_lastResult == -5) {
 				return -4;
 			}
+		} else {
+			m_state = 0x0D;
 		}
 		break;
 
@@ -11648,15 +11648,15 @@ int McCtrl::SaveDat()
 
 	case 0x0F:
 		m_lastResult = MemoryCardMan.McSetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x12;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			if (m_lastResult == -5) {
 				return -4;
 			}
+		} else {
+			m_state = 0x12;
 		}
 		break;
 
@@ -11699,10 +11699,10 @@ int McCtrl::SaveDat()
 		m_serialHi = serialHi;
 		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
-		if (m_userBuffer == 0) {
-			MemoryCardMan.MakeSaveData();
-		} else {
+		if (m_userBuffer != 0) {
 			memcpy(MemoryCardMan.m_saveBuffer, m_userBuffer, 0x8BD0);
+		} else {
+			MemoryCardMan.MakeSaveData();
 		}
 		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 0x13;
@@ -11728,12 +11728,12 @@ int McCtrl::SaveDat()
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
 		break;
@@ -12667,11 +12667,11 @@ int McCtrl::EraseDat()
 			m_state = -1;
 			MemoryCardMan.McUnmount(m_cardChannel);
 			return -4;
-		} else if (!MemoryCardMan.IsBrokenFile()) {
+		} else if (MemoryCardMan.IsBrokenFile()) {
+			m_state = 8;
+		} else {
 			MemoryCardMan.CreateMcBuff();
 			m_state = 0x0C;
-		} else {
-			m_state = 8;
 		}
 		break;
 
@@ -12730,14 +12730,14 @@ int McCtrl::EraseDat()
 
 	case 0x0C:
 		m_lastResult = MemoryCardMan.McGetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x0D;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			m_state = -1;
 			if (m_lastResult == -5) {
 				return -4;
 			}
+		} else {
+			m_state = 0x0D;
 		}
 		break;
 
@@ -12766,15 +12766,15 @@ int McCtrl::EraseDat()
 
 	case 0x0F:
 		m_lastResult = MemoryCardMan.McSetStat(m_cardChannel);
-		if (m_lastResult == 0) {
-			m_state = 0x12;
-		} else {
+		if (m_lastResult != 0) {
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			if (m_lastResult == -5) {
 				return -4;
 			}
+		} else {
+			m_state = 0x12;
 		}
 		break;
 
@@ -12812,15 +12812,16 @@ int McCtrl::EraseDat()
 	case 0x12: {
 		unsigned int serialLo = 0;
 		unsigned int serialHi = 0;
-		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) == 0) {
+			m_serialHi = serialHi;
+			m_serialLo = serialLo;
+		} else {
 			MemoryCardMan.McClose();
 			MemoryCardMan.McUnmount(m_cardChannel);
 			MemoryCardMan.DestroyMcBuff();
 			m_state = -1;
 			return -1;
 		}
-		m_serialHi = serialHi;
-		m_serialLo = serialLo;
 		MemoryCardMan.CreateMcBuff();
 		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
 		m_state = 0x13;
@@ -12846,12 +12847,12 @@ int McCtrl::EraseDat()
 			}
 
 			const int closeResult = MemoryCardMan.McClose();
-			if (closeResult == 0) {
-				MemoryCardMan.McUnmount(m_cardChannel);
-				MemoryCardMan.DestroyMcBuff();
-			} else {
+			if (closeResult != 0) {
 				m_lastResult = closeResult;
 				m_state = -1;
+			} else {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
 			}
 		}
 		break;

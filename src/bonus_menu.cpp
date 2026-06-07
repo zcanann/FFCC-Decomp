@@ -1948,10 +1948,10 @@ void CMenuPcs::CalcResultCloseAnim()
 	const int closeCount = nameBase + activePartyCount;
 
 	if (*(signed char*)(statePtr + 0xb) == 0) {
-		for (int i = 0; i < (int)header->count; i++) {
-			sprites[i].timer = 0;
-			sprites[i].motionX = 0.0f;
-			sprites[i].motionY = 0.0f;
+		for (int i = 0; i < (int)((BonusAnimHeader*)this->m_bonusAnimPtr)->count; i++) {
+			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].timer = 0;
+			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].motionX = 0.0f;
+			((BonusAnimSprite*)(this->m_bonusAnimPtr + 8))[i].motionY = 0.0f;
 		}
 
 		sprites[0].startFrame = 9999;

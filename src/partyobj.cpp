@@ -754,36 +754,40 @@ void CGPartyObj::onFrameAlways()
 		party.target = 0;
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0 ||
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0 ||
 	    (*reinterpret_cast<short*>(&m_lastMapIdHit) != 1)) {
 		LoadWeapon(-1, 0);
 		LoadShield(-1);
 	} else {
-		int weaponItem;
-		int weaponRef;
-		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
 		if (m_weaponModelHandle == nullptr) {
-			if (weaponItem <= 0) {
+			int weaponItem = party.pendingWeaponItem;
+			int weaponRef = party.weaponItem;
+			if (weaponItem < 1) {
 				LoadWeapon(-1, 0);
 			} else {
-				LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
+				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				LoadWeapon(packedItem & 0xFFF, packedItem >> 12);
 			}
+			party.weaponItem = weaponRef;
+			party.pendingWeaponItem = weaponItem;
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
 			party.commandFlags &= 0xDF;
 		}
 
-		int shieldIndex = reinterpret_cast<short*>(m_scriptHandle)[0x2C];
-		if (shieldIndex <= 0) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		int shieldIndex = *reinterpret_cast<short*>(script + 0x58);
+		int shieldItem;
+		if (shieldIndex < 0) {
+			shieldItem = 0;
+		} else {
+			shieldItem = *reinterpret_cast<short*>(script + shieldIndex * 2 + 0xB6);
+		}
+		if (shieldItem < 1) {
 			LoadShield(-1);
 		} else {
-			int shieldItem = reinterpret_cast<short*>(m_scriptHandle)[0x5B + shieldIndex];
-			if (shieldItem <= 0) {
-				LoadShield(-1);
-			} else {
-				int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
-				if (m_shieldModelHandle == nullptr || m_shieldModelHandle->m_charaNo != shieldModel) {
-					LoadShield(shieldModel);
-				}
+			int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
+			if (m_shieldModelHandle == nullptr || m_shieldModelHandle->m_charaNo != shieldModel) {
+				LoadShield(shieldModel);
 			}
 		}
 	}

@@ -1931,6 +1931,8 @@ void CMiniGamePcs::MngThreadMain(void*)
                             }
                             break;
                         case 3:
+                            *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
+                            break;
                         default:
                             *reinterpret_cast<unsigned int*>(playerBase + 0x1420) = 0;
                             break;

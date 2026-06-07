@@ -1901,26 +1901,26 @@ void CShopMenu::DrawMake()
         font->SetColor(white.color);
 
         font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, 60.0f, rowY, 0x1B, 0x12);
+        MenuPcs.DrawNoShadowFont(font, s_Slash_80332d84, FLOAT_80332e3c, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
         SetupShopMenuAmountFont(font, &white.color);
-        float neededX = 244.0f - font->GetWidth(neededBuffer);
-        MenuPcs.DrawNoShadowFont(font, neededBuffer, neededX, rowY, 0x1B, 0x12);
+        int rightEdge = static_cast<int>(372.0f - font->GetWidth(neededBuffer));
+        MenuPcs.DrawNoShadowFont(font, neededBuffer, rightEdge, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
         font->SetMargin(FLOAT_80332d28);
         font->SetShadow(1);
         font->SetScale(FLOAT_80332d28);
         font->SetColor(white.color);
-        float slashX = neededX - FLOAT_80332d28 - font->GetWidth("/");
+        rightEdge = static_cast<int>(static_cast<float>(rightEdge - 8) - font->GetWidth("/"));
         font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, const_cast<char*>("/"), slashX, rowY, 0x1B, 0x12);
+        MenuPcs.DrawNoShadowFont(font, const_cast<char*>("/"), rightEdge, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
-        float nameX = slashX - FLOAT_80332d28 - font->GetWidth(materialName);
+        rightEdge = static_cast<int>(static_cast<float>(rightEdge - 8) - font->GetWidth(materialName));
         font->DrawInit();
-        MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialName), nameX, rowY, 0x1B, 0x12);
+        MenuPcs.DrawNoShadowFont(font, const_cast<char*>(materialName), rightEdge, rowY, 0x1B, 0x12);
         MenuPcs.DrawInit();
 
         int ownedCount = 0;

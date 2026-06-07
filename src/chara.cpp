@@ -1389,7 +1389,6 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
-	CMesh* mesh = ModelMeshes(this);
 	u32 posQuant = ModelPosQuant(this);
 	u32 normQuant = ModelNormQuant(this);
 
@@ -1397,6 +1396,7 @@ void CChara::CModel::CalcSkin()
 	u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;
 	Chara.gqrInit(posGqr, normGqr, 0x0C070C07);
 
+	CMesh* mesh = ModelMeshes(this);
 	for (u32 i = 0; i < ModelMeshCount(this); i++) {
 		mesh->Calc(this);
 		mesh++;

@@ -169,9 +169,9 @@ static inline void BSplineVec(Vec& out, Vec* p0, Vec* p1, Vec* p2, Vec* p3, floa
     PSVECAdd(&c3, &c0, &out);
 }
 
-static inline Vec* ClampPathPoint(Vec* points, int index, int maxIndex)
+static inline Vec* ClampPathPoint(CFlatPathPoint* points, int index, int maxIndex)
 {
-    return &points[ClampIndex(index, maxIndex)];
+    return &points[ClampIndex(index, maxIndex)].m_position;
 }
 
 static inline unsigned int* GetGameWorkLinkTableWords(CGame::CGameWork& gameWork)
@@ -2108,18 +2108,18 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
                       static_cast<float>(static_cast<int>(object->m_localBase[2]));
 
             if ((mode & 4) != 0) {
-                Vec* pathPoints = &m_pathPoints[0].m_position;
+                CFlatPathPoint* pathPoints = m_pathPoints;
                 const int maxIndex = pointCount - 1;
                 const int segmentCount = pointCount + 1 - (mode & 1) - ((mode >> 1) & 1);
                 const float scaled = t * static_cast<float>(segmentCount);
                 const int baseIndex = (mode & 1) + static_cast<int>(scaled);
                 const float segmentT = fmodf(scaled, FLOAT_80330B34);
 
-                CVector startDelta = CVector(pathPoints[1]) - CVector(pathPoints[0]);
-                CVector startPhantom1 = CVector(pathPoints[0]) - startDelta;
+                CVector startDelta = CVector(pathPoints[1].m_position) - CVector(pathPoints[0].m_position);
+                CVector startPhantom1 = CVector(pathPoints[0].m_position) - startDelta;
                 CVector startPhantom2 = startPhantom1 - startDelta;
-                CVector endDelta = CVector(pathPoints[maxIndex]) - CVector(pathPoints[maxIndex - 1]);
-                CVector endPhantom1 = CVector(pathPoints[maxIndex]) + endDelta;
+                CVector endDelta = CVector(pathPoints[maxIndex].m_position) - CVector(pathPoints[maxIndex - 1].m_position);
+                CVector endPhantom1 = CVector(pathPoints[maxIndex].m_position) + endDelta;
                 CVector endPhantom2 = endPhantom1 + endDelta;
 
                 Vec* p0;

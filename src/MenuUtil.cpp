@@ -1232,30 +1232,30 @@ void CMenuPcs::DrawOptionMenu()
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(firstScale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth +
-			                           selectorX),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335C8),
 			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
 			          kOptionAnimMax, kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth +
-			                           selectorX + secondOffset),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335D8),
 			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 		} else {
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth +
-			                           selectorX),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335C8),
 			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth +
-			                           selectorX + secondOffset),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335D8),
 			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
 			          kOptionAnimMax, kOptionAnimMax);
 		}
@@ -1305,30 +1305,30 @@ void CMenuPcs::DrawOptionMenu()
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(firstScale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth +
-			                           selectorX),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335E8),
 			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, firstText, firstScale,
 			          kOptionAnimMax, kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth +
-			                           selectorX + secondOffset),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335F0),
 			          static_cast<int>(FLOAT_803335A4), color, 6, secondText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 		} else {
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth +
-			                           selectorX),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(firstText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335E8),
 			          static_cast<int>(FLOAT_803335A4), color, 6, firstText, scale, kOptionAnimMax,
 			          kOptionAnimMax);
 			font->SetMargin(kOptionAnimMax);
 			font->SetShadow(1);
 			font->SetScale(scale);
-			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * kMenuCenteringHalfWidth +
-			                           selectorX + secondOffset),
+			DrawFont2(static_cast<int>((FLOAT_803335B0 - font->GetWidth(secondText)) * DOUBLE_803335D0 +
+			                           DOUBLE_803335F0),
 			          static_cast<int>(FLOAT_803335A4 - FLOAT_803335A0), color, 0x17, secondText, scale,
 			          kOptionAnimMax, kOptionAnimMax);
 		}

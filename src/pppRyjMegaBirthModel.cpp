@@ -529,7 +529,7 @@ void birth(
             goto join_position;
         }
     } else if (mode < 10) {
-        u8 speedMode = params->m_speedMode;
+        s8 speedMode = params->m_speedMode;
         s16 pathIndex = *(s16*)(payload + 0x138);
         Vec* pathBase = pObject->m_drawMatrixPtr;
 
@@ -541,7 +541,7 @@ void birth(
             }
 
             Vec spawnPoint;
-            u16 sampleIndex;
+            s16 sampleIndex;
 
             if ((speedMode == 0) || (speedMode >= 6)) {
                 if ((s32)pathInfo[1] <= (s32)(u32)work->m_unused1E) {

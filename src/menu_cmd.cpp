@@ -683,8 +683,8 @@ int CMenuPcs::CmdCtrl()
 
 	cmd->prevMode = cmd->mode;
 
-	s16 mode = cmd->mode;
-	s16 state = cmd->phase;
+	int mode = cmd->mode;
+	int state = cmd->phase;
 
 	if ((mode == 0) || (state == 1)) {
 		actionHandled = CmdCtrlCur();
@@ -817,27 +817,26 @@ int CMenuPcs::CmdCtrl()
 int CMenuPcs::CmdClose()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	CmdState* cmd = GetCmdStateView(this);
-	if (cmd->commandResult == 0) {
+	if (GetCmdStateView(this)->commandResult == 0) {
 		if (UniteCloseAnim(-1) != 0) {
-			cmd->transitionTimer = 0;
-			cmd->commandResult = 1;
+			GetCmdStateView(this)->transitionTimer = 0;
+			GetCmdStateView(this)->commandResult = 1;
 		}
 		return 0;
 	}
 
 	s32 doneCount = 0;
-	cmd->transitionTimer = cmd->transitionTimer + 1;
+	GetCmdStateView(this)->transitionTimer = GetCmdStateView(this)->transitionTimer + 1;
 
 	CmdListStorage* list = GetCmdListStorage(this);
 	u32 count = static_cast<u32>(list->count);
 	CmdListEntry* entry = list->entries;
-	s32 closeTimer = static_cast<s32>(cmd->transitionTimer);
+	s32 closeTimer = static_cast<s32>(GetCmdStateView(this)->transitionTimer);
 	const s32 entryCount = static_cast<s32>(count);
 
 	for (s32 i = 0; i < entryCount; i++) {
 		if (entry->startFrame <= closeTimer) {
-			if (closeTimer >= (entry->startFrame + entry->duration)) {
+			if ((entry->startFrame + entry->duration) <= closeTimer) {
 				doneCount = doneCount + 1;
 				entry->alpha = 0.0f;
 			} else {

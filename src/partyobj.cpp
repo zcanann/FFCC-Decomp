@@ -3650,15 +3650,16 @@ void CGPartyObj::canPlayerGoMenu()
  */
 int CGPartyObj::useItem(int itemId)
 {
-	bool canUse = false;
+	int canUse = 0;
 	int result;
+	const char* msgBase = lbl_801DCA48;
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9A]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x9B]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0) &&
 	    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
-		canUse = true;
+		canUse = 1;
 	}
 
 	if (!canUse) {
@@ -3669,7 +3670,7 @@ int CGPartyObj::useItem(int itemId)
 		    (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
 			result = 0;
 		} else {
-			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x170), itemId, itemKind);
+			System.Printf(const_cast<char*>(msgBase + 0x170), itemId, itemKind);
 			bonus(5, itemId, 0);
 
 			if (itemKind == 0x186) {
@@ -3679,7 +3680,7 @@ int CGPartyObj::useItem(int itemId)
 					heal = 4;
 				}
 				addHp(heal, 0);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x1AC), heal);
+				System.Printf(const_cast<char*>(msgBase + 0x1AC), heal);
 			} else if (itemKind == 0x17D) {
 				int heal;
 				int foodIndex = itemId - 0x17D;
@@ -3697,7 +3698,7 @@ int CGPartyObj::useItem(int itemId)
 					m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
 				}
 				addHp(heal, 0);
-				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x194), heal);
+				System.Printf(const_cast<char*>(msgBase + 0x194), heal);
 			}
 
 			CFlatRuntime::CStack stack[2];

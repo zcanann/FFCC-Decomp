@@ -1881,7 +1881,7 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 		target.z = tmp.z;
 	}
 
-	if ((ModelFlags10C(this) & 0x80) != 0) {
+	if (static_cast<s8>(ModelFlags10C(this)) < 0) {
 		NodeDynPosition(node).x = target.x;
 		NodeDynPosition(node).y = target.y;
 		NodeDynPosition(node).z = target.z;

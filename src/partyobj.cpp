@@ -1566,16 +1566,10 @@ void CGPartyObj::shouki()
 {
 #define script reinterpret_cast<unsigned char*>(m_scriptHandle)
 
-	if (*reinterpret_cast<unsigned short*>(script + 0x1C) == 0 ||
-	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 24) & 0xC0000000) >> 31) == 0 &&
-	     static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) == 0) ||
-	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(m_weaponNodeFlagBytes.m_flags1) << 24) & 0xC0000000) >> 31) == 0) {
-		if (m_unk688 != 0) {
-			deletePSlotBit(0x200);
-			m_unk688 = 0;
-		}
-		return;
-	}
+	if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0 &&
+	    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 24) & 0xC0000000) >> 31) != 0 ||
+	     static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 27) & 0xC0000000) >> 31) != 0) &&
+	    static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(m_weaponNodeFlagBytes.m_flags1) << 24) & 0xC0000000) >> 31) != 0) {
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
@@ -1632,6 +1626,13 @@ void CGPartyObj::shouki()
 				addHp(-1, static_cast<CGPrgObj*>(0));
 			}
 		}
+	}
+		return;
+	}
+
+	if (m_unk688 != 0) {
+		deletePSlotBit(0x200);
+		m_unk688 = 0;
 	}
 #undef script
 }

@@ -1803,9 +1803,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         outResult = 0;
         break;
     case -5: {
-        unsigned short buttons = 0;
+        short buttons;
         if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButton(*object->m_localBase);
+        } else {
+            buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;
@@ -1936,9 +1938,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x0B: {
-        unsigned short buttons = 0;
+        short buttons;
         if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonDown(*object->m_localBase);
+        } else {
+            buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;
@@ -1948,9 +1952,11 @@ int CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFu
         break;
     }
     case -0x0C: {
-        unsigned short buttons = 0;
+        short buttons;
         if (((1 << *object->m_localBase) & m_padInputDisableMask) == 0) {
             buttons = Pad.GetButtonRepeat(*object->m_localBase);
+        } else {
+            buttons = 0;
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;

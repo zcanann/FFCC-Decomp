@@ -469,25 +469,17 @@ void CGObject::onDestroy()
  */
 void CGObject::move()
 {
-    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+    if (!HasLoadedModel(m_charaModelHandle)) {
         return;
     }
 
-    u8 weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
-    if (Game.m_currentMapId == 0x21) {
-        if (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1D) | (weaponFlags >> 3)) < 0) {
-            m_groundHitOffset.y = sZeroFloat;
+    if (Game.m_currentMapId != 0x21 && m_weaponNodeFlagBits.m_unk10 && !m_weaponNodeFlagBits.m_control3) {
+        PSVECAdd(&m_groundHitOffset, &m_bodyOffset, &m_groundHitOffset);
+        if (m_groundHitOffset.y < sGroundOffsetFloor) {
+            m_groundHitOffset.y = sGroundOffsetFloor;
         }
-    } else {
-        if ((static_cast<int>((static_cast<u32>(weaponFlags) << 0x1B) | (weaponFlags >> 5)) < 0)
-            && (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1C) | (weaponFlags >> 4)) >= 0)) {
-            PSVECAdd(&m_groundHitOffset, &m_bodyOffset, &m_groundHitOffset);
-            if (m_groundHitOffset.y < sGroundOffsetFloor) {
-                m_groundHitOffset.y = sGroundOffsetFloor;
-            }
-        } else if (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1D) | (weaponFlags >> 3)) < 0) {
-            m_groundHitOffset.y = sZeroFloat;
-        }
+    } else if (m_weaponNodeFlagBits.m_unk04) {
+        m_groundHitOffset.y = sZeroFloat;
     }
 
     bool movingWithScript = false;

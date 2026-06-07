@@ -1561,7 +1561,7 @@ void CShopMenu::DrawShopBase()
 
     _GXColor white;
     white.r = 0xFF; white.g = 0xFF; white.b = 0xFF; white.a = 0xFF;
-    int x = 0x3C;
+    unsigned int x = 0x3C;
     while (x < 0x25C) {
         drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;

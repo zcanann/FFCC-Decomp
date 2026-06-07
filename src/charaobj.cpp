@@ -1668,9 +1668,11 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    staType != 0x1C && damageAmount < 1) {
 			damageAmount = 1;
 		}
-		if ((sourceObj->GetCID() & 0x2D) == 0x2D && static_cast<int>(sourceObj->m_capsuleHalfHeight) >= 0 &&
-		    sourceObj->m_nearColRadius != 0.0f) {
-			damageAmount *= static_cast<int>(sourceObj->m_nearColRadius);
+		CGCharaObj* sourceChara = reinterpret_cast<CGCharaObj*>(sourceObj);
+		if ((sourceObj->GetCID() & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&
+		    sourceChara->m_comboLinkCount != 0) {
+			System.Printf(dbg + 0x2F8);
+			damageAmount *= sourceChara->m_comboLinkCount;
 		}
 
 		if (damageAmount != 0) {
@@ -1703,6 +1705,12 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if (selfHasGuard) {
 					sourceObj->bonus(0xC, resolvedItemId, this);
 				}
+				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
+					sourceChara->m_comboLinks[i]->bonus(0x11, resolvedItemId, this);
+					if (selfHasGuard) {
+						sourceChara->m_comboLinks[i]->bonus(0xC, resolvedItemId, this);
+					}
+				}
 			}
 			putHitParticleFromItem(sourceObj, resolvedItemId);
 			if ((GetCID() & 0xAD) == 0xAD) {
@@ -1711,6 +1719,65 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					(*reinterpret_cast<unsigned short*>(script9 + 0x190) * 1000) + 6 +
 					Math.Rand(3);
 				playSe3D(seNo, 0x32, 0x96, 0, 0);
+			}
+		}
+
+		if ((sourceObj->GetCID() & 0x6D) == 0x6D &&
+		    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+			int counterState = sourceChara->m_comboItemState;
+			if (counterState >= 0) {
+				int counterType;
+				int counterItem;
+				int counterSe;
+				if (counterState == 1) {
+					counterType = 0;
+					counterItem = 0x20B;
+					counterSe = 0x7E2;
+				} else if (counterState < 1) {
+					counterType = 1;
+					counterItem = 0x207;
+					counterSe = 0x7E1;
+				} else if (counterState < 3) {
+					counterType = 4;
+					counterItem = 0x20F;
+					counterSe = 0x7E3;
+				}
+				int counterResist;
+				int counterAllow;
+				int counterEffect;
+				calcRegist(counterType, counterItem, counterResist, counterAllow, counterEffect, 1);
+				if (counterAllow != 0) {
+					if ((m_bgColMask & 0x80000) != 0) {
+						effective(counterType, counterItem, sourceObj, counterEffect);
+						playSe3D(counterSe, 0x32, 0x96, 0, 0);
+					} else {
+						System.Printf(dbg + 0x310);
+					}
+				}
+			} else {
+				int counterResist;
+				int counterAllow;
+				int counterEffect;
+				if (((DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0 ||
+				     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x6CC) == 2) &&
+				    (calcRegist(0x69, resolvedItemId, counterResist, counterAllow, counterEffect, 0), counterAllow != 0)) {
+					int chance;
+					if ((GetCID() & 0xAD) == 0xAD) {
+						chance = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x19A);
+					} else {
+						chance = 0x32;
+					}
+					if (chance != 0 && (DbgMenuPcs.GetDbgFlagsRaw() & 0x20) != 0) {
+						chance = 100;
+					}
+					if (chance != 0 && Math.Rand(100) <= static_cast<unsigned int>(chance)) {
+						if ((m_bgColMask & 0x80000) != 0) {
+							effective(0x69, resolvedItemId, sourceObj, counterEffect);
+						} else {
+							System.Printf(dbg + 0x348);
+						}
+					}
+				}
 			}
 		}
 

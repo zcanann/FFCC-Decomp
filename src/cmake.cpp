@@ -1432,7 +1432,13 @@ void CMenuPcs::CmakeResultDraw()
         DrawInit();
 
         CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
+        if (handle->m_charaKind != 3) {
+            SetProjection(0x16);
+            SetLight(2);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 1.0f;
+            handle->Draw(5);
+            RestoreProjection();
+        } else {
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
             GXColor charaColor;
@@ -1445,12 +1451,6 @@ void CMenuPcs::CmakeResultDraw()
                 0,
                 33.0f, 132.0f, 128.0f, 104.0f,
                 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 1.0f;
-            handle->Draw(5);
-            RestoreProjection();
         }
 
         DrawInit();

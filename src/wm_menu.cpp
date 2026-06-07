@@ -11347,11 +11347,13 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - maxWidth) * DOUBLE_803313f8);
 	}
 
-	float y = static_cast<float>(m_menuWindowInfo->y + 0x20);
+	const double yStep = static_cast<double>(FLOAT_80331404);
+	double y = static_cast<double>(m_menuWindowInfo->y + 0x20);
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
 	for (int i = 0; i < *reinterpret_cast<const int*>(winMess); i++) {
+		y = static_cast<double>(static_cast<float>(y));
 		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
 		if (strlen(text) != 0) {
@@ -11367,7 +11369,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 				posX = static_cast<float>(static_cast<double>(m_menuWindowInfo->x) + static_cast<double>(m_menuWindowInfo->width - textWidth) * DOUBLE_803313f8);
 			}
 			font->SetPosX(posX);
-			font->SetPosY(y);
+			font->SetPosY(static_cast<float>(y));
 			if (messType == 0) {
 				char* slotText = 0;
 				if (winType != 0) {
@@ -11392,7 +11394,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 			}
 			font->Draw(textBuf);
 		}
-		y += FLOAT_80331404;
+		y += yStep;
 		entry += 2;
 	}
 

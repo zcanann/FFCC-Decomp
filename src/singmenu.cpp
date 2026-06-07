@@ -1601,14 +1601,14 @@ void CMenuPcs::DrawSingleBase(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
-    float y = 64.0f;
-    float sliceHeight = 32.0f;
-    while (y < 384.0f) {
-        if ((384.0f - y) < sliceHeight) {
-            sliceHeight = 384.0f - y;
+    int y = 64;
+    int sliceHeight = 32;
+    while (y < 384) {
+        if ((384 - y) < sliceHeight) {
+            sliceHeight = 384 - y;
         }
 
-        MenuPcs.DrawRect(0, 0.0f, y, 640.0f, sliceHeight, 0.0f,
+        MenuPcs.DrawRect(0, 0.0f, static_cast<float>(y), 640.0f, static_cast<float>(sliceHeight), 0.0f,
                                          0.0f, 1.0f, 1.0f, 0.0f);
         y += sliceHeight;
     }

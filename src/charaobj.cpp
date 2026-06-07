@@ -1809,13 +1809,6 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		}
 	}
 
-	if (staType == 0x1C || staType == 4 || staType < 2) {
-		changeStat(6, 0, 0);
-	} else if (staType == 0x25 || staType == 0x68 || staType == 0x6A) {
-		changeStat(0x19, 0, 0);
-	} else if (staType == 0x6B) {
-		changeStat(0x1A, 0, 0);
-	}
 }
 /*
  * --INFO--

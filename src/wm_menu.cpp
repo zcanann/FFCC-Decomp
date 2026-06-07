@@ -6413,12 +6413,12 @@ LAB_calc:
 
 	int iVar16 = DAT_801dc140;
 	if (uVar14 == 3) {
-		*reinterpret_cast<short*>(wmFrame + 0xB4) = (short)((0x2B - DAT_801dc140) / 2) + 0x2C;
-		*reinterpret_cast<short*>(wmFrame + 0xB6) = 0x43;
-		*reinterpret_cast<short*>(wmFrame + 0xB8) = (short)iVar16;
-		*reinterpret_cast<short*>(wmFrame + 0xBA) = 0x20;
-		*reinterpret_cast<float*>(wmFrame + 0xBC) = FLOAT_80331524;
-		*reinterpret_cast<float*>(wmFrame + 0xC0) = FLOAT_80331528;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB4) = (0x2B - DAT_801dc140) / 2 + 0x2C;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB6) = 0x43;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xB8) = (short)iVar16;
+		*reinterpret_cast<short*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBA) = 0x20;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xBC) = FLOAT_80331524;
+		*reinterpret_cast<float*>(reinterpret_cast<int>(m_wm.m_frameData) + 0xC0) = FLOAT_80331528;
 	} else {
 		int digits[4];
 		iVar16 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);

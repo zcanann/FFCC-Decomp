@@ -10083,14 +10083,12 @@ LAB_draw:
 	state = worldState->m_mainState;
 	if (state == 0) {
 		frameAlpha = static_cast<float>(DOUBLE_803314e8 *
-		                                (static_cast<double>(worldState->m_frameCounter) -
-		                                 DOUBLE_80331408));
+		                                static_cast<double>(static_cast<int>(worldState->m_frameCounter)));
 	} else if (state > 0 && state < 4) {
 		frameAlpha = FLOAT_803313e8;
 	} else {
 		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 *
-		                                  (static_cast<double>(worldState->m_frameCounter) -
-		                                   DOUBLE_80331408) -
+		                                  static_cast<double>(static_cast<int>(worldState->m_frameCounter)) -
 		                                  DOUBLE_80331420));
 	}
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
